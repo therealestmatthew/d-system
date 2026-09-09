@@ -83,7 +83,7 @@ returns zero matches. This is the question this `/session-close` run exists to s
 
 ## Review
 
-Independent sub-agent review, run against commit range `the commit “Claim phase-priv-02 for agent-clay”..HEAD` (dev), reproduced verbatim:
+Independent sub-agent review, run against commit range from “Claim phase-priv-02 for agent-clay” to HEAD (dev), reproduced verbatim:
 
 > **Verification commands, run myself**
 >

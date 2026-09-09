@@ -103,7 +103,7 @@ phase's own work, against its own rerun of the verification commands. Findings p
 >
 > ## Acceptance condition 3: No new system, kind, folder, or schema added by this session
 >
-> **MET.** `git diff the commit “Claim phase-gov-03 (agent-gov03)” the commit “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)” -- schemas/document.schema.json docs/08-governance/codes.yaml docs/08-governance/systems.yaml` is empty — confirmed directly. `git show --stat the commit “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)”` shows exactly four touched files: the new ADR, the new session record, `catalog.md` (regenerated, mechanical), and `backlog.yaml` (updated `phase-gov-03` fields + new `phase-gov-04` entry, which is a backlog item, not a new system/kind/folder/schema). No new folder appears anywhere in the diff.
+> **MET.** A diff between “Claim phase-gov-03 (agent-gov03)” and “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)” over `schemas/document.schema.json docs/08-governance/codes.yaml docs/08-governance/systems.yaml` is empty — confirmed directly. The file list of “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)” shows exactly four touched files: the new ADR, the new session record, `catalog.md` (regenerated, mechanical), and `backlog.yaml` (updated `phase-gov-03` fields + new `phase-gov-04` entry, which is a backlog item, not a new system/kind/folder/schema). No new folder appears anywhere in the diff.
 >
 > ## Verification rerun
 >
@@ -115,7 +115,7 @@ phase's own work, against its own rerun of the verification commands. Findings p
 > 365 passed, 2 warnings in 2.70s
 > ```
 >
-> This matches exactly what the session record's `## Verification` section claims for "at close" (89 documents / 365 tests), and matches its explanation that the delta from the original 85/320 figures came from `phase-cap-03`/`phase-cap-04` closing independently afterward — confirmed via `git log`, which shows those two phases' checkpoint/close commits sitting directly after the commit “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)”. `git diff the commit “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)” HEAD -- docs/04-decisions/ADR-012-systems-review.md` is empty, so ADR-012 itself is unaltered since.
+> This matches exactly what the session record's `## Verification` section claims for "at close" (89 documents / 365 tests), and matches its explanation that the delta from the original 85/320 figures came from `phase-cap-03`/`phase-cap-04` closing independently afterward — confirmed via `git log`, which shows those two phases' checkpoint/close commits sitting directly after the commit “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)”. A diff from “phase-gov-03: answer all seven PROMPT-003 questions (ADR-012)” to HEAD over `docs/04-decisions/ADR-012-systems-review.md` is empty, so ADR-012 itself is unaltered since.
 >
 > ## Other discrepancies found
 >

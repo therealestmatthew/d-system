@@ -114,6 +114,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-08-16 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-16-event-identity-and-amendment-fold.md |
 | SESS-2026-09-08-17 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-17-annotations-and-typed-relationships.md |
 | SESS-2026-09-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-18-idea-triage-agent.md |
+| SESS-2026-09-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md |
 
 ## Plans and their phases
 
@@ -130,7 +131,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.06 | doc-html-06-verification | approved | 2 | 0 | 0 | — |
 | PLAN-004 | doc-reliability-follow-up | approved | 8 | 0 | 3 | agent-architect, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
-| PLAN-006 | doc-confidentiality-sweep | draft | 1 | 0 | 5 | agent-architect, agent-clay, agent-fern |
+| PLAN-006 | doc-confidentiality-sweep | draft | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
 | PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 3 | agent-checkpoint, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
@@ -158,4 +159,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-107 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 5, requirement: 4, session: 37.
+108 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 5, requirement: 4, session: 38.

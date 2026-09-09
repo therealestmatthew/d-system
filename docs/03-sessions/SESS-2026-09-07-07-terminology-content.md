@@ -90,8 +90,8 @@ only `/session-close` (owner-invoked) may set `status: complete`, after its own 
 ## Review
 
 Independent review by a fresh, non-fork sub-agent, given the phase's `scope`/`acceptance`/
-`verification`, the exact commit list (the commit “Define the shared vocabulary in brain/concepts and regenerate the glossary”, the commit “Write the architecture overview and enrich systems.yaml”, the commit “Record the phase-term-02 session and update next_action”, the commit “Checkpoint phase-term-02 at session-close, evidence now recorded live” — explicitly
-excluding the interleaved, unrelated `phase-ses-06` commits the commit “Claim phase-ses-06 (agent-ses06)”/the commit “Let checkpoint record evidence while a phase is active or blocked”/the commit “Record phase-ses-06's session and dogfood the new evidence gate” that fall
+`verification`, the exact commit list (“Define the shared vocabulary in brain/concepts and regenerate the glossary”, the commit “Write the architecture overview and enrich systems.yaml”, the commit “Record the phase-term-02 session and update next_action”, the commit “Checkpoint phase-term-02 at session-close, evidence now recorded live” — explicitly
+excluding the interleaved, unrelated `phase-ses-06` commits “Claim phase-ses-06 (agent-ses06)”/“Let checkpoint record evidence while a phase is active or blocked”/the commit “Record phase-ses-06's session and dogfood the new evidence gate” that fall
 chronologically between them on `dev`), and this session record. Reported verbatim:
 
 > **Verification command outputs (actual, fresh reruns)**
@@ -117,8 +117,9 @@ chronologically between them on `dev`), and this session record. Reported verbat
 >    **Met.** Independently parsed `systems.yaml` and diffed it against `ARCH-004`'s §3 table: domain,
 >    status and `depends_on` match row-for-row for all 16 systems, including the retired `sys-course`
 >    (empty deps, correctly shown). No system omitted, no dependency misstated.
-> 3. *"No per-subsystem architecture document is created."* — **Met.** `git log the commit “Claim phase-term-02 (agent-term02)”..“Checkpoint phase-term-02 at session-close, evidence now recorded live” --
->    docs/07-architecture/` and a directory listing at the commit “Checkpoint phase-term-02 at session-close, evidence now recorded live” show only
+> 3. *"No per-subsystem architecture document is created."* — **Met.** The log from “Claim phase-term-02
+>    (agent-term02)” to “Checkpoint phase-term-02 at session-close, evidence now recorded live” over
+>    `docs/07-architecture/`, and a directory listing at that same commit, show only
 >    `ARCH-004-architecture-overview.md` was added; `ARCH-001`/`002`/`003` pre-date this phase.
 >
 > **Discrepancies between session record and reality**
@@ -127,8 +128,8 @@ chronologically between them on `dev`), and this session record. Reported verbat
 > coverage of "16 systems.yaml entries," the single new architecture file, the `completion_evidence`
 > file list) checked out against the diff and fresh command runs. The five `systems.yaml` descriptions
 > the commit message says gained a "does not yet" clause (`sys-contracts`, `sys-brain`,
-> `sys-delivery`, `sys-governance`, `sys-backlog`) are indeed the exact five changed in `git show
-> the commit “Write the architecture overview and enrich systems.yaml”`'s diff.
+> `sys-delivery`, `sys-governance`, `sys-backlog`) are indeed the exact five changed by the commit “Write the architecture overview and enrich
+> systems.yaml”.
 >
 > **Overall recommendation**
 >

@@ -155,7 +155,7 @@ path and conclude the citations were invented.
 check re-run afterwards. The owner directed a merge. The check that matters was still performed:
 governance, the catalog comparison and the full suite were all run on `dev` **after** integration,
 in the combined 19-events-plus-architecture state that neither branch held on its own. The
-integration commit is the commit “Merge the idea and plan lifecycle architecture”.
+integration commit is “Merge the idea and plan lifecycle architecture”.
 
 **Implementation code was written during a documentation phase.** `src/governance/codes.py` and
 `test/test_codes.py` changed. The phase's scope says documentation only. The four folders the owner

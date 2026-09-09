@@ -107,7 +107,7 @@ None for this phase's own scope. `phase-cap-05` (structuring and routing) is the
 
 ## Review
 
-Independent sub-agent review, run fresh against `the commit “Claim phase-cap-04”..HEAD` (the three commits this session
+Independent sub-agent review, run fresh against the range from “Claim phase-cap-04” to HEAD (the three commits this session
 produced: the commit “Build raw-only CLI and inbox intake (phase-cap-04)”, the commit “Document capture intake and fix REQ-002's stale pointers”, the commit “Checkpoint phase-cap-04: acceptance met, ready for session-close”), with the reviewer running every verification command
 itself rather than trusting this record:
 
@@ -187,7 +187,7 @@ itself rather than trusting this record:
 >
 > The session record's governance-check transcript shows `Governance OK: 16 systems, 88 documents,
 > ...`, but rerunning `uv run python -m src.governance` now on the final committed state
-> (`the commit “Claim phase-cap-04”..“Checkpoint phase-cap-04: acceptance met, ready for session-close”`) gives **89 documents** — matching `catalog.md`'s own footer count ("89
+> (from “Claim phase-cap-04” to “Checkpoint phase-cap-04: acceptance met, ready for session-close”) gives **89 documents** — matching `catalog.md`'s own footer count ("89
 > documents"). This is almost certainly just the record capturing that command's output before the
 > final commit (the commit “Checkpoint phase-cap-04: acceptance met, ready for session-close”, the checkpoint commit) landed, rather than a real inconsistency in the
 > current state — the committed `catalog.md` and a fresh governance run agree with each other right

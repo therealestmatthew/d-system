@@ -81,7 +81,7 @@ None on this phase.
 
 Independent sub-agent review, given the phase's scope/acceptance/verification (including the note
 that the fifth acceptance condition was a deliberate correction added during orientation, not
-scope creep), REQ-002's R18/R19/R20/R21/R24, the commit range `the commit “Claim phase-cap-07 for agent-cap07”..HEAD`, and this session
+scope creep), REQ-002's R18/R19/R20/R21/R24, the commit range from “Claim phase-cap-07 for agent-cap07” to HEAD, and this session
 record, with instructions to rerun everything itself rather than trust the record. Reported
 verbatim:
 

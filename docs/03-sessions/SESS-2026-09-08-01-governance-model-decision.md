@@ -65,7 +65,7 @@ settled per the plan's stated sequencing.
 ## Review
 
 Independent review by a fresh, non-fork sub-agent, given the phase's `scope`/`acceptance`/
-`verification` (pasted from `backlog.yaml`), the commit range `the commit “Claim phase-gov-02 as agent-gov02”..HEAD` (the two commits after
+`verification` (pasted from `backlog.yaml`), the commit range from “Claim phase-gov-02 as agent-gov02” to HEAD (the two commits after
 the claim commit: the commit “Add ADR-011, answering PROMPT-005's governance kind/system question” adding ADR-011, the commit “Checkpoint phase-gov-02 with session record and catalog regen” the checkpoint), and this session record.
 Instructed to independently rerun verification and check ADR-011's citations against the real
 documents rather than trust the record's claims. Reported verbatim:
@@ -80,7 +80,7 @@ documents rather than trust the record's claims. Reported verbatim:
 > **2. Every claim cites a real document — Met**, based on sampling 7+ claims across all five
 > sections; every one checked out against the actual file.
 >
-> **3. No schema written this session — Met.** `git diff the commit “Claim phase-gov-02 as agent-gov02”..HEAD -- schemas/` is empty;
+> **3. No schema written this session — Met.** A diff from “Claim phase-gov-02 as agent-gov02” to HEAD over `schemas/` is empty;
 > confirmed independently by full `git diff --stat` (only ADR-011, the session record, `backlog.yaml`,
 > and `catalog.md` changed).
 >
@@ -114,7 +114,7 @@ documents rather than trust the record's claims. Reported verbatim:
 > - `uv run pytest` → `313 passed, 2 warnings` — matches session record exactly.
 > - `uv run python -m src.governance --catalog` regenerated and diffed against the committed
 > `docs/08-governance/catalog.md` → **no drift**, diff is empty.
-> - `git diff the commit “Claim phase-gov-02 as agent-gov02”..HEAD -- schemas/` → empty, confirming the no-schema claim.
+> - A diff from “Claim phase-gov-02 as agent-gov02” to HEAD over `schemas/` → empty, confirming the no-schema claim.
 > - Backlog status: `phase-gov-02` is still `status: active` (not `complete`) after the checkpoint
 > commit, consistent with the rule that only `/session-close` sets `complete`. `decision_record:
 > doc-backlog-decisions` resolves to GOV-003, `kind: governance` — consistent with the passing

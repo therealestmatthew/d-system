@@ -2306,7 +2306,7 @@ items:
   systems:
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -2338,12 +2338,28 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/03-sessions
-  next_action: Confirm phases 1 to 4 are merged and verified, then choose squash or
-    filter-repo.
-  blocked_reason: History rewriting is irreversible and must follow the working-tree
-    cleanup, not precede it.
-  resume_when: Phases priv-01 to priv-04 and priv-06 are complete and the working
-    tree passes the leak check.
+  next_action: Complete. The repository has one commit and a live remote. Remaining
+    confidentiality work is the owner's alone — confirming the GitHub repository is
+    set to private, which cannot be checked from the local tooling.
+  session: doc-session-history-rewrite-and-remote
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md
+  - docs/09-backlog/backlog.yaml
+  result: 'History squashed to a single commit b2b564b and pushed to
+    github.com/therealestmatthew/d-system as main. Acceptance verified: one commit
+    across all refs, with commits reachable including reflogs also one, no tags and
+    no stash; the only _data paths remaining are the tracked fictional example set;
+    the leak checker passes over 356 tracked files against 31 identifiers, run with
+    this session record staged so the gate could see it; no hex string in a tracked
+    document resolves to a commit except the surviving commit itself. Commit-hash
+    references were rewritten to descriptions across 27 files before the squash,
+    with a follow-up pass over 14 files converting git commands left holding a prose
+    commit name. Three rounds of independent sub-agent review; the second round
+    found a blocking leak — the session record itself printed the client identifier,
+    invisible to the checker while the file was untracked — which was redacted
+    before any commit. The ordering claim, that every check ran before the remote
+    was added, is recorded as unverifiable after the fact because the rewrite
+    destroyed the reflog that would evidence it.'
 - id: phase-priv-06
   title: Remove the standing checker exemption and purge the remaining identifier
   plan: doc-confidentiality-sweep
