@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Document code register",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated",
+    "series",
+    "reserved",
+    "retired"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Register contract version."
+    },
+    "updated": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Last substantive register edit date.",
+      "format": "date"
+    },
+    "series": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per document kind; the only source of truth for prefix, numbering and location.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "kind",
+          "locations",
+          "numbering",
+          "sub_codes"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Uppercase series prefix used by every code in this series.",
+            "pattern": "^[A-Z]+$"
+          },
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Document kind this series numbers; must match the document schema enum.",
+            "enum": [
+              "plan",
+              "adr",
+              "architecture",
+              "prompt",
+              "session",
+              "requirement",
+              "walkthrough",
+              "operation",
+              "governance"
+            ]
+          },
+          "locations": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "description": "Repository-relative directory prefixes where this kind may live.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Directory prefix ending in a slash.",
+              "pattern": "^[A-Za-z0-9_./-]+/$"
+            }
+          },
+          "numbering": {
+            "type": "string",
+            "minLength": 1,
+            "description": "counter allocates the next free number; dated derives the code from the document date.",
+            "enum": [
+              "counter",
+              "dated"
+            ]
+          },
+          "sub_codes": {
+            "type": "boolean",
+            "description": "Whether child documents may take a dotted sub-code under a parent; counter series only."
+          }
+        }
+      }
+    },
+    "reserved": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Codes claimed before their document exists; the counter skips them.",
+      "items": {
+        "$ref": "#/definitions/ledgerEntry"
+      }
+    },
+    "retired": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Codes withdrawn from use; never reissued to another document.",
+      "items": {
+        "$ref": "#/definitions/ledgerEntry"
+      }
+    }
+  },
+  "definitions": {
+    "ledgerEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "reason"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Allocated code in an existing series.",
+          "pattern": "^[A-Z]+-(?:[0-9]{3}(?:\\.[0-9]{2})?|[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2})$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the code is held; names the claiming phase or the withdrawn document."
+        }
+      }
+    }
+  }
+}

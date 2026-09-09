@@ -1,0 +1,225 @@
+{
+  "originals": {
+    "research/implementation_glossary.md": "c4525508a66f8613958702bd369f2487aba42919108d19cc54205dbe3a484a31",
+    "research/CLAUDE.codebase-review.md": "4042a336e09e465a72c5e018b88811e84fbb896af272b2a1c97f1e8e2113afe8",
+    "research/terminology_investigation.md": "f5845ab3e7d6900c1b5c6537f6ee7d91984a62d9e492daa5fa31c5a99b14eaf0",
+    "research/research_expansion.md": "029d8eb13ec73eeb263ab3d2e4d5f0ab16aa3daef6c1726c7c811417ca3c3431",
+    "research/d-system-terminology-artifacts.zip": "0c9aaf70f714fe47800765a62edae4df01aeeaa832775d5f725d49dfa28a9624",
+    "research/knowledge_glossary.md": "275d493258c4b25820cd591d184a8f0e36cb8c7c745863e7c1b56ce2c85ddff8",
+    "research/two_system_architecture.md": "ae84e772959aec4d48db2e231ec4d69ebf1eb690aa37bb0a2e3f382c28e00843",
+    "research/d-system-complete-chat-source-ledger.md": "6b94ed88c4caa5169d461e67eea41952e2929dacfb646ad12cff64485e57bf42",
+    "research/d-system-research-starter.zip": "d3d4c95131fec08d47c7b31ecef5d22d370db97b078699fde4131f38dc41b82e",
+    "research/d-system-ideation-to-reality-pack.zip": "c389003e8fc79fbba345d99bdb11252a5b33c349cead358d61098b9d47de2620",
+    "research/development_traceability_model.md": "a9ae5e579881bb0a8fafbe273993bcfef7dd994a7742cb58900883f4e2593591",
+    "research/CLAUDE.literature-review.md": "8bccc75cb36734c159c328aea49200ce1c46a4144c13de0c10fe8dccd245a5c1",
+    "research/research_agent_addendum.md": "6d1f6e28111c649960a0cfc2013c4cdba9916a15a2abe8894eda6dbe0dfd1c5b",
+    "research/phase_context_contract.md": "63ef060e43e70dcd0f1c8a76758a64d96d549264ab403f9371dc93635dd7c1bc",
+    "research/development_evidence_matrix_template.csv": "e3cc51ee9f735eb4580822fb7febaabfa1046bc7fc75ad55f403b77de2922db0"
+  },
+  "copies": [
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/architecture.md",
+      "copy": "research/architecture/architecture.md",
+      "sha256": "256900d45092e8982d9b3755800835cc8cf3f527759a3315eb3ab5d6aadd9f89",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/knowledge_glossary.md",
+      "copy": "research/architecture/knowledge_glossary.md",
+      "sha256": "275d493258c4b25820cd591d184a8f0e36cb8c7c745863e7c1b56ce2c85ddff8",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-terminology-artifacts/knowledge_glossary.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/terminology_investigation.md",
+      "copy": "research/architecture/terminology_investigation.md",
+      "sha256": "f5845ab3e7d6900c1b5c6537f6ee7d91984a62d9e492daa5fa31c5a99b14eaf0",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-terminology-artifacts/terminology_investigation.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/two_system_architecture.md",
+      "copy": "research/architecture/two_system_architecture.md",
+      "sha256": "ae84e772959aec4d48db2e231ec4d69ebf1eb690aa37bb0a2e3f382c28e00843",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/two_system_architecture.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/implementation_glossary.md",
+      "copy": "research/architecture/implementation_glossary.md",
+      "sha256": "c4525508a66f8613958702bd369f2487aba42919108d19cc54205dbe3a484a31",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/implementation_glossary.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/development_traceability_model.md",
+      "copy": "research/architecture/development_traceability_model.md",
+      "sha256": "a9ae5e579881bb0a8fafbe273993bcfef7dd994a7742cb58900883f4e2593591",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/development_traceability_model.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/phase_context_contract.md",
+      "copy": "research/architecture/phase_context_contract.md",
+      "sha256": "63ef060e43e70dcd0f1c8a76758a64d96d549264ab403f9371dc93635dd7c1bc",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/phase_context_contract.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/transition_vocabulary.md",
+      "copy": "research/architecture/transition_vocabulary.md",
+      "sha256": "2a6f6c887b3a61a7a32cb477c09ec8c77389afa04dcae81496568f35611182f1",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/novelty_hypotheses.md",
+      "copy": "research/hypotheses/novelty_hypotheses.md",
+      "sha256": "ddb18a96d2ad26f3ca87e991d18f857bc959d332c8298fb9e334abfe63bb8f73",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/source_ledger.md",
+      "copy": "research/sources/source_ledger.md",
+      "sha256": "53d90d688de97b1d3d287ba27406ed7d900f629d939caa3f0538c6d3653543fa",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/d-system-complete-chat-source-ledger.md",
+      "copy": "research/sources/cited_sources_chat_seed.md",
+      "sha256": "6b94ed88c4caa5169d461e67eea41952e2929dacfb646ad12cff64485e57bf42",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/literature_review_protocol.md",
+      "copy": "research/protocols/literature_review_protocol.md",
+      "sha256": "e0cfe20d9dd46721f593c36dc86f9e40d894eff18bc74c2c5664ca458419660c",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/agent_instructions.md",
+      "copy": "research/protocols/agent_instructions.md",
+      "sha256": "5a6f98d62ad62801b365156fa787b0248bca90ee25e38be37e284774b8e150d0",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/research_expansion.md",
+      "copy": "research/protocols/research_expansion.md",
+      "sha256": "029d8eb13ec73eeb263ab3d2e4d5f0ab16aa3daef6c1726c7c811417ca3c3431",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/research_expansion.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/research_agent_addendum.md",
+      "copy": "research/protocols/research_agent_addendum.md",
+      "sha256": "6d1f6e28111c649960a0cfc2013c4cdba9916a15a2abe8894eda6dbe0dfd1c5b",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/research_agent_addendum.md",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/sources/archive-extractions/d-system-research-starter/d-system-research-starter/evidence_matrix_template.csv",
+      "copy": "research/evidence/evidence_matrix_template.csv",
+      "sha256": "8f003ee2c53e0d7e056bb925c0617d0ca6ec6caae6847c379124e602dd385665",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/development_evidence_matrix_template.csv",
+      "copy": "research/evidence/development_evidence_matrix_template.csv",
+      "sha256": "e3cc51ee9f735eb4580822fb7febaabfa1046bc7fc75ad55f403b77de2922db0",
+      "alternative_sources": [
+        {
+          "path": "research/sources/archive-extractions/d-system-ideation-to-reality-pack/d-system-ideation-to-reality-pack/development_evidence_matrix_template.csv",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "source": "research/CLAUDE.codebase-review.md",
+      "copy": "research/adversarial-codebase-review/CLAUDE.md",
+      "sha256": "4042a336e09e465a72c5e018b88811e84fbb896af272b2a1c97f1e8e2113afe8",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/CLAUDE.literature-review.md",
+      "copy": "research/literature-review/CLAUDE.md",
+      "sha256": "8bccc75cb36734c159c328aea49200ce1c46a4144c13de0c10fe8dccd245a5c1",
+      "alternative_sources": []
+    },
+    {
+      "source": "research/architecture/architecture.md",
+      "copy": "research/adversarial-codebase-review/reference/architecture.md",
+      "sha256": "256900d45092e8982d9b3755800835cc8cf3f527759a3315eb3ab5d6aadd9f89"
+    },
+    {
+      "source": "research/architecture/knowledge_glossary.md",
+      "copy": "research/adversarial-codebase-review/reference/knowledge_glossary.md",
+      "sha256": "275d493258c4b25820cd591d184a8f0e36cb8c7c745863e7c1b56ce2c85ddff8"
+    },
+    {
+      "source": "research/architecture/terminology_investigation.md",
+      "copy": "research/adversarial-codebase-review/reference/terminology_investigation.md",
+      "sha256": "f5845ab3e7d6900c1b5c6537f6ee7d91984a62d9e492daa5fa31c5a99b14eaf0"
+    },
+    {
+      "source": "research/architecture/two_system_architecture.md",
+      "copy": "research/adversarial-codebase-review/reference/two_system_architecture.md",
+      "sha256": "ae84e772959aec4d48db2e231ec4d69ebf1eb690aa37bb0a2e3f382c28e00843"
+    },
+    {
+      "source": "research/architecture/implementation_glossary.md",
+      "copy": "research/adversarial-codebase-review/reference/implementation_glossary.md",
+      "sha256": "c4525508a66f8613958702bd369f2487aba42919108d19cc54205dbe3a484a31"
+    },
+    {
+      "source": "research/architecture/development_traceability_model.md",
+      "copy": "research/adversarial-codebase-review/reference/development_traceability_model.md",
+      "sha256": "a9ae5e579881bb0a8fafbe273993bcfef7dd994a7742cb58900883f4e2593591"
+    },
+    {
+      "source": "research/architecture/phase_context_contract.md",
+      "copy": "research/adversarial-codebase-review/reference/phase_context_contract.md",
+      "sha256": "63ef060e43e70dcd0f1c8a76758a64d96d549264ab403f9371dc93635dd7c1bc"
+    },
+    {
+      "source": "research/architecture/transition_vocabulary.md",
+      "copy": "research/adversarial-codebase-review/reference/transition_vocabulary.md",
+      "sha256": "2a6f6c887b3a61a7a32cb477c09ec8c77389afa04dcae81496568f35611182f1"
+    },
+    {
+      "source": "research/hypotheses/novelty_hypotheses.md",
+      "copy": "research/adversarial-codebase-review/reference/novelty_hypotheses.md",
+      "sha256": "ddb18a96d2ad26f3ca87e991d18f857bc959d332c8298fb9e334abfe63bb8f73"
+    }
+  ]
+}

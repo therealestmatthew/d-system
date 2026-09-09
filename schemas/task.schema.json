@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "task.schema.json",
+  "title": "Task",
+  "description": "A unit of work, stored in _data/tasks/ as its own record. Both parents are optional: a task may hang off a commitment, off a project, off both, or off neither. Per ADR-008 an entity that can exist without a parent cannot be stored inside one, which is why tasks are no longer an array embedded in commitment JSON. Parentless tasks are real and intended; they must stay visible through the unfiled view or they become a write-only pile.",
+  "type": "object",
+  "required": ["id", "description", "status", "created"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^t-[0-9]+" },
+    "commitment_id": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Commitment this task fulfils, or null when the task stands alone"
+    },
+    "project_id": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Project this task belongs to, or null when unfiled. Not derived from the commitment; set it when it is known."
+    },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["open", "in_progress", "complete", "blocked", "cancelled"],
+      "default": "open"
+    },
+    "priority": {
+      "type": ["string", "null"],
+      "enum": ["high", "medium", "low", null],
+      "default": null
+    },
+    "created": { "type": "string", "format": "date" },
+    "due_date": { "type": ["string", "null"], "format": "date" },
+    "completed": { "type": ["string", "null"], "format": "date" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Tag IDs — must exist in _data/tags.json"
+    },
+    "notes": { "type": "string", "default": "" },
+    "capture": { "$ref": "evidence.schema.json#/definitions/capture_source" }
+  }
+}

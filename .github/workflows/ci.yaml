@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+
+jobs:
+  python:
+    name: Python lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync --extra dev
+      - name: No private content leaked into the tracked tree
+        run: uv run python tools/check_no_private_content.py
+      - run: uv run python -m src.governance
+      - name: Catalog is current
+        run: |
+          uv run python -m src.governance --catalog > /tmp/catalog.md
+          diff -u docs/08-governance/catalog.md /tmp/catalog.md
+      - run: uv run ruff check src/ test/
+      - run: uv run mypy src/
+      - run: uv run pytest
+
+  frontend:
+    name: TypeScript build check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ts/package-lock.json
+      - run: npm ci
+      - run: npm run build

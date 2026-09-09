@@ -1,0 +1,16 @@
+{
+  "id": "example-web-platform",
+  "name": "Example Web Platform",
+  "status": "active",
+  "category": "work",
+  "type": "project",
+  "description": "Fictional example: modernizing a client's legacy internal tool into a web platform. Worked example for the project schema's full field set.",
+  "tags": ["client-a", "react", "typescript"],
+  "stakeholders": ["jordan-rivera"],
+  "started": "2026-01-15",
+  "target_date": "2026-12-31",
+  "last_reviewed": "2026-09-01",
+  "review_cadence": "biweekly",
+  "repository": "https://github.com/example-org/example-web-platform",
+  "notes": "Fictional data, not a real engagement. Exercises every project field, including stakeholders and repository."
+}

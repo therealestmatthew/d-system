@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "decision.schema.json",
+  "title": "Decision",
+  "description": "A dated choice, its reasoning, and who was involved. Answers 'what did we decide and why', traceable in retrospect. Decisions are the only high-stakes record type under ADR-007, so every decision record routes to flagged review regardless of evidence level.",
+  "type": "object",
+  "required": ["id", "date", "decision", "rationale"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^d-[0-9]+" },
+    "date": { "type": "string", "format": "date" },
+    "decision": {
+      "type": "string",
+      "description": "The choice that was made. Protected: an agent never invents a decision's existence."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why it was made. Protected: an agent never invents a decision's reasoning. A decision without its reasoning is not retrievable in retrospect, which is the point of the record."
+    },
+    "project_id": { "type": ["string", "null"], "default": null },
+    "interaction_id": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Interaction this decision was made in, when it is known"
+    },
+    "decided_by": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Person IDs from _data/people/ — confirmed identities only"
+    },
+    "decided_by_names": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Names mentioned but not yet resolved to a person record"
+    },
+    "alternatives": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Options considered and not taken"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "superseded", "reversed"],
+      "default": "active"
+    },
+    "supersedes": { "type": ["string", "null"], "default": null },
+    "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "notes": { "type": "string", "default": "" },
+    "capture": { "$ref": "evidence.schema.json#/definitions/capture_source" }
+  }
+}

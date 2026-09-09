@@ -1,0 +1,15 @@
+{
+  "id": "automation-toolkit",
+  "name": "Automation Toolkit",
+  "status": "planning",
+  "category": "system",
+  "type": "system",
+  "description": "Fictional example: a meta-framework for reusable automation building blocks, not yet started.",
+  "tags": ["python", "automation", "building-blocks"],
+  "stakeholders": [],
+  "started": null,
+  "target_date": null,
+  "last_reviewed": null,
+  "review_cadence": "ad-hoc",
+  "notes": ""
+}

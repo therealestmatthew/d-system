@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Governed document front matter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "code",
+    "title",
+    "kind",
+    "status",
+    "owner",
+    "created",
+    "updated",
+    "systems",
+    "depends_on"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Metadata contract version."
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permanent document identifier, independent of file path.",
+      "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Catalog code from the series registered for this kind; permanent once merged.",
+      "pattern": "^[A-Z]+-(?:[0-9]{3}(?:\\.[0-9]{2})?|[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2})$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title."
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Document role.",
+      "enum": [
+        "plan",
+        "adr",
+        "architecture",
+        "prompt",
+        "session",
+        "requirement",
+        "walkthrough",
+        "operation",
+        "governance"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Lifecycle state; valid states also depend on kind.",
+      "enum": [
+        "draft",
+        "approved",
+        "active",
+        "accepted",
+        "complete",
+        "deprecated",
+        "superseded"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Accountable owner key in systems.yaml; authorship is recorded by Git."
+    },
+    "created": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Date this document was created or first registered; ISO date.",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Date last substantively changed or reviewed; ISO date.",
+      "format": "date"
+    },
+    "systems": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "System IDs affected by this document.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Referenced identifier or path.",
+        "pattern": "^sys-[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "depends_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Prerequisite document IDs; must form an acyclic graph.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Referenced identifier or path.",
+        "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "parent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Parent plan ID for a multi-file plan.",
+      "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "supersedes": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Documents replaced by this document.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Referenced identifier or path.",
+        "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "review_after": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Advisory review date; an overdue date emits a warning.",
+      "format": "date"
+    },
+    "completion_evidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Existing repository file paths demonstrating completion; reviewed by the owner.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Referenced identifier or path."
+      }
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Optional existing tag IDs from _data/tags.json.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Referenced identifier or path."
+      }
+    }
+  }
+}

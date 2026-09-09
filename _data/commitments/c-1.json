@@ -1,0 +1,13 @@
+{
+  "id": "c-1",
+  "project_id": "example-web-platform",
+  "description": "Ship the redesigned onboarding flow for Example Web Platform.",
+  "promised_to": "jordan-rivera",
+  "due_date": "2026-10-15",
+  "status": "in_progress",
+  "priority": "high",
+  "created": "2026-09-01",
+  "completed": null,
+  "tags": ["react"],
+  "notes": "Fictional example commitment, used to exercise commitment schema fields and link to tasks."
+}

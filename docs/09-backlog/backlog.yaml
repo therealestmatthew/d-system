@@ -1,0 +1,4214 @@
+schema_version: 1
+updated: '2026-09-08'
+decision_record: doc-backlog-decisions
+max_active: 3
+next_up:
+- phase-ses-01
+items:
+- id: phase-rel-01
+  title: Restore the baseline Python lint gate
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Replace the obsolete Generator import without changing connection behavior.
+  acceptance:
+  - The documented full Python lint command passes.
+  - The source type check remains clean.
+  verification:
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - src/db/connection.py
+  next_action: Replace the obsolete Generator import without changing connection behavior.
+  session: doc-session-baseline-lint
+  completion_evidence:
+  - src/db/connection.py
+  result: Generator now imports from collections.abc. ruff check src/ test/ passes
+    for the first time and mypy src/ stays clean; 104 tests pass. Connection behavior
+    is unchanged.
+- id: phase-rel-02
+  title: Validate every source shape before rebuilding
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-contracts
+  - sys-projection
+  owner: repository-owner
+  agent: agent-architect
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-01
+  scope:
+  - Add a reusable preflight for all entity JSON and memory front matter using existing
+    schemas.
+  - Reject malformed or missing memory metadata with file and field diagnostics before
+    SQL mutation.
+  acceptance:
+  - Invalid JSON, invalid dates and malformed memory fail before any DROP statement.
+  - Valid current source files pass without creating data/ during validation.
+  verification:
+  - Run focused preflight tests against temporary source trees; inspect invalid-file
+    diagnostics.
+  deliverables:
+  - src/db/source_validation.py
+  - test/test_source_validation.py
+  - tools/rebuild_db.py
+  next_action: Add a reusable preflight for all entity JSON and memory front matter
+    using existing schemas.
+  session: doc-session-source-preflight
+  completion_evidence:
+  - src/db/source_validation.py
+  - test/test_source_validation.py
+  - tools/rebuild_db.py
+  - docs/03-sessions/SESS-2026-09-06-05-source-preflight.md
+  result: 'validate_sources runs as the first statement of rebuild(), before mkdir,
+    connect and the eight DROP statements. Checked against the real tree: a project
+    file carrying an out-of-range date and the retired cadence value printed both
+    problems with file and field, exited 1, and left the existing 33 project rows
+    intact; a Markdown file with no front matter reported missing YAML front matter
+    and exited 1. 37 focused tests and 264 in total pass; ruff, mypy and governance
+    are clean. The first run found every brain entry failing because PyYAML resolves
+    unquoted dates to date objects, which the validator now normalizes rather than
+    rewriting seven files. The loader read of the cadence field was corrected to review_cadence,
+    which phase-cap-02 renamed; without it the rebuild would have written null for
+    all 33 projects and reported success.'
+- id: phase-rel-03
+  title: Enforce source references and global identities
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-contracts
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-02
+  scope:
+  - Check tag, project, person, commitment and related-memory references, plus duplicate
+    source and task IDs.
+  - Preserve the documented repository memory scope d-system and distinguish it from
+    portfolio projects.
+  acceptance:
+  - Unknown references and duplicate tasks across commitments identify both source
+    records.
+  - Validation failure leaves an existing temporary projection unchanged.
+  verification:
+  - Run source-integrity tests for missing references, duplicate IDs and valid repository-scope
+    memory.
+  deliverables:
+  - src/db/source_validation.py
+  - test/test_source_validation.py
+  next_action: Check tag, project, person, commitment and related-memory references,
+    plus duplicate source and task IDs.
+- id: phase-rel-04
+  title: Make project stakeholders the membership authority
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-03
+  scope:
+  - Record project.stakeholders as canonical and person.projects as derived in an
+    ADR.
+  - Update schemas first, then loader/projection and authoring procedures; specify
+    compatibility for legacy person-side lists.
+  acceptance:
+  - project_people is built solely from canonical project stakeholder IDs.
+  - Conflicting legacy person.projects input is handled explicitly rather than silently
+    changing membership.
+  - Temporary fixtures verify both directions; no real person records are invented.
+  verification:
+  - Run membership fixtures for canonical, stale derived and unknown-person cases;
+    review the ADR.
+  deliverables:
+  - schemas/project.schema.json
+  - schemas/person.schema.json
+  - tools/rebuild_db.py
+  - test/test_membership.py
+  - docs/04-decisions/ADR-004-membership-authority.md
+  next_action: Record project.stakeholders as canonical and person.projects as derived
+    in an ADR.
+- id: phase-rel-05
+  title: Specify failure-safe projection publication
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-03
+  scope:
+  - Choose and document a transaction or temporary-build publication strategy after
+    testing local DuckDB reader behavior.
+  - Define rollback, connection cleanup and view reapplication contracts.
+  acceptance:
+  - The ADR names the reader/concurrency assumptions and failure recovery path.
+  - A temporary-database experiment demonstrates the chosen publication boundary.
+  verification:
+  - Record the experiment commands and observed results in a governed session document.
+  deliverables:
+  - docs/04-decisions/ADR-005-projection-publication.md
+  next_action: Choose and document a transaction or temporary-build publication strategy
+    after testing local DuckDB reader behavior.
+- id: phase-rel-06
+  title: Implement atomic rebuild and failure recovery
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-04
+  - phase-rel-05
+  scope:
+  - Implement the accepted publication strategy around the validated source snapshot.
+  - Close all connections on success and failure; preserve the previous usable projection.
+  acceptance:
+  - Injected mid-load failure leaves the previous database queryable with its old
+    rows.
+  - Two successful rebuilds produce equivalent domain/junction rows and release connections.
+  verification:
+  - Run temporary-DB failure-injection and repeatability tests.
+  deliverables:
+  - tools/rebuild_db.py
+  - test/test_rebuild_db.py
+  next_action: Implement the accepted publication strategy around the validated source
+    snapshot.
+- id: phase-rel-07
+  title: Unify database paths and application access helpers
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-projection
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-06
+  scope:
+  - Anchor database paths to one repository-aware configuration shared by CLI and
+    application helpers.
+  - Separate context-manager use from a yielding FastAPI dependency and update generation
+    guidance.
+  acceptance:
+  - Changing working directory does not select a different database.
+  - Dependency lifetime tests confirm a usable connection is yielded and closed.
+  verification:
+  - Run alternate-working-directory and dependency-lifetime tests using temporary
+    databases.
+  deliverables:
+  - src/db/connection.py
+  - test/test_db_connection.py
+  - docs/02-prompts/PROMPT-001-artifact-code-generation-system.md
+  next_action: Anchor database paths to one repository-aware configuration shared
+    by CLI and application helpers.
+- id: phase-rel-08
+  title: Correct global-memory and all-results retrieval
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-02
+  scope:
+  - 'Include scope: global memories alongside a requested project, including repository-scoped
+    memories.'
+  - Make --all unbounded unless an explicit --limit is supplied; retain the ordinary
+    default limit.
+  acceptance:
+  - A project query includes global and matching project entries but excludes unrelated
+    project/session entries.
+  - A corpus larger than ten entries verifies --all, explicit limits, tag conjunction
+    and stable ordering.
+  verification:
+  - Run focused context-query and CLI tests on a temporary memory database.
+  deliverables:
+  - tools/load_context.py
+  - test/test_load_context.py
+  next_action: 'Include scope: global memories alongside a requested project, including
+    repository-scoped memories.'
+- id: phase-rel-09
+  title: Extend CI to ingestion and retrieval tooling
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-delivery
+  - sys-projection
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-06
+  - phase-rel-07
+  - phase-rel-08
+  scope:
+  - Resolve existing script lint issues and include the selected loader/retrieval
+    tooling in CI checks.
+  - Widen the lint gate documented in AGENTS.md and OPS-001 to cover tools/, so the
+    command agents run by hand matches the one CI runs. Owner decision; see GOV-003.
+  - Keep tests isolated from the repository database.
+  acceptance:
+  - The expanded lint/test commands pass and cover preflight, failed rebuild and retrieval
+    behavior.
+  - uv run ruff check src/ test/ tools/ passes, and that is the command AGENTS.md
+    and OPS-001 name.
+  - CI tests neither require nor create the repository data/ directory.
+  verification:
+  - uv run pytest
+  - Run the expanded lint and type commands defined in the updated CI job.
+  deliverables:
+  - .github/workflows/ci.yaml
+  - tools/rebuild_db.py
+  - tools/load_context.py
+  - test/test_rebuild_db.py
+  - AGENTS.md
+  - docs/08-governance/OPS-001-operations.md
+  next_action: Resolve existing script lint issues and include the selected loader/retrieval
+    tooling in CI checks.
+- id: phase-rel-10
+  title: Reconcile durable documentation with shipped behavior
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  - doc-system-audit
+  - doc-tagging
+  - doc-artifact-code-generation
+  systems:
+  - sys-governance
+  - sys-brain
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-04
+  - phase-rel-07
+  - phase-rel-08
+  scope:
+  - Correct stale tag counts, Python requirement claims, membership procedures and
+    high-confidence descriptions of unbuilt capabilities.
+  - Align the artifact-generation prompt with strict runtime validation and the actual
+    dependency pattern; link shared conventions.
+  acceptance:
+  - Current claims are tied to code; proposed signals, page generation and agents
+    are labeled as planned until implemented.
+  - Tag lifecycle guidance and source-authoring procedures match the current registry
+    and canonical membership.
+  verification:
+  - uv run python -m src.governance
+  - Review each edited memory against current code and preserve provenance/history.
+  deliverables:
+  - docs/07-architecture/ARCH-001-tagging-system.md
+  - docs/02-prompts/PROMPT-001-artifact-code-generation-system.md
+  - brain/entities/d-system-overview.md
+  - brain/concepts/mini-systems-architecture.md
+  - brain/procedures/add-new-project.md
+  next_action: Correct stale tag counts, Python requirement claims, membership procedures
+    and high-confidence descriptions of unbuilt capabilities.
+- id: phase-html-01
+  title: Define strict page contracts and generated-output ownership
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-01-build-tooling
+  - doc-html-02-backend
+  - doc-html-adversarial-audit
+  systems:
+  - sys-contracts
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Record authored YAML as canonical and generated JSON as ignored build output in
+    an ADR.
+  - Define site/page schemas for routing and all four block types, including runtime
+    rejection rules and a shared-contract strategy.
+  acceptance:
+  - Valid sample payloads and invalid block variants have executable schema cases.
+  - The ADR defines output location, schema dialect, stale-file removal and Python/TypeScript
+    contract alignment.
+  verification:
+  - Run page/site schema tests; review the ADR against the saved user choices.
+  deliverables:
+  - schemas/site.schema.json
+  - schemas/page.schema.json
+  - docs/04-decisions/006-page-contracts.md
+  - test/test_page_contracts.py
+  next_action: Record authored YAML as canonical and generated JSON as ignored build
+    output in an ADR.
+- id: phase-html-02
+  title: Build validated YAML pages into ignored JSON
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-01-build-tooling
+  - doc-html-adversarial-audit
+  systems:
+  - sys-html
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-01
+  - phase-rel-02
+  scope:
+  - Implement the YAML conversion command with schema validation before publishing
+    generated output.
+  - Ignore generated JSON and remove only stale outputs owned by this generator.
+  acceptance:
+  - Malformed YAML or invalid block content fails without publishing partial output.
+  - A removed source page removes its generated output; authored files remain intact.
+  verification:
+  - Run temporary-tree conversion, invalid-input and stale-output tests.
+  deliverables:
+  - tools/build_pages.py
+  - .gitignore
+  - test/test_build_pages.py
+  next_action: Implement the YAML conversion command with schema validation before
+    publishing generated output.
+- id: phase-html-03
+  title: Implement runtime-validated page models
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-02-backend
+  - doc-html-adversarial-audit
+  systems:
+  - sys-api
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-01
+  scope:
+  - Create strict Pydantic models from the agreed contract boundary for site, page
+    and discriminated block payloads.
+  acceptance:
+  - Unknown block types and invalid content are rejected at runtime.
+  - Contract fixtures demonstrate alignment with the JSON Schemas without relying
+    on TypeScript for validation.
+  verification:
+  - Run page-model positive and negative contract tests.
+  deliverables:
+  - src/models/pages.py
+  - test/test_page_models.py
+  next_action: Create strict Pydantic models from the agreed contract boundary for
+    site, page and discriminated block payloads.
+- id: phase-html-04
+  title: Serve site and page configuration through FastAPI
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-02-backend
+  - doc-html-06-verification
+  - doc-html-adversarial-audit
+  systems:
+  - sys-api
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-02
+  - phase-html-03
+  scope:
+  - Add and register site-config and page-by-ID routes against the chosen generated-output
+    location.
+  - Handle missing pages, invalid IDs and invalid generated payloads consistently.
+  acceptance:
+  - Site and page requests return validated payloads; missing pages produce 404.
+  - Traversal attempts are rejected and malformed generated data cannot bypass runtime
+    validation.
+  verification:
+  - Run TestClient tests with temporary page files for success, missing, traversal
+    and invalid content.
+  deliverables:
+  - src/api/routes/pages.py
+  - src/api/__init__.py
+  - test/test_pages_api.py
+  next_action: Add and register site-config and page-by-ID routes against the chosen
+    generated-output location.
+- id: phase-html-05
+  title: Install the frontend styling foundation
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-03-frontend-setup
+  - doc-html-adversarial-audit
+  systems:
+  - sys-ui
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-01
+  scope:
+  - Add the planned router/styling dependencies and CSS-first design tokens to the
+    existing Vite app.
+  acceptance:
+  - TypeScript and production build checks pass with the new dependencies.
+  - A visible development sample confirms that theme utilities are actually applied.
+  verification:
+  - cd ts && npm run lint
+  - cd ts && npm run build
+  - Record a visual check of the applied theme tokens.
+  deliverables:
+  - ts/package.json
+  - ts/package-lock.json
+  - ts/vite.config.ts
+  - ts/src/index.css
+  next_action: Add the planned router/styling dependencies and CSS-first design tokens
+    to the existing Vite app.
+- id: phase-html-06
+  title: Wire typed routing and page-loading states
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-03-frontend-setup
+  - doc-html-04-frontend-components
+  - doc-html-adversarial-audit
+  systems:
+  - sys-ui
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-04
+  - phase-html-05
+  scope:
+  - Add typed configuration access, site-config bootstrap and the existing-app router
+    entry point.
+  - Implement navigation/layout, loading, not-found and retry/error states.
+  acceptance:
+  - Navigation changes pages without a full reload and unknown routes render a useful
+    404.
+  - Unavailable backend and page-load failures render recoverable error states.
+  verification:
+  - Run frontend type/build checks and record navigation, loading and backend-unavailable
+    checks.
+  deliverables:
+  - ts/src/router.tsx
+  - ts/src/main.tsx
+  - ts/src/layouts/RootLayout.tsx
+  - ts/src/components/ErrorBoundary.tsx
+  - ts/src/types/schema.ts
+  next_action: Add typed configuration access, site-config bootstrap and the existing-app
+    router entry point.
+- id: phase-html-07
+  title: Render hero and text content blocks
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-04-frontend-components
+  - doc-html-adversarial-audit
+  systems:
+  - sys-ui
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-03
+  - phase-html-05
+  scope:
+  - Implement typed HeroBlock and TextBlock components against the approved content
+    shapes.
+  acceptance:
+  - Optional headings, descriptions and calls to action render correctly when present
+    or absent.
+  - Long/multiline text remains readable without unsafe HTML injection.
+  verification:
+  - Run frontend type/build checks and render representative optional-field and long-text
+    fixtures.
+  deliverables:
+  - ts/src/components/blocks/HeroBlock.tsx
+  - ts/src/components/blocks/TextBlock.tsx
+  next_action: Implement typed HeroBlock and TextBlock components against the approved
+    content shapes.
+- id: phase-html-08
+  title: Complete block rendering and dynamic pages
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-04-frontend-components
+  - doc-html-adversarial-audit
+  systems:
+  - sys-ui
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-06
+  - phase-html-07
+  scope:
+  - Add image and responsive columns components plus exhaustive block dispatch and
+    DynamicPage.
+  acceptance:
+  - All four block types render from API data, including image alt/caption and narrow-screen
+    columns.
+  - Unknown block variants cannot silently render as valid supported content.
+  verification:
+  - Run frontend type/build checks; record desktop and narrow-screen checks for all
+    block types.
+  deliverables:
+  - ts/src/components/blocks/ImageBlock.tsx
+  - ts/src/components/blocks/ColumnsBlock.tsx
+  - ts/src/components/BlockRenderer.tsx
+  - ts/src/pages/DynamicPage.tsx
+  next_action: Add image and responsive columns components plus exhaustive block dispatch
+    and DynamicPage.
+- id: phase-html-09
+  title: Provide sample pages and the authoring workflow
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-05-sample-data
+  - doc-html-01-build-tooling
+  - doc-html-adversarial-audit
+  systems:
+  - sys-html
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-02
+  - phase-html-04
+  - phase-html-08
+  scope:
+  - Add authored site/home/about YAML and wire the generator into documented build
+    steps.
+  - Document adding, updating and removing a page without editing generated JSON.
+  acceptance:
+  - A clean checkout can generate and serve home/about pages from committed YAML.
+  - Editing YAML and rebuilding changes the page; generated JSON stays untracked.
+  verification:
+  - Run the documented clean-build and page-edit workflow; inspect Git ignored-output
+    behavior.
+  deliverables:
+  - _data/site.yaml
+  - _data/pages/home.yaml
+  - _data/pages/about.yaml
+  - docs/08-governance/page-authoring.md
+  next_action: Add authored site/home/about YAML and wire the generator into documented
+    build steps.
+- id: phase-html-10
+  title: Verify the complete page-generation vertical slice
+  plan: doc-html-00-overview
+  sources:
+  - doc-backlog-decisions
+  - doc-html-06-verification
+  - doc-html-adversarial-audit
+  systems:
+  - sys-html
+  - sys-delivery
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-html-09
+  scope:
+  - Execute the original automated and manual verification checklist against the completed
+    page workflow.
+  - Record actual results and repair failures within this slice before declaring the
+    HTML plan complete.
+  acceptance:
+  - Clean build, navigation, all blocks, page edits/removals and invalid/missing-page
+    cases pass.
+  - The session record supplies completion evidence for the overview and all six child
+    plans.
+  verification:
+  - uv run pytest
+  - cd ts && npm run lint
+  - cd ts && npm run build
+  - Execute docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.06-verification.md.
+  deliverables:
+  - test/test_pages_api.py
+  - docs/03-sessions/2026-09-05-html-verification.md
+  next_action: Execute the original automated and manual verification checklist against
+    the completed page workflow.
+- id: phase-sig-01
+  title: Add a reproducible SQL view installation boundary
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rel-06
+  scope:
+  - Define the schema/DDL placement convention for derived signal outputs and install
+    views after table rebuilds.
+  acceptance:
+  - A rebuild recreates views against the newly loaded tables.
+  - View installation failure respects the accepted projection failure guarantees.
+  verification:
+  - Run temporary-DB rebuild/view lifecycle tests.
+  deliverables:
+  - sql/002_signal_views.sql
+  - tools/rebuild_db.py
+  - test/test_signal_views.py
+  next_action: Define the schema/DDL placement convention for derived signal outputs
+    and install views after table rebuilds.
+- id: phase-sig-02
+  title: Implement Stale Radar
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-01
+  - phase-cap-07
+  scope:
+  - Define and implement v_stale_projects with all six cadence thresholds and explicit
+    unknown-review handling.
+  acceptance:
+  - Boundary dates and every cadence produce the specified stale status.
+  - Unknown last_reviewed is visible and distinguishable from an up-to-date project.
+  verification:
+  - Test fixed-date project fixtures for daily, weekly, biweekly, monthly, ad-hoc
+    and ongoing cadences.
+  deliverables:
+  - schemas/stale-project.schema.json
+  - sql/002_signal_views.sql
+  - test/test_stale_radar.py
+  next_action: Define and implement v_stale_projects with all six cadence thresholds
+    and explicit unknown-review handling.
+- id: phase-sig-03
+  title: Implement the Accountability Ledger
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-01
+  - phase-rel-04
+  - phase-cap-08
+  scope:
+  - Implement open external commitments joined to people and ordered by due date,
+    with explicit null-date handling.
+  acceptance:
+  - Completed/cancelled and self-only commitments are excluded.
+  - Empty data is reported honestly; due, overdue and undated commitments have deterministic
+    ordering.
+  verification:
+  - Run synthetic people/commitment fixtures without creating real portfolio commitments.
+  deliverables:
+  - schemas/accountability.schema.json
+  - sql/002_signal_views.sql
+  - test/test_accountability.py
+  next_action: Implement open external commitments joined to people and ordered by
+    due date, with explicit null-date handling.
+- id: phase-sig-04
+  title: Implement Project Health Signal
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-02
+  - phase-sig-03
+  scope:
+  - Define deterministic red/amber/green rules for review recency, overdue commitments
+    and blocked tasks.
+  acceptance:
+  - Fixtures cover each health state and conflicting signals with explicit precedence.
+  - Active projects with no commitment history are flagged without implying fabricated
+    activity.
+  verification:
+  - Run health-rule boundary and empty-activity tests.
+  deliverables:
+  - schemas/project-health.schema.json
+  - sql/002_signal_views.sql
+  - test/test_project_health.py
+  next_action: Define deterministic red/amber/green rules for review recency, overdue
+    commitments and blocked tasks.
+- id: phase-sig-05
+  title: Implement Cognitive Load Estimator
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-01
+  - phase-cap-07
+  scope:
+  - Define all priority and cadence weights and implement per-project/portfolio load
+    totals.
+  acceptance:
+  - All cadence values, including biweekly and ongoing, have documented weights.
+  - Closed commitments contribute no active load; known fixtures match hand-calculated
+    totals.
+  verification:
+  - Compare fixture outputs against hand-calculated load scores and top-project ordering.
+  deliverables:
+  - schemas/cognitive-load.schema.json
+  - sql/002_signal_views.sql
+  - test/test_cognitive_load.py
+  next_action: Define all priority and cadence weights and implement per-project/portfolio
+    load totals.
+- id: phase-sig-06
+  title: Implement weekly Commitment Velocity
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-01
+  - phase-cap-08
+  scope:
+  - Compute rolling weekly creation/completion counts, backlog deltas and trend with
+    explicit calendar boundaries.
+  acceptance:
+  - Zero-activity weeks appear and date-boundary cases are deterministic.
+  - Historical incompleteness is labeled rather than inferred as zero completed work.
+  verification:
+  - Run four-week fixtures with created/completed dates, missing dates and empty weeks.
+  deliverables:
+  - schemas/commitment-velocity.schema.json
+  - sql/002_signal_views.sql
+  - test/test_velocity.py
+  next_action: Compute rolling weekly creation/completion counts, backlog deltas and
+    trend with explicit calendar boundaries.
+- id: phase-sig-07
+  title: Define durable velocity snapshot ownership
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-06
+  scope:
+  - Record whether weekly snapshots are durable observations or disposable exports
+    and define an idempotent period key.
+  - Specify schema, correction policy and output location before implementing writes.
+  acceptance:
+  - The ADR distinguishes current recomputation from the original historical observation.
+  - The schema defines period, observation time, source/provenance and correction
+    behavior.
+  verification:
+  - Review duplicate-week and later-source-correction examples against the ADR and
+    schema.
+  deliverables:
+  - schemas/velocity-snapshot.schema.json
+  - docs/04-decisions/007-velocity-snapshots.md
+  next_action: Record whether weekly snapshots are durable observations or disposable
+    exports and define an idempotent period key.
+- id: phase-sig-08
+  title: Persist weekly velocity observations
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-07
+  scope:
+  - Implement explicit snapshot creation using the accepted ownership and correction
+    rules.
+  acceptance:
+  - Repeating an observation request is idempotent and never silently overwrites history.
+  - Snapshots validate and link to the corresponding weekly velocity output.
+  verification:
+  - Run temporary-directory duplicate-period, correction and invalid-snapshot tests.
+  deliverables:
+  - tools/snapshot_velocity.py
+  - test/test_velocity_snapshots.py
+  next_action: Implement explicit snapshot creation using the accepted ownership and
+    correction rules.
+- id: phase-sig-09
+  title: Implement Tag Cluster Analyzer and graph export
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-signals
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-sig-01
+  scope:
+  - Compute co-occurrence, shared-tag project pairs, tag density and under-tagged
+    projects; export a deterministic graph JSON.
+  acceptance:
+  - Pairs are deduplicated and shared-tag counts match fixtures.
+  - Graph export validates and empty/retired-tag cases retain explicit historical
+    meaning.
+  verification:
+  - Run tag/junction fixtures and stable graph-export comparisons.
+  deliverables:
+  - schemas/tag-clusters.schema.json
+  - sql/002_signal_views.sql
+  - tools/export_tag_clusters.py
+  - test/test_tag_clusters.py
+  next_action: Compute co-occurrence, shared-tag project pairs, tag density and under-tagged
+    projects; export a deterministic graph JSON.
+- id: phase-syn-01
+  title: Generate deterministic project context packs
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-sig-03
+  - phase-sig-04
+  - phase-sig-05
+  - phase-rel-04
+  scope:
+  - Generate portable Markdown containing project metadata, signals, stakeholders,
+    open work, related projects and recent completions.
+  acceptance:
+  - Single and multiple project requests include the specified sections with source
+    IDs.
+  - Empty commitments and missing history are labeled; no AI service is required to
+    collect facts.
+  verification:
+  - Run context-pack fixtures for populated, empty and unknown projects.
+  deliverables:
+  - tools/context_pack.py
+  - test/test_context_pack.py
+  next_action: Generate portable Markdown containing project metadata, signals, stakeholders,
+    open work, related projects and recent completions.
+- id: phase-syn-02
+  title: Create a manual session briefing workflow
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-syn-01
+  - phase-sig-02
+  scope:
+  - Package the daily signal inputs and a model-independent prompt for prioritizing
+    three to five actions.
+  - Define the human-directed synthesis input/output contract and validate that narrative
+    recommendations cite real source items.
+  acceptance:
+  - The workflow produces a usable briefing from explicit input without automatically
+    invoking a provider.
+  - Empty or low-quality inputs are disclosed and proposed actions reference actual
+    source records.
+  verification:
+  - Run deterministic briefing-input tests and record one manually invoked sample
+    synthesis.
+  deliverables:
+  - tools/briefing_input.py
+  - docs/02-prompts/session-briefing.md
+  - test/test_briefing_input.py
+  next_action: Package the daily signal inputs and a model-independent prompt for
+    prioritizing three to five actions.
+- id: phase-syn-03
+  title: Create the weekly review workflow
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-syn-02
+  - phase-sig-08
+  scope:
+  - Combine briefing, velocity and health into a manual review prompt and governed
+    append-only session output.
+  acceptance:
+  - The output captures accomplishments, slippage, portfolio changes and one recommendation.
+  - Repeated generation never silently overwrites an existing reviewed session.
+  verification:
+  - Test weekly input collection and duplicate-output behavior; record a reviewed
+    sample.
+  deliverables:
+  - tools/weekly_review.py
+  - docs/02-prompts/weekly-review.md
+  - test/test_weekly_review.py
+  next_action: Combine briefing, velocity and health into a manual review prompt and
+    governed append-only session output.
+- id: phase-syn-04
+  title: Create the monthly portfolio digest
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-syn-03
+  - phase-sig-09
+  scope:
+  - Combine all six signal outputs into a manual strategic synthesis workflow with
+    dated provenance.
+  acceptance:
+  - Digest covers health, load, clusters, velocity and people with open commitments.
+  - Insufficient history is explicit and the Markdown output satisfies documentation
+    governance.
+  verification:
+  - Run digest input/metadata fixtures and review a sample against all signal inputs.
+  deliverables:
+  - tools/portfolio_digest.py
+  - docs/02-prompts/portfolio-digest.md
+  - test/test_portfolio_digest.py
+  next_action: Combine all six signal outputs into a manual strategic synthesis workflow
+    with dated provenance.
+- id: phase-syn-05
+  title: Export the portfolio digest through generated HTML
+  plan: doc-mini-systems
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-synthesis
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-syn-04
+  - phase-html-10
+  scope:
+  - Map a reviewed digest into supported page blocks and the existing YAML-to-JSON
+    page build pipeline.
+  acceptance:
+  - Markdown and HTML views refer to the same dated digest input.
+  - The export uses existing page contracts and passes the page-generation validation/build
+    checks.
+  verification:
+  - Run digest-to-page fixtures and verify a complete rendered report.
+  deliverables:
+  - tools/export_digest_page.py
+  - test/test_digest_page.py
+  next_action: Map a reviewed digest into supported page blocks and the existing YAML-to-JSON
+    page build pipeline.
+- id: phase-mem-01
+  title: Reconcile memory-agent contracts with accepted choices
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - "Revise contracts A\u2013D to preserve direct authorized edits, manual selected-session\
+    \ invocation and owner-approved promotion/conflict resolution."
+  - Use Chronicle as the working role name and distinguish prompt roles from deployed
+    agents; remove unconditional semantic-search thresholds.
+  acceptance:
+  - No active contract claims Vault Scribe is the only writer.
+  - The plan separates current exact/tag/keyword capabilities from conditional semantic
+    and agentic extensions.
+  verification:
+  - Review every contract and open-question section against doc-backlog-decisions.
+  deliverables:
+  - docs/01-plans/PLAN-001-agent-memory-system.md
+  - docs/04-decisions/008-memory-workflow.md
+  next_action: "Revise contracts A\u2013D to preserve direct authorized edits, manual\
+    \ selected-session invocation and owner-approved promotion/conflict resolution."
+- id: phase-mem-02
+  title: Provide the Vault Scribe intake and review role
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-01
+  - phase-rel-02
+  scope:
+  - Create a model-independent role prompt for validation, duplicate review, confidence,
+    recency and candidate dispositions.
+  acceptance:
+  - The prompt supports authorized direct editing and never treats age alone as proof
+    of inaccuracy.
+  - A sample batch yields accepted/rejected/deferred dispositions with rationale and
+    unchanged stable IDs.
+  verification:
+  - Walk through duplicate, uncertain, update and invalid-candidate examples in a
+    session record.
+  deliverables:
+  - docs/02-prompts/vault-scribe.md
+  next_action: Create a model-independent role prompt for validation, duplicate review,
+    confidence, recency and candidate dispositions.
+- id: phase-mem-03
+  title: Provide Chronicle extraction for a selected session
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-01
+  scope:
+  - Define candidate schema and extraction prompt with action, target, source session/excerpt
+    and rationale.
+  - Use an explicit input session; produce staging candidates without writing brain
+    entries.
+  acceptance:
+  - Every candidate cites the selected session and passes its schema.
+  - Invocation without a selected source fails clearly and extraction itself does
+    not edit brain/.
+  verification:
+  - Validate create/update candidate examples and exercise the prompt on a synthetic
+    public session.
+  deliverables:
+  - schemas/memory-candidate.schema.json
+  - docs/02-prompts/chronicle.md
+  - test/test_memory_candidates.py
+  next_action: Define candidate schema and extraction prompt with action, target,
+    source session/excerpt and rationale.
+- id: phase-mem-04
+  title: Validate candidate batches and record dispositions
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-02
+  - phase-mem-03
+  scope:
+  - Implement candidate-batch validation, exact-ID duplicate checks and accepted/rejected/deferred
+    response records.
+  acceptance:
+  - Every input candidate receives a disposition; invalid updates cannot target unknown
+    memories.
+  - Validation is read-only and includes source/provenance diagnostics.
+  verification:
+  - Run mixed valid, duplicate, unknown-target and malformed batch tests.
+  deliverables:
+  - src/memory/candidates.py
+  - test/test_memory_candidates.py
+  next_action: Implement candidate-batch validation, exact-ID duplicate checks and
+    accepted/rejected/deferred response records.
+- id: phase-mem-05
+  title: Implement owner-reviewed promotion and conflict resolution
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-04
+  scope:
+  - Define and validate explicit owner dispositions for conflicting claims and session-to-durable
+    promotion.
+  - Keep undecided proposals pending with source evidence and an auditable resolution
+    record.
+  acceptance:
+  - No unresolved conflict or unapproved promotion changes a durable memory.
+  - Approve/reject/defer examples retain both rationale and original provenance.
+  verification:
+  - Run missing-approval, explicit-disposition and conflicting-source fixtures.
+  deliverables:
+  - schemas/memory-resolution.schema.json
+  - src/memory/resolutions.py
+  - test/test_memory_resolutions.py
+  next_action: Define and validate explicit owner dispositions for conflicting claims
+    and session-to-durable promotion.
+- id: phase-mem-06
+  title: Apply validated and authorized memory batches
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-04
+  - phase-mem-05
+  - phase-rel-06
+  scope:
+  - Implement candidate application with safe source-file writes, index maintenance,
+    provenance and disposition output.
+  - Synchronize the derived DB only after validated source updates; document recovery
+    if projection synchronization fails.
+  acceptance:
+  - Writes preserve stable IDs and required owner decisions for conflicts/promotions.
+  - A failed write cannot leave a truncated source entry; rebuild failures have a
+    recoverable, reported source state.
+  verification:
+  - Run temporary-tree create/update/write-failure and rebuild-failure tests.
+  deliverables:
+  - tools/apply_memory_candidates.py
+  - src/memory/apply.py
+  - test/test_memory_apply.py
+  next_action: Implement candidate application with safe source-file writes, index
+    maintenance, provenance and disposition output.
+- id: phase-mem-07
+  title: Implement the nonsemantic Librarian retrieval contract
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-01
+  - phase-rel-08
+  scope:
+  - Implement exact-ID, tag and keyword routing with a consistent context header and
+    confidence/recency metadata.
+  - Return method-used and no-match explanations; keep the tool read-only.
+  acceptance:
+  - Exact IDs avoid unnecessary wider search and combined filters honor the corrected
+    global semantics.
+  - Output conforms to contract A with explicit limits and no hidden write side effects.
+  verification:
+  - Run exact-hit, fallback, empty-result, multi-tag and global-context fixtures.
+  deliverables:
+  - src/memory/retrieval.py
+  - tools/librarian.py
+  - test/test_librarian.py
+  next_action: Implement exact-ID, tag and keyword routing with a consistent context
+    header and confidence/recency metadata.
+- id: phase-mem-08
+  title: Specify the blended retrieval-hint contract
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-contracts
+  - sys-brain
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-01
+  scope:
+  - Define type-derived default hints, registered explicit hint IDs and optional retrieval_hints
+    metadata using the same registry vocabulary.
+  - Update tag/memory schemas first; define additive deduplication, compatibility
+    and which hints need explicit storage.
+  acceptance:
+  - Existing memories remain valid without the new field.
+  - No second hint registry is introduced, and schema examples cover inferred, explicit
+    and combined hints.
+  verification:
+  - Validate old and new memory/tag fixtures; review the blend against the user clarification.
+  deliverables:
+  - schemas/tag.schema.json
+  - schemas/memory.schema.json
+  - docs/04-decisions/009-retrieval-hints.md
+  - test/test_retrieval_hints.py
+  next_action: Define type-derived default hints, registered explicit hint IDs and
+    optional retrieval_hints metadata using the same registry vocabulary.
+- id: phase-mem-09
+  title: Implement blended hints in ingestion and retrieval
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-brain
+  - sys-projection
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-07
+  - phase-mem-08
+  - phase-rel-06
+  scope:
+  - Load and query optional routing hints after the schema change, with type-derived
+    defaults and registered explicit additions.
+  - Update DDL, loaders and context formatting only where the accepted contract requires
+    persistence.
+  acceptance:
+  - Equivalent inferred and explicit hints produce consistent routing and are deduplicated.
+  - Unknown explicit hint IDs fail validation; existing no-hint memories remain retrievable.
+  verification:
+  - Run migration/rebuild and retrieval tests for all supported memory types and mixed
+    hint sources.
+  deliverables:
+  - sql/001_schema.sql
+  - tools/rebuild_db.py
+  - src/memory/retrieval.py
+  - test/test_retrieval_hints.py
+  next_action: Load and query optional routing hints after the schema change, with
+    type-derived defaults and registered explicit additions.
+- id: phase-mem-10
+  title: Measure keyword and tag retrieval quality
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-retrieval
+  - sys-memory-agents
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-09
+  scope:
+  - Create a small public/synthetic query-to-relevant-memory evaluation set and a
+    repeatable evaluation command.
+  - Record misses, relevance/coverage and latency before considering embeddings.
+  acceptance:
+  - The report identifies concrete unmet retrieval needs or explicitly records that
+    current retrieval is sufficient.
+  - Evaluation runs locally without transmitting memories or requiring an embedding
+    provider.
+  verification:
+  - Run the evaluation twice on the fixed corpus and compare deterministic retrieval
+    results.
+  deliverables:
+  - test/fixtures/retrieval_cases.json
+  - tools/evaluate_retrieval.py
+  - docs/03-sessions/2026-09-05-retrieval-baseline.md
+  next_action: Create a small public/synthetic query-to-relevant-memory evaluation
+    set and a repeatable evaluation command.
+- id: phase-mem-11
+  title: Produce a manual memory-health review report
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-06
+  - phase-mem-09
+  scope:
+  - Report aging entries, uncertain claims, duplicate candidates and orphan links
+    with proposed actions.
+  - Keep age-based confidence changes and pruning as reviewed proposals rather than
+    automatic mutations.
+  acceptance:
+  - The review report identifies why each memory needs attention without silently
+    rewriting it.
+  - A manually selected corpus can be reviewed independently of semantic-search availability.
+  verification:
+  - Run dated memory fixtures for stale, uncertain, duplicate and well-supported entries.
+  deliverables:
+  - tools/review_memories.py
+  - test/test_memory_review.py
+  next_action: Report aging entries, uncertain claims, duplicate candidates and orphan
+    links with proposed actions.
+- id: phase-mem-12
+  title: Create expiring, owner-reviewed pruning proposals
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-11
+  scope:
+  - Define a pruning proposal schema and generator with IDs, reasons, replacements,
+    per-item dispositions and expiry.
+  - Exclude permanent episode memories and flag unresolved inbound references.
+  acceptance:
+  - Proposals expire after the contract period and contain no default approval.
+  - Episodes and broken replacement/reference cases cannot become executable deletions.
+  verification:
+  - Run expiry, immutable-episode, missing-replacement and undecided-item fixtures.
+  deliverables:
+  - schemas/pruning-proposal.schema.json
+  - tools/propose_pruning.py
+  - test/test_pruning_proposals.py
+  next_action: Define a pruning proposal schema and generator with IDs, reasons, replacements,
+    per-item dispositions and expiry.
+- id: phase-mem-13
+  title: Apply explicitly approved pruning with an audit record
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-brain
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mem-12
+  - phase-rel-06
+  scope:
+  - Implement pruning application for valid, unexpired, individually approved items
+    with source/index/reference consistency.
+  - Write a durable episode audit record and synchronize the projection after approved
+    source changes.
+  acceptance:
+  - Missing approval, expiry or episode targets prevent deletion.
+  - Approved deletions retain an audit trail and have tested failure/recovery behavior.
+  verification:
+  - Run approval-gate, expiry, audit-log and failure-injection tests on a temporary
+    brain tree.
+  deliverables:
+  - tools/apply_pruning.py
+  - test/test_apply_pruning.py
+  next_action: Implement pruning application for valid, unexpired, individually approved
+    items with source/index/reference consistency.
+- id: phase-mem-14
+  title: Define opt-in review automation without automating writes
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-mem-11
+  - phase-mem-13
+  scope:
+  - Package the manual health-review command for an opt-in periodic trigger and document
+    its installation/removal.
+  - Keep Chronicle manual and leave promotion, conflict resolution and pruning owner-reviewed.
+  acceptance:
+  - A test trigger emits review proposals only; it cannot approve or apply them.
+  - Cadence is configurable and no external scheduler is activated by installing the
+    code.
+  verification:
+  - Run a local trigger dry run and verify all write/approval boundaries; review opt-in
+    instructions.
+  deliverables:
+  - tools/run_memory_review.py
+  - docs/08-governance/memory-review-operations.md
+  - test/test_memory_review_trigger.py
+  next_action: Package the manual health-review command for an opt-in periodic trigger
+    and document its installation/removal.
+- id: phase-mem-15
+  title: Choose semantic-search scope and embedding provider
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-retrieval
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-mem-10
+  scope:
+  - Use the recorded retrieval failures to evaluate local/cloud provider, privacy,
+    cost, vector dimensions and storage compatibility.
+  - Record the chosen provider, data boundary and success targets before any memory
+    content is transmitted.
+  acceptance:
+  - An ADR ties semantic scope to measured misses and documents provider/data-use
+    authorization.
+  - Quality and latency targets are specified without arbitrary corpus-count migration
+    thresholds.
+  verification:
+  - Review evaluation evidence and a provider comparison using synthetic inputs only
+    until data use is authorized.
+  deliverables:
+  - docs/04-decisions/010-semantic-retrieval.md
+  next_action: Use the recorded retrieval failures to evaluate local/cloud provider,
+    privacy, cost, vector dimensions and storage compatibility.
+  blocked_reason: Embeddings are explicitly deferred until keyword/tag retrieval proves
+    insufficient.
+  resume_when: phase-mem-10 records concrete unmet retrieval needs; review that evidence
+    before releasing this phase.
+- id: phase-mem-16
+  title: Define embedding cache and invalidation contracts
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-contracts
+  - sys-retrieval
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-mem-15
+  scope:
+  - Define embedding schema, model/dimension identity, content hashes, stale-record
+    handling and reconstruction behavior.
+  - Add DDL and cache contract tests after the accepted provider choice.
+  acceptance:
+  - Model changes and content changes invalidate affected vectors deterministically.
+  - The contract preserves file authority and states how rebuilds retain or reconstruct
+    disposable vectors.
+  verification:
+  - Run cache identity/invalidation fixtures with synthetic vectors.
+  deliverables:
+  - schemas/memory-embedding.schema.json
+  - sql/003_memory_embeddings.sql
+  - test/test_embedding_cache.py
+  next_action: Define embedding schema, model/dimension identity, content hashes,
+    stale-record handling and reconstruction behavior.
+  blocked_reason: Embeddings are explicitly deferred until keyword/tag retrieval proves
+    insufficient.
+  resume_when: phase-mem-10 records concrete unmet retrieval needs; review that evidence
+    before releasing this phase.
+- id: phase-mem-17
+  title: Build embeddings through the selected provider adapter
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-retrieval
+  - sys-memory-agents
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-mem-16
+  scope:
+  - Implement the chosen embedding adapter and incremental refresh command with bounded
+    failures/retries.
+  - Keep credentials/configuration out of tracked content and enforce the approved
+    data boundary.
+  acceptance:
+  - Unchanged content avoids redundant embedding requests and changed content refreshes
+    correctly.
+  - Provider failures preserve usable cache entries and identify failed memory IDs.
+  verification:
+  - Use a deterministic fake provider for cache/update/failure tests; perform a live
+    smoke test only within approved data use.
+  deliverables:
+  - src/memory/embeddings.py
+  - tools/refresh_embeddings.py
+  - test/test_embeddings.py
+  next_action: Implement the chosen embedding adapter and incremental refresh command
+    with bounded failures/retries.
+  blocked_reason: Embeddings are explicitly deferred until keyword/tag retrieval proves
+    insufficient.
+  resume_when: phase-mem-10 records concrete unmet retrieval needs; review that evidence
+    before releasing this phase.
+- id: phase-mem-18
+  title: Integrate semantic search as a measured retrieval fallback
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-retrieval
+  - sys-memory-agents
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-mem-17
+  scope:
+  - Add vector fallback after exact/tag/keyword retrieval while preserving filtering
+    and output contracts.
+  acceptance:
+  - Semantic results honor project/scope/tag constraints and expose method/model provenance.
+  - The fixed evaluation corpus meets the accepted improvement targets without breaking
+    exact matches.
+  verification:
+  - Run filtered semantic-search fixtures and compare the retrieval evaluation with
+    the baseline.
+  deliverables:
+  - src/memory/semantic.py
+  - src/memory/retrieval.py
+  - test/test_semantic_retrieval.py
+  next_action: Add vector fallback after exact/tag/keyword retrieval while preserving
+    filtering and output contracts.
+  blocked_reason: Embeddings are explicitly deferred until keyword/tag retrieval proves
+    insufficient.
+  resume_when: phase-mem-10 records concrete unmet retrieval needs; review that evidence
+    before releasing this phase.
+- id: phase-mem-19
+  title: Add bounded agentic query refinement
+  plan: doc-agent-memory
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-memory-agents
+  - sys-retrieval
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-mem-18
+  scope:
+  - Implement limited query decomposition/retries with deduplication and method/cost
+    reporting.
+  - Require the evaluation to show remaining failures that query refinement can address.
+  acceptance:
+  - The loop terminates at explicit attempt/time limits and never writes memory state.
+  - Evaluation demonstrates improvement on the documented remaining failures without
+    suppressing low-confidence provenance.
+  verification:
+  - Run deterministic mock-agent termination/deduplication tests and the fixed retrieval
+    evaluation.
+  deliverables:
+  - src/memory/refinement.py
+  - test/test_retrieval_refinement.py
+  next_action: Implement limited query decomposition/retries with deduplication and
+    method/cost reporting.
+  blocked_reason: Agentic refinement depends on justified semantic search and evidence
+    of remaining misses.
+  resume_when: Semantic retrieval is implemented and evaluated; remaining misses justify
+    a bounded refinement loop.
+- id: phase-doc-01
+  title: Define the document code register and its contract
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a Draft-07 contract for the register covering series, numbering mode, reservations
+    and retirements.
+  - Create the register with nine series and the existing ADR-004/ADR-005 reservations.
+  - Load and schema-check the register in the validator, replacing the hardcoded LOCATIONS
+    mapping.
+  acceptance:
+  - The register is the only source of truth for kind, series prefix, numbering mode
+    and permitted locations.
+  - An invalid register fails with a field-level diagnostic before any document is
+    scanned.
+  - The document schema still treats code as optional, so the existing tree stays
+    green.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest test/test_governance.py
+  deliverables:
+  - schemas/codes.schema.json
+  - docs/08-governance/codes.yaml
+  - src/governance/codes.py
+  - src/governance/__main__.py
+  next_action: Add a Draft-07 contract for the register covering series, reservations
+    and retirements.
+  session: doc-session-document-codes
+  completion_evidence:
+  - schemas/codes.schema.json
+  - docs/08-governance/codes.yaml
+  - src/governance/codes.py
+  - src/governance/__main__.py
+  result: Register loads and schema-checks; LOCATIONS deleted. Governance OK with
+    24 documents and code still optional.
+- id: phase-doc-02
+  title: Add deterministic allocation and the committed documentation catalog
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-doc-01
+  scope:
+  - Implement --next-code for a counter kind, a parent and a dated kind, printing
+    one code and nothing else.
+  - Implement --catalog joining document front matter with backlog phase state and
+    the ledger lists.
+  - Commit the catalog as a generated file and add a CI step that fails when it drifts.
+  acceptance:
+  - Repeated allocation runs against an unchanged tree print identical values.
+  - Allocation skips reserved and retired numbers rather than reissuing them.
+  - Dated allocation returns the next unused sequence for that date and never consults
+    a global counter.
+  - The catalog reuses backlog readiness rather than re-deriving phase state.
+  - A committed catalog that no longer matches regenerated output fails CI.
+  verification:
+  - uv run python -m src.governance --next-code adr
+  - uv run python -m src.governance --next-code session
+  - uv run python -m src.governance --catalog
+  - uv run pytest test/test_codes.py
+  deliverables:
+  - src/governance/codes.py
+  - src/governance/__main__.py
+  - docs/08-governance/catalog.md
+  - .github/workflows/ci.yaml
+  - test/test_codes.py
+  next_action: Implement --next-code for a counter kind, a parent and a dated kind,
+    printing one code and nothing else.
+  session: doc-session-document-codes
+  completion_evidence:
+  - src/governance/codes.py
+  - docs/08-governance/catalog.md
+  - .github/workflows/ci.yaml
+  - test/test_codes.py
+  result: --next-code returned ADR-006 and SESS-2026-09-05-01; --catalog rendered
+    24 documents. CI diffs the committed catalog against regenerated output.
+- id: phase-doc-03
+  title: Backfill codes into every existing governed document
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-doc-02
+  scope:
+  - Assign a code to each existing document in git creation order per series, front
+    matter only.
+  - Give the seven dynamic-HTML plan files a parent code and six sub-codes.
+  - Leave ADR-004 and ADR-005 reserved rather than assigning them.
+  acceptance:
+  - Every governed document carries a unique code whose series matches its kind.
+  - No file is renamed and no inbound link changes in this phase.
+  - The allocation command reports the correct next code in every series afterwards.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --catalog
+  deliverables:
+  - docs/01-plans
+  - docs/02-prompts
+  - docs/04-decisions
+  - docs/06-requirements
+  - docs/07-architecture
+  - docs/08-governance
+  - plans
+  next_action: Assign a code to each existing document in git creation order per series,
+    front matter only.
+  session: doc-session-document-codes
+  completion_evidence:
+  - schemas/document.schema.json
+  - docs/01-plans/PLAN-005-document-code-system.md
+  - docs/08-governance/catalog.md
+  result: 24 codes assigned in creation order. Allocation then returned PLAN-006,
+    PLAN-003.07, ADR-006 and SESS-2026-09-05-01, matching the plan's predictions.
+- id: phase-doc-04
+  title: Backfill code-prefixed filenames and every inbound reference
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-doc-03
+  scope:
+  - Rename every governed file so its code is the filename prefix, including the plan
+    folder.
+  - Update systems.yaml paths, backlog deliverables, category READMEs, root entry
+    points and prose links.
+  acceptance:
+  - Every governed filename begins with its own code and the plan folder is named
+    for its parent code.
+  - No repository Markdown link or registry path resolves to a pre-rename location.
+  - The registry path checks and backlog reports still pass after the renames.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  - Search the repository for surviving pre-rename paths and confirm none remain.
+  deliverables:
+  - docs/01-plans
+  - docs/04-decisions
+  - docs/07-architecture
+  - docs/08-governance/systems.yaml
+  - docs/09-backlog/backlog.yaml
+  - AGENTS.md
+  - CLAUDE.md
+  - README.md
+  next_action: Rename every governed file so its code is the filename prefix, including
+    the plan folder.
+  session: doc-session-document-codes
+  completion_evidence:
+  - docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md
+  - docs/04-decisions/ADR-001-file-based-governance.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/systems.yaml
+  - docs/09-backlog/backlog.yaml
+  result: 25 paths renamed with git mv and roughly 40 references updated. Every relative
+    Markdown link resolves; a strict-mode dry run reported no errors.
+- id: phase-doc-05
+  title: Enforce code, filename and sub-code rules
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-doc-04
+  scope:
+  - Make code required in both the counter and dated grammars, and enforce uniqueness,
+    series/kind agreement, location and filename prefix.
+  - Enforce sub-code and parent consistency in both directions, and reserved/retired
+    code rules.
+  - Cover every rejection path with tests, since silent acceptance is the real risk.
+  acceptance:
+  - A document missing a code, or holding a duplicate, wrong-series or mismatched-filename
+    code, fails.
+  - A reserved code fails until its reservation is removed, and a retired code can
+    never be reused.
+  - A dated code whose embedded date differs from the document created date fails.
+  - Each failure names the offending file and the expected value.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - schemas/document.schema.json
+  - src/governance/codes.py
+  - src/governance/__main__.py
+  - test/test_codes.py
+  next_action: Make code required and enforce uniqueness, series/kind agreement, location
+    and filename prefix.
+  session: doc-session-document-codes
+  completion_evidence:
+  - schemas/document.schema.json
+  - src/governance/codes.py
+  - test/test_codes.py
+  - test/test_governance.py
+  result: code required and all strict rules enforced; 104 tests pass. Placing a stub
+    at ADR-006 validated clean and a one-character filename change failed with 'filename
+    must start with ADR-006-'.
+- id: phase-doc-06
+  title: Record the code decision and operating rules
+  plan: doc-document-codes
+  sources:
+  - doc-document-code-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-doc-05
+  scope:
+  - Write the decision record covering identity, register-versus-scan and sub-codes.
+  - Write the code-assignment protocol covering grammar, allocation, reservation and
+    collisions.
+  - Amend the protocol sentence forbidding committed generated snapshots to permit
+    a drift-checked derived file, while still forbidding hand-maintained lists.
+  - Update the governance protocol, operations, document template and agent instructions.
+  acceptance:
+  - An agent can assign a correct code using only the committed instructions and one
+    command.
+  - The governance protocol taxonomy and front-matter tables describe the code field
+    and naming rule.
+  - The new records carry codes allocated by the command rather than chosen by hand.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --catalog
+  - Follow the written procedure to allocate and place one new stub document, then
+    revert it.
+  deliverables:
+  - docs/04-decisions/ADR-006-document-codes.md
+  - docs/08-governance/GOV-005-document-codes.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/OPS-001-operations.md
+  - templates/governance/document.md
+  - AGENTS.md
+  next_action: Write the decision record covering identity, register-versus-scan and
+    sub-codes.
+  session: doc-session-document-codes
+  completion_evidence:
+  - docs/04-decisions/ADR-006-document-codes.md
+  - docs/08-governance/GOV-005-document-codes.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/OPS-001-operations.md
+  - templates/governance/document.md
+  - AGENTS.md
+  result: ADR-006 and GOV-005 written; protocol, operations, template and AGENTS.md
+    updated. Following the written procedure alone allocated REQ-002, placed a document
+    from the template and validated green.
+- id: phase-rel-11
+  title: Make the contract tests and the source preflight agree about dates
+  plan: doc-reliability-follow-up
+  sources:
+  - doc-backlog-decisions
+  - doc-session-source-preflight
+  systems:
+  - sys-contracts
+  owner: repository-owner
+  agent: agent-rel11
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-rel-02
+  scope:
+  - Enable the jsonschema format checker in test/test_schemas.py so a date is checked
+    as a date.
+  - Cover the divergence with a case that a string check would pass and a date check
+    rejects.
+  acceptance:
+  - A malformed date in a schema fixture fails test/test_schemas.py, not only the
+    preflight.
+  - Both suites reject the same values; no source file or schema changes.
+  verification:
+  - uv run pytest test/test_schemas.py test/test_source_validation.py
+  - uv run python -m src.governance
+  deliverables:
+  - test/test_schemas.py
+  next_action: Complete.
+  session: doc-session-contract-tests-date-format
+  completion_evidence:
+  - test/test_schemas.py
+  - docs/03-sessions/SESS-2026-09-08-10-contract-tests-date-format.md
+  result: format_checker=Draft7Validator.FORMAT_CHECKER added to test/test_schemas.py's
+    validator(), and a new test asserts a malformed date (2026-13-45) fails validation
+    and names the field. 156 tests pass in test/test_schemas.py and test/test_source_validation.py;
+    372 pass overall; governance exits 0. Independent sub-agent review reran everything
+    itself and found both acceptance conditions genuinely held, no discrepancies.
+- id: phase-priv-01
+  title: Decide and record the structure/content boundary
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-governance
+  owner: repository-owner
+  agent: agent-architect
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the ADR defining structure versus content and why the portfolio relocates
+    rather than hides.
+  - Amend the protocol where it names _data/ the git-tracked source of truth.
+  acceptance:
+  - The ADR states the fresh-clone-stays-green constraint and the rejected gitignore-in-place
+    option.
+  - The protocol and the intended code behaviour agree rather than contradicting each
+    other.
+  verification:
+  - uv run python -m src.governance
+  - Read the amended protocol against the ADR and confirm no surviving contradiction.
+  deliverables:
+  - docs/04-decisions/ADR-009-structure-content-boundary.md
+  - docs/08-governance/GOV-001-protocol.md
+  next_action: Write the ADR defining structure versus content and why the portfolio
+    relocates rather than hides.
+  session: doc-session-structure-content-boundary
+  completion_evidence:
+  - docs/04-decisions/ADR-009-structure-content-boundary.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  result: ADR-009 defines structure as what stays true if every record were replaced,
+    states the fresh-clone-stays-green constraint and rejects gitignoring _data/ in
+    place. GOV-001 now names the configured data root instead of the tracked path
+    and says the relocation has not happened. The phase's declared ADR-007 had already
+    been issued to the capture work, so the ADR is ADR-009 and the collision is recorded
+    in GOV-003. Governance exits 0 at 39 documents; pytest passes 110 tests. Five
+    other source-of-truth references were checked and none contradicts the ADR.
+- id: phase-priv-02
+  title: Scrub client and personal identifiers from tracked structure
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-brain
+  - sys-retrieval
+  owner: repository-owner
+  agent: agent-clay
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-priv-01
+  scope:
+  - Replace the real project list in README.md with counts by category.
+  - Replace client identifiers in the architecture document, brain memories and the
+    retrieval CLI docstring.
+  - Replace the client tag with a generic identifier, keeping the category so the
+    taxonomy shape survives.
+  acceptance:
+  - No tracked file matches the client identifier in any casing.
+  - No tracked file outside _private/ names a real project ID.
+  - The tag taxonomy still exercises all six categories.
+  verification:
+  - git grep -Ii -e client-a -- .
+  - uv run python -m src.governance
+  deliverables:
+  - README.md
+  - docs/07-architecture/ARCH-001-tagging-system.md
+  - brain/concepts/tag-taxonomy.md
+  - brain/index.md
+  - tools/load_context.py
+  - _data/tags.json
+  next_action: Complete.
+  session: doc-session-scrub-tracked-structure
+  completion_evidence:
+  - README.md
+  - _data/tags.json
+  - docs/07-architecture/ARCH-001-tagging-system.md
+  - docs/02-prompts/PROMPT-002-capture-and-structuring-system.md
+  - tools/load_context.py
+  - docs/08-governance/OPS-003-load-context.md
+  - brain/index.md
+  - docs/08-governance/catalog.md
+  - docs/03-sessions/SESS-2026-09-08-12-scrub-tracked-structure.md
+  result: 'README.md replaced its real project list with counts by category (34
+    total, corrected from a stale 33). _data/tags.json''s client tag renamed the real client identifier
+    -> client-a, both referencing related arrays updated. ARCH-001, PROMPT-002,
+    tools/load_context.py, OPS-003 and brain/index.md had their real-client-identifier references
+    replaced (OPS-003''s generated block via generate_tool_docs.py). governance exits
+    0 at 100 documents; pytest passes 386. An independent /session-close review
+    (SESS-2026-09-08-12) confirmed this phase''s own scope is done cleanly and found
+    no discrepancies, but git grep -Ii -e client-a -- . still matches the three untouched
+    _data/projects/client-a-*.json files -- the first two acceptance conditions remain
+    literally unmet by that grep. The owner reviewed this and directed closure
+    anyway: the remaining gap is explicitly phase-priv-03''s deliverable (relocating
+    those files), not a defect in this phase''s work, and phase-priv-03 depends on
+    this phase reaching complete to become claimable. Recorded here as an explicit
+    owner override of the literal acceptance text, not an agent judgement call --
+    see the session record''s Decisions section for the full account.'
+- id: phase-priv-03
+  title: Relocate the portfolio and seed a fictional example set
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-portfolio
+  - sys-projection
+  - sys-contracts
+  owner: repository-owner
+  agent: agent-clay
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-priv-02
+  scope:
+  - Move the 34 real project files and client tag entries to _private/portfolio/.
+  - Write a fictional portfolio covering every schema field in use, including a person
+    and a commitment with tasks.
+  - Add D_SYSTEM_DATA_ROOT support to the rebuild tool and the governance validator,
+    defaulting to _data/. tools/load_context.py needs no change since it only reads
+    the already-built data/d_system.duckdb and has no direct _data/ dependency, so
+    it is dropped from this phase's deliverables (corrected during orientation).
+    src/db/source_validation.py is added instead, since it is rebuild_db.py's own
+    preflight and hardcodes _data/ independently of rebuild_db.py's root parameter,
+    so the override does not actually work end-to-end without it.
+  acceptance:
+  - A clone with no environment variables set validates and rebuilds from the fictional
+    set alone.
+  - The owner's real records still rebuild when the data root points at _private/portfolio/.
+  - The example set contains at least one person and one commitment with tasks, which
+    the tree has never had.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/rebuild_db.py
+  - uv run pytest
+  deliverables:
+  - _data/projects
+  - _data/tags.json
+  - _data/people
+  - _data/commitments
+  - _data/tasks
+  - tools/rebuild_db.py
+  - src/db/source_validation.py
+  - src/governance/__main__.py
+  next_action: Complete.
+  session: doc-session-relocate-portfolio
+  completion_evidence:
+  - _data/projects/example-web-platform.json
+  - _data/people/jordan-rivera.json
+  - _data/commitments/c-1.json
+  - _data/tasks/t-1.json
+  - src/db/source_validation.py
+  - tools/rebuild_db.py
+  - src/governance/__main__.py
+  - docs/08-governance/systems.yaml
+  - docs/03-sessions/SESS-2026-09-08-13-relocate-portfolio.md
+  - CLAUDE.md
+  - README.md
+  - brain/concepts/json-source-of-truth-pattern.md
+  - brain/procedures/add-new-project.md
+  - docs/02-prompts/PROMPT-001-artifact-code-generation-system.md
+  - docs/08-governance/GLOSSARY.md
+  - docs/08-governance/GOV-001-protocol.md
+  result: 'The 34 real project files moved to _private/portfolio/projects/ (gitignored),
+    with the three client-a-*.json files'' dangling real-client-identifier tag references corrected to
+    "client-a" in the copy. _data/tags.json needed no change and was not duplicated:
+    per ADR-009 the tag taxonomy is shared structure, not content, and every tag the
+    real portfolio uses already exists in the tracked set (verified: zero missing).
+    _data/projects/ was reseeded with 5 fictional projects covering every project
+    schema field in use (id, name, status, category, type, description, tags,
+    stakeholders, started, target_date, last_reviewed, review_cadence, repository,
+    notes). Added the tree''s first person (_data/people/jordan-rivera.json), first
+    commitment (_data/commitments/c-1.json) and its three tasks (_data/tasks/t-1..3.json).
+    D_SYSTEM_DATA_ROOT support added via a shared data_root() helper in
+    src/db/source_validation.py, used by tools/rebuild_db.py''s entity loading and by
+    src/governance/__main__.py''s project-reference check (the latter deliberately
+    bypasses public_path()''s _private/ block, which stays in force everywhere else
+    in governance). tags.json and ideas.jsonl stay fixed at the tracked _data/ always.
+    Verified both roots independently: with no environment variable set, governance
+    passes and rebuild produces 5 projects/1 person/1 commitment/3 tasks from the
+    fictional set alone; with D_SYSTEM_DATA_ROOT=_private/portfolio, governance passes
+    and rebuild produces the real 34 projects. pytest passes 357 (was 386 on dev;
+    the 29-test drop is test_every_source_project_validates, parametrized over
+    _data/projects/*.json, now iterating 5 fictional files instead of 34 real ones).
+    One pre-existing completed phase cited a real project file under _data/projects/
+    as completion evidence; that file relocated as real content, so the citation was
+    dropped from its deliverables/completion_evidence with a note explaining why,
+    leaving its other evidence untouched. Follow-up: updated every process note found
+    describing where to create projects/people/commitments/tasks so none still says
+    "_data/" unconditionally -- GOV-001''s stale "until phase-priv-03 relocates"
+    caveat, brain/procedures/add-new-project.md, brain/concepts/json-source-of-truth-pattern.md
+    (regenerating GLOSSARY.md from it), README.md''s data-architecture rule and
+    inventory section, CLAUDE.md''s Data Architecture section and directory
+    reference table, and PROMPT-001''s project-JSON generation rule. See session
+    for the full account and one flagged-but-unresolved item concerning
+    phase-cap-08''s acceptance wording.'
+- id: phase-priv-04
+  title: Harden ignore rules and add an enforceable leak check
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  agent: agent-fern
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-priv-03
+  scope:
+  - Extend .gitignore to name the private portfolio paths explicitly rather than relying
+    on _private/ alone.
+  - Add a checker that fails when a tracked file matches the confidential identifier
+    list.
+  - Wire the checker into CI and a pre-commit hook.
+  - 'Widened during orientation, owner-approved: the checker surfaced 22 tracked files
+    still leaking real client/project identifiers that phase-priv-02 missed (mostly
+    session records narrating real work, plus two doc/title collisions). Scrub those
+    now rather than leaving the checker red or deferring to a new phase, except one
+    lower-sensitivity real project identifier (the owner''s own project rather than
+    a client, deeply woven into closed governance records about a since-completed
+    phase), deliberately left out of this pass and exempted in the checker with a
+    named reason. (That identifier was later purged too, by phase-priv-06.)'
+  acceptance:
+  - The checker fails on a deliberately planted identifier in a tracked file.
+  - The checker passes on the cleaned tree and runs in CI before the other gates.
+  - git add -f of a private file is caught by the checker rather than only by .gitignore.
+  verification:
+  - uv run python tools/check_no_private_content.py
+  - Plant an identifier in a tracked file, confirm the checker fails, then revert.
+  - uv run pytest test/test_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/check_no_private_content.py
+  - tools/git-hooks/pre-commit
+  - .gitignore
+  - .github/workflows/ci.yaml
+  - test/test_private_content.py
+  - docs/08-governance/OPS-009-check-no-private-content.md
+  - docs/07-architecture/ARCH-001-tagging-system.md
+  - templates/README.md
+  - docs/03-sessions/SESS-2026-09-06-04-entity-contracts.md
+  - docs/03-sessions/SESS-2026-09-08-12-scrub-tracked-structure.md
+  - docs/03-sessions/SESS-2026-09-08-13-relocate-portfolio.md
+  - docs/09-backlog/backlog.yaml
+  session: doc-session-leak-check
+  completion_evidence:
+  - tools/check_no_private_content.py
+  - tools/git-hooks/pre-commit
+  - .gitignore
+  - .github/workflows/ci.yaml
+  - test/test_private_content.py
+  - docs/08-governance/OPS-009-check-no-private-content.md
+  - docs/03-sessions/SESS-2026-09-08-14-leak-check.md
+  result: 'Checker built and passes on the current tree (251 files, 30 identifiers);
+    both plant tests (content leak, git add -f of a _private/ path) correctly fail
+    it. CI runs it ahead of governance. Orientation found 22 tracked files phase-priv-02
+    had missed; owner approved scrubbing them in this phase, except one lower-sensitivity
+    real project identifier which is deliberately exempted with a named reason --
+    see session record''s Unresolved section. Full verification (checker, plant
+    tests, test_private_content.py x12, governance, full pytest x369) all green.
+    Independent sub-agent review (session record) corroborated all three acceptance
+    conditions, reran every verification command itself, and independently confirmed
+    the checker''s identifier list is never hardcoded in tracked source; its one
+    finding (a stale 102-vs-103 document count quoted in the session record''s
+    verification transcript) was corrected in the same record before closure. The
+    deferred identifier remained a known, exempted gap for phase-priv-05 to account
+    for before any push, until phase-priv-06 purged it.'
+  next_action: Complete.
+- id: phase-priv-05
+  title: Rewrite history and verify before adding a remote
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-priv-04
+  - phase-priv-06
+  scope:
+  - Squash to a single initial commit. This is decided - history is not preserved,
+    and git-filter-repo is not the fallback. Verifying that no commit anywhere names
+    a confidential identifier is a check that must hold across every commit, and filter-repo
+    reports success while leaving a blob reachable from a tag or the reflog. One tree
+    is provable by inspection.
+  - Sweep every tracked document for commit-hash references before squashing, since
+    none will resolve afterwards. Replace each with a description of what changed.
+  - Verify no commit in any ref names a private path or a confidential identifier.
+  - Add the remote only after verification passes.
+  acceptance:
+  - The repository has exactly one commit, and no ref, tag or reflog entry reaches
+    an earlier one.
+  - git log --all --name-only names no real portfolio path.
+  - A case-insensitive search across every commit finds no confidential identifier.
+  - No tracked file cites a commit hash, since none would resolve after the squash.
+  - The remote is added only after every check above passes, and never before.
+  verification:
+  - git rev-list --count --all
+  - git log --all --name-only | grep -c _data/projects
+  - Search every commit for the identifier list and confirm no match.
+  - git grep -nE '\b[0-9a-f]{7,40}\b' -- '*.md' '*.yaml' and confirm no commit hashes
+    remain.
+  - uv run python -m src.governance
+  deliverables:
+  - docs/03-sessions
+  next_action: Confirm phases 1 to 4 are merged and verified, then choose squash or
+    filter-repo.
+  blocked_reason: History rewriting is irreversible and must follow the working-tree
+    cleanup, not precede it.
+  resume_when: Phases priv-01 to priv-04 and priv-06 are complete and the working
+    tree passes the leak check.
+- id: phase-priv-06
+  title: Remove the standing checker exemption and purge the remaining identifier
+  plan: doc-confidentiality-sweep
+  sources: []
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  agent: agent-fern
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-priv-04
+  scope:
+  - 'phase-priv-04 left one real project identifier deliberately unscrubbed and
+    exempted in the checker: the owner''s own extracted course project (see that
+    phase''s session record). It has since been confirmed extracted to a separate,
+    independent local repository with no shared history and no remote on either
+    side, so the owner has directed a full purge rather than continuing the
+    exemption. This phase does that.'
+  - Delete the session record narrating the extraction and the now-orphaned backlog
+    phase for that extraction, since the owner judged neither carries ongoing value
+    once the extraction itself is independently confirmed complete elsewhere.
+  - Reword every remaining incidental mention of the identifier in tracked structure
+    (an ADR, a systems registry entry, a standing plan, .gitignore, and several
+    session records) so the identifier itself no longer appears, while preserving
+    the point each passage was making.
+  - Remove the identifier from the checker's EXEMPT_IDENTIFIERS list so it is
+    enforced like any other real project identifier from this point on.
+  acceptance:
+  - The checker passes on the cleaned tree with no exemption for this identifier.
+  - Nothing depends_on the deleted session record or backlog phase (verified before
+    deleting, not assumed).
+  - Every reworded passage still reads coherently and preserves its original point.
+  verification:
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/check_no_private_content.py
+  - docs/04-decisions/ADR-012-systems-review.md
+  - docs/08-governance/systems.yaml
+  - docs/01-plans/PLAN-015-ephemeral-working-plans.md
+  - .gitignore
+  - docs/09-backlog/backlog.yaml
+  - docs/03-sessions/SESS-2026-09-06-08-cadence-and-course-tracking.md
+  - docs/03-sessions/SESS-2026-09-06-10-idea-plan-lifecycle-architecture.md
+  - docs/03-sessions/SESS-2026-09-07-06-session-overview.md
+  - docs/03-sessions/SESS-2026-09-08-13-relocate-portfolio.md
+  - docs/03-sessions/SESS-2026-09-08-14-leak-check.md
+  - docs/07-architecture/ARCH-004-architecture-overview.md
+  session: doc-session-purge-course-identifier
+  completion_evidence:
+  - tools/check_no_private_content.py
+  - docs/04-decisions/ADR-012-systems-review.md
+  - docs/08-governance/systems.yaml
+  - docs/01-plans/PLAN-015-ephemeral-working-plans.md
+  - .gitignore
+  - docs/07-architecture/ARCH-004-architecture-overview.md
+  - docs/03-sessions/SESS-2026-09-08-15-purge-course-identifier.md
+  result: 'Deleted the extraction session record and its now-orphaned backlog phase
+    (verified structurally before deleting; a broader prose grep at close found two
+    more current documents -- ARCH-004, ADR-012 -- still citing the dead id and fixed
+    those too). Reworded the identifier out of .gitignore, ADR-012, systems.yaml,
+    PLAN-015, and five session records. Removed the EXEMPT_IDENTIFIERS entry -- checker
+    now enforces it like any other real identifier (confirmed: planting it again fails
+    the checker). Found and fixed a verification gap in phase-priv-04''s own closed
+    session record, which still quoted several real identifiers verbatim -- only
+    visible once the checker ran against the fully staged tree rather than the working
+    tree. Checker OK (256 files, 31 identifiers), governance OK (103 documents), full
+    pytest 369 passed. Independent sub-agent review corroborated all three acceptance
+    conditions and reran every verification command itself; it surfaced two minor,
+    non-blocking discrepancies (a 102-vs-103 document count in the record''s pasted
+    output, and an unflagged phase-scope-01 mention in the ungoverned _tmpagent/AGENTS.md
+    worked-example ledger), both recorded and addressed in the session record before
+    closure -- the count fixed, the ledger mention deliberately left as acceptable
+    historical narration.'
+  next_action: Complete.
+- id: phase-cap-01
+  title: Run the capture-system definition session
+  plan: doc-capture-system
+  sources:
+  - doc-capture-system-prompt
+  systems:
+  - sys-portfolio
+  - sys-contracts
+  owner: repository-owner
+  agent: agent-architect
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Read docs/02-prompts/PROMPT-002-capture-and-structuring-system.md and follow it.
+  - Interview the owner in small batches; record the answers as decisions with their
+    reasoning.
+  - Produce a requirements document, a build plan and backlog phases covering that
+    plan.
+  acceptance:
+  - A reader who was not in the session can tell from the committed documents what
+    gets captured, in what form, what the agent decides unaided and what it must ask
+    about.
+  - The requirements state observable conditions with verification methods, not intentions.
+  - Backlog phases exist for the new build plan and the governance check passes.
+  - No implementation code is written; any prototype is thrown away and labelled as
+    such.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --backlog
+  deliverables:
+  - docs/06-requirements
+  - docs/01-plans
+  - docs/04-decisions
+  - docs/09-backlog/backlog.yaml
+  next_action: Read docs/02-prompts/PROMPT-002-capture-and-structuring-system.md and
+    follow it.
+  session: doc-session-capture-definition
+  completion_evidence:
+  - docs/04-decisions/ADR-007-capture-routing.md
+  - docs/04-decisions/ADR-008-record-types.md
+  - docs/06-requirements/REQ-002-capture-requirements.md
+  - docs/01-plans/PLAN-009-capture-build.md
+  - docs/09-backlog/backlog.yaml
+  - docs/08-governance/systems.yaml
+  result: Interviewed the owner in five batches and recorded fifteen decisions across
+    two ADRs. The entity model gained four record types and first-class tasks with
+    optional parents; cadence was redefined as a review rhythm with derived staleness.
+    REQ-002 states 25 verifiable requirements and PLAN-009 schedules eight build phases.
+    Governance exits 0 at 37 documents and 77 phases; pytest passes 110 tests. No
+    implementation code was written.
+- id: phase-cap-02
+  title: Define contracts for the expanded entity model
+  plan: doc-capture-build
+  sources:
+  - doc-record-types
+  - doc-capture-requirements
+  systems:
+  - sys-contracts
+  - sys-brain
+  owner: repository-owner
+  agent: agent-architect
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-cap-01
+  scope:
+  - Add schemas for task, interaction, decision, waiting_on and development_event.
+  - Add the shared evidence-and-provenance shape carried by every agent-filled field.
+  - Carry only a raw-capture reference and the assumed-field list onto promoted records,
+    per GOV-003.
+  - Make commitment project_id optional and remove the embedded tasks array.
+  - Rename project commitment_cadence to review_cadence and retire the ongoing value.
+  - Rename the key in every _data/projects file, and apply the owner's replacement
+    cadence for the three projects that held the retired value.
+  - "Correct the live instructions that still name the old field \u2014 README, the\
+    \ add-a-project procedure and PROMPT-001. Historical records keep the name they\
+    \ were written with."
+  acceptance:
+  - Fixtures for each new type validate, and a task validates with neither parent
+    set.
+  - A review_cadence of ongoing fails validation with the field named.
+  - A protected field at a non-explicit evidence level without a review flag fails
+    validation.
+  - Every _data/projects file validates against the renamed project schema.
+  - No DDL, loader or application code changes in this phase.
+  verification:
+  - uv run pytest test/test_schemas.py
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/task.schema.json
+  - schemas/interaction.schema.json
+  - schemas/decision.schema.json
+  - schemas/waiting-on.schema.json
+  - schemas/development-event.schema.json
+  - schemas/commitment.schema.json
+  - schemas/project.schema.json
+  - test/test_schemas.py
+  - schemas/evidence.schema.json
+  - _data/projects
+  - README.md
+  - brain/procedures/add-new-project.md
+  - docs/02-prompts/PROMPT-001-artifact-code-generation-system.md
+  next_action: Write the five new schemas and the shared evidence shape before touching
+    DDL or loaders.
+  session: doc-session-entity-contracts
+  completion_evidence:
+  - schemas/evidence.schema.json
+  - schemas/task.schema.json
+  - schemas/interaction.schema.json
+  - schemas/decision.schema.json
+  - schemas/waiting-on.schema.json
+  - schemas/development-event.schema.json
+  - schemas/commitment.schema.json
+  - schemas/project.schema.json
+  - test/test_schemas.py
+  - docs/03-sessions/SESS-2026-09-06-04-entity-contracts.md
+  result: Nine entity shapes where five were. test/test_schemas.py passes 117 tests
+    and the full suite 227; governance exits 0 at 42 documents; ruff and mypy stay
+    clean. A protected field at inferred with no review flag fails on a required review_flag
+    naming the field, and passes once flagged. All 33 _data/projects files validate
+    against the renamed schema, including the three the owner reassigned off the retired
+    cadence. No DDL, loader or application code changed, so the projection carries
+    no cadence until phase-cap-07 updates the loader.
+- id: phase-cap-03
+  title: Define the raw capture and staging contracts
+  plan: doc-capture-build
+  sources:
+  - doc-capture-routing
+  - doc-capture-requirements
+  systems:
+  - sys-capture
+  - sys-contracts
+  owner: repository-owner
+  agent: agent-cap03
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-cap-02
+  scope:
+  - Define the raw capture record shape, its identifier and its immutability rule.
+  - Define the staged record shape wrapping an entity record with its route and flags.
+  - Fix the on-disk locations for the raw store, the inbox and staging.
+  - Add ignore rules so none of the three is ever tracked.
+  acceptance:
+  - A raw capture record validates and carries content, an identifier and a timestamp.
+  - A staged record validates only with a resolvable raw source reference and a route.
+  - git check-ignore confirms every capture location is ignored.
+  verification:
+  - uv run pytest test/test_capture_contracts.py
+  - git check-ignore -v the configured raw, inbox and staging paths
+  deliverables:
+  - schemas/capture.schema.json
+  - schemas/staged-record.schema.json
+  - .gitignore
+  - test/test_capture_contracts.py
+  next_action: Complete. phase-cap-04 (raw intake) can now build against these two
+    schemas.
+  session: doc-session-capture-contracts
+  completion_evidence:
+  - schemas/capture.schema.json
+  - schemas/staged-record.schema.json
+  - .gitignore
+  - test/test_capture_contracts.py
+  result: "Defined capture.schema.json and staged-record.schema.json, fixed _capture/raw,\
+    \ _capture/inbox and _capture/staging as gitignored locations, and added 26 passing\
+    \ contract tests. No writer built \u2014 contracts only, per scope. Independent\
+    \ sub-agent review corroborated all three acceptance conditions with no discrepancies.\
+    \ Full detail in SESS-2026-09-08-04."
+- id: phase-cap-04
+  title: Build raw intake through the CLI and inbox
+  plan: doc-capture-build
+  sources:
+  - doc-capture-routing
+  - doc-capture-requirements
+  systems:
+  - sys-capture
+  owner: repository-owner
+  agent: agent-cap04
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-cap-03
+  scope:
+  - Add a single-command CLI quick capture that writes one raw record.
+  - Add inbox intake that turns any file-shaped input into raw records.
+  - Write raw records only; no interpretation or structuring in this phase.
+  acceptance:
+  - Captured text is stored byte-identical to the input through both paths.
+  - No code path in this phase edits or deletes an existing raw record.
+  - Nothing is written to _data/ or to staging.
+  verification:
+  - uv run pytest test/test_capture_intake.py
+  - uv run ruff check src/ test/ tools/
+  deliverables:
+  - tools/capture.py
+  - src/capture/raw.py
+  - test/test_capture_intake.py
+  next_action: Complete. phase-cap-05 (structuring and routing) can now build against
+    this raw-only intake.
+  session: doc-session-capture-intake
+  completion_evidence:
+  - src/capture/raw.py
+  - tools/capture.py
+  - test/test_capture_intake.py
+  - docs/08-governance/OPS-008-capture.md
+  result: Built src/capture/raw.py (write_raw_capture, the only writer for _capture/raw/,
+    and scan_inbox, shared by both intake channels) and tools/capture.py, the CLI,
+    taking a single positional text argument or stdin, plus --inbox to drain the inbox
+    directory. Both write raw records only, validated against schemas/capture.schema.json
+    before every write. A converted inbox file moves to _capture/inbox/processed/
+    so a later scan never recaptures it; a file that fails to convert is left in place
+    and the scan continues with the rest. Added 19 tests in test/test_capture_intake.py,
+    all passing; ruff and mypy clean; full suite at 365 passed. Also added docs/08-governance/OPS-008-capture.md
+    (a new tools/*.py ships with its own paired OPS-* doc per AGENTS.md, enforced
+    by test_tool_docs.py) and corrected REQ-002 R5's stale verification pointer and
+    its now-outdated "nothing implemented" line. Independent sub-agent review corroborated
+    all three acceptance conditions with no discrepancies beyond a stale document-count
+    in a pasted transcript. Full detail in SESS-2026-09-08-05.
+- id: phase-cap-05
+  title: Implement structuring, evidence scoring and routing
+  plan: doc-capture-build
+  sources:
+  - doc-capture-routing
+  - doc-capture-requirements
+  systems:
+  - sys-capture
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-cap-04
+  scope:
+  - Score each agent-filled field as explicit, inferred or guessed with provenance.
+  - Enforce the never-invent rules for promised_to, due_date, decision and completion.
+  - Route staged records to clean, flagged or held on stakes crossed with evidence.
+  - Hold every new person, project, tag or tag category rather than creating it.
+  acceptance:
+  - A fixture set covering each cell of the stakes-by-evidence matrix produces the
+    stated route.
+  - An ambiguous capture completes non-interactively and yields a flagged record.
+  - A capture naming an unknown person creates no person record anywhere.
+  - The same fixture through all three channels produces identical routing and evidence.
+  verification:
+  - uv run pytest test/test_capture_routing.py
+  - uv run mypy src/
+  deliverables:
+  - src/capture/structure.py
+  - src/capture/routing.py
+  - test/test_capture_routing.py
+  next_action: Build the routing table and the never-invent validation against the
+    matrix fixtures.
+- id: phase-cap-06
+  title: Build review and promotion into the source of truth
+  plan: doc-capture-build
+  sources:
+  - doc-capture-routing
+  - doc-capture-requirements
+  systems:
+  - sys-capture
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-cap-05
+  scope:
+  - Promote all clean staged records in one owner action and no flagged or held ones.
+  - Present flagged items with raw text, proposed record, assumed fields and reasons,
+    ordered by stakes.
+  - Take the identity decision for held people, projects, tags and tag categories.
+  - Append dated correction entries to promoted records without touching raw captures.
+  acceptance:
+  - Bulk promotion moves only clean records; a mixed batch leaves flagged and held
+    staged.
+  - No capture path other than promotion writes to _data/.
+  - A correction records the field, the previous value and the new one, and the prior
+    value stays readable.
+  verification:
+  - uv run pytest test/test_capture_review.py
+  - uv run pytest test/test_capture_promotion.py
+  deliverables:
+  - src/capture/review.py
+  - src/capture/promote.py
+  - tools/review.py
+  - test/test_capture_review.py
+  - test/test_capture_promotion.py
+  next_action: Build promotion first, then the review presentation that feeds it.
+- id: phase-cap-07
+  title: Project the expanded entity model into DuckDB
+  plan: doc-capture-build
+  sources:
+  - doc-record-types
+  - doc-capture-requirements
+  systems:
+  - sys-projection
+  owner: repository-owner
+  agent: agent-cap07
+  status: complete
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-cap-02
+  scope:
+  - Add tables for interaction, decision, waiting_on and development_event.
+  - Drop NOT NULL from commitments project_id and from tasks commitment_id and project_id.
+  - Load tasks from _data/tasks/ instead of unpacking them from commitment JSON.
+  - Derive last_touched at rebuild and add the unfiled view for parentless records.
+  acceptance:
+  - Fixtures for each new type load and survive a rebuild unchanged.
+  - A task loads with neither parent, with either, and with both.
+  - last_touched exists only in the projection and advances when an interaction is
+    added.
+  - last_reviewed is unchanged by activity.
+  - The unfiled view returns exactly the parentless fixtures (REQ-002 R19).
+  verification:
+  - uv run pytest test/test_rebuild.py
+  - uv run python tools/rebuild_db.py
+  deliverables:
+  - sql/001_schema.sql
+  - sql/003_capture_views.sql
+  - tools/rebuild_db.py
+  - test/test_rebuild.py
+  next_action: Complete.
+  session: doc-session-expanded-entity-projection
+  completion_evidence:
+  - sql/001_schema.sql
+  - sql/003_capture_views.sql
+  - tools/rebuild_db.py
+  - test/test_rebuild.py
+  - docs/03-sessions/SESS-2026-09-08-11-expanded-entity-projection.md
+  result: Added interactions/decisions/waiting_on/development_events tables, dropped
+    NOT NULL from commitments.project_id and tasks.commitment_id/project_id, switched
+    tasks to load from _data/tasks/, and added sql/003_capture_views.sql with a
+    project_last_touched view (derived, never stored) and an unfiled view (REQ-002
+    R19, added to this phase's own acceptance list after a scope-gap review). 14
+    new tests in test/test_rebuild.py pass; 386 pass overall; governance exits 0;
+    a real rebuild against the actual repository succeeds. Independent sub-agent
+    review reran everything itself and found all five acceptance conditions
+    genuinely held, no discrepancies.
+- id: phase-cap-08
+  title: Seed the portfolio through the capture pipeline
+  plan: doc-capture-build
+  sources:
+  - doc-capture-requirements
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-cap-06
+  - phase-cap-07
+  scope:
+  - Run real captures end to end through intake, structuring, review and promotion.
+  - Confirm no project has regained a retired cadence value. The owner reassigned
+    the original three during phase-cap-02; see GOV-003.
+  - Respect the structure/content boundary; captured content stays private until promoted.
+  acceptance:
+  - commitments, interactions and tasks are non-empty after a rebuild.
+  - No project carries a retired review_cadence value.
+  - Every promoted record traces back to a raw capture.
+  verification:
+  - uv run python tools/rebuild_db.py
+  - uv run pytest
+  deliverables:
+  - _data/commitments
+  - _data/tasks
+  - _data/interactions
+  next_action: Capture a real working period through the full pipeline rather than
+    authoring records by hand.
+- id: phase-cap-09
+  title: Confirm the signal and synthesis tracks are unblocked
+  plan: doc-capture-build
+  sources:
+  - doc-capture-build
+  systems:
+  - sys-signals
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-cap-08
+  scope:
+  - Record row counts per table against the needs listed in PLAN-009.
+  - Separate phases that need non-empty tables from those needing accumulated history.
+  - Put the waiting_on scope change to phase-sig-03 to the owner for a decision.
+  acceptance:
+  - Every phase-sig and phase-syn phase is marked as data-ready or as needing accumulation,
+    with counts.
+  - The owner's decision on the two-sided accountability ledger is recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance --ready
+  - uv run python tools/rebuild_db.py
+  deliverables:
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - docs/09-backlog/backlog.yaml
+  next_action: Measure real row counts before declaring any downstream phase ready.
+- id: phase-gov-01
+  title: Reject backlog deliverables claiming an unreserved code
+  plan: doc-code-reservation-enforcement
+  sources:
+  - doc-backlog-decisions
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Check every backlog deliverable whose filename carries a code against existing
+    documents and the codes.yaml reservations.
+  - Fail with the phase, the code and the file named, and say to reserve it in codes.yaml.
+  acceptance:
+  - A fixture phase naming an unreserved code fails with the phase and code named.
+  - A deliverable naming an existing document passes.
+  - A deliverable carrying no code, such as AGENTS.md, passes.
+  - The current repository passes unchanged, including the reserved ADR-004 and ADR-005
+    claims.
+  verification:
+  - uv run pytest test/test_backlog.py
+  - uv run python -m src.governance
+  deliverables:
+  - src/governance/backlog.py
+  - test/test_backlog.py
+  next_action: Check coded deliverables against existing documents and codes.yaml
+    reservations.
+- id: phase-ses-01
+  title: Define the session type taxonomy and per-type context
+  plan: doc-session-lifecycle
+  sources: []
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Decide the set of session types and, for each, what an agent must read, may skip,
+    must produce and must never do.
+  - Resolve whether brainstorming produces a governed artifact, and how a session
+    changing type mid-flight behaves.
+  - Name the rules that are universal across all types, including confidentiality,
+    code allocation and the push gate.
+  - Decide whether the type is declared by the owner, inferred from the claimed phase,
+    or both.
+  acceptance:
+  - A requirements document states each type's obligations as observable conditions
+    with verification methods.
+  - The universal rules are listed once and marked as non-negotiable per type.
+  - The mid-flight type change is answered rather than deferred, since it is the common
+    case.
+  verification:
+  - uv run python -m src.governance
+  - Read the taxonomy and confirm each type answers what to load, produce and avoid.
+  deliverables:
+  - docs/06-requirements
+  - docs/04-decisions
+  next_action: Decide the set of session types and what each one loads.
+- id: phase-ses-02
+  title: Build the session opening entry points
+  plan: doc-session-lifecycle
+  sources: []
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-ses-01
+  scope:
+  - Implement one entry point per session type in the location phase 1 chose.
+  - Keep each entry point a pointer to the authoritative document rather than a copy
+    of its rules.
+  acceptance:
+  - Invoking an entry point loads the context its type needs and nothing the type
+    does not need.
+  - No entry point restates a rule that AGENTS.md or a governance document already
+    owns.
+  - An implementation entry point loads code conventions; a planning entry point does
+    not.
+  verification:
+  - Open a fresh session, invoke each entry point, and confirm the loaded context
+    matches the taxonomy.
+  - uv run python -m src.governance
+  deliverables:
+  - .claude
+  - AGENTS.md
+  next_action: Implement one entry point per session type in the location phase 1
+    chose.
+- id: phase-ses-03
+  title: Build the checkpoint skill
+  plan: doc-session-lifecycle
+  sources: []
+  systems:
+  - sys-governance
+  owner: repository-owner
+  agent: agent-checkpoint
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build checkpoint as a skill, invocable by the owner or by the agent whenever either
+    sees value, and safe to run repeatedly during one session.
+  - Define the session record as the single output product both checkpoint and session-close
+    write, created on the first checkpoint and updated by every run after it.
+  - Cover verification output as actually observed, session record with an allocated
+    code, backlog status and evidence, next_up pruning, catalog regeneration and the
+    governance check.
+  - Make the incomplete path the ordinary one - a phase whose acceptance is unmet
+    stays queued or active with an honest next_action, and the skill never claims
+    completion that is not there.
+  - Work in the primary checkout with no remote, and scope the worktree and rebase
+    steps to sessions that actually use a worktree.
+  - Replace the blanket primary-checkout prohibition with the conditions recorded
+    in GOV-003.
+  - Reference the skill from CLAUDE.md and AGENTS.md without restating its rules in
+    either.
+  acceptance:
+  - The skill is executable end to end without a remote or a worktree.
+  - Running it twice with no work between produces no diff, so a checkpoint is cheap
+    to repeat.
+  - A phase with unmet acceptance is left queued or active with a next_action, never
+    marked complete.
+  - A second run updates the existing session record rather than creating a second
+    one.
+  - Following it leaves the governance check green and the catalog current.
+  - CLAUDE.md and AGENTS.md both reference the skill, so an agent can know to invoke
+    it unprompted.
+  - No governed document still forbids the primary checkout unconditionally.
+  verification:
+  - Invoke the skill twice for a real phase and confirm the second run is a no-op
+    diff.
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - .claude/skills/checkpoint
+  - AGENTS.md
+  - CLAUDE.md
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  next_action: Complete. phase-ses-05 (session-close) depends on this phase and is
+    ready to claim.
+  session: doc-session-checkpoint-skill
+  completion_evidence:
+  - .claude/skills/checkpoint/SKILL.md
+  - docs/03-sessions/SESS-2026-09-07-01-checkpoint-skill.md
+  - AGENTS.md
+  - CLAUDE.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  result: All seven acceptance conditions confirmed met (see SESS-2026-09-07-01),
+    and independently reconfirmed by a fresh non-fork sub-agent audit requested separately
+    by the owner (git-history cross-checked, not just the session record's prose).
+    uv run python -m src.governance passes (16 systems, 67 documents, 8 memories,
+    95 backlog phases); uv run pytest passes (290 passed, 2 warnings). The checkpoint
+    skill was dogfooded twice against this phase with no other work in between; the
+    second run produced an empty git diff. The skill itself never wrote status:complete
+    -- this transition was done through the standard AGENTS.md hand-off procedure,
+    since phase-ses-05 (session-close) does not exist yet. The audit's one finding
+    -- GOV-003-backlog-decisions.md was touched by this phase but missing from deliverables/completion_evidence
+    -- is fixed here.
+- id: phase-ses-05
+  title: Build the session-close command with third-party review
+  plan: doc-session-lifecycle
+  sources: []
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  agent: agent-checkpoint
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-ses-03
+  scope:
+  - Build session-close as a command, not a skill - the owner alone decides a session
+    is over, and an agent must never reach it by concluding on its own that the work
+    is finished.
+  - Finalise the same session record the checkpoint skill creates and updates, rather
+    than writing a second document.
+  - Add third-party review by a sub-agent - acceptance conditions actually met, verification
+    output actually observed, and whether the record matches the diff.
+  - Record the depth a checkpoint deliberately skips - what was decided and why, corrections
+    made, and what the next session needs that the code does not carry.
+  - Mark the phase complete only here, and only when acceptance genuinely holds.
+  acceptance:
+  - Only the owner can invoke it; no agent-reachable path reaches session completion.
+  - It updates the session record the checkpoint created rather than creating a second
+    one.
+  - The sub-agent review runs against the diff and its findings are recorded, including
+    when it finds nothing.
+  - A session whose acceptance conditions are unmet closes without the phase being
+    marked complete.
+  - Governance is green and the catalog current afterwards.
+  verification:
+  - Close a real session and confirm the sub-agent review reported against the actual
+    diff.
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - .claude/commands/session-close.md
+  - AGENTS.md
+  - CLAUDE.md
+  - docs/03-sessions
+  next_action: Complete. phase-ses-04 (dogfood the protocols and correct them) still
+    waits on phase-ses-02.
+  session: doc-session-close-command
+  completion_evidence:
+  - .claude/commands/session-close.md
+  - docs/03-sessions/SESS-2026-09-07-03-session-close-command.md
+  - AGENTS.md
+  - CLAUDE.md
+  result: All five acceptance conditions confirmed met by two independent sub-agent
+    review passes (see SESS-2026-09-07-03). The first pass caught a real defect --
+    the catalog had not been regenerated after the session record was added, so uv
+    run pytest was genuinely failing on test_committed_catalog_matches_regenerated_output
+    -- and correctly reported the phase as not yet complete. After the catalog was
+    regenerated, a second independent pass caught a second real gap -- the review
+    section itself was still a placeholder while the record narrated a finished end-state
+    that had not happened yet -- and again correctly withheld completion. Both gaps
+    are now fixed. uv run python -m src.governance passes (16 systems, 68 documents,
+    8 memories, 95 backlog phases); uv run pytest passes (290 passed, 2 warnings);
+    the catalog diffs clean against a fresh render.
+- id: phase-ses-04
+  title: Dogfood the protocols and correct them
+  plan: doc-session-lifecycle
+  sources: []
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ses-02
+  - phase-ses-03
+  - phase-ses-05
+  scope:
+  - Run each session type at least once against real backlog work.
+  - Correct the protocols from what actually happened rather than from what was intended.
+  acceptance:
+  - A session opened cold produces work of the same quality as one opened with a full
+    conversation behind it.
+  - Every correction is traceable to an observed failure, not to a predicted one.
+  - No step in either protocol needed the owner to prompt it.
+  verification:
+  - Open a cold session per type, complete a real phase, and record where the protocol
+    fell short.
+  - uv run python -m src.governance
+  deliverables:
+  - AGENTS.md
+  - docs/03-sessions
+  next_action: Run each session type once against real backlog work and record where
+    the protocol falls short.
+- id: phase-ses-06
+  title: Let checkpoint record evidence before a phase completes
+  plan: doc-session-lifecycle
+  sources:
+  - doc-backlog-protocol
+  systems:
+  - sys-backlog
+  owner: repository-owner
+  status: complete
+  agent: agent-ses06
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Relax src/governance/backlog.py so session, completion_evidence and result may
+    be present while a phase is active or blocked (a held claim), not only when status
+    is complete, so a checkpoint mid a long or complex session can record real interim
+    evidence without waiting for close.
+  - Keep the existing requirement that a complete phase has all three fields populated
+    with genuine content, and that queued/deferred/cancelled phases (no held claim)
+    carry none of them.
+  - Update GOV-002's field table to state plainly that these fields may be recorded
+    incrementally before completion, not only at it.
+  - Note the corrected contract in the checkpoint skill so its own instructions and
+    the checker agree.
+  acceptance:
+  - An active or blocked phase carrying session, completion_evidence and result passes
+    governance.
+  - A queued, deferred or cancelled phase carrying any of the three still fails governance.
+  - A complete phase missing any of the three still fails governance, unchanged from
+    today.
+  verification:
+  - uv run pytest test/test_backlog.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/governance/backlog.py
+  - test/test_backlog.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - .claude/skills/checkpoint/SKILL.md
+  next_action: Complete. No further action.
+  session: doc-session-2026-09-07-08
+  completion_evidence:
+  - src/governance/backlog.py
+  - test/test_backlog.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - .claude/skills/checkpoint/SKILL.md
+  result: All three acceptance conditions met and independently corroborated by a
+    fresh sub-agent review with no discrepancies; the review's one finding (no dedicated
+    test for the cancelled-status case) was fixed before closing. See SESS-2026-09-07-08
+    for verification output, per-condition evidence and the review verbatim.
+- id: phase-term-01
+  title: Scaffold the terminology system
+  plan: doc-terminology-system
+  sources:
+  - doc-terminology-system
+  systems:
+  - sys-brain
+  - sys-retrieval
+  - sys-projection
+  - sys-governance
+  owner: repository-owner
+  agent: agent-term01
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - "Add a systems field to memory.schema.json, and validate it against systems.yaml\
+    \ in src/governance/__main__.py \u2014 JSON Schema cannot reach systems.yaml on\
+    \ its own."
+  - Add a systems column to the memories table in sql/001_schema.sql and load it in
+    rebuild_db.py; load_context.py queries DuckDB, so the filter cannot work without
+    it.
+  - Add a --system filter to tools/load_context.py.
+  - Write tools/generate_glossary.py, deterministic and able to emit several filtered
+    glossaries.
+  - Add a test asserting the committed glossary matches regenerated output.
+  acceptance:
+  - A memory naming an unknown system fails the governance check with the system named.
+  - load_context.py --system returns only memories carrying that system.
+  - Regenerating the glossary twice produces identical output.
+  - The glossary test fails when the committed file is edited by hand.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/memory.schema.json
+  - src/governance/__main__.py
+  - sql/001_schema.sql
+  - tools/rebuild_db.py
+  - tools/load_context.py
+  - tools/generate_glossary.py
+  - test/
+  next_action: Complete. Writing the actual short-definition vocabulary (concept memories
+    following PLAN-012's one-sentence convention) is PROMPT-004's separate, still-open
+    job.
+  session: doc-session-2026-09-07-05
+  completion_evidence:
+  - schemas/memory.schema.json
+  - src/governance/__main__.py
+  - sql/001_schema.sql
+  - tools/rebuild_db.py
+  - tools/load_context.py
+  - tools/generate_glossary.py
+  - docs/08-governance/GLOSSARY.md
+  - test/test_glossary.py
+  - test/test_load_context.py
+  - docs/03-sessions/SESS-2026-09-07-05-terminology-system-scaffold.md
+  result: "All four acceptance conditions independently confirmed by a fresh non-fork\
+    \ sub-agent review (see SESS-2026-09-07-05), which also caught and led to fixing\
+    \ one real defect \u2014 a vacuous hand-edit-detection test that never invoked\
+    \ the actual check mechanism. memory.schema.json gained a systems field validated\
+    \ against systems.yaml in the governance check (mirrors the existing document\
+    \ check). sql/001_schema.sql and rebuild_db.py carry it through to DuckDB; load_context.py's\
+    \ --system filter is proven against a real temporary DuckDB. generate_glossary.py\
+    \ is deterministic (--check passes, a plain regen produces zero diff) and filterable\
+    \ by tag/system, refusing a filtered run without --out so the committed unfiltered\
+    \ glossary is never silently overwritten. uv run pytest passes (310 passed); uv\
+    \ run python -m src.governance passes (16 systems, 71 documents, 8 memories, 95\
+    \ backlog phases); ruff and mypy clean. No new brain/ content was written, honoring\
+    \ the plan's scaffolding-before-content sequencing."
+- id: phase-term-02
+  title: Define the vocabulary and document the architecture
+  plan: doc-terminology-system
+  sources:
+  - doc-terminology-system
+  systems:
+  - sys-brain
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  agent: agent-term02
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-term-01
+  scope:
+  - Write grouped term definitions into brain/concepts/ per PROMPT-004.
+  - Generate the glossary and commit it.
+  - Write one governed architecture overview of the whole system.
+  - Enrich every systems.yaml description with what the subsystem does and does not
+    yet do.
+  acceptance:
+  - Every term listed in PROMPT-004 is defined or explicitly deferred with a reason.
+  - The architecture overview names every subsystem and how they depend on each other.
+  - No per-subsystem architecture document is created.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run python tools/load_context.py --query "ephemeral plan"
+  - uv run python tools/load_context.py --system sys-backlog
+  deliverables:
+  - brain/concepts/
+  - docs/07-architecture/
+  - docs/08-governance/systems.yaml
+  next_action: Complete. No further action.
+  session: doc-session-2026-09-07-07
+  completion_evidence:
+  - brain/concepts/terms-plans-and-work.md
+  - brain/concepts/terms-documents-and-governance.md
+  - brain/concepts/terms-data-and-storage.md
+  - brain/concepts/terms-memory-and-retrieval.md
+  - brain/concepts/terms-systems-vocabulary.md
+  - docs/08-governance/GLOSSARY.md
+  - docs/07-architecture/ARCH-004-architecture-overview.md
+  - docs/08-governance/systems.yaml
+  result: "All three acceptance conditions met and independently corroborated by a\
+    \ fresh sub-agent review with no discrepancies found \u2014 see SESS-2026-09-07-07\
+    \ for verification output, per-condition evidence and the review verbatim."
+- id: phase-gov-02
+  title: Decide whether governance is a system, a kind, or both
+  plan: doc-governance-model
+  sources:
+  - doc-governance-model
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  agent: agent-gov02
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-term-02
+  scope:
+  - Answer the five questions in PROMPT-005 against real documents, not in principle.
+  - Decide whether governance documents need a field distinguishing enforced rules
+    from convention.
+  - Decide whether the governance and operation kinds should merge.
+  acceptance:
+  - One ADR answers all five questions, including any answered leave it alone.
+  - Every claim cites a real document in this repository.
+  - No schema is written this session; changes become phases.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  next_action: Complete. Follow-on decisions land in phase-gov-03 (PROMPT-003) and
+    phase-tool-01, both now unblocked.
+  session: doc-session-2026-09-08-01
+  completion_evidence:
+  - docs/04-decisions/ADR-011-governance-model.md
+  - docs/03-sessions/SESS-2026-09-08-01-governance-model-decision.md
+  result: ADR-011 answers all five PROMPT-005 questions, each claim cited to a real
+    document; no schema changed. Governance (77 documents) and pytest (313 passed)
+    both green. Independent sub-agent review sampled 8+ citations, reran verification
+    and diffed the catalog itself; found no discrepancies and recommended completion.
+- id: phase-tool-01
+  title: Document each tool with a generated reference
+  plan: doc-tooling-documentation
+  sources:
+  - doc-tooling-documentation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: complete
+  agent: agent-tool01
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-term-01
+  - phase-gov-02
+  scope:
+  - Write tools/generate_tool_docs.py following the glossary generator pattern, not
+    a second shape.
+  - Write one OPS document per existing tool, generated reference plus hand-written
+    narrative.
+  - Add a test asserting each committed generated section matches regenerated output.
+  - Record in AGENTS.md that a new tool ships with its operations document.
+  - Use whichever series phase-gov-02 settles on; do not mint OPS codes before that
+    decision.
+  acceptance:
+  - Regenerating twice produces identical output.
+  - The test fails when a generated section is edited by hand.
+  - No document is created for a tool that does not exist yet.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/generate_tool_docs.py
+  - docs/08-governance/
+  next_action: Complete.
+  session: doc-session-2026-09-08-02
+  completion_evidence:
+  - tools/generate_tool_docs.py
+  - test/test_tool_docs.py
+  - docs/08-governance/OPS-002-rebuild-db.md
+  - docs/08-governance/OPS-003-load-context.md
+  - docs/08-governance/OPS-004-generate-glossary.md
+  - docs/08-governance/OPS-005-append-idea.md
+  - docs/08-governance/OPS-006-generate-ideas-md.md
+  - docs/08-governance/OPS-007-generate-tool-docs.md
+  - docs/03-sessions/SESS-2026-09-08-02-tool-reference-docs.md
+  result: uv run pytest -> 320 passed, 2 warnings. uv run python -m src.governance
+    -> Governance OK, 16 systems, 84 documents, 13 memories, 96 backlog phases. All
+    three acceptance conditions met. An independent sub-agent review corroborated
+    the three conditions and flagged two discrepancies (a stale document count in
+    this record, and a missing OPS document for the generator itself); both were fixed
+    before this close -- the generator's own OPS-007 was written, a real marker-splitting
+    bug the self-inclusion exposed was fixed with a regression test, and this record's
+    numbers were updated to match a fresh rerun. See the session record's Review and
+    Corrections sections for the full account.
+- id: phase-gov-03
+  title: Run the systems review for scope creep and complexity
+  plan: doc-governance-model
+  sources:
+  - doc-governance-model
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: complete
+  agent: agent-gov03
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-gov-02
+  scope:
+  - Answer the seven questions in PROMPT-003 with a bias toward removal.
+  - Weigh the plan-requirement pressure against its four recorded instances.
+  - Inherit the governance/operation answer from phase-gov-02 rather than reopening
+    it.
+  acceptance:
+  - Every Part 2 question has a written answer, including those answered leave it
+    alone.
+  - Any decision that changes the system has an ADR.
+  - No new system, kind, folder or schema is added by this session.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/04-decisions/
+  - docs/09-backlog/backlog.yaml
+  next_action: Complete. phase-gov-04 implements the deferred walkthrough retirement.
+  session: doc-session-2026-09-08-03
+  completion_evidence:
+  - docs/04-decisions/ADR-012-systems-review.md
+  - docs/09-backlog/backlog.yaml
+  - docs/03-sessions/SESS-2026-09-08-03-systems-review.md
+  result: "All seven PROMPT-003 questions answered in ADR-012 \u2014 one decision\
+    \ that changes the system (retire kind walkthrough, zero instances across 84 documents)\
+    \ and six confirmations of the current design, each re-checked against evidence\
+    \ rather than PLAN-014's stated premise. Question 4's grep overturned that premise\
+    \ directly - one real plan-before-code bypass exists, not several, plus a separately-formalized\
+    \ unphased-work pattern that is not the same thing. An independent sub-agent review\
+    \ corroborated all three acceptance conditions from its own diff read and rerun\
+    \ (89 documents, 365 tests after phase-cap-03/04 closed independently in the interim)\
+    \ and found one citation error in ADR-012 (a quote misattributed to PLAN-014 instead\
+    \ of PROMPT-003), fixed in this close. Governance and the full test suite are\
+    \ green after catalog regeneration."
+- id: phase-gov-04
+  title: Retire the unused walkthrough document kind
+  plan: doc-governance-model
+  sources:
+  - doc-systems-review-decision
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-gov-03
+  scope:
+  - Remove walkthrough from the kind enum in schemas/document.schema.json.
+  - Remove the WALK series entry from docs/08-governance/codes.yaml.
+  - Remove the walkthrough row from the taxonomy table in GOV-001-protocol.md.
+  - Confirm no existing document uses kind walkthrough before removing it.
+  acceptance:
+  - No governed document declares kind walkthrough.
+  - schemas/document.schema.json rejects kind walkthrough.
+  - The taxonomy table and codes.yaml no longer list it.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - schemas/document.schema.json
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/GOV-001-protocol.md
+  next_action: 'Grep docs/ for ''kind: walkthrough'' to confirm zero uses, then remove
+    the enum value, the WALK series entry and the taxonomy row in one diff.'
+- id: phase-tool-02
+  title: Generalise the tooling for reuse across repositories
+  plan: doc-tooling-documentation
+  sources:
+  - doc-tooling-documentation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-tool-01
+  scope:
+  - Replace ROOT-from-__file__ in the tools and the governance module with discovery
+    of a config file, so a tool no longer has to live inside the repository it operates
+    on.
+  - "Move the hardcoded constants into that config \u2014 EXEMPT, MEMORY_DIRS, the\
+    \ scanned folder list, and the _data, brain, schemas and sql paths."
+  - State a test for which assumptions generalise and which stay repository-specific.
+  - Change no behaviour for this repository; the config ships with today's values
+    as defaults.
+  acceptance:
+  - The full suite passes unchanged with the config supplying current values.
+  - A tool run from outside the repository against an explicit root produces identical
+    output.
+  - Nothing that works today stops working.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/
+  - src/governance/
+  next_action: Start by replacing ROOT-from-__file__ with config discovery; every
+    other constant depends on that indirection existing.
+- id: phase-idea-01
+  title: Build the idea record system
+  plan: doc-idea-record-system
+  sources:
+  - doc-idea-record-system
+  systems:
+  - sys-portfolio
+  - sys-projection
+  - sys-governance
+  - sys-contracts
+  owner: repository-owner
+  agent: agent-slate
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write schemas/idea.schema.json for the event shape and the legal status transitions.
+  - Write tools/append_idea.py, which takes prose and generates the id, timestamp
+    and event; it is the only sanctioned writer and it accepts no timestamp argument
+    at all.
+  - Expose it as a custom tool an agent can call, wrapping the script rather than
+    reimplementing it.
+  - Migrate every entry created before the writer exists into _data/ideas.jsonl, preserving
+    their recorded timestamps exactly and unflagged.
+  - Write tools/backfill_ideas.py as a one-time migrator importing event construction
+    from append_idea.py and overriding only the timestamp, then delete it once the
+    migration is committed.
+  - Project into DuckDB as ideas (folded current state) and idea_events (full history).
+  - Write tools/generate_ideas_md.py and make docs/00-working/ideas.md a generated
+    artifact.
+  - Amend ADR-010, which currently describes the list as ungoverned markdown.
+  acceptance:
+  - A status change appends a line and modifies none.
+  - The test fails when any committed line in _data/ideas.jsonl is altered.
+  - An illegal transition is refused by the writer with the attempted transition named.
+  - A second discard after a revisit is refused as permanent.
+  - Regenerating ideas.md twice produces identical output, and the test fails on a
+    hand edit.
+  - Time in each state is queryable from idea_events without parsing markdown.
+  - Every entry present in the markdown list before migration has a created event
+    in _data/ideas.jsonl carrying its original timestamp.
+  - append_idea.py exposes no way to supply a timestamp, asserted by a test against
+    its interface rather than its behaviour.
+  - tools/backfill_ideas.py is absent from the tree at completion, surviving only
+    in history.
+  - The custom tool wrapper exists and invokes tools/append_idea.py without duplicating
+    its logic.
+  - ADR-010 states that _data/ideas.jsonl is the source of truth and ideas.md is generated,
+    with no remaining claim that the list is ungoverned markdown.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/rebuild_db.py
+  deliverables:
+  - schemas/idea.schema.json
+  - _data/ideas.jsonl
+  - tools/append_idea.py
+  - tools/generate_ideas_md.py
+  - tools/rebuild_db.py
+  - sql/001_schema.sql
+  - src/db/source_validation.py
+  - .claude/commands/idea.md
+  - docs/00-working/ideas.md
+  - docs/00-working/README.md
+  - docs/04-decisions/ADR-010-idea-staging.md
+  - docs/01-plans/PLAN-016-idea-record-system.md
+  - docs/08-governance/systems.yaml
+  - test/
+  next_action: "Write schemas/idea.schema.json first \u2014 the writer, the projection\
+    \ and the enforcement test all encode the same transition rules, and the schema\
+    \ is where they should be stated once."
+  session: doc-session-2026-09-06-09
+  completion_evidence:
+  - schemas/idea.schema.json
+  - _data/ideas.jsonl
+  - tools/append_idea.py
+  - tools/generate_ideas_md.py
+  - tools/rebuild_db.py
+  - sql/001_schema.sql
+  - src/db/source_validation.py
+  - .claude/commands/idea.md
+  - docs/00-working/ideas.md
+  - docs/00-working/README.md
+  - docs/04-decisions/ADR-010-idea-staging.md
+  - docs/01-plans/PLAN-016-idea-record-system.md
+  - docs/08-governance/systems.yaml
+  - test/test_ideas.py
+  result: "285 tests pass, 19 of them new; governance exits 0 across 16 systems, 57\
+    \ documents and 88 phases; the rebuild projects 13 ideas and 13 idea_events. All\
+    \ thirteen markdown entries migrated with their original timestamps and every\
+    \ body byte-identical. The --at override PLAN-016 specified was replaced by tools/backfill_ideas.py,\
+    \ run once and then deleted, so the shipped writer has no timestamp argument at\
+    \ all \u2014 asserted against the parser rather than against behaviour. The append-only\
+    \ guarantee is checked against git HEAD and verified by mutation. Migrated timestamps\
+    \ are preserved exactly and carry no flag, having been observed against a clock\
+    \ as the ideas arrived, so they are the same kind of data the writer stamps."
+- id: phase-idea-02
+  title: Build the idea triage agent
+  plan: doc-idea-record-system
+  sources:
+  - doc-idea-record-system
+  systems:
+  - sys-portfolio
+  - sys-memory-agents
+  owner: repository-owner
+  status: complete
+  agent: agent-claude
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-idea-01
+  - phase-idea-08
+  scope:
+  - Build the agent that scouts each open idea for related plans, phases and documents.
+  - Have it move ideas from open to triaged with findings attached, never past that.
+  acceptance:
+  - The agent writes only through the tool from phase-idea-01, using the finding-kind
+    annotated event phase-idea-08 adds.
+  - It never advances an idea beyond triaged; owner judgement is not automated.
+  - An overlap it finds is recorded on the entry as a finding annotation, never used
+    to decline or merge one.
+  verification:
+  - uv run pytest
+  deliverables:
+  - .claude/
+  next_action: Complete. A full sweep of the remaining ~44 open ideas, and idea
+    000049's own triage, are out of scope for this phase and left for a future
+    session (see SESS-2026-09-08-18's Left undone).
+  session: doc-session-idea-triage-agent
+  completion_evidence:
+  - .claude/agents/idea-triage.md
+  - .claude/commands/idea-triage.md
+  - _data/ideas.jsonl
+  result: Built the idea-triage subagent and its /idea-triage driver command.
+    Exercised end-to-end against three real ideas (000046, 000047, 000048) -
+    each produced exactly one finding annotation via
+    `tools/append_idea.py annotate --kind finding` and moved open -> triaged,
+    never further. Extended at the owner's direction with two non-executing
+    proposal mechanisms in the finding text (PROPOSED LINK, PROPOSED PROMOTION)
+    that the owner reviews and runs by hand. Backfilled idea 000007's own
+    missed promotion (promoted -> PLAN-016) as a related correctness fix.
+    Independent sub-agent review corroborated all three acceptance conditions
+    Met from its own diff/log inspection and pytest run; its one substantive
+    caveat (enforcement is instructional via prompt, not a hard tool-permission
+    wall) is recorded in SESS-2026-09-08-18's Left undone, not a blocker.
+- id: phase-idea-03
+  title: Synthesize the idea and plan lifecycle architecture
+  plan: doc-ephemeral-working-plans
+  sources:
+  - doc-idea-record-system
+  - doc-idea-staging
+  systems:
+  - sys-governance
+  - sys-backlog
+  - sys-portfolio
+  - sys-projection
+  owner: repository-owner
+  status: complete
+  agent: agent-codex-architecture
+  session: doc-session-2026-09-06-10
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Execute the owner-directed architecture brief in _working/CODEX-PROMPT.md; this
+    explicit task overrides ordinary queue selection without reordering next_up.
+  - Analyze the transcript first through a dedicated reader, reconcile the four audit
+    and brief inputs, and synthesize category proposals before governing them.
+  - Produce one parent plan, six category child plans in four lifecycle and architecture
+    folders, requirements, transcript analysis, and session-sized proposed implementation
+    phases.
+  - Change documentation only; preserve all existing idea data and do not execute
+    the writer or implementation phases.
+  acceptance:
+  - The synthesized documents preserve the corrected amendment mechanism and expose
+    provenance gaps and cross-category conflicts.
+  - The four requested folders contain category documents with known facts, proposals,
+    open questions, affected paths, verification, and conflicts.
+  - Requirements and backlog coverage distinguish this architecture result from future
+    implementation.
+  - The catalog is regenerated and governance exits 0.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - Review category coverage and conflict decisions against the authoritative synthesis
+    and transcript-analysis report.
+  deliverables:
+  - docs/01-plans/
+  - docs/06-requirements/
+  - docs/00-working/idea-plan-architecture/
+  - docs/03-sessions/
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
+  - docs/09-backlog/backlog.yaml
+  next_action: Follow _working/CODEX-PROMPT.md; stage exploratory findings ungoverned
+    and govern only the reconciled architecture.
+  completion_evidence:
+  - docs/01-plans/PLAN-017-idea-plan-lifecycle/PLAN-017-overview.md
+  - docs/06-requirements/REQ-003-idea-plan-lifecycle.md
+  - docs/03-sessions/SESS-2026-09-06-10-idea-plan-lifecycle-architecture.md
+  - docs/00-working/idea-plan-architecture/transcript-analysis.md
+  result: 'Governance OK: 16 systems, 66 documents, 8 memories, 95 backlog phases.
+    pytest: 290 passed. mypy: no issues in 11 source files. Six category children
+    in four folders; five session-sized implementation phases queued. The validator
+    was relaxed to permit one area-folder level and GOV-005 now documents it.'
+- id: phase-idea-04
+  title: Make the idea write path safe and single-source the replay
+  plan: doc-idea-plan-lifecycle
+  sources:
+  - doc-idea-plan-writing-projection
+  - doc-idea-plan-event-contract
+  - doc-idea-plan-lifecycle-requirements
+  systems:
+  - sys-portfolio
+  - sys-projection
+  owner: repository-owner
+  agent: agent-idea04
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idea-03
+  scope:
+  - Give --title the stdin and file input --body already has, and rewrite the example
+    in the idea command so the form an agent copies is the safe one.
+  - Move replay into one importable module in src/ and delete the three existing copies,
+    including the test fixture that reimplements it.
+  - Add the from-check so a status event is validated against the status replay has
+    actually reached, before any append and before the rebuild drops a table.
+  - Repair the two broken tests using synthetic later events built in a fixture.
+  acceptance:
+  - Prose containing backticks, dollar substitutions, quotes, newlines and non-ASCII
+    survives the real CLI unchanged, and no sentinel command executes.
+  - One replay implementation and one transition table have all consumers; no copy
+    remains in test/.
+  - A mismatched from, an illegal transition, a duplicate creation, an unknown idea
+    and a second revisit each fail before the log or the database is touched.
+  - No event or document schema changed, and the existing log is byte-identical.
+  verification:
+  - uv run pytest test/test_ideas.py
+  - uv run ruff check src/ test/ tools/
+  - uv run mypy src/
+  - uv run pytest
+  deliverables:
+  - src/
+  - tools/append_idea.py
+  - tools/rebuild_db.py
+  - tools/generate_ideas_md.py
+  - test/test_ideas.py
+  - .claude/commands/idea.md
+  next_action: Complete. phase-idea-07 depends on this and now has one fold() to extend.
+  session: doc-session-2026-09-07-02
+  completion_evidence:
+  - src/db/ideas.py
+  - tools/append_idea.py
+  - tools/rebuild_db.py
+  - src/db/source_validation.py
+  - test/test_ideas.py
+  - .claude/commands/idea.md
+  - tools/generate_ideas_md.py
+  - docs/00-working/README.md
+  - docs/03-sessions/SESS-2026-09-07-02-idea-write-path-safety.md
+  result: 'uv run pytest test/test_ideas.py: 30 passed. uv run ruff check src/ test/
+    tools/: 1 pre-existing unrelated error (tools/load_context.py, untouched by this
+    phase). uv run mypy src/: no issues in 12 source files. uv run pytest: 299 passed.
+    _data/ideas.jsonl, schemas/idea.schema.json and sql/001_schema.sql unchanged.
+    All four acceptance conditions independently confirmed by a fresh non-fork sub-agent
+    review, run retroactively once session-close existed (see SESS-2026-09-07-02 ##
+    Review). That review caught one real gap outside the four acceptance bullets:
+    tools/generate_ideas_md.py and docs/00-working/README.md still showed the dangerous
+    --body "..." example in their own text, defeating the point of fixing .claude/commands/idea.md.
+    Fixed in the same session; docs/00-working/ideas.md regenerated and the full suite
+    re-confirmed green afterward.'
+- id: phase-idea-05
+  title: Derive plan status consistency from phase state
+  plan: doc-idea-plan-lifecycle
+  sources:
+  - doc-idea-plan-plan-lifecycle
+  - doc-idea-plan-lifecycle-requirements
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idea-03
+  scope:
+  - Implement the severity matrix in src/governance/backlog.py, attributing phases
+    by plan OR sources and counting each once.
+  - Take a fresh inventory of every plan rather than trusting the four-plan baseline,
+    and reconcile each contradiction it finds.
+  - Report stored status, phase counts, distribution class, severity and reason for
+    every plan, including the ones that pass.
+  acceptance:
+  - Every matrix cell is parameterized in tests and the distribution classifier is
+    proven disjoint and exhaustive.
+  - Complete with a mix of complete and cancelled phases warns; the warning clears
+    when completion evidence explains the cancellations, and GOV-002 is unchanged.
+  - The six HTML children remain covered, and no plan is left holding a status its
+    phases contradict.
+  verification:
+  - uv run pytest test/test_backlog.py test/test_governance.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/governance/backlog.py
+  - test/test_backlog.py
+  - docs/01-plans/
+  next_action: Run the inventory first and report what it finds; the baseline of four
+    mislabeled plans predates this architecture and is not a closed list.
+- id: phase-idea-06
+  title: Require plan activation before work begins
+  plan: doc-idea-plan-lifecycle
+  sources:
+  - doc-idea-plan-plan-lifecycle
+  - doc-idea-plan-governance-delivery
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idea-05
+  scope:
+  - Order the existing backlog command so orientation reads without activating, activation
+    lands in its own narrow commit, and the claim commit follows it.
+  - Update AGENTS.md, GOV-001 and GOV-002 in the same change so their ordering agrees.
+  acceptance:
+  - Implementation can never precede activation, and a claim-only commit under an
+    approved plan no longer trips the upstream rule.
+  - The text approved cannot by itself manufacture consent; authorization is recorded,
+    not inferred.
+  - Orient, claim and go keep their existing invocation boundaries.
+  verification:
+  - uv run pytest test/test_backlog.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - .claude/commands/backlog.md
+  - AGENTS.md
+  - docs/08-governance/
+  - src/governance/
+  - test/
+  next_action: Write the ordering down in one place first, then make the other three
+    documents point at it rather than restating it.
+- id: phase-idea-07
+  title: Add event identity and the amendment fold
+  plan: doc-idea-plan-lifecycle
+  sources:
+  - doc-idea-plan-event-contract
+  - doc-idea-plan-lifecycle-requirements
+  systems:
+  - sys-portfolio
+  - sys-projection
+  owner: repository-owner
+  agent: agent-fold
+  status: complete
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-idea-04
+  - phase-gov-03
+  scope:
+  - Add an optional eid to the event grammar and resolve legacy events to a digest
+    of their own bytes, rewriting no existing line.
+  - Add the amended event with the per-field replace/clear/inherit truth table and
+    an amends pointer that names an identity rather than a position.
+  - Fold amendments as a merge over a chain, resolving amendments of amendments recursively.
+  - Move the idea_events primary key from (idea, seq) to the resolved identity, keeping
+    seq as an ordinary sortable column.
+  acceptance:
+  - Two amendments correcting different fields of one event both survive; neither
+    reverts the other.
+  - Required fields cannot be cleared; optional contributions can, and clearing one
+    leaves its siblings intact.
+  - A fixture interleaving two worktrees' appended lines leaves every amends pointer
+    resolvable.
+  - Two events resolving to one identity fail the fold rather than being silently
+    accepted.
+  verification:
+  - uv run pytest test/test_ideas.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - schemas/idea.schema.json
+  - sql/001_schema.sql
+  - src/
+  - tools/
+  - test/
+  next_action: Complete. phase-idea-08 depends on this and now has an amends pointer,
+    identity resolution and an amendment fold to build annotations on top of — including
+    the real optional, clearable field (a note or link) that exercises the half of this
+    phase's second acceptance condition title/body could not, being both required.
+  session: doc-session-event-identity-and-amendment-fold
+  completion_evidence:
+  - schemas/idea.schema.json
+  - src/db/ideas.py
+  - tools/append_idea.py
+  - tools/rebuild_db.py
+  - sql/001_schema.sql
+  - test/test_ideas.py
+  - docs/03-sessions/SESS-2026-09-08-16-event-identity-and-amendment-fold.md
+  - docs/01-plans/PLAN-017-idea-plan-lifecycle/Idea Architecture/PLAN-017.03-event-contract-and-amendment-fold.md
+  result: 49 of test/test_ideas.py pass (13 new), 382 of the full suite pass, governance
+    exits 0 across 16 systems and 104 documents, and the rebuild projects 46 idea_events
+    rows with no error. _data/ideas.jsonl is untouched (confirmed via git diff over the
+    branch's whole commit range, not just git status). An independent sub-agent review
+    reached the same 3-Met/1-Partially-met verdict from its own diff read and reruns, and
+    found one real bug outside the acceptance criteria — a rebuild_db.py KeyError on a
+    schema-legal explicit-inherit amendment shape no writer emits — fixed same-session with
+    a regression test that fails pre-fix and passes post-fix (commit “Fix rebuild_db KeyError on an explicit-inherit amendment field”). Condition 2
+    ("required fields cannot be cleared; optional contributions can") was Partially met on
+    its own — the required-cannot-clear half is enforced structurally and verified, but the
+    optional-can-clear half had no real field to test, since title/body — the only fields
+    this phase makes amendable — are both required. The owner reviewed that reasoning and
+    explicitly decided to close this phase now rather than hold it for phase-idea-08 to
+    supply a testable optional field, accepting condition 2 as satisfied given phase-idea-07's
+    declared scope (2026-09-08).
+- id: phase-idea-08
+  title: Add annotations and typed relationships
+  plan: doc-idea-plan-lifecycle
+  sources:
+  - doc-idea-plan-annotations-links
+  - doc-idea-plan-idea-lifecycle
+  systems:
+  - sys-portfolio
+  - sys-projection
+  - sys-memory-agents
+  owner: repository-owner
+  agent: agent-claude
+  status: complete
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-idea-07
+  scope:
+  - Add the annotated event with author, one of three kinds, and text, permitted on
+    terminal ideas.
+  - Add the linked event with extends, supersedes and relates_to, storing each edge
+    once and deriving its inverse.
+  - Validate promoted_to as a non-empty array of governed document codes, reading
+    a legacy scalar as a singleton without rewriting it.
+  - Collapse agent findings in the rendered view so one triage run does not make it
+    unreadable.
+  acceptance:
+  - Annotations accumulate and never replace each other; an amendment corrects one
+    annotation's text and not the collection.
+  - A link never mutates its target; supersedes does not discard, and a legal revisit
+    is not refused because of a graph edge.
+  - A cycle in extends is flagged at fold time and the capture still succeeds.
+  - Rendering is deterministic across processes and hash seeds, and --check detects
+    stale output.
+  verification:
+  - uv run pytest test/test_ideas.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - schemas/idea.schema.json
+  - sql/001_schema.sql
+  - src/
+  - tools/
+  - test/
+  - docs/00-working/ideas.md
+  session: doc-session-annotations-and-typed-relationships
+  completion_evidence:
+  - schemas/idea.schema.json
+  - sql/001_schema.sql
+  - src/db/ideas.py
+  - tools/append_idea.py
+  - tools/generate_ideas_md.py
+  - tools/rebuild_db.py
+  - test/test_ideas.py
+  - .claude/commands/idea.md
+  result: All four acceptance conditions met, corroborated by an independent
+    sub-agent review that ran its own commands and its own schema/code checks (see
+    doc-session-annotations-and-typed-relationships). uv run pytest test/test_ideas.py
+    passes 62, uv run pytest passes 395, governance is clean. Integrated onto dev at
+    the commit “phase-idea-08 — annotations and typed relationships”. phase-idea-02's acceptance already read the sanctioned-writer
+    requirement correctly before this phase started, so its scope needed no edit.
+  next_action: Complete. phase-idea-02 (the triage agent) can now proceed — it
+    depends on this phase for the finding-kind annotated event it writes findings
+    through.
+- id: phase-idea-09
+  title: Add an ordered priority queue for open ideas
+  plan: doc-idea-priority-queue
+  sources:
+  - doc-idea-priority-queue
+  systems:
+  - sys-portfolio
+  - sys-governance
+  owner: repository-owner
+  agent: agent-claude
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  session: doc-session-2026-09-08-idea-priority-queue
+  completion_evidence:
+  - schemas/idea-priority.schema.json
+  - docs/00-working/ideas-priority.yaml
+  - src/governance/idea_priority.py
+  - test/test_ideas.py
+  - docs/00-working/README.md
+  result: Implementation, verification and documentation complete (see docs/03-sessions/SESS-2026-09-08-08-idea-priority-queue.md).
+    Independent sub-agent review corroborated all four acceptance conditions and surfaced
+    one real gap (scope bullet 4, docs/00-working/README.md not updated), which was
+    fixed and reverified before close.
+  scope:
+  - "Add schemas/idea-priority.schema.json and docs/00-working/ideas-priority.yaml,\
+    \ holding an ordered next_up list of six-digit idea IDs (seeded empty \u2014 idea\
+    \ 000039, which this implements, was promoted to PLAN-019 in the same session\
+    \ and is no longer something to look at next)."
+  - Extend src/governance to validate that every next_up entry exists in _data/ideas.jsonl
+    and is open or triaged, and that updated is not in the future.
+  - Extend tools/generate_ideas_md.py to render the priority order at the top of docs/00-working/ideas.md.
+  - Document the new file and who may edit it.
+  acceptance:
+  - ideas-priority.yaml validates against its schema.
+  - uv run python -m src.governance fails on a next_up entry naming a nonexistent
+    idea ID or one whose status is reviewing, promoted or discarded.
+  - tools/generate_ideas_md.py renders the priority order deterministically; running
+    it twice with no source change produces an identical file.
+  - No change to tools/append_idea.py, schemas/idea.schema.json, or any existing idea
+    event.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/generate_ideas_md.py
+  deliverables:
+  - schemas/idea-priority.schema.json
+  - docs/00-working/ideas-priority.yaml
+  - src/governance/
+  - tools/generate_ideas_md.py
+  - test/
+  next_action: Implementation, verification and documentation (docs/00-working/README.md)
+    are done; nothing remains but /session-close review.
+- id: phase-idea-10
+  title: Harden idea-triage against a misdirected write with a pinned-id wrapper
+  plan: doc-idea-record-system
+  sources:
+  - doc-idea-record-system
+  systems:
+  - sys-portfolio
+  - sys-memory-agents
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-idea-02
+  scope:
+  - "Build a thin wrapper script (e.g. tools/triage_annotate.py) that the idea-triage\
+    \ subagent calls instead of tools/append_idea.py annotate directly. The wrapper\
+    \ reads the target idea id from a per-dispatch file the driver writes immediately\
+    \ before invoking the subagent — never from an argument the subagent itself\
+    \ supplies — so a confused subagent has no path to write to the wrong idea's\
+    \ record, unlike the two prompt-level guardrails already in place (see\
+    \ SESS-2026-09-08-18's addendum for the full design writeup and the concrete bug\
+    \ that motivates this)."
+  - Update .claude/commands/idea-triage.md to create and clean up the per-dispatch pin
+    file around each subagent call, and .claude/agents/idea-triage.md to call the
+    wrapper instead of the raw CLI.
+  - "Investigate, as a possibly-complementary second layer (not a substitute): a\
+    \ PreToolUse hook blocking Bash calls to append_idea.py whose idea id doesn't\
+    \ match the current dispatch's pin file, correlated via Claude Code's per-dispatch\
+    \ agent_id. Confirmed feasible in principle (hooks fire inside subagents and carry\
+    \ agent_id/agent_type) but has two open risks to resolve before relying on it:\
+    \ command-pattern matching is documented as best-effort against shell variable\
+    \ expansion, and there is a race window between the Agent tool call returning its\
+    \ agent_id and the subagent's first tool call. If either risk can't be closed\
+    \ cleanly, ship the wrapper script alone and drop the hook rather than force it."
+  - Confirm whether the maxTurns frontmatter field actually takes effect in a fresh
+    session (bumped 15 -> 30 in phase-idea-02's closing session without confirmed
+    effect within that same session — see the addendum) and adjust if not.
+  acceptance:
+  - A test or manual adversarial run demonstrates a subagent instructed (or confused
+    into attempting) to write idea A's finding under idea B's id cannot succeed; the
+    wrapper refuses or silently corrects to the pinned id.
+  - idea-triage's existing behavior (finding annotation, PROPOSED LINK/PROMOTION
+    lines, status left untouched) is unchanged for the normal, correct case.
+  - The hook investigation's two open risks are either resolved and the hook shipped,
+    or explicitly written up as not worth shipping and dropped — not left silently
+    unresolved.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/triage_annotate.py
+  - .claude/agents/idea-triage.md
+  - .claude/commands/idea-triage.md
+  - test/
+  next_action: Design is written up in SESS-2026-09-08-18's addendum. First step is
+    the wrapper script itself (tools/triage_annotate.py) and wiring the driver to
+    create/pass/clean up the per-dispatch pin file; the hook investigation is a
+    separate, optional second pass once the wrapper is proven.
+- id: phase-plc-01
+  title: Consolidate plans/ into docs/01-plans/
+  plan: doc-plans-directory-consolidation
+  sources:
+  - doc-plans-directory-consolidation
+  systems:
+  - sys-governance
+  - sys-memory-agents
+  owner: repository-owner
+  agent: agent-claude
+  status: complete
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Move plans/PLAN-001-agent-memory-system.md to docs/01-plans/ and plans/codex_governance_prompt.md
+    to docs/02-prompts/, keeping the latter ungoverned and exempt.
+  - Retire plans/ from codes.yaml's PLAN locations and from the governance discovery
+    loop, not just empty it of files.
+  - Update every non-historical inbound reference and regenerate the catalog and glossary.
+  acceptance:
+  - No governed document lives under root plans/; doc-agent-memory resolves at its
+    new path with an unchanged id and code.
+  - sys-memory-agents' existence-checked path in systems.yaml resolves.
+  - grep -rn '\bplans/' outside docs/01-plans/ and the named historical documents
+    returns nothing.
+  - uv run python -m src.governance and uv run pytest both pass with no test-code
+    edits.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - grep -rn '\bplans/' . --include=*.md --include=*.py --include=*.yaml
+  deliverables:
+  - docs/01-plans/PLAN-001-agent-memory-system.md
+  - docs/02-prompts/codex_governance_prompt.md
+  - src/governance/__main__.py
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/GOV-005-document-codes.md
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - README.md
+  - docs/09-backlog/README.md
+  - docs/09-backlog/backlog.yaml
+  - docs/08-governance/systems.yaml
+  - docs/07-architecture/ARCH-002-system-audit.md
+  - docs/06-requirements/REQ-001-document-code-requirements.md
+  - docs/02-prompts/PROMPT-004-terminology-and-architecture.md
+  - brain/concepts/terms-documents-and-governance.md
+  - _tmpagent/AGENTS.md
+  - docs/08-governance/GLOSSARY.md
+  - docs/08-governance/catalog.md
+  next_action: Complete. The unworktreed src/ edit is recorded as a process deviation
+    in SESS-2026-09-08-06; no follow-on phase filed for it.
+  session: doc-session-plans-directory-consolidation
+  completion_evidence:
+  - docs/01-plans/PLAN-001-agent-memory-system.md
+  - docs/02-prompts/codex_governance_prompt.md
+  - src/governance/__main__.py
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/systems.yaml
+  - docs/08-governance/catalog.md
+  - docs/03-sessions/SESS-2026-09-08-06-plans-directory-consolidation.md
+  result: "Both plans/ files moved with git mv (PLAN-001 keeping its id/code; codex_governance_prompt.md\
+    \ keeping its ungoverned, exempt status at docs/02-prompts/). plans/ was dropped\
+    \ from codes.yaml's PLAN locations and from the discovery loop in src/governance/__main__.py,\
+    \ not merely emptied. Every non-historical inbound reference was updated and a\
+    \ reversal entry was added to GOV-003-backlog-decisions.md. The glossary and catalog\
+    \ were regenerated from their generators. An independent sub-agent review corroborated\
+    \ all four acceptance conditions from its own diff read (commit “Consolidate root plans/ into docs/01-plans/ (phase-plc-01)”) and rerun,\
+    \ and flagged one process deviation \u2014 this phase touched src/ without a git\
+    \ worktree, which AGENTS.md calls for. No peer held a claim at the time, so no\
+    \ collision occurred; recorded in the session record rather than left implicit.\
+    \ Governance (92 documents, 98 phases), pytest (365 passed), ruff and mypy are\
+    \ all green."
+- id: phase-agnt-01
+  title: Add Gemini orientation and multi-agent setup
+  plan: doc-governance-model
+  sources: []
+  systems:
+  - sys-brain
+  owner: repository-owner
+  status: complete
+  agent: agent-gemini
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add GOV-007 repo orientation.
+  - Add GEMINI.md for Gemini agent orientation.
+  - Update catalog.
+  acceptance:
+  - The GEMINI.md file is created and provides proper orientation for the Gemini agent.
+  - The GOV-007-repo-orientation.md file abstracts architecture details from CLAUDE.md.
+  - The catalog is successfully updated to include GOV-007.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-007-repo-orientation.md
+  - GEMINI.md
+  next_action: Complete. No further action needed.
+  session: doc-session-gemini-orientation
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-08-07-gemini-orientation.md
+  - docs/08-governance/GOV-007-repo-orientation.md
+  - GEMINI.md
+  result: Governance script passed. Catalog updated. Acceptance criteria met.
+- id: phase-agnt-02
+  title: Update AGENTS.md for framework-agnostic multi-agent rules
+  plan: doc-governance-model
+  sources: []
+  systems:
+  - sys-brain
+  owner: repository-owner
+  status: complete
+  agent: agent-gemini
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Update AGENTS.md to explicitly instruct agents to verify dev is clean before integrating.
+  - Abstract any framework-specific mentions (like .claude) in AGENTS.md out to be
+    more generic.
+  - Add guidelines for leaving unmerged branches as PR-equivalents when peer reviews
+    or manual merges are needed.
+  acceptance:
+  - AGENTS.md contains explicit instructions on checking for a clean dev before merge.
+  - AGENTS.md advises on leaving branches unmerged for review instead of forcing integration.
+  - Framework-specific tool mentions in AGENTS.md are generalized.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - AGENTS.md
+  next_action: Complete. No further action needed.
+  session: doc-session-agents-update
+  completion_evidence:
+  - AGENTS.md
+  - docs/03-sessions/SESS-2026-09-08-09-agents-update.md
+  result: AGENTS.md updated successfully and strictly verified.

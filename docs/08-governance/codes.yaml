@@ -1,0 +1,70 @@
+schema_version: 1
+updated: '2026-09-06'
+# Series definitions are the only source of truth for prefix, numbering and location.
+# The register holds nothing derivable from documents: no titles, statuses or owners.
+series:
+- code: PLAN
+  kind: plan
+  locations:
+  - docs/01-plans/
+  numbering: counter
+  sub_codes: true
+- code: ADR
+  kind: adr
+  locations:
+  - docs/04-decisions/
+  numbering: counter
+  sub_codes: false
+- code: ARCH
+  kind: architecture
+  locations:
+  - docs/07-architecture/
+  numbering: counter
+  sub_codes: false
+- code: REQ
+  kind: requirement
+  locations:
+  - docs/06-requirements/
+  numbering: counter
+  sub_codes: false
+- code: PROMPT
+  kind: prompt
+  locations:
+  - docs/02-prompts/
+  numbering: counter
+  sub_codes: false
+- code: OPS
+  kind: operation
+  locations:
+  - docs/08-governance/
+  numbering: counter
+  sub_codes: false
+- code: GOV
+  kind: governance
+  locations:
+  - docs/08-governance/
+  numbering: counter
+  sub_codes: false
+- code: SESS
+  kind: session
+  locations:
+  - docs/03-sessions/
+  numbering: dated
+  sub_codes: false
+- code: WALK
+  kind: walkthrough
+  locations:
+  - docs/03-sessions/
+  numbering: dated
+  sub_codes: false
+# Codes claimed before their document exists. Allocation skips these.
+reserved:
+- code: ADR-004
+  reason: Membership authority decision; deliverable of phase-rel-04.
+- code: ADR-005
+  reason: Projection publication decision; deliverable of phase-rel-05.
+# Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
+retired:
+- code: PLAN-011
+  reason: Issued three times on dev in one day — course production, course extraction, then the
+    ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued.

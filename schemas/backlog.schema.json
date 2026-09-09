@@ -1,0 +1,246 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "One-session plan phase backlog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated",
+    "decision_record",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Backlog contract version."
+    },
+    "updated": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Last substantive backlog edit date.",
+      "format": "date"
+    },
+    "decision_record": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Governed record of user choices and open decisions.",
+      "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "max_active": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4,
+      "default": 1,
+      "description": "Simultaneous active phases allowed; concurrent phases must still be disjoint."
+    },
+    "next_up": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Phase IDs that jump the queue, in order. Everything else falls back to priority then ID.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Phase ID promoted to the front of the queue.",
+        "pattern": "^phase-[a-z]+-[0-9]{2}$"
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per independently verifiable plan phase.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "plan",
+          "sources",
+          "systems",
+          "owner",
+          "status",
+          "priority",
+          "session_budget",
+          "depends_on",
+          "scope",
+          "acceptance",
+          "verification",
+          "deliverables",
+          "next_action"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable phase ID; never renumber existing items.",
+            "pattern": "^phase-[a-z]+-[0-9]{2}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "One concrete outcome achievable in one session."
+          },
+          "plan": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Primary parent plan document ID.",
+            "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value.",
+              "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "uniqueItems": true,
+            "minItems": 0,
+            "description": "Other source document IDs, including child plan coverage and accepted decisions."
+          },
+          "systems": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value.",
+              "pattern": "^sys-[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Affected existing system IDs."
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owner key from systems.yaml."
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Execution state; readiness is derived from dependencies.",
+            "enum": [
+              "queued",
+              "active",
+              "blocked",
+              "deferred",
+              "complete",
+              "cancelled"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4,
+            "description": "1=foundation, 2=capability, 3=composition, 4=conditional extension."
+          },
+          "session_budget": {
+            "type": "integer",
+            "const": 1,
+            "description": "Exactly one focused work session, including verification and handoff."
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value.",
+              "pattern": "^phase-[a-z]+-[0-9]{2}$"
+            },
+            "uniqueItems": true,
+            "minItems": 0,
+            "description": "Prerequisite phase IDs; all must be complete before starting."
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value."
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Bounded implementation or decision steps for this phase."
+          },
+          "acceptance": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value."
+            },
+            "uniqueItems": true,
+            "minItems": 2,
+            "description": "Observable conditions required for completion."
+          },
+          "verification": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value."
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Commands or concrete review checks to verify the result."
+          },
+          "deliverables": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value."
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Planned repository paths; existence is required only in completion_evidence."
+          },
+          "next_action": {
+            "type": "string",
+            "minLength": 1,
+            "description": "First useful action for the next session."
+          },
+          "agent": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Claim identity of the working agent; names its branch agent/<phase-id>.",
+            "pattern": "^agent-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "blocked_reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required explanation for blocked, deferred or cancelled phases."
+          },
+          "resume_when": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required condition for releasing a blocked or deferred phase."
+          },
+          "session": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Governed session or walkthrough record; required on completion.",
+            "pattern": "^doc-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "completion_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced value."
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Existing files proving completion; separate from future deliverables."
+          },
+          "result": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Actual verification result and outcome; required on completion."
+          }
+        }
+      }
+    }
+  }
+}

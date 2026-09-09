@@ -1,0 +1,226 @@
+[
+  {
+    "id": "knowledge-base",
+    "label": "Knowledge Base",
+    "category": "methodology",
+    "description": "Shared memory, wiki, and knowledge base systems for cross-session and cross-model context.",
+    "related": ["agentic-systems", "ai-tools", "frameworks"],
+    "deprecated": false
+  },
+  {
+    "id": "ai-tools",
+    "label": "AI Tools",
+    "category": "methodology",
+    "description": "AI tooling, integrations, and AI-powered product features — broader than any single model or platform.",
+    "related": ["claude", "agentic-systems", "prompt-engineering"],
+    "deprecated": false
+  },
+  {
+    "id": "agentic-systems",
+    "label": "Agentic Systems",
+    "category": "methodology",
+    "description": "Multi-agent orchestration, agentic workflows, and autonomous AI system design.",
+    "related": ["ai-tools", "claude", "automation", "frameworks"],
+    "deprecated": false
+  },
+  {
+    "id": "anaplan",
+    "label": "Anaplan",
+    "category": "platform",
+    "description": "Anaplan connected planning platform — model building, integrations, and delivery.",
+    "related": ["consulting", "client-a"],
+    "deprecated": false
+  },
+  {
+    "id": "automation",
+    "label": "Automation",
+    "category": "methodology",
+    "description": "Process automation, scripting, and workflow orchestration — not specific to any tool.",
+    "related": ["python", "selenium", "playwright", "agentic-systems"],
+    "deprecated": false
+  },
+  {
+    "id": "aws",
+    "label": "AWS",
+    "category": "platform",
+    "description": "Amazon Web Services cloud platform.",
+    "related": ["cloud"],
+    "deprecated": false
+  },
+  {
+    "id": "building-blocks",
+    "label": "Building Blocks",
+    "category": "methodology",
+    "description": "Reusable software components, snippets, templates, and patterns designed for cross-project leverage.",
+    "related": ["frameworks", "templates", "code-gen"],
+    "deprecated": false
+  },
+  {
+    "id": "claude",
+    "label": "Claude / Anthropic",
+    "category": "platform",
+    "description": "Anthropic Claude AI — models, APIs, Claude Code, and the broader Anthropic ecosystem.",
+    "related": ["ai-tools", "agentic-systems", "prompt-engineering"],
+    "deprecated": false
+  },
+  {
+    "id": "cloud",
+    "label": "Cloud",
+    "category": "platform",
+    "description": "Cloud computing in general — use a specific platform tag (aws) when the platform is known.",
+    "related": ["aws"],
+    "deprecated": false
+  },
+  {
+    "id": "code-gen",
+    "label": "Code Generation",
+    "category": "methodology",
+    "description": "Artifact and code generation systems — schema-driven, AI-assisted, or deterministic.",
+    "related": ["frameworks", "building-blocks", "agentic-systems", "automation"],
+    "deprecated": false
+  },
+  {
+    "id": "consulting",
+    "label": "Consulting",
+    "category": "domain",
+    "description": "Client-facing consulting and professional services delivery.",
+    "related": ["anaplan", "client-a", "education"],
+    "deprecated": false
+  },
+  {
+    "id": "data-science",
+    "label": "Data Science",
+    "category": "domain",
+    "description": "Data science, machine learning, statistical analysis, and analytics.",
+    "related": ["python", "ai-tools"],
+    "deprecated": false
+  },
+  {
+    "id": "education",
+    "label": "Education",
+    "category": "domain",
+    "description": "Teaching, facilitation, curriculum design, and knowledge transfer.",
+    "related": ["consulting", "claude"],
+    "deprecated": false
+  },
+  {
+    "id": "finance",
+    "label": "Finance",
+    "category": "domain",
+    "description": "Financial management, budgeting, debt reduction, and income tracking.",
+    "related": ["side-gig"],
+    "deprecated": false
+  },
+  {
+    "id": "frameworks",
+    "label": "Frameworks",
+    "category": "methodology",
+    "description": "Framework and architecture design — reusable structural patterns for systems.",
+    "related": ["building-blocks", "code-gen", "automation"],
+    "deprecated": false
+  },
+  {
+    "id": "hackathon",
+    "label": "Hackathon",
+    "category": "context",
+    "description": "Time-boxed competitive or collaborative build events.",
+    "related": ["claude", "ai-tools"],
+    "deprecated": false
+  },
+  {
+    "id": "html",
+    "label": "HTML / Web",
+    "category": "tech",
+    "description": "HTML generation, web page structure, templating, and static/dynamic web output.",
+    "related": ["templates", "react", "typescript"],
+    "deprecated": false
+  },
+  {
+    "id": "client-a",
+    "label": "Client A",
+    "category": "client",
+    "description": "A named client engagement — real identity kept out of the tracked structure.",
+    "related": ["anaplan", "consulting"],
+    "deprecated": false
+  },
+  {
+    "id": "playwright",
+    "label": "Playwright",
+    "category": "tech",
+    "description": "Microsoft Playwright browser automation library.",
+    "related": ["selenium", "automation", "python"],
+    "deprecated": false
+  },
+  {
+    "id": "prompt-engineering",
+    "label": "Prompt Engineering",
+    "category": "methodology",
+    "description": "Prompt design, optimization, versioning, and library management for LLMs.",
+    "related": ["claude", "ai-tools", "agentic-systems"],
+    "deprecated": false
+  },
+  {
+    "id": "python",
+    "label": "Python",
+    "category": "tech",
+    "description": "Python language — backend, scripting, data, and automation.",
+    "related": ["automation", "data-science"],
+    "deprecated": false
+  },
+  {
+    "id": "react",
+    "label": "React / TypeScript",
+    "category": "tech",
+    "description": "React frontend framework, typically paired with TypeScript in this stack.",
+    "related": ["typescript", "html"],
+    "deprecated": false
+  },
+  {
+    "id": "security",
+    "label": "Security & Cyber",
+    "category": "domain",
+    "description": "Security design principles, threat modeling, and cybersecurity practices.",
+    "related": ["frameworks", "python"],
+    "deprecated": false
+  },
+  {
+    "id": "selenium",
+    "label": "Selenium",
+    "category": "tech",
+    "description": "Selenium browser automation library.",
+    "related": ["playwright", "automation", "python"],
+    "deprecated": false
+  },
+  {
+    "id": "side-gig",
+    "label": "Side Gig",
+    "category": "context",
+    "description": "Income-generating work outside primary employment.",
+    "related": ["finance"],
+    "deprecated": false
+  },
+  {
+    "id": "templates",
+    "label": "Templates",
+    "category": "methodology",
+    "description": "Document, HTML, and code templates — reusable structures that vary by data injection.",
+    "related": ["html", "building-blocks", "code-gen"],
+    "deprecated": false
+  },
+  {
+    "id": "typescript",
+    "label": "TypeScript",
+    "category": "tech",
+    "description": "TypeScript language — primarily used for the React frontend in this stack.",
+    "related": ["react", "html"],
+    "deprecated": false
+  },
+  {
+    "id": "wellness",
+    "label": "Wellness",
+    "category": "domain",
+    "description": "Physical health, mental health, fitness, and mindfulness practices.",
+    "related": [],
+    "deprecated": false
+  }
+]

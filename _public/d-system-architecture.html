@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-System — Proposed Knowledge Architecture</title>
+<style>
+:root{
+  --bg:#0A0E0C; --surface:#111814; --raised:#18211C; --raised-2:#1E2A24;
+  --border:#24322B; --border-lit:#31423A;
+  --green:#4A9B70; --green-deep:#2C6349; --green-dim:#7FB99A; --green-glow:rgba(74,155,112,.14);
+  --mahogany:#A85D48; --mahogany-hi:#C77B63; --mahogany-lo:#6E3B2F; --mahogany-glow:rgba(168,93,72,.14);
+  --text:#E7EDE9; --text-dim:#94A69C; --text-faint:#6B7A72;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --nav-w:264px;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:400 16px/1.65 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 500px at 12% -8%, rgba(44,99,73,.20), transparent 62%),
+    radial-gradient(760px 460px at 92% 4%, rgba(110,59,47,.13), transparent 60%);
+  background-attachment:fixed;
+}
+a{color:var(--green-dim);text-decoration:none}
+a:hover{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--mahogany-hi);outline-offset:2px;border-radius:4px}
+code,kbd{font-family:var(--mono);font-size:.88em}
+h1,h2,h3,h4{line-height:1.22;margin:0;font-weight:600;letter-spacing:-.012em}
+p{margin:0 0 .9em}
+p:last-child{margin-bottom:0}
+
+/* ---------- layout ---------- */
+.shell{display:grid;grid-template-columns:var(--nav-w) minmax(0,1fr);min-height:100vh}
+.nav{
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--border);background:rgba(10,14,12,.82);
+  backdrop-filter:blur(12px);padding:26px 16px 32px;
+}
+.nav-brand{display:block;padding:0 8px 16px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.nav-brand b{display:block;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.nav-brand span{display:block;font-size:11.5px;color:var(--text-faint);margin-top:5px;letter-spacing:.05em}
+.nav ol{list-style:none;margin:0;padding:0;counter-reset:nv}
+.nav ol a{
+  display:flex;gap:10px;align-items:baseline;padding:7px 9px;border-radius:7px;
+  font-size:13.5px;color:var(--text-dim);border-left:2px solid transparent;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.nav ol a:hover{background:var(--raised);color:var(--text);text-decoration:none}
+.nav ol a .n{font-family:var(--mono);font-size:11px;color:var(--text-faint);min-width:16px}
+.nav ol a.active{background:var(--mahogany-glow);color:var(--mahogany-hi);border-left-color:var(--mahogany)}
+.nav ol a.active .n{color:var(--mahogany)}
+.nav-tools{margin-top:18px;padding:0 8px;display:flex;flex-direction:column;gap:8px}
+
+.main{min-width:0;padding:0 0 96px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 40px}
+.prose{max-width:74ch}
+
+/* ---------- masthead ---------- */
+.mast{padding:76px 0 54px;border-bottom:1px solid var(--border)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:22px;
+  padding:6px 13px;border:1px solid var(--border-lit);border-radius:100px;background:var(--surface);
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mahogany);box-shadow:0 0 9px var(--mahogany)}
+.mast h1{font-size:clamp(38px,6.2vw,64px);letter-spacing:-.033em;margin-bottom:.34em}
+.mast h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:clamp(17px,2.1vw,20.5px);line-height:1.55;color:var(--text-dim);max-width:64ch}
+.lede strong{color:var(--text);font-weight:600}
+.status{
+  margin-top:30px;padding:14px 18px;border-left:3px solid var(--mahogany);
+  background:linear-gradient(90deg,var(--mahogany-glow),transparent 78%);
+  border-radius:0 var(--r) var(--r) 0;font-size:13.5px;color:var(--text-dim);max-width:74ch;
+}
+.status b{color:var(--mahogany-hi);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:34px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.stat b{display:block;font:600 30px/1 var(--mono);color:var(--green);letter-spacing:-.03em}
+.stat span{display:block;font-size:11.5px;color:var(--text-faint);margin-top:8px;letter-spacing:.075em;text-transform:uppercase}
+
+/* ---------- sections / panels ---------- */
+.sec{border-bottom:1px solid var(--border)}
+.sec > summary{
+  list-style:none;cursor:pointer;padding:30px 0;display:flex;gap:20px;align-items:flex-start;
+  transition:opacity .15s;
+}
+.sec > summary::-webkit-details-marker{display:none}
+.sec > summary:hover{opacity:.86}
+.sec-n{font:500 12px/1.7 var(--mono);color:var(--mahogany);letter-spacing:.14em;padding-top:5px;min-width:34px}
+.sec-h{flex:1;min-width:0}
+.sec-h h2{font-size:clamp(23px,3vw,31px);letter-spacing:-.02em}
+.sec-h p{margin:8px 0 0;color:var(--text-dim);font-size:15px;max-width:70ch}
+.chev{
+  width:26px;height:26px;flex:none;margin-top:5px;border:1px solid var(--border-lit);border-radius:50%;
+  display:grid;place-items:center;color:var(--text-faint);transition:transform .22s,color .15s,border-color .15s;
+}
+.sec[open] > summary .chev{transform:rotate(180deg);color:var(--mahogany);border-color:var(--mahogany-lo)}
+.sec-body{padding:2px 0 46px;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.anchor{opacity:0;color:var(--text-faint);font-size:14px;padding-left:8px;transition:opacity .15s}
+.sec-h h2:hover .anchor{opacity:1}
+
+/* ---------- generic pieces ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.card h3{font-size:16px;margin-bottom:9px}
+.card h3 .k{font-family:var(--mono);font-size:11px;color:var(--mahogany);display:block;margin-bottom:6px;letter-spacing:.13em;text-transform:uppercase}
+.card p{font-size:14.5px;color:var(--text-dim)}
+.card.accent{border-color:var(--mahogany-lo);background:linear-gradient(160deg,var(--mahogany-glow),var(--surface) 55%)}
+.card.leaf{border-color:var(--border-lit);background:linear-gradient(160deg,var(--green-glow),var(--surface) 55%)}
+
+.quote{
+  border-left:3px solid var(--green);padding:16px 22px;background:var(--surface);
+  border-radius:0 var(--r) var(--r) 0;font-size:16.5px;line-height:1.6;color:var(--text);
+}
+.note{
+  border-left:3px solid var(--mahogany);padding:13px 18px;background:var(--surface);
+  border-radius:0 var(--r) var(--r) 0;font-size:14px;color:var(--text-dim);
+}
+.note b{color:var(--mahogany-hi)}
+.h4{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin:34px 0 14px;font-weight:600}
+.h4:first-child{margin-top:0}
+
+ul.tick{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+ul.tick li{position:relative;padding-left:22px;font-size:14.5px;color:var(--text-dim)}
+ul.tick li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:1px;background:var(--green);transform:rotate(45deg)}
+ul.tick li b{color:var(--text);font-weight:600}
+ul.tick.mah li::before{background:var(--mahogany)}
+
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:11.5px;padding:4px 9px;border-radius:5px;
+  background:var(--raised);border:1px solid var(--border-lit);color:var(--green-dim);letter-spacing:.05em;
+}
+.pill.m{color:var(--mahogany-hi);border-color:var(--mahogany-lo);background:var(--mahogany-glow)}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+
+pre{
+  margin:0;background:#080B09;border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.8px;line-height:1.68;color:var(--text-dim);
+}
+pre .key{color:var(--green)}
+pre .val{color:var(--text)}
+pre .cm{color:var(--text-faint);font-style:italic}
+pre .vb{color:var(--mahogany-hi)}
+.code-head{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);
+  padding:10px 20px;background:var(--raised);border:1px solid var(--border);border-bottom:0;border-radius:var(--r) var(--r) 0 0;
+}
+.code-head + pre{border-radius:0 0 var(--r) var(--r)}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);font-weight:600;background:var(--raised)}
+tr:last-child td{border-bottom:0}
+td code{color:var(--mahogany-hi)}
+
+/* ---------- controls ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  font:500 12.5px/1 var(--sans);padding:9px 14px;border-radius:7px;
+  background:var(--raised);border:1px solid var(--border-lit);color:var(--text-dim);
+  transition:background .15s,color .15s,border-color .15s;
+}
+.btn:hover{background:var(--raised-2);color:var(--text);border-color:var(--green-deep)}
+.btn.on{background:var(--mahogany-glow);border-color:var(--mahogany-lo);color:var(--mahogany-hi)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.search{
+  flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border-lit);border-radius:7px;
+  padding:10px 14px;color:var(--text);font:400 14px var(--sans);
+}
+.search::placeholder{color:var(--text-faint)}
+.search:focus{outline:none;border-color:var(--green-deep);box-shadow:0 0 0 3px var(--green-glow)}
+.count{font-family:var(--mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap}
+
+/* ---------- diagrams ---------- */
+.dgm{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.dgm svg{display:block;width:100%;height:auto;min-width:520px;max-width:100%;font-family:var(--sans)}
+.dgm .nd rect,.dgm .nd circle,.dgm .nd polygon{
+  fill:var(--raised);stroke:var(--border-lit);stroke-width:1.2;transition:fill .18s,stroke .18s;
+}
+.dgm .nd text{fill:var(--text);font-size:12.5px;font-weight:500;transition:fill .18s}
+.dgm .nd .sub{fill:var(--text-faint);font-size:10.5px;font-weight:400}
+.dgm .nd.st rect{fill:rgba(44,99,73,.20);stroke:var(--green-deep)}
+.dgm .nd.ac rect,.dgm .nd.ac circle{fill:rgba(168,93,72,.18);stroke:var(--mahogany-lo)}
+.dgm .ed{stroke:var(--border-lit);stroke-width:1.4;fill:none;transition:stroke .18s,stroke-width .18s}
+.dgm .vb{fill:var(--mahogany-hi);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em}
+.dgm .lb{fill:var(--text-faint);font-size:11px}
+.dgm .zone{fill:none;stroke:var(--border);stroke-width:1;stroke-dasharray:5 5;rx:10}
+.dgm .zone-t{fill:var(--text-faint);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase}
+.dgm[data-focus] .nd:not(.hot){opacity:.26}
+.dgm[data-focus] .ed:not(.hot){opacity:.16}
+.dgm .nd{cursor:pointer}
+.dgm .nd.hot rect,.dgm .nd.hot circle{stroke:var(--mahogany);stroke-width:2}
+.dgm .ed.hot{stroke:var(--mahogany);stroke-width:2}
+.dgm-cap{font-size:12.5px;color:var(--text-faint);margin-top:12px;text-align:center;font-style:italic}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border);padding:18px 20px}
+  .nav ol{display:flex;flex-wrap:wrap;gap:4px}
+  .nav ol a{border-left:0;border-bottom:2px solid transparent;padding:6px 10px}
+  .nav ol a.active{border-left:0;border-bottom-color:var(--mahogany)}
+  .nav-tools{flex-direction:row;margin-top:12px}
+  .wrap{padding:0 22px}
+  .mast{padding:44px 0 36px}
+}
+@media print{
+  .nav,.nav-tools,.bar,.chev{display:none !important}
+  body{background:#fff;color:#000}
+  .sec-body{display:block !important}
+  .card,.dgm,pre,.tbl-wrap{break-inside:avoid;border-color:#ccc}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="nav" aria-label="Section navigation">
+  <a class="nav-brand" href="#top"><b>D&#8209;System</b><span>Proposed knowledge architecture</span></a>
+  <ol id="navlist"></ol>
+  <div class="nav-tools">
+    <button class="btn" id="expandAll" type="button">Expand all sections</button>
+    <button class="btn" id="collapseAll" type="button">Collapse all</button>
+  </div>
+</nav>
+
+<main class="main" id="top">
+<div class="wrap">
+
+<!-- ============ MASTHEAD ============ -->
+<header class="mast">
+  <div class="eyebrow">Working research architecture</div>
+  <h1>An append&#8209;only architecture for <em>collective human&#8209;agent reasoning</em></h1>
+  <p class="lede">D&#8209;System aims to represent not only <strong>what is known</strong>, but what kind of knowledge a state represents, how its truth status should be regarded, where it sits in an idea&#8209;to&#8209;action lifecycle, how it changed from prior states, who or what caused those changes, what evidence supported them, and how that lineage should affect later retrieval.</p>
+  <div class="status">
+    <b>Status.</b> Everything on this page is the architecture <b>as proposed</b>. The source documents describe themselves as &ldquo;proposed research, not authoritative descriptions of the implementation&rdquo; and their vocabulary as &ldquo;working definitions, not claims of novelty.&rdquo; Read it as a design under test, not a description of shipped behaviour.
+  </div>
+  <div class="stats">
+    <div class="stat"><b>3</b><span>Classification axes</span></div>
+    <div class="stat"><b>89</b><span>Transition verbs</span></div>
+    <div class="stat"><b>50</b><span>Defined terms</span></div>
+    <div class="stat"><b>11</b><span>Lifecycle stages</span></div>
+    <div class="stat"><b>12</b><span>Falsifiable hypotheses</span></div>
+  </div>
+</header>
+
+<!-- ============ 01 CORE DISTINCTION ============ -->
+<details class="sec" id="core" open>
+  <summary><span class="sec-n">01</span><span class="sec-h"><h2>The core distinction<a class="anchor" href="#core">#</a></h2><p>Three things that ordinary systems collapse into one, and the reason D&#8209;System keeps them apart.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="quote" style="margin-bottom:24px">
+      <strong>State</strong> describes what the system represents at a point in reasoning history. <strong>Transition</strong> describes how one state became another. <strong>Provenance</strong> describes the lineage and responsibility of that transition.
+    </div>
+    <div class="grid g3">
+      <div class="card leaf"><h3><span class="k">Node</span>State</h3><p>A semantically meaningful representation of something at a particular point in its reasoning or operational history. Classified across three independent dimensions and never overwritten.</p></div>
+      <div class="card accent"><h3><span class="k">Edge &mdash; first class</span>Transition</h3><p>A typed transformation by which one or more states produce, influence, supersede, or lead to subsequent states. A transition is a research object even where a graph API exposes it as an edge.</p></div>
+      <div class="card"><h3><span class="k">Attached to transitions</span>Provenance</h3><p>Origin and derivational lineage &mdash; actors, evidence, method, authority, time, upstream dependencies. The record of who caused a change and on what basis.</p></div>
+    </div>
+    <div class="h4">Why the separation matters</div>
+    <div class="prose">
+      <p style="color:var(--text-dim);font-size:15px">A single frozen state is not sufficient to reconstruct change. Historical meaning often resides in the delta between states and in the transition that produced the delta. A system that mutates records in place keeps the answer and discards the reasoning; a system that keeps states but not typed transitions keeps the reasoning as unstructured text.</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 02 THREE-AXIS ============ -->
+<details class="sec" id="axes" open>
+  <summary><span class="sec-n">02</span><span class="sec-h"><h2>Three&#8209;axis classification<a class="anchor" href="#axes">#</a></h2><p>Every knowledge state is classified independently on what it <em>is</em>, what its <em>truth status</em> is, and where it sits in its <em>lifecycle</em>. Pick one value from each column to compose a state.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div id="composer"></div>
+    <div class="note" style="margin-top:22px"><b>Open research issue.</b> Temporal validity should likely be represented separately from epistemic status. A proposition can have been true within a prior interval without becoming a falsified proposition &mdash; and the lifecycle is not assumed to be strictly linear: retrospective insights may trigger reconsideration and produce new generative seeds.</div>
+  </div>
+</details>
+
+<!-- ============ 03 STATE TRANSITIONS ============ -->
+<details class="sec" id="transitions" open>
+  <summary><span class="sec-n">03</span><span class="sec-h"><h2>The state&#8209;transition model<a class="anchor" href="#transitions">#</a></h2><p>The lifecycle is treated as a graph of typed transitions between retained states, not a set of mutable records. Hover or click any node.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 470" role="img" aria-label="Cyclic state-transition path from Not Considered through Generative Seed, Evaluated Conclusion, Strategic Directive, Operational Tasks, Event or Artifact, and Retrospective Insight, returning to Generative Seed.">
+        <title>State-transition lifecycle</title>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#31423A"/></marker>
+          <marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#A85D48"/></marker>
+        </defs>
+        <g class="nd" data-node="n0"><rect x="300" y="14" width="300" height="42" rx="8"/><text x="450" y="40" text-anchor="middle">Not Considered</text></g>
+        <path class="ed" data-e="n0" data-t="n1" d="M450 56 L450 92" marker-end="url(#ah)"/>
+        <text class="vb" x="462" y="80">CONSIDER</text>
+        <g class="nd st" data-node="n1"><rect x="300" y="92" width="300" height="46" rx="8"/><text x="450" y="112" text-anchor="middle">Generative Seed</text><text class="sub" x="450" y="128" text-anchor="middle">lifecycle &middot; raw idea under consideration</text></g>
+        <path class="ed" data-e="n1" data-t="n2" d="M450 138 L450 176" marker-end="url(#ah)"/>
+        <text class="vb" x="462" y="163">HYPOTHESIZE / EVALUATE</text>
+        <g class="nd st" data-node="n2"><rect x="300" y="176" width="300" height="42" rx="8"/><text x="450" y="202" text-anchor="middle">Evaluated Conclusion</text></g>
+        <path class="ed" data-e="n2" data-t="n3" d="M450 218 L450 254" marker-end="url(#ahm)"/>
+        <text class="vb" x="462" y="242">DECIDE</text>
+        <g class="nd ac" data-node="n3"><rect x="300" y="254" width="300" height="46" rx="8"/><text x="450" y="274" text-anchor="middle">Strategic Directive</text><text class="sub" x="450" y="290" text-anchor="middle">commitment, not a truth claim</text></g>
+        <path class="ed" data-e="n3" data-t="n4" d="M450 300 L450 336" marker-end="url(#ah)"/>
+        <text class="vb" x="462" y="324">DECOMPOSE / PLAN</text>
+        <g class="nd st" data-node="n4"><rect x="300" y="336" width="300" height="42" rx="8"/><text x="450" y="362" text-anchor="middle">Operational Task(s)</text></g>
+        <path class="ed" data-e="n4" data-t="n5" d="M600 357 L700 357 Q724 357 724 333 L724 246" marker-end="url(#ah)"/>
+        <text class="vb" x="736" y="310">EXECUTE</text>
+        <g class="nd" data-node="n5"><rect x="620" y="200" width="212" height="46" rx="8"/><text x="726" y="220" text-anchor="middle">Event / Artifact</text><text class="sub" x="726" y="236" text-anchor="middle">outcome in the world</text></g>
+        <path class="ed" data-e="n5" data-t="n6" d="M726 200 L726 150 Q726 126 702 126 L620 126" marker-end="url(#ah)"/>
+        <text class="vb" x="614" y="152" text-anchor="end">OBSERVE / REFLECT</text>
+        <g class="nd" data-node="n6"><rect x="620" y="60" width="212" height="46" rx="8"/><text x="726" y="80" text-anchor="middle">Retrospective Insight</text><text class="sub" x="726" y="96" text-anchor="middle">learning, gaps, debt</text></g>
+        <path class="ed" data-e="n6" data-t="n1" d="M620 83 L120 83 Q76 83 76 115 L76 115 Q76 115 122 115" marker-end="url(#ahm)"/>
+        <path class="ed" data-e="n6" data-t="n1" d="M76 115 L296 115" marker-end="url(#ahm)"/>
+        <text class="vb" x="86" y="103">RECONSIDER</text>
+        <rect class="zone" x="24" y="404" width="852" height="52"/>
+        <text class="zone-t" x="44" y="426">Append-only</text>
+        <text class="lb" x="44" y="446">A prior state is not overwritten when a new state appears. The reasoning lineage remains available for historical reconstruction and later challenge.</text>
+      </svg>
+      <div class="dgm-cap">Illustrative path &mdash; the lifecycle is a graph, not a queue. RECONSIDER closes the loop.</div>
+    </div>
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card accent"><h3>A decision need not be a node</h3><p><code>DECIDE</code> can be the transition that produces a Strategic Directive, rather than a classification the directive carries. This is the single most consequential modelling choice on this page: it moves rationale, alternatives, authority and dissent out of a record&rsquo;s fields and onto the edge that created it.</p></div>
+      <div class="card"><h3>Nothing is overwritten</h3><p>Instead of mutating <code>Hypothesis &rarr; Ground&nbsp;Truth</code> and losing the former state, D&#8209;System records a new state and the transition between them. Supersession is asserted, not performed by deletion.</p></div>
+    </div>
+    <div class="h4">What append-only is meant to permit</div>
+    <div class="pills">
+      <span class="pill">Historical reconstruction</span><span class="pill">Reasoning provenance</span><span class="pill">Contradiction analysis</span><span class="pill">Supersession chains</span><span class="pill">Post&#8209;hoc audits</span><span class="pill">Counterfactual analysis</span><span class="pill">Reliability measurement</span><span class="pill">Knowledge transfer with rationale</span>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 04 VOCABULARY ============ -->
+<details class="sec" id="vocab" open>
+  <summary><span class="sec-n">04</span><span class="sec-h"><h2>Transition vocabulary<a class="anchor" href="#vocab">#</a></h2><p>A provisional set of 89 distinct verbs, listed across nine families &mdash; several appear in more than one. The literature review is expected to decide which reuse established ontology terminology and which need D&#8209;System&#8209;specific semantics.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="bar">
+      <input class="search" id="vSearch" type="search" placeholder="Filter verbs&hellip;" aria-label="Filter transition verbs">
+      <button class="btn" id="vCanon" type="button">Canonical subset only</button>
+      <button class="btn" id="vReset" type="button">Reset</button>
+      <span class="count" id="vCount"></span>
+    </div>
+    <div class="pills" id="vFamilies" style="margin-bottom:18px"></div>
+    <div id="vGrid" class="grid g3"></div>
+    <div class="note" style="margin-top:20px"><b>Canonical subset.</b> For implementation the proposal is to begin with a smaller controlled vocabulary of 38 verbs and map the richer set to subtypes and aliases &mdash; not to ship all 89 as first&#8209;class types.</div>
+  </div>
+</details>
+
+<!-- ============ 05 TWO EDGE FAMILIES ============ -->
+<details class="sec" id="edges" open>
+  <summary><span class="sec-n">05</span><span class="sec-h"><h2>Two families of graph relationship<a class="anchor" href="#edges">#</a></h2><p>Semantic edges model the world. Transition edges model the history of reasoning and action. The distinction is foundational.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 300" role="img" aria-label="Two panels contrasting semantic relationships that model the domain against state-transition relationships that model reasoning history.">
+        <title>Semantic versus transition edge families</title>
+        <rect class="zone" x="20" y="20" width="410" height="260"/>
+        <text class="zone-t" x="40" y="48">Semantic &mdash; models the domain</text>
+        <g class="nd st" data-node="s1"><rect x="52" y="76" width="150" height="40" rx="8"/><text x="127" y="101" text-anchor="middle">PostgreSQL</text></g>
+        <g class="nd st" data-node="s2"><rect x="252" y="76" width="150" height="40" rx="8"/><text x="327" y="101" text-anchor="middle">Neo4j</text></g>
+        <path class="ed" data-e="s1" data-t="s2" d="M202 96 L248 96" marker-end="url(#ah)"/>
+        <text class="vb" x="227" y="86" text-anchor="middle">ALTERNATIVE_TO</text>
+        <g class="nd st" data-node="s3"><rect x="152" y="184" width="150" height="40" rx="8"/><text x="227" y="209" text-anchor="middle">Storage layer</text></g>
+        <path class="ed" data-e="s1" data-t="s3" d="M127 116 L127 204 L148 204" marker-end="url(#ah)"/>
+        <text class="vb" x="60" y="164">PART_OF</text>
+        <text class="lb" x="40" y="262">DEPENDS_ON &middot; IMPLEMENTS &middot; RELATES_TO &middot; USES</text>
+
+        <rect class="zone" x="470" y="20" width="410" height="260"/>
+        <text class="zone-t" x="490" y="48">Transition &mdash; models reasoning history</text>
+        <g class="nd" data-node="t1"><rect x="502" y="76" width="150" height="40" rx="8"/><text x="577" y="101" text-anchor="middle">Hypothesis</text></g>
+        <g class="nd ac" data-node="t2"><rect x="702" y="76" width="150" height="40" rx="8"/><text x="777" y="101" text-anchor="middle">Conclusion</text></g>
+        <path class="ed" data-e="t1" data-t="t2" d="M652 96 L698 96" marker-end="url(#ahm)"/>
+        <text class="vb" x="675" y="86" text-anchor="middle">EVALUATE</text>
+        <g class="nd ac" data-node="t3"><rect x="602" y="184" width="150" height="40" rx="8"/><text x="677" y="209" text-anchor="middle">Directive</text></g>
+        <path class="ed" data-e="t2" data-t="t3" d="M777 116 L777 204 L756 204" marker-end="url(#ahm)"/>
+        <text class="vb" x="792" y="164">DECIDE</text>
+        <text class="lb" x="490" y="262">CONSIDER &middot; VALIDATE &middot; FALSIFY &middot; OBSERVE &middot; SUPERSEDE</text>
+      </svg>
+      <div class="dgm-cap">Same graph, two edge families with different semantics. Conflating them makes &ldquo;why&rdquo; unqueryable.</div>
+    </div>
+    <div class="grid g2" style="margin-top:20px">
+      <div class="card leaf"><h3><span class="k">Semantic relationships</span>Describe the represented domain</h3><div class="pills" style="margin-top:10px"><span class="pill">ALTERNATIVE_TO</span><span class="pill">DEPENDS_ON</span><span class="pill">PART_OF</span><span class="pill">IMPLEMENTS</span><span class="pill">RELATES_TO</span><span class="pill">USES</span></div></div>
+      <div class="card accent"><h3><span class="k">State-transition relationships</span>Describe the evolution of knowledge</h3><div class="pills" style="margin-top:10px"><span class="pill m">CONSIDER</span><span class="pill m">HYPOTHESIZE</span><span class="pill m">EVALUATE</span><span class="pill m">VALIDATE</span><span class="pill m">FALSIFY</span><span class="pill m">DECIDE</span><span class="pill m">DECOMPOSE</span><span class="pill m">EXECUTE</span><span class="pill m">OBSERVE</span><span class="pill m">REFLECT</span><span class="pill m">RECONSIDER</span><span class="pill m">SUPERSEDE</span></div></div>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 06 PROVENANCE ============ -->
+<details class="sec" id="provenance" open>
+  <summary><span class="sec-n">06</span><span class="sec-h"><h2>Provenance<a class="anchor" href="#provenance">#</a></h2><p>What a transition record must carry if the system is to answer &ldquo;why does this state exist, and on whose authority?&rdquo;</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g2">
+      <div>
+        <div class="code-head">Proposed transition record</div>
+<pre><span class="key">transition_id</span>:
+<span class="key">verb</span>: <span class="vb">DECIDE</span>
+<span class="key">from_nodes</span>: []
+<span class="key">to_nodes</span>: []
+
+<span class="key">actors</span>:
+  <span class="key">initiator</span>: []
+  <span class="key">participants</span>: []
+  <span class="key">approvers</span>: []
+
+<span class="key">actor_types</span>:
+  - <span class="val">human</span>
+  - <span class="val">agent</span>
+  - <span class="val">group</span>
+  - <span class="val">system</span>
+
+<span class="key">evidence</span>: []
+<span class="key">rationale</span>:
+<span class="key">method</span>:
+<span class="key">timestamp</span>:
+
+<span class="key">authority_context</span>:
+  <span class="key">domain</span>:
+  <span class="key">role</span>:
+  <span class="key">authorization</span>:
+
+<span class="key">lineage</span>:
+  <span class="key">upstream_transitions</span>: []
+  <span class="key">upstream_evidence</span>: []</pre>
+      </div>
+      <div>
+        <div class="h4">Questions provenance must answer</div>
+        <ul class="tick mah">
+          <li>Who <b>initiated</b> the transition?</li>
+          <li>Who <b>participated</b>, and who <b>approved</b>?</li>
+          <li>Was it individual, collective, <b>delegated</b>, or automated?</li>
+          <li>Which <b>evidence</b> was used?</li>
+          <li>Which <b>methods</b> produced that evidence?</li>
+          <li>What <b>prior reasoning</b> influenced the actor?</li>
+          <li>Under what <b>authority</b> was the transition made?</li>
+          <li>Were multiple supposedly independent transitions actually <b>derived from the same source</b>?</li>
+        </ul>
+        <div class="note" style="margin-top:22px"><b>Authority is not reliability.</b> A manager may have authority to approve a deployment without being the most technically reliable source on database performance. Actor identity, actor type, domain authority, authorization and historical reliability should not be collapsed into a single scalar weight.</div>
+      </div>
+    </div>
+    <div class="h4">Formal shape</div>
+    <div class="grid g3">
+      <div class="card"><h3><span class="k">State</span>S = (O, E, L, Content, TemporalScope, Metadata)</h3><p>Three classifications plus content, the interval over which it applies, and metadata.</p></div>
+      <div class="card accent"><h3><span class="k">Transition</span>S<sub>t</sub> &mdash;[T, P]&rarr; S<sub>t+1</sub></h3><p><code>T</code> is the typed transition; <code>P</code> is its provenance.</p></div>
+      <div class="card"><h3><span class="k">Provenance</span>P = (Actors, Evidence, Method, Authority, Time, Lineage)</h3><p>Working abstractions, not yet a formal ontology or mathematical theory.</p></div>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 07 CONFLICT ============ -->
+<details class="sec" id="conflict" open>
+  <summary><span class="sec-n">07</span><span class="sec-h"><h2>Conflict, authority and convergence<a class="anchor" href="#conflict">#</a></h2><p>Losing branches are preserved rather than deleted, and agreement is discounted by how much of it is derivative.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 250" role="img" aria-label="A prior state branching into two competing transitions producing State A and State B, both retained.">
+        <title>Preserved conflicting branches</title>
+        <g class="nd st" data-node="p"><rect x="40" y="98" width="170" height="46" rx="8"/><text x="125" y="126" text-anchor="middle">Prior State</text></g>
+        <path class="ed" data-e="p" data-t="a" d="M210 112 Q300 112 300 62 L406 62" marker-end="url(#ahm)"/>
+        <text class="vb" x="300" y="48" text-anchor="middle">T1</text>
+        <path class="ed" data-e="p" data-t="b" d="M210 130 Q300 130 300 180 L406 180" marker-end="url(#ahm)"/>
+        <text class="vb" x="300" y="206" text-anchor="middle">T2</text>
+        <g class="nd ac" data-node="a"><rect x="410" y="38" width="180" height="46" rx="8"/><text x="500" y="60" text-anchor="middle">State A</text><text class="sub" x="500" y="76" text-anchor="middle">contested &middot; retained</text></g>
+        <g class="nd ac" data-node="b"><rect x="410" y="156" width="180" height="46" rx="8"/><text x="500" y="178" text-anchor="middle">State B</text><text class="sub" x="500" y="194" text-anchor="middle">contested &middot; retained</text></g>
+        <path class="ed" data-e="a" data-t="w" d="M590 62 Q666 62 666 106 L700 106" marker-end="url(#ah)"/>
+        <path class="ed" data-e="b" data-t="w" d="M590 180 Q666 180 666 136 L700 136" marker-end="url(#ah)"/>
+        <g class="nd" data-node="w"><rect x="704" y="92" width="164" height="58" rx="8"/><text x="786" y="114" text-anchor="middle">Epistemic weighting</text><text class="sub" x="786" y="132" text-anchor="middle">dominant, not deleted</text></g>
+        <text class="lb" x="40" y="230">Neither branch is erased. Candidate statuses: unresolved &middot; contested &middot; dominant &middot; superseded &middot; reconciled.</text>
+      </svg>
+      <div class="dgm-cap">Conflict resolution should not use a single global actor score.</div>
+    </div>
+    <div class="h4">Candidate weighting inputs</div>
+    <div class="grid g4">
+      <div class="card"><h3>Evidence strength</h3></div>
+      <div class="card"><h3>Domain&#8209;specific actor authority</h3></div>
+      <div class="card"><h3>Historical actor / system reliability</h3></div>
+      <div class="card"><h3>Independence of supporting paths</h3></div>
+      <div class="card"><h3>Degree of corroboration</h3></div>
+      <div class="card"><h3>Temporal relevance / recency</h3></div>
+      <div class="card"><h3>Applicability to current context</h3></div>
+      <div class="card"><h3>Strength of contradictory evidence</h3></div>
+      <div class="card"><h3>Formal authorization</h3></div>
+    </div>
+    <div style="margin-top:20px">
+      <div class="code-head">Conceptual form &mdash; intentionally not yet a finalized formula</div>
+<pre><span class="vb">Weight</span> = f(<span class="key">Evidence</span>,
+           <span class="key">DomainAuthority</span>,
+           <span class="key">Reliability</span>,
+           <span class="key">Independence</span>,
+           <span class="key">Convergence</span>,
+           <span class="key">TemporalRelevance</span>,
+           <span class="key">Contradiction</span>)</pre>
+    </div>
+    <div class="quote" style="margin-top:22px">Five agents repeating one source should not be treated as five independent confirmations.</div>
+    <p style="color:var(--text-dim);font-size:15px;margin-top:16px;max-width:74ch">Repeated arrival at the same conclusion strengthens confidence only to the extent that the paths are meaningfully independent. Independent human reasoning, separate experiments, telemetry, and distinct agents using non&#8209;overlapping evidence may constitute stronger convergence. Independence is a property of the derivation topology, not of the count.</p>
+  </div>
+</details>
+
+<!-- ============ 08 MEMORY ============ -->
+<details class="sec" id="memory" open>
+  <summary><span class="sec-n">08</span><span class="sec-h"><h2>Memory, context and retrieval<a class="anchor" href="#memory">#</a></h2><p>The working hypothesis that memory lives in lineage rather than in a node type &mdash; and the retrieval primitive that would follow from it.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="quote" style="margin-bottom:22px">Nodes preserve states; transition lineage preserves much of what should be understood as memory.</div>
+    <div class="grid g2">
+      <div class="card leaf"><h3>What the hypothesis claims</h3><p>Richer memory may emerge from retained states <b>+</b> transitions <b>+</b> temporal ordering <b>+</b> provenance <b>+</b> relationships <b>+</b> retrieval capability &mdash; rather than from a dedicated memory record type.</p></div>
+      <div class="card"><h3>What it explicitly does not claim</h3><p>That all memory must literally be implemented as graph edges. It is a conceptual hypothesis to test against memory systems, temporal knowledge representation, event sourcing, provenance research and cognitive models.</p></div>
+    </div>
+    <div class="h4">Stored knowledge is not active context</div>
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 210" role="img" aria-label="Flow from experience to memory store to selected context to reasoning and back to new experience.">
+        <title>Experience to context loop</title>
+        <g class="nd st" data-node="c1"><rect x="24" y="70" width="150" height="46" rx="8"/><text x="99" y="98" text-anchor="middle">Experience</text></g>
+        <path class="ed" data-e="c1" data-t="c2" d="M174 93 L206 93" marker-end="url(#ah)"/><text class="vb" x="190" y="82" text-anchor="middle">retain</text>
+        <g class="nd st" data-node="c2"><rect x="210" y="70" width="160" height="46" rx="8"/><text x="290" y="98" text-anchor="middle">Memory store</text></g>
+        <path class="ed" data-e="c2" data-t="c3" d="M370 93 L402 93" marker-end="url(#ahm)"/><text class="vb" x="386" y="82" text-anchor="middle">retrieve</text>
+        <g class="nd ac" data-node="c3"><rect x="406" y="70" width="160" height="46" rx="8"/><text x="486" y="92" text-anchor="middle">Context</text><text class="sub" x="486" y="108" text-anchor="middle">selected, ephemeral</text></g>
+        <path class="ed" data-e="c3" data-t="c4" d="M566 93 L598 93" marker-end="url(#ah)"/><text class="vb" x="582" y="82" text-anchor="middle">reason</text>
+        <g class="nd st" data-node="c4"><rect x="602" y="70" width="170" height="46" rx="8"/><text x="687" y="98" text-anchor="middle">Claim / Decision</text></g>
+        <path class="ed" data-e="c4" data-t="c1" d="M687 116 L687 156 Q687 176 663 176 L123 176 Q99 176 99 156 L99 120" marker-end="url(#ah)"/>
+        <text class="vb" x="400" y="170" text-anchor="middle">act / observe &rarr; new experience</text>
+        <text class="lb" x="24" y="40">Context is selected. Retrieval decides what becomes context; storage does not.</text>
+      </svg>
+    </div>
+    <div class="h4">The intended retrieval primitive</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-bottom:16px">Richer than nearest&#8209;neighbour semantic search. An agent should be able to retrieve:</p>
+    <div class="pills">
+      <span class="pill">Current dominant state</span><span class="pill">Reasoning lineage</span><span class="pill">Supporting evidence</span><span class="pill m">Dissenting branches</span><span class="pill">Actor provenance</span><span class="pill m">Unresolved hypotheses</span><span class="pill">Superseded directives</span><span class="pill">Confidence &amp; authority signals</span><span class="pill">Relevant temporal context</span>
+    </div>
+    <div class="card leaf" style="margin-top:22px">
+      <h3><span class="k">Example desired output</span>What a topology-aware answer looks like</h3>
+      <p style="font-size:15.5px;color:var(--text)">&ldquo;PostgreSQL is the current strategic direction, reached through multiple evaluations, affirmed by authorized architecture actors, superseding an earlier alternative, with one unresolved concern around long&#8209;term traversal performance.&rdquo;</p>
+      <p style="margin-top:12px">The research question is whether graph topology, provenance, and epistemic/lifecycle state can improve downstream reasoning compared with standard document or vector&#8209;memory retrieval.</p>
+    </div>
+  </div>
+</details>
+<!-- ============ 09 TWO SYSTEMS ============ -->
+<details class="sec" id="twosys" open>
+  <summary><span class="sec-n">09</span><span class="sec-h"><h2>The two&#8209;system architecture<a class="anchor" href="#twosys">#</a></h2><p>Cognition and software execution solve different problems. D&#8209;System proposes not collapsing them into one undifferentiated graph &mdash; and modelling the boundary between them explicitly.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card leaf">
+        <h3><span class="k">System A &mdash; KCMS</span>Knowledge Construction &amp; Management</h3>
+        <p style="font-size:16px;color:var(--text);font-weight:500;margin:12px 0">&ldquo;What do we currently think or know, why, and how did we get here?&rdquo;</p>
+        <div class="pills" style="margin-top:14px"><span class="pill">information</span><span class="pill">ideas</span><span class="pill">questions</span><span class="pill">observations</span><span class="pill">claims</span><span class="pill">evidence</span><span class="pill">assumptions</span><span class="pill">hypotheses</span><span class="pill">beliefs</span><span class="pill">alternatives</span><span class="pill">inference</span><span class="pill">conclusions</span><span class="pill">decisions</span><span class="pill">provenance</span><span class="pill">memory</span><span class="pill">context</span><span class="pill">conflict</span><span class="pill">convergence</span><span class="pill">authority</span><span class="pill">learning</span></div>
+      </div>
+      <div class="card accent">
+        <h3><span class="k">System B &mdash; IES</span>Implementation &amp; Experience</h3>
+        <p style="font-size:16px;color:var(--text);font-weight:500;margin:12px 0">&ldquo;What are we trying to make real, how are we making it real, and what actually happened?&rdquo;</p>
+        <div class="pills" style="margin-top:14px"><span class="pill m">requirements</span><span class="pill m">constraints</span><span class="pill m">acceptance criteria</span><span class="pill m">specifications</span><span class="pill m">plans</span><span class="pill m">phases</span><span class="pill m">tasks</span><span class="pill m">dependencies</span><span class="pill m">artifacts</span><span class="pill m">code</span><span class="pill m">configuration</span><span class="pill m">tests</span><span class="pill m">deployments</span><span class="pill m">functionality</span><span class="pill m">runtime events</span><span class="pill m">outcomes</span><span class="pill m">incidents</span><span class="pill m">telemetry</span><span class="pill m">observed experience</span></div>
+      </div>
+    </div>
+
+    <div class="h4">The boundary &mdash; converting reasoned commitment into implementable intent</div>
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 420" role="img" aria-label="Knowledge construction flows through DECIDE into a decision, which splits via DERIVE and CONSTRAIN into requirements and constraints, then merges via SPECIFY into a specification and implementation.">
+        <title>Knowledge-to-implementation boundary</title>
+        <rect class="zone" x="20" y="18" width="860" height="118"/>
+        <text class="zone-t" x="42" y="42">System A &mdash; knowledge construction</text>
+        <g class="nd st" data-node="k1"><rect x="46" y="62" width="150" height="42" rx="8"/><text x="121" y="88" text-anchor="middle">Ideas</text></g>
+        <path class="ed" data-e="k1" data-t="k2" d="M196 83 L232 83" marker-end="url(#ah)"/>
+        <g class="nd st" data-node="k2"><rect x="236" y="62" width="150" height="42" rx="8"/><text x="311" y="88" text-anchor="middle">Evidence</text></g>
+        <path class="ed" data-e="k2" data-t="k3" d="M386 83 L422 83" marker-end="url(#ah)"/>
+        <g class="nd st" data-node="k3"><rect x="426" y="62" width="150" height="42" rx="8"/><text x="501" y="88" text-anchor="middle">Evaluation</text></g>
+        <path class="ed" data-e="k3" data-t="k4" d="M576 83 L612 83" marker-end="url(#ah)"/>
+        <g class="nd st" data-node="k4"><rect x="616" y="62" width="150" height="42" rx="8"/><text x="691" y="88" text-anchor="middle">Conclusion</text></g>
+
+        <path class="ed" data-e="k4" data-t="d1" d="M691 104 Q691 140 560 140 L450 140 L450 166" marker-end="url(#ahm)"/>
+        <text class="vb" x="470" y="134">DECIDE</text>
+
+        <g class="nd ac" data-node="d1"><rect x="330" y="166" width="240" height="46" rx="8"/><text x="450" y="188" text-anchor="middle">Decision / Directive</text><text class="sub" x="450" y="204" text-anchor="middle">the translation boundary</text></g>
+
+        <path class="ed" data-e="d1" data-t="r1" d="M390 212 Q390 244 250 244 L250 268" marker-end="url(#ah)"/>
+        <text class="vb" x="262" y="240">DERIVE</text>
+        <path class="ed" data-e="d1" data-t="r2" d="M510 212 Q510 244 650 244 L650 268" marker-end="url(#ah)"/>
+        <text class="vb" x="562" y="240">CONSTRAIN</text>
+
+        <rect class="zone" x="20" y="252" width="860" height="152"/>
+        <text class="zone-t" x="42" y="392">System B &mdash; implementation &amp; experience</text>
+        <g class="nd" data-node="r1"><rect x="160" y="268" width="180" height="42" rx="8"/><text x="250" y="294" text-anchor="middle">Requirement(s)</text></g>
+        <g class="nd" data-node="r2"><rect x="560" y="268" width="180" height="42" rx="8"/><text x="650" y="294" text-anchor="middle">Constraint(s)</text></g>
+        <path class="ed" data-e="r1" data-t="sp" d="M250 310 Q250 336 380 336 L406 336" marker-end="url(#ah)"/>
+        <path class="ed" data-e="r2" data-t="sp" d="M650 310 Q650 336 520 336 L494 336" marker-end="url(#ah)"/>
+        <text class="vb" x="450" y="326" text-anchor="middle">SPECIFY</text>
+        <g class="nd ac" data-node="sp"><rect x="370" y="336" width="160" height="42" rx="8"/><text x="450" y="362" text-anchor="middle">Specification</text></g>
+      </svg>
+      <div class="dgm-cap">A decision does not automatically equal a requirement.</div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3>What a decision may actually do</h3>
+      <p style="margin-bottom:12px">This translation should be modelled explicitly rather than hidden inside documents. A single decision may:</p>
+      <div class="pills"><span class="pill">create requirements</span><span class="pill">modify requirements</span><span class="pill">reject requirements</span><span class="pill">introduce constraints</span><span class="pill">prioritize requirements</span><span class="pill">select architecture</span><span class="pill">authorize implementation</span><span class="pill m">supersede a prior directive</span></div>
+    </div>
+
+    <div class="h4">The full lifecycle &mdash; twelve stages, one loop</div>
+    <div id="stages"></div>
+
+    <div class="h4">The reality feedback loop</div>
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 260" role="img" aria-label="Expected behaviour leads to implementation and actual behaviour, which either corroborates expectation or produces a contradiction that triggers reconsideration.">
+        <title>Reality feedback loop</title>
+        <g class="nd st" data-node="f1"><rect x="40" y="106" width="170" height="46" rx="8"/><text x="125" y="134" text-anchor="middle">Expected behavior</text></g>
+        <path class="ed" data-e="f1" data-t="f2" d="M210 129 L246 129" marker-end="url(#ah)"/>
+        <g class="nd st" data-node="f2"><rect x="250" y="106" width="170" height="46" rx="8"/><text x="335" y="134" text-anchor="middle">Implementation</text></g>
+        <path class="ed" data-e="f2" data-t="f3" d="M420 129 L456 129" marker-end="url(#ah)"/>
+        <g class="nd ac" data-node="f3"><rect x="460" y="106" width="170" height="46" rx="8"/><text x="545" y="134" text-anchor="middle">Actual behavior</text></g>
+        <path class="ed" data-e="f3" data-t="f4" d="M630 118 Q690 118 690 62 L716 62" marker-end="url(#ah)"/>
+        <text class="lb" x="642" y="86">matches</text>
+        <g class="nd st" data-node="f4"><rect x="720" y="40" width="160" height="44" rx="8"/><text x="800" y="60" text-anchor="middle">Corroborating</text><text class="sub" x="800" y="76" text-anchor="middle">evidence</text></g>
+        <path class="ed" data-e="f3" data-t="f5" d="M630 140 Q690 140 690 196 L716 196" marker-end="url(#ahm)"/>
+        <text class="lb" x="642" y="182">differs</text>
+        <g class="nd ac" data-node="f5"><rect x="720" y="174" width="160" height="44" rx="8"/><text x="800" y="194" text-anchor="middle">Contradiction</text><text class="sub" x="800" y="210" text-anchor="middle">anomaly</text></g>
+        <path class="ed" data-e="f5" data-t="f1" d="M800 218 L800 240 Q800 246 786 246 L125 246 Q125 246 125 214 L125 156" marker-end="url(#ahm)"/>
+        <text class="vb" x="440" y="240" text-anchor="middle">RECONSIDER KNOWLEDGE</text>
+        <text class="lb" x="40" y="34">The running system becomes an evidence generator for the knowledge system.</text>
+      </svg>
+    </div>
+
+    <div class="h4">Separation of truth, intent and realization</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-bottom:18px">Three layers D&#8209;System proposes never to collapse. The worked example shows why: each line is a different kind of claim, and merging any two makes the last line unstateable.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:16%">Layer</th><th style="width:24%">Asks</th><th>Worked example</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill">Epistemic</span></td><td>What do we believe or know?</td><td>&ldquo;We believe users need offline support.&rdquo;</td></tr>
+          <tr><td><span class="pill">Intent</span></td><td>What have we decided should be true?</td><td>&ldquo;The product shall support offline operation.&rdquo;</td></tr>
+          <tr><td><span class="pill">Realization</span></td><td>What was actually implemented?</td><td>&ldquo;Offline caching exists in release 2.4.&rdquo;</td></tr>
+          <tr><td><span class="pill m">Observed</span></td><td>What actually happened?</td><td>&ldquo;Offline synchronization fails on conflict.&rdquo;</td></tr>
+          <tr><td><span class="pill m">Reflection</span></td><td>What does that mean?</td><td>&ldquo;The implementation does not fully satisfy the intended requirement.&rdquo;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quote" style="margin-top:24px">Reality &rarr; Representation &rarr; Reasoning &rarr; Commitment &rarr; Specification &rarr; Execution &rarr; Realization &rarr; Observation &rarr; Experience &rarr; Revised Representation</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-top:14px">D&#8209;System&rsquo;s research question is whether preserving explicit provenance&#8209;bearing transitions across this entire loop improves human&#8209;agent development, context reconstruction, change&#8209;impact analysis and system explainability.</p>
+  </div>
+</details>
+
+<!-- ============ 10 TRACEABILITY ============ -->
+<details class="sec" id="trace" open>
+  <summary><span class="sec-n">10</span><span class="sec-h"><h2>Bidirectional traceability<a class="anchor" href="#trace">#</a></h2><p>Both directions must work, and neither should depend solely on text similarity. Toggle the chain to reverse it.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="bar">
+      <button class="btn on" id="dirFwd" type="button">Forward &mdash; what became of this idea?</button>
+      <button class="btn" id="dirBack" type="button">Backward &mdash; why does this exist?</button>
+    </div>
+    <div class="dgm" data-dgm id="traceDgm">
+      <svg viewBox="0 0 900 300" role="img" aria-label="Traceability chain from idea through claim, decision, requirement, specification, plan, phase, artifact, test, deployment, functionality, to runtime outcome.">
+        <title>Bidirectional traceability chain</title>
+        <g class="nd st" data-node="x1"><rect x="20" y="34" width="128" height="40" rx="7"/><text x="84" y="59" text-anchor="middle">Idea</text></g>
+        <g class="nd st" data-node="x2"><rect x="176" y="34" width="128" height="40" rx="7"/><text x="240" y="59" text-anchor="middle">Claim</text></g>
+        <g class="nd ac" data-node="x3"><rect x="332" y="34" width="128" height="40" rx="7"/><text x="396" y="59" text-anchor="middle">Decision</text></g>
+        <g class="nd" data-node="x4"><rect x="488" y="34" width="128" height="40" rx="7"/><text x="552" y="59" text-anchor="middle">Requirement</text></g>
+        <g class="nd" data-node="x5"><rect x="644" y="34" width="128" height="40" rx="7"/><text x="708" y="59" text-anchor="middle">Specification</text></g>
+        <g class="nd" data-node="x6"><rect x="644" y="130" width="128" height="40" rx="7"/><text x="708" y="155" text-anchor="middle">Plan</text></g>
+        <g class="nd ac" data-node="x7"><rect x="488" y="130" width="128" height="40" rx="7"/><text x="552" y="155" text-anchor="middle">Phase</text></g>
+        <g class="nd" data-node="x8"><rect x="332" y="130" width="128" height="40" rx="7"/><text x="396" y="155" text-anchor="middle">Commit / Artifact</text></g>
+        <g class="nd" data-node="x9"><rect x="176" y="130" width="128" height="40" rx="7"/><text x="240" y="155" text-anchor="middle">Test</text></g>
+        <g class="nd" data-node="x10"><rect x="20" y="130" width="128" height="40" rx="7"/><text x="84" y="155" text-anchor="middle">Deployment</text></g>
+        <g class="nd" data-node="x11"><rect x="20" y="226" width="128" height="40" rx="7"/><text x="84" y="251" text-anchor="middle">Functionality</text></g>
+        <g class="nd st" data-node="x12"><rect x="176" y="226" width="200" height="40" rx="7"/><text x="276" y="251" text-anchor="middle">Runtime Outcome</text></g>
+        <g id="traceEdges">
+          <path class="ed" data-e="x1" data-t="x2" d="M148 54 L172 54"/>
+          <path class="ed" data-e="x2" data-t="x3" d="M304 54 L328 54"/>
+          <path class="ed" data-e="x3" data-t="x4" d="M460 54 L484 54"/>
+          <path class="ed" data-e="x4" data-t="x5" d="M616 54 L640 54"/>
+          <path class="ed" data-e="x5" data-t="x6" d="M772 54 Q800 54 800 102 Q800 150 776 150"/>
+          <path class="ed" data-e="x6" data-t="x7" d="M644 150 L620 150"/>
+          <path class="ed" data-e="x7" data-t="x8" d="M488 150 L464 150"/>
+          <path class="ed" data-e="x8" data-t="x9" d="M332 150 L308 150"/>
+          <path class="ed" data-e="x9" data-t="x10" d="M176 150 L152 150"/>
+          <path class="ed" data-e="x10" data-t="x11" d="M84 170 L84 222"/>
+          <path class="ed" data-e="x11" data-t="x12" d="M148 246 L172 246"/>
+        </g>
+        <text class="lb" x="410" y="248" id="traceLbl">Forward: idea &rarr; realized outcome</text>
+      </svg>
+      <div class="dgm-cap">Neither direction should depend on text similarity. The relationships should be explicit and provenance&#8209;aware.</div>
+    </div>
+
+    <div class="h4">Candidate relationship vocabulary</div>
+    <div class="grid g3" id="relVocab"></div>
+
+    <div class="h4">Trace queries the system should support</div>
+    <div class="grid g2" id="traceQueries"></div>
+
+    <div class="h4">Trace integrity &mdash; a path is not a trace</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-bottom:16px">A trace should not be considered complete merely because a path exists. Candidate integrity properties:</p>
+    <div class="grid g3">
+      <div class="card"><h3>Provenance is known</h3></div>
+      <div class="card"><h3>Relationship type is explicit</h3></div>
+      <div class="card"><h3>Temporal order is coherent</h3></div>
+      <div class="card"><h3>Decision authority is known</h3></div>
+      <div class="card"><h3>Requirement scope is known</h3></div>
+      <div class="card"><h3>Artifact version is identified</h3></div>
+      <div class="card"><h3>Verification evidence exists</h3></div>
+      <div class="card"><h3>Deployment / environment is identified</h3></div>
+      <div class="card"><h3>Outcome refers to the correct deployed version</h3></div>
+    </div>
+
+    <div class="h4">Epistemic blast radius</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-bottom:16px">The set of downstream decisions, requirements, specifications, plans, artifacts, functionality or conclusions whose justification depends materially on a state that has been revised, falsified, weakened or superseded. Click the assumption to propagate.</p>
+    <div class="dgm" id="blastDgm">
+      <svg viewBox="0 0 900 160" role="img" aria-label="Falsifying assumption A17 propagates through decision D4, requirement R8, specification S3, plan P9 to code C22.">
+        <title>Epistemic blast radius propagation</title>
+        <g class="nd ac blast" data-node="b0" id="blastSeed"><rect x="16" y="48" width="132" height="52" rx="8"/><text x="82" y="70" text-anchor="middle">Assumption</text><text class="sub" x="82" y="87" text-anchor="middle">A17</text></g>
+        <path class="ed blast-e" data-e="b0" data-t="b1" d="M148 74 L176 74" marker-end="url(#ah)"/><text class="vb" x="162" y="62" text-anchor="middle">supports</text>
+        <g class="nd blast" data-node="b1"><rect x="180" y="48" width="128" height="52" rx="8"/><text x="244" y="70" text-anchor="middle">Decision</text><text class="sub" x="244" y="87" text-anchor="middle">D4</text></g>
+        <path class="ed blast-e" data-e="b1" data-t="b2" d="M308 74 L336 74" marker-end="url(#ah)"/><text class="vb" x="322" y="62" text-anchor="middle">derives</text>
+        <g class="nd blast" data-node="b2"><rect x="340" y="48" width="128" height="52" rx="8"/><text x="404" y="70" text-anchor="middle">Requirement</text><text class="sub" x="404" y="87" text-anchor="middle">R8</text></g>
+        <path class="ed blast-e" data-e="b2" data-t="b3" d="M468 74 L496 74" marker-end="url(#ah)"/><text class="vb" x="482" y="62" text-anchor="middle">specified_by</text>
+        <g class="nd blast" data-node="b3"><rect x="500" y="48" width="120" height="52" rx="8"/><text x="560" y="70" text-anchor="middle">Spec</text><text class="sub" x="560" y="87" text-anchor="middle">S3</text></g>
+        <path class="ed blast-e" data-e="b3" data-t="b4" d="M620 74 L648 74" marker-end="url(#ah)"/><text class="vb" x="634" y="62" text-anchor="middle">planned_by</text>
+        <g class="nd blast" data-node="b4"><rect x="652" y="48" width="110" height="52" rx="8"/><text x="707" y="70" text-anchor="middle">Plan</text><text class="sub" x="707" y="87" text-anchor="middle">P9</text></g>
+        <path class="ed blast-e" data-e="b4" data-t="b5" d="M762 74 L790 74" marker-end="url(#ah)"/><text class="vb" x="776" y="62" text-anchor="middle">implemented_by</text>
+        <g class="nd blast" data-node="b5"><rect x="794" y="48" width="90" height="52" rx="8"/><text x="839" y="70" text-anchor="middle">Code</text><text class="sub" x="839" y="87" text-anchor="middle">C22</text></g>
+        <text class="lb" x="16" y="132" id="blastLbl">If A17 is falsified, the system should identify D4, R8, S3, P9 and C22 as candidates for reassessment.</text>
+      </svg>
+    </div>
+    <div class="note" style="margin-top:18px"><b>Provisional term.</b> &ldquo;Epistemic blast radius&rdquo; is a D&#8209;System working term and must be checked against established impact&#8209;analysis and requirements&#8209;traceability terminology.</div>
+  </div>
+</details>
+
+<!-- ============ 11 PHASE CONTRACT ============ -->
+<details class="sec" id="phase" open>
+  <summary><span class="sec-n">11</span><span class="sec-h"><h2>The phase context contract<a class="anchor" href="#phase">#</a></h2><p>A phase is the smallest planned unit of work intended to be completed within one bounded agentic development session &mdash; and, more importantly, a stable contract between persistent knowledge and ephemeral agent context.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 210" role="img" aria-label="Persistent knowledge is constructed into a phase context package, executed agentically to produce phase outputs, then consolidated back into persistent knowledge.">
+        <title>Phase context contract loop</title>
+        <g class="nd st" data-node="ph1"><rect x="40" y="80" width="180" height="50" rx="8"/><text x="130" y="110" text-anchor="middle">Persistent Knowledge</text></g>
+        <path class="ed" data-e="ph1" data-t="ph2" d="M220 105 L266 105" marker-end="url(#ahm)"/>
+        <text class="vb" x="243" y="93" text-anchor="middle">construct</text>
+        <g class="nd ac" data-node="ph2"><rect x="270" y="72" width="200" height="66" rx="8"/><text x="370" y="98" text-anchor="middle">Phase Context Package</text><text class="sub" x="370" y="116" text-anchor="middle">a projection, not the knowledge</text></g>
+        <path class="ed" data-e="ph2" data-t="ph3" d="M470 105 L516 105" marker-end="url(#ahm)"/>
+        <text class="vb" x="493" y="93" text-anchor="middle">execute</text>
+        <g class="nd st" data-node="ph3"><rect x="520" y="80" width="180" height="50" rx="8"/><text x="610" y="110" text-anchor="middle">Phase Outputs</text></g>
+        <path class="ed" data-e="ph3" data-t="ph1" d="M700 105 Q760 105 760 158 Q760 178 736 178 L154 178 Q130 178 130 158 L130 134" marker-end="url(#ahm)"/>
+        <text class="vb" x="440" y="172" text-anchor="middle">CONSOLIDATE</text>
+        <text class="lb" x="40" y="46">A phase should be executable without requiring the agent to rediscover the entire project history.</text>
+      </svg>
+    </div>
+
+    <div class="grid g2" style="margin-top:22px">
+      <div>
+        <div class="code-head">Phase input contract</div>
+<pre><span class="key">phase_id</span>:
+<span class="key">plan_id</span>:
+<span class="key">objective</span>:
+
+<span class="key">upstream_intent</span>:
+  <span class="key">decisions</span>: []
+  <span class="key">requirements</span>: []
+  <span class="key">constraints</span>: []
+  <span class="key">acceptance_criteria</span>: []
+
+<span class="key">context</span>:
+  <span class="key">relevant_knowledge</span>: []
+  <span class="key">prior_phase_outputs</span>: []
+  <span class="key">relevant_artifacts</span>: []
+  <span class="key">code_locations</span>: []
+  <span class="key">known_failures</span>: []
+  <span class="key">unresolved_questions</span>: []
+
+<span class="key">execution</span>:
+  <span class="key">permitted_tools</span>: []
+  <span class="key">permissions</span>: []
+  <span class="key">expected_tasks</span>: []
+  <span class="key">dependencies</span>: []
+
+<span class="key">expected_outputs</span>:
+  <span class="key">artifacts</span>: []
+  <span class="key">tests</span>: []
+  <span class="key">documentation</span>: []
+  <span class="key">state_changes</span>: []
+
+<span class="key">completion_definition</span>:
+  <span class="key">acceptance_criteria</span>: []
+  <span class="key">verification_required</span>: []</pre>
+      </div>
+      <div>
+        <div class="code-head">Phase output contract &mdash; more than code</div>
+<pre><span class="key">status</span>:
+<span class="key">actual_actions</span>: []
+
+<span class="key">artifacts_created</span>: []
+<span class="key">artifacts_modified</span>: []
+<span class="key">tests_run</span>: []
+<span class="key">verification_results</span>: []
+
+<span class="cm"># the epistemic yield of the session</span>
+<span class="key">decisions_made_during_execution</span>: []
+<span class="key">new_assumptions</span>: []
+<span class="key">observations</span>: []
+<span class="key">new_evidence</span>: []
+<span class="key">failures</span>: []
+<span class="key">unexpected_findings</span>: []
+<span class="key">open_questions</span>: []
+<span class="key">technical_debt</span>: []
+
+<span class="key">requirements_satisfied</span>: []
+<span class="key">requirements_partially_satisfied</span>: []
+<span class="key">requirements_unsatisfied</span>: []
+
+<span class="key">recommended_followup</span>: []</pre>
+      </div>
+    </div>
+
+    <div class="h4">Consolidation &mdash; outputs become states and transitions</div>
+    <div class="grid g4">
+      <div class="card"><h3>Agent discovered undocumented constraint</h3><p><span class="pill m">CAPTURE</span> &rarr; New Constraint</p></div>
+      <div class="card"><h3>Test disproved performance assumption</h3><p><span class="pill m">FALSIFY</span> &rarr; Revised Knowledge State</p></div>
+      <div class="card"><h3>Implementation required architectural choice</h3><p><span class="pill m">DECIDE</span> &rarr; New Architecture Decision</p></div>
+      <div class="card"><h3>Phase completed requirement</h3><p><span class="pill m">VERIFY</span> &rarr; Requirement Satisfaction State</p></div>
+    </div>
+
+    <div class="note" style="margin-top:22px"><b>One phase, one session is an aspiration &mdash; not an invariant.</b> The model must support interrupted sessions, failed phases, partial completion, retry, agent handoff, human escalation, phase split, and requirement change during execution. Whether phase identity survives these cases, or successor phases should be created, is an open question.</div>
+
+    <div class="h4">Open research questions on the phase abstraction</div>
+    <div class="grid g2" id="phaseQs"></div>
+  </div>
+</details>
+<!-- ============ 12 GLOSSARY ============ -->
+<details class="sec" id="glossary" open>
+  <summary><span class="sec-n">12</span><span class="sec-h"><h2>Glossary<a class="anchor" href="#glossary">#</a></h2><p>Fifty&#8209;three terms across the knowledge and implementation vocabularies. Working definitions, established before the conceptual model is translated into schemas, APIs or agent behaviour &mdash; not claims of alignment with academic terminology.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="bar">
+      <input class="search" id="gSearch" type="search" placeholder="Search terms and definitions&hellip;  (press / )" aria-label="Search glossary">
+      <button class="btn on" data-gtab="all" type="button">All</button>
+      <button class="btn" data-gtab="k" type="button">Knowledge</button>
+      <button class="btn" data-gtab="i" type="button">Implementation</button>
+      <span class="count" id="gCount"></span>
+    </div>
+    <div id="gList" class="grid" style="gap:12px"></div>
+    <div class="quote" style="margin-top:26px">No term in this glossary should automatically become a database table, node label or edge type merely because it has been defined conceptually. <strong>Conceptual ontology first. Storage ontology second.</strong></div>
+  </div>
+</details>
+
+<!-- ============ 13 HYPOTHESES ============ -->
+<details class="sec" id="hypotheses" open>
+  <summary><span class="sec-n">13</span><span class="sec-h"><h2>Falsifiable hypotheses<a class="anchor" href="#hypotheses">#</a></h2><p>Twelve claims written to be disproved. Each carries the condition that would falsify it &mdash; the point of the exercise is to make novelty testable rather than asserted.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="note" style="margin-bottom:22px"><b>No novelty claim is established.</b> The working hypothesis is that individual components overlap with substantial prior work, while possible differentiation may lie in the integration of <b>typed multi&#8209;dimensional knowledge states + explicit state&#8209;transition semantics + provenance&#8209;weighted human/agent convergence and conflict + topology&#8209;aware context transfer</b>. This must be aggressively tested against prior art.</div>
+    <div class="grid g2" id="hypList"></div>
+    <div class="h4">Required outcome categories</div>
+    <p style="color:var(--text-dim);font-size:15px;max-width:74ch;margin-bottom:14px">Each hypothesis must ultimately be classified as exactly one of the following. <code>NOVEL</code> is not an available verdict without a substantially stronger search and expert review.</p>
+    <div class="pills">
+      <span class="pill">LIKELY_ALREADY_KNOWN</span><span class="pill">KNOWN_COMPONENT_NEW_INTEGRATION</span><span class="pill m">POTENTIALLY_DISTINCT</span><span class="pill">INSUFFICIENT_EVIDENCE</span>
+    </div>
+  </div>
+</details>
+
+<!-- ============ FOOTER ============ -->
+<footer style="padding:52px 0 0">
+  <div class="h4">Source map</div>
+  <p style="color:var(--text-dim);font-size:14.5px;max-width:74ch;margin-bottom:20px">Every section on this page is drawn from the working research documents under <code>research/</code>. Nothing here originates outside them.</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:34%">Section</th><th>Source document</th></tr></thead>
+      <tbody>
+        <tr><td>01 &ndash; 08 &nbsp;Knowledge architecture</td><td><code>research/architecture/architecture.md</code></td></tr>
+        <tr><td>04 &nbsp;Transition vocabulary</td><td><code>research/architecture/transition_vocabulary.md</code></td></tr>
+        <tr><td>09 &nbsp;Two&#8209;system architecture</td><td><code>research/two_system_architecture.md</code></td></tr>
+        <tr><td>10 &nbsp;Traceability</td><td><code>research/development_traceability_model.md</code></td></tr>
+        <tr><td>10 &nbsp;Epistemic blast radius</td><td><code>research/implementation_glossary.md</code></td></tr>
+        <tr><td>11 &nbsp;Phase context contract</td><td><code>research/phase_context_contract.md</code></td></tr>
+        <tr><td>12 &nbsp;Glossary &mdash; knowledge</td><td><code>research/knowledge_glossary.md</code></td></tr>
+        <tr><td>12 &nbsp;Glossary &mdash; implementation</td><td><code>research/implementation_glossary.md</code></td></tr>
+        <tr><td>13 &nbsp;Hypotheses H0&ndash;H6</td><td><code>research/hypotheses/novelty_hypotheses.md</code></td></tr>
+        <tr><td>13 &nbsp;Hypotheses H7&ndash;H11</td><td><code>research/protocols/research_expansion.md</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="color:var(--text-faint);font-size:13px;margin-top:30px;padding-top:22px;border-top:1px solid var(--border)">
+    D&#8209;System &mdash; proposed knowledge architecture. Self&#8209;contained local document; no external resources, no network requests, no stored state.
+  </p>
+</footer>
+
+</div>
+</main>
+</div>
+<script>
+"use strict";
+
+/* ============================================================
+   DATA — transcribed from research/ working documents
+   ============================================================ */
+
+const AXES = [
+  { key:"O", name:"Ontological", q:"What is this?", src:"architecture.md &sect;2.1", values:[
+    { n:"Concepts & Mental Models", d:"Theoretical constructs, principles, paradigms, abstractions, or conceptual models." },
+    { n:"Artifacts & Entities", d:"Concrete digital or physical outputs and entities — systems, reports, code artifacts, commits, architectures, datasets." },
+    { n:"Processes & Workflows", d:"Sequential operations, methods, and procedures describing how something is performed." },
+    { n:"Events", d:"Distinct occurrences in time, such as failures, deployments, meetings, or observed changes." }
+  ]},
+  { key:"E", name:"Epistemic", q:"What is its truth status?", src:"architecture.md &sect;2.2", values:[
+    { n:"Axioms & Ground Truths", d:"Claims currently accepted as verified or reliable within the applicable scope." },
+    { n:"Hypotheses & Assumptions", d:"Untested or provisionally accepted claims requiring validation." },
+    { n:"Anti-Patterns & Falsified", d:"Disproven theories, failed approaches, known dead ends, or explicitly rejected propositions — retained to prevent cyclic mistakes." }
+  ]},
+  { key:"L", name:"Lifecycle", q:"Where is it in its evolution?", src:"architecture.md &sect;2.3", values:[
+    { n:"Generative Seeds", d:"Raw or developing ideas under consideration before commitment." },
+    { n:"Strategic Directives", d:"High-level commitments, goals, or plans that consolidate prior evaluation into direction." },
+    { n:"Operational Tasks", d:"Executable actions derived from strategic direction." },
+    { n:"Retrospective Insights", d:"Post-execution learning, gaps, technical debt, observations, or context discovered after action." }
+  ]}
+];
+
+const VERB_FAMILIES = [
+  { f:"Introduction / ideation", v:["CONSIDER","CAPTURE","PROPOSE","DISCOVER","GENERATE","DERIVE","REFRAME","EXPAND","SYNTHESIZE","DECOMPOSE"] },
+  { f:"Epistemic formation",     v:["HYPOTHESIZE","ASSUME","INFER","CONCLUDE","GENERALIZE","SPECIALIZE","FORMALIZE"] },
+  { f:"Evaluation / investigation", v:["EVALUATE","COMPARE","TEST","VERIFY","VALIDATE","CHALLENGE","REVIEW","AUDIT","MEASURE","OBSERVE","SIMULATE","EXPERIMENT"] },
+  { f:"Epistemic resolution",    v:["CONFIRM","CORROBORATE","REFUTE","FALSIFY","DISPROVE","REVISE","QUALIFY","INVALIDATE","REOPEN"] },
+  { f:"Selection / decision",    v:["DECIDE","SELECT","REJECT","PRIORITIZE","DEPRIORITIZE","APPROVE","DENY","COMMIT","DEFER","ESCALATE"] },
+  { f:"Planning / operationalization", v:["PLAN","DECOMPOSE","SPECIFY","DESIGN","SCHEDULE","ASSIGN","SEQUENCE","DEPEND","ESTIMATE","SCOPE","RESOURCE"] },
+  { f:"Execution",               v:["EXECUTE","IMPLEMENT","CREATE","MODIFY","DEPLOY","MIGRATE","INTEGRATE","CONFIGURE","ACTIVATE","DEACTIVATE","COMPLETE","FAIL","ABORT","ROLLBACK"] },
+  { f:"Observation / feedback",  v:["OBSERVE","MEASURE","MONITOR","DETECT","COMPARE","ASSESS","REFLECT","RETROSPECT","DIAGNOSE","ATTRIBUTE","LEARN"] },
+  { f:"Evolution",               v:["RECONSIDER","REOPEN","REVISE","ADAPT","REFINE","REPLACE","SUPERSEDE","DEPRECATE","RETIRE","REVERSE","PIVOT"] }
+];
+
+const CANONICAL = new Set(["CONSIDER","CAPTURE","PROPOSE","GENERATE","DERIVE","SYNTHESIZE","HYPOTHESIZE","ASSUME","EVALUATE","TEST","VALIDATE","FALSIFY","CONCLUDE","REVISE","DECIDE","SELECT","REJECT","APPROVE","DEFER","PLAN","DECOMPOSE","DESIGN","ASSIGN","EXECUTE","IMPLEMENT","COMPLETE","FAIL","OBSERVE","MEASURE","ASSESS","REFLECT","DIAGNOSE","LEARN","RECONSIDER","REFINE","SUPERSEDE","DEPRECATE","RETIRE"]);
+
+const STAGES = [
+  { n:"Stage 0", t:"External reality / latent possibility", d:"Something exists, happens, is desired, or becomes relevant before D-System represents it." },
+  { n:"Stage 1", t:"Capture / ideation", d:"An idea, question, observation, request, problem, opportunity or commitment enters the system." },
+  { n:"Stage 2", t:"Knowledge construction", d:"Hypothesize, compare, investigate, infer, challenge, validate, falsify, synthesize, conclude. Outputs: conclusions, unresolved alternatives, evidence structures, updated beliefs." },
+  { n:"Stage 3", t:"Decision", d:"A sufficiently authorized reasoning process establishes direction. The transition itself retains alternatives considered, evidence, rationale, actors, authority, uncertainty, dissent, scope and assumptions." },
+  { n:"Stage 4", t:"Intent formalization", d:"Decision becomes implementable through requirements, constraints, non-functional requirements, acceptance criteria, specification and architecture/design." },
+  { n:"Stage 5", t:"Planning", d:"Specification becomes executable work: Plan → Phase → Tasks, inputs, context package, acceptance criteria and expected outputs." },
+  { n:"Stage 6", t:"Agentic execution", d:"A phase is executed during a bounded development session. The executing human or agent receives a context package and produces artifacts." },
+  { n:"Stage 7", t:"Verification", d:"Outputs are checked against requirements, acceptance criteria, tests, invariants, constraints and architecture decisions." },
+  { n:"Stage 8", t:"Deployment / realization", d:"Verified artifacts become part of a running system or operational process." },
+  { n:"Stage 9", t:"Observation", d:"Reality produces telemetry, incidents, user feedback, performance measurements, errors, unexpected behavior and successful outcomes." },
+  { n:"Stage 10", t:"Experience and reflection", d:"Observations are interpreted. They may validate or falsify assumptions, reveal missing requirements, identify technical debt, expose unintended consequences, or generate retrospective insights." },
+  { n:"Stage 11", t:"Knowledge update", d:"The observed world changes the knowledge graph. The cycle begins again." }
+];
+
+const REL_VOCAB = [
+  { g:"Knowledge → intent",        v:["INFORMS","MOTIVATES","SUPPORTS","CHALLENGES","ASSUMES","CONCLUDES","DECIDES","AUTHORIZES"] },
+  { g:"Intent → specification",    v:["DERIVES_REQUIREMENT","IMPOSES_CONSTRAINT","SATISFIED_BY","FORMALIZED_AS","SPECIFIED_BY","DESIGNED_BY"] },
+  { g:"Specification → execution", v:["PLANNED_BY","DECOMPOSED_INTO","DEPENDS_ON","ASSIGNED_TO","EXECUTED_IN","CONSUMES_CONTEXT"] },
+  { g:"Execution → artifact",      v:["PRODUCES","MODIFIES","IMPLEMENTS","TESTS","VERIFIES","FAILS_CRITERION"] },
+  { g:"Artifact → reality",        v:["DEPLOYED_AS","REALIZES","PROVIDES_CAPABILITY","EMITS","CAUSES"] },
+  { g:"Reality → knowledge",       v:["OBSERVED_AS","MEASURED_BY","GENERATES_EVIDENCE","CORROBORATES","CONTRADICTS","TRIGGERS_RECONSIDERATION"] }
+];
+
+const TRACE_QUERIES = [
+  { q:"Why does this code exist?", d:"Traverse backward from artifact or code to phase, plan, specification, requirement, decision, rationale and evidence, and the originating idea or need." },
+  { q:"What became of this idea?", d:"Traverse forward into decisions, requirements, plans, artifacts, functionality and observed outcomes." },
+  { q:"Which code depends on this assumption?", d:"Traverse dependency and provenance paths from the assumption through decisions and specifications to artifacts." },
+  { q:"Which requirements are unimplemented?", d:"Find requirements with no verified realization path." },
+  { q:"Which implemented functions have no current justification?", d:"Find functionality whose upstream requirement or decision has been superseded, retracted, or lost." },
+  { q:"Which decisions have not been realized?", d:"Find authorized decisions with no downstream verified implementation." },
+  { q:"Which runtime observations challenge design assumptions?", d:"Connect telemetry and observations back to assumptions and claims." },
+  { q:"What changed because of this retrospective insight?", d:"Traverse the next cycle from insight into revised decisions, plans and artifacts." }
+];
+
+const PHASE_QS = [
+  "Is “phase” the correct established term?",
+  "Is a phase better modeled as an episode, work package, checkpoint, transaction, or task?",
+  "What information maximizes execution quality without context overload?",
+  "How should context packages be evaluated?",
+  "What must always be returned from an agent session for reliable memory consolidation?",
+  "Can context packages be generated automatically from graph lineage?",
+  "How should conflicting upstream knowledge be represented in the context package?",
+  "When should dissenting or superseded information be included?",
+  "How should context construction change by agent role?",
+  "Can phase-level provenance support reproducible agentic development?"
+];
+
+/* d = definition, x = important distinction / caution, e = example, r = candidate representation */
+const GLOSSARY = [
+{s:"k",t:"Information",d:"Any representable content available to the system, regardless of whether it is true, useful, believed, remembered, or currently relevant.",x:"The broadest term in the glossary. Something can be information without being knowledge, evidence, memory, or context.",e:"A sentence from a document. A benchmark result. A false claim retained for historical purposes.",r:"Umbrella concept rather than necessarily a concrete node type."},
+{s:"k",t:"Idea",d:"A represented unit of cognitive content introduced for consideration, development, combination, evaluation, or action.",x:"Open issue: useful as the original application primitive, but possibly too narrow to serve as the universal underlying primitive. “Deployment failed at 14:32” is better represented as an observation; “Implement authentication by Friday” as a task or directive.",e:"“Maybe D-System should use PostgreSQL.” “Provenance could help resolve conflicting conclusions.”",r:"User-facing concept and/or subtype of a more neutral knowledge-state primitive."},
+{s:"k",t:"Knowledge State",d:"A semantically meaningful representation of something at a particular point in its reasoning or operational history: S = (Content, O, E, L, TemporalScope, Metadata).",x:"A state is semantic. A database version is an implementation mechanism. See [[Version]].",e:"",r:"Core first-class object."},
+{s:"k",t:"Claim",d:"A proposition capable of being evaluated epistemically — supported, challenged, validated, falsified, uncertain.",x:"A claim is what is asserted. It is not the same as an actor's belief in that assertion. See [[Belief]].",e:"“Neo4j will outperform PostgreSQL for D-System's target traversal workload.”",r:"First-class knowledge state or proposition subtype."},
+{s:"k",t:"Belief",d:"An actor's epistemic stance toward a claim.",x:"Multiple actors can hold incompatible beliefs about the same claim without requiring duplicate claims. See [[Claim]], [[Conflict]].",e:"Human A SUPPORTS C17 · Agent B REJECTS C17 · Agent C UNCERTAIN about C17.",r:"Likely an actor-to-claim relationship, or a reified stance record when metadata is required."},
+{s:"k",t:"Knowledge",d:"Structured retained information available to the system for reasoning, retrieval, explanation, or action.",x:"Caution: in precise epistemic analysis, avoid using “knowledge” as a synonym for “true claim.” D-System deliberately retains hypotheses, disagreement, superseded states and falsified concepts.",e:"",r:"System-level collective concept rather than a single node class."},
+{s:"k",t:"Memory",d:"Retained information about prior states, experiences, events, transitions and relationships that can influence later reasoning or action.",x:"Key hypothesis: memory is not necessarily a node type. Richer memory may emerge from retained states + transitions + temporal ordering + provenance + relationships + retrieval capability. An idea has semantic content; memory describes persistence and later influence across time. See [[Transition]], [[Provenance]].",e:"",r:"Derived or system capability, potentially with explicit memory structures where required."},
+{s:"k",t:"Experience",d:"A temporally bounded sequence of events, observations, actions, outcomes and resulting state transitions involving one or more actors.",x:"Experience is the occurrence or episode; [[Memory]] is the retained representation capable of influencing later behavior.",e:"Requirement changed → architect observed change → prior directive reconsidered → alternatives reevaluated → new directive selected → implementation changed → outcome observed.",r:"Composite subgraph, episode object, or derived temporal window. Requires research."},
+{s:"k",t:"Observation",d:"A recorded perception, measurement, or detection concerning the represented world.",x:"Distinct from inference. “Latency was 420 ms” is an observation; “at this latency the architecture will not satisfy the SLA” is an [[Inference]]. Keeping these separate preserves reasoning provenance.",e:"“Median query latency was 420 ms during benchmark B17.”",r:"First-class state or claim with observation-specific provenance."},
+{s:"k",t:"Evidence",d:"Information used to support, challenge, validate, falsify, or otherwise alter the epistemic treatment of a claim or transition.",x:"Evidence may itself have provenance, methodology, actor or source, timestamp, confidence, applicability, and dependencies on other evidence.",e:"",r:"First-class object, or a role played by another knowledge object. Research should determine which is cleaner."},
+{s:"k",t:"Inference",d:"The derivational process by which a new proposition is produced from existing information, claims, evidence, rules, or observations.",x:"See [[Observation]] for the distinction that must be preserved.",e:"Observations + Requirements —INFER→ Conclusion.",r:"Transition or activity rather than a resulting node type; the result may be a claim or conclusion."},
+{s:"k",t:"Conclusion",d:"A proposition produced as the outcome of an evaluation, inference, investigation, or synthesis.",x:"A conclusion need not be a final organizational commitment. Conclusion —DECIDE→ [[Directive]].",e:"",r:"Knowledge state with derivational provenance."},
+{s:"k",t:"Decision",d:"A transition or resolution process that selects among alternatives and establishes commitment or direction.",x:"Working hypothesis: decision is better modeled primarily as a transition or activity than as a lifecycle node classification. See [[Transition]], [[Directive]].",e:"Evaluated alternatives —DECIDE→ Strategic Directive.",r:"First-class transition or activity with actor, authority, rationale, alternatives and evidence."},
+{s:"k",t:"Directive",d:"A prescriptive state establishing intended direction, policy, commitment, or goal.",x:"A directive is not primarily a descriptive truth claim. Its epistemic treatment may therefore require different semantics from factual claims.",e:"“Use PostgreSQL for D-System V1.”",r:"First-class state; currently associated with the lifecycle classification Strategic Directive."},
+{s:"k",t:"Task",d:"A bounded executable unit of intended action, generally derived from a directive, plan, commitment, obligation, or operational need.",x:"See [[Commitment]] for why the two are not the same.",e:"",r:"First-class state; currently associated with the lifecycle classification Operational Task."},
+{s:"k",t:"Commitment",d:"An obligation accepted by an actor or group to perform, deliver, maintain, or honor something.",x:"A commitment is not necessarily identical to a [[Task]]. One commitment can generate many tasks, and a task can exist without representing an external commitment.",e:"Commitment: “Deliver the architecture review by Friday.” Tasks: update diagram, run benchmarks, write findings, schedule review.",r:"Likely a first-class object or relationship, because personal workload management was one of D-System's originating use cases."},
+{s:"k",t:"Event",d:"A distinct occurrence in the represented world.",x:"An event in reality is not the same as the transition by which D-System learns about or reacts to it. World Event —OBSERVE/CAPTURE→ Represented State. See [[Transition]].",e:"“The production deployment failed.”",r:"First-class ontological category."},
+{s:"k",t:"Transition",d:"A typed transformation or derivational relationship by which one or more represented states produce, influence, supersede, or lead to one or more subsequent states.",x:"Abstraction: Sₜ —[T, P]→ Sₜ₊₁, where T is the transition verb and P is [[Provenance]].",e:"",r:"First-class record, even if graph APIs expose it as an edge."},
+{s:"k",t:"Provenance",d:"The origin and derivational lineage of a state or transition, including relevant actors, evidence, methods, authority, time, and upstream dependencies.",x:"Distinct from [[History]]: provenance answers where something came from and through whom or what process. It should also expose whether apparently independent conclusions are actually derived from the same source.",e:"",r:"Structured first-class metadata or subgraph attached to transitions and evidence."},
+{s:"k",t:"History",d:"The temporally ordered record of states, events and transitions.",x:"History answers what happened and in what order. [[Provenance]] answers where something came from and through whom.",e:"",r:"Derived from append-only state and transition records rather than stored as a separate duplicated object."},
+{s:"k",t:"Context",d:"The subset of available information selected as relevant to a particular reasoning, communication, or action episode.",x:"Stored knowledge ≠ active context. Context is selected. D-System's potential contribution may involve constructing context using epistemic topology, provenance, dissent, authority and reasoning lineage rather than semantic similarity alone.",e:"",r:"Ephemeral, derived runtime object."},
+{s:"k",t:"Retrieval",d:"The process of selecting retained information, states, experiences, or reasoning lineage for inclusion in active context.",x:"May consider semantic relevance, current or superseded status, temporal applicability, epistemic status, provenance, actor authority, evidence, independent convergence, dissent and unresolved uncertainty. See [[Context]], [[Convergence]].",e:"",r:"System behavior or algorithm."},
+{s:"k",t:"Reasoning",d:"A process that transforms available context into new claims, evaluations, conclusions, plans, decisions, or actions.",x:"",e:"",r:"Process composed of transitions and possibly explicit reasoning traces. Exact treatment requires research."},
+{s:"k",t:"Actor",d:"An identifiable participant capable of generating, observing, evaluating, authorizing, transforming, or acting upon information.",x:"Actor identity, actor type, domain authority, authorization and historical reliability should not be collapsed into a single scalar weight. See [[Authority]], [[Reliability]].",e:"Candidate classes: human, AI agent, group or team, organization, automated system.",r:""},
+{s:"k",t:"Authority",d:"The context-dependent legitimacy or permission of an actor to make, approve, enforce, or supersede a particular kind of transition or directive.",x:"Authority is not identical to epistemic [[Reliability]]. A manager may have authority to approve a deployment without being the most technically reliable source regarding database performance.",e:"",r:""},
+{s:"k",t:"Reliability",d:"An empirically informed estimate of how dependably an actor, source, process, or system has produced accurate or useful outputs within an applicable domain and context.",x:"See [[Authority]].",e:"",r:"Derived metric, not a universal static actor property."},
+{s:"k",t:"Convergence",d:"The condition in which multiple reasoning or evidence paths arrive at materially compatible conclusions or states.",x:"Convergence should be weighted by independence. Five repetitions of one source ≠ five independent confirmations.",e:"",r:"Derived graph or topological signal."},
+{s:"k",t:"Conflict",d:"A condition in which claims, beliefs, directives, observations, or transition outcomes are mutually incompatible within an applicable scope.",x:"Conflict should generally be represented rather than immediately erased. Candidate statuses: unresolved, contested, dominant, superseded, reconciled.",e:"",r:""},
+{s:"k",t:"Version",d:"An implementation-level representation of change to a stored object.",x:"Version is not synonymous with semantic state. A state transition may create a new version, a new node, multiple nodes, or another representation depending on implementation. See [[Knowledge State]].",e:"",r:""},
+
+{s:"i",t:"Requirement",d:"A statement of a need, capability, behavior, quality, or condition that a resulting system or process is expected to satisfy.",x:"Distinguish from [[Decision]], [[Specification]] and [[Task]]. A decision may generate a requirement; a requirement describes what must be satisfied.",e:"",r:""},
+{s:"i",t:"Constraint",d:"A limitation on the acceptable solution space.",x:"A constraint can arise from reality, policy, architecture, regulation, prior decisions, or resource limitations.",e:"Must use PostgreSQL. Cannot transmit regulated data externally. Must execute within 500 ms. Must remain backward compatible.",r:""},
+{s:"i",t:"Acceptance Criterion",d:"An explicit condition used to determine whether a requirement, phase, feature, or deliverable has been satisfactorily completed.",x:"Acceptance criteria create a bridge between intent and [[Verification]].",e:"",r:""},
+{s:"i",t:"Specification",d:"A structured description of intended system behavior, structure, interfaces, constraints, or implementation-relevant design.",x:"A specification operationalizes requirements sufficiently to guide planning and implementation.",e:"",r:""},
+{s:"i",t:"Design",d:"A proposed structural or behavioral solution for satisfying requirements and constraints.",x:"Design should retain links to requirements, alternatives, decisions, assumptions and rationale.",e:"",r:""},
+{s:"i",t:"Architecture Decision",d:"A decision affecting significant system structure, technology, behavior, constraints, or long-lived design direction.",x:"Architecture Decision Records (ADRs) are an important prior-art area for D-System research.",e:"",r:""},
+{s:"i",t:"Plan",d:"An organized intended path from a defined starting state to a desired outcome.",x:"A plan may contain ordered or dependent phases. A plan is not itself execution.",e:"",r:""},
+{s:"i",t:"Phase",d:"The smallest planned unit of work intended to be completed within one bounded agentic development session.",x:"A phase is an execution and context boundary, not necessarily the smallest action; it may contain multiple tasks. This definition must be compared against episode, work package, checkpoint, task, sprint, step, transaction and agent session. See [[Development Session]], [[Context Package]].",e:"Candidate structure: objective, inputs, context_requirements, requirements, constraints, decisions, tasks, dependencies, acceptance_criteria, expected_outputs, actual_outputs, unresolved_questions, resulting_knowledge.",r:""},
+{s:"i",t:"Task",d:"A bounded executable action contributing to a phase, plan, requirement, commitment, or operational objective.",x:"A task may be smaller than a [[Phase]].",e:"",r:""},
+{s:"i",t:"Development Session",d:"A bounded period of human or agent execution in which a selected context is loaded and one or more planned actions are performed.",x:"A session is a runtime occurrence; a [[Phase]] is a planned unit. One phase may ideally map to one session, but the model must handle interruption, failure, retries and multi-session phases.",e:"",r:""},
+{s:"i",t:"Context Package",d:"The deliberately constructed information supplied to an agent or human for execution of a phase.",x:"A context package is a projection of persistent knowledge, not the persistent knowledge itself. See [[Context]].",e:"Candidate contents: objective, relevant requirements, specification, applicable decisions, constraints, relevant prior knowledge, code locations, dependencies, prior phase outputs, known failures, open questions, acceptance criteria.",r:""},
+{s:"i",t:"Artifact",d:"A concrete output produced during development or operation.",x:"",e:"Source file, commit, test, schema, configuration, documentation, deployment package, generated report.",r:""},
+{s:"i",t:"Implementation",d:"The realization of a design or specification through artifacts, code, configuration, infrastructure, procedures, or other operational mechanisms.",x:"",e:"",r:""},
+{s:"i",t:"Functionality / Capability",d:"Observable behavior or ability provided by the implemented system.",x:"Research question: whether functionality and capability require separate definitions.",e:"",r:""},
+{s:"i",t:"Verification",d:"The process of determining whether an implementation or artifact satisfies its specified requirements, constraints, acceptance criteria, or design rules.",x:"Verification asks approximately: did we build what was specified? Compare [[Validation]].",e:"",r:""},
+{s:"i",t:"Validation",d:"Potential implementation-side meaning: does the realized system actually satisfy the underlying need or intended use?",x:"This must be reconciled with D-System's epistemic use of VALIDATE as a transition verb. Terminology collision is expected and should be researched. Compare [[Verification]].",e:"",r:""},
+{s:"i",t:"Test",d:"A controlled procedure or executable check that produces evidence relevant to verification, validation, performance, reliability, or another property.",x:"A test result is [[Evidence]]; the test procedure is not identical to its result.",e:"",r:""},
+{s:"i",t:"Deployment",d:"The transition by which an implementation becomes available in a target environment.",x:"",e:"",r:""},
+{s:"i",t:"Runtime Event",d:"An occurrence produced or detected while the realized system operates.",x:"",e:"Request processed, error raised, job completed, service restarted, deadline missed.",r:""},
+{s:"i",t:"Telemetry",d:"Recorded operational measurements emitted by a system.",x:"Telemetry can become [[Observation]] and [[Evidence]] in the knowledge system.",e:"",r:""},
+{s:"i",t:"Outcome",d:"The realized consequence of an action, implementation, decision, or system behavior.",x:"An outcome may be intended or unintended.",e:"",r:""},
+{s:"i",t:"Feedback",d:"Information generated by outcomes or observation and routed back into evaluation, reasoning, planning, or implementation.",x:"Feedback closes the ideation-to-reality loop.",e:"",r:""},
+{s:"i",t:"Change Impact",d:"The set of downstream states, artifacts, requirements, plans, functionality, or operations potentially affected by a changed upstream state.",x:"Compare [[Epistemic Blast Radius]], which propagates from epistemic change rather than artifact change.",e:"",r:""},
+{s:"i",t:"Epistemic Blast Radius",d:"The set of downstream decisions, requirements, specifications, plans, artifacts, functionality, or conclusions whose justification depends materially on an assumption, claim, evidence source, or reasoning state that has been revised, falsified, weakened, or superseded.",x:"A D-System working term. Provisional — must be checked against established impact-analysis and requirements-traceability terminology.",e:"A17 supports D4; D4 derives R8; R8 specified_by S3; S3 planned_by P9; P9 implemented_by C22. If A17 is falsified, all of D4, R8, S3, P9 and C22 become candidates for reassessment.",r:""}
+];
+
+const HYPOTHESES = [
+{id:"H0",isNull:true,t:"Null hypothesis",d:"D-System is primarily a recombination of existing knowledge-graph, provenance, temporal reasoning, argumentation, trust, event-sourcing and agent-memory techniques. No materially novel architecture or mechanism is required.",f:"The literature review should actively attempt to <em>support</em> this one."},
+{id:"H1",t:"Multi-dimensional state model",d:"A knowledge state classified independently by ontological nature, epistemic status and idea/action lifecycle may provide a useful typed state representation that is not commonly integrated in existing agent-memory systems.",f:"Find an established framework that uses equivalent orthogonal dimensions for essentially the same purpose."},
+{id:"H2",t:"Typed transition semantics as reasoning memory",d:"Explicit transitions between append-only knowledge states may provide a useful representation of reasoning history distinct from ordinary semantic graph relationships.",f:"Find prior work that already models equivalent typed reasoning-state transitions with comparable semantics and use cases."},
+{id:"H3",t:"Provenance as a conflict-resolution input",d:"Transition provenance — including human/agent identity, domain authority, evidence, method, lineage and delegation — may be usable as an input to epistemic conflict resolution.",f:"Find an existing system or formalism that already provides materially equivalent provenance-aware arbitration."},
+{id:"H4",t:"Independence-aware convergence",d:"Repeated independent arrival at equivalent states may act as a graph-topological epistemic signal, while derivative agreement should be discounted based on shared lineage.",f:"Find prior work that already calculates equivalent convergence over provenance/derivation topology for mixed human-agent knowledge."},
+{id:"H5",t:"Topology-aware context transfer",d:"Retrieval for agents may be improved by selecting not only semantically relevant content but also current state, reasoning lineage, evidence, dissent, authority, convergence and unresolved uncertainty.",f:"Find an existing agent-memory or retrieval architecture that already performs materially equivalent context assembly."},
+{id:"H6",t:"Integrated human-agent collective knowledge evolution",d:"The full synthesis may form a distinct architecture for shared human-agent knowledge evolution even if every individual primitive exists independently.",f:"Find a system or research framework whose end-to-end architecture and purpose substantially subsume D-System."},
+{id:"H7",t:"Development provenance",d:"Software functionality can be represented as the downstream result of an append-only provenance lineage connecting ideas, observations, evidence, decisions, requirements, specifications, plans, execution phases, artifacts, verification and observed outcomes.",f:"Find an existing framework whose end-to-end provenance model materially subsumes this chain."},
+{id:"H8",t:"Phase-bounded context construction",d:"A planned development phase can serve as an explicit context boundary for agentic software engineering, allowing context to be assembled from persistent reasoning and development lineage, and execution results to be consolidated back into persistent memory.",f:"Find an established agentic development architecture with materially equivalent semantics and lifecycle."},
+{id:"H9",t:"Bidirectional epistemic traceability",d:"A system can support both forward tracing from idea or knowledge to realized functionality and outcome, and backward tracing from functionality or artifact to the reasoning, evidence, assumptions and decisions that justify it.",f:"Find prior art providing materially equivalent bidirectional reasoning-to-runtime traceability."},
+{id:"H10",t:"Epistemic blast-radius analysis",d:"When an upstream assumption, evidence source, or claim is weakened, falsified, or superseded, provenance topology can identify downstream decisions, requirements, plans, artifacts, tests and functionality requiring reassessment.",f:"Find established impact-analysis systems already performing equivalent propagation from epistemic change rather than only artifact or requirement change."},
+{id:"H11",t:"Runtime-to-knowledge closure",d:"Operational telemetry, tests, incidents and user outcomes can be transformed into provenance-bearing evidence that updates the same knowledge structure from which implementation intent originated.",f:"Find an architecture providing materially equivalent closed-loop reasoning from knowledge to implementation to runtime evidence and back."}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/* ============================================================
+   NAV + SCROLL SPY
+   ============================================================ */
+function initNav(){
+  const secs = $$("details.sec");
+  const ol = $("#navlist");
+  ol.innerHTML = secs.map(s => {
+    const n = $(".sec-n", s).textContent;
+    const h = $(".sec-h h2", s).firstChild.textContent.trim();
+    return '<li><a href="#' + s.id + '" data-for="' + s.id + '"><span class="n">' + n + "</span><span>" + esc(h) + "</span></a></li>";
+  }).join("");
+
+  const links = {};
+  $$("#navlist a").forEach(a => { links[a.dataset.for] = a; });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      $$("#navlist a").forEach(a => a.classList.remove("active"));
+      const a = links[e.target.id];
+      if (a) a.classList.add("active");
+    });
+  }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+  secs.forEach(s => io.observe(s));
+
+  $("#expandAll").addEventListener("click", () => secs.forEach(s => { s.open = true; }));
+  $("#collapseAll").addEventListener("click", () => secs.forEach(s => { s.open = false; }));
+
+  // Section stepping with [ and ]
+  document.addEventListener("keydown", ev => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+    if (ev.key !== "[" && ev.key !== "]") return;
+    const tops = secs.map(s => s.getBoundingClientRect().top);
+    let i = tops.findIndex(t => t > 4);
+    if (ev.key === "[") i = (i <= 0 ? secs.length : i) - 1;
+    if (i < 0 || i >= secs.length) return;
+    secs[i].open = true;
+    secs[i].scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+/* ============================================================
+   DIAGRAM FOCUS — shared across every SVG
+   ============================================================ */
+function initDiagrams(){
+  $$("[data-dgm]").forEach(box => {
+    const nodes = $$(".nd", box);
+    const edges = $$(".ed", box);
+    let pinned = null;
+
+    const clear = () => {
+      box.removeAttribute("data-focus");
+      nodes.concat(edges).forEach(el => el.classList.remove("hot"));
+    };
+    const focus = id => {
+      clear();
+      box.setAttribute("data-focus", id);
+      const touched = { [id]: true };
+      edges.forEach(e => {
+        if (e.dataset.e === id || e.dataset.t === id) {
+          e.classList.add("hot");
+          touched[e.dataset.e] = true;
+          touched[e.dataset.t] = true;
+        }
+      });
+      nodes.forEach(n => { if (touched[n.dataset.node]) n.classList.add("hot"); });
+    };
+
+    nodes.forEach(n => {
+      n.setAttribute("tabindex", "0");
+      n.setAttribute("role", "button");
+      n.addEventListener("mouseenter", () => { if (!pinned) focus(n.dataset.node); });
+      n.addEventListener("mouseleave", () => { if (!pinned) clear(); });
+      n.addEventListener("focus", () => { if (!pinned) focus(n.dataset.node); });
+      n.addEventListener("blur", () => { if (!pinned) clear(); });
+      const toggle = () => {
+        if (pinned === n.dataset.node) { pinned = null; clear(); }
+        else { pinned = n.dataset.node; focus(pinned); }
+      };
+      n.addEventListener("click", toggle);
+      n.addEventListener("keydown", ev => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); toggle(); }
+      });
+    });
+    box.addEventListener("keydown", ev => { if (ev.key === "Escape") { pinned = null; clear(); } });
+  });
+}
+
+/* ============================================================
+   THREE-AXIS COMPOSER
+   ============================================================ */
+function initComposer(){
+  const host = $("#composer");
+  const pick = { O:0, E:1, L:0 };
+
+  host.innerHTML =
+    '<div class="grid g3">' +
+    AXES.map(ax =>
+      '<div class="card" style="padding:0;overflow:hidden">' +
+        '<div style="padding:16px 18px;border-bottom:1px solid var(--border);background:var(--raised)">' +
+          '<span class="k" style="font-family:var(--mono);font-size:11px;color:var(--mahogany);letter-spacing:.13em;text-transform:uppercase">Axis ' + ax.key + "</span>" +
+          '<h3 style="margin:6px 0 2px;font-size:17px">' + ax.name + "</h3>" +
+          '<p style="font-size:13px;margin:0;color:var(--text-faint)">' + ax.q + "</p>" +
+        "</div>" +
+        '<div style="padding:10px" data-axis="' + ax.key + '">' +
+          ax.values.map((v, i) =>
+            '<button class="ax-opt" type="button" data-axis="' + ax.key + '" data-i="' + i + '">' +
+              '<b>' + esc(v.n) + "</b><span>" + esc(v.d) + "</span>" +
+            "</button>"
+          ).join("") +
+        "</div>" +
+      "</div>"
+    ).join("") +
+    "</div>" +
+    '<div class="card leaf" style="margin-top:18px">' +
+      '<span class="k" style="font-family:var(--mono);font-size:11px;color:var(--mahogany);letter-spacing:.13em;text-transform:uppercase">Composed state</span>' +
+      '<pre style="margin-top:12px;background:#080B09" id="axOut"></pre>' +
+      '<p style="margin-top:12px;font-size:13.5px;color:var(--text-faint)">The three axes are assigned independently. All ' +
+      (AXES[0].values.length * AXES[1].values.length * AXES[2].values.length) +
+      " combinations are legal — a falsified process, an axiomatic event and a hypothetical directive are all expressible.</p>" +
+    "</div>";
+
+  const style = document.createElement("style");
+  style.textContent =
+    ".ax-opt{display:block;width:100%;text-align:left;cursor:pointer;background:transparent;border:1px solid transparent;" +
+    "border-radius:8px;padding:11px 13px;margin-bottom:4px;color:var(--text-dim);font:inherit;transition:background .15s,border-color .15s}" +
+    ".ax-opt b{display:block;font-size:14px;color:var(--text);font-weight:600;margin-bottom:4px}" +
+    ".ax-opt span{display:block;font-size:12.5px;line-height:1.5;color:var(--text-faint)}" +
+    ".ax-opt:hover{background:var(--raised)}" +
+    ".ax-opt.on{background:var(--mahogany-glow);border-color:var(--mahogany-lo)}" +
+    ".ax-opt.on b{color:var(--mahogany-hi)}";
+  document.head.appendChild(style);
+
+  function render(){
+    $$(".ax-opt", host).forEach(b => b.classList.toggle("on", pick[b.dataset.axis] === +b.dataset.i));
+    const o = AXES[0].values[pick.O].n, e = AXES[1].values[pick.E].n, l = AXES[2].values[pick.L].n;
+    $("#axOut").innerHTML =
+      '<span class="key">S</span> = (\n' +
+      '  <span class="key">O</span>  ontological     <span class="vb">' + esc(o) + "</span>\n" +
+      '  <span class="key">E</span>  epistemic       <span class="vb">' + esc(e) + "</span>\n" +
+      '  <span class="key">L</span>  lifecycle       <span class="vb">' + esc(l) + "</span>\n" +
+      '  <span class="key">Content</span>\n' +
+      '  <span class="key">TemporalScope</span>   <span class="cm"># open issue: likely separate from E</span>\n' +
+      '  <span class="key">Metadata</span>\n)';
+  }
+  host.addEventListener("click", ev => {
+    const b = ev.target.closest(".ax-opt");
+    if (!b) return;
+    pick[b.dataset.axis] = +b.dataset.i;
+    render();
+  });
+  render();
+}
+
+/* ============================================================
+   TRANSITION VERBS
+   ============================================================ */
+function initVerbs(){
+  const active = new Set();
+  let canon = false;
+
+  $("#vFamilies").innerHTML = VERB_FAMILIES.map((f, i) =>
+    '<button class="btn" type="button" data-fam="' + i + '">' + esc(f.f) +
+    ' <span style="opacity:.55;font-family:var(--mono)">' + f.v.length + "</span></button>"
+  ).join("");
+
+  function render(){
+    const q = $("#vSearch").value.trim().toUpperCase();
+    // several verbs appear in more than one family, so count distinct verbs, not cells
+    const shown = new Set();
+    $("#vGrid").innerHTML = VERB_FAMILIES.map((f, i) => {
+      if (active.size && !active.has(i)) return "";
+      const verbs = f.v.filter(v => (!q || v.indexOf(q) > -1) && (!canon || CANONICAL.has(v)));
+      if (!verbs.length) return "";
+      verbs.forEach(v => shown.add(v));
+      return '<div class="card"><h3><span class="k">' + f.v.length + " verbs</span>" + esc(f.f) + "</h3>" +
+        '<div class="pills" style="margin-top:12px">' +
+        verbs.map(v => '<span class="pill' + (CANONICAL.has(v) ? " m" : "") + '">' + v + "</span>").join("") +
+        "</div></div>";
+    }).join("") || '<div class="note" style="grid-column:1/-1">No verbs match that filter.</div>';
+    $("#vCount").textContent = shown.size + " distinct verbs";
+    $$("#vFamilies .btn").forEach(b => b.classList.toggle("on", active.has(+b.dataset.fam)));
+    $("#vCanon").classList.toggle("on", canon);
+  }
+
+  $("#vFamilies").addEventListener("click", ev => {
+    const b = ev.target.closest("[data-fam]");
+    if (!b) return;
+    const i = +b.dataset.fam;
+    active.has(i) ? active.delete(i) : active.add(i);
+    render();
+  });
+  $("#vSearch").addEventListener("input", render);
+  $("#vCanon").addEventListener("click", () => { canon = !canon; render(); });
+  $("#vReset").addEventListener("click", () => {
+    active.clear(); canon = false; $("#vSearch").value = ""; render();
+  });
+  render();
+}
+
+/* ============================================================
+   STATIC LIST RENDERERS
+   ============================================================ */
+function initLists(){
+  $("#stages").innerHTML =
+    '<div class="grid g2">' + STAGES.map(s =>
+      '<div class="card"><h3><span class="k">' + s.n + "</span>" + esc(s.t) + "</h3><p>" + esc(s.d) + "</p></div>"
+    ).join("") + "</div>";
+
+  $("#relVocab").innerHTML = REL_VOCAB.map(g =>
+    '<div class="card"><h3 style="font-size:14px">' + g.g + "</h3>" +
+    '<div class="pills" style="margin-top:11px">' +
+    g.v.map(v => '<span class="pill m">' + v + "</span>").join("") + "</div></div>"
+  ).join("");
+
+  $("#traceQueries").innerHTML = TRACE_QUERIES.map(q =>
+    '<div class="card"><h3>' + esc(q.q) + "</h3><p>" + esc(q.d) + "</p></div>"
+  ).join("");
+
+  $("#phaseQs").innerHTML = PHASE_QS.map((q, i) =>
+    '<div class="card"><h3 style="font-size:14.5px"><span class="k">Q' + (i + 1) + "</span>" + esc(q) + "</h3></div>"
+  ).join("");
+
+  $("#hypList").innerHTML = HYPOTHESES.map(h =>
+    '<div class="card ' + (h.isNull ? "accent" : "leaf") + '" id="hyp-' + h.id + '">' +
+      '<h3><span class="k">' + h.id + (h.isNull ? " &middot; the one to try hardest to support" : "") + "</span>" + esc(h.t) + "</h3>" +
+      "<p>" + esc(h.d) + "</p>" +
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+        '<div style="font:600 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mahogany);margin-bottom:7px">Falsification condition</div>' +
+        '<p style="font-size:13.5px;margin:0">' + h.f + "</p>" +
+      "</div>" +
+    "</div>"
+  ).join("");
+}
+
+/* ============================================================
+   GLOSSARY
+   ============================================================ */
+function initGlossary(){
+  const byName = {};
+  GLOSSARY.forEach(g => { byName[g.t.toLowerCase()] = "term-" + slug(g.t); });
+
+  // [[Term]] -> internal link, resolving aliases to the closest defined term
+  const link = txt => esc(txt).replace(/\[\[([^\]]+)\]\]/g, (m, name) => {
+    const id = byName[name.toLowerCase()];
+    return id
+      ? '<a href="#' + id + '" data-xref="' + id + '">' + esc(name) + "</a>"
+      : "<em>" + esc(name) + "</em>";
+  });
+
+  let tab = "all";
+
+  function render(){
+    const q = $("#gSearch").value.trim().toLowerCase();
+    const hits = GLOSSARY.filter(g => {
+      if (tab !== "all" && g.s !== tab) return false;
+      if (!q) return true;
+      return (g.t + " " + g.d + " " + g.x + " " + g.e + " " + g.r).toLowerCase().indexOf(q) > -1;
+    });
+
+    $("#gCount").textContent = hits.length + " of " + GLOSSARY.length + " terms";
+    $("#gList").innerHTML = hits.length ? hits.map(g =>
+      '<div class="card" id="term-' + slug(g.t) + '">' +
+        '<h3 style="font-size:17px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">' +
+          esc(g.t) +
+          '<span class="pill' + (g.s === "i" ? " m" : "") + '" style="font-size:10px">' +
+            (g.s === "k" ? "knowledge" : "implementation") + "</span>" +
+        "</h3>" +
+        '<p style="color:var(--text);font-size:15px;margin-top:8px">' + link(g.d) + "</p>" +
+        (g.x ? '<p style="font-size:13.5px;margin-top:10px"><b style="color:var(--mahogany-hi)">Distinction. </b>' + link(g.x) + "</p>" : "") +
+        (g.e ? '<p style="font-size:13.5px;margin-top:8px"><b style="color:var(--green-dim)">Example. </b>' + link(g.e) + "</p>" : "") +
+        (g.r ? '<p style="font-size:12.5px;margin-top:10px;color:var(--text-faint)"><b>Candidate representation. </b>' + link(g.r) + "</p>" : "") +
+      "</div>"
+    ).join("") : '<div class="note">No term or definition matches &ldquo;' + esc($("#gSearch").value) + "&rdquo;.</div>";
+  }
+
+  $("#gSearch").addEventListener("input", render);
+  $$("[data-gtab]").forEach(b => b.addEventListener("click", () => {
+    tab = b.dataset.gtab;
+    $$("[data-gtab]").forEach(o => o.classList.toggle("on", o === b));
+    render();
+  }));
+
+  // cross-reference click: clear the filter so the target is guaranteed visible, then flash it
+  $("#gList").addEventListener("click", ev => {
+    const a = ev.target.closest("[data-xref]");
+    if (!a) return;
+    ev.preventDefault();
+    $("#gSearch").value = "";
+    tab = "all";
+    $$("[data-gtab]").forEach(o => o.classList.toggle("on", o.dataset.gtab === "all"));
+    render();
+    const el = document.getElementById(a.dataset.xref);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.style.transition = "border-color .25s, background .25s";
+    el.style.borderColor = "var(--mahogany)";
+    el.style.background = "var(--mahogany-glow)";
+    setTimeout(() => { el.style.borderColor = ""; el.style.background = ""; }, 1400);
+  });
+
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) {
+      ev.preventDefault();
+      $("#glossary").open = true;
+      $("#gSearch").focus();
+      $("#gSearch").select();
+    }
+    if (ev.key === "Escape" && ev.target === $("#gSearch")) {
+      $("#gSearch").value = "";
+      render();
+    }
+  });
+
+  render();
+}
+
+/* ============================================================
+   TRACEABILITY DIRECTION + BLAST RADIUS
+   ============================================================ */
+function initTrace(){
+  const edges = $$("#traceEdges .ed");
+  const lbl = $("#traceLbl");
+  const set = fwd => {
+    edges.forEach(e => {
+      e.setAttribute("marker-end", fwd ? "url(#ah)" : "");
+      e.setAttribute("marker-start", fwd ? "" : "url(#ahm)");
+    });
+    lbl.textContent = fwd
+      ? "Forward: idea → realized outcome"
+      : "Backward: functionality → the reasoning that justifies it";
+    $("#dirFwd").classList.toggle("on", fwd);
+    $("#dirBack").classList.toggle("on", !fwd);
+  };
+  $("#dirFwd").addEventListener("click", () => set(true));
+  $("#dirBack").addEventListener("click", () => set(false));
+  set(true);
+
+  // blast radius: click the seed to propagate downstream
+  const box = $("#blastDgm");
+  const chain = $$(".blast", box);
+  const chainEdges = $$(".blast-e", box);
+  const blabel = $("#blastLbl");
+  let running = false;
+
+  $("#blastSeed").addEventListener("click", ev => {
+    ev.stopPropagation();
+    if (running) return;
+    running = true;
+    chain.forEach(n => n.classList.remove("hit"));
+    chainEdges.forEach(e => e.classList.remove("hit"));
+    blabel.textContent = "A17 falsified — propagating…";
+    let i = 0;
+    const step = () => {
+      if (i >= chain.length) {
+        blabel.textContent = "5 downstream states flagged for reassessment: D4, R8, S3, P9, C22.";
+        running = false;
+        return;
+      }
+      chain[i].classList.add("hit");
+      if (i > 0 && chainEdges[i - 1]) chainEdges[i - 1].classList.add("hit");
+      i++;
+      setTimeout(step, 260);
+    };
+    step();
+  });
+
+  const st = document.createElement("style");
+  st.textContent =
+    "#blastDgm .nd.hit rect{fill:rgba(168,93,72,.34);stroke:var(--mahogany);stroke-width:2}" +
+    "#blastDgm .nd.hit text{fill:var(--mahogany-hi)}" +
+    "#blastDgm .ed.hit{stroke:var(--mahogany);stroke-width:2.2}";
+  document.head.appendChild(st);
+}
+
+/* ============================================================
+   MASTHEAD STATS — computed, never hand-counted
+   ============================================================ */
+function initStats(){
+  const uniqueVerbs = new Set();
+  VERB_FAMILIES.forEach(f => f.v.forEach(v => uniqueVerbs.add(v)));
+  const nums = [
+    [AXES.length, "Classification axes"],
+    [uniqueVerbs.size, "Transition verbs"],
+    [GLOSSARY.length, "Defined terms"],
+    [STAGES.length, "Lifecycle stages"],
+    [HYPOTHESES.length, "Falsifiable hypotheses"]
+  ];
+  $(".stats").innerHTML = nums.map(n =>
+    '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>"
+  ).join("");
+}
+
+/* ============================================================
+   HEADING ANCHORS
+   ============================================================ */
+function initAnchors(){
+  $$(".anchor").forEach(a => a.addEventListener("click", ev => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    const url = location.href.split("#")[0] + a.getAttribute("href");
+    history.replaceState(null, "", a.getAttribute("href"));
+    if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+    const was = a.textContent;
+    a.textContent = "copied";
+    a.style.opacity = "1";
+    setTimeout(() => { a.textContent = was; a.style.opacity = ""; }, 1100);
+  }));
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+initStats();
+initComposer();
+initVerbs();
+initLists();
+initGlossary();
+initTrace();
+initDiagrams();
+initNav();
+initAnchors();
+
+// honour a deep link after everything has rendered
+if (location.hash) {
+  const el = document.querySelector(location.hash);
+  if (el) {
+    const sec = el.closest("details.sec");
+    if (sec) sec.open = true;
+    setTimeout(() => el.scrollIntoView({ block: "start" }), 60);
+  }
+}
+</script>
+</body>
+</html>

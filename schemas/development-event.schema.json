@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "development-event.schema.json",
+  "title": "Development event",
+  "description": "A training, certification, talk or milestone — the record type that makes personal development countable over time. Kept separate from interaction because a training is not an exchange with a stakeholder, and folding it in would corrupt every meeting metric.",
+  "type": "object",
+  "required": ["id", "date", "type", "title"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^de-[0-9]+" },
+    "date": { "type": "string", "format": "date" },
+    "type": {
+      "type": "string",
+      "enum": ["training", "certification", "course", "talk", "reading", "milestone", "other"],
+      "description": "talk=one the owner gave or attended, recorded either way in notes | milestone=a marked step that is not itself a course or credential"
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string", "default": "" },
+    "project_id": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Usually a learning or certification project, when one exists"
+    },
+    "provider": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Organization or platform that delivered it"
+    },
+    "credential": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Credential or certificate identifier, when the event produced one"
+    },
+    "hours": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "default": null,
+      "description": "Effort in hours, when it is known and worth counting"
+    },
+    "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "notes": { "type": "string", "default": "" },
+    "capture": { "$ref": "evidence.schema.json#/definitions/capture_source" }
+  }
+}

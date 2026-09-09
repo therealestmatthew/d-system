@@ -1,0 +1,15 @@
+{
+  "id": "hackathon-prototype",
+  "name": "Hackathon Prototype",
+  "status": "complete",
+  "category": "work",
+  "type": "project",
+  "description": "Fictional example: a completed weekend hackathon build.",
+  "tags": ["hackathon", "prompt-engineering"],
+  "stakeholders": [],
+  "started": "2026-03-01",
+  "target_date": "2026-03-02",
+  "last_reviewed": "2026-03-05",
+  "review_cadence": null,
+  "notes": "Archived after the event; kept as an example of a completed project record."
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "staged-record.schema.json",
+  "title": "Staged record",
+  "description": "A candidate entity record proposed by structuring, wrapped with its raw source, its route and its per-field evidence, before any owner review (ADR-007 sections 5-7). Stored under _capture/staging/, one file per record, named `<id>.json`. Nothing here is promoted yet — only an explicit owner action (REQ-002 R12, R13) moves a record's `entity` into `_data/` and drops this wrapper. This schema validates the wrapper shape and that the source reference is present and well-formed; it does not validate `entity` against the target type's own schema (that belongs to structuring, phase-cap-05) and it does not check that `capture_id` actually resolves to a file under _capture/raw/ (that belongs to the code that reads staging, and its tests, since a JSON Schema cannot see the filesystem).",
+  "type": "object",
+  "required": ["id", "capture_id", "entity_type", "route", "entity"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^staged-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}$",
+      "description": "Same shape as a raw capture id (capture.schema.json), assigned when the record is staged rather than when it was captured. The two ids are independent: one capture can yield zero, one, or several staged records (for example, a transcript naming two commitments)."
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The raw capture this record derives from (REQ-002 R3). Every structured record names its source; a staged record with no resolvable source reference is rejected."
+    },
+    "entity_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What kind of record `entity` proposes to become. Expected to be one of the nine entity types (project, person, commitment, task, tag, interaction, decision, waiting-on, development-event) or a structural identity (new person, new project, new tag, new tag category) per ADR-007's stakes table. Left as an open string rather than a closed enum here: ADR-007 also names a `raw note` tier with no schema of its own yet, and settling exactly what that maps to is structuring's decision (phase-cap-05), not this contract's."
+    },
+    "route": {
+      "type": "string",
+      "enum": ["clean", "flagged", "held"],
+      "description": "clean=every field explicit, stakes low or medium, promoted in bulk | flagged=any field inferred or guessed, or stakes high, one owner decision | held=a new durable identity, an identity call the agent may not make (ADR-007 section 5). Whether a given entity_type/evidence combination produced the *correct* route is checked by structuring's own fixtures (REQ-002 R8); this schema only requires the value to be one of the three."
+    },
+    "entity": {
+      "type": "object",
+      "description": "The candidate field values for the proposed entity, in the shape its own schema will eventually require. Deliberately not validated against that schema here — staging exists precisely so an incomplete or provisional interpretation can be reviewed rather than rejected outright."
+    },
+    "evidence": {
+      "$ref": "evidence.schema.json",
+      "description": "Per-field evidence and provenance for every agent-filled field in `entity` (REQ-002 R6), keyed by field name. Optional in this schema and defaulting to empty only because a record every field of which came verbatim from a structural fixture is conceivable; structuring is what actually populates it, and evidence.schema.json is what makes a protected field's unflagged assumption a validation failure."
+    },
+    "staged_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "default": null,
+      "description": "When structuring produced this record, RFC 3339 with a mandatory offset, same convention as capture.schema.json's captured_at. Null is only for hand-built fixtures; the writer is expected to always set it."
+    }
+  }
+}

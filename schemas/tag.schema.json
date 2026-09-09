@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Tag",
+  "description": "A single tag entry in _data/tags.json. Tags are the primary cross-cutting classification axis in d-system.",
+  "type": "object",
+  "required": ["id", "label", "category"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Stable kebab-case identifier. Never rename after first use on a project — it will break queries."
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable display name"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["client", "platform", "tech", "domain", "methodology", "context"],
+      "description": "Grouping axis: client=specific org | platform=named product/service | tech=language/library/tool | domain=knowledge area | methodology=approach/framework | context=situational"
+    },
+    "description": {
+      "type": "string",
+      "default": "",
+      "description": "One sentence clarifying scope and distinguishing from similar tags"
+    },
+    "related": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "IDs of semantically related tags — used for discovery, not hierarchy"
+    },
+    "deprecated": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this tag is being phased out. Deprecated tags remain valid on existing projects but must not be added to new ones."
+    }
+  }
+}

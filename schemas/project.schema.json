@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "project.schema.json",
+  "title": "Project",
+  "description": "A project, activity, goal, or system tracked in d-system. last_touched is deliberately absent: it is derived at rebuild from the latest activity across the project's interactions, commitments, tasks and decisions, and a hand-maintained activity date is a number that drifts. additionalProperties is false, so a _data/ file carrying it is rejected.",
+  "type": "object",
+  "required": ["id", "name", "status", "category", "type"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique kebab-case identifier",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "planning", "blocked", "complete", "archived"]
+    },
+    "category": {
+      "type": "string",
+      "enum": ["work", "learning", "system", "personal"],
+      "description": "work=client/employer | learning=certifications/study | system=meta-frameworks | personal=life"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["project", "activity", "goal", "system", "certification"],
+      "description": "project=scoped+bounded | activity=ongoing habit | goal=aspirational target | system=framework being built | certification=credentialing path"
+    },
+    "description": { "type": "string", "default": "" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tag IDs — must exist in _data/tags.json"
+    },
+    "stakeholders": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Person IDs from _data/people/"
+    },
+    "started": { "type": ["string", "null"], "format": "date" },
+    "target_date": { "type": ["string", "null"], "format": "date" },
+    "last_reviewed": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "When the owner deliberately sat down and assessed this project. Hand-set, and distinct from the derived last_touched, which only says activity happened. Both questions are worth answering; do not collapse them."
+    },
+    "review_cadence": {
+      "type": ["string", "null"],
+      "enum": ["daily", "weekly", "biweekly", "monthly", "quarterly", "ad-hoc", null],
+      "description": "Policy the owner sets: how often this project should be touched. The threshold staleness is measured against — a project is stale when today minus the derived last_touched exceeds this rhythm. 'ongoing' is retired: it described activity status, which project.status already carries, and gave the staleness check nothing to compute against. ad-hoc declares no rhythm, so the project never becomes stale on a schedule."
+    },
+    "repository": {
+      "type": "string",
+      "description": "Where this project's own code or content actually lives, when it is not this repository — a local path or a remote URL. d-system tracks that a project exists; this field is how it says where the project went, instead of a free-text note that drifts."
+    },
+    "notes": { "type": "string", "default": "" }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "daily-fitness-habit",
+  "name": "Daily Fitness Habit",
+  "status": "active",
+  "category": "personal",
+  "type": "activity",
+  "description": "Fictional example: an ongoing personal habit tracked as an activity rather than a bounded project.",
+  "tags": ["wellness"],
+  "stakeholders": [],
+  "started": "2026-01-01",
+  "target_date": null,
+  "last_reviewed": "2026-09-01",
+  "review_cadence": "weekly",
+  "notes": ""
+}

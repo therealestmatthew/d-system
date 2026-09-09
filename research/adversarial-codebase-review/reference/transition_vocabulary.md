@@ -1,0 +1,159 @@
+# Preliminary State-Transition Vocabulary
+
+This vocabulary is provisional. The literature review should determine which terms should reuse established ontology terminology and which require D-System-specific semantics.
+
+## Introduction / ideation
+- CONSIDER
+- CAPTURE
+- PROPOSE
+- DISCOVER
+- GENERATE
+- DERIVE
+- REFRAME
+- EXPAND
+- SYNTHESIZE
+- DECOMPOSE
+
+## Epistemic formation
+- HYPOTHESIZE
+- ASSUME
+- INFER
+- CONCLUDE
+- GENERALIZE
+- SPECIALIZE
+- FORMALIZE
+
+## Evaluation / investigation
+- EVALUATE
+- COMPARE
+- TEST
+- VERIFY
+- VALIDATE
+- CHALLENGE
+- REVIEW
+- AUDIT
+- MEASURE
+- OBSERVE
+- SIMULATE
+- EXPERIMENT
+
+## Epistemic resolution
+- CONFIRM
+- CORROBORATE
+- REFUTE
+- FALSIFY
+- DISPROVE
+- REVISE
+- QUALIFY
+- INVALIDATE
+- REOPEN
+
+## Selection / decision
+- DECIDE
+- SELECT
+- REJECT
+- PRIORITIZE
+- DEPRIORITIZE
+- APPROVE
+- DENY
+- COMMIT
+- DEFER
+- ESCALATE
+
+## Planning / operationalization
+- PLAN
+- DECOMPOSE
+- SPECIFY
+- DESIGN
+- SCHEDULE
+- ASSIGN
+- SEQUENCE
+- DEPEND
+- ESTIMATE
+- SCOPE
+- RESOURCE
+
+## Execution
+- EXECUTE
+- IMPLEMENT
+- CREATE
+- MODIFY
+- DEPLOY
+- MIGRATE
+- INTEGRATE
+- CONFIGURE
+- ACTIVATE
+- DEACTIVATE
+- COMPLETE
+- FAIL
+- ABORT
+- ROLLBACK
+
+## Observation / feedback
+- OBSERVE
+- MEASURE
+- MONITOR
+- DETECT
+- COMPARE
+- ASSESS
+- REFLECT
+- RETROSPECT
+- DIAGNOSE
+- ATTRIBUTE
+- LEARN
+
+## Evolution
+- RECONSIDER
+- REOPEN
+- REVISE
+- ADAPT
+- REFINE
+- REPLACE
+- SUPERSEDE
+- DEPRECATE
+- RETIRE
+- REVERSE
+- PIVOT
+
+## Candidate compact canonical vocabulary
+
+For implementation, begin with a smaller controlled vocabulary and map richer verbs to subtypes/aliases:
+
+- CONSIDER
+- CAPTURE
+- PROPOSE
+- GENERATE
+- DERIVE
+- SYNTHESIZE
+- HYPOTHESIZE
+- ASSUME
+- EVALUATE
+- TEST
+- VALIDATE
+- FALSIFY
+- CONCLUDE
+- REVISE
+- DECIDE
+- SELECT
+- REJECT
+- APPROVE
+- DEFER
+- PLAN
+- DECOMPOSE
+- DESIGN
+- ASSIGN
+- EXECUTE
+- IMPLEMENT
+- COMPLETE
+- FAIL
+- OBSERVE
+- MEASURE
+- ASSESS
+- REFLECT
+- DIAGNOSE
+- LEARN
+- RECONSIDER
+- REFINE
+- SUPERSEDE
+- DEPRECATE
+- RETIRE

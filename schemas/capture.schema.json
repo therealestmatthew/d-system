@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "capture.schema.json",
+  "title": "Raw capture record",
+  "description": "One raw capture, verbatim, before any interpretation runs (ADR-007 section 1). Stored under _capture/raw/, one file per record, named `<id>.json`. Raw text is never edited and never deleted by an agent (REQ-002 R2) — a correction to a derived record leaves the record here untouched. Every field an agent later fills on a staged record carries a `provenance.capture_id` (evidence.schema.json) that must resolve to a record here; that resolvability is checked by the source-reading code and its tests, not by this schema, which validates only the shape of one record in isolation.",
+  "type": "object",
+  "required": ["id", "captured_at", "channel", "content"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^raw-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}$",
+      "description": "raw-<capture time, compact UTC, YYYYMMDDTHHMMSSZ>-<6 lowercase hex chars>. Time-prefixed so records sort chronologically by filename with no separate index; the hex suffix disambiguates two captures landing in the same second across the three concurrent channels (ADR-007 section 2), which a single incrementing counter cannot do without a shared writer. Assigned once, by whichever channel writes the record, and never reassigned. This is the format phase-cap-02's evidence.schema.json deferred to this phase."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "description": "When the capture happened, RFC 3339 with a mandatory offset, mirroring idea.schema.json's `at` field for the same reason: ordering across records requires a comparable time, and a naked local time is not one. The pattern carries enforcement until phase-rel-11 turns on the `date-time` format checker; `format` stays as the declaration of intent."
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["session", "inbox", "cli"],
+      "description": "Which of the three intake channels produced this record (ADR-007 section 2). Recorded for audit only — all three channels write the same shape and are expected to converge on the same routing and evidence for the same text (REQ-002 R4)."
+    },
+    "content": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The capture, byte-identical to what was submitted (REQ-002 R1). Never rewritten in place; a correction creates a new derived record and leaves this one exactly as captured."
+    },
+    "source_path": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "For the inbox channel, the original file path the capture was read from, relative to _capture/inbox/. Null for the session and cli channels, which have no file of origin."
+    }
+  }
+}

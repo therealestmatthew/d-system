@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# uv
+# uv.lock is intentionally committed for reproducible installs
+
+# DuckDB
+data/
+*.duckdb
+*.duckdb.wal
+
+# Node / TypeScript
+ts/node_modules/
+ts/dist/
+js/node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Private — never committed. Named explicitly, not just the parent, so that removing or
+# narrowing the _private/ line alone would not silently re-expose these paths — see
+# phase-priv-04 and tools/check_no_private_content.py, which enforces this at commit time.
+_private/
+_private/portfolio/
+_private/portfolio/projects/
+
+# Working scratchpad — local only. Ephemeral task detail, briefs, audits and drafts live here
+# and are never committed. Nothing in it is deleted without the owner's explicit approval
+# (PLAN-015). .gitkeep predates this rule and stays tracked; one other file was tracked by
+# explicit exception for a single completed phase to delete as its own last step, and was
+# removed when that phase completed.
+_working/
+!_working/.gitkeep
+
+# Agent worktrees — guard only; the sanctioned location is ../d-system-worktrees/
+_worktrees/
+
+# Capture — raw intake (_capture/raw), the inbox (_capture/inbox) and staging
+# (_capture/staging). Private by default (ADR-007 section 8): only records a promotion
+# step deliberately moves into _data/ are ever tracked. See PLAN-009 phase-cap-03.
+_capture/

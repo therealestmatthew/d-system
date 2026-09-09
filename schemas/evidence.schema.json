@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "evidence.schema.json",
+  "title": "Field evidence and provenance",
+  "description": "The shape every agent-filled field carries on a STAGED record: an evidence level and a pointer back into the raw capture that supports it. Per ADR-007 evidence is scored per field, not per record, so review means checking specific claims rather than re-reading whole records. Per GOV-003 this full scoring does NOT travel into _data/ — a promoted record keeps only definitions/capture_source. The root of this file is the evidence map itself: an object keyed by the name of the field it describes.",
+  "type": "object",
+  "additionalProperties": { "$ref": "#/definitions/field_evidence" },
+  "properties": {
+    "promised_to": { "$ref": "#/definitions/protected_field_evidence" },
+    "due_date": { "$ref": "#/definitions/protected_field_evidence" },
+    "decision": { "$ref": "#/definitions/protected_field_evidence" },
+    "rationale": { "$ref": "#/definitions/protected_field_evidence" },
+    "completed": { "$ref": "#/definitions/protected_field_evidence" },
+    "received": { "$ref": "#/definitions/protected_field_evidence" }
+  },
+  "definitions": {
+    "protected_field_names": {
+      "description": "The four things an agent never invents, per ADR-007 section 4, expressed as the field names that carry them. 'completion of anything' covers both commitment.completed and waiting_on.received. Read this list from the schema rather than restating it in code.",
+      "enum": ["promised_to", "due_date", "decision", "rationale", "completed", "received"]
+    },
+    "level": {
+      "type": "string",
+      "enum": ["explicit", "inferred", "guessed"],
+      "description": "explicit=the raw text states it | inferred=supported by surrounding context but not stated | guessed=pattern match with no support in the text"
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Where in the raw capture the value came from. Required, not optional: a confidence marker that cannot be traced back to its source cannot be verified.",
+      "required": ["capture_id"],
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "type": "string",
+          "minLength": 1,
+          "$comment": "Identifier of the raw capture record. Its format is fixed by phase-cap-03, which owns schemas/capture.schema.json; this contract requires only that it be non-empty and resolvable."
+        },
+        "quote": {
+          "type": ["string", "null"],
+          "description": "The supporting span of raw text, verbatim. Required at explicit and inferred; null is only valid at guessed, which by definition has no support."
+        },
+        "start": { "type": ["integer", "null"], "minimum": 0 },
+        "end": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "field_evidence": {
+      "type": "object",
+      "required": ["level", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "level": { "$ref": "#/definitions/level" },
+        "provenance": { "$ref": "#/definitions/provenance" },
+        "reason": {
+          "type": ["string", "null"],
+          "description": "Why the agent read the text this way. Required whenever the level is not explicit, because REQ-002 R14 requires review to show the reason for each assumption."
+        },
+        "review_flag": {
+          "type": "boolean",
+          "default": false,
+          "description": "True when this field must be decided by the owner before promotion."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["level"], "properties": { "level": { "enum": ["explicit", "inferred"] } } },
+          "then": {
+            "properties": {
+              "provenance": {
+                "required": ["capture_id", "quote"],
+                "properties": { "quote": { "type": "string", "minLength": 1 } }
+              }
+            }
+          }
+        },
+        {
+          "if": { "required": ["level"], "properties": { "level": { "enum": ["inferred", "guessed"] } } },
+          "then": {
+            "required": ["reason"],
+            "properties": { "reason": { "type": "string", "minLength": 1 } }
+          }
+        }
+      ]
+    },
+    "protected_field_evidence": {
+      "description": "A protected field additionally requires an explicit review flag whenever its evidence level is not explicit. An unflagged non-explicit value in a protected field is a validation failure, not a style problem (ADR-007 section 4, REQ-002 R7).",
+      "allOf": [
+        { "$ref": "#/definitions/field_evidence" },
+        {
+          "if": { "required": ["level"], "properties": { "level": { "enum": ["inferred", "guessed"] } } },
+          "then": {
+            "required": ["review_flag"],
+            "properties": { "review_flag": { "const": true } }
+          }
+        }
+      ]
+    },
+    "capture_source": {
+      "type": ["object", "null"],
+      "description": "What a PROMOTED record in _data/ keeps of its origin, per GOV-003: a pointer to the raw capture plus the names of the fields that were non-explicit at promotion time. Null on records the owner authored by hand rather than through capture. Keeping every field's evidence level forever would roughly double the field count on every entity; keeping nothing would leave a bulk-approved record with no memory of what was assumed.",
+      "required": ["capture_id"],
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": { "type": "string", "minLength": 1 },
+        "assumed_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Names of the fields that were inferred or guessed when this record was promoted. Empty means every field was explicit."
+        },
+        "promoted": { "type": ["string", "null"], "format": "date" }
+      }
+    }
+  }
+}

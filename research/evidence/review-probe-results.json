@@ -1,0 +1,47 @@
+{
+  "dangling_source_errors": [],
+  "task_loaded_with_dangling_parents": [
+    "missing-project",
+    "missing-commitment",
+    null
+  ],
+  "projection_missing_fields": {
+    "projects": [
+      "repository",
+      "stakeholders"
+    ],
+    "tasks": [
+      "capture"
+    ]
+  },
+  "project_people_from_stakeholders": 0,
+  "duplicate_source_errors": [],
+  "duplicate_rebuild_exception": "ConstraintException",
+  "old_projection_after_failed_rebuild": 0,
+  "partial_projection_after_failed_rebuild": 1,
+  "all_count_of_12": 10,
+  "global_scope_other_project_included": false,
+  "session_scope_null_project_included_as_global": true,
+  "amendment_current": {
+    "title": "Corrected",
+    "updated": "2026-09-01T00:00:00Z"
+  },
+  "amendment_prefix": "Original",
+  "dangling_link_fold_accepted": "999999",
+  "low_level_append_non_owner_assessment": "assessment",
+  "promotion_target_not_resolved": [
+    "NONEXISTENT-DOC"
+  ],
+  "time_reversal_accepted": "2026-08-01T00:00:00Z",
+  "inbox_crlf_bytes_preserved": false,
+  "processed_original_crlf_preserved": true,
+  "processed_same_filename_preserves_original": false,
+  "raw_records_after_two_inbox_inputs": 2,
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok"
+    }
+  },
+  "api_projects_status": 404
+}

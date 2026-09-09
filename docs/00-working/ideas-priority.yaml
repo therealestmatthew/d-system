@@ -1,0 +1,12 @@
+schema_version: 1
+updated: '2026-09-08'
+# Ideas that jump the queue, in order. Everything else falls back to status then ID
+# (open before triaged; lower ID first within a status). Hand-edited, like backlog.yaml's
+# next_up — reordering is an operational decision, not a fact logged in _data/ideas.jsonl.
+# Empty at creation: idea 000039, which this file implements, was promoted to PLAN-019 in
+# the same session and is no longer something to look at next.
+next_up:
+- '000041'
+- '000038'
+- '000037'
+- '000040'

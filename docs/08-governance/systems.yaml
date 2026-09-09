@@ -1,0 +1,239 @@
+schema_version: 1
+owners:
+  repository-owner: Repository maintainer; accountable role, not a claim of personal review or approval.
+systems:
+- id: sys-contracts
+  name: Entity contracts
+  domain: data
+  status: implemented
+  owner: repository-owner
+  paths:
+  - schemas/project.schema.json
+  - schemas/person.schema.json
+  - schemas/commitment.schema.json
+  - schemas/tag.schema.json
+  - schemas/memory.schema.json
+  - schemas/idea.schema.json
+  - src/db/source_validation.py
+  depends_on: []
+  description: Six JSON Schemas, invoked by the source preflight before every rebuild. The idea schema
+    also states the status machine the writer and the projection both read, so the transition rules
+    have one statement rather than three. Each schema validates one file's own shape in isolation; it
+    does not yet check that a reference resolves — a project's tag or a task's owning commitment can
+    still point at nothing, since the DDL carries no foreign keys and no phase has added a
+    cross-reference check.
+- id: sys-portfolio
+  name: Portfolio source files
+  domain: data
+  status: implemented
+  owner: repository-owner
+  paths:
+  - _data/projects
+  - _data/tags.json
+  - _data/people
+  - _data/commitments
+  - _data/tasks
+  - _data/ideas.jsonl
+  - tools/append_idea.py
+  - tools/generate_ideas_md.py
+  depends_on:
+  - sys-contracts
+  description: Projects, tags, people, commitments and tasks are populated. Per ADR-009, the tracked
+    _data/ holds a small fictional example set that exercises every entity schema; the owner's real
+    portfolio lives at _private/portfolio/, read instead when D_SYSTEM_DATA_ROOT is set (see
+    data_root() in src/db/source_validation.py). Tasks point back to their commitment by ID rather
+    than being embedded. Ideas are an append-only event log written only by tools/append_idea.py;
+    docs/00-working/ideas.md is generated from it.
+- id: sys-capture
+  name: Capture and structuring
+  domain: data
+  status: scaffold
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-009-capture-build.md
+  - docs/02-prompts/PROMPT-002-capture-and-structuring-system.md
+  - docs/08-governance/OPS-008-capture.md
+  - schemas/capture.schema.json
+  - schemas/staged-record.schema.json
+  - src/capture/raw.py
+  - tools/capture.py
+  - test/test_capture_contracts.py
+  - test/test_capture_intake.py
+  depends_on:
+  - sys-contracts
+  - sys-portfolio
+  description: The raw-capture and staged-record contracts are defined and the _capture/raw,
+    _capture/inbox and _capture/staging locations are fixed and gitignored (phase-cap-03). The CLI
+    quick-capture and inbox scanner write raw records only, through the one writer both share
+    (phase-cap-04); a converted inbox file moves to _capture/inbox/processed/ so it is never
+    recaptured. Evidence-scored structuring, routing and promotion into _data/ are still proposed
+    only — nothing captured here can yet become a real record.
+- id: sys-brain
+  name: Shared Markdown memory
+  domain: memory
+  status: implemented
+  owner: repository-owner
+  paths:
+  - brain
+  - schemas/memory.schema.json
+  - tools/generate_glossary.py
+  depends_on:
+  - sys-contracts
+  description: Human- and model-authored memories with typed YAML metadata (concept, entity, procedure,
+    episode, decision), including a `systems` field for subsystem-scoped retrieval. Direct human/model
+    editing remains the current workflow; there is no dedicated writer agent (the proposed Vault
+    Scribe role), no automated promotion or conflict resolution, and no periodic review trigger.
+- id: sys-projection
+  name: DuckDB projection
+  domain: data
+  status: implemented
+  owner: repository-owner
+  paths:
+  - tools/rebuild_db.py
+  - sql/001_schema.sql
+  - src/db/connection.py
+  depends_on:
+  - sys-portfolio
+  - sys-brain
+  description: Full drop/recreate loader builds eight tables; no atomic publication or automatic synchronization.
+- id: sys-retrieval
+  name: Memory context CLI
+  domain: memory
+  status: implemented
+  owner: repository-owner
+  paths:
+  - tools/load_context.py
+  depends_on:
+  - sys-projection
+  description: Read-only keyword, project, type and conjunctive tag filtering; confidence/created ordering.
+    No embeddings or agent router.
+- id: sys-api
+  name: FastAPI application
+  domain: application
+  status: scaffold
+  owner: repository-owner
+  paths:
+  - src/main.py
+  - src/api/__init__.py
+  - src/models
+  depends_on: []
+  description: Health endpoint, CORS and empty /api/v1 router; no domain API or DB-backed route.
+- id: sys-ui
+  name: React UI
+  domain: application
+  status: scaffold
+  owner: repository-owner
+  paths:
+  - ts/src/App.tsx
+  - ts/src/main.tsx
+  - ts/vite.config.ts
+  - ts/package.json
+  depends_on: []
+  description: Heading-only app and Vite API proxy configuration; no runtime API requests.
+- id: sys-html
+  name: Dynamic HTML generation
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md
+  - templates/README.md
+  depends_on:
+  - sys-api
+  - sys-ui
+  - sys-contracts
+  description: Proposed YAML-to-JSON pages, API, React Router, typed blocks and styling. Templates are
+    placeholders.
+- id: sys-course
+  name: Git course production
+  domain: delivery
+  status: retired
+  owner: repository-owner
+  paths: []
+  depends_on: []
+  description: Model-first course production — concept notes, syllabus, animation specs and
+    production stack. Extracted to its own, independent repository (see the corresponding real
+    project's repository field in the private portfolio); this repository contains none of it.
+    Kept as a retired entry rather than deleted, matching how the registry treats other component
+    lifecycle transitions.
+- id: sys-signals
+  name: SQL portfolio signals
+  domain: data
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-002-mini-systems-proposal.md
+  depends_on:
+  - sys-projection
+  description: Health, cognitive load, stale radar, accountability, velocity and tag clusters; no SQL
+    views exist.
+- id: sys-synthesis
+  name: Portfolio synthesis
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-002-mini-systems-proposal.md
+  depends_on:
+  - sys-signals
+  description: Context packs, daily briefing, weekly review and portfolio digest; no generators exist.
+- id: sys-memory-agents
+  name: Memory agent roles
+  domain: memory
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-001-agent-memory-system.md
+  depends_on:
+  - sys-retrieval
+  description: Vault Scribe, Chronicle and Librarian are proposed roles/contracts; no agents, vectors
+    or pruning tool implemented.
+- id: sys-delivery
+  name: Build and quality gates
+  domain: delivery
+  status: implemented
+  owner: repository-owner
+  paths:
+  - .github/workflows/ci.yaml
+  - pyproject.toml
+  - uv.lock
+  - ts/package-lock.json
+  - test
+  depends_on: []
+  description: Existing Python lint/type/test and frontend build jobs; governance gate added by this
+    change. `tools/` scripts are not yet covered by the documented `ruff check src/ test/` gate
+    (tracked by `phase-rel-09`), and there is no deploy or release job.
+- id: sys-governance
+  name: Repository governance
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths:
+  - src/governance
+  - schemas/document.schema.json
+  - schemas/systems.schema.json
+  - schemas/codes.schema.json
+  - docs/08-governance/systems.yaml
+  - docs/08-governance/codes.yaml
+  - tools/generate_tool_docs.py
+  depends_on: []
+  description: Strict document and memory checks, a per-kind document code register with deterministic
+    allocation, and a derived live plan inventory; no DuckDB persistence. It does not verify that a
+    plan's claims are actually true, run tests, rebuild the database, or check every business JSON
+    file — those are separate commands and separate human judgment.
+- id: sys-backlog
+  name: Session phase backlog
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths:
+  - docs/09-backlog/backlog.yaml
+  - schemas/backlog.schema.json
+  - src/governance/backlog.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  depends_on:
+  - sys-governance
+  description: One-session plan phases with dependencies, derived readiness, completion evidence and mechanically
+    checked open-plan coverage. Bounded concurrent claims require disjoint systems, deliverable paths
+    and dependency chains. It cannot see whether an agent's actual edits strayed outside a phase's
+    declared systems and deliverables — that boundary is enforced by diff review, not the checker.

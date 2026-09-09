@@ -1,0 +1,15 @@
+{
+  "id": "cloud-architect-cert",
+  "name": "Cloud Architect Certification",
+  "status": "active",
+  "category": "learning",
+  "type": "certification",
+  "description": "Fictional example: studying toward a cloud architecture certification.",
+  "tags": ["aws", "education"],
+  "stakeholders": [],
+  "started": "2026-06-01",
+  "target_date": "2026-11-30",
+  "last_reviewed": "2026-08-20",
+  "review_cadence": "monthly",
+  "notes": ""
+}

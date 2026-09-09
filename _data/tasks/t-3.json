@@ -1,0 +1,13 @@
+{
+  "id": "t-3",
+  "commitment_id": "c-1",
+  "project_id": "example-web-platform",
+  "description": "Get stakeholder sign-off before the ship date.",
+  "status": "open",
+  "priority": null,
+  "created": "2026-09-10",
+  "due_date": null,
+  "completed": null,
+  "tags": [],
+  "notes": ""
+}

@@ -1,0 +1,13 @@
+{
+  "id": "t-2",
+  "commitment_id": "c-1",
+  "project_id": "example-web-platform",
+  "description": "Implement the onboarding flow in the frontend.",
+  "status": "in_progress",
+  "priority": "high",
+  "created": "2026-09-10",
+  "due_date": "2026-10-05",
+  "completed": null,
+  "tags": ["react", "typescript"],
+  "notes": ""
+}

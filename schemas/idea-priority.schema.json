@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "idea-priority.schema.json",
+  "title": "Idea priority queue",
+  "description": "docs/00-working/ideas-priority.yaml. A plain ordered list of idea IDs that jump the queue, sitting beside the append-only idea log (schemas/idea.schema.json) rather than inside it — the same shape as backlog.yaml's next_up. Reordering is a hand-edited operational decision, not a logged event: git history is the audit trail. Every listed idea must actually exist in _data/ideas.jsonl and be open or triaged; that cross-file check happens in governance, not here.",
+  "type": "object",
+  "required": ["schema_version", "updated", "next_up"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "updated": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date this file was last reordered. Must not be in the future."
+    },
+    "next_up": {
+      "type": "array",
+      "description": "Idea IDs that jump the queue, in order. Everything else falls back to status (open before triaged) then ID.",
+      "items": { "type": "string", "pattern": "^[0-9]{6}$" },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "jordan-rivera",
+  "name": "Jordan Rivera",
+  "role": "Product Manager",
+  "organization": "Client A",
+  "email": "jordan.rivera@example.com",
+  "projects": ["example-web-platform"],
+  "notes": "Fictional example stakeholder, used to exercise the person schema and the project.stakeholders linkage."
+}

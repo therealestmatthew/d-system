@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Brain Memory Entry",
+  "description": "A single entry in the shared model-agnostic memory system (brain/). Stored as Markdown with YAML frontmatter. Readable and writable by any AI model.",
+  "type": "object",
+  "required": ["id", "title", "type", "created"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mem-[a-z0-9-]+$",
+      "description": "Stable identifier — never rename after first use. Format: mem-<slug>"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title — used in index and context headers"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["concept", "entity", "procedure", "episode", "decision"],
+      "description": "concept=how something works | entity=facts about a thing | procedure=how to do something | episode=what happened | decision=why something was chosen"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Tag IDs from _data/tags.json — enables cross-system filtering"
+    },
+    "systems": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "System IDs from docs/08-governance/systems.yaml — mirrors what governed documents already carry, and answers 'everything about this subsystem' directly rather than through tags or brain/ folder structure."
+    },
+    "source_model": {
+      "type": "string",
+      "description": "Model or human that authored or last substantively edited this entry. Format: provider/model-id or 'human'. Examples: anthropic/claude-sonnet-4-6, openai/gpt-4o, google/gemini-2.0-flash, human"
+    },
+    "project": {
+      "type": ["string", "null"],
+      "description": "Project ID this memory belongs to, or null for global memories"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": ["string", "null"],
+      "format": "date"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "uncertain"],
+      "default": "medium",
+      "description": "How reliable this memory is. Uncertain = needs verification before acting on it."
+    },
+    "related": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "IDs of related memory entries (mem-*)"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["global", "project", "session"],
+      "default": "global",
+      "description": "global=applies everywhere | project=scoped to one project | session=temporary, review for promotion to global"
+    }
+  }
+}

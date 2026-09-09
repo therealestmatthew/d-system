@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "waiting-on.schema.json",
+  "title": "Waiting-on",
+  "description": "Something another party owes the owner. The mirror of a commitment, not a status on one: here the owner is the creditor rather than the debtor, so the staleness question, the follow-up behaviour and the person's role all differ. This is the inbound half of the owner's second priority — nothing went quiet.",
+  "type": "object",
+  "required": ["id", "description", "requested", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^w-[0-9]+" },
+    "description": { "type": "string" },
+    "owed_by": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Person ID if the identity is confirmed, otherwise the name as written. Per ADR-008 a name in a note creates no person record."
+    },
+    "project_id": { "type": ["string", "null"], "default": null },
+    "requested": {
+      "type": "string",
+      "format": "date",
+      "description": "When the owner asked. This is the clock 'gone quiet' is measured against."
+    },
+    "due_date": { "type": ["string", "null"], "format": "date" },
+    "status": {
+      "type": "string",
+      "enum": ["open", "chased", "received", "abandoned"],
+      "description": "open=asked, waiting | chased=followed up at least once | received=delivered | abandoned=stopped waiting without delivery"
+    },
+    "last_chased": {
+      "type": ["string", "null"],
+      "format": "date",
+      "default": null,
+      "description": "Date of the most recent follow-up, so a chase that also went quiet is visible"
+    },
+    "received": {
+      "type": ["string", "null"],
+      "format": "date",
+      "default": null,
+      "description": "When it actually arrived. Protected: an agent never invents completion of anything."
+    },
+    "priority": {
+      "type": ["string", "null"],
+      "enum": ["high", "medium", "low", null],
+      "default": null
+    },
+    "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "notes": { "type": "string", "default": "" },
+    "capture": { "$ref": "evidence.schema.json#/definitions/capture_source" }
+  }
+}

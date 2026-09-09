@@ -1,0 +1,120 @@
+- id: H1
+  name: Multi-dimensional state model
+  claim: A knowledge state classified independently by ontological nature, epistemic status, and idea/action lifecycle may provide a useful typed state representation that is not commonly integrated in existing agent-memory systems.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an established framework that uses equivalent orthogonal dimensions for essentially the same purpose.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H2
+  name: Typed transition semantics as reasoning memory
+  claim: Explicit transitions between append-only knowledge states may provide a useful representation of reasoning history distinct from ordinary semantic graph relationships.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find prior work that already models equivalent typed reasoning-state transitions with comparable semantics and use cases.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H3
+  name: Provenance as a conflict-resolution input
+  claim: Transition provenance, including human/agent identity, domain authority, evidence, method, lineage, and delegation, may be usable as an input to epistemic conflict resolution.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an existing system/formalism that already provides materially equivalent provenance-aware arbitration.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H4
+  name: Independence-aware convergence
+  claim: Repeated independent arrival at equivalent states may act as a graph-topological epistemic signal, while derivative agreement should be discounted based on shared lineage.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find prior work that already calculates equivalent convergence over provenance/derivation topology for mixed human-agent knowledge.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H5
+  name: Topology-aware context transfer
+  claim: Retrieval for agents may be improved by selecting not only semantically relevant content but also current state, reasoning lineage, evidence, dissent, authority, convergence, and unresolved uncertainty.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an existing agent-memory/retrieval architecture that already performs materially equivalent context assembly.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H6
+  name: Integrated human-agent collective knowledge evolution
+  claim: The full synthesis may form a distinct architecture for shared human-agent knowledge evolution even if every individual primitive exists independently.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find a system or research framework whose end-to-end architecture and purpose substantially subsume D-System.
+  prior_art_families_to_search: UNKNOWN
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H7
+  name: Development provenance
+  claim: Software functionality can be represented as the downstream result of an append-only provenance lineage connecting ideas, observations, evidence, decisions, requirements, specifications, plans, execution phases, artifacts, verification, and observed outcomes.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an existing framework whose end-to-end provenance model materially subsumes this chain.
+  prior_art_families_to_search: Requirements Traceability Matrix, bidirectional traceability, software traceability
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H8
+  name: Phase-bounded context construction
+  claim: A planned development phase can serve as an explicit context boundary for agentic software engineering, allowing context to be assembled from persistent reasoning/development lineage and execution results to be consolidated back into persistent memory.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an established agentic development architecture with materially equivalent semantics and lifecycle.
+  prior_art_families_to_search: Agentic development, context boundary
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H9
+  name: Bidirectional epistemic traceability
+  claim: A system can support both forward tracing from idea/knowledge to realized functionality/outcome, and backward tracing from functionality/artifact to the reasoning, evidence, assumptions, and decisions that justify it.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find prior art providing materially equivalent bidirectional reasoning-to-runtime traceability.
+  prior_art_families_to_search: Requirements Traceability Matrix, bidirectional traceability, Design rationale systems
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H10
+  name: Epistemic blast-radius analysis
+  claim: When an upstream assumption, evidence source, or claim is weakened, falsified, or superseded, provenance topology can identify downstream decisions, requirements, plans, artifacts, tests, and functionality requiring reassessment.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find established impact-analysis systems already performing equivalent propagation from epistemic change rather than only artifact/requirement change.
+  prior_art_families_to_search: impact-analysis systems, change impact analysis, assumption dependency
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE
+
+- id: H11
+  name: Runtime-to-knowledge closure
+  claim: Operational telemetry, tests, incidents, and user outcomes can be transformed into provenance-bearing evidence that updates the same knowledge structure from which implementation intent originated.
+  origin_status: CONCEPTUAL_PROPOSAL
+  implementation_baseline: UNKNOWN
+  existing_internal_evidence: UNKNOWN
+  what_would_falsify_it: Find an architecture providing materially equivalent closed-loop reasoning from knowledge to implementation to runtime evidence and back.
+  prior_art_families_to_search: self-adaptive systems, DevOps feedback loops, continuous requirements engineering
+  experimental_baseline_if_applicable: UNKNOWN
+  status: UNTESTED_PRE_LITERATURE

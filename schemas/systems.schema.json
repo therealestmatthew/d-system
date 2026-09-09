@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Systems registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "owners",
+    "systems"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Registry contract version."
+    },
+    "owners": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Accountable role or person; no fabricated approval."
+      },
+      "description": "Owner directory; repository-owner is the current maintainer role."
+    },
+    "systems": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "domain",
+          "status",
+          "owner",
+          "paths",
+          "depends_on",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Permanent system ID.",
+            "pattern": "^sys-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name."
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Grouping, not a second component hierarchy.",
+            "enum": [
+              "data",
+              "memory",
+              "application",
+              "delivery",
+              "governance"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Implementation maturity, distinct from document lifecycle.",
+            "enum": [
+              "implemented",
+              "scaffold",
+              "planned",
+              "retired"
+            ]
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Key from the owners map."
+          },
+          "paths": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "Existing code, schema, data or documentation paths that locate this component.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced identifier or path."
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "System dependencies; acyclic and not inferred from imports.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Referenced identifier or path.",
+              "pattern": "^sys-[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Current responsibility and limits; planned entries describe intended behavior."
+          }
+        }
+      },
+      "description": "One entry per independently changeable capability, not per file or portfolio project."
+    }
+  }
+}
