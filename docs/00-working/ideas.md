@@ -431,6 +431,7 @@ This idea is not a proposal for new work — it is a detailed naming of work alr
 **Links**
 
 - relates_to ← `000010`
+- relates_to ← `000071`
 
 ---
 
@@ -537,6 +538,7 @@ PROPOSED LINK: 000010 --relates_to--> 000008 (dashboard would render metrics der
 
 - relates_to → `000008`
 - extends → `000050`
+- relates_to ← `000071`
 
 ---
 
@@ -1894,6 +1896,10 @@ The key unresolved design questions in 000042's body (generator location, static
 
 </details>
 
+**Links**
+
+- relates_to ← `000071`
+
 ---
 
 ## 000043 · Review documentation front matter and plan a documentation database for knowledge retrieval
@@ -2066,6 +2072,7 @@ No existing backlog phase covers this ground: the `phase-idea-*` track (phase-id
 - relates_to → `000047`
 - relates_to ← `000018`
 - relates_to ← `000049`
+- relates_to ← `000072`
 
 ---
 
@@ -3143,3 +3150,534 @@ PROPOSED LINK: 000067 --relates_to--> 000051 (portable adapters must preserve th
 No existing governed requirement or plan was found that delivers cross-agent skill portability. PLAN-008 created Claude-specific lifecycle entry points, while the complete phase-agnt-02 only generalized repository working rules in AGENTS.md. The remaining material design choice is the canonical source location and adapter schema; the plan should choose one and require drift detection rather than preserve duplicate hand-maintained bodies.
 
 </details>
+
+**Links**
+
+- relates_to ← `000069`
+- relates_to ← `000072`
+
+---
+
+## 000068 · Scout research/ for application ideas and enhancements not yet captured
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+`research/` holds roughly 10,700 lines across ~90 files — the proposed knowledge architecture, two
+glossaries, the transition vocabulary, the two-system model, the traceability model, the phase context
+contract, twelve adversarial codebase-review reports, and an evidence register. Almost none of it has
+been mined for actionable application ideas. The adversarial review in particular was written to
+surface gaps, and its findings were deliberately never executed: `research/adversarial-codebase-review/12_recommendations.md`
+ends "Stop here; do not start the prepared literature-review workflow."
+
+Idea: run a systematic scouting pass over `research/` and record every actionable enhancement it
+implies as its own idea in the log, so the research corpus stops being a document nobody reads and
+becomes queued work. This is deliberately a capture exercise, not a build one.
+
+Candidate seams, from a first skim rather than a full read:
+- The twelve ranked findings F01-F14 in `10_adversarial_findings.md` — several describe concrete
+  defects with reproductions (non-atomic rebuild, projection field omissions, context scope
+  semantics, capture fidelity under CRLF normalisation). Some may already be covered by existing
+  backlog phases; that overlap is exactly what triage exists to establish.
+- `09_preserve_list.md`'s PRESERVE_UNLESS_DISPROVEN patterns, which are design constraints on any
+  future work rather than tasks.
+- The seventeen research questions in `11_research_questions_generated.md`.
+- `implementation_glossary.md`'s "epistemic blast radius" and the traceability queries in
+  `development_traceability_model.md` §4, several of which are plausible product features.
+
+What it would touch: `_data/ideas.jsonl` (many new ideas), and nothing else. No research file is
+edited — the corpus is evidence and stays as written.
+
+Verification: every recorded idea cites the research file and line range it came from; a second pass
+over the same source produces no duplicates; and ideas that merely restate an existing backlog phase
+are annotated as such rather than recorded as new.
+
+What is unresolved: how much of the adversarial review is already covered by existing phases, and
+whether the research architecture ideas (append-only knowledge states, provenance-weighted
+convergence) belong in this repository's backlog at all or are a separate research track. The review
+itself says the recommended next action is external review, not execution.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:34:54-04:00): ## Finding for Idea 000068: Scout research/ for application ideas and enhancements not yet captured
+
+The idea proposes a systematic scouting pass over `research/` (roughly 10,700 lines across ~90 files) to extract actionable application ideas and enhancements — a capture exercise, not a build one. The central open question it raises is precisely which adversarial findings are already covered by existing backlog phases and therefore not new work.
+
+### What was found
+
+**Coverage overlap with backlog phases:** Systematic review of the backlog reveals that some (but not all) adversarial findings are already planned:
+
+- **F02 (context scope semantically wrong, all-mode incomplete)**: Directly addressed by **phase-rel-08** "Correct global-memory and all-results retrieval" (queued, depends on phase-rel-02). Scope explicitly includes "Include scope: global memories alongside a requested project, including repository-scoped memories" and "Make --all unbounded unless an explicit --limit is supplied."
+
+- **F03 (non-atomic rebuild, PK failure leaves old projection gone and new partial)**: Directly addressed by **phase-rel-05** "Specify failure-safe projection publication" (queued) and **phase-rel-06** "Implement atomic rebuild and failure recovery" (queued, depends on phase-rel-04 and phase-rel-05). Phase-rel-06 scope explicitly includes "Close all connections on success and failure; preserve the previous usable projection" with acceptance criteria including "Injected mid-load failure leaves the previous database queryable with its old rows."
+
+**Unaddressed findings:** The backlog does not yet plan work for several HIGH findings:
+- F01 (global append-only architecture not fully implemented across all source records/checkpoints, only ideas)
+- F04 (exact original capture evidence not guaranteed due to CRLF normalization and repeated basenames)
+- F05 (reasoning-to-runtime traceability cannot be completed; assumption identities, artifact versions, deployment feedback incomplete)
+- F06 (query projection omits provenance and relationship information: entity capture pointer, project repository/stakeholders, commitment tags not projected)
+- F07-F14 (various MEDIUM findings on corrections/chronology equivalence, attribution authority, relationship guarantees, effective state hiding disagreement, operational concurrency control, policy/memory drift, and the OPEN_QUESTION F14 about whether boundary should be governance rather than universal ontology)
+
+The adversarial review's own guidance (12_recommendations.md: "Stop here; do not start the prepared literature-review workflow") appears not yet acted on, and no phase explicitly dedicates work to extracting and recording these as new ideas.
+
+**No related idea or plan document found:** No existing idea proposes mining `research/` for enhancement ideas. No existing plan document includes this scouting as a phase. Ideas 000021, 000040, and others address related concerns (disaster recovery, deterministic search, etc.) but none propose the systematic extraction of actionable ideas from the adversarial review findings or other research files. The research corpus itself (10,700 lines) remains ungoverned and unqueued as actionable work.
+
+**Design note:** The research directory is explicitly "evidence and stays as written" — the idea correctly avoids proposing edits to research files. The work is capture only, recording ideas in `_data/ideas.jsonl` with citations to source line ranges.
+
+### Why it matters
+
+The idea identifies a genuine gap: the adversarial review was written to surface gaps in the system and its research explicitly provides candidate seams (F01-F14, PRESERVE_UNLESS_DISPROVEN patterns, 17 research questions, implementation glossary concepts). Some gaps are already in the backlog (F02, F03); others are not. The overlap is exactly what the idea flags as unresolved, and triage confirms it: backlog phases exist for some findings but not others, and no unified plan yet captures "extract and record all actionable findings as ideas." The research corpus in `/code/d-system/research/` remains a body of work the system does not yet harvest.
+
+No overlap with another idea or promotion to an existing plan was found.
+
+</details>
+
+---
+
+## 000069 · Should Claude Code remain a dependency once agent workflows are portable?
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+An open question rather than a proposal, recorded so it gets answered deliberately instead of by
+drift.
+
+`PLAN-020` (portable agent workflows, promoted from idea `000067`) is building a single source of
+truth that generates framework-specific agent workflows. If that succeeds, the Claude-specific
+surface — `.claude/skills/`, `.claude/commands/`, `.claude/agents/` — becomes generated output rather
+than authored content. At that point the question is worth asking plainly: does this repository still
+need Claude Code specifically, or does it need *an* agent runner, with Claude Code as one
+interchangeable option?
+
+Arguments for dropping it, to be tested rather than assumed:
+- Framework lock-in is a real cost, and `AGENTS.md` was deliberately written framework-agnostic from
+  the start ("every agent in this repository, human-directed or autonomous").
+- Every governed document, tool and prompt is already neutral. The Claude-specific layer is thin.
+
+Arguments against, equally untested:
+- Some mechanisms have no clean equivalent elsewhere. `/session-close` is owner-only *by virtue of
+  being a slash command a person types*; that guard may not survive translation to a framework
+  without the same concept, which would weaken a control rather than port it.
+- Subagent review — used three times in one session on 2026-09-09 and which caught a confidentiality
+  leak — depends on spawning independent agents with fresh context. Not every runner offers that.
+
+What it would touch: nothing directly. This is a decision to make, and its outcome would touch
+`.claude/`, `AGENTS.md`, `CLAUDE.md` and `PLAN-020`'s scope.
+
+Verification: the question is answered when there is a written decision (an ADR) naming what is kept,
+what is dropped, and which capabilities have no equivalent elsewhere — not when someone deletes a
+directory.
+
+What is unresolved: essentially all of it, including whether the question is premature. `PLAN-020`
+has one phase in flight; asking this before that lands risks deciding against evidence that does not
+exist yet. The honest answer today may be "revisit when phase-port-01 and its siblings are complete."
+
+Raised by the owner on 2026-09-10, phrased as a question.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-10T03:39:25-04:00): Owner elaboration, 2026-09-10. The question is sharper than framework portability alone. Once there is an orchestrated swarm of collaborative, specialised agents covering everything that needs doing, do we need Claude Code at all — or only an input that an always-on agent monitors? The shape the owner has in mind: a deterministic script watching an inbox, whose arrivals trigger a cascading series of loops and agent productivity, with no interactive session in the middle. Claude Code becomes one possible driver of that cascade rather than the thing the system is built around. Two caveats the owner stated explicitly: we may still want Claude Code even in that scenario, and this is not a case for discarding the question — the always-on framing makes it more worth answering, not less. Note the tension with the existing owner-only controls: an inbox-triggered cascade with no interactive session has no obvious place for /session-close, which is a command a person types precisely so an agent cannot reach the completion decision. Whatever replaces the interactive session has to preserve that boundary or consciously drop it.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:38:39-04:00): PLAN-020 (portable agent workflows, promoted from 000067) creates the technical conditions to answer this question but does not itself decide it. The plan explicitly states in its "Out of scope" section that it "does not edit AGENTS.md or CLAUDE.md; any future need to change either requires the owner's separate, exact approval" — which reserves the framework-choice decision for after the portability contract is proven.
+
+REQ-005 (portable workflow requirements) specifies that workflows must be discoverable and invocable by Claude Code, Codex, and plain-prompt fallback, but does not mandate or forbid Claude Code as a retained dependency.
+
+The idea correctly identifies two mechanisms that lack equivalents in other frameworks: (1) owner-only slash commands like `/session-close`, which PLAN-020 explicitly keeps owner-only and does not port into any agent surface, and (2) subagent review — spawning independent agents with fresh context to catch errors. PLAN-020's scope and OPS-010 will make both visible but do not decide whether they justify retaining Claude Code.
+
+Related work: idea 000072 (Agents covering the full lifecycle) faces a parallel coordination problem: whether to build lifecycle agents in Claude-specific format now and port them to PLAN-020's portable manifest later, or to defer their construction until the manifest is ready. That idea explicitly notes the risk of "building four agents in a Claude-specific format that a portable manifest will then regenerate is wasted work," which is structurally the same dependency-lock question 000069 raises but applied to future agent definitions rather than existing infrastructure.
+
+The honest answer today, as the idea itself notes, is: "revisit when phase-port-01 and its siblings are complete." PLAN-020 is currently in phase-port-01 (active with agent-codex-port), and the manifest contract — which will make host capability differences explicit — is the evidence needed to decide whether the specific mechanisms identified (slash commands, subagent spawning) justify keeping Claude Code as a framework or not.
+
+PROPOSED LINK: 000069 --relates_to--> 000072 (both coordinate around PLAN-020's scope: retaining a dependency vs deferring work until the portable contract is proven)
+
+</details>
+
+**Links**
+
+- relates_to → `000067`
+- relates_to → `000072`
+- relates_to ← `000076`
+
+---
+
+## 000070 · Build a demo of the idea system for the skills-and-agents training session
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+The owner is facilitating a training session on skills and agents and needs a worked, live example
+rather than slides. This repository's idea system is a good candidate: it is small enough to explain
+in minutes, it exercises skills, slash commands, subagents and a sanctioned CLI writer together, and
+it has real data behind it — 67 ideas across 262 events as of 2026-09-10.
+
+Idea: assemble a demo path through the idea system that shows each mechanism doing something real,
+in an order an audience can follow. A rough shape:
+1. `/orient` — what can an agent do here at all, enumerated live from disk.
+2. Record an idea from the audience through `/idea`, showing the sanctioned writer allocating an id
+   and validating the event rather than a file being hand-edited.
+3. `/idea-triage` — a subagent scouting that idea and writing a finding annotation, demonstrating
+   agent-to-agent delegation and the deliberate limit that triage can never close an idea.
+4. Metrics over the log (see the companion idea on metric commands) to show that an append-only event
+   log answers questions a mutable list cannot: cycle time, funnel, orphan rate.
+5. `PROMPT-007` turning the idea into a requirement, plan and phases — the hand-off from capture to
+   governed work.
+
+The point to land is not the tooling but the separation: what a *skill* is versus a *command* versus
+a *subagent* versus a *tool*, and why this repository puts the owner-only decision (`/session-close`)
+behind a command a person types rather than something an agent can reach.
+
+What it would touch: possibly a demo script or runbook document; ideally nothing in the production
+path, so the demo exercises the real system rather than a mock.
+
+Verification: the demo runs end to end against the real repository without a manual fix-up; every
+step produces visible output an audience can read; and a dry run finds no step that needs the
+presenter to explain away an error.
+
+What is unresolved: whether to demo against real data or a seeded fixture set — real data is more
+convincing but the log is append-only, so a live demo permanently adds whatever is recorded during
+it. Also unresolved: session length, audience familiarity with git, and whether the demo should end
+at a plan or carry through to an executed phase.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. Every mechanism the demo needs already exists and works: the orient skill, the idea and idea-triage commands backed by a subagent, the sanctioned writer append_idea.py, and 76 real ideas across 289 events as of today. PROMPT-006 through PROMPT-009 are the reusable path the demo walks, and PLAN-016 delivered the append-only log and schema underneath it. Step 4 depends on 000071, which was raised in the same conversation and proposes the metrics command that does not yet exist. The gap worth knowing before planning: the distinction between a skill, a command, a subagent and a tool — the point the demo exists to land — is implicit in PLAN-020's capability mapping and authority declarations but has no dedicated teaching document anywhere, so the demo would have to write that explanatory material rather than point at it. The idea's own two unresolved questions stand: real data versus a seeded fixture set, and whether to end at a plan or carry through to an executed phase.
+
+</details>
+
+**Links**
+
+- relates_to → `000071`
+- relates_to ← `000071`
+
+---
+
+## 000071 · Commands that report idea metrics, and a second command that shows what commands can do
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+Two related gaps, both surfaced while preparing the skills-and-agents demo.
+
+First: there is no way to ask the idea log a question without writing a throwaway script. On
+2026-09-10 an ad-hoc script produced real, useful numbers from `_data/ideas.jsonl` — 67 ideas from 262
+events; a funnel of 6 open, 56 triaged, 5 promoted, 0 discarded; a 7.5% promotion rate against an
+83.6% triaged-but-unacted bulge; median created-to-triaged cycle time of 28.2 hours across 59
+transitions; 91% of ideas carrying at least one annotation; 66 typed links (54 `relates_to`, 12
+`extends`) with 16 ideas orphaned; and zero discard events in the entire history. None of that is
+reachable without rewriting the script.
+
+Idea: a command — and the tool beneath it — that reports these as a standing view. Candidate metrics,
+all computable from the log today: funnel counts and rates, cycle time between any two statuses,
+annotation coverage, link-type distribution and orphan count, throughput by day, amendment rate as a
+proxy for rework, and age of open ideas.
+
+Second, and the reason this is one idea rather than two: the demo needs a command that *illustrates
+what commands are for*. A metrics command is a good example precisely because it is read-only,
+produces output an audience can read, and answers a question no single file can. Pairing it with
+something that visibly changes state — recording an idea, or triaging one — shows the two shapes a
+command takes.
+
+What it would touch: a new `tools/*.py` with its paired `OPS-*` document, a slash command wrapping
+it, and the existing fold in `src/db/ideas.py` (reuse it; do not re-implement state derivation).
+Possibly `sql/` if the metrics are better computed over the DuckDB projection than the raw log.
+
+Verification: every reported number is reproducible by an independent script over the same log; the
+command reports zero counts as zero rather than omitting the row; a metric derived from the fold
+matches the same metric derived from the projection; and running it twice against an unchanged log
+produces identical output.
+
+What is unresolved: whether metrics should read the append-only log directly or the DuckDB projection
+— the log is authoritative but the projection is queryable, and idea `000004` and the `phase-mem-*`
+line already circle this question. Also unresolved: whether "0 discards in 262 events" indicates a
+healthy backlog or an unused code path, which is a question the metric surfaces but cannot answer.
+
+Raised by the owner on 2026-09-10, alongside the training-demo idea.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. This overlaps an existing idea: 000008 'Metrics and analysis over the ideas data' is already triaged and covers the metrics half; 000010 (ideation dashboard) names idea metrics as a component, and 000042 proposes an ideas and backlog HTML view that metrics could feed. What 000071 adds beyond those is the second command — one that demonstrates what commands are for — and the training context from 000070. The owner should decide whether this supersedes 000008, merges into it, or narrows to the demo-specific part. The infrastructure is in place either way: fold() in src/db/ideas.py replays the log into current state, sql/001_schema.sql defines ideas, idea_annotations and idea_links, and rebuild_db.py shows the fold populating DuckDB. The convention that a new tool ships with a paired OPS document is well established (OPS-002, OPS-005, OPS-006). No existing tool or command reports metrics over any dataset. On the log-versus-projection question the idea raises: the log is authoritative, but fold() already abstracts the difference — both rebuild_db.py and generate_ideas_md.py read the log through it — so reading through the fold makes the choice an implementation detail rather than a contract decision.
+
+</details>
+
+**Links**
+
+- relates_to → `000070`
+- relates_to → `000008`
+- relates_to → `000010`
+- relates_to → `000042`
+- relates_to ← `000070`
+
+---
+
+## 000072 · Agents covering the full lifecycle from idea to working product
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+Today one subagent exists — `idea-triage`, which scouts a single open idea and annotates it. Every
+other stage of the path from idea to shipped functionality is carried by a prompt a human pastes
+(`PROMPT-006` through `PROMPT-009`) or by the owner directly. The prompts encode the procedure well;
+what they do not do is run without a person driving each step.
+
+Idea: build out the agent roster so each stage of the lifecycle has an agent with a bounded remit,
+mirroring how `idea-triage` is deliberately incapable of closing an idea. Candidate roles, to be
+argued rather than assumed:
+- A **planner** that turns a triaged idea into a requirement, plan and phases (`PROMPT-007`'s job).
+- An **executor** that works a single claimed phase (`PROMPT-008`'s job).
+- A **verifier** or reviewer that independently checks acceptance from the diff, of the kind used
+  three times on 2026-09-09 and which caught a confidentiality leak the author had missed twice.
+- An **auditor** for read-only plan-versus-implementation drift (`PROMPT-009`'s job).
+
+The design constraint that matters more than the roster: each agent's authority must be bounded and
+stated, the way triage's is. The value of triage is not that it scouts but that it *cannot promote*.
+An executor that can mark its own phase complete would destroy the independent-review property that
+`/session-close` exists to protect.
+
+This idea is the umbrella; the "just one more", "minimalist" and "product owner" agents recorded
+alongside it are specific members of a different family — deliberative rather than procedural — and
+should be planned together with these but not merged into them.
+
+What it would touch: `.claude/agents/`, and — given `PLAN-020` — probably the portable agent-workflow
+manifest rather than any framework-specific directory. `AGENTS.md`'s concurrency protocol, since more
+agents means more simultaneous claims against `max_active`. Possibly `docs/02-prompts/`, if a prompt
+becomes an agent's instruction body rather than a separate artifact.
+
+Verification: each agent has a written remit naming what it may not do; an agent asked to exceed its
+remit refuses and says why; the lifecycle runs end to end on a real idea with the owner intervening
+only at the sanctioned decision points; and `max_active` still holds under concurrent agents.
+
+What is unresolved: how much of this should wait for `PLAN-020` to land, since building four agents
+in a Claude-specific format that a portable manifest will then regenerate is wasted work. Also
+unresolved: whether a "verifier" agent can be genuinely independent when spawned by the agent whose
+work it reviews, and whether prompts and agents should remain separate artifacts at all.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:54-04:00): Scouted 2026-09-10. The dependency this idea flags is real and load-bearing: PLAN-020 (promoted from 000067) designs one canonical source for portable workflows with generated host-specific adapters, so building a planner, executor, verifier and auditor in Claude-specific .claude/ format now creates work PLAN-020 will regenerate. REQ-005 and the 000067 audit establish the shape — framework-neutral behaviour lives in governed documents, and PROMPT-006 through PROMPT-009 already are those documents; only discovery and invocation wrappers translate per host. ADR-003's concurrency protocol is the other pressure point: max_active is 3, and four procedural agents plus the deliberation trio (000073, 000074, 000075, all already linked as extends) strain both the lock table and session context. The /session-close boundary is correctly identified as the model for each agent's authority limit, and PLAN-016 already delivered idea-triage as a worked example of a bounded remit; the checkpoint skill is the precedent for recording evidence without claiming completion. PLAN-017 addresses idea-plan consistency but automates none of these stages.
+
+</details>
+
+**Links**
+
+- relates_to → `000067`
+- relates_to → `000046`
+- relates_to ← `000069`
+- extended_by ← `000073`
+- extended_by ← `000074`
+- extended_by ← `000075`
+
+---
+
+## 000073 · The "just one more" agent — an agent whose only job is breadth
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+An adversarial-deliberation agent whose sole purpose is expansion: more options, more possibilities,
+more of what is not currently being considered. Its remit is breadth of search, and it is judged on
+what it surfaces that nobody had thought of, not on whether the suggestions are practical.
+
+Given a list, a set of requirements, a design, or a decision, it asks: what is missing? What is the
+adjacent option nobody named? What assumption is silently narrowing the space? What would a different
+discipline propose here? It should be willing to produce candidates it expects to be rejected — a
+suggestion that survives the minimalist's cut is a bonus, not the objective.
+
+Deliberately paired with the "minimalist" agent, which does the opposite, and refereed by the
+"product owner" agent which has the final say. None of the three is useful alone: an unopposed
+expander produces an unbuildable wishlist, and this repository already carries an explicit warning
+about that failure — the adversarial codebase review's first opposing argument is "D-System is
+over-modeled", and it survives contact ("premature universal modeling is a credible risk").
+
+What it would touch: `.claude/agents/` or, given `PLAN-020`, the portable agent-workflow manifest.
+Likely a shared harness with the other two deliberation agents, since they must operate on the same
+input and produce comparably-shaped output for the arbiter to weigh.
+
+Verification: given a deliberately narrow input, it produces options outside the frame of the input;
+given the same input twice it produces materially different sets, since a breadth agent that
+converges is not doing its job; and its output is explicitly labelled as candidates rather than
+recommendations, so nothing downstream mistakes volume for endorsement.
+
+What is unresolved: how to stop it degenerating into noise — an agent rewarded for volume will
+produce volume. Whether it should be bounded (produce at most N) or unbounded and filtered downstream.
+Whether it should see the minimalist's objections and respond, or argue blind to avoid anchoring.
+And whether "breadth" is even the right framing, or whether the useful axis is *unconsidered* rather
+than *more*.
+
+Raised by the owner on 2026-09-10, as one of a trio with the minimalist and product-owner agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. The repository already contains the argument this agent is designed to produce, but not the mechanism: research/adversarial-codebase-review/10_adversarial_findings.md runs ten opposing arguments in a survives / does not survive format, and its first is 'D-System is over-modeled', which survives contact — the exact risk this idea names. That review was written by hand for one audit; nothing generates breadth on demand. Today the function appears only as the 'alternatives considered' section PROMPT-007 asks a planner to write, which is a human remembering to look outward rather than an agent whose remit is looking outward. First of the deliberation trio under 000072; none of the three exists operationally. The idea-triage agent's bounded remit — scouts, cannot promote — is the available precedent for constraining what this agent may do with what it finds.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to → `000074`
+- relates_to ← `000075`
+
+---
+
+## 000074 · The "minimalist" agent — an agent that argues for exactly what is necessary
+
+**Created 2026-09-10T03:33:14-04:00 · Status: `triaged`**
+
+An adversarial-deliberation agent whose remit is necessity: exactly what is required, no more and no
+less. Given a set of candidate requirements, options or scope items, it ranks them by how essential
+each is, recommends the minimum set that satisfies the actual need, and argues its case rather than
+merely listing.
+
+The "and defends it vigorously" part is the design point, not a flourish. An agent that produces a
+ranked list and shrugs adds nothing over sorting. The value is in it holding a position against the
+"just one more" agent's expansion and forcing the disagreement to be about reasons, so the "product
+owner" agent has an argument to arbitrate rather than two lists to merge.
+
+This has direct precedent in the repository. The adversarial codebase review's opposing arguments are
+exactly this shape — for each claim it states the strongest case, then what survives contact and what
+does not ("Survives: premature universal modeling is a credible risk. Does not survive: 'every current
+distinction is waste'"). That format is a good candidate for this agent's output.
+
+What it would touch: `.claude/agents/` or the portable agent-workflow manifest under `PLAN-020`;
+a shared harness with the other two deliberation agents.
+
+Verification: given a padded requirement set, it identifies the padding and says why each cut is
+safe; given a genuinely minimal set, it says so rather than cutting to appear useful — an agent that
+always cuts is as useless as one that never does; its rankings cite the need each requirement serves;
+and it distinguishes "not necessary" from "not necessary yet", which are different recommendations.
+
+What is unresolved: necessary *for what* — the agent needs a stated objective to measure necessity
+against, and where that comes from is unspecified. Whether it should see the expander's full output or
+only the merged candidate set. How it handles a requirement that is cheap but not necessary, where
+strict minimalism gives the wrong answer. And whether it should be able to escalate "this whole thing
+is unnecessary" rather than only trimming within a frame it was handed.
+
+Raised by the owner on 2026-09-10, as one of a trio with the just-one-more and product-owner agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. Grounded in concrete precedent rather than a general principle: the adversarial review's final challenge section already argues 'D-System is over-modeled' and 'the three classifications are unnecessary', and its survives / does not survive format is exactly the output shape this idea proposes. The same review supplies the opposing voice this agent must argue against — the PRESERVE_UNLESS_DISPROVEN list in 09_preserve_list.md, which records complexity that earned its place. PROMPT-007's requirement that statements be observable and testable is aligned with the idea's core move, separating what can be verified as necessary from what merely seems useful. No governed document or backlog phase delivers an adversarial-deliberation agent; PLAN-020 covers portable workflows for agents that already exist, not new agent types.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to ← `000073`
+- relates_to ← `000075`
+
+---
+
+## 000075 · The "product owner" agent — the arbiter with the final say between breadth and minimalism
+
+**Created 2026-09-10T03:33:14-04:00 · Status: `triaged`**
+
+The third of a deliberation trio. The "just one more" agent expands, the "minimalist" agent cuts, and
+this agent decides — weighing both arguments and issuing a ruling with reasons.
+
+Its remit is judgement, which makes it the most dangerous of the three to build and the one whose
+authority needs the sharpest boundary. Deciding scope is close to the owner's own role, and this
+repository has already drawn that line explicitly elsewhere: `idea-triage` may scout but never
+promote or decline, and `/session-close` is a command a person types precisely so an agent cannot
+reach the completion decision. The same question applies here — is this agent's ruling a
+*recommendation the owner accepts*, or a *decision that stands*? Recorded as an open question, because
+getting it wrong hands away the judgement the other two agents exist to inform.
+
+What it must produce is not a merged list. It should state which argument won on each contested item
+and why, what it rejected from both sides, what it is deferring rather than deciding, and what
+evidence would change its mind. A ruling with no losing side means the arbitration did not happen.
+
+What it would touch: `.claude/agents/` or the `PLAN-020` manifest; the shared deliberation harness;
+and, if its rulings are to be durable, some record of the decision and its rationale — an ADR, an idea
+annotation, or a decision record, which is itself an open question.
+
+Verification: given genuinely opposed inputs it produces a ruling that contradicts at least one side
+rather than splitting the difference; its rulings cite the arguments rather than restating the
+options; the same inputs produce a stable ruling across runs; and it declines to rule where the
+inputs do not support one, rather than manufacturing a decision.
+
+What is unresolved: the authority boundary above, which is the important one. Also: whether it sees
+the two agents' arguments only, or the original input too. Whether it can send an item back for more
+argument rather than ruling on it. How its ruling relates to the owner's — if the owner disagrees, is
+that a correction to the agent, a new input, or simply the owner's prerogative. And whether three
+agents is the right number, or whether a fourth for evidence-gathering would prevent both sides
+arguing from assertion.
+
+Raised by the owner on 2026-09-10, as the arbiter of the trio.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. The authority question this idea raises has a consistent answer everywhere else in the repository: agents propose, the owner decides. GOV-003 states it directly — 'agents propose; owner resolves conflicts and approves promotion'. The idea-triage agent's acceptance record (SESS-2026-09-08-18) establishes that triage never advances an idea beyond triaged and that recorded overlap is never used to decline or merge; its findings emit PROPOSED LINK and PROPOSED PROMOTION lines that the owner executes. session-close is blunter still: an agent must never invoke it on its own judgement, and it is the only route to status complete. PLAN-020 preserves the same boundary for future portable workflows. So a binding ruling would be the first mechanism in this repository to cross that line, while a recommendation fits the existing model exactly — which makes this idea's open question a genuine architectural choice rather than a detail. No existing plan, phase or document addresses deliberative multi-agent arbitration.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to → `000073`
+- relates_to → `000074`
+
+---
+
+## 000076 · Should we delete Claude Code?
+
+**Created 2026-09-10T03:39:39-04:00 · Status: `discarded`**
+
+The question stated point-blank, without qualification: should this repository stop using Claude Code?
+
+Recorded because it was raised in that form on 2026-09-10 and the log should show what was actually
+asked, not only the improved version of it. As a decision to make, it is a worse question than the one
+recorded at 000069 ("Should Claude Code remain a dependency once agent workflows are portable?"), for
+two reasons.
+
+First, it has no gate. Asked point-blank it invites an answer today, against evidence that does not
+exist yet — PLAN-020 has one phase in flight and the capability matrix it will produce is precisely
+what the answer depends on. 000069 ties the question to that evidence.
+
+Second, it presumes the alternative is deletion rather than substitution. The real question is what
+replaces the capabilities Claude Code currently supplies — owner-only slash commands, and independent
+subagent review of the kind that caught a confidentiality leak on 2026-09-09 — and whether anything
+else offers them. "Delete?" does not ask that; "remain a dependency?" does.
+
+Expected disposition: discard, superseded by 000069. Retained in the log rather than deleted, because
+the append-only contract keeps rejected framings visible so the same question is not re-litigated from
+scratch later.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-10T03:39:48-04:00): Discarding this framing, not the question. The owner is not willing to discard the question as phrased at 000069 — the always-on orchestration framing makes it more worth answering — but is willing to discard 'should we delete Claude Code' asked point-blank. A question with no gate and a presumed answer is a worse instrument than the same question tied to the evidence that would settle it. 000069 carries it forward.
+
+**Links**
+
+- relates_to → `000069`
