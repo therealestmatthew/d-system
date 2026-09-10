@@ -65,8 +65,6 @@ reserved:
   reason: Projection publication decision; deliverable of phase-rel-05.
 - code: OPS-010
   reason: Portable workflow generator operations document; deliverable of phase-port-01.
-- code: OPS-013
-  reason: Demo reset tool operations document; deliverable of phase-demo-05.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011
