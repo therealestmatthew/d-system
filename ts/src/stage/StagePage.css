@@ -294,9 +294,15 @@ body {
   color: #fff4ec;
 }
 
-/* R10/R11: collapse hides the region via CSS only — every session's TerminalSession instance
-   stays mounted (its socket stays open) beneath this. */
-.stage-region--terminal-collapsed {
+/* R10/R11: collapse hides the region's body via CSS only — every session's TerminalSession
+   instance stays mounted (its socket stays open) beneath this. Unlike an earlier version of this
+   rule, this hides only the body, not the whole .stage-region--terminal section: the "Collapse
+   terminal" / "Expand terminal" toggle lives in .stage-region__header, a sibling of the body, so
+   collapsing must never remove the header from the visible tree — otherwise there is no control
+   left to re-expand it. The section keeps its full grid-cell height (grid-template-rows on
+   .stage-page__grid is unaffected by this collapse), so no other region reflows or overlaps; the
+   terminal region simply shows its header strip over empty space while collapsed. */
+.stage-region--terminal-collapsed .stage-region__body {
   display: none;
 }
 
