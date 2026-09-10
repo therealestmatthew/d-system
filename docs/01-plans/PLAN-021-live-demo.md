@@ -25,6 +25,34 @@ agents following the demo prompt pack ([PROMPT-010](../02-prompts/PROMPT-010-dem
 through [PROMPT-017](../02-prompts/PROMPT-017-demo-rehearsal-gate.md)); this plan carries the
 structure the backlog phases implement.
 
+## Execution sequence
+
+The build runs as two sessions, each driven by one pasteable prompt, with everything either
+session needs authored before it starts — no prompt is written mid-build:
+
+1. **The agent factory session** ([PROMPT-010](../02-prompts/PROMPT-010-demo-agent-factory.md))
+   produced this plan, REQ-006, ADR-013, the five backlog phases, the eight demo agents under
+   `.claude/agents/`, and the delegation prompt pack. Its child specifications —
+   [PROMPT-011](../02-prompts/PROMPT-011-demo-governance-docs-spec.md) (governance documents),
+   [PROMPT-012](../02-prompts/PROMPT-012-demo-agent-roster-spec.md) (agent roster),
+   [PROMPT-013](../02-prompts/PROMPT-013-demo-delegation-pack-spec.md) (delegation pack and
+   validation gate) — are read lazily, one per step. A validation gate certifies the output
+   before anything builds.
+2. **The build session** ([PROMPT-014](../02-prompts/PROMPT-014-demo-build-orchestration.md)) is a
+   coordinator only: it claims the phases below, dispatches the three orchestrator agents with
+   their pre-crafted prompts verbatim, and verifies their reports independently. Its children —
+   [PROMPT-015](../02-prompts/PROMPT-015-demo-phase-protocol.md) (phase protocol),
+   [PROMPT-016](../02-prompts/PROMPT-016-demo-guardrails.md) (budgets, descope ladder, escalation),
+   [PROMPT-017](../02-prompts/PROMPT-017-demo-rehearsal-gate.md) (the rehearsal gate that defines
+   done) — are likewise read only when reached. Every delegation prompt is idempotent, so one-shot
+   completion and multi-session resume are the same prompt.
+
+The commentary behind these choices: creation and validation are separated (creators never grade
+their own work, validators never see the creator's rationale); models are tiered by task shape
+(haiku for mechanical gates, sonnet for judgment, opus only as a single documented escalation);
+and the coordinator holds no authorship so that everything it executes was reviewable before the
+session began.
+
 ## Build structure
 
 Five phases in `docs/09-backlog/backlog.yaml`, tracked as `phase-demo-*`:
@@ -74,6 +102,25 @@ Applied in order when time runs short; each rung is independent of the ones belo
   rehearsal transcripts, scoped to the specific commands and paths the live segment uses, so the
   segment runs without permission pauses while the write fences stay in place. Blanket auto-accept
   is never used.
+
+## Vision
+
+The demo is the first realized slice of two standing ambitions rather than a one-off prop. The
+overview page is the first working product of the HTML generation framework that
+[PLAN-003](PLAN-003-dynamic-html-generation/PLAN-003-overview.md) designs and the `phase-html-*`
+track queues: source data rendered through templates into pages, deterministically. The pattern it
+demonstrates — deterministic scripts compute, Claude orchestrates them and keeps the page current —
+is the division of labor the whole platform is meant to run on: model calls are spent on judgment
+and coordination, never on recomputing what a script computes the same way every time.
+
+The demo's own construction is the other half of the vision: the factory pattern (roster, prompt
+pack, validation gate, then a coordinator that only spends what was pre-built) is reusable for any
+future multi-agent build here, and speaks directly to the agent-engineering idea family
+(`000078`–`000082`). After demo day, the intended trajectory is: the overview page regenerates as
+repository state changes; the stage page's workflow-triggering grows into the UI that `CLAUDE.md`
+already names as the platform's purpose; and what the audience watched — idea to triage to plan to
+working software under governance — remains the repository's actual operating loop, not a
+performance of it.
 
 ## Afterlife
 
