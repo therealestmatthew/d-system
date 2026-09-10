@@ -239,6 +239,61 @@ body {
   cursor: pointer;
 }
 
+/* R12's command panel: an in-place reveal (Popover, dismissible per R03) in the terminal
+   region's header. When the terminal route is absent, TerminalRegion still renders CommandPanel
+   (disabled prop) so this trigger appears — visibly disabled — alongside the region's existing
+   absent-terminal message below, instead of vanishing along with the rest of the live-terminal
+   header controls. */
+.stage-command-panel__trigger--disabled {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid #c7ccd6;
+  background: #eef1f2;
+  color: #8b949e;
+  cursor: not-allowed;
+}
+
+.stage-command-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.stage-command-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stage-command-panel__entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+.stage-command-panel__run-badge {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  background: #b34700;
+  color: #fff4ec;
+}
+
 /* R10/R11: collapse hides the region via CSS only — every session's TerminalSession instance
    stays mounted (its socket stays open) beneath this. */
 .stage-region--terminal-collapsed {

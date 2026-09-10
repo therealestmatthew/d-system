@@ -1,0 +1,7 @@
+{
+  "commands": [
+    { "label": "PLACEHOLDER COMMAND 1 — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_1", "run": false },
+    { "label": "PLACEHOLDER COMMAND 2 — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_2", "run": false },
+    { "label": "PLACEHOLDER COMMAND 3 (runs immediately) — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_3", "run": true }
+  ]
+}

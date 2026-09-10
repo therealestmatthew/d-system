@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 import Tooltip from './Tooltip'
 import Popover from './Popover'
+import CommandPanel from './CommandPanel'
 
 type TerminalEnabledState = 'checking' | 'enabled' | 'disabled' | 'unknown'
 type ConnectionState = 'connecting' | 'open' | 'closed'
@@ -12,6 +13,16 @@ const TERMINAL_WEBSOCKET_PATH = '/api/v1/demo/terminal/ws'
 // REQ-006 R10: "up to four terminal sessions as tabs."
 const MAX_SESSIONS = 4
 const FIRST_SESSION_ID = 1
+
+// The imperative handle TerminalSession exposes to its parent (TerminalRegion) so the command
+// panel (REQ-006 R12) — rendered in TerminalRegion's own header, not inside TerminalSession —
+// can reach the *active* session's live socket without new shared state. This is the repo's
+// existing prop-drilling style applied to a child's otherwise-private socket: the handle exposes
+// only "send this text", never the socket itself or term.write(), so an injected command is
+// always painted by the shell's own echo over the wire, exactly like a keystroke.
+export interface TerminalSessionHandle {
+  sendCommand: (text: string, appendNewline: boolean) => void
+}
 
 /**
  * One terminal session's xterm.js instance and its own websocket — the unit R10 says must be
@@ -25,12 +36,34 @@ const FIRST_SESSION_ID = 1
  * only when TerminalRegion removes this session's id from its list (the guarded-drop / guarded
  * tab-close path in the parent).
  */
-function TerminalSession({ visible }: { visible: boolean }) {
+const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(function TerminalSession(
+  { visible },
+  ref,
+) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting')
   // Holds the mount effect's `attemptFit` closure so the visibility-triggered effect below can
   // call the same guarded-fit-and-resize-frame logic without redefining it.
   const attemptFitRef = useRef<() => void>(() => {})
+  // Holds the mount effect's live socket so the imperative handle below (and the command panel
+  // that reaches it) always sends over the *current* socket, not a stale closure from mount.
+  const socketRef = useRef<WebSocket | null>(null)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      sendCommand: (text: string, appendNewline: boolean) => {
+        const socket = socketRef.current
+        if (!socket || socket.readyState !== WebSocket.OPEN) return
+        // Same path as term.onData below — raw bytes over the socket, never term.write() — so
+        // the shell's own echo paints the text; no trailing newline leaves it un-executed on the
+        // input line, a trailing "\n" (run: true entries) executes it immediately.
+        const payload = appendNewline ? `${text}\n` : text
+        socket.send(new TextEncoder().encode(payload))
+      },
+    }),
+    [],
+  )
 
   useEffect(() => {
     const container = containerRef.current
@@ -52,6 +85,7 @@ function TerminalSession({ visible }: { visible: boolean }) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const socket = new WebSocket(`${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}`)
     socket.binaryType = 'arraybuffer'
+    socketRef.current = socket
 
     // Guards fitAddon.fit() against a zero-size container — an inactive tab or a collapsed
     // region has a container with no box (CSS-hidden per R10/R11's "never terminate, just
@@ -104,6 +138,7 @@ function TerminalSession({ visible }: { visible: boolean }) {
     return () => {
       resizeObserver.disconnect()
       dataDisposable.dispose()
+      socketRef.current = null
       socket.close()
       term.dispose()
     }
@@ -131,7 +166,7 @@ function TerminalSession({ visible }: { visible: boolean }) {
       ) : null}
     </div>
   )
-}
+})
 
 /**
  * The embedded terminal region: xterm.js in the browser, bridged over a websocket to the real
@@ -167,6 +202,14 @@ export default function TerminalRegion({
   const [sessionIds, setSessionIds] = useState<number[]>([FIRST_SESSION_ID])
   const [activeSessionId, setActiveSessionId] = useState<number>(FIRST_SESSION_ID)
   const nextSessionIdRef = useRef(FIRST_SESSION_ID + 1)
+  // Every mounted session's imperative handle, keyed by session id — reached into (not lifted to
+  // state) so the command panel (R12) can send to whichever session is active without a new
+  // shared-state mechanism, matching the repo's existing ref-based prop-drilling style.
+  const sessionHandlesRef = useRef<Map<number, TerminalSessionHandle>>(new Map())
+
+  const sendToActiveSession = (text: string, appendNewline: boolean) => {
+    sessionHandlesRef.current.get(activeSessionId)?.sendCommand(text, appendNewline)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -218,6 +261,7 @@ export default function TerminalRegion({
           Switching tabs or collapsing this region never ends a session; closing a tab or
           dropping the whole region does, after confirming.
         </Tooltip>
+        <CommandPanel disabled={enabledState !== 'enabled'} onSelect={sendToActiveSession} />
         {enabledState === 'enabled' ? (
           <button
             type="button"
@@ -287,7 +331,14 @@ export default function TerminalRegion({
               </p>
             ) : (
               sessionIds.map((id) => (
-                <TerminalSession key={id} visible={!collapsed && id === activeSessionId} />
+                <TerminalSession
+                  key={id}
+                  visible={!collapsed && id === activeSessionId}
+                  ref={(handle) => {
+                    if (handle) sessionHandlesRef.current.set(id, handle)
+                    else sessionHandlesRef.current.delete(id)
+                  }}
+                />
               ))
             )}
           </div>
