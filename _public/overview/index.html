@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-System Overview</title>
+<style>
+/*
+  D-System overview — stylesheet for the templates/html/overview-*.html family.
+
+  Inlined verbatim into overview-page.html's {{INLINE_STYLES}} token by the generator so the
+  rendered page carries no external stylesheet link (self-contained, no network dependency,
+  safe to embed by srcdoc or same-origin src). System font stack only — no webfont fetch.
+
+  Selectors are scoped under .overview so this file can be inlined into a page that also
+  carries the stage's own styles (phase-demo-02) without collision.
+*/
+
+.overview {
+  box-sizing: border-box;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1b1f24;
+  background: #ffffff;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.75rem 1rem 1.25rem;
+}
+
+.overview *,
+.overview *::before,
+.overview *::after {
+  box-sizing: inherit;
+}
+
+/* ---- header ---- */
+
+.overview__header {
+  margin-bottom: 0.75rem;
+}
+
+.overview__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.overview__meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #57606a;
+}
+
+/* ---- tabs (CSS-only, no JavaScript) ---- */
+
+.overview__tabset {
+  display: flex;
+  flex-wrap: wrap;
+  border-top: 1px solid #d0d7de;
+}
+
+.overview__tab-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overview__tab-label {
+  order: 1;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #57606a;
+  border-bottom: 2px solid transparent;
+  user-select: none;
+}
+
+.overview__tab-input:checked + .overview__tab-label {
+  color: #0969da;
+  border-bottom-color: #0969da;
+}
+
+.overview__tab-input:focus-visible + .overview__tab-label {
+  outline: 2px solid #0969da;
+  outline-offset: -2px;
+}
+
+.overview__panel {
+  order: 2;
+  display: none;
+  width: 100%;
+  padding-top: 0.75rem;
+}
+
+#tab-metrics:checked ~ #panel-metrics,
+#tab-concepts:checked ~ #panel-concepts,
+#tab-systems:checked ~ #panel-systems {
+  display: block;
+}
+
+.overview__panel-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ---- metrics: chart blocks + table fallback ---- */
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-section {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  min-width: 0;
+}
+
+.metric-section__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metric-section__chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 0.5rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(3.5rem, 30%) 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+}
+
+.bar-row__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #24292f;
+}
+
+.bar-row__track {
+  display: block;
+  height: 0.6rem;
+  background: #eaeef2;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-row__fill {
+  display: block;
+  height: 100%;
+  background: #0969da;
+  border-radius: 3px 0 0 3px;
+}
+
+.bar-row__value {
+  text-align: right;
+  color: #57606a;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-section__table-fallback {
+  margin-top: 0.5rem;
+}
+
+.metric-section__table-fallback summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #0969da;
+}
+
+.metric-table {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.metric-table th,
+.metric-table td {
+  text-align: left;
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid #eaeef2;
+}
+
+.metric-table th {
+  color: #57606a;
+  font-weight: 600;
+}
+
+/* ---- inventories: concepts, terms, systems ---- */
+
+.inventory__group {
+  margin-bottom: 1rem;
+}
+
+.inventory__group-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.inventory-table th,
+.inventory-table td {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid #eaeef2;
+  vertical-align: top;
+}
+
+.inventory-table th {
+  color: #57606a;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+}
+
+.inventory-table__id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  color: #57606a;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #eaeef2;
+  color: #24292f;
+}
+
+.status-badge--implemented {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+
+.status-badge--scaffold {
+  background: #fff8c5;
+  color: #9a6700;
+}
+
+.status-badge--planned {
+  background: #ddf4ff;
+  color: #0969da;
+}
+
+.status-badge--deprecated {
+  background: #ffebe9;
+  color: #cf222e;
+}
+
+/* ---- footer ---- */
+
+.overview__footer {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #d0d7de;
+  font-size: 0.7rem;
+  color: #57606a;
+}
+
+.overview__footer code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---- narrow embedding widths ---- */
+
+@media (max-width: 480px) {
+  .bar-row {
+    grid-template-columns: minmax(2.5rem, 25%) 1fr auto;
+    font-size: 0.7rem;
+  }
+
+  .overview__tab-label {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.78rem;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="overview">
+  <header class="overview__header">
+    <h1 class="overview__title">D-System Overview</h1>
+    <p class="overview__meta">
+      Generated 2026-09-10T05:27:15-04:00
+      &middot; 82 ideas
+      &middot; 326 events
+      &middot; 110 backlog phases
+      &middot; 8 concepts
+      &middot; 43 terms
+      &middot; 18 systems
+    </p>
+  </header>
+
+  <div class="overview__tabset">
+    <input type="radio" name="overview-tab" id="tab-metrics" class="overview__tab-input" checked>
+    <label for="tab-metrics" class="overview__tab-label">Metrics</label>
+
+    <input type="radio" name="overview-tab" id="tab-concepts" class="overview__tab-input">
+    <label for="tab-concepts" class="overview__tab-label">Concepts &amp; Terminology</label>
+
+    <input type="radio" name="overview-tab" id="tab-systems" class="overview__tab-input">
+    <label for="tab-systems" class="overview__tab-label">Systems</label>
+
+    <section id="panel-metrics" class="overview__panel overview__panel--metrics" aria-labelledby="tab-metrics">
+      <h2 class="overview__panel-title">Idea and backlog metrics</h2>
+      <div class="metric-grid">
+        <article class="metric-section" id="metric-funnel">
+  <h3 class="metric-section__title">Idea funnel by status</h3>
+  <div class="metric-section__chart" role="img" aria-label="Idea funnel by status by count">
+    <div class="bar-row">
+  <span class="bar-row__label">discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.56%;"></span></span>
+  <span class="bar-row__value">1</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 18.75%;"></span></span>
+  <span class="bar-row__value">12</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">promoted</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.81%;"></span></span>
+  <span class="bar-row__value">5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">64</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th><th scope="col">rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>discarded</td><td>1</td><td>0.0122</td></tr><tr><td>open</td><td>12</td><td>0.1463</td></tr><tr><td>promoted</td><td>5</td><td>0.061</td></tr><tr><td>reviewing</td><td>0</td><td>0.0</td></tr><tr><td>triaged</td><td>64</td><td>0.7805</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-cycle_time">
+  <h3 class="metric-section__title">Cycle time between statuses (hours)</h3>
+  <div class="metric-section__chart" role="img" aria-label="Cycle time between statuses (hours) by count">
+    <div class="bar-row">
+  <span class="bar-row__label">discarded-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.49%;"></span></span>
+  <span class="bar-row__value">1</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;promoted</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 2.99%;"></span></span>
+  <span class="bar-row__value">2</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;triaged</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">67</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">reviewing-&gt;discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">reviewing-&gt;promoted</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;promoted</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.48%;"></span></span>
+  <span class="bar-row__value">3</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th><th scope="col">median_hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>discarded-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;discarded</td><td>1</td><td>0.0</td></tr><tr><td>open-&gt;promoted</td><td>2</td><td>28.32</td></tr><tr><td>open-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;triaged</td><td>67</td><td>28.16</td></tr><tr><td>reviewing-&gt;discarded</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;promoted</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;discarded</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;promoted</td><td>3</td><td>2.77</td></tr><tr><td>triaged-&gt;reviewing</td><td>0</td><td>0.0</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-annotation_coverage">
+  <h3 class="metric-section__title">Annotation coverage</h3>
+  <div class="metric-section__chart" role="img" aria-label="Annotation coverage by count">
+    <div class="bar-row">
+  <span class="bar-row__label">annotated</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">71</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">unannotated</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 15.49%;"></span></span>
+  <span class="bar-row__value">11</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th><th scope="col">rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>annotated</td><td>71</td><td>0.8659</td></tr><tr><td>unannotated</td><td>11</td><td>0.1341</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-link_distribution">
+  <h3 class="metric-section__title">Link type distribution</h3>
+  <div class="metric-section__chart" role="img" aria-label="Link type distribution by count">
+    <div class="bar-row">
+  <span class="bar-row__label">extends</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 25.68%;"></span></span>
+  <span class="bar-row__value">19</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">relates_to</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">74</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">supersedes</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>extends</td><td>19</td></tr><tr><td>relates_to</td><td>74</td></tr><tr><td>supersedes</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-link_orphans">
+  <h3 class="metric-section__title">Linked vs. orphaned ideas</h3>
+  <div class="metric-section__chart" role="img" aria-label="Linked vs. orphaned ideas by count">
+    <div class="bar-row">
+  <span class="bar-row__label">connected</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">67</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">orphaned</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 22.39%;"></span></span>
+  <span class="bar-row__value">15</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>connected</td><td>67</td></tr><tr><td>orphaned</td><td>15</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-throughput_by_day">
+  <h3 class="metric-section__title">Idea throughput by day</h3>
+  <div class="metric-section__chart" role="img" aria-label="Idea throughput by day by created">
+    <div class="bar-row">
+  <span class="bar-row__label">2026-09-06</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">19</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-07</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 89.47%;"></span></span>
+  <span class="bar-row__value">17</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-08</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 68.42%;"></span></span>
+  <span class="bar-row__value">13</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-09</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 94.74%;"></span></span>
+  <span class="bar-row__value">18</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-10</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 78.95%;"></span></span>
+  <span class="bar-row__value">15</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2026-09-06</td><td>19</td></tr><tr><td>2026-09-07</td><td>17</td></tr><tr><td>2026-09-08</td><td>13</td></tr><tr><td>2026-09-09</td><td>18</td></tr><tr><td>2026-09-10</td><td>15</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-age_of_open_ideas">
+  <h3 class="metric-section__title">Age of open ideas (days)</h3>
+  <div class="metric-section__chart" role="img" aria-label="Age of open ideas (days) by age_days">
+    <div class="bar-row">
+  <span class="bar-row__label">000061</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">1.07</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000062</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 99.07%;"></span></span>
+  <span class="bar-row__value">1.06</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000063</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 99.07%;"></span></span>
+  <span class="bar-row__value">1.06</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000064</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 96.26%;"></span></span>
+  <span class="bar-row__value">1.03</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000065</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 96.26%;"></span></span>
+  <span class="bar-row__value">1.03</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000066</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 35.51%;"></span></span>
+  <span class="bar-row__value">0.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000077</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 5.61%;"></span></span>
+  <span class="bar-row__value">0.06</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000078</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.67%;"></span></span>
+  <span class="bar-row__value">0.05</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000079</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.67%;"></span></span>
+  <span class="bar-row__value">0.05</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000080</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.67%;"></span></span>
+  <span class="bar-row__value">0.05</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000081</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.67%;"></span></span>
+  <span class="bar-row__value">0.05</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000082</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.67%;"></span></span>
+  <span class="bar-row__value">0.05</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">age_days</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>000061</td><td>1.07</td></tr><tr><td>000062</td><td>1.06</td></tr><tr><td>000063</td><td>1.06</td></tr><tr><td>000064</td><td>1.03</td></tr><tr><td>000065</td><td>1.03</td></tr><tr><td>000066</td><td>0.38</td></tr><tr><td>000077</td><td>0.06</td></tr><tr><td>000078</td><td>0.05</td></tr><tr><td>000079</td><td>0.05</td></tr><tr><td>000080</td><td>0.05</td></tr><tr><td>000081</td><td>0.05</td></tr><tr><td>000082</td><td>0.05</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+<article class="metric-section" id="metric-backlog_by_status">
+  <h3 class="metric-section__title">Backlog phases by status</h3>
+  <div class="metric-section__chart" role="img" aria-label="Backlog phases by status by count">
+    <div class="bar-row">
+  <span class="bar-row__label">active</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 4.76%;"></span></span>
+  <span class="bar-row__value">3</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">blocked</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">cancelled</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">complete</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 61.9%;"></span></span>
+  <span class="bar-row__value">39</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">deferred</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.94%;"></span></span>
+  <span class="bar-row__value">5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">queued</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">63</span>
+</div>
+
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          <th scope="col">count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>active</td><td>3</td></tr><tr><td>blocked</td><td>0</td></tr><tr><td>cancelled</td><td>0</td></tr><tr><td>complete</td><td>39</td></tr><tr><td>deferred</td><td>5</td></tr><tr><td>queued</td><td>63</td></tr>
+      </tbody>
+    </table>
+  </details>
+</article>
+
+      </div>
+    </section>
+
+    <section id="panel-concepts" class="overview__panel overview__panel--concepts" aria-labelledby="tab-concepts">
+      <div class="inventory">
+  <h2 class="overview__panel-title">Concepts &amp; terminology</h2>
+
+  <section class="inventory__group">
+    <h3 class="inventory__group-title">Concepts (8)</h3>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Title</th>
+          <th scope="col">Tags</th>
+          <th scope="col">Systems</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td class="inventory-table__id">mem-concept-json-sot</td>
+  <td>JSON Source-of-Truth Pattern</td>
+  <td>frameworks, knowledge-base, python</td>
+  <td></td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-mini-systems</td>
+  <td>Mini Systems Architecture</td>
+  <td>agentic-systems, frameworks, knowledge-base</td>
+  <td></td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-tag-taxonomy</td>
+  <td>Tag Taxonomy</td>
+  <td>frameworks, knowledge-base</td>
+  <td></td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-data-and-storage</td>
+  <td>Data and Storage</td>
+  <td></td>
+  <td>sys-governance, sys-portfolio, sys-projection</td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-documents-and-governance</td>
+  <td>Documents and Governance</td>
+  <td></td>
+  <td>sys-governance</td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-memory-and-retrieval</td>
+  <td>Memory and Retrieval</td>
+  <td></td>
+  <td>sys-brain, sys-retrieval</td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-plans-and-work</td>
+  <td>Plans and Work</td>
+  <td></td>
+  <td>sys-backlog, sys-governance</td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-systems-vocabulary</td>
+  <td>Systems</td>
+  <td></td>
+  <td>sys-governance</td>
+</tr>
+
+      </tbody>
+    </table>
+  </section>
+
+  <section class="inventory__group">
+    <h3 class="inventory__group-title">Terms (43)</h3>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th scope="col">Term</th>
+          <th scope="col">Concept</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>`_data/`</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>`_private/`</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>`_public/`</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>`_working/`</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Acceptance</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Brain</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Catalog</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Code</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Completion evidence</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Concept (memory type)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Confidence</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Decision (memory type)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Deliverable</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Derived layer</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Document code allocation</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Document kind</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Domain</td>
+  <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
+</tr>
+<tr>
+  <td>Entity (data sense)</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Entity (memory sense)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Ephemeral plan</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Episode (memory type)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Governance check</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Governed document</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Governed plan</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Memory type</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Next action</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>next_up</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Phase</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Portfolio</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Procedure (memory type)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Projection</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Reserved code</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Retired code</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Scope (memory field)</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Series</td>
+  <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Session budget</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Source model</td>
+  <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Source of truth</td>
+  <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Subsystem</td>
+  <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
+</tr>
+<tr>
+  <td>System</td>
+  <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
+</tr>
+<tr>
+  <td>System status</td>
+  <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
+</tr>
+<tr>
+  <td>Track</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Verification</td>
+  <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+
+      </tbody>
+    </table>
+  </section>
+</div>
+
+    </section>
+
+    <section id="panel-systems" class="overview__panel overview__panel--systems" aria-labelledby="tab-systems">
+      <div class="inventory">
+  <h2 class="overview__panel-title">Systems registry (18)</h2>
+  <table class="inventory-table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Domain</th>
+        <th scope="col">Status</th>
+        <th scope="col">Depends on</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="inventory-table__row status-scaffold">
+  <td class="inventory-table__id">sys-api</td>
+  <td>FastAPI application</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-backlog</td>
+  <td>Session phase backlog</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-governance</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-brain</td>
+  <td>Shared Markdown memory</td>
+  <td>memory</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-contracts</td>
+</tr>
+<tr class="inventory-table__row status-scaffold">
+  <td class="inventory-table__id">sys-capture</td>
+  <td>Capture and structuring</td>
+  <td>data</td>
+  <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
+  <td>sys-contracts, sys-portfolio</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-contracts</td>
+  <td>Entity contracts</td>
+  <td>data</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-retired">
+  <td class="inventory-table__id">sys-course</td>
+  <td>Git course production</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--retired">retired</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-delivery</td>
+  <td>Build and quality gates</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-demo-overview</td>
+  <td>Deterministic overview generation</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-backlog, sys-html, sys-portfolio</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-demo-stage</td>
+  <td>Demo stage page</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-api, sys-ui</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-governance</td>
+  <td>Repository governance</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-html</td>
+  <td>Dynamic HTML generation</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-api, sys-contracts, sys-ui</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-memory-agents</td>
+  <td>Memory agent roles</td>
+  <td>memory</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-retrieval</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-portfolio</td>
+  <td>Portfolio source files</td>
+  <td>data</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-contracts</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-projection</td>
+  <td>DuckDB projection</td>
+  <td>data</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-brain, sys-portfolio</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-retrieval</td>
+  <td>Memory context CLI</td>
+  <td>memory</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-projection</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-signals</td>
+  <td>SQL portfolio signals</td>
+  <td>data</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-projection</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-synthesis</td>
+  <td>Portfolio synthesis</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-signals</td>
+</tr>
+<tr class="inventory-table__row status-scaffold">
+  <td class="inventory-table__id">sys-ui</td>
+  <td>React UI</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
+  <td></td>
+</tr>
+
+    </tbody>
+  </table>
+</div>
+
+    </section>
+  </div>
+
+  <footer class="overview__footer">
+    <p>
+      Rendered by <code>tools/generate_overview.py</code> from
+      <code>tools/overview_metrics.py</code> and <code>tools/overview_inventory.py</code>.
+      No figure on this page is computed at render time.
+    </p>
+  </footer>
+</div>
+</body>
+</html>
