@@ -1,6 +1,6 @@
 ---
 name: demo-creator-web
-description: Frontend creator for the live-demo build — TypeScript/React/HTML/CSS work such as the xterm.js terminal wiring, the talking-points rotator, the overview panel, the zero-scroll stage layout, and the overview template families. Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
+description: Frontend creator for the live-demo and workbench builds — TypeScript/React/HTML/CSS work such as the xterm.js terminal wiring, the talking-points rotator, the overview panel, the zero-scroll stage layout, the overview template families, and the workbench surfaces (layout engine, notes strip, terminal panel rework, injection dropdowns, HTML Viewer, explorer panels per REQ-007). Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 effort: high

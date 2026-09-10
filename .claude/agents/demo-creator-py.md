@@ -1,6 +1,6 @@
 ---
 name: demo-creator-py
-description: Python creator for the live-demo build — the PTY adapter, the terminal websocket route, the deterministic overview tools, the overview skill definition that wraps them, the demo reset tool, and their tests. Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
+description: Python creator for the live-demo and workbench builds — the PTY adapter, the terminal websocket route, the deterministic overview tools, the overview skill definition that wraps them, the demo reset tool, the workbench API routes (enumeration, filesystem, explorers, reveal action, session registry per ADR-014/ADR-015), and their tests. Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 effort: high

@@ -1,6 +1,6 @@
 ---
 name: demo-validator-code
-description: Reviews one live-demo work item's diff against its requirement text and runs its verification commands, inside the worktree named in its prompt. Receives the diff, the requirement and the commands — never the creator's rationale. Read-and-run only; changes nothing.
+description: Reviews one live-demo or workbench work item's diff against its requirement text and runs its verification commands, inside the worktree named in its prompt. Receives the diff, the requirement and the commands — never the creator's rationale. Read-and-run only; changes nothing.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: medium

@@ -1,6 +1,6 @@
 ---
 name: demo-validator-web
-description: Browser-driving validator for the live-demo build — uses the Playwright MCP server (configured in .mcp.json) to verify the stage page and generated overview page in a real browser, covering the zero-scroll layout at the required window sizes, popup behavior, the terminal echo round-trip, rotator behavior, and rendered-page checks. Part of the demo-track completion gate (GOV-003). Changes no repository file. Spawns no subagents.
+description: Browser-driving validator for the live-demo and workbench builds — uses the Playwright MCP server (configured in .mcp.json) to verify the stage/workbench page and generated pages in a real browser, covering the zero-scroll layout at the required window sizes in every layout, popup and dropdown behavior, the terminal echo round-trip, injection semantics, panel and explorer assertions (REQ-007), and rendered-page checks. Part of the GOV-003 completion gate for both tracks. Changes no repository file. Spawns no subagents.
 tools: Read, Grep, Glob, Bash, mcp__playwright
 model: sonnet
 effort: medium

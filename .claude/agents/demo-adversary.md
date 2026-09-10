@@ -1,6 +1,6 @@
 ---
 name: demo-adversary
-description: Adversarial reviewer for the live-demo build — audits one phase's branch diff against its specifications and repository reality, assuming the work is broken and hunting for where it fails when executed or merged. Part of the demo-track completion gate (GOV-003). Read-and-run only; changes nothing. Spawns no subagents.
+description: Adversarial reviewer for the live-demo and workbench builds — audits one phase's branch diff against its specifications and repository reality, assuming the work is broken and hunting for where it fails when executed or merged. Part of the GOV-003 completion gate for both tracks. Read-and-run only; changes nothing. Spawns no subagents.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: high

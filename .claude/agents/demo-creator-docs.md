@@ -1,6 +1,6 @@
 ---
 name: demo-creator-docs
-description: Documentation creator for the live-demo build — OPS documents for the new tools, templated checklists, and the runbook skeleton. Explicitly not the talking-points copy, which is audience-facing and owned by demo-orch-content. Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
+description: Documentation creator for the live-demo and workbench builds — OPS documents for the new tools, templated checklists, and the runbook skeleton. Explicitly not the talking-points copy or other audience-facing prose, which demo-orch-content owns. Works one dispatched work item at a time inside the worktree named in its prompt. Spawns no subagents.
 tools: Read, Grep, Glob, Bash, Write
 model: haiku
 effort: medium

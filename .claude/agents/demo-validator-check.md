@@ -1,6 +1,6 @@
 ---
 name: demo-validator-check
-description: Runs the mechanical gates for the live-demo build inside the worktree named in its prompt — the governance check, the staged private-content check, schema and drift checks, and front-matter and checklist audits. Read-and-run only; changes nothing and exercises no judgment beyond the checklist given.
+description: Runs the mechanical gates for the live-demo and workbench builds inside the worktree named in its prompt — the governance check, the staged private-content check, schema and drift checks, and front-matter and checklist audits. Read-and-run only; changes nothing and exercises no judgment beyond the checklist given.
 tools: Read, Grep, Glob, Bash
 model: haiku
 effort: medium
