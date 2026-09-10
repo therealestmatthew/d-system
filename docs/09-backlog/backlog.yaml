@@ -4746,11 +4746,15 @@ items:
   deliverables:
   - ts/public/talking-points.json
   - tools/demo_reset.py
+  - test/test_demo_reset.py
   - docs/08-governance/OPS-013-demo-reset.md
   - docs/08-governance/codes.yaml
   - docs/08-governance/catalog.md
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  - _public/overview
   next_action: 'Claim released 2026-09-10 with zero commits on agent/phase-demo-05
     (worktree kept) when the owner folded phase-demo-06 into the track ahead of the
     rehearsals; re-claim after phase-demo-06 completes, then draft the runbook
