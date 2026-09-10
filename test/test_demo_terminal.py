@@ -20,6 +20,7 @@ that both routes are registered regardless of `D_SYSTEM_DEMO_TERMINAL`.
 
 from __future__ import annotations
 
+import contextlib
 import importlib
 import json
 import subprocess
@@ -42,6 +43,7 @@ from src.api.routes.demo_stage import (
 )
 from src.api.routes.demo_terminal import (
     BIND_HOST_ENV_VAR,
+    IDLE_TIMEOUT_ENV_VAR,
     UVICORN_HOST_ENV_VAR,
     NonLoopbackBindError,
     enforce_loopback_bind,
@@ -252,6 +254,38 @@ def test_resize_text_frame_applies_to_pty_window_size(
     assert b"51 132" in output
 
 
+def test_oversized_resize_frame_is_dropped_without_crashing_the_session(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """`src/demo/posix.py` packs `cols`/`rows` with `struct.pack("HHHH", ...)`, an unsigned
+    short per field (0..65535 only); a resize frame outside that range used to reach
+    `adapter.resize()` and raise `struct.error` — not a `WebSocketDisconnect` — tearing the
+    whole session down (D06-A finding 1, proven with
+    `{"type":"resize","cols":100000,"rows":40}`). It must now be dropped like any other
+    malformed frame, and the session must keep working afterward.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    output = b""
+    oversized_frames = [
+        json.dumps({"type": "resize", "cols": 100000, "rows": 40}),
+        json.dumps({"type": "resize", "cols": 80, "rows": 100000}),
+        json.dumps({"type": "resize", "cols": 0, "rows": 40}),
+        json.dumps({"type": "resize", "cols": 65536, "rows": 65536}),
+    ]
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+        for frame in oversized_frames:
+            websocket.send_text(frame)
+        websocket.send_bytes(b"echo demo-terminal-oversized-resize-marker\n")
+        deadline = time.monotonic() + 5.0
+        while (
+            b"demo-terminal-oversized-resize-marker" not in output
+            and time.monotonic() < deadline
+        ):
+            output += websocket.receive_bytes()
+    assert b"demo-terminal-oversized-resize-marker" in output
+
+
 def test_malformed_text_frame_is_dropped_without_crashing_or_reaching_shell(
     rebuild_app: Callable[..., FastAPI],
 ) -> None:
@@ -343,6 +377,67 @@ def test_two_concurrent_websocket_sessions_are_independent_shells(
     assert b"session-two-value" not in output_one
     assert b"marker-two-is-session-two-value" in output_two
     assert b"session-one-value" not in output_two
+
+
+def test_idle_timeout_reaps_orphaned_shell_after_abrupt_disconnect(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Simulates a peer that vanishes without ever sending a close frame — a SIGKILL'd
+    client or a dropped network path. `websocket.receive()` would otherwise block on this
+    forever, so `finally: adapter.close()` never runs and the shell is orphaned (D06-A
+    finding 2, proven with a hard-killed client leaving `sleep 6666` running). This test
+    never sends the transport's own `websocket.disconnect` message — no `with` block, no
+    `.close()` — and asserts the adapter is reaped anyway, within the bounded idle timeout.
+    """
+    monkeypatch.setenv(IDLE_TIMEOUT_ENV_VAR, "0.3")
+    app = rebuild_app(flag="1")
+
+    # `rebuild_app` reloaded `src.api.routes.demo_terminal`; re-fetch it from `sys.modules`
+    # so the monkeypatch below lands on the module object the running route actually uses.
+    reloaded_demo_terminal_module = sys.modules["src.api.routes.demo_terminal"]
+
+    created_adapters: list[PosixPtyAdapter] = []
+    original_create_adapter = reloaded_demo_terminal_module.create_adapter
+
+    def _capturing_create_adapter(*args: object, **kwargs: object) -> PosixPtyAdapter:
+        adapter = original_create_adapter(*args, **kwargs)  # type: ignore[arg-type]
+        created_adapters.append(adapter)
+        return adapter
+
+    monkeypatch.setattr(
+        reloaded_demo_terminal_module, "create_adapter", _capturing_create_adapter
+    )
+
+    client = TestClient(app)
+    session = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    websocket = session.__enter__()
+    try:
+        websocket.send_bytes(b"echo demo-terminal-abrupt-marker\n")
+        output = b""
+        deadline = time.monotonic() + 5.0
+        while (
+            b"demo-terminal-abrupt-marker" not in output and time.monotonic() < deadline
+        ):
+            output += websocket.receive_bytes()
+        assert b"demo-terminal-abrupt-marker" in output
+        assert len(created_adapters) == 1
+
+        # No close frame is ever sent from here on — the peer has simply vanished.
+        start = time.monotonic()
+        reap_deadline = start + 5.0
+        while created_adapters[0].alive and time.monotonic() < reap_deadline:
+            time.sleep(0.05)
+        elapsed = time.monotonic() - start
+
+        assert created_adapters[0].alive is False, "adapter was not reaped after the peer vanished"
+        assert elapsed < 5.0, f"reap took {elapsed:.2f}s, past the bounded window"
+    finally:
+        # Best-effort cleanup of the background portal thread the test session started;
+        # harmless if it has already torn itself down.
+        with contextlib.suppress(Exception):
+            session.close(1006)
+        with contextlib.suppress(Exception):
+            session.__exit__(None, None, None)
 
 
 def test_registration_fails_fast_for_non_loopback_bind_with_flag_set(

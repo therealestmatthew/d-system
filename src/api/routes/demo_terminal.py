@@ -30,6 +30,42 @@ DEFAULT_UVICORN_HOST: Final[str] = "127.0.0.1"
 READ_CHUNK_SIZE: Final[int] = 4096
 READ_TIMEOUT_SECONDS: Final[float] = 0.1
 
+# `struct.pack("HHHH", ...)` in `src/demo/posix.py` packs each field as an unsigned short
+# (0..65535); a resize frame outside that range reaches `fcntl.ioctl` and raises
+# `struct.error`, which is not a `WebSocketDisconnect` and so tears the whole session down
+# (D06-A finding 1, proven with `{"type":"resize","cols":100000,...}`). Rejecting it here,
+# before `adapter.resize()` is ever called, keeps it a dropped frame like any other malformed
+# one.
+MIN_TERMINAL_DIMENSION: Final[int] = 1
+MAX_TERMINAL_DIMENSION: Final[int] = 65535
+
+# A peer that vanishes without sending a close frame — SIGKILL'd, or a dropped network path —
+# never sends `websocket.disconnect`, so an unbounded `await websocket.receive()` blocks
+# forever and `finally: adapter.close()` never runs, orphaning the shell (D06-A finding 2,
+# proven with a hard-killed client leaving `sleep 6666` running). Wrapping each receive in a
+# timeout bounds how long a session can go silent before its shell is reaped; any real frame —
+# including a future client-side keepalive ping — resets the clock simply by making the next
+# receive() resolve. Generous by default so a presenter reading slides mid-demo, with no
+# keystrokes and no shell output, is never mistaken for a dead peer; overridable for tests.
+IDLE_TIMEOUT_ENV_VAR: Final[str] = "D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS"
+DEFAULT_IDLE_TIMEOUT_SECONDS: Final[float] = 300.0
+
+
+def _resolve_idle_timeout_seconds() -> float:
+    """The idle bound for `websocket.receive()`, read fresh on each connection.
+
+    Read at connection time rather than cached at import time so tests can set
+    `D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS` to a small value with `monkeypatch` without
+    reloading this module.
+    """
+    raw = os.environ.get(IDLE_TIMEOUT_ENV_VAR)
+    if raw is None:
+        return DEFAULT_IDLE_TIMEOUT_SECONDS
+    try:
+        return float(raw)
+    except ValueError:
+        return DEFAULT_IDLE_TIMEOUT_SECONDS
+
 
 class NonLoopbackBindError(RuntimeError):
     """Raised when D_SYSTEM_DEMO_TERMINAL=1 but the configured bind host is not loopback."""
@@ -99,19 +135,26 @@ async def _pump_adapter_to_websocket(adapter: TerminalAdapter, websocket: WebSoc
             await websocket.send_bytes(data)
 
 
-def _is_positive_int(value: object) -> TypeGuard[int]:
-    """True for a JSON integer greater than zero — excludes bool, which is an int subclass."""
-    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+def _is_valid_dimension(value: object) -> TypeGuard[int]:
+    """True for a JSON integer in `1..MAX_TERMINAL_DIMENSION` — excludes bool, which is an
+    int subclass, and excludes anything `struct.pack("HHHH", ...)` (an unsigned short per
+    field, in `src/demo/posix.py`) cannot hold.
+    """
+    return (
+        isinstance(value, int)
+        and not isinstance(value, bool)
+        and MIN_TERMINAL_DIMENSION <= value <= MAX_TERMINAL_DIMENSION
+    )
 
 
 def _apply_control_message(adapter: TerminalAdapter, text: str) -> None:
     """Parse a text frame as a control message and apply it, or drop it silently.
 
     The only recognized control message is `{"type": "resize", "cols": N, "rows": N}` with
-    positive integer `cols`/`rows`. Invalid JSON, a non-object payload, an unrecognized
-    `"type"`, or a missing/non-positive-integer `cols`/`rows` is dropped without raising —
-    a malformed text frame must never crash the session and must never reach the shell as
-    input, so there is no fallback path here that writes `text` to the adapter.
+    `cols`/`rows` integers in `1..MAX_TERMINAL_DIMENSION`. Invalid JSON, a non-object payload,
+    an unrecognized `"type"`, or a missing/out-of-range `cols`/`rows` is dropped without
+    raising — a malformed text frame must never crash the session and must never reach the
+    shell as input, so there is no fallback path here that writes `text` to the adapter.
     """
     try:
         message = json.loads(text)
@@ -121,9 +164,9 @@ def _apply_control_message(adapter: TerminalAdapter, text: str) -> None:
         return
     cols = message.get("cols")
     rows = message.get("rows")
-    if not _is_positive_int(cols):
+    if not _is_valid_dimension(cols):
         return
-    if not _is_positive_int(rows):
+    if not _is_valid_dimension(rows):
         return
     adapter.resize(cols, rows)
 
@@ -135,14 +178,25 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     Two ASGI frame kinds share this one socket: binary frames are raw shell input, written
     to the adapter unchanged; text frames are control messages (today, only a terminal
     resize) parsed and applied by `_apply_control_message` — never written to the shell.
+
+    Each `receive()` is bounded by an idle timeout (`_resolve_idle_timeout_seconds`): a peer
+    that vanishes without a close frame — SIGKILL'd, or a dropped network path — would
+    otherwise block this loop forever and leave the shell orphaned, since `finally:` never
+    runs until the `await` resolves (D06-A finding 2).
     """
     await websocket.accept()
     adapter = create_adapter()
     adapter.start()
     pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))
+    idle_timeout_seconds = _resolve_idle_timeout_seconds()
     try:
         while True:
-            message = await websocket.receive()
+            try:
+                message = await asyncio.wait_for(
+                    websocket.receive(), timeout=idle_timeout_seconds
+                )
+            except TimeoutError:
+                break
             if message["type"] == "websocket.disconnect":
                 raise WebSocketDisconnect(message["code"], message.get("reason"))
             data = message.get("bytes")
