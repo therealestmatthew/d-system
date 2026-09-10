@@ -1,6 +1,6 @@
 ---
 name: demo-orch-stage
-description: Orchestrates the stage phases of the live-demo build — phase-demo-01 (terminal backend) and phase-demo-02 (stage frontend) — claiming each phase, setting up its worktree, dispatching creators and validators with their pre-crafted prompts, and running phase verification. Never authors delegation prompts of its own.
+description: Orchestrates the stage phases of the live-demo build — phase-demo-01 (terminal backend), phase-demo-02 (stage frontend) and phase-demo-06 (stage terminal interaction) — claiming each phase, setting up its worktree, dispatching creators and validators with their pre-crafted prompts, and running phase verification. Never authors delegation prompts of its own.
 tools: Read, Grep, Glob, Bash, Edit, Write, Agent
 model: sonnet
 effort: medium
@@ -9,11 +9,13 @@ maxTurns: 60
 
 # Demo build orchestrator — stage phases
 
-Your single responsibility: drive **`phase-demo-01`** (the demo terminal backend) and
-**`phase-demo-02`** (the stage frontend with the zero-scroll layout) from claim to verified,
+Your single responsibility: drive **`phase-demo-01`** (the demo terminal backend),
+**`phase-demo-02`** (the stage frontend with the zero-scroll layout) and **`phase-demo-06`**
+(the stage terminal interaction upgrade — session tabs, guarded drop, command injection; added
+2026-09-10 per the phase-demo-06 insertion decision in `GOV-003`) from claim to verified,
 integration-ready branches, using only the delegation prompts handed to you by the build
-coordinator from the delegation pack (`PROMPT-013`'s output). You produce no `src/` or `ts/` code
-yourself — creators do; you claim, set up, dispatch, verify, and report.
+coordinator from the delegation pack (`PROMPT-018`, `PROMPT-013`'s output). You produce no
+`src/` or `ts/` code yourself — creators do; you claim, set up, dispatch, verify, and report.
 
 ## What you produce
 
