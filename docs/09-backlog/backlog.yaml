@@ -4817,10 +4817,11 @@ items:
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
   next_action: 'D06-C1/V1, D06-C2/V2 and D06-C3/V3 all pass, each committed on
-    agent/phase-demo-06. Resolve the uv run pytest catalog-drift failure with the
-    coordinator (same pre-existing, cross-phase condition already reported against
-    phase-demo-02), then dispatch D06-A and D06-W (coordinator-owned) before
-    requesting the owner''s approval to integrate agent/phase-demo-06 into dev.'
+    agent/phase-demo-06. D06-A''s fix cycle 1 (one blocker, two majors fixed and
+    validated; one minor recorded per idea 000087, not fixed, per the
+    coordinator''s instruction) reported green to the coordinator. Await D06-W
+    (Playwright browser verification, coordinator-owned) before requesting the
+    owner''s approval to integrate agent/phase-demo-06 into dev.'
   session: doc-session-demo-stage-terminal-interaction
   completion_evidence:
   - src/api/routes/demo_terminal.py
@@ -4830,16 +4831,22 @@ items:
   - ts/public/demo-commands.json
   result: 'All three creator/validator item pairs (D06-C1/V1, D06-C2/V2, D06-C3/V3)
     pass with no findings, each committed narrowly on agent/phase-demo-06. D06-G
-    (phase gate, run and resumed once after a truncated first pass) confirms:
+    (phase gate, run and resumed once after a truncated first pass) confirmed:
     governance OK; check_no_private_content OK with changes staged; all four
     deliverables exist; npm run build, ruff and mypy all clean; no placeholder
     command string from demo-commands.json leaks into ts/src; the diff against dev
-    touches only the phase''s declared deliverable paths. uv run pytest is 473
-    passed, 1 failed — the failure is pre-existing catalog drift, reproduced
-    identically on plain dev with none of this phase''s changes present, not a
-    defect in this diff. Not marking the phase complete; D06-A (adversarial review)
-    and D06-W (Playwright browser verification) are still outstanding and owned by
-    the build coordinator, and integration into dev requires the owner''s approval.'
+    touches only the phase''s declared deliverable paths. The coordinator''s D06-A
+    adversarial review then found one blocker (embedded-newline injection bypassing
+    run:false) and two majors (unbounded resize crashing the session; abrupt
+    disconnect orphaning the shell) — all three fixed and independently validated
+    (commits e474ccb, 2e6fda3), plus one minor (no session registry at the
+    websocket route bounding the four-session cap) recorded against idea 000087
+    per the coordinator''s explicit instruction, not fixed. Full re-verification
+    after the fix cycle: uv run pytest 476 passed (the earlier catalog-drift
+    failure is resolved on this branch, see the session record); ruff and mypy
+    clean; npm run build clean. Not marking the phase complete; D06-W (Playwright
+    browser verification) is still outstanding and owned by the build coordinator,
+    and integration into dev requires the owner''s approval.'
 - id: phase-demo-07
   title: Skills-and-agents glossary and diagram library
   plan: doc-live-demo

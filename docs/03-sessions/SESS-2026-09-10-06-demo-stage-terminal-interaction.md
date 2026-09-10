@@ -21,21 +21,21 @@ depends_on: [doc-live-demo, doc-prompt-demo-build-delegation-pack]
 ## Verification
 
 - `cd ts && npm run build` — `tsc -b && vite build` succeeds; `dist/index.html`,
-  `dist/assets/index-CfxlgVqL.css` (12.82 kB), `dist/assets/index-BGb0orNz.js` (495.33 kB); 38
-  modules transformed, built in under 1.2s.
-- `uv run pytest` — `1 failed, 473 passed, 2 warnings`. The single failure
-  (`test/test_codes.py::test_committed_catalog_matches_regenerated_output`) is pre-existing
-  catalog drift — reproduced identically on plain `dev` in the primary checkout with none of this
-  phase's changes present; not introduced by this phase's diff. See `## Unresolved`.
+  `dist/assets/index-CfxlgVqL.css` (12.82 kB), `dist/assets/index-DAUn58IC.js` (495.40 kB); 38
+  modules transformed, built in ~1s.
+- `uv run pytest` — `476 passed, 2 warnings`. No failures; the catalog-drift failure recorded
+  earlier in this session cleared on its own once this branch's own checkpoint commit (`b1bb28d`)
+  regenerated and committed `docs/08-governance/catalog.md` — confirmed by rerunning the same test
+  after that commit landed.
 - `uv run ruff check src/ test/` — `All checks passed!`
 - `uv run mypy src/` — `Success: no issues found in 23 source files`.
-- `uv run python -m src.governance` — `Governance OK: 18 systems, 135 documents, 15 memories, 111
+- `uv run python -m src.governance` — `Governance OK: 18 systems, 136 documents, 15 memories, 111
   backlog phases`, exit 0.
 - `uv run python tools/check_no_private_content.py`, run with all changes staged (`git add -A`
-  first) — `check_no_private_content: OK (429 tracked files, 0 identifiers checked)`.
-- Adversarial review (D06-A) and Playwright browser verification (D06-W) — not yet dispatched. Per
-  `PROMPT-018`'s completion-gate convention and `GOV-003`'s demo-track completion decision, both
-  are dispatched by the build coordinator at `PROMPT-015` step 8, not by this orchestrator.
+  first) — `check_no_private_content: OK` (repeated at each commit above, all clean).
+- Adversarial review (D06-A) — dispatched by the coordinator; see the fix-cycle entry below.
+  Playwright browser verification (D06-W) — not yet dispatched; follows from the coordinator once
+  this fix cycle is reported green.
 
 Item-level dispatch history (creator/validator pairs from `PROMPT-018`'s D06 section):
 
@@ -95,6 +95,50 @@ Item-level dispatch history (creator/validator pairs from `PROMPT-018`'s D06 sec
   and four files under `ts/src/stage/` — all within the phase's declared deliverable paths, nothing
   else.
 
+D06-A fix cycle (1 of at most 2, coordinator-dispatched adversarial review found one blocker, two
+majors and one minor):
+
+- BLOCKER — a `run:false` command entry with an embedded newline executed everything before the
+  `\n` once it reached the shell (`sendCommand` shipped `entry.command` byte-for-byte, withholding
+  only the trailing newline; `isCommandEntry` validated types only). Fixed at both layers:
+  `CommandPanel.tsx`'s `isCommandEntry` now rejects any entry whose `command` contains a control
+  character (`0x00`-`0x1f` or `0x7f`) at load time; `TerminalRegion.tsx`'s `sendCommand` also
+  strips any `\r`/`\n` from `text` when it is not the one appending the trailing newline, so a
+  caller that bypassed `CommandPanel` entirely still cannot smuggle one onto the wire. Commit
+  `e474ccb`. Validator (`demo-validator-code`): PASS, no findings — confirmed both layers close the
+  exact attack, no stray control bytes landed in either file, `npm run build` clean.
+- MAJOR — an oversized resize frame (`{"type":"resize","cols":100000,...}`) raised an uncaught
+  `struct.error` in `struct.pack("HHHH", ...)` (`src/demo/posix.py`, 65535-per-field limit) that
+  was not a `WebSocketDisconnect`, tearing the connection down. Fixed: `cols`/`rows` are now bounded
+  to `1..65535` before `adapter.resize()` is ever called; out-of-range frames drop like any other
+  malformed frame. New test sends the exact finding frame plus boundary cases and asserts the
+  session survives and still echoes.
+- MAJOR — an abrupt disconnect (SIGKILL'd client, dropped network, no close frame) left
+  `terminal_websocket`'s `await websocket.receive()` never resolving, so `finally: adapter.close()`
+  never ran, orphaning the shell (proven with a hard-killed client leaving `sleep 6666` running).
+  Fixed: the receive loop now wraps `websocket.receive()` in `asyncio.wait_for` with an idle
+  timeout (`D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS`, default 300s, resolved fresh per
+  connection); a timeout breaks the loop into the existing `finally` cleanup, so the PTY is reaped
+  within the bound through the same path as a graceful disconnect, not a new one. New test shrinks
+  the timeout, opens a session with no close frame ever sent, and asserts the adapter's `alive`
+  flag goes `False` within the bound. Both majors: commit `2e6fda3`. Validator
+  (`demo-validator-code`): PASS, no findings — confirmed the bound is exactly `1..65535`, confirmed
+  the idle-timeout path reaches `adapter.close()` via the existing cleanup rather than a new one,
+  confirmed both tests exercise the exact scenarios from the findings. `uv run pytest`: 476 passed.
+  `ruff`/`mypy`: clean.
+- MINOR (record only, no code change) — the four-session cap is enforced in the UI
+  (`TerminalRegion`'s `addSession` guards at function level, held under the adversary's attack) but
+  the websocket route itself has no session registry, so raw local websocket connections bypassing
+  the UI can exceed four sessions. This matches ADR-013's current scope (loopback-only, no
+  session-identity layer). A session registry that would close this gap is parked as idea `000087`
+  (terminal interaction API for driving demo shell sessions from outside the stage page) — not
+  fixed here, per the coordinator's explicit instruction to record rather than code it.
+
+Full re-verification after the fix cycle, run by this orchestrator in the worktree: `cd ts &&
+npm run build` clean (38 modules, ~1s); `uv run pytest` — `476 passed, 2 warnings`; `uv run ruff
+check src/ test/` — `All checks passed!`; `uv run mypy src/` — `Success: no issues found in 23
+source files`.
+
 ## Acceptance
 
 - A long-running command in one tab survives switching tabs and collapsing/re-expanding the
@@ -122,24 +166,24 @@ Item-level dispatch history (creator/validator pairs from `PROMPT-018`'s D06 sec
 ## Backlog
 
 - `phase-demo-06`: `status: active`, `agent: agent-demo-stage`.
-- `next_action`: Resolve the `uv run pytest` catalog-drift failure with the coordinator (same
-  pre-existing, cross-phase condition already reported against `phase-demo-02`), then dispatch
-  D06-A and D06-W (coordinator-owned) before requesting the owner's approval to integrate
-  `agent/phase-demo-06` into `dev`.
+- `next_action`: D06-A's fix cycle 1 is reported green (build/pytest/ruff/mypy all clean, both
+  fixes validated) to the coordinator. Await D06-W (Playwright browser verification,
+  coordinator-owned) before requesting the owner's approval to integrate `agent/phase-demo-06`
+  into `dev`.
 
 ## Unresolved
 
-- `uv run pytest` fails `test/test_codes.py::test_committed_catalog_matches_regenerated_output`.
-  Reproduced identically on plain `dev` in the primary checkout at `/code/d-system` with none of
-  this phase's changes present — pre-existing catalog drift, not introduced by this phase's diff
-  (which touches only `src/api/routes/demo_terminal.py`, `test/test_demo_terminal.py`,
-  `ts/public/demo-commands.json` and `ts/src/stage/`). Reported up rather than fixed, since
-  regenerating and committing `docs/08-governance/catalog.md` is outside this phase's declared
-  deliverable paths and outside this orchestrator's authority to fix on `dev` unilaterally.
-- D06-A (adversarial review) and D06-W (Playwright browser verification), and integration into
-  `dev`, are all outstanding and require the coordinator/owner, not this orchestrator, to proceed.
+- The `uv run pytest` catalog-drift failure recorded earlier in this session is resolved on this
+  branch — this branch's own checkpoint commit (`b1bb28d`) regenerated and committed
+  `docs/08-governance/catalog.md`, and the failure has not recurred since.
+- D06-W (Playwright browser verification) and integration into `dev` are outstanding and require
+  the coordinator/owner, not this orchestrator, to proceed.
+- The MINOR finding from D06-A (no session registry at the websocket route, so the four-session
+  cap can be exceeded by a client that bypasses the UI) is recorded, not fixed, per the
+  coordinator's explicit instruction — see idea `000087` above.
 - The D06-G dispatch's first run ended mid-checklist with no recorded findings; the resumed run
-  used its own item numbering rather than the checklist's, reported `RED` on pytest correctly, but
-  did not report against three of the six checklist items. This orchestrator completed those three
-  directly rather than dispatching a third phase-gate attempt (which would exceed the two-fix-cycle
-  bound for a single work item, and the gap was a reporting omission, not a defect found).
+  used its own item numbering rather than the checklist's, reported `RED` on pytest correctly (a
+  failure since resolved as above), but did not report against three of the six checklist items.
+  This orchestrator completed those three directly rather than dispatching a third phase-gate
+  attempt (which would exceed the two-fix-cycle bound for a single work item, and the gap was a
+  reporting omission, not a defect found).
