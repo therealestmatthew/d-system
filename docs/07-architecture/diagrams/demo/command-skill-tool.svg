@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="Command, skill and tool — who initiates">
+  <title>Command, skill, tool — who initiates</title>
+  <desc>A command is invoked by the person, a skill is loaded by the model when the task matches, a tool is called by the model as a step.</desc>
+  <defs>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 16px; fill: #0f172a; }
+      .title { font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .colhead { font-size: 26px; font-weight: 700; fill: #ffffff; }
+      .who { font-size: 21px; font-weight: 700; fill: #0f172a; }
+      .cap { font-size: 15px; font-weight: 700; fill: #64748b; letter-spacing: 0.08em; }
+      .body { font-size: 17px; fill: #334155; }
+      .foot { font-size: 19px; fill: #334155; }
+      .panel { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .rule { stroke: #cbd5e1; stroke-width: 2; }
+      .cmd { fill: #b45309; }
+      .skl { fill: #6d28d9; }
+      .tl { fill: #15803d; }
+      .band { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="768" fill="#ffffff"/>
+  <text class="title" x="512" y="52" text-anchor="middle">Command, skill, tool — who initiates</text>
+
+  <!-- Command -->
+  <rect class="panel" x="40" y="86" width="304" height="536" rx="12"/>
+  <rect class="cmd" x="40" y="86" width="304" height="58" rx="12"/>
+  <text class="colhead" x="192" y="126" text-anchor="middle">Command</text>
+
+  <text class="cap" x="64" y="182">INITIATED BY</text>
+  <text class="who" x="64" y="212">The person</text>
+  <line class="rule" x1="64" y1="236" x2="320" y2="236"/>
+
+  <text class="body" x="64" y="272">A named prompt you trigger</text>
+  <text class="body" x="64" y="298">by typing a slash command.</text>
+  <text class="body" x="64" y="324">The model runs it because</text>
+  <text class="body" x="64" y="350">you asked for it by name.</text>
+
+  <text class="cap" x="64" y="406">LIVES IN</text>
+  <text class="mono" x="64" y="436">.claude/commands/</text>
+  <text class="mono" x="64" y="458">  &lt;name&gt;.md</text>
+
+  <text class="cap" x="64" y="510">HERE</text>
+  <text class="mono" x="64" y="540">/backlog</text>
+  <text class="mono" x="64" y="564">/idea</text>
+  <text class="mono" x="64" y="588">/idea-triage</text>
+  <text class="mono" x="64" y="612">/session-close</text>
+
+  <!-- Skill -->
+  <rect class="panel" x="360" y="86" width="304" height="536" rx="12"/>
+  <rect class="skl" x="360" y="86" width="304" height="58" rx="12"/>
+  <text class="colhead" x="512" y="126" text-anchor="middle">Skill</text>
+
+  <text class="cap" x="384" y="182">INITIATED BY</text>
+  <text class="who" x="384" y="212">The model</text>
+  <line class="rule" x1="384" y1="236" x2="640" y2="236"/>
+
+  <text class="body" x="384" y="272">A folder of instructions the</text>
+  <text class="body" x="384" y="298">model loads when the task</text>
+  <text class="body" x="384" y="324">matches its description.</text>
+  <text class="body" x="384" y="350">You need not know it exists.</text>
+
+  <text class="cap" x="384" y="406">LIVES IN</text>
+  <text class="mono" x="384" y="436">.claude/skills/&lt;name&gt;/</text>
+  <text class="mono" x="384" y="458">  SKILL.md</text>
+
+  <text class="cap" x="384" y="510">HERE</text>
+  <text class="mono" x="384" y="540">orient</text>
+  <text class="mono" x="384" y="564">checkpoint</text>
+  <text class="mono" x="384" y="588">d-system-overview</text>
+
+  <!-- Tool -->
+  <rect class="panel" x="680" y="86" width="304" height="536" rx="12"/>
+  <rect class="tl" x="680" y="86" width="304" height="58" rx="12"/>
+  <text class="colhead" x="832" y="126" text-anchor="middle">Tool</text>
+
+  <text class="cap" x="704" y="182">INITIATED BY</text>
+  <text class="who" x="704" y="212">The model</text>
+  <line class="rule" x1="704" y1="236" x2="960" y2="236"/>
+
+  <text class="body" x="704" y="272">A single capability the model</text>
+  <text class="body" x="704" y="298">requests as one step. The</text>
+  <text class="body" x="704" y="324">program executes it and hands</text>
+  <text class="body" x="704" y="350">back a tool result.</text>
+
+  <text class="cap" x="704" y="406">LIVES IN</text>
+  <text class="body" x="704" y="436">the application itself, or</text>
+  <text class="body" x="704" y="458">an MCP server</text>
+
+  <text class="cap" x="704" y="510">HERE</text>
+  <text class="mono" x="704" y="540">Read · Bash · Edit</text>
+  <text class="mono" x="704" y="564">mcp__playwright__*</text>
+
+  <rect class="band" x="40" y="648" width="944" height="88" rx="12"/>
+  <text class="foot" x="512" y="684" text-anchor="middle">All three arrive as text in the same context. What differs is who decides to bring them in.</text>
+  <text class="foot" x="512" y="714" text-anchor="middle">They compose: a command can invoke a skill, and a skill tells the model which tools to call.</text>
+</svg>

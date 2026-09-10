@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills and agents — diagram library</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --ink: #0f172a;
+    --muted: #475569;
+    --line: #cbd5e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f172a; --card: #1e293b; --ink: #f1f5f9; --muted: #94a3b8; --line: #334155; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 32px 64px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header { max-width: 1100px; margin: 0 auto 36px; }
+  h1 { font-size: 32px; margin: 0 0 12px; }
+  .lede { font-size: 17px; color: var(--muted); margin: 0; max-width: 70ch; }
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card a.shot { display: block; background: #ffffff; border-bottom: 1px solid var(--line); }
+  .card img { display: block; width: 100%; height: auto; }
+  .meta { padding: 16px 18px 20px; }
+  .meta h2 { font-size: 19px; margin: 0 0 6px; }
+  .meta h2 a { color: inherit; text-decoration: none; }
+  .meta h2 a:hover { text-decoration: underline; }
+  .meta p { margin: 0; font-size: 15px; color: var(--muted); }
+  footer {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    font-size: 15px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.93em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Skills and agents — diagram library</h1>
+  <p class="lede">Six standalone diagrams for the skills-and-agents training session. Each is a
+  self-contained SVG drawn at 1024&times;768 with no external asset or network dependency: open this
+  page or any single file straight from the filesystem, with no dev server running. The labels come
+  from the glossary entries in <code>brain/concepts/terms-skills-and-agents-demo.md</code>.</p>
+</header>
+
+<main class="grid">
+  <article class="card">
+    <a class="shot" href="llm-vs-agent.svg"><img src="llm-vs-agent.svg" alt="LLM vs agent"></a>
+    <div class="meta">
+      <h2><a href="llm-vs-agent.svg">LLM vs agent</a></h2>
+      <p>The same model on both sides — the loop, the tools and the permissions are what differ.</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="skill-architecture.svg"><img src="skill-architecture.svg" alt="Skill architecture"></a>
+    <div class="meta">
+      <h2><a href="skill-architecture.svg">Skill architecture</a></h2>
+      <p>What a skill folder holds, and which half of <code>SKILL.md</code> is in the context before it is invoked.</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="agentic-loop.svg"><img src="agentic-loop.svg" alt="The agentic loop"></a>
+    <div class="meta">
+      <h2><a href="agentic-loop.svg">The agentic loop</a></h2>
+      <p>Context, model call, tool call, result appended — every pass a fresh call over a larger context.</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="sub-agents-context-isolation.svg"><img src="sub-agents-context-isolation.svg" alt="Sub-agents and context isolation"></a>
+    <div class="meta">
+      <h2><a href="sub-agents-context-isolation.svg">Sub-agents and context isolation</a></h2>
+      <p>A sub-agent works in its own context window; only its final report crosses back.</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="mcp-architecture.svg"><img src="mcp-architecture.svg" alt="MCP architecture"></a>
+    <div class="meta">
+      <h2><a href="mcp-architecture.svg">MCP architecture</a></h2>
+      <p>The application is the MCP client; servers expose tools that land in the model's list beside the built-in ones.</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="command-skill-tool.svg"><img src="command-skill-tool.svg" alt="Command, skill, tool"></a>
+    <div class="meta">
+      <h2><a href="command-skill-tool.svg">Command, skill, tool</a></h2>
+      <p>Who initiates each one — the person, or the model — with this repository's examples of all three.</p>
+    </div>
+  </article>
+</main>
+
+<footer>
+  Built by <code>phase-demo-07</code> for REQ-006 R13. SVG rather than Mermaid because these are
+  presented from the filesystem at a fixed projector size, which GitHub-rendered Mermaid cannot do.
+  To change a label, edit the glossary entry first and then the diagram — the acceptance condition is
+  that the two match exactly.
+</footer>
+</body>
+</html>

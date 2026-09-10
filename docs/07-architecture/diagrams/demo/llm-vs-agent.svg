@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="LLM versus agent">
+  <title>LLM vs agent</title>
+  <desc>An LLM is one stateless call from text in to text out. An agent is the same model in a loop with tools.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .title { font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .head { font-size: 26px; font-weight: 700; fill: #0f172a; }
+      .sub { font-size: 18px; fill: #475569; }
+      .box { font-size: 21px; font-weight: 600; fill: #0f172a; }
+      .small { font-size: 16px; fill: #475569; }
+      .note { font-size: 17px; fill: #334155; }
+      .edge { stroke: #334155; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .panel { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .n { fill: #ffffff; stroke: #334155; stroke-width: 2; }
+      .model { fill: #dbeafe; stroke: #1d4ed8; stroke-width: 2.5; }
+      .tool { fill: #dcfce7; stroke: #15803d; stroke-width: 2.5; }
+      .ctx { fill: #fef3c7; stroke: #b45309; stroke-width: 2.5; }
+      .loop { fill: none; stroke: #6d28d9; stroke-width: 2.5; stroke-dasharray: 8 6; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="768" fill="#ffffff"/>
+  <text class="title" x="512" y="54" text-anchor="middle">LLM vs agent</text>
+
+  <!-- Left: LLM -->
+  <rect class="panel" x="40" y="86" width="444" height="620" rx="14"/>
+  <text class="head" x="262" y="128" text-anchor="middle">LLM</text>
+  <text class="sub" x="262" y="156" text-anchor="middle">one call: text in, text out</text>
+
+  <rect class="n" x="102" y="196" width="320" height="64" rx="10"/>
+  <text class="box" x="262" y="235" text-anchor="middle">Prompt (text in)</text>
+  <path class="edge" d="M 262 260 V 316"/>
+
+  <rect class="model" x="102" y="320" width="320" height="86" rx="10"/>
+  <text class="box" x="262" y="354" text-anchor="middle">Model</text>
+  <text class="small" x="262" y="382" text-anchor="middle">claude-opus-5</text>
+  <path class="edge" d="M 262 406 V 462"/>
+
+  <rect class="n" x="102" y="466" width="320" height="64" rx="10"/>
+  <text class="box" x="262" y="505" text-anchor="middle">Text out</text>
+
+  <text class="note" x="262" y="590" text-anchor="middle">No memory of the previous call.</text>
+  <text class="note" x="262" y="618" text-anchor="middle">Cannot read a file or run a command.</text>
+  <text class="note" x="262" y="646" text-anchor="middle">The whole conversation is sent again</text>
+  <text class="note" x="262" y="672" text-anchor="middle">every time.</text>
+
+  <!-- Right: agent -->
+  <rect class="panel" x="540" y="86" width="444" height="620" rx="14"/>
+  <text class="head" x="762" y="128" text-anchor="middle">Agent</text>
+  <text class="sub" x="762" y="156" text-anchor="middle">the same model in a loop with tools</text>
+
+  <rect class="n" x="602" y="182" width="320" height="56" rx="10"/>
+  <text class="box" x="762" y="218" text-anchor="middle">Goal</text>
+  <path class="edge" d="M 762 238 V 272"/>
+
+  <rect class="loop" x="568" y="276" width="372" height="292" rx="14"/>
+  <text class="small" x="584" y="300">agentic loop</text>
+
+  <rect class="ctx" x="602" y="312" width="300" height="56" rx="10"/>
+  <text class="box" x="752" y="348" text-anchor="middle">Context</text>
+  <path class="edge" d="M 752 368 V 400"/>
+
+  <rect class="model" x="602" y="404" width="300" height="56" rx="10"/>
+  <text class="box" x="752" y="440" text-anchor="middle">Model</text>
+  <path class="edge" d="M 752 460 V 492"/>
+
+  <rect class="tool" x="602" y="496" width="300" height="56" rx="10"/>
+  <text class="box" x="752" y="532" text-anchor="middle">Tool call → tool result</text>
+
+  <path class="edge" d="M 902 524 H 922 V 340 H 906"/>
+  <text class="small" x="958" y="440" transform="rotate(-90 958 440)" text-anchor="middle">result appended</text>
+
+  <path class="edge" d="M 602 432 H 556 V 628 H 600"/>
+  <rect class="n" x="602" y="600" width="320" height="56" rx="10"/>
+  <text class="box" x="762" y="636" text-anchor="middle">Answer</text>
+  <text class="small" x="762" y="682" text-anchor="middle">the model answers instead of calling a tool</text>
+
+  <text class="note" x="512" y="736" text-anchor="middle">Same model on both sides. The loop, the tools and the permissions are what make it an agent.</text>
+</svg>
