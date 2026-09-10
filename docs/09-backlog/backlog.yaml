@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-demo-04
 - phase-demo-05
 - phase-port-01
 - phase-ses-01
@@ -4627,7 +4626,7 @@ items:
   - sys-html
   - sys-demo-overview
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-data
   priority: 1
   session_budget: 1
@@ -4666,11 +4665,9 @@ items:
   - templates/styles
   - _public/overview
   - test/test_generate_overview.py
-  next_action: All D04-C1..C4 items and the D04-G phase gate are green on
-    agent/phase-demo-04, committed but not yet integrated into dev. Remaining is the
-    coordinator's D04-A adversarial review and D04-W Playwright verification (GOV-003
-    demo-track completion gate), then the integration/completion decision -- neither
-    is this orchestrator's to perform.
+  next_action: 'None — phase complete: D04-A findings fixed, D04-W browser verification
+    passed 5/5, branch integrated into dev with the owner''s approval (GOV-003
+    demo-track completion gate).'
   session: doc-session-demo-data-overview-skill
   completion_evidence:
   - tools/generate_overview.py
@@ -4680,11 +4677,16 @@ items:
   - templates/styles/overview.css
   - _public/overview/index.html
   - test/test_generate_overview.py
-  result: D04-C1 (templates), D04-C2 (generator), D04-C3 (skill), D04-C4 (OPS-014) and
-    D04-G (phase gate) all complete on agent/phase-demo-04 with their validators
-    passing. Full-suite verification (pytest, ruff, mypy, governance, private-content
-    check, double-generation determinism) is green. Awaiting the coordinator's D04-A
-    and D04-W dispatches before integration.
+  result: 'Integrated into dev at a89828d (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. Templates, generator, overview skill and
+    OPS-014 all validator-passed; double generation byte-identical end to end. D04-A
+    adversarial review: no blockers; two major documentation-contract findings fixed
+    (template GENERATED_AT comment corrected to meta.reference_at; SKILL.md
+    provenance split between fold()-sourced metrics and brain//systems.yaml-sourced
+    inventories). D04-W browser verification passed all 5 items: page figures match
+    the tools'' own JSON exactly, inventories non-empty with the systems count
+    matching the registry, no external network dependency. Final verification: 470
+    tests pass; governance OK; staged private-content check OK.'
 - id: phase-demo-05
   title: Demo content, runbook, reset tool and rehearsals
   plan: doc-live-demo
