@@ -4401,7 +4401,8 @@ items:
   - sys-api
   - sys-demo-stage
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-demo-stage
   priority: 1
   session_budget: 1
   depends_on: []
