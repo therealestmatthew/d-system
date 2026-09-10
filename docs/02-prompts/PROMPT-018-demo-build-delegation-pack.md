@@ -1339,3 +1339,297 @@ Stop each server you started. Stop when every browser-marked step has a recorded
 timing and evidence — or when the stage cannot start, reported with the real startup output as a
 blocking finding.
 ```
+
+---
+
+## D06 — phase-demo-06: stage terminal interaction (orchestrator: `demo-orch-stage`)
+
+Added 2026-09-10 with the owner's approval of the phase-demo-06 insertion (GOV-003); REQ-006
+rows R10–R12 govern.
+
+### D06-K — kickoff
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-orch-stage. Phase: phase-demo-06 (stage terminal interaction — session tabs, guarded
+drop, command injection; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md).
+Depends on phase-demo-01 through phase-demo-04 being integrated into dev AND marked status:
+complete — confirm before claiming.
+Worktree: /code/d-system-worktrees/phase-demo-06. Branch: agent/phase-demo-06, from dev.
+Ports: backend 8010, frontend 5180.
+
+1. On an up-to-date dev in /code/d-system, claim phase-demo-06 per AGENTS.md in one small commit
+   (status: active, agent: agent-demo-stage — your claim id as this orchestrator).
+2. Create the worktree; uv venv && uv sync --extra dev; cd ts && npm install (worktree-local
+   node_modules, never a symlink).
+3. Dispatch, in order: D06-C1 then D06-V1; D06-C2 then D06-V2; D06-C3 then D06-V3 — each verbatim
+   from PROMPT-018. At most two fix cycles per item, then report up. When a creator reports its
+   item done, commit that item on the phase branch (narrow, one concern per commit) BEFORE
+   dispatching its validator — the validator judges git diff dev...agent/phase-demo-06, which is
+   empty until the work is committed.
+4. Dispatch D06-G as the phase gate.
+5. Run the phase's verification commands yourself in the worktree and paste real output:
+   cd ts && npm run build; uv run pytest; uv run ruff check src/ test/; uv run mypy src/;
+   uv run python -m src.governance; uv run python tools/check_no_private_content.py with the
+   changes staged.
+6. Checkpoint progress. Do not mark the phase complete, do not integrate, do not push without
+   asking.
+
+Phase deliverables (verbatim from the backlog): ts/src; ts/public/demo-commands.json;
+src/api/routes/demo_terminal.py; test/test_demo_terminal.py.
+
+Stop when every deliverable exists in the worktree, D06-G is green, and the verification output
+is pasted — or when a blocking finding is reported up.
+```
+
+### D06-C1 — creator: websocket control frames (resize)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-creator-py. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180 (not needed by this item).
+
+Extend the terminal websocket route (src/api/routes/demo_terminal.py) to accept JSON text frames
+as control messages alongside the existing binary input frames: replace the receive_bytes() loop
+with receive() handling both frame kinds — binary bytes go to adapter.write() unchanged; a text
+frame parsing as {"type": "resize", "cols": N, "rows": N} with positive integers calls
+adapter.resize(cols, rows) (implemented but unused today, src/demo/posix.py TIOCSWINSZ); any
+other or malformed text frame is ignored safely and never reaches the shell as input. No new
+endpoints, one PTY per websocket, ADR-013's gating and loopback binding unchanged — do not touch
+registration or enforce code.
+
+Extend test/test_demo_terminal.py: a resize frame reaches the adapter (assert cols/rows applied
+or the adapter method called); a malformed text frame neither crashes the session nor appears in
+the shell's input; binary round-trip still works after a text frame; two concurrent websocket
+sessions are independent shells.
+
+Run in the worktree and paste real output: uv run pytest; uv run ruff check src/ test/;
+uv run mypy src/.
+
+Stop when the route change and tests exist and the commands' real output is pasted — or report
+the blocking finding.
+```
+
+### D06-V1 — validator: control frames
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-code. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180 (not needed by this item).
+
+Diff: git diff dev...agent/phase-demo-06 -- src/api/routes/demo_terminal.py test/test_demo_terminal.py
+
+Requirement text: the websocket route accepts binary frames as raw shell input (unchanged) and
+JSON text frames as control messages; {"type":"resize","cols":N,"rows":N} calls the adapter's
+resize; malformed or unknown text frames are ignored and never written to the shell — a text
+frame reaching adapter.write() is a failing finding. No new endpoints; registration gating and
+the loopback fail-fast are untouched; one PTY per websocket. Tests cover resize reaching the
+adapter, malformed-frame safety, binary round-trip after a text frame, and two independent
+concurrent sessions.
+
+Commands: uv run pytest; uv run ruff check src/ test/; uv run mypy src/.
+
+Stop when your verdict, findings and the commands' verbatim output are reported.
+```
+
+### D06-C2 — creator: session tabs, collapse, guarded drop
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-creator-web. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Rework the terminal region in ts/src/stage/ per REQ-006 rows R10 and R11:
+
+- Session tabs: the region hosts up to four terminal sessions as tabs (tab bar in the region
+  header: one control per session plus a new-tab control, disabled at the cap). Each session is
+  its own TerminalRegion instance over its own websocket. Every session's component stays
+  mounted; inactive tabs are CSS-hidden — switching tabs must never close a socket. Guard the
+  ResizeObserver/fitAddon.fit() path against zero-size containers and refit on tab activation
+  (TerminalRegion.tsx currently fits unconditionally). On fit, send the D06-C1 resize control
+  frame ({"type":"resize","cols":N,"rows":N}) over the socket.
+- Collapse: a control that hides the whole terminal region via CSS and the existing
+  --no-terminal grid reflow, leaving every socket open; re-expanding refits and shows the same
+  sessions.
+- Guarded drop: the existing descope toggle (rung 4) keeps its unmount-and-terminate behavior
+  but only after an explicit confirmation step (reuse the portaled Popover with a clearly
+  labelled confirm action). Closing an individual tab gets the same confirm. Nothing terminates
+  before the confirm; everything the confirm names terminates after it.
+
+Zero-scroll (REQ-006 R02) must hold at 1280x720, 1366x768, 1920x1080 and 1024x768 with 1-4 tabs,
+collapsed and expanded.
+
+Run in the worktree and paste real output: cd ts && npm run build.
+
+Stop when tabs, collapse, the guarded drop and the resize frame sending exist and the build
+output is pasted — or report the blocking finding.
+```
+
+### D06-V2 — validator: tabs and guards
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-code. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Diff: git diff dev...agent/phase-demo-06 -- ts/
+
+Requirement text: REQ-006 rows R10 and R11. Check the code implements: up to four session tabs,
+each an independent websocket; every session component stays mounted with inactive tabs
+CSS-hidden — a conditional render that unmounts on tab switch is a failing finding; the fit path
+guarded against zero-size containers, refit on activation, resize control frame sent on fit;
+collapse hides the region without closing any socket; the drop control and per-tab close each
+require an explicit confirm before termination — a code path that terminates a session without
+passing through the confirm is a failing finding; a fifth tab cannot be created.
+
+Commands: cd ts && npm run build.
+
+Stop when your verdict, findings and the command's verbatim output are reported.
+```
+
+### D06-C3 — creator: command panel and injection
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-creator-web. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Build the command panel per REQ-006 row R12: an in-place reveal within the terminal region
+header (the three-region layout contract R01/R02 is untouched). Entries load from
+ts/public/demo-commands.json — create it with clearly-placeholder entries of shape
+{"label": ..., "command": ..., "run": false} (final content is authored in phase-demo-05; never
+write real demo commands into page code — editing the JSON must change the list with no
+rebuild). Selecting an entry sends its command text into the ACTIVE tab's websocket — through
+the socket (the shell's echo paints it), never term.write() — without a trailing newline, so it
+lands on the input line un-executed; entries with run true append a newline. Expose the active
+terminal's send via a ref-based imperative handle from TerminalRegion (the repo's prop-drilling
+style; no new state library). When the terminal route is absent, the panel renders disabled
+alongside the existing absent-terminal message and nothing errors.
+
+Run in the worktree and paste real output: cd ts && npm run build.
+
+Stop when the panel, its data file, the injection path and the absent-state degrade exist and
+the build output is pasted — or report the blocking finding.
+```
+
+### D06-V3 — validator: command panel
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-code. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Diff: git diff dev...agent/phase-demo-06 -- ts/
+
+Requirement text: REQ-006 row R12. The panel's entries come only from
+ts/public/demo-commands.json — command text hardcoded in a component is a failing finding;
+injection goes through the active tab's websocket send, not term.write() — a term.write()
+injection is a failing finding; no trailing newline unless the entry sets run true; the panel is
+an in-place reveal inside the terminal region (no fourth page region); it degrades without
+errors when the terminal route is absent.
+
+Commands: cd ts && npm run build; grep ts/src for each placeholder command string from
+demo-commands.json (none may appear in components).
+
+Stop when your verdict, findings and the commands' verbatim output are reported.
+```
+
+### D06-G — phase gate
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-check. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Checklist:
+1. uv run python -m src.governance exits 0 (paste the summary line).
+2. git add -A, then uv run python tools/check_no_private_content.py passes with changes staged.
+3. Every phase deliverable exists: the ts/src tab/collapse/drop/panel changes;
+   ts/public/demo-commands.json; the src/api/routes/demo_terminal.py control-frame handling;
+   test/test_demo_terminal.py extensions.
+4. cd ts && npm run build passes; uv run pytest passes; uv run ruff check src/ test/ passes;
+   uv run mypy src/ passes.
+5. grep confirms no demo-commands.json command string appears inside ts/src.
+6. The diff against dev touches nothing outside the phase's deliverable paths plus the standard
+   checkpoint files (session record, backlog entry, catalog).
+
+Stop when every item has a recorded real result and the overall verdict is stated.
+```
+
+### D06-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+Adversarially review phase-demo-06 (stage terminal interaction). Assume it is broken; find where
+it fails. Specifications: the phase's backlog entry; REQ-006 rows R10-R12; ADR-013. Attack at
+minimum: whether a hidden tab's socket actually stays open or the CSS hide still unmounts;
+whether dropped or closed sessions genuinely terminate their shell processes — hunt for orphaned
+PTYs after a confirmed drop, a page reload, and a websocket error; whether any termination path
+bypasses the confirm; whether the fifth-tab cap can be defeated; whether injection can target
+the wrong tab or a dropped session; whether a crafted demo-commands.json entry (quotes,
+backticks, control characters) breaks injection or executes despite run false; whether a resize
+control frame can be forged as shell input or shell output can forge a control frame; whether
+ADR-013's gating and loopback enforcement survived the route change unmodified; whether
+zero-scroll still holds structurally with four tabs and the panel open. Run commands to turn
+suspicion into evidence.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
+### D06-W — browser verification (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-web. Worktree: /code/d-system-worktrees/phase-demo-06. Branch:
+agent/phase-demo-06. Ports: backend 8010, frontend 5180.
+
+In the worktree, start the backend with the terminal enabled
+(D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010) and the frontend
+(cd ts && npm run dev -- --port 5180, proxy configured for :8010). Then verify mechanically:
+
+1. Session persistence (R10): open a second tab; in tab 1 run a long-lived command (e.g.
+   sleep 300 &, then echo marker-1); switch to tab 2, run echo marker-2; switch back and assert
+   tab 1's scrollback still shows marker-1; collapse and re-expand the region and assert both
+   tabs' content survives; assert the new-tab control refuses a fifth tab.
+2. Guards (R11): activate the drop control and assert nothing terminates before its confirm;
+   confirm and assert the sessions genuinely end; reopen, close one tab through its confirm and
+   assert only that tab's session ended.
+3. Injection (R12): open the command panel, select an entry and assert its text appears on the
+   active tab's input line un-executed; press Enter and assert it executes; select a run true
+   entry and assert it executes on selection; edit ts/public/demo-commands.json, reload, and
+   assert the list changed.
+4. Zero-scroll (R02): at 1280x720, 1366x768, 1920x1080 and 1024x768, with four tabs open and
+   the command panel open and closed: document scrollHeight <= viewport height and no two
+   region bounding boxes intersect. Screenshot each size once.
+5. Restart the backend WITHOUT the flag and assert the absent-terminal message renders and the
+   command panel is disabled with no console errors.
+6. browser_console_messages shows no uncaught errors across the above.
+
+Stop each server you started. Stop when every item has a recorded pass/fail with the measured
+evidence — or when the stage cannot start, reported with the real startup output as a blocking
+finding.
+```
