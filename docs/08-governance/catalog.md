@@ -39,6 +39,8 @@ CI regenerates it and fails on any difference.
 | OPS-007 | operation | active | repository-owner | docs/08-governance/OPS-007-generate-tool-docs.md |
 | OPS-008 | operation | active | repository-owner | docs/08-governance/OPS-008-capture.md |
 | OPS-009 | operation | active | repository-owner | docs/08-governance/OPS-009-check-no-private-content.md |
+| OPS-011 | operation | active | repository-owner | docs/08-governance/OPS-011-overview-metrics.md |
+| OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -171,7 +173,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 5 | 0 | 0 | — |
+| PLAN-021 | doc-live-demo | draft | 4 | 1 | 0 | agent-demo-data |
 
 ## Held codes
 
@@ -180,10 +182,8 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
-| OPS-011 | reserved | Overview metrics tool operations document; deliverable of phase-demo-03. |
-| OPS-012 | reserved | Overview inventory tool operations document; deliverable of phase-demo-03. |
 | OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
 | OPS-014 | reserved | Overview page generator operations document; deliverable of phase-demo-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-128 documents — adr: 11, architecture: 5, governance: 7, operation: 9, plan: 32, prompt: 18, requirement: 6, session: 40.
+130 documents — adr: 11, architecture: 5, governance: 7, operation: 11, plan: 32, prompt: 18, requirement: 6, session: 40.
