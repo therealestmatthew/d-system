@@ -1,8 +1,13 @@
 schema_version: 1
-updated: '2026-09-09'
+updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-demo-01
+- phase-demo-03
+- phase-demo-02
+- phase-demo-04
+- phase-demo-05
 - phase-port-01
 - phase-ses-01
 items:
@@ -4386,3 +4391,233 @@ items:
   - .codex
   next_action: After all adapters land, run each host from a clean session and use
     observed discovery and authority behavior to correct the documentation.
+- id: phase-demo-01
+  title: Build the demo terminal backend and stage read routes
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  - doc-demo-terminal-decision
+  systems:
+  - sys-api
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Implement the PTY adapter with a POSIX pty + bash implementation and a ConPTY via
+    pywinpty + cmd/PowerShell implementation, platform auto-detected with a config
+    override for shell choice; declare pywinpty as a Windows-only optional dependency.
+  - Add the terminal websocket route under src/api/routes/, registered in
+    src/api/__init__.py, mounted only when D_SYSTEM_DEMO_TERMINAL=1 and served on
+    127.0.0.1 only, per ADR-013.
+  - Add the read routes the stage page needs (talking-points content, generated
+    overview location).
+  acceptance:
+  - With D_SYSTEM_DEMO_TERMINAL unset the terminal route does not exist; with it set,
+    a websocket client on 127.0.0.1 reaches a real shell and receives command output
+    (REQ-006 R04 and R05).
+  - The shell override selects the configured shell; platform detection picks the
+    POSIX adapter on Linux without pywinpty installed.
+  - Stage read routes return the talking-points data file content unchanged.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  deliverables:
+  - src/demo
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/demo_stage.py
+  - src/api/__init__.py
+  - pyproject.toml
+  - uv.lock
+  - test/test_demo_terminal.py
+  next_action: Implement the PTY adapter interface and its POSIX implementation, then
+    the flag-gated websocket route and its absence-by-default test.
+- id: phase-demo-02
+  title: Build the stage frontend with the zero-scroll layout
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  scope:
+  - Build the stage page in ts/ with an xterm.js terminal component connected to the
+    phase-demo-01 websocket, a talking-points rotator whose content loads from a data
+    file rather than being hardcoded, and an embedded panel showing the generated
+    overview page.
+  - Implement the zero-scroll layout — fits the viewport at common window sizes,
+    elements resize dynamically and never overlap, overflow content is revealed in
+    place via tabs, expanders or buttons; hover popups collapse on pointer leave and
+    click popups are dismissible (REQ-006 R02 and R03).
+  - Implement the descope fallbacks from PLAN-021 — the overview panel as an
+    open-in-tab link and the stage without the embedded terminal — as switchable
+    layout states, and a clear in-page message when the terminal route is absent.
+  acceptance:
+  - At 1280x720, 1366x768, 1920x1080 and 1024x768 the page shows no page scrollbar
+    and no overlapping elements, and hidden content is reachable in place (REQ-006
+    R02).
+  - A command typed in the embedded terminal against a flag-enabled backend returns
+    real shell output end to end.
+  - Editing the talking-points data file changes the rotator content without a change
+    to page code.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  deliverables:
+  - ts/src
+  - ts/package.json
+  - ts/package-lock.json
+  - ts/public/talking-points.json
+  next_action: Scaffold the stage page layout grid first and prove zero-scroll at the
+    four sizes with placeholder panels before wiring xterm.js.
+- id: phase-demo-03
+  title: Build the deterministic overview tools
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-overview
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build tools/overview_metrics.py emitting chart-ready JSON metrics over the idea
+    log — read via fold() in src/db/ideas.py, never raw — and the backlog, covering
+    the idea 000071 metric set (funnel counts and rates, cycle times, annotation
+    coverage, link distribution and orphan count, throughput, age of open ideas)
+    with zero counts reported as zero.
+  - Build tools/overview_inventory.py emitting consolidated inventories of concepts
+    and terminology (from the brain/ glossary sources) and of systems (from
+    docs/08-governance/systems.yaml).
+  - Both tools are deterministic — same inputs, same outputs, no model or network
+    calls — and ship with OPS-011 and OPS-012, generated reference blocks filled by
+    tools/generate_tool_docs.py, and tests.
+  acceptance:
+  - Running each tool twice against an unchanged repository produces byte-identical
+    output (REQ-006 R07).
+  - Reported idea metrics match an independent recomputation over the same log in the
+    tests.
+  - OPS-011 and OPS-012 exist with filled generated blocks and the governance check
+    passes.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  deliverables:
+  - tools/overview_metrics.py
+  - tools/overview_inventory.py
+  - docs/08-governance/OPS-011-overview-metrics.md
+  - docs/08-governance/OPS-012-overview-inventory.md
+  - test/test_overview_tools.py
+  next_action: Implement overview_metrics.py against fold() with its determinism test
+    first, then the inventory tool, then the OPS documents.
+- id: phase-demo-04
+  title: Build the overview skill, templates and page generation
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-html
+  - sys-demo-overview
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-03
+  scope:
+  - Build tools/generate_overview.py, which runs the phase-demo-03 tools and renders
+    templates/html/ and templates/styles/ overview templates into a generated
+    overview page under _public/, with OPS-014 and tests.
+  - Write .claude/skills/d-system-overview/SKILL.md orchestrating the deterministic
+    tools and the generator; the skill calls the scripts and never recomputes their
+    outputs (REQ-006 R08).
+  - Render metrics as charts from the chart-ready JSON with a table fallback per
+    PLAN-021 descope rung 1.
+  acceptance:
+  - Invoking the skill produces the overview page under _public/ and every figure on
+    it matches the corresponding tool output.
+  - Two generations against an unchanged repository produce an identical page.
+  - The skill definition contains no recomputation of tool-owned numbers.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  deliverables:
+  - tools/generate_overview.py
+  - docs/08-governance/OPS-014-generate-overview.md
+  - .claude/skills/d-system-overview/SKILL.md
+  - templates/html
+  - templates/styles
+  - _public/overview
+  - test/test_generate_overview.py
+  next_action: Define the page template family and render the phase-demo-03 sample
+    outputs through it before writing the skill wrapper.
+- id: phase-demo-05
+  title: Demo content, runbook, reset tool and rehearsals
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-stage
+  - sys-demo-overview
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  - phase-demo-02
+  - phase-demo-03
+  - phase-demo-04
+  scope:
+  - Write the final talking-points copy into the stage data file and the live-segment
+    runbook with per-step timeboxes summing inside 15 minutes (REQ-006 R09).
+  - Build tools/demo_reset.py with OPS-013 — returns demo-visible state to the
+    rehearsed baseline (regenerated overview outputs, cleared scratch state) without
+    touching idea-log history or governed documents.
+  - Write the Windows machine setup checklist per PLAN-021, including the pre-demo
+    git tag step and screen hygiene, and run the REQ-006 R06 terminal smoke check on
+    the presentation machine.
+  - Run two timed dry-runs of the live segment and record per-step times in the
+    runbook.
+  acceptance:
+  - Both dry-runs complete within 15 minutes with every step inside its timebox, and
+    their times are recorded in the runbook (REQ-006 R09).
+  - The R06 smoke check on the presentation machine is recorded as passing in the
+    runbook.
+  - Running demo_reset.py after a rehearsal restores the rehearsed baseline and
+    leaves the idea log and governed documents untouched.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  deliverables:
+  - ts/public/talking-points.json
+  - tools/demo_reset.py
+  - docs/08-governance/OPS-013-demo-reset.md
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  next_action: Draft the runbook timeboxes from the PROMPT-010 live-segment shape,
+    then build demo_reset.py so the first dry-run can already use it.

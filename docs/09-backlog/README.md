@@ -19,6 +19,7 @@
 | `phase-idea-*` | Idea capture as an append-only event log, its write tooling and triage agent | [Idea record system](../01-plans/PLAN-016-idea-record-system.md) |
 | `phase-scope-*` | Repository boundary — extracting work that belongs elsewhere and recording where it went | [Ephemeral working plans](../01-plans/PLAN-015-ephemeral-working-plans.md) |
 | `phase-plc-*` | Retiring root `plans/` as a governed concept and consolidating it into `docs/01-plans/` | [Plans directory consolidation](../01-plans/PLAN-018-plans-directory-consolidation.md) |
+| `phase-demo-*` | Live-demo stage backend and frontend, deterministic overview tools, overview generation and demo readiness | [Live demo plan](../01-plans/PLAN-021-live-demo.md) |
 
 ```bash
 uv run python -m src.governance --ready

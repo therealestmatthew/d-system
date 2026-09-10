@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(AGENTS.md)",
+      "Write(AGENTS.md)",
+      "Edit(CLAUDE.md)",
+      "Write(CLAUDE.md)",
+      "Edit(_private/**)",
+      "Write(_private/**)",
+      "Edit(.agents/**)",
+      "Write(.agents/**)",
+      "Edit(.codex/**)",
+      "Write(.codex/**)",
+      "Edit(_data/ideas.jsonl)",
+      "Write(_data/ideas.jsonl)"
+    ]
+  }
+}

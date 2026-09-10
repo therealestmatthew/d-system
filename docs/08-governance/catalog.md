@@ -17,6 +17,7 @@ CI regenerates it and fails on any difference.
 | ADR-010 | adr | accepted | repository-owner | docs/04-decisions/ADR-010-idea-staging.md |
 | ADR-011 | adr | accepted | repository-owner | docs/04-decisions/ADR-011-governance-model.md |
 | ADR-012 | adr | accepted | repository-owner | docs/04-decisions/ADR-012-systems-review.md |
+| ADR-013 | adr | accepted | repository-owner | docs/04-decisions/ADR-013-demo-terminal-capability.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -69,6 +70,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | plan | approved | repository-owner | docs/01-plans/PLAN-018-plans-directory-consolidation.md |
 | PLAN-019 | plan | draft | repository-owner | docs/01-plans/PLAN-019-idea-priority-queue.md |
 | PLAN-020 | plan | draft | repository-owner | docs/01-plans/PLAN-020-portable-agent-workflows.md |
+| PLAN-021 | plan | draft | repository-owner | docs/01-plans/PLAN-021-live-demo.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -86,11 +88,13 @@ CI regenerates it and fails on any difference.
 | PROMPT-015 | prompt | active | repository-owner | docs/02-prompts/PROMPT-015-demo-phase-protocol.md |
 | PROMPT-016 | prompt | active | repository-owner | docs/02-prompts/PROMPT-016-demo-guardrails.md |
 | PROMPT-017 | prompt | active | repository-owner | docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md |
+| PROMPT-018 | prompt | active | repository-owner | docs/02-prompts/PROMPT-018-demo-build-delegation-pack.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
 | REQ-004 | requirement | active | repository-owner | docs/06-requirements/REQ-004-plans-directory-consolidation.md |
 | REQ-005 | requirement | draft | repository-owner | docs/06-requirements/REQ-005-portable-agent-workflows.md |
+| REQ-006 | requirement | draft | repository-owner | docs/06-requirements/REQ-006-live-demo.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -130,6 +134,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-18-idea-triage-agent.md |
 | SESS-2026-09-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md |
 | SESS-2026-09-09-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-02-post-sweep-policy-and-prompts.md |
+| SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 
 ## Plans and their phases
 
@@ -166,6 +171,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
+| PLAN-021 | doc-live-demo | draft | 5 | 0 | 0 | — |
 
 ## Held codes
 
@@ -174,6 +180,10 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
+| OPS-011 | reserved | Overview metrics tool operations document; deliverable of phase-demo-03. |
+| OPS-012 | reserved | Overview inventory tool operations document; deliverable of phase-demo-03. |
+| OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
+| OPS-014 | reserved | Overview page generator operations document; deliverable of phase-demo-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-123 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 31, prompt: 17, requirement: 5, session: 39.
+128 documents — adr: 11, architecture: 5, governance: 7, operation: 9, plan: 32, prompt: 18, requirement: 6, session: 40.

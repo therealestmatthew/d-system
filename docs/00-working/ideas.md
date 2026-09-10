@@ -3351,9 +3351,10 @@ Raised by the owner on 2026-09-10.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. Every mechanism the demo needs already exists and works: the orient skill, the idea and idea-triage commands backed by a subagent, the sanctioned writer append_idea.py, and 76 real ideas across 289 events as of today. PROMPT-006 through PROMPT-009 are the reusable path the demo walks, and PLAN-016 delivered the append-only log and schema underneath it. Step 4 depends on 000071, which was raised in the same conversation and proposes the metrics command that does not yet exist. The gap worth knowing before planning: the distinction between a skill, a command, a subagent and a tool — the point the demo exists to land — is implicit in PLAN-020's capability mapping and authority declarations but has no dedicated teaching document anywhere, so the demo would have to write that explanatory material rather than point at it. The idea's own two unresolved questions stand: real data versus a seeded fixture set, and whether to end at a plan or carry through to an executed phase.
+- **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Realized by the live-demo pack recorded 2026-09-10: the live demo requirements (REQ-006), the live demo plan (PLAN-021), the demo terminal decision (ADR-013) and the five phase-demo-* backlog phases now govern the build, queued at the front of next_up. The demo prompt pack (PROMPT-010 through PROMPT-017) drives the factory and build sessions.
 
 </details>
 
@@ -3410,9 +3411,10 @@ Raised by the owner on 2026-09-10, alongside the training-demo idea.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. This overlaps an existing idea: 000008 'Metrics and analysis over the ideas data' is already triaged and covers the metrics half; 000010 (ideation dashboard) names idea metrics as a component, and 000042 proposes an ideas and backlog HTML view that metrics could feed. What 000071 adds beyond those is the second command — one that demonstrates what commands are for — and the training context from 000070. The owner should decide whether this supersedes 000008, merges into it, or narrows to the demo-specific part. The infrastructure is in place either way: fold() in src/db/ideas.py replays the log into current state, sql/001_schema.sql defines ideas, idea_annotations and idea_links, and rebuild_db.py shows the fold populating DuckDB. The convention that a new tool ships with a paired OPS document is well established (OPS-002, OPS-005, OPS-006). No existing tool or command reports metrics over any dataset. On the log-versus-projection question the idea raises: the log is authoritative, but fold() already abstracts the difference — both rebuild_db.py and generate_ideas_md.py read the log through it — so reading through the fold makes the choice an implementation detail rather than a contract decision.
+- **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Metrics design subsumed into the deterministic overview tools on 2026-09-10: phase-demo-03 (build the deterministic overview tools, under PLAN-021) builds tools/overview_metrics.py reading the log via fold() and emitting the funnel, cycle-time, annotation-coverage, link-distribution, throughput and age metrics as chart-ready JSON, with OPS-011 reserved for its operations document. The command-wrapper half of the idea stays open here.
 
 </details>
 

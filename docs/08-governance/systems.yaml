@@ -221,6 +221,37 @@ systems:
     allocation, and a derived live plan inventory; no DuckDB persistence. It does not verify that a
     plan's claims are actually true, run tests, rebuild the database, or check every business JSON
     file — those are separate commands and separate human judgment.
+- id: sys-demo-stage
+  name: Demo stage page
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-021-live-demo.md
+  - docs/04-decisions/ADR-013-demo-terminal-capability.md
+  depends_on:
+  - sys-api
+  - sys-ui
+  description: The live-demo presentation stage — an embedded xterm.js terminal over a websocket to
+    a PTY-backed shell, a talking-points rotator, and an embedded generated overview panel, in a
+    zero-scroll layout. The terminal capability is localhost-only, gated behind
+    D_SYSTEM_DEMO_TERMINAL=1 and never deployed (ADR-013). Planned; built by phase-demo-01 and
+    phase-demo-02.
+- id: sys-demo-overview
+  name: Deterministic overview generation
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-021-live-demo.md
+  depends_on:
+  - sys-portfolio
+  - sys-backlog
+  - sys-html
+  description: Deterministic scripts over the idea log (via fold()), the backlog and this registry
+    that emit chart-ready JSON and consolidated inventories, plus the skill and templates that render
+    them into a generated overview page under _public/. Same inputs, same outputs; no model calls in
+    the data path. Planned; built by phase-demo-03 and phase-demo-04.
 - id: sys-backlog
   name: Session phase backlog
   domain: governance
