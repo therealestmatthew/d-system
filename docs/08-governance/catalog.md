@@ -21,6 +21,7 @@ CI regenerates it and fails on any difference.
 | ADR-014 | adr | accepted | repository-owner | docs/04-decisions/ADR-014-workbench-terminal-capability.md |
 | ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
+| ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -33,6 +34,7 @@ CI regenerates it and fails on any difference.
 | GOV-005 | governance | active | repository-owner | docs/08-governance/GOV-005-document-codes.md |
 | GOV-006 | governance | active | repository-owner | docs/08-governance/GOV-006-conversation-guidelines.md |
 | GOV-007 | governance | active | repository-owner | docs/08-governance/GOV-007-repo-orientation.md |
+| GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -205,4 +207,4 @@ CI regenerates it and fails on any difference.
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-150 documents — adr: 14, architecture: 5, governance: 7, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 48.
+152 documents — adr: 15, architecture: 5, governance: 8, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 48.
