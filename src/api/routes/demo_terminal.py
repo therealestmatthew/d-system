@@ -22,6 +22,7 @@ from src.demo.factory import create_adapter
 
 DEMO_TERMINAL_FLAG: Final[str] = "D_SYSTEM_DEMO_TERMINAL"
 BIND_HOST_ENV_VAR: Final[str] = "D_SYSTEM_BIND_HOST"
+UVICORN_HOST_ENV_VAR: Final[str] = "UVICORN_HOST"
 LOOPBACK_HOSTS: Final[frozenset[str]] = frozenset({"127.0.0.1", "::1", "localhost"})
 DEFAULT_UVICORN_HOST: Final[str] = "127.0.0.1"
 
@@ -36,11 +37,27 @@ class NonLoopbackBindError(RuntimeError):
 def resolve_configured_host() -> str:
     """The host this process is bound (or about to bind) to.
 
-    Checked in order: the `D_SYSTEM_BIND_HOST` env var (an explicit override — used by tests,
-    and by any launch method that does not go through the `uvicorn` CLI), then `--host` on the
-    process's own `sys.argv` (the `uvicorn` CLI and the app it imports run in the same
-    interpreter process, so `--host 0.0.0.0` on the launch command line is visible here), then
-    uvicorn's own default of 127.0.0.1.
+    This is a heuristic, not a certainty: it inspects the same process's env vars and argv
+    for the ways `uvicorn` conventionally learns its bind host, but it cannot see every path
+    a caller could take to change that host (a programmatic `uvicorn.run(host=...)` call, a
+    config file, a reverse proxy remapping the bind after the fact, or an env var name this
+    function does not yet know to check). Adding a new launch method to the fleet without
+    adding it here would let that method start on a non-loopback host unrefused — so treat
+    this function's coverage as "the launch paths in use today", not "every launch path".
+
+    Checked in order:
+    1. `D_SYSTEM_BIND_HOST` — an explicit override used by tests, and by any launch method
+       that does not go through the `uvicorn` CLI at all.
+    2. `--host` on the process's own `sys.argv` — the `uvicorn` CLI and the app it imports run
+       in the same interpreter process, so `--host 0.0.0.0` on the launch command line is
+       visible here. An explicit CLI flag is what a real `uvicorn` invocation honors over its
+       own env-var default, so it is checked before `UVICORN_HOST` here too.
+    3. `UVICORN_HOST` — uvicorn's CLI is built on `click` with `auto_envvar_prefix="UVICORN"`,
+       so `UVICORN_HOST=0.0.0.0` sets `--host` for a `uvicorn` launch exactly as if it had been
+       passed on the command line, and this function must check it or a launch of the form
+       `UVICORN_HOST=0.0.0.0 uvicorn src.main:app` would bind non-loopback while this function
+       still reported the loopback default.
+    4. Uvicorn's own default of 127.0.0.1, when none of the above says otherwise.
     """
     env_host = os.environ.get(BIND_HOST_ENV_VAR)
     if env_host:
@@ -51,6 +68,9 @@ def resolve_configured_host() -> str:
             return argv[index + 1]
         if arg.startswith("--host="):
             return arg.split("=", 1)[1]
+    uvicorn_host_env = os.environ.get(UVICORN_HOST_ENV_VAR)
+    if uvicorn_host_env:
+        return uvicorn_host_env
     return DEFAULT_UVICORN_HOST
 
 

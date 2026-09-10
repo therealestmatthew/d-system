@@ -35,11 +35,13 @@ from starlette.websockets import WebSocketDisconnect
 import src.api as api_module
 import src.main as main_module
 from src.api.routes.demo_stage import (
+    DEMO_TERMINAL_FLAG_ENV_VAR,
     OVERVIEW_PAGE_PATH_ENV_VAR,
     TALKING_POINTS_PATH_ENV_VAR,
 )
 from src.api.routes.demo_terminal import (
     BIND_HOST_ENV_VAR,
+    UVICORN_HOST_ENV_VAR,
     NonLoopbackBindError,
     enforce_loopback_bind,
     resolve_configured_host,
@@ -51,6 +53,7 @@ from src.demo.posix import PosixPtyAdapter
 DEMO_TERMINAL_WS_PATH = "/api/v1/demo/terminal/ws"
 DEMO_STAGE_TALKING_POINTS_PATH = "/api/v1/demo/stage/talking-points"
 DEMO_STAGE_OVERVIEW_LOCATION_PATH = "/api/v1/demo/stage/overview-location"
+DEMO_STAGE_TERMINAL_ENABLED_PATH = "/api/v1/demo/stage/terminal-enabled"
 
 
 def test_platform_detection_is_not_windows_on_linux() -> None:
@@ -245,6 +248,23 @@ def test_registration_fails_fast_for_non_loopback_bind_with_flag_set(
         rebuild_app(flag="1", bind_host="0.0.0.0")
 
 
+def test_registration_fails_fast_for_uvicorn_host_env_var_non_loopback(
+    monkeypatch: pytest.MonkeyPatch, rebuild_app: Callable[..., FastAPI]
+) -> None:
+    """The full bypass reproduced end to end: `D_SYSTEM_DEMO_TERMINAL=1
+    UVICORN_HOST=0.0.0.0 uv run uvicorn src.main:app --port 8010` — no `--host` flag, no
+    `D_SYSTEM_BIND_HOST`, just `UVICORN_HOST` the way `uvicorn`'s `click`-based CLI (built with
+    `auto_envvar_prefix="UVICORN"`) actually reads it — must still refuse to build the app
+    (D01-A finding 1).
+    """
+    monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
+    monkeypatch.setenv(UVICORN_HOST_ENV_VAR, "0.0.0.0")
+    monkeypatch.setattr(sys, "argv", ["uvicorn", "src.main:app", "--port", "8010"])
+    with pytest.raises(RuntimeError, match="loopback"):
+        rebuild_app(flag="1")
+    monkeypatch.delenv(UVICORN_HOST_ENV_VAR, raising=False)
+
+
 def test_enforce_loopback_bind_raises_for_non_loopback_host(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -287,6 +307,50 @@ def test_resolve_configured_host_env_var_overrides_argv(monkeypatch: pytest.Monk
         sys, "argv", ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8010"]
     )
     assert resolve_configured_host() == "127.0.0.1"
+
+
+def test_resolve_configured_host_reads_uvicorn_host_env_var(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`uvicorn`'s CLI is `click`-based with `auto_envvar_prefix="UVICORN"`, so
+    `UVICORN_HOST=0.0.0.0 uvicorn src.main:app` sets the bind host exactly as `--host 0.0.0.0`
+    would, without either the flag or `D_SYSTEM_BIND_HOST` appearing anywhere. Missing this
+    check let `D_SYSTEM_DEMO_TERMINAL=1 UVICORN_HOST=0.0.0.0 uv run uvicorn src.main:app` start
+    and bind non-loopback (D01-A finding 1) — this proves the pure function alone now catches
+    it.
+    """
+    monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
+    monkeypatch.setenv(UVICORN_HOST_ENV_VAR, "0.0.0.0")
+    monkeypatch.setattr(sys, "argv", ["uvicorn", "src.main:app", "--port", "8010"])
+    assert resolve_configured_host() == "0.0.0.0"
+
+
+def test_resolve_configured_host_argv_host_flag_wins_over_uvicorn_host_env_var(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An explicit `--host` on the command line is what a real `uvicorn` launch honors over its
+    own `UVICORN_HOST`-sourced default, so this function must agree.
+    """
+    monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
+    monkeypatch.setenv(UVICORN_HOST_ENV_VAR, "0.0.0.0")
+    monkeypatch.setattr(
+        sys, "argv", ["uvicorn", "src.main:app", "--host", "127.0.0.1", "--port", "8010"]
+    )
+    assert resolve_configured_host() == "127.0.0.1"
+
+
+def test_enforce_loopback_bind_raises_for_non_loopback_uvicorn_host_env_var(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The exact bypass the adversarial review (D01-A finding 1) demonstrated: no
+    `D_SYSTEM_BIND_HOST` set, no `--host` on argv, only `UVICORN_HOST=0.0.0.0` — the loopback
+    fail-fast must still refuse.
+    """
+    monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
+    monkeypatch.setenv(UVICORN_HOST_ENV_VAR, "0.0.0.0")
+    monkeypatch.setattr(sys, "argv", ["uvicorn", "src.main:app", "--port", "8010"])
+    with pytest.raises(NonLoopbackBindError):
+        enforce_loopback_bind()
 
 
 # --- src/api/routes/demo_stage.py: talking-points and overview-location read routes ---
@@ -356,6 +420,31 @@ def test_get_overview_location_defaults_to_a_path_under_public(
     assert response.status_code == 200
     path = response.json()["path"]
     assert path.startswith("_public/")
+
+
+def test_get_terminal_enabled_reports_false_with_flag_unset(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(DEMO_TERMINAL_FLAG_ENV_VAR, raising=False)
+    client = TestClient(main_module.app)
+    response = client.get(DEMO_STAGE_TERMINAL_ENABLED_PATH)
+    assert response.status_code == 200
+    assert response.json() == {"terminal_enabled": False}
+
+
+def test_get_terminal_enabled_reports_true_with_flag_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`demo_stage.py` reads the flag itself rather than importing `demo_terminal`, so this
+    proves the read-back without needing the app to be rebuilt under the flag — the whole point
+    of this route (D01-A finding 2) is that it works regardless of whether the terminal route
+    module was ever imported in this process.
+    """
+    monkeypatch.setenv(DEMO_TERMINAL_FLAG_ENV_VAR, "1")
+    client = TestClient(main_module.app)
+    response = client.get(DEMO_STAGE_TERMINAL_ENABLED_PATH)
+    assert response.status_code == 200
+    assert response.json() == {"terminal_enabled": True}
 
 
 def test_get_talking_points_defaults_to_ts_public_location(

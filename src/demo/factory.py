@@ -3,8 +3,13 @@
 `create_adapter()` is the one place that picks a `TerminalAdapter` implementation: the
 platform is auto-detected via `platform.system()`, and either the `shell` argument or
 the `D_SYSTEM_DEMO_SHELL` environment variable overrides the default shell for that
-platform. The Windows backend is imported lazily, inside the branch that needs it, so a
-Linux or macOS caller never touches `src/demo/windows.py`'s `pywinpty` import.
+platform. `src.demo.windows` itself is imported unconditionally, at module load, by
+this file below — that module only defines `WindowsConPtyAdapter` and a default shell
+constant, it does not import `pywinpty` at module scope. The actual safety mechanism is
+inside `WindowsConPtyAdapter.start()`, which defers `import winpty` to the moment a
+Windows adapter is actually started — so a Linux or macOS caller loads
+`src/demo/windows.py` but never touches its `pywinpty` import, because that import
+never happens on this platform.
 """
 
 from __future__ import annotations
