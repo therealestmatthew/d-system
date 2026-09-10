@@ -4696,7 +4696,8 @@ items:
   - sys-demo-stage
   - sys-demo-overview
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-demo-content
   priority: 1
   session_budget: 1
   depends_on:
