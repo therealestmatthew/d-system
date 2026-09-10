@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="The agentic loop">
+  <title>The agentic loop</title>
+  <desc>Context, model call, tool call, tool result appended to the context, repeat — until the model answers instead of calling a tool.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .title { font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .head { font-size: 24px; font-weight: 700; fill: #6d28d9; }
+      .box { font-size: 23px; font-weight: 700; fill: #0f172a; }
+      .small { font-size: 16px; fill: #475569; }
+      .lbl { font-size: 17px; fill: #334155; }
+      .note { font-size: 18px; fill: #334155; }
+      .edge { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .ctx { fill: #fef3c7; stroke: #b45309; stroke-width: 2.5; }
+      .model { fill: #dbeafe; stroke: #1d4ed8; stroke-width: 2.5; }
+      .tool { fill: #dcfce7; stroke: #15803d; stroke-width: 2.5; }
+      .out { fill: #ffffff; stroke: #334155; stroke-width: 2.5; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="768" fill="#ffffff"/>
+  <text class="title" x="512" y="52" text-anchor="middle">The agentic loop</text>
+
+  <rect class="ctx" x="60" y="140" width="300" height="120" rx="12"/>
+  <text class="box" x="210" y="186" text-anchor="middle">Context</text>
+  <text class="small" x="210" y="216" text-anchor="middle">system prompt · conversation ·</text>
+  <text class="small" x="210" y="240" text-anchor="middle">every tool result so far</text>
+
+  <rect class="model" x="664" y="140" width="300" height="120" rx="12"/>
+  <text class="box" x="814" y="186" text-anchor="middle">Model call</text>
+  <text class="small" x="814" y="216" text-anchor="middle">reads the whole context,</text>
+  <text class="small" x="814" y="240" text-anchor="middle">decides what to do next</text>
+
+  <rect class="tool" x="664" y="410" width="300" height="120" rx="12"/>
+  <text class="box" x="814" y="456" text-anchor="middle">Tool call</text>
+  <text class="small" x="814" y="486" text-anchor="middle">a tool name and arguments,</text>
+  <text class="small" x="814" y="510" text-anchor="middle">run by the program</text>
+
+  <rect class="tool" x="60" y="410" width="300" height="120" rx="12"/>
+  <text class="box" x="210" y="456" text-anchor="middle">Tool result</text>
+  <text class="small" x="210" y="486" text-anchor="middle">output, or the error —</text>
+  <text class="small" x="210" y="510" text-anchor="middle">both are just text</text>
+
+  <path class="edge" d="M 360 200 H 658"/>
+  <text class="lbl" x="509" y="182" text-anchor="middle">the whole context, every time</text>
+
+  <path class="edge" d="M 814 260 V 404"/>
+  <text class="lbl" x="798" y="318" text-anchor="end">the model requests it;</text>
+  <text class="lbl" x="798" y="342" text-anchor="end">it never executes</text>
+
+  <path class="edge" d="M 664 470 H 366"/>
+  <text class="lbl" x="515" y="502" text-anchor="middle">the program executes and returns</text>
+
+  <path class="edge" d="M 210 410 V 266"/>
+  <text class="lbl" x="228" y="318">appended —</text>
+  <text class="lbl" x="228" y="342">the context grows</text>
+
+  <text class="head" x="512" y="392" text-anchor="middle">agentic loop</text>
+
+  <path class="edge" d="M 964 200 H 996 V 664 H 730"/>
+  <rect class="out" x="404" y="628" width="320" height="72" rx="12"/>
+  <text class="box" x="564" y="672" text-anchor="middle">Answer</text>
+  <text class="lbl" x="978" y="590" text-anchor="end">the model answers</text>
+  <text class="lbl" x="978" y="614" text-anchor="end">instead of calling a tool</text>
+
+  <text class="note" x="200" y="604" text-anchor="middle">Every pass is a fresh model call</text>
+  <text class="note" x="200" y="630" text-anchor="middle">over a context one result larger.</text>
+  <text class="note" x="200" y="668" text-anchor="middle">A failed command is not a crash —</text>
+  <text class="note" x="200" y="694" text-anchor="middle">just another result to read.</text>
+</svg>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="Sub-agents and context isolation">
+  <title>Sub-agents and context isolation</title>
+  <desc>A sub-agent runs its own loop in its own context window; only its final report crosses back into the caller's context.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+      .title { font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .head { font-size: 24px; font-weight: 700; fill: #0f172a; }
+      .box { font-size: 21px; font-weight: 700; fill: #0f172a; }
+      .small { font-size: 16px; fill: #475569; }
+      .lbl { font-size: 17px; fill: #334155; }
+      .stop { font-size: 17px; font-weight: 700; fill: #b91c1c; }
+      .edge { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .blocked { stroke: #b91c1c; stroke-width: 3; fill: none; }
+      .panel { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .ctx { fill: #fef3c7; stroke: #b45309; stroke-width: 2.5; }
+      .model { fill: #dbeafe; stroke: #1d4ed8; stroke-width: 2.5; }
+      .tool { fill: #dcfce7; stroke: #15803d; stroke-width: 2.5; }
+      .n { fill: #ffffff; stroke: #334155; stroke-width: 2.5; }
+      .loop { fill: none; stroke: #6d28d9; stroke-width: 2.5; stroke-dasharray: 8 6; }
+      .boundary { stroke: #b91c1c; stroke-width: 3; stroke-dasharray: 10 8; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="768" fill="#ffffff"/>
+  <text class="title" x="512" y="52" text-anchor="middle">Sub-agents and context isolation</text>
+
+  <rect class="panel" x="36" y="88" width="440" height="464" rx="12"/>
+  <text class="head" x="56" y="124">Caller — the main session</text>
+  <rect class="ctx" x="60" y="140" width="392" height="96" rx="10"/>
+  <text class="box" x="256" y="176" text-anchor="middle">Its context window</text>
+  <text class="small" x="256" y="208" text-anchor="middle">CLAUDE.md, the conversation, its own tool results</text>
+
+  <rect class="n" x="60" y="290" width="392" height="64" rx="10"/>
+  <text class="box" x="256" y="329" text-anchor="middle">Task for the sub-agent</text>
+
+  <rect class="n" x="60" y="440" width="392" height="82" rx="10"/>
+  <text class="box" x="256" y="474" text-anchor="middle">Final report</text>
+  <text class="small" x="256" y="502" text-anchor="middle">one result, appended here</text>
+
+  <rect class="panel" x="548" y="88" width="440" height="464" rx="12"/>
+  <text class="head" x="568" y="124">Sub-agent</text>
+  <rect class="ctx" x="572" y="140" width="392" height="96" rx="10"/>
+  <text class="box" x="768" y="176" text-anchor="middle">Its own context window</text>
+  <text class="small" x="768" y="208" text-anchor="middle">starts fresh — it does not inherit the caller's</text>
+
+  <rect class="loop" x="572" y="258" width="392" height="164" rx="12"/>
+  <text class="small" x="588" y="282">its own agentic loop, its own tools</text>
+  <rect class="model" x="596" y="294" width="164" height="54" rx="10"/>
+  <text class="box" x="678" y="329" text-anchor="middle">Model call</text>
+  <rect class="tool" x="782" y="294" width="158" height="54" rx="10"/>
+  <text class="box" x="861" y="329" text-anchor="middle">Tool call</text>
+  <text class="small" x="768" y="382" text-anchor="middle">dozens of tool results accumulate in here</text>
+  <text class="small" x="768" y="406" text-anchor="middle">and are discarded when it finishes</text>
+
+  <rect class="n" x="572" y="446" width="392" height="70" rx="10"/>
+  <text class="box" x="768" y="489" text-anchor="middle">Report</text>
+
+  <path class="boundary" d="M 512 100 V 560"/>
+
+  <path class="edge" d="M 452 316 L 566 214"/>
+  <text class="lbl" x="470" y="252" text-anchor="end">prompt in</text>
+
+  <path class="edge" d="M 568 478 L 458 478"/>
+  <text class="lbl" x="512" y="440" text-anchor="middle">report out</text>
+
+  <path class="blocked" d="M 572 390 H 530"/>
+  <path class="blocked" d="M 524 376 V 404"/>
+
+  <text class="stop" x="512" y="600" text-anchor="middle">context boundary — the sub-agent's tool output never crosses it; only its report does</text>
+
+  <text class="head" x="56" y="650">In this repository</text>
+  <text class="lbl" x="56" y="682"><tspan class="mono">demo-orch-stage</tspan> claims a phase and dispatches <tspan class="mono">demo-creator-web</tspan> to write the code,</text>
+  <text class="lbl" x="56" y="708">then <tspan class="mono">demo-validator-code</tspan> to check it. The validator is given the diff, the requirement and the</text>
+  <text class="lbl" x="56" y="734">commands — never the creator's rationale, because it never shared the creator's context.</text>
+</svg>

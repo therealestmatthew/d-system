@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="Skill architecture">
+  <title>Skill architecture</title>
+  <desc>A skill is a folder holding SKILL.md: YAML front matter always in context, and a Markdown body loaded when the skill is invoked.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+      .title { font-size: 36px; font-weight: 700; fill: #0f172a; }
+      .head { font-size: 23px; font-weight: 700; fill: #0f172a; }
+      .box { font-size: 20px; font-weight: 700; fill: #0f172a; }
+      .code { font-size: 17px; fill: #0f172a; }
+      .small { font-size: 16px; fill: #475569; }
+      .note { font-size: 17px; fill: #334155; }
+      .edge { stroke: #334155; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .panel { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .front { fill: #dbeafe; stroke: #1d4ed8; stroke-width: 2.5; }
+      .body { fill: #ede9fe; stroke: #6d28d9; stroke-width: 2.5; }
+      .ctx { fill: #fef3c7; stroke: #b45309; stroke-width: 2.5; }
+    </style>
+  </defs>
+
+  <rect width="1024" height="768" fill="#ffffff"/>
+  <text class="title" x="512" y="52" text-anchor="middle">Skill architecture</text>
+
+  <!-- Directory structure -->
+  <rect class="panel" x="36" y="80" width="424" height="248" rx="12"/>
+  <text class="head" x="56" y="116">Where a skill lives</text>
+  <text class="code mono" x="56" y="152">.claude/</text>
+  <text class="code mono" x="76" y="178">skills/</text>
+  <text class="code mono" x="96" y="204">d-system-overview/</text>
+  <text class="code mono" x="116" y="230">SKILL.md</text>
+  <text class="code mono" x="96" y="256">orient/SKILL.md</text>
+  <text class="code mono" x="96" y="282">checkpoint/SKILL.md</text>
+  <text class="small" x="56" y="312">One folder per skill. Supporting files are optional.</text>
+
+  <!-- SKILL.md anatomy -->
+  <rect class="panel" x="490" y="80" width="498" height="382" rx="12"/>
+  <text class="head" x="512" y="116">SKILL.md</text>
+
+  <rect class="front" x="512" y="132" width="454" height="132" rx="10"/>
+  <text class="code mono" x="530" y="158">---</text>
+  <text class="code mono" x="530" y="182">name: d-system-overview</text>
+  <text class="code mono" x="530" y="206">description: Regenerate the overview</text>
+  <text class="code mono" x="530" y="228">page by running the tool …</text>
+  <text class="code mono" x="530" y="252">---</text>
+
+  <rect class="body" x="512" y="280" width="454" height="160" rx="10"/>
+  <text class="code mono" x="530" y="308"># d-system-overview</text>
+  <text class="code mono" x="530" y="336">Run the deterministic tool, then</text>
+  <text class="code mono" x="530" y="358">report the figures it printed.</text>
+  <text class="code mono" x="530" y="386">uv run python tools/generate_overview.py</text>
+  <text class="small" x="530" y="420">Instructions, not code — the determinism lives in the tool.</text>
+
+  <text class="small" x="470" y="182" text-anchor="end">front matter</text>
+  <path class="edge" d="M 470 198 H 506"/>
+  <text class="small" x="470" y="338" text-anchor="end">body</text>
+  <path class="edge" d="M 470 354 H 506"/>
+
+  <!-- Progressive disclosure -->
+  <text class="head" x="512" y="510" text-anchor="middle">Progressive disclosure — what is actually in the context</text>
+
+  <rect class="ctx" x="60" y="534" width="330" height="150" rx="12"/>
+  <text class="box" x="225" y="570" text-anchor="middle">Before invocation</text>
+  <text class="note" x="225" y="604" text-anchor="middle">name + description only</text>
+  <text class="note" x="225" y="632" text-anchor="middle">— about one line per skill,</text>
+  <text class="note" x="225" y="658" text-anchor="middle">for every skill installed.</text>
+
+  <path class="edge" d="M 394 610 H 628"/>
+  <text class="small" x="511" y="588" text-anchor="middle">the model judges that the</text>
+  <text class="small" x="511" y="646" text-anchor="middle">description matches the task</text>
+
+  <rect class="ctx" x="634" y="534" width="330" height="150" rx="12"/>
+  <text class="box" x="799" y="570" text-anchor="middle">After invocation</text>
+  <text class="note" x="799" y="604" text-anchor="middle">the whole body, plus any</text>
+  <text class="note" x="799" y="632" text-anchor="middle">file it points to — loaded</text>
+  <text class="note" x="799" y="658" text-anchor="middle">for this task only.</text>
+
+  <text class="note" x="512" y="726" text-anchor="middle">This is why a description is written to say when to use the skill, not to summarise it.</text>
+</svg>
