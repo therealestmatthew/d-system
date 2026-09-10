@@ -35,7 +35,11 @@ export default function Popover({
 }: {
   triggerLabel: string
   title: string
-  children: ReactNode
+  // Most callers (e.g. TalkingPointsRegion's "show all" list) pass static content. Callers that
+  // need a confirm action inside the bubble (R11's guarded drop / guarded tab close) pass a
+  // function instead, so they can close the popover themselves once the confirmed action has
+  // run, without Popover exposing its internal `open` state as a wider API.
+  children: ReactNode | ((close: () => void) => ReactNode)
 }) {
   const [open, setOpen] = useState(false)
   const [style, setStyle] = useState<CSSProperties>({})
@@ -147,7 +151,9 @@ export default function Popover({
                   ×
                 </button>
               </div>
-              <div className="stage-popover__body">{children}</div>
+              <div className="stage-popover__body">
+                {typeof children === 'function' ? children(() => setOpen(false)) : children}
+              </div>
             </div>,
             document.body,
           )

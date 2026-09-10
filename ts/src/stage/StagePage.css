@@ -67,6 +67,17 @@ body {
   border-color: #8fa1c7;
 }
 
+/* The rung-4 drop control is a Popover trigger (guarded, R11) rather than a plain toggle button
+   when a terminal region exists to drop — matches the other layout-control buttons' look. */
+.stage-page__layout-controls .stage-popover__trigger {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #666;
+  background: #2a2e37;
+  color: #fff;
+}
+
 /* Default grid: terminal on the left spanning both rows, talking points and overview stacked
    on the right. minmax(0, ...) on every track keeps children from forcing the grid — and so
    the page — to grow past the viewport. */
@@ -145,13 +156,112 @@ body {
   font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
 }
 
-/* The live terminal region: no padding around the mount point (xterm.js manages its own
-   internal spacing) and positioned so the "connection closed" overlay can sit on top of it
-   without disturbing the xterm.js layout underneath. */
+/* The live terminal region: a flex column so the tab bar (auto height) sits above the sessions
+   area, which fills the rest and hosts every session's mount point stacked absolutely so
+   whichever one is active fills the same box regardless of which tab that is. No padding around
+   the sessions area (xterm.js manages its own internal spacing). */
 .stage-region__body--terminal {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: 0;
   background: #0d1117;
+}
+
+/* R10/R11: up to four tabs, one per session, plus a new-session control disabled at the cap.
+   Every tab stays in the DOM regardless of which is active — only .stage-terminal-session's own
+   visibility (below) responds to the active tab, never this bar's presence. */
+.stage-terminal-tabbar {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 0 0 auto;
+  padding: 0.35rem 0.5rem;
+  background: #161b22;
+  border-bottom: 1px solid #2a2e37;
+  overflow-x: auto; /* many tabs reveal in place via horizontal scroll, not page scroll */
+}
+
+.stage-terminal-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  border-radius: 4px;
+  background: #21262d;
+  flex: 0 0 auto;
+}
+
+.stage-terminal-tab--active {
+  background: #30363d;
+  outline: 1px solid #58a6ff;
+}
+
+.stage-terminal-tab__select {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: #c9d1d9;
+  cursor: pointer;
+}
+
+.stage-terminal-tab .stage-popover__trigger {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.45rem;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  background: transparent;
+  color: #8b949e;
+}
+
+.stage-terminal-tab__new {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid #444c56;
+  background: #21262d;
+  color: #c9d1d9;
+  cursor: pointer;
+}
+
+.stage-terminal-tab__new:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stage-terminal-collapse-toggle {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+/* R10/R11: collapse hides the region via CSS only — every session's TerminalSession instance
+   stays mounted (its socket stays open) beneath this. */
+.stage-region--terminal-collapsed {
+  display: none;
+}
+
+/* Sessions area: relative positioning lets every session's mount point stack in the same box
+   (position: absolute, inset: 0) so whichever tab is active fills exactly this area, and
+   switching tabs never changes this container's own size. */
+.stage-terminal-sessions {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.stage-terminal-session {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.stage-terminal-session--active {
+  display: block;
 }
 
 .stage-terminal-mount {
@@ -175,6 +285,26 @@ body {
   background: rgba(13, 17, 23, 0.92);
   border: 1px solid #b34700;
   border-radius: 4px;
+}
+
+/* R11's guarded drop / guarded tab-close confirmation content, rendered inside a Popover
+   bubble. */
+.stage-terminal-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stage-terminal-confirm__action {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #b34700;
+  background: #fff4ec;
+  color: #b34700;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .stage-placeholder-text {
