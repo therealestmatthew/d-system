@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-System — Prompt-Pack Planning Protocol</title>
+<style>
+:root{
+  --bg:#0A0E0C; --surface:#111814; --raised:#18211C; --raised-2:#1E2A24;
+  --border:#24322B; --border-lit:#31423A;
+  --green:#4A9B70; --green-deep:#2C6349; --green-dim:#7FB99A; --green-glow:rgba(74,155,112,.14);
+  --mahogany:#A85D48; --mahogany-hi:#C77B63; --mahogany-lo:#6E3B2F; --mahogany-glow:rgba(168,93,72,.14);
+  --text:#E7EDE9; --text-dim:#94A69C; --text-faint:#6B7A72;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --nav-w:264px;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:400 16px/1.65 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 500px at 12% -8%, rgba(44,99,73,.20), transparent 62%),
+    radial-gradient(760px 460px at 92% 4%, rgba(110,59,47,.13), transparent 60%);
+  background-attachment:fixed;
+}
+a{color:var(--green-dim);text-decoration:none}
+a:hover{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--mahogany-hi);outline-offset:2px;border-radius:4px}
+code,kbd{font-family:var(--mono);font-size:.88em}
+h1,h2,h3,h4{line-height:1.22;margin:0;font-weight:600;letter-spacing:-.012em}
+p{margin:0 0 .9em}
+p:last-child{margin-bottom:0}
+
+/* ---------- layout ---------- */
+.shell{display:grid;grid-template-columns:var(--nav-w) minmax(0,1fr);min-height:100vh}
+.nav{
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--border);background:rgba(10,14,12,.82);
+  backdrop-filter:blur(12px);padding:26px 16px 32px;
+}
+.nav-brand{display:block;padding:0 8px 16px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.nav-brand b{display:block;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.nav-brand span{display:block;font-size:11.5px;color:var(--text-faint);margin-top:5px;letter-spacing:.05em}
+.nav ol{list-style:none;margin:0;padding:0;counter-reset:nv}
+.nav ol a{
+  display:flex;gap:10px;align-items:baseline;padding:7px 9px;border-radius:7px;
+  font-size:13.5px;color:var(--text-dim);border-left:2px solid transparent;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.nav ol a:hover{background:var(--raised);color:var(--text);text-decoration:none}
+.nav ol a .n{font-family:var(--mono);font-size:11px;color:var(--text-faint);min-width:16px}
+.nav ol a.active{background:var(--mahogany-glow);color:var(--mahogany-hi);border-left-color:var(--mahogany)}
+.nav ol a.active .n{color:var(--mahogany)}
+.nav-tools{margin-top:18px;padding:0 8px;display:flex;flex-direction:column;gap:8px}
+
+.main{min-width:0;padding:0 0 96px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 40px}
+.prose{max-width:74ch}
+
+/* ---------- masthead ---------- */
+.mast{padding:76px 0 54px;border-bottom:1px solid var(--border)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:22px;
+  padding:6px 13px;border:1px solid var(--border-lit);border-radius:100px;background:var(--surface);
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mahogany);box-shadow:0 0 9px var(--mahogany)}
+.mast h1{font-size:clamp(38px,6.2vw,64px);letter-spacing:-.033em;margin-bottom:.34em}
+.mast h1 em{font-style:normal;color:var(--green)}
+.lede{font-size:clamp(17px,2.1vw,20.5px);line-height:1.55;color:var(--text-dim);max-width:64ch}
+.lede strong{color:var(--text);font-weight:600}
+.status{
+  margin-top:30px;padding:14px 18px;border-left:3px solid var(--mahogany);
+  background:linear-gradient(90deg,var(--mahogany-glow),transparent 78%);
+  border-radius:0 var(--r) var(--r) 0;font-size:13.5px;color:var(--text-dim);max-width:74ch;
+}
+.status b{color:var(--mahogany-hi);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:34px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.stat b{display:block;font:600 30px/1 var(--mono);color:var(--green);letter-spacing:-.03em}
+.stat span{display:block;font-size:11.5px;color:var(--text-faint);margin-top:8px;letter-spacing:.075em;text-transform:uppercase}
+
+/* ---------- sections / panels ---------- */
+.sec{border-bottom:1px solid var(--border)}
+.sec > summary{
+  list-style:none;cursor:pointer;padding:30px 0;display:flex;gap:20px;align-items:flex-start;
+  transition:opacity .15s;
+}
+.sec > summary::-webkit-details-marker{display:none}
+.sec > summary:hover{opacity:.86}
+.sec-n{font:500 12px/1.7 var(--mono);color:var(--mahogany);letter-spacing:.14em;padding-top:5px;min-width:34px}
+.sec-h{flex:1;min-width:0}
+.sec-h h2{font-size:clamp(23px,3vw,31px);letter-spacing:-.02em}
+.sec-h p{margin:8px 0 0;color:var(--text-dim);font-size:15px;max-width:70ch}
+.chev{
+  width:26px;height:26px;flex:none;margin-top:5px;border:1px solid var(--border-lit);border-radius:50%;
+  display:grid;place-items:center;color:var(--text-faint);transition:transform .22s,color .15s,border-color .15s;
+}
+.sec[open] > summary .chev{transform:rotate(180deg);color:var(--mahogany);border-color:var(--mahogany-lo)}
+.sec-body{padding:2px 0 46px;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.anchor{opacity:0;color:var(--text-faint);font-size:14px;padding-left:8px;transition:opacity .15s}
+.sec-h h2:hover .anchor{opacity:1}
+
+/* ---------- generic pieces ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.card h3{font-size:16px;margin-bottom:9px}
+.card h3 .k{font-family:var(--mono);font-size:11px;color:var(--mahogany);display:block;margin-bottom:6px;letter-spacing:.13em;text-transform:uppercase}
+.card p{font-size:14.5px;color:var(--text-dim)}
+.card.accent{border-color:var(--mahogany-lo);background:linear-gradient(160deg,var(--mahogany-glow),var(--surface) 55%)}
+.card.leaf{border-color:var(--border-lit);background:linear-gradient(160deg,var(--green-glow),var(--surface) 55%)}
+
+.quote{
+  border-left:3px solid var(--green);padding:16px 22px;background:var(--surface);
+  border-radius:0 var(--r) var(--r) 0;font-size:16.5px;line-height:1.6;color:var(--text);
+}
+.note{
+  border-left:3px solid var(--mahogany);padding:13px 18px;background:var(--surface);
+  border-radius:0 var(--r) var(--r) 0;font-size:14px;color:var(--text-dim);
+}
+.note b{color:var(--mahogany-hi)}
+.h4{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin:34px 0 14px;font-weight:600}
+.h4:first-child{margin-top:0}
+
+ul.tick{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+ul.tick li{position:relative;padding-left:22px;font-size:14.5px;color:var(--text-dim)}
+ul.tick li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:1px;background:var(--green);transform:rotate(45deg)}
+ul.tick li b{color:var(--text);font-weight:600}
+ul.tick.mah li::before{background:var(--mahogany)}
+
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:11.5px;padding:4px 9px;border-radius:5px;
+  background:var(--raised);border:1px solid var(--border-lit);color:var(--green-dim);letter-spacing:.05em;
+}
+.pill.m{color:var(--mahogany-hi);border-color:var(--mahogany-lo);background:var(--mahogany-glow)}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+
+pre{
+  margin:0;background:#080B09;border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.8px;line-height:1.68;color:var(--text-dim);
+}
+pre .key{color:var(--green)}
+pre .val{color:var(--text)}
+pre .cm{color:var(--text-faint);font-style:italic}
+pre .vb{color:var(--mahogany-hi)}
+.code-head{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);
+  padding:10px 20px;background:var(--raised);border:1px solid var(--border);border-bottom:0;border-radius:var(--r) var(--r) 0 0;
+}
+.code-head + pre{border-radius:0 0 var(--r) var(--r)}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);font-weight:600;background:var(--raised)}
+tr:last-child td{border-bottom:0}
+td code{color:var(--mahogany-hi)}
+
+/* ---------- controls ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  font:500 12.5px/1 var(--sans);padding:9px 14px;border-radius:7px;
+  background:var(--raised);border:1px solid var(--border-lit);color:var(--text-dim);
+  transition:background .15s,color .15s,border-color .15s;
+}
+.btn:hover{background:var(--raised-2);color:var(--text);border-color:var(--green-deep)}
+.btn.on{background:var(--mahogany-glow);border-color:var(--mahogany-lo);color:var(--mahogany-hi)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.search{
+  flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border-lit);border-radius:7px;
+  padding:10px 14px;color:var(--text);font:400 14px var(--sans);
+}
+.search::placeholder{color:var(--text-faint)}
+.search:focus{outline:none;border-color:var(--green-deep);box-shadow:0 0 0 3px var(--green-glow)}
+.count{font-family:var(--mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap}
+
+/* ---------- diagrams ---------- */
+.dgm{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.dgm svg{display:block;width:100%;height:auto;min-width:520px;max-width:100%;font-family:var(--sans)}
+.dgm .nd rect,.dgm .nd circle,.dgm .nd polygon{
+  fill:var(--raised);stroke:var(--border-lit);stroke-width:1.2;transition:fill .18s,stroke .18s;
+}
+.dgm .nd text{fill:var(--text);font-size:12.5px;font-weight:500;transition:fill .18s}
+.dgm .nd .sub{fill:var(--text-faint);font-size:10.5px;font-weight:400}
+.dgm .nd.st rect{fill:rgba(44,99,73,.20);stroke:var(--green-deep)}
+.dgm .nd.ac rect,.dgm .nd.ac circle{fill:rgba(168,93,72,.18);stroke:var(--mahogany-lo)}
+.dgm .ed{stroke:var(--border-lit);stroke-width:1.4;fill:none;transition:stroke .18s,stroke-width .18s}
+.dgm .vb{fill:var(--mahogany-hi);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em}
+.dgm .lb{fill:var(--text-faint);font-size:11px}
+.dgm .zone{fill:none;stroke:var(--border);stroke-width:1;stroke-dasharray:5 5;rx:10}
+.dgm .zone-t{fill:var(--text-faint);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase}
+.dgm[data-focus] .nd:not(.hot){opacity:.26}
+.dgm[data-focus] .ed:not(.hot){opacity:.16}
+.dgm .nd{cursor:pointer}
+.dgm .nd.hot rect,.dgm .nd.hot circle{stroke:var(--mahogany);stroke-width:2}
+.dgm .ed.hot{stroke:var(--mahogany);stroke-width:2}
+.dgm-cap{font-size:12.5px;color:var(--text-faint);margin-top:12px;text-align:center;font-style:italic}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border);padding:18px 20px}
+  .nav ol{display:flex;flex-wrap:wrap;gap:4px}
+  .nav ol a{border-left:0;border-bottom:2px solid transparent;padding:6px 10px}
+  .nav ol a.active{border-left:0;border-bottom-color:var(--mahogany)}
+  .nav-tools{flex-direction:row;margin-top:12px}
+  .wrap{padding:0 22px}
+  .mast{padding:44px 0 36px}
+}
+@media print{
+  .nav,.nav-tools,.bar,.chev{display:none !important}
+  body{background:#fff;color:#000}
+  .sec-body{display:block !important}
+  .card,.dgm,pre,.tbl-wrap{break-inside:avoid;border-color:#ccc}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="nav" aria-label="Section navigation">
+  <a class="nav-brand" href="#top"><b>D&#8209;System</b><span>Prompt-pack planning protocol</span></a>
+  <ol id="navlist"></ol>
+  <div class="nav-tools">
+    <button class="btn" id="expandAll" type="button">Expand all sections</button>
+    <button class="btn" id="collapseAll" type="button">Collapse all</button>
+  </div>
+</nav>
+
+<main class="main" id="top">
+<div class="wrap">
+
+<!-- ============ MASTHEAD ============ -->
+<header class="mast">
+  <div class="eyebrow">Governed build methodology &middot; GOV&#8209;008</div>
+  <h1>One session <em>manufactures the pack</em>. A second session spends it.</h1>
+  <p class="lede">A <strong>prompt pack</strong> is the complete governed artifact set a multi&#8209;agent build runs from &mdash; requirement, decisions, plan, backlog phases, roster deltas, delegation prompts, coordinator prompt and kick&#8209;off record. This page is the protocol for manufacturing one: <strong>eight stages, four adversarial gates, nothing authored mid&#8209;build.</strong></p>
+  <div class="status">
+    <b>Authority.</b> The authoritative text is the prompt-pack planning protocol (<b>GOV&#8209;008</b>, <code>docs/08-governance/</code>); its adoption as the standard for multi&#8209;agent builds is recorded in <b>ADR&#8209;017</b>. This page is a rendering of that protocol, not a second copy of the rules &mdash; where they differ, the governed documents win.
+  </div>
+  <div class="stats"></div>
+</header>
+
+<!-- ============ 01 CORE SPLIT ============ -->
+<details class="sec" id="split" open>
+  <summary><span class="sec-n">01</span><span class="sec-h"><h2>The core split<a class="anchor" href="#split">#</a></h2><p>Planning and building are different kinds of work, done in different sessions, with a hard boundary between them.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="quote" style="margin-bottom:24px">
+      The <strong>planning session</strong> manufactures the pack. The <strong>build session</strong> spends it &mdash; via verbatim dispatch. If the planning session did not write it, the build session does not send it.
+    </div>
+    <div class="grid g3">
+      <div class="card leaf"><h3><span class="k">Session one</span>Planning</h3><p>Interactive, owner&#8209;in&#8209;the&#8209;loop. Ratifies decisions through question batches, investigates the repository, and writes every artifact the build will need &mdash; through the eight&#8209;stage pipeline below.</p></div>
+      <div class="card accent"><h3><span class="k">The boundary</span>Verbatim dispatch</h3><p>Every build prompt is pre&#8209;crafted and idempotent. A missing prompt is a blocking finding for the owner, never something to improvise. This is what makes the build resumable, auditable and cheap.</p></div>
+      <div class="card"><h3><span class="k">Session two</span>Build</h3><p>A coordinator claims nothing, writes no code, and dispatches pre&#8209;built orchestrators with their pre&#8209;crafted prompts. Every re&#8209;run of the same coordinator prompt is a resume, not a restart.</p></div>
+    </div>
+    <div class="h4">Why the boundary holds</div>
+    <div class="prose">
+      <p style="color:var(--text-dim);font-size:15px">Authoring during a build mixes two failure modes: judgment made under schedule pressure, and prompts nobody reviewed. The pipeline moves all authoring into the planning session, where each artifact passes an adversarial gate before anything downstream depends on it. The build session then has exactly one job &mdash; execution against frozen inputs &mdash; and its failures are legible: either an input was wrong (a planning defect, caught by audit next time) or the execution drifted (a coordinator defect, visible in the report).</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 02 ANATOMY ============ -->
+<details class="sec" id="anatomy" open>
+  <summary><span class="sec-n">02</span><span class="sec-h"><h2>Anatomy of a prompt pack<a class="anchor" href="#anatomy">#</a></h2><p>Every artifact the pipeline produces. All are governed documents with allocated codes &mdash; except exactly one.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g3" id="artifacts"></div>
+    <div class="note" style="margin-top:22px"><b>The one untracked artifact.</b> The kick&#8209;off paragraph is delivered in chat so the owner can paste it into the next terminal without hunting for files. Its durable copy is the kick&#8209;off record&rsquo;s final section &mdash; the chat delivery is a convenience copy, and everything else on this page is governed.</div>
+  </div>
+</details>
+
+<!-- ============ 03 PIPELINE ============ -->
+<details class="sec" id="pipeline" open>
+  <summary><span class="sec-n">03</span><span class="sec-h"><h2>The eight&#8209;stage pipeline<a class="anchor" href="#pipeline">#</a></h2><p>Stages produce artifacts; gates freeze them. Owner sign&#8209;off at a gate means later changes go through the same gate again. Hover or click any node.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="dgm" data-dgm>
+      <svg viewBox="0 0 900 760" role="img" aria-label="Eight-stage prompt-pack pipeline from Prompt A through Prompt B, its adversarial review, pack drafting, the pack audit, the coordinator prompt, owner sign-off, and the kick-off record feeding the build session.">
+        <title>Prompt-pack pipeline</title>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#31423A"/></marker>
+          <marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#A85D48"/></marker>
+        </defs>
+
+        <g class="nd st" data-node="s1"><rect x="270" y="14" width="330" height="46" rx="8"/><text x="435" y="34" text-anchor="middle">1 &middot; Prompt A &mdash; pre&#8209;plan package</text><text class="sub" x="435" y="50" text-anchor="middle">owner&rsquo;s ratified decisions &middot; inventory &middot; open questions</text></g>
+        <path class="ed" data-e="s1" data-t="s2" d="M435 60 L435 96" marker-end="url(#ah)"/>
+        <text class="vb" x="447" y="84">EXECUTE A</text>
+        <g class="nd st" data-node="s2"><rect x="270" y="96" width="330" height="46" rx="8"/><text x="435" y="116" text-anchor="middle">2 &middot; Prompt B &mdash; pack&#8209;factory prompt</text><text class="sub" x="435" y="132" text-anchor="middle">separate governed document, never merged into A</text></g>
+        <path class="ed" data-e="s2" data-t="s3" d="M435 142 L435 178" marker-end="url(#ahm)"/>
+        <text class="vb" x="447" y="166">REVIEW / SYNTHESIZE</text>
+        <g class="nd ac" data-node="s3"><rect x="270" y="178" width="330" height="46" rx="8"/><text x="435" y="198" text-anchor="middle">3 &middot; Gate &mdash; adversarial review of B</text><text class="sub" x="435" y="214" text-anchor="middle">audited against A and repository reality &middot; owner signs off</text></g>
+        <path class="ed" data-e="s3" data-t="s4" d="M435 224 L435 260" marker-end="url(#ah)"/>
+        <text class="vb" x="447" y="248">EXECUTE B</text>
+        <g class="nd st" data-node="s4"><rect x="270" y="260" width="330" height="46" rx="8"/><text x="435" y="280" text-anchor="middle">4 &middot; Draft the pack files</text><text class="sub" x="435" y="296" text-anchor="middle">requirement &middot; decisions &middot; plan &middot; phases &middot; delegation pack</text></g>
+        <path class="ed" data-e="s4" data-t="s5" d="M435 306 L435 342" marker-end="url(#ahm)"/>
+        <text class="vb" x="447" y="330">AUDIT / FIX</text>
+        <g class="nd ac" data-node="s5"><rect x="270" y="342" width="330" height="46" rx="8"/><text x="435" y="362" text-anchor="middle">5 &middot; Gate &mdash; adversarial audit of the pack</text><text class="sub" x="435" y="378" text-anchor="middle">assumes it is broken &middot; governance must exit 0</text></g>
+        <path class="ed" data-e="s5" data-t="s6" d="M435 388 L435 424" marker-end="url(#ah)"/>
+        <text class="vb" x="447" y="412">DRAFT</text>
+        <g class="nd st" data-node="s6"><rect x="270" y="424" width="330" height="46" rx="8"/><text x="435" y="444" text-anchor="middle">6 &middot; Coordinator prompt</text><text class="sub" x="435" y="460" text-anchor="middle">generic &middot; idempotent &middot; every re&#8209;run is a resume</text></g>
+        <path class="ed" data-e="s6" data-t="s7" d="M435 470 L435 506" marker-end="url(#ahm)"/>
+        <text class="vb" x="447" y="494">SIGN OFF</text>
+        <g class="nd ac" data-node="s7"><rect x="270" y="506" width="330" height="46" rx="8"/><text x="435" y="526" text-anchor="middle">7 &middot; Gate &mdash; owner sign&#8209;off</text><text class="sub" x="435" y="542" text-anchor="middle">adversarial review here only on the owner&rsquo;s request</text></g>
+        <path class="ed" data-e="s7" data-t="s8" d="M435 552 L435 588" marker-end="url(#ahm)"/>
+        <text class="vb" x="447" y="576">RATIFY DELTAS</text>
+        <g class="nd ac" data-node="s8"><rect x="270" y="588" width="330" height="46" rx="8"/><text x="435" y="608" text-anchor="middle">8 &middot; Kick&#8209;off record</text><text class="sub" x="435" y="624" text-anchor="middle">per&#8209;build owner deltas &middot; starting state &middot; wins over 6</text></g>
+        <path class="ed" data-e="s8" data-t="s9" d="M600 611 L700 611 Q724 611 724 587 L724 500" marker-end="url(#ahm)"/>
+        <text class="vb" x="736" y="560">PASTE</text>
+        <g class="nd" data-node="s9"><rect x="620" y="454" width="212" height="46" rx="8"/><text x="726" y="474" text-anchor="middle">Build session</text><text class="sub" x="726" y="490" text-anchor="middle">the kick&#8209;off paragraph starts it</text></g>
+
+        <rect class="zone" x="24" y="668" width="852" height="70"/>
+        <text class="zone-t" x="44" y="692">Plan mode first</text>
+        <text class="lb" x="44" y="712">Stage 4 always drafts in plan mode; auto execution begins only after the owner confirms the plan.</text>
+        <text class="lb" x="44" y="728">Both adversarial gates (3 and 5) end in synthesis &mdash; findings become fixes, not a report to shelve.</text>
+      </svg>
+      <div class="dgm-cap">Mahogany edges and nodes are the owner&rsquo;s territory: gates, ratification, and the paste that starts the build.</div>
+    </div>
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card accent"><h3>Gates freeze, they do not decorate</h3><p>A gate that passes means the artifact is frozen; a change afterwards re&#8209;enters the same gate. The workbench pack audit caught five real defects before execution &mdash; including a dispatch plan the claim validator would have rejected mid&#8209;build.</p></div>
+      <div class="card"><h3>A and B are never one document</h3><p>Prompt A is the owner&rsquo;s input; Prompt B is the machine that turns it into artifacts. Keeping them separate makes the review gate between them real: B is audited against A, and sign&#8209;off has a definite object.</p></div>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 04 STANDING RULES ============ -->
+<details class="sec" id="rules" open>
+  <summary><span class="sec-n">04</span><span class="sec-h"><h2>Standing rules<a class="anchor" href="#rules">#</a></h2><p>Five rule groups that travel with every pack, whatever it builds.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g2">
+      <div class="card leaf"><h3><span class="k">Context</span>Selective injection</h3><p>Context loads when the step that needs it begins, never up front. Short parents defer to children; the delegation pack is dispatched verbatim one section at a time. Nothing front&#8209;loads the full pack into any agent&rsquo;s opening context.</p></div>
+      <div class="card"><h3><span class="k">Discipline</span>Agent hygiene</h3><p>The coordinator claims nothing and never does a worker&rsquo;s job. Claim budgets and path locks are checked numerically before claiming. Validators receive the diff, the requirement and the commands &mdash; never a creator&rsquo;s rationale. Truncated agents are resumed, not re&#8209;run; assertions are verified against real output.</p></div>
+      <div class="card"><h3><span class="k">Spend</span>Cost protocols</h3><p>Haiku for mechanical gates. <b style="color:var(--text)">Sonnet is the standard model for judgment work.</b> Opus is never pre&#8209;assigned &mdash; at most one documented escalation per build, only when absolutely necessary. Two fix cycles per item; what survives them is reported, not looped on.</p></div>
+      <div class="card accent"><h3><span class="k">Cadence</span>Gate check&#8209;in policy</h3><p>Prompt A always asks the owner up front: stop at gates for check&#8209;in, or push through to close&#8209;out? The answer lands in the kick&#8209;off record, never assumed. A critical issue first gets a dual review &mdash; an adversarial agent attempts a solution &mdash; and pauses for the owner only if it survives unresolved.</p></div>
+    </div>
+    <div class="h4">And always</div>
+    <ul class="tick mah">
+      <li><b>Descope is the owner&rsquo;s alone.</b> The pack drafts the ladder for emergencies, but no rung is taken without explicit direction unless the kick&#8209;off record grants a stated exception.</li>
+      <li><b>A failing check is a result to record</b>, never a step to retry until quiet.</li>
+      <li><b>Every document code comes from the allocator</b> (<code>--next-code</code>), and the artifact set is called a <b>prompt pack</b> &mdash; never a &ldquo;workbench&rdquo;, which names the UI product.</li>
+    </ul>
+  </div>
+</details>
+
+<!-- ============ 05 CASE STUDY: DEMO ============ -->
+<details class="sec" id="run-demo">
+  <summary><span class="sec-n">05</span><span class="sec-h"><h2>Case study &mdash; the live demo build<a class="anchor" href="#run-demo">#</a></h2><p>The first run of the shape, before it had a name: six phases, ten agents, a rehearsed demo.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g2">
+      <div class="card"><h3><span class="k">The pack</span>Factory output</h3><p>The agent factory (<code>PROMPT&#8209;010</code>) manufactured the roster, the governance documents and the delegation pack (<code>PROMPT&#8209;018</code>) in one planning session &mdash; deferring its detailed specifications to child documents read only when their step began.</p></div>
+      <div class="card"><h3><span class="k">The build</span>Coordinated spend</h3><p>The build coordinator (<code>PROMPT&#8209;014</code>) dispatched the pack verbatim across the six demo phases &mdash; terminal backend, stage frontend, overview tools, overview skill, content and rehearsal, stage interaction &mdash; under the two&#8209;fix&#8209;cycle cap and the completion gate.</p></div>
+    </div>
+    <div class="h4">What it proved</div>
+    <ul class="tick">
+      <li><b>Verbatim dispatch scales.</b> Ten agents worked from pre&#8209;crafted prompts with no mid&#8209;build authoring, and the track closed audited&#8209;complete.</li>
+      <li><b>Selective injection holds context budgets down.</b> Parent prompts stayed around a hundred lines while the pack carried the detail.</li>
+      <li><b>The shape was reusable.</b> <code>PROMPT&#8209;010</code> said so at the time &mdash; &ldquo;single&#8209;use in intent, reusable in shape&rdquo; &mdash; and the workbench run proved it.</li>
+    </ul>
+    <div class="pills" style="margin-top:18px">
+      <span class="pill">PROMPT-010 factory</span><span class="pill">PROMPT-011..013 specs</span><span class="pill">PROMPT-014 coordinator</span><span class="pill">PROMPT-015 phase protocol</span><span class="pill">PROMPT-016 guardrails</span><span class="pill">PROMPT-017 rehearsal gate</span><span class="pill">PROMPT-018 delegation pack</span>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 06 CASE STUDY: WORKBENCH ============ -->
+<details class="sec" id="run-wb">
+  <summary><span class="sec-n">06</span><span class="sec-h"><h2>Case study &mdash; the workbench build<a class="anchor" href="#run-wb">#</a></h2><p>The second run added the full gate structure &mdash; and its audits caught real defects before a single line of build code.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="grid g2">
+      <div class="card"><h3><span class="k">The pack</span>Planned against a deadline</h3><p>The pre&#8209;plan package (<code>PROMPT&#8209;020</code>) carried the owner&rsquo;s ratified decisions and open questions into a planning session that produced the requirement (<code>REQ&#8209;007</code>), three decisions (<code>ADR&#8209;014..016</code>), the plan (<code>PLAN&#8209;022</code>), seven phases and the delegation pack (<code>PROMPT&#8209;021</code>) &mdash; one week before the demo that presents the result.</p></div>
+      <div class="card accent"><h3><span class="k">The gate that paid</span>Five findings</h3><p>The adversarial pack audit (commit <code>804c6c7</code>) found a parallel dispatch the claim validator would have rejected numerically, a notes picker fed from the wrong source, a supersession that was asserted but not recorded, and clipboard assertions no validator could check. All fixed before execution.</p></div>
+    </div>
+    <div class="h4">What it added to the protocol</div>
+    <ul class="tick">
+      <li><b>The kick&#8209;off record</b> (<code>PROMPT&#8209;023</code>): per&#8209;build owner rulings &mdash; pre&#8209;approved integration, owner&#8209;only descope, a bounded enhancement lane &mdash; in a governed document that wins over the coordinator prompt where they differ.</li>
+      <li><b>The dual&#8209;review rule for critical issues</b>: an adversarial agent attempts a solution before the build is allowed to pause for the owner.</li>
+      <li><b>Numeric claim&#8209;budget checks</b>: the conflicts column says nothing about the budget, so the budget is counted, not eyeballed.</li>
+    </ul>
+    <div class="pills" style="margin-top:18px">
+      <span class="pill">PROMPT-020 pre-plan package</span><span class="pill">REQ-007</span><span class="pill">ADR-014..016</span><span class="pill">PLAN-022</span><span class="pill">PROMPT-021 delegation pack</span><span class="pill">PROMPT-022 coordinator</span><span class="pill m">PROMPT-023 kick-off record</span>
+    </div>
+  </div>
+</details>
+
+<!-- ============ 07 ARTIFACT TEMPLATES ============ -->
+<details class="sec" id="templates">
+  <summary><span class="sec-n">07</span><span class="sec-h"><h2>Artifact templates<a class="anchor" href="#templates">#</a></h2><p>The required sections per artifact &mdash; GOV&#8209;008&rsquo;s appendix, so a future pack can be assembled mechanically.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Artifact</th><th>Required sections</th></tr></thead>
+        <tbody>
+          <tr><td><code>Prompt A</code> &mdash; pre&#8209;plan package</td><td>Ratified decisions (do&#8209;not&#8209;re&#8209;ask) &middot; feature inventory &middot; what the planning session must produce, in order &middot; open questions for the owner &middot; standing constraints &middot; deadline context &middot; the prompt block that drafts Prompt B</td></tr>
+          <tr><td><code>Prompt B</code> &mdash; pack&#8209;factory prompt</td><td>Role statement and hard scope limits (documents only) &middot; preflight &middot; the pack artifacts to produce, in order, codes from <code>--next-code</code> &middot; the open&#8209;questions protocol &middot; stop condition</td></tr>
+          <tr><td>Delegation&#8209;pack phase section</td><td><code>K</code> kickoff &middot; <code>C*</code> creators and <code>V*</code> validators in pairs &middot; <code>G</code> phase gate &middot; <code>A</code> adversarial review &middot; <code>W</code> browser verification where the phase has a UI</td></tr>
+          <tr><td>Coordinator prompt</td><td>Coordinator&#8209;only role statement &middot; preflight (governance, budget check, clean checkout, tooling smoke) &middot; phase graph with dispatch order and the locks that force it &middot; completion gate and integration terms &middot; close&#8209;out</td></tr>
+          <tr><td>Kick&#8209;off record</td><td>Starting state &middot; owner&#8209;ratified deltas with the precedence rule &middot; the kick&#8209;off paragraph</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+</div>
+</main>
+</div>
+<script>
+"use strict";
+
+/* ============================================================
+   DATA — transcribed from GOV-008 / ADR-017
+   ============================================================ */
+
+const STAGES = [
+  { n:"1", t:"Prompt A — the pre-plan package" },
+  { n:"2", t:"Prompt B — the pack-factory prompt" },
+  { n:"3", t:"Gate — adversarial review of B" },
+  { n:"4", t:"Execute B — draft the pack files" },
+  { n:"5", t:"Gate — adversarial audit of the pack" },
+  { n:"6", t:"The coordinator prompt" },
+  { n:"7", t:"Gate — owner sign-off" },
+  { n:"8", t:"The kick-off record and paragraph" }
+];
+
+const GATES = ["Adversarial review of B", "Adversarial audit of the pack", "Owner sign-off on the coordinator", "Kick-off ratification"];
+
+const RULES = ["Selective injection", "Agent hygiene", "Cost protocols", "Gate check-in policy", "Owner-only descope"];
+
+const RUNS = ["Live demo build (PROMPT-010..018)", "Workbench build (PROMPT-020..023)"];
+
+const ARTIFACTS = [
+  { k:"Governed", cls:"leaf", n:"Requirement", d:"Observable rows with verification methods — browser-verification rows in the validator style wherever the deliverable has a UI." },
+  { k:"Governed", cls:"leaf", n:"Decision records", d:"One per boundary the build needs settled — capability gating, API surface, persistence formats — with supersessions stated mechanically, never implied." },
+  { k:"Governed", cls:"leaf", n:"Plan + backlog phases", d:"Phases sized one session each, dependency-ordered, the chain encoded in depends_on rather than left to judgment." },
+  { k:"Governed", cls:"", n:"Agent-roster deltas", d:"Existing charters extended where possible; a new agent only with cause. Fences and claim budgets stay." },
+  { k:"Governed", cls:"", n:"Delegation pack", d:"Per-phase sections — kickoff, creator/validator pairs, phase gate, adversarial review, browser verification — each idempotent and dispatchable verbatim." },
+  { k:"Governed", cls:"", n:"Descope ladder", d:"Ordered for the actual runway, drafted for emergencies, pulled only by the owner." },
+  { k:"Governed", cls:"accent", n:"Coordinator prompt", d:"Generic and idempotent: preflight, phase graph, completion gate, close-out. Per-build rulings never live here." },
+  { k:"Governed", cls:"accent", n:"Kick-off record", d:"The owner's ratified deltas, the pinned starting state, the precedence rule — and the kick-off paragraph as its final section." },
+  { k:"Untracked — by design", cls:"accent", n:"Kick-off paragraph", d:"The single paragraph referencing everything, delivered in chat to paste into the fresh terminal. The one artifact that is never governed." }
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.prototype.slice.call((el || document).querySelectorAll(s));
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/* ============================================================
+   MASTHEAD STATS — computed, never hand-counted
+   ============================================================ */
+function initStats(){
+  const nums = [
+    [STAGES.length, "Pipeline stages"],
+    [GATES.length, "Adversarial gates"],
+    [ARTIFACTS.length, "Pack artifacts"],
+    [RULES.length, "Standing rule groups"],
+    [RUNS.length, "Proven runs"]
+  ];
+  $(".stats").innerHTML = nums.map(n =>
+    '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>"
+  ).join("");
+}
+
+/* ============================================================
+   ARTIFACT GRID — rendered from the same data the stats count
+   ============================================================ */
+function initArtifacts(){
+  $("#artifacts").innerHTML = ARTIFACTS.map(a =>
+    '<div class="card ' + a.cls + '"><h3><span class="k">' + esc(a.k) + "</span>" + esc(a.n) + "</h3><p>" + esc(a.d) + "</p></div>"
+  ).join("");
+}
+
+/* ============================================================
+   NAV — built from the sections, highlighted on scroll
+   ============================================================ */
+function initNav(){
+  const secs = $$("details.sec");
+  const ol = $("#navlist");
+  ol.innerHTML = secs.map(s => {
+    const n = $(".sec-n", s).textContent;
+    const h = $(".sec-h h2", s).firstChild.textContent.trim();
+    return '<li><a href="#' + s.id + '" data-for="' + s.id + '"><span class="n">' + n + "</span><span>" + esc(h) + "</span></a></li>";
+  }).join("");
+
+  const links = {};
+  $$("#navlist a").forEach(a => { links[a.dataset.for] = a; });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      $$("#navlist a").forEach(a => a.classList.remove("active"));
+      const a = links[e.target.id];
+      if (a) a.classList.add("active");
+    });
+  }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+  secs.forEach(s => io.observe(s));
+
+  $("#expandAll").addEventListener("click", () => secs.forEach(s => { s.open = true; }));
+  $("#collapseAll").addEventListener("click", () => secs.forEach(s => { s.open = false; }));
+
+  // Section stepping with [ and ]
+  document.addEventListener("keydown", ev => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+    if (ev.key !== "[" && ev.key !== "]") return;
+    const tops = secs.map(s => s.getBoundingClientRect().top);
+    let i = tops.findIndex(t => t > 4);
+    if (ev.key === "[") i = (i <= 0 ? secs.length : i) - 1;
+    if (i < 0 || i >= secs.length) return;
+    secs[i].open = true;
+    secs[i].scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+/* ============================================================
+   DIAGRAM FOCUS — shared across every SVG
+   ============================================================ */
+function initDiagrams(){
+  $$("[data-dgm]").forEach(box => {
+    const nodes = $$(".nd", box);
+    const edges = $$(".ed", box);
+    let pinned = null;
+
+    const clear = () => {
+      box.removeAttribute("data-focus");
+      nodes.concat(edges).forEach(el => el.classList.remove("hot"));
+    };
+    const focus = id => {
+      clear();
+      box.setAttribute("data-focus", id);
+      const touched = { [id]: true };
+      edges.forEach(e => {
+        if (e.dataset.e === id || e.dataset.t === id) {
+          e.classList.add("hot");
+          touched[e.dataset.e] = true;
+          touched[e.dataset.t] = true;
+        }
+      });
+      nodes.forEach(n => { if (touched[n.dataset.node]) n.classList.add("hot"); });
+    };
+
+    nodes.forEach(n => {
+      n.setAttribute("tabindex", "0");
+      n.setAttribute("role", "button");
+      n.addEventListener("mouseenter", () => { if (!pinned) focus(n.dataset.node); });
+      n.addEventListener("mouseleave", () => { if (!pinned) clear(); });
+      n.addEventListener("focus", () => { if (!pinned) focus(n.dataset.node); });
+      n.addEventListener("blur", () => { if (!pinned) clear(); });
+      const toggle = () => {
+        if (pinned === n.dataset.node) { pinned = null; clear(); }
+        else { pinned = n.dataset.node; focus(pinned); }
+      };
+      n.addEventListener("click", toggle);
+      n.addEventListener("keydown", ev => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); toggle(); }
+      });
+    });
+    box.addEventListener("keydown", ev => { if (ev.key === "Escape") { pinned = null; clear(); } });
+  });
+}
+
+/* ============================================================
+   HEADING ANCHORS
+   ============================================================ */
+function initAnchors(){
+  $$(".anchor").forEach(a => a.addEventListener("click", ev => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    const url = location.href.split("#")[0] + a.getAttribute("href");
+    history.replaceState(null, "", a.getAttribute("href"));
+    if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+    const was = a.textContent;
+    a.textContent = "copied";
+    a.style.opacity = "1";
+    setTimeout(() => { a.textContent = was; a.style.opacity = ""; }, 1100);
+  }));
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+initStats();
+initArtifacts();
+initNav();
+initDiagrams();
+initAnchors();
+
+// honour a deep link after everything has rendered
+if (location.hash) {
+  const el = document.querySelector(location.hash);
+  if (el) {
+    const sec = el.closest("details.sec");
+    if (sec) sec.open = true;
+    setTimeout(() => el.scrollIntoView({ block: "start" }), 60);
+  }
+}
+</script>
+</body>
+</html>

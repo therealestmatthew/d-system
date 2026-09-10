@@ -1,0 +1,76 @@
+<!--
+  Atlas family — page skeleton for standalone showcase / report / architecture pages.
+
+  A generator (or an agent writing a page by hand) fills every {{TOKEN}} with plain string
+  substitution — no templating dependency is assumed or required. The two shipped pages of the
+  family, _public/d-system-architecture.html and _public/prompt-pack-protocol.html, are the
+  reference renderings; templates/html/atlas-components.html carries the canonical markup for
+  everything that goes inside {{MASTHEAD}} and {{SECTIONS}}.
+
+  Token contract:
+    {{PAGE_TITLE}}     - plain text for <title>, e.g. "D-System — Prompt-Pack Planning Protocol"
+    {{BRAND}}          - short brand text in the nav sidebar (the origin pages use "D-System")
+    {{BRAND_SUB}}      - one-line subtitle under the brand naming this page's subject
+    {{INLINE_STYLES}}  - the full contents of templates/styles/atlas.css, inlined so the page
+                         is one self-contained file with no external stylesheet link
+    {{MASTHEAD}}       - one atlas-components.html "masthead" render (inside <div class="wrap">)
+    {{SECTIONS}}       - one or more atlas-components.html "section" renders, in page order
+    {{PAGE_SCRIPT}}    - the page's data arrays and any page-specific init functions, plus calls
+                         to the shell initializers below. Masthead stats MUST be computed from
+                         the data arrays ({{PAGE_SCRIPT}} owns them), never hand-counted.
+
+  The interactive shell is part of the family, not boilerplate to reinvent. Copy these
+  functions verbatim from _public/prompt-pack-protocol.html (they are identical in the origin
+  page) into the script block alongside {{PAGE_SCRIPT}}:
+    $ / $$ / esc       - query and escaping helpers every initializer assumes
+    initNav()          - builds the sidebar list from details.sec sections, highlights the
+                         section in view via IntersectionObserver, wires the expand/collapse-all
+                         buttons and the [ / ] section-stepping keys
+    initDiagrams()     - hover/click/keyboard focus for every .dgm SVG: the focused node's
+                         edges and neighbours go .hot, the rest dim via [data-focus]; click
+                         pins, Escape clears
+    initAnchors()      - copy-link heading anchors with the "copied" flash
+    the deep-link boot - after init, opens the section a #hash points into and scrolls to it
+
+  Section ids double as anchor targets; keep them short and stable — they are the page's
+  public deep-link surface.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}}</title>
+<style>
+{{INLINE_STYLES}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="nav" aria-label="Section navigation">
+  <a class="nav-brand" href="#top"><b>{{BRAND}}</b><span>{{BRAND_SUB}}</span></a>
+  <ol id="navlist"></ol>
+  <div class="nav-tools">
+    <button class="btn" id="expandAll" type="button">Expand all sections</button>
+    <button class="btn" id="collapseAll" type="button">Collapse all</button>
+  </div>
+</nav>
+
+<main class="main" id="top">
+<div class="wrap">
+
+{{MASTHEAD}}
+
+{{SECTIONS}}
+
+</div>
+</main>
+</div>
+<script>
+"use strict";
+
+{{PAGE_SCRIPT}}
+</script>
+</body>
+</html>
