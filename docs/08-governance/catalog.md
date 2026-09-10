@@ -101,6 +101,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-020 | prompt | active | repository-owner | docs/02-prompts/PROMPT-020-workbench-pre-plan-package.md |
 | PROMPT-021 | prompt | active | repository-owner | docs/02-prompts/PROMPT-021-workbench-delegation-pack.md |
 | PROMPT-022 | prompt | active | repository-owner | docs/02-prompts/PROMPT-022-workbench-build-orchestration.md |
+| PROMPT-023 | prompt | active | repository-owner | docs/02-prompts/PROMPT-023-workbench-build-kickoff.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -204,4 +205,4 @@ CI regenerates it and fails on any difference.
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-149 documents — adr: 14, architecture: 5, governance: 7, operation: 13, plan: 33, prompt: 22, requirement: 7, session: 48.
+150 documents — adr: 14, architecture: 5, governance: 7, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 48.
