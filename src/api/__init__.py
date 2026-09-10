@@ -19,7 +19,14 @@ router.include_router(demo_stage.router, prefix="/demo/stage")
 # flag unset, src.api.routes.demo_terminal is never imported and the route does not exist
 # (404), rather than existing and refusing. Importing the module also runs its loopback-bind
 # fail-fast check, so a non-loopback launch with the flag set fails here, at app construction.
+#
+# The workbench read routes (ADR-015) share the same one gate, one binding: mounted only under
+# this same flag, and src.api.routes.workbench re-runs the same loopback-bind check on import.
 if os.environ.get("D_SYSTEM_DEMO_TERMINAL") == "1":
     from src.api.routes import demo_terminal
 
     router.include_router(demo_terminal.router, prefix="/demo/terminal")
+
+    from src.api.routes import workbench
+
+    router.include_router(workbench.router, prefix="/workbench")
