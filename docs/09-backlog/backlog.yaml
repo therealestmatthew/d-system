@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-demo-06
 - phase-demo-05
 - phase-port-01
 - phase-ses-01
@@ -4765,7 +4764,7 @@ items:
   - sys-demo-stage
   owner: repository-owner
   agent: agent-demo-stage
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -4816,14 +4815,11 @@ items:
   - ts/public/demo-commands.json
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
-  next_action: 'D06-C1/V1, D06-C2/V2 and D06-C3/V3 all pass, each committed on
-    agent/phase-demo-06. D06-A''s fix cycle (one blocker, two majors fixed and
-    validated; one minor recorded per idea 000087, not fixed, per the
-    coordinator''s instruction) and D06-W''s fix cycle (the R10 collapse/re-expand
-    failure, fixed and validated) are both reported green to the coordinator.
-    Await the coordinator''s re-run of the browser check on the fixed collapse
-    path and their own demo-commands.json live-edit check before requesting the
-    owner''s approval to integrate agent/phase-demo-06 into dev.'
+  next_action: 'None — phase complete: both fix cycles green (D06-A blocker and
+    majors; D06-W collapse path), the coordinator''s targeted browser re-check and
+    live-edit check passed, and the branch integrated into dev with the owner''s
+    approval (GOV-003 demo-track completion gate, extended to this phase by the
+    phase-demo-06 insertion decision).'
   session: doc-session-demo-stage-terminal-interaction
   completion_evidence:
   - src/api/routes/demo_terminal.py
@@ -4855,7 +4851,14 @@ items:
     build clean. Not marking the phase complete; the coordinator''s re-run of the
     fixed collapse path, their demo-commands.json live-edit check, and integration
     into dev all remain outstanding and require the coordinator/owner, not this
-    orchestrator.'
+    orchestrator. Completion (coordinator, post-integration): the targeted browser
+    re-check passed the fixed collapse path with real clicks and zero-scroll held
+    in both states; the live-edit check confirmed an appended demo-commands.json
+    entry appears and injects un-executed with no rebuild; the branch was rebased
+    onto dev (three checkpoint conflicts resolved keeping both sides) and
+    integrated fast-forward at 0f1723c with the owner''s approval; final
+    verification on dev: 476 tests pass, governance OK, staged private-content
+    check OK.'
 - id: phase-demo-07
   title: Skills-and-agents glossary and diagram library
   plan: doc-live-demo
