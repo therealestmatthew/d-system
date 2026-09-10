@@ -261,16 +261,26 @@ def test_search_route_rejects_symlink_escape(rebuild_app: Callable[..., FastAPI]
 def test_root_listing_contains_no_private_or_gitignored_entry(
     rebuild_app: Callable[..., FastAPI],
 ) -> None:
-    app = rebuild_app(flag="1")
-    client = TestClient(app)
-    response = client.get(WORKBENCH_LIST_PATH, params={"path": "."})
-    assert response.status_code == 200
-    names = {entry["name"] for entry in response.json()}
+    private_dir = REPO_ROOT / "_private"
+    private_dir_preexisted = private_dir.is_dir()
+    if not private_dir_preexisted:
+        private_dir.mkdir()
+    try:
+        assert private_dir.is_dir(), "fixture assumption: a real _private/ dir exists"
 
-    assert (REPO_ROOT / ".venv").is_dir(), "fixture assumption: a real gitignored dir exists"
-    assert ".venv" not in names
-    assert "_private" not in names
-    assert ".git" not in names
+        app = rebuild_app(flag="1")
+        client = TestClient(app)
+        response = client.get(WORKBENCH_LIST_PATH, params={"path": "."})
+        assert response.status_code == 200
+        names = {entry["name"] for entry in response.json()}
+
+        assert (REPO_ROOT / ".venv").is_dir(), "fixture assumption: a real gitignored dir exists"
+        assert ".venv" not in names
+        assert "_private" not in names
+        assert ".git" not in names
+    finally:
+        if not private_dir_preexisted and private_dir.is_dir():
+            private_dir.rmdir()
 
 
 def test_search_under_root_never_descends_into_gitignored_directories(
