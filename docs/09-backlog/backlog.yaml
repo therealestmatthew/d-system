@@ -4666,8 +4666,25 @@ items:
   - templates/styles
   - _public/overview
   - test/test_generate_overview.py
-  next_action: Define the page template family and render the phase-demo-03 sample
-    outputs through it before writing the skill wrapper.
+  next_action: All D04-C1..C4 items and the D04-G phase gate are green on
+    agent/phase-demo-04, committed but not yet integrated into dev. Remaining is the
+    coordinator's D04-A adversarial review and D04-W Playwright verification (GOV-003
+    demo-track completion gate), then the integration/completion decision -- neither
+    is this orchestrator's to perform.
+  session: doc-session-demo-data-overview-skill
+  completion_evidence:
+  - tools/generate_overview.py
+  - docs/08-governance/OPS-014-generate-overview.md
+  - .claude/skills/d-system-overview/SKILL.md
+  - templates/html/overview-page.html
+  - templates/styles/overview.css
+  - _public/overview/index.html
+  - test/test_generate_overview.py
+  result: D04-C1 (templates), D04-C2 (generator), D04-C3 (skill), D04-C4 (OPS-014) and
+    D04-G (phase gate) all complete on agent/phase-demo-04 with their validators
+    passing. Full-suite verification (pytest, ruff, mypy, governance, private-content
+    check, double-generation determinism) is green. Awaiting the coordinator's D04-A
+    and D04-W dispatches before integration.
 - id: phase-demo-05
   title: Demo content, runbook, reset tool and rehearsals
   plan: doc-live-demo
