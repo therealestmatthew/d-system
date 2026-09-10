@@ -23,11 +23,11 @@ tools/demo_reset.py restore` is the fallback action named in the runbook for eve
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 8s | Failed to bind: ports 8010/5180 occupied by a peer agent's servers in `/code/d-system` (not this worktree). See Rehearsal Findings. |
+| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 8s | Failed to bind: ports 8010/5180 occupied by a peer agent's servers in `/code/d-system` (not this worktree). See Rehearsal Findings. |
 | /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000088, labelled a rehearsal entry. |
 | /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | 1s (discovery only) | The discovery query ran; the subagent-dispatch half did not — a rehearsal agent forbidden from dispatching subagents cannot complete this step. See Rehearsal Findings. |
 | plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
-| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | 1s | No `/overview-build` command exists; ran `tools/generate_overview.py` directly per the skill's own documented command. See Rehearsal Findings. |
+| overview-skill rebuild | Invoke the `d-system-overview` skill live to rebuild the overview — this is the step's point: `demo_reset.py prepare` deliberately parked the pre-built skill so this rebuild is real, not a replay. Concrete fallback command if skill invocation is unavailable: `uv run python tools/generate_overview.py`. Full fallback: `uv run python tools/demo_reset.py restore`, then invoke the now-restored skill. Wait for page generation. | 4m | 1s | No `/overview-build` command exists; ran `tools/generate_overview.py` directly per the skill's own documented command. See Rehearsal Findings. |
 | test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | skipped-by-marking | Browser-executable; covered by D05-W. |
 | **Total (CLI-executable steps measured)** | | **15m** | **10s** | Partial: /idea-triage's subagent half unmeasured; total is not a complete R09 verification. |
 
@@ -37,46 +37,53 @@ tools/demo_reset.py restore` is the fallback action named in the runbook for eve
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 14s | Same port collision as dry-run 1, unchanged (peer servers still bound to 8010/5180). |
+| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 14s | Same port collision as dry-run 1, unchanged (peer servers still bound to 8010/5180). |
 | /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000090, labelled a rehearsal entry. |
 | /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | not run | Not executed this pass — same subagent-dispatch restriction as dry-run 1. |
 | plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
-| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | 0s | `demo_reset.py prepare` had parked `.claude/skills/d-system-overview/`, so the skill is not at its active path when this step runs; ran `tools/generate_overview.py` directly. See Rehearsal Findings. |
+| overview-skill rebuild | Invoke the `d-system-overview` skill live to rebuild the overview — this is the step's point: `demo_reset.py prepare` deliberately parked the pre-built skill so this rebuild is real, not a replay. Concrete fallback command if skill invocation is unavailable: `uv run python tools/generate_overview.py`. Full fallback: `uv run python tools/demo_reset.py restore`, then invoke the now-restored skill. Wait for page generation. | 4m | 0s | `demo_reset.py prepare` had parked `.claude/skills/d-system-overview/`, so the skill is not at its active path when this step runs; ran `tools/generate_overview.py` directly. See Rehearsal Findings. |
 | test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | skipped-by-marking | Browser-executable; covered by D05-W. |
 | **Total (CLI-executable steps measured)** | | **15m** | **14s** | Partial: /idea-triage entirely unmeasured this pass; total is not a complete R09 verification. |
 
 ## Rehearsal Findings (both fresh-eyes passes, 2026-09-10)
 
 These are moments a presenter would have to explain away, surfaced by two cold runs of this
-runbook. Recorded, not silently fixed — reported up per this build's governance protocol.
+runbook. Recorded, not silently fixed at the time — each is addressed below by a coordinator fix
+cycle (2026-09-10) that changed the step definitions above, not the historical Actual/Notes
+columns, which still reflect what each rehearsal pass actually observed.
 
 1. **Port collision with a peer agent's dev servers.** Both passes found 8010 and 5180 occupied
    by processes rooted at `/code/d-system` (not this worktree), unrelated to phase-demo-05. The
    backend fails loudly (`address already in use`); the frontend does not — Vite silently falls
    back to the next free port (`5181`) and prints it, so a presenter who only reads the runbook's
-   literal `http://localhost:5180` would land on a dead page. The runbook does not yet tell the
-   presenter to check port availability first or to read Vite's actual reported URL.
+   literal `http://localhost:5180` would land on a dead page. **Addressed:** the stray servers
+   were leftovers from an earlier validator run and have been killed; the `/orient` step and its
+   Step Markers entry now carry an explicit port-free precondition (`ss -tlnp | grep -E
+   "8010|5180"`) before startup.
 2. **`/idea-triage` is marked CLI-executable "via shell commands," but its second step dispatches
    a subagent** (`.claude/commands/idea-triage.md`). A rehearsal agent restricted from dispatching
    subagents can run the discovery half but not complete the step, so neither fresh-eyes pass
    produced a real timing for this step — the segment's second-largest timebox is unverified by
    CLI-only rehearsal. The real presenter's Claude Code session can dispatch the subagent; this is
-   a rehearsal-tooling limitation, not proof the step is unusable, but it means R09's 15-minute
-   total has not yet been verified end to end by an agent.
+   a rehearsal-tooling limitation, not proof the step is unusable. **Addressed:** the `/idea-triage`
+   Step Markers entry now states the discovery half is CLI-measurable and the subagent-dispatch
+   half runs only in the presenter's own Claude Code session; a rehearsal agent records it as
+   partially measured, not failed. R09's full 15-minute total still needs a presenter-driven pass
+   to verify the subagent half's timing.
 3. **`/overview-build` does not exist** as a slash command; only `.claude/commands/idea.md`,
-   `idea-triage.md`, `backlog.md`, `session-close.md` exist. The row's "or equivalent skill
-   invocation" hedge covers execution (both passes substituted `tools/generate_overview.py`), but
-   a presenter typing `/overview-build` literally would get an unrecognized-command result the
-   runbook does not anticipate.
+   `idea-triage.md`, `backlog.md`, `session-close.md` exist. **Addressed:** the overview-skill
+   rebuild step no longer references `/overview-build`; it now describes what actually happens —
+   the presenter's agents build/invoke the `d-system-overview` skill live, with
+   `uv run python tools/generate_overview.py` as the concrete fallback command.
 4. **Sequencing gap between `demo_reset.py prepare` and the overview-skill-rebuild step.**
    `prepare` parks `.claude/skills/d-system-overview/` to `.claude/skills/_parked/` by design
-   (D05-C1). The runbook's overview-skill-rebuild step instructs invoking the skill, but after
+   (D05-C1). The runbook's overview-skill-rebuild step instructed invoking the skill, but after
    `prepare` has run the skill is not discoverable at its active path — only `restore` (documented
    as the failure fallback, not a required pre-step) puts it back. Both rehearsal passes worked
-   around this by calling `tools/generate_overview.py` directly rather than "invoking the skill" as
-   the step instructs. Whether the live segment's narrative intends the skill to stay parked
-   through this step (audience sees the deterministic tools run directly) or expects it restored
-   first is not resolved in this runbook and needs an owner decision, not an orchestrator guess.
+   around this by calling `tools/generate_overview.py` directly. **Addressed as narrative, not a
+   tool change:** the overview-skill rebuild step's Step Markers entry now states the parked-skill
+   design plainly — the parking is deliberate so the live rebuild is real, not a replay, and
+   `restore` remains the named fallback if the live rebuild fails.
 
 ## Step Markers
 
@@ -90,7 +97,10 @@ Each step is marked for execution context:
 
 ### /orient step
 
-- CLI-executable: Backend and frontend startup.
+- CLI-executable: Verify ports 8010 and 5180 are free (`ss -tlnp | grep -E "8010|5180"`) before
+  starting the backend and frontend. Both dry-run rehearsals collided with stray validator/dev
+  servers left running from an earlier session's checkout, not this worktree — check first rather
+  than assuming a clean port.
 - Browser-executable: Open page, verify layout at 1280×720, 1920×1080, half-width viewport.
 - Owner-performed (Windows gate): Run all steps on the presentation machine.
 
@@ -103,10 +113,13 @@ Each step is marked for execution context:
 
 ### /idea-triage step
 
-- CLI-executable only: run `/idea-triage` in the presenter's chat session. `/idea-triage`
-  (`.claude/commands/idea-triage.md`) drives the idea-triage subagent over open ideas and records a
-  finding — there is no triage page or status selector on the stage page. No browser-executable
-  check exists for this step.
+- CLI-executable, partially measurable: run `/idea-triage` in the presenter's chat session.
+  `/idea-triage` (`.claude/commands/idea-triage.md`) has two halves — a discovery query, which a
+  rehearsal agent can run and time directly, and a subagent dispatch that annotates a finding and
+  moves the idea to `triaged`, which runs only in the presenter's own Claude Code session. A
+  rehearsal agent barred from dispatching subagents records this step as partially measured (the
+  discovery half's time only), not as failed — there is no triage page or status selector on the
+  stage page, and no browser-executable check exists for this step.
 
 ### plan beat
 
@@ -114,8 +127,15 @@ Each step is marked for execution context:
 
 ### overview-skill rebuild
 
-- CLI-executable: Invoke the skill to rebuild the overview.
+- CLI-executable: Invoke the `d-system-overview` skill to rebuild the overview. Fallback command:
+  `uv run python tools/generate_overview.py`.
 - Browser-executable: Verify overview page regenerates and embeds the current outputs.
+- **Sequencing note (parked-skill design):** `tools/demo_reset.py prepare` deliberately parks
+  `.claude/skills/d-system-overview/` to `.claude/skills/_parked/d-system-overview/` before the
+  segment starts, so this step's rebuild is a real, live invocation rather than a replay of
+  something already built. `tools/demo_reset.py restore` is the named fallback if the live
+  rebuild fails: it puts the pre-built skill back and regenerates the overview from current data,
+  after which the presenter invokes the now-restored skill and continues.
 
 ### test
 
