@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-demo-05
 - phase-port-01
 - phase-ses-01
 items:
@@ -4696,7 +4695,7 @@ items:
   - sys-demo-stage
   - sys-demo-overview
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-content
   priority: 1
   session_budget: 1
@@ -4758,7 +4757,19 @@ items:
   - src/api/routes/demo_stage.py
   - test/test_demo_terminal.py
   session: doc-session-demo-content-runbook-reset-rehearsals
-  next_action: 'D05-G is green on all 9 items. D05-A''s two majors and D05-W''s one
+  next_action: 'None — phase complete and integrated into dev at ea2c3ed with the
+    owner''s approval (GOV-003 demo-track completion gate). Deferred items are
+    recorded in the result; the REQ-006 R06 Windows smoke check and the
+    owner-driven R09 timing move to the workbench track''s rehearsal-refresh phase
+    (PROMPT-020 decision 7).'
+  completion_evidence:
+  - tools/demo_reset.py
+  - test/test_demo_reset.py
+  - docs/08-governance/OPS-013-demo-reset.md
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  - ts/public/talking-points.json
+  result: 'D05-G is green on all 9 items. D05-A''s two majors and D05-W''s one
     code-level finding are fixed on agent/phase-demo-05: the Windows checklist runs
     PROMPT-017''s full 7-item fresh-eyes checklist plus a prepare/restore
     verification against the tagged state; ts/public/talking-points.json is
@@ -4777,9 +4788,10 @@ items:
     owner decision (PROMPT-020 decision 7): the workbench track''s
     rehearsal-refresh phase re-times the live segment owner-driven against the
     final UI. uv run pytest, npm run build, governance and the staged
-    private-content check all pass on the rebased tree. Reported green to the
-    coordinator; the phase goes to the owner for integration from here. Still
-    outstanding, owner-machine work: the REQ-006 R06 Windows smoke check.'
+    private-content check all pass on the rebased tree (495 tests). Integrated
+    fast-forward at ea2c3ed with the owner''s approval after an owner-sanctioned
+    third fix cycle. Still outstanding, owner-machine work: the REQ-006 R06
+    Windows smoke check, alongside the deferred owner-driven R09 timing.'
 - id: phase-demo-06
   title: Stage terminal interaction — session tabs, guarded drop, command injection
   plan: doc-live-demo
