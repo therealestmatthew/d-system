@@ -21,7 +21,7 @@ depends_on: [doc-live-demo, doc-prompt-demo-build-delegation-pack]
 ## Verification
 
 - `cd ts && npm run build` — `tsc -b && vite build` succeeds; `dist/index.html`,
-  `dist/assets/index-CfxlgVqL.css` (12.82 kB), `dist/assets/index-DAUn58IC.js` (495.40 kB); 38
+  `dist/assets/index-ZpTiJ9jO.css` (12.84 kB), `dist/assets/index-DWqr5BsF.js` (495.40 kB); 38
   modules transformed, built in ~1s.
 - `uv run pytest` — `476 passed, 2 warnings`. No failures; the catalog-drift failure recorded
   earlier in this session cleared on its own once this branch's own checkpoint commit (`b1bb28d`)
@@ -33,9 +33,10 @@ depends_on: [doc-live-demo, doc-prompt-demo-build-delegation-pack]
   backlog phases`, exit 0.
 - `uv run python tools/check_no_private_content.py`, run with all changes staged (`git add -A`
   first) — `check_no_private_content: OK` (repeated at each commit above, all clean).
-- Adversarial review (D06-A) — dispatched by the coordinator; see the fix-cycle entry below.
-  Playwright browser verification (D06-W) — not yet dispatched; follows from the coordinator once
-  this fix cycle is reported green.
+- Adversarial review (D06-A) — dispatched by the coordinator, findings fixed; see the D06-A fix
+  cycle entry below. Playwright browser verification (D06-W) — dispatched by the coordinator,
+  found one confirmed failure (R10 collapse/re-expand) with everything else passing on measured
+  evidence; the failure is fixed; see the D06-W fix cycle entry below.
 
 Item-level dispatch history (creator/validator pairs from `PROMPT-018`'s D06 section):
 
@@ -139,25 +140,49 @@ npm run build` clean (38 modules, ~1s); `uv run pytest` — `476 passed, 2 warni
 check src/ test/` — `All checks passed!`; `uv run mypy src/` — `Success: no issues found in 23
 source files`.
 
+D06-W fix cycle (2 of 2, the last — coordinator's Playwright browser verification): session
+persistence across tab switches, both R11 guards (confirmed with `/proc`-level termination proof),
+R12 injection semantics, zero-scroll at all four required sizes with four tabs and the panel open
+and closed, and the absent-flag degrade all passed on measured evidence. One confirmed failure:
+
+- FAIL — R10 collapse/re-expand: `.stage-region--terminal-collapsed { display: none }` hid the
+  entire terminal `<section>`, including its `<header>` where the "Collapse terminal"/"Expand
+  terminal" toggle lives, so once collapsed the control was invisible and unclickable — no UI path
+  back to expanded state. Sessions themselves survived underneath (confirmed by the validator's
+  forced event dispatch); only the CSS scope was wrong. Fixed: the collapsed-state rule now reads
+  `.stage-region--terminal-collapsed .stage-region__body { display: none; }`, so only the body
+  (tab bar + sessions area) is hidden while the header and its toggle stay rendered and clickable
+  in both states. `TerminalRegion.tsx` and `StagePage.tsx` are unchanged — CSS-only fix, confirmed
+  by an empty diff on both files against the parent commit. Grid geometry
+  (`.stage-page__grid`'s `grid-template-rows`/`grid-template-columns`) has no dependency on the
+  collapsed class, so neither the talking-points nor overview region can reflow or overlap as a
+  side effect at any of the four required sizes. Commit `bde64df`. Validator
+  (`demo-validator-code`): PASS, no findings — confirmed the selector now scopes only the body,
+  confirmed both other files are byte-for-byte unchanged, confirmed no `TerminalSession`
+  mount/unmount logic was touched.
+
+Full re-verification after this fix, run by this orchestrator in the worktree: `cd ts &&
+npm run build` clean (38 modules, ~1s); `uv run pytest` — `476 passed, 2 warnings`.
+
 ## Acceptance
 
 - A long-running command in one tab survives switching tabs and collapsing/re-expanding the
-  region, and a fifth tab cannot be opened (REQ-006 R10) — Not yet confirmed live. The mechanism
-  exists and is code-reviewed (D06-C2/D06-V2: every session stays mounted, CSS-only visibility, cap
-  enforced in two places) but has not been exercised in a real browser in this session; that
-  measurement is D06-W's (Playwright), owned by the coordinator.
+  region, and a fifth tab cannot be opened (REQ-006 R10) — Partially confirmed. The coordinator's
+  D06-W browser check confirmed session persistence across tab switches and the fifth-tab cap with
+  measured evidence, but found collapse/re-expand itself broken (no UI path back to expanded
+  state) — fixed in the D06-W fix cycle above (commit `bde64df`, code-reviewed PASS), but the
+  coordinator's re-run of the browser check on the fixed collapse path has not happened in this
+  session; that confirmation is the coordinator's, not this orchestrator's.
 - Nothing terminates a session before its confirmation step; the confirmed drop and tab close
-  genuinely terminate with no orphaned shell processes (REQ-006 R11) — Not yet confirmed live for
-  the same reason. D06-V2 confirmed by code inspection that no termination path bypasses the
-  `Popover` confirm; whether a confirmed termination leaves no orphaned PTY process is a runtime
-  fact D06-A/D06-W would need to establish, not something this session observed directly.
+  genuinely terminate with no orphaned shell processes (REQ-006 R11) — Met. The coordinator's D06-W
+  browser check confirmed both R11 guards with `/proc`-level termination proof (no orphaned shell
+  processes after a confirmed drop or tab close).
 - An injected command appears un-executed on the active tab's input line, a `run: true` entry
   executes on selection, and editing `demo-commands.json` changes the list with no page-code
-  rebuild (REQ-006 R12) — Partially confirmed. The no-rebuild claim was verified directly (D06-C3
-  inspected `ts/dist/demo-commands.json` post-build and confirmed placeholder content unchanged);
-  the injection behavior itself (un-executed landing, `run: true` auto-execute) is code-reviewed
-  (D06-V3: websocket send not `term.write()`, newline logic matches `run`) but not exercised live in
-  a browser.
+  rebuild (REQ-006 R12) — Met for injection semantics: the coordinator's D06-W browser check
+  confirmed R12 injection semantics with measured evidence. The live-edit-changes-the-list half is
+  explicitly still to be checked by the coordinator during their own verification, since
+  `demo-validator-web`'s role bars file writes.
 - A resize in the browser reaches the PTY (adapter `resize()` called), proven by a test — Met. D06-
   V1 confirmed `test_resize_text_frame_applies_to_pty_window_size` in `test/test_demo_terminal.py`
   asserts the real kernel-reported window size via `stty size` read back through the PTY after a
@@ -166,18 +191,20 @@ source files`.
 ## Backlog
 
 - `phase-demo-06`: `status: active`, `agent: agent-demo-stage`.
-- `next_action`: D06-A's fix cycle 1 is reported green (build/pytest/ruff/mypy all clean, both
-  fixes validated) to the coordinator. Await D06-W (Playwright browser verification,
-  coordinator-owned) before requesting the owner's approval to integrate `agent/phase-demo-06`
-  into `dev`.
+- `next_action`: Both fix cycles (D06-A: one blocker, two majors; D06-W: the R10 collapse/re-expand
+  failure) are fixed, independently validated, and reported green (build/pytest/ruff/mypy all
+  clean) to the coordinator. Await the coordinator's re-run of the browser check on the fixed
+  collapse path and their own live-edit check of `demo-commands.json` before requesting the
+  owner's approval to integrate `agent/phase-demo-06` into `dev`.
 
 ## Unresolved
 
 - The `uv run pytest` catalog-drift failure recorded earlier in this session is resolved on this
   branch — this branch's own checkpoint commit (`b1bb28d`) regenerated and committed
   `docs/08-governance/catalog.md`, and the failure has not recurred since.
-- D06-W (Playwright browser verification) and integration into `dev` are outstanding and require
-  the coordinator/owner, not this orchestrator, to proceed.
+- The coordinator's re-run of the browser check on the fixed R10 collapse/re-expand path, their own
+  live-edit check of `demo-commands.json`, and integration into `dev` are all outstanding and
+  require the coordinator/owner, not this orchestrator, to proceed.
 - The MINOR finding from D06-A (no session registry at the websocket route, so the four-session
   cap can be exceeded by a client that bypasses the UI) is recorded, not fixed, per the
   coordinator's explicit instruction — see idea `000087` above.

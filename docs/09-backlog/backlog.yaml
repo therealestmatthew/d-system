@@ -4817,10 +4817,12 @@ items:
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
   next_action: 'D06-C1/V1, D06-C2/V2 and D06-C3/V3 all pass, each committed on
-    agent/phase-demo-06. D06-A''s fix cycle 1 (one blocker, two majors fixed and
+    agent/phase-demo-06. D06-A''s fix cycle (one blocker, two majors fixed and
     validated; one minor recorded per idea 000087, not fixed, per the
-    coordinator''s instruction) reported green to the coordinator. Await D06-W
-    (Playwright browser verification, coordinator-owned) before requesting the
+    coordinator''s instruction) and D06-W''s fix cycle (the R10 collapse/re-expand
+    failure, fixed and validated) are both reported green to the coordinator.
+    Await the coordinator''s re-run of the browser check on the fixed collapse
+    path and their own demo-commands.json live-edit check before requesting the
     owner''s approval to integrate agent/phase-demo-06 into dev.'
   session: doc-session-demo-stage-terminal-interaction
   completion_evidence:
@@ -4841,12 +4843,19 @@ items:
     disconnect orphaning the shell) — all three fixed and independently validated
     (commits e474ccb, 2e6fda3), plus one minor (no session registry at the
     websocket route bounding the four-session cap) recorded against idea 000087
-    per the coordinator''s explicit instruction, not fixed. Full re-verification
-    after the fix cycle: uv run pytest 476 passed (the earlier catalog-drift
-    failure is resolved on this branch, see the session record); ruff and mypy
-    clean; npm run build clean. Not marking the phase complete; D06-W (Playwright
-    browser verification) is still outstanding and owned by the build coordinator,
-    and integration into dev requires the owner''s approval.'
+    per the coordinator''s explicit instruction, not fixed. The coordinator''s D06-W
+    Playwright browser verification then confirmed session persistence, both R11
+    guards with /proc-level termination proof, R12 injection semantics and
+    zero-scroll at all four sizes on measured evidence, but found R10
+    collapse/re-expand broken (the collapse control''s CSS hid its own re-expand
+    toggle, leaving no UI path back) — fixed with a one-file CSS-scope narrowing
+    (commit bde64df) and independently validated. Full re-verification after both
+    fix cycles: uv run pytest 476 passed (the earlier catalog-drift failure is
+    resolved on this branch, see the session record); ruff and mypy clean; npm run
+    build clean. Not marking the phase complete; the coordinator''s re-run of the
+    fixed collapse path, their demo-commands.json live-edit check, and integration
+    into dev all remain outstanding and require the coordinator/owner, not this
+    orchestrator.'
 - id: phase-demo-07
   title: Skills-and-agents glossary and diagram library
   plan: doc-live-demo
