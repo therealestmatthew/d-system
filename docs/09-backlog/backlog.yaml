@@ -4816,8 +4816,30 @@ items:
   - ts/public/demo-commands.json
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
-  next_action: Claim the phase, then build the session-tab model and collapse/drop
-    separation first — the command panel and resize frames layer on top of it.
+  next_action: 'D06-C1/V1, D06-C2/V2 and D06-C3/V3 all pass, each committed on
+    agent/phase-demo-06. Resolve the uv run pytest catalog-drift failure with the
+    coordinator (same pre-existing, cross-phase condition already reported against
+    phase-demo-02), then dispatch D06-A and D06-W (coordinator-owned) before
+    requesting the owner''s approval to integrate agent/phase-demo-06 into dev.'
+  session: doc-session-demo-stage-terminal-interaction
+  completion_evidence:
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/CommandPanel.tsx
+  - ts/public/demo-commands.json
+  result: 'All three creator/validator item pairs (D06-C1/V1, D06-C2/V2, D06-C3/V3)
+    pass with no findings, each committed narrowly on agent/phase-demo-06. D06-G
+    (phase gate, run and resumed once after a truncated first pass) confirms:
+    governance OK; check_no_private_content OK with changes staged; all four
+    deliverables exist; npm run build, ruff and mypy all clean; no placeholder
+    command string from demo-commands.json leaks into ts/src; the diff against dev
+    touches only the phase''s declared deliverable paths. uv run pytest is 473
+    passed, 1 failed — the failure is pre-existing catalog drift, reproduced
+    identically on plain dev with none of this phase''s changes present, not a
+    defect in this diff. Not marking the phase complete; D06-A (adversarial review)
+    and D06-W (Playwright browser verification) are still outstanding and owned by
+    the build coordinator, and integration into dev requires the owner''s approval.'
 - id: phase-demo-07
   title: Skills-and-agents glossary and diagram library
   plan: doc-live-demo
