@@ -4434,6 +4434,7 @@ items:
     reported (GOV-003 demo-track completion gate)
   deliverables:
   - src/demo
+  - src/api/routes/__init__.py
   - src/api/routes/demo_terminal.py
   - src/api/routes/demo_stage.py
   - src/api/__init__.py
