@@ -56,11 +56,14 @@ terminal functionality on Windows.
    ```
    Expected: backend starts and listens on `127.0.0.1:8010`.
 
-2. In a new shell, start the frontend:
+2. In a new shell, start the frontend (Windows PowerShell):
    ```
    cd ts
+   $env:VITE_API_TARGET="http://localhost:8010"
    npm run dev -- --port 5180
    ```
+   Without `VITE_API_TARGET`, the dev proxy silently targets `http://localhost:8000` instead of
+   the demo backend on `8010`, and every stage route 404s if anything else holds port 8000.
    Expected: Vite dev server starts on `http://localhost:5180`.
 
 3. Open a browser and navigate to `http://localhost:5180`.
@@ -96,9 +99,10 @@ before the Windows-machine gate is called green.
 
 1. [ ] Backend starts on 8010 with `D_SYSTEM_DEMO_TERMINAL=1`; frontend builds and serves on
        5180.
-2. [ ] The stage page loads; at 1280×720, 1920×1080, **and a half-width window** there is zero
-       page scrolling, no overlapping elements, and every reveal control (tabs, expanders,
-       popups) opens and collapses as required.
+2. [ ] The stage page loads; at 1280×720, 1920×1080, **and a half-width window (960×1080 —
+       D05-W's interpretation, confirmed passing)** there is zero page scrolling, no overlapping
+       elements, and every reveal control (tabs, expanders, popups) opens and collapses as
+       required.
 3. [ ] The embedded terminal connects, runs a real shell, and echoes interactive input.
 4. [ ] The talking-points panel cycles the owner's content from its data file.
 5. [ ] `tools/demo_reset.py` parks the pre-built overview skill and seeds the fallback audience

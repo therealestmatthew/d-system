@@ -27,7 +27,7 @@ workbench track's rehearsal-refresh phase, per the owner's PROMPT-020 decision 7
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 8s | Failed to bind: ports 8010/5180 occupied by a peer agent's servers in `/code/d-system` (not this worktree). See Rehearsal Findings. |
+| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180` (frontend — without VITE_API_TARGET the proxy silently targets :8000 and every stage route 404s if anything else holds that port); open http://localhost:5180; review the interface state | 1m | 8s | Failed to bind: ports 8010/5180 occupied by a peer agent's servers in `/code/d-system` (not this worktree). See Rehearsal Findings. |
 | /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000088, labelled a rehearsal entry. |
 | /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | 1s (discovery only) | The discovery query ran; the subagent-dispatch half did not — a rehearsal agent forbidden from dispatching subagents cannot complete this step. See Rehearsal Findings. |
 | plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
@@ -41,7 +41,7 @@ workbench track's rehearsal-refresh phase, per the owner's PROMPT-020 decision 7
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 14s | Same port collision as dry-run 1, unchanged (peer servers still bound to 8010/5180). |
+| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing (both dry-runs collided with stray validator/dev servers left running in a checkout; confirm whose process it is before ever killing one). Then: `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180` (frontend — without VITE_API_TARGET the proxy silently targets :8000 and every stage route 404s if anything else holds that port); open http://localhost:5180; review the interface state | 1m | 14s | Same port collision as dry-run 1, unchanged (peer servers still bound to 8010/5180). |
 | /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000090, labelled a rehearsal entry. |
 | /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | not run | Not executed this pass — same subagent-dispatch restriction as dry-run 1. |
 | plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
@@ -105,7 +105,8 @@ Each step is marked for execution context:
   starting the backend and frontend. Both dry-run rehearsals collided with stray validator/dev
   servers left running from an earlier session's checkout, not this worktree — check first rather
   than assuming a clean port.
-- Browser-executable: Open page, verify layout at 1280×720, 1920×1080, half-width viewport.
+- Browser-executable: Open page, verify layout at 1280×720, 1920×1080, and a half-width window
+  (960×1080 — D05-W's interpretation, confirmed passing).
 - Owner-performed (Windows gate): Run all steps on the presentation machine.
 
 ### /idea step
