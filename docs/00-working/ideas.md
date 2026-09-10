@@ -1824,6 +1824,7 @@ PROPOSED LINK: 000040 --relates_to--> 000039 (deterministic search generates can
 - relates_to → `000006`
 - relates_to → `000039`
 - relates_to ← `000004`
+- relates_to ← `000081`
 
 ---
 
@@ -3488,6 +3489,8 @@ Raised by the owner on 2026-09-10.
 - extended_by ← `000074`
 - extended_by ← `000075`
 - relates_to ← `000077`
+- relates_to ← `000078`
+- relates_to ← `000082`
 
 ---
 
@@ -3750,8 +3753,288 @@ Raised on 2026-09-10 after the owner asked what had happened to the agent that a
 calls. Relates to 000072 (lifecycle agents), which inherits this problem for every agent it proposes,
 and to 000070 (training demo), which would hit it in front of an audience.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by repository-owner (2026-09-10T04:06:37-04:00): Correction, 2026-09-10, same day as the idea. The cap is not undocumented and not a platform limit: .claude/agents/idea-triage.md sets maxTurns: 30 in its own frontmatter, alongside model: haiku and effort: medium. The owner recalled configuring it when the triage agent was first built, and the file confirms it. That settles two of the idea's open questions — the cap is 30 because it was chosen to be 30, and it is configurable by editing one line. Two consequences follow. First, the model matters: triage runs on haiku, and a smaller model may need more turns to reach the same conclusion, so turns and model should be tuned together rather than separately. Second, this is a portability gap for PLAN-020 — the Codex port at .codex/agents/idea-triage.toml carries model_reasoning_effort but has no turn-budget equivalent, so the same agent has a bounded budget under one host and an unbounded one under another. The idea's remaining open questions stand: whether an agent can observe its own remaining budget, and whether a third party can observe it live rather than only in the completion metadata after the fact.
+
+</details>
+
 **Links**
 
 - relates_to → `000072`
 - relates_to → `000070`
 - relates_to → `000071`
+- relates_to ← `000080`
+
+---
+
+## 000078 · Agent engineering as a discipline with its own framework
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+
+An umbrella for the practice of building agents deliberately, rather than writing one agent at a time
+and rediscovering the same problems. The proposition is that agent construction has recurring concerns
+that deserve to be named, reasoned about once, and reused — and that the artefact this produces may be
+a framework for planning many agents rather than a plan for building any particular one.
+
+Four sub-topics are recorded as their own ideas alongside this umbrella:
+- **Guides** — system prompts, AGENTS.md files, constraint documents: what an agent is told.
+- **Sensors** — evals, validation loops, output parsers, monitoring live while an agent runs: how its
+  behaviour is observed.
+- **Context pipelines** — metadata graphs, RAG systems, semantic layers: what an agent is given.
+- **Orchestration** — routing, multi-agent coordination, recovery paths: how agents fit together.
+
+The dimensions are not obviously exhaustive and are not obviously orthogonal. Evaluation could be read
+as a sensor or as its own concern; a recovery path is orchestration but depends on a sensor firing;
+constraint documents are guides but shade into authority, which is arguably a fifth axis this
+repository already treats as first-class. Testing that decomposition is part of the work, not a
+preliminary to it.
+
+This repository is already an unusually good substrate for the question, because it has agent
+construction evidence rather than opinion. One agent exists (idea-triage) with a deliberately bounded
+remit. PLAN-020 is building a portable workflow manifest with authority declarations and a capability
+matrix. Four workflow prompts encode procedure as governed documents. AGENTS.md is a constraint
+document that has already drifted and been corrected. And 000077 records a concrete, measured failure
+mode with numbers attached. That is more raw material than most agent-engineering discussions have.
+
+What it would touch: probably nothing directly at first. If it becomes a framework it would inform
+PLAN-020, the agent roster in 000072, the deliberation trio in 000073-000075, and any future agent —
+as a lens applied during planning rather than code written.
+
+Verification: the framework earns its place if applying it to an agent that already exists surfaces
+something its authors missed, and if applying it to a proposed agent changes what gets built. A
+taxonomy that only relabels existing practice has failed, and should be discarded rather than kept
+for tidiness.
+
+What is unresolved: whether this is one framework or four separate concerns that happen to co-occur;
+whether it belongs in this repository at all or is general practice that should live somewhere reusable;
+and whether the right output is a governed document, a set of prompts, or a checklist applied during
+planning. Also unresolved: how it relates to the adversarial review's warning about premature universal
+modelling, which applies to frameworks about agents exactly as much as to knowledge ontologies.
+
+Raised by the owner on 2026-09-10.
+
+**Links**
+
+- relates_to → `000072`
+- extended_by ← `000079`
+- extended_by ← `000080`
+- extended_by ← `000081`
+- extended_by ← `000082`
+
+---
+
+## 000079 · Agent engineering: Guides — system prompts, AGENTS.md files, constraint documents
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+
+One of four sub-topics under the agent-engineering umbrella. Guides are what an agent is told: its
+system prompt, the working agreement it reads, and the constraint documents that bound what it may do.
+
+This repository has more evidence about guides than about any other agent-engineering concern, most of
+it from things going wrong.
+
+AGENTS.md is a constraint document read by every agent regardless of framework, and it has already
+demonstrated the failure modes worth studying. It drifted: five documents asserted there was no remote
+for a day after there was one, and nothing detected it. It was edited by an agent that then generalised
+a one-time instruction into standing policy, which is why it now carries a rule forbidding agents from
+editing it at all. And CLAUDE.md's own "what belongs in this file" section already reasons explicitly
+about the tradeoff — reference pointers stay correct when their target changes, duplicated facts drift,
+and duplication is only justified when being unaware for one turn causes irreversible harm.
+
+The four workflow prompts (PROMPT-006 to PROMPT-009) are guides in a different shape: procedure encoded
+as governed documents that a human pastes, deliberately framework-neutral so they work for any runner.
+The idea-triage agent's instruction body is a third shape — a system prompt with an authority boundary
+stated in it. PLAN-020 is currently deciding how all of these translate across hosts.
+
+Questions worth answering:
+- What belongs in a system prompt versus a constraint document versus a governed procedure? This
+  repository has all three and no stated rule for choosing.
+- How is drift detected? Guides are prose, and prose has no test. The catalog has a drift test and the
+  glossary has one; AGENTS.md has nothing.
+- How much should a guide restate versus point at? CLAUDE.md answers this for itself and the answer
+  cost a day when it was got wrong.
+- What makes a constraint enforceable rather than advisory? A rule an agent can ignore silently is a
+  suggestion. Some rules here are enforced by tests, some by validators, most by prose.
+
+What it would touch: AGENTS.md and CLAUDE.md, which may not be edited without the owner's separate
+approval; docs/02-prompts/; .claude/agents/; PLAN-020's manifest.
+
+Verification: an agent given only the guides can complete a task correctly without the owner
+intervening to supply a rule that was written down somewhere it did not read; and a deliberately
+introduced drift in a guide is detected by something other than a person noticing.
+
+What is unresolved: whether "guide" is one concept or several wearing one name, and whether the
+enforceability question makes this really a sub-topic of Sensors.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Links**
+
+- extends → `000078`
+
+---
+
+## 000080 · Agent engineering: Sensors — evals, validation loops, output parsers, live monitoring
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+
+One of four sub-topics under the agent-engineering umbrella. Sensors are how an agent's behaviour is
+observed: evaluations run against it, validation loops that check its output, parsers that turn prose
+into something checkable, and monitoring while it is still running rather than after it has stopped.
+
+The live-monitoring half is the gap this repository can already name precisely. On 2026-09-10 two of six
+triage scouts hit their configured maxTurns of 30 and stopped mid-sentence with no finding (000077). The
+completion metadata reported tool_uses afterwards, but nothing observed them while they ran, so the
+truncation was noticed only because a human read the output and saw it end mid-thought. The owner's
+framing of the opportunity: if a third party can see an agent's remaining budget while it runs, that
+third party can alert the agent before it is cut off — which turns a silent failure into a handled one.
+
+Three questions that follow, none currently answerable here:
+- Can an agent observe its own remaining budget? If not, no instruction of the form "wrap up before you
+  run out" is actionable, and the fix has to be structural.
+- Can a third party observe it live rather than only in the completion metadata? Today the driver sees
+  tool_uses only after the agent finishes.
+- Is truncation detectable programmatically? tool_uses equal to the configured maxTurns is a strong
+  signal, though not a certain one, since an agent could legitimately finish on its last permitted turn.
+
+Sensors in the non-live sense already exist here and are worth cataloguing as prior art, because they
+show what "checked" looks like when it works: the governance validator, which must exit 0; the leak
+checker, which reads git ls-files and therefore cannot see an unstaged file; drift tests on the catalog
+and the glossary that fail when generated output diverges from its source; and the independent sub-agent
+review used at session close, which on 2026-09-09 caught a confidentiality leak the author had missed
+twice. That last one is the strongest evidence in the repository that a sensor with genuine independence
+beats a more careful author.
+
+What it would touch: potentially test/, tools/, the agent definitions, and whatever monitoring surface
+does not yet exist. Interacts directly with 000077 and with 000072's proposed verifier agent.
+
+Verification: a truncated agent is detected without a human reading its output; a monitored agent
+receives a warning before its budget is exhausted and produces a usable partial result; and an eval
+suite distinguishes an agent that followed its remit from one that produced plausible output outside it.
+
+What is unresolved: whether monitoring belongs in this repository or in the host running the agents;
+whether an alert can even reach a running agent mid-flight; and whether evaluating an agent's judgement
+is possible without a reference answer, which is the hard case for every agent here whose output is a
+finding rather than a computation.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000077`
+
+---
+
+## 000081 · Agent engineering: Context pipelines — metadata graphs, RAG systems, semantic layers
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+
+One of four sub-topics under the agent-engineering umbrella. Context pipelines are what an agent is
+given: how relevant material is selected, structured and delivered before it starts, and what shape that
+material arrives in.
+
+This is the sub-topic with the deepest existing groundwork, most of it unbuilt. research/ contains a
+whole proposed architecture on exactly this question — that retrieval should consider reasoning lineage,
+evidence, dissent, authority, convergence and unresolved uncertainty rather than semantic similarity
+alone, and that context is selected rather than stored. The phase context contract argues a phase should
+be executable without an agent rediscovering the entire project history. The adversarial review then
+falsified most of it as implemented: current retrieval is substring and metadata filtering ranked by
+confidence and date, it does not query rationale or dissent, and the memory loader does not retrieve
+ideas, captures, decisions or phase outputs as a unified graph.
+
+The repository already has the raw material a pipeline would draw on, in several unconnected shapes:
+the append-only idea log with typed links and annotations; the DuckDB projection; brain/ memories with
+types, confidence and scope; governed documents with a dependency graph; and the backlog with phase
+dependencies. Idea 000040 proposes deterministic search across several of these. The phase-mem-* line is
+deferred pending recorded retrieval failures that nothing currently collects — which is itself a sensor
+gap, and a dependency worth noting.
+
+Questions worth answering:
+- What does an agent actually need, versus what is available? Every agent here currently gets whatever
+  the driver pastes plus whatever it greps. That is a pipeline, just an undesigned one.
+- Should context be assembled deterministically, semantically, or both? The research proposes both with
+  deterministic first; nothing has tested either.
+- How is a context package evaluated? The phase context contract asks this and does not answer it.
+- What must be excluded? Superseded states, retracted annotations and stale confidence are all reachable
+  today, and the fold exists precisely because raw reads show them as current.
+
+What it would touch: tools/load_context.py, the DuckDB projection, brain/, the fold in src/db/ideas.py,
+and any agent that currently improvises its own context gathering.
+
+Verification: two agents given the same task and the same pipeline produce comparable context sets; an
+agent given a pipeline-assembled package completes a phase without needing to grep for something the
+pipeline should have supplied; and superseded or retracted material never appears in an assembled
+package.
+
+What is unresolved: how much of the research architecture is worth building versus how much was
+falsified by the review; whether this belongs to the application or to agent engineering, since it is
+plausibly both; and the standing warning that the review's strongest surviving argument against the
+research model was premature universal modelling.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000040`
+
+---
+
+## 000082 · Agent engineering: Orchestration — routing, multi-agent coordination, recovery paths
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+
+One of four sub-topics under the agent-engineering umbrella. Orchestration is how agents fit together:
+which agent gets which work, how simultaneous agents avoid colliding, and what happens when one fails
+partway.
+
+Coordination is the part this repository has actually built, and it works. ADR-003 and AGENTS.md define
+a claim protocol: a phase is claimed in backlog.yaml before work starts, the governance validator is the
+lock check and rejects a claim overlapping a peer's systems, deliverable paths or dependency chain, and
+max_active caps concurrent work at three. On 2026-09-10 that machinery answered a real question — a peer
+agent held phase-port-01 across a worktree, and checking its declared paths established there was no
+collision before proceeding. The lock table is a genuine mechanism, not a convention.
+
+Recovery is where it thins out. Several failure modes have now been observed rather than theorised:
+- An agent that runs out of budget mid-work leaves a claim held and a finding unwritten (000077).
+- An agent whose host budget expires stalls with a phase claimed and a worktree open, which happened on
+  2026-09-10 and resolved only because the owner said so.
+- A claim commit that changes phase counts without regenerating the catalog leaves the tree red for
+  everyone else until that agent returns.
+None of these has a defined recovery path. There is no timeout on a claim, no way for a peer to
+determine whether a claim is active or abandoned, and no reclaim procedure.
+
+Routing barely exists. Work is currently selected by the first ready phase in rendered order, which is
+deliberate and requires no judgement — but it assigns work to whoever asks next rather than to whichever
+agent suits it. Once the roster in 000072 exists, and the deliberation trio in 000073-000075 alongside
+it, something has to decide which agent handles what.
+
+The owner's raised question about parallelism belongs here: if every agent carries the same
+configuration and the same budget, running one or a thousand does not change any individual agent's
+odds of truncating — only the odds that at least one does. The observed correlation on 2026-09-10 was
+with task breadth, not concurrency: the two scouts that truncated had the broadest scouting scopes, and
+the three narrow ones finished in 14 to 19 turns.
+
+What it would touch: ADR-003, AGENTS.md's concurrent-agent protocol, backlog.yaml's claim fields,
+src/governance/backlog.py's lock check, and 000072's roster.
+
+Verification: an abandoned claim is detectable and reclaimable without the owner adjudicating; two
+agents given overlapping work are refused by the lock check rather than colliding; and an agent that
+fails partway leaves the repository in a state a peer can pick up.
+
+What is unresolved: whether claims need leases or heartbeats; whether recovery is automatic or always
+owner-mediated, given every existing authority boundary here puts the owner in the loop; and whether
+routing should be a mechanism at all or stay a queue the owner orders.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000072`
