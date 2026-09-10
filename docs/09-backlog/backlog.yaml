@@ -3,6 +3,7 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-demo-06
 - phase-demo-05
 - phase-port-01
 - phase-ses-01
@@ -4696,8 +4697,7 @@ items:
   - sys-demo-stage
   - sys-demo-overview
   owner: repository-owner
-  status: active
-  agent: agent-demo-content
+  status: queued
   priority: 1
   session_budget: 1
   depends_on:
@@ -4705,6 +4705,7 @@ items:
   - phase-demo-02
   - phase-demo-03
   - phase-demo-04
+  - phase-demo-06
   scope:
   - Write the final talking-points copy into the stage data file and the live-segment
     runbook in the rehearsal gate's step shape (orient, record an idea, triage it,
@@ -4750,5 +4751,69 @@ items:
   - docs/08-governance/catalog.md
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
-  next_action: Draft the runbook timeboxes from the PROMPT-010 live-segment shape,
-    then build demo_reset.py so the first dry-run can already use it.
+  next_action: 'Claim released 2026-09-10 with zero commits on agent/phase-demo-05
+    (worktree kept) when the owner folded phase-demo-06 into the track ahead of the
+    rehearsals; re-claim after phase-demo-06 completes, then draft the runbook
+    timeboxes from the PROMPT-010 live-segment shape and build demo_reset.py so the
+    first dry-run can already use it.'
+- id: phase-demo-06
+  title: Stage terminal interaction — session tabs, guarded drop, command injection
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  - phase-demo-02
+  - phase-demo-03
+  - phase-demo-04
+  scope:
+  - Host up to four terminal sessions as tabs in the terminal region, each an
+    independent shell over its own websocket; keep every session's component mounted
+    (CSS-hidden when inactive) so tab switches and region collapse never terminate a
+    session (REQ-006 R10).
+  - Separate collapse from drop — collapse hides the region with sessions intact;
+    the drop control (descope rung 4) and closing an individual tab each require an
+    explicit confirmation before the session terminates (REQ-006 R11).
+  - Build the command list revealed in place within the terminal region, loaded from
+    ts/public/demo-commands.json with no command text hardcoded in components;
+    selecting an entry sends its command into the active terminal's websocket
+    without a trailing newline (entries with run true append one); degrade cleanly
+    when the terminal route is absent (REQ-006 R12).
+  - Wire resize end to end — the frontend fit sends a JSON control frame the
+    websocket route parses into the adapter's resize(); binary frames stay raw
+    input; malformed text frames are ignored safely. No new endpoints, one PTY per
+    websocket, ADR-013's gating and binding unchanged.
+  acceptance:
+  - A long-running command in one tab survives switching tabs and collapsing and
+    re-expanding the region, and a fifth tab cannot be opened (REQ-006 R10).
+  - Nothing terminates a session before its confirmation step; the confirmed drop
+    and tab close genuinely terminate with no orphaned shell processes (REQ-006 R11).
+  - An injected command appears un-executed on the active tab's input line, a run
+    true entry executes on selection, and editing demo-commands.json changes the
+    list with no page-code rebuild (REQ-006 R12).
+  - A resize in the browser reaches the PTY (adapter resize called), proven by a
+    test.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D06-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright browser verification (demo-validator-web, pack D06-W) covering session
+    persistence, the confirmation guards, injection and zero-scroll at the four sizes
+  deliverables:
+  - ts/src
+  - ts/public/demo-commands.json
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  next_action: Claim the phase, then build the session-tab model and collapse/drop
+    separation first — the command panel and resize frames layer on top of it.

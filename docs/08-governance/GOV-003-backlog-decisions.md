@@ -240,6 +240,19 @@ status field. Everywhere outside `phase-demo-*`, `/session-close` remains the on
 `status: complete`, and the checkpoint skill's never-complete rule stands unmodified (its text is
 currently a `phase-port-01` deliverable and was deliberately not edited for this exception).
 
+## phase-demo-06 inserted ahead of the rehearsal phase
+
+Owner decision, 2026-09-10, after testing the integrated stage (phases 01–04): the stage terminal
+interaction upgrade (`phase-demo-06` — session tabs that survive collapse, a confirmation-guarded
+drop control, in-page command injection from a data file, resize wiring; REQ-006 rows R10–R12)
+folds into the demo track ahead of the rehearsals rather than waiting for a post-demo phase.
+`phase-demo-05` was returned to `queued` — its claim released with zero commits on its branch,
+its worktree kept — and gained `phase-demo-06` as a dependency so the runbook and rehearsals
+describe the final UI. The demo-track completion decision above extends to `phase-demo-06` on the
+same terms ("five phases" reads as the track's phases). A backend inject/read API for driving the
+terminal from outside the page was considered and parked as an idea: per ADR-013's closing
+consequence, that capability starts from its own decision record.
+
 Semantic provider, private/cloud data boundary, storage and quality targets belong to deferred `phase-mem-15`. No provider was selected or memory transmission authorized by the questionnaire. Agentic refinement additionally requires evidence that the simpler retrieval stages leave useful work unresolved. The optional periodic memory-review phase packages an opt-in trigger; it does not activate a scheduler or automate approval/deletion.
 
 These are tracked gates with resume conditions, not missing backlog coverage. All feature plans remain open until their mapped phases are completed or explicitly cancelled with rationale.

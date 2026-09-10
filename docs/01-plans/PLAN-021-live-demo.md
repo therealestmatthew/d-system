@@ -69,9 +69,21 @@ Five phases in `docs/09-backlog/backlog.yaml`, tracked as `phase-demo-*`:
 - **`phase-demo-04` — overview generation.** The `d-system-overview` skill, `templates/html/` and
   `templates/styles/` template families, and generation into `_public/`. Depends on
   `phase-demo-03`.
+- **`phase-demo-06` — stage terminal interaction.** Added 2026-09-10 after the owner tested the
+  integrated stage (phases 01–04): terminal sessions as tabs (cap 4) that survive tab switches
+  and region collapse; collapse and session-drop separated into two controls with the drop and
+  per-tab close behind an explicit confirmation; a command list loaded from
+  `ts/public/demo-commands.json` injecting into the active terminal's input line; and the resize
+  control frame wiring the frontend fit to the adapter's `resize()`. REQ-006 rows R10–R12.
+  All inside ADR-013's existing gate — one PTY per websocket, no new endpoints. Depends on
+  `phase-demo-01` through `phase-demo-04`. The descope ladder's rung 4 is now exercised through
+  the confirmed drop control; a backend inject/read API for driving the terminal from outside
+  the page is deliberately excluded and parked as an idea — per ADR-013 it starts from its own
+  decision record.
 - **`phase-demo-05` — demo content and readiness.** Final talking-points copy, the live-segment
   runbook, `tools/demo_reset.py` with its OPS document, the Windows setup checklist, and
-  rehearsals. Depends on all four.
+  rehearsals. Depends on all four build phases and on `phase-demo-06` (added 2026-09-10), so the
+  runbook and rehearsals describe the final stage UI.
 
 ## Descope ladder
 
