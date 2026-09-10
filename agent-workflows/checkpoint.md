@@ -15,7 +15,7 @@ governance rules and does not repeat them.
 - **Never run `git worktree`, `git rebase`, or anything touching a remote.** This workflow edits files
   in whatever working tree it is invoked from and nothing else. It gives identical instructions
   whether that tree is the primary checkout or an agent's worktree — see
-  [GOV-003](../../../docs/08-governance/GOV-003-backlog-decisions.md) for when each is required.
+  `docs/08-governance/GOV-003-backlog-decisions.md` for when each is required.
   Integration, rebasing and hand-off remain the separate procedure in `AGENTS.md`.
 - **Never touch a backlog line, session record, or `next_up` entry that belongs to a phase you are
   not currently working.** A peer's claim is a peer's claim.

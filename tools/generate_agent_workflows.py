@@ -51,7 +51,10 @@ def _strings(value: object, label: str) -> list[str]:
 
 
 def _inside(root: Path, relative: str, label: str) -> Path:
-    path = (root / relative).resolve()
+    relative_path = Path(relative)
+    if relative_path.is_absolute():
+        raise WorkflowError(f"{label} must be repository-relative: {relative}")
+    path = (root / relative_path).resolve()
     try:
         path.relative_to(root.resolve())
     except ValueError as error:
@@ -136,12 +139,19 @@ def validate_and_render(manifest: dict[str, Any], root: Path = ROOT) -> dict[Pat
             capabilities = _mapping(
                 target.get("capabilities"), f"{workflow_id}.{host}.capabilities"
             )
+            malformed = [
+                key
+                for key, value in capabilities.items()
+                if not isinstance(key, str) or not isinstance(value, str) or not value
+            ]
+            if malformed:
+                raise WorkflowError(
+                    f"{workflow_id}/{host}: malformed capability mappings: {malformed}"
+                )
             unsupported = set(
                 _strings(target.get("unsupported"), f"{workflow_id}.{host}.unsupported")
             )
-            mapped = {
-                key for key, value in capabilities.items() if isinstance(value, str) and value
-            }
+            mapped = set(capabilities)
             overlap = mapped & unsupported
             missing = required - mapped - unsupported
             unknown = (mapped | unsupported) - required

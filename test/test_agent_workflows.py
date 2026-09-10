@@ -115,6 +115,29 @@ def test_source_must_exist_inside_the_canonical_directory() -> None:
         generator.validate_and_render(manifest, ROOT)
 
 
+def test_source_and_target_paths_must_be_repository_relative() -> None:
+    manifest = copy.deepcopy(_manifest())
+    manifest["workflows"][0]["source"] = str(
+        ROOT / "agent-workflows" / "orient.md"
+    )
+    with pytest.raises(generator.WorkflowError, match="must be repository-relative"):
+        generator.validate_and_render(manifest, ROOT)
+
+    manifest = copy.deepcopy(_manifest())
+    manifest["workflows"][0]["targets"][0]["path"] = str(
+        ROOT / ".claude" / "skills" / "orient" / "SKILL.md"
+    )
+    with pytest.raises(generator.WorkflowError, match="must be repository-relative"):
+        generator.validate_and_render(manifest, ROOT)
+
+
+def test_every_capability_mapping_must_be_a_nonempty_string() -> None:
+    manifest = copy.deepcopy(_manifest())
+    manifest["workflows"][0]["targets"][0]["capabilities"]["bogus"] = False
+    with pytest.raises(generator.WorkflowError, match="malformed capability mappings"):
+        generator.validate_and_render(manifest, ROOT)
+
+
 def test_checkpoint_source_and_outputs_forbid_completion() -> None:
     outputs = generator.validate_and_render(_manifest(), ROOT)
     checkpoint = (ROOT / "agent-workflows" / "checkpoint.md").read_text(encoding="utf-8")

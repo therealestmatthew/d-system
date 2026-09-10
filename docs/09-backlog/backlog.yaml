@@ -4285,8 +4285,8 @@ items:
   - .agents/skills/orient/SKILL.md
   - .agents/skills/checkpoint/SKILL.md
   - docs/02-prompts/PROMPT-008-execute-a-phase.md
-  next_action: Implementation and declared verification are complete; owner-invoked
-    session-close can perform independent review and decide completion.
+  next_action: The initial independent review's three findings are fixed and covered
+    by regression tests; obtain a fresh independent review before deciding completion.
   session: doc-session-portable-workflow-foundation
   completion_evidence:
   - agent-workflows/workflows.yaml
@@ -4296,10 +4296,11 @@ items:
   - test/test_agent_workflows.py
   - docs/08-governance/OPS-010-generate-agent-workflows.md
   - docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md
-  result: Four generated adapters match two canonical workflow bodies; 10 targeted
-    tests and all 405 repository tests pass, governance reports 117 documents and
+  result: Four generated adapters match two canonical workflow bodies; 12 targeted
+    tests and all 407 repository tests pass, governance reports 117 documents and
     105 phases, targeted Ruff passes, and mypy reports no issues. All four acceptance
-    conditions are met pending owner-invoked independent close review.
+    conditions are met after correcting three findings from the initial independent
+    close review; a fresh independent review remains before completion.
 - id: phase-port-02
   title: Port safe commands and the idea-triage agent
   plan: doc-portable-agent-workflows
