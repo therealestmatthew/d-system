@@ -145,6 +145,38 @@ body {
   font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
 }
 
+/* The live terminal region: no padding around the mount point (xterm.js manages its own
+   internal spacing) and positioned so the "connection closed" overlay can sit on top of it
+   without disturbing the xterm.js layout underneath. */
+.stage-region__body--terminal {
+  position: relative;
+  padding: 0;
+  background: #0d1117;
+}
+
+.stage-terminal-mount {
+  height: 100%;
+  width: 100%;
+}
+
+/* xterm.js sizes its own canvas/rows to its containing element; min-height: 0 on every
+   ancestor up to .stage-region (already set) is what lets that container actually shrink
+   instead of forcing the grid to grow past the viewport (REQ-006 R02). */
+.stage-terminal-mount .xterm,
+.stage-terminal-mount .xterm-viewport {
+  height: 100%;
+}
+
+.stage-terminal-mount__overlay {
+  position: absolute;
+  inset: auto 0.75rem 0.75rem;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  background: rgba(13, 17, 23, 0.92);
+  border: 1px solid #b34700;
+  border-radius: 4px;
+}
+
 .stage-placeholder-text {
   margin: 0 0 0.5rem;
   font-size: 0.85rem;
