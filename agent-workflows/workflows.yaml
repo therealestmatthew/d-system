@@ -1,0 +1,54 @@
+schema_version: 1
+workflows:
+- id: orient
+  name: orient
+  description: Show the repository's live workflows, tools, governance state, backlog, and working tree without changing anything.
+  authority: read-only
+  source: agent-workflows/orient.md
+  requires:
+  - read_files
+  - run_commands
+  targets:
+  - host: claude
+    kind: skill
+    path: .claude/skills/orient/SKILL.md
+    capabilities:
+      read_files: Read
+      run_commands: Bash
+    unsupported: []
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/orient/SKILL.md
+    capabilities:
+      read_files: filesystem
+      run_commands: shell
+    unsupported: []
+- id: checkpoint
+  name: checkpoint
+  description: Record observed progress on the active phase without ever marking it complete; safe to repeat against unchanged state.
+  authority: agent-invocable
+  source: agent-workflows/checkpoint.md
+  requires:
+  - read_files
+  - edit_files
+  - run_commands
+  - ask_user
+  targets:
+  - host: claude
+    kind: skill
+    path: .claude/skills/checkpoint/SKILL.md
+    capabilities:
+      read_files: Read
+      edit_files: Edit
+      run_commands: Bash
+      ask_user: AskUserQuestion
+    unsupported: []
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/checkpoint/SKILL.md
+    capabilities:
+      read_files: filesystem
+      edit_files: filesystem
+      run_commands: shell
+      ask_user: structured-user-input
+    unsupported: []

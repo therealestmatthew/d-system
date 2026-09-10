@@ -44,6 +44,7 @@ CI regenerates it and fails on any difference.
 | OPS-007 | operation | active | repository-owner | docs/08-governance/OPS-007-generate-tool-docs.md |
 | OPS-008 | operation | active | repository-owner | docs/08-governance/OPS-008-capture.md |
 | OPS-009 | operation | active | repository-owner | docs/08-governance/OPS-009-check-no-private-content.md |
+| OPS-010 | operation | active | repository-owner | docs/08-governance/OPS-010-generate-agent-workflows.md |
 | OPS-011 | operation | active | repository-owner | docs/08-governance/OPS-011-overview-metrics.md |
 | OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
 | OPS-013 | operation | active | repository-owner | docs/08-governance/OPS-013-demo-reset.md |
@@ -150,6 +151,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-18-idea-triage-agent.md |
 | SESS-2026-09-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md |
 | SESS-2026-09-09-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-02-post-sweep-policy-and-prompts.md |
+| SESS-2026-09-09-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md |
 | SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 | SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
 | SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
@@ -205,7 +207,6 @@ CI regenerates it and fails on any difference.
 |---|---|---|
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
-| OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-153 documents — adr: 15, architecture: 5, governance: 8, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 49.
+155 documents — adr: 15, architecture: 5, governance: 8, operation: 14, plan: 33, prompt: 23, requirement: 7, session: 50.
