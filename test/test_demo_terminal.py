@@ -450,11 +450,18 @@ def test_get_terminal_enabled_reports_true_with_flag_set(
 def test_get_talking_points_defaults_to_ts_public_location(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """With no override, a genuinely missing default file 404s and names the default location
-    (`ts/public/talking-points.json`), rather than raising an unrelated error.
+    """With no override, the route serves `ts/public/talking-points.json` — this phase's own
+    deliverable — unchanged, byte for byte, rather than a re-serialized or partial copy.
     """
     monkeypatch.delenv(TALKING_POINTS_PATH_ENV_VAR, raising=False)
+    default_path = (
+        Path(__file__).resolve().parents[1] / "ts" / "public" / "talking-points.json"
+    )
+    assert default_path.is_file()
+    expected_content = default_path.read_bytes()
+
     client = TestClient(main_module.app)
     response = client.get(DEMO_STAGE_TALKING_POINTS_PATH)
-    assert response.status_code == 404
-    assert "ts/public/talking-points.json" in response.json()["detail"]
+
+    assert response.status_code == 200
+    assert response.content == expected_content
