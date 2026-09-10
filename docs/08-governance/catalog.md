@@ -139,7 +139,8 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-09-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-02-post-sweep-policy-and-prompts.md |
 | SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 | SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
-| SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-data-overview-skill.md |
+| SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
+| SESS-2026-09-10-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-04-demo-data-overview-skill.md |
 
 ## Plans and their phases
 
@@ -176,7 +177,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 2 | 2 | 1 | agent-demo-data, agent-demo-stage |
+| PLAN-021 | doc-live-demo | draft | 2 | 1 | 2 | agent-demo-data, agent-demo-stage |
 
 ## Held codes
 
@@ -188,4 +189,4 @@ CI regenerates it and fails on any difference.
 | OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-133 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 18, requirement: 6, session: 42.
+134 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 18, requirement: 6, session: 43.
