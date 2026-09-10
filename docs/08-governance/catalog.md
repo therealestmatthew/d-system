@@ -93,6 +93,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-017 | prompt | active | repository-owner | docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md |
 | PROMPT-018 | prompt | active | repository-owner | docs/02-prompts/PROMPT-018-demo-build-delegation-pack.md |
 | PROMPT-019 | prompt | active | repository-owner | docs/02-prompts/PROMPT-019-demo-glossary-diagram-audit.md |
+| PROMPT-020 | prompt | active | repository-owner | docs/02-prompts/PROMPT-020-workbench-pre-plan-package.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -192,4 +193,4 @@ CI regenerates it and fails on any difference.
 | OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-137 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 19, requirement: 6, session: 45.
+138 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 20, requirement: 6, session: 45.
