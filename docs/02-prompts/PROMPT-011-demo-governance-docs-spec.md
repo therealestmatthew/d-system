@@ -53,7 +53,10 @@ method. It must cover, at minimum:
 descope ladder verbatim — (1) overview charts become tables, (2) talking-points rotator loses
 transitions, (3) embedded overview panel becomes an open-in-tab link, (4) embedded terminal falls
 back to a side-by-side real terminal — and the demo-day operational requirements (Windows machine
-setup checklist, pre-demo git tag, demo-reset, screen hygiene).
+setup checklist, pre-demo git tag, demo-reset, screen hygiene, the recorded-dry-run fallback, the
+pre-approved permission allowlist). State the afterlife explicitly (owner decision, 2026-09-10):
+everything the demo produces is kept as real work — the audience idea stays in the log, the demo
+phases are closed via `/session-close`, and the overview page becomes a maintained feature.
 
 ## 3. ADR (`--next-code decision`)
 

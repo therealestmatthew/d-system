@@ -47,11 +47,26 @@ from the runbook; a pass exceeding 15 minutes total triggers tightening (pre-agr
 plan beat first, then pre-stage the `/orient` output). Every step's fallback is the same action:
 un-park the pre-built skill and continue the narrative.
 
+**The second pass is screen-recorded** (owner decision, 2026-09-10): a successful recording is a
+gate deliverable — the last-resort fallback if the API or network fails on stage, narrated live
+over the video. The runbook names the recording's path on the presentation machine.
+
+## Permission allowlist
+
+After the dry-runs, build a pre-approved allowlist for the live-demo session from the rehearsal
+transcripts (the `fewer-permission-prompts` skill does exactly this), scoped to the specific
+commands and paths the live segment uses — so the segment runs without permission pauses while
+the write fences stay in place and still visibly block forbidden paths. Blanket auto-accept is
+not used.
+
 ## Windows-machine gate (owner performs, coordinator guides)
 
-The presentation machine is Windows; development is Linux, so this cannot be verified remotely:
+The presentation machine is Windows; development is Linux, so this cannot be verified remotely.
+The owner reports base setup (repo clone, uv, Node, Claude Code authenticated) is already done —
+so this gate **verifies** rather than installs:
 
-1. Repo cloned; `uv sync --extra dev` and `npm install` complete; `pywinpty` installed.
+1. `uv sync --extra dev` and `npm install` are current with the demo branches; `pywinpty`
+   present (it enters the tree during this build, so it postdates the base setup).
 2. Terminal adapter smoke check: websocket route serves a ConPTY-backed cmd or PowerShell (per
    the configured shell), xterm.js renders it, interactive input works.
 3. The full rehearsal checklist above passes once on that machine.
