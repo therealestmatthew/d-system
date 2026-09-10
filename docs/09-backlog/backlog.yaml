@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-demo-01
-- phase-demo-03
 - phase-demo-02
 - phase-demo-04
 - phase-demo-05
@@ -4505,7 +4504,7 @@ items:
   systems:
   - sys-demo-overview
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-data
   priority: 1
   session_budget: 1
@@ -4545,10 +4544,8 @@ items:
   - docs/08-governance/codes.yaml
   - docs/08-governance/catalog.md
   - test/test_overview_tools.py
-  next_action: 'All three work items (D03-C1/V1, D03-C2/V2, D03-C3) and the D03-G phase
-    gate are green on agent/phase-demo-03, committed but not yet integrated into dev.
-    Remaining: the coordinator''s D03-A adversarial review and the completion/integration
-    decision (GOV-003 demo-track gate) — neither is this orchestrator''s to perform.'
+  next_action: 'None — phase complete: D03-A adversarial findings fixed, branch integrated
+    into dev with the owner''s approval (GOV-003 demo-track completion gate).'
   session: doc-session-demo-data-overview-tools
   completion_evidence:
   - tools/overview_metrics.py
@@ -4556,16 +4553,17 @@ items:
   - docs/08-governance/OPS-011-overview-metrics.md
   - docs/08-governance/OPS-012-overview-inventory.md
   - test/test_overview_tools.py
-  result: 'On agent/phase-demo-03 (not yet integrated): overview_metrics.py and
-    overview_inventory.py emit deterministic chart-ready JSON (funnel, cycle time,
-    annotation coverage, link distribution/orphans, throughput, age of open ideas,
-    backlog-by-status; concepts/terms; systems), each reading idea state only through
-    fold()/load_events(). uv run pytest passes 417 tests; ruff check src/ test/ and
-    mypy src/ are clean; uv run python -m src.governance reports Governance OK: 18
-    systems, 131 documents, 15 memories, 110 backlog phases; each tool run twice
-    against the unchanged tree diffs empty. OPS-011/OPS-012 carry filled generated
-    blocks and codes.yaml no longer reserves OPS-011/OPS-012. D03-G (demo-validator-check)
-    verdict: all checklist items green.'
+  result: 'Integrated into dev at 58503b2 (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. overview_metrics.py and overview_inventory.py
+    emit deterministic chart-ready JSON (funnel, cycle time, annotation coverage,
+    link distribution/orphans, throughput, age of open ideas, backlog-by-status;
+    concepts/terms; systems), each reading idea state only through fold()/load_events().
+    D03-G verdict: all checklist items green. D03-A adversarial review: no blocker
+    or major findings; two minors fixed (stale self-reported governance counts;
+    independent recomputation tests extended to every metrics section). Final
+    verification: uv run pytest passes 424 tests; ruff and mypy clean; governance
+    OK (131 documents); each tool run twice against the unchanged tree diffs empty;
+    staged private-content check OK.'
 - id: phase-demo-04
   title: Build the overview skill, templates and page generation
   plan: doc-live-demo
