@@ -1154,6 +1154,7 @@ No existing plan, requirement, or phase currently covers claim recovery. PLAN-01
 
 - relates_to ← `000041`
 - relates_to ← `000059`
+- relates_to ← `000082`
 
 ---
 
@@ -2311,6 +2312,7 @@ No overlapping umbrella ideas or related parent-level concepts found. The specif
 
 - extended_by ← `000012`
 - extended_by ← `000014`
+- relates_to ← `000079`
 
 ---
 
@@ -2449,6 +2451,10 @@ Idea 000030 (Always-on worker host and watchdog for supervised agent runs) is lo
 The scope questions named in 000054's body — what to instrument first, where telemetry data lives, how it differs from provenance — are genuinely open design questions with no prior governed analysis.
 
 </details>
+
+**Links**
+
+- relates_to ← `000080`
 
 ---
 
@@ -2755,7 +2761,7 @@ The idea would likely benefit from position relative to PLAN-001: clarify whethe
 
 ## 000061 · Classify idea nodes by ontological, epistemic, and lifecycle type, not just tags and links
 
-**Created 2026-09-09T03:42:09-04:00 · Status: `open`**
+**Created 2026-09-09T03:42:09-04:00 · Status: `triaged`**
 
 Owner's framing (2026-09-09, recorded verbatim as given, per ADR-010): classifying nodes in
 an append-only knowledge graph transforms a flat web of tags into a rigorous ontology, allowing
@@ -2819,6 +2825,41 @@ Open questions, deliberately unresolved here pending discussion:
 - Whether "NetworkX" or a similar graph-processing framework is the intended query surface, or
   whether DuckDB (the existing derived layer) can express the same traversal queries adequately.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:20:59-04:00): Related Plans and Decisions
+
+PLAN-017.04 (Annotations and relationship contributions) explicitly defers tags and classification with a stated gate condition: "60 captured ideas, or one recorded instance of failing to find an idea that was known to exist." The idea log now holds 86 ideas, exceeding the 60-idea threshold. PLAN-017.04 reserves this gate as a resumption point rather than a deferred-indefinitely task: "resolving it under time pressure is how a vocabulary becomes permanent by accident" — the condition exists precisely to enable work like 000061 to proceed when the corpus is large enough to justify structured classification.
+
+Related Ideas
+
+Idea 000061 relates to several existing concepts already recorded as linked ideas:
+
+- 000018 (tagging and plan-mapping system for ideas) is extended by this idea — 000061 proposes a different approach, structured type classification rather than free-form tags.
+- 000053 (allow ideas to link directly to plan/document IDs) addresses link targets; 000061 focuses on node types as an orthogonal dimension.
+- 000060 (memory and context management) touches similar classification concerns in the brain/ system; PLAN-001 (Agent Memory System) implements type-based discrimination there (concept, entity, procedure, episode, decision).
+- 000032 (evidence-backed provenance graph for memories, reports and recommendations) covers related ground in provenance and graph traversal.
+- 000062 (a pure classification agent for idea nodes) explicitly extends this idea and proposes a dedicated agent to perform the classification work.
+- 000063 (two more idea link types: abstraction and forking) relates to the edge-type expansion, orthogonal to the node-type proposal here.
+
+Retrieval System Context
+
+The idea mentions 000004/000005/000043/000044/000045 (vector/graph retrieval work) as stakeholders in how node type becomes a first-class filter in the retrieval layer. No specific plan governs that retrieval layer yet — PLAN-001 covers memory retrieval contracts but reserves semantic/vector search for future phases. The question of whether node classification interacts with semantic retrieval remains open.
+
+Schema and Implementation Questions
+
+The body acknowledges several open technical questions about whether the three axes apply to all ideas, whether this becomes a new field on the existing idea schema or a separate graph layer, and whether DuckDB can express the traversal queries or if NetworkX/graph-specific tooling is needed. These are genuine architectural questions, not blockers to the proposal itself.
+
+Backfill Consideration
+
+The body raises a backfill question for ~86 existing ideas. PLAN-016 (`phase-idea-01`) delivered the schema and structure; PLAN-017 series delivered the write path, amendments, and annotations. No phase yet addresses retroactive classification of the existing corpus, which would be required before this system could be operationalized as a working retrieval facet.
+
+</details>
+
 **Links**
 
 - extends → `000018`
@@ -2832,7 +2873,7 @@ Open questions, deliberately unresolved here pending discussion:
 
 ## 000062 · A pure classification agent for idea nodes, deliberately doing neither tagging nor linking
 
-**Created 2026-09-09T03:57:57-04:00 · Status: `open`**
+**Created 2026-09-09T03:57:57-04:00 · Status: `triaged`**
 
 The owner's proposal (2026-09-09): an agent whose sole purpose is interpreting a single idea's
 own merits and essence, and assigning it a value on each axis of ARCH-005's ontological /
@@ -2852,6 +2893,46 @@ has anything concrete to write into. Also depends on the backfill question ARCH-
 if the taxonomy adds fields to schemas/idea.schema.json, this agent is presumably how the
 existing ~60 ideas get retroactively classified, not just new ones going forward.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:22:24-04:00): Idea 000062 proposes a dedicated classification agent whose sole purpose is assigning values on the ontological, epistemic, and lifecycle axes of ARCH-005's taxonomy — deliberately excluding tagging (000018's domain) and relationship-building (000055's domain). The separation of concerns is deliberate: classification should assess an idea in isolation to reflect its intrinsic nature rather than being biased by nearby nodes in the graph.
+
+Related Plan and Architecture
+
+ARCH-005 (Idea node classification) is the foundational document this idea depends on. It defines the three-axis taxonomy — ontological (nature of the idea), epistemic (truth status), and lifecycle/temporal (execution stage) — and proposes PLAN-017 was the immediate predecessor, handling the core idea-record and lifecycle architecture; PLAN-017.04 defers tagging/classification until "60 captured ideas or a recorded failed retrieval," naming this as the gate condition to resume that work. The idea corpus has now grown to 86 ideas (as of this session), exceeding the 60-idea threshold. ARCH-005's "recommended build order" places the classification agent (000062) at step 5, after schema additions ship (step 3), backfill happens (step 4), and before the connection-builder agent (000055) lands.
+
+Related Ideas
+
+The effective state shows 000062 already carries the right links:
+- extends -> 000061 (the taxonomy definition captured before ARCH-005 was written)
+- relates_to -> 000055 (the connection-builder agent that maintains relationships and tags separately)
+
+Idea 000065 (decomposition procedure for compound ideas) relates_to 000062 and 000055, depending on both agents existing to execute the procedure. Ideas 000018 (tagging system) and 000053 (document-code links) are orthogonal extensions to the idea schema, already linked to 000061 and deferred under the same gate condition.
+
+Open Technical Questions
+
+ARCH-005 section "Open questions" names several unresolved issues this agent would depend on:
+- Whether every idea needs values on all three axes, or if some axes are optional for certain idea types
+- Whether classification lives as new fields on schemas/idea.schema.json or as a separate typed-node system
+- How node type interacts with 000004/000005/000043/000044/000045's vector/graph retrieval layer once that lands
+- Whether DuckDB can express the traversal queries the taxonomy unlocks, or if NetworkX or similar graph-processing library is needed
+
+Backfill Dependency
+
+The idea correctly flags a backfill requirement: if the taxonomy adds fields to the schema, the existing ~86 ideas would need retroactive classification for the system to be operationally useful. ARCH-005 names this as step 4 in the recommended build order, explicitly requiring the agent (step 5) to exist before backfill can proceed at scale.
+
+No Related Plan or Document
+
+No specific plan (REQ/PLAN) has been written yet to govern this agent's design or implementation. ARCH-005 itself is `status: draft`, confirming it is a reference architecture, not an implementation commitment. PLAN-017.04 (Annotations and relationship contributions) defers this gate; its acceptance would need to be refreshed to trigger work on the governing REQ/PLAN for idea system work (steps 2-5 of ARCH-005's build order).
+
+No promotion or existing delivery found.
+
+</details>
+
 **Links**
 
 - extends → `000061`
@@ -2862,7 +2943,7 @@ existing ~60 ideas get retroactively classified, not just new ones going forward
 
 ## 000063 · Two more idea link types: abstraction (atomic to general) and forking (compound to split parts)
 
-**Created 2026-09-09T03:58:13-04:00 · Status: `open`**
+**Created 2026-09-09T03:58:13-04:00 · Status: `triaged`**
 
 The owner's proposal (2026-09-09), raised while discussing ARCH-005's classification taxonomy:
 extend the three existing link types (extends/supersedes/relates_to, schemas/idea.schema.json)
@@ -2946,6 +3027,40 @@ See also: idea 000064 (a lineage annotation kind for thought-progression, replac
 and idea 000065 (a decomposition procedure for compound ideas that don't form a cohesive
 emergent whole).
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:23:58-04:00): **State of the idea as of 2026-09-09:**
+
+Idea 000063 proposes two new link types: abstraction (generalizes/specializes) and forking (forked_from). The owner's assessment annotation on 000063 itself records that the design was resolved during the same session:
+
+**Forking half — RESOLVED and partially superseded:**
+The forking link type proposal was dropped. Instead:
+- 000064 (lineage annotation kind) provides a new annotation kind to record thought progression ("this idea originated from thinking through idea NNNNNN") — queryable but structurally inert, not participation in the relationship graph.
+- 000065 (decomposition procedure for compound ideas) operationalizes the actual decomposition workflow, using 000064's lineage annotations rather than a new link type.
+- A new link type `component_of` (atomic idea → compound idea) was introduced for composition semantics — many-to-many, allowing one atomic idea to function in multiple compound contexts. This is distinct from forking.
+- "Atomic" and "compound" are now structural positions derivable from the graph (does anything assert component_of into this node?), not hand-classified node types.
+
+ARCH-005 (section "Composition and abstraction (resolved 2026-09-09)") confirms the resolution: composition runs bottom-up via component_of; forking as originally proposed was abandoned in favor of the annotation + procedure approach.
+
+**Abstraction half — UNRESOLVED:**
+The assessment annotation explicitly resolves forking and confirms component_of and composition semantics, but does not address the abstraction question: whether abstraction (generalizes/specializes) deserves its own directional link type pair, or whether it is better understood as a tightened, explicit reading of the existing `extends` type where "specific idea extends its broader/abstract parent" becomes the canonical semantics. This remains open.
+
+**Related documents and ideas:**
+- ARCH-005: Idea node classification taxonomy; sections on composition/abstraction confirm the forking resolution and describe how component_of fits the model, but leave the abstraction distinction unresolved.
+- 000061: Classify idea nodes (triaged); introduces the ontological/epistemic/lifecycle axes that provide the framework for distinguishing node kinds.
+- 000064: Lineage annotation kind (open); implements the replacement mechanism for forked_from as annotation rather than link.
+- 000065: Decomposition procedure (open); depends on 000064 and operationalizes compound idea splitting.
+- 000055: Connection-builder agent (relates_to 000063); already scoped in ARCH-005's build order.
+- 000062: Pure classification agent (relates_to 000055); scoped in ARCH-005.
+
+No governing plan (PLAN) or requirement (REQ) yet exists for the schema changes (component_of link type and lineage annotation kind). ARCH-005's section 7 ("Recommended build order") names this as item 2: "Write the governing REQ/PLAN, turning this document plus 000061–000065, 000053 and 000018 into an accepted requirement and implementation plan."
+
+**Assessment:**
+The forking half of 000063 is effectively superseded by the resolved design captured in 000064 and 000065. The abstraction half remains genuinely open and unresolved. This idea's own assessment annotation serves as the resolution record, making further promotion of 000063 itself premature until the abstraction semantics question is settled (either a new link type or a tightened reading of extends).
+
+</details>
+
 **Links**
 
 - relates_to → `000061`
@@ -2956,7 +3071,7 @@ emergent whole).
 
 ## 000064 · A lineage annotation kind for recording thought-progression without shaping the idea graph
 
-**Created 2026-09-09T04:37:02-04:00 · Status: `open`**
+**Created 2026-09-09T04:37:02-04:00 · Status: `triaged`**
 
 Surfaced resolving idea 000063: the original "forked_from" link-type proposal was dropped
 because it recorded provenance of *thought* (how the owner actually arrived at an idea), not
@@ -2979,6 +3094,39 @@ event does. That is exactly the property this needs: queryable, but structurally
 Depends on nothing else shipping first; this is a small, independent schema addition (one new
 enum value) that could land alongside or ahead of 000063's `component_of` link type.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:25:24-04:00): **State of the idea as of 2026-09-10:**
+
+Idea 000064 proposes a fourth annotation kind, `lineage`, for recording how an idea's content originated during the owner's thinking through another idea — e.g., "this idea was pulled out of a brainstorm dump that also produced NNNNNN" — without participating in the relationship graph. It was surfaced from 000063 (Two more idea link types) as a resolution to that idea's forking half: the original `forked_from` link type was dropped because it records *provenance of thought* (owner's process), not *provenance of meaning* (structural relationships), and those need different mechanisms.
+
+**Current implementation status: Proposed only, not yet implemented.**
+- Not in schema: schemas/idea.schema.json currently has annotation kinds `["note", "finding", "assessment"]` only; `lineage` does not yet exist.
+- No governing plan or requirement yet exists.
+- ARCH-005 (Idea node classification, draft status) fully describes and justifies this idea and three related schema changes (lineage annotation, component_of link type, classification fields) as a bundled unit. ARCH-005's "Recommended build order" (item 2) explicitly names this: write the governing REQ/PLAN as a gate before any schema change lands (item 3).
+
+**Existing justified context:**
+- ARCH-005 (draft architecture document) confirms on line 108 that lineage is proposed as "a new annotation kind (`000064`) — queryable, but structurally inert, same as `note`/`assessment` today."
+- The assessment annotation on 000063 itself records the resolution: forking is dropped, replaced by the annotation + decomposition procedure approach (000064 and 000065).
+- PLAN-017.04 (Annotations and relationship contributions, draft from 2026-09-06) anticipated this exact case: "An unknown kind fails validation rather than being accepted as free text, so adding a fourth is a deliberate schema change and not a typo." (line 48-49).
+
+**Related ideas already linked:**
+- 000063 (Two more idea link types) — the parent from which this idea was surfaced; its resolution assessment names 000064 as replacing forked_from.
+- 000065 (Decomposition procedure for compound ideas) — operationalizes the workflow using 000064's lineage annotations; already links to 000064.
+- 000062 (Pure classification agent, relates_to 000065) and 000055 (Connection-builder agent, relates_to 000065) — agents that would interact with lineage annotations once deployed.
+
+**Open design questions:**
+ARCH-005 does not yet settle whether this lives as three new fields on schemas/idea.schema.json (alongside component_of and classification fields), a separate typed-node system, or the seed of a distinct knowledge-graph layer (section "Where does this live?"). This affects implementation shape, not proposal validity.
+
+**Assessment:**
+000064 is complete as a proposal and properly justified. It awaits step 2 of ARCH-005's build order: the governing REQ/PLAN that bundling this with 000061–000065, 000053, and 000018 into an accepted requirement and implementation plan. Until that document exists and is accepted, promotion is premature. This is exactly the case ARCH-005 describes as "the gate before any schema change lands."
+
+</details>
+
 **Links**
 
 - relates_to → `000063`
@@ -2988,7 +3136,7 @@ enum value) that could land alongside or ahead of 000063's `component_of` link t
 
 ## 000065 · A decomposition procedure for compound ideas that don't form a cohesive emergent whole
 
-**Created 2026-09-09T04:37:15-04:00 · Status: `open`**
+**Created 2026-09-09T04:37:15-04:00 · Status: `triaged`**
 
 Follows from resolving idea 000063: a "compound idea" that turns out to be a disjoint
 brainstorm-dump, not a real emergent system, needs a defined procedure for pulling it apart —
@@ -3021,6 +3169,42 @@ Open questions: whether steps 1-4 are ever automated (agent-driven) or always ow
 how "already exists" in step 2 is actually checked (semantic search implies 000004/000045's
 retrieval work needs to exist first, or this stays a manual/approximate check until then).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:26:52-04:00): Idea 000065 proposes a decomposition procedure for handling compound ideas that are disjoint brainstorm dumps rather than coherent emergent systems. The finding below confirms the idea's dependencies, its design grounding, and current implementation status.
+
+## Current state of dependencies
+
+ARCH-005 (idea node classification), a draft architecture document created 2026-09-09, explicitly describes this resolution and names 000065 as one of three ideas it produced. ARCH-005 defines the principles (bottom-up composition via `component_of`, lineage as annotation not link type) that make the decomposition procedure in 000065 possible. The document's recommended build order positions 000065 as step 9, to be written "once `component_of` exists and there's a real backlog worth decomposing."
+
+Ideas 000063 and 000064, both created 2026-09-09, have already been triaged:
+
+- 000063 (two more idea link types) has an owner assessment resolving the design: `forked_from` was dropped as a link type and replaced with a lineage annotation (000064), leaving `component_of` as the sole new link type for composition.
+
+- 000064 (lineage annotation kind) proposes adding a fourth annotation kind to schemas/idea.schema.json alongside the existing note/finding/assessment. Currently the schema only defines those three enum values; lineage is unimplemented.
+
+Ideas 000062 (pure classification agent) and 000055 (connection-builder agent) both exist as open ideas with appropriate cross-links recorded, but neither has been promoted to a plan or begun implementation. 000065's body states both are prerequisites: "neither does yet" and "depends on both 000062 and 000055 existing" to execute the procedure.
+
+## What exists and what does not
+
+- **ARCH-005 exists (draft status)**: design grounding is durable and documented.
+- **000063 and 000064 exist (open status, triaged)**: the design proposals they represent are resolved.
+- **000064's schema change (lineage annotation) does not exist**: would require a small addition to schemas/idea.schema.json to support the new kind value.
+- **000062 and 000055 exist as ideas (open status)**: neither has been promoted to a plan yet.
+- **000065 as a procedure exists as idea text (open status)**: no governing REQ/PLAN has been written, no implementation has begun.
+
+## Relationship to governance
+
+ARCH-005's recommended build order (step 2) explicitly calls for "Write the governing REQ/PLAN, turning this document plus `000061`–`000065`, `000053` and `000018` into an accepted requirement and implementation plan, per this repo's plan-before-code rule. The gate before any schema change lands." This idea (000065) is named as part of that unified scope and is not actionable independently until the gating requirement/plan exists.
+
+The idea already carries appropriate relates_to edges to 000063, 000064, 000062, and 000055, recorded as part of its creation.
+
+</details>
+
 **Links**
 
 - relates_to → `000063`
@@ -3032,7 +3216,7 @@ retrieval work needs to exist first, or this stays a manual/approximate check un
 
 ## 000066 · Protect main and require PRs from dev, with a multi-agent developer protocol to match
 
-**Created 2026-09-09T20:16:50-04:00 · Status: `open`**
+**Created 2026-09-09T20:16:50-04:00 · Status: `triaged`**
 
 Nothing currently prevents a direct commit to `main`. As of 2026-09-09 `main` is the only branch, it
 is the remote's default, and `AGENTS.md` instructs agents to claim phases and integrate work onto it
@@ -3101,6 +3285,69 @@ Raised by the owner on 2026-09-09, immediately after reviewing the post-push pol
 the four workflow prompts (PROMPT-006 through PROMPT-009). Needs a requirement and a plan before any
 implementation, per AGENTS.md's plan-before-code rule.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:28:50-04:00): ## Finding: Idea 000066 — Branch Protection and Multi-Agent PR Protocol
+
+**Overlap with Other Ideas:** No direct idea-to-idea overlap found. Related concerns (concurrency protocol, git tooling, workflow refinement) exist in ideas 000025, 000041, and 000059, but these address different problems.
+
+**Recent Changes and Current State:**
+
+The branch model described in this idea has been partially addressed:
+
+- **Branch structure:** Both `dev` and `main` branches exist locally and remotely; the current working branch is `dev` per git status.
+- **AGENTS.md corrected:** Commit `bed6731` (2026-09-10, "Correct the trunk to dev in AGENTS.md and add the demo prompt packs") explicitly restored `dev` as the integration branch throughout AGENTS.md with owner approval, and noted that "main stays gated pending 000066".
+- **ADR-003 already in place:** The accepted "Worktree-isolated concurrent agents" decision (`ADR-003`, created 2026-09-05) already describes `dev` as the lock-table integration branch, confirming that the intended model is already decided and partly documented.
+
+**Stale References Requiring Reconciliation:**
+
+Governance documents still carry post-2026-09-09 references to `main` as the integration branch:
+
+- `GOV-001-protocol.md` line 181-182: "The catalog on `main` — the integration branch — is the lock table"; lines 188-191 reference `main` as the primary checkout location.
+- `OPS-001-operations.md` lines 123, 127, 131, 137, 151, 153: operational procedures still direct agents to claim, checkout, and rebase against `main` rather than `dev`.
+
+These are the exact references mentioned in the idea as touched by commit `0c82996` when the push went out.
+
+**Infrastructure Gaps:**
+
+- **Branch protection rules:** GitHub's branch protection API is not accessible for this private repository on a free plan (`HTTP 403: "Upgrade to GitHub Pro or make this repository public"`). The protection rules themselves cannot be configured until the account tier changes or the repository becomes public, which is outside the scope of governance documents but is prerequisite infrastructure for enforcement.
+- **PR requirement:** No pull request gate currently exists from `dev` to `main`. The protocol update needed to describe when/how agents or the owner opens that PR, who merges it, and how agents know when work has landed is still open.
+- **CI as merge gate:** The existing `.github/workflows/ci.yaml` runs tests and builds but is not currently a required check for merges; linking it to branch protection requires both the protection rules to exist and the CI configuration to be updated.
+
+**Unresolved Design Decisions from the Idea:**
+
+The idea itself identifies several open questions that any requirement/plan would need to address:
+
+- Whether a single-owner private repository benefits from PR review gates now versus later (value may be entirely in habit and audit trail).
+- Whether agents can realistically open pull requests (requires `gh` auth, raises confidentiality concerns).
+- How PR gating interacts with the primary-checkout exception in `GOV-003` (documentation-only phases may lose the exception or have it narrowed).
+- Whether force-push protection should be restated as branch protection rather than prose rule.
+
+**Relevant Governed Documents and Plans:**
+
+- `AGENTS.md` (root) — describes the concurrent agent protocol and integration workflow; already corrected to `dev` per commit `bed6731`.
+- `ADR-003-multi-agent-concurrency.md` — already accepts the `dev`-based integration model and lock-table mechanism.
+- `GOV-001-protocol.md` — describes governance structure and concurrent agent execution; carries stale `main` references requiring update.
+- `GOV-003-backlog-decisions.md` — carries decisions about worktree and checkout rules; may interact with any PR gate design.
+- `OPS-001-operations.md` — carries operational procedures; requires update to reference `dev` instead of `main`.
+- `ADR-007-capture-routing.md`, `docs/08-governance/` catalog — governance model structure that would inform any PR protocol design.
+
+**Summary:**
+
+The idea's core request — move from direct `main` commits to a gated PR model with `dev` as the working integration branch — is partially implemented (branches exist, AGENTS.md corrected) but incomplete:
+
+1. Governance documents contain stale references requiring reconciliation to match the intended model now described in AGENTS.md and ADR-003.
+2. GitHub infrastructure (branch protection, required status checks) cannot be configured on the current free-plan account.
+3. The multi-agent PR protocol itself — who opens PRs, when, approval flow, cadence — is still open design work.
+
+The idea requires a plan before implementation per AGENTS.md's plan-before-code rule. That plan should clarify the unresolved design decisions, address the GitHub infrastructure constraint, and produce a reconciliation checklist for the governance documents that currently describe the wrong model.
+
+</details>
+
 ---
 
 ## 000067 · Portable agent workflows from a single source of truth
@@ -3156,6 +3403,7 @@ No existing governed requirement or plan was found that delivers cross-agent ski
 
 - relates_to ← `000069`
 - relates_to ← `000072`
+- relates_to ← `000079`
 
 ---
 
@@ -3363,6 +3611,7 @@ Raised by the owner on 2026-09-10.
 - relates_to → `000071`
 - relates_to ← `000071`
 - relates_to ← `000077`
+- relates_to ← `000087`
 
 ---
 
@@ -3694,7 +3943,7 @@ scratch later.
 
 ## 000077 · Handle subagent tool-use truncation: resume to recover, do not re-run
 
-**Created 2026-09-10T03:57:14-04:00 · Status: `open`**
+**Created 2026-09-10T03:57:14-04:00 · Status: `triaged`**
 
 Subagents in this repository silently hit a tool-use cap and stop mid-work, before they write their
 conclusion. Observed directly on 2026-09-10 while running six read-only triage scouts in parallel: two
@@ -3759,9 +4008,25 @@ and to 000070 (training demo), which would hit it in front of an audience.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by repository-owner (2026-09-10T04:06:37-04:00): Correction, 2026-09-10, same day as the idea. The cap is not undocumented and not a platform limit: .claude/agents/idea-triage.md sets maxTurns: 30 in its own frontmatter, alongside model: haiku and effort: medium. The owner recalled configuring it when the triage agent was first built, and the file confirms it. That settles two of the idea's open questions — the cap is 30 because it was chosen to be 30, and it is configurable by editing one line. Two consequences follow. First, the model matters: triage runs on haiku, and a smaller model may need more turns to reach the same conclusion, so turns and model should be tuned together rather than separately. Second, this is a portability gap for PLAN-020 — the Codex port at .codex/agents/idea-triage.toml carries model_reasoning_effort but has no turn-budget equivalent, so the same agent has a bounded budget under one host and an unbounded one under another. The idea's remaining open questions stand: whether an agent can observe its own remaining budget, and whether a third party can observe it live rather than only in the completion metadata after the fact.
+- **finding** by agent-idea-triage (2026-09-10T06:30:43-04:00): Idea 000077 raises a concrete truncation problem observed on 2026-09-10 when six triage scouts ran in parallel, with two hitting a 30-tool-call cap mid-sentence. The issue is well-documented: truncation is silent (no signal in the agent's own output), but context is preserved (near-identical token counts show the work was cached), so resuming without re-running is recoverable — the metrics scout resumed without the "keep searching" instruction, used 0 further tool calls, and finished in 12 seconds.
+
+Related governed documents:
+- PROMPT-016 (demo guardrails) explicitly references this idea: "Truncated agent output: resume the agent, never re-run (idea `000077`)" — the principle is recorded but implemented only as a brief note, not as formal guidance for detecting or recovering from truncation.
+- PLAN-020 (portable agent workflows) discusses agent capabilities and host-specific settings but does not address truncation recovery or budget constraints.
+- PROMPT-006 (idea capture and triage) is silent on agent budgets and truncation.
+
+The triage agent's own instructions (.claude/agents/idea-triage.md) do not mention budget constraints, approaching-limit behavior, or how to write a conclusion when context is approaching exhaustion. The instruction to "write your conclusion before you run out" would require the agent to observe its own remaining budget, which is unresolved.
+
+Existing linked ideas are appropriate: 000072 (lifecycle agents inherits this for every proposed agent), 000070 (demo would hit this in front of an audience), 000071 (metrics command, one of the affected scouts).
+
+Related idea 000080 (agent engineering: sensors) explicitly uses this truncation problem as its motivating example and discusses live monitoring as a detection mechanism. The relationship is complementary: 000077 proposes recovery (stop and report from what you have), while 000080 proposes monitoring (alert before exhaustion). Both address the same truncation problem from different angles.
+
+The idea is not fully delivered. PROMPT-016's mention is acknowledgement, not implementation. The triage agent still lacks explicit recovery instructions, drivers lack formal guidance on resuming with "stop and report" directives, and no detection or verification procedure is documented.
+
+PROPOSED LINK: 000077 --relates_to--> 000080 (both address agent truncation; 080 proposes monitoring as detection, 077 proposes recovery as handling)
 
 </details>
 
@@ -3770,13 +4035,15 @@ and to 000070 (training demo), which would hit it in front of an audience.
 - relates_to → `000072`
 - relates_to → `000070`
 - relates_to → `000071`
+- relates_to → `000080`
 - relates_to ← `000080`
+- relates_to ← `000082`
 
 ---
 
 ## 000078 · Agent engineering as a discipline with its own framework
 
-**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
 
 An umbrella for the practice of building agents deliberately, rather than writing one agent at a time
 and rediscovering the same problems. The proposition is that agent construction has recurring concerns
@@ -3820,6 +4087,45 @@ modelling, which applies to frameworks about agents exactly as much as to knowle
 
 Raised by the owner on 2026-09-10.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:32:30-04:00): ## Agent engineering as a discipline: Umbrella framework for building agents systematically
+
+This idea proposes a framework for agent construction discipline covering four dimensions (Guides, Sensors, Context pipelines, Orchestration), with the core claim that agent construction has recurring concerns worth naming and reasoning about once rather than rediscovering in each agent.
+
+**Existing agent construction evidence in the repository:**
+
+The idea correctly identifies abundant raw material. AGENTS.md (doc-adr-multi-agent-concurrency in AGENTS.md enforcement) is a constraint document that has drifted and been corrected. Four workflow prompts encode procedure as governed documents: PROMPT-006 (idea capture and triage), PROMPT-007 (idea to plan), PROMPT-008 (execute a phase), PROMPT-009 (plan audit), plus demo-specific prompts PROMPT-010 through PROMPT-016. PLAN-020 deals directly with authority declarations, capability matrices, and host-specific adapter generation for portable agent workflows. ADR-003 (doc-adr-multi-agent-concurrency) covers the orchestration dimension explicitly—worktree isolation, claiming protocols, and safety rules for concurrent agent work. REQ-005 captures portable agent workflow requirements including behavioral definitions, discovery, authority mapping, and capability matrices. Idea 000077 provides concrete, measured evidence of a failure mode (tool-use truncation at 30 calls, resumption preserving context) with three control cases. The idea-triage agent itself is a deliberately bounded, single-concern implementation (.claude/agents/idea-triage.md).
+
+**Dimension-specific overlaps with existing work:**
+
+- **Guides** (000079): AGENTS.md as constraint document; PROMPT-006, -007, -008, -009 as governed procedure prompts; CLAUDE.md as framework-specific orientation; PLAN-020 manifest metadata.
+- **Sensors** (000080): 000077 as measured failure mode; governance checking (`uv run python -m src.governance`); pytest validation gates; `ruff` and `mypy` lint/type checks. Connection between observed truncation behavior and how resumption preserves context is directly relevant.
+- **Context pipelines** (000081): Existing overlap with 000040 (deterministic search algorithms for ideas, backlog, memories, decisions), already recorded as relates_to.
+- **Orchestration** (000082): ADR-003 covers worktree isolation, claiming, disjointness checking, and handoff. Relates to 000072 (lifecycle agents) and 000020 (MCP-mediated multi-agent coordination), both already recorded in the idea graph.
+
+**The core unresolved question:**
+
+The idea itself identifies the critical bar: "A taxonomy that only relabels existing practice has failed, and should be discarded rather than kept for tidiness." The framework earns its place only if applying it surfaces something the authors of AGENTS.md, PLAN-020, ADR-003 and the existing prompts missed, or if applying it to a proposed agent (000072's lifecycle agents, 000020's Librarian service) changes what gets built. The idea names three specific open questions: whether this is one framework or four separate concerns that co-occur; whether it belongs in this repository or is general practice belonging elsewhere reusable; and whether the output is a governed document, a set of prompts, or a planning checklist.
+
+**Caution from adversarial review:**
+
+The idea correctly flags the adversarial review's warning about premature universal modeling. The review's first opposing argument to D-System's current state is "over-modeled," and it survives contact ("premature universal modeling is a credible risk"). A framework about agents runs exactly the same risk if it abstracts too early—naming concerns that turn out to be context-specific, inventing a universal dimension that three agents use and the fourth ignores, or producing a model that is elegant but orthogonal to what actually matters when the next agent gets built.
+
+**Verification criterion already stated in the idea:**
+
+The idea's own bar is precise: applying the framework to the idea-triage agent or the proposed lifecycle agents (000072) must surface something the authors missed, or the framework should be discarded. Testing the decomposition (whether the four dimensions are exhaustive and orthogonal) is explicitly part of the work, not a preliminary to it.
+
+No related plan, requirement, or backlog phase found that already covers agent construction as a named discipline with a framework. PLAN-020 addresses portable workflows; ADR-003 addresses multi-agent coordination; the prompts address specific procedures. The umbrella idea of systematizing agent construction from first principles as its own discipline is distinct from all of these, though it would inform their evolution if the framework proves to surface real gaps.
+
+The four sub-ideas (000079-000082) are already properly linked via extends relationships and should proceed as parallel research supporting the umbrella question.
+
+</details>
+
 **Links**
 
 - relates_to → `000072`
@@ -3832,7 +4138,7 @@ Raised by the owner on 2026-09-10.
 
 ## 000079 · Agent engineering: Guides — system prompts, AGENTS.md files, constraint documents
 
-**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
 
 One of four sub-topics under the agent-engineering umbrella. Guides are what an agent is told: its
 system prompt, the working agreement it reads, and the constraint documents that bound what it may do.
@@ -3875,15 +4181,44 @@ enforceability question makes this really a sub-topic of Sensors.
 
 Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:33:59-04:00): **Guides work is distributed across PLAN-020 and existing governance documents; drift detection remains unresolved.**
+
+Idea 000079 identifies guides as system prompts (like the idea-triage agent's instruction body), constraint documents (AGENTS.md and CLAUDE.md), and procedure-shaped guides (PROMPT-006 through PROMPT-009). The idea correctly names this repository's core evidence: AGENTS.md itself has drifted (the "no remote" rule stood stale), CLAUDE.md already names the tradeoff between reference pointers and drift (line 74-75), and the two files now carry an explicit no-edit-without-approval rule enforced by prose alone.
+
+PLAN-020 (Portable agent workflows) is actively addressing part of this landscape by creating a canonical source for workflow guide bodies, generating host-specific adapters from it, and planning drift tests (line 94). PLAN-020's "Canonical behavior is independent of every host directory" section (lines 39-60) and the requirement R09 of REQ-005 directly speak to the byte-identical regeneration and tampering detection the idea names as unresolved. However, PLAN-020 only covers portable workflows — it does not address the drift-detection gap for AGENTS.md, CLAUDE.md, or the relationship between system prompts (like the triage agent's body) and constraint documents.
+
+PLAN-013 (Tooling documentation) discusses "no drift enforcement yet" for the glossary and catalog, noting that "generation already removes drift from the mechanical half" but that "the remaining risk is prose" (lines 70-76). The issue the idea names — "guides are prose, and prose has no test" — appears verbatim in PLAN-013's reasoning, but that plan defers enforcement.
+
+PLAN-020 does explicitly name the no-edit rule when it states "any future need to change either [AGENTS.md or CLAUDE.md] requires the owner's separate, exact approval" (line 139), making the rule visible in the portable-workflows manifest. But the four unresolved questions the idea poses remain open:
+- What belongs in a system prompt versus a constraint document versus a governed procedure — no stated rule exists
+- How drift is detected — PLAN-020 adds drift tests for generated workflows, but not for hand-maintained guides
+- How much a guide should restate versus point — CLAUDE.md answers this for itself, but the principle is not generalized
+- What makes a constraint enforceable — PLAN-020 maps capabilities and marks unsupported ones, but most AGENTS.md rules remain prose
+
+No overlapping idea-to-idea relationships found beyond the umbrella structure (000079 extends 000078). The related governance and plan documents are already recorded.
+
+PROPOSED LINK: 000079 --relates_to--> 000067 (Portable agent workflows: PLAN-020 is the delivery vehicle for guide manifestation and drift tests, one of the four guide topics this idea raises)
+PROPOSED LINK: 000079 --relates_to--> 000051 (Agent harness and guardrails: enforceability of constraints is a shared concern with guide rules)
+
+</details>
+
 **Links**
 
 - extends → `000078`
+- relates_to → `000067`
+- relates_to → `000051`
 
 ---
 
 ## 000080 · Agent engineering: Sensors — evals, validation loops, output parsers, live monitoring
 
-**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
 
 One of four sub-topics under the agent-engineering umbrella. Sensors are how an agent's behaviour is
 observed: evaluations run against it, validation loops that check its output, parsers that turn prose
@@ -3926,16 +4261,38 @@ finding rather than a computation.
 
 Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:35:45-04:00): Sensors for agent behavior are partially in place but fragmented. The idea's own body accurately catalogs the existing non-live sensors: a governance validator exits 0 or fails at `src/governance/__main__.py:audit()`, a leak checker in `tools/check_no_private_content.py` scans tracked files, drift tests in `test/test_codes.py` (committed catalog vs. regenerated) and `test/test_glossary.py` (glossary parity) catch divergence between source and generated output, and session-close review via an independent sub-agent (mentioned in `docs/03-sessions/` records and confirmed in `phase-doc-01`'s acceptance criteria) has surfaced confidentiality leaks the author missed.
+
+The live-monitoring gap is real and specific: on 2026-09-10, two triage scouts (000077) hit their maxTurns cap at exactly 30 tool calls and stopped mid-sentence with no finding, yet `completion.tool_uses` appeared only in the response metadata after the agent finished. Nothing observed them while they ran, so recovery and graceful degradation are impossible today. The owner's framing is precise: if a third party can observe an agent's remaining budget in flight, it can alert the agent before truncation, turning a silent failure into a handled one.
+
+Three open technical questions follow directly: can an agent observe its own remaining budget (if not, the fix is structural); can a third party observe it live rather than only post-completion (the completion metadata is retrospective); and is truncation detectable programmatically (tool_uses equal to maxTurns is a strong but not certain signal).
+
+This idea relates directly to 000077 (Handle subagent tool-use truncation: resume to recover, do not re-run), where 000077 addresses recovery and resumption after truncation, while 000080 addresses detection and the alert mechanism — complementary angles on the same failure mode. Idea 000054 (Observability and telemetry) is a broader umbrella for watching the system run (structured logging, metrics, tracing across backend and agent runs), and sensors are a specialized instance of observability. Idea 000051 (Agent harness and guardrails) covers enforcement mechanisms (hooks, tests, settings.json) and is thematically adjacent but distinct — guardrails block bad behavior, while sensors report it.
+
+No existing plan document found; the governance and verification infrastructure is scattered across test/, tools/, and src/governance/ rather than consolidated under a single plan or requirement.
+
+PROPOSED LINK: 000080 --relates_to--> 000054 (both about observing agent and system behavior; 080 focuses on agent-specific sensors, 054 on system-wide telemetry)
+
+</details>
+
 **Links**
 
 - extends → `000078`
 - relates_to → `000077`
+- relates_to → `000054`
+- relates_to ← `000077`
 
 ---
 
 ## 000081 · Agent engineering: Context pipelines — metadata graphs, RAG systems, semantic layers
 
-**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
 
 One of four sub-topics under the agent-engineering umbrella. Context pipelines are what an agent is
 given: how relevant material is selected, structured and delivered before it starts, and what shape that
@@ -3981,6 +4338,34 @@ research model was premature universal modelling.
 
 Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:37:49-04:00): ## Context Pipelines: Research Existing, Current Implementation Incomplete
+
+The research architecture for context pipelines is documented in `research/architecture/architecture.md` and proposes a rich retrieval model that considers reasoning lineage, evidence, dissent, authority, convergence, and unresolved uncertainty — not semantic similarity alone. It models knowledge as typed state-transition graphs with provenance, asking: what evidence supported this decision, who made it, and under what authority?
+
+The `phase_context_contract.md` in the same directory articulates the pipeline's purpose: a phase should be executable without requiring an agent to rediscover the entire project history. It asks whether context packages can be generated automatically from graph lineage and what information maximizes execution quality without overload.
+
+Current implementation falls short. `tools/load_context.py` implements only Layer 3 of PLAN-001's five-layer retrieval pipeline: substring/ILIKE keyword search ranked by confidence and recency. Layers 4 (semantic similarity) and 5 (agentic RAG refinement) remain proposed only. More critically, the current retrieval does not query rationale, does not retrieve ideas, captures, decisions or phase outputs as a unified graph, and does not traverse reasoning lineage. The `fold()` function in `src/db/ideas.py` successfully resolves effective idea state — applying amendments correctly and detecting cycles in extends links — but the rest of the system does not use it to assemble context packages.
+
+The backlog phases `phase-mem-07` through `phase-mem-09` plan to implement the nonsemantic Librarian retrieval contract and blended retrieval hints, but these are improvements to Layer 3, not approaches to Layers 4–5 or to graph-aware selection.
+
+The adversarial review (research/CLAUDE.codebase-review.md, section 6) flagged the gap explicitly: it determined that retrieval is currently recency-based with keyword filtering, that prior reasoning lineage is not preserved, that superseded information can reappear if raw reads bypass fold(), and that context selection lacks explainability. Its strongest surviving argument was "premature universal modelling" — that the research architecture attempts to solve too many problems simultaneously.
+
+The idea correctly identifies this as unresolved: whether the full research model is worth building, whether it belongs to the application or to agent engineering, and how much of it was falsified by review. The fold() and load_context.py pieces work, but neither yet connects to the graph-based retrieval the research proposes.
+
+Overlaps with existing work:
+- PLAN-001 (Agent Memory System) describes Layer 3–5 retrieval in Section 9; this idea asks whether all five layers are worth building
+- `phase-mem-07` through `phase-mem-09` implement parts of Layer 3 and tagging strategy, not the graph-aware selection
+- 000040 (Research deterministic search algorithms) proposes one path forward on selecting from multiple sources; this idea asks what "context pipeline" means if not deterministic or semantic selection
+- 000072 (Agents covering full lifecycle) and 000082 (Orchestration) are siblings in the agent-engineering umbrella and will depend on what context pipelines actually deliver
+
+</details>
+
 **Links**
 
 - extends → `000078`
@@ -3990,7 +4375,7 @@ Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
 
 ## 000082 · Agent engineering: Orchestration — routing, multi-agent coordination, recovery paths
 
-**Created 2026-09-10T04:08:11-04:00 · Status: `open`**
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
 
 One of four sub-topics under the agent-engineering umbrella. Orchestration is how agents fit together:
 which agent gets which work, how simultaneous agents avoid colliding, and what happens when one fails
@@ -4036,7 +4421,204 @@ routing should be a mechanism at all or stay a queue the owner orders.
 
 Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:39:35-04:00): Idea 000082 asks for a cohesive orchestration framework covering three topics: routing (assigning work to agents), coordination (preventing collisions), and recovery paths (handling failure modes). The finding addresses each.
+
+**Coordination and the lock mechanism are built.** ADR-003 (worktree-isolated concurrent agents over a disjoint backlog) and AGENTS.md's concurrent-agent sections document the claim protocol: backlog.yaml on dev is the lock table, a phase becomes active with a small commit that sets status: active and names the agent, the governance validator (src/governance/backlog.py) is the lock check rejecting overlapping systems/deliverables/dependencies, and max_active caps concurrent work at three. This machinery was tested on 2026-09-10 when a peer agent held phase-port-01 across a worktree; checking its declared paths established there was no collision before proceeding — the lock table is a genuine mechanism, not a convention.
+
+**Recovery is identified but unimplemented.** Three specific failure modes have been observed:
+- An agent that runs out of budget mid-work leaves a claim held and a finding unwritten — idea 000077 (Handle subagent tool-use truncation) names this scenario.
+- An agent whose host budget expires or whose session limit is hit stalls with a phase claimed and a worktree orphaned. This happened on 2026-09-10; resolution required owner intervention. Idea 000025 (No recovery procedure exists for an abandoned agent claim in the concurrency protocol) documents this scenario exactly — no timeout on a claim, no way to detect whether a claim is active or abandoned, no reclaim procedure.
+- A claim commit that changes phase counts without regenerating the catalog leaves the tree red for all peers until the claiming agent returns.
+
+ADR-003 and AGENTS.md cover claiming, working in a worktree, completing and handing off, and resolving merge collisions, but name no procedure for recovering from abandonment.
+
+**Routing barely exists.** Work is currently selected by taking the first ready phase in rendered order from backlog.yaml. This is deliberate and requires no judgement — but it assigns work to whoever asks next rather than to whichever agent suits it. Idea 000072 (Agents covering the full lifecycle from idea to working product) establishes the roster; ideas 000073–000075 (the deliberation trio: "just one more", "minimalist", "product owner") propose agents that would have different selection criteria and preferences. Once that deliberation machinery is built, routing must decide which agent handles what — the observation noted in 000082 is apt: the owner's question about parallelism correlates truncation with task breadth (the two scouts with the broadest scopes truncated; the three narrow ones finished in 14–19 turns), not with concurrency itself. A routing mechanism that matches task scope to agent capability could reduce the observed correlation.
+
+Unresolved: whether claims need leases or heartbeats for staleness detection; whether recovery is automatic (governance check that flags stale claims, semi-automated owner action) or always owner-mediated (fully manual procedure); and whether routing becomes a first-class mechanism or remains a queue the owner orders.
+
+PROPOSED LINK: 000082 --relates_to--> 000025 (both address recovery of abandoned claims in the concurrent-agent protocol)
+PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents fail mid-work and leave incomplete state)
+
+</details>
+
 **Links**
 
 - extends → `000078`
 - relates_to → `000072`
+- relates_to → `000025`
+- relates_to → `000077`
+
+---
+
+## 000083 · Template library with deterministic or AI population
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A growing library of template files that can be dynamically populated — either deterministically (data merged into slots by code) or by AI (a model filling or adapting the template). Came up alongside the dynamic HTML generation direction: the repo already has templates/html/ and templates/styles/ as the template layer of the generation pipeline (source data → templates → generation scripts → UI), so this idea is about making that layer a first-class, growing library rather than a fixed set — templates as reusable assets that accumulate over time. It would touch templates/, the generation scripts in tools/ and src/, and potentially the React UI for browsing or triggering population. Unresolved: what the template format and slot/placeholder convention is, how a template declares whether it is deterministic-fill or AI-fill (or both), and how the library is indexed so templates are discoverable. Overlaps the existing HTML generation framework described in CLAUDE.md; recorded anyway — triage can connect it to whatever plan governs that work. Related new ideas recorded in the same batch: the HTML component library and the color palette library, both of which would feed the same generation pipeline.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:41:32-04:00): **Finding: Template library governs implementation of existing framework**
+
+Idea 000083 proposes a template library with deterministic or AI-fill capabilities — reusable template assets that accumulate over time, living in templates/html/ and templates/styles/ with generation scripts in tools/ and src/. This directly serves the HTML generation framework that CLAUDE.md describes and that the repository is building to implement.
+
+Current state of the framework:
+- **PLAN-003** ("Dynamic HTML Generation Website Tool," code `doc-html-00-overview`, status `approved`) designs a page rendering system that uses block-based composition from YAML/JSON configuration with a tools/build_pages.py converter and runtime validation.
+- **phase-html-01** through **phase-html-10** (queued in `docs/09-backlog/backlog.yaml`) implement PLAN-003 in phases, starting with schema definition and build tooling.
+- **PLAN-021** ("Live demo stage and overview build") includes **phase-demo-04** (overview generation), which explicitly uses templates/html/ and templates/styles/ template families to generate an overview page into _public/.
+- **REQ-006** ("Live-demo requirements," R08) specifies that a skill renders templates/html/ templates into the generated overview page.
+- The templates/html/ and templates/styles/ directories exist but are empty (only .gitkeep); no build_pages.py or generation scripts exist yet.
+
+Related ideas 000084 (HTML component library) and 000085 (color palette library) are being triaged separately. All three would feed the same generation pipeline and represent complementary abstractions within the framework PLAN-003 governs: components are reusable UI building blocks, templates are pages or page sections composed of components, and palettes are optional styling configuration applied during generation.
+
+The template library idea is not formally linked to PLAN-003 yet, though it clearly describes the asset layer that the plan's generation pipeline depends on. No overlap with other ideas' content; 000083 addresses a distinct concern (the template asset library) that the existing plan governs at the architectural level but has not yet explicitly scoped.
+
+</details>
+
+**Links**
+
+- relates_to ← `000084`
+
+---
+
+## 000084 · HTML component library for the dynamic HTML generation plan
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A library of reusable HTML/UI components to serve as the building blocks for the dynamic HTML generation plan: menu bars, dialog boxes that pop up and disappear on hover-over events, toolbars, tooltips, in-page UI search functionality, an embedded terminal, and similar. The point is composability — page generation assembles pages from these known-good blocks instead of emitting bespoke markup each time. It would touch templates/html/ and templates/styles/ (where component markup and styles would live), the generation tooling in tools/ and src/, and possibly ts/ if components need script behavior (hover dialogs, search, the embedded terminal). Note the live-demo build already includes an xterm.js embedded terminal and stage components — that work is a likely first source or consumer of library entries. Unresolved: whether components are plain HTML/CSS fragments, templated fragments, or JS-bearing widgets; how a component declares its inputs; and where the boundary sits between this library and the React frontend's own components. Related ideas from the same batch: the template library (components are what templates compose) and the color palette library (an optional styling configuration for the same generation tool).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:43:16-04:00): PLAN-003 (Dynamic HTML Generation Website Tool, approved) already governs the framework for composable page generation, with phase-html-01 through phase-html-10 queued in the backlog. However, this idea and PLAN-003 describe different component models:
+
+PLAN-003.04 implements React/TypeScript block components (HeroBlock, TextBlock, ImageBlock, ColumnsBlock) as the rendering layer in ts/src/components/blocks/. These components are fetched as page configurations from FastAPI and rendered client-side.
+
+This idea proposes a component library for templates/html/ and templates/styles/, addressing an unresolved architectural question: whether components are plain HTML/CSS fragments, templated fragments, or JS-bearing widgets. This is distinct from PLAN-003's block-component approach, which answers that question for the React frontend specifically. The library described here appears to exist at a different layer — potentially for template population, static site generation, or content assembly before delivery to React.
+
+Current state of cited concrete work:
+- templates/html/ and templates/styles/ contain only .gitkeep placeholders. phase-demo-04 (queued in PLAN-021) will write demo-specific templates here for the overview page, but this is not a general component library.
+- The xterm.js embedded terminal mentioned as a "likely first source or consumer" is not yet implemented. phase-demo-02 (queued in PLAN-021, depends on phase-demo-01) is scoped to build the xterm.js terminal component wired to a websocket backend, but the component has not been built or added to templates/html/.
+
+Related work in the same generation pipeline: 000083 (template library) and 000085 (color palette library) both address pieces of the HTML generation framework at different layers — templates address content structure and slots, palettes address styling configuration, and this idea addresses reusable UI building blocks. These three ideas are related but orthogonal in focus.
+
+The architectural question this idea raises is genuine: PLAN-003 leaves unresolved whether components are fragments, templated fragments, or widgets, and how they declare their inputs. The existing block-component implementation in PLAN-003 answers that for React, but this idea may be asking about a complementary library for other generation contexts. No related plan, phase or document found that specifically addresses composable component libraries as described here — the closest governed work is PLAN-003's block components, which solve a related but distinct problem at the React rendering layer.
+
+PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building blocks in the HTML generation pipeline, at different layers)
+
+</details>
+
+**Links**
+
+- relates_to → `000083`
+- relates_to ← `000085`
+
+---
+
+## 000085 · Color palette library for the HTML generation tool
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A library of color combinations that are known to work well together, offered as an optional configuration input to the HTML generation library tool: a generated page or template family picks (or is assigned) a palette rather than hard-coding colors, and every palette in the library is pre-vetted for coherence. It would touch templates/styles/ (palettes as a style asset, likely CSS variables or a small data file per palette) and the generation tooling that applies a chosen palette during page generation. Unresolved: the palette format (how many roles per palette — background, surface, accent, text, etc.), whether palettes carry light/dark variants, whether accessibility contrast checks are part of admission to the library, and how a template or generation run selects one. Related ideas from the same batch: the template library and the HTML component library — a palette is the optional third input alongside templates and components in the same generation pipeline.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:44:57-04:00): **Related governed documents:**
+
+PLAN-003 (Dynamic HTML Generation Website Tool) governs the HTML generation framework via phases phase-html-01 through phase-html-10. PLAN-003.03 specifies a Tailwind CSS v4 setup with static, hardcoded color tokens in `ts/src/index.css` — ten roles defined (`--color-primary`, `--color-secondary`, `--color-surface`, `--color-text`, `--color-text-muted`, `--color-accent`, `--color-danger`, and three primary variants). These are compile-time CSS tokens; they do not vary at runtime or per-page. phase-html-05 will implement this styling foundation as a deliverable.
+
+The adversarial audit (ARCH-003, finding L1) flags that PLAN-003's overview promises "configuration-driven theming," but the current design delivers only static compile-time CSS. The audit recommends clarifying whether theming should be "compile-time CSS" or "deliberately added" as configurable. Idea 000085 proposes making theming configurable via a pre-vetted color palette library: pages or template families would select from a library of coherent palettes rather than hard-coding colors.
+
+**Current state of color/theming in the repo:**
+
+templates/styles/ contains only .gitkeep. No palettes, no per-theme CSS variations and no configuration mechanism for palette selection currently exist. ts/src/index.css does not yet exist (phase-html-05 not started).
+
+**Fit within PLAN-003's scope:**
+
+000085 addresses a deliberate design question that ARCH-003 flagged as unresolved: whether configuration-driven theming is in scope for the HTML generation tool. If approved, a palette library would:
+
+1. Extend the current static `@theme` block to support multiple pre-vetted palettes
+2. Live in templates/styles/ as CSS or data files (per-palette CSS variables, or a data structure mapping palette IDs to color objects)
+3. Require a selection mechanism — likely a configuration field in site.yaml or page YAML specifying which palette to apply
+4. Touch the generation tooling (tools/build_pages.py) to apply the selected palette during page generation, and the frontend (React components) to consume the palette via Tailwind utilities
+
+The idea leaves unresolved: palette format (how many roles, whether to include light/dark variants), accessibility contrast requirements for admission, and the selection mechanism (site-wide default vs. per-page override). These are design choices within PLAN-003's existing contract.
+
+**Relationship to sibling ideas:**
+
+000083 (Template library) and 000084 (HTML component library) are related libraries for the same HTML generation pipeline; all three are optional inputs to the page generation and rendering system described by PLAN-003. Unlike templates and components, a palette library is purely presentational — it does not introduce new block types or visual structures, only color schemes.
+
+**No promotion applicable:** the idea's ask (a pre-vetted color palette library) is not yet delivered by any governed document. It is a candidate feature addition to PLAN-003, not fulfillment of an existing plan or requirement.
+
+PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable libraries for the HTML generation tool's design system)
+
+</details>
+
+**Links**
+
+- relates_to → `000084`
+
+---
+
+## 000086 · Repo tracker and multi-repo memory agent
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A tracked list of all of the owner's repositories — both personally created repos and external repos the owner has starred or marked for future reference — paired with a multi-repo memory and awareness agent whose purpose is connecting the dots across them: knowing what exists where, and pointing someone at the right existing repo when they need something so nothing gets rebuilt that already exists ("don't rebuild the wheel"). The owner specifically notes the autoclaude-api repo, which scouts repositories for Claude skills, and says these should tie in together somehow — the repo tracker's list is plausibly the corpus that agent (and autoclaude-api's scouting) operates over. It would touch the data layer (a new tracked entity or list — repos are not currently a d-system entity), possibly a new schema in schemas/, and an agentic workflow for the awareness agent, which fits the system's stated purpose as a platform for agentic workflow triggering. Unresolved: whether the tracker and the agent are one effort or two (recorded here as one idea because the owner presented them together — triage may split them), where the repo list lives (tracked _data/ entity vs. pulled live from GitHub stars/API), what "marked for future reference" means mechanically, exactly how the autoclaude-api tie-in works, and what memory the awareness agent keeps versus derives on demand.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:46:13-04:00): **Repo Tracker and Multi-Repo Memory Agent (000086) — Triage Finding**
+
+**Overlap with other ideas:** No direct overlap with existing ideas. The idea stands alone as a novel data entity (repos) and agentic workflow distinct from the knowledge retrieval and agent engineering ideas (000002, 000004, 000020, 000067, 000072-075, 000081), which address mechanics and tooling that *could support* a repo awareness agent but do not propose repo tracking itself.
+
+**Existing governed documents:** No related plan, requirement, or backlog phase found. Search results:
+- No `repo.schema.json` exists; repos are not yet a d-system entity (confirmed via schemas/ directory listing)
+- Zero references to "autoclaude-api" outside this idea's body — it is an external repository the owner mentioned, not a local system
+- Backlog (backlog.yaml) contains phases for reliability, HTML generation, signals, synthesis, memory agents, and demo work — no phase for repo tracking or multi-repo awareness
+- Knowledge retrieval research documents (`gemini-knowledge-retrieval-*.md`) exist but address documentation graph queries within d-system (~1,400 nodes), not cross-repo tracking or a repo-as-entity data layer
+
+**Key unresolved questions from the body remain:** The idea correctly flags that tracker and agent may be two efforts; where repo metadata lives (pulled live vs. tracked _data/); what "marked for future reference" means mechanically; how autoclaude-api ties in; and whether the memory agent computes or caches. These are open for the owner's decision, not addressed by existing work.
+
+**Summary:** This is a greenfield feature touching a new data domain (repos), requiring new schema, new entity in _data/, and a novel agentic pattern. No existing document, phase, or idea covers repo-as-entity tracking or multi-repo awareness. The owner's reference to autoclaude-api appears to be context on an external tool that might *consume* the repo tracker's list, not an existing system in this repository to integrate with.
+
+</details>
+
+---
+
+## 000087 · Terminal interaction API for driving demo shell sessions from outside the stage page
+
+**Created 2026-09-10T12:55:38-04:00 · Status: `open`**
+
+Flag-gated HTTP endpoints (inject input, read buffered output) plus a session registry so scripts and agents outside the stage page can drive the demo terminal's shell sessions programmatically.
+
+Why it came up: while scoping the stage terminal interaction upgrade (phase-demo-06, 2026-09-10) the owner asked for ways to interact with the embedded terminal from outside it. In-page injection (a command panel sending into the existing websocket) made the cut; this API half was deliberately parked, per the GOV-003 decision inserting phase-demo-06 ahead of the rehearsal phase.
+
+What it would touch: the demo terminal decision (ADR-013) says a shell capability beyond the demo stage starts from its own decision record, so this begins with a new ADR covering gating (its own env flag or the existing one), loopback binding, session identity, authentication if any, and output buffering. Implementation lives in the route layer (src/api/routes/demo_terminal.py or a sibling registered behind the same gate): a registry mapping session id to adapter, and a broadcast output buffer so an HTTP reader does not steal bytes from the websocket pump (adapter reads are destructive). The adapter contract (src/demo/adapter.py) needs no change — write() is already the injection primitive.
+
+Unresolved: whether sessions should outlive their websocket (detach/reattach), how much output history to buffer, and whether this generalises into the workflow-triggering UI the platform vision names — in which case it may deserve requirement work rather than a demo-track bolt-on.
+
+**Links**
+
+- relates_to → `000070`
