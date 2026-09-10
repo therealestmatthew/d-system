@@ -4960,7 +4960,13 @@ items:
   - docs/00-working/demo-glossary.md
   - docs/07-architecture/diagrams/demo
   - docs/07-architecture/README.md
-  next_action: Claim the phase and write the concept memory first — the diagrams take
-    their labels from its entries, and the acceptance check is that they match exactly.
-    Content-only phase, no lock on sys-demo-stage or sys-demo-overview, so it can run
-    alongside phase-demo-05/06.
+  session: doc-session-demo-glossary-diagrams
+  next_action: Built and verified on agent/phase-demo-07; awaiting the owner's review.
+    All three acceptance conditions hold — seventeen terms in the filtered glossary, six
+    SVGs legible at 1024x768 with labels matching their entries, and both generations
+    byte-identical on a second run with test/test_glossary.py green. Left active rather
+    than complete because GOV-003's demo-track completion exception names phase-demo-01
+    through phase-demo-06 and not this phase, so /session-close remains the only path to
+    complete. Visual review used headless Chrome from file:// rather than the Playwright
+    MCP server, whose browser profile a peer agent holds; see SESS-2026-09-10-09. The
+    branch is not integrated — that is the owner's call.
