@@ -1,0 +1,653 @@
+<title>Skills and Agents Lexicon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  :root {
+    /* Light — neutrals biased toward the diagrams' own slate, accent lifted from
+       the violet the loop and MCP plates already use. */
+    --ground:   #ffffff;
+    --surface:  #f4f6fa;
+    --sunken:   #eaeef5;
+    --line:     #d7dde8;
+    --ink:      #101828;
+    --muted:    #55607a;
+    --accent:   #6d28d9;
+    --accent-soft: #efe9fd;
+
+    --fam-found: #b45309;
+    --fam-act:   #15803d;
+    --fam-comp:  #6d28d9;
+    --fam-pack:  #1d4ed8;
+    --fam-int:   #0e7490;
+    --fam-keep:  #9f1239;
+
+    --serif: "Source Serif 4", Iowan Old Style, Palatino, Georgia, serif;
+    --sans:  "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --measure: 66ch;
+    --page: 1140px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0e131c;
+      --surface:  #161d29;
+      --sunken:   #1c2532;
+      --line:     #27303f;
+      --ink:      #e7ecf5;
+      --muted:    #97a3ba;
+      --accent:   #a78bfa;
+      --accent-soft: #241d3d;
+
+      --fam-found: #e0a45e;
+      --fam-act:   #5fbe86;
+      --fam-comp:  #a78bfa;
+      --fam-pack:  #7ba5f5;
+      --fam-int:   #4fb6c9;
+      --fam-keep:  #ef8098;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #0e131c;
+    --surface:  #161d29;
+    --sunken:   #1c2532;
+    --line:     #27303f;
+    --ink:      #e7ecf5;
+    --muted:    #97a3ba;
+    --accent:   #a78bfa;
+    --accent-soft: #241d3d;
+
+    --fam-found: #e0a45e;
+    --fam-act:   #5fbe86;
+    --fam-comp:  #a78bfa;
+    --fam-pack:  #7ba5f5;
+    --fam-int:   #4fb6c9;
+    --fam-keep:  #ef8098;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--page); margin-inline: auto; padding-inline: clamp(20px, 5vw, 56px); }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+  code, .mono { font-family: var(--mono); font-size: 0.88em; }
+  code { background: var(--sunken); padding: 0.1em 0.34em; border-radius: 4px; }
+
+  /* ---- sticky bar ---- */
+  .bar {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--ground);
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 52px; }
+  .bar .name { font-family: var(--serif); font-weight: 600; font-size: 1.02rem; letter-spacing: 0.01em; }
+  .bar nav { display: flex; gap: 22px; font-size: 0.85rem; }
+  .bar nav a { color: var(--muted); text-decoration: none; }
+  .bar nav a:hover { color: var(--ink); }
+
+  /* ---- masthead ---- */
+  .masthead { padding: clamp(48px, 7vw, 88px) 0 0; }
+  .eyebrow {
+    font-size: 0.74rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(2.3rem, 5vw, 3.4rem); line-height: 1.08;
+    letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 22px;
+  }
+  .lede { max-width: var(--measure); color: var(--muted); font-size: 1.09rem; margin: 0; }
+
+  .facts {
+    display: flex; flex-wrap: wrap; gap: 0 44px;
+    margin: 36px 0 0; padding: 0; list-style: none;
+    border-top: 1px solid var(--line); padding-top: 22px;
+  }
+  .facts div { display: flex; flex-direction: column; gap: 2px; }
+  .facts dt { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .facts dd { margin: 0; font-family: var(--mono); font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+
+  /* ---- what to check ---- */
+  .checks { margin: 56px 0 0; padding: 26px 30px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .checks h2 { font-family: var(--sans); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; }
+  .checks ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .checks li { display: grid; grid-template-columns: 1.1rem 1fr; gap: 12px; align-items: start; max-width: 92ch; }
+  .checks li::before { content: ""; width: 9px; height: 9px; margin-top: 0.52em; border-radius: 2px; background: var(--accent); }
+
+  /* ---- sections ---- */
+  section { scroll-margin-top: 68px; }
+  .section-head { margin: clamp(64px, 9vw, 108px) 0 34px; }
+  .section-head h2 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(1.6rem, 3vw, 2.15rem);
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  .section-head p { margin: 0; color: var(--muted); max-width: var(--measure); }
+
+  /* ---- diagram plates ---- */
+  .plates { display: grid; gap: clamp(40px, 5vw, 64px); }
+  .plate { margin: 0; }
+  .plate-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 14px; }
+  .plate-head h3 { font-family: var(--serif); font-weight: 600; font-size: 1.28rem; margin: 0; }
+  .plate-head .file { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); }
+  .frame {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .frame img { display: block; width: 100%; min-width: 620px; height: auto; border-radius: 4px; }
+  figcaption { margin-top: 14px; color: var(--muted); max-width: 84ch; }
+  .uses { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .uses .label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+  .chip {
+    font-family: var(--mono); font-size: 0.78rem; text-decoration: none;
+    color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 11px; transition: border-color 0.15s, background 0.15s;
+  }
+  .chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+  /* ---- glossary ---- */
+  .family + .family { margin-top: 52px; }
+  .family-label {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 4px;
+  }
+  .family-label::before { content: ""; width: 26px; height: 3px; border-radius: 2px; background: var(--fam); }
+  .family-note { margin: 0 0 26px; color: var(--muted); font-size: 0.92rem; max-width: var(--measure); }
+
+  .entry { display: grid; grid-template-columns: 1fr; gap: 4px 40px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .entry .headword { font-family: var(--serif); font-weight: 600; font-size: 1.32rem; margin: 0; letter-spacing: -0.005em; }
+  .entry .def { margin: 0; max-width: var(--measure); }
+  .entry .def + .def { margin-top: 10px; }
+
+  @media (min-width: 900px) {
+    .entry { grid-template-columns: 15.5rem 1fr; }
+    .entry .headword { padding-top: 2px; }
+  }
+
+  .advanced { margin-top: 52px; padding: 28px 30px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .advanced h3 { font-family: var(--serif); font-weight: 600; font-size: 1.18rem; margin: 0 0 6px; }
+  .advanced > p { margin: 0 0 20px; color: var(--muted); font-size: 0.92rem; max-width: var(--measure); }
+  .advanced dl { margin: 0; display: grid; gap: 16px; }
+  .advanced dt { font-family: var(--mono); font-size: 0.9rem; font-weight: 500; margin-bottom: 3px; }
+  .advanced dd { margin: 0; color: var(--muted); max-width: var(--measure); }
+
+  footer { margin: clamp(72px, 9vw, 112px) 0 72px; padding-top: 26px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+  footer p { margin: 0 0 10px; max-width: 88ch; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="bar">
+  <div class="wrap">
+    <span class="name">Skills &amp; Agents Lexicon</span>
+    <nav>
+      <a href="#diagrams">Diagrams</a>
+      <a href="#glossary">Glossary</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Training session · 10 September 2026</p>
+    <h1>Skills and Agents Lexicon</h1>
+    <p class="lede">Seventeen terms and six diagrams, built for the live training session and laid
+    out here for review. Every term is defined against what this repository actually contains, so
+    each claim made on the day can be checked against a file on screen — and every diagram takes its
+    labels from the entry that defines them.</p>
+
+    <dl class="facts">
+      <div><dt>Terms</dt><dd>17 + 4 named</dd></div>
+      <div><dt>Diagrams</dt><dd>6 &times; 1024&thinsp;&times;&thinsp;768</dd></div>
+      <div><dt>Phase</dt><dd>phase-demo-07</dd></div>
+      <div><dt>Branch</dt><dd>agent/phase-demo-07</dd></div>
+    </dl>
+  </header>
+
+  <section class="checks" id="check">
+    <h2>What to check</h2>
+    <ul>
+      <li><span>Every term you listed has an entry, and each definition is <em>true of this
+      repository</em> — the file paths, counts and examples are the ones that will be on
+      screen.</span></li>
+      <li><span>Each diagram is legible at projector size, and its labels use the same words as the
+      matching entry. The chips under each plate link to the terms it uses.</span></li>
+      <li><span>The term set is the right set: nothing missing that the audience will need, nothing
+      carried that earns no time on the day.</span></li>
+    </ul>
+  </section>
+
+  <section id="diagrams">
+    <div class="section-head">
+      <h2>The diagram library</h2>
+      <p>Six standalone SVGs. Each is self-contained — no external asset, no network dependency —
+      so any one opens from the filesystem with no dev server running. They live in
+      <code>docs/07-architecture/diagrams/demo/</code>, indexed by an <code>index.html</code>
+      contact sheet.</p>
+    </div>
+
+    <div class="plates">
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>LLM vs agent</h3>
+          <span class="file">llm-vs-agent.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkxMTSB2ZXJzdXMgYWdlbnQiPgogIDx0aXRsZT5MTE0gdnMgYWdlbnQ8L3RpdGxlPgogIDxkZXNjPkFuIExMTSBpcyBvbmUgc3RhdGVsZXNzIGNhbGwgZnJvbSB0ZXh0IGluIHRvIHRleHQgb3V0LiBBbiBhZ2VudCBpcyB0aGUgc2FtZSBtb2RlbCBpbiBhIGxvb3Agd2l0aCB0b29scy48L2Rlc2M+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzMzNDE1NSIvPgogICAgPC9tYXJrZXI+CiAgICA8c3R5bGU+CiAgICAgIHRleHQgeyBmb250LWZhbWlseTogdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAiU2Vnb2UgVUkiLCBSb2JvdG8sIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7IH0KICAgICAgLnRpdGxlIHsgZm9udC1zaXplOiAzNnB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5oZWFkIHsgZm9udC1zaXplOiAyNnB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zdWIgeyBmb250LXNpemU6IDE4cHg7IGZpbGw6ICM0NzU1Njk7IH0KICAgICAgLmJveCB7IGZvbnQtc2l6ZTogMjFweDsgZm9udC13ZWlnaHQ6IDYwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc21hbGwgeyBmb250LXNpemU6IDE2cHg7IGZpbGw6ICM0NzU1Njk7IH0KICAgICAgLm5vdGUgeyBmb250LXNpemU6IDE3cHg7IGZpbGw6ICMzMzQxNTU7IH0KICAgICAgLmVkZ2UgeyBzdHJva2U6ICMzMzQxNTU7IHN0cm9rZS13aWR0aDogMi41OyBmaWxsOiBub25lOyBtYXJrZXItZW5kOiB1cmwoI2Fycm93KTsgfQogICAgICAucGFuZWwgeyBmaWxsOiAjZjhmYWZjOyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMjsgfQogICAgICAubiB7IGZpbGw6ICNmZmZmZmY7IHN0cm9rZTogIzMzNDE1NTsgc3Ryb2tlLXdpZHRoOiAyOyB9CiAgICAgIC5tb2RlbCB7IGZpbGw6ICNkYmVhZmU7IHN0cm9rZTogIzFkNGVkODsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLnRvb2wgeyBmaWxsOiAjZGNmY2U3OyBzdHJva2U6ICMxNTgwM2Q7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5jdHggeyBmaWxsOiAjZmVmM2M3OyBzdHJva2U6ICNiNDUzMDk7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5sb29wIHsgZmlsbDogbm9uZTsgc3Ryb2tlOiAjNmQyOGQ5OyBzdHJva2Utd2lkdGg6IDIuNTsgc3Ryb2tlLWRhc2hhcnJheTogOCA2OyB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KCiAgPHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iNzY4IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgY2xhc3M9InRpdGxlIiB4PSI1MTIiIHk9IjU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5MTE0gdnMgYWdlbnQ8L3RleHQ+CgogIDwhLS0gTGVmdDogTExNIC0tPgogIDxyZWN0IGNsYXNzPSJwYW5lbCIgeD0iNDAiIHk9Ijg2IiB3aWR0aD0iNDQ0IiBoZWlnaHQ9IjYyMCIgcng9IjE0Ii8+CiAgPHRleHQgY2xhc3M9ImhlYWQiIHg9IjI2MiIgeT0iMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5MTE08L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iMjYyIiB5PSIxNTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPm9uZSBjYWxsOiB0ZXh0IGluLCB0ZXh0IG91dDwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9Im4iIHg9IjEwMiIgeT0iMTk2IiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjY0IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSIyNjIiIHk9IjIzNSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UHJvbXB0ICh0ZXh0IGluKTwvdGV4dD4KICA8cGF0aCBjbGFzcz0iZWRnZSIgZD0iTSAyNjIgMjYwIFYgMzE2Ii8+CgogIDxyZWN0IGNsYXNzPSJtb2RlbCIgeD0iMTAyIiB5PSIzMjAiIHdpZHRoPSIzMjAiIGhlaWdodD0iODYiIHJ4PSIxMCIvPgogIDx0ZXh0IGNsYXNzPSJib3giIHg9IjI2MiIgeT0iMzU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Nb2RlbDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjI2MiIgeT0iMzgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5jbGF1ZGUtb3B1cy01PC90ZXh0PgogIDxwYXRoIGNsYXNzPSJlZGdlIiBkPSJNIDI2MiA0MDYgViA0NjIiLz4KCiAgPHJlY3QgY2xhc3M9Im4iIHg9IjEwMiIgeT0iNDY2IiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjY0IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSIyNjIiIHk9IjUwNSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VGV4dCBvdXQ8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSIyNjIiIHk9IjU5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gbWVtb3J5IG9mIHRoZSBwcmV2aW91cyBjYWxsLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjYyIiB5PSI2MTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNhbm5vdCByZWFkIGEgZmlsZSBvciBydW4gYSBjb21tYW5kLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjYyIiB5PSI2NDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRoZSB3aG9sZSBjb252ZXJzYXRpb24gaXMgc2VudCBhZ2FpbjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjYyIiB5PSI2NzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmV2ZXJ5IHRpbWUuPC90ZXh0PgoKICA8IS0tIFJpZ2h0OiBhZ2VudCAtLT4KICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjU0MCIgeT0iODYiIHdpZHRoPSI0NDQiIGhlaWdodD0iNjIwIiByeD0iMTQiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNzYyIiB5PSIxMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFnZW50PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzdWIiIHg9Ijc2MiIgeT0iMTU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj50aGUgc2FtZSBtb2RlbCBpbiBhIGxvb3Agd2l0aCB0b29sczwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9Im4iIHg9IjYwMiIgeT0iMTgyIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjU2IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI3NjIiIHk9IjIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+R29hbDwvdGV4dD4KICA8cGF0aCBjbGFzcz0iZWRnZSIgZD0iTSA3NjIgMjM4IFYgMjcyIi8+CgogIDxyZWN0IGNsYXNzPSJsb29wIiB4PSI1NjgiIHk9IjI3NiIgd2lkdGg9IjM3MiIgaGVpZ2h0PSIyOTIiIHJ4PSIxNCIvPgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iNTg0IiB5PSIzMDAiPmFnZW50aWMgbG9vcDwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9ImN0eCIgeD0iNjAyIiB5PSIzMTIiIHdpZHRoPSIzMDAiIGhlaWdodD0iNTYiIHJ4PSIxMCIvPgogIDx0ZXh0IGNsYXNzPSJib3giIHg9Ijc1MiIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Db250ZXh0PC90ZXh0PgogIDxwYXRoIGNsYXNzPSJlZGdlIiBkPSJNIDc1MiAzNjggViA0MDAiLz4KCiAgPHJlY3QgY2xhc3M9Im1vZGVsIiB4PSI2MDIiIHk9IjQwNCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1NiIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNzUyIiB5PSI0NDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1vZGVsPC90ZXh0PgogIDxwYXRoIGNsYXNzPSJlZGdlIiBkPSJNIDc1MiA0NjAgViA0OTIiLz4KCiAgPHJlY3QgY2xhc3M9InRvb2wiIHg9IjYwMiIgeT0iNDk2IiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjU2IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI3NTIiIHk9IjUzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG9vbCBjYWxsIOKGkiB0b29sIHJlc3VsdDwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gOTAyIDUyNCBIIDkyMiBWIDM0MCBIIDkwNiIvPgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iOTU4IiB5PSI0NDAiIHRyYW5zZm9ybT0icm90YXRlKC05MCA5NTggNDQwKSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cmVzdWx0IGFwcGVuZGVkPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iZWRnZSIgZD0iTSA2MDIgNDMyIEggNTU2IFYgNjI4IEggNjAwIi8+CiAgPHJlY3QgY2xhc3M9Im4iIHg9IjYwMiIgeT0iNjAwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjU2IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI3NjIiIHk9IjYzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QW5zd2VyPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iNzYyIiB5PSI2ODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPnRoZSBtb2RlbCBhbnN3ZXJzIGluc3RlYWQgb2YgY2FsbGluZyBhIHRvb2w8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSI1MTIiIHk9IjczNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2FtZSBtb2RlbCBvbiBib3RoIHNpZGVzLiBUaGUgbG9vcCwgdGhlIHRvb2xzIGFuZCB0aGUgcGVybWlzc2lvbnMgYXJlIHdoYXQgbWFrZSBpdCBhbiBhZ2VudC48L3RleHQ+Cjwvc3ZnPgo=" alt="Diagram: an LLM is one stateless call from text in to text out; an agent is the same model in a loop with tools."></div>
+        <figcaption>The same model on both sides. The loop, the tools and the permissions are what
+        make it an agent — which is the point the rest of the session builds on.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#llm">LLM</a>
+          <a class="chip" href="#context">Context</a>
+          <a class="chip" href="#tool-call">Tool call</a>
+          <a class="chip" href="#agent">Agent</a>
+          <a class="chip" href="#agentic-loop">Agentic loop</a>
+        </div>
+      </figure>
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>Skill architecture</h3>
+          <span class="file">skill-architecture.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNraWxsIGFyY2hpdGVjdHVyZSI+CiAgPHRpdGxlPlNraWxsIGFyY2hpdGVjdHVyZTwvdGl0bGU+CiAgPGRlc2M+QSBza2lsbCBpcyBhIGZvbGRlciBob2xkaW5nIFNLSUxMLm1kOiBZQU1MIGZyb250IG1hdHRlciBhbHdheXMgaW4gY29udGV4dCwgYW5kIGEgTWFya2Rvd24gYm9keSBsb2FkZWQgd2hlbiB0aGUgc2tpbGwgaXMgaW52b2tlZC48L2Rlc2M+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzMzNDE1NSIvPgogICAgPC9tYXJrZXI+CiAgICA8c3R5bGU+CiAgICAgIHRleHQgeyBmb250LWZhbWlseTogdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAiU2Vnb2UgVUkiLCBSb2JvdG8sIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7IH0KICAgICAgLm1vbm8geyBmb250LWZhbWlseTogdWktbW9ub3NwYWNlLCBTRk1vbm8tUmVndWxhciwgTWVubG8sIENvbnNvbGFzLCAiTGliZXJhdGlvbiBNb25vIiwgbW9ub3NwYWNlOyB9CiAgICAgIC50aXRsZSB7IGZvbnQtc2l6ZTogMzZweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuaGVhZCB7IGZvbnQtc2l6ZTogMjNweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYm94IHsgZm9udC1zaXplOiAyMHB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5jb2RlIHsgZm9udC1zaXplOiAxN3B4OyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zbWFsbCB7IGZvbnQtc2l6ZTogMTZweDsgZmlsbDogIzQ3NTU2OTsgfQogICAgICAubm90ZSB7IGZvbnQtc2l6ZTogMTdweDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuZWRnZSB7IHN0cm9rZTogIzMzNDE1NTsgc3Ryb2tlLXdpZHRoOiAyLjU7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjYXJyb3cpOyB9CiAgICAgIC5wYW5lbCB7IGZpbGw6ICNmOGZhZmM7IHN0cm9rZTogI2NiZDVlMTsgc3Ryb2tlLXdpZHRoOiAyOyB9CiAgICAgIC5mcm9udCB7IGZpbGw6ICNkYmVhZmU7IHN0cm9rZTogIzFkNGVkODsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLmJvZHkgeyBmaWxsOiAjZWRlOWZlOyBzdHJva2U6ICM2ZDI4ZDk7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5jdHggeyBmaWxsOiAjZmVmM2M3OyBzdHJva2U6ICNiNDUzMDk7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KCiAgPHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iNzY4IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgY2xhc3M9InRpdGxlIiB4PSI1MTIiIHk9IjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Ta2lsbCBhcmNoaXRlY3R1cmU8L3RleHQ+CgogIDwhLS0gRGlyZWN0b3J5IHN0cnVjdHVyZSAtLT4KICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjM2IiB5PSI4MCIgd2lkdGg9IjQyNCIgaGVpZ2h0PSIyNDgiIHJ4PSIxMiIvPgogIDx0ZXh0IGNsYXNzPSJoZWFkIiB4PSI1NiIgeT0iMTE2Ij5XaGVyZSBhIHNraWxsIGxpdmVzPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjb2RlIG1vbm8iIHg9IjU2IiB5PSIxNTIiPi5jbGF1ZGUvPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjb2RlIG1vbm8iIHg9Ijc2IiB5PSIxNzgiPnNraWxscy88L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iOTYiIHk9IjIwNCI+ZC1zeXN0ZW0tb3ZlcnZpZXcvPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJjb2RlIG1vbm8iIHg9IjExNiIgeT0iMjMwIj5TS0lMTC5tZDwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI5NiIgeT0iMjU2Ij5vcmllbnQvU0tJTEwubWQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iOTYiIHk9IjI4MiI+Y2hlY2twb2ludC9TS0lMTC5tZDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjU2IiB5PSIzMTIiPk9uZSBmb2xkZXIgcGVyIHNraWxsLiBTdXBwb3J0aW5nIGZpbGVzIGFyZSBvcHRpb25hbC48L3RleHQ+CgogIDwhLS0gU0tJTEwubWQgYW5hdG9teSAtLT4KICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjQ5MCIgeT0iODAiIHdpZHRoPSI0OTgiIGhlaWdodD0iMzgyIiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNTEyIiB5PSIxMTYiPlNLSUxMLm1kPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iZnJvbnQiIHg9IjUxMiIgeT0iMTMyIiB3aWR0aD0iNDU0IiBoZWlnaHQ9IjEzMiIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iNTMwIiB5PSIxNTgiPi0tLTwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjE4MiI+bmFtZTogZC1zeXN0ZW0tb3ZlcnZpZXc8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iNTMwIiB5PSIyMDYiPmRlc2NyaXB0aW9uOiBSZWdlbmVyYXRlIHRoZSBvdmVydmlldzwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjIyOCI+cGFnZSBieSBydW5uaW5nIHRoZSB0b29sIOKApjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjI1MiI+LS0tPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iYm9keSIgeD0iNTEyIiB5PSIyODAiIHdpZHRoPSI0NTQiIGhlaWdodD0iMTYwIiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjMwOCI+IyBkLXN5c3RlbS1vdmVydmlldzwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjMzNiI+UnVuIHRoZSBkZXRlcm1pbmlzdGljIHRvb2wsIHRoZW48L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iNTMwIiB5PSIzNTgiPnJlcG9ydCB0aGUgZmlndXJlcyBpdCBwcmludGVkLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSI1MzAiIHk9IjM4NiI+dXYgcnVuIHB5dGhvbiB0b29scy9nZW5lcmF0ZV9vdmVydmlldy5weTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjUzMCIgeT0iNDIwIj5JbnN0cnVjdGlvbnMsIG5vdCBjb2RlIOKAlCB0aGUgZGV0ZXJtaW5pc20gbGl2ZXMgaW4gdGhlIHRvb2wuPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjQ3MCIgeT0iMTgyIiB0ZXh0LWFuY2hvcj0iZW5kIj5mcm9udCBtYXR0ZXI8L3RleHQ+CiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gNDcwIDE5OCBIIDUwNiIvPgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iNDcwIiB5PSIzMzgiIHRleHQtYW5jaG9yPSJlbmQiPmJvZHk8L3RleHQ+CiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gNDcwIDM1NCBIIDUwNiIvPgoKICA8IS0tIFByb2dyZXNzaXZlIGRpc2Nsb3N1cmUgLS0+CiAgPHRleHQgY2xhc3M9ImhlYWQiIHg9IjUxMiIgeT0iNTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9ncmVzc2l2ZSBkaXNjbG9zdXJlIOKAlCB3aGF0IGlzIGFjdHVhbGx5IGluIHRoZSBjb250ZXh0PC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iY3R4IiB4PSI2MCIgeT0iNTM0IiB3aWR0aD0iMzMwIiBoZWlnaHQ9IjE1MCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iMjI1IiB5PSI1NzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkJlZm9yZSBpbnZvY2F0aW9uPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSIyMjUiIHk9IjYwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+bmFtZSArIGRlc2NyaXB0aW9uIG9ubHk8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im5vdGUiIHg9IjIyNSIgeT0iNjMyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7igJQgYWJvdXQgb25lIGxpbmUgcGVyIHNraWxsLDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjI1IiB5PSI2NTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmZvciBldmVyeSBza2lsbCBpbnN0YWxsZWQuPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iZWRnZSIgZD0iTSAzOTQgNjEwIEggNjI4Ii8+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSI1MTEiIHk9IjU4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+dGhlIG1vZGVsIGp1ZGdlcyB0aGF0IHRoZTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjUxMSIgeT0iNjQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5kZXNjcmlwdGlvbiBtYXRjaGVzIHRoZSB0YXNrPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iY3R4IiB4PSI2MzQiIHk9IjUzNCIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxNTAiIHJ4PSIxMiIvPgogIDx0ZXh0IGNsYXNzPSJib3giIHg9Ijc5OSIgeT0iNTcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BZnRlciBpbnZvY2F0aW9uPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSI3OTkiIHk9IjYwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+dGhlIHdob2xlIGJvZHksIHBsdXMgYW55PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSI3OTkiIHk9IjYzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+ZmlsZSBpdCBwb2ludHMgdG8g4oCUIGxvYWRlZDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iNzk5IiB5PSI2NTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmZvciB0aGlzIHRhc2sgb25seS48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSI1MTIiIHk9IjcyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VGhpcyBpcyB3aHkgYSBkZXNjcmlwdGlvbiBpcyB3cml0dGVuIHRvIHNheSB3aGVuIHRvIHVzZSB0aGUgc2tpbGwsIG5vdCB0byBzdW1tYXJpc2UgaXQuPC90ZXh0Pgo8L3N2Zz4K" alt="Diagram: a skill folder holding SKILL.md, with front matter always in context and the body loaded on invocation."></div>
+        <figcaption>What a skill folder holds, and which half of <code>SKILL.md</code> is in the
+        context before it is ever invoked. The real <code>d-system-overview</code> skill is the
+        worked example.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#skill">Skill</a>
+          <a class="chip" href="#progressive-disclosure">Progressive disclosure</a>
+          <a class="chip" href="#context">Context</a>
+        </div>
+      </figure>
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>The agentic loop</h3>
+          <span class="file">agentic-loop.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlRoZSBhZ2VudGljIGxvb3AiPgogIDx0aXRsZT5UaGUgYWdlbnRpYyBsb29wPC90aXRsZT4KICA8ZGVzYz5Db250ZXh0LCBtb2RlbCBjYWxsLCB0b29sIGNhbGwsIHRvb2wgcmVzdWx0IGFwcGVuZGVkIHRvIHRoZSBjb250ZXh0LCByZXBlYXQg4oCUIHVudGlsIHRoZSBtb2RlbCBhbnN3ZXJzIGluc3RlYWQgb2YgY2FsbGluZyBhIHRvb2wuPC9kZXNjPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiMzMzQxNTUiLz4KICAgIDwvbWFya2VyPgogICAgPHN0eWxlPgogICAgICB0ZXh0IHsgZm9udC1mYW1pbHk6IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgIlNlZ29lIFVJIiwgUm9ib3RvLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmOyB9CiAgICAgIC50aXRsZSB7IGZvbnQtc2l6ZTogMzZweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuaGVhZCB7IGZvbnQtc2l6ZTogMjRweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzZkMjhkOTsgfQogICAgICAuYm94IHsgZm9udC1zaXplOiAyM3B4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zbWFsbCB7IGZvbnQtc2l6ZTogMTZweDsgZmlsbDogIzQ3NTU2OTsgfQogICAgICAubGJsIHsgZm9udC1zaXplOiAxN3B4OyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5ub3RlIHsgZm9udC1zaXplOiAxOHB4OyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5lZGdlIHsgc3Ryb2tlOiAjMzM0MTU1OyBzdHJva2Utd2lkdGg6IDM7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjYXJyb3cpOyB9CiAgICAgIC5jdHggeyBmaWxsOiAjZmVmM2M3OyBzdHJva2U6ICNiNDUzMDk7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5tb2RlbCB7IGZpbGw6ICNkYmVhZmU7IHN0cm9rZTogIzFkNGVkODsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLnRvb2wgeyBmaWxsOiAjZGNmY2U3OyBzdHJva2U6ICMxNTgwM2Q7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5vdXQgeyBmaWxsOiAjZmZmZmZmOyBzdHJva2U6ICMzMzQxNTU7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KCiAgPHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iNzY4IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgY2xhc3M9InRpdGxlIiB4PSI1MTIiIHk9IjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UaGUgYWdlbnRpYyBsb29wPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iY3R4IiB4PSI2MCIgeT0iMTQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEyMCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iMjEwIiB5PSIxODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNvbnRleHQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSIyMTAiIHk9IjIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+c3lzdGVtIHByb21wdCDCtyBjb252ZXJzYXRpb24gwrc8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSIyMTAiIHk9IjI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+ZXZlcnkgdG9vbCByZXN1bHQgc28gZmFyPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0ibW9kZWwiIHg9IjY2NCIgeT0iMTQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEyMCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iODE0IiB5PSIxODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1vZGVsIGNhbGw8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSI4MTQiIHk9IjIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cmVhZHMgdGhlIHdob2xlIGNvbnRleHQsPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iODE0IiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmRlY2lkZXMgd2hhdCB0byBkbyBuZXh0PC90ZXh0PgoKICA8cmVjdCBjbGFzcz0idG9vbCIgeD0iNjY0IiB5PSI0MTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iMTIwIiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI4MTQiIHk9IjQ1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG9vbCBjYWxsPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iODE0IiB5PSI0ODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmEgdG9vbCBuYW1lIGFuZCBhcmd1bWVudHMsPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iODE0IiB5PSI1MTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPnJ1biBieSB0aGUgcHJvZ3JhbTwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9InRvb2wiIHg9IjYwIiB5PSI0MTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iMTIwIiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSIyMTAiIHk9IjQ1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG9vbCByZXN1bHQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSIyMTAiIHk9IjQ4NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+b3V0cHV0LCBvciB0aGUgZXJyb3Ig4oCUPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMjEwIiB5PSI1MTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmJvdGggYXJlIGp1c3QgdGV4dDwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gMzYwIDIwMCBIIDY1OCIvPgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9IjUwOSIgeT0iMTgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj50aGUgd2hvbGUgY29udGV4dCwgZXZlcnkgdGltZTwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gODE0IDI2MCBWIDQwNCIvPgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9Ijc5OCIgeT0iMzE4IiB0ZXh0LWFuY2hvcj0iZW5kIj50aGUgbW9kZWwgcmVxdWVzdHMgaXQ7PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9Ijc5OCIgeT0iMzQyIiB0ZXh0LWFuY2hvcj0iZW5kIj5pdCBuZXZlciBleGVjdXRlczwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gNjY0IDQ3MCBIIDM2NiIvPgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9IjUxNSIgeT0iNTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj50aGUgcHJvZ3JhbSBleGVjdXRlcyBhbmQgcmV0dXJuczwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gMjEwIDQxMCBWIDI2NiIvPgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9IjIyOCIgeT0iMzE4Ij5hcHBlbmRlZCDigJQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImxibCIgeD0iMjI4IiB5PSIzNDIiPnRoZSBjb250ZXh0IGdyb3dzPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNTEyIiB5PSIzOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmFnZW50aWMgbG9vcDwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gOTY0IDIwMCBIIDk5NiBWIDY2NCBIIDczMCIvPgogIDxyZWN0IGNsYXNzPSJvdXQiIHg9IjQwNCIgeT0iNjI4IiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjcyIiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI1NjQiIHk9IjY3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QW5zd2VyPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9Ijk3OCIgeT0iNTkwIiB0ZXh0LWFuY2hvcj0iZW5kIj50aGUgbW9kZWwgYW5zd2VyczwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibGJsIiB4PSI5NzgiIHk9IjYxNCIgdGV4dC1hbmNob3I9ImVuZCI+aW5zdGVhZCBvZiBjYWxsaW5nIGEgdG9vbDwvdGV4dD4KCiAgPHRleHQgY2xhc3M9Im5vdGUiIHg9IjIwMCIgeT0iNjA0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FdmVyeSBwYXNzIGlzIGEgZnJlc2ggbW9kZWwgY2FsbDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjAwIiB5PSI2MzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPm92ZXIgYSBjb250ZXh0IG9uZSByZXN1bHQgbGFyZ2VyLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibm90ZSIgeD0iMjAwIiB5PSI2NjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkEgZmFpbGVkIGNvbW1hbmQgaXMgbm90IGEgY3Jhc2gg4oCUPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJub3RlIiB4PSIyMDAiIHk9IjY5NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+anVzdCBhbm90aGVyIHJlc3VsdCB0byByZWFkLjwvdGV4dD4KPC9zdmc+Cg==" alt="Diagram: context, model call, tool call, tool result appended to the context, repeating until the model answers."></div>
+        <figcaption>Every pass is a fresh model call over a context one result larger. It is also
+        where a failed command stops looking like a crash: the failure is just another result to
+        read.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#agentic-loop">Agentic loop</a>
+          <a class="chip" href="#context">Context</a>
+          <a class="chip" href="#prompt">System prompt</a>
+          <a class="chip" href="#tool-call">Tool call</a>
+        </div>
+      </figure>
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>Sub-agents and context isolation</h3>
+          <span class="file">sub-agents-context-isolation.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN1Yi1hZ2VudHMgYW5kIGNvbnRleHQgaXNvbGF0aW9uIj4KICA8dGl0bGU+U3ViLWFnZW50cyBhbmQgY29udGV4dCBpc29sYXRpb248L3RpdGxlPgogIDxkZXNjPkEgc3ViLWFnZW50IHJ1bnMgaXRzIG93biBsb29wIGluIGl0cyBvd24gY29udGV4dCB3aW5kb3c7IG9ubHkgaXRzIGZpbmFsIHJlcG9ydCBjcm9zc2VzIGJhY2sgaW50byB0aGUgY2FsbGVyJ3MgY29udGV4dC48L2Rlc2M+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzMzNDE1NSIvPgogICAgPC9tYXJrZXI+CiAgICA8c3R5bGU+CiAgICAgIHRleHQgeyBmb250LWZhbWlseTogdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAiU2Vnb2UgVUkiLCBSb2JvdG8sIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7IH0KICAgICAgLm1vbm8geyBmb250LWZhbWlseTogdWktbW9ub3NwYWNlLCBTRk1vbm8tUmVndWxhciwgTWVubG8sIENvbnNvbGFzLCAiTGliZXJhdGlvbiBNb25vIiwgbW9ub3NwYWNlOyB9CiAgICAgIC50aXRsZSB7IGZvbnQtc2l6ZTogMzZweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuaGVhZCB7IGZvbnQtc2l6ZTogMjRweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuYm94IHsgZm9udC1zaXplOiAyMXB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5zbWFsbCB7IGZvbnQtc2l6ZTogMTZweDsgZmlsbDogIzQ3NTU2OTsgfQogICAgICAubGJsIHsgZm9udC1zaXplOiAxN3B4OyBmaWxsOiAjMzM0MTU1OyB9CiAgICAgIC5zdG9wIHsgZm9udC1zaXplOiAxN3B4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjYjkxYzFjOyB9CiAgICAgIC5lZGdlIHsgc3Ryb2tlOiAjMzM0MTU1OyBzdHJva2Utd2lkdGg6IDM7IGZpbGw6IG5vbmU7IG1hcmtlci1lbmQ6IHVybCgjYXJyb3cpOyB9CiAgICAgIC5ibG9ja2VkIHsgc3Ryb2tlOiAjYjkxYzFjOyBzdHJva2Utd2lkdGg6IDM7IGZpbGw6IG5vbmU7IH0KICAgICAgLnBhbmVsIHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjY2JkNWUxOyBzdHJva2Utd2lkdGg6IDI7IH0KICAgICAgLmN0eCB7IGZpbGw6ICNmZWYzYzc7IHN0cm9rZTogI2I0NTMwOTsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLm1vZGVsIHsgZmlsbDogI2RiZWFmZTsgc3Ryb2tlOiAjMWQ0ZWQ4OyBzdHJva2Utd2lkdGg6IDIuNTsgfQogICAgICAudG9vbCB7IGZpbGw6ICNkY2ZjZTc7IHN0cm9rZTogIzE1ODAzZDsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLm4geyBmaWxsOiAjZmZmZmZmOyBzdHJva2U6ICMzMzQxNTU7IHN0cm9rZS13aWR0aDogMi41OyB9CiAgICAgIC5sb29wIHsgZmlsbDogbm9uZTsgc3Ryb2tlOiAjNmQyOGQ5OyBzdHJva2Utd2lkdGg6IDIuNTsgc3Ryb2tlLWRhc2hhcnJheTogOCA2OyB9CiAgICAgIC5ib3VuZGFyeSB7IHN0cm9rZTogI2I5MWMxYzsgc3Ryb2tlLXdpZHRoOiAzOyBzdHJva2UtZGFzaGFycmF5OiAxMCA4OyB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KCiAgPHJlY3Qgd2lkdGg9IjEwMjQiIGhlaWdodD0iNzY4IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgY2xhc3M9InRpdGxlIiB4PSI1MTIiIHk9IjUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TdWItYWdlbnRzIGFuZCBjb250ZXh0IGlzb2xhdGlvbjwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9InBhbmVsIiB4PSIzNiIgeT0iODgiIHdpZHRoPSI0NDAiIGhlaWdodD0iNDY0IiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNTYiIHk9IjEyNCI+Q2FsbGVyIOKAlCB0aGUgbWFpbiBzZXNzaW9uPC90ZXh0PgogIDxyZWN0IGNsYXNzPSJjdHgiIHg9IjYwIiB5PSIxNDAiIHdpZHRoPSIzOTIiIGhlaWdodD0iOTYiIHJ4PSIxMCIvPgogIDx0ZXh0IGNsYXNzPSJib3giIHg9IjI1NiIgeT0iMTc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JdHMgY29udGV4dCB3aW5kb3c8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSIyNTYiIHk9IjIwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q0xBVURFLm1kLCB0aGUgY29udmVyc2F0aW9uLCBpdHMgb3duIHRvb2wgcmVzdWx0czwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9Im4iIHg9IjYwIiB5PSIyOTAiIHdpZHRoPSIzOTIiIGhlaWdodD0iNjQiIHJ4PSIxMCIvPgogIDx0ZXh0IGNsYXNzPSJib3giIHg9IjI1NiIgeT0iMzI5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UYXNrIGZvciB0aGUgc3ViLWFnZW50PC90ZXh0PgoKICA8cmVjdCBjbGFzcz0ibiIgeD0iNjAiIHk9IjQ0MCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI4MiIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iMjU2IiB5PSI0NzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZpbmFsIHJlcG9ydDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjI1NiIgeT0iNTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5vbmUgcmVzdWx0LCBhcHBlbmRlZCBoZXJlPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjU0OCIgeT0iODgiIHdpZHRoPSI0NDAiIGhlaWdodD0iNDY0IiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNTY4IiB5PSIxMjQiPlN1Yi1hZ2VudDwvdGV4dD4KICA8cmVjdCBjbGFzcz0iY3R4IiB4PSI1NzIiIHk9IjE0MCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI5NiIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNzY4IiB5PSIxNzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkl0cyBvd24gY29udGV4dCB3aW5kb3c8L3RleHQ+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSI3NjgiIHk9IjIwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+c3RhcnRzIGZyZXNoIOKAlCBpdCBkb2VzIG5vdCBpbmhlcml0IHRoZSBjYWxsZXInczwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9Imxvb3AiIHg9IjU3MiIgeT0iMjU4IiB3aWR0aD0iMzkyIiBoZWlnaHQ9IjE2NCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSI1ODgiIHk9IjI4MiI+aXRzIG93biBhZ2VudGljIGxvb3AsIGl0cyBvd24gdG9vbHM8L3RleHQ+CiAgPHJlY3QgY2xhc3M9Im1vZGVsIiB4PSI1OTYiIHk9IjI5NCIgd2lkdGg9IjE2NCIgaGVpZ2h0PSI1NCIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNjc4IiB5PSIzMjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1vZGVsIGNhbGw8L3RleHQ+CiAgPHJlY3QgY2xhc3M9InRvb2wiIHg9Ijc4MiIgeT0iMjk0IiB3aWR0aD0iMTU4IiBoZWlnaHQ9IjU0IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI4NjEiIHk9IjMyOSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG9vbCBjYWxsPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iNzY4IiB5PSIzODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmRvemVucyBvZiB0b29sIHJlc3VsdHMgYWNjdW11bGF0ZSBpbiBoZXJlPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iNzY4IiB5PSI0MDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmFuZCBhcmUgZGlzY2FyZGVkIHdoZW4gaXQgZmluaXNoZXM8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJuIiB4PSI1NzIiIHk9IjQ0NiIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI3MCIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNzY4IiB5PSI0ODkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlJlcG9ydDwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImJvdW5kYXJ5IiBkPSJNIDUxMiAxMDAgViA1NjAiLz4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gNDUyIDMxNiBMIDU2NiAyMTQiLz4KICA8dGV4dCBjbGFzcz0ibGJsIiB4PSI0NzAiIHk9IjI1MiIgdGV4dC1hbmNob3I9ImVuZCI+cHJvbXB0IGluPC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iZWRnZSIgZD0iTSA1NjggNDc4IEwgNDU4IDQ3OCIvPgogIDx0ZXh0IGNsYXNzPSJsYmwiIHg9IjUxMiIgeT0iNDQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5yZXBvcnQgb3V0PC90ZXh0PgoKICA8cGF0aCBjbGFzcz0iYmxvY2tlZCIgZD0iTSA1NzIgMzkwIEggNTMwIi8+CiAgPHBhdGggY2xhc3M9ImJsb2NrZWQiIGQ9Ik0gNTI0IDM3NiBWIDQwNCIvPgoKICA8dGV4dCBjbGFzcz0ic3RvcCIgeD0iNTEyIiB5PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmNvbnRleHQgYm91bmRhcnkg4oCUIHRoZSBzdWItYWdlbnQncyB0b29sIG91dHB1dCBuZXZlciBjcm9zc2VzIGl0OyBvbmx5IGl0cyByZXBvcnQgZG9lczwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImhlYWQiIHg9IjU2IiB5PSI2NTAiPkluIHRoaXMgcmVwb3NpdG9yeTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibGJsIiB4PSI1NiIgeT0iNjgyIj48dHNwYW4gY2xhc3M9Im1vbm8iPmRlbW8tb3JjaC1zdGFnZTwvdHNwYW4+IGNsYWltcyBhIHBoYXNlIGFuZCBkaXNwYXRjaGVzIDx0c3BhbiBjbGFzcz0ibW9ubyI+ZGVtby1jcmVhdG9yLXdlYjwvdHNwYW4+IHRvIHdyaXRlIHRoZSBjb2RlLDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibGJsIiB4PSI1NiIgeT0iNzA4Ij50aGVuIDx0c3BhbiBjbGFzcz0ibW9ubyI+ZGVtby12YWxpZGF0b3ItY29kZTwvdHNwYW4+IHRvIGNoZWNrIGl0LiBUaGUgdmFsaWRhdG9yIGlzIGdpdmVuIHRoZSBkaWZmLCB0aGUgcmVxdWlyZW1lbnQgYW5kIHRoZTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibGJsIiB4PSI1NiIgeT0iNzM0Ij5jb21tYW5kcyDigJQgbmV2ZXIgdGhlIGNyZWF0b3IncyByYXRpb25hbGUsIGJlY2F1c2UgaXQgbmV2ZXIgc2hhcmVkIHRoZSBjcmVhdG9yJ3MgY29udGV4dC48L3RleHQ+Cjwvc3ZnPgo=" alt="Diagram: a sub-agent runs its own loop in its own context window; only its final report crosses back to the caller."></div>
+        <figcaption>The diagram added by the audit — nothing in the original five covered
+        <em>Sub-agent</em>. The whole point is the boundary: the sub-agent's tool output never
+        crosses it, only its report does.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#sub-agent">Sub-agent</a>
+          <a class="chip" href="#orchestration">Orchestration</a>
+          <a class="chip" href="#context">Context</a>
+          <a class="chip" href="#agentic-loop">Agentic loop</a>
+        </div>
+      </figure>
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>MCP architecture</h3>
+          <span class="file">mcp-architecture.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1DUCBhcmNoaXRlY3R1cmUiPgogIDx0aXRsZT5NQ1AgYXJjaGl0ZWN0dXJlPC90aXRsZT4KICA8ZGVzYz5UaGUgYXBwbGljYXRpb24gaXMgdGhlIE1DUCBjbGllbnQ7IE1DUCBzZXJ2ZXJzIGV4cG9zZSB0b29scyBvdmVyIHRoZSBwcm90b2NvbCwgYW5kIHRoZXkgYXJyaXZlIGluIHRoZSBtb2RlbCdzIHRvb2wgbGlzdCBiZXNpZGUgdGhlIGJ1aWx0LWluIG9uZXMuPC9kZXNjPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiMzMzQxNTUiLz4KICAgIDwvbWFya2VyPgogICAgPHN0eWxlPgogICAgICB0ZXh0IHsgZm9udC1mYW1pbHk6IHVpLXNhbnMtc2VyaWYsIHN5c3RlbS11aSwgIlNlZ29lIFVJIiwgUm9ib3RvLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmOyB9CiAgICAgIC5tb25vIHsgZm9udC1mYW1pbHk6IHVpLW1vbm9zcGFjZSwgU0ZNb25vLVJlZ3VsYXIsIE1lbmxvLCBDb25zb2xhcywgIkxpYmVyYXRpb24gTW9ubyIsIG1vbm9zcGFjZTsgfQogICAgICAudGl0bGUgeyBmb250LXNpemU6IDM2cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLmhlYWQgeyBmb250LXNpemU6IDIycHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLmJveCB7IGZvbnQtc2l6ZTogMjFweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuY29kZSB7IGZvbnQtc2l6ZTogMTdweDsgZmlsbDogIzBmMTcyYTsgfQogICAgICAuc21hbGwgeyBmb250LXNpemU6IDE2cHg7IGZpbGw6ICM0NzU1Njk7IH0KICAgICAgLmJhbmQgeyBmb250LXNpemU6IDIwcHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICM2ZDI4ZDk7IH0KICAgICAgLmVkZ2UgeyBzdHJva2U6ICMzMzQxNTU7IHN0cm9rZS13aWR0aDogMzsgZmlsbDogbm9uZTsgbWFya2VyLWVuZDogdXJsKCNhcnJvdyk7IH0KICAgICAgLnBhbmVsIHsgZmlsbDogI2Y4ZmFmYzsgc3Ryb2tlOiAjY2JkNWUxOyBzdHJva2Utd2lkdGg6IDI7IH0KICAgICAgLm1vZGVsIHsgZmlsbDogI2RiZWFmZTsgc3Ryb2tlOiAjMWQ0ZWQ4OyBzdHJva2Utd2lkdGg6IDIuNTsgfQogICAgICAudG9vbCB7IGZpbGw6ICNkY2ZjZTc7IHN0cm9rZTogIzE1ODAzZDsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLnNydiB7IGZpbGw6ICNlZGU5ZmU7IHN0cm9rZTogIzZkMjhkOTsgc3Ryb2tlLXdpZHRoOiAyLjU7IH0KICAgICAgLnNydjIgeyBmaWxsOiAjZmZmZmZmOyBzdHJva2U6ICM2ZDI4ZDk7IHN0cm9rZS13aWR0aDogMi41OyBzdHJva2UtZGFzaGFycmF5OiA4IDY7IH0KICAgICAgLnByb3RvY29sIHsgZmlsbDogI2Y1ZjNmZjsgc3Ryb2tlOiAjNmQyOGQ5OyBzdHJva2Utd2lkdGg6IDIuNTsgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CgogIDxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgZmlsbD0iI2ZmZmZmZiIvPgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNTEyIiB5PSI0NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TUNQIGFyY2hpdGVjdHVyZTwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9Im1vZGVsIiB4PSIzNTIiIHk9IjcyIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjYyIiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSI1MTIiIHk9IjExMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TW9kZWw8L3RleHQ+CiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gNTEyIDEzNCBWIDE4MiIvPgoKICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjYwIiB5PSIxODYiIHdpZHRoPSI5MDQiIGhlaWdodD0iMTgwIiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iODQiIHk9IjIxOCI+QXBwbGljYXRpb24g4oCUIENsYXVkZSBDb2RlLCBhY3RpbmcgYXMgdGhlIE1DUCBjbGllbnQ8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJ0b29sIiB4PSI5MCIgeT0iMjM0IiB3aWR0aD0iMzkyIiBoZWlnaHQ9Ijk2IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSIyODYiIHk9IjI3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QnVpbHQtaW4gdG9vbHM8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iMjg2IiB5PSIzMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlJlYWQgwrcgQmFzaCDCtyBFZGl0IMK3IEdyZXA8L3RleHQ+CgogIDxyZWN0IGNsYXNzPSJ0b29sIiB4PSI1NDIiIHk9IjIzNCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI5NiIgcng9IjEwIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNzM4IiB5PSIyNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRvb2xzIGZyb20gTUNQIHNlcnZlcnM8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iNzM4IiB5PSIzMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPm1jcF9fcGxheXdyaWdodF9fYnJvd3Nlcl9jbGljazwvdGV4dD4KCiAgPHRleHQgY2xhc3M9InNtYWxsIiB4PSI1MTIiIHk9IjM1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VGhlIG1vZGVsIHNlZXMgb25lIGZsYXQgbGlzdCBvZiB0b29scyBhbmQgY2FsbHMgdGhlbSB0aGUgc2FtZSB3YXkuIE9ubHkgdGhlIG5hbWluZyBzaG93cyB3aGVyZSB0aGV5IGNhbWUgZnJvbS48L3RleHQ+CgogIDxwYXRoIGNsYXNzPSJlZGdlIiBkPSJNIDc2MCAzNjYgViAzODQiLz4KCiAgPHJlY3QgY2xhc3M9InByb3RvY29sIiB4PSI2MCIgeT0iMzg4IiB3aWR0aD0iOTA0IiBoZWlnaHQ9IjQ4IiByeD0iMTAiLz4KICA8dGV4dCBjbGFzcz0iYmFuZCIgeD0iODQiIHk9IjQxOSI+TW9kZWwgQ29udGV4dCBQcm90b2NvbCDigJQgb25lIGludGVyZmFjZSwgYW55IGNsaWVudCwgYW55IHNlcnZlcjwvdGV4dD4KCiAgPHBhdGggY2xhc3M9ImVkZ2UiIGQ9Ik0gMzAwIDQzNiBWIDQ2NiIvPgogIDxwYXRoIGNsYXNzPSJlZGdlIiBkPSJNIDc2MCA0MzYgViA0NjYiLz4KCiAgPHJlY3QgY2xhc3M9InNydiIgeD0iMTQwIiB5PSI0NzAiIHdpZHRoPSIzMjAiIGhlaWdodD0iMTI4IiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iYm94IiB4PSIzMDAiIHk9IjUwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TUNQIHNlcnZlcjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSIzMDAiIHk9IjU0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cGxheXdyaWdodDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9IjMwMCIgeT0iNTcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5uYXZpZ2F0ZSDCtyBjbGljayDCtyBzbmFwc2hvdDwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9InNydjIiIHg9IjYwMCIgeT0iNDcwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjEyOCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImJveCIgeD0iNzYwIiB5PSI1MDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFub3RoZXIgTUNQIHNlcnZlcjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9Ijc2MCIgeT0iNTQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5hIGRhdGFiYXNlLCBhbiBpc3N1ZSB0cmFja2VyLDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic21hbGwiIHg9Ijc2MCIgeT0iNTY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj55b3VyIG93biBzZXJ2aWNlIOKAlCBzYW1lIHByb3RvY29sPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNTEyIiB5PSI2NDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRoZSB3aG9sZSBkZWNsYXJhdGlvbiBpbiB0aGlzIHJlcG9zaXRvcnk6IDx0c3BhbiBjbGFzcz0ibW9ubyI+Lm1jcC5qc29uPC90c3Bhbj48L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iMzIyIiB5PSI2ODIiPnsgIm1jcFNlcnZlcnMiOiB7ICJwbGF5d3JpZ2h0IjogezwvdGV4dD4KICA8dGV4dCBjbGFzcz0iY29kZSBtb25vIiB4PSIzNTIiIHk9IjcwOCI+ImNvbW1hbmQiOiAibnB4Iiw8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImNvZGUgbW9ubyIgeD0iMzUyIiB5PSI3MzQiPiJhcmdzIjogWyJAcGxheXdyaWdodC9tY3BAbGF0ZXN0Il0gfSB9IH08L3RleHQ+Cjwvc3ZnPgo=" alt="Diagram: the application acts as MCP client; MCP servers expose tools that arrive in the model's tool list beside the built-in ones."></div>
+        <figcaption>The application is the client, not the server. This repository's entire MCP
+        declaration is four lines, and it is on the plate.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#mcp">MCP</a>
+          <a class="chip" href="#mcp-server">MCP server</a>
+          <a class="chip" href="#tool">Tool</a>
+        </div>
+      </figure>
+
+      <figure class="plate">
+        <div class="plate-head">
+          <h3>Command, skill, tool</h3>
+          <span class="file">command-skill-tool.svg</span>
+        </div>
+        <div class="frame"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgdmlld0JveD0iMCAwIDEwMjQgNzY4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1hbmQsIHNraWxsIGFuZCB0b29sIOKAlCB3aG8gaW5pdGlhdGVzIj4KICA8dGl0bGU+Q29tbWFuZCwgc2tpbGwsIHRvb2wg4oCUIHdobyBpbml0aWF0ZXM8L3RpdGxlPgogIDxkZXNjPkEgY29tbWFuZCBpcyBpbnZva2VkIGJ5IHRoZSBwZXJzb24sIGEgc2tpbGwgaXMgbG9hZGVkIGJ5IHRoZSBtb2RlbCB3aGVuIHRoZSB0YXNrIG1hdGNoZXMsIGEgdG9vbCBpcyBjYWxsZWQgYnkgdGhlIG1vZGVsIGFzIGEgc3RlcC48L2Rlc2M+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIHRleHQgeyBmb250LWZhbWlseTogdWktc2Fucy1zZXJpZiwgc3lzdGVtLXVpLCAiU2Vnb2UgVUkiLCBSb2JvdG8sIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7IH0KICAgICAgLm1vbm8geyBmb250LWZhbWlseTogdWktbW9ub3NwYWNlLCBTRk1vbm8tUmVndWxhciwgTWVubG8sIENvbnNvbGFzLCAiTGliZXJhdGlvbiBNb25vIiwgbW9ub3NwYWNlOyBmb250LXNpemU6IDE2cHg7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLnRpdGxlIHsgZm9udC1zaXplOiAzNnB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjMGYxNzJhOyB9CiAgICAgIC5jb2xoZWFkIHsgZm9udC1zaXplOiAyNnB4OyBmb250LXdlaWdodDogNzAwOyBmaWxsOiAjZmZmZmZmOyB9CiAgICAgIC53aG8geyBmb250LXNpemU6IDIxcHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGZpbGw6ICMwZjE3MmE7IH0KICAgICAgLmNhcCB7IGZvbnQtc2l6ZTogMTVweDsgZm9udC13ZWlnaHQ6IDcwMDsgZmlsbDogIzY0NzQ4YjsgbGV0dGVyLXNwYWNpbmc6IDAuMDhlbTsgfQogICAgICAuYm9keSB7IGZvbnQtc2l6ZTogMTdweDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAuZm9vdCB7IGZvbnQtc2l6ZTogMTlweDsgZmlsbDogIzMzNDE1NTsgfQogICAgICAucGFuZWwgeyBmaWxsOiAjZjhmYWZjOyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMjsgfQogICAgICAucnVsZSB7IHN0cm9rZTogI2NiZDVlMTsgc3Ryb2tlLXdpZHRoOiAyOyB9CiAgICAgIC5jbWQgeyBmaWxsOiAjYjQ1MzA5OyB9CiAgICAgIC5za2wgeyBmaWxsOiAjNmQyOGQ5OyB9CiAgICAgIC50bCB7IGZpbGw6ICMxNTgwM2Q7IH0KICAgICAgLmJhbmQgeyBmaWxsOiAjZjFmNWY5OyBzdHJva2U6ICNjYmQ1ZTE7IHN0cm9rZS13aWR0aDogMjsgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CgogIDxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9Ijc2OCIgZmlsbD0iI2ZmZmZmZiIvPgogIDx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iNTEyIiB5PSI1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q29tbWFuZCwgc2tpbGwsIHRvb2wg4oCUIHdobyBpbml0aWF0ZXM8L3RleHQ+CgogIDwhLS0gQ29tbWFuZCAtLT4KICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjQwIiB5PSI4NiIgd2lkdGg9IjMwNCIgaGVpZ2h0PSI1MzYiIHJ4PSIxMiIvPgogIDxyZWN0IGNsYXNzPSJjbWQiIHg9IjQwIiB5PSI4NiIgd2lkdGg9IjMwNCIgaGVpZ2h0PSI1OCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImNvbGhlYWQiIHg9IjE5MiIgeT0iMTI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Db21tYW5kPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iY2FwIiB4PSI2NCIgeT0iMTgyIj5JTklUSUFURUQgQlk8L3RleHQ+CiAgPHRleHQgY2xhc3M9IndobyIgeD0iNjQiIHk9IjIxMiI+VGhlIHBlcnNvbjwvdGV4dD4KICA8bGluZSBjbGFzcz0icnVsZSIgeDE9IjY0IiB5MT0iMjM2IiB4Mj0iMzIwIiB5Mj0iMjM2Ii8+CgogIDx0ZXh0IGNsYXNzPSJib2R5IiB4PSI2NCIgeT0iMjcyIj5BIG5hbWVkIHByb21wdCB5b3UgdHJpZ2dlcjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iNjQiIHk9IjI5OCI+YnkgdHlwaW5nIGEgc2xhc2ggY29tbWFuZC48L3RleHQ+CiAgPHRleHQgY2xhc3M9ImJvZHkiIHg9IjY0IiB5PSIzMjQiPlRoZSBtb2RlbCBydW5zIGl0IGJlY2F1c2U8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImJvZHkiIHg9IjY0IiB5PSIzNTAiPnlvdSBhc2tlZCBmb3IgaXQgYnkgbmFtZS48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJjYXAiIHg9IjY0IiB5PSI0MDYiPkxJVkVTIElOPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtb25vIiB4PSI2NCIgeT0iNDM2Ij4uY2xhdWRlL2NvbW1hbmRzLzwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iNjQiIHk9IjQ1OCI+ICAmbHQ7bmFtZSZndDsubWQ8L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJjYXAiIHg9IjY0IiB5PSI1MTAiPkhFUkU8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im1vbm8iIHg9IjY0IiB5PSI1NDAiPi9iYWNrbG9nPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtb25vIiB4PSI2NCIgeT0iNTY0Ij4vaWRlYTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iNjQiIHk9IjU4OCI+L2lkZWEtdHJpYWdlPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJtb25vIiB4PSI2NCIgeT0iNjEyIj4vc2Vzc2lvbi1jbG9zZTwvdGV4dD4KCiAgPCEtLSBTa2lsbCAtLT4KICA8cmVjdCBjbGFzcz0icGFuZWwiIHg9IjM2MCIgeT0iODYiIHdpZHRoPSIzMDQiIGhlaWdodD0iNTM2IiByeD0iMTIiLz4KICA8cmVjdCBjbGFzcz0ic2tsIiB4PSIzNjAiIHk9Ijg2IiB3aWR0aD0iMzA0IiBoZWlnaHQ9IjU4IiByeD0iMTIiLz4KICA8dGV4dCBjbGFzcz0iY29saGVhZCIgeD0iNTEyIiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNraWxsPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iY2FwIiB4PSIzODQiIHk9IjE4MiI+SU5JVElBVEVEIEJZPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ3aG8iIHg9IjM4NCIgeT0iMjEyIj5UaGUgbW9kZWw8L3RleHQ+CiAgPGxpbmUgY2xhc3M9InJ1bGUiIHgxPSIzODQiIHkxPSIyMzYiIHgyPSI2NDAiIHkyPSIyMzYiLz4KCiAgPHRleHQgY2xhc3M9ImJvZHkiIHg9IjM4NCIgeT0iMjcyIj5BIGZvbGRlciBvZiBpbnN0cnVjdGlvbnMgdGhlPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJib2R5IiB4PSIzODQiIHk9IjI5OCI+bW9kZWwgbG9hZHMgd2hlbiB0aGUgdGFzazwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iMzg0IiB5PSIzMjQiPm1hdGNoZXMgaXRzIGRlc2NyaXB0aW9uLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iMzg0IiB5PSIzNTAiPllvdSBuZWVkIG5vdCBrbm93IGl0IGV4aXN0cy48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJjYXAiIHg9IjM4NCIgeT0iNDA2Ij5MSVZFUyBJTjwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iMzg0IiB5PSI0MzYiPi5jbGF1ZGUvc2tpbGxzLyZsdDtuYW1lJmd0Oy88L3RleHQ+CiAgPHRleHQgY2xhc3M9Im1vbm8iIHg9IjM4NCIgeT0iNDU4Ij4gIFNLSUxMLm1kPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iY2FwIiB4PSIzODQiIHk9IjUxMCI+SEVSRTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iMzg0IiB5PSI1NDAiPm9yaWVudDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iMzg0IiB5PSI1NjQiPmNoZWNrcG9pbnQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im1vbm8iIHg9IjM4NCIgeT0iNTg4Ij5kLXN5c3RlbS1vdmVydmlldzwvdGV4dD4KCiAgPCEtLSBUb29sIC0tPgogIDxyZWN0IGNsYXNzPSJwYW5lbCIgeD0iNjgwIiB5PSI4NiIgd2lkdGg9IjMwNCIgaGVpZ2h0PSI1MzYiIHJ4PSIxMiIvPgogIDxyZWN0IGNsYXNzPSJ0bCIgeD0iNjgwIiB5PSI4NiIgd2lkdGg9IjMwNCIgaGVpZ2h0PSI1OCIgcng9IjEyIi8+CiAgPHRleHQgY2xhc3M9ImNvbGhlYWQiIHg9IjgzMiIgeT0iMTI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Ub29sPC90ZXh0PgoKICA8dGV4dCBjbGFzcz0iY2FwIiB4PSI3MDQiIHk9IjE4MiI+SU5JVElBVEVEIEJZPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJ3aG8iIHg9IjcwNCIgeT0iMjEyIj5UaGUgbW9kZWw8L3RleHQ+CiAgPGxpbmUgY2xhc3M9InJ1bGUiIHgxPSI3MDQiIHkxPSIyMzYiIHgyPSI5NjAiIHkyPSIyMzYiLz4KCiAgPHRleHQgY2xhc3M9ImJvZHkiIHg9IjcwNCIgeT0iMjcyIj5BIHNpbmdsZSBjYXBhYmlsaXR5IHRoZSBtb2RlbDwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iNzA0IiB5PSIyOTgiPnJlcXVlc3RzIGFzIG9uZSBzdGVwLiBUaGU8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImJvZHkiIHg9IjcwNCIgeT0iMzI0Ij5wcm9ncmFtIGV4ZWN1dGVzIGl0IGFuZCBoYW5kczwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iNzA0IiB5PSIzNTAiPmJhY2sgYSB0b29sIHJlc3VsdC48L3RleHQ+CgogIDx0ZXh0IGNsYXNzPSJjYXAiIHg9IjcwNCIgeT0iNDA2Ij5MSVZFUyBJTjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iYm9keSIgeD0iNzA0IiB5PSI0MzYiPnRoZSBhcHBsaWNhdGlvbiBpdHNlbGYsIG9yPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJib2R5IiB4PSI3MDQiIHk9IjQ1OCI+YW4gTUNQIHNlcnZlcjwvdGV4dD4KCiAgPHRleHQgY2xhc3M9ImNhcCIgeD0iNzA0IiB5PSI1MTAiPkhFUkU8L3RleHQ+CiAgPHRleHQgY2xhc3M9Im1vbm8iIHg9IjcwNCIgeT0iNTQwIj5SZWFkIMK3IEJhc2ggwrcgRWRpdDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ibW9ubyIgeD0iNzA0IiB5PSI1NjQiPm1jcF9fcGxheXdyaWdodF9fKjwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9ImJhbmQiIHg9IjQwIiB5PSI2NDgiIHdpZHRoPSI5NDQiIGhlaWdodD0iODgiIHJ4PSIxMiIvPgogIDx0ZXh0IGNsYXNzPSJmb290IiB4PSI1MTIiIHk9IjY4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QWxsIHRocmVlIGFycml2ZSBhcyB0ZXh0IGluIHRoZSBzYW1lIGNvbnRleHQuIFdoYXQgZGlmZmVycyBpcyB3aG8gZGVjaWRlcyB0byBicmluZyB0aGVtIGluLjwvdGV4dD4KICA8dGV4dCBjbGFzcz0iZm9vdCIgeD0iNTEyIiB5PSI3MTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlRoZXkgY29tcG9zZTogYSBjb21tYW5kIGNhbiBpbnZva2UgYSBza2lsbCwgYW5kIGEgc2tpbGwgdGVsbHMgdGhlIG1vZGVsIHdoaWNoIHRvb2xzIHRvIGNhbGwuPC90ZXh0Pgo8L3N2Zz4K" alt="Diagram: a command is invoked by the person, a skill is loaded by the model when the task matches, a tool is called by the model as a step."></div>
+        <figcaption>The three are distinguished by one thing — who initiates — with this
+        repository's four commands, three skills and real tool names filling the columns.</figcaption>
+        <div class="uses">
+          <span class="label">Terms</span>
+          <a class="chip" href="#command">Command</a>
+          <a class="chip" href="#skill">Skill</a>
+          <a class="chip" href="#tool">Tool</a>
+          <a class="chip" href="#mcp-server">MCP server</a>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <section id="glossary">
+    <div class="section-head">
+      <h2>The glossary</h2>
+      <p>Grouped as the session runs them: what a model is, what makes it act, how several are
+      composed, how work is packaged for it, what it connects to, and what survives the
+      conversation. Canonical in
+      <code>brain/concepts/terms-skills-and-agents-demo.md</code>.</p>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-found)">
+      <p class="family-label">Foundations</p>
+      <p class="family-note">What the model is, and what it is shown.</p>
+
+      <article class="entry" id="llm">
+        <h3 class="headword">LLM</h3>
+        <div>
+          <p class="def">A large language model: a function from text in to text out, with no memory
+          of previous calls and no ability to act on anything. Every call starts from nothing and is
+          given the entire conversation as input.</p>
+          <p class="def">Not a program that runs continuously, and not the same thing as the product
+          wrapped around it — Claude Code is an application; <code>claude-opus-5</code> is a model it
+          calls.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="token">
+        <h3 class="headword">Token</h3>
+        <div>
+          <p class="def">The unit a model reads and writes — roughly a short word or word fragment,
+          not a character and not a word. Both the limit on how much a model can be shown at once and
+          the unit work is billed in are counted in tokens, which is why what goes into the context
+          is an engineering decision rather than a free choice.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="context">
+        <h3 class="headword">Context</h3>
+        <div>
+          <p class="def">Everything the model is shown on one call: the system prompt, the
+          conversation so far, file contents that were read, tool results, and any memory or
+          instruction file loaded automatically. The <strong>context window</strong> is the maximum
+          number of tokens that will fit.</p>
+          <p class="def">Not storage — nothing persists in the context between calls; whatever should
+          be present on the next call is sent again. In this repository <code>CLAUDE.md</code>, and
+          <code>GOV-006</code> through the import in it, are in the context of every Claude Code
+          session from the first turn.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="prompt">
+        <h3 class="headword">Prompt and system prompt</h3>
+        <div>
+          <p class="def">The <strong>prompt</strong> is the instruction text sent for one call. The
+          <strong>system prompt</strong> is the framing instruction that comes first and stays
+          constant across a conversation — who the assistant is, what tools exist, what the rules
+          are. The distinction is one of position and persistence, not of mechanism: both are text in
+          the same context.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-act)">
+      <p class="family-label">Acting</p>
+      <p class="family-note">What turns a model call into something that gets work done.</p>
+
+      <article class="entry" id="tool">
+        <h3 class="headword">Tool</h3>
+        <div>
+          <p class="def">A capability the model may invoke, declared to it as a name, a description
+          and a typed parameter schema. Reading a file, running a shell command and driving a browser
+          are all tools. The model never executes anything itself — it emits a request, and the
+          surrounding program runs it.</p>
+          <p class="def">Not a plugin installed into the model; a tool exists only for the calls it is
+          declared in.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="tool-call">
+        <h3 class="headword">Tool call</h3>
+        <div>
+          <p class="def">One invocation of a tool: the model emits the tool's name and arguments, the
+          program executes it and returns a <strong>tool result</strong>, and that result is appended
+          to the context for the next call. A tool is the declaration; a tool call is a single use of
+          it.</p>
+          <p class="def">Both the call and its result consume tokens, which is why a tool that returns
+          a large output is expensive even when the answer is small.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="agent">
+        <h3 class="headword">Agent</h3>
+        <div>
+          <p class="def">A model in a loop with tools and a goal, where the model decides which tool
+          to call next and when it is finished. What separates an agent from a single model call is
+          not the model but the loop and the tools around it.</p>
+          <p class="def">Not autonomy in the sense of unsupervised — the surrounding program still
+          decides what is permitted, and in this repository <code>.claude/settings.json</code> denies
+          edits to <code>AGENTS.md</code>, <code>CLAUDE.md</code>, <code>_private/**</code> and
+          <code>_data/ideas.jsonl</code> outright.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="agentic-loop">
+        <h3 class="headword">Agentic loop</h3>
+        <div>
+          <p class="def">The cycle an agent repeats: read the context, decide, call a tool, append the
+          result to the context, decide again — until the model answers instead of calling a tool, or
+          a limit stops it. Each pass is a fresh model call over a context that has grown by one tool
+          result.</p>
+          <p class="def">The loop is the reason an agent can recover from a failed command: the
+          failure is just another result to read.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-comp)">
+      <p class="family-label">Composition</p>
+      <p class="family-note">More than one agent, and why the boundary between them matters.</p>
+
+      <article class="entry" id="sub-agent">
+        <h3 class="headword">Sub-agent</h3>
+        <div>
+          <p class="def">A second agent started by the first, with its own context window, its own
+          tool set and its own loop, which reports one result back to the caller. The point is context
+          isolation: the sub-agent's intermediate tool output never enters the caller's context, only
+          its final report does.</p>
+          <p class="def">In this repository <code>.claude/agents/</code> holds eleven definitions — a
+          Markdown file whose front matter sets <code>name</code>, <code>description</code>,
+          <code>tools</code>, <code>model</code> and limits like <code>maxTurns</code>, and whose body
+          is the sub-agent's instructions. <code>demo-adversary</code> is one: it is given
+          <code>Read, Grep, Glob, Bash</code> and cannot write.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="orchestration">
+        <h3 class="headword">Orchestration and multi-agent</h3>
+        <div>
+          <p class="def">One agent dispatching several others and combining their results, rather than
+          doing the work itself. The demo build in this repository is organised that way:
+          <code>demo-orch-stage</code>, <code>demo-orch-data</code> and <code>demo-orch-content</code>
+          claim phases and dispatch <code>demo-creator-*</code> agents to write code and
+          <code>demo-validator-*</code> agents to check it, with the creator's rationale deliberately
+          withheld from the validator.</p>
+          <p class="def">Not inherently better than one agent — it buys isolation and parallelism at
+          the cost of every sub-agent starting without the caller's context.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-pack)">
+      <p class="family-label">Packaging</p>
+      <p class="family-note">How instructions are handed to a model, and who initiates.</p>
+
+      <article class="entry" id="skill">
+        <h3 class="headword">Skill</h3>
+        <div>
+          <p class="def">A folder of instructions the model loads when a task calls for it:
+          <code>SKILL.md</code> with YAML front matter giving a <code>name</code> and a
+          <code>description</code>, a Markdown body containing the procedure, and optionally
+          supporting files the body points to. This repository has three under
+          <code>.claude/skills/</code> — <code>orient</code>, <code>checkpoint</code> and
+          <code>d-system-overview</code>.</p>
+          <p class="def">A skill is instructions, not code: <code>d-system-overview</code> tells the
+          agent to run <code>tools/generate_overview.py</code> and report what it printed; the
+          determinism lives in the tool, not in the skill.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="progressive-disclosure">
+        <h3 class="headword">Progressive disclosure</h3>
+        <div>
+          <p class="def">The mechanism that makes many skills affordable. Only each skill's
+          <code>name</code> and <code>description</code> are in the context at all times; the body is
+          loaded when the skill is invoked. Adding a skill therefore costs one line of context until
+          it is needed, which is why a <code>description</code> is written to say when to use the
+          skill rather than to summarise it.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="command">
+        <h3 class="headword">Command</h3>
+        <div>
+          <p class="def">A named prompt the user triggers by typing <code>/&lt;name&gt;</code> — a
+          <strong>slash command</strong> — defined in this repository as a Markdown file under
+          <code>.claude/commands/</code> with <code>description</code> and
+          <code>argument-hint</code> front matter. <code>/backlog</code>, <code>/idea</code>,
+          <code>/idea-triage</code> and <code>/session-close</code> are the four here.</p>
+          <p class="def">A command is invoked by the person; a skill is loaded by the model when it
+          judges the task matches; a tool is called by the model as a step. That is the whole
+          distinction between the three — who initiates.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-int)">
+      <p class="family-label">Interfaces</p>
+      <p class="family-note">How capabilities reach the model from outside the application.</p>
+
+      <article class="entry" id="mcp">
+        <h3 class="headword">MCP</h3>
+        <div>
+          <p class="def">The Model Context Protocol: a standard interface for exposing tools and data
+          to any model application, so a capability is implemented once instead of once per client.
+          Not a tool and not a model — a protocol that tools are served over, with the application
+          acting as the <strong>MCP client</strong>.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="mcp-server">
+        <h3 class="headword">MCP server</h3>
+        <div>
+          <p class="def">One process that serves capabilities over MCP. <code>.mcp.json</code> in this
+          repository declares one, <code>playwright</code>, launched as
+          <code>npx @playwright/mcp@latest</code>; its browser tools then appear to the agent
+          alongside the built-in ones, named <code>mcp__playwright__*</code>.</p>
+          <p class="def">"An MCP" in casual use almost always means an MCP server.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="family" style="--fam: var(--fam-keep)">
+      <p class="family-label">What survives</p>
+      <p class="family-note">The context does not outlast the conversation. These do.</p>
+
+      <article class="entry" id="session">
+        <h3 class="headword">Session</h3>
+        <div>
+          <p class="def">One continuous conversation with its own accumulating context, ending when it
+          is closed. Overloaded in this repository, so read it in context: a <strong>session
+          record</strong> under <code>docs/03-sessions/</code> is the governed document written at the
+          end of one, and a <strong>terminal session</strong> on the demo stage page is a shell behind
+          a websocket. Governed phases are budgeted in sessions — one phase is meant to fit one.</p>
+        </div>
+      </article>
+
+      <article class="entry" id="memory">
+        <h3 class="headword">Memory</h3>
+        <div>
+          <p class="def">Anything deliberately written down so a later session can read it, since the
+          context does not survive the conversation. Three kinds here: <code>brain/</code> holds
+          model-agnostic Markdown entries, <code>docs/05-memories/</code> holds governed cross-session
+          context, and <code>CLAUDE.md</code> is loaded automatically every session.</p>
+          <p class="def">Not recall by the model: memory is a file that something chooses to read
+          back.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="advanced">
+      <h3>Named, but not covered in depth</h3>
+      <p>Four topics the session names so nobody thinks they were forgotten, each with a one-line
+      entry rather than a segment.</p>
+      <dl>
+        <div>
+          <dt>Hooks</dt>
+          <dd>Shell commands the harness runs automatically at fixed points in the loop, configured in
+          <code>settings.json</code>. None are configured in this repository; the equivalent
+          guarantees here come from <code>permissions.deny</code> and the governance check.</dd>
+        </div>
+        <div>
+          <dt>Agent permissions</dt>
+          <dd>The allow and deny rules deciding which tool calls run, prompt for approval, or are
+          refused. <code>.claude/settings.json</code> here denies writes to <code>AGENTS.md</code>,
+          <code>CLAUDE.md</code>, <code>_private/**</code> and <code>_data/ideas.jsonl</code>,
+          enforcing in the harness what the working agreement states in prose.</dd>
+        </div>
+        <div>
+          <dt>Observability</dt>
+          <dd>Recording what an agent did — tool calls, tokens, cost, outcome — so a run can be
+          audited afterwards rather than reconstructed from its output.</dd>
+        </div>
+        <div>
+          <dt>Agent SDK</dt>
+          <dd>The library for building agents of your own on the same loop, tool and sub-agent model,
+          outside the CLI.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built by <span class="mono">phase-demo-07</span> for R13 of the live-demo requirements
+    (<span class="mono">REQ-006</span>). The glossary is canonical in
+    <span class="mono">brain/concepts/terms-skills-and-agents-demo.md</span> and rendered from there
+    by <span class="mono">tools/generate_glossary.py</span>; the diagrams are in
+    <span class="mono">docs/07-architecture/diagrams/demo/</span>.</p>
+    <p>To change a label, edit the glossary entry first and then the diagram — the acceptance
+    condition is that the two match exactly.</p>
+  </footer>
+
+</div>
