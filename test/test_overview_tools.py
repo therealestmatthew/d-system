@@ -1,13 +1,18 @@
-"""Tests for tools/overview_metrics.py -- determinism and independent recomputation.
+"""Tests for tools/overview_metrics.py and tools/overview_inventory.py -- determinism and
+independent recomputation.
 
-Two things anchor this file. First, the acceptance criterion from idea `000071` and REQ-006 R07:
-running the tool twice against an unchanged repository must produce byte-identical output, both
-as a subprocess (the way it is actually run) and as a direct call to `render()` (the way it is
-easiest to assert). Second, the funnel counts the tool reports must match an independent
-recomputation over the same log via `fold()` -- the tool must not silently diverge from the
-projection it is supposed to summarise. A handful of zero-row tests pin the "zero counts appear
-as zero rows, never omitted" requirement against a synthetic single-idea log, where every status,
-transition and link type but one is genuinely unseen.
+Two things anchor the metrics half of this file. First, the acceptance criterion from idea
+`000071` and REQ-006 R07: running the tool twice against an unchanged repository must produce
+byte-identical output, both as a subprocess (the way it is actually run) and as a direct call to
+`render()` (the way it is easiest to assert). Second, the funnel counts the tool reports must
+match an independent recomputation over the same log via `fold()` -- the tool must not silently
+diverge from the projection it is supposed to summarise. A handful of zero-row tests pin the
+"zero counts appear as zero rows, never omitted" requirement against a synthetic single-idea log,
+where every status, transition and link type but one is genuinely unseen.
+
+The inventory half applies the same determinism criterion to `tools/overview_inventory.py`, plus
+an independent recomputation of the systems inventory count against a direct
+`yaml.safe_load()` of `docs/08-governance/systems.yaml`.
 """
 
 from __future__ import annotations
@@ -21,10 +26,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 
 from src.db.ideas import LINK_TYPES, fold, legal_transitions, load_events
 
 ROOT = Path(__file__).resolve().parents[1]
+SYSTEMS_REGISTRY = ROOT / "docs" / "08-governance" / "systems.yaml"
 
 
 def _load(name: str) -> Any:
@@ -38,6 +45,7 @@ def _load(name: str) -> Any:
 
 
 overview_metrics = _load("overview_metrics")
+overview_inventory = _load("overview_inventory")
 append_idea = _load("append_idea")
 
 
@@ -212,3 +220,120 @@ def test_main_writes_to_out_path(tmp_path: Path) -> None:
     written = json.loads(out.read_text(encoding="utf-8"))
     assert "meta" in written
     assert written["meta"]["event_count"] >= 0
+
+
+# --- tools/overview_inventory.py -----------------------------------------------------------
+# --- Determinism over the real, committed repository ------------------------------------
+
+
+def test_inventory_two_subprocess_runs_produce_byte_identical_stdout() -> None:
+    first = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "overview_inventory.py")],
+        cwd=ROOT,
+        capture_output=True,
+        check=True,
+    )
+    second = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "overview_inventory.py")],
+        cwd=ROOT,
+        capture_output=True,
+        check=True,
+    )
+    assert first.stdout == second.stdout
+    assert first.stdout, "expected non-empty output"
+
+
+def test_inventory_render_is_deterministic_across_in_process_calls() -> None:
+    concepts = overview_inventory.load_concepts()
+    systems = overview_inventory.load_systems()
+    assert overview_inventory.render(concepts, systems) == overview_inventory.render(
+        concepts, systems
+    )
+
+
+def test_inventory_output_is_valid_json_with_sorted_keys_and_a_trailing_newline() -> None:
+    concepts = overview_inventory.load_concepts()
+    systems = overview_inventory.load_systems()
+    rendered = overview_inventory.render(concepts, systems)
+    parsed = json.loads(rendered)
+    assert rendered.endswith("\n")
+    assert json.dumps(parsed, indent=2, sort_keys=True, ensure_ascii=True) + "\n" == rendered
+
+
+# --- Systems inventory count against an independent recomputation ------------------------
+
+
+def test_systems_inventory_count_matches_the_registry_entry_count() -> None:
+    registry = yaml.safe_load(SYSTEMS_REGISTRY.read_text(encoding="utf-8"))
+    expected_ids = sorted(entry["id"] for entry in registry["systems"])
+
+    inventory = overview_inventory.build_inventory(
+        overview_inventory.load_concepts(), overview_inventory.load_systems()
+    )
+    reported_ids = sorted(entry["id"] for entry in inventory["systems"])
+
+    assert reported_ids == expected_ids
+    assert inventory["meta"]["system_count"] == len(registry["systems"])
+    assert len(inventory["systems"]) == len(registry["systems"])
+
+
+def test_systems_inventory_rows_carry_id_name_domain_status_and_dependency_edges() -> None:
+    inventory = overview_inventory.build_inventory(
+        overview_inventory.load_concepts(), overview_inventory.load_systems()
+    )
+    for row in inventory["systems"]:
+        assert set(row) == {"id", "name", "domain", "status", "depends_on"}
+        assert row["depends_on"] == sorted(row["depends_on"])
+    assert inventory["systems"] == sorted(inventory["systems"], key=lambda row: row["id"])
+
+
+# --- Concepts and terminology inventory -----------------------------------------------------
+
+
+def test_concepts_inventory_rows_are_sorted_and_carry_their_tags_and_systems() -> None:
+    inventory = overview_inventory.build_inventory(
+        overview_inventory.load_concepts(), overview_inventory.load_systems()
+    )
+    concepts = inventory["concepts"]
+    assert concepts == sorted(concepts, key=lambda row: row["id"])
+    for row in concepts:
+        assert set(row) == {"id", "title", "tags", "systems"}
+        assert row["tags"] == sorted(row["tags"])
+        assert row["systems"] == sorted(row["systems"])
+    assert inventory["meta"]["concept_count"] == len(concepts)
+
+
+def test_terms_inventory_extracts_every_heading_from_a_grouped_glossary_concept() -> None:
+    inventory = overview_inventory.build_inventory(
+        overview_inventory.load_concepts(), overview_inventory.load_systems()
+    )
+    terms = inventory["terms"]
+    assert terms == sorted(terms, key=lambda row: (row["term"].lower(), row["concept_id"]))
+    phase_terms = [row for row in terms if row["term"] == "Phase"]
+    assert phase_terms
+    assert phase_terms[0]["concept_id"] == "mem-concept-terms-plans-and-work"
+    assert inventory["meta"]["term_count"] == len(terms)
+
+
+def test_inventory_reports_zero_counts_as_zero_for_an_empty_registry_and_no_concepts() -> None:
+    inventory = overview_inventory.build_inventory([], [])
+    assert inventory["meta"] == {"concept_count": 0, "term_count": 0, "system_count": 0}
+    assert inventory["concepts"] == []
+    assert inventory["terms"] == []
+    assert inventory["systems"] == []
+
+
+def test_load_systems_missing_file_is_empty(tmp_path: Path) -> None:
+    assert overview_inventory.load_systems(tmp_path / "nope.yaml") == []
+
+
+# --- The CLI --------------------------------------------------------------------------------
+
+
+def test_inventory_main_writes_to_out_path(tmp_path: Path) -> None:
+    out = tmp_path / "inventory.json"
+    exit_code = overview_inventory.main(["--out", str(out)])
+    assert exit_code == 0
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert "meta" in written
+    assert written["meta"]["system_count"] >= 0
