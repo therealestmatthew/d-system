@@ -13,8 +13,12 @@
                                  here so the rendered page is one self-contained file with no
                                  external network dependency and no repository-relative link
                                  that could break when embedded from a different origin/path.
-    {{GENERATED_AT}}          - ISO 8601 timestamp the generator ran at (not a data value —
-                                 fine to be wall-clock, it labels the render, not a metric)
+    {{GENERATED_AT}}          - tools/overview_metrics.py meta.reference_at (the idea log's
+                                 latest event timestamp) — never a wall-clock render timestamp.
+                                 tools/generate_overview.py requires this for its determinism
+                                 guarantee: two generations against an unchanged repository must
+                                 produce byte-identical output (REQ-006 R08), which a wall-clock
+                                 value would break
     {{IDEA_COUNT}}            - tools/overview_metrics.py meta.idea_count
     {{EVENT_COUNT}}           - tools/overview_metrics.py meta.event_count
     {{BACKLOG_PHASE_COUNT}}   - tools/overview_metrics.py meta.backlog_phase_count
