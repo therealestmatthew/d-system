@@ -1,0 +1,163 @@
+---
+id: mem-concept-terms-skills-and-agents-demo
+title: Skills and agents
+type: concept
+tags: [demo-glossary]
+systems: [sys-brain]
+source_model: anthropic/claude-opus-5
+project: d-system
+created: 2026-09-10
+updated: 2026-09-10
+confidence: high
+related: [mem-concept-terms-systems-vocabulary]
+scope: global
+---
+
+Grouped definitions for the skills-and-agents training session, per R13 in
+`docs/06-requirements/REQ-006-live-demo.md`. Each term is defined against what this repository actually contains — `.claude/skills/`,
+`.claude/agents/`, `.claude/commands/`, `.claude/settings.json` and `.mcp.json` — rather than
+generically, so a claim in the session can be checked against a file on screen. The diagrams under
+`docs/07-architecture/diagrams/demo/` take their labels from these entries.
+
+### LLM
+
+A large language model: a function from text in to text out, with no memory of previous calls and no
+ability to act on anything. Every call starts from nothing and is given the entire conversation as
+input. Not a program that runs continuously and not the same thing as the product wrapped around it —
+Claude Code is an application; `claude-opus-5` is a model it calls.
+
+### Token
+
+The unit a model reads and writes — roughly a short word or word fragment, not a character and not a
+word. Both the limit on how much a model can be shown at once and the unit work is billed in are
+counted in tokens, which is why what goes into the context is an engineering decision rather than a
+free choice.
+
+### Context
+
+Everything the model is shown on one call: the system prompt, the conversation so far, file contents
+that were read, tool results, and any memory or instruction file loaded automatically. The **context
+window** is the maximum number of tokens that will fit. Not storage — nothing persists in the context
+between calls; whatever should be present on the next call is sent again. In this repository
+`CLAUDE.md`, and `docs/08-governance/GOV-006-conversation-guidelines.md` through the import in it,
+are in the context of every Claude Code session from the first turn.
+
+### Prompt and system prompt
+
+The **prompt** is the instruction text sent for one call. The **system prompt** is the framing
+instruction that comes first and stays constant across a conversation — who the assistant is, what
+tools exist, what the rules are. The distinction is one of position and persistence, not of
+mechanism: both are text in the same context.
+
+### Tool
+
+A capability the model may invoke, declared to it as a name, a description and a typed parameter
+schema. Reading a file, running a shell command and driving a browser are all tools. The model never
+executes anything itself — it emits a request, and the surrounding program runs it. Not a plugin
+installed into the model; a tool exists only for the calls it is declared in.
+
+### Tool call
+
+One invocation of a tool: the model emits the tool's name and arguments, the program executes it and
+returns a **tool result**, and that result is appended to the context for the next call. A tool is
+the declaration; a tool call is a single use of it. Both the call and its result consume tokens,
+which is why a tool that returns a large output is expensive even when the answer is small.
+
+### Agent
+
+A model in a loop with tools and a goal, where the model decides which tool to call next and when it
+is finished. What separates an agent from a single model call is not the model but the loop and the
+tools around it. Not autonomy in the sense of unsupervised — the surrounding program still decides
+what is permitted, and in this repository `.claude/settings.json` denies edits to `AGENTS.md`,
+`CLAUDE.md`, `_private/**` and `_data/ideas.jsonl` outright.
+
+### Agentic loop
+
+The cycle an agent repeats: read the context, decide, call a tool, append the result to the context,
+decide again — until the model answers instead of calling a tool, or a limit stops it. Each pass is a
+fresh model call over a context that has grown by one tool result. The loop is the reason an agent
+can recover from a failed command: the failure is just another result to read.
+
+### Sub-agent
+
+A second agent started by the first, with its own context window, its own tool set and its own loop,
+which reports one result back to the caller. The point is context isolation: the sub-agent's
+intermediate tool output never enters the caller's context, only its final report does. In this
+repository `.claude/agents/` holds eleven definitions — a Markdown file whose front matter sets
+`name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
+instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
+
+### Orchestration and multi-agent
+
+One agent dispatching several others and combining their results, rather than doing the work itself.
+The demo build in this repository is organised that way: `demo-orch-stage`, `demo-orch-data` and
+`demo-orch-content` claim phases and dispatch `demo-creator-*` agents to write code and
+`demo-validator-*` agents to check it, with the creator's rationale deliberately withheld from the
+validator. Not inherently better than one agent — it buys isolation and parallelism at the cost of
+every sub-agent starting without the caller's context.
+
+### Skill
+
+A folder of instructions the model loads when a task calls for it: `SKILL.md` with YAML front matter
+giving a `name` and a `description`, a Markdown body containing the procedure, and optionally
+supporting files the body points to. This repository has three under `.claude/skills/` — `orient`,
+`checkpoint` and `d-system-overview`. A skill is instructions, not code: `d-system-overview` tells
+the agent to run `tools/generate_overview.py` and report what it printed; the determinism lives in
+the tool, not in the skill.
+
+### Progressive disclosure
+
+The mechanism that makes many skills affordable. Only each skill's `name` and `description` are in
+the context at all times; the body is loaded when the skill is invoked. Adding a skill therefore
+costs one line of context until it is needed, which is why a `description` is written to say when to
+use the skill rather than to summarise it.
+
+### Command
+
+A named prompt the user triggers by typing `/<name>` — a **slash command** — defined in this
+repository as a Markdown file
+under `.claude/commands/` with `description` and `argument-hint` front matter. `/backlog`, `/idea`,
+`/idea-triage` and `/session-close` are the four here. A command is invoked by the person; a skill is
+loaded by the model when it judges the task matches; a tool is called by the model as a step. That is
+the whole distinction between the three — who initiates.
+
+### MCP
+
+The Model Context Protocol: a standard interface for exposing tools and data to any model
+application, so a capability is implemented once instead of once per client. Not a tool and not a
+model — a protocol that tools are served over, with the application acting as the **MCP client**.
+
+### MCP server
+
+One process that serves capabilities over MCP. `.mcp.json` in this repository declares one,
+`playwright`, launched as `npx @playwright/mcp@latest`; its browser tools then appear to the agent
+alongside the built-in ones, named `mcp__playwright__*`. "An MCP" in casual use almost always means
+an MCP server.
+
+### Session
+
+One continuous conversation with its own accumulating context, ending when it is closed. Overloaded
+in this repository, so read it in context: a **session record** under `docs/03-sessions/` is the
+governed document written at the end of one, and a **terminal session** on the demo stage page is a
+shell behind a websocket. Governed phases are budgeted in sessions — one phase is meant to fit one.
+
+### Memory
+
+Anything deliberately written down so a later session can read it, since the context does not survive
+the conversation. Three kinds here: `brain/` holds model-agnostic Markdown entries — this file is one
+— `docs/05-memories/` holds governed cross-session context, and `CLAUDE.md` is loaded automatically
+every session. Not recall by the model: memory is a file that something chooses to read back.
+
+### Advanced topics, named but not covered in depth
+
+- **Hooks** — shell commands the harness runs automatically at fixed points in the loop, configured
+  in `settings.json`. None are configured in this repository; the equivalent guarantees here come
+  from `permissions.deny` and the governance check.
+- **Agent permissions** — the allow and deny rules deciding which tool calls run, prompt for
+  approval, or are refused. `.claude/settings.json` here denies writes to `AGENTS.md`, `CLAUDE.md`,
+  `_private/**` and `_data/ideas.jsonl`, enforcing in the harness what the working agreement states
+  in prose.
+- **Observability** — recording what an agent did (tool calls, tokens, cost, outcome) so a run can be
+  audited afterwards rather than reconstructed from its output.
+- **Agent SDK** — the library for building agents of your own on the same loop, tool and sub-agent
+  model, outside the CLI.
