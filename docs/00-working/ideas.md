@@ -4622,3 +4622,30 @@ Unresolved: whether sessions should outlive their websocket (detach/reattach), h
 **Links**
 
 - relates_to → `000070`
+
+---
+
+## 000088 · Rehearsal idea from dry-run 1
+
+**Created 2026-09-10T14:46:13-04:00 · Status: `open`**
+
+Recorded during the 2026-09-10 dry-run 1 rehearsal, phase-demo-05 (demo-validator-code timed
+walkthrough of the live-segment runbook). [Rehearsal entry: this idea is part of the demo record,
+not a real audience suggestion.] Placeholder content standing in for whatever prose an audience
+member offers on demo day; recorded solely to time the /idea step's sanctioned-writer path.
+
+---
+
+## 000089 · Demo fallback: audience idea seeded by tools/demo_reset.py
+
+**Created 2026-09-10T14:47:54-04:00 · Status: `open`**
+
+Seeded by `tools/demo_reset.py prepare` so the live-rebuild segment (REQ-006 R09) always has an idea to triage even if the audience does not supply one live. Labelled as the fallback seed by this exact title — `prepare` checks the folded idea state for this title before appending, so re-running `prepare` never seeds a duplicate. Real work per PLAN-021's afterlife decision: not reverted after the demo.
+
+---
+
+## 000090 · Rehearsal idea from phase-demo-05 second dry-run
+
+**Created 2026-09-10T14:49:28-04:00 · Status: `open`**
+
+Recorded during the 2026-09-10 dry-run rehearsal (demo-validator-code, phase-demo-05 worktree). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]

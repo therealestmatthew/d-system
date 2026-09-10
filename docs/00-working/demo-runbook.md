@@ -19,31 +19,64 @@ Record timings for two timed passes of the live segment. Each step carries an ex
 per-step times sum to at most 15 minutes. Stopping the timer and re-running `uv run python
 tools/demo_reset.py restore` is the fallback action named in the runbook for every step.
 
-### Dry-Run 1 (Date and time)
+### Dry-Run 1 — 2026-09-10, fresh-eyes rehearsal (D05-R, pack PROMPT-018), agent demo-validator-code
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | | |
-| /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | | Fallback: `uv run python tools/demo_reset.py restore` + continue with fallback idea |
-| /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | | Fallback: `uv run python tools/demo_reset.py restore` + continue with pre-built overview |
-| test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| **Total** | | **15m** | | |
+| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 8s | Failed to bind: ports 8010/5180 occupied by a peer agent's servers in `/code/d-system` (not this worktree). See Rehearsal Findings. |
+| /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000088, labelled a rehearsal entry. |
+| /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | 1s (discovery only) | The discovery query ran; the subagent-dispatch half did not — a rehearsal agent forbidden from dispatching subagents cannot complete this step. See Rehearsal Findings. |
+| plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
+| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | 1s | No `/overview-build` command exists; ran `tools/generate_overview.py` directly per the skill's own documented command. See Rehearsal Findings. |
+| test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | skipped-by-marking | Browser-executable; covered by D05-W. |
+| **Total (CLI-executable steps measured)** | | **15m** | **10s** | Partial: /idea-triage's subagent half unmeasured; total is not a complete R09 verification. |
 
-### Dry-Run 2 (Date and time)
+### Dry-Run 2 — 2026-09-10, fresh-eyes rehearsal (D05-R, pack PROMPT-018), agent demo-validator-code, after `uv run python tools/demo_reset.py prepare`
 
 **This pass is screen-recorded.** Screen recording path on presentation machine: `__RECORDING_PATH__`
 
 | Step | Command / Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | | |
-| /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | | Fallback: `uv run python tools/demo_reset.py restore` + continue with fallback idea |
-| /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | | Fallback: `uv run python tools/demo_reset.py restore` + continue with pre-built overview |
-| test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | | Fallback: `uv run python tools/demo_reset.py restore` + continue |
-| **Total** | | **15m** | | |
+| /orient | `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010` (backend); `cd ts && npm run dev -- --port 5180` (frontend); open http://localhost:5180; review the interface state | 1m | 14s | Same port collision as dry-run 1, unchanged (peer servers still bound to 8010/5180). |
+| /idea | `/idea <the idea in prose>` — a Claude Code slash command typed in the presenter's chat session (not a browser form or API call); wraps the sanctioned writer `tools/append_idea.py`. Skip to the already-seeded fallback idea if no audience idea is offered. | 2m | 0s | Recorded idea 000090, labelled a rehearsal entry. |
+| /idea-triage | `/idea-triage` — a Claude Code slash command (not a browser page); scouts the recorded idea and records a finding, moving it to `triaged` | 2m | not run | Not executed this pass — same subagent-dispatch restriction as dry-run 1. |
+| plan beat | Owner narrates the planning stage (no live CLI execution) | 3m | skipped-by-marking | Owner-performed. |
+| overview-skill rebuild | Run `/overview-build` or equivalent skill invocation; wait for page generation | 4m | 0s | `demo_reset.py prepare` had parked `.claude/skills/d-system-overview/`, so the skill is not at its active path when this step runs; ran `tools/generate_overview.py` directly. See Rehearsal Findings. |
+| test | Click through the generated overview page, verify talking-points panel cycles, confirm terminal still interactive | 3m | skipped-by-marking | Browser-executable; covered by D05-W. |
+| **Total (CLI-executable steps measured)** | | **15m** | **14s** | Partial: /idea-triage entirely unmeasured this pass; total is not a complete R09 verification. |
+
+## Rehearsal Findings (both fresh-eyes passes, 2026-09-10)
+
+These are moments a presenter would have to explain away, surfaced by two cold runs of this
+runbook. Recorded, not silently fixed — reported up per this build's governance protocol.
+
+1. **Port collision with a peer agent's dev servers.** Both passes found 8010 and 5180 occupied
+   by processes rooted at `/code/d-system` (not this worktree), unrelated to phase-demo-05. The
+   backend fails loudly (`address already in use`); the frontend does not — Vite silently falls
+   back to the next free port (`5181`) and prints it, so a presenter who only reads the runbook's
+   literal `http://localhost:5180` would land on a dead page. The runbook does not yet tell the
+   presenter to check port availability first or to read Vite's actual reported URL.
+2. **`/idea-triage` is marked CLI-executable "via shell commands," but its second step dispatches
+   a subagent** (`.claude/commands/idea-triage.md`). A rehearsal agent restricted from dispatching
+   subagents can run the discovery half but not complete the step, so neither fresh-eyes pass
+   produced a real timing for this step — the segment's second-largest timebox is unverified by
+   CLI-only rehearsal. The real presenter's Claude Code session can dispatch the subagent; this is
+   a rehearsal-tooling limitation, not proof the step is unusable, but it means R09's 15-minute
+   total has not yet been verified end to end by an agent.
+3. **`/overview-build` does not exist** as a slash command; only `.claude/commands/idea.md`,
+   `idea-triage.md`, `backlog.md`, `session-close.md` exist. The row's "or equivalent skill
+   invocation" hedge covers execution (both passes substituted `tools/generate_overview.py`), but
+   a presenter typing `/overview-build` literally would get an unrecognized-command result the
+   runbook does not anticipate.
+4. **Sequencing gap between `demo_reset.py prepare` and the overview-skill-rebuild step.**
+   `prepare` parks `.claude/skills/d-system-overview/` to `.claude/skills/_parked/` by design
+   (D05-C1). The runbook's overview-skill-rebuild step instructs invoking the skill, but after
+   `prepare` has run the skill is not discoverable at its active path — only `restore` (documented
+   as the failure fallback, not a required pre-step) puts it back. Both rehearsal passes worked
+   around this by calling `tools/generate_overview.py` directly rather than "invoking the skill" as
+   the step instructs. Whether the live segment's narrative intends the skill to stay parked
+   through this step (audience sees the deterministic tools run directly) or expects it restored
+   first is not resolved in this runbook and needs an owner decision, not an orchestrator guess.
 
 ## Step Markers
 
