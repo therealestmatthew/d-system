@@ -89,11 +89,14 @@ Applied in order when time runs short; each rung is independent of the ones belo
   zoom level, and the R06 smoke check from REQ-006 run and recorded before the session.
 - **Pre-demo git tag.** Tag the repository state before the session starts so anything recorded
   live (the idea log is append-only) is diffable against a known baseline afterwards.
-- **Demo reset.** `tools/demo_reset.py` returns the demo-visible state to the rehearsed baseline —
-  regenerated overview outputs, cleared scratch state, the pre-built overview skill parked
-  restorably, and the fallback audience idea seeded through the sanctioned writer (`PROMPT-017`).
-  It never deletes or rewrites idea-log content or any governed document; its only idea-log
-  access is appending through `tools/append_idea.py`.
+- **Demo reset.** `tools/demo_reset.py` has two subcommands (`PROMPT-017`): `prepare` sets the
+  stage — regenerated overview outputs, cleared scratch state, the pre-built overview skill
+  parked, the fallback audience idea seeded through the sanctioned writer — and `restore` is the
+  named fallback action that puts the pre-built skill back and regenerates from current data.
+  Page bytes always regenerate forward from the append-only log (the afterlife decision below
+  makes that intended, not drift); only the skill returns to its pre-built state. The tool never
+  deletes or rewrites idea-log content or any governed document; its only idea-log access is
+  appending through `tools/append_idea.py`.
 - **Screen hygiene.** Nothing from `_private/` on screen; notifications off; the terminal starts in
   the repository root with a clean scrollback; browser profile free of personal tabs and bookmarks.
 - **Recorded-dry-run fallback.** The second timed dry-run is screen-recorded, and a successful
@@ -127,6 +130,8 @@ performance of it.
 ## Afterlife
 
 Owner decision, 2026-09-10: everything the demo produces is kept as real work, not reverted. The
-idea recorded from the audience stays in the append-only log; the `phase-demo-*` phases are closed
-through `/session-close` like any other phase; and the generated overview page becomes a maintained
-feature of the repository rather than a prop.
+`phase-demo-*` phases complete through the adversarial-review + agentic-testing gate (the
+demo-track completion decision in `GOV-003`), with the owner reviewing retroactively. The
+idea recorded from the audience stays in the append-only log; the owner's retroactive review may
+run `/session-close` as an after-the-fact audit of the already-complete phases; and the generated
+overview page becomes a maintained feature of the repository rather than a prop.

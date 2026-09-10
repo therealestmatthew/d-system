@@ -4430,6 +4430,8 @@ items:
   - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D01-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
   deliverables:
   - src/demo
   - src/api/routes/demo_terminal.py
@@ -4481,6 +4483,11 @@ items:
   - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D02-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright browser verification (demo-validator-web, pack D02-W) covering zero page
+    scroll
+    and no overlap at the four sizes, popup behavior, terminal echo, rotator content
   deliverables:
   - ts/src
   - ts/package.json
@@ -4526,6 +4533,8 @@ items:
   - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D03-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
   deliverables:
   - tools/overview_metrics.py
   - tools/overview_inventory.py
@@ -4570,6 +4579,9 @@ items:
   - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D04-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright verification of the generated page (demo-validator-web, pack D04-W)
   deliverables:
   - tools/generate_overview.py
   - docs/08-governance/OPS-014-generate-overview.md
@@ -4605,11 +4617,12 @@ items:
     plan beat, overview-skill rebuild, test — PROMPT-017), each step carrying its
     commands, its fallback action and a timebox, the timeboxes summing inside 15
     minutes (REQ-006 R09).
-  - Build tools/demo_reset.py with OPS-013 — returns demo-visible state to the
-    rehearsed baseline (regenerated overview outputs, cleared scratch state), parks
-    the pre-built overview skill restorably, and seeds the fallback audience idea
-    through tools/append_idea.py, without ever deleting or rewriting idea-log
-    content or governed documents.
+  - Build tools/demo_reset.py with OPS-013, with two subcommands — prepare (regenerate
+    overview outputs, clear scratch state, park the pre-built overview skill, seed
+    the fallback audience idea through tools/append_idea.py) and restore (put the
+    parked skill back and regenerate from current data) — without ever deleting or
+    rewriting idea-log content or governed documents. Page bytes regenerate forward
+    from the append-only log; only the skill returns to its pre-built state.
   - Write the Windows machine setup checklist per PLAN-021, including the pre-demo
     git tag step and screen hygiene, and run the REQ-006 R06 terminal smoke check on
     the presentation machine.
@@ -4620,9 +4633,10 @@ items:
     their times are recorded in the runbook (REQ-006 R09).
   - The R06 smoke check on the presentation machine is recorded as passing in the
     runbook.
-  - Running demo_reset.py after a rehearsal restores the rehearsed baseline (parked
-    skill, seeded fallback idea, regenerated outputs) while never deleting or
-    rewriting idea-log content or governed documents; its only idea-log access is
+  - demo_reset.py prepare parks the skill, seeds the fallback idea without
+    duplication, and regenerates outputs; demo_reset.py restore returns the
+    pre-built skill byte-identical; both are double-run idempotent and never delete
+    or rewrite idea-log content or governed documents — the only idea-log access is
     appending through tools/append_idea.py.
   verification:
   - uv run pytest
@@ -4630,6 +4644,10 @@ items:
   - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D05-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright rehearsal pass over the runbook's browser-marked steps (demo-validator-web,
+    pack D05-W)
   deliverables:
   - ts/public/talking-points.json
   - tools/demo_reset.py

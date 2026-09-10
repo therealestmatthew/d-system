@@ -91,6 +91,20 @@ residue (the OPS-013 dispatch missing the reservation-removal instruction), fixe
 commit. The audit also exposed that the first gate's "commands runnable as written" check never
 ran the commands — the re-gate runs `ruff` and governance for real.
 
+## Completion-gate substitution
+
+Owner decision after the audit (2026-09-10): the mid-build `/session-close` pauses are replaced
+by an adversarial-review + agentic-testing completion gate, recorded as the demo-track completion
+decision in `GOV-003` — the coordinator marks a demo phase `complete` once its gate is green and
+the branch is integrated with the owner's approval, and the owner reviews retroactively. In
+support: the roster grew to ten (`demo-adversary` for per-phase adversarial review;
+`demo-validator-web` driving a real browser through the Playwright MCP server now configured in
+`.mcp.json`); the delegation pack gained the five D0N-A adversarial dispatches and the
+D02-W/D04-W/D05-W browser dispatches; `PROMPT-015` steps 8–9 now run the gate and the completion
+edit; `PROMPT-012` records the roster amendment; and REQ-006 rows R02/R03 verification became
+Playwright-executed instead of manual. The integration ask to the owner at each phase boundary is
+unchanged.
+
 ## Unresolved
 
 - The live demo plan (`PLAN-021`) carries `status: draft`; the owner's review flips it to

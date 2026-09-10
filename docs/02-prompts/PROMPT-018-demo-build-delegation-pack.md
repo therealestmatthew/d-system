@@ -31,6 +31,12 @@ Conventions used by every section:
   agent; never re-run it from scratch (idea `000077`).
 - Validator dispatches carry only the diff reference, the requirement text and the commands —
   never a creator's rationale.
+- **Completion gate**: per the demo-track completion decision in `GOV-003`, each phase's D0N-A
+  (adversarial review, `demo-adversary`) and — for browser-facing phases — D02-W/D04-W/D05-W
+  (Playwright browser checks, `demo-validator-web`) are dispatched by the **coordinator** at
+  PROMPT-015 step 8, not by the orchestrators. A phase is marked `status: complete` by the
+  coordinator only after this gate is green and the branch is integrated with the owner's
+  approval; the owner reviews retroactively.
 
 ---
 
@@ -244,6 +250,30 @@ Checklist:
 Stop when every item has a recorded real result and the overall verdict is stated.
 ```
 
+### D01-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-01. Branch:
+agent/phase-demo-01. Ports: backend 8010, frontend 5180.
+
+Adversarially review phase-demo-01 (the demo terminal backend). Assume it is broken; find where
+it fails. Specifications: the phase's backlog entry; REQ-006 rows R04 and R05
+(docs/06-requirements/REQ-006-live-demo.md); docs/04-decisions/ADR-013-demo-terminal-capability.md.
+Attack at minimum: whether the route is truly absent (not merely refusing) with the flag unset;
+whether the non-loopback fail-fast is enforced in code and actually exercised by a test, or a
+--host 0.0.0.0 launch with the flag set still starts; whether the adapter's platform detection
+and shell override do what the tests claim rather than what they mock; whether pywinpty could be
+imported on Linux through any path; whether any test passes vacuously; whether the diff touches
+anything outside the declared deliverables; whether anything here will break phase-demo-02's
+wiring. Run commands to turn suspicion into evidence.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
 ---
 
 ## D02 — phase-demo-02: stage frontend (orchestrator: `demo-orch-stage`)
@@ -256,9 +286,10 @@ what is missing; report what already existed.
 
 Agent: demo-orch-stage. Phase: phase-demo-02 (build the stage frontend with the zero-scroll
 layout; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-01 being integrated into dev AND closed by the owner's /session-close (status:
-complete in the backlog) — confirm both before claiming; the governance validator rejects an
-active phase whose prerequisite is not complete, and only the owner can complete one.
+phase-demo-01 being integrated into dev AND marked status: complete by the coordinator after its
+adversarial-review + agentic-testing gate (the demo-track completion decision in GOV-003) —
+confirm both before claiming; the governance validator rejects an active phase whose
+prerequisite is not complete.
 Worktree: /code/d-system-worktrees/phase-demo-02. Branch: agent/phase-demo-02, from dev.
 Ports: backend 8010, frontend 5180.
 
@@ -441,6 +472,64 @@ Checklist:
 6. The diff against dev touches nothing outside ts/.
 
 Stop when every item has a recorded real result and the overall verdict is stated.
+```
+
+### D02-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-02. Branch:
+agent/phase-demo-02. Ports: backend 8010, frontend 5180.
+
+Adversarially review phase-demo-02 (the stage frontend). Assume it is broken; find where it
+fails. Specifications: the phase's backlog entry; REQ-006 rows R01–R04; PLAN-021's descope
+ladder. Attack at minimum: whether the zero-scroll claim is structural (fixed page height,
+internal panel overflow) or just happens to hold at the developer's window size; whether the
+fallback layout states actually switch as documented; whether any talking-points copy leaked
+into component code; whether the proxy default was repointed despite the configurable-target
+requirement; whether the absent-route message actually renders when the backend flag is unset or
+only when the backend is down entirely; whether npm run build hides type errors the components
+carry. Run the build and read the code; the D02-W browser dispatch measures the rendered
+behavior — your job is what the code will do outside the happy path.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
+### D02-W — browser verification (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-web. Worktree: /code/d-system-worktrees/phase-demo-02. Branch:
+agent/phase-demo-02. Ports: backend 8010, frontend 5180.
+
+In the worktree, start the backend with the terminal enabled
+(D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010) and the frontend
+(cd ts && npm run dev -- --port 5180, with the proxy configured for :8010 per the phase's
+configurable-target mechanism). Then verify in the browser, mechanically:
+
+1. At 1280x720, 1366x768, 1920x1080 and 1024x768: the page has no scrollable overflow
+   (document scrollHeight <= viewport height, assert via evaluation) and no two of the three
+   region bounding boxes intersect. Screenshot each size.
+2. Overflowing content is reachable through its in-place control (tab/expander/button) at the
+   smallest size.
+3. A hover-triggered popup collapses when the pointer moves away; a click-triggered popup closes
+   from its visible dismiss control.
+4. Terminal round-trip: type a command (e.g. echo demo-web-check) into the embedded terminal and
+   assert its output appears in the terminal region.
+5. Rotator: the entries rendered match the content of ts/public/talking-points.json; the
+   next/previous control changes the visible entry.
+6. Restart the backend WITHOUT the flag and confirm the stage shows the clear absent-terminal
+   message rather than a raw connection error.
+7. browser_console_messages shows no uncaught errors across the above.
+
+Stop each server you started. Stop when every item has a recorded pass/fail with the measured
+evidence (assertion values, screenshot names, console output) — or when the stage cannot start,
+reported with the real startup output as a blocking finding.
 ```
 
 ---
@@ -643,6 +732,29 @@ Checklist:
 Stop when every item has a recorded real result and the overall verdict is stated.
 ```
 
+### D03-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-03. Branch:
+agent/phase-demo-03. Ports: backend 8010, frontend 5180 (not needed by this phase).
+
+Adversarially review phase-demo-03 (the deterministic overview tools). Assume it is broken; find
+where it fails. Specifications: the phase's backlog entry; REQ-006 row R07; idea 000071's metric
+set (read via fold(), never the raw log). Attack at minimum: whether any code path reads
+_data/ideas.jsonl without going through fold()/load_events(); whether determinism survives a
+dict-ordering or locale change rather than merely two same-process runs; whether the
+"independent recomputation" in the tests actually recomputes or just calls the same function
+twice; whether zero-count categories are really emitted; whether a metric's number is simply
+wrong against a hand count you perform on the real log; whether the OPS documents describe the
+tools as built or as specified.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
 ---
 
 ## D04 — phase-demo-04: overview skill, templates, generation (orchestrator: `demo-orch-data`)
@@ -655,9 +767,10 @@ what is missing; report what already existed.
 
 Agent: demo-orch-data. Phase: phase-demo-04 (build the overview skill, templates and page
 generation; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-03 being integrated into dev AND closed by the owner's /session-close (status:
-complete in the backlog) — confirm both before claiming; the governance validator rejects an
-active phase whose prerequisite is not complete, and only the owner can complete one.
+phase-demo-03 being integrated into dev AND marked status: complete by the coordinator after its
+adversarial-review + agentic-testing gate (the demo-track completion decision in GOV-003) —
+confirm both before claiming; the governance validator rejects an active phase whose
+prerequisite is not complete.
 Worktree: /code/d-system-worktrees/phase-demo-04. Branch: agent/phase-demo-04, from dev.
 Ports: backend 8010, frontend 5180 (not needed by this phase).
 
@@ -873,6 +986,54 @@ Checklist:
 Stop when every item has a recorded real result and the overall verdict is stated.
 ```
 
+### D04-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-04. Branch:
+agent/phase-demo-04. Ports: backend 8010, frontend 5180 (not needed by this phase).
+
+Adversarially review phase-demo-04 (overview skill, templates, generation). Assume it is broken;
+find where it fails. Specifications: the phase's backlog entry; REQ-006 row R08; PLAN-021
+descope rung 1. Attack at minimum: whether the generator recomputes any number the phase-demo-03
+tools own (compare a rendered figure against the tool's own output on the real repository);
+whether the double-generation identity holds because it is deterministic or because the test
+compares too little; whether the skill instructs anything that edits the generated page or
+restates numbers from model memory; whether the page truly has no external network dependency;
+whether the table fallback exists and renders, or only the charts do; whether OPS-014 and the
+skill describe what was built.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
+### D04-W — browser verification of the generated page (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-web. Worktree: /code/d-system-worktrees/phase-demo-04. Branch:
+agent/phase-demo-04. Ports: backend 8010, frontend 5180 (not needed — this page is static).
+
+Open the generated overview page under _public/overview/ in the worktree directly in the browser
+(file:// is fine). Verify mechanically:
+
+1. The page renders with no uncaught console errors and no failed network request to any
+   non-local URL (browser_network_requests must show no external host).
+2. Every metrics block renders either its chart or its table fallback — none renders empty.
+3. Spot-check one figure: read the corresponding value from the phase-demo-03 tool's JSON output
+   in the worktree and assert the page displays the same number.
+4. The concepts/terminology and systems inventories are present and non-empty, and the systems
+   count matches docs/08-governance/systems.yaml's entry count.
+5. Screenshot the full page once at 1366x768.
+
+Stop when every item has a recorded pass/fail with the measured evidence — or when the page does
+not exist at the stated path, reported as a blocking finding.
+```
+
 ---
 
 ## D05 — phase-demo-05: content, runbook, reset, rehearsals (orchestrator: `demo-orch-content`)
@@ -885,10 +1046,10 @@ what is missing; report what already existed.
 
 Agent: demo-orch-content. Phase: phase-demo-05 (demo content, runbook, reset tool and
 rehearsals; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-01 through phase-demo-04 being integrated into dev AND closed by the owner's
-/session-close (status: complete in the backlog) — confirm all four before claiming; the
-governance validator rejects an active phase whose prerequisite is not complete, and only the
-owner can complete one.
+phase-demo-01 through phase-demo-04 being integrated into dev AND marked status: complete by the
+coordinator after each phase's adversarial-review + agentic-testing gate (the demo-track
+completion decision in GOV-003) — confirm all four before claiming; the governance validator
+rejects an active phase whose prerequisite is not complete.
 Worktree: /code/d-system-worktrees/phase-demo-05. Branch: agent/phase-demo-05, from dev.
 Ports: backend 8010, frontend 5180.
 
@@ -902,7 +1063,8 @@ Ports: backend 8010, frontend 5180.
    committed.
 4. Yourself (this is the one authoring task that is yours): write the final talking-points copy
    into ts/public/talking-points.json per D05-O, replacing the placeholders.
-5. Dispatch D05-R (fresh-eyes rehearsal) twice, separated by a demo reset; record both runs'
+5. Dispatch D05-R (fresh-eyes rehearsal) twice, separated by uv run python tools/demo_reset.py
+   prepare; record both runs'
    per-step times in the runbook.
 6. Dispatch D05-G as the phase gate.
 7. Run the phase's verification commands yourself in the worktree and paste real output:
@@ -930,21 +1092,33 @@ what is missing; report what already existed.
 Agent: demo-creator-py. Worktree: /code/d-system-worktrees/phase-demo-05. Branch:
 agent/phase-demo-05. Ports: backend 8010, frontend 5180 (not needed by this item).
 
-Build tools/demo_reset.py: returns demo-visible state to the rehearsed baseline, preparing the
-stage for a rehearsal or the live run. It does four things, per the rehearsal gate
-(docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md): regenerates the overview outputs via
-tools/generate_overview.py; clears demo scratch state (list explicitly in the tool what it
-clears); PARKS the pre-built overview skill (moves .claude/skills/d-system-overview/ aside to a
-parked location it owns and can restore from — the live segment rebuilds the skill, and the
-fallback for every step is un-parking it); and SEEDS the fallback audience idea by running
-tools/append_idea.py (the sanctioned writer; appending an event is permitted — what is forbidden
-is deleting or rewriting the log). Hard limits, enforced in code with an explicit path
-allowlist: it never deletes or rewrites _data/ideas.jsonl or any file under docs/ except
-regenerated outputs it owns; its only idea-log access is appending through tools/append_idea.py;
-it never touches _private/, .agents/, .codex/, AGENTS.md or CLAUDE.md; running it twice in a row
-is safe — the second run reports nothing to do and does not seed a duplicate idea. Add tests in
-the phase's test scope proving the allowlist refuses an out-of-scope path, the park/restore
-round-trip, the no-duplicate-seed check, and the double-run idempotence.
+Build tools/demo_reset.py with two explicit subcommands, per the rehearsal gate
+(docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md):
+
+- `prepare` — sets the stage for a rehearsal or the live run: regenerates the overview outputs
+  via tools/generate_overview.py; clears demo scratch state (list explicitly in the tool what it
+  clears); PARKS the pre-built overview skill (moves .claude/skills/d-system-overview/ aside to
+  a parked location the tool owns); and SEEDS the fallback audience idea by running
+  tools/append_idea.py IF an idea labelled as the fallback seed is not already present in the
+  folded state (the sanctioned writer; appending is permitted — deleting or rewriting the log
+  never is).
+- `restore` — the fallback and post-segment action the runbook invokes by name: puts the parked
+  pre-built skill back in place and regenerates the overview outputs from current data.
+
+Contract to state in the tool's own help text: "pre-built state" means the pre-built SKILL is
+back in place; the overview page is always regenerated from current data, which grows as ideas
+are appended — the log is append-only, so byte-identical pre-rehearsal page output is
+deliberately NOT the contract (PLAN-021's afterlife decision keeps demo-recorded ideas as real
+work, and the page reflecting them is intended behavior).
+
+Hard limits, enforced in code with an explicit path allowlist: it never deletes or rewrites
+_data/ideas.jsonl or any file under docs/ except regenerated outputs it owns; its only idea-log
+access is appending through tools/append_idea.py; it never touches _private/, .agents/, .codex/,
+AGENTS.md or CLAUDE.md. Running either subcommand twice in a row is safe: a second `prepare`
+reports nothing to do and seeds no duplicate idea; a second `restore` reports the skill already
+in place. Add tests in the phase's test scope proving the allowlist refuses an out-of-scope
+path, the prepare→restore round-trip returns the skill to its original content, the
+no-duplicate-seed check, and both subcommands' double-run idempotence.
 
 Run in the worktree and paste real output: uv run pytest; uv run ruff check src/ test/;
 uv run mypy src/.
@@ -964,13 +1138,18 @@ agent/phase-demo-05. Ports: backend 8010, frontend 5180 (not needed by this item
 
 Diff: git diff dev...agent/phase-demo-05 -- tools/demo_reset.py test/
 
-Requirement text: the reset restores the rehearsed baseline (regenerated overview outputs,
-cleared scratch state), parks the pre-built overview skill restorably, and seeds the fallback
-audience idea only through tools/append_idea.py without duplicating it on a re-run. It can never
-delete or rewrite idea-log content, governed documents, _private/, .agents/, .codex/, AGENTS.md
-or CLAUDE.md — the protection must be an explicit allowlist in code, not a comment. Double-run
-idempotent. Tests prove the refusal, the park/restore round-trip, the no-duplicate seed, and the
-idempotence.
+Requirement text: the tool exposes two subcommands. `prepare` regenerates overview outputs,
+clears scratch state, parks the pre-built overview skill, and seeds the fallback audience idea
+only through tools/append_idea.py without duplicating it on a re-run. `restore` — a real,
+separately invokable operation, not an internal test helper — puts the parked pre-built skill
+back byte-identical and regenerates the outputs from current data. The tool's contract must
+state that page content regenerates forward from the append-only log (byte-identical
+pre-rehearsal page output is explicitly not claimed); a tool or test claiming to restore
+pre-rehearsal page bytes is a failing finding, and so is a runbook-named restore capability that
+does not exist. It can never delete or rewrite idea-log content, governed documents, _private/,
+.agents/, .codex/, AGENTS.md or CLAUDE.md — the protection must be an explicit allowlist in
+code, not a comment. Both subcommands double-run idempotent. Tests prove the refusal, the
+prepare→restore skill round-trip, the no-duplicate seed, and both idempotences.
 
 Commands: uv run pytest; uv run ruff check src/ test/; uv run mypy src/.
 
@@ -998,13 +1177,15 @@ Three documents:
    (docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md): /orient → record an idea (/idea) →
    triage it (/idea-triage) → plan beat → overview-skill rebuild → test, one section per step.
    Each step carries: the exact commands it runs, its timebox (the column sums to at most 15
-   minutes), and its fallback action — for every step, the same action: un-park the pre-built
-   skill via the reset tool's restore and continue the narrative. The skeleton also carries: the
+   minutes), and its fallback action — for every step, the same literal command: run
+   `uv run python tools/demo_reset.py restore` and continue the narrative with the pre-built
+   skill. The skeleton also carries: the
    descope ladder copied verbatim from docs/01-plans/PLAN-021-live-demo.md; empty dry-run
    recording tables for two rehearsals; a named line for the second dry-run's screen-recording
    path on the presentation machine (the recording is a rehearsal-gate deliverable); a marker on
-   each step that is agent-executable versus owner-performed visual check (page scroll, popup
-   behavior, terminal rendering — no roster agent has browser tooling); and a note that ideas
+   each step as CLI-executable (run by the D05-R rehearsal), browser-executable (run by the
+   D05-W Playwright pass — page scroll, popup behavior, terminal rendering), or owner-performed
+   (Windows-machine-only items); and a note that ideas
    recorded during rehearsal are permanent in the append-only log and must be labelled as
    rehearsal entries in their body text.
 3. docs/00-working/demo-windows-setup.md — ungoverned: the Windows machine checklist from
@@ -1057,9 +1238,10 @@ Diff: none — this is a rehearsal, not a review.
 Requirement text: docs/00-working/demo-runbook.md is the script; REQ-006 row R09
 (docs/06-requirements/REQ-006-live-demo.md) is the contract: every step completes inside its
 timebox and the whole segment inside 15 minutes. You have not seen this demo built; that is the
-point. Follow the runbook exactly as written, cold: run each agent-executable step's commands,
-time each step (date +%s before and after), skip steps the runbook marks owner-performed (record
-them as skipped-by-marking, with no time), and record what a presenter would have to explain
+point. Follow the runbook exactly as written, cold: run each CLI-executable step's commands,
+time each step (date +%s before and after), skip steps the runbook marks browser-executable
+(covered by the D05-W Playwright pass) or owner-performed (record both kinds as
+skipped-by-marking, with no time), and record what a presenter would have to explain
 away — a confusing output, a step whose instructions do not match reality, a missing
 precondition. Do not fix anything. Executing a runbook step whose command is the sanctioned idea
 writer (tools/append_idea.py) or a generation tool is execution, not editing — run it as
@@ -1108,4 +1290,52 @@ Checklist:
 9. The diff against dev touches nothing outside the phase's deliverable paths.
 
 Stop when every item has a recorded real result and the overall verdict is stated.
+```
+
+### D05-A — adversarial review (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-demo-05. Branch:
+agent/phase-demo-05. Ports: backend 8010, frontend 5180.
+
+Adversarially review phase-demo-05 (content, runbook, reset, rehearsals). Assume it is broken;
+find where it fails. Specifications: the phase's backlog entry; REQ-006 row R09;
+docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md; PLAN-021's demo-day operational requirements.
+Attack at minimum: whether demo_reset's allowlist is actually enforced in code (feed it an
+out-of-scope path); whether park/restore of the overview skill round-trips and a double run
+really seeds no duplicate idea; whether the runbook's steps would survive a presenter who knows
+nothing (run one cold yourself); whether the recorded dry-run times are real measurements or
+placeholders; whether the timeboxes sum as claimed; whether the talking-points copy contains
+anything unfit for a projector (length, jargon, placeholder residue); whether the Windows
+checklist verifies what PROMPT-017's gate expects rather than re-installing a completed setup.
+
+Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
+scenario) or the explicit statement that none survived, plus supporting output, are reported.
+```
+
+### D05-W — rehearsal browser pass (dispatched by the coordinator, PROMPT-015 step 8)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-web. Worktree: /code/d-system-worktrees/phase-demo-05. Branch:
+agent/phase-demo-05. Ports: backend 8010, frontend 5180.
+
+Companion to the D05-R command-line rehearsal: execute the runbook's browser-marked checks
+against the full running stage. In the worktree, start the backend with the terminal enabled
+(D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010) and the frontend
+(cd ts && npm run dev -- --port 5180), then walk every runbook step marked browser-executable
+in docs/00-working/demo-runbook.md, in order, timing each (assert timebox compliance), with the
+mechanical assertions of D02-W (no page scroll, no overlap, popup behavior, terminal echo) plus
+whatever the runbook step itself specifies. Record any moment a presenter would have to explain
+away. Steps the runbook marks owner-performed (Windows-machine-only items) are recorded as
+skipped-by-marking.
+
+Stop each server you started. Stop when every browser-marked step has a recorded pass/fail with
+timing and evidence — or when the stage cannot start, reported with the real startup output as a
+blocking finding.
 ```

@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-07'
+updated: '2026-09-10'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -218,7 +218,27 @@ governance discovery loop, not merely emptied of files — the same cost ADR-006
 the original code-system migration. See [PLAN-018](../01-plans/PLAN-018-plans-directory-consolidation.md)
 and [REQ-004](../06-requirements/REQ-004-plans-directory-consolidation.md), delivered by `phase-plc-01`.
 
-## Decisions reserved until evidence exists
+## The demo track completes through its testing gate, not through /session-close
+
+Owner decision, 2026-09-10, for the five `phase-demo-*` phases only. The backlog validator rejects
+an active phase whose prerequisite is not `status: complete`, and the demo build (PROMPT-014)
+cannot pause for an owner-run `/session-close` at every phase boundary on demo day. The owner
+substituted the completion authority for this track: a demo phase is marked `complete` by the
+build coordinator once its gate has passed — every verification command green with output
+captured, the phase's adversarial review (`demo-adversary`) with findings fixed or explicitly
+reported, and, for phases with a browser-facing deliverable, the Playwright-driven web checks
+(`demo-validator-web`) — and the branch is integrated onto `dev` with the owner's approval. The
+completion edit is one small commit on `dev` immediately after that integration.
+
+What is bought and what is conceded. The section above this one records why an agent must never
+decide a session is over; this decision consciously narrows that rule for one track, trading the
+owner's synchronous judgment for an adversarial gate plus **retroactive** owner review — the owner
+reads the session records and may run `/session-close` afterwards as an audit of phases already
+complete. The integration ask is unchanged: merging onto `dev` still requires the owner each time,
+so a human remains in the loop at every boundary; what moved is only which authority flips the
+status field. Everywhere outside `phase-demo-*`, `/session-close` remains the only path to
+`status: complete`, and the checkpoint skill's never-complete rule stands unmodified (its text is
+currently a `phase-port-01` deliverable and was deliberately not edited for this exception).
 
 Semantic provider, private/cloud data boundary, storage and quality targets belong to deferred `phase-mem-15`. No provider was selected or memory transmission authorized by the questionnaire. Agentic refinement additionally requires evidence that the simpler retrieval stages leave useful work unresolved. The optional periodic memory-review phase packages an opt-in trigger; it does not activate a scheduler or automate approval/deletion.
 

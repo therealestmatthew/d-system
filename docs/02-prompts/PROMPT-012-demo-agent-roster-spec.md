@@ -51,6 +51,14 @@ designed; orchestrators need the `Agent` tool in their `tools` list, workers mus
 | `demo-creator-docs` | haiku | medium | 30 | Read, Grep, Glob, Bash, Write | OPS docs, templated checklists, runbook skeleton. Talking-points *copy* is NOT theirs — it is audience-facing and belongs to `demo-orch-content` (sonnet) |
 | `demo-validator-code` | sonnet | medium | 40 | Read, Grep, Glob, Bash | Reviews a diff against its requirement and runs the verification commands. Receives the diff, the requirement text and the commands — **never the creator's rationale** |
 | `demo-validator-check` | haiku | medium | 30 | Read, Grep, Glob, Bash | Mechanical gates: governance run, staged private-content check, schema and drift checks, frontmatter and checklist audits |
+| `demo-adversary` | sonnet | high | 50 | Read, Grep, Glob, Bash | Adversarial per-phase review of the branch diff against spec and repository reality — part of the demo-track completion gate (`GOV-003`) |
+| `demo-validator-web` | sonnet | medium | 50 | Read, Grep, Glob, Bash, mcp__playwright | Playwright-driven browser verification of the stage and generated pages (zero-scroll, popups, terminal echo, rendered figures) — part of the same gate |
+
+**Amended 2026-09-10 (owner decision).** The roster grew from eight to ten: the owner substituted
+the mid-build `/session-close` pauses with an adversarial-review + agentic-testing completion gate
+(recorded in `GOV-003`), which needs a dedicated adversarial reviewer and a browser-driving
+validator using the Playwright MCP server configured in `.mcp.json`. The model policy above is
+unchanged and still binding — both additions are sonnet, and opus remains never pre-assigned.
 
 Each definition's body states: its single responsibility, what it must produce, what it must never
 do, and its stop condition (deliverables exist and verification output is pasted, or a blocking

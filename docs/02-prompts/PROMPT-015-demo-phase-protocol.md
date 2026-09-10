@@ -53,12 +53,18 @@ governs.
    verification command from the backlog phase passes with output captured; deliverables exist;
    `git rebase dev` is clean and the post-rebase governance + pytest run is green; the staged
    private-content check passes.
-8. Write/update the session record via the checkpoint skill (the orchestrator's report is the
-   input). The phase stays `active` or returns to `queued` with an exact `next_action` — never
-   `complete`.
-9. Report the branch ready for the owner's integration decision. After an approved merge, remove
-   the worktree and delete the branch; after integrating anything, tell the still-running
-   orchestrators to rebase their branches onto `dev`.
+8. Run the phase's completion gate (the demo-track completion decision in `GOV-003`): dispatch
+   the phase's adversarial review (`demo-adversary`, pack section D0N-A) and, for a phase with a
+   browser-facing deliverable, the Playwright web checks (`demo-validator-web`, pack sections
+   D02-W / D04-W / D05-W) — at most two fix cycles for findings, then escalate to the owner.
+   Write/update the session record via the checkpoint skill (the orchestrator's report is the
+   input); the checkpoint itself never sets `complete`.
+9. Report the branch ready for the owner's integration decision. After the approved merge, and
+   only if step 8's gate is green, set the phase `status: complete` on `dev` — with `session`,
+   `completion_evidence` and `result` recording what actually happened — in one small commit, per
+   the demo-track completion decision in `GOV-003`; the owner reviews retroactively. Then remove
+   the worktree and delete the branch, and tell the still-running orchestrators to rebase their
+   branches onto `dev`.
 
 ## Collisions
 
