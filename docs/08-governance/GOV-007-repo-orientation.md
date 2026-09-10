@@ -31,7 +31,7 @@ _data/
   ideas.jsonl            ← append-only idea event log
   projects/              ← one JSON per project
   commitments/           ← one JSON per commitment
-  tasks/                 ← one JSON per task, pointing back at its commitment
+  tasks/                 ← one JSON per task; may name a parent commitment or project
   people/                ← one JSON per person/stakeholder
 brain/                   ← shared memory entries (Markdown + YAML frontmatter)
 ```
@@ -51,10 +51,14 @@ than portfolio content, and are always read from the tracked tree.
 
 ### Schema files: `schemas/` (JSON Schema for validation)
 
-One schema per entity, invoked by the source preflight before every rebuild — `project`,
-`person`, `commitment`, `task`, `tag`, `memory` and `idea` cover the core entities; the rest cover
-capture, governance and backlog records. `sys-contracts` in [systems.yaml](systems.yaml) lists the
-set the preflight enforces.
+One schema per entity. The source preflight runs before every rebuild and enforces eleven of them:
+the eight entity directories in `ENTITY_DIRECTORIES` (`src/db/source_validation.py`) — `project`,
+`person`, `commitment`, `task`, `interaction`, `decision`, `waiting-on` and `development-event` —
+plus `tag`, `memory` and `idea`, validated separately in the same module. The remaining schemas
+cover capture, governance and backlog records and are checked elsewhere.
+
+`sys-contracts` in [systems.yaml](systems.yaml) still describes this as six schemas and omits
+`task`. It is stale; `src/db/source_validation.py` is the authority until a phase corrects it.
 
 ### DDL: `sql/001_schema.sql`, views in `sql/003_capture_views.sql`
 
@@ -64,8 +68,9 @@ Entity tables: `projects`, `people`, `tags`, `commitments`, `tasks`, `interactio
 `project_last_touched`, `unfiled`.
 
 Key relationships:
-- Tasks are their own records in `_data/tasks/` and reference their owning commitment by
-  `commitment_id`; the rebuild loads them straight into the `tasks` table
+- Tasks are their own records in `_data/tasks/` and name their owning commitment by
+  `commitment_id`; the rebuild loads them straight into the `tasks` table. Both parents are
+  optional — a parentless task is intended, and the `unfiled` view exists to keep it visible
 - `tags` field on project JSON is denormalized into both the `projects.tags` array column and the `project_tags` junction table
 - `project_people` is populated from the `projects` array inside each person's JSON
 - `ideas` is folded from the `idea_events` log rather than stored directly; read it through

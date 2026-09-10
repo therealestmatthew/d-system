@@ -107,8 +107,9 @@ cd ts && npm run build                             # Frontend build
 - `confidence`: `high` | `medium` | `low` | `uncertain`
 - `scope`: `global` | `project` | `session`
 
-`brain/index.md` lists the current entries. Adding one is a documented procedure —
-`brain/procedures/add-brain-memory.md`.
+Adding an entry is a documented procedure — `brain/procedures/add-brain-memory.md`.
+`uv run python -m src.governance` reports how many entries exist; `brain/index.md` is a
+hand-curated index and does not currently list them all.
 
 ---
 

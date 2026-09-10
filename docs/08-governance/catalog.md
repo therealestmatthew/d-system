@@ -159,6 +159,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-10-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-07-demo-content-runbook-reset-rehearsals.md |
 | SESS-2026-09-10-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-08-demo-build-coordination.md |
 | SESS-2026-09-10-09 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-09-workbench-planning.md |
+| SESS-2026-09-10-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-10-readme-orientation-audit.md |
 
 ## Plans and their phases
 
@@ -207,4 +208,4 @@ CI regenerates it and fails on any difference.
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-152 documents — adr: 15, architecture: 5, governance: 8, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 48.
+153 documents — adr: 15, architecture: 5, governance: 8, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 49.
