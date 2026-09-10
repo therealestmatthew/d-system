@@ -4827,7 +4827,8 @@ items:
   - sys-brain
   - sys-portfolio
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-demo-glossary
   priority: 1
   session_budget: 1
   depends_on: []
