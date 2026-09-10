@@ -41,8 +41,9 @@ Mannered prose substitute metaphor and flourish for direct statement. Instead of
 
 It carries the rules this file deliberately does not repeat: how to pick up work from the backlog
 queue, the requirement-and-plan-before-code expectation, document code allocation, the governance
-check, the concurrent-agent protocol, and the standing rule that **no agent pushes without asking**
-and **never writes a confidential identifier into a tracked file**.
+check, the concurrent-agent protocol, and the standing rules that an agent **asks before integrating
+a feature branch into the integration branch** — though pushing its own branch to `origin` needs no
+approval — and **never writes a confidential identifier into a tracked file**.
 
 This file is orientation only — what the project is and where things live. If it ever contradicts
 AGENTS.md, AGENTS.md wins.
@@ -65,8 +66,8 @@ Keep it to three things:
 2. **Explicit instructions** an agent must act on before it can do anything else, like reading
    AGENTS.md first.
 3. **Mission-critical facts worth duplicating** despite the drift risk. The bar is that being
-   unaware of it for one turn causes irreversible harm. The publishing rule above clears it: this
-   repository now has a remote, and an agent that pushes without asking cannot take it back.
+   unaware of it for one turn causes irreversible harm. The integration rule above clears it: work
+   merged onto the trunk without approval cannot be cleanly taken back once peers build on it.
    Convenience never clears it.
 
    The no-remote rule that stood here until 2026-09-09 is the cautionary case for this whole

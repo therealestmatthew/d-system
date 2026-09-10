@@ -46,8 +46,12 @@ one-time instruction not to push, and shipped inside a commit about unrelated st
 - **The repository has a remote, and history is public-capable.** The confidentiality sweep
   ([PLAN-006](docs/01-plans/PLAN-006-confidentiality-sweep.md)) completed on 2026-09-09: history was
   squashed to a single commit, verified to name no confidential identifier in any path or blob, and
-  only then pushed to `origin`. **Ask before pushing.** Committing during normal work is fine;
-  publishing is the owner's call, and what leaves this machine cannot be recalled.
+  only then pushed to `origin`.
+- **Pushing your own branch to `origin` needs no approval.** Publish `agent/<phase-id>` freely;
+  `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing.
+- **Ask before integrating a feature branch into the integration branch.** The merge that lands work
+  on the trunk is the owner's call — not the push that backs it up. `main` is the integration branch
+  today; idea `000066` plans to restore `dev` for this and gate `main` behind a pull request.
 - **Never write a confidential identifier into a tracked file** — not in code, a document, a commit
   message, or a session record *describing* the identifiers. `tools/check_no_private_content.py`
   reads `git ls-files`, so it cannot see a file until that file is staged. Run it **with your
