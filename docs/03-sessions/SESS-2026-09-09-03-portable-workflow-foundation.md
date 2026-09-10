@@ -71,17 +71,15 @@ targeted generator and test files pass Ruff.
 
 ## Backlog
 
-- Status: `active`
-- Next action: Implementation and declared verification are complete; the owner can invoke
-  session-close for independent review and the completion decision.
+- Status: `complete`
+- Next action: Continue the prioritized portability work with `phase-port-02`.
 - Evidence: canonical workflow sources and manifest, four generated adapters, generator and tests,
   OPS-010, updated PROMPT-008, and this session record.
 
 ## Unresolved
 
-A fresh independent review of the three corrections remains before the owner-controlled completion
-transition. The unrelated existing Ruff import-order finding in `src/governance/__main__.py` remains
-outside this phase.
+None within this phase. The unrelated existing Ruff import-order finding in
+`src/governance/__main__.py` remains outside this phase.
 
 ## Review
 
@@ -119,6 +117,10 @@ outside this phase.
 > The command outputs in `SESS-2026-09-09-03` are accurate. Its claim that implementation is complete and its `## Unresolved` section are not accurate because they omit the broken canonical link and manifest-validation gaps.
 >
 > **Completion is not justified. Unresolved discrepancies remain.**
+
+### Follow-up independent review
+
+> Follow-up independent review Met — single-source adapters. orient.md and checkpoint.md are the canonical behavioral sources. The four Claude/Open Agent Skills adapters match deterministic generator output; --check reports 4 workflow adapter(s) current. Met — authority and capability validation. The generator rejects owner-only workflows on agent-discoverable targets and rejects required capabilities lacking either a nonempty mapping or explicit unsupported declaration. It also rejects malformed capability keys/values, overlaps, unknown capabilities, unsupported targets, and path escapes. Met — drift and determinism. The focused contract suite passes 12 passed; tests cover tampering, deterministic rendering, absolute source/target paths, traversal, and malformed mappings. Met — PROMPT-008 boundary and fallback. PROMPT-008 references agent-workflows/checkpoint.md, contains no Claude-only checkpoint path, and preserves the prohibition on writing status: complete. The canonical GOV-003 repository-root reference resolves successfully. Verification evidence: Workflow check: passed. Focused tests: 12 passed. Governance: Governance OK: 16 systems, 117 documents, 15 memories, 105 backlog phases. Full suite: 407 passed, 2 warnings when run from a writable copy. The direct worktree run was blocked only because an existing test creates a temporary probe file and the audit worktree is read-only. git diff --check dev...HEAD: passed. Worktree: clean. Record discrepancy: None affecting implementation or acceptance. The session record accurately documents the initial findings and subsequent three corrections. The read-only filesystem limitation is environmental and not a repository discrepancy. Conclusion: All acceptance conditions are met, with no unresolved implementation discrepancy. Completion is technically justified; the owner-controlled session-close may proceed.
 
 ## Decisions
 

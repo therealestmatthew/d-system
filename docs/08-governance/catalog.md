@@ -180,7 +180,7 @@ CI regenerates it and fails on any difference.
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 3 | 1 | 3 | agent-checkpoint, agent-codex-port, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 4 | agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
@@ -197,7 +197,7 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
-| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
+| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 6 | 1 | 0 | agent-demo-stage |
 
