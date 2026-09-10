@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Never edit this file or AGENTS.md without explicit approval
+
+**Do not modify `CLAUDE.md` or `AGENTS.md` for any reason without the owner's explicit approval for
+that specific change.** There is no exception — not to correct an error, not to record something you
+learned, not because a phase seems to cover it, and not as tidy-up alongside other work.
+
+If you believe either file is wrong or stale: **say so and stop.** Quote the passage, propose the
+replacement wording, and let the owner decide. `AGENTS.md` carries the same rule and the account of
+why it exists.
+
 ## Important Writing Style
 Mannered prose substitute metaphor and flourish for direct statement. Instead of "a parameter worth varying," the mannered writer produces "a dial worth turning." Instead of "this point still matters," they write "this point earns its keep." The phrases exist to display the writer, not to convey the idea, and readers can tell. That is why mannered prose irritates: it makes the reader work harder so the writer can perform. It is also imprecise. Metaphors drag in connotations the writer did not choose and cannot control. The fix is to say what you mean. When a literal phrase is available, use it.
 

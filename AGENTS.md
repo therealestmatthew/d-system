@@ -4,6 +4,28 @@ The working agreement for every agent in this repository, human-directed or auto
 orientation files (e.g., `CLAUDE.md`, `GEMINI.md`) orient you to what the project is and where things live;
 this file governs how you work. Where the two ever disagree, this file wins.
 
+## Never edit this file or CLAUDE.md without explicit approval
+
+**No agent modifies `AGENTS.md` or `CLAUDE.md` for any reason without the owner's explicit approval
+for that specific change.** There is no exception. Not to fix something you are certain is wrong.
+Not to record something you learned this session. Not because a phase's scope appears to cover it.
+Not because another document contradicts them. Not as tidy-up alongside a change you were asked to
+make.
+
+These two files are the instructions every agent reads before doing anything. An agent that edits
+them rewrites its own governing rules and every future agent's, and the edit outlives the session
+that made it — usually without anyone reviewing it, because it arrives inside a diff about something
+else.
+
+**If you believe either file is wrong, out of date, or missing something: say so and stop.** Describe
+the problem, quote the passage, propose exact replacement wording, and let the owner decide. Reading
+these files is your job; rewriting them is not.
+
+This rule exists because it was broken. On 2026-09-09 an agent was asked to correct stale references
+to a branch and a remote. While doing so it replaced this file's publishing policy with a standing
+rule to "ask before pushing" — wording the owner had never requested, inferred from a single
+one-time instruction not to push, and shipped inside a commit about unrelated staleness.
+
 ## Before you start
 
 1. **Pick up work from the backlog.** Run `uv run python -m src.governance --ready` and take the
