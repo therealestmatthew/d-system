@@ -236,7 +236,7 @@ free label — it fixes the document's code series, canonical directory and requ
 
 The permanent identifier prefixing a governed document's filename — a counter (`PLAN-006`, with an
 optional sub-code `PLAN-003.01`) or a dated sequence (`SESS-2026-09-05-01`). Not something chosen by
-reading a directory — always allocated with `--next-code`, and never reused once it reaches `dev`. See
+reading a directory — always allocated with `--next-code`, and never reused once it reaches `main`. See
 `docs/08-governance/GOV-005-document-codes.md`.
 
 ### Series

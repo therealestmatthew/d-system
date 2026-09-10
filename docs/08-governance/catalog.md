@@ -49,7 +49,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.06 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.06-verification.md |
 | PLAN-004 | plan | approved | repository-owner | docs/01-plans/PLAN-004-reliability-follow-up.md |
 | PLAN-005 | plan | complete | repository-owner | docs/01-plans/PLAN-005-document-code-system.md |
-| PLAN-006 | plan | draft | repository-owner | docs/01-plans/PLAN-006-confidentiality-sweep.md |
+| PLAN-006 | plan | complete | repository-owner | docs/01-plans/PLAN-006-confidentiality-sweep.md |
 | PLAN-007 | plan | complete | repository-owner | docs/01-plans/PLAN-007-capture-and-structuring-system.md |
 | PLAN-008 | plan | draft | repository-owner | docs/01-plans/PLAN-008-session-lifecycle-protocols.md |
 | PLAN-009 | plan | draft | repository-owner | docs/01-plans/PLAN-009-capture-build.md |
@@ -73,6 +73,10 @@ CI regenerates it and fails on any difference.
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
 | PROMPT-004 | prompt | active | repository-owner | docs/02-prompts/PROMPT-004-terminology-and-architecture.md |
 | PROMPT-005 | prompt | active | repository-owner | docs/02-prompts/PROMPT-005-governance-model-review.md |
+| PROMPT-006 | prompt | active | repository-owner | docs/02-prompts/PROMPT-006-idea-capture-and-triage.md |
+| PROMPT-007 | prompt | active | repository-owner | docs/02-prompts/PROMPT-007-idea-to-plan.md |
+| PROMPT-008 | prompt | active | repository-owner | docs/02-prompts/PROMPT-008-execute-a-phase.md |
+| PROMPT-009 | prompt | active | repository-owner | docs/02-prompts/PROMPT-009-plan-audit.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -131,7 +135,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.06 | doc-html-06-verification | approved | 2 | 0 | 0 | — |
 | PLAN-004 | doc-reliability-follow-up | approved | 8 | 0 | 3 | agent-architect, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
-| PLAN-006 | doc-confidentiality-sweep | draft | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
+| PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
 | PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 3 | agent-checkpoint, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
@@ -159,4 +163,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-108 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 5, requirement: 4, session: 38.
+112 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 9, requirement: 4, session: 38.

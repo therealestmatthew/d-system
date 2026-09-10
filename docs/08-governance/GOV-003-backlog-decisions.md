@@ -118,7 +118,7 @@ which instructed a reader or an agent to write the old field name, PROMPT-001 of
 `phase-cap-02`. Historical records — ADR-008, PLAN-009, PROMPT-002 and the session logs — keep the old
 name, because they describe what was true when they were written.
 
-Both widenings were committed to `backlog.yaml` on `dev` before the work, so the wider lock was
+Both widenings were committed to `backlog.yaml` on `main` before the work, so the wider lock was
 visible first. The owner chose this over filing a separate migration phase; the alternative would
 have split one rename across two sessions with the data invalid in between. The owner also supplied
 the three replacement cadence values in the same session, which satisfies `phase-cap-08`'s cadence

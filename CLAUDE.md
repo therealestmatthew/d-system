@@ -2,14 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important Writing Style
+Mannered prose substitute metaphor and flourish for direct statement. Instead of "a parameter worth varying," the mannered writer produces "a dial worth turning." Instead of "this point still matters," they write "this point earns its keep." The phrases exist to display the writer, not to convey the idea, and readers can tell. That is why mannered prose irritates: it makes the reader work harder so the writer can perform. It is also imprecise. Metaphors drag in connotations the writer did not choose and cannot control. The fix is to say what you mean. When a literal phrase is available, use it.
+
 ## Read AGENTS.md first
 
 **→ [AGENTS.md](AGENTS.md) is the working agreement and governs everything you do here.**
 
 It carries the rules this file deliberately does not repeat: how to pick up work from the backlog
 queue, the requirement-and-plan-before-code expectation, document code allocation, the governance
-check, the concurrent-agent protocol, and the standing rule that **no agent adds a remote or pushes**
-until the confidentiality sweep completes.
+check, the concurrent-agent protocol, and the standing rule that **no agent pushes without asking**
+and **never writes a confidential identifier into a tracked file**.
 
 This file is orientation only — what the project is and where things live. If it ever contradicts
 AGENTS.md, AGENTS.md wins.
@@ -32,9 +35,13 @@ Keep it to three things:
 2. **Explicit instructions** an agent must act on before it can do anything else, like reading
    AGENTS.md first.
 3. **Mission-critical facts worth duplicating** despite the drift risk. The bar is that being
-   unaware of it for one turn causes irreversible harm. The no-remote rule above clears it: an
-   agent that pushes before the confidentiality sweep cannot take it back. Convenience never
-   clears it.
+   unaware of it for one turn causes irreversible harm. The publishing rule above clears it: this
+   repository now has a remote, and an agent that pushes without asking cannot take it back.
+   Convenience never clears it.
+
+   The no-remote rule that stood here until 2026-09-09 is the cautionary case for this whole
+   section. It was correct when written and false the moment `phase-priv-05` pushed, and it sat
+   stale in two files until someone went looking. Duplicating a fact means owning its drift.
 
 Everything else — conventions, commands, workflow, lifecycle rules — belongs in AGENTS.md or under
 `docs/08-governance/`, and is referenced from here rather than restated. When this file starts

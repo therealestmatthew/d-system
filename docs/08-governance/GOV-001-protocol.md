@@ -178,17 +178,17 @@ Several agents may hold phases at once, bounded by `max_active` in the catalog a
 disjoint `systems`, disjoint `deliverables` paths and no transitive dependency link. Each active
 phase names its `agent`; one agent holds one phase.
 
-The catalog on `dev` — the integration branch — is the lock table and the governance command is the
-lock check, so a claim is committed to `dev` before work begins rather than held on the agent's own
+The catalog on `main` — the integration branch — is the lock table and the governance command is the
+lock check, so a claim is committed to `main` before work begins rather than held on the agent's own
 branch. Whenever a peer holds an active claim or the phase touches `src/`, `ts/`, `schemas/`,
 `sql/`, `tools/` or `test/`, work happens in a
 `git worktree` on `agent/<phase-id>`, checked out at `../d-system-worktrees/<phase-id>` — outside the
 repository directory, so no scanner, linter or test run ever walks a second copy of the tree. A solo
 agent on a documentation- or skill-only phase, with no peer claim and no deliverable outside `docs/`
-or `.claude/`, may instead work directly in the primary checkout on `dev` (see
+or `.claude/`, may instead work directly in the primary checkout on `main` (see
 [GOV-003](GOV-003-backlog-decisions.md)). `_worktrees/` is gitignored as a guard against a misplaced
 worktree, not as a second sanctioned location. Integration requires the full check to pass *after*
-rebasing onto current `dev`.
+rebasing onto current `main`.
 
 This adds no scheduler, agent registry, service or lock daemon. Agent identities are ephemeral
 claim labels validated by pattern and uniqueness; they are not registry owners, and `repository-owner`

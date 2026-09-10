@@ -21,15 +21,23 @@ this file governs how you work. Where the two ever disagree, this file wins.
 
 ## Confidentiality and publishing
 
-- **This repository has no remote, and no agent adds one.** Nothing is pushed until `phase-priv-05`
-  of [PLAN-006](docs/01-plans/PLAN-006-confidentiality-sweep.md) completes — private remote included.
-  Real portfolio content is not yet separated from the tracked structure, and it is in every commit.
-  Rewriting local history is free; rewriting after a push is not.
-- `_private/` is gitignored. Never read or write there unless the owner directs you to.
-- `_data/` currently holds the owner's real projects, including named client engagements and
-  personal finances and health. Do not quote its contents into documents, commit messages or
-  summaries that are not themselves private.
-- If you believe a push is warranted, say so and stop. Do not add a remote to find out.
+- **The repository has a remote, and history is public-capable.** The confidentiality sweep
+  ([PLAN-006](docs/01-plans/PLAN-006-confidentiality-sweep.md)) completed on 2026-09-09: history was
+  squashed to a single commit, verified to name no confidential identifier in any path or blob, and
+  only then pushed to `origin`. **Ask before pushing.** Committing during normal work is fine;
+  publishing is the owner's call, and what leaves this machine cannot be recalled.
+- **Never write a confidential identifier into a tracked file** — not in code, a document, a commit
+  message, or a session record *describing* the identifiers. `tools/check_no_private_content.py`
+  reads `git ls-files`, so it cannot see a file until that file is staged. Run it **with your
+  changes staged**, or the gate passes by not looking. This is not hypothetical: during the sweep,
+  the record documenting the fix twice contained the client token, and only the staged run caught it.
+- `_private/` is gitignored and holds the owner's real portfolio — named client engagements,
+  personal finances and health. Never read or write there unless the owner directs you to.
+- `_data/` is the tracked fictional example set, and `_data/tags.json` the shared taxonomy. The real
+  records moved to `_private/portfolio/` in `phase-priv-03`; see
+  [ADR-009](docs/04-decisions/ADR-009-structure-content-boundary.md).
+- Rewriting local history is cheap; rewriting after a push is not. If history ever needs rewriting
+  again, say so and stop rather than forcing anything to `origin`.
 
 ## Stack
 
@@ -142,26 +150,29 @@ cd ts && npm run dev
 
 ## Concurrent agents: claim a phase
 
-`dev` is the integration branch — the trunk every agent claims on and integrates back into. `main`
-is reserved for future tagged release versions and does not exist yet; do not create it, and read
-any older reference to `main` as `dev`. There is also no remote (see *Confidentiality and
-publishing*), so every command below is local: nothing is fetched, pulled or pushed until a remote
-exists.
+`main` is the integration branch — the trunk every agent claims on and integrates back into, and the
+remote's default branch. It is the only long-lived branch; agent work happens on `agent/<phase-id>`
+branches that are integrated and deleted. Read any older reference to `main` as `main`: `main` was the
+trunk until 2026-09-09, when `phase-priv-05` squashed history onto `main` and pushed it. Release
+tagging, if it is ever introduced, will use tags rather than a second long-lived branch.
 
-Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the lock table, and
+A remote now exists, so `git fetch`, `git pull` and `git push` all work — but **ask the owner before
+pushing** (see *Confidentiality and publishing*).
+
+Several agents may work at once. `docs/09-backlog/backlog.yaml` on `main` is the lock table, and
 `uv run python -m src.governance` is the lock check. See [ADR-003](docs/04-decisions/ADR-003-multi-agent-concurrency.md).
 
 - Pick your own agent ID once and reuse it: lowercase `agent-<name>`, e.g. `agent-blue`. One agent
   holds at most one active phase.
-- Start on an up-to-date `dev`: `git switch dev` (add `&& git pull` once a remote exists).
+- Start on an up-to-date `main`: `git switch main` (add `&& git pull` once a remote exists).
 - Run `uv run python -m src.governance --ready`. Choose a phase whose **Conflicts** column is `—`.
   A non-empty Conflicts column means a peer already locked one of your systems or paths — pick
   something else; do not wait, and do not edit a peer's claim.
-- Claim it on `dev` in one small commit that changes nothing else: set the phase `status: active`,
+- Claim it on `main` in one small commit that changes nothing else: set the phase `status: active`,
   add `agent: agent-<name>`, and bump the catalog `updated` date.
 - Run `uv run python -m src.governance` before committing the claim. It rejects your claim if it
   overlaps a peer's systems, deliverable paths, or dependency chain, or if `max_active` is reached.
-- Commit the claim on `dev`. Once a remote exists and the push is rejected as non-fast-forward,
+- Commit the claim on `main`. Once a remote exists and the push is rejected as non-fast-forward,
   `git pull --rebase`, re-run the validator, and re-check that your claim is still safe — a peer
   claimed between your check and your push, and their systems may now collide with yours.
 
@@ -172,11 +183,11 @@ holds an active claim or the phase touches `src/`, `ts/`, `schemas/`, `sql/`, `t
 Each agent gets a physically separate directory, so tests, rebuilds and dev servers cannot corrupt a
 peer's run. A solo agent on a documentation- or skill-only phase, with no peer claim and no
 deliverable outside `docs/` or framework-specific directories (e.g., `.claude/`), may instead work directly in the primary checkout on
-`dev` — see [GOV-003](docs/08-governance/GOV-003-backlog-decisions.md).
+`main` — see [GOV-003](docs/08-governance/GOV-003-backlog-decisions.md).
 
 ```bash
-# from the primary checkout, on an up-to-date dev
-git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 dev
+# from the primary checkout, on an up-to-date main
+git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 main
 cd ../d-system-worktrees/phase-html-03
 uv venv && uv sync --extra dev            # each worktree has its own .venv
 uv run python tools/rebuild_db.py         # each worktree has its own gitignored data/
@@ -190,11 +201,11 @@ uv run python tools/rebuild_db.py         # each worktree has its own gitignored
 - If you run a dev server, pick a free port explicitly
   (`uv run uvicorn src.main:app --reload --port 8010`). Do not assume `:8000` or `:5173` is yours.
 - Stay inside your phase's declared `systems` and `deliverables`. If the work genuinely requires a
-  file outside them, stop: either narrow the change, or update the phase's declarations on `dev`
+  file outside them, stop: either narrow the change, or update the phase's declarations on `main`
   and re-run the validator so peers see the wider lock before you continue.
 - Commit narrow, atomic diffs — one concern per commit, on your branch only.
 - The only line of `backlog.yaml` you may touch is your own phase's, plus the catalog `updated` date.
-- Rebase onto `dev` rather than merging it in: `git rebase dev`. Do this whenever a peer integrates,
+- Rebase onto `main` rather than merging it in: `git rebase main`. Do this whenever a peer integrates,
   not only at the end.
 
 ## Concurrent agents: complete and hand off
@@ -212,16 +223,16 @@ Perform these in order. Do not mark a phase complete before the post-rebase vali
 4. Update your phase: `status: complete`, `session:`, `completion_evidence:` (files that exist now),
    and `result:` summarizing the actual verification output. Keep the `agent` field as the record of
    who did the work.
-5. `git rebase dev`, then re-run `uv run python -m src.governance` and
+5. `git rebase main`, then re-run `uv run python -m src.governance` and
    `uv run pytest`. This run — after the rebase, against your peers' merged work — is the one that
    decides whether the branch may integrate. If it fails, fix it on your branch; never integrate a
    red rebase.
-6. Check that the primary `dev` checkout is completely clean (`git status` shows no unstaged changes).
+6. Check that the primary `main` checkout is completely clean (`git status` shows no unstaged changes).
    **Never use `git stash` or force an integration if a peer agent has left uncommitted work.**
-7. If `dev` is clean, integrate the branch onto `dev` (fast-forward after the rebase), then clean up:
+7. If `main` is clean, integrate the branch onto `main` (fast-forward after the rebase), then clean up:
    `git worktree remove ../d-system-worktrees/<phase-id>` and `git branch -d agent/<phase-id>`.
-   If `dev` is dirty or manual review is required, leave your branch unmerged. Report that the work is ready
-   for review so the owner (or a peer) can `git diff dev..agent/<phase-id>` and merge it manually.
+   If `main` is dirty or manual review is required, leave your branch unmerged. Report that the work is ready
+   for review so the owner (or a peer) can `git diff main..agent/<phase-id>` and merge it manually.
 
 ## Concurrent agents: resolve collisions
 
@@ -237,11 +248,11 @@ Perform these in order. Do not mark a phase complete before the post-rebase vali
   declared `systems` or `deliverables` were wrong, and the declarations need fixing before either
   phase completes.
 - **A green branch that fails after rebase** means a peer changed behavior you depended on. Fix your
-  branch against current `dev`; do not revert the peer's commit.
+  branch against current `main`; do not revert the peer's commit.
 - When resolving a collision requires an actual choice — which phase yields, whether a boundary
   moves, whether a phase splits — record the decision and its reason in
   `docs/08-governance/GOV-003-backlog-decisions.md` in the same diff. Do not encode a resolution only in a
   commit message.
 - If you are working an area adjacent to a peer's — your system `depends_on` theirs in
   `systems.yaml` — treat their contract as frozen at the commit you branched from. Build against
-  merged `dev`, never against a peer's unmerged branch.
+  merged `main`, never against a peer's unmerged branch.

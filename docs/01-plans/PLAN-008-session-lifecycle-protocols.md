@@ -31,8 +31,9 @@ which a planning session should not have to carry. Today every session loads the
 the agent guesses the rest.
 
 **The one closing procedure that exists does not fit.** `AGENTS.md` has a six-step "complete and
-hand off" sequence, but steps 5 and 6 assume a worktree, an `origin` remote and a rebase. There is
-no remote, and the owner works in the primary checkout. So the section that should govern every
+hand off" sequence, but steps 5 and 6 assume a worktree, an `origin` remote and a rebase. When this plan was written
+there was no remote, and the owner works in the primary checkout. (An `origin` remote exists as of
+2026-09-09; the primary-checkout half of the mismatch is unchanged and is what this plan addresses.) So the section that should govern every
 session close is unusable for the sessions actually being run, and closing has instead been done
 from memory each time — which is how `AGENTS.md` came to instruct agents to name session records in
 a format the validator rejects.
@@ -134,7 +135,7 @@ stays `queued` or `active` with an honest `next_action`, which is the *ordinary*
 than an error branch: most checkpoints happen mid-work. This is the same requirement the original
 plan buried as "what to do when a session ends incomplete", promoted to the main case.
 
-It must work in the primary checkout with no remote. Repair or replace the existing "complete and
+It must work in the primary checkout, and must not assume a worktree. Repair or replace the existing "complete and
 hand off" section of `AGENTS.md` so the worktree and rebase steps apply only where a worktree is in
 use, rather than being presented as the universal close.
 
