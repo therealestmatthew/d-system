@@ -92,6 +92,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-016 | prompt | active | repository-owner | docs/02-prompts/PROMPT-016-demo-guardrails.md |
 | PROMPT-017 | prompt | active | repository-owner | docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md |
 | PROMPT-018 | prompt | active | repository-owner | docs/02-prompts/PROMPT-018-demo-build-delegation-pack.md |
+| PROMPT-019 | prompt | active | repository-owner | docs/02-prompts/PROMPT-019-demo-glossary-diagram-audit.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -178,7 +179,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 2 | 0 | 4 | agent-demo-data, agent-demo-stage |
+| PLAN-021 | doc-live-demo | draft | 2 | 1 | 4 | agent-demo-data, agent-demo-stage |
 
 ## Held codes
 
@@ -190,4 +191,4 @@ CI regenerates it and fails on any difference.
 | OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-135 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 18, requirement: 6, session: 44.
+136 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 19, requirement: 6, session: 44.
