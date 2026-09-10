@@ -57,8 +57,15 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
         if (!socket || socket.readyState !== WebSocket.OPEN) return
         // Same path as term.onData below — raw bytes over the socket, never term.write() — so
         // the shell's own echo paints the text; no trailing newline leaves it un-executed on the
-        // input line, a trailing "\n" (run: true entries) executes it immediately.
-        const payload = appendNewline ? `${text}\n` : text
+        // input line, a trailing "\n" (run: true entries) executes it immediately. Second defense
+        // layer (CommandPanel's isCommandEntry is the first): this method does not trust its
+        // caller either, so when it is not the one appending the newline, it strips any \r or \n
+        // already inside `text` rather than shipping it byte-for-byte — an embedded newline
+        // reaching the shell mid-string would execute everything before it, the same injection
+        // the load-time check exists to block, just reached a different way (a caller that
+        // bypasses CommandPanel entirely).
+        const sanitized = appendNewline ? text : text.replace(/[\r\n]/g, '')
+        const payload = appendNewline ? `${sanitized}\n` : sanitized
         socket.send(new TextEncoder().encode(payload))
       },
     }),

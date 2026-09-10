@@ -13,12 +13,22 @@ interface CommandsFile {
   commands: CommandEntry[]
 }
 
+// Control characters below 0x20 (plus DEL, 0x7f) — most importantly \n and \r — must never
+// appear inside a loaded command string. `sendCommand` ships `run: false` entries byte-for-byte
+// except for a trailing newline it withholds on purpose; an embedded \n in the middle of the
+// string would execute everything before it the moment the shell's line editor sees it, defeating
+// R12's "injects without executing" for any entry authored (or corrupted) with one. Rejecting the
+// whole entry at load time is the first of the two defense layers — see TerminalRegion's
+// `sendCommand` for the second.
+const CONTROL_CHARACTER_PATTERN = /[\x00-\x1f\x7f]/
+
 function isCommandEntry(value: unknown): value is CommandEntry {
   return (
     typeof value === 'object' &&
     value !== null &&
     typeof (value as { label?: unknown }).label === 'string' &&
     typeof (value as { command?: unknown }).command === 'string' &&
+    !CONTROL_CHARACTER_PATTERN.test((value as { command: string }).command) &&
     typeof (value as { run?: unknown }).run === 'boolean'
   )
 }
