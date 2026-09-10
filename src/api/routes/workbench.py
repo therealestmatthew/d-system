@@ -1,7 +1,7 @@
-"""The workbench read routes (ADR-015): injection-source enumeration, directory listing, and
-recursive file search.
+"""The workbench read routes (ADR-015): injection-source enumeration, directory listing,
+recursive file search, idea and backlog explorers, and the single reveal-in-explorer action.
 
-Every route here is GET-only and mounted only when `D_SYSTEM_DEMO_TERMINAL=1` —
+Every route here is mounted only when `D_SYSTEM_DEMO_TERMINAL=1` —
 `src/api/__init__.py` imports this module only under that flag, exactly like
 `src/api/routes/demo_terminal.py`, so with the flag unset none of these routes exist (404), not
 merely refuse. Importing this module also
@@ -9,7 +9,7 @@ re-runs `enforce_loopback_bind()` (ADR-015 rule 1: "one gate, one binding"), so 
 flag set on a non-loopback bind host fails fast here too, independent of whether
 `src.api.routes.demo_terminal` happened to be imported first.
 
-Two capabilities, both read-only and repository-bounded (ADR-015 rule 2):
+Five capabilities, all read-only except the one named action (ADR-015 rule 4):
 
 - `GET /injection-sources` live-enumerates `.claude/skills/`, `.claude/agents/` and
   `docs/02-prompts/` (governed `PROMPT-*` files only), applying the curated overrides file
@@ -21,20 +21,37 @@ Two capabilities, both read-only and repository-bounded (ADR-015 rule 2):
   `git check-ignore` reports as ignored (ADR-015 rule 3): the repository's own ignore rules, not a
   hand-kept list, so `_private/`, `.venv/`, `data/`, `node_modules/`, etc. are never listed while
   `_public/` and the tracked tree are.
+- `GET /ideas` and `GET /ideas/queue` read idea state exclusively through `load_events()` and
+  `fold()` (`src/db/ideas.py`) — never a direct parse of `_data/ideas.jsonl` — and report id,
+  title, status, created/updated, annotation count and link count per idea; the `queue` variant
+  ranks by status precedence then age (see `IDEA_QUEUE_STATUS_PRECEDENCE` below for the one
+  wording correction this applies against REQ-007 W10's literal text).
+- `GET /backlog` and `GET /backlog/queue` read `docs/09-backlog/backlog.yaml` and report id,
+  title, status, priority, queue position (`next_up` index, or null) and `depends_on` per phase;
+  the `queue` variant reuses `queue_order()` and `readiness()` from `src.governance.backlog`
+  directly, so it matches the governance `--ready` rendering by construction rather than by a
+  second, hand-kept ordering rule.
+- `POST /reveal` is the sole non-GET route: it validates its path per rule 2 above, then spawns
+  exactly one fixed opener via an argument list, never a shell string (ADR-015 rule 5).
 """
 
 from __future__ import annotations
 
 import json
 import os
+import platform
 import subprocess
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Final
 
+import yaml  # type: ignore[import-untyped]
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from src.api.routes.demo_terminal import enforce_loopback_bind
+from src.db.ideas import fold, load_events
+from src.governance.backlog import queue_order, readiness
 
 # Repository root: three levels above this file (src/api/routes/workbench.py -> src/api ->
 # src -> repo root) — same derivation as src/api/routes/demo_stage.py.
@@ -81,6 +98,12 @@ class DirectoryEntry(BaseModel):
 
 class PathEscapesRepositoryError(ValueError):
     """Raised when a caller-supplied path does not resolve inside `REPO_ROOT`."""
+
+
+BACKLOG_PATH: Final[Path] = REPO_ROOT / "docs" / "09-backlog" / "backlog.yaml"
+
+REVEAL_WINDOWS_OPENER: Final[str] = "explorer.exe"
+REVEAL_LINUX_OPENER: Final[str] = "xdg-open"
 
 
 # --- Path validation (ADR-015 rule 2) ---------------------------------------------------------
@@ -356,6 +379,192 @@ async def search_files(
         entry for entry in files if _matches_filters(entry, extensions=extensions, text_filter=q)
     ]
     return [_to_entry(entry) for entry in sorted(matched)]
+
+
+# --- Idea Explorer (ADR-015 rule 4, REQ-007 W10) -----------------------------------------------
+
+
+class IdeaRow(BaseModel):
+    id: str
+    title: str
+    status: str
+    created: str
+    updated: str
+    annotation_count: int
+    link_count: int
+
+
+#: Status precedence for the queue-ordered view. REQ-007 W10's own text reads "open → triaged →
+#: planned then age", but `planned` is not a legal idea status (`schemas/idea.schema.json`
+#: enumerates `open`, `triaged`, `reviewing`, `promoted`, `discarded`) — it never matches any
+#: idea and would leave the third tier permanently empty. `docs/01-plans/PLAN-019-idea-priority-
+#: queue.md`, which predates and motivates that requirement row, names the identical three-tier
+#: working precedence as "open before triaged before reviewing", so `reviewing` is applied here
+#: as the evident wording correction for `planned`. `promoted` and `discarded` are terminal
+#: (`src/db/ideas.py`'s `WORKING_STATES` excludes both) and rank after the three working states,
+#: tied with each other, so the queue view still surfaces every idea rather than dropping ones
+#: past scouting.
+IDEA_QUEUE_STATUS_PRECEDENCE: Final[dict[str, int]] = {
+    "open": 0,
+    "triaged": 1,
+    "reviewing": 2,
+    "promoted": 3,
+    "discarded": 3,
+}
+
+#: Precedence assigned to a status this mapping does not recognize — schema-illegal today, but a
+#: deterministic fallback (last, not an error) keeps this route from ever refusing to answer over
+#: a status it does not yet know about.
+_IDEA_QUEUE_UNKNOWN_STATUS_PRECEDENCE: Final[int] = max(IDEA_QUEUE_STATUS_PRECEDENCE.values()) + 1
+
+
+def _idea_row(idea_id: str, entry: dict[str, Any]) -> IdeaRow:
+    return IdeaRow(
+        id=idea_id,
+        title=entry["title"],
+        status=entry["status"],
+        created=entry["created"],
+        updated=entry["updated"],
+        annotation_count=len(entry["annotations"]),
+        link_count=len(entry["links"]),
+    )
+
+
+def _load_idea_state() -> dict[str, dict[str, Any]]:
+    """Idea state exclusively via `load_events()` + `fold()` — never a raw parse of the log."""
+    return fold(load_events())
+
+
+def _idea_queue_sort_key(idea_id: str, entry: dict[str, Any]) -> tuple[int, datetime, str]:
+    precedence = IDEA_QUEUE_STATUS_PRECEDENCE.get(
+        entry["status"], _IDEA_QUEUE_UNKNOWN_STATUS_PRECEDENCE
+    )
+    return (precedence, datetime.fromisoformat(entry["created"]), idea_id)
+
+
+@router.get("/ideas", response_model=list[IdeaRow])
+async def get_ideas() -> list[IdeaRow]:
+    """Every idea, id order — deterministic, and zero ideas is an empty list, not an error."""
+    state = _load_idea_state()
+    return [_idea_row(idea_id, entry) for idea_id, entry in sorted(state.items())]
+
+
+@router.get("/ideas/queue", response_model=list[IdeaRow])
+async def get_ideas_queue() -> list[IdeaRow]:
+    """The priority-queue view: status precedence, then age (oldest first), then id."""
+    state = _load_idea_state()
+    ordered = sorted(state.items(), key=lambda pair: _idea_queue_sort_key(*pair))
+    return [_idea_row(idea_id, entry) for idea_id, entry in ordered]
+
+
+# --- Backlog Explorer (ADR-015 rule 4, REQ-007 W11) ---------------------------------------------
+
+
+class BacklogPhaseRow(BaseModel):
+    id: str
+    title: str
+    status: str
+    priority: int
+    queue_position: int | None
+    depends_on: list[str]
+
+
+def _load_backlog_catalog() -> dict[str, Any]:
+    """`docs/09-backlog/backlog.yaml`, parsed with no schema validation of its own — this route
+    only reports what governance has already accepted, the same file `uv run python -m
+    src.governance` validates on every run.
+    """
+    raw = yaml.safe_load(BACKLOG_PATH.read_text(encoding="utf-8"))
+    return raw if isinstance(raw, dict) else {}
+
+
+def _backlog_row(item: dict[str, Any], next_up: list[str]) -> BacklogPhaseRow:
+    return BacklogPhaseRow(
+        id=item["id"],
+        title=item["title"],
+        status=item["status"],
+        priority=item["priority"],
+        queue_position=(next_up.index(item["id"]) + 1) if item["id"] in next_up else None,
+        depends_on=list(item["depends_on"]),
+    )
+
+
+@router.get("/backlog", response_model=list[BacklogPhaseRow])
+async def get_backlog() -> list[BacklogPhaseRow]:
+    """Every phase, id order — deterministic, independent of `next_up` or readiness."""
+    catalog = _load_backlog_catalog()
+    items = {item["id"]: item for item in catalog.get("items", [])}
+    next_up = catalog.get("next_up", [])
+    return [_backlog_row(items[key], next_up) for key in sorted(items)]
+
+
+@router.get("/backlog/queue", response_model=list[BacklogPhaseRow])
+async def get_backlog_queue() -> list[BacklogPhaseRow]:
+    """The priority-queue view, matching `uv run python -m src.governance --ready` by
+    construction: `queue_order()` places `next_up` phases first in listed order, then the rest
+    by priority then id (both from `src.governance.backlog`, the same functions that command
+    uses); the result is then narrowed to `readiness() == "ready"`, exactly as that command's
+    `--ready` rendering does — a `next_up` phase that is not itself ready (already active, still
+    waiting on a dependency, and so on) is excluded here exactly as it is there.
+    """
+    catalog = _load_backlog_catalog()
+    items = {item["id"]: item for item in catalog.get("items", [])}
+    next_up = catalog.get("next_up", [])
+    ordered = queue_order(items, next_up)
+    ready = [item for item in ordered if readiness(item, items) == "ready"]
+    return [_backlog_row(item, next_up) for item in ready]
+
+
+# --- Reveal-in-explorer (ADR-015 rule 5, REQ-007 W09) -------------------------------------------
+
+
+class RevealRequest(BaseModel):
+    path: str
+
+
+class RevealResult(BaseModel):
+    opened: str
+
+
+def _is_windows() -> bool:
+    return platform.system() == "Windows"
+
+
+def _reveal_argv(resolved: Path) -> list[str]:
+    """The one fixed opener argument list for `resolved` — an argument list, never a shell
+    string, per ADR-015 rule 5. On Windows, `explorer.exe /select,<path>` opens the entry's
+    parent folder with the entry itself selected, for a file or a directory alike. On Linux,
+    `xdg-open` has no selection concept, so it is given a directory to open outright: a file's
+    parent directory, or the directory itself when the entry already is one — never that
+    directory's own parent, which keeps the opened target inside the repository even when the
+    entry is the repository root itself.
+    """
+    if _is_windows():
+        return [REVEAL_WINDOWS_OPENER, f"/select,{resolved}"]
+    target_dir = resolved.parent if resolved.is_file() else resolved
+    return [REVEAL_LINUX_OPENER, str(target_dir)]
+
+
+def _launch_reveal_opener(argv: list[str]) -> None:
+    """Spawn the opener without waiting for it — a file manager window is not expected to exit
+    promptly, and this route reports success once the process is launched, not once it closes.
+    Isolated in its own function so tests can monkeypatch it and assert on `argv` without ever
+    starting a real opener process.
+    """
+    subprocess.Popen(argv)  # noqa: S603 - argument list built above, never a shell string
+
+
+@router.post("/reveal", response_model=RevealResult)
+async def reveal_in_explorer(request: RevealRequest) -> RevealResult:
+    try:
+        resolved = resolve_repo_relative_path(request.path)
+    except PathEscapesRepositoryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    if not resolved.exists():
+        raise HTTPException(status_code=404, detail=f"No such path: {request.path!r}")
+    argv = _reveal_argv(resolved)
+    _launch_reveal_opener(argv)
+    return RevealResult(opened=argv[-1])
 
 
 # This module is imported only when D_SYSTEM_DEMO_TERMINAL=1 (see src/api/__init__.py), exactly

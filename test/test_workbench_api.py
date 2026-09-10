@@ -6,7 +6,11 @@ the flag unset — REQ-007 W14); injection-source enumeration matches a direct l
 the curated overrides file relabels, replaces injected text, and hides entries; path
 validation rejects `..` traversal, an absolute path, and a symlink whose target leaves the
 repository, all on the *resolved* path; a root directory listing carries no `_private/` or
-gitignored entry; and every route responds to GET only.
+gitignored entry; the idea route matches an independent `fold()` recomputation (REQ-007 W10);
+the backlog route's queue view matches an independent read of `next_up` plus ready-by-priority
+(REQ-007 W11); the reveal-in-explorer action rejects escapes and non-POST, with its spawned
+argument list asserted via monkeypatching (no real opener process); and every other route
+responds to GET only.
 """
 
 from __future__ import annotations
@@ -17,16 +21,22 @@ import os
 import sys
 import tempfile
 from collections.abc import Callable, Iterator
+from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
+import yaml
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import src.api as api_module
 import src.main as main_module
+from src.api.routes import workbench as workbench_module
 from src.api.routes.workbench import (
     AGENTS_DIR,
+    BACKLOG_PATH,
+    IDEA_QUEUE_STATUS_PRECEDENCE,
     INJECTION_OVERRIDES_PATH_ENV_VAR,
     PROMPT_FILENAME_PREFIX,
     PROMPTS_DIR,
@@ -35,10 +45,17 @@ from src.api.routes.workbench import (
     PathEscapesRepositoryError,
     resolve_repo_relative_path,
 )
+from src.db.ideas import fold, load_events
+from src.governance.backlog import queue_order, readiness
 
 WORKBENCH_INJECTION_SOURCES_PATH = "/api/v1/workbench/injection-sources"
 WORKBENCH_LIST_PATH = "/api/v1/workbench/list"
 WORKBENCH_SEARCH_PATH = "/api/v1/workbench/search"
+WORKBENCH_IDEAS_PATH = "/api/v1/workbench/ideas"
+WORKBENCH_IDEAS_QUEUE_PATH = "/api/v1/workbench/ideas/queue"
+WORKBENCH_BACKLOG_PATH = "/api/v1/workbench/backlog"
+WORKBENCH_BACKLOG_QUEUE_PATH = "/api/v1/workbench/backlog/queue"
+WORKBENCH_REVEAL_PATH = "/api/v1/workbench/reveal"
 
 
 # --- app-rebuild fixture: mirrors test/test_demo_terminal.py's rebuild_app -------------------
@@ -58,6 +75,19 @@ def _uncache_workbench_modules() -> None:
         for attr in ("demo_terminal", "workbench"):
             if hasattr(routes_package, attr):
                 delattr(routes_package, attr)
+
+
+def _live_workbench_module() -> Any:
+    """The `src.api.routes.workbench` module object the currently-built app actually runs.
+
+    `rebuild_app` pops `src.api.routes.workbench` from `sys.modules` and reloads
+    `src.api`, which re-imports it — creating a *new* module object each time. The
+    `workbench_module` name imported at the top of this file keeps pointing at whichever
+    object was current at collection time, so monkeypatching it after a `rebuild_app` call
+    would patch a module the running app no longer uses. Reading `sys.modules` fresh, after
+    the rebuild, is what makes the patch land on the code path actually being exercised.
+    """
+    return sys.modules["src.api.routes.workbench"]
 
 
 @pytest.fixture
@@ -348,3 +378,253 @@ def test_search_route_rejects_non_get(rebuild_app: Callable[..., FastAPI]) -> No
     assert client.post(WORKBENCH_SEARCH_PATH).status_code == 405
     assert client.put(WORKBENCH_SEARCH_PATH).status_code == 405
     assert client.delete(WORKBENCH_SEARCH_PATH).status_code == 405
+
+
+# --- Idea Explorer route (ADR-015 rule 4, REQ-007 W10) ------------------------------------------
+
+
+def test_ideas_route_matches_independent_fold_recomputation(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """The route's rows equal an independent `fold(load_events())` run computed here, in the
+    test, from the same log — not by trusting the route's own JSON, which is what W10's
+    verification ("assert the rendered rows match an independent fold() run") requires.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_IDEAS_PATH)
+    assert response.status_code == 200
+    body = {row["id"]: row for row in response.json()}
+
+    expected_state = fold(load_events())
+    assert expected_state, "fixture assumption: the idea log is non-empty"
+    assert set(body) == set(expected_state)
+    for idea_id, entry in expected_state.items():
+        row = body[idea_id]
+        assert row["title"] == entry["title"]
+        assert row["status"] == entry["status"]
+        assert row["created"] == entry["created"]
+        assert row["updated"] == entry["updated"]
+        assert row["annotation_count"] == len(entry["annotations"])
+        assert row["link_count"] == len(entry["links"])
+
+
+def test_ideas_route_reports_zero_annotation_and_link_counts_as_zero(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    body = {row["id"]: row for row in client.get(WORKBENCH_IDEAS_PATH).json()}
+    state = fold(load_events())
+    zero_annotation_ideas = [key for key, entry in state.items() if not entry["annotations"]]
+    assert zero_annotation_ideas, "fixture assumption: at least one idea has no annotations"
+    for idea_id in zero_annotation_ideas:
+        assert body[idea_id]["annotation_count"] == 0
+
+
+def test_ideas_queue_route_orders_by_status_precedence_then_age(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_IDEAS_QUEUE_PATH)
+    assert response.status_code == 200
+    body = response.json()
+
+    state = fold(load_events())
+    assert state, "fixture assumption: the idea log is non-empty"
+
+    def expected_key(idea_id: str) -> tuple[int, datetime, str]:
+        entry = state[idea_id]
+        precedence = IDEA_QUEUE_STATUS_PRECEDENCE[entry["status"]]
+        return (precedence, datetime.fromisoformat(entry["created"]), idea_id)
+
+    expected_order = sorted(state, key=expected_key)
+    assert [row["id"] for row in body] == expected_order
+
+    # Every idea still open or triaged outranks every promoted or discarded idea.
+    open_or_triaged = {idea_id for idea_id, entry in state.items() if entry["status"] == "open"}
+    terminal = {idea_id for idea_id, entry in state.items() if entry["status"] == "discarded"}
+    assert open_or_triaged, "fixture assumption: at least one open idea exists"
+    assert terminal, "fixture assumption: at least one discarded idea exists"
+    ranks = {row["id"]: index for index, row in enumerate(body)}
+    assert max(ranks[idea_id] for idea_id in open_or_triaged) < min(
+        ranks[idea_id] for idea_id in terminal
+    )
+
+
+def test_ideas_routes_reject_non_get(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    assert client.post(WORKBENCH_IDEAS_PATH).status_code == 405
+    assert client.post(WORKBENCH_IDEAS_QUEUE_PATH).status_code == 405
+
+
+# --- Backlog Explorer route (ADR-015 rule 4, REQ-007 W11) ---------------------------------------
+
+
+def test_backlog_route_matches_backlog_yaml(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_BACKLOG_PATH)
+    assert response.status_code == 200
+    body = {row["id"]: row for row in response.json()}
+
+    catalog = yaml.safe_load(BACKLOG_PATH.read_text(encoding="utf-8"))
+    items = {item["id"]: item for item in catalog["items"]}
+    next_up = catalog.get("next_up", [])
+    assert set(body) == set(items)
+    for phase_id, item in items.items():
+        row = body[phase_id]
+        assert row["title"] == item["title"]
+        assert row["status"] == item["status"]
+        assert row["priority"] == item["priority"]
+        assert row["depends_on"] == item["depends_on"]
+        expected_position = next_up.index(phase_id) + 1 if phase_id in next_up else None
+        assert row["queue_position"] == expected_position
+
+
+def test_backlog_queue_route_matches_ready_by_priority_ordering(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """The queue view equals `next_up` order narrowed to ready phases, then the remaining ready
+    phases by priority — recomputed here independently from a fresh read of `backlog.yaml` via
+    the same `queue_order()`/`readiness()` functions the governance `--ready` command uses
+    (REQ-007 W11's own text: "matching the governance --ready rendering").
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_BACKLOG_QUEUE_PATH)
+    assert response.status_code == 200
+    body = response.json()
+
+    catalog = yaml.safe_load(BACKLOG_PATH.read_text(encoding="utf-8"))
+    items = {item["id"]: item for item in catalog["items"]}
+    next_up = catalog.get("next_up", [])
+    ordered = queue_order(items, next_up)
+    expected_ready_ids = [item["id"] for item in ordered if readiness(item, items) == "ready"]
+
+    assert expected_ready_ids, "fixture assumption: at least one phase is ready"
+    assert [row["id"] for row in body] == expected_ready_ids
+
+    next_up_ready = [key for key in next_up if key in expected_ready_ids]
+    if next_up_ready:
+        assert [row["id"] for row in body[: len(next_up_ready)]] == next_up_ready
+
+
+def test_backlog_routes_reject_non_get(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    assert client.post(WORKBENCH_BACKLOG_PATH).status_code == 405
+    assert client.post(WORKBENCH_BACKLOG_QUEUE_PATH).status_code == 405
+
+
+# --- Reveal-in-explorer action (ADR-015 rule 5, REQ-007 W09) ------------------------------------
+
+
+def test_reveal_rejects_dotdot_traversal(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": "../../etc/passwd"})
+    assert response.status_code == 400
+
+
+def test_reveal_rejects_absolute_path(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": "/etc/passwd"})
+    assert response.status_code == 400
+
+
+def test_reveal_rejects_symlink_escape(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    outside_target = tempfile.mkdtemp(prefix="workbench-reveal-escape-target-")
+    link_path = REPO_ROOT / "test" / "_workbench_reveal_symlink_escape_tmp"
+    try:
+        link_path.symlink_to(outside_target, target_is_directory=True)
+        response = client.post(
+            WORKBENCH_REVEAL_PATH, json={"path": "test/_workbench_reveal_symlink_escape_tmp"}
+        )
+        assert response.status_code == 400
+    finally:
+        if link_path.is_symlink() or link_path.exists():
+            link_path.unlink()
+        os.rmdir(outside_target)
+
+
+def test_reveal_rejects_nonexistent_path(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": "does/not/exist.txt"})
+    assert response.status_code == 404
+
+
+def test_reveal_spawns_xdg_open_on_the_containing_directory_for_a_file(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No real opener process starts: `_launch_reveal_opener` is monkeypatched to record the
+    argument list instead of calling `subprocess.Popen`.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    captured: list[list[str]] = []
+    live_workbench = _live_workbench_module()
+    monkeypatch.setattr(live_workbench, "_launch_reveal_opener", captured.append)
+    monkeypatch.setattr(live_workbench.platform, "system", lambda: "Linux")
+
+    target_file = "README.md"
+    assert (REPO_ROOT / target_file).is_file(), "fixture assumption: README.md exists"
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": target_file})
+    assert response.status_code == 200
+    assert captured == [["xdg-open", str(REPO_ROOT)]]
+
+
+def test_reveal_spawns_xdg_open_on_a_directory_entry_itself(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    captured: list[list[str]] = []
+    live_workbench = _live_workbench_module()
+    monkeypatch.setattr(live_workbench, "_launch_reveal_opener", captured.append)
+    monkeypatch.setattr(live_workbench.platform, "system", lambda: "Linux")
+
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": "test"})
+    assert response.status_code == 200
+    assert captured == [["xdg-open", str(REPO_ROOT / "test")]]
+
+
+def test_reveal_spawns_explorer_select_on_windows(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    captured: list[list[str]] = []
+    live_workbench = _live_workbench_module()
+    monkeypatch.setattr(live_workbench, "_launch_reveal_opener", captured.append)
+    monkeypatch.setattr(live_workbench.platform, "system", lambda: "Windows")
+
+    target_file = "README.md"
+    response = client.post(WORKBENCH_REVEAL_PATH, json={"path": target_file})
+    assert response.status_code == 200
+    expected_path = REPO_ROOT / target_file
+    assert captured == [["explorer.exe", f"/select,{expected_path}"]]
+
+
+def test_reveal_never_spawns_a_real_process_when_unpatched_argv_is_checked_directly() -> None:
+    """`_reveal_argv` is pure — it can be asserted on without touching `subprocess` at all."""
+    resolved = REPO_ROOT / "README.md"
+    assert workbench_module._reveal_argv(resolved) == ["xdg-open", str(REPO_ROOT)]
+
+
+def test_reveal_route_rejects_non_post(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    assert client.get(WORKBENCH_REVEAL_PATH).status_code == 405
+    assert client.put(WORKBENCH_REVEAL_PATH).status_code == 405
+    assert client.delete(WORKBENCH_REVEAL_PATH).status_code == 405
