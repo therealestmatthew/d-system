@@ -37,8 +37,10 @@ from starlette.websockets import WebSocketDisconnect
 import src.api as api_module
 import src.main as main_module
 from src.api.routes.demo_stage import (
+    DEFAULT_OVERVIEW_PAGE_PATH,
     DEMO_TERMINAL_FLAG_ENV_VAR,
     OVERVIEW_PAGE_PATH_ENV_VAR,
+    REPO_ROOT,
     TALKING_POINTS_PATH_ENV_VAR,
 )
 from src.api.routes.demo_terminal import (
@@ -622,12 +624,21 @@ def test_get_overview_location_reports_configured_path_without_requiring_file(
 def test_get_overview_location_defaults_to_a_path_under_public(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """The default must match tools/generate_overview.py's real output path
+    (`_public/overview/index.html`) exactly, not merely fall somewhere under `_public/` — a
+    looser assertion here is what let the two paths silently disagree before this fix."""
     monkeypatch.delenv(OVERVIEW_PAGE_PATH_ENV_VAR, raising=False)
     client = TestClient(main_module.app)
     response = client.get(DEMO_STAGE_OVERVIEW_LOCATION_PATH)
     assert response.status_code == 200
     path = response.json()["path"]
-    assert path.startswith("_public/")
+    # The route reports the default relative to REPO_ROOT (see get_overview_location); compare
+    # against DEFAULT_OVERVIEW_PAGE_PATH itself so a future change to that constant is caught here,
+    # matching tools/generate_overview.py's real output path exactly (_public/overview/index.html)
+    # rather than merely somewhere under _public/ — a looser assertion is what let the two paths
+    # silently disagree before this fix.
+    assert path == str(DEFAULT_OVERVIEW_PAGE_PATH.relative_to(REPO_ROOT))
+    assert path == "_public/overview/index.html"
 
 
 def test_get_terminal_enabled_reports_false_with_flag_unset(

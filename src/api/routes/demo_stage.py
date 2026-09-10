@@ -34,7 +34,7 @@ TALKING_POINTS_PATH_ENV_VAR: Final[str] = "D_SYSTEM_TALKING_POINTS_PATH"
 DEFAULT_TALKING_POINTS_PATH: Final[Path] = REPO_ROOT / "ts" / "public" / "talking-points.json"
 
 OVERVIEW_PAGE_PATH_ENV_VAR: Final[str] = "D_SYSTEM_OVERVIEW_PAGE_PATH"
-DEFAULT_OVERVIEW_PAGE_PATH: Final[Path] = REPO_ROOT / "_public" / "d-system-overview.html"
+DEFAULT_OVERVIEW_PAGE_PATH: Final[Path] = REPO_ROOT / "_public" / "overview" / "index.html"
 
 # Mirrors the flag name `src/api/__init__.py` checks to decide whether to import
 # `src.api.routes.demo_terminal` at all, and the flag `src/api/routes/demo_terminal.py` itself
