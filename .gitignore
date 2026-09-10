@@ -58,3 +58,22 @@ _worktrees/
 # (_capture/staging). Private by default (ADR-007 section 8): only records a promotion
 # step deliberately moves into _data/ are ever tracked. See PLAN-009 phase-cap-03.
 _capture/
+
+# Browser-verification output — screenshots dropped in the repository root by a phase's
+# visual checks, and the Playwright MCP server's own working directory. Ignored for two
+# reasons. They are regenerable: the finding a screenshot supported belongs in the session
+# record as prose, and the image can be produced again by re-running the check. And they
+# are unscannable: tools/check_no_private_content.py skips .png content by design
+# (CONTENT_CHECK_SKIP_SUFFIXES), so a screenshot is the one tracked file the content gate
+# cannot read — the eight that prompted this rule each showed the shell prompt, putting a
+# username and hostname in frame with nothing able to catch it.
+#
+# Anchored to the root so it never touches a deliberate image inside docs/ or templates/.
+# The tracked SVG diagrams under docs/07-architecture/diagrams/ are unaffected.
+/*.png
+.playwright-mcp/
+
+# NOT ignored, deliberately: .agents/ and .codex/. They look like tool directories but are
+# declared deliverables of the portable-agent-workflows phases — .agents/skills/*/SKILL.md
+# and .codex/agents/*.toml are named in docs/09-backlog/backlog.yaml. Ignoring either would
+# silently drop a peer's work. See PLAN-020.
