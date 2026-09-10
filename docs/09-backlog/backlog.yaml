@@ -4755,6 +4755,8 @@ items:
   - _data/ideas.jsonl
   - docs/00-working/ideas.md
   - _public/overview
+  - src/api/routes/demo_stage.py
+  - test/test_demo_terminal.py
   next_action: 'Claim released 2026-09-10 with zero commits on agent/phase-demo-05
     (worktree kept) when the owner folded phase-demo-06 into the track ahead of the
     rehearsals; re-claim after phase-demo-06 completes, then draft the runbook
