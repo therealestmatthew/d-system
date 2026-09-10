@@ -4516,6 +4516,7 @@ items:
   - ts/package-lock.json
   - ts/public/talking-points.json
   - ts/vite.config.ts
+  - test/test_demo_terminal.py
   next_action: Scaffold the stage page layout grid first and prove zero-scroll at the
     four sizes with placeholder panels before wiring xterm.js.
 - id: phase-demo-03
