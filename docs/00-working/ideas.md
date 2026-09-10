@@ -4681,3 +4681,46 @@ What it would touch: AGENTS.md only, two hunks. A full approved plan with the ex
 Unresolved — this is why the idea exists rather than the change: the owner approved the plan, but `.claude/settings.json` lines 4-7 hard-deny `Edit(AGENTS.md)` and `Write(AGENTS.md)`, and deny rules override approvals at the tool level. So the change needs either the owner applying the two hunks by hand, or the deny lifted for the duration and restored after. That mechanical question was put to the owner and deferred for time, not decided. Also undecided: whether it commits and pushes when applied.
 
 Marked priority-ish at the owner's request: worth doing before the next agent has to act on the rule, not urgent enough to interrupt current work.
+
+---
+
+## 000092 · HTML Designer agent: extract page designs into durable template families
+
+**Created 2026-09-10T18:58:09-04:00 · Status: `open`**
+
+An agent that scans the repository's HTML (_public/ pages, templates/ families, generated
+output) and extracts each page's design essence into durable, reusable templates — building an
+inventory of styles, themes, color palettes and general design schemas over time.
+
+Scope as envisioned by the owner (2026-09-10):
+- Scan a page and extract its token set (:root variables), type scale, component patterns and
+  interaction shell into a named template family under templates/styles/ and templates/html/,
+  following the existing family convention (header comment with provenance and usage, token
+  contract, canonical component markup).
+- Maintain an inventory index of families: palette swatches, theme character, component
+  coverage, which shipped pages render each family.
+- Propose merges when two pages share a scheme, and flag drift when a shipped page and its
+  family stylesheet diverge — drift is reported, not silently reconciled.
+- Registration lives in templates/README.md's family table.
+
+Precedent: the atlas family (templates/styles/atlas.css, templates/html/atlas-page.html,
+templates/html/atlas-components.html) was extracted manually on 2026-09-10 from
+_public/d-system-architecture.html and _public/prompt-pack-protocol.html — it is the
+inventory's first entry and the working example of the output this agent would produce.
+
+---
+
+## 000093 · Governance atlas page in the atlas design
+
+**Created 2026-09-10T18:58:09-04:00 · Status: `open`**
+
+A standalone HTML page covering the whole governance system in the atlas template family's
+design: the document-code series and allocator, the backlog protocol and claim model, the GOV
+document series, the idea lifecycle and sanctioned writer, and how the pieces reference each
+other — the broader companion to _public/prompt-pack-protocol.html, which covers only the
+prompt-pack planning protocol (GOV-008).
+
+Deferred by the owner on 2026-09-10 when scoping the protocol page: the ratified choice was
+"protocol + case studies for now, note to come back and build the broader governance atlas
+later." Build it from the atlas family (templates/styles/atlas.css, templates/html/atlas-*.html)
+rather than from scratch.
