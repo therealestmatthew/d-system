@@ -3360,6 +3360,7 @@ Raised by the owner on 2026-09-10.
 
 - relates_to → `000071`
 - relates_to ← `000071`
+- relates_to ← `000077`
 
 ---
 
@@ -3421,6 +3422,7 @@ Raised by the owner on 2026-09-10, alongside the training-demo idea.
 - relates_to → `000010`
 - relates_to → `000042`
 - relates_to ← `000070`
+- relates_to ← `000077`
 
 ---
 
@@ -3485,6 +3487,7 @@ Raised by the owner on 2026-09-10.
 - extended_by ← `000073`
 - extended_by ← `000074`
 - extended_by ← `000075`
+- relates_to ← `000077`
 
 ---
 
@@ -3681,3 +3684,74 @@ scratch later.
 **Links**
 
 - relates_to → `000069`
+
+---
+
+## 000077 · Handle subagent tool-use truncation: resume to recover, do not re-run
+
+**Created 2026-09-10T03:57:14-04:00 · Status: `open`**
+
+Subagents in this repository silently hit a tool-use cap and stop mid-work, before they write their
+conclusion. Observed directly on 2026-09-10 while running six read-only triage scouts in parallel: two
+of the six returned truncated output with no finding, both having used exactly 30 tool calls. The four
+that completed used 14 to 19. The cap is not documented anywhere in this repository, and nothing in
+the agent's own output says it was cut off — the report simply ends mid-sentence, in one case at "Now
+let me check if there's any existing metrics or report command anywhere:".
+
+The important part is what a truncated agent still holds. Resuming one preserves its context, so the
+work it already did is recoverable rather than lost. Measured on the metrics scout (000071):
+
+  run 1   30 tool uses   42,909 tokens   87s   truncated, no finding
+  run 2    0 tool uses   42,783 tokens   12s   complete finding, three proposed links
+
+Near-identical token counts across the two runs is the evidence that the 30 prior tool results were
+still in context. Run 2 was not recall from training data; it was reporting research already done but
+never delivered. Every claim it made checked out on independent verification: the four proposed link
+targets, fold() in src/db/ideas.py, the four idea tables in sql/001_schema.sql, both rebuild_db.py and
+generate_ideas_md.py reading through the fold, the OPS-002/005/006 pairings, and the absence of any
+existing metrics tool.
+
+The resume instruction decides the behaviour. The scout told to "stop searching and answer from what
+you already found" used 0 further tool calls and finished in 12 seconds. A sibling scout (000070)
+resumed without that instruction spent another 30 tool calls and hit the cap a second time. So
+tool_uses is per-invocation, not cumulative, and a resume can burn the whole budget again on work that
+was already done.
+
+Idea: make this a known, handled condition rather than something each driver rediscovers.
+
+What it would touch:
+- The triage agent's instructions (.claude/agents/idea-triage.md), and by extension whatever PLAN-020's
+  portable manifest generates: an agent approaching its budget should write its conclusion from what it
+  has rather than continuing to search, so truncation costs a worse finding instead of no finding.
+- Driver-side guidance in AGENTS.md or a governance document on recognising truncation and resuming
+  with an explicit "stop and report" instruction. Note AGENTS.md and CLAUDE.md may not be edited
+  without the owner's separate approval.
+- PROMPT-006, which instructs triage but says nothing about budgets.
+- Possibly the demo material in 000070, since a live audience will hit this.
+
+Verification: a scout deliberately given a task larger than its budget still returns a usable finding
+rather than stopping mid-sentence; a resumed agent instructed to stop searching returns without
+further tool calls; and a driver following the written guidance recovers a truncated scout's work
+without re-running it from scratch.
+
+What is unresolved:
+- Whether the cap is fixed at 30, configurable, or varies by agent type and model. It was 30 in both
+  observed cases but two samples is not a measurement.
+- Whether truncation can be detected programmatically. The usage metadata reports tool_uses but nothing
+  that distinguishes "finished" from "cut off"; today the only signal is a human noticing the report
+  ends mid-sentence.
+- Whether an agent can observe its own remaining budget. If it cannot, "write your conclusion before
+  you run out" is advice it has no way to act on, and the fix has to be structural — for instance
+  requiring a finding to be drafted early and revised, rather than composed at the end.
+- How this interacts with running scouts in parallel. Six at once multiplied the chance that at least
+  one truncated; two of six did.
+
+Raised on 2026-09-10 after the owner asked what had happened to the agent that answered with no tool
+calls. Relates to 000072 (lifecycle agents), which inherits this problem for every agent it proposes,
+and to 000070 (training demo), which would hit it in front of an audience.
+
+**Links**
+
+- relates_to → `000072`
+- relates_to → `000070`
+- relates_to → `000071`
