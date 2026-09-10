@@ -18,6 +18,7 @@ data/
 # Node / TypeScript
 ts/node_modules/
 ts/dist/
+ts/tsconfig.tsbuildinfo
 js/node_modules/
 
 # Environment

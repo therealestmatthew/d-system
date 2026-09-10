@@ -49,6 +49,11 @@ This is the parent of a pack. Children are read **only when the step that needs 
 >    your phases must be `—`. `git switch dev && git pull`; confirm the primary checkout is clean.
 > 4. Record the wall-clock start time. You will compare against it at every phase boundary
 >    (`PROMPT-016` governs what to do when behind).
+> 5. Confirm the Playwright MCP server is loaded — the `.mcp.json` project server needs the
+>    owner's one-time approval in a fresh session — and browsers are installed
+>    (`npx playwright install chromium`, once per machine). If this is the first session using
+>    it, dispatch `demo-validator-web`'s one-item smoke (report available browser tools) before
+>    any phase needs it.
 >
 > ### Step 1 — Execute the phase graph
 >
@@ -77,7 +82,11 @@ This is the parent of a pack. Children are read **only when the step that needs 
 >
 > ### Step 4 — Close out (every session, including interrupted ones)
 >
-> Run the checkpoint skill; update nothing to `complete` (only `/session-close` does that). Report
+> Run the checkpoint skill — it never sets `complete` itself. Phase completion follows the
+> demo-track completion decision in `GOV-003`: after a phase's adversarial review and agentic
+> testing pass (PROMPT-015 step 8) and its branch is integrated with the owner's approval, set
+> that phase `status: complete` on `dev` per PROMPT-015 step 9; the owner reviews retroactively.
+> Report
 > per `GOV-006`: phase-by-phase state with real verification output, spend posture (loop counts,
 > any escalation), wall-clock against budget, descope-ladder steps taken if any, assumptions made,
 > and — if the build is not finished — the exact resume state so the next run of this same prompt
