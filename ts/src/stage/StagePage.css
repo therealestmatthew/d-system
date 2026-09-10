@@ -187,14 +187,78 @@ body {
   color: #b34700;
 }
 
+.stage-talking-points__mode-toggle {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+.stage-talking-points__mode-toggle[aria-pressed='true'] {
+  background: #d9e0ec;
+  border-color: #6b7fa8;
+}
+
+/* The rotator's current-point transition. Only rendered in rotator mode — static-list mode
+   (PLAN-021 rung 2) renders every point as a plain list with no animation at all. */
+.stage-talking-points__current {
+  animation: stage-talking-points-fade-in 0.3s ease;
+}
+
+@keyframes stage-talking-points-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .stage-talking-points__controls {
   margin-bottom: 0.5rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.stage-talking-points__controls button {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+.stage-talking-points__controls button[aria-pressed='true'] {
+  background: #d9e0ec;
+  border-color: #6b7fa8;
 }
 
 .stage-talking-points__list {
   margin: 0;
   padding-left: 1.1rem;
   font-size: 0.82rem;
+}
+
+.stage-talking-points__list--static {
+  overflow-y: auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.stage-region__body--overview {
+  padding: 0;
+}
+
+.stage-overview__iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 .stage-overview__open-link {
