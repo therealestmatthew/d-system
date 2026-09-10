@@ -4562,7 +4562,7 @@ items:
     backlog-by-status; concepts/terms; systems), each reading idea state only through
     fold()/load_events(). uv run pytest passes 417 tests; ruff check src/ test/ and
     mypy src/ are clean; uv run python -m src.governance reports Governance OK: 18
-    systems, 130 documents, 15 memories, 110 backlog phases; each tool run twice
+    systems, 131 documents, 15 memories, 110 backlog phases; each tool run twice
     against the unchanged tree diffs empty. OPS-011/OPS-012 carry filled generated
     blocks and codes.yaml no longer reserves OPS-011/OPS-012. D03-G (demo-validator-check)
     verdict: all checklist items green.'

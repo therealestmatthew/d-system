@@ -23,7 +23,7 @@ depends_on: [doc-live-demo, doc-prompt-demo-build-delegation-pack]
 - `uv run pytest` — `417 passed, 2 warnings`.
 - `uv run ruff check src/ test/` — `All checks passed!`.
 - `uv run mypy src/` — `Success: no issues found in 15 source files`.
-- `uv run python -m src.governance` — `Governance OK: 18 systems, 130 documents, 15 memories,
+- `uv run python -m src.governance` — `Governance OK: 18 systems, 131 documents, 15 memories,
   110 backlog phases`, exit 0.
 - `uv run python tools/check_no_private_content.py`, run with all changes staged (the worktree
   was already fully committed, so `git add -A` staged nothing) —
