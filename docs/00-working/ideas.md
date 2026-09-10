@@ -40,6 +40,7 @@ Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority
 3. `000038` — Formalize the requirements-vs-plans process and design
 4. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
 5. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+6. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -4659,3 +4660,24 @@ Seeded by `tools/demo_reset.py prepare` so the live-rebuild segment (REQ-006 R09
 **Created 2026-09-10T14:49:28-04:00 · Status: `open`**
 
 Recorded during the 2026-09-10 dry-run rehearsal (demo-validator-code, phase-demo-05 worktree). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]
+
+---
+
+## 000091 · Rewrite the AGENTS.md push rule so its general/exception structure is legible
+
+**Created 2026-09-10T18:16:47-04:00 · Status: `open`**
+
+AGENTS.md states the push rule twice, and each passage states only half of it without saying which half:
+
+- Lines 50-51, "Confidentiality and publishing", states only the exception, phrased as an absolute: "Pushing your own branch to `origin` needs no approval. Publish `agent/<phase-id>` freely; `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing."
+- Lines 186-187, "Concurrent agents: claim a phase", states only the general rule, also as an absolute: "A remote now exists, so `git fetch`, `git pull` and `git push` all work — but ask the owner before pushing (see Confidentiality and publishing)."
+
+Both are correct. Together they are one general rule (ask the owner before pushing to `origin`) plus one standing exception (your own `agent/<phase-id>` branch needs no approval, because backing up your own work is not publishing). Nothing in either passage says so, and line 186's cross-reference points at the passage that appears to contradict it — so an agent following the pointer finds the opposite instruction with no way to tell which governs. This lands at exactly the moment an agent finishes a phase and has to decide what to do with its branch.
+
+Came up on 2026-09-10 while auditing README.md and GOV-007-repo-orientation.md for stale claims. I initially read the two passages as a contradiction and proposed picking a survivor; the owner corrected that — the exception is deliberate, and only the wording needs to make the relationship explicit.
+
+What it would touch: AGENTS.md only, two hunks. A full approved plan with the exact replacement text for both passages is at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md — hunk 1 restates the bullet as general-rule-then-exception; hunk 2 turns the duplicate into a pointer that names the structure instead of repeating an absolute. CLAUDE.md duplicates the exception in its integration-rule sentence; that parenthetical stays accurate under the rewrite and no CLAUDE.md edit is proposed, but it is that file's own named drift risk and is worth a look if the general rule is ever restated there.
+
+Unresolved — this is why the idea exists rather than the change: the owner approved the plan, but `.claude/settings.json` lines 4-7 hard-deny `Edit(AGENTS.md)` and `Write(AGENTS.md)`, and deny rules override approvals at the tool level. So the change needs either the owner applying the two hunks by hand, or the deny lifted for the duration and restored after. That mechanical question was put to the owner and deferred for time, not decided. Also undecided: whether it commits and pushes when applied.
+
+Marked priority-ish at the owner's request: worth doing before the next agent has to act on the rule, not urgent enough to interrupt current work.

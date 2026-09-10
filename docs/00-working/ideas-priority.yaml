@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-09'
+updated: '2026-09-10'
 # Ideas that jump the queue, in order. Everything else falls back to status then ID
 # (open before triaged; lower ID first within a status). Hand-edited, like backlog.yaml's
 # next_up — reordering is an operational decision, not a fact logged in _data/ideas.jsonl.
@@ -11,3 +11,4 @@ next_up:
 - '000038'
 - '000037'
 - '000040'
+- '000091'
