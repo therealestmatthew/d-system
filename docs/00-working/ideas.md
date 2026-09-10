@@ -35,10 +35,11 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-2. `000038` — Formalize the requirements-vs-plans process and design
-3. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-4. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+1. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+2. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+3. `000038` — Formalize the requirements-vs-plans process and design
+4. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+5. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
 
 ---
 
@@ -3018,3 +3019,76 @@ retrieval work needs to exist first, or this stays a manual/approximate check un
 - relates_to → `000064`
 - relates_to → `000062`
 - relates_to → `000055`
+
+---
+
+## 000066 · Protect main and require PRs from dev, with a multi-agent developer protocol to match
+
+**Created 2026-09-09T20:16:50-04:00 · Status: `open`**
+
+Nothing currently prevents a direct commit to `main`. As of 2026-09-09 `main` is the only branch, it
+is the remote's default, and `AGENTS.md` instructs agents to claim phases and integrate work onto it
+directly. That was a deliberate choice made in the same session that squashed history and added the
+remote (`SESS-2026-09-09-01`), but it was chosen for a repository with no remote and no collaborators,
+and it stops fitting the moment either changes.
+
+The owner's stated direction, recorded 2026-09-09: **work should not merge into `main` directly.
+`dev` becomes the integration branch again, and `main` only ever receives work through a pull
+request opened from `dev`.** Branch protection on the remote should enforce that rather than relying
+on every agent remembering it.
+
+This idea therefore revises a decision made hours earlier in the same day. That is deliberate and
+worth stating plainly: the branch model committed in `0c82996` rewrote 31 references across
+`AGENTS.md`, `GOV-001`, `GOV-002`, `GOV-003`, `GOV-005` and `OPS-001` from `dev` to `main`, on the
+reasoning that `main` had just been chosen as the pushed default. If this idea is built, most of
+those references move back, and the two-branch model the documents originally described is restored
+with a PR gate added on top. Whoever picks this up should read that commit before touching anything,
+because a naive revert would also undo the post-push policy corrections that shipped alongside it.
+
+What it would cover:
+
+- **Branch protection on GitHub** for `main`: require a pull request before merging, disallow direct
+  pushes, and decide whether to require review approval, passing status checks, linear history, and
+  whether the owner's own account is exempt. The repository is currently private and single-owner, so
+  some of these are ceremony today and load-bearing later; the decision should say which is which and
+  why, rather than enabling everything by reflex.
+- **Recreate `dev`** as the integration branch and set it as the default branch for day-to-day work,
+  leaving `main` as the released/reviewed trunk.
+- **Reconcile the governance documents** with whichever model is chosen — `AGENTS.md`'s "Concurrent
+  agents: claim a phase" and "complete and hand off" sections, `GOV-001`'s catalog-lock language,
+  `GOV-002`, `GOV-003`'s worktree conditions, `GOV-005`'s "never reused once it reaches" rule, and
+  `OPS-001`. These are the same passages `0c82996` touched.
+- **The multi-agent developer protocol itself.** Today `ADR-003` and `AGENTS.md` describe agents
+  claiming a phase in `backlog.yaml` and integrating onto the trunk directly. With a PR gate the
+  protocol needs answers it does not currently have: does each agent open its own PR from
+  `agent/<phase-id>` into `dev`, or do agents integrate onto `dev` and only `dev`-to-`main` is gated?
+  Who opens the `dev` to `main` PR, and on what cadence — per phase, per plan, or per session? What
+  happens to the existing claim/lock mechanism when merges become asynchronous and a PR can sit open
+  across sessions? How does an agent know whether its work has landed?
+- **CI as the enforcement point.** `.github/workflows/ci.yaml` already runs tests and builds. Branch
+  protection is most useful when it requires those checks to pass, which makes CI a merge gate rather
+  than a report. That interacts with the leak checker: `tools/check_no_private_content.py` should
+  almost certainly be a required check, since the sweep session showed it only sees staged or tracked
+  files and a PR is exactly where an untracked-until-now file becomes visible.
+
+What is unresolved:
+
+- Whether a single-owner private repository benefits from PR review gates now, or whether the value
+  is entirely in the habit and the audit trail. Worth deciding explicitly rather than assuming.
+- Whether agents can realistically open pull requests, which needs `gh` auth available to them, and
+  whether that is desirable given the confidentiality history — an agent that can open a PR can push
+  a branch, and `AGENTS.md` currently says to ask before pushing anything.
+- How this interacts with the primary-checkout exception in `GOV-003`. A documentation-only phase
+  currently commits straight to the trunk; under a PR gate it cannot, which either removes the
+  exception or gives it a narrower meaning.
+- Whether `phase-priv-05`'s "no force-push to origin" caution needs restating as branch protection
+  rather than prose, now that force-push protection is a setting rather than a rule to remember.
+
+Verification, if built: a direct push to `main` is rejected by the remote; a PR from `dev` with a
+failing check cannot merge; an agent following the updated `AGENTS.md` end to end lands work without
+touching `main` directly; and the governance documents contain no reference to a branch model that is
+not the one in force — the exact failure class that produced `0c82996`.
+
+Raised by the owner on 2026-09-09, immediately after reviewing the post-push policy corrections and
+the four workflow prompts (PROMPT-006 through PROMPT-009). Needs a requirement and a plan before any
+implementation, per AGENTS.md's plan-before-code rule.
