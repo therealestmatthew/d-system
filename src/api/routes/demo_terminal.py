@@ -10,9 +10,10 @@ fails fast at import time, before the app finishes constructing.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import sys
-from typing import Final
+from typing import Final, TypeGuard
 
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
@@ -98,17 +99,59 @@ async def _pump_adapter_to_websocket(adapter: TerminalAdapter, websocket: WebSoc
             await websocket.send_bytes(data)
 
 
+def _is_positive_int(value: object) -> TypeGuard[int]:
+    """True for a JSON integer greater than zero — excludes bool, which is an int subclass."""
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def _apply_control_message(adapter: TerminalAdapter, text: str) -> None:
+    """Parse a text frame as a control message and apply it, or drop it silently.
+
+    The only recognized control message is `{"type": "resize", "cols": N, "rows": N}` with
+    positive integer `cols`/`rows`. Invalid JSON, a non-object payload, an unrecognized
+    `"type"`, or a missing/non-positive-integer `cols`/`rows` is dropped without raising —
+    a malformed text frame must never crash the session and must never reach the shell as
+    input, so there is no fallback path here that writes `text` to the adapter.
+    """
+    try:
+        message = json.loads(text)
+    except (json.JSONDecodeError, TypeError):
+        return
+    if not isinstance(message, dict) or message.get("type") != "resize":
+        return
+    cols = message.get("cols")
+    rows = message.get("rows")
+    if not _is_positive_int(cols):
+        return
+    if not _is_positive_int(rows):
+        return
+    adapter.resize(cols, rows)
+
+
 @router.websocket("/ws")
 async def terminal_websocket(websocket: WebSocket) -> None:
-    """Bridge a websocket connection to a real shell session via the `src.demo` adapter."""
+    """Bridge a websocket connection to a real shell session via the `src.demo` adapter.
+
+    Two ASGI frame kinds share this one socket: binary frames are raw shell input, written
+    to the adapter unchanged; text frames are control messages (today, only a terminal
+    resize) parsed and applied by `_apply_control_message` — never written to the shell.
+    """
     await websocket.accept()
     adapter = create_adapter()
     adapter.start()
     pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))
     try:
         while True:
-            data = await websocket.receive_bytes()
-            adapter.write(data)
+            message = await websocket.receive()
+            if message["type"] == "websocket.disconnect":
+                raise WebSocketDisconnect(message["code"], message.get("reason"))
+            data = message.get("bytes")
+            if data is not None:
+                adapter.write(data)
+                continue
+            text = message.get("text")
+            if text is not None:
+                _apply_control_message(adapter, text)
     except WebSocketDisconnect:
         pass
     finally:

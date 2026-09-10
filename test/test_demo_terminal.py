@@ -21,6 +21,7 @@ that both routes are registered regardless of `D_SYSTEM_DEMO_TERMINAL`.
 from __future__ import annotations
 
 import importlib
+import json
 import subprocess
 import sys
 import time
@@ -230,6 +231,118 @@ def test_websocket_command_round_trip_with_flag_set(rebuild_app: Callable[..., F
         while b"demo-terminal-ws-marker" not in output and time.monotonic() < deadline:
             output += websocket.receive_bytes()
     assert b"demo-terminal-ws-marker" in output
+
+
+def test_resize_text_frame_applies_to_pty_window_size(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """A `{"type": "resize", ...}` text frame reaches the real PTY: `stty size` — read back
+    through the same shell the websocket drives — reports the dimensions the frame set, not
+    the PTY's default allocation size.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    output = b""
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+        websocket.send_text(json.dumps({"type": "resize", "cols": 132, "rows": 51}))
+        websocket.send_bytes(b"stty size\n")
+        deadline = time.monotonic() + 5.0
+        while b"51 132" not in output and time.monotonic() < deadline:
+            output += websocket.receive_bytes()
+    assert b"51 132" in output
+
+
+def test_malformed_text_frame_is_dropped_without_crashing_or_reaching_shell(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """Neither invalid JSON, a non-object payload, an unrecognized `"type"`, nor a
+    non-positive-integer `cols`/`rows` crashes the session or lands in the shell's input
+    stream — the session keeps working normally afterward, and the malformed text itself
+    never appears in the shell's output.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    output = b""
+    malformed_frames = [
+        "not json at all {{{",
+        "42",
+        '{"type": "banana"}',
+        '{"type": "resize"}',
+        '{"type": "resize", "cols": -5, "rows": 10}',
+        '{"type": "resize", "cols": "wide", "rows": 10}',
+        '{"type": "resize", "cols": 1.5, "rows": 10}',
+    ]
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+        for frame in malformed_frames:
+            websocket.send_text(frame)
+        websocket.send_bytes(b"echo demo-terminal-malformed-marker\n")
+        deadline = time.monotonic() + 5.0
+        while (
+            b"demo-terminal-malformed-marker" not in output and time.monotonic() < deadline
+        ):
+            output += websocket.receive_bytes()
+    assert b"demo-terminal-malformed-marker" in output
+    for frame in malformed_frames:
+        assert frame.encode() not in output
+
+
+def test_binary_round_trip_still_works_after_a_text_frame(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """A resize control frame does not disturb the ordinary binary input/output bridge — a
+    real command sent right after it still round-trips its real output.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    output = b""
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+        websocket.send_text(json.dumps({"type": "resize", "cols": 100, "rows": 40}))
+        websocket.send_bytes(b"echo demo-terminal-after-resize-marker\n")
+        deadline = time.monotonic() + 5.0
+        while (
+            b"demo-terminal-after-resize-marker" not in output
+            and time.monotonic() < deadline
+        ):
+            output += websocket.receive_bytes()
+    assert b"demo-terminal-after-resize-marker" in output
+
+
+def test_two_concurrent_websocket_sessions_are_independent_shells(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """Each websocket connection gets its own `create_adapter()` call and so its own PTY and
+    shell process — a variable set in one session's shell must not appear in the other's.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as ws_one, client.websocket_connect(
+        DEMO_TERMINAL_WS_PATH
+    ) as ws_two:
+        ws_one.send_bytes(b"export SESSION_MARKER=session-one-value\n")
+        ws_two.send_bytes(b"export SESSION_MARKER=session-two-value\n")
+        ws_one.send_bytes(b"echo marker-one-is-$SESSION_MARKER\n")
+        ws_two.send_bytes(b"echo marker-two-is-$SESSION_MARKER\n")
+
+        output_one = b""
+        deadline = time.monotonic() + 5.0
+        while (
+            b"marker-one-is-session-one-value" not in output_one
+            and time.monotonic() < deadline
+        ):
+            output_one += ws_one.receive_bytes()
+
+        output_two = b""
+        deadline = time.monotonic() + 5.0
+        while (
+            b"marker-two-is-session-two-value" not in output_two
+            and time.monotonic() < deadline
+        ):
+            output_two += ws_two.receive_bytes()
+
+    assert b"marker-one-is-session-one-value" in output_one
+    assert b"session-two-value" not in output_one
+    assert b"marker-two-is-session-two-value" in output_two
+    assert b"session-one-value" not in output_two
 
 
 def test_registration_fails_fast_for_non_loopback_bind_with_flag_set(
