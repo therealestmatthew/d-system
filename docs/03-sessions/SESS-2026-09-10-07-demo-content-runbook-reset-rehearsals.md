@@ -143,6 +143,67 @@ Governance OK: 18 systems, 139 documents, 15 memories, 112 backlog phases
 check_no_private_content: OK (437 tracked files, 0 identifiers checked)
 ```
 
+### Fix cycle 3/3 (owner-sanctioned, beyond the standard two-cycle cap) — D05-W browser pass
+
+`dev` commit `d4d2610` widened this phase's deliverables to `src/api/routes/demo_stage.py` and
+`test/test_demo_terminal.py` for the findings below. The branch was rebased onto `dev` at
+`d4d2610` (two conflicts, both in already-encountered files — `docs/08-governance/catalog.md`,
+generated, regenerated fresh after the rebase rather than hand-merged, and
+`docs/09-backlog/backlog.yaml`, resolved by keeping both sides as in the prior fix cycles;
+`_data/ideas.jsonl`'s append-only invariant reconfirmed: 0 removed lines against `dev`, 3 net-new).
+
+- **Fixed** — `src/api/routes/demo_stage.py`'s `DEFAULT_OVERVIEW_PAGE_PATH` was
+  `_public/d-system-overview.html`; `tools/generate_overview.py` actually writes
+  `_public/overview/index.html`, so after a successful rebuild the stage kept reporting the
+  overview absent unless `D_SYSTEM_OVERVIEW_PAGE_PATH` was set by hand — undocumented anywhere.
+  Aligned the default; the env-var override is unchanged. The existing default-path test asserted
+  only that the path started with `_public/`, loose enough to pass with either the wrong default
+  or the corrected one — tightened it to assert the exact expected value
+  (`_public/overview/index.html`), computed from `DEFAULT_OVERVIEW_PAGE_PATH` itself. D05-W
+  verified live that the panel populates once the path is correct.
+- **Fixed** — the runbook's `/orient` step and the Windows checklist's smoke-check frontend start
+  command omitted `VITE_API_TARGET`; without it the dev proxy silently targets
+  `http://localhost:8000` instead of the demo backend on `8010`, and every stage route 404s if
+  anything else holds port 8000 (D05-W reproduced this). Both now state
+  `VITE_API_TARGET=http://localhost:8010` alongside the `npm run dev` command, with a one-line
+  note on the failure mode.
+- **Fixed** — "half-width window" appeared in both documents with no pixel definition. Both now
+  say 960×1080, D05-W's own interpretation, which it confirmed passing.
+- **Record only, not fixed** — `ts/public/demo-commands.json` still carries placeholder entries
+  (labeled `PLACEHOLDER COMMAND 1/2/3`). Its real-copy authoring fell between phases:
+  `phase-demo-06` created this file after `phase-demo-05` was already scoped, so no phase's
+  delegation pack assigns writing its content. Deferred to the workbench track (PROMPT-020),
+  whose terminal rework revises this panel anyway.
+- **Record only, not fixed** — D05-W observed a harmless-but-visible websocket startup-race
+  console warning at `ts/src/stage/TerminalRegion.tsx:105`. Noted as a known cosmetic item for the
+  workbench track; not a `phase-demo-05` deliverable.
+
+Verification re-run after this fix cycle (real output, in the worktree):
+
+`uv run pytest`
+```
+495 passed, 2 warnings
+```
+
+`cd ts && npm run build`
+```
+✓ 38 modules transformed.
+dist/index.html                   0.39 kB │ gzip:   0.27 kB
+dist/assets/index-ZpTiJ9jO.css   12.84 kB │ gzip:   3.62 kB
+dist/assets/index-DWqr5BsF.js   495.40 kB │ gzip: 136.12 kB
+✓ built in 999ms
+```
+
+`uv run python -m src.governance`
+```
+Governance OK: 18 systems, 140 documents, 15 memories, 112 backlog phases
+```
+
+`uv run python tools/check_no_private_content.py` with the changes staged
+```
+check_no_private_content: OK (438 tracked files, 0 identifiers checked)
+```
+
 ## Acceptance
 
 - Both dry-runs complete within 15 minutes with every step inside its timebox, and their times
@@ -170,20 +231,25 @@ check_no_private_content: OK (437 tracked files, 0 identifiers checked)
 
 `phase-demo-05` — `status: active`, `agent: agent-demo-content`.
 
-`next_action`: D05-G is green on all 9 items; D05-A's two majors (Windows gate scope,
-talking-points length) are fixed on `agent/phase-demo-05`, its minor is recorded only (outside
-this phase's deliverables), and its two blockers are deferred by owner decision (PROMPT-020
-decision 7 — complete owner-driven R09 timing moves to the workbench track's rehearsal-refresh
-phase). Report this to the coordinator so it can dispatch D05-W (Playwright rehearsal pass) per
-GOV-003. Still outstanding, not fixable from this worktree: the REQ-006 R06 Windows smoke check
-(owner-machine work) and the deferred owner-driven timing pass.
+`next_action`: D05-G is green on all 9 items; D05-A's two majors and D05-W's one finding requiring
+a code fix are all fixed on `agent/phase-demo-05`; the minors from both reviews are recorded only
+(outside this phase's deliverables); the two D05-A blockers are deferred by owner decision
+(PROMPT-020 decision 7). `uv run pytest`, `cd ts && npm run build`, governance and the staged
+private-content check all pass on the rebased tree (see `## Verification` above). Reported to the
+coordinator as green — the phase goes to the owner for integration from here. Still outstanding,
+not fixable from this worktree: the REQ-006 R06 Windows smoke check (owner-machine work) and the
+deferred owner-driven timing pass.
 
 ## Unresolved
 
-- D05-W (Playwright rehearsal pass) is coordinator-dispatched, not yet run.
 - `/idea-triage`'s subagent-dispatch half and the full owner-driven R09 timing are deferred to
   the workbench track's rehearsal-refresh phase per PROMPT-020 decision 7 — not a defect left
   unfixed here.
 - The REQ-006 R06 Windows terminal smoke check has not been run — owner-machine work, outstanding.
 - The stale placeholder comment at `ts/src/stage/TalkingPointsRegion.tsx:31` is recorded, not
   fixed — outside `phase-demo-05`'s deliverables; the workbench rework owns that file's future.
+- `ts/public/demo-commands.json`'s placeholder entries are recorded, not fixed — the file is a
+  `phase-demo-06` deliverable created after `phase-demo-05` was scoped; real copy is deferred to
+  the workbench track per PROMPT-020.
+- D05-W's websocket startup-race console warning at `ts/src/stage/TerminalRegion.tsx:105` is
+  recorded as a known cosmetic item for the workbench track.

@@ -4758,23 +4758,28 @@ items:
   - src/api/routes/demo_stage.py
   - test/test_demo_terminal.py
   session: doc-session-demo-content-runbook-reset-rehearsals
-  next_action: 'D05-G is green on all 9 items. D05-A''s two majors are fixed on
-    agent/phase-demo-05: the Windows checklist (docs/00-working/demo-windows-setup.md)
-    now runs PROMPT-017''s full 7-item fresh-eyes checklist once on the
-    presentation machine plus a prepare/restore verification against the tagged
-    state, both with result blocks; ts/public/talking-points.json is reshaped to
-    D05-O''s own headline-plus-three-lines rule (npm run build reverified clean).
-    D05-A''s minor (a stale placeholder comment in
-    ts/src/stage/TalkingPointsRegion.tsx, outside this phase''s deliverables) is
-    recorded only. D05-A''s two blockers (R09''s partial timing evidence; agent-
-    driven rather than owner-driven dry-runs) are deferred by owner decision
-    (PROMPT-020 decision 7, dev commit 4c0acd5): the workbench track''s
+  next_action: 'D05-G is green on all 9 items. D05-A''s two majors and D05-W''s one
+    code-level finding are fixed on agent/phase-demo-05: the Windows checklist runs
+    PROMPT-017''s full 7-item fresh-eyes checklist plus a prepare/restore
+    verification against the tagged state; ts/public/talking-points.json is
+    reshaped to D05-O''s headline-plus-three-lines rule; the runbook and Windows
+    checklist name VITE_API_TARGET on the frontend start command and define
+    half-width as 960x1080; src/api/routes/demo_stage.py''s
+    DEFAULT_OVERVIEW_PAGE_PATH now matches generate_overview.py''s real output
+    path (_public/overview/index.html), with its test tightened to assert the
+    exact value. Recorded only, not fixed: a stale placeholder comment in
+    ts/src/stage/TalkingPointsRegion.tsx (D05-A minor), ts/public/demo-commands.json''s
+    placeholder entries (a phase-demo-06 deliverable created after this phase was
+    scoped), and a websocket startup-race console warning in TerminalRegion.tsx
+    (D05-W) — all three outside this phase''s deliverables, deferred to the
+    workbench track (PROMPT-020). D05-A''s two blockers (R09''s partial timing
+    evidence; agent-driven rather than owner-driven dry-runs) are deferred by
+    owner decision (PROMPT-020 decision 7): the workbench track''s
     rehearsal-refresh phase re-times the live segment owner-driven against the
-    final UI next week; the runbook now says so in one sentence. uv run pytest,
-    npm run build, governance and the staged private-content check all pass.
-    Reported to the coordinator so it can dispatch D05-W (Playwright rehearsal
-    pass) per GOV-003. Still outstanding, owner-machine work: the REQ-006 R06
-    Windows smoke check.'
+    final UI. uv run pytest, npm run build, governance and the staged
+    private-content check all pass on the rebased tree. Reported green to the
+    coordinator; the phase goes to the owner for integration from here. Still
+    outstanding, owner-machine work: the REQ-006 R06 Windows smoke check.'
 - id: phase-demo-06
   title: Stage terminal interaction — session tabs, guarded drop, command injection
   plan: doc-live-demo
