@@ -78,6 +78,14 @@ CI regenerates it and fails on any difference.
 | PROMPT-007 | prompt | active | repository-owner | docs/02-prompts/PROMPT-007-idea-to-plan.md |
 | PROMPT-008 | prompt | active | repository-owner | docs/02-prompts/PROMPT-008-execute-a-phase.md |
 | PROMPT-009 | prompt | active | repository-owner | docs/02-prompts/PROMPT-009-plan-audit.md |
+| PROMPT-010 | prompt | active | repository-owner | docs/02-prompts/PROMPT-010-demo-agent-factory.md |
+| PROMPT-011 | prompt | active | repository-owner | docs/02-prompts/PROMPT-011-demo-governance-docs-spec.md |
+| PROMPT-012 | prompt | active | repository-owner | docs/02-prompts/PROMPT-012-demo-agent-roster-spec.md |
+| PROMPT-013 | prompt | active | repository-owner | docs/02-prompts/PROMPT-013-demo-delegation-pack-spec.md |
+| PROMPT-014 | prompt | active | repository-owner | docs/02-prompts/PROMPT-014-demo-build-orchestration.md |
+| PROMPT-015 | prompt | active | repository-owner | docs/02-prompts/PROMPT-015-demo-phase-protocol.md |
+| PROMPT-016 | prompt | active | repository-owner | docs/02-prompts/PROMPT-016-demo-guardrails.md |
+| PROMPT-017 | prompt | active | repository-owner | docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -140,7 +148,7 @@ CI regenerates it and fails on any difference.
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 4 | 0 | 3 | agent-checkpoint, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 3 | 1 | 3 | agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
@@ -157,7 +165,7 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
-| PLAN-020 | doc-portable-agent-workflows | draft | 3 | 0 | 0 | — |
+| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
 
 ## Held codes
 
@@ -168,4 +176,4 @@ CI regenerates it and fails on any difference.
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-115 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 31, prompt: 9, requirement: 5, session: 39.
+123 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 31, prompt: 17, requirement: 5, session: 39.
