@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-demo-01
 - phase-demo-02
 - phase-demo-04
 - phase-demo-05
@@ -4400,7 +4399,7 @@ items:
   - sys-api
   - sys-demo-stage
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-stage
   priority: 1
   session_budget: 1
@@ -4441,8 +4440,29 @@ items:
   - pyproject.toml
   - uv.lock
   - test/test_demo_terminal.py
-  next_action: Implement the PTY adapter interface and its POSIX implementation, then
-    the flag-gated websocket route and its absence-by-default test.
+  next_action: 'None — phase complete: D01-A adversarial findings fixed, branch integrated
+    into dev with the owner''s approval (GOV-003 demo-track completion gate).'
+  session: doc-session-demo-stage-terminal-backend
+  completion_evidence:
+  - src/demo/adapter.py
+  - src/demo/factory.py
+  - src/demo/posix.py
+  - src/demo/windows.py
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/demo_stage.py
+  - test/test_demo_terminal.py
+  result: 'Integrated into dev at 12b019b (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. PTY adapter package (POSIX pty + bash; ConPTY
+    via pywinpty deferred to start()), flag-gated websocket route absent by default
+    per ADR-013, loopback fail-fast enforced for argv --host, D_SYSTEM_BIND_HOST and
+    UVICORN_HOST, and read-only stage routes including GET
+    /api/v1/demo/stage/terminal-enabled. D01-G gate green (items 1-4 pass; scope
+    residuals were checkpoint files plus the declared routes package init). D01-A
+    adversarial review: one blocker (UVICORN_HOST loopback bypass, proven by live
+    LAN handshake), one major (no absent-route signal for the frontend), one minor
+    (factory docstring) — all fixed and re-verified, including a live repro of both
+    refused non-loopback launches. Final verification: 458 tests pass; ruff and mypy
+    clean; governance OK (132 documents); staged private-content check OK.'
 - id: phase-demo-02
   title: Build the stage frontend with the zero-scroll layout
   plan: doc-live-demo
