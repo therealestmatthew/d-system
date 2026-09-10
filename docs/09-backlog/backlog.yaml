@@ -4818,3 +4818,55 @@ items:
   - test/test_demo_terminal.py
   next_action: Claim the phase, then build the session-tab model and collapse/drop
     separation first — the command panel and resize frames layer on top of it.
+- id: phase-demo-07
+  title: Skills-and-agents glossary and diagram library
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-brain
+  - sys-demo-overview
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add brain/concepts/terms-skills-and-agents-demo.md, one concept memory following the
+    terms-systems-vocabulary.md grouped-entry convention, tagged demo-glossary, defining
+    LLM, Agent, Sub-agent, Tool, MCP, Context, Command and Skill plus the owner-approved
+    additional terms (candidate set — Prompt/System prompt, Token, Tool call, MCP server,
+    Session, Memory, Orchestration/Multi-agent), each with a one-line entry for the
+    advanced topics named out of scope for depth (Hooks, Agent permissions, Observability,
+    Agent SDK) (REQ-006 R13).
+  - Regenerate the filtered view with
+    tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md
+    (docs/00-working per ADR-010 — regenerable working output, not the canonical
+    committed glossary OPS-004 governs).
+  - Build five standalone SVG diagrams under docs/07-architecture/diagrams/demo/ — LLM vs
+    agent, skill architecture (YAML front matter, SKILL.md, directory structure, assets),
+    the agentic loop, MCP architecture, and the command/skill/tool distinction — each
+    legible at a projector-safe 1024x768 with no external asset or network dependency,
+    plus a README.md indexing them with a one-line caption each.
+  acceptance:
+  - Every term the owner listed (LLM, Agent/Sub-Agent, Tool, MCP, Context, Command, Skill)
+    and every owner-approved addition has a concept entry; the regenerated filtered
+    glossary lists all of them (REQ-006 R13).
+  - Each of the five SVGs opens standalone in a browser, is legible at 1024x768, and its
+    labels match the corresponding glossary entry's terminology exactly.
+  - Running the filtered glossary generation twice against an unchanged repository
+    produces byte-identical output.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md
+    (run twice, diff empty)
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Visual review of each SVG in a browser at 1024x768
+  deliverables:
+  - brain/concepts/terms-skills-and-agents-demo.md
+  - docs/00-working/demo-glossary.md
+  - docs/07-architecture/diagrams/demo
+  next_action: Owner to confirm the proposed additional terms (Prompt/System prompt,
+    Token, Tool call, MCP server, Session, Memory, Orchestration/Multi-agent) and the
+    five proposed diagrams before claiming; content-only phase, no lock on sys-demo-stage,
+    can run alongside phase-demo-05/06.

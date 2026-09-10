@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-10'
 updated: '2026-09-10'
-systems: [sys-demo-stage, sys-demo-overview, sys-api, sys-ui, sys-html]
+systems: [sys-demo-stage, sys-demo-overview, sys-api, sys-ui, sys-html, sys-brain]
 depends_on: [doc-live-demo-requirements, doc-demo-terminal-decision]
 ---
 
@@ -84,6 +84,11 @@ Five phases in `docs/09-backlog/backlog.yaml`, tracked as `phase-demo-*`:
   runbook, `tools/demo_reset.py` with its OPS document, the Windows setup checklist, and
   rehearsals. Depends on all four build phases and on `phase-demo-06` (added 2026-09-10), so the
   runbook and rehearsals describe the final stage UI.
+- **`phase-demo-07` — skills-and-agents glossary and diagram library.** Added 2026-09-10 at the
+  owner's request, covering REQ-006 R13: `brain/concepts` memory entries defining the
+  skills-and-agents vocabulary the owner presents from, a filtered glossary regenerated from them,
+  and a standalone SVG diagram library. Content only — no stage UI change, no code, and no lock on
+  `sys-demo-stage` — so it depends on nothing and can run alongside any other phase.
 
 ## Descope ladder
 

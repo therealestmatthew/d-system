@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-10'
 updated: '2026-09-10'
-systems: [sys-demo-stage, sys-demo-overview, sys-api, sys-ui]
+systems: [sys-demo-stage, sys-demo-overview, sys-api, sys-ui, sys-brain]
 depends_on: [doc-prompt-demo-agent-factory]
 ---
 
@@ -23,9 +23,10 @@ must come from deterministic tooling over real repository data (metrics per idea
 slides or a model call at render time.
 
 This requirement covers the stage page, the embedded terminal capability, the deterministic overview
-tools, the overview generation skill, and the timing constraint on the live segment. It does not
-cover deployment (the stage runs only on the presentation machine), authentication, or any use of the
-terminal capability outside the demo.
+tools, the overview generation skill, the timing constraint on the live segment, and a
+skills-and-agents glossary and diagram library the owner presents from during the training content
+(idea `000070`). It does not cover deployment (the stage runs only on the presentation machine),
+authentication, or any use of the terminal capability outside the demo.
 
 ## Observable requirements and verification
 
@@ -43,3 +44,4 @@ terminal capability outside the demo.
 | R10 | The terminal region hosts up to four terminal sessions as tabs; each tab is an independent shell over its own websocket, and switching tabs or collapsing the region never terminates a session — scrollback and running processes survive. | Playwright-driven browser verification: start a long-running command in tab 1, switch to tab 2 and back, collapse and re-expand the region, and assert tab 1's scrollback and process are intact; assert a fifth tab cannot be opened. |
 | R11 | Collapsing the terminal region and dropping terminal sessions are two separate controls. The drop control (descope rung 4) and closing an individual tab each require an explicit confirmation step before any session terminates. | Playwright-driven browser verification: activate the drop control and each tab close, assert nothing terminates before the confirm action, assert the session genuinely terminates after it, and assert collapse alone never terminates anything. |
 | R12 | A command list loaded from a data file (`ts/public/demo-commands.json`; no command text hardcoded in components) is revealed in place within the terminal region; selecting an entry injects its command into the active terminal's input line without executing it, and entries marked `run: true` execute immediately. When the terminal route is absent the panel degrades alongside the existing absent-terminal message and nothing errors. | Playwright-driven browser verification: inject an entry and assert the text appears on the active tab's input line un-executed, then that Enter executes it; assert a `run: true` entry executes on selection; edit the data file and confirm the list changes with no rebuild of page code; load the stage with the flag unset and assert no errors. |
+| R13 | A skills-and-agents glossary — `brain/concepts` memory entries covering LLM, Agent, Sub-agent, Tool, MCP, Context, Command and Skill, plus the owner-approved additional terms, each with a one-line entry for the advanced topics named out of scope for depth (hooks, agent permissions, observability, Agent SDK) — and a library of standalone SVG diagrams illustrating LLM-vs-agent, skill architecture, the agentic loop, MCP architecture, and the command/skill/tool distinction, exist independently of the stage page and are viewable in a browser without the dev server running. | Regenerate the filtered glossary (`tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md`) and confirm every required term is present; open each SVG directly in a browser and visually confirm it is legible at a projector-safe size and matches the corresponding glossary entry's terminology. |
