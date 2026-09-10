@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Do not assume. Ask.
+
+**Do not make assumptions.** When something is unclear, unstated, or open to more than one reading,
+the answer is a question — not your best guess written into a file.
+
+**Do not turn a one-time instruction into a standing rule.** If the owner tells you to do something
+once, that is what they told you: once. It is not a policy, not a preference to generalise from, and
+not a principle to encode in a governing document. Do not invent rules, conventions or ideas the
+owner never asked for. If a pattern seems worth making permanent, propose it and let the owner
+decide.
+
+**Use the AskUserQuestion tool.** It is the preferred way to ask — for resolving uncertainty, for
+choosing between approaches, and for surfacing information the owner needs before the work goes
+further. Prefer it to burying a question in prose, and prefer asking to guessing whenever a wrong
+guess would send the work in a materially different direction.
+
+Ask at the point the work reaches the uncertainty, not at the end. Where a question genuinely can
+wait, state the assumption plainly, keep working, and surface it — but an assumption that changes
+what gets built is a question, not an assumption.
+
 ## Never edit this file or AGENTS.md without explicit approval
 
 **Do not modify `CLAUDE.md` or `AGENTS.md` for any reason without the owner's explicit approval for
