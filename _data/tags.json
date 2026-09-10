@@ -222,5 +222,13 @@
     "description": "Physical health, mental health, fitness, and mindfulness practices.",
     "related": [],
     "deprecated": false
+  },
+  {
+    "id": "demo-glossary",
+    "label": "Demo Glossary",
+    "category": "context",
+    "description": "Terms defined for the skills-and-agents training session — a view selector for generate_glossary.py --tag, not a subject area.",
+    "related": ["ai-tools", "agentic-systems", "claude"],
+    "deprecated": false
   }
 ]
