@@ -19,9 +19,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import statistics
 import subprocess
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +34,7 @@ from src.db.ideas import LINK_TYPES, fold, legal_transitions, load_events
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEMS_REGISTRY = ROOT / "docs" / "08-governance" / "systems.yaml"
+BACKLOG = ROOT / "docs" / "09-backlog" / "backlog.yaml"
 
 
 def _load(name: str) -> Any:
@@ -131,6 +134,181 @@ def test_funnel_counts_match_independent_recomputation_over_the_real_log() -> No
     for status in overview_metrics.STATUSES:
         assert reported[status] == expected.get(status, 0)
     assert sum(reported.values()) == len(state)
+
+
+def test_cycle_time_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    by_idea: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for event in events:
+        by_idea[event["idea"]].append(event)
+
+    revisit = overview_metrics.REVISIT_TRANSITION
+    transitions = sorted(legal_transitions() | {revisit})
+    durations: dict[tuple[str, str], list[float]] = {t: [] for t in transitions}
+
+    for idea_events in by_idea.values():
+        entered_at: datetime | None = None
+        for event in idea_events:
+            kind = event["event"]
+            if kind == "created":
+                entered_at = datetime.fromisoformat(event["at"])
+            elif kind == "status":
+                assert entered_at is not None
+                at = datetime.fromisoformat(event["at"])
+                key = (event["from"], event["to"])
+                durations[key].append((at - entered_at).total_seconds() / 3600)
+                entered_at = at
+            elif kind == "revisited":
+                assert entered_at is not None
+                at = datetime.fromisoformat(event["at"])
+                durations[revisit].append((at - entered_at).total_seconds() / 3600)
+                entered_at = at
+
+    expected_counts = {t: len(v) for t, v in durations.items()}
+    expected_medians = {
+        t: round(statistics.median(v), 2) if v else 0.0 for t, v in durations.items()
+    }
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["cycle_time"]
+    labels = section["labels"]
+    counts = _values(section, "count")
+    medians = _values(section, "median_hours")
+
+    expected_labels = [f"{source}->{target}" for source, target in transitions]
+    assert labels == expected_labels
+    for label, count, median in zip(labels, counts, medians):
+        source, target = label.split("->", 1)
+        assert count == expected_counts[(source, target)]
+        assert median == expected_medians[(source, target)]
+
+
+def test_annotation_coverage_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    state = fold(events)
+    total = len(state)
+    expected_annotated = sum(1 for entry in state.values() if len(entry["annotations"]) > 0)
+    expected_unannotated = total - expected_annotated
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["annotation_coverage"]
+    counts = dict(zip(section["labels"], _values(section, "count")))
+    rates = dict(zip(section["labels"], _values(section, "rate")))
+
+    assert counts["annotated"] == expected_annotated
+    assert counts["unannotated"] == expected_unannotated
+    assert rates["annotated"] == (round(expected_annotated / total, 4) if total else 0.0)
+    assert rates["unannotated"] == (round(expected_unannotated / total, 4) if total else 0.0)
+
+
+def test_link_distribution_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    state = fold(events)
+    counts: Counter[str] = Counter()
+    for entry in state.values():
+        for link in entry["links"]:
+            if not link["retracted"]:
+                counts[link["type"]] += 1
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["link_distribution"]
+    assert section["labels"] == sorted(LINK_TYPES)
+    reported = dict(zip(section["labels"], _values(section, "count")))
+    for link_type in LINK_TYPES:
+        assert reported[link_type] == counts.get(link_type, 0)
+
+
+def test_link_orphans_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    state = fold(events)
+    touched: set[str] = set()
+    for idea, entry in state.items():
+        for link in entry["links"]:
+            if link["retracted"]:
+                continue
+            touched.add(idea)
+            if link["target"] is not None:
+                touched.add(link["target"])
+    expected_orphaned = sum(1 for idea in state if idea not in touched)
+    expected_connected = len(state) - expected_orphaned
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["link_orphans"]
+    assert section["labels"] == ["connected", "orphaned"]
+    counts = dict(zip(section["labels"], _values(section, "count")))
+    assert counts["connected"] == expected_connected
+    assert counts["orphaned"] == expected_orphaned
+
+
+def test_throughput_by_day_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    created_dates = [
+        datetime.fromisoformat(event["at"]).date()
+        for event in events
+        if event["event"] == "created"
+    ]
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["throughput_by_day"]
+
+    if not created_dates:
+        assert section["labels"] == []
+        assert _values(section, "created") == []
+        return
+
+    counts = Counter(created_dates)
+    start, end = min(created_dates), max(created_dates)
+    expected_labels = []
+    expected_values = []
+    current = start
+    one_day = timedelta(days=1)
+    while current <= end:
+        expected_labels.append(current.isoformat())
+        expected_values.append(counts.get(current, 0))
+        current += one_day
+
+    assert section["labels"] == expected_labels
+    assert _values(section, "created") == expected_values
+    assert sum(expected_values) == len(created_dates)
+
+
+def test_age_of_open_ideas_matches_independent_recomputation_over_the_real_log() -> None:
+    events = load_events()
+    state = fold(events)
+    reference_at = max((datetime.fromisoformat(e["at"]) for e in events), default=None)
+    open_ideas = sorted(idea for idea, entry in state.items() if entry["status"] == "open")
+
+    metrics = overview_metrics.build_metrics(events, overview_metrics.load_backlog_items())
+    section = metrics["age_of_open_ideas"]
+    assert section["labels"] == open_ideas
+
+    if reference_at is None:
+        assert _values(section, "age_days") == [0.0 for _ in open_ideas]
+        return
+
+    expected_ages = [
+        round(
+            (reference_at - datetime.fromisoformat(state[idea]["created"])).total_seconds()
+            / 86400,
+            2,
+        )
+        for idea in open_ideas
+    ]
+    assert _values(section, "age_days") == expected_ages
+
+
+def test_backlog_by_status_matches_independent_recomputation_over_the_real_backlog() -> None:
+    data = yaml.safe_load(BACKLOG.read_text(encoding="utf-8")) or {}
+    items = data.get("items", [])
+    counts = Counter(item["status"] for item in items)
+
+    metrics = overview_metrics.build_metrics(load_events(), overview_metrics.load_backlog_items())
+    section = metrics["backlog_by_status"]
+    assert section["labels"] == sorted(overview_metrics.BACKLOG_STATUSES)
+    reported = dict(zip(section["labels"], _values(section, "count")))
+    for status in overview_metrics.BACKLOG_STATUSES:
+        assert reported[status] == counts.get(status, 0)
+    assert sum(reported.values()) == len(items)
 
 
 # --- Zero rows, never omitted -------------------------------------------------------------
