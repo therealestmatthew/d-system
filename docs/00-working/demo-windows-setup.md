@@ -87,6 +87,37 @@ Status: [PASS / FAIL]
 Notes:
 ```
 
+## Full Fresh-Eyes Rehearsal Checklist (PROMPT-017)
+
+**Run this once, in full, on the presentation machine before the demo.** This is the same
+checklist `docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md`'s fresh-eyes rehearsal runs on the
+development machine; running it again here catches anything specific to the Windows machine
+before the Windows-machine gate is called green.
+
+1. [ ] Backend starts on 8010 with `D_SYSTEM_DEMO_TERMINAL=1`; frontend builds and serves on
+       5180.
+2. [ ] The stage page loads; at 1280×720, 1920×1080, **and a half-width window** there is zero
+       page scrolling, no overlapping elements, and every reveal control (tabs, expanders,
+       popups) opens and collapses as required.
+3. [ ] The embedded terminal connects, runs a real shell, and echoes interactive input.
+4. [ ] The talking-points panel cycles the owner's content from its data file.
+5. [ ] `tools/demo_reset.py` parks the pre-built overview skill and seeds the fallback audience
+       idea; the live-rebuild path runs end to end (idea recorded, triaged, skill rebuilt from
+       the deterministic tools, skill invoked, overview page generated and rendered in the
+       embedded panel); then `restore` returns the pre-built state.
+6. [ ] **Determinism check**: run `tools/overview_metrics.py` and `tools/overview_inventory.py`
+       (or `tools/generate_overview.py`, which wraps both) twice and confirm identical output.
+7. [ ] **Side-by-side fallback**: exercise the stage without the embedded terminal (descope rung
+       4) alongside an external terminal window, once.
+
+**Result (owner to fill in):**
+
+```
+Date and time:
+Items 1-7 status: [PASS / FAIL, per item]
+Notes:
+```
+
 ## Pre-Demo Git Tag
 
 - [ ] Create a pre-demo git tag to capture the baseline state before live-segment ideas are
@@ -96,6 +127,23 @@ Notes:
       git push origin demo-day-2026-09-10
       ```
 - [ ] Verify the tag exists: `git tag -l demo-day-*` lists the tag.
+- [ ] Verify `tools/demo_reset.py prepare` once against the tagged state: run
+      `uv run python tools/demo_reset.py prepare`, confirm it reports the skill parked and the
+      fallback idea seeded (or already present), and record the result below.
+- [ ] Verify `tools/demo_reset.py restore` once against the same tagged state: run
+      `uv run python tools/demo_reset.py restore`, confirm it reports the skill restored, and
+      record the result below.
+
+**`prepare`/`restore` verification result (owner to fill in):**
+
+```
+Date and time:
+prepare output:
+prepare status: [PASS / FAIL]
+restore output:
+restore status: [PASS / FAIL]
+Notes:
+```
 
 ## Screen Hygiene (Live Session)
 

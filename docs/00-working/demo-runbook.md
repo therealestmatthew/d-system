@@ -19,6 +19,10 @@ Record timings for two timed passes of the live segment. Each step carries an ex
 per-step times sum to at most 15 minutes. Stopping the timer and re-running `uv run python
 tools/demo_reset.py restore` is the fallback action named in the runbook for every step.
 
+The two passes below are agent-driven fresh-eyes rehearsals against the current UI, run early to
+catch runbook and tooling defects; complete owner-driven timing against the final UI moves to the
+workbench track's rehearsal-refresh phase, per the owner's PROMPT-020 decision 7.
+
 ### Dry-Run 1 — 2026-09-10, fresh-eyes rehearsal (D05-R, pack PROMPT-018), agent demo-validator-code
 
 | Step | Command / Action | Timebox | Actual | Notes |
