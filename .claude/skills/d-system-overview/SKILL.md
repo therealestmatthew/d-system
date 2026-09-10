@@ -5,10 +5,12 @@ description: Regenerate the D-System overview page by running tools/generate_ove
 
 # d-system-overview
 
-Runs one script, reads what it printed, and stops. Nothing here computes a number — every figure on
-the generated page comes from `tools/overview_metrics.py` and `tools/overview_inventory.py`, read
-via `fold()` in `src/db/ideas.py` (REQ-006 R08), and `tools/generate_overview.py` copies those
-figures onto the page verbatim.
+Runs one script, reads what it printed, and stops. Nothing here computes a number. Metrics figures
+(idea count, event count, backlog phase count) come from `tools/overview_metrics.py`, which reads
+the idea log via `fold()`/`load_events()` in `src/db/ideas.py` (REQ-006 R08). Inventory figures
+(concept count, term count, system count) come from `tools/overview_inventory.py`, which reads the
+`brain/` concept memories and `docs/08-governance/systems.yaml`, not the idea log.
+`tools/generate_overview.py` copies both sets of figures onto the page verbatim.
 
 ## What this skill must never do
 
