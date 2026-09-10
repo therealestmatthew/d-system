@@ -4758,21 +4758,19 @@ items:
   - src/api/routes/demo_stage.py
   - test/test_demo_terminal.py
   session: doc-session-demo-content-runbook-reset-rehearsals
-  next_action: 'D05-C1/V1 (demo_reset.py, tested and validated, no findings), D05-C2
-    (OPS-013, runbook skeleton, Windows checklist), D05-O (talking-points copy) and
-    the coordinator''s fix cycle 1/2 (runbook: port-free precondition on /orient,
-    /overview-build replaced with the real live-skill-invocation narrative, the
-    parked-skill sequencing explained, /idea-triage''s partial measurability noted)
-    are committed on agent/phase-demo-05, rebased onto dev at 9753a88 (which
-    resolved the D05-G diff-scope finding by declaring _data/ideas.jsonl,
-    docs/00-working/ideas.md and _public/overview as deliverables, and cleared the
-    stray-server port collision). Re-run D05-G and the phase verification commands
-    against the rebased tree, then report green so the coordinator can dispatch
-    D05-A and D05-W (coordinator-owned per GOV-003). Still outstanding: whether
-    /idea-triage''s subagent half can be timed by an agent at all (a
-    presenter-driven pass may be required for a complete R09 verification), and
-    the REQ-006 R06 Windows smoke check, which is owner-machine work and cannot
-    run here.'
+  next_action: 'D05-C1/V1, D05-C2, D05-O and the coordinator''s fix cycle 1/2 (runbook:
+    port-free precondition on /orient, /overview-build replaced with the real
+    live-skill-invocation narrative, the parked-skill sequencing explained,
+    /idea-triage''s partial measurability noted) are committed on
+    agent/phase-demo-05, rebased onto dev at 9753a88. D05-G re-run after the rebase
+    is green on all 9 checklist items, including diff scope. uv run pytest, ruff,
+    mypy, governance and the staged private-content check all pass on the rebased
+    tree. Reported to the coordinator so it can dispatch D05-A (adversarial review)
+    and D05-W (Playwright rehearsal pass) per GOV-003. Still outstanding, not
+    fixable from this worktree: whether /idea-triage''s subagent half can be timed
+    by an agent at all (a presenter-driven pass may be required for a complete R09
+    verification), and the REQ-006 R06 Windows smoke check, which is owner-machine
+    work.'
 - id: phase-demo-06
   title: Stage terminal interaction — session tabs, guarded drop, command injection
   plan: doc-live-demo
