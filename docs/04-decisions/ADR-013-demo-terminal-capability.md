@@ -4,7 +4,7 @@ id: doc-demo-terminal-decision
 code: ADR-013
 title: Demo terminal is a localhost-only, flag-gated capability that is never deployed
 kind: adr
-status: accepted
+status: superseded
 owner: repository-owner
 created: '2026-09-10'
 updated: '2026-09-10'
@@ -13,6 +13,11 @@ depends_on: [doc-live-demo-requirements]
 ---
 
 # Demo terminal is a localhost-only, flag-gated capability that is never deployed
+
+> **Superseded and narrowed 2026-09-10 by the workbench terminal capability decision
+> ([ADR-014](ADR-014-workbench-terminal-capability.md))**: the demo-only intent below ends — the
+> terminal is a workbench product capability — while the loopback-only binding and the
+> `D_SYSTEM_DEMO_TERMINAL=1` gating carry forward unchanged.
 
 ## Context
 

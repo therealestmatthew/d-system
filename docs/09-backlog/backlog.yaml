@@ -4973,8 +4973,9 @@ items:
     alongside phase-demo-05/06.
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
-  next_action: Once the owner approves the pack, claim per AGENTS.md and dispatch pack
-    section W01 (PROMPT-021); may run in parallel with phase-wb-02 (disjoint locks).
+  next_action: Once the owner approves the pack, claim per AGENTS.md (checking the max_active
+    budget first) and dispatch pack section W01 (PROMPT-021); the track runs strictly
+    sequentially from here.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5042,19 +5043,21 @@ items:
   - test/test_demo_terminal.py
 - id: phase-wb-02
   title: Layout engine and notes strip
-  next_action: Once the owner approves the pack, claim per AGENTS.md and dispatch pack
-    section W02 (PROMPT-021); may run in parallel with phase-wb-01 (disjoint locks).
+  next_action: After phase-wb-01 completes and integrates (the notes-file picker consumes its
+    listing route; one claim id, one active phase), dispatch pack section W02 (PROMPT-021).
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
   - doc-workbench-layout-decision
+  - doc-workbench-api-decision
   systems:
   - sys-ui
   owner: repository-owner
   status: queued
   priority: 1
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-wb-01
   scope:
   - Build the layout engine per ADR-016 - a slot model where every panel is
     assigned to exactly one slot per layout, layout definitions loaded from
@@ -5072,7 +5075,9 @@ items:
     wide display-only strip at the top right, no title, the tooltip moved to its
     far left, every control in one downward-triangle dropdown including the
     notes-file picker over a fixed notes directory, the chosen file persisted like
-    layout selections; remove the stale placeholder comment that panel carried.
+    layout selections; the picker's file list comes from phase-wb-01's workbench listing
+    route (ADR-015), never a hardcoded list; remove the stale placeholder comment that panel
+    carried.
   - Preserve zero-scroll and non-overlap at 1280x720, 1366x768, 1920x1080 and
     1024x768 in both layouts (REQ-006 R02 remains binding).
   acceptance:

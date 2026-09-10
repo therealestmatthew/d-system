@@ -10,6 +10,7 @@ created: '2026-09-10'
 updated: '2026-09-10'
 systems: [sys-demo-stage, sys-api, sys-ui]
 depends_on: [doc-workbench-requirements, doc-demo-terminal-decision]
+supersedes: [doc-demo-terminal-decision]
 ---
 
 # The workbench terminal is a gated product capability with a session registry and selectable shells

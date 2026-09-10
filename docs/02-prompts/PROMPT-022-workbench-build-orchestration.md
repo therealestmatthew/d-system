@@ -42,8 +42,11 @@ needs them begins**.
 >    `phase-wb-*` phases exist; note which are already complete-in-fact from a previous run of
 >    this prompt — those are skipped, not redone.
 > 3. Check the peer claims (`phase-port-01`; `phase-demo-07` if still active): their Conflicts
->    columns against your phases must be `—`. `git switch dev && git pull`; confirm the primary
->    checkout is clean.
+>    columns against your phases must be `—`. Also check the numeric budget explicitly — the
+>    Conflicts column says nothing about it: count of currently active phases + the claim you
+>    are about to make must not exceed `max_active` (3). If the budget is full, wait for a peer
+>    to complete rather than claiming into a validator rejection. `git switch dev && git pull`;
+>    confirm the primary checkout is clean.
 > 4. Record the wall-clock start time; the live demo is the week of 2026-09-15, and `PROMPT-016`
 >    governs behavior when behind — with REQ-007's descope ladder replacing its demo-track
 >    ladder, and every rung you execute reported to the owner as you take it.
@@ -53,13 +56,13 @@ needs them begins**.
 > ### Step 1 — Execute the phase graph
 >
 > Read `PROMPT-015` now; it governs claim, worktree, dispatch, gate and hand-off for every
-> phase, with `PROMPT-021` supplying the prompts. Dispatch order: `phase-wb-01` and
-> `phase-wb-02` in parallel (both under `demo-orch-stage`, two dispatches, two worktrees — the
-> orchestrator's one-active-phase rule applies per claim, so stagger the claims as the pack's
-> kickoffs describe); then, strictly in sequence, `phase-wb-03` (demo-orch-stage), `phase-wb-04`,
-> `phase-wb-05`, `phase-wb-06` (demo-orch-data), each only after its predecessor is integrated
-> and marked complete — they share the `ts/src` lock; then `phase-wb-07` (demo-orch-content)
-> last. Never exceed two concurrently claimed workbench phases.
+> phase, with `PROMPT-021` supplying the prompts. Dispatch order is **strictly sequential**,
+> one phase at a time, each claimed only after its predecessor is integrated and marked
+> complete: `phase-wb-01`, `phase-wb-02`, `phase-wb-03` (demo-orch-stage); `phase-wb-04`,
+> `phase-wb-05`, `phase-wb-06` (demo-orch-data); `phase-wb-07` (demo-orch-content). The
+> sequence is load-bearing twice over: `demo-orch-stage`'s single claim id may hold only one
+> active phase, the `ts/src` lock forbids concurrent frontend phases, and the `max_active`
+> budget is shared with the peers — never hold more than one workbench claim at a time.
 >
 > After each orchestrator reports, verify its claims yourself before acting on them: the
 > phase's verification commands were run and their real output is in the report, the

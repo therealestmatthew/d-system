@@ -27,8 +27,10 @@ the glossary phase (`phase-demo-07`, `agent-demo-glossary`).
 - `uv run python -m src.governance` — `Governance OK: 18 systems, 148 documents, 15 memories,
   119 backlog phases`, exit 0 (also confirmed exit 0 before any change was made).
 - `uv run python -m src.governance --ready` — the seven `phase-wb-*` phases render at queue
-  positions 1–7, `phase-wb-01` and `phase-wb-02` ready with empty Conflicts columns; the two
-  peer claims unchanged.
+  positions 1–7, `phase-wb-01` ready with an empty Conflicts column and the rest waiting on
+  the sequential dependency chain; the two peer claims unchanged. (A Conflicts column of `—`
+  says nothing about the `max_active` budget — the pack audit below corrected an earlier
+  over-reading of this report.)
 - `uv run pytest` — 495 passed, 2 warnings.
 - `uv run python tools/check_no_private_content.py`, run with all changes staged —
   `check_no_private_content: OK (447 tracked files, 31 identifiers checked)`.
@@ -66,6 +68,31 @@ configuration surface; viewer + one explorer slot on the right; `.html`+`.svg` v
 compatibility; in-app directory dialogs; five context-menu actions; gated both-platform
 reveal-in-explorer; `next_up`+priority queue views; slash/natural injection texts; one
 overrides file; notes-file picker in the strip dropdown.
+
+## Post-pack audits (2026-09-10, owner-directed)
+
+Two independent audits ran after the pack was committed. A haiku coverage audit against
+`PROMPT-020` found no missing or partial item. An adversarial audit (`demo-adversary`, in a
+scratch worktree, changing nothing) surfaced five findings, all fixed in this session with the
+owner's direction:
+
+1. **Blocker** — the coordinator's `phase-wb-01` ∥ `phase-wb-02` parallel dispatch was
+   mechanically rejected by the validator (one claim id, one active phase; reproduced). Owner
+   chose strictly sequential: the whole track now runs one phase at a time, `phase-wb-02`
+   depends on `phase-wb-01`, and `PROMPT-021`/`PROMPT-022`/`PLAN-022`/backlog were aligned.
+2. **Blocker** — the same parallel claim exceeded `max_active: 3` with the two peers active
+   (reproduced: "4 found"). `PROMPT-022`'s preflight and both stage kickoffs now carry an
+   explicit numeric budget check, separate from the Conflicts column.
+3. **Major** — `ADR-015` described the notes-file picker (W01) as API-fed while `phase-wb-02`
+   had no `phase-wb-01` dependency and its creator prompt hardcoded `ts/public/`. Owner chose
+   the API-fed picker: `phase-wb-02` now depends on `phase-wb-01`, `W02-C2`/`W02-V2`/`W02-A`
+   and REQ-007 W01 name the listing route, and `W02-A`'s specification list gained `ADR-015`.
+4. **Major** — the `ADR-013` supersession was prose-only, so the governance supersession check
+   never fired. `ADR-014` now carries `supersedes: [doc-demo-terminal-decision]`, `ADR-013` is
+   `status: superseded` with a banner pointing forward.
+5. **Major** — REQ-007 W09's clipboard assertions were not mechanically checkable under the
+   Playwright MCP toolset. W09 and `W05-W` now verify copies by stubbing
+   `navigator.clipboard.writeText` via script injection and asserting the passed string.
 
 ## Unresolved
 

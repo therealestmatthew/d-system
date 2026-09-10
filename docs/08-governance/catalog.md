@@ -17,7 +17,7 @@ CI regenerates it and fails on any difference.
 | ADR-010 | adr | accepted | repository-owner | docs/04-decisions/ADR-010-idea-staging.md |
 | ADR-011 | adr | accepted | repository-owner | docs/04-decisions/ADR-011-governance-model.md |
 | ADR-012 | adr | accepted | repository-owner | docs/04-decisions/ADR-012-systems-review.md |
-| ADR-013 | adr | accepted | repository-owner | docs/04-decisions/ADR-013-demo-terminal-capability.md |
+| ADR-013 | adr | superseded | repository-owner | docs/04-decisions/ADR-013-demo-terminal-capability.md |
 | ADR-014 | adr | accepted | repository-owner | docs/04-decisions/ADR-014-workbench-terminal-capability.md |
 | ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |

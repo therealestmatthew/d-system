@@ -43,7 +43,8 @@ demo-track decision, extended to this track in that document):
   the two shipped layout JSON files under `_data/workbench/layouts/`, slot-header dropdowns for
   multi-panel slots, localStorage selections per ADR-016; the notes strip replacing the
   talking-points panel (display-only, tooltip far left, one dropdown including the notes-file
-  picker), retiring `TalkingPointsRegion`'s stale placeholder comment with it. W01, W05, W06.
+  picker, fed by `phase-wb-01`'s listing route per ADR-015), retiring `TalkingPointsRegion`'s
+  stale placeholder comment with it. W01, W05, W06.
 - **`phase-wb-03` — terminal panel rework and shells.** The `(...)` ellipsis menu (collapse and
   drop move in; standalone controls go), drop-in-place info page with deactivated injection
   dropdowns, the Skills/Prompts/Agents dropdowns wired to `phase-wb-01`'s enumeration, and the
@@ -63,12 +64,17 @@ demo-track decision, extended to this track in that document):
   presentation machine (REQ-006 R06 smoke check, CMD and PowerShell round-trips), and two
   owner-driven timed dry-runs closing REQ-006 R09's deferred conditions. W13. Never descoped.
 
-Dependency order: `phase-wb-01` ∥ `phase-wb-02` (disjoint locks: `src/` and the overrides file
-vs `ts/` and the layout files); then `phase-wb-03` → `phase-wb-04` → `phase-wb-05` →
-`phase-wb-06` strictly in sequence — all four deliver into `ts/src`, so the concurrency
-validator's path locks forbid parallel claims, and the chain is encoded as `depends_on` rather
-than left to judgment (`phase-wb-05` also genuinely needs `phase-wb-04`'s viewer tabs for its
-open-in-viewer submenu); `phase-wb-07` last, after all six.
+Dependency order: **strictly sequential**, `phase-wb-01` → `phase-wb-02` → `phase-wb-03` →
+`phase-wb-04` → `phase-wb-05` → `phase-wb-06` → `phase-wb-07`, each claimed only after its
+predecessor integrates and completes, with the chain encoded as `depends_on` rather than left
+to judgment. Three constraints force it (the 2026-09-10 pack audit's findings, accepted by the
+owner): `demo-orch-stage`'s single claim id may hold only one active phase, so `phase-wb-01`
+and `phase-wb-02` cannot run in parallel under it; the `max_active: 3` budget is already
+two-thirds held by peers (`phase-port-01`, `phase-demo-07`), so a second simultaneous workbench
+claim is rejected numerically; and `phase-wb-03`..`06` all deliver into `ts/src`, whose path
+lock forbids parallel claims. Real data dependencies reinforce it: `phase-wb-02`'s notes-file
+picker consumes `phase-wb-01`'s listing route, and `phase-wb-05`'s open-in-viewer submenu needs
+`phase-wb-04`'s viewer tabs.
 
 ## Descope ladder
 

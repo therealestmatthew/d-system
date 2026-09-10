@@ -63,7 +63,8 @@ agent/phase-wb-01, from dev. Ports: backend 8010, frontend 5180 (frontend not ne
 
 1. On an up-to-date dev in /code/d-system, claim phase-wb-01 per AGENTS.md (status: active,
    agent: agent-demo-stage, catalog updated date) in one small commit; the governance run must
-   accept the claim. This phase may run in parallel with phase-wb-02; their locks are disjoint.
+   accept the claim. Before claiming, confirm the max_active budget has room (active count + 1
+   <= 3); if it is full, report up and wait rather than claiming into a validator rejection.
 2. Create the worktree and set it up: uv venv && uv sync --extra dev.
 3. Dispatch, in order: W01-C1 then W01-V1; W01-C2 then W01-V2; W01-C3 then W01-V3 — each prompt
    verbatim from PROMPT-021 (docs/02-prompts/PROMPT-021-workbench-delegation-pack.md). At most
@@ -335,14 +336,16 @@ Assess the current state of the worktree and repository against the deliverables
 what is missing; report what already existed.
 
 Agent: demo-orch-stage. Phase: phase-wb-02 (layout engine and notes strip; see
-docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-022-workbench.md).
+docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-022-workbench.md). Depends on phase-wb-01
+being integrated into dev and marked status: complete by the coordinator (the notes-file picker
+consumes its listing route, and your claim id may hold only one active phase) — confirm before
+claiming.
 Worktree: /code/d-system-worktrees/phase-wb-02. Branch: agent/phase-wb-02, from dev.
 Ports: backend 8010, frontend 5180.
 
 1. On an up-to-date dev in /code/d-system, claim phase-wb-02 per AGENTS.md in one small commit
-   (status: active, agent: agent-demo-stage). If you are still holding phase-wb-01 active,
-   close it out first — one agent holds at most one active phase. This phase may run in
-   parallel with phase-wb-01 under a second orchestrator dispatch; their locks are disjoint.
+   (status: active, agent: agent-demo-stage). Before claiming, confirm the max_active budget
+   has room (active count + 1 <= 3); if it is full, report up and wait.
 2. Create the worktree; uv venv && uv sync --extra dev; cd ts && npm install (worktree-local
    node_modules, never a symlink).
 3. Dispatch, in order: W02-C1 then W02-V1; W02-C2 then W02-V2 — each verbatim from PROMPT-021.
@@ -436,7 +439,9 @@ Replace the talking-points panel with the notes strip per REQ-007 W01: a short, 
 display-only strip at the top right with NO title and no "talking points" label, showing the
 active entry; the ? tooltip moves to the strip's far left; every control — next/previous
 cycling, the timed advance, and a picker listing compatible JSON files from the fixed notes
-directory (ts/public/, where talking-points.json lives) — moves into ONE dropdown behind a
+directory (ts/public/, where talking-points.json lives), enumerated through phase-wb-01's
+workbench listing route with a .json extension filter — never a hardcoded file list and never a
+client-side directory walk — moves into ONE dropdown behind a
 standard downward-triangle affordance. The strip surface itself triggers nothing. The chosen
 notes file persists in the browser under the ADR-016 selections key and survives reload;
 content still loads from the chosen data file with no copy hardcoded in components. Remove the
@@ -463,7 +468,8 @@ Diff: git diff dev...agent/phase-wb-02 -- ts/
 Requirement text: REQ-007 W01. The strip is display-only (no click handler on the strip surface
 beyond the dropdown affordance), carries no title or "talking points" string, has the tooltip
 at its far left, and holds every control inside one dropdown including the notes-file picker
-scoped to the fixed notes directory; the chosen file and the entry content come from data, not
+scoped to the fixed notes directory and fed by the phase-wb-01 listing route (a hardcoded file
+list or client-side directory walk is a failing finding); the chosen file and the entry content come from data, not
 component code; the choice persists under the versioned selections key; the old panel's
 standalone controls and stale placeholder comment are gone.
 
@@ -502,8 +508,10 @@ what is missing; report what already existed.
 Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-wb-02. Branch: agent/phase-wb-02.
 
 Adversarially review phase-wb-02 (layout engine and notes strip). Assume it is broken; find
-where it fails. Specifications: the phase's backlog entry; REQ-007 W01, W05, W06; ADR-016;
-REQ-006 R02. Attack at minimum: whether zero-scroll is structural in BOTH layouts or only holds
+where it fails. Specifications: the phase's backlog entry; REQ-007 W01, W05, W06; ADR-015 (the
+notes-file picker is fed by the phase-wb-01 listing route); ADR-016; REQ-006 R02. Attack at
+minimum: whether the notes-file picker's list really comes from the listing route rather than a
+hardcoded list or client-side walk; whether zero-scroll is structural in BOTH layouts or only holds
 in layout-1; whether a malformed or version-bumped layout file crashes the page instead of
 falling back to defaults; whether stored selections referencing a removed panel or slot wedge
 the UI; whether the configuration surface leaks geometry editing; whether any panel can end up
@@ -1196,7 +1204,9 @@ Verify mechanically:
    re-scopes.
 2. Right-click a file: all five actions present; open-in-viewer into tab 2 renders the file in
    that tab; inject-path puts the repo-relative path un-executed on the active terminal line;
-   both copy actions place the expected strings (read the clipboard); reveal returns success
+   for both copy actions, stub navigator.clipboard.writeText via script injection BEFORE
+   clicking and assert the exact string each action passed to it (do not attempt to read the
+   OS clipboard — headless contexts do not grant clipboard-read); reveal returns success
    from the action route (assert the network response; do not require a desktop window).
 3. The menu dismisses on click-away and on Escape.
 4. Zero-scroll and non-overlap hold at the four sizes with the tree populated;
