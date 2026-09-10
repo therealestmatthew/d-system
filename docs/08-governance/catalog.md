@@ -35,6 +35,7 @@ CI regenerates it and fails on any difference.
 | GOV-006 | governance | active | repository-owner | docs/08-governance/GOV-006-conversation-guidelines.md |
 | GOV-007 | governance | active | repository-owner | docs/08-governance/GOV-007-repo-orientation.md |
 | GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
+| GOV-009 | governance | active | repository-owner | docs/08-governance/GOV-009-research-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -208,4 +209,4 @@ CI regenerates it and fails on any difference.
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-153 documents — adr: 15, architecture: 5, governance: 8, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 49.
+154 documents — adr: 15, architecture: 5, governance: 9, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 49.
