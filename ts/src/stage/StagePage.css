@@ -324,19 +324,23 @@ body {
   cursor: pointer;
 }
 
+/* Rendered via a portal into document.body (Popover.tsx) so that .stage-region /
+   .stage-region__body's overflow: hidden never clips it. Position (top/bottom/left), width and
+   max-height are computed in JS from the trigger's getBoundingClientRect() and set inline,
+   clamped to the viewport — the position: fixed here is a fallback only. The bubble itself is a
+   flex column with a fixed-height header (so the dismiss control never scrolls out of reach) and
+   a scrollable body, so all entries stay reachable via internal scrolling at any required
+   viewport size (REQ-006 R02: reveal-in-place, no page-level scrollbar). */
 .stage-popover__bubble {
-  position: absolute;
-  bottom: 130%;
-  left: 0;
-  z-index: 20;
-  width: 16rem;
-  max-width: 60vw;
-  max-height: 50vh;
-  overflow: auto;
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border: 1px solid #c7ccd6;
   border-radius: 6px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
 .stage-popover__header {
@@ -346,6 +350,7 @@ body {
   padding: 0.4rem 0.6rem;
   border-bottom: 1px solid #e5e8ee;
   background: #fafbfc;
+  flex: 0 0 auto;
 }
 
 .stage-popover__title {
@@ -364,6 +369,9 @@ body {
 
 .stage-popover__body {
   padding: 0.5rem 0.6rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }
 
 /* Projector-safe 1024x768: tighten spacing so all three regions keep their full content
