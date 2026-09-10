@@ -1,10 +1,15 @@
-"""Demo terminal websocket route — ADR-013 section 1 and 2.
+"""Demo terminal websocket route — ADR-013 sections 1 and 2, extended by ADR-014 sections 4 and 5.
 
 `src/api/__init__.py` imports this module only when `D_SYSTEM_DEMO_TERMINAL=1`; with the flag
 unset, this module is never imported and the route is never registered — the websocket path
 does not exist, it does not exist-but-refuse. Importing this module is also what triggers
 `enforce_loopback_bind()` below, so a launch with the flag set on a non-loopback bind host
 fails fast at import time, before the app finishes constructing.
+
+ADR-014 adds two things on top of that unchanged gating/binding posture: a server-side session
+registry that bounds concurrent sessions to four (section 4), and per-session shell selection
+against a fixed allowlist — bash, cmd, powershell — with a structured in-panel refusal for a
+shell the host cannot run (section 5).
 """
 
 from __future__ import annotations
@@ -13,13 +18,14 @@ import asyncio
 import json
 import os
 import sys
+import uuid
 from typing import Final, TypeGuard
 
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
 from src.demo.adapter import TerminalAdapter
-from src.demo.factory import create_adapter
+from src.demo.factory import create_adapter, is_windows
 
 DEMO_TERMINAL_FLAG: Final[str] = "D_SYSTEM_DEMO_TERMINAL"
 BIND_HOST_ENV_VAR: Final[str] = "D_SYSTEM_BIND_HOST"
@@ -49,6 +55,89 @@ MAX_TERMINAL_DIMENSION: Final[int] = 65535
 # keystrokes and no shell output, is never mistaken for a dead peer; overridable for tests.
 IDLE_TIMEOUT_ENV_VAR: Final[str] = "D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS"
 DEFAULT_IDLE_TIMEOUT_SECONDS: Final[float] = 300.0
+
+# ADR-014 section 4: the four-session cap moves from UI-only (idea `000087`, `phase-demo-06`) to
+# server-side, enforced against this registry rather than trusted from the client. One PTY per
+# websocket stays; a session still ends the moment its websocket does (`finally` below), so the
+# registry's size is always "sessions genuinely alive right now", not a count that can drift.
+MAX_CONCURRENT_SESSIONS: Final[int] = 4
+SESSION_LIMIT_CLOSE_CODE: Final[int] = 4001
+SESSION_LIMIT_CLOSE_REASON: Final[str] = (
+    f"Maximum of {MAX_CONCURRENT_SESSIONS} concurrent terminal sessions reached"
+)
+
+# Session id -> the adapter that session owns. Module-level and mutated only from the single
+# event loop this route runs on (FastAPI/Starlette websocket handlers are coroutines, not
+# threads), so plain dict reads/writes are safe without a lock.
+SESSIONS: Final[dict[str, TerminalAdapter]] = {}
+
+# ADR-014 section 5: the three panel options the workbench offers, each through the one adapter
+# interface (POSIX pty for bash; ConPTY via `pywinpty` on Windows for cmd/powershell). This is a
+# fixed allowlist, not a set of examples — an arbitrary executable path or an unlisted name is
+# rejected outright, never passed to `create_adapter()`.
+SHELL_QUERY_PARAM: Final[str] = "shell"
+POSIX_SHELL_NAMES: Final[frozenset[str]] = frozenset({"bash"})
+WINDOWS_SHELL_NAMES: Final[frozenset[str]] = frozenset({"cmd", "powershell"})
+SHELL_ALLOWLIST: Final[frozenset[str]] = POSIX_SHELL_NAMES | WINDOWS_SHELL_NAMES
+
+# The structured refusal a client can render as an in-panel message (REQ-007 W12) instead of a
+# raw error or a pretend-connect: a JSON text frame naming the requested shell and why it was
+# refused, sent over an accepted socket that is then closed — never a bare connection failure,
+# which gives client-side JavaScript no information to show the presenter.
+SHELL_REFUSAL_MESSAGE_TYPE: Final[str] = "shell_refusal"
+SHELL_REFUSAL_CLOSE_CODE: Final[int] = 4002
+SHELL_REFUSAL_REASON_INVALID: Final[str] = "invalid_shell"
+SHELL_REFUSAL_REASON_UNAVAILABLE: Final[str] = "unavailable_shell"
+
+
+def _shell_is_available_on_host(shell: str, *, windows: bool | None = None) -> bool:
+    """True when `shell` belongs to the platform family this host actually runs.
+
+    `windows` overrides `is_windows()`'s platform detection for tests, matching the same
+    pattern `src/demo/factory.py`'s `resolve_shell()` uses. bash is the POSIX panel; cmd and
+    powershell are the two Windows panels — a POSIX host can no more run cmd than a Windows host
+    (without WSL, which this adapter does not attempt) can run bash.
+    """
+    on_windows = is_windows() if windows is None else windows
+    return shell in (WINDOWS_SHELL_NAMES if on_windows else POSIX_SHELL_NAMES)
+
+
+def _executable_for_shell(shell: str | None) -> str | None:
+    """The `create_adapter(shell=...)` override for an already-allowlisted shell name.
+
+    `None` (no `shell` query param at all) is passed straight through, preserving the existing
+    default-shell behavior untouched. A "bash" request also resolves to `None`, so
+    `D_SYSTEM_DEMO_SHELL` still overrides the default bash panel exactly as it did before this
+    session-per-shell selection existed; "cmd" and "powershell" are passed through as literal
+    executable names for `WindowsConPtyAdapter` to spawn.
+    """
+    if shell is None or shell == "bash":
+        return None
+    return shell
+
+
+async def _refuse_shell_request(
+    websocket: WebSocket, shell: str, *, reason: str, message: str
+) -> None:
+    """Accept the socket, deliver a structured refusal the frontend can render, then close.
+
+    Accepting first (rather than closing during the handshake, as the session-limit check in
+    `terminal_websocket` does) is deliberate: ADR-014 section 5 requires this to look like "a
+    clear in-panel message", not a failed connection attempt indistinguishable from a network
+    error.
+    """
+    await websocket.accept()
+    await websocket.send_text(
+        json.dumps(
+            {
+                "type": SHELL_REFUSAL_MESSAGE_TYPE,
+                "shell": shell,
+                "reason": reason,
+                "message": message,
+            }
+        )
+    )
+    await websocket.close(code=SHELL_REFUSAL_CLOSE_CODE, reason=message)
 
 
 def _resolve_idle_timeout_seconds() -> float:
@@ -183,10 +272,46 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     that vanishes without a close frame — SIGKILL'd, or a dropped network path — would
     otherwise block this loop forever and leave the shell orphaned, since `finally:` never
     runs until the `await` resolves (D06-A finding 2).
+
+    ADR-014 adds two refusal paths ahead of the shell actually starting. The session-limit
+    check runs first and closes during the handshake — never accepted, so it reads to the
+    client as a refused connection with a reason, matching "a clear close reason" (section 4).
+    The shell-selection check runs second, via the `?shell=` query param: an unlisted name or
+    one unavailable on this host is accepted, told why over a structured text frame, and closed
+    (`_refuse_shell_request`) — never a pretend-connect (section 5). Neither refusal ever
+    reaches `SESSIONS` or spawns an adapter.
     """
+    if len(SESSIONS) >= MAX_CONCURRENT_SESSIONS:
+        await websocket.close(code=SESSION_LIMIT_CLOSE_CODE, reason=SESSION_LIMIT_CLOSE_REASON)
+        return
+
+    requested_shell = websocket.query_params.get(SHELL_QUERY_PARAM)
+    if requested_shell is not None:
+        if requested_shell not in SHELL_ALLOWLIST:
+            await _refuse_shell_request(
+                websocket,
+                requested_shell,
+                reason=SHELL_REFUSAL_REASON_INVALID,
+                message=(
+                    f"{requested_shell!r} is not a supported terminal shell "
+                    f"(allowed: {', '.join(sorted(SHELL_ALLOWLIST))})"
+                ),
+            )
+            return
+        if not _shell_is_available_on_host(requested_shell):
+            await _refuse_shell_request(
+                websocket,
+                requested_shell,
+                reason=SHELL_REFUSAL_REASON_UNAVAILABLE,
+                message=f"{requested_shell} is not available on this host",
+            )
+            return
+
     await websocket.accept()
-    adapter = create_adapter()
+    session_id = uuid.uuid4().hex
+    adapter = create_adapter(shell=_executable_for_shell(requested_shell))
     adapter.start()
+    SESSIONS[session_id] = adapter
     pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))
     idle_timeout_seconds = _resolve_idle_timeout_seconds()
     try:
@@ -211,6 +336,7 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     finally:
         pump_task.cancel()
         adapter.close()
+        SESSIONS.pop(session_id, None)
 
 
 # This module is imported only when D_SYSTEM_DEMO_TERMINAL=1 (see src/api/__init__.py), so

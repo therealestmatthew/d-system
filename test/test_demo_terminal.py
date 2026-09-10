@@ -46,6 +46,13 @@ from src.api.routes.demo_stage import (
 from src.api.routes.demo_terminal import (
     BIND_HOST_ENV_VAR,
     IDLE_TIMEOUT_ENV_VAR,
+    MAX_CONCURRENT_SESSIONS,
+    SESSION_LIMIT_CLOSE_CODE,
+    SHELL_ALLOWLIST,
+    SHELL_REFUSAL_CLOSE_CODE,
+    SHELL_REFUSAL_MESSAGE_TYPE,
+    SHELL_REFUSAL_REASON_INVALID,
+    SHELL_REFUSAL_REASON_UNAVAILABLE,
     UVICORN_HOST_ENV_VAR,
     NonLoopbackBindError,
     enforce_loopback_bind,
@@ -379,6 +386,147 @@ def test_two_concurrent_websocket_sessions_are_independent_shells(
     assert b"session-two-value" not in output_one
     assert b"marker-two-is-session-two-value" in output_two
     assert b"session-one-value" not in output_two
+
+
+def test_fifth_concurrent_session_is_refused_while_four_are_open(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """ADR-014 section 4: the four-session cap is enforced by the route's own registry, not
+    merely trusted from the UI (idea `000087`) — a fifth concurrent websocket is refused with a
+    clear close reason while four genuine sessions are still open.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    with (
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_one,
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_two,
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_three,
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_four,
+    ):
+        with pytest.raises(WebSocketDisconnect) as exc_info:
+            with client.websocket_connect(DEMO_TERMINAL_WS_PATH):
+                pass  # pragma: no cover — refused before any frame can be exchanged
+        assert exc_info.value.code == SESSION_LIMIT_CLOSE_CODE
+        assert str(MAX_CONCURRENT_SESSIONS) in (exc_info.value.reason or "")
+
+
+def test_refusal_is_absent_once_one_of_four_sessions_closes(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """The cap tracks sessions genuinely alive right now: closing one of four open sessions
+    frees a slot, and a fifth connection attempt then succeeds — proven with a real command
+    round trip through the newly admitted session, not merely an absence of the refusal.
+    """
+    app = rebuild_app(flag="1")
+    reloaded_demo_terminal_module = sys.modules["src.api.routes.demo_terminal"]
+    client = TestClient(app)
+
+    session_one = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_one.__enter__()
+    session_two = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_two.__enter__()
+    session_three = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_three.__enter__()
+    session_four = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_four.__enter__()
+    try:
+        # Close one of the four — the server-side `finally:` in `terminal_websocket` pops the
+        # registry entry as part of tearing the session down.
+        session_one.__exit__(None, None, None)
+        deadline = time.monotonic() + 5.0
+        while (
+            len(reloaded_demo_terminal_module.SESSIONS) >= MAX_CONCURRENT_SESSIONS
+            and time.monotonic() < deadline
+        ):
+            time.sleep(0.05)
+        assert len(reloaded_demo_terminal_module.SESSIONS) < MAX_CONCURRENT_SESSIONS
+
+        output = b""
+        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as fifth_websocket:
+            fifth_websocket.send_bytes(b"echo demo-terminal-fifth-after-close-marker\n")
+            deadline = time.monotonic() + 5.0
+            while (
+                b"demo-terminal-fifth-after-close-marker" not in output
+                and time.monotonic() < deadline
+            ):
+                output += fifth_websocket.receive_bytes()
+        assert b"demo-terminal-fifth-after-close-marker" in output
+    finally:
+        for session in (session_two, session_three, session_four):
+            with contextlib.suppress(Exception):
+                session.__exit__(None, None, None)
+
+
+def test_bash_shell_request_round_trips_a_real_command(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """`?shell=bash` — the allowlisted, always-available-on-Linux panel — proves the
+    shell-selection plumbing actually reaches the adapter, not just that it accepts the name
+    (REQ-007 W12: "a pytest asserts the shell-selection plumbing passes the requested shell to
+    the adapter override").
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    output = b""
+    with client.websocket_connect(f"{DEMO_TERMINAL_WS_PATH}?shell=bash") as websocket:
+        websocket.send_bytes(b"echo demo-terminal-bash-shell-marker\n")
+        deadline = time.monotonic() + 5.0
+        while b"demo-terminal-bash-shell-marker" not in output and time.monotonic() < deadline:
+            output += websocket.receive_bytes()
+    assert b"demo-terminal-bash-shell-marker" in output
+
+
+@pytest.mark.parametrize("unavailable_shell", ["cmd", "powershell"])
+def test_windows_only_shell_request_on_linux_produces_structured_unavailable_refusal(
+    rebuild_app: Callable[..., FastAPI], unavailable_shell: str
+) -> None:
+    """ADR-014 section 5: cmd and powershell belong to the Windows adapter family; on this
+    (Linux) host, a request for either is accepted, told why over a structured JSON text frame
+    — never a raw error, never a pretend-connect — and then closed. This is exactly the
+    REQ-007 W12 Linux case: "select CMD and PowerShell and assert each renders the in-panel
+    unavailability message."
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    session = client.websocket_connect(f"{DEMO_TERMINAL_WS_PATH}?shell={unavailable_shell}")
+    websocket = session.__enter__()
+    try:
+        payload = json.loads(websocket.receive_text())
+        assert payload == {
+            "type": SHELL_REFUSAL_MESSAGE_TYPE,
+            "shell": unavailable_shell,
+            "reason": SHELL_REFUSAL_REASON_UNAVAILABLE,
+            "message": f"{unavailable_shell} is not available on this host",
+        }
+        with pytest.raises(WebSocketDisconnect) as exc_info:
+            websocket.receive_text()
+        assert exc_info.value.code == SHELL_REFUSAL_CLOSE_CODE
+    finally:
+        with contextlib.suppress(Exception):
+            session.__exit__(None, None, None)
+
+
+def test_non_allowlisted_shell_is_rejected(rebuild_app: Callable[..., FastAPI]) -> None:
+    """ADR-014 section 5: "arbitrary executable paths are rejected" — a name outside the fixed
+    allowlist (bash, cmd, powershell) never reaches `create_adapter()`, and is refused through
+    the same structured-message path as an unavailable-but-allowlisted shell.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    session = client.websocket_connect(f"{DEMO_TERMINAL_WS_PATH}?shell=/bin/zsh")
+    websocket = session.__enter__()
+    try:
+        payload = json.loads(websocket.receive_text())
+        assert payload["type"] == SHELL_REFUSAL_MESSAGE_TYPE
+        assert payload["shell"] == "/bin/zsh"
+        assert payload["reason"] == SHELL_REFUSAL_REASON_INVALID
+        assert "/bin/zsh" not in SHELL_ALLOWLIST  # sanity: this really is not an allowlisted name
+        with pytest.raises(WebSocketDisconnect) as exc_info:
+            websocket.receive_text()
+        assert exc_info.value.code == SHELL_REFUSAL_CLOSE_CODE
+    finally:
+        with contextlib.suppress(Exception):
+            session.__exit__(None, None, None)
 
 
 def test_idle_timeout_reaps_orphaned_shell_after_abrupt_disconnect(
