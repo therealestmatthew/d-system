@@ -4825,7 +4825,7 @@ items:
   - doc-live-demo-requirements
   systems:
   - sys-brain
-  - sys-demo-overview
+  - sys-portfolio
   owner: repository-owner
   status: queued
   priority: 1
@@ -4834,39 +4834,54 @@ items:
   scope:
   - Add brain/concepts/terms-skills-and-agents-demo.md, one concept memory following the
     terms-systems-vocabulary.md grouped-entry convention, tagged demo-glossary, defining
-    LLM, Agent, Sub-agent, Tool, MCP, Context, Command and Skill plus the owner-approved
-    additional terms (candidate set — Prompt/System prompt, Token, Tool call, MCP server,
-    Session, Memory, Orchestration/Multi-agent), each with a one-line entry for the
-    advanced topics named out of scope for depth (Hooks, Agent permissions, Observability,
-    Agent SDK) (REQ-006 R13).
-  - Regenerate the filtered view with
-    tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md
+    the seventeen terms finalized by the PROMPT-019 audit — LLM, Token, Context, Prompt
+    and system prompt, Tool, Tool call, Agent, Agentic loop, Sub-agent, Orchestration and
+    multi-agent, Skill, Progressive disclosure, Command, MCP, MCP server, Session, Memory
+    — each defined against this repository's actual .claude/ and .mcp.json conventions
+    rather than generically, plus a one-line entry for the advanced topics named out of
+    scope for depth (Hooks, Agent permissions, Observability, Agent SDK) (REQ-006 R13).
+  - Register the demo-glossary tag in _data/tags.json (category context). The governance
+    check rejects any memory tag absent from that taxonomy, so without this the phase
+    fails its own first verification command.
+  - Regenerate both glossaries — the committed unfiltered docs/08-governance/GLOSSARY.md,
+    which goes stale the moment any concept memory is added and is asserted by
+    test/test_glossary.py, and the filtered view at docs/00-working/demo-glossary.md
     (docs/00-working per ADR-010 — regenerable working output, not the canonical
     committed glossary OPS-004 governs).
-  - Build five standalone SVG diagrams under docs/07-architecture/diagrams/demo/ — LLM vs
+  - Build six standalone SVG diagrams under docs/07-architecture/diagrams/demo/ — LLM vs
     agent, skill architecture (YAML front matter, SKILL.md, directory structure, assets),
-    the agentic loop, MCP architecture, and the command/skill/tool distinction — each
-    legible at a projector-safe 1024x768 with no external asset or network dependency,
-    plus a README.md indexing them with a one-line caption each.
+    the agentic loop, sub-agents and context isolation, MCP architecture, and the
+    command/skill/tool distinction — each legible at a projector-safe 1024x768 with no
+    external asset or network dependency, plus an index.html contact sheet linking them
+    with a one-line caption each and a pointer to it from docs/07-architecture/README.md.
+    The index is HTML rather than a README.md because docs/ subdirectories are not exempt
+    from the governance front-matter scan, and because the presenter opens it from the
+    filesystem with no dev server running.
   acceptance:
   - Every term the owner listed (LLM, Agent/Sub-Agent, Tool, MCP, Context, Command, Skill)
-    and every owner-approved addition has a concept entry; the regenerated filtered
-    glossary lists all of them (REQ-006 R13).
-  - Each of the five SVGs opens standalone in a browser, is legible at 1024x768, and its
-    labels match the corresponding glossary entry's terminology exactly.
-  - Running the filtered glossary generation twice against an unchanged repository
-    produces byte-identical output.
+    and every addition the PROMPT-019 audit finalized has a concept entry; the regenerated
+    filtered glossary lists all of them (REQ-006 R13).
+  - Each of the six SVGs opens standalone in a browser from the filesystem with no dev
+    server, is legible at 1024x768, and its labels match the corresponding glossary
+    entry's terminology exactly.
+  - Running both glossary generations twice against an unchanged repository produces
+    byte-identical output, and test/test_glossary.py passes.
   verification:
   - uv run python -m src.governance
+  - uv run python tools/generate_glossary.py (unfiltered; run twice, diff empty)
   - uv run python tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md
     (run twice, diff empty)
+  - uv run pytest test/test_glossary.py
   - uv run python tools/check_no_private_content.py with the changes staged
-  - Visual review of each SVG in a browser at 1024x768
+  - Visual review of each SVG and of index.html in a browser at 1024x768
   deliverables:
   - brain/concepts/terms-skills-and-agents-demo.md
+  - _data/tags.json
+  - docs/08-governance/GLOSSARY.md
   - docs/00-working/demo-glossary.md
   - docs/07-architecture/diagrams/demo
-  next_action: Owner to confirm the proposed additional terms (Prompt/System prompt,
-    Token, Tool call, MCP server, Session, Memory, Orchestration/Multi-agent) and the
-    five proposed diagrams before claiming; content-only phase, no lock on sys-demo-stage,
-    can run alongside phase-demo-05/06.
+  - docs/07-architecture/README.md
+  next_action: Claim the phase and write the concept memory first — the diagrams take
+    their labels from its entries, and the acceptance check is that they match exactly.
+    Content-only phase, no lock on sys-demo-stage or sys-demo-overview, so it can run
+    alongside phase-demo-05/06.
