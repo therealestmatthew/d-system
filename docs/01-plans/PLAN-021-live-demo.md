@@ -66,3 +66,18 @@ Applied in order when time runs short; each rung is independent of the ones belo
   log's history or any governed document.
 - **Screen hygiene.** Nothing from `_private/` on screen; notifications off; the terminal starts in
   the repository root with a clean scrollback; browser profile free of personal tabs and bookmarks.
+- **Recorded-dry-run fallback.** The second timed dry-run is screen-recorded, and a successful
+  recording is a rehearsal-gate deliverable (`PROMPT-017`): the last-resort fallback if the API or
+  network fails on stage, narrated live over the video. The runbook names the recording's path on
+  the presentation machine.
+- **Pre-approved permission allowlist.** The live-demo session runs on an allowlist built from the
+  rehearsal transcripts, scoped to the specific commands and paths the live segment uses, so the
+  segment runs without permission pauses while the write fences stay in place. Blanket auto-accept
+  is never used.
+
+## Afterlife
+
+Owner decision, 2026-09-10: everything the demo produces is kept as real work, not reverted. The
+idea recorded from the audience stays in the append-only log; the `phase-demo-*` phases are closed
+through `/session-close` like any other phase; and the generated overview page becomes a maintained
+feature of the repository rather than a prop.
