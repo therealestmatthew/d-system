@@ -41,6 +41,7 @@ CI regenerates it and fails on any difference.
 | OPS-009 | operation | active | repository-owner | docs/08-governance/OPS-009-check-no-private-content.md |
 | OPS-011 | operation | active | repository-owner | docs/08-governance/OPS-011-overview-metrics.md |
 | OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
+| OPS-014 | operation | active | repository-owner | docs/08-governance/OPS-014-generate-overview.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -139,7 +140,6 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 | SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
 | SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
-| SESS-2026-09-10-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-04-demo-stage-frontend.md |
 
 ## Plans and their phases
 
@@ -176,7 +176,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 1 | 1 | 3 | agent-demo-data, agent-demo-stage |
+| PLAN-021 | doc-live-demo | draft | 2 | 1 | 2 | agent-demo-data, agent-demo-stage |
 
 ## Held codes
 
@@ -186,7 +186,6 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | OPS-013 | reserved | Demo reset tool operations document; deliverable of phase-demo-05. |
-| OPS-014 | reserved | Overview page generator operations document; deliverable of phase-demo-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-133 documents — adr: 11, architecture: 5, governance: 7, operation: 11, plan: 32, prompt: 18, requirement: 6, session: 43.
+133 documents — adr: 11, architecture: 5, governance: 7, operation: 12, plan: 32, prompt: 18, requirement: 6, session: 42.

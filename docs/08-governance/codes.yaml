@@ -67,8 +67,6 @@ reserved:
   reason: Portable workflow generator operations document; deliverable of phase-port-01.
 - code: OPS-013
   reason: Demo reset tool operations document; deliverable of phase-demo-05.
-- code: OPS-014
-  reason: Overview page generator operations document; deliverable of phase-demo-04.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011
