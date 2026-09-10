@@ -61,7 +61,11 @@ phase-ses-01`. Codes `OPS-011`–`OPS-014` reserved for the phases' tool documen
 ## Permission fences
 
 `.claude/settings.json` was created with deny rules (`PROMPT-013` section 2), each fencing a
-standing limit that was previously instructional only:
+standing limit that was previously instructional only. The fences cover `Edit`/`Write` calls in
+the primary checkout and (after the adversarial audit below) the `../d-system-worktrees/*`
+worktrees; they do not and cannot cover writes made through Bash, so for shell commands the
+standing limits remain instructional — that gap is inherent to what the spec's Edit/Write deny
+rules can express:
 
 - `Edit`/`Write` on `AGENTS.md` and `CLAUDE.md` — no agent edits the governing files without
   explicit per-change approval (`AGENTS.md`'s own first rule).
@@ -70,6 +74,22 @@ standing limit that was previously instructional only:
   (`phase-port-01`); no other agent may touch them.
 - `Edit`/`Write` on `_data/ideas.jsonl` — the append-only idea log accepts writes only through
   `tools/append_idea.py`, which runs via Bash and is unaffected by the fence.
+
+## Adversarial audit
+
+At the owner's direction, an adversarial agent audited the whole factory output before the build
+session. It found four blockers — invalid claim ids (the backlog schema's `agent-*` pattern),
+a serial-phase deadlock on the prerequisite-must-be-complete rule with no `/session-close`
+scheduled, a pre-existing red `ruff` gate on `dev` that sat in every phase's verification, and
+OPS dispatches that would trip the reserved-code check — plus majors (no commit-before-validate,
+loopback binding as a docstring, the reset/runbook specs misaligned with the rehearsal gate
+(`PROMPT-017`), validator definitions unable to execute the rehearsal's idea step, fences not
+covering worktrees) and minors. All were fixed with the owner's approval in commits `9e86d17`
+(the ruff one-liner on `dev`) and `b21cb19` (everything else, including the owner-approved
+one-line correction to the build-side phase protocol `PROMPT-015`). The re-run gate found one
+residue (the OPS-013 dispatch missing the reservation-removal instruction), fixed in the same
+commit. The audit also exposed that the first gate's "commands runnable as written" check never
+ran the commands — the re-gate runs `ruff` and governance for real.
 
 ## Unresolved
 
