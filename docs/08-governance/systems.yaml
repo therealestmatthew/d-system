@@ -128,8 +128,13 @@ systems:
   - ts/src/main.tsx
   - ts/vite.config.ts
   - ts/package.json
-  depends_on: []
-  description: Heading-only app and Vite API proxy configuration; no runtime API requests.
+  - docs/01-plans/PLAN-022-workbench.md
+  depends_on:
+  - sys-api
+  description: The chartered management UI. Becomes the workbench (PLAN-022, REQ-007) — a
+    configurable surface of panels, named layouts and injection controls built on the demo
+    stage, per the owner's 2026-09-10 decision (PROMPT-020). Scaffold today; built by
+    phase-wb-01 through phase-wb-07.
 - id: sys-html
   name: Dynamic HTML generation
   domain: application
@@ -224,19 +229,23 @@ systems:
 - id: sys-demo-stage
   name: Demo stage page
   domain: application
-  status: planned
+  status: implemented
   owner: repository-owner
   paths:
   - docs/01-plans/PLAN-021-live-demo.md
   - docs/04-decisions/ADR-013-demo-terminal-capability.md
+  - ts/src/stage
+  - src/demo
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/demo_stage.py
   depends_on:
   - sys-api
   - sys-ui
   description: The live-demo presentation stage — an embedded xterm.js terminal over a websocket to
     a PTY-backed shell, a talking-points rotator, and an embedded generated overview panel, in a
-    zero-scroll layout. The terminal capability is localhost-only, gated behind
-    D_SYSTEM_DEMO_TERMINAL=1 and never deployed (ADR-013). Planned; built by phase-demo-01 and
-    phase-demo-02.
+    zero-scroll layout, built by phase-demo-01/02/06. Evolving into the workbench under sys-ui
+    (PLAN-022) — ADR-014 supersedes and narrows the demo-only terminal posture of ADR-013, keeping
+    the loopback-only binding and the D_SYSTEM_DEMO_TERMINAL=1 gate.
 - id: sys-demo-overview
   name: Deterministic overview generation
   domain: application

@@ -4619,6 +4619,16 @@ What it would touch: the demo terminal decision (ADR-013) says a shell capabilit
 
 Unresolved: whether sessions should outlive their websocket (detach/reattach), how much output history to buffer, and whether this generalises into the workflow-triggering UI the platform vision names — in which case it may deserve requirement work rather than a demo-track bolt-on.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-workbench-planner (2026-09-10T17:28:57-04:00): Narrowed by the workbench planning session (2026-09-10): the session-registry half — a backend registry bounding the four-session cap with per-session allowlisted shell selection — is adopted into the workbench terminal capability decision (ADR-014, built by phase-wb-01, PLAN-022). The idea's remaining open scope is the outside-the-page inject/read HTTP API (detach/reattach, output buffering), which still starts from its own decision record.
+
+</details>
+
 **Links**
 
 - relates_to → `000070`

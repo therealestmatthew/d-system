@@ -253,6 +253,27 @@ same terms ("five phases" reads as the track's phases). A backend inject/read AP
 terminal from outside the page was considered and parked as an idea: per ADR-013's closing
 consequence, that capability starts from its own decision record.
 
+## The demo-track completion gate extends to the workbench track
+
+Owner decision, 2026-09-10, ratified through the workbench pre-plan package (`PROMPT-020`, item
+5 of its production list). The completion-authority substitution recorded above for
+`phase-demo-*` extends on identical terms to the seven `phase-wb-*` phases of the workbench
+build ([PLAN-022](../01-plans/PLAN-022-workbench.md)): a workbench phase is marked
+`status: complete` by the build coordinator (`PROMPT-022`) once its gate has passed — every
+verification command green with output captured, the phase's adversarial review
+(`demo-adversary`, pack `WNN-A`) with findings fixed or explicitly reported, and, for phases
+with a browser-facing deliverable, the Playwright-driven checks (`demo-validator-web`, pack
+`WNN-W`) — and the branch is integrated onto `dev` with the owner's approval. The completion
+edit is one small commit on `dev` immediately after that integration.
+
+The same trade and the same limits apply: the owner's synchronous judgment is substituted by
+the adversarial gate plus retroactive review, integration onto `dev` still requires the owner
+each time, and everywhere outside `phase-demo-*` and `phase-wb-*`, `/session-close` remains the
+only path to `status: complete`. One addition specific to this track: `phase-wb-07`'s
+owner-machine conditions — the REQ-006 R06 Windows smoke check, the REQ-007 W12 Windows shell
+round-trips, and the owner-driven R09 timing — close only on the owner's recorded results; the
+coordinator may not mark that phase complete on agent evidence alone.
+
 Semantic provider, private/cloud data boundary, storage and quality targets belong to deferred `phase-mem-15`. No provider was selected or memory transmission authorized by the questionnaire. Agentic refinement additionally requires evidence that the simpler retrieval stages leave useful work unresolved. The optional periodic memory-review phase packages an opt-in trigger; it does not activate a scheduler or automate approval/deletion.
 
 These are tracked gates with resume conditions, not missing backlog coverage. All feature plans remain open until their mapped phases are completed or explicitly cancelled with rationale.

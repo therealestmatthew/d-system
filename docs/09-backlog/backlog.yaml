@@ -3,6 +3,13 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-wb-01
+- phase-wb-02
+- phase-wb-03
+- phase-wb-04
+- phase-wb-05
+- phase-wb-06
+- phase-wb-07
 - phase-port-01
 - phase-ses-01
 items:
@@ -4964,3 +4971,372 @@ items:
     their labels from its entries, and the acceptance check is that they match exactly.
     Content-only phase, no lock on sys-demo-stage or sys-demo-overview, so it can run
     alongside phase-demo-05/06.
+- id: phase-wb-01
+  title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
+  next_action: Once the owner approves the pack, claim per AGENTS.md and dispatch pack
+    section W01 (PROMPT-021); may run in parallel with phase-wb-02 (disjoint locks).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-terminal-decision
+  - doc-workbench-api-decision
+  systems:
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the gated workbench route family per ADR-015, mounted only under
+    D_SYSTEM_DEMO_TERMINAL=1 and the loopback binding, all read-only except the
+    reveal action - injection-source enumeration of .claude/skills/, .claude/agents/
+    and docs/02-prompts/ merged with the curated-overrides file
+    _data/workbench/injection-overrides.json (labels, injected text, hidden entries;
+    seed the file with a valid empty-override shape); repo-bounded directory listing
+    and recursive file search with an extension filter, excluding _private/ and
+    gitignored entries; an idea route reading exclusively through fold()
+    (src/db/ideas.py); a backlog route over docs/09-backlog/backlog.yaml whose queue
+    ordering matches the governance --ready rendering (next_up first, then ready
+    phases by priority).
+  - Build the reveal-in-explorer action route per ADR-015 - POST only, path
+    validated repo-relative on the resolved path, spawning exactly explorer.exe
+    /select on Windows or xdg-open of the containing directory on Linux via an
+    argument list, never a shell string.
+  - Add ADR-014's backend session registry to the terminal websocket route - session
+    id to adapter, the four-session cap enforced server-side with a clear refusal
+    for a fifth, and per-session shell selection validated against the fixed
+    allowlist (bash, cmd, powershell) with a structured unavailable-shell refusal
+    on hosts lacking the shell. One PTY per websocket, gating and binding unchanged.
+  - Cover REQ-007 W14 in tests - absent-by-default routes, traversal and
+    symlink-escape rejection, no _private/ or gitignored listings, GET-only reads,
+    reveal path validation - plus the registry cap, the shell allowlist and the
+    enumeration/override merge.
+  acceptance:
+  - With the flag unset every workbench route is absent (404); with it set, the W14
+    rejection matrix passes - traversal, absolute-path and symlink-escape requests
+    refused, listings free of _private/ and gitignored entries, reads GET-only.
+  - Enumeration output matches the three directories minus hidden overrides, and an
+    override's relabel and text replacement are reflected in the route response.
+  - The idea route's rows match an independent fold() run; the backlog route's queue
+    view matches uv run python -m src.governance --ready for next_up and ready
+    ordering.
+  - A fifth concurrent terminal session is refused by the backend; cmd and
+    powershell requests on Linux return the structured unavailable-shell refusal;
+    a non-allowlisted shell request is rejected.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W01-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  deliverables:
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - src/api/__init__.py
+  - src/demo
+  - _data/workbench/injection-overrides.json
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+- id: phase-wb-02
+  title: Layout engine and notes strip
+  next_action: Once the owner approves the pack, claim per AGENTS.md and dispatch pack
+    section W02 (PROMPT-021); may run in parallel with phase-wb-01 (disjoint locks).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-layout-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the layout engine per ADR-016 - a slot model where every panel is
+    assigned to exactly one slot per layout, layout definitions loaded from
+    _data/workbench/layouts/ (schema_version, stable layout and slot ids,
+    fractional geometry, default assignments), the two shipped layouts (layout-1
+    terminal-left, layout-2 terminal full-width bottom), a slot-header dropdown
+    (small downward triangle beside the name) on any slot holding several panels
+    that swaps the selected panel into view, and a layout-configuration button at
+    the page top right opening a surface that selects the active layout and
+    assigns panels to slots - no geometry editing (REQ-007 W05, W06).
+  - Persist the active layout and per-layout per-slot selections in localStorage
+    under one namespaced versioned key, discarding unknown or version-mismatched
+    stored state in favor of the layout file's defaults (ADR-016).
+  - Replace the talking-points panel with the notes strip (REQ-007 W01) - a short
+    wide display-only strip at the top right, no title, the tooltip moved to its
+    far left, every control in one downward-triangle dropdown including the
+    notes-file picker over a fixed notes directory, the chosen file persisted like
+    layout selections; remove the stale placeholder comment that panel carried.
+  - Preserve zero-scroll and non-overlap at 1280x720, 1366x768, 1920x1080 and
+    1024x768 in both layouts (REQ-006 R02 remains binding).
+  acceptance:
+  - Switching layouts moves the terminal region per each layout's geometry, panel
+    reassignment renders in the chosen slot, and both survive reload; a cleared
+    store yields layout-1 defaults (REQ-007 W05).
+  - A multi-panel slot's header dropdown lists and swaps its panels; a single-panel
+    slot renders a plain header (REQ-007 W06).
+  - The notes strip is display-only with all controls in its dropdown, the file
+    picker switches and persists the notes file, and the tooltip sits far left
+    (REQ-007 W01).
+  - Zero page scroll and no overlapping regions in both layouts at all four sizes.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W02-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W02-W) covering W01,
+    W05, W06 and zero-scroll in both layouts at the four sizes
+  deliverables:
+  - ts/src
+  - _data/workbench/layouts
+- id: phase-wb-03
+  title: Terminal panel rework, injection dropdowns and shell panels
+  next_action: After phase-wb-01 and phase-wb-02 complete and integrate, dispatch pack
+    section W03 (PROMPT-021).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-terminal-decision
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-01
+  - phase-wb-02
+  scope:
+  - Rework the terminal panel per REQ-007 W02 and W03 - a (...) ellipsis menu at
+    the panel top right holding Collapse terminal and Drop/restore terminal, the
+    standalone collapse control and page-level drop control removed, drop replacing
+    the terminal area in place with an inactive-terminal info page (no layout
+    reflow) while the injection dropdowns stay visible but grayed and unclickable;
+    collapse and drop keep REQ-006 R10/R11 semantics unchanged.
+  - Add the Skills, Prompts and Agents injection dropdowns next to Commands, fed by
+    phase-wb-01's enumeration route with overrides applied, injecting each
+    category's agreed text un-executed per REQ-006 R12 semantics (REQ-007 W04),
+    sharing the drop deactivation behavior.
+  - Add Terminal (bash), CMD and PowerShell as three panel options in the slot
+    dropdown over the per-session shell selection, rendering the structured
+    unavailable-shell refusal as a clear in-panel message (REQ-007 W12, Linux half).
+  - Sweep the recorded demo-track minors in this region - replace
+    ts/public/demo-commands.json's placeholder entries with real demo commands and
+    fix the websocket startup-race console warning in the terminal component.
+  acceptance:
+  - No standalone collapse or page-level drop control renders; both live in the
+    ellipsis menu with sessions surviving collapse and confirmation guarding drop
+    (REQ-007 W02).
+  - Dropped state shows the info page inside unchanged panel bounds with all four
+    injection dropdowns visible, disabled and unclickable; restore returns a
+    working terminal (REQ-007 W03).
+  - Each category injects its exact agreed text un-executed; an overrides-file
+    relabel, replacement and hide take effect with no rebuild (REQ-007 W04).
+  - CMD and PowerShell panels on Linux show the in-panel unavailability message
+    with no uncaught console errors; bash round-trips (REQ-007 W12).
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W03-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W03-W) covering W02,
+    W03, W04 and W12's Linux assertions
+  deliverables:
+  - ts/src
+  - ts/public/demo-commands.json
+- id: phase-wb-04
+  title: HTML Viewer panel with tabs
+  next_action: After phase-wb-03 (shared ts/src lock), dispatch pack section W04
+    (PROMPT-021).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-03
+  scope:
+  - Build the HTML Viewer panel generalizing the overview panel (REQ-007 W07) - it
+    displays a selected page with the generated overview one selectable entry;
+    header controls right of the title are a refresh button, a searchable dropdown
+    over the compatible files (.html and .svg) found recursively under the selected
+    directory via phase-wb-01's search route, and a button opening the in-app
+    directory dialog fed by the listing route, repo-relative only.
+  - Add tabs exactly like the terminal's session tabs (REQ-007 W08) - directory,
+    search text and displayed page scoped per tab, shared header controls, tab
+    state persisted in the browser per ADR-016's selections split.
+  - Register the panel as a panel type assignable by the layout engine, defaulting
+    to layout-1's main right slot.
+  acceptance:
+  - The dropdown lists exactly the recursive .html/.svg files of the selected
+    directory, filters by the search input, and renders both an .html page (a
+    known overview figure) and an .svg; refresh re-fetches a changed file; the
+    dialog re-scopes the directory (REQ-007 W07).
+  - Two tabs hold different directory/search/page state, switch cleanly, and
+    survive reload (REQ-007 W08).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W04-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W04-W) covering W07
+    and W08
+  deliverables:
+  - ts/src
+- id: phase-wb-05
+  title: File Browser panel
+  next_action: After phase-wb-04 (shared ts/src lock; needs the viewer tabs for the
+    open-in-viewer submenu), dispatch pack section W05 (PROMPT-021).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-04
+  scope:
+  - Build the File Browser panel (REQ-007 W09) - context folder chosen through the
+    in-app dialog, collapsible treeview of subdirectories and files from
+    phase-wb-01's listing route, text-search and file-type filters hiding folders
+    with no matches.
+  - Implement the right-click context menu for every entry - reveal in file
+    explorer / open containing folder through the action route; open in HTML
+    Viewer with a nested submenu choosing the target tab (compatible files); copy
+    relative path; copy absolute path; inject path into terminal un-executed via
+    the R12 injection mechanics.
+  - Ship the documentation-explorer mode (plans, decisions, requirements, ...) as
+    a File Browser configuration preset, not a separate panel.
+  acceptance:
+  - The tree matches the filesystem for a known folder; filters hide non-matching
+    files and empty folders; the documentation-explorer preset re-scopes the tree
+    (REQ-007 W09).
+  - All five context-menu actions work - open-in-viewer lands in the chosen tab,
+    inject-path appears un-executed on the active terminal, both copies place the
+    expected strings, and the reveal request reaches the backend action route
+    (Linux assertion; Windows behavior is exercised by phase-wb-07's checklist).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W05-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W05-W) covering W09
+  deliverables:
+  - ts/src
+- id: phase-wb-06
+  title: Idea and Backlog explorer panels
+  next_action: After phase-wb-05 (shared ts/src lock), dispatch pack section W06
+    (PROMPT-021).
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-05
+  scope:
+  - Build the Idea Explorer panel (REQ-007 W10) over phase-wb-01's fold()-only
+    route - columns id, title, status, age, annotation count, link count; sortable
+    and filterable; a toggle between the standard view and a priority-queue view
+    ranking by status precedence (open, triaged, planned) then age. No code path
+    reads _data/ideas.jsonl directly.
+  - Build the Backlog Explorer panel (REQ-007 W11) as the same configuration
+    surface over the backlog route - columns id, title, status, priority, queue
+    position, depends_on; its priority-queue view ordered next_up first, then
+    ready phases by priority, matching the governance --ready rendering.
+  - Register both as panel types in layout-1's explorer slot behind the slot-header
+    dropdown, File Browser remaining the default-visible panel.
+  acceptance:
+  - Idea rows match an independent fold() run and the queue view ranks by status
+    precedence then age (REQ-007 W10).
+  - Backlog rows match backlog.yaml and the queue view's top rows equal next_up in
+    order followed by ready phases by priority, cross-checked against the --ready
+    report (REQ-007 W11).
+  - Layout-1's explorer slot lists all three explorers in its header dropdown with
+    File Browser visible by default (REQ-007 W06).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W06-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W06-W) covering W10,
+    W11 and the W06 slot-dropdown assertions
+  deliverables:
+  - ts/src
+- id: phase-wb-07
+  title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
+  next_action: After all six build phases, dispatch pack section W07 (PROMPT-021);
+    the Windows checks and both dry-runs are owner-machine, owner-driven work.
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-01
+  - phase-wb-02
+  - phase-wb-03
+  - phase-wb-04
+  - phase-wb-05
+  - phase-wb-06
+  scope:
+  - Rewrite the live-segment runbook against the final workbench UI in the
+    rehearsal gate's step shape (PROMPT-017), each step carrying its commands,
+    fallback action and timebox, the timeboxes summing inside 15 minutes; update
+    the Windows setup checklist to the workbench launch (REQ-007 W13).
+  - Run the deferred owner-machine checks on the presentation machine and record
+    them in the runbook - the REQ-006 R06 terminal smoke check, and a CMD and a
+    PowerShell panel round-trip (REQ-007 W12's Windows half).
+  - Run two owner-driven timed dry-runs of the live segment against the final UI
+    and record per-step times, closing REQ-006 R09's deferred conditions.
+  - Re-run the rehearsal gate semantics (PROMPT-017) including a demo_reset.py
+    prepare/restore verification; the reset tool, OPS-013 and their behavior stay
+    unchanged per PROMPT-020 decision 7.
+  acceptance:
+  - The runbook describes the workbench UI only, with per-step commands, fallbacks
+    and timeboxes summing inside 15 minutes (REQ-007 W13).
+  - The R06 smoke check and both shell round-trips are recorded as passing on the
+    presentation machine.
+  - Both owner-driven dry-runs complete within 15 minutes with every step inside
+    its timebox, per-step times recorded - the REQ-006 R09 conditions deferred
+    from phase-demo-05 are closed, not re-deferred.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Playwright rehearsal pass over the runbook's browser-marked steps
+    (demo-validator-web, pack W07-W)
+  - The executed Windows checklist and both dry-runs' recorded times in the runbook
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
