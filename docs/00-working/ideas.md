@@ -4682,6 +4682,52 @@ Unresolved — this is why the idea exists rather than the change: the owner app
 
 Marked priority-ish at the owner's request: worth doing before the next agent has to act on the rule, not urgent enough to interrupt current work.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-readme-audit (2026-09-10T19:11:22-04:00): Verbatim replacement text for both hunks, copied here so the approved wording survives independently of the plan file at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md, which lives outside the repository and outside backup.
+
+HUNK 1 — AGENTS.md, "Confidentiality and publishing", currently lines 50-51.
+
+Replace this bullet:
+
+- **Pushing your own branch to `origin` needs no approval.** Publish `agent/<phase-id>` freely;
+  `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing.
+
+With this bullet:
+
+- **Ask the owner before pushing to `origin`, with one standing exception: your own
+  `agent/<phase-id>` branch.** Publish that freely — backing up your own work is not publishing.
+  Anything else that reaches `origin` is the owner's call: `dev`, a tag, a peer's branch. `git
+  fetch` and `git pull` are never gated.
+
+The bullet immediately after it ("Ask before integrating a feature branch into the integration branch") is unchanged and still draws the separate distinction between backing a branch up and landing it on the trunk.
+
+HUNK 2 — AGENTS.md, "Concurrent agents: claim a phase", currently lines 186-187.
+
+Replace this paragraph:
+
+A remote now exists, so `git fetch`, `git pull` and `git push` all work — but **ask the owner before
+pushing** (see *Confidentiality and publishing*).
+
+With this paragraph:
+
+A remote now exists, so `git fetch`, `git pull` and `git push` all work. Pushing your own
+`agent/<phase-id>` branch is the standing exception to the ask-first rule; every other push to
+`origin` needs the owner, and so does integrating your branch into `dev` — see *Confidentiality and
+publishing*.
+
+WHY THIS WORDING. The two passages are a general rule (ask before pushing to origin) and one deliberate exception (your own agent branch). Neither passage currently says which of the two it is, so each reads as a complete statement and they appear to conflict — and hunk 2's cross-reference points at hunk 1, so an agent following the pointer finds what looks like the opposite instruction. The rewrite keeps both rules intact and makes the relationship explicit in both places. Do not "resolve" this by deleting either passage; the owner rejected that approach explicitly when it was proposed.
+
+LINE NUMBERS WILL DRIFT. Match on the quoted text, not the line numbers above.
+
+STILL BLOCKED. .claude/settings.json denies Edit(AGENTS.md) and Write(AGENTS.md), and a deny rule overrides an approval at the tool level, so an agent cannot apply this even with the owner's approval on record. It needs the owner applying the hunks by hand, or the deny lifted for the duration and restored afterwards. Whether the change commits and pushes when applied was also left undecided.
+
+</details>
+
 ---
 
 ## 000092 · HTML Designer agent: extract page designs into durable template families
@@ -4724,3 +4770,28 @@ Deferred by the owner on 2026-09-10 when scoping the protocol page: the ratified
 "protocol + case studies for now, note to come back and build the broader governance atlas
 later." Build it from the atlas family (templates/styles/atlas.css, templates/html/atlas-*.html)
 rather than from scratch.
+
+---
+
+## 000094 · Investigate and clean up the unaccounted Codex worktree at ~/.codex/worktrees/511d/d-system
+
+**Created 2026-09-10T19:12:42-04:00 · Status: `open`**
+
+`git worktree list` from the primary checkout reports four worktrees, and one of them is not accounted for by any process this repository documents:
+
+/code/d-system                               [dev]
+/code/d-system-worktrees/phase-demo-07       [agent/phase-demo-07]
+/code/d-system-worktrees/phase-port-01       [agent/phase-port-01]
+/home/mimmik/.codex/worktrees/511d/d-system  (detached HEAD)
+
+The first three are exactly what ADR-003 prescribes: the primary checkout on the integration branch, plus one worktree per active claim at ../d-system-worktrees/<phase-id> on branch agent/<phase-id>. Both of those claims were live when this was written (phase-port-01 held by agent-codex-port, phase-demo-07 by agent-demo-glossary), so those two are healthy.
+
+The fourth is not. It sits under ~/.codex/worktrees/, not the sibling directory ADR-003 requires, and it is on a detached HEAD rather than a named agent branch — so it is invisible to `git branch --list 'agent/*'`, carries no phase id, and cannot be matched to a backlog claim. It was found at commit da9547e.
+
+Why it matters. ADR-003 puts worktrees at ../d-system-worktrees/ specifically so that no tool operating on the primary checkout — pytest, ruff, mypy, or the governance Markdown scanner — ever walks a second copy of the repository. A worktree under the home directory does not violate that (it is outside the repo too), so this is not an active correctness hazard. The concerns are different ones: a detached-HEAD worktree holds a commit reachable from nothing, so any work in it is invisible to `git log` on dev and will be garbage-collected if the worktree is removed without first naming the commit; and an unaccounted worktree makes `git worktree list` stop being a reliable answer to "who is working on this repository right now", which is the question an agent asks before assuming a port or a claim is free.
+
+What to do. Do not delete it blind — check first whether it holds unmerged work: `git -C /home/mimmik/.codex/worktrees/511d/d-system status` and `git log --oneline -5` there, and `git log dev..da9547e` to see whether that commit is already on the trunk. If it holds nothing, `git worktree remove` it and prune. If it holds real work, give it a branch name before doing anything else, because a detached HEAD is one `worktree remove` away from being unrecoverable.
+
+Also worth deciding, separately from this instance: whether the Codex harness creating worktrees under ~/.codex/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration to point at ../d-system-worktrees/. ADR-003 was written for the sanctioned agent flow and does not mention other harnesses. That is a decision for the owner, not something to infer from one worktree.
+
+Found on 2026-09-10 during the close of SESS-2026-09-10-10, while checking whether the two peer phase claims were live or stale. Recorded rather than acted on: the session held no backlog claim, and removing another harness's worktree is not a change to make on a hunch at the end of an unrelated session.
