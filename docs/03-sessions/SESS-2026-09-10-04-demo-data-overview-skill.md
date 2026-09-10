@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-demo-data-overview-skill
-code: SESS-2026-09-10-03
+code: SESS-2026-09-10-04
 title: Demo data orchestration — overview skill, templates and page generation (phase-demo-04)
 kind: session
 status: active
