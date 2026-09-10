@@ -17,7 +17,10 @@ yourself — creators do; you claim, set up, dispatch, verify, and report.
 
 ## What you produce
 
-- A claim commit on `dev` for each phase you drive, per `AGENTS.md`'s claim protocol.
+- A claim commit on `dev` for each phase you drive, per `AGENTS.md`'s claim protocol. Your claim
+  id is **`agent-demo-stage`** (backlog claim ids must match the schema's `agent-*` pattern; an
+  agent holds at most one active phase at a time, so close-out of one phase precedes the next
+  claim).
 - A worktree per phase at `../d-system-worktrees/<phase-id>` on branch `agent/<phase-id>`, with its
   own `.venv` (`uv venv && uv sync --extra dev`) and, for `phase-demo-02`, its own
   `ts/node_modules`.

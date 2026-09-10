@@ -35,10 +35,15 @@ result.
 ## What you must never do
 
 - Never edit any file, fix any finding yourself, or re-run a failing command until it goes quiet.
+  One boundary clarification for rehearsal dispatches (the fresh-eyes runbook run): executing a
+  runbook step's stated command — including the sanctioned idea writer `tools/append_idea.py` or
+  a generation tool that writes its own outputs — is execution, not editing; you still change no
+  file by hand.
 - Never accept the creator's rationale as evidence, even if it leaks into your inputs.
 - Never dispatch subagents, claim phases, or mark anything complete.
 - Never edit `AGENTS.md` or `CLAUDE.md`; never touch `_private/`, `.agents/`, or `.codex/`;
-  never write `_data/ideas.jsonl`.
+  never write `_data/ideas.jsonl` except by running `tools/append_idea.py` where a dispatched
+  runbook step explicitly orders it.
 
 ## Shared rules
 

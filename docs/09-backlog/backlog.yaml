@@ -4418,6 +4418,9 @@ items:
   - With D_SYSTEM_DEMO_TERMINAL unset the terminal route does not exist; with it set,
     a websocket client on 127.0.0.1 reaches a real shell and receives command output
     (REQ-006 R04 and R05).
+  - With the flag set, startup on a non-loopback bind host fails fast, proven by a
+    test — the loopback restriction is enforced in code, not documented in a comment
+    (ADR-013).
   - The shell override selects the configured shell; platform detection picks the
     POSIX adapter on Linux without pywinpty installed.
   - Stage read routes return the talking-points data file content unchanged.
@@ -4474,6 +4477,8 @@ items:
   verification:
   - cd ts && npm run build
   - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   deliverables:
@@ -4481,6 +4486,7 @@ items:
   - ts/package.json
   - ts/package-lock.json
   - ts/public/talking-points.json
+  - ts/vite.config.ts
   next_action: Scaffold the stage page layout grid first and prove zero-scroll at the
     four sizes with placeholder panels before wiring xterm.js.
 - id: phase-demo-03
@@ -4525,6 +4531,8 @@ items:
   - tools/overview_inventory.py
   - docs/08-governance/OPS-011-overview-metrics.md
   - docs/08-governance/OPS-012-overview-inventory.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
   - test/test_overview_tools.py
   next_action: Implement overview_metrics.py against fold() with its determinism test
     first, then the inventory tool, then the OPS documents.
@@ -4565,6 +4573,8 @@ items:
   deliverables:
   - tools/generate_overview.py
   - docs/08-governance/OPS-014-generate-overview.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
   - .claude/skills/d-system-overview/SKILL.md
   - templates/html
   - templates/styles
@@ -4591,10 +4601,15 @@ items:
   - phase-demo-04
   scope:
   - Write the final talking-points copy into the stage data file and the live-segment
-    runbook with per-step timeboxes summing inside 15 minutes (REQ-006 R09).
+    runbook in the rehearsal gate's step shape (orient, record an idea, triage it,
+    plan beat, overview-skill rebuild, test — PROMPT-017), each step carrying its
+    commands, its fallback action and a timebox, the timeboxes summing inside 15
+    minutes (REQ-006 R09).
   - Build tools/demo_reset.py with OPS-013 — returns demo-visible state to the
-    rehearsed baseline (regenerated overview outputs, cleared scratch state) without
-    touching idea-log history or governed documents.
+    rehearsed baseline (regenerated overview outputs, cleared scratch state), parks
+    the pre-built overview skill restorably, and seeds the fallback audience idea
+    through tools/append_idea.py, without ever deleting or rewriting idea-log
+    content or governed documents.
   - Write the Windows machine setup checklist per PLAN-021, including the pre-demo
     git tag step and screen hygiene, and run the REQ-006 R06 terminal smoke check on
     the presentation machine.
@@ -4605,8 +4620,10 @@ items:
     their times are recorded in the runbook (REQ-006 R09).
   - The R06 smoke check on the presentation machine is recorded as passing in the
     runbook.
-  - Running demo_reset.py after a rehearsal restores the rehearsed baseline and
-    leaves the idea log and governed documents untouched.
+  - Running demo_reset.py after a rehearsal restores the rehearsed baseline (parked
+    skill, seeded fallback idea, regenerated outputs) while never deleting or
+    rewriting idea-log content or governed documents; its only idea-log access is
+    appending through tools/append_idea.py.
   verification:
   - uv run pytest
   - uv run ruff check src/ test/
@@ -4617,6 +4634,8 @@ items:
   - ts/public/talking-points.json
   - tools/demo_reset.py
   - docs/08-governance/OPS-013-demo-reset.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
   next_action: Draft the runbook timeboxes from the PROMPT-010 live-segment shape,

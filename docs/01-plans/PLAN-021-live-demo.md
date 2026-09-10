@@ -90,8 +90,10 @@ Applied in order when time runs short; each rung is independent of the ones belo
 - **Pre-demo git tag.** Tag the repository state before the session starts so anything recorded
   live (the idea log is append-only) is diffable against a known baseline afterwards.
 - **Demo reset.** `tools/demo_reset.py` returns the demo-visible state to the rehearsed baseline —
-  regenerated overview outputs and cleared scratch state — without touching the append-only idea
-  log's history or any governed document.
+  regenerated overview outputs, cleared scratch state, the pre-built overview skill parked
+  restorably, and the fallback audience idea seeded through the sanctioned writer (`PROMPT-017`).
+  It never deletes or rewrites idea-log content or any governed document; its only idea-log
+  access is appending through `tools/append_idea.py`.
 - **Screen hygiene.** Nothing from `_private/` on screen; notifications off; the terminal starts in
   the repository root with a clean scrollback; browser profile free of personal tabs and bookmarks.
 - **Recorded-dry-run fallback.** The second timed dry-run is screen-recorded, and a successful

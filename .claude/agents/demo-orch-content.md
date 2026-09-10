@@ -21,7 +21,8 @@ work.
 
 ## What you produce
 
-- A claim commit on `dev` for the phase, per `AGENTS.md`'s claim protocol.
+- A claim commit on `dev` for the phase, per `AGENTS.md`'s claim protocol. Your claim id is
+  **`agent-demo-content`** (backlog claim ids must match the schema's `agent-*` pattern).
 - A worktree at `../d-system-worktrees/phase-demo-05` on branch `agent/phase-demo-05`, with its
   own `.venv` (`uv venv && uv sync --extra dev`).
 - Dispatches of `demo-creator-py` (the reset tool), `demo-creator-docs` (runbook skeleton, OPS

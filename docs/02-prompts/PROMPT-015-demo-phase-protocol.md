@@ -23,7 +23,10 @@ governs.
 
 ## Claim
 
-1. On clean, up-to-date `dev`: set the phase `status: active`, `agent: agent-demo-coord`, bump the
+1. On clean, up-to-date `dev`: set the phase `status: active`, `agent:` the driving orchestrator's
+   claim id (`agent-demo-stage`, `agent-demo-data`, or `agent-demo-content` — one id per
+   orchestrator, each holding at most one active phase, per the backlog schema and AGENTS.md),
+   and bump the
    catalog `updated` date — one commit, nothing else in it. Run
    `uv run python -m src.governance` before committing; a rejected claim means a peer moved —
    re-pull, re-check, re-decide.

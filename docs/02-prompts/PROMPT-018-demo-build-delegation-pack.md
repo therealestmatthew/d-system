@@ -48,12 +48,16 @@ Worktree: /code/d-system-worktrees/phase-demo-01. Branch: agent/phase-demo-01, f
 Ports: backend 8010, frontend 5180.
 
 1. On an up-to-date dev in /code/d-system, claim phase-demo-01 per AGENTS.md (status: active,
-   agent: demo-orch-stage, catalog updated date) in one small commit; the governance run must
-   accept the claim.
+   agent: agent-demo-stage, catalog updated date) in one small commit; the governance run must
+   accept the claim. (Claim ids must match the schema's agent-* pattern; your claim id as this
+   orchestrator is agent-demo-stage.)
 2. Create the worktree at the path above and set it up: uv venv && uv sync --extra dev.
 3. Dispatch, in order: D01-C1 then D01-V1; D01-C2 then D01-V2; D01-C3 then D01-V3 — each prompt
    verbatim from PROMPT-018 (docs/02-prompts/PROMPT-018-demo-build-delegation-pack.md). At most
-   two fix cycles per item, then report up.
+   two fix cycles per item, then report up. When a creator reports its item done, commit that
+   item on the phase branch (narrow, one concern per commit) BEFORE dispatching its validator —
+   the validator judges git diff dev...agent/phase-demo-01, which is empty until the work is
+   committed.
 4. Dispatch D01-G (demo-validator-check) as the phase gate.
 5. Run the phase's verification commands yourself in the worktree and paste real output:
    uv run pytest; uv run ruff check src/ test/; uv run mypy src/;
@@ -134,13 +138,15 @@ Build the terminal websocket route at src/api/routes/demo_terminal.py, registere
 src/api/__init__.py, bridging the websocket to a shell session through the src/demo adapter
 (built by D01-C1). Per docs/04-decisions/ADR-013-demo-terminal-capability.md: the route is
 registered only when D_SYSTEM_DEMO_TERMINAL=1 — when the flag is unset the route must not exist
-(404), not exist-but-refuse. Document in the route module that the demo server is started bound
-to 127.0.0.1. Declare pywinpty as a Windows-only optional dependency in pyproject.toml
-(sys_platform == 'win32') and update uv.lock.
+(404), not exist-but-refuse. Enforce the loopback binding in code, not in a comment: when the
+flag is set, app startup fails fast unless the configured bind host is loopback (127.0.0.1 or
+::1), so a --host 0.0.0.0 launch with the terminal enabled refuses to start. Declare pywinpty as
+a Windows-only optional dependency in pyproject.toml (sys_platform == 'win32') and update
+uv.lock.
 
 Extend test/test_demo_terminal.py: with the flag unset the route returns 404; with the flag set,
 a websocket client sends a command and receives its output (FastAPI TestClient supports websocket
-testing).
+testing); and the non-loopback bind check refuses with the flag set.
 
 Run in the worktree and paste real output: uv run pytest; uv run ruff check src/ test/;
 uv run mypy src/.
@@ -163,8 +169,10 @@ Diff: git diff dev...agent/phase-demo-01 -- src/api pyproject.toml uv.lock test/
 Requirement text: REQ-006 rows R04 and R05 (docs/06-requirements/REQ-006-live-demo.md) and
 docs/04-decisions/ADR-013-demo-terminal-capability.md. Concretely: the websocket route exists
 only when D_SYSTEM_DEMO_TERMINAL=1 (absent means 404, not 403); it bridges to a real shell via
-the src/demo adapter; pywinpty is optional and Windows-only in pyproject.toml; tests prove both
-the absent-by-default state and a command round-trip with the flag set. The diff must not touch
+the src/demo adapter; the loopback binding is enforced in code — with the flag set, startup on a
+non-loopback host must fail fast, and a mere docstring or comment is a failing finding; pywinpty
+is optional and Windows-only in pyproject.toml; tests prove the absent-by-default state, a
+command round-trip with the flag set, and the non-loopback refusal. The diff must not touch
 files outside src/api, src/demo, pyproject.toml, uv.lock and test/test_demo_terminal.py.
 
 Commands: uv run pytest; uv run ruff check src/ test/; uv run mypy src/.
@@ -248,15 +256,21 @@ what is missing; report what already existed.
 
 Agent: demo-orch-stage. Phase: phase-demo-02 (build the stage frontend with the zero-scroll
 layout; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-01 being integrated into dev — confirm that before claiming.
+phase-demo-01 being integrated into dev AND closed by the owner's /session-close (status:
+complete in the backlog) — confirm both before claiming; the governance validator rejects an
+active phase whose prerequisite is not complete, and only the owner can complete one.
 Worktree: /code/d-system-worktrees/phase-demo-02. Branch: agent/phase-demo-02, from dev.
 Ports: backend 8010, frontend 5180.
 
-1. On an up-to-date dev in /code/d-system, claim phase-demo-02 per AGENTS.md in one small commit.
+1. On an up-to-date dev in /code/d-system, claim phase-demo-02 per AGENTS.md in one small commit
+   (status: active, agent: agent-demo-stage — your claim id as this orchestrator).
 2. Create the worktree; uv venv && uv sync --extra dev; cd ts && npm install (worktree-local
    node_modules, never a symlink).
 3. Dispatch, in order: D02-C1 then D02-V1; D02-C2 then D02-V2; D02-C3 then D02-V3 — each verbatim
-   from PROMPT-018. At most two fix cycles per item, then report up.
+   from PROMPT-018. At most two fix cycles per item, then report up. When a creator reports its
+   item done, commit that item on the phase branch (narrow, one concern per commit) BEFORE
+   dispatching its validator — the validator judges git diff dev...agent/phase-demo-02, which is
+   empty until the work is committed.
 4. Dispatch D02-G as the phase gate.
 5. Run the phase's verification commands yourself in the worktree and paste real output:
    cd ts && npm run build; uv run pytest; uv run python -m src.governance;
@@ -329,8 +343,10 @@ Agent: demo-creator-web. Worktree: /code/d-system-worktrees/phase-demo-02. Branc
 agent/phase-demo-02. Ports: backend 8010, frontend 5180.
 
 Add xterm.js to ts/ (npm dependency, worktree install) and build the terminal component wired to
-the phase-demo-01 websocket route through the Vite proxy (backend on 8010; adjust the dev proxy
-target accordingly, keeping the /api path convention). When the terminal route is absent — the
+the phase-demo-01 websocket route through the Vite proxy. Do not repoint the default proxy
+target: make it configurable (e.g. a VITE_API_TARGET env variable) defaulting to the existing
+:8000, with the demo launch setting :8010 — ts/vite.config.ts is in this phase's deliverables
+for exactly this change, and the /api path convention stays. When the terminal route is absent — the
 default state per docs/04-decisions/ADR-013-demo-terminal-capability.md — the component shows a
 clear in-page message, not a raw connection error. Resize the terminal with its region.
 
@@ -353,8 +369,9 @@ Diff: git diff dev...agent/phase-demo-02 -- ts/
 
 Requirement text: REQ-006 row R04's frontend half — xterm.js over a websocket to the backend
 route; a clear in-page message when the route is absent (ADR-013 makes absent the default);
-terminal resizes with its region; proxy targets port 8010, never 8000. xterm.js appears in
-ts/package.json and ts/package-lock.json.
+terminal resizes with its region; the proxy target is configurable with the default target
+unchanged (:8000) and the demo configuration selecting :8010 — a hardcoded repoint of the
+default is a failing finding. xterm.js appears in ts/package.json and ts/package-lock.json.
 
 Commands: cd ts && npm run build.
 
@@ -441,11 +458,16 @@ docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md).
 Worktree: /code/d-system-worktrees/phase-demo-03. Branch: agent/phase-demo-03, from dev.
 Ports: backend 8010, frontend 5180 (not needed by this phase).
 
-1. On an up-to-date dev in /code/d-system, claim phase-demo-03 per AGENTS.md in one small commit.
-   This phase may run in parallel with phase-demo-01; its systems are disjoint.
+1. On an up-to-date dev in /code/d-system, claim phase-demo-03 per AGENTS.md in one small commit
+   (status: active, agent: agent-demo-data — your claim id as this orchestrator; claim ids must
+   match the schema's agent-* pattern). This phase may run in parallel with phase-demo-01; its
+   systems are disjoint.
 2. Create the worktree; uv venv && uv sync --extra dev.
 3. Dispatch, in order: D03-C1 then D03-V1; D03-C2 then D03-V2; D03-C3 — each verbatim from
-   PROMPT-018. At most two fix cycles per item, then report up.
+   PROMPT-018. At most two fix cycles per item, then report up. When a creator reports its item
+   done, commit that item on the phase branch (narrow, one concern per commit) BEFORE dispatching
+   its validator — the validator judges git diff dev...agent/phase-demo-03, which is empty until
+   the work is committed.
 4. Dispatch D03-G as the phase gate.
 5. Run the phase's verification commands yourself in the worktree and paste real output:
    uv run pytest; uv run ruff check src/ test/; uv run mypy src/;
@@ -576,10 +598,15 @@ agent/phase-demo-03. Ports: backend 8010, frontend 5180 (not needed by this item
 
 Write docs/08-governance/OPS-011-overview-metrics.md (for tools/overview_metrics.py) and
 docs/08-governance/OPS-012-overview-inventory.md (for tools/overview_inventory.py). Both codes
-are already reserved in docs/08-governance/codes.yaml — use them exactly. Follow the repository's
-existing OPS documents for front matter and shape: hand-written narrative (what the tool reads,
-what it emits, its determinism contract), an empty <!-- generated:tool-reference:start/end -->
-block, then run uv run python tools/generate_tool_docs.py to fill it.
+are already reserved in docs/08-governance/codes.yaml — use them exactly, and IN THE SAME CHANGE
+remove both codes' reservation entries from docs/08-governance/codes.yaml: the governance check
+rejects a document carrying a still-reserved code ("reserved; remove the reservation in this
+change"). Then regenerate the catalog: uv run python -m src.governance --catalog >
+docs/08-governance/catalog.md (the command prints; the redirect writes the file). Follow the
+repository's existing OPS documents for front matter and shape: hand-written narrative (what the
+tool reads, what it emits, its determinism contract), an empty
+<!-- generated:tool-reference:start/end --> block, then run
+uv run python tools/generate_tool_docs.py to fill it.
 
 Run in the worktree and paste real output: uv run python tools/generate_tool_docs.py;
 uv run python -m src.governance.
@@ -603,8 +630,9 @@ Checklist:
 3. Every phase deliverable exists: tools/overview_metrics.py; tools/overview_inventory.py;
    docs/08-governance/OPS-011-overview-metrics.md; docs/08-governance/OPS-012-overview-inventory.md;
    test/test_overview_tools.py.
-4. Both OPS documents carry governed front matter, their reserved codes, and non-empty generated
-   tool-reference blocks.
+4. Both OPS documents carry governed front matter, their allocated codes, and non-empty generated
+   tool-reference blocks; the OPS-011 and OPS-012 reservation entries are removed from
+   docs/08-governance/codes.yaml in this branch, and the regenerated catalog is committed.
 5. uv run pytest passes; uv run ruff check src/ test/ passes; uv run mypy src/ passes.
 6. Each tool run twice produces byte-identical output (paste the diff commands and their empty
    results).
@@ -627,14 +655,20 @@ what is missing; report what already existed.
 
 Agent: demo-orch-data. Phase: phase-demo-04 (build the overview skill, templates and page
 generation; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-03 being integrated into dev — confirm that before claiming.
+phase-demo-03 being integrated into dev AND closed by the owner's /session-close (status:
+complete in the backlog) — confirm both before claiming; the governance validator rejects an
+active phase whose prerequisite is not complete, and only the owner can complete one.
 Worktree: /code/d-system-worktrees/phase-demo-04. Branch: agent/phase-demo-04, from dev.
 Ports: backend 8010, frontend 5180 (not needed by this phase).
 
-1. On an up-to-date dev in /code/d-system, claim phase-demo-04 per AGENTS.md in one small commit.
+1. On an up-to-date dev in /code/d-system, claim phase-demo-04 per AGENTS.md in one small commit
+   (status: active, agent: agent-demo-data — your claim id as this orchestrator).
 2. Create the worktree; uv venv && uv sync --extra dev.
 3. Dispatch, in order: D04-C1 then D04-V1; D04-C2 then D04-V2; D04-C3 then D04-V3; D04-C4 — each
-   verbatim from PROMPT-018. At most two fix cycles per item, then report up.
+   verbatim from PROMPT-018. At most two fix cycles per item, then report up. When a creator
+   reports its item done, commit that item on the phase branch (narrow, one concern per commit)
+   BEFORE dispatching its validator — the validator judges git diff dev...agent/phase-demo-04,
+   which is empty until the work is committed.
 4. Dispatch D04-G as the phase gate.
 5. Run the phase's verification commands yourself in the worktree and paste real output:
    uv run pytest; uv run ruff check src/ test/; uv run mypy src/;
@@ -797,9 +831,13 @@ Agent: demo-creator-docs. Worktree: /code/d-system-worktrees/phase-demo-04. Bran
 agent/phase-demo-04. Ports: backend 8010, frontend 5180 (not needed by this item).
 
 Write docs/08-governance/OPS-014-generate-overview.md for tools/generate_overview.py. The code is
-reserved in docs/08-governance/codes.yaml — use it exactly. Follow the existing OPS documents:
-governed front matter, hand-written narrative (what it runs, where output lands, the determinism
-contract), empty generated block, then uv run python tools/generate_tool_docs.py to fill it.
+reserved in docs/08-governance/codes.yaml — use it exactly, and IN THE SAME CHANGE remove its
+reservation entry from docs/08-governance/codes.yaml (the governance check rejects a document
+carrying a still-reserved code), then regenerate the catalog:
+uv run python -m src.governance --catalog > docs/08-governance/catalog.md. Follow the existing
+OPS documents: governed front matter, hand-written narrative (what it runs, where output lands,
+the determinism contract), empty generated block, then
+uv run python tools/generate_tool_docs.py to fill it.
 
 Run in the worktree and paste real output: uv run python tools/generate_tool_docs.py;
 uv run python -m src.governance.
@@ -824,7 +862,9 @@ Checklist:
    docs/08-governance/OPS-014-generate-overview.md; .claude/skills/d-system-overview/SKILL.md;
    templates/html and templates/styles overview files; _public/overview generated page;
    test/test_generate_overview.py.
-4. OPS-014 carries governed front matter, its reserved code, and a non-empty generated block.
+4. OPS-014 carries governed front matter, its allocated code, and a non-empty generated block;
+   the OPS-014 reservation entry is removed from docs/08-governance/codes.yaml in this branch,
+   and the regenerated catalog is committed.
 5. uv run pytest passes; uv run ruff check src/ test/ passes; uv run mypy src/ passes.
 6. Generating twice produces an identical _public/overview (paste the diff command and its empty
    result).
@@ -845,14 +885,21 @@ what is missing; report what already existed.
 
 Agent: demo-orch-content. Phase: phase-demo-05 (demo content, runbook, reset tool and
 rehearsals; see docs/09-backlog/backlog.yaml and docs/01-plans/PLAN-021-live-demo.md). Depends on
-phase-demo-01 through phase-demo-04 being integrated into dev — confirm that before claiming.
+phase-demo-01 through phase-demo-04 being integrated into dev AND closed by the owner's
+/session-close (status: complete in the backlog) — confirm all four before claiming; the
+governance validator rejects an active phase whose prerequisite is not complete, and only the
+owner can complete one.
 Worktree: /code/d-system-worktrees/phase-demo-05. Branch: agent/phase-demo-05, from dev.
 Ports: backend 8010, frontend 5180.
 
-1. On an up-to-date dev in /code/d-system, claim phase-demo-05 per AGENTS.md in one small commit.
+1. On an up-to-date dev in /code/d-system, claim phase-demo-05 per AGENTS.md in one small commit
+   (status: active, agent: agent-demo-content — your claim id as this orchestrator).
 2. Create the worktree; uv venv && uv sync --extra dev; cd ts && npm install.
 3. Dispatch, in order: D05-C1 then D05-V1; D05-C2 — each verbatim from PROMPT-018. At most two
-   fix cycles per item, then report up.
+   fix cycles per item, then report up. When a creator reports its item done, commit that item
+   on the phase branch (narrow, one concern per commit) BEFORE dispatching its validator — the
+   validator judges git diff dev...agent/phase-demo-05, which is empty until the work is
+   committed.
 4. Yourself (this is the one authoring task that is yours): write the final talking-points copy
    into ts/public/talking-points.json per D05-O, replacing the placeholders.
 5. Dispatch D05-R (fresh-eyes rehearsal) twice, separated by a demo reset; record both runs'
@@ -883,13 +930,21 @@ what is missing; report what already existed.
 Agent: demo-creator-py. Worktree: /code/d-system-worktrees/phase-demo-05. Branch:
 agent/phase-demo-05. Ports: backend 8010, frontend 5180 (not needed by this item).
 
-Build tools/demo_reset.py: returns demo-visible state to the rehearsed baseline — regenerates the
-overview outputs via tools/generate_overview.py and clears demo scratch state (list explicitly in
-the tool what it clears). Hard limits, enforced in code with an explicit path allowlist: it never
-deletes or rewrites _data/ideas.jsonl or any file under docs/ except regenerated outputs it owns;
+Build tools/demo_reset.py: returns demo-visible state to the rehearsed baseline, preparing the
+stage for a rehearsal or the live run. It does four things, per the rehearsal gate
+(docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md): regenerates the overview outputs via
+tools/generate_overview.py; clears demo scratch state (list explicitly in the tool what it
+clears); PARKS the pre-built overview skill (moves .claude/skills/d-system-overview/ aside to a
+parked location it owns and can restore from — the live segment rebuilds the skill, and the
+fallback for every step is un-parking it); and SEEDS the fallback audience idea by running
+tools/append_idea.py (the sanctioned writer; appending an event is permitted — what is forbidden
+is deleting or rewriting the log). Hard limits, enforced in code with an explicit path
+allowlist: it never deletes or rewrites _data/ideas.jsonl or any file under docs/ except
+regenerated outputs it owns; its only idea-log access is appending through tools/append_idea.py;
 it never touches _private/, .agents/, .codex/, AGENTS.md or CLAUDE.md; running it twice in a row
-is safe and the second run reports nothing to do. Add tests in the phase's test scope proving the
-allowlist refuses an out-of-scope path and the double-run is idempotent.
+is safe — the second run reports nothing to do and does not seed a duplicate idea. Add tests in
+the phase's test scope proving the allowlist refuses an out-of-scope path, the park/restore
+round-trip, the no-duplicate-seed check, and the double-run idempotence.
 
 Run in the worktree and paste real output: uv run pytest; uv run ruff check src/ test/;
 uv run mypy src/.
@@ -910,9 +965,12 @@ agent/phase-demo-05. Ports: backend 8010, frontend 5180 (not needed by this item
 Diff: git diff dev...agent/phase-demo-05 -- tools/demo_reset.py test/
 
 Requirement text: the reset restores the rehearsed baseline (regenerated overview outputs,
-cleared scratch state) and can never touch idea-log history, governed documents, _private/,
-.agents/, .codex/, AGENTS.md or CLAUDE.md — the protection must be an explicit allowlist in
-code, not a comment. Double-run idempotent. Tests prove the refusal and the idempotence.
+cleared scratch state), parks the pre-built overview skill restorably, and seeds the fallback
+audience idea only through tools/append_idea.py without duplicating it on a re-run. It can never
+delete or rewrite idea-log content, governed documents, _private/, .agents/, .codex/, AGENTS.md
+or CLAUDE.md — the protection must be an explicit allowlist in code, not a comment. Double-run
+idempotent. Tests prove the refusal, the park/restore round-trip, the no-duplicate seed, and the
+idempotence.
 
 Commands: uv run pytest; uv run ruff check src/ test/; uv run mypy src/.
 
@@ -930,13 +988,25 @@ agent/phase-demo-05. Ports: backend 8010, frontend 5180 (not needed by this item
 
 Three documents:
 1. docs/08-governance/OPS-013-demo-reset.md for tools/demo_reset.py — code reserved in
-   docs/08-governance/codes.yaml; existing OPS shape; empty generated block filled by
-   uv run python tools/generate_tool_docs.py.
+   docs/08-governance/codes.yaml; use it exactly, and IN THE SAME CHANGE remove the OPS-013
+   reservation entry from docs/08-governance/codes.yaml (the governance check rejects a document
+   carrying a still-reserved code), then regenerate the catalog:
+   uv run python -m src.governance --catalog > docs/08-governance/catalog.md. Existing OPS
+   shape; empty generated block filled by uv run python tools/generate_tool_docs.py.
 2. docs/00-working/demo-runbook.md — ungoverned (no front matter, no code, per ADR-010's staging
-   rules): the live-segment runbook skeleton with the five steps from idea 000070
-   (orient, record an idea, triage it, metrics, idea-to-plan) as sections, a per-step timebox
-   column summing to at most 15 minutes, the descope ladder copied verbatim from
-   docs/01-plans/PLAN-021-live-demo.md, and empty dry-run recording tables for two rehearsals.
+   rules): the live-segment runbook skeleton with the step shape the rehearsal gate defines
+   (docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md): /orient → record an idea (/idea) →
+   triage it (/idea-triage) → plan beat → overview-skill rebuild → test, one section per step.
+   Each step carries: the exact commands it runs, its timebox (the column sums to at most 15
+   minutes), and its fallback action — for every step, the same action: un-park the pre-built
+   skill via the reset tool's restore and continue the narrative. The skeleton also carries: the
+   descope ladder copied verbatim from docs/01-plans/PLAN-021-live-demo.md; empty dry-run
+   recording tables for two rehearsals; a named line for the second dry-run's screen-recording
+   path on the presentation machine (the recording is a rehearsal-gate deliverable); a marker on
+   each step that is agent-executable versus owner-performed visual check (page scroll, popup
+   behavior, terminal rendering — no roster agent has browser tooling); and a note that ideas
+   recorded during rehearsal are permanent in the append-only log and must be labelled as
+   rehearsal entries in their body text.
 3. docs/00-working/demo-windows-setup.md — ungoverned: the Windows machine checklist from
    PLAN-021's demo-day operational requirements (clone location, uv and Node versions, pywinpty
    install, D_SYSTEM_DEMO_TERMINAL=1, ports 8010/5180, browser and zoom, the REQ-006 R06 smoke
@@ -987,10 +1057,19 @@ Diff: none — this is a rehearsal, not a review.
 Requirement text: docs/00-working/demo-runbook.md is the script; REQ-006 row R09
 (docs/06-requirements/REQ-006-live-demo.md) is the contract: every step completes inside its
 timebox and the whole segment inside 15 minutes. You have not seen this demo built; that is the
-point. Follow the runbook exactly as written, cold: run each step's commands, time each step
-(date +%s before and after), and record what a presenter would have to explain away — a
-confusing output, a step whose instructions do not match reality, a missing precondition. Do not
-fix anything.
+point. Follow the runbook exactly as written, cold: run each agent-executable step's commands,
+time each step (date +%s before and after), skip steps the runbook marks owner-performed (record
+them as skipped-by-marking, with no time), and record what a presenter would have to explain
+away — a confusing output, a step whose instructions do not match reality, a missing
+precondition. Do not fix anything. Executing a runbook step whose command is the sanctioned idea
+writer (tools/append_idea.py) or a generation tool is execution, not editing — run it as
+written, labelling any idea you record as a rehearsal entry per the runbook; you still change no
+file by hand.
+
+Second-run note, overriding a literal reading of this prompt's opening clause for this dispatch
+only: a rehearsal is a run, not a deliverable. When the dry-run tables already hold one run's
+times, you are the second run — execute the runbook in full again rather than reporting nothing
+missing.
 
 Commands: exactly those the runbook states, in order, plus the timing wrappers.
 
@@ -1014,11 +1093,13 @@ Checklist:
    grep for TODO/PLACEHOLDER/lorem); tools/demo_reset.py;
    docs/08-governance/OPS-013-demo-reset.md; docs/00-working/demo-runbook.md;
    docs/00-working/demo-windows-setup.md.
-4. OPS-013 carries governed front matter, its reserved code, and a non-empty generated block; the
-   two docs/00-working/ documents carry no front matter and no code (they are ungoverned by
-   design).
-5. The runbook's timeboxes sum to at most 15 minutes and both dry-run tables carry recorded
-   times.
+4. OPS-013 carries governed front matter, its allocated code, and a non-empty generated block;
+   the OPS-013 reservation entry is removed from docs/08-governance/codes.yaml in this branch,
+   and the regenerated catalog is committed; the two docs/00-working/ documents carry no front
+   matter and no code (they are ungoverned by design).
+5. The runbook's timeboxes sum to at most 15 minutes; both dry-run tables carry recorded times;
+   every step names its commands and its fallback action; the second dry-run's screen-recording
+   path line exists; and each step is marked agent-executable or owner-performed.
 6. The runbook contains the descope ladder verbatim from docs/01-plans/PLAN-021-live-demo.md
    (diff the four rungs' text).
 7. The Windows checklist contains the REQ-006 R06 smoke-check step with its result line, the
