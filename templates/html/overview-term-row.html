@@ -1,0 +1,16 @@
+<!--
+  D-System overview — one row of the terms table, repeated inside
+  overview-concepts-panel.html's {{TERM_ROWS}} slot, one per entry in
+  tools/overview_inventory.py's "terms" array: {"term", "concept_id", "concept_title"}.
+
+  Token contract:
+    {{TERM}}               - e.g. "Governed plan"
+    {{TERM_CONCEPT_TITLE}} - the owning concept's title, e.g. "Documents and Governance"
+    {{TERM_CONCEPT_ID}}    - the owning concept's id, shown as a parenthetical so a term
+                              defined inside a grouped glossary memory is traceable back to
+                              its source file without a second table
+-->
+<tr>
+  <td>{{TERM}}</td>
+  <td>{{TERM_CONCEPT_TITLE}} <span class="inventory-table__id">({{TERM_CONCEPT_ID}})</span></td>
+</tr>

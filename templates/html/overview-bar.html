@@ -1,0 +1,20 @@
+<!--
+  D-System overview — single bar row component, repeated inside
+  overview-metrics-section.html's {{CHART_BARS}} slot, one per label in the section's
+  primary series.
+
+  Token contract:
+    {{BAR_LABEL}}    - the label text, e.g. "open" or "2026-09-10"
+    {{BAR_PERCENT}}  - 0-100, the value normalized against the max value in the primary
+                        series (computed by the generator, never guessed here — a value of
+                        0 in a series of all zeros should render as a 0-width bar, not a
+                        divide-by-zero)
+    {{BAR_VALUE}}    - the raw value as it appears in the JSON (e.g. "12" or "0.7805"),
+                        shown as text so the bar's exact figure is always legible even when
+                        the fill width is visually tiny
+-->
+<div class="bar-row">
+  <span class="bar-row__label">{{BAR_LABEL}}</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: {{BAR_PERCENT}}%;"></span></span>
+  <span class="bar-row__value">{{BAR_VALUE}}</span>
+</div>

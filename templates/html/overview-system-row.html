@@ -1,0 +1,25 @@
+<!--
+  D-System overview — one row of the systems table, repeated inside
+  overview-systems-panel.html's {{SYSTEM_ROWS}} slot, one per entry in
+  tools/overview_inventory.py's "systems" array: {"id", "name", "domain", "status",
+  "depends_on": [...]}.
+
+  Token contract:
+    {{SYSTEM_ID}}           - e.g. "sys-backlog"
+    {{SYSTEM_NAME}}          - e.g. "Session phase backlog"
+    {{SYSTEM_DOMAIN}}        - e.g. "governance"
+    {{SYSTEM_STATUS}}        - one of docs/08-governance/systems.yaml's status vocabulary
+                                (e.g. "implemented", "scaffold"); also used as a CSS class
+                                suffix, so the generator must lowercase it and it must
+                                contain no whitespace, which the registry's own values
+                                already satisfy
+    {{SYSTEM_DEPENDS_ON}}    - the "depends_on" array already joined by the generator (e.g.
+                                with ", "); an empty array renders as an empty string
+-->
+<tr class="inventory-table__row status-{{SYSTEM_STATUS}}">
+  <td class="inventory-table__id">{{SYSTEM_ID}}</td>
+  <td>{{SYSTEM_NAME}}</td>
+  <td>{{SYSTEM_DOMAIN}}</td>
+  <td><span class="status-badge status-badge--{{SYSTEM_STATUS}}">{{SYSTEM_STATUS}}</span></td>
+  <td>{{SYSTEM_DEPENDS_ON}}</td>
+</tr>

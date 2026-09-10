@@ -1,0 +1,19 @@
+<!--
+  D-System overview — one row of the concepts table, repeated inside
+  overview-concepts-panel.html's {{CONCEPT_ROWS}} slot, one per entry in
+  tools/overview_inventory.py's "concepts" array: {"id", "title", "tags": [...],
+  "systems": [...]}.
+
+  Token contract:
+    {{CONCEPT_ID}}       - e.g. "mem-concept-json-sot"
+    {{CONCEPT_TITLE}}    - e.g. "JSON Source-of-Truth Pattern"
+    {{CONCEPT_TAGS}}     - the "tags" array already joined by the generator (e.g. with
+                            ", "); an empty array renders as an empty string, not "None"
+    {{CONCEPT_SYSTEMS}}  - the "systems" array already joined the same way
+-->
+<tr>
+  <td class="inventory-table__id">{{CONCEPT_ID}}</td>
+  <td>{{CONCEPT_TITLE}}</td>
+  <td>{{CONCEPT_TAGS}}</td>
+  <td>{{CONCEPT_SYSTEMS}}</td>
+</tr>
