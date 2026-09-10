@@ -68,6 +68,7 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | plan | draft | repository-owner | docs/01-plans/PLAN-017-idea-plan-lifecycle/Plan Architecture/PLAN-017.06-governance-integration-and-delivery.md |
 | PLAN-018 | plan | approved | repository-owner | docs/01-plans/PLAN-018-plans-directory-consolidation.md |
 | PLAN-019 | plan | draft | repository-owner | docs/01-plans/PLAN-019-idea-priority-queue.md |
+| PLAN-020 | plan | draft | repository-owner | docs/01-plans/PLAN-020-portable-agent-workflows.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -81,6 +82,7 @@ CI regenerates it and fails on any difference.
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
 | REQ-004 | requirement | active | repository-owner | docs/06-requirements/REQ-004-plans-directory-consolidation.md |
+| REQ-005 | requirement | draft | repository-owner | docs/06-requirements/REQ-005-portable-agent-workflows.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -138,14 +140,14 @@ CI regenerates it and fails on any difference.
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 3 | agent-checkpoint, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 4 | 0 | 3 | agent-checkpoint, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
 | PLAN-013 | doc-tooling-documentation | draft | 1 | 0 | 1 | agent-tool01 |
 | PLAN-014 | doc-governance-model | draft | 1 | 0 | 4 | agent-gemini, agent-gov02, agent-gov03 |
 | PLAN-015 | doc-ephemeral-working-plans | draft | 0 | 0 | 1 | agent-codex-architecture |
-| PLAN-016 | doc-idea-record-system | draft | 1 | 0 | 3 | agent-claude, agent-codex-architecture, agent-slate |
+| PLAN-016 | doc-idea-record-system | draft | 2 | 0 | 3 | agent-claude, agent-codex-architecture, agent-slate |
 | PLAN-017 | doc-idea-plan-lifecycle | draft | 2 | 0 | 3 | agent-claude, agent-fold, agent-idea04 |
 | PLAN-017.01 | doc-idea-plan-idea-lifecycle | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-017.02 | doc-idea-plan-plan-lifecycle | draft | 2 | 0 | 0 | — |
@@ -155,6 +157,7 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
+| PLAN-020 | doc-portable-agent-workflows | draft | 3 | 0 | 0 | — |
 
 ## Held codes
 
@@ -162,6 +165,7 @@ CI regenerates it and fails on any difference.
 |---|---|---|
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
+| OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-113 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 9, requirement: 4, session: 39.
+115 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 31, prompt: 9, requirement: 5, session: 39.

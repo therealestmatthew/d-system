@@ -3092,3 +3092,54 @@ not the one in force — the exact failure class that produced `0c82996`.
 Raised by the owner on 2026-09-09, immediately after reviewing the post-push policy corrections and
 the four workflow prompts (PROMPT-006 through PROMPT-009). Needs a requirement and a plan before any
 implementation, per AGENTS.md's plan-before-code rule.
+
+---
+
+## 000067 · Portable agent workflows from a single source of truth
+
+**Created 2026-09-09T22:47:01-04:00 · Status: `promoted` · became PLAN-020**
+
+Make D-System's reusable agent workflows usable by Codex, Gemini, and other agents without treating Claude Code's `.claude/skills`, slash commands, or subagent frontmatter as the canonical form. The work should separate framework-neutral behavioral instructions from each framework's invocation and configuration wrapper, identify which workflows are safe and meaningful to expose to agents, and preserve owner-only boundaries such as session closure.
+
+This would touch the workflow definitions under `.claude/`, the existing untracked experiments under `.agents/` and `.codex/`, reusable prompts under `docs/02-prompts/`, and whatever governed source, generator, validation, and drift tests are chosen. It may also require framework-specific generated adapters, but should not duplicate hand-maintained instruction bodies across formats.
+
+Verification should prove that supported workflows can be discovered and invoked from at least Claude Code and Codex, that generated adapters match their canonical source, that framework-only metadata remains in the correct wrapper, and that owner-only workflows are not accidentally made agent-reachable. Governance and the full test suite must stay green.
+
+Unresolved questions include what canonical representation should own shared workflow content, whether existing reusable prompts already provide enough of that source, how to model agents that have no native skill mechanism, which current skills and commands should be portable, and whether the half-finished `.agents/` copy or `.codex/` format translation contains anything worth preserving.
+
+This idea came from a Codex session on 2026-09-09: the repository's orient workflow existed only as `.claude/skills/orient/SKILL.md`, so Codex could read and follow it but could not invoke it as a native skill. The mismatch exposed the broader portability problem.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-codex (2026-09-09T22:54:55-04:00): Verified audit finding for 000067 (portable agent workflows from a single source of truth):
+
+The working assumption is substantially correct. Most behavioral content is already ordinary repository prose; Claude coupling is concentrated in discovery location, invocation syntax, tool names, and agent configuration. The idea-triage agent's Claude front matter declares `tools: Read, Grep, Bash`, `model: haiku`, `effort: medium`, and `maxTurns: 30` at `.claude/agents/idea-triage.md:1-7`, while its body states repository behavior such as reading effective idea state through `fold()` and never deciding promotion (`:12-22`). The commands similarly embed Claude surfaces: `$ARGUMENTS` in `.claude/commands/backlog.md:13`, `AskUserQuestion` at `:117-128`, and the Agent tool in `.claude/commands/session-close.md:48-60`. The orient skill hardcodes `.claude/commands`, `.claude/skills`, and `.claude/agents` as the inventory at `.claude/skills/orient/SKILL.md:35-41`. Those wrappers cannot be treated as universal interfaces.
+
+The existing portable layer is strong. `AGENTS.md` explicitly governs agents regardless of framework. PROMPT-006 says the same at `docs/02-prompts/PROMPT-006-idea-capture-and-triage.md:29-44`, and PROMPT-007 separates framework-neutral idea-to-plan behavior from invocation at `docs/02-prompts/PROMPT-007-idea-to-plan.md:29-107`. Governance documents and the Python tools are callable without a Claude runtime. Every current `tools/*.py` has an OPS document. This implies durable policy and workflow decisions should live in governed, host-neutral sources; host packages should translate discovery, arguments, permissions, and tool calls.
+
+The half-finished port is useful evidence but is not a safe final pattern. `git status --short .agents .codex` reports both directories as untracked, and `git ls-files .agents .codex` returns nothing. `git diff --no-index` confirms `.agents/skills/checkpoint/SKILL.md` is byte-identical to `.claude/skills/checkpoint/SKILL.md`: it proves Codex can consume essentially the same skill format, but two hand-maintained copies would drift. `.codex/agents/idea-triage.toml` is a real host translation with Codex fields (`name`, `description`, `model_reasoning_effort`, `developer_instructions`), but it already demonstrates drift: line 104 changes the valid Claude source reference to the nonexistent `.Codex/commands/idea.md`, omits Claude's explicit Haiku model and 30-turn cap, and has no generated-equivalence check. These files should remain untracked until canonical ownership and generation are designed.
+
+Current official Codex documentation verifies that repository skills use the open Agent Skills `SKILL.md` format under `.agents/skills`, can be explicitly or implicitly invoked, and that project custom agents use `.codex/agents/*.toml` with separate model, reasoning, sandbox, and instruction configuration. It also documents importing Claude skills, commands, and subagents as a migration path. This verifies Codex support, but does not establish that Gemini or every future host has a native skill mechanism. A portable contract therefore cannot require a Skill tool; it needs a plain-prompt/manual fallback and capability-specific adapters. Sources checked: https://learn.chatgpt.com/docs/build-skills and https://learn.chatgpt.com/docs/agent-configuration/subagents.
+
+The repository already has the right anti-drift precedent. `tools/generate_tool_docs.py:1-20` owns a generated block derived from tool source, while `test/test_tool_docs.py:34-77` checks pairing, exact regeneration, determinism, and tamper detection. `tools/generate_glossary.py:1-13` and `test/test_glossary.py` apply the same single-source rule. Portable workflow adapters should use that pattern: one canonical behavioral source, deterministic generation or equivalence validation for checked-in host adapters, and CI failure on drift. Symlinks may be an optional host-specific optimization, but are not a sufficient cross-host contract because only Codex support was verified.
+
+Recommended portability boundary:
+- Port `orient` and `checkpoint` first. Their procedures are broadly framework-neutral and both are useful to autonomous agents. Remove host paths from their canonical behavior and translate discovery/invocation in adapters.
+- Expose the governed PROMPT-006 through PROMPT-009 workflow chain as the universal fallback for hosts with no skill feature. PROMPT-008 still contains a Claude checkpoint path, so adapter work must eliminate that leak rather than copying it.
+- Port `idea`, `idea-triage`, and `backlog` behavior only through explicit adapters that preserve their sanctioned writers, folded-state reads, question batching, and ownership boundaries. Their current command files are Claude invocation wrappers, not canonical content.
+- Translate the idea-triage custom agent from one canonical instruction body into Claude and Codex metadata. Model choice, reasoning effort, turn/token controls, sandbox, and tool allowlists remain adapter configuration because hosts expose different controls.
+- Do not make `session-close` an autonomous skill. `.claude/commands/session-close.md:12-19` intentionally makes it owner-only and the sole completion path. Other hosts may receive an owner-invoked command or documented procedure, but no agent-discoverable adapter may weaken that boundary.
+
+Related work: 000013 (investigate other useful commands) asks how repeated routines should be classified as commands versus skills and whether they belong in a portable set. 000003 (a skill for mid-session notes updates) produced the checkpoint skill now needing portability. 000007 (an agent for triaging parked ideas) produced the custom agent translation case. 000051 (agent harness and guardrails) is adjacent because generated adapters must preserve permission and authority boundaries, but it addresses enforcement rather than workflow portability.
+
+PROPOSED LINK: 000067 --relates_to--> 000013 (000013 explicitly leaves command-versus-skill classification and portable ownership unresolved)
+PROPOSED LINK: 000067 --extends--> 000003 (generalizes the delivered checkpoint skill from a Claude-only location into a portable workflow)
+PROPOSED LINK: 000067 --relates_to--> 000051 (portable adapters must preserve the guardrails and authority boundaries that 000051 governs)
+
+No existing governed requirement or plan was found that delivers cross-agent skill portability. PLAN-008 created Claude-specific lifecycle entry points, while the complete phase-agnt-02 only generalized repository working rules in AGENTS.md. The remaining material design choice is the canonical source location and adapter schema; the plan should choose one and require drift detection rather than preserve duplicate hand-maintained bodies.
+
+</details>

@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-08'
+updated: '2026-09-09'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -4228,3 +4228,159 @@ items:
   - AGENTS.md
   - docs/03-sessions/SESS-2026-09-08-09-agents-update.md
   result: AGENTS.md updated successfully and strictly verified.
+- id: phase-port-01
+  title: Establish canonical workflows and portable skill adapters
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-session-lifecycle
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Define the versioned canonical workflow manifest, neutral instruction bodies,
+    authority classes, capability declarations, and deterministic rendering contract.
+  - Build the renderer and OPS-010, with exact regeneration, idempotence, malformed-source,
+    unsupported-capability, and hand-edit drift tests.
+  - Move orientation and checkpoint behavior into canonical sources and generate Claude
+    and Open Agent Skills adapters without changing their repository decisions.
+  - Replace Claude-only checkpoint references in the reusable execution prompt with
+    the canonical workflow lookup and plain-prompt fallback.
+  acceptance:
+  - Orientation and checkpoint each have one behavioral source and byte-reproducible
+    Claude and Open Agent Skills representations.
+  - Generation refuses an owner-only workflow targeted at an agent-discoverable adapter
+    and refuses required capabilities that have neither a target mapping nor an explicit
+    unsupported declaration.
+  - A hand edit to any generated adapter fails the drift check, while two clean generations
+    produce identical bytes.
+  - PROMPT-008 resolves checkpoint without requiring a Claude path and still preserves
+    the no-completion checkpoint boundary.
+  verification:
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run pytest test/test_agent_workflows.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - agent-workflows
+  - tools/generate_agent_workflows.py
+  - docs/08-governance/OPS-010-generate-agent-workflows.md
+  - test/test_agent_workflows.py
+  - .claude/skills/orient/SKILL.md
+  - .claude/skills/checkpoint/SKILL.md
+  - .agents/skills/orient/SKILL.md
+  - .agents/skills/checkpoint/SKILL.md
+  - docs/02-prompts/PROMPT-008-execute-a-phase.md
+  next_action: Define the canonical manifest and authority/capability schema, then
+    prove it by rendering orientation and checkpoint before porting more workflows.
+- id: phase-port-02
+  title: Port safe commands and the idea-triage agent
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-idea-record-system
+  systems:
+  - sys-governance
+  - sys-backlog
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-port-01
+  scope:
+  - Convert idea capture, backlog orientation, and idea-triage driver behavior into
+    canonical workflows with Claude and Codex-compatible adapters.
+  - Convert the idea-triage role from one canonical instruction body into Claude and
+    Codex custom-agent formats, preserving Haiku/medium/bounded Claude configuration
+    and recording verified Codex model, effort, sandbox, and unsupported limits.
+  - Preserve sanctioned idea writes, folded-state reads, one-idea scope, finding-only
+    authority, question batching, and owner review of proposed links and promotions.
+  - Exclude session-close from every agent-discoverable target and add refusal tests
+    for an owner-only workflow requested as a skill.
+  acceptance:
+  - The three safe command workflows are discoverable through supported Claude and
+    Codex surfaces and produce equivalent allowed and refused outcomes in fixtures.
+  - Claude and Codex idea-triage definitions render from one body; no path, behavioral
+    instruction, or required target setting differs without a declared mapping.
+  - The Claude triage adapter retains Haiku, medium effort, and its bounded run; the
+    Codex adapter exposes its reviewed economical-model mapping, medium reasoning,
+    sandbox, and every execution limit the host cannot enforce.
+  - No generated agent or skill can apply a link, promotion, discard, or backlog
+    completion transition.
+  verification:
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run pytest test/test_agent_workflows.py test/test_ideas.py
+  - Run one synthetic idea through each generated triage-agent definition and compare
+    the folded finding and refused operations.
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - agent-workflows
+  - .claude/commands/idea.md
+  - .claude/commands/idea-triage.md
+  - .claude/commands/backlog.md
+  - .claude/agents/idea-triage.md
+  - .agents/skills/idea/SKILL.md
+  - .agents/skills/idea-triage/SKILL.md
+  - .agents/skills/backlog/SKILL.md
+  - .codex/agents/idea-triage.toml
+  - test/test_agent_workflows.py
+  next_action: After phase-port-01 fixes the adapter contract, port the smallest
+    command first and compare its accepted and refused behavior across both hosts.
+- id: phase-port-03
+  title: Verify cross-host discovery and fallback behavior
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-prompt-idea-capture-and-triage
+  - doc-prompt-idea-to-plan
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-port-02
+  scope:
+  - Run clean-session discovery and invocation checks in Claude Code and Codex for
+    orientation, checkpoint, idea capture, backlog orientation, and idea triage.
+  - Run the governed plain-prompt fallback with native skill discovery disabled and
+    compare its decisions, writes, and authority refusals with the native runs.
+  - Update Gemini orientation and repository workflow documentation to use the verified
+    native mechanism if one is available, otherwise the tested prompt fallback.
+  - Remove or replace the two pre-plan untracked conversion experiments only after
+    their generated successors pass, and record unsupported host capabilities plainly.
+  acceptance:
+  - Fresh Claude and Codex sessions enumerate and invoke every supported native workflow
+    from live repository state without manually pasting its procedure.
+  - A clean agent session with no native skill mechanism completes the same synthetic
+    orientation and phase-flow checks through the governed prompt fallback.
+  - Repository documentation distinguishes native, fallback-only, unavailable, and
+    owner-only workflows; session-close is absent from autonomous discovery everywhere.
+  - No duplicate hand-maintained workflow body remains, and the working tree contains
+    no superseded untracked portability experiment.
+  verification:
+  - Record clean-session Claude, Codex, and fallback walkthroughs with the discovered
+    workflow inventory and observed effects.
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - GEMINI.md
+  - docs/08-governance/GOV-007-repo-orientation.md
+  - docs/03-sessions
+  - agent-workflows
+  - .claude
+  - .agents
+  - .codex
+  next_action: After all adapters land, run each host from a clean session and use
+    observed discovery and authority behavior to correct the documentation.

@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-06'
+updated: '2026-09-09'
 # Series definitions are the only source of truth for prefix, numbering and location.
 # The register holds nothing derivable from documents: no titles, statuses or owners.
 series:
@@ -63,6 +63,8 @@ reserved:
   reason: Membership authority decision; deliverable of phase-rel-04.
 - code: ADR-005
   reason: Projection publication decision; deliverable of phase-rel-05.
+- code: OPS-010
+  reason: Portable workflow generator operations document; deliverable of phase-port-01.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011
