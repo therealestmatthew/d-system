@@ -90,6 +90,59 @@ D05-G (phase gate, `demo-validator-check`) was re-dispatched verbatim after the 
 returned **all 9 checklist items PASS**, including item 9 (diff scope), which is now green against
 the widened deliverables declaration.
 
+### Fix cycle 2/2 — D05-A adversarial review
+
+The D05-A adversarial review raised two blockers and two majors, resolved as follows:
+
+- **Blocker — R09's timing evidence is partial** and **blocker — the dry-runs are agent-driven,
+  not owner-driven per PROMPT-017**: both **deferred by owner decision**, not fixed here. Per
+  `docs/02-prompts/PROMPT-020-workbench-pre-plan-package.md` decision 7 (commit `4c0acd5` on
+  `dev`), the demo now runs next week on a reworked workbench UI, and the workbench track ends
+  with a rehearsal-refresh phase that re-times the live segment owner-driven against the final
+  UI. `docs/00-working/demo-runbook.md`'s Dry-Run Rehearsals section now carries one sentence
+  stating this explicitly. The R09 acceptance line below stays honestly Not met, unchanged in
+  substance.
+- **Major — the Windows checklist implemented a narrower gate than PROMPT-017 specifies**: fixed.
+  `docs/00-working/demo-windows-setup.md` gained a Full Fresh-Eyes Rehearsal Checklist section
+  running all 7 of PROMPT-017's fresh-eyes items once on the presentation machine (including the
+  half-width viewport check, the determinism check and the side-by-side fallback exercise, each
+  with a result line), and the Pre-Demo Git Tag section now requires `demo_reset.py prepare` and
+  `restore` to each be verified once against the tagged state, with a result block.
+- **Major — `ts/public/talking-points.json` violated D05-O's own length rule**: fixed. All eight
+  entries were single dense paragraphs (200-234 characters); each is now a short headline plus
+  exactly three brief supporting lines (newline-separated within the string, schema unchanged),
+  preserving each entry's message. `cd ts && npm run build` reverified clean.
+- **Minor — a stale placeholder comment at `ts/src/stage/TalkingPointsRegion.tsx:31`**
+  ("this file ships clearly-placeholder entries," no longer true now that D05-O's real copy is
+  shipped): recorded only, not fixed — that file is outside `phase-demo-05`'s deliverables (it
+  belongs to `phase-demo-02`), and the workbench rework owns its future per PROMPT-020.
+
+Verification re-run after the fix cycle (real output, in the worktree):
+
+`uv run pytest`
+```
+495 passed, 2 warnings
+```
+
+`cd ts && npm run build`
+```
+✓ 38 modules transformed.
+dist/index.html                   0.39 kB │ gzip:   0.27 kB
+dist/assets/index-ZpTiJ9jO.css   12.84 kB │ gzip:   3.62 kB
+dist/assets/index-DWqr5BsF.js   495.40 kB │ gzip: 136.12 kB
+✓ built in 1.06s
+```
+
+`uv run python -m src.governance`
+```
+Governance OK: 18 systems, 139 documents, 15 memories, 112 backlog phases
+```
+
+`uv run python tools/check_no_private_content.py` with the changes staged
+```
+check_no_private_content: OK (437 tracked files, 0 identifiers checked)
+```
+
 ## Acceptance
 
 - Both dry-runs complete within 15 minutes with every step inside its timebox, and their times
@@ -97,7 +150,9 @@ the widened deliverables declaration.
   but `/idea-triage`'s subagent-dispatch half was not executed by either rehearsal agent (a
   rehearsal-tooling constraint, not a proven step failure, and now documented as such in the
   runbook's Step Markers section), so neither pass produced a complete, verified 15-minute total.
-  See `## Verification` above and the runbook's Rehearsal Findings section.
+  See `## Verification` above and the runbook's Rehearsal Findings section. Complete owner-driven
+  timing against the final UI is deferred to the workbench track's rehearsal-refresh phase, per
+  the owner's PROMPT-020 decision 7 — an owner decision, not a defect left unfixed here.
 - The R06 smoke check on the presentation machine is recorded as passing in the runbook —
   **Not met**. The Windows checklist (`docs/00-working/demo-windows-setup.md`) carries the R06
   smoke-check procedure and an owner-fillable result block, but the check itself requires the
@@ -115,17 +170,20 @@ the widened deliverables declaration.
 
 `phase-demo-05` — `status: active`, `agent: agent-demo-content`.
 
-`next_action`: D05-G is green on all 9 items after the coordinator's fix cycle 1/2 and the
-rebase onto `dev` at `9753a88`. Report this to the coordinator so it can dispatch D05-A
-(adversarial review) and D05-W (Playwright rehearsal pass) per GOV-003. Still outstanding, not
-fixable from this worktree: whether `/idea-triage`'s subagent half can be timed by an agent at
-all, or whether R09's full 15-minute total needs a presenter-driven pass; and the REQ-006 R06
-Windows smoke check, which is owner-machine work.
+`next_action`: D05-G is green on all 9 items; D05-A's two majors (Windows gate scope,
+talking-points length) are fixed on `agent/phase-demo-05`, its minor is recorded only (outside
+this phase's deliverables), and its two blockers are deferred by owner decision (PROMPT-020
+decision 7 — complete owner-driven R09 timing moves to the workbench track's rehearsal-refresh
+phase). Report this to the coordinator so it can dispatch D05-W (Playwright rehearsal pass) per
+GOV-003. Still outstanding, not fixable from this worktree: the REQ-006 R06 Windows smoke check
+(owner-machine work) and the deferred owner-driven timing pass.
 
 ## Unresolved
 
-- D05-A (adversarial review) and D05-W (Playwright rehearsal pass) are coordinator-dispatched,
-  not yet run.
-- `/idea-triage`'s subagent-dispatch half remains unverified by both rehearsal passes; the
-  runbook now documents this as a rehearsal-tooling limitation rather than a step defect.
+- D05-W (Playwright rehearsal pass) is coordinator-dispatched, not yet run.
+- `/idea-triage`'s subagent-dispatch half and the full owner-driven R09 timing are deferred to
+  the workbench track's rehearsal-refresh phase per PROMPT-020 decision 7 — not a defect left
+  unfixed here.
 - The REQ-006 R06 Windows terminal smoke check has not been run — owner-machine work, outstanding.
+- The stale placeholder comment at `ts/src/stage/TalkingPointsRegion.tsx:31` is recorded, not
+  fixed — outside `phase-demo-05`'s deliverables; the workbench rework owns that file's future.

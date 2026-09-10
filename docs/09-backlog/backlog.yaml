@@ -4758,19 +4758,23 @@ items:
   - src/api/routes/demo_stage.py
   - test/test_demo_terminal.py
   session: doc-session-demo-content-runbook-reset-rehearsals
-  next_action: 'D05-C1/V1, D05-C2, D05-O and the coordinator''s fix cycle 1/2 (runbook:
-    port-free precondition on /orient, /overview-build replaced with the real
-    live-skill-invocation narrative, the parked-skill sequencing explained,
-    /idea-triage''s partial measurability noted) are committed on
-    agent/phase-demo-05, rebased onto dev at 9753a88. D05-G re-run after the rebase
-    is green on all 9 checklist items, including diff scope. uv run pytest, ruff,
-    mypy, governance and the staged private-content check all pass on the rebased
-    tree. Reported to the coordinator so it can dispatch D05-A (adversarial review)
-    and D05-W (Playwright rehearsal pass) per GOV-003. Still outstanding, not
-    fixable from this worktree: whether /idea-triage''s subagent half can be timed
-    by an agent at all (a presenter-driven pass may be required for a complete R09
-    verification), and the REQ-006 R06 Windows smoke check, which is owner-machine
-    work.'
+  next_action: 'D05-G is green on all 9 items. D05-A''s two majors are fixed on
+    agent/phase-demo-05: the Windows checklist (docs/00-working/demo-windows-setup.md)
+    now runs PROMPT-017''s full 7-item fresh-eyes checklist once on the
+    presentation machine plus a prepare/restore verification against the tagged
+    state, both with result blocks; ts/public/talking-points.json is reshaped to
+    D05-O''s own headline-plus-three-lines rule (npm run build reverified clean).
+    D05-A''s minor (a stale placeholder comment in
+    ts/src/stage/TalkingPointsRegion.tsx, outside this phase''s deliverables) is
+    recorded only. D05-A''s two blockers (R09''s partial timing evidence; agent-
+    driven rather than owner-driven dry-runs) are deferred by owner decision
+    (PROMPT-020 decision 7, dev commit 4c0acd5): the workbench track''s
+    rehearsal-refresh phase re-times the live segment owner-driven against the
+    final UI next week; the runbook now says so in one sentence. uv run pytest,
+    npm run build, governance and the staged private-content check all pass.
+    Reported to the coordinator so it can dispatch D05-W (Playwright rehearsal
+    pass) per GOV-003. Still outstanding, owner-machine work: the REQ-006 R06
+    Windows smoke check.'
 - id: phase-demo-06
   title: Stage terminal interaction — session tabs, guarded drop, command injection
   plan: doc-live-demo
