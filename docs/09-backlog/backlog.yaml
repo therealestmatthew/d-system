@@ -3,6 +3,7 @@ updated: '2026-09-09'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-port-01
 - phase-ses-01
 items:
 - id: phase-rel-01
@@ -4238,7 +4239,8 @@ items:
   - sys-governance
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-codex-port
   priority: 2
   session_budget: 1
   depends_on: []
