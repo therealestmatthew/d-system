@@ -4517,8 +4517,45 @@ items:
   - ts/public/talking-points.json
   - ts/vite.config.ts
   - test/test_demo_terminal.py
-  next_action: Scaffold the stage page layout grid first and prove zero-scroll at the
-    four sizes with placeholder panels before wiring xterm.js.
+  next_action: 'All three work items (D02-C1/V1, D02-C2/V2, D02-C3/V3) are green on
+    agent/phase-demo-02, committed. D02-G (phase gate) failed on one item: uv run
+    pytest reports 2 failed, 456 passed. One failure (test_committed_catalog_matches_regenerated_output)
+    reproduces identically on plain dev and is not introduced by this phase''s ts/-only
+    diff. The other (test_get_talking_points_defaults_to_ts_public_location) is a
+    prompt/reality mismatch between this phase''s required ts/public/talking-points.json
+    deliverable and a phase-demo-01 test that assumes the file is absent by default
+    — reported to the coordinator rather than fixed, since resolving it means editing
+    test/test_demo_terminal.py, outside this phase''s deliverable paths. Remaining
+    after that: the coordinator''s D02-A adversarial review, D02-W Playwright browser
+    verification, and the completion/integration decision (GOV-003 demo-track gate)
+    — none of which is this orchestrator''s to perform.'
+  session: doc-session-demo-stage-frontend
+  completion_evidence:
+  - ts/src/stage/StagePage.tsx
+  - ts/src/stage/StagePage.css
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/TalkingPointsRegion.tsx
+  - ts/src/stage/OverviewRegion.tsx
+  - ts/src/stage/Tooltip.tsx
+  - ts/src/stage/Popover.tsx
+  - ts/public/talking-points.json
+  - ts/vite.config.ts
+  result: 'On agent/phase-demo-02 (not yet integrated): the stage page renders three
+    zero-scroll regions (terminal, talking-points, overview) in a CSS grid with
+    minmax(0,...) tracks and overflow:hidden on html/body; hover Tooltip and click-dismissible
+    Popover components; two switchable descope states (overview open-in-tab link,
+    terminal hidden). Terminal region mounts a real xterm.js Terminal only when the
+    backend reports terminal_enabled, piped over a websocket through a now-configurable
+    Vite proxy (VITE_API_TARGET, default unchanged). Talking-points rotator loads
+    from ts/public/talking-points.json (placeholder copy) via the phase-demo-01 route,
+    with manual next/previous, optional auto-advance, and a rung-2 static-list degrade.
+    Overview panel embeds the generated page from _public/ via a dedicated dev-server
+    middleware, with the rung-3 open-in-tab fallback. cd ts && npm run build passes
+    clean. uv run pytest: 2 failed, 456 passed — both failures investigated and traced
+    to causes outside this phase''s diff (see next_action). uv run python -m src.governance
+    reports Governance OK: 18 systems, 132 documents, 15 memories, 110 backlog phases.
+    uv run python tools/check_no_private_content.py with changes staged: OK (413
+    tracked files, 0 identifiers checked). D02-A and D02-W not yet dispatched (coordinator-owned).'
 - id: phase-demo-03
   title: Build the deterministic overview tools
   plan: doc-live-demo

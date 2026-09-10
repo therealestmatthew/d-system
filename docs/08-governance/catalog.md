@@ -139,6 +139,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 | SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
 | SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
+| SESS-2026-09-10-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-04-demo-stage-frontend.md |
 
 ## Plans and their phases
 
@@ -188,4 +189,4 @@ CI regenerates it and fails on any difference.
 | OPS-014 | reserved | Overview page generator operations document; deliverable of phase-demo-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-132 documents — adr: 11, architecture: 5, governance: 7, operation: 11, plan: 32, prompt: 18, requirement: 6, session: 42.
+133 documents — adr: 11, architecture: 5, governance: 7, operation: 11, plan: 32, prompt: 18, requirement: 6, session: 43.
