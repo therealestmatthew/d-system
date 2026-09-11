@@ -5191,3 +5191,11 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening id
 **Links**
 
 - extends → `000114`
+
+---
+
+## 000122 · Evaluate alternative languages and platforms for a non-web rebuild of the application
+
+**Created 2026-09-11T18:14:30-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, deliberately standalone - not part of the next-pack batch; for future consideration. The application is becoming something like an integrated development environment: a fully customizable workspace shaped to the owner's perfect workflow (panels, terminals, file viewers, explorers, notes, agent triggering). That vision does not have to live in a web app. This idea is to think through a rebuild in a different language and platform - candidates the owner named: Rust, Go, C# - weighing what each offers for a desktop-class IDE-style application (native windowing/terminal integration, performance, packaging, long-term maintainability, ecosystem for embedding editors/terminals/webviews). Constraints for the evaluation: the rebuild would START from the same functionality the current FastAPI + React workbench already has (feature parity as the baseline, not a redesign), and the evaluation should also weigh hybrid paths (e.g. keeping the Python data/agent layer and replacing only the shell) against a full rewrite. Output when picked up: a comparison with a recommendation, not code.
