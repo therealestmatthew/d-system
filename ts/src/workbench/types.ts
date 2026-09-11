@@ -82,14 +82,14 @@ export function isLayoutDefinition(value: unknown): value is LayoutDefinition {
   )
 }
 
-/** The layout files' current `schema_version` (ADR-016 rule 1: each layout file "carries a
- * `schema_version` integer"; both shipped files declare `1`). The single namespaced storage key
- * ADR-016 rule 3 describes is shared by every kind of selection it lists — the layout engine's
- * own active-layout/slot choices (`useWorkbenchLayouts`) and the notes strip's chosen file
- * (`NotesStripRegion`, REQ-007 W01) both key off this same constant, so they read and write the
- * same key rather than two different ones. Bumping a layout file's `schema_version` is a
- * coordinated change: this constant moves with it. */
-export const WORKBENCH_SCHEMA_VERSION = 1
+// The layout files' `schema_version` (ADR-016 rule 1: each layout file "carries a
+// `schema_version` integer"; both shipped files declare `1`) is not duplicated as a constant
+// here. It is resolved once, at runtime, from the fetched layout files by `useWorkbenchLayouts`
+// (its `schemaVersion` return value) and shared with every other consumer of the single
+// namespaced storage key ADR-016 rule 3 describes — the notes strip included — via
+// `schemaVersionContext.ts`'s `ActiveSchemaVersionProvider`/`useActiveSchemaVersion`. A hardcoded
+// copy of the version number is exactly what let the two consumers drift apart independently; see
+// `schemaVersionContext.ts` for the shared source of truth.
 
 /** The browser's stored selections (ADR-016 rule 3): active layout id, per-layout per-slot panel
  * choices, and the notes strip's chosen file, under one key namespaced by the layouts'

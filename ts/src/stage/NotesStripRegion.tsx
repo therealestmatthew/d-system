@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Tooltip from './Tooltip'
 import Popover from './Popover'
-import { WORKBENCH_SCHEMA_VERSION } from '../workbench/types'
+import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadActiveNotesFile, saveActiveNotesFile } from '../workbench/storage'
 
 // The fixed notes directory (REQ-007 W01) — repository-relative, passed to the workbench
@@ -59,21 +59,32 @@ function isNotesFileEntryList(value: unknown): value is NotesFileEntry[] {
  * lives behind the single dropdown at the right, opened by a standard downward-triangle
  * affordance. The strip surface itself triggers nothing.
  *
- * The picker's options come from the workbench listing route (`GET /api/v1/workbench/list`,
+ * The picker's candidates come from the workbench listing route (`GET /api/v1/workbench/list`,
  * `src/api/routes/workbench.py`, `phase-wb-01`), filtered to `.json` under the fixed notes
  * directory (`ts/public/`) — never a hardcoded file list and never a client-side directory walk.
- * Once a file is chosen, its content is fetched directly from Vite's static serving of
- * `ts/public/` (the same runtime-fetch convention `CommandPanel` uses for `demo-commands.json`),
- * so both the dropdown's enumeration and the strip's content come from disk, not page code.
+ * Listing alone only proves a file is JSON, not that it is a *notes* file (REQ-007 W01 requires
+ * the picker to list compatible files): every candidate is additionally fetched and probed with
+ * `isNotesFile` before it is offered, so an incompatible JSON file living in the same directory
+ * (e.g. `CommandPanel`'s `demo-commands.json`) never appears in the dropdown, even though it
+ * appears in the raw listing. Once a file is chosen, its content is fetched directly from Vite's
+ * static serving of `ts/public/` (the same runtime-fetch convention `CommandPanel` uses), so both
+ * the dropdown's enumeration and the strip's content come from disk, not page code.
  *
  * The chosen file persists across reloads under the ADR-016 selections key
- * (`ts/src/workbench/storage.ts`'s `saveActiveNotesFile`/`loadActiveNotesFile`), sharing that key
- * with the layout engine's own persisted selections via a merge-on-write, so this component's
- * writes never clobber the layout engine's, and vice versa.
+ * (`ts/src/workbench/storage.ts`'s `saveActiveNotesFile`/`loadActiveNotesFile`), namespaced by the
+ * schema version `StagePage` provides via `useActiveSchemaVersion` (the same single version
+ * `useWorkbenchLayouts` resolves for the layout engine's own selections — never a hardcoded copy
+ * of it), sharing that key via a merge-on-write so this component's writes never clobber the
+ * layout engine's, and vice versa.
  */
 export default function NotesStripRegion() {
+  // Resolved once, from the layout files, by `useWorkbenchLayouts` and provided by `StagePage` —
+  // see `schemaVersionContext.ts`. `null` only before layouts have loaded, which this component
+  // never observes in practice since `Slot.tsx` mounts panels only once `loadState === 'loaded'`.
+  const schemaVersion = useActiveSchemaVersion()
   const [activeFile, setActiveFile] = useState<string>(
-    () => loadActiveNotesFile(WORKBENCH_SCHEMA_VERSION) ?? DEFAULT_NOTES_FILENAME,
+    () =>
+      (schemaVersion !== null ? loadActiveNotesFile(schemaVersion) : null) ?? DEFAULT_NOTES_FILENAME,
   )
   const [contentState, setContentState] = useState<ContentLoadState>('loading')
   const [points, setPoints] = useState<string[]>([])
@@ -83,8 +94,13 @@ export default function NotesStripRegion() {
   const [fileList, setFileList] = useState<NotesFileEntry[]>([])
   const contentFetchGeneration = useRef(0)
 
-  // The compatible-file list for the dropdown's picker — enumerated once via the workbench
-  // listing route, independent of which file is currently active or whether its content loads.
+  // The compatible-file list for the dropdown's picker: every `.json` candidate the workbench
+  // listing route returns, then narrowed to the ones whose *content* actually shapes up as a
+  // notes file (REQ-007 W01) — the listing route only knows extensions, not schemas, so a
+  // co-located but incompatible JSON file (e.g. `CommandPanel`'s `demo-commands.json`) would
+  // otherwise appear in the picker and yield a reachable error state once selected. The candidate
+  // count under `ts/public/` is small, so probing each one with a direct fetch is cheap; this
+  // still never hardcodes a file list — every name still comes from the listing route.
   useEffect(() => {
     let cancelled = false
     setFileListState('loading')
@@ -93,13 +109,25 @@ export default function NotesStripRegion() {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json()
       })
-      .then((body: unknown) => {
-        if (cancelled) return
+      .then(async (body: unknown) => {
         if (!isNotesFileEntryList(body)) {
-          setFileListState('error')
+          if (!cancelled) setFileListState('error')
           return
         }
-        setFileList(body)
+        const probed = await Promise.all(
+          body.map(async (entry) => {
+            try {
+              const response = await fetch(`/${entry.name}`, { cache: 'no-store' })
+              if (!response.ok) return null
+              const content: unknown = await response.json()
+              return isNotesFile(content) ? entry : null
+            } catch {
+              return null
+            }
+          }),
+        )
+        if (cancelled) return
+        setFileList(probed.filter((entry): entry is NotesFileEntry => entry !== null))
         setFileListState('loaded')
       })
       .catch(() => {
@@ -153,7 +181,7 @@ export default function NotesStripRegion() {
 
   const selectFile = (fileName: string) => {
     setActiveFile(fileName)
-    saveActiveNotesFile(WORKBENCH_SCHEMA_VERSION, fileName)
+    if (schemaVersion !== null) saveActiveNotesFile(schemaVersion, fileName)
   }
 
   const currentEntryText =

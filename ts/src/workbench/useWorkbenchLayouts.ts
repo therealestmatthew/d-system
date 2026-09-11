@@ -23,6 +23,10 @@ async function fetchLayout(id: string): Promise<unknown> {
  * layout, slot or panel — or written under a different schema-version key entirely — is dropped
  * silently in favor of each layout's own `default_panel` (ADR-016 rule 4), never surfaced as an
  * error and never migrated.
+ *
+ * Also resolves the one ADR-016 `schema_version` the storage key is namespaced by (returned as
+ * `schemaVersion`) — the single source of truth `StagePage` provides to every panel via
+ * `ActiveSchemaVersionProvider`, so no other consumer derives or hardcodes its own copy.
  */
 export function useWorkbenchLayouts() {
   const [loadState, setLoadState] = useState<WorkbenchLoadState>('loading')
@@ -95,6 +99,12 @@ export function useWorkbenchLayouts() {
     })
   }, [layouts, activeLayoutId, selections])
 
+  // The single ADR-016 schema version, resolved from the loaded layout files — the one source of
+  // truth `NotesStripRegion` also reads, via `StagePage`'s `ActiveSchemaVersionProvider`, rather
+  // than a hardcoded constant of its own (both files ship `schema_version: 1` today, but only
+  // this derivation is authoritative once a data-only bump lands).
+  const schemaVersion = layouts[0]?.schema_version ?? null
+
   const activeLayout = layouts.find((layout) => layout.layout_id === activeLayoutId) ?? null
 
   /** The panel type id resolved for `slot` within `layout`: the stored selection when it is
@@ -115,6 +125,7 @@ export function useWorkbenchLayouts() {
   return {
     loadState,
     layouts,
+    schemaVersion,
     activeLayout,
     activeLayoutId,
     setActiveLayoutId: setActiveLayoutIdState,
