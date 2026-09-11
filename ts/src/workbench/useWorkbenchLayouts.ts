@@ -22,6 +22,43 @@ async function fetchLayout(id: string): Promise<unknown> {
   return response.json()
 }
 
+// --- REQ-007 W17: the terminal slot's fresh-store default becomes platform-conditional --------
+
+// The one slot id this default applies to, across both shipped layout files — hardcoded the same
+// way `TerminalRegion.tsx`'s own websocket path and shell allowlist are: a small, well-known
+// piece of this repo's fixed vocabulary, not a value layout files vary per-install.
+const TERMINAL_SLOT_ID = 'terminal'
+// The panel ids `panelRegistry.tsx` already registers for bash and PowerShell respectively.
+const BASH_PANEL_ID = 'terminal'
+const POWERSHELL_PANEL_ID = 'terminal-powershell'
+const PLATFORM_ROUTE = '/api/v1/workbench/platform'
+
+/** The terminal slot's platform-conditional fresh-store default panel id (REQ-007 W17): bash
+ * unless the backend's `/platform` route (`src/api/routes/workbench.py`, W09-C1) reports
+ * `windows`, in which case PowerShell. The route is gated behind `D_SYSTEM_DEMO_TERMINAL=1`
+ * (ADR-015 rule 1) exactly like the terminal websocket itself, so a non-ok response — 404 when
+ * the flag is unset, same as every other route that import gate hides — resolves to bash here
+ * too, never an error and never a guess at a platform this route did not report. Awaited as part
+ * of this hook's one load effect (below), never as a separate, later-resolving fetch: resolving
+ * it before `loadState` ever reaches `'loaded'` is what stops a fresh session's default terminal
+ * panel from changing *after* a session may have already started against the file's own
+ * platform-neutral default — the exact race a later-arriving platform answer would otherwise
+ * open, one this route's own absence-by-default posture (ADR-013) makes easy to trip over. */
+async function fetchTerminalPlatformDefaultPanel(): Promise<string> {
+  try {
+    const response = await fetch(PLATFORM_ROUTE, { cache: 'no-store' })
+    if (!response.ok) return BASH_PANEL_ID
+    const body: unknown = await response.json()
+    const platform =
+      typeof body === 'object' && body !== null
+        ? (body as Record<string, unknown>).platform
+        : undefined
+    return platform === 'windows' ? POWERSHELL_PANEL_ID : BASH_PANEL_ID
+  } catch {
+    return BASH_PANEL_ID
+  }
+}
+
 /** Resolves one raw layout file's default total assignment (panel_id -> slot_id) overridden by
  * any valid stored per-panel reassignment (REQ-007 W16). Invalid stored entries — an unknown
  * panel, an unknown slot, or a slot the panel is not eligible for — are dropped silently in
@@ -96,9 +133,11 @@ function buildSlots(
  * before the W16 delta (see `types.ts`'s file doc) — `getSlotPanel` resolves a slot's *visible*
  * panel and `setSlotPanel` changes it, both scoped to the panels the slot currently holds
  * (`slot.admits`, now computed from panel eligibility + assignment rather than a raw per-slot
- * admits list). `setPanelSlot`, exposed alongside them, is the new REQ-007 W16 primitive — moving
- * a panel to a different one of its eligible slots — for the assignment-only configuration-dialog
- * rework to call; nothing in this data-model phase's scope calls it yet.
+ * admits list); `Slot.tsx`'s header dropdown is the only caller of `setSlotPanel` as of the W17
+ * delta — `LayoutConfigDialog.tsx` no longer duplicates it (REQ-007 W16/W17: that was never
+ * intended). `setPanelSlot`, exposed alongside them, is the REQ-007 W16 primitive — moving a
+ * panel to a different one of its eligible slots — that the W17 assignment-only configuration
+ * dialog now calls.
  */
 export function useWorkbenchLayouts() {
   const [loadState, setLoadState] = useState<WorkbenchLoadState>('loading')
@@ -114,14 +153,24 @@ export function useWorkbenchLayouts() {
   const [slotVisiblePanel, setSlotVisiblePanel] = useState<Record<string, Record<string, string>>>(
     {},
   )
+  // REQ-007 W17: the terminal slot's platform-conditional fresh-store default panel id, resolved
+  // once by the load effect below (see `fetchTerminalPlatformDefaultPanel`'s own doc for why it
+  // is awaited alongside the layout files rather than fetched separately). The initial value here
+  // is never actually observed by a consumer — `getSlotPanel` is only ever called once
+  // `loadState` reaches `'loaded'`, by which point this has already resolved.
+  const [terminalPlatformDefaultPanelId, setTerminalPlatformDefaultPanelId] =
+    useState<string>(BASH_PANEL_ID)
   // Guards the persistence effect against writing an empty/partial state back to localStorage
   // during the load race, before the stored state has actually been read once.
   const hydratedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
-    Promise.all(LAYOUT_FILE_IDS.map(fetchLayout))
-      .then((bodies) => {
+    Promise.all([
+      Promise.all(LAYOUT_FILE_IDS.map(fetchLayout)),
+      fetchTerminalPlatformDefaultPanel(),
+    ])
+      .then(([bodies, platformDefaultPanelId]) => {
         if (cancelled) return
         const valid = bodies.filter(isRawLayoutFile)
         if (valid.length === 0) {
@@ -166,6 +215,7 @@ export function useWorkbenchLayouts() {
         )
         setPanelAssignments(validatedAssignments)
         setSlotVisiblePanel(validatedVisiblePanels)
+        setTerminalPlatformDefaultPanelId(platformDefaultPanelId)
         setLoadState('loaded')
         hydratedRef.current = true
       })
@@ -197,8 +247,9 @@ export function useWorkbenchLayouts() {
   const schemaVersion = rawLayouts[0]?.schema_version ?? null
 
   // The app-facing layouts (REQ-007 W16): each slot's `admits`/`default_panel` recomputed from
-  // this layout's resolved panel assignment, so a reassignment (once the configuration-dialog
-  // rework calls `setPanelSlot`) is reflected here without any other change to this hook's shape.
+  // this layout's resolved panel assignment, so a reassignment (via the configuration dialog's
+  // `setPanelSlot` call, REQ-007 W17) is reflected here without any other change to this hook's
+  // shape.
   const layouts: LayoutDefinition[] = rawLayouts.map((layout) => {
     const { assignment } = resolveAssignment(layout, panelAssignments[layout.layout_id])
     return {
@@ -206,6 +257,11 @@ export function useWorkbenchLayouts() {
       layout_id: layout.layout_id,
       name: layout.name,
       slots: buildSlots(layout, assignment),
+      // REQ-007 W17: the raw file's own per-panel eligibility, unchanged by resolution — the
+      // assignment-only configuration dialog reads this to build "one selector per panel over
+      // its eligible slots" (`LayoutConfigDialog.tsx`), independent of which slot each panel is
+      // *currently* assigned to (that is `slots[].admits`, above).
+      panels: layout.panels,
       grid: layout.grid,
     }
   })
@@ -218,6 +274,19 @@ export function useWorkbenchLayouts() {
   const getSlotPanel = (layout: LayoutDefinition, slot: LayoutSlotDefinition): string | null => {
     const stored = slotVisiblePanel[layout.layout_id]?.[slot.slot_id]
     if (stored && slot.admits.includes(stored)) return stored
+    // REQ-007 W17: only the terminal slot's *fresh-store* default (no stored choice survived
+    // validation above) is platform-conditional, and only when the platform-preferred panel is
+    // actually one of this slot's currently-assigned panels — a user who has reassigned
+    // `terminal-powershell` away from the terminal slot, or a host the platform route reports as
+    // not having PowerShell available, both fall straight through to the layout file's own
+    // (platform-neutral) `default_panel` below, same as ADR-016 rule 4's "no valid override falls
+    // back to the file's own default" posture elsewhere in this hook.
+    if (
+      slot.slot_id === TERMINAL_SLOT_ID &&
+      slot.admits.includes(terminalPlatformDefaultPanelId)
+    ) {
+      return terminalPlatformDefaultPanelId
+    }
     return slot.default_panel
   }
 
@@ -231,11 +300,10 @@ export function useWorkbenchLayouts() {
     }))
   }
 
-  /** Moves `panelId` to `slotId` within `layoutId` — the REQ-007 W16 primitive an
-   * assignment-only configuration dialog needs ("one selector per panel over its eligible
+  /** Moves `panelId` to `slotId` within `layoutId` — the REQ-007 W16 primitive the W17
+   * assignment-only configuration dialog calls ("one selector per panel over its eligible
    * slots"). Silently a no-op if `slotId` is not one of the panel's eligible slots in the loaded
-   * layout, matching this hook's existing "invalid input is dropped, never an error" posture. Not
-   * called anywhere yet — this data-model phase does not rework `LayoutConfigDialog.tsx`. */
+   * layout, matching this hook's existing "invalid input is dropped, never an error" posture. */
   const setPanelSlot = (layoutId: string, panelId: string, slotId: string) => {
     const layout = rawLayouts.find((candidate) => candidate.layout_id === layoutId)
     const panel = layout?.panels.find((candidate) => candidate.panel_id === panelId)

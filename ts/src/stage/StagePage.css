@@ -617,6 +617,27 @@ body {
   overflow: hidden;
 }
 
+/* REQ-007 W17 item 4: a single-panel slot's portal body container (`Slot.tsx`) — the panel's own
+   component now mounts via a portal into this div rather than as a direct JSX child, so it can
+   move between slots (a reassignment) without unmounting. This must behave exactly like the
+   plain `<Component />` it replaces as `.stage-workbench-slot`'s direct flex child (that class is
+   `display: flex` with no explicit `flex-direction`, i.e. row): `flex: 1 1 auto` here is what
+   `.stage-region`'s own `flex: 1 1 auto` used to get for free from being that direct child,
+   `min-width: 0`/`min-height: 0` are the same shrink-to-fit guards every other slot-adjacent
+   wrapper in this file already carries, and `display: flex; flex-direction: column` gives the
+   nested `.stage-region` child the same column flex context `.stage-workbench-slot__body` above
+   already gives the multi-panel case (idea `000104`'s fix, generalized here to the single-panel
+   case this delta introduces a wrapper for). No border, background or padding — this container
+   must stay visually transparent. */
+.stage-workbench-slot__portal-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .stage-workbench-slot__panel-list {
   list-style: none;
   margin: 0;
@@ -637,8 +658,12 @@ body {
   cursor: pointer;
 }
 
-/* The layout-configuration surface (REQ-007 W05, ADR-016): active-layout radio group plus one
-   panel-assignment `<select>` per slot — no geometry control, per ADR-016 rule 2. */
+/* The layout-configuration surface (REQ-007 W05, reworked by W16/W17, ADR-016): active-layout
+   radio group plus one panel-assignment `<select>` per *panel*, over that panel's own eligible
+   slots — a total mapping, no geometry control (ADR-016 rule 2). Before the W16/W17 rework this
+   held one `<select>` per *slot* instead (`.stage-workbench-config__slot-option`, retired) — a
+   dialog-level duplicate of each multi-panel slot's own header dropdown switcher (`Slot.tsx`),
+   never an actual reassignment; see `LayoutConfigDialog.tsx`'s file doc for the full history. */
 .stage-workbench-config {
   display: flex;
   flex-direction: column;
@@ -658,7 +683,7 @@ body {
 }
 
 .stage-workbench-config__layout-option,
-.stage-workbench-config__slot-option {
+.stage-workbench-config__panel-option {
   display: flex;
   align-items: center;
   justify-content: space-between;

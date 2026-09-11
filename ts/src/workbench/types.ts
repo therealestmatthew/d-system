@@ -18,10 +18,12 @@
  *   same shape `Slot.tsx`/`LayoutConfigDialog.tsx`/`StagePage.tsx` already consumed before the
  *   W16 delta moved eligibility from the slot to the panel: those three files render "the panels
  *   this slot currently holds" and "which one is visible" either way, so keeping their input
- *   shape stable confines this delta to the loading/validation layer (this file,
- *   `useWorkbenchLayouts.ts`, `storage.ts`) — the assignment-only configuration dialog (REQ-007
- *   W16's "one selector per panel over its eligible slots") is a separate, not-yet-built rework
- *   of `LayoutConfigDialog.tsx` itself, out of this data-model phase's scope.
+ *   shape stable confined that delta to the loading/validation layer (this file,
+ *   `useWorkbenchLayouts.ts`, `storage.ts`) when it landed; the assignment-only configuration
+ *   dialog rework REQ-007 W16 called for ("one selector per panel over its eligible slots") is
+ *   `LayoutConfigDialog.tsx` itself, built in the REQ-007 W17 delta alongside this shape's
+ *   `panels` field (below) — the one addition that dialog needed beyond what W16 already
+ *   exposed.
  */
 
 // --- the raw, on-disk layout file shape (schema_version 2, W16) ------------------------------
@@ -170,6 +172,12 @@ export interface LayoutDefinition {
   layout_id: string
   name: string
   slots: LayoutSlotDefinition[]
+  /** Every panel type declared in this layout file and the slot ids it may be assigned to
+   * (mirrors `RawLayoutPanel` unchanged) — exposed on the resolved shape, alongside `slots`,
+   * so the assignment-only configuration dialog (REQ-007 W16/W17, `LayoutConfigDialog.tsx`)
+   * can build "one selector per panel over its eligible slots" without reaching into the raw
+   * file shape `useWorkbenchLayouts` otherwise keeps private. */
+  panels: RawLayoutPanel[]
   grid: LayoutGridDefinition
 }
 
