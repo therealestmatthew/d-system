@@ -60,12 +60,20 @@ type LoadState = 'loading' | 'loaded' | 'missing' | 'error'
  * When the terminal route is absent (`disabled`), the trigger renders as a disabled button
  * instead of a `Popover` — visible alongside the existing absent-terminal message in the region
  * body, never erroring, and never attempting to fetch a selection target that doesn't exist.
+ *
+ * When the terminal is merely dropped rather than absent (`deactivated`, REQ-007 W03), the
+ * `Popover` itself stays mounted — entries stay loaded, no refetch flicker on restore — but its
+ * trigger carries a real `disabled` attribute (via `Popover`'s own `disabled` prop) so it is
+ * visible, grayed out and genuinely unclickable rather than merely styled, and reactivates the
+ * instant `deactivated` goes false again.
  */
 export default function CommandPanel({
   disabled,
+  deactivated = false,
   onSelect,
 }: {
   disabled: boolean
+  deactivated?: boolean
   onSelect: (command: string, run: boolean) => void
 }) {
   const [loadState, setLoadState] = useState<LoadState>('loading')
@@ -121,7 +129,11 @@ export default function CommandPanel({
   }
 
   return (
-    <Popover triggerLabel={`Commands (${entries.length})`} title="Command list">
+    <Popover
+      triggerLabel={`Commands (${entries.length})`}
+      title="Command list"
+      disabled={deactivated}
+    >
       {(close) => (
         <div className="stage-command-panel">
           {loadState === 'loading' ? (

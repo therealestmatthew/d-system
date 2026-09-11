@@ -5,6 +5,7 @@ import '@xterm/xterm/css/xterm.css'
 import Tooltip from './Tooltip'
 import Popover from './Popover'
 import CommandPanel from './CommandPanel'
+import TerminalMenu from './TerminalMenu'
 
 type TerminalEnabledState = 'checking' | 'enabled' | 'disabled' | 'unknown'
 type ConnectionState = 'connecting' | 'open' | 'closed'
@@ -76,6 +77,13 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
     const container = containerRef.current
     if (!container) return
 
+    // Guards every socket/terminal event handler below against firing after this effect's own
+    // cleanup has already run — most importantly under React 18 StrictMode in dev, which mounts,
+    // cleans up and remounts every effect once on purpose to surface exactly this class of bug.
+    // Without it, the first (StrictMode-only) instance's `message` handler could still call
+    // `term.write()` after `term.dispose()` had already run.
+    let disposed = false
+
     setConnectionState('connecting')
 
     const term = new Terminal({
@@ -115,12 +123,20 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
     attemptFit()
 
     socket.addEventListener('open', () => {
+      if (disposed) return
       setConnectionState('open')
       attemptFit()
     })
-    socket.addEventListener('close', () => setConnectionState('closed'))
-    socket.addEventListener('error', () => setConnectionState('closed'))
+    socket.addEventListener('close', () => {
+      if (disposed) return
+      setConnectionState('closed')
+    })
+    socket.addEventListener('error', () => {
+      if (disposed) return
+      setConnectionState('closed')
+    })
     socket.addEventListener('message', (event) => {
+      if (disposed) return
       if (event.data instanceof ArrayBuffer) {
         term.write(new Uint8Array(event.data))
       } else if (typeof event.data === 'string') {
@@ -143,10 +159,23 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
     resizeObserver.observe(container)
 
     return () => {
+      disposed = true
       resizeObserver.disconnect()
       dataDisposable.dispose()
       socketRef.current = null
-      socket.close()
+      // The startup-race console warning this fixes: calling `.close()` on a socket still in
+      // `CONNECTING` state (readyState 0) makes the browser log "WebSocket is closed before the
+      // connection is established" — harmless, but real, under React 18 StrictMode's
+      // mount-cleanup-remount dance in dev, where the first instance's cleanup can run before its
+      // handshake finishes. Closing a CONNECTING socket immediately is otherwise correct (the
+      // session must end promptly), so instead of skipping the close, this defers it: let the
+      // handshake finish, then close normally, once, the moment it does. `disposed` above already
+      // stops every other handler from acting on this now-superseded socket in the meantime.
+      if (socket.readyState === WebSocket.CONNECTING) {
+        socket.addEventListener('open', () => socket.close(), { once: true })
+      } else {
+        socket.close()
+      }
       term.dispose()
     }
     // Mount once per TerminalSession instance — a session's socket and shell live for the
@@ -192,17 +221,26 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
  *
  * REQ-006 R10/R11: hosts up to four independent sessions as tabs (every session's
  * TerminalSession stays mounted; inactive tabs are CSS-hidden only), a collapse control that
- * hides the region via CSS, and a guarded whole-region drop — both go through the portaled
- * Popover's confirm action before anything terminates (drop) or are a plain toggle (collapse).
+ * hides the region via CSS, and a guarded whole-region drop. REQ-007 W02 moves both controls into
+ * a single `(...)` ellipsis menu (`TerminalMenu`) at the header's top right: the header's own
+ * standalone "Collapse terminal" button and the page-level drop control (`StagePage`'s old rung-4
+ * "Terminal: Shown/Hidden" toggle, already gone as of `phase-wb-02`) no longer exist anywhere.
+ * Collapse still only flips CSS (no session terminates); drop still goes through `TerminalMenu`'s
+ * in-bubble confirm step before anything terminates.
+ *
+ * REQ-007 W03: dropping no longer makes the region disappear or unmount. `dropped` swaps only the
+ * body — the tab bar and session views are replaced in place by an inactive-terminal info page —
+ * while the header, including the ellipsis menu and every injection dropdown (`CommandPanel`
+ * today; the Skills/Prompts/Agents dropdowns land in a later phase), stays mounted and visible.
+ * Each dropdown receives `deactivated={dropped}` so it renders grayed out and genuinely
+ * unclickable (a real `disabled` attribute via `Popover`'s own `disabled` prop, not styling
+ * alone) and reactivates the instant `dropped` goes false again. The section's own box — and so
+ * the workbench layout engine's (`ts/src/workbench/`, REQ-007 W05/ADR-016) fixed slot geometry
+ * around it — never changes shape between the two states.
  *
  * Both `collapsed` and `dropped` are local state here (`phase-wb-02`), not lifted to a parent —
- * unlike before this phase's layout engine, a panel's own drop/collapse no longer needs to
- * trigger a page-level grid reflow, because the workbench layout engine (`ts/src/workbench/`,
- * REQ-007 W05/ADR-016) gives every slot a fixed geometry per the active layout file: dropping or
- * collapsing this panel changes only what renders *inside* its own fixed slot box, never the
- * grid around it. `dropped` replaces the previous page-level "Terminal: Shown/Hidden" toggle
- * (`StagePage`'s old rung-4 control) with an equivalent in-panel one that keeps the slot's box
- * present and shows an in-place message instead of unmounting the whole region.
+ * a panel's own drop/collapse only ever changes what renders *inside* its fixed slot box, never
+ * the grid around it.
  */
 export default function TerminalRegion() {
   const [enabledState, setEnabledState] = useState<TerminalEnabledState>('checking')
@@ -257,35 +295,6 @@ export default function TerminalRegion() {
     }
   }
 
-  if (dropped) {
-    return (
-      <section className="stage-region stage-region--terminal" aria-label="Terminal">
-        <header className="stage-region__header">
-          <h2>Terminal</h2>
-          <Tooltip label="About the terminal region">
-            Up to four independent xterm.js terminals, each over its own websocket to a real
-            shell, when the backend's terminal capability is enabled (ADR-013). Absent by
-            default. Switching tabs or collapsing this region never ends a session; closing a
-            tab or dropping the whole region does, after confirming.
-          </Tooltip>
-          <button
-            type="button"
-            className="stage-terminal-collapse-toggle"
-            onClick={() => setDropped(false)}
-          >
-            Restore terminal
-          </button>
-        </header>
-        <div className="stage-region__body stage-region__body--terminal-placeholder">
-          <p className="stage-placeholder-text stage-placeholder-text--absent">
-            Terminal dropped — every open session's shell process and scrollback ended. Use
-            "Restore terminal" to start fresh sessions.
-          </p>
-        </div>
-      </section>
-    )
-  }
-
   return (
     <section
       className={'stage-region stage-region--terminal' + (collapsed ? ' stage-region--terminal-collapsed' : '')}
@@ -297,42 +306,33 @@ export default function TerminalRegion() {
           Up to four independent xterm.js terminals, each over its own websocket to a real
           shell, when the backend's terminal capability is enabled (ADR-013). Absent by default.
           Switching tabs or collapsing this region never ends a session; closing a tab or
-          dropping the whole region does, after confirming.
+          dropping the whole region does, after confirming. While dropped, the terminal area
+          shows an inactive-terminal info page in place and the injection dropdowns are
+          deactivated until restored.
         </Tooltip>
-        <CommandPanel disabled={enabledState !== 'enabled'} onSelect={sendToActiveSession} />
+        <CommandPanel
+          disabled={enabledState !== 'enabled'}
+          deactivated={dropped}
+          onSelect={sendToActiveSession}
+        />
         {enabledState === 'enabled' ? (
-          <button
-            type="button"
-            className="stage-terminal-collapse-toggle"
-            aria-pressed={collapsed}
-            onClick={() => setCollapsed((value) => !value)}
-          >
-            {collapsed ? 'Expand terminal' : 'Collapse terminal'}
-          </button>
+          <TerminalMenu
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed((value) => !value)}
+            dropped={dropped}
+            onRestore={() => setDropped(false)}
+            onConfirmDrop={() => setDropped(true)}
+          />
         ) : null}
-        <Popover triggerLabel="Drop terminal" title="Drop the terminal region?">
-          {(close) => (
-            <div className="stage-terminal-confirm">
-              <p className="stage-placeholder-text">
-                Dropping the terminal region ends every open session's shell process and
-                scrollback. This cannot be undone. Use "Collapse terminal" instead to hide it
-                without ending anything.
-              </p>
-              <button
-                type="button"
-                className="stage-terminal-confirm__action"
-                onClick={() => {
-                  setDropped(true)
-                  close()
-                }}
-              >
-                Confirm: drop terminal and end all sessions
-              </button>
-            </div>
-          )}
-        </Popover>
       </header>
-      {enabledState === 'enabled' ? (
+      {dropped ? (
+        <div className="stage-region__body stage-region__body--terminal-placeholder">
+          <p className="stage-placeholder-text stage-placeholder-text--absent">
+            Terminal dropped — every open session's shell process and scrollback ended. Open the
+            "..." menu and choose "Restore terminal" to start fresh sessions.
+          </p>
+        </div>
+      ) : enabledState === 'enabled' ? (
         <div className="stage-region__body stage-region__body--terminal">
           <div className="stage-terminal-tabbar" role="tablist" aria-label="Terminal sessions">
             {sessionIds.map((id, index) => (

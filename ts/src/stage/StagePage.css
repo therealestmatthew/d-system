@@ -201,14 +201,52 @@ body {
   cursor: not-allowed;
 }
 
-.stage-terminal-collapse-toggle {
+/* REQ-007 W02: the terminal panel's sole "(...)" ellipsis menu (`TerminalMenu.tsx`), replacing
+   both the old standalone header collapse button and the old page-level drop control. Pushed to
+   the header's far right the same way those two controls were. */
+.stage-region--terminal .stage-region__header > .stage-popover:last-child {
   margin-left: auto;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+}
+
+.stage-terminal-menu,
+.stage-terminal-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.stage-terminal-menu__item {
+  text-align: left;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
   border-radius: 4px;
   border: 1px solid #99a3b3;
   background: #eef1f6;
   cursor: pointer;
+}
+
+.stage-terminal-menu__confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.stage-terminal-menu__cancel {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+/* REQ-007 W03: an injection dropdown's trigger while the terminal is dropped — visible, grayed
+   out, genuinely unclickable via Popover's own `disabled` prop (a real `disabled` attribute, not
+   styling alone), reactivating the instant the terminal is restored. */
+.stage-popover__trigger--disabled {
+  color: #8b949e;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* R12's command panel: an in-place reveal (Popover, dismissible per R03) in the terminal

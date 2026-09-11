@@ -30,11 +30,18 @@ const MIN_BUBBLE_HEIGHT_PX = 120
  */
 export default function Popover({
   triggerLabel,
+  triggerAriaLabel,
   title,
   children,
   width = BUBBLE_WIDTH_PX,
+  disabled = false,
+  onOpenChange,
 }: {
   triggerLabel: string
+  // Accessible name for the trigger when `triggerLabel`'s visible text is not descriptive on its
+  // own (e.g. the terminal panel's "..." ellipsis menu, REQ-007 W02) — falls back to the trigger's
+  // own text content (`triggerLabel`) when omitted, matching every existing caller's behavior.
+  triggerAriaLabel?: string
   title: string
   // Most callers (e.g. NotesStripRegion's controls menu) pass static content. Callers that
   // need a confirm action inside the bubble (R11's guarded drop / guarded tab close) pass a
@@ -44,6 +51,15 @@ export default function Popover({
   // Overrides the bubble's default width in px — the layout-configuration surface
   // (`LayoutConfigDialog`, `phase-wb-02`) needs more room than the default list/confirm bubbles.
   width?: number
+  // REQ-007 W03: while true, the trigger renders with a real `disabled` attribute — grayed out
+  // and genuinely unclickable, not just styled — and any already-open bubble is force-closed.
+  // Reactivates the instant the caller flips this back to false (e.g. terminal restore).
+  disabled?: boolean
+  // Fires whenever `open` changes, including the force-close triggered by `disabled` flipping to
+  // true. Lets a caller that keeps its own state inside the bubble (the terminal menu's
+  // in-progress drop confirmation) reset that state whenever the bubble closes without it having
+  // run — so reopening the menu never resurfaces a stale confirmation from an abandoned attempt.
+  onOpenChange?: (open: boolean) => void
 }) {
   const [open, setOpen] = useState(false)
   const [style, setStyle] = useState<CSSProperties>({})
@@ -88,6 +104,18 @@ export default function Popover({
     setStyle(next)
   }
 
+  useEffect(() => {
+    onOpenChange?.(open)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  // Force-close whenever the caller disables the trigger — a bubble left open while its trigger
+  // goes disabled (e.g. mid-drop) would be reachable only via Escape/outside-click, not via the
+  // now-disabled trigger button, and REQ-007 W03 wants deactivation to be immediate and total.
+  useEffect(() => {
+    if (disabled) setOpen(false)
+  }, [disabled])
+
   useLayoutEffect(() => {
     if (!open) return
     reposition()
@@ -129,9 +157,14 @@ export default function Popover({
       <button
         type="button"
         ref={triggerRef}
-        className="stage-popover__trigger"
+        className={'stage-popover__trigger' + (disabled ? ' stage-popover__trigger--disabled' : '')}
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        aria-label={triggerAriaLabel}
+        disabled={disabled}
+        onClick={() => {
+          if (disabled) return
+          setOpen((value) => !value)
+        }}
       >
         {triggerLabel}
       </button>
