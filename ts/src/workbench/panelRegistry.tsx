@@ -3,14 +3,26 @@ import TerminalRegion, { TerminalRegionCmd, TerminalRegionPowerShell } from '../
 import NotesStripRegion from '../stage/NotesStripRegion'
 import OverviewRegion from '../stage/OverviewRegion'
 import HtmlViewerRegion from '../stage/HtmlViewerRegion'
+import FileBrowserRegion from '../stage/FileBrowserRegion'
 
 /**
  * The panel type registry (REQ-007 W05/W06): every panel type id a layout's slots may name, and
  * the component that renders it. `Component: null` marks a type id later phases will implement
- * (`html-viewer` — `phase-wb-04`; `file-browser` — `phase-wb-05`; `idea-explorer` and
- * `backlog-explorer` — `phase-wb-06`) — declaring the id now lets the shipped layout files admit
- * it into a slot today, so a future phase's only change is registering the component here and
- * (if needed) a layout-file edit, never new engine code (ADR-016 consequences).
+ * (`idea-explorer` and `backlog-explorer` — `phase-wb-06`) — declaring the id now lets the
+ * shipped layout files admit it into a slot today, so a future phase's only change is registering
+ * the component here and (if needed) a layout-file edit, never new engine code (ADR-016
+ * consequences).
+ *
+ * `file-browser` (`phase-wb-05`, `FileBrowserRegion`) is this comment's other formerly-`null`
+ * entry now filled in — the tree/filter/preset half of REQ-007 W09 only; the right-click context
+ * menu that same requirement row also describes is not part of `FileBrowserRegion` yet. Layout
+ * 1's explorer slot (`_data/workbench/layouts/layout-1.json`) admits `file-browser`,
+ * `idea-explorer` and `backlog-explorer` with `default_panel: null`; `Slot.tsx` resolves a slot
+ * with exactly one *implemented* admitted panel to that panel regardless of `default_panel`, so
+ * `file-browser` renders there today with no layout-file edit needed — it stops being the only
+ * implemented one the moment `phase-wb-06` fills in the other two, at which point that slot
+ * reaches `Slot.tsx`'s multi-panel dropdown branch and `default_panel` would need to be set
+ * explicitly for `file-browser` to stay the one shown first.
  *
  * `terminal`, `notes-strip` and `overview` are this phase's three existing regions (REQ-007
  * dispatch item 5: "existing regions become panels of this engine") — each already renders its
@@ -54,7 +66,7 @@ export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
   'notes-strip': { displayName: 'Notes', Component: NotesStripRegion },
   overview: { displayName: 'Overview', Component: OverviewRegion },
   'html-viewer': { displayName: 'HTML Viewer', Component: HtmlViewerRegion },
-  'file-browser': { displayName: 'File Browser', Component: null },
+  'file-browser': { displayName: 'File Browser', Component: FileBrowserRegion },
   'idea-explorer': { displayName: 'Idea Explorer', Component: null },
   'backlog-explorer': { displayName: 'Backlog Explorer', Component: null },
 }
