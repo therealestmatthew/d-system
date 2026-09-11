@@ -5530,7 +5530,7 @@ items:
   - ts/src/stage/BacklogExplorerRegion.tsx
   - ts/src/workbench/panelRegistry.tsx
   - ts/src/workbench/Slot.tsx
-  result: 'In progress. W06-C1 (Idea Explorer) passed first-cycle: build clean,
+  result: 'Complete. W06-C1 (Idea Explorer) passed first-cycle: build clean,
     W06-V1 clean PASS with no findings - idea data comes only from the
     phase-wb-01 idea route, six columns render, sort/filter work on route
     data, queue view uses the route''s own ordering. W06-C2 (Backlog
@@ -5544,8 +5544,13 @@ items:
     000097/000099), no direct ideas.jsonl reference, diff confined to ts/.
     This orchestrator''s own verification commands (npm run build,
     governance, check_no_private_content) all ran clean. No fix cycles were
-    needed on either work item. W06-A and W06-W are the coordinator''s
-    dispatches and have not yet been run.'
+    needed on either work item. W06-A (adversarial review) and W06-W
+    (Playwright browser verification), the coordinator''s dispatches, have
+    since both run and passed: W06-A found nothing, numbers cross-verified
+    against independent fold() and --ready recomputations; W06-W was green
+    on every item including the explorer-slot dropdown rider deferred from
+    phase-wb-02. Integrated into dev fast-forward at cdd773b under
+    PROMPT-023 delta 1 (pre-approved, gate green).'
   priority: 1
   session_budget: 1
   depends_on:
