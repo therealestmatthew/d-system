@@ -5016,6 +5016,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 
 - **note** by repository-owner (2026-09-11T17:24:26-04:00): Part of the owner's 2026-09-11 batch for the next workbench prompt pack, together with 000109 (double-click tab opens new browser tab), 000110 (markdown rendering in the viewer), 000111 (file bookmark categories and their system integration) and 000112 (File Explorer right-click open-in-viewer).
 - **note** by repository-owner (2026-09-11T17:28:41-04:00): Batch extended 2026-09-11: also 000113 (terminal persistence and performance audit, all three shells) and 000114 (general performance audit with caching) for the same next planning session.
+- **note** by repository-owner (2026-09-11T17:48:07-04:00): Batch extended again 2026-09-11: 000115 (duplication/modularity audit, e.g. multi-panel slot support) and 000116 (code structure and file-size audit with proposed target structures). Planning-session instruction from the owner: before authoring the pack, review ALL items in this batch (000108-000116) and determine the optimal ordering for both investigating and executing them - audits (000113-000116) likely inform the design and sequencing of the feature items (000108-000112), and the bookmark system (000111) needs its storage/reference ADR before anything builds against it.
 
 **Links**
 
@@ -5094,3 +5095,27 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to → `000113`
+
+---
+
+## 000115 · Duplication audit: find what is done multiple times and generalize toward modularity
+
+**Created 2026-09-11T17:48:01-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the application for duplication - logic, components and patterns implemented more than once - and identify where a generalization would make the application more modular. The owner's motivating example: multi-panel support in a slot (the wrapper/header/switcher machinery in Slot.tsx and its CSS chain, which phase-wb-08's fix and idea 000101's duplicate header both touched) should be one generic mechanism, not per-slot or per-panel reimplementation. The audit names each duplication with file references, judges whether generalizing pays for itself, and proposes the shared abstraction where it does.
+
+**Links**
+
+- relates_to ← `000116`
+
+---
+
+## 000116 · Code structure and file-size audit: identify refactoring needs and propose target structures
+
+**Created 2026-09-11T17:48:01-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the structure of the code and file sizes - lines of code per file across ts/src and src/ - and identify where refactoring is necessary (oversized files, mixed responsibilities, components or modules grown past one clear purpose). For each place refactoring is warranted, the audit proposes what the new structure would look like (the split, the new module boundaries, what moves where) rather than only flagging the size. Pairs with the duplication audit: a shared abstraction extracted there often IS the refactor proposed here.
+
+**Links**
+
+- relates_to → `000115`

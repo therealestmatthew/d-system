@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-06'
-updated: '2026-09-08'
+updated: '2026-09-11'
 systems: [sys-governance]
 depends_on: [doc-governance-protocol]
 ---
@@ -58,6 +58,17 @@ state the assumption, keep working, and surface it at the end.
 This is the same principle the capture system applies to the owner's own notes in
 [ADR-007](../04-decisions/ADR-007-capture-routing.md): ambiguity is flagged, not interrupted for. An
 agent that asks about everything moves the organising load back onto the person it exists to unload.
+
+## Capture new asks as ideas, immediately
+
+When the owner names a want outside the session's current work — a bug they noticed, a feature,
+an audit, an item "for the next planning session" — record it at once through the sanctioned idea
+writer (`tools/append_idea.py`), one idea per distinct ask, and confirm the ids back. Do not fold
+it into the active task, and do not hold it in conversation memory until the end of the session.
+This is the primary capture path in every session and context: it keeps the current work
+uninterrupted while guaranteeing the ask survives the session. `ADR-010`'s record-as-given rule
+applies; asks that form a batch for one future session are linked and annotated onto a shared
+anchor idea so they surface together.
 
 ## Say plainly when a correction is a correction
 
