@@ -4898,3 +4898,21 @@ WHY THIS WAS RECORDED RATHER THAN FIXED. src/demo/ belongs to sys-demo-stage, wh
 WHAT THE NEXT PERSON SHOULD DO. Confirm the cause before changing anything: `git log --oneline -5 -- src/demo/posix.py` and read f0801af's diff against the `alive` property and whatever the session registry retains. Check whether the registry keeps a file descriptor or Popen handle open past shell exit. Then decide whether the bug is in the adapter or the test's assumption — the test has been in the suite since the demo track and passed throughout it, which argues for the adapter.
 
 Found on 2026-09-11 while running the full suite during an unrelated session's final checks. The suite had passed at 495 earlier in the same session; it is now 549 tests, so roughly 54 tests arrived with merged workbench work and three of the pre-existing demo tests broke alongside them.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
+
+</details>
+
+---
+
+## 000100 · Silence the flag-off 404 probes from the workbench frontend
+
+**Created 2026-09-11T00:27:59-04:00 · Status: `open`**
+
+With D_SYSTEM_DEMO_TERMINAL unset, the frontend still fetches /api/v1/workbench/injection-sources and /list on load, producing four browser console 404 resource-log entries per reload (measured in phase-wb-03's W03-W item 5). Degradation is otherwise correct — disabled dropdowns, absent-terminal message, no uncaught exceptions — so this is cosmetic console noise, not a defect. Candidate: probe the existing /api/v1/demo/stage/terminal-enabled endpoint first and skip workbench fetches when false. Recorded via the PROMPT-023 enhancement lane (record, do not build) during the phase-wb-03 scout pass.
