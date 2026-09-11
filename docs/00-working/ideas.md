@@ -4795,3 +4795,39 @@ What to do. Do not delete it blind — check first whether it holds unmerged wor
 Also worth deciding, separately from this instance: whether the Codex harness creating worktrees under ~/.codex/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration to point at ../d-system-worktrees/. ADR-003 was written for the sanctioned agent flow and does not mention other harnesses. That is a decision for the owner, not something to infer from one worktree.
 
 Found on 2026-09-10 during the close of SESS-2026-09-10-10, while checking whether the two peer phase claims were live or stale. Recorded rather than acted on: the session held no backlog claim, and removing another harness's worktree is not a change to make on a hunch at the end of an unrelated session.
+
+---
+
+## 000095 · Close the session-cap TOCTOU window in the demo terminal route
+
+**Created 2026-09-10T21:17:43-04:00 · Status: `open`**
+
+phase-wb-01's W01-A adversarial review observed (not demonstrated) a structural race: the len(SESSIONS) >= MAX_CONCURRENT_SESSIONS check in src/api/routes/demo_terminal.py is separated from the registry insertion by an await websocket.accept(), so two connections racing the boundary could theoretically both pass the check. Repeated real concurrent-connect storms (8-way and 10-way, multiple runs) never manifested it under the asyncio/uvicorn scheduler. Candidate fix: reserve the registry slot before accept() and release on failure. Deliberately recorded rather than built during the workbench track (PROMPT-023 enhancement lane: cap enforcement is REQ-007 W12 stated behavior).
+
+---
+
+## 000096 · Document or reconcile D_SYSTEM_DEMO_SHELL override vs per-session shell selection
+
+**Created 2026-09-10T21:17:49-04:00 · Status: `open`**
+
+With the operator-side D_SYSTEM_DEMO_SHELL override set (ADR-013 backward-compatibility), a workbench client selecting shell=bash gets the override executable instead of bash — proven live in phase-wb-01's W01-A review (override /usr/bin/whoami ran whoami). Not client-exploitable and intentional per the code's own comment, but 'select bash' not meaning 'run bash' will surprise an operator. Candidate: document the interaction in the demo terminal OPS document, or make the override apply only when no explicit shell is requested. Recorded via the PROMPT-023 enhancement lane (record, do not build).
+
+---
+
+## 000097 · Session-failure tracking system that derives anti-pattern rules for future sessions
+
+**Created 2026-09-10T21:41:38-04:00 · Status: `open`**
+
+The owner requested this on 2026-09-10, during the workbench build, after a cluster of failures whose costs were avoidable in hindsight. The idea is a system that tracks session failures and computes anti-patterns from them, so that future sessions are more robust at identifying and handling errors.
+
+Motivating examples from the workbench build:
+
+1. A stale pyenv shim lock on the host (~/.pyenv/shims/.pyenv-shim) made three PTY tests fail deterministically for every agent. Diagnosing it required comparing the branch against a dev baseline, and the one-line fix needed the owner's hands because host-level deletes are permission-blocked.
+
+2. An orchestrator agent stalled three times by backgrounding long commands and ending its turn, and was eventually replaced mid-phase.
+
+3. A coordinator command chain piped governance output through tail, which masked a nonzero exit code, so a completion commit briefly landed on a red governance check before being caught and amended.
+
+The proposed system would capture failures like these as structured records: what failed, the signal that revealed it, the wrong first interpretation if there was one, and the effective fix. From those records it would derive anti-pattern rules — for example: never pipe a gating command's output in the same shell invocation that acts on success; run long commands in the foreground inside an agent turn; compare against a baseline before attributing a failure to new work. Those rules would then be surfaced to future sessions. It could integrate with brain/procedures/, which already holds model-agnostic corrections, or use a new structured store that the governance tooling can check.
+
+The open design question is where the capture happens — at session close, at checkpoint, or through a dedicated tool — and how the derived rules reach agents without bloating every session's context.
