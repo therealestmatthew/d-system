@@ -445,7 +445,23 @@ export default function HtmlViewerRegion() {
               Selected page is absent — <code>{activeTab.selectedFile}</code> does not exist.
             </p>
           ) : embedded ? (
-            <iframe className="stage-overview__iframe" src={embedSrc ?? undefined} title="HTML Viewer" />
+            // `sandbox=""` (no tokens, i.e. every restriction applied — no scripts, no
+            // same-origin access, no top navigation, no forms/popups): unlike
+            // `OverviewRegion`'s iframe, which always embeds one fixed repo-generated page, this
+            // panel embeds whatever `.html`/`.svg` the workbench search/listing routes turn up
+            // anywhere non-ignored in the repository (REQ-007 W07) — a script inside any of
+            // those, served same-origin via `/workbench-file/...`, would otherwise run with the
+            // app's own privileges: read/write its `localStorage` (the ADR-016 selections key),
+            // reach `window.parent`, or make same-origin fetches to workbench routes including
+            // `POST /api/v1/workbench/reveal` (which spawns the OS opener). The generated
+            // overview page this panel also renders (W04-W) has no `<script>` tags, so it
+            // renders unaffected by `sandbox` blocking script execution.
+            <iframe
+              className="stage-overview__iframe"
+              src={embedSrc ?? undefined}
+              title="HTML Viewer"
+              sandbox=""
+            />
           ) : (
             <a
               className="stage-overview__open-link"

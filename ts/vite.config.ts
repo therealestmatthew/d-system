@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { createReadStream, existsSync, statSync } from 'node:fs'
+import { createReadStream, existsSync, realpathSync, statSync } from 'node:fs'
 import { extname, join, normalize, resolve, sep } from 'node:path'
 import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -10,6 +10,10 @@ import react from '@vitejs/plugin-react'
 const repoRoot = resolve(__dirname, '..')
 const publicDir = join(repoRoot, '_public')
 const workbenchLayoutsDir = join(repoRoot, '_data', 'workbench', 'layouts')
+// The symlink-resolved repo root — `serveRepositoryFiles`'s boundary check below must compare
+// against this, not the textual `repoRoot`, so a symlinked worktree checkout itself doesn't
+// widen the boundary it is meant to enforce.
+const realRepoRoot = realpathSync(repoRoot)
 
 const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
 const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
@@ -142,6 +146,14 @@ function isGitIgnored(repoRelativePath: string): boolean {
 // rejecting, the same two checks `src/api/routes/workbench.py`'s `resolve_repo_relative_path` and
 // `_git_ignored_paths` apply server-side — this loopback-only dev tool holds itself to the same
 // boundary the backend API does, even though nothing here is reachable off-machine.
+//
+// This is a workbench route (ADR-015 rule 1: "one gate, one binding"), so — mirroring
+// `src/api/__init__.py`'s refusal to import `workbench.py` unless `D_SYSTEM_DEMO_TERMINAL=1` —
+// it is only ever registered when that same flag is set in this process's own environment; see
+// the gated entry in the `plugins` array below. Unregistered, `/workbench-file/*` falls through
+// to Vite's normal middleware chain and 404s (or, under the dev server's history fallback,
+// serves `index.html` like any other unknown route) — it does not exist, the same "unset means
+// absent" property the backend route enjoys.
 function serveRepositoryFiles(): Plugin {
   const attach = (middlewares: Connect.Server) => {
     middlewares.use(WORKBENCH_FILE_PREFIX, (req, res) => {
@@ -158,7 +170,13 @@ function serveRepositoryFiles(): Plugin {
         res.end('Forbidden')
         return
       }
-      if (relative.split('/').includes('.git')) {
+      // `.git` exclusion, checked on every path segment case-insensitively: the presentation
+      // machine (`docs/00-working/demo-windows-setup.md`) is Windows, whose case-insensitive
+      // filesystem would let a segment spelled `.GIT` reach this far were the comparison
+      // case-sensitive, and `git check-ignore` (the `isGitIgnored` check below) does not flag
+      // `.git` itself — it is not a tracked-vs-ignored question, it is always excluded, the same
+      // rule the backend applies via `ALWAYS_EXCLUDED_NAMES`.
+      if (relative.split('/').some((segment) => segment.toLowerCase() === '.git')) {
         res.statusCode = 403
         res.end('Forbidden')
         return
@@ -167,6 +185,23 @@ function serveRepositoryFiles(): Plugin {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Not found: ${relative}`)
+        return
+      }
+      // Resolve symlinks before trusting the boundary check above: `resolved` there is only
+      // textually normalized (`normalize`/`join`, matching `serveGeneratedOverview`'s and
+      // `serveWorkbenchLayouts`'s own string-containment checks), so a symlink under the
+      // repository whose target lands outside it — e.g. `_public/evil-link.txt` pointing outside
+      // the repo root — passes that check untouched and would still serve the outside file's
+      // bytes. The backend's own boundary (`src/api/routes/workbench.py`'s
+      // `resolve_repo_relative_path`) uses `Path.resolve()`, which follows symlinks, for exactly
+      // this reason (ADR-015 rule 2: "symlinks whose resolved target leaves the root");
+      // `realpathSync` is Node's equivalent, and by this point `existsSync` above has already
+      // confirmed the symlink chain resolves to a real file, so this cannot throw for the paths
+      // that reach it.
+      const realResolved = realpathSync(resolved)
+      if (realResolved !== realRepoRoot && !realResolved.startsWith(realRepoRoot + sep)) {
+        res.statusCode = 403
+        res.end('Forbidden')
         return
       }
       if (isGitIgnored(relative)) {
@@ -208,7 +243,19 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_TARGET || 'http://localhost:8000'
 
   return {
-    plugins: [react(), serveGeneratedOverview(), serveWorkbenchLayouts(), serveRepositoryFiles()],
+    plugins: [
+      react(),
+      serveGeneratedOverview(),
+      serveWorkbenchLayouts(),
+      // Gated: `/workbench-file/*` serves raw bytes of any non-ignored repository file, the same
+      // capability class ADR-015 rule 1 requires behind `D_SYSTEM_DEMO_TERMINAL=1` for every
+      // workbench route. `env` here is `loadEnv`'s result, which reads both this process's own
+      // environment and any `.env` file — a normal `npm run dev` (flag unset) never registers
+      // this plugin, so the route does not exist, matching the backend's own "unimported means
+      // absent" gate in `src/api/__init__.py`. A demo launch must set the flag for this frontend
+      // process too (not only the backend's), not merely have it on the backend's environment.
+      ...(env.D_SYSTEM_DEMO_TERMINAL === '1' ? [serveRepositoryFiles()] : []),
+    ],
     server: {
       proxy: {
         '/api': {
