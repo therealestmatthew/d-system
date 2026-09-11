@@ -5,6 +5,7 @@ import '@xterm/xterm/css/xterm.css'
 import Tooltip from './Tooltip'
 import Popover from './Popover'
 import CommandPanel from './CommandPanel'
+import InjectionDropdowns from './InjectionDropdowns'
 import TerminalMenu from './TerminalMenu'
 
 type TerminalEnabledState = 'checking' | 'enabled' | 'disabled' | 'unknown'
@@ -230,9 +231,9 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
  *
  * REQ-007 W03: dropping no longer makes the region disappear or unmount. `dropped` swaps only the
  * body — the tab bar and session views are replaced in place by an inactive-terminal info page —
- * while the header, including the ellipsis menu and every injection dropdown (`CommandPanel`
- * today; the Skills/Prompts/Agents dropdowns land in a later phase), stays mounted and visible.
- * Each dropdown receives `deactivated={dropped}` so it renders grayed out and genuinely
+ * while the header, including the ellipsis menu and every injection dropdown (`CommandPanel` plus
+ * the Skills/Prompts/Agents dropdowns, `InjectionDropdowns`, REQ-007 W04), stays mounted and
+ * visible. Each dropdown receives `deactivated={dropped}` so it renders grayed out and genuinely
  * unclickable (a real `disabled` attribute via `Popover`'s own `disabled` prop, not styling
  * alone) and reactivates the instant `dropped` goes false again. The section's own box — and so
  * the workbench layout engine's (`ts/src/workbench/`, REQ-007 W05/ADR-016) fixed slot geometry
@@ -314,6 +315,11 @@ export default function TerminalRegion() {
           disabled={enabledState !== 'enabled'}
           deactivated={dropped}
           onSelect={sendToActiveSession}
+        />
+        <InjectionDropdowns
+          disabled={enabledState !== 'enabled'}
+          deactivated={dropped}
+          onSelect={(injection) => sendToActiveSession(injection, false)}
         />
         {enabledState === 'enabled' ? (
           <TerminalMenu

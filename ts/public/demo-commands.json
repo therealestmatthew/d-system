@@ -1,7 +1,24 @@
 {
   "commands": [
-    { "label": "PLACEHOLDER COMMAND 1 — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_1", "run": false },
-    { "label": "PLACEHOLDER COMMAND 2 — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_2", "run": false },
-    { "label": "PLACEHOLDER COMMAND 3 (runs immediately) — replace with real content in phase-demo-05.", "command": "echo PLACEHOLDER_COMMAND_3", "run": true }
+    {
+      "label": "orient: verify ports 8010 and 5180 are free",
+      "command": "ss -tlnp | grep -E \"8010|5180\"",
+      "run": true
+    },
+    {
+      "label": "idea: record an idea (edit the prose before running)",
+      "command": "/idea <the idea in prose>",
+      "run": false
+    },
+    {
+      "label": "idea-triage: scout the recorded idea and record a finding",
+      "command": "/idea-triage",
+      "run": false
+    },
+    {
+      "label": "overview: rebuild the overview (fallback command)",
+      "command": "uv run python tools/generate_overview.py",
+      "run": false
+    }
   ]
 }
