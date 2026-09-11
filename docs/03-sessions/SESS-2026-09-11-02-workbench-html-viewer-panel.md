@@ -25,12 +25,12 @@ tabs scoping directory/search/page per tab with ADR-016 persistence.
 
 Run in the worktree (`/code/d-system-worktrees/phase-wb-04`, branch `agent/phase-wb-04`, rebased
 onto `dev` at `8142de3` — which widened this phase's deliverables to `ts/vite.config.ts` and
-`_data/workbench/layouts` — after W04-A's fix cycle 1 below):
+`_data/workbench/layouts` — after both of W04-A's fix cycles below):
 
 - `cd ts && npm run build` — `tsc -b && vite build` succeeds, `✓ 49 modules transformed`, built
-  in ~1.0-1.1s across every rerun including the post-fix-cycle rerun (the chunk-size-over-500kB
-  note is Vite's informational warning, not an error).
-- `uv run pytest` — `546 passed, 3 failed`, unchanged across the fix cycle. The three failures
+  in ~1.0-1.1s across every rerun including the rerun after fix cycle 2 (the
+  chunk-size-over-500kB note is Vite's informational warning, not an error).
+- `uv run pytest` — `546 passed, 3 failed`, unchanged across both fix cycles. The three failures
   (`test_posix_adapter_reports_alive_then_not_alive`,
   `test_resize_text_frame_applies_to_pty_window_size`,
   `test_two_concurrent_websocket_sessions_are_independent_shells`, all in
@@ -60,39 +60,53 @@ onto `dev` at `8142de3` — which widened this phase's deliverables to `ts/vite.
 ## Backlog
 
 - `status: active`, `agent: agent-demo-data`.
-- `next_action`: W04-A (adversarial review) fix cycle 1 of at most 2 complete — all four findings
-  (2 blocker, 1 major, 1 minor) fixed, committed, and re-verified with no regression. Remaining
-  before this phase can close: the coordinator's re-review of the fix (or acceptance of it) and
-  W04-W (Playwright browser verification), then integration into `dev` with the owner's approval.
+- `next_action`: W04-A adversarial review complete across both fix cycles (2 of 2 used). Fix cycle
+  1 (`300b6ac`) fixed 2 blockers, 1 major, 1 minor; the re-review confirmed all four hold live and
+  surfaced 1 new blocker plus 2 small items; fix cycle 2 (`1f45371`) fixed all three, re-verified
+  with no regression. Remaining before this phase can close: W04-W (Playwright browser
+  verification, coordinator-dispatched), then integration into `dev` with the owner's approval.
 - `completion_evidence`: `ts/src/stage/HtmlViewerRegion.tsx`,
   `ts/src/stage/DirectoryPickerDialog.tsx`, `ts/src/workbench/panelRegistry.tsx`,
   `ts/src/workbench/storage.ts`, `ts/src/workbench/types.ts`, `ts/vite.config.ts`,
   `_data/workbench/layouts/layout-1.json`.
 - `result`: W04-C1/V1 (viewer panel and controls) and W04-C2/V2 (viewer tabs) each passed on the
   first creator/validator cycle, no fix cycles needed. W04-G's mechanical checklist passed apart
-  from the 3 known-environmental PTY test failures. A pre-existing governance drift (the
-  `phase-wb-04` claim commit had not regenerated `docs/08-governance/catalog.md`) was caught by
-  W04-G's pytest run and fixed on `dev` at `eb5c1cf`. The coordinator then dispatched W04-A
-  (adversarial review, GOV-003 completion gate), which returned 2 blockers, 1 major and 1 minor:
-  the file-serving dev route (`/workbench-file/*`) had no demo-gate, live on every plain
-  `npm run dev` (ADR-015 rule 1); its boundary check only normalized paths textually, so a
-  symlink under the repo pointing outside it served the outside file's bytes (ADR-015 rule 2);
-  the HTML Viewer's iframe had no `sandbox` attribute, letting any embedded script run
-  same-origin with the app; and the `.git` exclusion was case-sensitive, missing `.GIT` on the
-  Windows presentation machine. Fix cycle 1 of at most 2: `demo-creator-web` fixed all four
-  (`ts/vite.config.ts` commit `300b6ac`) — gated `serveRepositoryFiles` behind
+  from the 3 known-environmental PTY test failures. A pre-existing governance drift (this phase's
+  own claim commit had not regenerated `docs/08-governance/catalog.md`) was caught by W04-G's
+  pytest run and fixed on `dev` at `eb5c1cf`.
+
+  W04-A (adversarial review) fix cycle 1 of 2 fixed 2 blockers (the file-serving dev route had no
+  demo-gate, live on every plain `npm run dev`, ADR-015 rule 1; its boundary check did not
+  resolve symlinks, so a symlink under the repo pointing outside it served the outside file's
+  bytes, ADR-015 rule 2), 1 major (the viewer iframe had no `sandbox` attribute) and 1 minor
+  (case-sensitive `.git` exclusion) — commit `300b6ac`: gated `serveRepositoryFiles` behind
   `D_SYSTEM_DEMO_TERMINAL=1` in the frontend process's own environment, added a `realpathSync`
-  boundary check mirroring the backend's `Path.resolve()`, set `sandbox=""` on the viewer iframe
-  (verified the generated overview page has no `<script>` tags so it still renders), and made the
-  `.git` segment check case-insensitive. Adversary's holding findings (refresh cache-busting,
-  two-tab isolation, reload restoration, zero-scroll structure, open-in-tab fallback) were left
-  untouched. Re-ran `npm run build`, `uv run pytest`, `uv run python -m src.governance`, and
-  `check_no_private_content.py` after the fix — no regression, results unchanged apart from the
-  fix itself.
+  boundary check mirroring the backend's `Path.resolve()`, set `sandbox=""` on the viewer iframe,
+  made the `.git` segment check case-insensitive.
+
+  The re-review confirmed all four fix-cycle-1 fixes hold (each re-proven live) and found 1 new
+  blocker plus 2 small items. Fix cycle 2 of 2 (last before owner escalation), commit `1f45371`:
+  BLOCKER — the open-in-tab fallback served the same untrusted content as a full top-level
+  navigation with no sandboxing (an iframe attribute cannot reach a top-level navigation),
+  defeating the iframe sandbox fix in one click; per the owner-ratified constraint to keep the
+  fallback rather than descope it, `serveRepositoryFiles` now sets
+  `Content-Security-Policy: sandbox` on every response from `/workbench-file/*`, which applies to
+  top-level navigations the same as to frames, blocking script execution and giving the document
+  an opaque origin; the generated overview page has no `<script>` tags so it still renders
+  through both the iframe and the open-in-tab path (confirmed live). FLAGGED — the `.git`
+  segment check now strips trailing dots/spaces before the case-insensitive comparison, closing
+  the Win32 trailing-dot/space path-stripping bypass (unprovable on this Linux worktree, string
+  normalization verified correct here). MINOR — fixed a TOCTOU where the symlink-boundary check
+  validated `realpathSync(resolved)` but `createReadStream` then re-opened the original path; now
+  streams from the already-validated `realResolved` path. Everything the adversary held from fix
+  cycle 1 (gate, symlink boundary, iframe sandbox, `.git` case-insensitivity) and from the
+  original W04-A pass (refresh cache-busting, two-tab isolation, reload restoration, zero-scroll
+  structure, registration) is untouched. Re-verified after fix cycle 2: `npm run build` clean,
+  `uv run pytest` 546 passed/3 failed unchanged (environmental), governance and
+  `check_no_private_content` both green.
 
 ## Unresolved
 
-- The coordinator's re-review of the W04-A fix (or its acceptance) and W04-W (Playwright browser
-  verification) are dispatched by the coordinator, not this orchestrator, per the pack
-  (`PROMPT-021`) — not yet run.
+- W04-W (Playwright browser verification) is dispatched by the coordinator, not this
+  orchestrator, per the pack (`PROMPT-021`) — not yet run.
 - Integration into `dev` awaits the owner's explicit approval.

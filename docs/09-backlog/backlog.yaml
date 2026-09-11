@@ -5290,11 +5290,12 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-04
   title: HTML Viewer panel with tabs
-  next_action: W04-A fix cycle 1 of at most 2 complete - all four findings (2 blocker,
-    1 major, 1 minor) fixed, committed at 300b6ac, re-verified with no regression.
-    Remaining before close - coordinator's re-review of the fix and W04-W
-    (Playwright browser verification), then integration into dev with the owner's
-    approval.
+  next_action: W04-A adversarial review complete across both fix cycles (2 of 2
+    used) - fix cycle 1 (300b6ac) fixed 2 blockers/1 major/1 minor; re-review found
+    1 new blocker plus 2 small items; fix cycle 2 (1f45371) fixed all three,
+    re-verified with no regression. Remaining before close - W04-W (Playwright
+    browser verification, coordinator-dispatched), then integration into dev with
+    the owner's approval.
   session: doc-session-workbench-html-viewer-panel
   plan: doc-workbench
   sources:
@@ -5332,10 +5333,24 @@ items:
     own environment, added a realpathSync boundary check mirroring the backend''s
     Path.resolve(), set sandbox="" on the viewer iframe (the generated overview page
     has no <script> tags so it still renders), and made the .git segment check
-    case-insensitive. Adversary''s holding findings (refresh cache-busting, two-tab
-    isolation, reload restoration, zero-scroll structure, open-in-tab fallback) were
-    left untouched. Re-verified after the fix: npm run build clean, uv run pytest
-    546 passed/3 failed unchanged (environmental), governance and
+    case-insensitive. The re-review confirmed all four fix-cycle-1 fixes hold live
+    and found 1 new blocker plus 2 small items. Fix cycle 2 of 2 (last before owner
+    escalation), commit 1f45371: BLOCKER - the open-in-tab fallback served the same
+    untrusted content as a full top-level navigation with no sandboxing, defeating
+    the iframe sandbox fix in one click; per the owner-ratified constraint to keep
+    the fallback rather than descope it, serveRepositoryFiles now sets
+    Content-Security-Policy: sandbox on every /workbench-file/* response, which
+    applies to top-level navigations the same as to frames; the generated overview
+    has no <script> tags so it still renders through both the iframe and the
+    open-in-tab path. FLAGGED - the .git segment check now strips trailing
+    dots/spaces before the case-insensitive comparison, closing the Win32
+    trailing-dot/space path-stripping bypass. MINOR - fixed a TOCTOU where the
+    symlink-boundary check validated realpathSync(resolved) but createReadStream
+    re-opened the original path; now streams from the validated realResolved path.
+    Everything held from fix cycle 1 and the original W04-A pass (refresh
+    cache-busting, two-tab isolation, reload restoration, zero-scroll structure,
+    registration) is untouched. Re-verified after fix cycle 2: npm run build clean,
+    uv run pytest 546 passed/3 failed unchanged (environmental), governance and
     check_no_private_content both green. W04-W remains, dispatched by the
     coordinator per PROMPT-021, not this orchestrator.'
   priority: 1
