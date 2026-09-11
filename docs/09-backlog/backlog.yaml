@@ -5425,9 +5425,8 @@ items:
   - ts/src/workbench/panelRegistry.tsx
   - src/api/routes/workbench.py
   - test/test_workbench_api.py
-  result: 'In progress (evidence lives on the unmerged agent/phase-wb-05 worktree
-    branch, not yet on dev, so not cited as completion_evidence here). W05-C1
-    (tree, filters, documentation-explorer preset) passed first-cycle: build
+  result: 'Complete. W05-C1 (tree, filters, documentation-explorer preset) passed
+    first-cycle: build
     clean, W05-V1 clean PASS with no findings. W05-C2 (context menu) built 4
     of 5 actions first-cycle (reveal, open-in-viewer with tab submenu,
     copy-relative-path, inject-path); the 5th, copy-absolute-path, needed a

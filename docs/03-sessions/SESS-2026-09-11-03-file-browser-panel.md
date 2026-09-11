@@ -20,48 +20,25 @@ depends_on: [doc-workbench]
 
 ## Verification
 
-- `cd ts && npm run build` (re-run after the W05-G fix cycle 2 duplicate-key fix):
-  ```
-  > d-system-ui@0.0.1 build
-  > tsc -b && vite build
+Recomputed at session close on `dev` (commit range `392b052..3c6fac0` — phase-wb-04's completion
+commit through phase-wb-05's own completion-evidence commit; branch `agent/phase-wb-05` integrated
+fast-forward at `041cf45`, completion edit `a392a76`, evidence-listing follow-up `3c6fac0`):
 
-  vite v6.4.3 building for production...
-  transforming...
-  ✓ 52 modules transformed.
-  rendering chunks...
-  computing gzip size...
-  dist/index.html                   0.39 kB │ gzip:   0.27 kB
-  dist/assets/index-C1FZ2Xc5.css   20.09 kB │ gzip:   4.58 kB
-  dist/assets/index-CBwMI6Is.js   528.80 kB │ gzip: 145.12 kB
-
-  (!) Some chunks are larger than 500 kB after minification. ...
-  ✓ built in 1.21s
-  ```
-- `uv run python -m src.governance`:
-  ```
-  Governance OK: 18 systems, 162 documents, 16 memories, 119 backlog phases
-  ```
-- `uv run python tools/check_no_private_content.py` with the changes staged:
-  ```
-  note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
-  check_no_private_content: OK (493 tracked files, 0 identifiers checked)
-  ```
-- `uv run pytest test/test_workbench_api.py -v` (re-run after the W05-A fix cycle, includes the
-  new gitignore-exclusion test):
-  ```
-  42 passed, 2 warnings in 1.87s
-  ```
-- `uv run pytest` (full suite, re-run after the W05-A fix cycle):
-  ```
-  552 passed, 3 failed in 153.51s (0:02:33)
-  ```
-  The 3 failures are unchanged from before the fix cycle, all in `test/test_demo_terminal.py`
+- `cd ts && npm run build` — `tsc -b && vite build` succeeds, `✓ 55 modules transformed`, built in
+  `1.18s` (module count grew from the mid-session `52` as later phases added panels; the
+  chunk-size-over-500kB note remains Vite's informational warning, not an error).
+- `uv run python -m src.governance` — exit 0, `Governance OK: 18 systems, 165 documents, 16
+  memories, 121 backlog phases` (counts reflect the repository's current state, not this phase's
+  diff alone).
+- `git add -A` then `uv run python tools/check_no_private_content.py` — `check_no_private_content:
+  OK (500 tracked files, 31 identifiers checked)`.
+- `uv run pytest` (full suite) — `552 passed, 3 failed`. The three failures
   (`test_posix_adapter_reports_alive_then_not_alive`,
   `test_resize_text_frame_applies_to_pty_window_size`,
-  `test_two_concurrent_websocket_sessions_are_independent_shells`), each showing
-  `pyenv: cannot rehash: couldn't acquire lock ... .pyenv-shim` — the recorded host-wide
-  pyenv-rehash issue (ideas 000097/000099), not a phase failure. This phase's diff does not touch
-  `test/test_demo_terminal.py` or `src/demo`.
+  `test_two_concurrent_websocket_sessions_are_independent_shells`, all in
+  `test/test_demo_terminal.py`) are the known host-wide `pyenv rehash` shim-lock contention
+  (ideas 000097/000099), unchanged in identity and count from the mid-session run; this phase's
+  diff does not touch `test/test_demo_terminal.py` or `src/demo`.
 - Adversarial review (pack W05-A, dispatched by the coordinator): returned 1 BLOCKER and 1 MINOR,
   both fixed in fix cycle 1 — see Acceptance.
 - Playwright browser verification (pack W05-W, dispatched by the coordinator): passed every
@@ -70,7 +47,9 @@ depends_on: [doc-workbench]
   2, menu dismissal, zero-scroll/non-overlap at all four sizes). One real defect surfaced
   incidentally: a React duplicate-key warning in `FileBrowserRegion.tsx`'s `TreeLevel`, reproduced
   for `docs/04-decisions/README.md` and `docs/README.md`. Fixed in fix cycle 2 (the last for this
-  gate) — see Acceptance.
+  gate) — see Acceptance. Integrated into `dev` fast-forward at `041cf45` under PROMPT-023 delta 1
+  (pre-approved, gate green); post-rebase build, governance, staged private-content check and
+  pytest (552 passed, 3 environmental PTY failures) reconfirmed by the coordinator at completion.
 
 ## Acceptance
 
@@ -128,19 +107,17 @@ depends_on: [doc-workbench]
 
 ## Backlog
 
-- `status: active`, `agent: agent-demo-data`.
-- `next_action`: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend fix cycle),
-  W05-G, W05-A's fix cycle 1 (blocker + minor), and W05-W with its fix cycle 2 (React
-  duplicate-key, the last fix cycle for this phase's gate) have all passed; this orchestrator's
-  own verification commands are pasted above. Remaining before this phase can close: the owner's
-  integration decision and `/session-close` — no further coordinator dispatch is outstanding
-  against this orchestrator per the pack.
-- `completion_evidence`: not recorded on `dev` yet — the files exist only on the unmerged
-  `agent/phase-wb-05` worktree branch: `ts/src/stage/FileBrowserRegion.tsx`,
-  `ts/src/stage/FileTreeContextMenu.tsx`, `ts/src/stage/panelBridge.ts`,
-  `ts/src/workbench/panelRegistry.tsx`, `src/api/routes/workbench.py`,
-  `test/test_workbench_api.py`; citing them as `completion_evidence` on `dev` trips governance's
-  evidence-exists check, so they are named here instead.
+- `status: complete`, `agent: agent-demo-data` retained as the record of who did the work.
+- `next_action`: None — phase complete: W05-A clean after its two fix cycles (oracle exclusion and
+  stale-render key collision), W05-W green on every item with measured evidence, and the branch
+  integrated into `dev` fast-forward at `041cf45` under PROMPT-023 delta 1 pre-approved integration
+  (GOV-003 completion gate, workbench extension).
+- `completion_evidence`: now recorded on `dev` (added in the follow-up commit `3c6fac0` once the
+  files landed at `041cf45` and governance's evidence-exists check could see them):
+  `ts/src/stage/FileBrowserRegion.tsx`, `ts/src/stage/FileTreeContextMenu.tsx`,
+  `ts/src/stage/panelBridge.ts`, `ts/src/workbench/panelRegistry.tsx`,
+  `src/api/routes/workbench.py`, `test/test_workbench_api.py` — all confirmed present at this
+  audit.
 - `result`: 'In progress. W05-C1 (tree, filters, documentation-explorer preset) passed
     first-cycle: build clean, W05-V1 clean PASS with no findings. W05-C2 (context menu) built 4
     of 5 actions first-cycle (reveal, open-in-viewer with tab submenu, copy-relative-path,
@@ -173,11 +150,173 @@ depends_on: [doc-workbench]
     fetched for and gating the tree build on that matching contextFolder. Confirmed gone via a
     live before/after Playwright repro. Re-verified: npm run build clean (foreground, pasted
     above). Every dispatch this pack assigns to this orchestrator or the coordinator for
-    phase-wb-05 has now run and passed.'
+    phase-wb-05 has now run and passed. Integrated into dev fast-forward at 041cf45 under
+    PROMPT-023 delta 1 (pre-approved, gate green); completion_evidence recorded on dev in the
+    follow-up commit 3c6fac0 once the files existed there for governance's evidence-exists check.'
 
 ## Unresolved
 
-None blocking this orchestrator's charter. Every W05 work item, the phase gate, and both rounds
-of coordinator-dispatched review (W05-A, W05-W) have passed, each fix cycle within the two-cycle
-limit. What remains is the owner's integration decision and `/session-close` — neither of which
-this orchestrator performs.
+None. Both acceptance conditions are Met, W05-A and W05-W both passed (across their fix cycles),
+and the branch is integrated onto `dev` with `completion_evidence` recorded. Nothing from this
+phase was left open at close.
+
+## Review
+
+Independent sub-agent review at close (fresh general-purpose agent, commit range
+`392b052..3c6fac0` — phase-wb-04's completion commit through phase-wb-05's own
+completion-evidence follow-up — its own command runs from a detached worktree pinned to
+`3c6fac0`, no access to this record's conclusions beyond the claims it was asked to check).
+Findings pasted verbatim, condition by condition:
+
+- **Acceptance condition 1 (REQ-007 W09) — HOLDS.** "`ts/src/stage/FileBrowserRegion.tsx` fetches
+  the flat file list from `GET /api/v1/workbench/search` exactly once per context-folder change
+  (line 292, `SEARCH_URL` constant at line 7) and builds the tree client-side (`buildTree`, lines
+  99–128) from that list alone — no other data source. `buildTree` only ever creates a directory
+  node while inserting a file that survived filtering under it (lines 108–123), so an
+  empty/non-matching folder is structurally never instantiated, not merely hidden after the fact —
+  this is what makes 'filters hide … empty folders' true rather than aspirational. On the backend,
+  `src/api/routes/workbench.py`'s `GET /search` (line ~372) walks via `_walk_visible_tree`, which
+  prunes `.git` and anything `git check-ignore` reports (lines 146–178) before descending, and
+  returns files only (`is_file()` filter, line 390) — so the tree the frontend reconstructs is a
+  faithful, exclusion-consistent mirror of the filesystem for any folder. The documentation-explorer
+  mode is a plain data entry in `PRESETS` (`FileBrowserRegion.tsx` lines 63–70: `{id:
+  'documentation', directory: 'docs', typeFilter: '.md'}`), applied by setting the same
+  `contextFolder`/`typeFilter` state a manual browse would set (lines 512–517).
+  `ts/src/workbench/panelRegistry.tsx` registers exactly one `file-browser` entry (line 70) — no
+  second panel type exists for the documentation mode, satisfying the scope's explicit 'not a
+  separate panel.' Reran `cd ts && npm run build` against `3c6fac0`: `tsc -b && vite build`
+  succeeded, `✓ 52 modules transformed`, built in `1.13s` — clean, matching the module count the
+  session record itself attributes to that point in history (it explains the later 55-module
+  figure as growth from subsequent phases layered on top; I reproduced 55 modules by building
+  current `dev` HEAD directly, confirming that explanation rather than taking it on faith)."
+- **Acceptance condition 2 (five context-menu actions) — HOLDS.** "Read
+  `ts/src/stage/FileTreeContextMenu.tsx` and `ts/src/stage/panelBridge.ts` in full at `3c6fac0`,
+  plus every handler in `FileBrowserRegion.tsx`: Reveal — `handleReveal` (lines 387–417) POSTs to
+  `/api/v1/workbench/reveal`; backend `reveal_in_explorer` (workbench.py line 602) validates the
+  path, refuses excluded paths (400), and spawns `xdg-open`/`explorer.exe` via
+  `_reveal_argv`/`_launch_reveal_opener` — pre-existing route from phase-wb-01, genuinely reached.
+  Open in HTML Viewer with tab submenu — `handleOpenInViewer` (lines 479–483) calls
+  `viewerHandle.openInTab`, which `HtmlViewerRegion.tsx`'s new effect (diff, lines 278–296)
+  implements as a real `updateTab`/`setActiveTabId` call, not a stub; the submenu itself
+  (`FileTreeContextMenu.tsx` lines 140–173) lists live tabs from `viewerBridge`. Copy relative path
+  — `handleCopyRelativePath` (lines 422–431) writes `node.path` (the exact string `/search`
+  returned) via `navigator.clipboard.writeText`. Copy absolute path — `handleCopyAbsolutePath`
+  (lines 439–475) GETs `/api/v1/workbench/absolute-path` and clipboards the returned
+  `absolute_path`. Inject path into terminal — `handleInjectPath` (lines 487–494) calls
+  `terminalHandle.injectPath`, which `TerminalRegion.tsx`'s new effect (diff, lines 392–411)
+  implements as `sendToActiveSession(path, false)` — the identical un-executed R12 path
+  `InjectionDropdowns` already uses, not a separate/parallel mechanism. None of the five is a stub;
+  each reaches a real backend call, a real clipboard write, or a real cross-panel bridge call into
+  another panel's actual state-mutating function."
+- **The `/absolute-path` exclusion fix — confirmed structurally equivalent to its siblings.**
+  "Confirmed at `workbench.py` lines 400–415. It calls `resolve_repo_relative_path` (rule 2,
+  identical to `/list`/`/search`/`/reveal`) and, as of `3c6fac0`, also calls
+  `_is_reveal_excluded(resolved)` (line 413) — the same helper `/reveal` uses (line 610) and which
+  itself delegates to `_git_ignored_paths`, the same function backing `/list`'s and `/search`'s
+  `_visible_children`/`_walk_visible_tree`. This is genuinely the same exclusion mechanism reused,
+  not a parallel or incomplete reimplementation. Diffed `8708efe` (original route, no exclusion
+  check, would 200 on `.venv`) against `65d3909` (the fix) directly: the only change is `if not
+  resolved.exists()` becoming `if not resolved.exists() or _is_reveal_excluded(resolved)`, still
+  raising `404`. Reran `test/test_workbench_api.py` in the pinned worktree with a correctly
+  gitignored `.venv` directory present: all 42 tests pass, including
+  `test_absolute_path_route_404s_a_gitignored_path_never_confirming_existence`, which asserts
+  `.venv` fixture-ignored via `_git_ignored_paths` and then asserts the route returns exactly
+  `404`. This is a genuine, executing assertion, not a prose claim."
+- **The duplicate-key fix mechanism — genuinely present.** "`FileBrowserRegion.tsx` at `3c6fac0`
+  has `entriesFolder` state (line 277) set only inside the fetch's `.then` alongside `setEntries`
+  (lines 299–301) — so it always lags one render behind `contextFolder` on a folder switch, exactly
+  as claimed. The `tree` memo is gated on it (lines 343–346: `entriesFolder === contextFolder ?
+  filteredEntries : []`), and the loading-state render is separately gated the same way (line 575:
+  `loadState === 'loading' || entriesFolder !== contextFolder`). This is precisely the 'gate the
+  tree build on `entriesFolder === contextFolder`' mechanism the session record describes, not a
+  different or partial fix."
+- **Reruns performed independently** (against `3c6fac0` unless noted): `cd ts && npm run build` —
+  clean, `52 modules transformed`, `1.13s`. `uv run python -m src.governance` — `Governance OK: 18
+  systems, 162 documents, 16 memories, 119 backlog phases` at `3c6fac0`; rerun on current `dev`
+  HEAD gave `165 documents, 121 backlog phases`, matching this session record's figures —
+  confirming the record's numbers were computed at present-day `dev`, not at the historical commit,
+  exactly as its own parenthetical says. `git add -A && uv run python tools/check_no_private_content.py`
+  run against the real repo (the throwaway worktree lacks gitignored `_private/portfolio/`):
+  `check_no_private_content: OK (500 tracked files, 31 identifiers checked)` — an exact match.
+  `uv run pytest test/test_workbench_api.py` at `3c6fac0` — `42 passed`, matching the claimed count
+  and the claimed 'was 41' delta (verified directly against the `8708efe`→`65d3909` diff, which
+  adds exactly one new test). Full `uv run pytest` at `3c6fac0` — `552 passed, 3 failed` in
+  `152.65s`; the three failures are the identical `test/test_demo_terminal.py` tests the record
+  names, with the identical `pyenv: cannot rehash … .pyenv-shim` root cause visible in the captured
+  output — an exact match, not just an exact count.
+- **Discrepancies found**: none substantive. Two cosmetic/process points: "(1) The build
+  verification pasted in the session record (`55 modules`) was computed against current `dev` at
+  session-close time, not against the `3c6fac0` endpoint the commit range names — the record's own
+  parenthetical says as much, and I reproduced both numbers (52 at `3c6fac0`, 55 at current `dev`)
+  to confirm the explanation holds rather than being a gloss over a real inconsistency. (2) The
+  three 'fix cycle' commits reportedly authored on the unmerged `agent/phase-wb-05` branch
+  (`65d3909`, `e700c85`, and by extension earlier branch commits) each have an identical-content
+  counterpart on `dev` under a different hash (`4e02fed`, `041cf45`) with the same author, message
+  and timestamp but a different parent — i.e., the branch was replayed/rebased onto `dev` before
+  the final pointer move, rather than a literal `git merge --ff-only` of the branch's own original
+  commit objects. The record's phrase 'integrated fast-forward at `041cf45`' is accurate for that
+  final step in isolation but slightly overstates continuity with the branch commits it names
+  elsewhere (`65d3909`, `e700c85`) as if they were the commits that landed on `dev`. This is a
+  documentation-precision nit about how the integration was described, not a finding about what
+  code actually shipped — the diffs are byte-identical between the branch commit and its `dev`
+  counterpart in every case I checked."
+- **Bottom line (verbatim)**: "Both acceptance conditions genuinely hold, independently verified
+  against the actual diff and rerun commands rather than the session record's or backlog.yaml's
+  claims: the tree is a structurally faithful, exclusion-consistent mirror of the filesystem built
+  only from phase-wb-01's search route, filters and the documentation-explorer preset behave
+  exactly as specified with the preset confirmed to be configuration rather than a second panel,
+  and all five context-menu actions reach real, non-stub behavior including a `copy-absolute-path`
+  backend route that applies the same repo-boundary-and-exclusion checks as its siblings and 404s a
+  gitignored path exactly as its own test (which I reran and watched pass) asserts. The two items
+  flagged by this phase's own history — the `/absolute-path` information-disclosure blocker and the
+  React duplicate-key race — were both genuinely fixed by the mechanism the record describes, not
+  merely claimed to be fixed. No discrepancy found rises above cosmetic imprecision in how the
+  integration step was narrated; nothing here contradicts the phase's `status: complete`."
+
+## Decisions
+
+- The owner ran `/session-close phase-wb-05` on 2026-09-11 as a **retroactive audit** of a phase
+  the build coordinator had already marked `status: complete` under the GOV-003 demo/workbench
+  completion-gate exception, not as the phase's original close — the same posture as the
+  `phase-wb-04` audit run immediately before this one in the same session. No implementation work
+  was performed this session; the only edits were to this session record (recomputing `## Phase`
+  through `## Unresolved` against current `dev` instead of the mid-phase state they had been
+  frozen at) and one factual correction to `backlog.yaml` (below).
+- The owner flagged a parallel session working directly in this same primary checkout on
+  enhancements from a later phase (`phase-wb-08`/`phase-wb-09`, per the hand-off docs already on
+  `dev`). To avoid sweeping in that session's uncommitted work, this close's commit (step 8) stages
+  only the two files this session actually changed by name, rather than `git add -A` as the command
+  otherwise directs — a deliberate, owner-confirmed deviation from the literal instruction, scoped
+  to this close only.
+- Because the phase was already `status: complete`, this session's step-6 completion decision was
+  whether that status should *stand*, not whether to *set* it. Both required conditions held — the
+  recomputed checkpoint-equivalent acceptance verdicts (both Met) and the independent sub-agent
+  review (no discrepancies rising above cosmetic) — so the status is left unchanged at `complete`.
+
+## Corrections
+
+- `backlog.yaml`'s `result` field for `phase-wb-05` opened with "In progress (evidence lives on
+  the unmerged `agent/phase-wb-05` worktree branch, not yet on dev, so not cited as
+  `completion_evidence` here)" — stale as soon as the follow-up commit `3c6fac0` actually recorded
+  `completion_evidence` on `dev`, and doubly stale next to `status: complete`. Corrected to
+  "Complete." in this session; no other wording in the field changed. This is the same class of
+  leftover mid-phase language corrected in the `phase-wb-04` audit immediately before this one —
+  worth checking the remaining `phase-wb-*` `result` fields for the same pattern before they are
+  each audited in turn.
+- This session record's `## Verification`, `## Backlog`, and `## Unresolved` sections were still
+  describing the mid-phase state (`52 modules`, `completion_evidence` "not recorded on dev yet,"
+  `status: active`) despite the phase having finished and closed on `dev` before this audit began.
+  Recomputed against current `dev` (`a7a35ec` at the time of this edit) per this command's own
+  instruction that these sections must reflect the repository "as it stands at close."
+
+## Left undone
+
+- The independent review's discrepancy 2 (the `agent/phase-wb-05` branch was replayed/rebased onto
+  `dev` before the fast-forward pointer move, so the commit hashes named elsewhere in this record —
+  `65d3909`, `e700c85` — are not literally the commits sitting on `dev`, even though their content
+  is byte-identical to `4e02fed`/`041cf45`) was not corrected in the body text above; it is
+  recorded here rather than rewritten throughout, matching the precedent set in the `phase-wb-04`
+  audit for cosmetic hash discrepancies.
+- Whether the other already-complete `phase-wb-*` records carry the same stale "In progress"
+  leading sentence this one and `phase-wb-04`'s did was not checked here — flagged for whoever
+  audits the next one.
