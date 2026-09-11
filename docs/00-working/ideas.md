@@ -5017,11 +5017,13 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T17:24:26-04:00): Part of the owner's 2026-09-11 batch for the next workbench prompt pack, together with 000109 (double-click tab opens new browser tab), 000110 (markdown rendering in the viewer), 000111 (file bookmark categories and their system integration) and 000112 (File Explorer right-click open-in-viewer).
 - **note** by repository-owner (2026-09-11T17:28:41-04:00): Batch extended 2026-09-11: also 000113 (terminal persistence and performance audit, all three shells) and 000114 (general performance audit with caching) for the same next planning session.
 - **note** by repository-owner (2026-09-11T17:48:07-04:00): Batch extended again 2026-09-11: 000115 (duplication/modularity audit, e.g. multi-panel slot support) and 000116 (code structure and file-size audit with proposed target structures). Planning-session instruction from the owner: before authoring the pack, review ALL items in this batch (000108-000116) and determine the optimal ordering for both investigating and executing them - audits (000113-000116) likely inform the design and sequencing of the feature items (000108-000112), and the bookmark system (000111) needs its storage/reference ADR before anything builds against it.
+- **note** by repository-owner (2026-09-11T18:01:55-04:00): Batch extended 2026-09-11 with five agent-scouted, owner-approved companions: 000117 (Popover-wide fix scope, extends 000108), 000118 (COMPATIBLE_EXTENSIONS gate for markdown), 000119 (markdown render-location decision), 000120 (batch panel-bridge for categories), 000121 (cache invalidation vs demo-week overview regeneration, extends 000114). Scout also confirmed terminal reconnect is already idea 000087 and the bookmark-store write ADR is inside 000111.
 
 **Links**
 
 - relates_to ← `000109`
 - relates_to ← `000110`
+- extended_by ← `000117`
 
 ---
 
@@ -5034,6 +5036,7 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 **Links**
 
 - relates_to → `000108`
+- relates_to ← `000119`
 
 ---
 
@@ -5046,6 +5049,8 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 **Links**
 
 - relates_to → `000108`
+- relates_to ← `000118`
+- relates_to ← `000119`
 
 ---
 
@@ -5058,6 +5063,7 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 **Links**
 
 - relates_to ← `000112`
+- relates_to ← `000120`
 
 ---
 
@@ -5070,6 +5076,8 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 **Links**
 
 - relates_to → `000111`
+- relates_to ← `000118`
+- relates_to ← `000120`
 
 ---
 
@@ -5095,6 +5103,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to → `000113`
+- extended_by ← `000121`
 
 ---
 
@@ -5119,3 +5128,66 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to → `000115`
+
+---
+
+## 000117 · Popup sizing fix belongs in the shared Popover component - audit all its consumers
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), extending idea 000108. The owner-reported "only two entries visible" symptom is not specific to the HTML Viewer's file selector: it renders through the shared ts/src/stage/Popover.tsx, whose reposition() computes maxHeight with a hard MIN_BUBBLE_HEIGHT_PX = 120 floor that reproduces the symptom for any caller. Eight other components use the same Popover - InjectionDropdowns.tsx (skills/agents/prompts lists, open-ended length), TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx. The pack should scope the 000108 fix as "Popover.tsx's height math plus an audit of every consumer", not "the HTML Viewer's dropdown", or the same bug ships unfixed in every sibling and resurfaces as a fresh report.
+
+**Links**
+
+- extends → `000108`
+
+---
+
+## 000118 · Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000110 and 000112. HtmlViewerRegion.tsx exports COMPATIBLE_EXTENSIONS = ['.html', '.svg'] as the single list FileBrowserRegion.tsx's right-click menu reads to decide viewerCompatible - deliberately one list, no second hand-kept copy. When 000110 teaches the viewer to render markdown, this constant is the choke point that decides whether "Open in HTML Viewer" even appears on a .md file. Today the File Browser's own built-in "Documentation" preset (directory docs/, typeFilter .md) cannot open any of its own files into the viewer for exactly this reason. The pack must update the list in the same work item that adds markdown rendering, and the validator should assert the context-menu action appears on .md files.
+
+**Links**
+
+- relates_to → `000110`
+- relates_to → `000112`
+
+---
+
+## 000119 · Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000109 and 000110. 000110 leaves the markdown conversion location open ("either the serving route or the frontend"). If it lands as a frontend-only render step inside HtmlViewerRegion, then 000109's double-click-to-new-tab - which loads the raw /workbench-file/ bytes directly, bypassing the component - shows unrendered markdown source for exactly the file type the same batch adds rendering for. The security half is already solved: ts/vite.config.ts's serveRepositoryFiles plugin sets a Content-Security-Policy: sandbox header so a top-level navigation gets the iframe's restrictions. The planning session should decide the render location explicitly (route-side rendering makes both surfaces consistent) rather than letting two build items collide by accident.
+
+**Links**
+
+- relates_to → `000109`
+- relates_to → `000110`
+
+---
+
+## 000120 · Extend the panel bridge to batch, multi-target actions for bookmark categories
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000111 and 000112. ts/src/stage/panelBridge.ts is deliberately a single-handle, single-action bridge: each BridgeSlot holds one live handle for one panel instance, and an action with nothing registered reads null and disables - never throws, never queues. 000112's open-in-viewer fits that shape (one file, one target). 000111's categories imply "pull up a category's files as a set" - N files at once, plausibly across several viewer tabs or across File Browser and Viewer together. Without extending the bridge to a batch/multi-target contract, the category feature either builds an ad hoc parallel mechanism (duplicating what panelBridge already solved - the 000115 duplication audit's exact concern) or silently degrades to opening the first file only.
+
+**Links**
+
+- relates_to → `000111`
+- relates_to → `000112`
+
+---
+
+## 000121 · Cache invalidation must cover the regenerate-overview-during-demo-week flow
+
+**Created 2026-09-11T18:01:48-04:00 · Status: `open`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening idea 000114's invalidation requirement with its specific, dated instance. The HTML Viewer's file dropdown is fed by GET /api/v1/workbench/search and a fresh tab's default page by GET /api/v1/demo/stage/overview-location - both reflect what exists on disk under _public/overview/. The d-system-overview flow (tools/generate_overview.py) is explicitly meant to be re-run whenever the live demo needs a fresh page, i.e. during demo-prep week itself. A cache with a naive TTL or no file-mtime invalidation on these routes would hide a just-regenerated overview from the viewer's own picker on exactly the week it matters (demo 2026-09-15). The 000114 audit should measure these routes first and any cache on them must key on file mtimes or be explicitly busted by the generator.
+
+**Links**
+
+- extends → `000114`
