@@ -5000,6 +5000,10 @@ CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). 
 
 </details>
 
+**Links**
+
+- relates_to ← `000113`
+
 ---
 
 ## 000108 · HTML Viewer file-selector popup is too short: show 8-10 entries with scroll, open below, consider resizing
@@ -5011,6 +5015,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 **Annotations**
 
 - **note** by repository-owner (2026-09-11T17:24:26-04:00): Part of the owner's 2026-09-11 batch for the next workbench prompt pack, together with 000109 (double-click tab opens new browser tab), 000110 (markdown rendering in the viewer), 000111 (file bookmark categories and their system integration) and 000112 (File Explorer right-click open-in-viewer).
+- **note** by repository-owner (2026-09-11T17:28:41-04:00): Batch extended 2026-09-11: also 000113 (terminal persistence and performance audit, all three shells) and 000114 (general performance audit with caching) for the same next planning session.
 
 **Links**
 
@@ -5064,3 +5069,28 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 **Links**
 
 - relates_to → `000111`
+
+---
+
+## 000113 · Audit terminal persistence and performance across all three shells
+
+**Created 2026-09-11T17:28:34-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). A deliberate audit - not a bug fix - of the terminal panels' persistence and performance, covering bash, CMD and PowerShell equally: when sessions survive (layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload) and when they die, whether each survival/death is intended and communicated, and how the panels perform (connect latency, echo latency, resize behavior, scrollback handling, behavior at the six-session cap). The persistence half should build on idea 000107's corrected diagnosis (a stored visible-panel choice differing between layouts silently kills the hidden shell's session) and on whatever phase-wb-09's W16 rework ships; CMD and PowerShell need real coverage on the Windows machine, which agent evidence cannot supply - the audit should say which measurements are owner-machine checks.
+
+**Links**
+
+- relates_to → `000107`
+- relates_to ← `000114`
+
+---
+
+## 000114 · General workbench performance audit, with caching as the primary improvement lever
+
+**Created 2026-09-11T17:28:34-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the workbench's general performance - page load, panel mount/switch times, API round-trips (enumeration, filesystem, explorers), HTML Viewer file serving, overview generation - and then evaluate where caching can improve it: candidates include backend response caching for the enumeration/filesystem routes, frontend caching of layout and panel data, memoizing expensive renders, and cache headers on the file-serving route. The audit half produces measurements first (what is actually slow, with numbers); the caching half is designed against those numbers, not assumed - each cache needs an invalidation story (repository files change under the app) before it ships.
+
+**Links**
+
+- relates_to → `000113`
