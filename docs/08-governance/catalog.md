@@ -211,7 +211,7 @@ CI regenerates it and fails on any difference.
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
-| PLAN-022 | doc-workbench | active | 2 | 1 | 6 | agent-demo-data, agent-demo-stage |
+| PLAN-022 | doc-workbench | active | 2 | 0 | 7 | agent-demo-data, agent-demo-stage |
 
 ## Held codes
 
