@@ -35,12 +35,13 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-2. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-3. `000038` — Formalize the requirements-vs-plans process and design
-4. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-5. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-6. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+1. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+2. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+3. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+4. `000038` — Formalize the requirements-vs-plans process and design
+5. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+6. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+7. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -4775,7 +4776,7 @@ rather than from scratch.
 
 ## 000094 · Investigate and clean up the unaccounted Codex worktree at ~/.codex/worktrees/511d/d-system
 
-**Created 2026-09-10T19:12:42-04:00 · Status: `open`**
+**Created 2026-09-10T19:12:42-04:00 · Status: `discarded`**
 
 `git worktree list` from the primary checkout reports four worktrees, and one of them is not accounted for by any process this repository documents:
 
@@ -4795,6 +4796,30 @@ What to do. Do not delete it blind — check first whether it holds unmerged wor
 Also worth deciding, separately from this instance: whether the Codex harness creating worktrees under ~/.codex/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration to point at ../d-system-worktrees/. ADR-003 was written for the sanctioned agent flow and does not mention other harnesses. That is a decision for the owner, not something to infer from one worktree.
 
 Found on 2026-09-10 during the close of SESS-2026-09-10-10, while checking whether the two peer phase claims were live or stale. Recorded rather than acted on: the session held no backlog claim, and removing another harness's worktree is not a change to make on a hunch at the end of an unrelated session.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-readme-audit (2026-09-11T00:04:10-04:00): Resolved on 2026-09-11. Both halves of this idea are done, and the worktree is gone.
+
+WHAT WAS ESTABLISHED. The owner took the question to Codex directly. The worktree's commit da9547e ("Generate portable workflow skill adapters", authored 2026-09-09) was never merged as that SHA — `git merge-base --is-ancestor da9547e dev` returned false — but its content did reach dev, by rebase onto origin/dev, landing as part of PR #2 (merge commit 818f64b, "portable workflow skill adapters"). The rebase happened because that session had unstaged changes running in a sub-agent at the time.
+
+Content equivalence was verified rather than assumed. Diffing da9547e against dev across agent-workflows/, tools/generate_agent_workflows.py, test/test_agent_workflows.py, .agents/skills/orient/SKILL.md and OPS-010 showed dev holding a superset: every file present, plus 23 added lines in the test and a net 14 in the tool. The only lines dev lacks relative to da9547e were a duplicated GOV-003 link, a path .resolve() call and a small dict comprehension — later refinements, not dropped work. The worktree itself was clean, with no uncommitted changes.
+
+WHAT WAS DONE. With nothing left to protect, the worktree was removed:
+
+    git worktree remove /home/mimmik/.codex/worktrees/511d/d-system
+
+The same pass also removed /code/d-system-worktrees/phase-port-01 and deleted the merged branch agent/phase-port-01 (was 8a62993). phase-port-01 had completed via PR #2 and was no longer an active claim, so its worktree and branch were the cleanup AGENTS.md's hand-off step 7 already prescribes, left undone when that phase closed. `git worktree list` now reports only the primary checkout and the two live claims, phase-demo-07 and phase-wb-03.
+
+THE OPEN QUESTION THIS IDEA RAISED IS NOT ANSWERED. Whether the Codex harness creating worktrees under ~/.codex/worktrees/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration that should point at ../d-system-worktrees/, was not decided — this instance was cleaned up without settling the general case. ADR-003 was written for the sanctioned agent flow and still does not mention other harnesses. If a second such worktree appears, that is the signal to decide it properly rather than clean up again.
+
+Discarded rather than promoted: it was resolved directly and became no document, so there is nothing to name in --promoted-to.
+
+</details>
 
 ---
 
@@ -4839,3 +4864,37 @@ The open design question is where the capture happens — at session close, at c
 **Created 2026-09-10T22:18:33-04:00 · Status: `open`**
 
 ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
+
+---
+
+## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+
+**Created 2026-09-11T00:11:20-04:00 · Status: `open`**
+
+`uv run pytest` on dev reports `3 failed, 546 passed` as of 2026-09-11. All three failures are in test/test_demo_terminal.py:
+
+    test_posix_adapter_reports_alive_then_not_alive
+    test_resize_text_frame_applies_to_pty_window_size
+    test_two_concurrent_websocket_sessions_are_independent_shells
+
+The first one's assertion, which is probably the root of the other two:
+
+    adapter.write(b"exit\n")
+    deadline = time.monotonic() + 5.0
+    while adapter.alive and time.monotonic() < deadline:
+        adapter.read(size=4096, timeout=0.5)
+    assert adapter.alive is False
+    E   assert True is False
+    E    +  where True = <src.demo.posix.PosixPtyAdapter object at 0x...>.alive
+
+So the PTY adapter's `alive` property stays True after the shell is told to exit and given five seconds to do it. Either the child is not exiting or `alive` no longer observes that it did.
+
+NOT FLAKY, AND NOT LOCAL. The failure reproduces identically on repeated single-test runs (two consecutive runs, same assertion, 5.05s each). It is not caused by any uncommitted or unpushed work: the three commits sitting unpushed on dev at the time of writing touch no path under src/demo/ or test/test_demo_terminal.py, and the most recent change to the adapter — f0801af, "phase-wb-01: session registry and shell allowlist (W01-C3)" — is already an ancestor of origin/dev. `git merge-base --is-ancestor f0801af origin/dev` returns true. Anyone who clones or pulls dev right now gets a red suite.
+
+LIKELY CAUSE, NOT VERIFIED. f0801af is the prime suspect on recency and subject matter — a session registry that tracks live shells is exactly the kind of change that can hold a reference to a child process and keep it from being reaped, or change what `alive` consults. This was not confirmed by bisect or by reading the diff; it is a starting point, not a diagnosis.
+
+WHY THIS WAS RECORDED RATHER THAN FIXED. src/demo/ belongs to sys-demo-stage, which is under an active claim: phase-wb-03, held by agent-demo-stage, locking sys-ui and sys-demo-stage. The session that found this held no claim at all, so touching that code would have meant editing a peer's locked system without one — the precise collision ADR-003's disjointness rule exists to prevent. The right owner for the fix is whoever holds sys-demo-stage, and the fastest route is to tell that agent rather than to open a phase.
+
+WHAT THE NEXT PERSON SHOULD DO. Confirm the cause before changing anything: `git log --oneline -5 -- src/demo/posix.py` and read f0801af's diff against the `alive` property and whatever the session registry retains. Check whether the registry keeps a file descriptor or Popen handle open past shell exit. Then decide whether the bug is in the adapter or the test's assumption — the test has been in the suite since the demo track and passed throughout it, which argues for the adapter.
+
+Found on 2026-09-11 while running the full suite during an unrelated session's final checks. The suite had passed at 495 earlier in the same session; it is now 549 tests, so roughly 54 tests arrived with merged workbench work and three of the pre-existing demo tests broke alongside them.
