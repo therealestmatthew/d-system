@@ -91,6 +91,18 @@ export function isLayoutDefinition(value: unknown): value is LayoutDefinition {
 // copy of the version number is exactly what let the two consumers drift apart independently; see
 // `schemaVersionContext.ts` for the shared source of truth.
 
+/** One HTML Viewer tab's persisted context (REQ-007 W08 / ADR-016: "per-tab HTML Viewer state
+ * (directory, search, page)"). `id` is stable within the browser's stored state only — it has no
+ * relationship to a layout slot id or a terminal session id. `directory`/`selected_file` are
+ * `null` while a freshly created tab is still being seeded from the generated overview's own
+ * location (mirrors `HtmlViewerRegion`'s pre-tabs mount-time fetch, now per tab). */
+export interface StoredHtmlViewerTab {
+  id: number
+  directory: string | null
+  search_text: string
+  selected_file: string | null
+}
+
 /** The browser's stored selections (ADR-016 rule 3): active layout id, per-layout per-slot panel
  * choices, and the notes strip's chosen file, under one key namespaced by the layouts'
  * `schema_version`. Never geometry, never copy — selections only. Every field beyond
@@ -105,4 +117,11 @@ export interface StoredWorkbenchState {
    * `null`/absent means no choice has ever been persisted — the strip falls back to its own
    * default file (ADR-016 rule 4: repository defaults are the fallback state). */
   active_notes_file?: string | null
+  /** The HTML Viewer's open tabs and which one was active (REQ-007 W08). Absent, or invalid,
+   * falls back to a single fresh tab seeded from the generated overview page's own location
+   * (ADR-016 rule 4). */
+  html_viewer_tabs?: {
+    tabs: StoredHtmlViewerTab[]
+    active_tab_id: number
+  }
 }

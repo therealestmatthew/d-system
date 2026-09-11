@@ -1,4 +1,4 @@
-import type { StoredWorkbenchState } from './types'
+import type { StoredHtmlViewerTab, StoredWorkbenchState } from './types'
 
 // ADR-016 rule 3: "a single namespaced key carrying the schema_version of the layouts it was
 // written against." The version lives in the key itself (not just the stored value) so a layout
@@ -49,7 +49,28 @@ function isStoredWorkbenchState(
   ) {
     return false
   }
+  if (record.html_viewer_tabs !== undefined) {
+    if (typeof record.html_viewer_tabs !== 'object' || record.html_viewer_tabs === null) {
+      return false
+    }
+    const viewerTabs = record.html_viewer_tabs as Record<string, unknown>
+    if (!Array.isArray(viewerTabs.tabs) || !viewerTabs.tabs.every(isStoredHtmlViewerTab)) {
+      return false
+    }
+    if (typeof viewerTabs.active_tab_id !== 'number') return false
+  }
   return true
+}
+
+function isStoredHtmlViewerTab(value: unknown): value is StoredHtmlViewerTab {
+  if (typeof value !== 'object' || value === null) return false
+  const record = value as Record<string, unknown>
+  return (
+    typeof record.id === 'number' &&
+    (record.directory === null || typeof record.directory === 'string') &&
+    typeof record.search_text === 'string' &&
+    (record.selected_file === null || typeof record.selected_file === 'string')
+  )
 }
 
 /**
@@ -113,4 +134,23 @@ export function loadActiveNotesFile(schemaVersion: number): string | null {
  * (see `patchStoredState`) — never overwriting the layout engine's own stored fields. */
 export function saveActiveNotesFile(schemaVersion: number, fileName: string | null): void {
   patchStoredState(schemaVersion, { active_notes_file: fileName })
+}
+
+/** The HTML Viewer's persisted tabs and active tab id (REQ-007 W08), or `null` when nothing
+ * valid is stored — the viewer falls back to a single fresh tab in that case (ADR-016 rule 4). */
+export function loadHtmlViewerTabs(
+  schemaVersion: number,
+): { tabs: StoredHtmlViewerTab[]; active_tab_id: number } | null {
+  return loadStoredState(schemaVersion)?.html_viewer_tabs ?? null
+}
+
+/** Persists the HTML Viewer's open tabs and which one is active, merging into whatever else is
+ * stored under this key (see `patchStoredState`) — never overwriting the layout engine's or the
+ * notes strip's own stored fields. */
+export function saveHtmlViewerTabs(
+  schemaVersion: number,
+  tabs: StoredHtmlViewerTab[],
+  activeTabId: number,
+): void {
+  patchStoredState(schemaVersion, { html_viewer_tabs: { tabs, active_tab_id: activeTabId } })
 }
