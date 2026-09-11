@@ -22,9 +22,11 @@ Five capabilities, all read-only except the one named action (ADR-015 rule 4):
   hand-kept list, so `_private/`, `.venv/`, `data/`, `node_modules/`, etc. are never listed while
   `_public/` and the tracked tree are.
 - `GET /absolute-path` resolves a caller-supplied repository-relative path the same way (ADR-015
-  rule 2) and reports the absolute filesystem path it names — "the repository root joined
-  server-side", per ADR-015's consequences ("Copy-absolute-path (W09) is served from the
-  backend's knowledge of the repository root"), for the File Browser's copy-absolute-path action.
+  rule 2), also refusing (404, indistinguishable from nonexistent) anything the `_private`/
+  gitignore exclusion (rule 3) would hide from `/list` and `/search`, and reports the absolute
+  filesystem path it names — "the repository root joined server-side", per ADR-015's consequences
+  ("Copy-absolute-path (W09) is served from the backend's knowledge of the repository root"), for
+  the File Browser's copy-absolute-path action.
 - `GET /ideas` and `GET /ideas/queue` read idea state exclusively through `load_events()` and
   `fold()` (`src/db/ideas.py`) — never a direct parse of `_data/ideas.jsonl` — and report id,
   title, status, created/updated, annotation count and link count per idea; the `queue` variant
@@ -397,15 +399,18 @@ async def search_files(
 
 @router.get("/absolute-path", response_model=AbsolutePathResult)
 async def get_absolute_path(path: str = ".") -> AbsolutePathResult:
-    """The absolute filesystem path a repository-relative `path` resolves to, validated
-    identically to `/list` and `/search` (ADR-015 rule 2) — the repository root joined
-    server-side, never trusting a client-supplied absolute path.
+    """The absolute filesystem path a repository-relative `path` resolves to, validated against
+    the repository boundary identically to `/list` and `/search` (ADR-015 rule 2), and also
+    subject to the same `_private`/gitignore exclusion those routes apply when rendering entries
+    (ADR-015 rule 3, via `_is_reveal_excluded`) — an excluded path 404s exactly like a
+    nonexistent one, never confirming its existence or location, so this route cannot be used as
+    an existence/location oracle over content the sibling routes hide.
     """
     try:
         resolved = resolve_repo_relative_path(path)
     except PathEscapesRepositoryError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
-    if not resolved.exists():
+    if not resolved.exists() or _is_reveal_excluded(resolved):
         raise HTTPException(status_code=404, detail=f"No such path: {path!r}")
     return AbsolutePathResult(absolute_path=str(resolved))
 

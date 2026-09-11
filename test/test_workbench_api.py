@@ -411,6 +411,28 @@ def test_absolute_path_route_rejects_symlink_escape(
         os.rmdir(outside_target)
 
 
+def test_absolute_path_route_404s_a_gitignored_path_never_confirming_existence(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """`/absolute-path` must apply the same `_private`/gitignore exclusion (ADR-015 rule 3) that
+    `/list` and `/search` apply when rendering entries — the finding this guards against:
+    `/absolute-path` checked only the repo-boundary rule (rule 2), so a gitignored path (here,
+    `.venv`, git-ignored by `.gitignore`) 200'd with its absolute location while `/list` and
+    `/search` never show it and `/reveal` refuses it — a clean existence/location oracle over
+    content the sibling routes hide. The correct response is 404, indistinguishable from a
+    genuinely nonexistent path, not the 400 `/reveal` uses for its own exclusion.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    venv_dir = REPO_ROOT / ".venv"
+    assert venv_dir in workbench_module._git_ignored_paths([venv_dir]), (
+        "fixture assumption: .venv is git-ignored at the repository root"
+    )
+    response = client.get(WORKBENCH_ABSOLUTE_PATH_PATH, params={"path": ".venv"})
+    assert response.status_code == 404
+
+
 def test_absolute_path_route_rejects_non_get(rebuild_app: Callable[..., FastAPI]) -> None:
     app = rebuild_app(flag="1")
     client = TestClient(app)

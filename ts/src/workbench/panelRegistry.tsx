@@ -14,9 +14,10 @@ import FileBrowserRegion from '../stage/FileBrowserRegion'
  * consequences).
  *
  * `file-browser` (`phase-wb-05`, `FileBrowserRegion`) is this comment's other formerly-`null`
- * entry now filled in — the tree/filter/preset half of REQ-007 W09 only; the right-click context
- * menu that same requirement row also describes is not part of `FileBrowserRegion` yet. Layout
- * 1's explorer slot (`_data/workbench/layouts/layout-1.json`) admits `file-browser`,
+ * entry now filled in — REQ-007 W09's tree, filters and documentation-explorer preset, plus the
+ * five-action right-click context menu (reveal, open-in-viewer with tab submenu, copy relative
+ * path, copy absolute path, inject path) that same requirement row describes, wired via
+ * `FileTreeContextMenu.tsx`. Layout 1's explorer slot (`_data/workbench/layouts/layout-1.json`) admits `file-browser`,
  * `idea-explorer` and `backlog-explorer` with `default_panel: null`; `Slot.tsx` resolves a slot
  * with exactly one *implemented* admitted panel to that panel regardless of `default_panel`, so
  * `file-browser` renders there today with no layout-file edit needed — it stops being the only
