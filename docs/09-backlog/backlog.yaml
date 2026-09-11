@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-03
 - phase-wb-04
 - phase-wb-05
 - phase-wb-06
@@ -5194,17 +5193,11 @@ items:
     PROMPT-023 delta 1.'
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
-  next_action: W03-C1/V1 and W03-C3/V3 passed with no findings. W03-C2/V2 passed first
-    pass, then W03-A found one MAJOR (InjectionDropdowns.tsx's whole-payload .every()
-    gate blanking all three dropdowns on one malformed entry); fixed narrowly (fix
-    cycle 1 of 2, commit 196410b - per-category .filter(isInjectionSourceEntry)
-    replacing the whole-payload gate, both load-bearing defenses unweakened) and
-    re-validated PASS with no regression. W03-G's item-6 scope finding (diff touching
-    _data/workbench/layouts/*.json, required by ADR-016's data-driven admits model)
-    was closed by the coordinator's deliverables-widening ruling (6a63f67). uv run
-    pytest's 3 test_demo_terminal.py PTY failures remain the known host-wide pyenv
-    rehash contention, environmental. W03-W (browser verification) remains,
-    coordinator-dispatched.
+  next_action: 'None — phase complete: all items validated, the W03-A major fixed and
+    re-validated with its behavior confirmed in the browser, W03-W passed all six items
+    with measured evidence, and the branch integrated into dev fast-forward at 72506f4
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
   session: doc-session-workbench-terminal-panel-rework
   plan: doc-workbench
   sources:
@@ -5214,8 +5207,41 @@ items:
   - sys-ui
   - sys-demo-stage
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-stage
+  completion_evidence:
+  - ts/src/stage/TerminalMenu.tsx
+  - ts/src/stage/InjectionDropdowns.tsx
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/CommandPanel.tsx
+  - ts/src/stage/Popover.tsx
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/public/demo-commands.json
+  - _data/workbench/layouts/layout-1.json
+  - _data/workbench/layouts/layout-2.json
+  - docs/03-sessions/SESS-2026-09-10-13-workbench-terminal-panel-rework.md
+  result: 'Complete. All three creator/validator pairs passed first pass (W03-C1/V1
+    ellipsis menu and drop-in-place; W03-C2/V2 injection dropdowns; W03-C3/V3 shell
+    panels). W03-G green apart from the environmental pytest red (3 known host pyenv
+    PTY failures) and an item-6 scope finding closed by the coordinator ruling that
+    ADR-016 puts slot admits in layout data (deliverables widened, 6a63f67). W03-A
+    found one major, no blocker: one malformed injection-overrides entry blanked all
+    three dropdowns via a whole-payload .every() gate; fixed with per-category
+    .filter() (196410b, fix cycle 1 of 2 for W03-C2), both injection-execution
+    defenses untouched, re-validated PASS by W03-V2. W03-W passed all six items with
+    measured evidence: menu-only collapse/drop with a live process surviving
+    collapse and dying only after confirmation; drop-in-place with identical panel
+    bbox and truly disabled dropdowns; per-category injection exact and un-executed
+    with the overrides live-edit (relabel, replace, hide) effective on refresh with
+    no rebuild, and the fix confirmed behaviorally (one bad entry drops only itself,
+    3 to 2, no console errors); bash round-trips with CMD/PowerShell in-panel
+    unavailable messages; flag-off degradation correct with a recorded cosmetic
+    caveat (four network-404 resource logs from probing designed-absent routes, no
+    uncaught exceptions - idea 000100); zero scroll and no overlaps at all four
+    sizes. Orchestrator self-reported one process deviation: W03-V3 dispatched
+    before W03-C3 was committed; the validator assessed the real worktree state and
+    no rework was needed. Integrated fast-forward into dev at 72506f4 under
+    PROMPT-023 delta 1.'
   priority: 1
   session_budget: 1
   depends_on:
