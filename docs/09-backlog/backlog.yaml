@@ -5403,8 +5403,12 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-05
   title: File Browser panel
-  next_action: Dispatching pack section W05 (PROMPT-021) - W05-C1/V1 then
-    W05-C2/V2, then the phase gate.
+  next_action: Blocked, reported to the coordinator - W05-C1/V1 passed clean;
+    W05-C2 built 4 of 5 context-menu actions, but copy-absolute-path needs a
+    backend route ADR-015 presupposes (served from the backend's knowledge of
+    the repository root) that phase-wb-01 never shipped, and this phase's
+    deliverable is ts/src only. Awaiting a coordinator decision (widen the
+    deliverable, or descope the action) before dispatching W05-V2.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5414,6 +5418,17 @@ items:
   owner: repository-owner
   status: active
   agent: agent-demo-data
+  session: doc-session-file-browser-panel
+  result: 'In progress (evidence lives on the unmerged agent/phase-wb-05 worktree
+    branch, not yet on dev, so not cited as completion_evidence here). W05-C1
+    (tree, filters, documentation-explorer preset)
+    passed first-cycle: build clean, W05-V1 clean PASS with no findings.
+    W05-C2 (context menu) built 4 of 5 actions fully (reveal, open-in-viewer
+    with tab submenu, copy-relative-path, inject-path); copy-absolute-path is
+    blocked - ADR-015 presupposes a backend route resolving repo-relative to
+    absolute paths that src/api/routes/workbench.py does not have, and adding
+    one is outside this phase''s ts/src-only deliverable. Reported up rather
+    than committing an out-of-scope backend file.'
   priority: 1
   session_budget: 1
   depends_on:
