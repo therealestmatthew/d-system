@@ -32,9 +32,9 @@ Date/time: `__DATE_TIME_1__`
 
 | Step | Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing. Then: start the backend with `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010`; start the frontend with `cd ts && D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180 --strictPort`; open http://localhost:5180. Start a Claude Code session in the terminal by running `claude`. Review the workbench interface: notes strip at top right with `?` tooltip at far left and dropdown menu; terminal panel on the left with ellipsis menu in top right (Collapse and Drop/restore); injection dropdowns (Commands, Skills, Prompts, Agents) below the terminal header; layout-configuration button at top right; HTML Viewer panel and explorer slot (File Browser visible first, with Idea Explorer and Backlog Explorer in the header dropdown) on the right. | 1m | __ACTUAL_1__ | "This is the d-system workbench — where this project actually gets worked on. Terminal on the left runs a live Claude Code session. Top right is a notes strip, out of the way until I need it — it's what's cueing me right now. On the right, a viewer for generated pages and a browser over the repository itself. The dropdowns next to the terminal hand an agent an exact command or prompt without me typing it out." |
+| /orient | Precondition: verify ports 8010 and 5180 are free — `ss -tlnp \| grep -E "8010\|5180"` should print nothing. Then: start the backend with `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010`; start the frontend with `cd ts && D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180 --strictPort`; open http://localhost:5180. **Check the terminal slot's header** (top left, small downward triangle): if it does not already read "Terminal (bash) ▾", click it and select "Terminal (bash)" from the panel picker dialog — on the presentation machine (Windows) this defaults correctly, but a non-Windows rehearsal host can default to CMD, which fails outright with `cmd is not available on this host`. Start a Claude Code session in the terminal by running `claude`. Review the workbench interface: notes strip at top right with `?` tooltip at far left and dropdown menu; terminal panel on the left with ellipsis menu in top right (Collapse and Drop/restore) and its own header dropdown for panel choice (Terminal/CMD/PowerShell); injection dropdowns (Commands, Skills, Prompts, Agents) below the terminal header; layout-configuration button at top right; HTML Viewer panel and explorer slot (File Browser visible first, with Idea Explorer and Backlog Explorer in the header dropdown) on the right. | 1m | __ACTUAL_1__ | "This is the d-system workbench — where this project actually gets worked on. Terminal on the left runs a live Claude Code session. Top right is a notes strip, out of the way until I need it — it's what's cueing me right now. On the right, a viewer for generated pages and a browser over the repository itself. The dropdowns next to the terminal hand an agent an exact command or prompt without me typing it out." |
 | /idea | Type `/idea <the idea in prose>` in the Claude Code session (not a browser form or API call); wraps `tools/append_idea.py`. If no audience idea, skip to pre-seeded fallback. | 2m | __ACTUAL_2__ | "Let's capture something live. Give me an idea — anything you'd want this system to do." [take an audience suggestion, or use the pre-seeded fallback] "I type `/idea` and the idea in plain language, right here in the terminal. That's it — no form, no dialog. It's written straight into the project's permanent idea log." |
-| /idea-triage | Type `/idea-triage` in Claude Code to scout and triage the recorded idea. | 2m | __ACTUAL_3__ | "Now I hand that idea to an agent to scout — `/idea-triage`. It reads the idea, searches the repository for related plans and prior decisions, and records what it finds directly on the idea. Every idea gets this same pass before anyone acts on it." |
+| /idea-triage | Type `/idea-triage` in Claude Code to scout and triage the recorded idea. **`/idea-triage` triages the entire open backlog, not just this one idea** — after the captured idea's subagent reports back, the session announces it will continue to the next open idea, and continue through the rest. **Fallback (always follow this):** as soon as the captured idea's subagent reports back and the finding is recorded, interrupt with `Ctrl-C` (not `Escape` — it does not stop the queued continuation) before the session moves to the next backlog idea. | 2m | __ACTUAL_3__ | "Now I hand that idea to an agent to scout — `/idea-triage`. It reads the idea, searches the repository for related plans and prior decisions, and records what it finds directly on the idea. Every idea gets this same pass before anyone acts on it." [as soon as this one idea's finding is recorded, hit Ctrl-C before it moves to the next backlog idea] |
 | plan beat | Narrate the planning stage (no live CLI execution). | 3m | __ACTUAL_4__ | "From here the normal path is: requirements, then an implementation plan, then a backlog phase an agent can claim and build against — I won't run that live, it's a longer loop, but that's the chain a triaged idea travels." |
 | overview-skill rebuild | Invoke the `d-system-overview` skill live to rebuild the overview — this is the step's point: `demo_reset.py prepare` deliberately parks the pre-built skill so this rebuild is real, not a replay. Fallback command if skill invocation unavailable: `uv run python tools/generate_overview.py`. Full fallback: `uv run python tools/demo_reset.py restore` then invoke the now-restored skill. Wait for page generation. Verify the HTML Viewer displays the generated overview (will already be open in the visible tab). | 4m | __ACTUAL_5__ | "Now let's generate a live report. I'm invoking the `d-system-overview` skill from the Skills dropdown — it rebuilds this project's status page from what's on disk right now, not a cached copy." [select the skill, Enter, wait] "While that runs — the panel on the right is already pointed at where it lands." |
 | test | In the HTML Viewer, click refresh to reload the page and verify the generated overview displays current data. Verify the terminal panel remains interactive (type a quick command or test the session tabs). Close the demo by returning the interface to its pre-demo state. | 3m | __ACTUAL_6__ | "Refresh — there's today's data, generated during this session." [click refresh] "And the terminal underneath is still live." [type a quick command] "One idea, captured and triaged, fed into a report regenerated live — same terminal driving all of it." |
@@ -48,9 +48,9 @@ Date/time: `__DATE_TIME_2__`
 
 | Step | Action | Timebox | Actual | Notes |
 |---|---|---|---|---|
-| /orient | Precondition: verify ports 8010 and 5180 are free. Then: start the backend with `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010`; start the frontend with `cd ts && D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180 --strictPort`; open http://localhost:5180. Start a Claude Code session in the terminal by running `claude`. Review the workbench interface. | 1m | __ACTUAL_1__ | "This is the d-system workbench — where this project actually gets worked on. Terminal on the left runs a live Claude Code session. Top right is a notes strip, out of the way until I need it — it's what's cueing me right now. On the right, a viewer for generated pages and a browser over the repository itself." |
+| /orient | Precondition: verify ports 8010 and 5180 are free. Then: start the backend with `D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010`; start the frontend with `cd ts && D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180 --strictPort`; open http://localhost:5180. Check the terminal slot's header dropdown (top left); if it does not read "Terminal (bash) ▾" already, select "Terminal (bash)" from the panel picker. Start a Claude Code session in the terminal by running `claude`. Review the workbench interface. | 1m | __ACTUAL_1__ | "This is the d-system workbench — where this project actually gets worked on. Terminal on the left runs a live Claude Code session. Top right is a notes strip, out of the way until I need it — it's what's cueing me right now. On the right, a viewer for generated pages and a browser over the repository itself." |
 | /idea | Type `/idea <the idea in prose>` in Claude Code. | 2m | __ACTUAL_2__ | "Let's capture something live. Give me an idea." [take an audience suggestion, or use the pre-seeded fallback] "I type `/idea` and the idea in plain language — written straight into the project's permanent idea log." |
-| /idea-triage | Type `/idea-triage` in Claude Code. | 2m | __ACTUAL_3__ | "Now I hand it to an agent to scout — `/idea-triage`. It searches the repository for related plans and prior decisions and records what it finds directly on the idea." |
+| /idea-triage | Type `/idea-triage` in Claude Code. Interrupt with `Ctrl-C` as soon as the one captured idea's finding is recorded — the command otherwise continues into the rest of the open backlog. | 2m | __ACTUAL_3__ | "Now I hand it to an agent to scout — `/idea-triage`. It searches the repository for related plans and prior decisions and records what it finds directly on the idea." [Ctrl-C as soon as this idea's finding is recorded] |
 | plan beat | Narrate the planning stage. | 3m | __ACTUAL_4__ | "From here the normal path is requirements, then a plan, then a backlog phase an agent can claim — I won't run that live, but that's the chain a triaged idea travels." |
 | overview-skill rebuild | Invoke the skill live; fallback is `uv run python tools/generate_overview.py` or full fallback `uv run python tools/demo_reset.py restore` + skill invoke. Verify the HTML Viewer displays the overview. | 4m | __ACTUAL_5__ | "Now let's generate a live report. I'm invoking the `d-system-overview` skill from the Skills dropdown — it rebuilds this project's status page from what's on disk right now, not a cached copy." [select the skill, Enter, wait] |
 | test | Refresh HTML Viewer; verify terminal interactivity; return interface to pre-demo state. | 3m | __ACTUAL_6__ | "Refresh — there's today's data, generated during this session." [click refresh] "And the terminal underneath is still live." [type a quick command] "One idea, captured and triaged, fed into a report regenerated live." |
@@ -81,11 +81,26 @@ Rehearsal Findings).
 | test | 3m | ~16s | Pass | Refresh confirmed via iframe idea-count change (101→102); terminal interactivity confirmed via echoed command; `demo_reset.py restore` completed in 0.69s. |
 | **Total (CLI-executable/mechanical steps measured)** | **15m** | **well under 15m** | Partial | Not comparable to the owner's 15m budget — the live-REPL portions of /idea and /idea-triage, which consume most of their timeboxes in a real demo, were not exercised. |
 
-### Agent-Driven Pass 2 — after `uv run python tools/demo_reset.py prepare`, fresh-eyes rehearsal (W07-R), agent demo-validator-web
+### Agent-Driven Pass 2 — 2026-09-11, fresh-eyes rehearsal (W07-R), agent demo-validator-web
 
-Times and findings recorded after this pass completes; run against the runbook as fixed by the
-pass-1 findings below (the `/orient` step now instructs starting `claude` in the terminal before
-`/idea`).
+Run against the runbook as fixed by the pass-1 findings (the `/orient` step's `claude`-in-terminal
+instruction). `uv run python tools/demo_reset.py prepare` ran cleanly (0.43s) before the pass; both
+launch commands worked verbatim.
+
+| Step | Timebox | Actual (AGENT-DRIVEN) | Pass/Fail | Notes |
+|---|---|---|---|---|
+| /orient | 1m | ~232s (≈3m52s), ~10s of which is server cold start | Fail against timebox | Blocking finding inside this step — see Rehearsal Findings item 4. Layout, control inventory and zero-page-scroll otherwise matched the runbook exactly (terminal left, notes strip top right, HTML Viewer + File Browser default on the right, Idea/Backlog Explorer behind the header dropdown). |
+| /idea | 2m | N/A — no audience idea; skipped straight to the pre-seeded fallback per the step's own instruction | N/A | Pass (fallback path exercised as designed). |
+| /idea-triage | 2m | ~115s to complete triage of one idea (000087), after the agent intervened to stop broader scope | Fits, for a single idea | Pass with a major finding — see Rehearsal Findings item 5. Left uninterrupted, this step does not do what the runbook narrates. |
+| plan beat | 3m | N/A — narration only | N/A | Nothing to mechanically verify. |
+| overview-skill rebuild | 4m | Skills dropdown check: instant. Fallback command `generate_overview.py`: 0.38s | Pass | Skills dropdown correctly listed only `_parked`, `checkpoint`, `orient` — `d-system-overview` absent while parked, confirming the parked-skill design (same as Pass 1). |
+| test | 3m | Refresh: instant, confirmed via event-count change (395→397 events). `demo_reset.py restore`: 0.42s | Pass | |
+| **Total (CLI-executable/mechanical steps measured)** | **15m** | **not comparable — /orient alone exceeded budget** | Fail | The /orient blocking finding (item 4) makes this pass's total not meaningful against the owner's 15m budget; see findings 4 and 5 for what must change before the owner's timed dry-runs. |
+
+Side effects on the worktree from this pass are real, intended idea-log activity, not test pollution:
+the `/idea-triage` step triaged idea `000087` via the sanctioned `append_idea.py status` call
+(`_data/ideas.jsonl`, `docs/00-working/ideas.md`, `_public/overview/index.html` all regenerated
+accordingly). Both servers were stopped and ports 8010/5180 confirmed free at the end of the pass.
 
 ## Rehearsal Findings (agent-driven passes, 2026-09-11)
 
@@ -104,6 +119,46 @@ pass-1 findings below (the `/orient` step now instructs starting `claude` in the
    presenter starting the stack before the audience is seated would not experience this the same
    way; flagged for the owner's attention during the real timed dry-runs rather than changed
    here, since the timebox reflects the live-segment's on-stage time, not setup time.
+4. **The terminal slot can default to a non-functional panel on a non-Windows machine, and the
+   runbook never mentioned the picker.** Pass 2 found the terminal loaded with header "CMD ▾"
+   and body text `cmd is not available on this host` — no shell, no prompt — on this (Linux)
+   rehearsal host. Clicking the header opened an undocumented dialog, "Terminal: choose a
+   panel," listing "Terminal (bash)" and "PowerShell." Nothing in the runbook mentioned this
+   control, that CMD can be the default, or that a presenter might need to switch panels before
+   typing `claude`. **Addressed:** the `/orient` step and the Workbench UI Reference now document
+   the terminal slot's panel picker and instruct checking/selecting a working shell before
+   starting the Claude Code session — this matters most because rehearsals run on Linux while
+   the live machine is Windows, where CMD is expected to work; on a rehearsal host it may not.
+5. **`/idea-triage`, typed once as the runbook instructs, does not triage only the just-captured
+   idea.** Pass 2 found that typing `/idea-triage` dispatches a subagent for the captured idea,
+   then the session announces it will continue through the rest of the open backlog ("I'll
+   verify its finding and advance it when the subagent reports back, then continue through the
+   remaining 15 ideas one at a time") — 16 ideas were open at rehearsal start. `Escape` did not
+   stop the queued continuation; it took two rounds of `Ctrl-C` to fully halt it, after it had
+   already begun a second idea. The single idea it did complete triaged correctly (mechanics are
+   sound); the command's actual scope (all open ideas, self-directed, hard to interrupt) is the
+   problem, not its correctness. This is a real mismatch with the runbook's single-idea narrative
+   ("Now I hand *that idea* to an agent to scout") and its 2-minute timebox — left unattended for
+   2 minutes, a presenter would be well into unrelated backlog housekeeping live on stage. **Not
+   a runbook-authoring choice to leave as-is:** the underlying `/idea-triage` command's behavior
+   is not this phase's deliverable to change (its deliverables are the runbook and Windows
+   checklist only). **Addressed within the runbook's own scope:** the `/idea-triage` step now
+   states the command's real scope-past-one-idea behavior and gives the presenter an explicit,
+   named fallback — interrupt with `Ctrl-C` (not `Escape`) as soon as the one captured idea's
+   subagent reports back, before the session continues to the next backlog idea — so the
+   timebox is honest about what "done" looks like on stage.
+6. **Terminal panel renders severely clipped (~85px, about two visible text rows), hiding almost
+   all of a live Claude Code session's output.** Pass 2 found `.xterm` container height 0 against
+   a child `.xterm-screen` height of 372.99 via `getBoundingClientRect()` — a real CSS/layout
+   sizing bug, not a small window; content was present and interactive but not visible without
+   scripted inspection. **This is a code defect outside this phase's deliverables (application
+   code, not the runbook or Windows checklist) and is not fixed here.** It is recorded for the
+   owner as idea `000104` (terminal panel clipped-height layout bug) rather than built against.
+   Flagging prominently: **this would wreck the live demo if unaddressed** — the terminal panel
+   is the primary visual surface for the entire live segment, and this pass found it functionally
+   invisible even once a working shell was selected.
+7. **Repeat of Pass 1 finding 2**: `_parked` still renders as its own selectable entry in the
+   Skills dropdown, alongside `checkpoint` and `orient`. Still cosmetic, not a runbook defect.
 
 ## Step Markers
 
@@ -113,7 +168,7 @@ Each step is marked for execution context:
 
 ### /orient step
 
-- Owner-performed: verify ports are free, start backend with `D_SYSTEM_DEMO_TERMINAL=1`, start frontend with `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010`, open browser to `http://localhost:5180`. Start a Claude Code session in the terminal by running `claude`. Scan the workbench interface: notes strip (top right, `?` tooltip at far left, dropdown menu); terminal panel (left side, ellipsis menu in top right); injection dropdowns (Commands, Skills, Prompts, Agents); layout-configuration button (top right); HTML Viewer (right side, with refresh button, searchable file dropdown, directory dialog); explorer slot (File Browser default, Idea Explorer and Backlog Explorer in header dropdown). Verify zero page scroll at all viewport sizes.
+- Owner-performed: verify ports are free, start backend with `D_SYSTEM_DEMO_TERMINAL=1`, start frontend with `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010`, open browser to `http://localhost:5180`. Check the terminal slot's header dropdown (top left, small downward triangle); if it does not already read "Terminal (bash) ▾", select "Terminal (bash)" from the panel picker dialog it opens ("Terminal: choose a panel", listing Terminal/CMD/PowerShell) — the presentation machine (Windows) should default correctly, but confirm rather than assume. Start a Claude Code session in the terminal by running `claude`. Scan the workbench interface: notes strip (top right, `?` tooltip at far left, dropdown menu); terminal panel (left side, ellipsis menu in top right, plus its own header dropdown for panel choice); injection dropdowns (Commands, Skills, Prompts, Agents); layout-configuration button (top right); HTML Viewer (right side, with refresh button, searchable file dropdown, directory dialog); explorer slot (File Browser default, Idea Explorer and Backlog Explorer in header dropdown). Verify zero page scroll at all viewport sizes.
 
 ### /idea step
 
@@ -121,7 +176,7 @@ Each step is marked for execution context:
 
 ### /idea-triage step
 
-- Owner-performed: type `/idea-triage` in Claude Code to scout and triage the idea.
+- Owner-performed: type `/idea-triage` in Claude Code to scout and triage the idea. **The command triages the whole open backlog, not just this one idea, once dispatched** — as soon as the captured idea's subagent reports back and its finding is recorded, interrupt with `Ctrl-C` (not `Escape`) before the session continues to the next open idea.
 
 ### plan beat
 
@@ -182,7 +237,7 @@ The final workbench UI (REQ-007 W13) presents these controls:
 
 - **Notes strip** (top right): Display-only entry from the active notes file; no title label. The `?` tooltip sits at the strip's far left. All controls (cycling, file picker, timed advance) live in one dropdown menu behind a downward-triangle affordance; the strip surface itself triggers nothing. Selected notes file persists in browser.
 
-- **Terminal panel** (left side): A `(...)` ellipsis menu in the top right corner contains "Collapse terminal" and "Drop/restore terminal" (moves from page-level chrome into this menu). Collapse does not terminate sessions. Drop replaces the terminal area in place with an info page saying the terminal is inactive; the panel does not disappear and the page layout does not reflow. While dropped, the injection dropdowns remain visible but deactivated. Restore returns a working terminal.
+- **Terminal panel** (left side): A `(...)` ellipsis menu in the top right corner contains "Collapse terminal" and "Drop/restore terminal" (moves from page-level chrome into this menu). Collapse does not terminate sessions. Drop replaces the terminal area in place with an info page saying the terminal is inactive; the panel does not disappear and the page layout does not reflow. While dropped, the injection dropdowns remain visible but deactivated. Restore returns a working terminal. Separately, the slot's own header (top left, small downward triangle) admits more than one panel — Terminal (bash), CMD, PowerShell — and opens a "Terminal: choose a panel" dialog to switch between them; the default panel selected on load is not guaranteed to be a working shell on every host (rehearsal found it default to CMD, which fails outright on Linux with `cmd is not available on this host`), so confirm the header reads a working panel before proceeding.
 
 - **Injection dropdowns** (below terminal header): **Commands**, **Skills**, **Prompts**, **Agents** — four dropdowns, same behavior for each. Selecting an entry injects its invocation text into the active shell un-executed (e.g., `/skill-name` for a skill, one-line run instruction for a prompt, dispatch phrase for an agent). Fed by live enumeration with optional curated overrides. Deactivated while terminal is dropped.
 
