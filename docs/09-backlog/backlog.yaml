@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-01
 - phase-wb-02
 - phase-wb-03
 - phase-wb-04
@@ -4973,11 +4972,11 @@ items:
     alongside phase-demo-05/06.
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
-  next_action: All work items built and validated on agent/phase-wb-01; adversarial review
-    W01-A ran and its one blocker (reveal spawning on _private//gitignored paths) is fixed
-    (991df62) and re-validated green by W01-V2. Gate W01-G green except pytest, which fails
-    only on three pre-existing dev PTY failures from host pyenv shim contention (handled at
-    the host level). Remaining - owner-approved integration.
+  next_action: 'None — phase complete: all items validated, the W01-A blocker fixed
+    and re-validated, and the branch integrated into dev fast-forward at 1bafba3
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension). The three pre-existing PTY test failures are a host
+    environment defect tracked outside this phase.'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -4988,7 +4987,35 @@ items:
   owner: repository-owner
   agent: agent-demo-stage
   session: doc-session-workbench-backend-api
-  status: active
+  completion_evidence:
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - src/api/__init__.py
+  - src/demo/factory.py
+  - _data/workbench/injection-overrides.json
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+  - docs/03-sessions/SESS-2026-09-10-11-workbench-backend-api.md
+  result: 'All three creator/validator pairs (W01-C1/V1 with one fix cycle proving
+    the _private/ exclusion against a real fixture, W01-C2/V2, W01-C3/V3) validated
+    green on agent/phase-wb-01. W01-G gate: governance OK; staged private-content
+    check OK; all seven deliverables present; ruff and mypy clean. The coordinator-run
+    W01-A adversarial review found one blocker — the reveal route spawned an opener
+    on _private//gitignored paths, proven live — fixed by guarding the resolved path
+    with the listings git check-ignore exclusion plus two no-spawn tests (1bafba3)
+    and re-validated green by a second W01-V2 pass; its remaining observations were
+    recorded as ideas 000095 (session-cap TOCTOU, theoretical, never manifested
+    under real concurrent load) and 000096 (D_SYSTEM_DEMO_SHELL override vs shell
+    selection). Post-rebase verification: governance OK (18 systems, 155 documents);
+    pytest 534 passed, 3 failed — the three test_demo_terminal.py PTY failures
+    reproduce identically on the dev baseline and trace to host pyenv shim-lock
+    contention polluting PTY output, an environment defect predating the phase,
+    reported to the owner with the removal command. Orchestration note: the phase
+    orchestrator was replaced mid-phase by a Fable-model agent on explicit owner
+    authorization after repeated background-command stalls (documented PROMPT-012
+    deviation). Integration pre-approved per PROMPT-023 delta 1; merged fast-forward
+    at 1bafba3.'
+  status: complete
   priority: 1
   session_budget: 1
   depends_on: []
