@@ -5820,7 +5820,8 @@ items:
   - sys-ui
   - sys-api
   owner: repository-owner
-  status: queued
+  agent: agent-demo-stage
+  status: active
   priority: 1
   session_budget: 1
   depends_on:
