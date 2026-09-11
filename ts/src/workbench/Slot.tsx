@@ -12,13 +12,13 @@ import type { LayoutSlotDefinition } from './types'
  *   phase ships (`TerminalRegion`, `NotesStripRegion`, `OverviewRegion`) already renders its own
  *   `.stage-region` section, which is what satisfies "a single-panel slot renders a plain
  *   header" here (the notes strip's own header carries no title, per REQ-007 W01).
- * - More than one implemented panel admitted (not reachable by either shipped layout file today —
- *   every implemented panel type is admitted by exactly one slot — but built for the layouts a
- *   later phase ships once phase-wb-05/06's explorer panels exist): a slot-level header shows the
- *   current panel's name beside a small downward-triangle dropdown listing the others; selecting
- *   one swaps it into view. The swapped-in panel still renders its own inner header too — a
- *   double-header cosmetic case this phase leaves for whichever future phase first exercises it
- *   with real panels, noted in `panelRegistry.tsx`.
+ * - More than one implemented panel admitted (the terminal slot, since `phase-wb-03`'s CMD and
+ *   PowerShell shell options landed, and layout 1's explorer slot, since `phase-wb-06`'s
+ *   `idea-explorer` joined `phase-wb-05`'s `file-browser`): a slot-level header shows the current
+ *   panel's name
+ *   beside a small downward-triangle dropdown listing the others; selecting one swaps it into
+ *   view. The swapped-in panel still renders its own inner header too — a double-header cosmetic
+ *   case left as-is, noted in `panelRegistry.tsx`.
  */
 export default function Slot({
   slot,

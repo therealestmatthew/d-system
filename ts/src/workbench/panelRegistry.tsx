@@ -4,26 +4,32 @@ import NotesStripRegion from '../stage/NotesStripRegion'
 import OverviewRegion from '../stage/OverviewRegion'
 import HtmlViewerRegion from '../stage/HtmlViewerRegion'
 import FileBrowserRegion from '../stage/FileBrowserRegion'
+import IdeaExplorerRegion from '../stage/IdeaExplorerRegion'
 
 /**
  * The panel type registry (REQ-007 W05/W06): every panel type id a layout's slots may name, and
- * the component that renders it. `Component: null` marks a type id later phases will implement
- * (`idea-explorer` and `backlog-explorer` — `phase-wb-06`) — declaring the id now lets the
- * shipped layout files admit it into a slot today, so a future phase's only change is registering
- * the component here and (if needed) a layout-file edit, never new engine code (ADR-016
- * consequences).
+ * the component that renders it. `Component: null` marks a type id a later phase will implement
+ * (`backlog-explorer`, still pending) — declaring the id now lets the shipped layout files admit
+ * it into a slot today, so that phase's only change is registering the component here and (if
+ * needed) a layout-file edit, never new engine code (ADR-016 consequences).
  *
- * `file-browser` (`phase-wb-05`, `FileBrowserRegion`) is this comment's other formerly-`null`
- * entry now filled in — REQ-007 W09's tree, filters and documentation-explorer preset, plus the
+ * `file-browser` (`phase-wb-05`, `FileBrowserRegion`) and `idea-explorer` (`phase-wb-06`,
+ * `IdeaExplorerRegion`) are this comment's other two formerly-`null` entries now filled in.
+ * `file-browser` is REQ-007 W09's tree, filters and documentation-explorer preset, plus the
  * five-action right-click context menu (reveal, open-in-viewer with tab submenu, copy relative
  * path, copy absolute path, inject path) that same requirement row describes, wired via
- * `FileTreeContextMenu.tsx`. Layout 1's explorer slot (`_data/workbench/layouts/layout-1.json`) admits `file-browser`,
- * `idea-explorer` and `backlog-explorer` with `default_panel: null`; `Slot.tsx` resolves a slot
- * with exactly one *implemented* admitted panel to that panel regardless of `default_panel`, so
- * `file-browser` renders there today with no layout-file edit needed — it stops being the only
- * implemented one the moment `phase-wb-06` fills in the other two, at which point that slot
- * reaches `Slot.tsx`'s multi-panel dropdown branch and `default_panel` would need to be set
- * explicitly for `file-browser` to stay the one shown first.
+ * `FileTreeContextMenu.tsx`. `idea-explorer` is REQ-007 W10's columns (id, title, status, age,
+ * annotation count, link count), sortable and text/status-filterable, with a standard/
+ * priority-queue view toggle that re-fetches `phase-wb-01`'s `GET /ideas` or `GET /ideas/queue`
+ * rather than re-ranking client-side. Layout 1's explorer slot
+ * (`_data/workbench/layouts/layout-1.json`) admits `file-browser`, `idea-explorer` and
+ * `backlog-explorer`, in that order, with `default_panel: null`; `Slot.tsx` resolves a slot with
+ * exactly one *implemented* admitted panel to that panel, and — now that two are implemented —
+ * falls through to its "first of `implementedAdmits`" default when no panel has been explicitly
+ * selected, which is `file-browser` given the admits order above: it stays the slot's
+ * default-visible panel, with `idea-explorer` reachable via the slot-header dropdown
+ * `Slot.tsx` now renders for this slot. `backlog-explorer` will join that same dropdown once
+ * implemented, with no further layout-file edit needed.
  *
  * `terminal`, `notes-strip` and `overview` are this phase's three existing regions (REQ-007
  * dispatch item 5: "existing regions become panels of this engine") — each already renders its
@@ -51,9 +57,12 @@ import FileBrowserRegion from '../stage/FileBrowserRegion'
  * logic.
  *
  * A slot resolving to more than one *implemented* panel is wrapped by `Slot.tsx` in an outer
- * dropdown header instead; whichever future phase first populates such a slot should note that
- * the wrapped panel still renders its own inner header too, and may want to drop it in that
- * configuration — out of this phase's scope to resolve for panels that do not exist yet.
+ * dropdown header instead; the terminal slot (above) was the first to reach that branch, and the
+ * explorer slot is now the second, once `phase-wb-06` filled in `idea-explorer` alongside
+ * `phase-wb-05`'s `file-browser`. The wrapped panel still renders its own inner header too (the
+ * same double-header cosmetic case the terminal slot already carries) — left as-is here too, out
+ * of this phase's declared scope (`ts/src`, this file and `IdeaExplorerRegion.tsx`), not because
+ * it is otherwise desirable.
  */
 export interface PanelDefinition {
   displayName: string
@@ -68,7 +77,7 @@ export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
   overview: { displayName: 'Overview', Component: OverviewRegion },
   'html-viewer': { displayName: 'HTML Viewer', Component: HtmlViewerRegion },
   'file-browser': { displayName: 'File Browser', Component: FileBrowserRegion },
-  'idea-explorer': { displayName: 'Idea Explorer', Component: null },
+  'idea-explorer': { displayName: 'Idea Explorer', Component: IdeaExplorerRegion },
   'backlog-explorer': { displayName: 'Backlog Explorer', Component: null },
 }
 
