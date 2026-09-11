@@ -4611,7 +4611,7 @@ A tracked list of all of the owner's repositories — both personally created re
 
 ## 000087 · Terminal interaction API for driving demo shell sessions from outside the stage page
 
-**Created 2026-09-10T12:55:38-04:00 · Status: `open`**
+**Created 2026-09-10T12:55:38-04:00 · Status: `triaged`**
 
 Flag-gated HTTP endpoints (inject input, read buffered output) plus a session registry so scripts and agents outside the stage page can drive the demo terminal's shell sessions programmatically.
 
@@ -4625,9 +4625,26 @@ Unresolved: whether sessions should outlive their websocket (detach/reattach), h
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-workbench-planner (2026-09-10T17:28:57-04:00): Narrowed by the workbench planning session (2026-09-10): the session-registry half — a backend registry bounding the four-session cap with per-session allowlisted shell selection — is adopted into the workbench terminal capability decision (ADR-014, built by phase-wb-01, PLAN-022). The idea's remaining open scope is the outside-the-page inject/read HTTP API (detach/reattach, output buffering), which still starts from its own decision record.
+- **finding** by agent-idea-triage (2026-09-11T10:15:59-04:00): ## Scope Partially Delivered; Remaining Work Explicitly Parked
+
+Idea 000087 proposes a Terminal interaction API for driving demo shell sessions from outside the stage page, including HTTP endpoints for inject/read plus session registry, with unresolved questions about session detach/reattach, output buffering, and generalization into workflow triggering.
+
+**Partial delivery via ADR-014 (Workbench Terminal Capability):**
+ADR-014, accepted 2026-09-10, addresses the session registry component: it mandates "a backend session registry bounds and identifies sessions" at the websocket route, enforcing the four-session cap there rather than only in the UI (resolving the minor issue recorded during phase-demo-06). However, ADR-014 explicitly keeps parked the remaining scope of 000087: "the outside-the-page inject/read HTTP API, detach/reattach, and output buffering stay parked in that idea and would start from a further record." ADR-014 concludes: "Idea 000087 stays open, narrowed: its registry half is delivered here; annotate it so the remaining scope is the inject/read API alone."
+
+**Related governance:**
+- ADR-013 (Demo Terminal Capability) established the principle: "If a future feature wants shell execution, it starts from its own decision record, not from this one" — applied here to the beyond-demo API half.
+- PLAN-021 (Live Demo, phase-demo-06 scope) deliberately excluded the API: "a backend inject/read API for driving the terminal from outside the page is deliberately excluded and parked as an idea — per ADR-013 it starts from its own decision record."
+- Phase-demo-06 (completed) recorded the missing session registry as a minor against 000087, now resolved by ADR-014's mandate.
+
+**Current state:**
+The idea's registry requirement is satisfied. The inject/read API, detach/reattach capability, and output buffering remain open work. ADR-014 calls explicitly for this idea to be narrowed via annotation so remaining scope surfaces clearly. No new ADR yet exists for the HTTP API surface; that work would begin from a separate decision record following the precedent ADR-013 establishes.
+
+**Existing link:**
+000087 already relates_to 000070 (Build a demo of the idea system), recording the connection for training-session demo context.
 
 </details>
 
@@ -4940,3 +4957,11 @@ Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent p
 **Created 2026-09-11T04:19:18-04:00 · Status: `open`**
 
 Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
+
+---
+
+## 000104 · Workbench terminal panel renders clipped to ~85px (.xterm container height 0), hiding almost all live output
+
+**Created 2026-09-11T10:20:15-04:00 · Status: `open`**
+
+Found during phase-wb-07 agent-driven rehearsal pass 2 (W07-R, demo-validator-web, 2026-09-11). Once a working terminal panel is selected and a Claude Code session is running inside it, the panel renders at a severely clipped height (~85px, about 2 visible text rows). Confirmed via getBoundingClientRect(): the .xterm container reports height: 0 while its child .xterm-screen reports height: 372.99 — a real CSS/layout sizing bug in the terminal panel, not a small window or a content issue. The session content is present and interactive (confirmed via .xterm-rows.innerText) but is not visible to a presenter without scripted inspection. This is new since rehearsal pass 1 and was not present there. This would wreck the live demo if unaddressed — the terminal panel is the primary visual surface for the entire live segment. Not fixed as part of phase-wb-07 (its deliverables are docs/00-working/demo-runbook.md and docs/00-working/demo-windows-setup.md only, not application code); recorded here for the owner to route to a build phase or hotfix. Likely touches the terminal panel's CSS/layout in ts/src/workbench (the .xterm/.xterm-screen sizing chain) — worth checking flex/height inheritance through the slot and panel containers.
