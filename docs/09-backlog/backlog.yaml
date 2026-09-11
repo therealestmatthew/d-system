@@ -5462,6 +5462,8 @@ items:
   - Playwright browser verification (demo-validator-web, pack W05-W) covering W09
   deliverables:
   - ts/src
+  - src/api/routes/workbench.py
+  - test/test_workbench_api.py
 - id: phase-wb-06
   title: Idea and Backlog explorer panels
   next_action: After phase-wb-05 (shared ts/src lock), dispatch pack section W06
