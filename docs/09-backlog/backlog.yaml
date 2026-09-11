@@ -5765,8 +5765,34 @@ items:
     persistence guard
   deliverables:
   - ts/src
-  next_action: Dispatch the W08-M diagnosis, then root-cause the height
-    collapse from its measurements before writing any fix.
+  next_action: 'Dispatch the coordinator-owned completion gate (W08-A adversarial
+    review, W08-W Playwright browser verification) against agent/phase-wb-08 commit
+    073676b (merged with dev at 84937bb). The creator fix (W08-C1), its code review
+    (W08-V1) and the mechanical phase gate (W08-G) are all green; W08-M''s diagnosis
+    is complete.'
+  session: doc-session-phase-wb-08-panel-fixes
+  completion_evidence:
+  - ts/src/stage/StagePage.css
+  result: 'In progress (not complete; evidence lives on the unmerged
+    agent/phase-wb-08 worktree branch, commit 073676b, merged with dev at
+    84937bb). W08-M diagnosis (demo-validator-web, resumed by the coordinator
+    past two turn-limit truncations) found the shared root cause:
+    .stage-workbench-slot__body never set display, defaulting to block and
+    starving every panel wrapped in a multi-panel slot (terminal, HTML Viewer
+    in layout 2, File Browser) down to content height. W08-C1 (demo-creator-web)
+    fixed it with a single 17-line CSS change (display: flex; flex-direction:
+    column), covering all three shell panels, any slot geometry, and the File
+    Browser scroll per REQ-007 W18; the HTML Viewer''s no-flag blank state was
+    confirmed by W08-M as the separate launch-flag gap (runbook scope,
+    phase-wb-10), left untouched. W08-V1 (demo-validator-code) passed with no
+    findings on first review. W08-G (demo-validator-check, the phase gate)
+    initially failed on a stale docs/08-governance/catalog.md
+    (test_committed_catalog_matches_regenerated_output) caused by this
+    orchestrator''s own claim commit not regenerating the catalog; fixed
+    directly on dev (commit d34ac7a) and merged into the phase branch
+    (84937bb), then W08-G re-ran green (all five checklist items pass).
+    Remaining: the coordinator-owned completion gate (W08-A adversarial
+    review, W08-W Playwright browser verification) per GOV-003.'
 - id: phase-wb-09
   title: Layout assignment model — per-panel eligibility, assignment-only dialog
   plan: doc-workbench
