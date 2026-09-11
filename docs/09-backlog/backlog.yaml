@@ -5403,8 +5403,8 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-05
   title: File Browser panel
-  next_action: After phase-wb-04 (shared ts/src lock; needs the viewer tabs for the
-    open-in-viewer submenu), dispatch pack section W05 (PROMPT-021).
+  next_action: Dispatching pack section W05 (PROMPT-021) - W05-C1/V1 then
+    W05-C2/V2, then the phase gate.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5412,7 +5412,8 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-demo-data
   priority: 1
   session_budget: 1
   depends_on:
