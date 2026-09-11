@@ -56,6 +56,55 @@ Date/time: `__DATE_TIME_2__`
 | test | Refresh HTML Viewer; verify terminal interactivity; return interface to pre-demo state. | 3m | __ACTUAL_6__ | "Refresh — there's today's data, generated during this session." [click refresh] "And the terminal underneath is still live." [type a quick command] "One idea, captured and triaged, fed into a report regenerated live." |
 | **Total (all steps)** | | **15m** | __TOTAL_2__ | |
 
+## Agent-Driven Rehearsal Passes (fresh-eyes mechanics checks)
+
+These are NOT the owner-driven timed dry-runs above and do not close REQ-006 R09's deferred
+conditions — R09 closes only on the owner's own recorded passes in the Dry-Run tables above.
+These two agent-driven passes (`demo-validator-web`, pack W07-R) are mechanics checks run early
+to catch runbook and tooling defects against the final workbench UI, dispatched by
+demo-orch-content and separated by `uv run python tools/demo_reset.py prepare`.
+
+### Agent-Driven Pass 1 — 2026-09-11, fresh-eyes rehearsal (W07-R), agent demo-validator-web
+
+Ran before the runbook's `/orient`-step `claude`-session fix below; the /idea and /idea-triage
+CLI halves were exercised directly via `tools/append_idea.py` and an open-idea listing rather
+than through the embedded terminal, because the terminal opened to plain bash at the time (see
+Rehearsal Findings).
+
+| Step | Timebox | Actual (AGENT-DRIVEN) | Pass/Fail | Notes |
+|---|---|---|---|---|
+| /orient | 1m | ~85s | Fail against timebox | Mostly cold-start latency (uvicorn + vite boot) plus mechanical verification of every control; a presenter starting the stack before the audience arrives would not experience this as one live minute. Both launch commands worked verbatim. |
+| /idea | 2m | CLI half: 3.97s (`append_idea.py add`, idea 000102) | Pass (CLI half only) | Live-Claude-Code-REPL half not independently measurable by an agent barred from a nested interactive session — see Rehearsal Findings item 1. |
+| /idea-triage | 2m | CLI half (open-idea listing): ~0.06s | Pass (CLI half only) | The `/idea-triage` subagent-dispatch half is not independently measurable by this agent, same restriction as phase-demo-05's rehearsal. |
+| plan beat | 3m | N/A — narration only | N/A | Nothing to mechanically verify. |
+| overview-skill rebuild | 4m | Fallback command: 0.62s (`generate_overview.py`) | Pass (fallback path only) | Skills dropdown correctly omitted `d-system-overview` while `demo_reset.py prepare` had it parked, confirming the parked-skill design. Live skill-dispatch-via-terminal half blocked by the same terminal finding. |
+| test | 3m | ~16s | Pass | Refresh confirmed via iframe idea-count change (101→102); terminal interactivity confirmed via echoed command; `demo_reset.py restore` completed in 0.69s. |
+| **Total (CLI-executable/mechanical steps measured)** | **15m** | **well under 15m** | Partial | Not comparable to the owner's 15m budget — the live-REPL portions of /idea and /idea-triage, which consume most of their timeboxes in a real demo, were not exercised. |
+
+### Agent-Driven Pass 2 — after `uv run python tools/demo_reset.py prepare`, fresh-eyes rehearsal (W07-R), agent demo-validator-web
+
+Times and findings recorded after this pass completes; run against the runbook as fixed by the
+pass-1 findings below (the `/orient` step now instructs starting `claude` in the terminal before
+`/idea`).
+
+## Rehearsal Findings (agent-driven passes, 2026-09-11)
+
+1. **Terminal opens to plain bash, not a live Claude Code session.** Pass 1 found the embedded
+   terminal shows a bare `user@host:path$` prompt on load; the runbook's `/idea` and
+   `/idea-triage` steps assume typing `/idea ...` directly into a Claude Code REPL, but nothing
+   in the runbook said to start one first. **Addressed:** the `/orient` step's action text (both
+   Dry-Run tables) and its step marker now instruct starting a Claude Code session in the
+   terminal (`claude`) before proceeding to `/idea`.
+2. **`_parked` renders as its own selectable entry in the Skills dropdown** rather than being
+   hidden, which could read as a real skill to a presenter unfamiliar with the parking mechanism.
+   Not addressed in this pass — cosmetic, not a runbook defect (the dropdown's own content is a
+   workbench UI matter, not the runbook's).
+3. **`/orient`'s measured ~85s exceeds its 1m timebox** almost entirely due to backend/frontend
+   cold-start latency plus this agent's own mechanical verification of every listed control. A
+   presenter starting the stack before the audience is seated would not experience this the same
+   way; flagged for the owner's attention during the real timed dry-runs rather than changed
+   here, since the timebox reflects the live-segment's on-stage time, not setup time.
+
 ## Step Markers
 
 Each step is marked for execution context:
