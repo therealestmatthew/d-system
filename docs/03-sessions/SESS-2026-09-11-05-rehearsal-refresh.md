@@ -31,7 +31,27 @@ depends_on: [doc-workbench]
   check_no_private_content: OK (497 tracked files, 0 identifiers checked)
   ```
 - Playwright rehearsal pass over the runbook's browser-marked steps (demo-validator-web,
-  pack W07-W): not run — this is the coordinator's dispatch, not this orchestrator's.
+  pack W07-W, dispatched by the coordinator): **PASS, no blocking finding** — every control
+  the runbook names in the browser-marked steps exists under that name and behaves as
+  described (terminal header dropdown, notes-strip controls, terminal ellipsis menu, the
+  four injection dropdowns with counts, the layout-configuration dialog, explorer header
+  dropdown and swap, HTML Viewer refresh/file-dropdown/directory controls, parked-skill
+  dropdown state, refresh re-fetch confirmed via the iframe's `?v=` bump, terminal echo
+  round-trip). A first dispatch was blocked by a stale Playwright browser lock (a leftover
+  Chrome from the pass-2 rehearsal holding the shared profile); the owner killed the stale
+  process and the re-run completed. Two non-blocking notes: (a) the HTML Viewer has an
+  "Embedded"/"Open-in-tab link" toggle documented nowhere in the runbook — recorded as idea
+  `000105`; (b) zero-scroll could be mechanically confirmed only at the single available
+  window size (1600×1000; the Playwright environment ignores viewport overrides), so
+  multi-size scroll verification remains a rehearsal-environment limitation, not a defect.
+- Supplementary owner-requested check (same day, coordinator dispatch): the terminal shell
+  session **persists across layout switches**. With fresh state and Terminal (bash) resolved
+  in both layouts, a marker variable set in Layout 1 survived Layout 1 → 2 → 1
+  (`check-persist26030` printed identically after each switch), scrollback stayed intact, no
+  new terminal websocket opened (constructor hook recorded zero connections), and the
+  "connection closed" message never appeared. Caveat recorded for the owner: per-layout
+  stored panel selections mean a layout whose terminal slot resolves to a different panel
+  type would remount and end sessions on switch.
 - The executed Windows checklist and both dry-runs' recorded times in the runbook:
   not run — owner-machine, owner-driven work; not performed by any agent.
 - W07-C1 (demo-creator-docs): rewrote `docs/00-working/demo-runbook.md` and
@@ -139,5 +159,19 @@ depends_on: [doc-workbench]
 - Idea `000104` (terminal panel clipped to ~85px, a real layout sizing bug found during
   pass 2) is flagged prominently for the owner: it would wreck the live demo if
   unaddressed, and is outside this phase's deliverables to fix.
-- The Playwright rehearsal pass over the runbook's browser-marked steps (pack W07-W) is the
-  coordinator's dispatch, not this orchestrator's, and has not yet been run.
+- Idea `000105` (the HTML Viewer's Embedded/Open-in-tab toggle is documented nowhere in the
+  runbook) is recorded on the phase branch for the owner — a small runbook follow-up or a
+  flag-gated control, to be reconciled with the layout-assignment redesign.
+- Two follow-up fixes are staged for a fresh session in
+  `docs/00-working/handoff-workbench-layout-and-terminal-fixes.md` (owner-directed,
+  2026-09-11): the idea `000104` terminal truncation fix first, then a layout-assignment
+  redesign; that session is under way and edits `REQ-007`/`PLAN-022`/`backlog.yaml` in the
+  primary checkout, which is why this checkpoint deliberately did not touch
+  `backlog.yaml` — the phase's `next_action` there still predates the W07-W result, and
+  this record is the current source for it.
+- Process hazard observed this checkpoint, for the owner: sequential idea ids collide
+  across branches. Dev's log tip was `000101` while the un-merged `agent/phase-wb-07`
+  branch already carried `000102`–`000104`, so an append on dev minted a second, different
+  `000102` (caught before commit, reverted, re-appended at the branch tip as `000105`).
+  Until the branch merges, `_data/ideas.jsonl` must only be appended to on
+  `agent/phase-wb-07`.
