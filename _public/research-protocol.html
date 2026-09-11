@@ -392,7 +392,7 @@ td code{color:var(--mahogany-hi)}
 
 <!-- ============ 06 STANDING RULES ============ -->
 <details class="sec" id="rules">
-  <summary><span class="sec-n">06</span><span class="sec-h"><h2>Standing rules<a class="anchor" href="#rules">#</a></h2><p>Six rule groups that travel with every campaign, whatever it investigates.</p></span><span class="chev">&#9662;</span></summary>
+  <summary><span class="sec-n">06</span><span class="sec-h"><h2>Standing rules<a class="anchor" href="#rules">#</a></h2><p>Seven rule groups that travel with every campaign, whatever it investigates.</p></span><span class="chev">&#9662;</span></summary>
   <div class="sec-body">
     <div class="grid g2">
       <div class="card leaf"><h3><span class="k">Context</span>Selective injection</h3><p>Context loads when the step that needs it begins, never up front. Search prompts carry their own domain and terminology variants, not the whole matrix; the coordinator defers the content methodology to the agents that execute it. Nothing front&#8209;loads the full pack into any agent&rsquo;s opening context.</p></div>
@@ -401,13 +401,13 @@ td code{color:var(--mahogany-hi)}
       <div class="card"><h3><span class="k">Discipline</span>Agent hygiene</h3><p>The coordinator claims nothing, searches nothing, writes no findings. Search, extraction and review are separate dispatches, and reviewers receive sources and evidence rows &mdash; never the searcher&rsquo;s rationale. Findings commit before review; truncated agents are resumed, not re&#8209;run; assertions are verified against the ledger.</p></div>
       <div class="card"><h3><span class="k">Spend</span>Cost protocols</h3><p>Haiku for mechanical gates. <b style="color:var(--text)">Sonnet is the standard model for search and extraction</b> &mdash; and the default for synthesis and collision review. Opus is never pre&#8209;assigned: at most one documented escalation per campaign. Two fix cycles per item; what survives them is reported, not looped on.</p></div>
       <div class="card accent"><h3><span class="k">Cadence</span>Gate check&#8209;in policy</h3><p>Prompt A always asks the owner up front: stop at gates for check&#8209;in, or push through to close&#8209;out? The answer lands in the kick&#8209;off record, never assumed. A critical issue &mdash; a collision that falsifies scope, a methodology defect that invalidates collected evidence &mdash; first gets a dual review, and pauses for the owner only if it survives unresolved.</p></div>
+      <div class="card accent"><h3><span class="k">Completion</span>Stop conditions and descope</h3><p>The content methodology&rsquo;s stop conditions become the completion gate, measured against the ledger &mdash; saturation is demonstrated, never declared. The descope ladder exists for emergencies, but no rung is taken without the owner&rsquo;s explicit direction unless the kick&#8209;off record grants a stated exception. A campaign that stops early stops at a phase boundary, with its resume state in the session record.</p></div>
     </div>
     <div class="h4">And always</div>
     <ul class="tick mah">
-      <li><b>Descope is the owner&rsquo;s alone.</b> The ladder names which domains, hypotheses or passes are cut first, but no rung is taken without explicit direction unless the kick&#8209;off record grants a stated exception.</li>
       <li><b>Seed sources stay seed sources</b> until they pass the verification steps the content methodology requires; the historical seed ledger is never silently altered.</li>
       <li><b>Negative claims use the status vocabulary</b> &mdash; a failed search is recorded as a search that failed, with its queries.</li>
-      <li><b>Every document code comes from the allocator</b> (<code>--next-code</code>), and a campaign that stops early stops at a phase boundary, with its resume state in the session record.</li>
+      <li><b>Every document code comes from the allocator</b> (<code>--next-code</code>).</li>
     </ul>
   </div>
 </details>
@@ -454,7 +454,7 @@ const STAGES = [
 
 const GATES = ["Adversarial review of B", "Adversarial audit of the pack", "Owner sign-off on the coordinator", "Kick-off ratification"];
 
-const RULES = ["Selective injection", "Thesis discipline", "Evidence hygiene", "Agent hygiene", "Cost protocols", "Gate check-in policy"];
+const RULES = ["Selective injection", "Thesis discipline", "Evidence hygiene", "Agent hygiene", "Cost protocols", "Gate check-in policy", "Stop conditions and descope"];
 
 const PASSES = ["Broad map", "Deep reading", "Adversarial test", "Synthesis"];
 
