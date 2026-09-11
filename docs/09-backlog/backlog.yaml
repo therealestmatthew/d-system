@@ -5194,8 +5194,14 @@ items:
     PROMPT-023 delta 1.'
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
-  next_action: After phase-wb-01 and phase-wb-02 complete and integrate, dispatch pack
-    section W03 (PROMPT-021).
+  next_action: W03-C1/V1, W03-C2/V2 and W03-C3/V3 all passed with no findings; W03-G's
+    gate reported two results - uv run pytest's 3 test_demo_terminal.py PTY failures
+    (known host-wide pyenv rehash contention, environmental) and the diff touching
+    _data/workbench/layouts/*.json in addition to ts/ (required by ADR-016's
+    data-driven admits model for the CMD/PowerShell panel options, not a defect) -
+    reported to the coordinator rather than resolved unilaterally. W03-A (adversarial
+    review) and W03-W (browser verification) remain, both coordinator-dispatched.
+  session: doc-session-workbench-terminal-panel-rework
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
