@@ -5,8 +5,9 @@ and completed before the live demo session. Every item is checked by the owner; 
 guides as needed.
 
 The goal is to verify base setup is in place (repo clone, `uv`, Node, authentication), that
-demo-specific dependencies are current, and that the terminal capability works end to end on Windows
-before the rehearsal gate begins.
+demo-specific dependencies are current, the terminal capability works end to end on Windows,
+the workbench launch works correctly, and that CMD and PowerShell panels function before
+rehearsal begins.
 
 ## Base Setup (Pre-Session, Usually Already Done)
 
@@ -17,7 +18,7 @@ before the rehearsal gate begins.
       `__NODE_VERSION__`)
 - [ ] Claude Code authenticated and able to write to the repository.
 
-## Demo-Specific Verification (Updated for Phase Demo-05)
+## Demo-Specific Verification (Updated for Workbench)
 
 ### Python and Backend Dependencies
 
@@ -31,10 +32,12 @@ before the rehearsal gate begins.
 - [ ] Run `npm install` in the repository root to ensure frontend dependencies are current.
 - [ ] Confirm no errors in the npm output.
 
-### Environment Variable for Terminal Route
+### Environment Variables for Terminal Route and Frontend API Target
 
 - [ ] Set `D_SYSTEM_DEMO_TERMINAL=1` in the shell environment **before** starting the backend.
       On Windows PowerShell: `$env:D_SYSTEM_DEMO_TERMINAL=1`. On cmd: `set D_SYSTEM_DEMO_TERMINAL=1`.
+- [ ] Set `VITE_API_TARGET=http://localhost:8010` **before** starting the frontend dev server.
+      On PowerShell: `$env:VITE_API_TARGET="http://localhost:8010"`. On cmd: `set VITE_API_TARGET=http://localhost:8010`.
 
 ### Port Availability
 
@@ -49,7 +52,7 @@ terminal functionality on Windows.
 
 ### Steps
 
-1. Start the backend:
+1. Start the backend (PowerShell):
    ```
    $env:D_SYSTEM_DEMO_TERMINAL=1
    uv run uvicorn src.main:app --port 8010
@@ -59,15 +62,18 @@ terminal functionality on Windows.
 2. In a new shell, start the frontend (Windows PowerShell):
    ```
    cd ts
+   $env:D_SYSTEM_DEMO_TERMINAL=1
    $env:VITE_API_TARGET="http://localhost:8010"
-   npm run dev -- --port 5180
+   npm run dev -- --port 5180 --strictPort
    ```
    Without `VITE_API_TARGET`, the dev proxy silently targets `http://localhost:8000` instead of
    the demo backend on `8010`, and every stage route 404s if anything else holds port 8000.
+   The `--strictPort` flag ensures the frontend fails rather than silently falling back to
+   another port.
    Expected: Vite dev server starts on `http://localhost:5180`.
 
 3. Open a browser and navigate to `http://localhost:5180`.
-   Expected: the stage page loads; the layout is visible with the terminal region present.
+   Expected: the workbench page loads; the layout is visible with the terminal region present.
 
 4. Type a command in the embedded terminal (e.g., `echo Hello from Windows`).
    Expected: the command executes and real shell output appears in the terminal.
@@ -83,42 +89,138 @@ on Windows and the stage is ready for rehearsal.
 
 ```
 Date and time:
-Shell type observed (cmd or PowerShell):
+Shell type observed (PowerShell or cmd):
 Command typed:
 Output received:
 Status: [PASS / FAIL]
 Notes:
 ```
 
-## Full Fresh-Eyes Rehearsal Checklist (PROMPT-017)
+## Workbench Launch Check
+
+**Run this check to verify the workbench launches correctly with the proper environment variables.**
+
+### Steps
+
+1. From the repository root, start the backend in PowerShell:
+   ```
+   $env:D_SYSTEM_DEMO_TERMINAL=1
+   uv run uvicorn src.main:app --port 8010
+   ```
+
+2. In a new PowerShell window, navigate to the `ts` directory and start the frontend:
+   ```
+   cd ts
+   $env:D_SYSTEM_DEMO_TERMINAL=1
+   $env:VITE_API_TARGET="http://localhost:8010"
+   npm run dev -- --port 5180 --strictPort
+   ```
+
+3. Open a browser and navigate to `http://localhost:5180`.
+
+4. Verify the workbench interface loads with these elements:
+   - Notes strip at top right with `?` tooltip at far left and dropdown menu
+   - Terminal panel on left with ellipsis menu (`...`) in top right
+   - Injection dropdowns (Commands, Skills, Prompts, Agents) below terminal header
+   - Layout-configuration button at top right
+   - HTML Viewer panel on right with refresh button, file dropdown, and directory button
+   - Explorer slot below HTML Viewer with File Browser visible (Idea Explorer and Backlog Explorer in header dropdown)
+
+5. Stop the servers with Ctrl+C.
+
+### Result
+
+**Workbench launch result (owner to fill in):**
+
+```
+Date and time:
+All interface elements present: [YES / NO]
+Status: [PASS / FAIL]
+Notes:
+```
+
+## CMD and PowerShell Panel Round-Trip Checks (REQ-007 W12)
+
+**Run these checks to verify CMD and PowerShell panels work correctly.** Each check executes a
+command in the respective shell and verifies output appears.
+
+### CMD Panel Check
+
+1. In the workbench, the terminal slot (left side) admits three panels — Terminal (bash),
+   CMD and PowerShell — because the slot holds more than one panel, its header renders a
+   dropdown (small downward triangle beside the slot name, top left).
+2. Click the terminal slot's header dropdown and select **CMD**.
+3. Type a test command: `echo Hello from CMD`
+4. Verify the command executes and output appears: `Hello from CMD`
+
+**CMD panel result (owner to fill in):**
+
+```
+Date and time:
+Command typed: echo Hello from CMD
+Output received: [TEXT]
+Status: [PASS / FAIL]
+Notes:
+```
+
+### PowerShell Panel Check
+
+1. In the workbench, click the terminal slot's header dropdown (top left) and select **PowerShell**.
+2. Type a test command: `Write-Host "Hello from PowerShell"`
+3. Verify the command executes and output appears: `Hello from PowerShell`
+
+**PowerShell panel result (owner to fill in):**
+
+```
+Date and time:
+Command typed: Write-Host "Hello from PowerShell"
+Output received: [TEXT]
+Status: [PASS / FAIL]
+Notes:
+```
+
+## Full Fresh-Eyes Rehearsal Checklist (PROMPT-017 and REQ-007 W13)
 
 **Run this once, in full, on the presentation machine before the demo.** This is the same
-checklist `docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md`'s fresh-eyes rehearsal runs on the
-development machine; running it again here catches anything specific to the Windows machine
-before the Windows-machine gate is called green.
+checklist the rehearsal gate runs; running it again here on the presentation machine catches
+anything specific to Windows before the live demo begins.
 
-1. [ ] Backend starts on 8010 with `D_SYSTEM_DEMO_TERMINAL=1`; frontend builds and serves on
-       5180.
-2. [ ] The stage page loads; at 1280×720, 1920×1080, **and a half-width window (960×1080 —
-       D05-W's interpretation, confirmed passing)** there is zero page scrolling, no overlapping
-       elements, and every reveal control (tabs, expanders, popups) opens and collapses as
-       required.
-3. [ ] The embedded terminal connects, runs a real shell, and echoes interactive input.
-4. [ ] The talking-points panel cycles the owner's content from its data file.
-5. [ ] `tools/demo_reset.py` parks the pre-built overview skill and seeds the fallback audience
-       idea; the live-rebuild path runs end to end (idea recorded, triaged, skill rebuilt from
-       the deterministic tools, skill invoked, overview page generated and rendered in the
-       embedded panel); then `restore` returns the pre-built state.
-6. [ ] **Determinism check**: run `tools/overview_metrics.py` and `tools/overview_inventory.py`
-       (or `tools/generate_overview.py`, which wraps both) twice and confirm identical output.
-7. [ ] **Side-by-side fallback**: exercise the stage without the embedded terminal (descope rung
-       4) alongside an external terminal window, once.
+1. [ ] Backend and frontend start with `D_SYSTEM_DEMO_TERMINAL=1` on ports 8010 and 5180 respectively.
+2. [ ] The workbench page loads at 1280×720, 1920×1080, and intermediate sizes; there is zero page
+       scrolling, no overlapping elements, and every reveal control (tabs, expanders, dropdowns)
+       opens and collapses as required.
+3. [ ] The embedded terminal connects, runs a real shell (bash or PowerShell depending on configuration),
+       and echoes interactive input. Session tabs function.
+4. [ ] The notes strip displays the active entry with no title label; all controls live in the dropdown
+       menu (cycling, file picker, timed advance); the `?` tooltip appears at the strip's far left.
+5. [ ] The terminal panel's ellipsis menu (top right) contains Collapse and Drop/restore options and
+       both function: collapse does not terminate sessions; drop displays an info page and grays out
+       injection dropdowns; restore returns a working terminal.
+6. [ ] Injection dropdowns (Commands, Skills, Prompts, Agents) inject their entries' text un-executed
+       into the active terminal tab. Selections persist across the panel.
+7. [ ] `tools/demo_reset.py prepare` parks the pre-built overview skill and seeds the fallback audience
+       idea; the live-rebuild path runs end to end (idea recorded, triaged, skill rebuilt from the
+       deterministic tools, skill invoked, overview page generated and rendered in the HTML Viewer);
+       then `restore` returns the pre-built state.
+8. [ ] The HTML Viewer displays the generated overview; the refresh button reloads it; the file dropdown
+       lists files in the chosen directory; the directory button opens a dialog to change the search
+       directory. The viewer has tabs with directory, search text, and displayed page scoped per tab.
+9. [ ] The explorer slot displays File Browser by default (with Idea Explorer and Backlog Explorer behind
+       the header dropdown); the File Browser shows a collapsible tree, is filterable by text and file type,
+       and right-click context menus work (reveal-in-explorer, open-in-HTML-Viewer, copy paths, inject path).
+10. [ ] Layout configuration button switches between layouts; zero scroll and no overlapping regions in
+        both layouts at all sizes.
+11. [ ] **Determinism check**: run `tools/overview_metrics.py` and `tools/overview_inventory.py`
+        (or `tools/generate_overview.py`, which wraps both) twice and confirm identical output.
+12. [ ] CMD and PowerShell panel options each execute a command and display output correctly (W12).
+13. [ ] **Side-by-side fallback**: exercise the workbench without the embedded terminal (descope rung 8)
+        alongside an external terminal window, once.
 
 **Result (owner to fill in):**
 
 ```
 Date and time:
-Items 1-7 status: [PASS / FAIL, per item]
+Items 1-13 status: [PASS / FAIL, per item]
 Notes:
 ```
 
@@ -127,8 +229,8 @@ Notes:
 - [ ] Create a pre-demo git tag to capture the baseline state before live-segment ideas are
       recorded. Example:
       ```
-      git tag demo-day-2026-09-10
-      git push origin demo-day-2026-09-10
+      git tag demo-day-2026-09-15
+      git push origin demo-day-2026-09-15
       ```
 - [ ] Verify the tag exists: `git tag -l demo-day-*` lists the tag.
 - [ ] Verify `tools/demo_reset.py prepare` once against the tagged state: run
@@ -154,7 +256,7 @@ Notes:
 Before the live demo begins:
 
 - [ ] Notifications and alerts are disabled (so no unexpected popups appear during the recording).
-- [ ] The terminal window is opened in the repository root with a clean scrollback (no previous
+- [ ] The PowerShell or cmd window is opened in the repository root with a clean scrollback (no previous
       commands visible).
 - [ ] The browser profile is clean: no personal tabs, bookmarks or history showing.
 - [ ] Nothing from `_private/` is visible on screen at any point during the demo.
