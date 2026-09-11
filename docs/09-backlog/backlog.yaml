@@ -5417,6 +5417,13 @@ items:
   status: complete
   agent: agent-demo-data
   session: doc-session-file-browser-panel
+  completion_evidence:
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/FileTreeContextMenu.tsx
+  - ts/src/stage/panelBridge.ts
+  - ts/src/workbench/panelRegistry.tsx
+  - src/api/routes/workbench.py
+  - test/test_workbench_api.py
   result: 'In progress (evidence lives on the unmerged agent/phase-wb-05 worktree
     branch, not yet on dev, so not cited as completion_evidence here). W05-C1
     (tree, filters, documentation-explorer preset) passed first-cycle: build
