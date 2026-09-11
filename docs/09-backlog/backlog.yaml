@@ -5073,8 +5073,10 @@ items:
   - test/test_demo_terminal.py
 - id: phase-wb-02
   title: Layout engine and notes strip
-  next_action: After phase-wb-01 completes and integrates (the notes-file picker consumes its
-    listing route; one claim id, one active phase), dispatch pack section W02 (PROMPT-021).
+  next_action: W02-C1/V1 and W02-C2/V2 are committed and validated with no findings; W02-G
+    (phase gate) is green. Remaining before close - the coordinator dispatches W02-A
+    (adversarial review) and W02-W (Playwright browser verification), the GOV-003 completion
+    gate this orchestrator does not run itself.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5133,6 +5135,31 @@ items:
   - ts/src
   - ts/vite.config.ts
   - _data/workbench/layouts
+  session: doc-session-workbench-layout-notes-strip
+  completion_evidence:
+  - ts/src/workbench/types.ts
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/src/workbench/LayoutConfigDialog.tsx
+  - ts/src/workbench/storage.ts
+  - ts/src/workbench/Slot.tsx
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  - ts/src/stage/NotesStripRegion.tsx
+  - _data/workbench/layouts/layout-1.json
+  - _data/workbench/layouts/layout-2.json
+  result: 'Interim, not complete: W02-C1 (layout engine) and W02-C2 (notes strip) committed on
+    agent/phase-wb-02 and each validated by its dispatched validator with no findings. W02-G
+    (phase gate) recorded a full pass on the second dispatch (the first run''s transcript
+    truncated and was re-dispatched, never treated as a result): governance exit 0,
+    check_no_private_content OK, both deliverables present, npm run build passes, pytest 534
+    passed/3 failed (the three failures are the known host-wide pyenv shim rehash contention in
+    test_demo_terminal.py, an environmental defect, not a phase finding), and the diff against
+    dev touches only ts/ and _data/workbench/layouts/. A mid-session blocking finding (W02-C2''s
+    sanctioned deletion of ts/src/stage/TalkingPointsRegion.tsx broke governance''s
+    completion-evidence check for the already-complete phase-demo-02) was reported up and
+    resolved by the coordinator on dev (commit 0ab5aa4, GOV-003); the worktree was rebased onto
+    it and governance now passes. Outstanding before this phase can close: W02-A (adversarial
+    review) and W02-W (Playwright browser verification), both coordinator-dispatched per the
+    phase''s own verification list.'
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
   next_action: After phase-wb-01 and phase-wb-02 complete and integrate, dispatch pack
