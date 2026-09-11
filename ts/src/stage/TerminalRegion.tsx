@@ -7,6 +7,7 @@ import Popover from './Popover'
 import CommandPanel from './CommandPanel'
 import InjectionDropdowns from './InjectionDropdowns'
 import TerminalMenu from './TerminalMenu'
+import { terminalBridge, type TerminalBridgeHandle } from './panelBridge'
 
 type TerminalEnabledState = 'checking' | 'enabled' | 'disabled' | 'unknown'
 type ConnectionState = 'connecting' | 'open' | 'closed'
@@ -387,6 +388,27 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
       setActiveSessionId(next[Math.max(0, Math.min(index, next.length - 1))])
     }
   }
+
+  // REQ-007 W09: publishes this instance's injection reach — enabled/dropped plus a way to send
+  // un-executed text to the active session's input line — to the File Browser's right-click
+  // context menu ("Inject path into terminal"), which is a sibling panel with no other route to
+  // reach this one (`panelBridge.ts`). `injectPath` reuses `sendToActiveSession` with
+  // `appendNewline: false`, the exact same call `InjectionDropdowns`' `onSelect` already makes
+  // (R12 mechanics), so a menu-injected path behaves identically to a Skills/Prompts/Agents
+  // selection. Re-registers whenever `enabledState`/`dropped`/`activeSessionId` change so the
+  // bridge's availability flags and injection target never lag what the header's own injection
+  // dropdowns are keyed on; unregisters on unmount (this terminal-type panel swapped out of its
+  // slot, or the whole app tearing down).
+  useEffect(() => {
+    const handle: TerminalBridgeHandle = {
+      enabled: enabledState === 'enabled',
+      dropped,
+      injectPath: (path) => sendToActiveSession(path, false),
+    }
+    terminalBridge.register(handle)
+    return () => terminalBridge.unregister(handle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabledState, dropped, activeSessionId])
 
   // REQ-007 W12: bash keeps the pre-existing bare "Terminal" title (nothing about the bash
   // panel's own label changes), cmd/powershell name themselves so the presenter can tell the

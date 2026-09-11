@@ -1,7 +1,26 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import DirectoryPickerDialog from './DirectoryPickerDialog'
+import FileTreeContextMenu from './FileTreeContextMenu'
+import { COMPATIBLE_EXTENSIONS } from './HtmlViewerRegion'
+import { useTerminalBridge, useViewerBridge } from './panelBridge'
 
 const SEARCH_URL = '/api/v1/workbench/search'
+const REVEAL_URL = '/api/v1/workbench/reveal'
+
+// REQ-007 W09's "copy absolute path" action, and ADR-015's own "served from the backend's
+// knowledge of the repository root": no route in `src/api/routes/workbench.py` resolves and
+// returns a repo-relative path's absolute, server-side location — `/list`/`/search` report only
+// the repo-relative `path` field (`DirectoryEntry`), and `/reveal`'s response is the argument
+// handed to the OS opener it just spawned as a side effect, not a standalone path lookup. This
+// menu item is shown for every entry (never hidden — the action is applicable in principle to
+// any path) but always surfaces this in-place message instead of a real path, since there is
+// nothing this frontend-only phase can correctly compute client-side: the repository root is a
+// server-side filesystem location this component has no way to know. See this phase's dispatch
+// report for the finding.
+const ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE =
+  'Copy absolute path is not available: no backend route resolves the repository root server-side yet ' +
+  '(ADR-015 names this capability; src/api/routes/workbench.py has no route for it). Flagged as a ' +
+  'blocking finding rather than guessed at client-side.'
 
 interface DirectoryEntry {
   name: string
@@ -10,6 +29,22 @@ interface DirectoryEntry {
 }
 
 type LoadState = 'loading' | 'loaded' | 'error'
+
+/** The right-clicked tree entry the context menu is currently open for, and the pointer position
+ * it should open at. `null` means no menu is open. */
+interface ContextMenuState {
+  x: number
+  y: number
+  node: FileTreeNode
+}
+
+/** The outcome of the most recent context-menu action, shown as a single in-place status line
+ * (REQ-007 W09's "surface its refusal … as a visible message", generalized to every action's
+ * outcome rather than just the reveal refusal it was written for). */
+interface ActionStatus {
+  kind: 'info' | 'error'
+  message: string
+}
 
 /** One node of the client-built file tree (REQ-007 W09). `path` is always repository-relative,
  * matching what `phase-wb-01`'s routes take and return. Directories carry their descendants;
@@ -128,11 +163,15 @@ function TreeLevel({
   nodes,
   expandedPaths,
   onToggle,
+  onContextMenu,
   root = false,
 }: {
   nodes: FileTreeNode[]
   expandedPaths: Set<string>
   onToggle: (path: string) => void
+  /** REQ-007 W09: right-click opens the context menu for the node under the pointer — attached
+   * to every entry, directory and file alike, at every depth. */
+  onContextMenu: (event: ReactMouseEvent, node: FileTreeNode) => void
   /** The outermost call (the context folder's own children) skips the indent every deeper level
    * gets, so the top-level entries sit flush with the tree container instead of one step in. */
   root?: boolean
@@ -152,16 +191,26 @@ function TreeLevel({
               className="stage-file-browser__tree-toggle"
               aria-expanded={expandedPaths.has(node.path)}
               onClick={() => onToggle(node.path)}
+              onContextMenu={(event) => onContextMenu(event, node)}
             >
               <span aria-hidden="true">{expandedPaths.has(node.path) ? '▾' : '▸'}</span> {node.name}/
             </button>
             {expandedPaths.has(node.path) ? (
-              <TreeLevel nodes={node.children} expandedPaths={expandedPaths} onToggle={onToggle} />
+              <TreeLevel
+                nodes={node.children}
+                expandedPaths={expandedPaths}
+                onToggle={onToggle}
+                onContextMenu={onContextMenu}
+              />
             ) : null}
           </li>
         ) : (
           <li key={node.path} className="stage-file-browser__tree-item">
-            <span className="stage-file-browser__tree-file" title={node.path}>
+            <span
+              className="stage-file-browser__tree-file"
+              title={node.path}
+              onContextMenu={(event) => onContextMenu(event, node)}
+            >
               {node.name}
             </span>
           </li>
@@ -172,12 +221,12 @@ function TreeLevel({
 }
 
 /**
- * The File Browser panel (REQ-007 W09, tree half only — the right-click context menu described
- * alongside it in W09 is a separate, not-yet-dispatched slice of that same requirement row and is
- * not built here). Shows a collapsible treeview of subdirectories and files under a context
- * folder chosen through the same in-app directory dialog `HtmlViewerRegion` already uses
- * (`DirectoryPickerDialog`, the `phase-wb-04` pattern over `phase-wb-01`'s one-level listing
- * route), filterable by text search and by file type, hiding folders with no matches.
+ * The File Browser panel (REQ-007 W09). Shows a collapsible treeview of subdirectories and files
+ * under a context folder chosen through the same in-app directory dialog `HtmlViewerRegion`
+ * already uses (`DirectoryPickerDialog`, the `phase-wb-04` pattern over `phase-wb-01`'s one-level
+ * listing route), filterable by text search and by file type, hiding folders with no matches, and
+ * right-clickable for a five-action context menu (`FileTreeContextMenu.tsx`, this comment's own
+ * later section) on every entry.
  *
  * Fed by the recursive search route (`GET /api/v1/workbench/search`, `phase-wb-01`) fetched once
  * per context-folder change with no `q`/`ext` query params — every non-ignored file under the
@@ -202,6 +251,23 @@ function TreeLevel({
  * simply leaves no preset's configuration matching current state, so the preset `<select>` shows
  * "Custom" — computed from current state (`currentPresetId`), never tracked as separate state
  * that could drift from it.
+ *
+ * The context menu (REQ-007 W09's second half): right-clicking any tree entry opens
+ * `FileTreeContextMenu` at the pointer with five actions — reveal in file explorer, open in HTML
+ * Viewer (compatible files only, nested submenu choosing the target tab), copy relative path,
+ * copy absolute path, and inject path into terminal. The first, third and fifth are wired here
+ * directly (a `POST /reveal` call, `navigator.clipboard.writeText`, and the terminal bridge's
+ * `injectPath`); "open in HTML Viewer" and "inject path into terminal" reach a *different*,
+ * independently-mounted panel, which this component has no other way to reach — see
+ * `panelBridge.ts`'s doc comment for why a small cross-panel registry exists at all. Every
+ * outcome (a reveal refusal's message, a copy confirmation, an injection confirmation) is shown
+ * in `actionStatus`, a single-line status this panel owns, rather than a transient `alert()` —
+ * consistent with this app's general posture of an in-place message over a native dialog.
+ * "Copy absolute path" is the one action with no working backend behind it yet: ADR-015 says it
+ * "is served from the backend's knowledge of the repository root," but `src/api/routes/
+ * workbench.py` has no route that resolves and returns one — see this component's own
+ * `ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE` for what is shown instead, and this phase's dispatch
+ * report for the finding.
  */
 export default function FileBrowserRegion() {
   const [contextFolder, setContextFolder] = useState('.')
@@ -210,6 +276,14 @@ export default function FileBrowserRegion() {
   const [entries, setEntries] = useState<DirectoryEntry[]>([])
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set())
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
+  const [actionStatus, setActionStatus] = useState<ActionStatus | null>(null)
+
+  // REQ-007 W09's remaining two actions reach a different, independently-mounted panel — see
+  // `panelBridge.ts`'s doc comment. `null` here means "that panel is not currently on screen",
+  // which `FileTreeContextMenu` renders as a disabled/hidden item rather than a broken action.
+  const terminalHandle = useTerminalBridge()
+  const viewerHandle = useViewerBridge()
 
   useEffect(() => {
     let cancelled = false
@@ -281,6 +355,103 @@ export default function FileBrowserRegion() {
     PRESETS.find((preset) => preset.directory === contextFolder && preset.typeFilter === typeFilter)?.id ??
     'custom'
 
+  // A stale menu anchored to an entry from the previous context folder would otherwise linger
+  // over the newly loaded tree — close it (and any leftover status) the moment the browsed folder
+  // changes, the same "fresh browse resets transient state" rule the expansion-clearing effect
+  // above already applies.
+  useEffect(() => {
+    setContextMenu(null)
+  }, [contextFolder])
+
+  function openContextMenu(event: ReactMouseEvent, node: FileTreeNode): void {
+    event.preventDefault()
+    setContextMenu({ x: event.clientX, y: event.clientY, node })
+  }
+
+  // REQ-007 W09 action 1: POST the entry's repo-relative path to phase-wb-01's reveal route
+  // (`src/api/routes/workbench.py`, `POST /reveal`) and surface its refusal — a repository-escape
+  // or an excluded (`_private/`/gitignored) path, ADR-015 rule 5 — as a visible message rather
+  // than a silent failure. A success spawns the OS file-manager opener as a side effect; this
+  // reports that it was requested, not that the opener window has appeared (the route itself
+  // does not wait for that either).
+  async function handleReveal(node: FileTreeNode): Promise<void> {
+    try {
+      const response = await fetch(REVEAL_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: node.path }),
+      })
+      if (response.ok) {
+        setActionStatus({ kind: 'info', message: `Reveal requested for "${node.path}".` })
+        return
+      }
+      let detail = `request failed (status ${response.status})`
+      try {
+        const body: unknown = await response.json()
+        if (
+          typeof body === 'object' &&
+          body !== null &&
+          typeof (body as { detail?: unknown }).detail === 'string'
+        ) {
+          detail = (body as { detail: string }).detail
+        }
+      } catch {
+        // Falls through with the status-only message above — the body was not JSON with a
+        // `detail` string, which the reveal route always sends on refusal, but this stays
+        // defensive against anything else fronting the API in a dev proxy misconfiguration.
+      }
+      setActionStatus({ kind: 'error', message: `Reveal refused: ${detail}` })
+    } catch {
+      setActionStatus({ kind: 'error', message: 'Reveal failed: could not reach the backend.' })
+    }
+  }
+
+  // REQ-007 W09 action 3: the exact repo-relative string the tree already carries (`node.path`
+  // is `DirectoryEntry.path` verbatim, as served by `/search` — REQ-007 W09's "as served by the
+  // API").
+  function handleCopyRelativePath(node: FileTreeNode): void {
+    navigator.clipboard.writeText(node.path).then(
+      () => setActionStatus({ kind: 'info', message: `Copied relative path: ${node.path}` }),
+      () =>
+        setActionStatus({
+          kind: 'error',
+          message: 'Could not copy the relative path — the clipboard was not reachable.',
+        }),
+    )
+  }
+
+  // REQ-007 W09 action 4 — see `ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE`'s own comment for why this
+  // reports absence rather than a path.
+  function handleCopyAbsolutePath(): void {
+    setActionStatus({ kind: 'error', message: ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE })
+  }
+
+  // REQ-007 W09 action 2: hands the entry's path to whichever HTML Viewer tab the submenu chose,
+  // through the bridge `HtmlViewerRegion` registers itself into (`panelBridge.ts`).
+  function handleOpenInViewer(node: FileTreeNode, tabId: number): void {
+    if (!viewerHandle) return
+    viewerHandle.openInTab(tabId, node.path)
+    setActionStatus({ kind: 'info', message: `Opened "${node.path}" in the HTML Viewer.` })
+  }
+
+  // REQ-007 W09 action 5: same un-executed injection `InjectionDropdowns`' own selections use
+  // (R12 mechanics), reached through the terminal bridge.
+  function handleInjectPath(node: FileTreeNode): void {
+    if (!terminalHandle) return
+    terminalHandle.injectPath(node.path)
+    setActionStatus({
+      kind: 'info',
+      message: `Injected "${node.path}" into the active terminal tab's input line.`,
+    })
+  }
+
+  const contextMenuNode = contextMenu?.node ?? null
+  const contextMenuViewerCompatible =
+    contextMenuNode !== null &&
+    !contextMenuNode.isDir &&
+    COMPATIBLE_EXTENSIONS.includes(extensionOf(contextMenuNode.name) ?? '')
+  const contextMenuTerminalAvailable = terminalHandle !== null && terminalHandle.enabled && !terminalHandle.dropped
+
   return (
     <section className="stage-region stage-region--file-browser" aria-label="File Browser">
       <header className="stage-region__header">
@@ -311,6 +482,24 @@ export default function FileBrowserRegion() {
         <p className="stage-file-browser__meta">
           Browsing <code>{contextFolder}</code>
         </p>
+        {actionStatus ? (
+          <p
+            className={
+              'stage-file-browser__status' +
+              (actionStatus.kind === 'error' ? ' stage-file-browser__status--error' : '')
+            }
+          >
+            {actionStatus.message}
+            <button
+              type="button"
+              className="stage-file-browser__status-dismiss"
+              aria-label="Dismiss status message"
+              onClick={() => setActionStatus(null)}
+            >
+              ×
+            </button>
+          </p>
+        ) : null}
         <div className="stage-file-browser__filters">
           <input
             type="text"
@@ -350,11 +539,31 @@ export default function FileBrowserRegion() {
               nodes={tree.children}
               expandedPaths={effectiveExpandedPaths}
               onToggle={toggleExpanded}
+              onContextMenu={openContextMenu}
               root
             />
           )}
         </div>
       </div>
+      {contextMenu ? (
+        <FileTreeContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          entryName={contextMenu.node.name}
+          viewerCompatible={contextMenuViewerCompatible}
+          viewerAvailable={viewerHandle !== null}
+          viewerTabs={viewerHandle?.tabs ?? []}
+          terminalAvailable={contextMenuTerminalAvailable}
+          onReveal={() => {
+            void handleReveal(contextMenu.node)
+          }}
+          onOpenInViewer={(tabId) => handleOpenInViewer(contextMenu.node, tabId)}
+          onCopyRelativePath={() => handleCopyRelativePath(contextMenu.node)}
+          onCopyAbsolutePath={handleCopyAbsolutePath}
+          onInjectPath={() => handleInjectPath(contextMenu.node)}
+          onClose={() => setContextMenu(null)}
+        />
+      ) : null}
     </section>
   )
 }

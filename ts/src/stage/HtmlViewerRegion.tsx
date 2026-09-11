@@ -3,6 +3,7 @@ import DirectoryPickerDialog from './DirectoryPickerDialog'
 import Popover from './Popover'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadHtmlViewerTabs, saveHtmlViewerTabs } from '../workbench/storage'
+import { viewerBridge, type ViewerBridgeHandle } from './panelBridge'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 const SEARCH_URL = '/api/v1/workbench/search'
@@ -11,8 +12,10 @@ const SEARCH_URL = '/api/v1/workbench/search'
 // (`src/api/routes/workbench.py`, `phase-wb-01`) report paths only, never content (ADR-015), so
 // this is what actually fetches the bytes an iframe can render.
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
-// REQ-007 W07: "the compatible files (.html and .svg)".
-const COMPATIBLE_EXTENSIONS = ['.html', '.svg']
+// REQ-007 W07: "the compatible files (.html and .svg)". Exported so the File Browser's
+// right-click context menu (`FileBrowserRegion.tsx`, REQ-007 W09) can hide "Open in HTML Viewer"
+// on an incompatible entry using this same list rather than a second, hand-kept copy of it.
+export const COMPATIBLE_EXTENSIONS = ['.html', '.svg']
 
 // REQ-007 W08: "tabs exactly like the terminal's session tabs" — mirrors `TerminalRegion`'s own
 // `MAX_SESSIONS`/`FIRST_SESSION_ID` constants and cap, one tab bar per panel instance.
@@ -271,6 +274,26 @@ export default function HtmlViewerRegion() {
       activeTabId,
     )
   }, [schemaVersion, tabs, activeTabId])
+
+  // REQ-007 W09: publishes this instance's live tabs — and a way to open a path into one of them
+  // — to the File Browser's right-click context menu, which is a sibling panel with no other
+  // route to reach this one (`panelBridge.ts`'s own doc comment explains why a bridge is needed
+  // at all). Re-registers on every `tabs` change so the bridge's tab list (and each tab's label,
+  // which is derived from array position) never lags the panel actually on screen; unregisters on
+  // unmount, e.g. the layout's main slot swapping away from `html-viewer` (layout 2 also admits
+  // `overview`), so a stale registration never outlives the panel it describes.
+  useEffect(() => {
+    const handle: ViewerBridgeHandle = {
+      tabs: tabs.map((tab, index) => ({ id: tab.id, label: `Tab ${index + 1}` })),
+      openInTab: (tabId, path) => {
+        updateTab(tabId, { selectedFile: path })
+        setActiveTabId(tabId)
+      },
+    }
+    viewerBridge.register(handle)
+    return () => viewerBridge.unregister(handle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabs])
 
   const addTab = () => {
     if (tabs.length >= MAX_TABS) return
