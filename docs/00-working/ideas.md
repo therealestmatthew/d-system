@@ -5019,6 +5019,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T17:48:07-04:00): Batch extended again 2026-09-11: 000115 (duplication/modularity audit, e.g. multi-panel slot support) and 000116 (code structure and file-size audit with proposed target structures). Planning-session instruction from the owner: before authoring the pack, review ALL items in this batch (000108-000116) and determine the optimal ordering for both investigating and executing them - audits (000113-000116) likely inform the design and sequencing of the feature items (000108-000112), and the bookmark system (000111) needs its storage/reference ADR before anything builds against it.
 - **note** by repository-owner (2026-09-11T18:01:55-04:00): Batch extended 2026-09-11 with five agent-scouted, owner-approved companions: 000117 (Popover-wide fix scope, extends 000108), 000118 (COMPATIBLE_EXTENSIONS gate for markdown), 000119 (markdown render-location decision), 000120 (batch panel-bridge for categories), 000121 (cache invalidation vs demo-week overview regeneration, extends 000114). Scout also confirmed terminal reconnect is already idea 000087 and the bookmark-store write ADR is inside 000111.
 - **note** by repository-owner (2026-09-11T19:32:52-04:00): Batch extended 2026-09-11 (evening): 000123 (audit the pre-build HTML generation plans against the built reality - accomplished/open/superseded/retire disposition per requirement) and 000124 (formalize the system's vocabulary - e.g. the terminal slot is named after its initial occupant, wrong once panels are assignable; governed glossary plus rename-vs-alias migration). 000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names.
+- **note** by repository-owner (2026-09-11T19:40:47-04:00): Batch reframed 2026-09-11 (000125): the batch has outgrown one plan - the planning session opens with holistic triage of ALL these ideas (categorize, prioritize, group into multiple plans with an ordering across them) before any deep-dive development. Added: 000126 (thorough audit of commands/skills/agents - codebase design first, demo effectiveness second), 000127 (idea skill delegates capture to a subagent to protect main-session context; one instance of a recurring owner pattern), 000128 (shared state model for multi-agent planning sessions).
 
 **Links**
 
@@ -5223,3 +5224,48 @@ Owner request, 2026-09-11, for the next workbench prompt-pack planning session (
 
 - relates_to → `000115`
 - relates_to → `000116`
+
+---
+
+## 000125 · Holistic triage of the accumulated idea batch: categorize, prioritize, and split into plans
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+
+Owner direction, 2026-09-11, governing how the next planning session opens. The idea batch anchored at 000108 has grown past what one plan should contain, and the owner expects to keep adding. Before any deep dive into comprehensive development, the planning session must take a holistic look at ALL open ideas in the batch (and any that join later): categorize them, prioritize them, and figure out how they group into DIFFERENT plans - plural - rather than forcing one prompt pack to hold everything. Only after that grouping is settled does comprehensive development of each plan begin. This supersedes the earlier framing of "the next prompt pack" as a single container: the pack-planning session becomes a triage-and-grouping session first, producing multiple plan boundaries with an ordering across them.
+
+---
+
+## 000126 · Thorough audit of the repository's commands, skills, and agents
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Audit everything under .claude/ (commands, skills) and the agent definitions this repository ships: first and foremost for efficient and proper design of the codebase - each command/skill/agent judged on whether its scope, tooling, model assignment and context cost fit its job - and second for creating effective demos, like the live demo of 2026-09-15 (which skills/agents make good on-stage material, which need hardening before being shown). The audit should produce per-item findings (keep / redesign / retire / missing-and-needed) and feed the recurring pattern the owner has flagged: work that runs in the main session context but should not (see the idea-skill subagent example and the shared-state model idea recorded alongside this one).
+
+**Links**
+
+- relates_to ← `000127`
+- relates_to ← `000128`
+
+---
+
+## 000127 · Idea skill delegates capture to a subagent instead of spending main-session context
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108); named by the owner as one example of a recurring pattern to expect in their working style. The idea skill currently performs capture directly in the main conversation context. In sessions where the context window is precious - like a long coordination or planning session - the skill should instead spin up a subagent that handles the capture (writing the idea through the sanctioned writer, linking, regenerating the markdown, committing per protocol) and returns only the created ids, keeping the tool output and file churn out of the main context. The general principle to extract during the commands/skills/agents audit: any skill whose work is mechanical and self-contained should run in a subagent by default, with the main session receiving just the result. Constraint: the subagent must still obey the idea-system rules (sanctioned writer only, ids taken from the writer's output, post-processed reads).
+
+**Links**
+
+- relates_to → `000126`
+
+---
+
+## 000128 · Shared state model for multi-agent planning sessions
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Develop a shared state model that tracks relevant information for use across multiple agents during highly variable, complex planning sessions like the 2026-09-11 workbench sessions: facts established mid-session (environment quirks such as the port-8000 conflict, corrected diagnoses like idea 000107's, decisions taken, batch membership and ordering), available to every dispatched agent without the coordinator re-pasting them into each prompt. Design questions: where the state lives (the tracked _tmpagent/ mechanism already exists for files sibling worktree agents must read - extend it, or a new structured store), its shape (append-only facts vs a curated current-state document), who may write it (coordinator only, or any agent with attribution), how staleness is handled, and how it relates to the session record (which is the human-facing account, not an agent data bus). Relates to the truncation/resume frictions and repeated coordinator addenda observed in the wb-08/09 builds - much of what the coordinator hand-carried between agents is exactly this state.
+
+**Links**
+
+- relates_to → `000126`
