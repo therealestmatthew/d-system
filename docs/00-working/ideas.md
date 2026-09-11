@@ -4916,3 +4916,11 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 **Created 2026-09-11T00:27:59-04:00 · Status: `open`**
 
 With D_SYSTEM_DEMO_TERMINAL unset, the frontend still fetches /api/v1/workbench/injection-sources and /list on load, producing four browser console 404 resource-log entries per reload (measured in phase-wb-03's W03-W item 5). Degradation is otherwise correct — disabled dropdowns, absent-terminal message, no uncaught exceptions — so this is cosmetic console noise, not a defect. Candidate: probe the existing /api/v1/demo/stage/terminal-enabled endpoint first and skip workbench fetches when false. Recorded via the PROMPT-023 enhancement lane (record, do not build) during the phase-wb-03 scout pass.
+
+---
+
+## 000101 · Workbench multi-panel slots render a double header after a dropdown swap
+
+**Created 2026-09-11T03:39:18-04:00 · Status: `open`**
+
+When a slot admitting several panels swaps one in via its header dropdown (REQ-007 W06), the swapped-in panel still renders its own inner .stage-region header below the slot-level header, so the panel shows two stacked headers. Deliberately left as a cosmetic case by phase-wb-02 (noted in ts/src/workbench/Slot.tsx and ts/src/workbench/panelRegistry.tsx) when no multi-panel slot was reachable; it became reachable when phase-wb-03 shipped the shell panel options and phase-wb-05/06 filled layout-1's explorer slot (file-browser, idea-explorer, backlog-explorer). Candidate polish: suppress or merge the inner header when a panel renders inside a multi-panel slot, keeping the slot-level dropdown header as the single title row. Touches REQ-007 W06's rendered look but not its stated behavior, so recorded for the owner rather than built (workbench build enhancement lane, PROMPT-023 delta 3). Found during the phase-wb-06 coordinator scout, 2026-09-11.
