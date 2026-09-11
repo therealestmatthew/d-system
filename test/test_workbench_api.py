@@ -561,6 +561,75 @@ def test_reveal_rejects_nonexistent_path(rebuild_app: Callable[..., FastAPI]) ->
     assert response.status_code == 404
 
 
+def test_reveal_refuses_a_private_path_and_never_spawns(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The same `_private/` exclusion the listing routes apply
+    (`test_root_listing_contains_no_private_or_gitignored_entry`) must also stop `/reveal` from
+    spawning an opener on a `_private/`-scoped path — the finding this guards against: `/reveal`
+    checked only path escape, never the private/gitignored exclusion, so it could be pointed at
+    `_private/` and would actually spawn.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    captured: list[list[str]] = []
+    live_workbench = _live_workbench_module()
+    monkeypatch.setattr(live_workbench, "_launch_reveal_opener", captured.append)
+    monkeypatch.setattr(live_workbench.platform, "system", lambda: "Linux")
+
+    private_dir = REPO_ROOT / "_private"
+    secret_dir = private_dir / "_workbench_reveal_private_tmp"
+    secret_file = secret_dir / "secret.txt"
+    private_dir_preexisted = private_dir.is_dir()
+    if not private_dir_preexisted:
+        private_dir.mkdir()
+    secret_dir.mkdir()
+    secret_file.write_text("not for reveal\n")
+    try:
+        response = client.post(
+            WORKBENCH_REVEAL_PATH,
+            json={"path": "_private/_workbench_reveal_private_tmp/secret.txt"},
+        )
+        assert response.status_code == 400
+        assert captured == [], "no opener process may be spawned on a _private/ path"
+    finally:
+        secret_file.unlink()
+        secret_dir.rmdir()
+        if not private_dir_preexisted:
+            private_dir.rmdir()
+
+
+def test_reveal_refuses_a_gitignored_path_and_never_spawns(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A path excluded by `git check-ignore` alone (no `_private/` involved) must also be
+    refused — the guard is the same exclusion the listing routes apply, not a hand-kept
+    `_private/`-only special case. `*.py[cod]` (`.gitignore`) is used as the fixture pattern.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    captured: list[list[str]] = []
+    live_workbench = _live_workbench_module()
+    monkeypatch.setattr(live_workbench, "_launch_reveal_opener", captured.append)
+    monkeypatch.setattr(live_workbench.platform, "system", lambda: "Linux")
+
+    ignored_file = REPO_ROOT / "test" / "_workbench_reveal_gitignore_tmp.pyc"
+    ignored_file.write_text("not for reveal\n")
+    try:
+        assert ignored_file in workbench_module._git_ignored_paths([ignored_file]), (
+            "fixture assumption: *.py[cod] under test/ is git-ignored"
+        )
+        response = client.post(
+            WORKBENCH_REVEAL_PATH, json={"path": "test/_workbench_reveal_gitignore_tmp.pyc"}
+        )
+        assert response.status_code == 400
+        assert captured == [], "no opener process may be spawned on a gitignored path"
+    finally:
+        ignored_file.unlink()
+
+
 def test_reveal_spawns_xdg_open_on_the_containing_directory_for_a_file(
     rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
 ) -> None:

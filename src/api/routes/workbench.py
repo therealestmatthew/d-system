@@ -31,8 +31,11 @@ Five capabilities, all read-only except the one named action (ADR-015 rule 4):
   the `queue` variant reuses `queue_order()` and `readiness()` from `src.governance.backlog`
   directly, so it matches the governance `--ready` rendering by construction rather than by a
   second, hand-kept ordering rule.
-- `POST /reveal` is the sole non-GET route: it validates its path per rule 2 above, then spawns
-  exactly one fixed opener via an argument list, never a shell string (ADR-015 rule 5).
+- `POST /reveal` is the sole non-GET route: it validates its path per rule 2 above, refuses a
+  path `_private/` or `git check-ignore` would exclude from the listing routes (the same check
+  `_git_ignored_paths` performs there, applied here to the single resolved path before spawning
+  anything), then spawns exactly one fixed opener via an argument list, never a shell string
+  (ADR-015 rule 5).
 """
 
 from __future__ import annotations
@@ -526,6 +529,17 @@ class RevealResult(BaseModel):
     opened: str
 
 
+def _is_reveal_excluded(resolved: Path) -> bool:
+    """`True` if `resolved` is `_private/` (or anywhere under it) or otherwise `git
+    check-ignore`d — the same exclusion `_visible_children`/`_walk_visible_tree` apply to the
+    listing routes via `_git_ignored_paths`, reused here on the single resolved path so `/reveal`
+    cannot spawn an opener on a path the listing routes would never show. `_private/` is itself
+    listed in `.gitignore`, so this one call covers both; `resolved` is required to exist (the
+    caller checks that first), which `_git_ignored_paths` requires.
+    """
+    return bool(_git_ignored_paths([resolved]))
+
+
 def _is_windows() -> bool:
     return platform.system() == "Windows"
 
@@ -562,6 +576,10 @@ async def reveal_in_explorer(request: RevealRequest) -> RevealResult:
         raise HTTPException(status_code=400, detail=str(error)) from error
     if not resolved.exists():
         raise HTTPException(status_code=404, detail=f"No such path: {request.path!r}")
+    if _is_reveal_excluded(resolved):
+        raise HTTPException(
+            status_code=400, detail=f"Path is excluded from reveal: {request.path!r}"
+        )
     argv = _reveal_argv(resolved)
     _launch_reveal_opener(argv)
     return RevealResult(opened=argv[-1])
