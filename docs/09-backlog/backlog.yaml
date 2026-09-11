@@ -5131,6 +5131,7 @@ items:
     W05, W06 and zero-scroll in both layouts at the four sizes
   deliverables:
   - ts/src
+  - ts/vite.config.ts
   - _data/workbench/layouts
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
