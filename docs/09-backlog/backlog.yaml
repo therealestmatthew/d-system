@@ -3,7 +3,6 @@ updated: '2026-09-10'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-02
 - phase-wb-03
 - phase-wb-04
 - phase-wb-05
@@ -5073,13 +5072,11 @@ items:
   - test/test_demo_terminal.py
 - id: phase-wb-02
   title: Layout engine and notes strip
-  next_action: W02-C1/V1 and W02-C2/V2 are committed and validated with no findings; W02-G
-    (phase gate) is green. W02-A (adversarial review) reported two majors and two minors, no
-    blocker; both majors fixed in one dispatch and re-validated clean by W02-V1/W02-V2; minor 3
-    recorded as idea 000098 by the coordinator, minor 4 resolved by widening this phase's
-    deliverables on dev. Remaining before close - the coordinator dispatches W02-W (Playwright
-    browser verification), the last item of the GOV-003 completion gate this orchestrator does
-    not run itself.
+  next_action: 'None — phase complete: all items validated, the W02-A majors fixed and
+    re-validated, W02-W passed on every reachable check with the multi-panel-dropdown and
+    panel-reassignment sub-checks deferred to phase-wb-04..06 whose panels first make them
+    exercisable, and the branch integrated into dev fast-forward at 622c558 under PROMPT-023
+    delta 1 pre-approved integration (GOV-003 completion gate, workbench extension).'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5089,7 +5086,7 @@ items:
   - sys-ui
   owner: repository-owner
   agent: agent-demo-stage
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -5151,7 +5148,8 @@ items:
   - ts/vite.config.ts
   - _data/workbench/layouts/layout-1.json
   - _data/workbench/layouts/layout-2.json
-  result: 'Interim, not complete: W02-C1 (layout engine) and W02-C2 (notes strip) committed on
+  - docs/03-sessions/SESS-2026-09-10-12-workbench-layout-notes-strip.md
+  result: 'Complete. W02-C1 (layout engine) and W02-C2 (notes strip) committed on
     agent/phase-wb-02 and each validated by its dispatched validator with no findings. W02-G
     (phase gate) recorded a full pass on the second dispatch (the first run''s transcript
     truncated and was re-dispatched, never treated as a result): governance exit 0,
@@ -5171,8 +5169,15 @@ items:
     notes-file picker), committed narrowly (38f56b3), and confirmed by re-dispatching W02-V1 and
     W02-V2 verbatim - both PASS, no findings, no regression. npm run build and governance
     reproduced green after the fix and the rebase onto dev''s widened-deliverables commit.
-    Outstanding before this phase can close: W02-W (Playwright browser verification),
-    coordinator-dispatched per the phase''s own verification list.'
+    W02-W (coordinator-dispatched) then passed every reachable check with measured evidence -
+    zero-scroll and non-overlap at all four sizes in both layouts, layout switch/reload/
+    clear-storage geometry round-trips, the full notes-strip battery, no application console
+    errors - with two sub-checks (multi-panel dropdown swap, panel reassignment) recorded as
+    not exercisable until phase-wb-04..06 register real panels; their gates cover them. A
+    coordinator-dispatched targeted browser re-check after the fix confirmed the picker lists
+    only notes-shaped files (demo-commands.json absent), persistence shares the one ADR-016
+    key, and layouts still round-trip. Integrated fast-forward into dev at 622c558 under
+    PROMPT-023 delta 1.'
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
   next_action: After phase-wb-01 and phase-wb-02 complete and integrate, dispatch pack
