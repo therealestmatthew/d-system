@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-10'
+updated: '2026-09-11'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -278,7 +278,17 @@ Semantic provider, private/cloud data boundary, storage and quality targets belo
 
 These are tracked gates with resume conditions, not missing backlog coverage. All feature plans remain open until their mapped phases are completed or explicitly cancelled with rationale.
 
-## A completed phase's evidence entry retires when a later phase legitimately deletes the file
+## The workbench completion gate extends to the fix phases
+
+Owner decision, 2026-09-11, ratified in the workbench-fixes planning session (AskUserQuestion,
+recorded in `PROMPT-024`'s planning trail). The workbench completion-authority substitution
+above extends on identical terms to `phase-wb-08` and `phase-wb-09`, the two fix phases the
+2026-09-11 delta added to [PLAN-022](../01-plans/PLAN-022-workbench.md) ("the seven
+`phase-wb-*` phases" reads as the track's phases, the same reading the `phase-demo-06`
+insertion established for the demo track). Integration onto `dev` is pre-approved for both
+behind a green gate per the kick-off record's delta. The extension does **not** cover
+`phase-wb-10` (the runbook refresh): that documentation phase completes through
+`/session-close` as normal, and its integration asks the owner.
 
 Coordinator decision, 2026-09-10, during the workbench build (PROMPT-022/PROMPT-023).
 `phase-wb-02`'s pack instruction (PROMPT-021 W02-C2, owner-ratified) replaces the

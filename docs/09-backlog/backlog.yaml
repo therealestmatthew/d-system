@@ -5,6 +5,7 @@ max_active: 3
 next_up:
 - phase-wb-08
 - phase-wb-09
+- phase-wb-10
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
@@ -5559,7 +5560,7 @@ items:
   - Build the Idea Explorer panel (REQ-007 W10) over phase-wb-01's fold()-only
     route - columns id, title, status, age, annotation count, link count; sortable
     and filterable; a toggle between the standard view and a priority-queue view
-    ranking by status precedence (open, triaged, planned) then age. No code path
+    ranking by status precedence (open, triaged, reviewing) then age. No code path
     reads _data/ideas.jsonl directly.
   - Build the Backlog Explorer panel (REQ-007 W11) as the same configuration
     surface over the backlog route - columns id, title, status, priority, queue
@@ -5682,7 +5683,7 @@ items:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
 - id: phase-wb-08
-  title: Terminal panel truncation fix — shell panels visibly fill their slot
+  title: Panel rendering fixes — terminal fill, HTML Viewer, File Browser scroll
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5706,6 +5707,17 @@ items:
     occupy - the fix must not hard-code the terminal slot's current geometry,
     because phase-wb-09 makes shells assignable to the main slot and re-runs the
     fill checks there (REQ-007 W15).
+  - Diagnose the HTML Viewer's blank rendering (owner report 2026-09-11) before
+    fixing, distinguishing the phase-wb-04 launch-flag follow-on
+    (D_SYSTEM_DEMO_TERMINAL=1 required on the frontend process) from the same
+    wrapper height collapse (layout 2's main slot is multi-panel); fix
+    whichever the diagnosis confirms is code (REQ-007 W15, viewer half). A
+    pre-fix diagnosis dispatch (pack W08-M, demo-validator-web) records the
+    live measurements the creator consumes - the creator agent has no browser
+    tool of its own.
+  - Give the File Browser tree internal vertical scrolling within the panel
+    body, holding in any slot and layout, with the page never scrolling
+    (REQ-007 W18).
   - Preserve zero page scroll (REQ-006 R02) and session persistence across
     layout switches.
   acceptance:
@@ -5718,19 +5730,32 @@ items:
   - 'The layout-switch persistence guard passes: MARKER set in layout 1 echoes
     identically after switching to layout 2 and back, with no new terminal
     websocket opened during the switches.'
+  - With the frontend launched flag-set, the HTML Viewer renders a known
+    overview figure in both layouts, including layout 2's multi-panel main
+    slot; the diagnosis report states the confirmed cause of the blank-viewer
+    report (REQ-007 W15).
+  - The File Browser body scrolls internally over an expanded docs/ tree, its
+    last entry reachable, with document scroll unchanged, in both layouts
+    (REQ-007 W18).
+  - The Windows confirmations (terminal and viewer visibly filled on the
+    presentation machine) are owner checks recorded in the build kick-off
+    record, not closed here on agent evidence.
   verification:
   - cd ts && npm run build
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   - Adversarial review (demo-adversary, pack W08-A) with findings fixed or
     explicitly reported (GOV-003 completion gate, workbench extension)
+  - Pre-fix diagnosis (demo-validator-web, pack W08-M) with recorded live
+    measurements consumed by the creator
   - Playwright browser verification (demo-validator-web, pack W08-W) covering
-    W15's fill assertions for all three shell panels in both layouts at the four
-    sizes plus the persistence guard
+    W15's fill assertions for all three shell panels and the HTML Viewer in
+    both layouts at the four sizes, W18's internal-scroll assertions, and the
+    persistence guard
   deliverables:
   - ts/src
-  next_action: Root-cause the xterm height collapse in the multi-panel slot
-    wrapper's height chain before writing any fix.
+  next_action: Dispatch the W08-M diagnosis, then root-cause the height
+    collapse from its measurements before writing any fix.
 - id: phase-wb-09
   title: Layout assignment model — per-panel eligibility, assignment-only dialog
   plan: doc-workbench
@@ -5784,8 +5809,8 @@ items:
     main slot in both layouts (REQ-007 W15 re-run), and the persistence guard
     passes.
   - On Linux a fresh store defaults the terminal slot to bash; the Windows
-    default (PowerShell) and a Windows two-shell round-trip are recorded in the
-    phase-wb-07 owner checklist, not closed here.
+    default (PowerShell) and a Windows two-shell round-trip are owner checks
+    recorded in the build kick-off record, not closed here.
   verification:
   - cd ts && npm run build
   - uv run pytest
@@ -5807,3 +5832,42 @@ items:
   - docs/04-decisions/ADR-014-workbench-terminal-capability.md
   next_action: Bump the layout schema_version and move eligibility onto the
     panel entries before touching the dialog.
+- id: phase-wb-10
+  title: Runbook and checklist refresh for the post-fix workbench UI
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-09
+  scope:
+  - Update the runbook and Windows setup checklist to the post-fix UI - the
+    assignment-only configuration dialog and the platform-conditional default
+    visible shell (PowerShell on Windows) replacing the descriptions of the old
+    per-slot dialog and bash-first default, in the rehearsal gate's step shape
+    (PROMPT-017); timeboxes stay inside 15 minutes.
+  - Add the phase-wb-04 follow-on launch line - D_SYSTEM_DEMO_TERMINAL=1 must
+    be set on the frontend process as well as the backend, or the HTML
+    Viewer's file-serving route is absent - to the launch sections of both
+    documents.
+  - Documentation only; no code, no reset-tool or OPS-013 changes (PROMPT-020
+    decision 7 stands).
+  acceptance:
+  - Both documents describe only the post-fix UI; no reference to the retired
+    per-slot configuration selects or a bash-first Windows default remains.
+  - Both launch sections state the frontend flag requirement.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - grep both documents for retired-dialog and bash-default phrasing - none
+    present
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  next_action: Rewrite the configuration and launch sections of both documents
+    against the integrated phase-wb-09 UI.

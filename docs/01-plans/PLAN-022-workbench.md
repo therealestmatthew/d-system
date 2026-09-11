@@ -83,11 +83,14 @@ W15–W17; hand-off `docs/00-working/handoff-workbench-layout-and-terminal-fixes
 under a new delegation pack ([PROMPT-024](../02-prompts/PROMPT-024-workbench-fixes-delegation-pack.md))
 with the same execution model as the seven phases above:
 
-- **`phase-wb-08` — terminal panel truncation fix (first priority).** Root-cause and fix the
-  shell panels' collapsing xterm area (idea `000104`; blank-white on Windows), covering all
-  three shell panels and any slot a shell can occupy, with the layout-switch session-persistence
-  regression guard. W15. It blocks `phase-wb-07`'s owner-driven dry-runs and Windows checks, so
-  it runs before everything else.
+- **`phase-wb-08` — panel rendering fixes (first priority).** Root-cause and fix the shell
+  panels' collapsing xterm area (idea `000104`; blank-white on Windows), covering all three
+  shell panels and any slot a shell can occupy, with the layout-switch session-persistence
+  regression guard; diagnose and fix the HTML Viewer's blank rendering (owner report
+  2026-09-11 — distinguishing the `phase-wb-04` frontend launch-flag follow-on from the same
+  wrapper collapse); and give the File Browser tree internal scrolling. W15, W18. A
+  diagnosis dispatch (`W08-M`, `demo-validator-web`) captures live measurements before the
+  creator works, because the creator agent has no browser tool.
 - **`phase-wb-09` — layout-assignment redesign (second).** Eligibility moves from slot to
   panel; the configuration dialog becomes the assignment-only surface; header dropdowns stay
   switchers; two live shells allowed; the backend cap rises to six with a platform/shell
@@ -95,12 +98,17 @@ with the same execution model as the seven phases above:
   bash elsewhere); layout files bump `schema_version` with ADR-016 rule-3 silent fallback.
   W16, W17. Its verification re-runs W15's fill assertions with a shell in the main slot.
 
-Order: `phase-wb-08` → `phase-wb-09`, encoded as `depends_on`; both precede the remaining
-owner-machine work of `phase-wb-07` in `next_up`, because that work is blocked on the terminal
-being visible. Follow-up noted, not folded in: after `phase-wb-09` changes the configuration
-dialog, the runbook and Windows checklist need an update pass (they describe the old dialog);
-that update belongs to the rehearsal-refresh work (`phase-wb-07`'s owner-facing documents) and
-is dispatched separately, not inside these phases.
+- **`phase-wb-10` — runbook and checklist refresh (owner decision 2026-09-11).** A
+  documentation-only phase after `phase-wb-09`: the runbook and Windows setup checklist are
+  updated to the post-fix UI (the assignment dialog, the platform-conditional default shell)
+  and gain the `phase-wb-04` follow-on launch line — `D_SYSTEM_DEMO_TERMINAL=1` on the
+  frontend process as well as the backend. Completes through `/session-close`, not the
+  coordinator (GOV-003).
+
+Order: `phase-wb-08` → `phase-wb-09` → `phase-wb-10`, encoded as `depends_on`. The rehearsal
+refresh (`phase-wb-07`) is being closed by the owner (2026-09-11) on their own recorded
+results; the post-fix Windows confirmations (W15 fill, W17 default and two-shell round-trip)
+are owner checks recorded in the build kick-off record rather than a re-opened `phase-wb-07`.
 
 ## Descope ladder
 

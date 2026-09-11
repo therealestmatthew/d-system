@@ -14,10 +14,11 @@ depends_on: [doc-workbench, doc-workbench-requirements, doc-prompt-workbench-del
 
 # Workbench fixes delegation pack — terminal truncation and layout assignment
 
-Every prompt the build coordinator sends to execute `phase-wb-08` (terminal panel truncation
-fix, first priority) and `phase-wb-09` (layout-assignment redesign), one delimited section per
-dispatch. Produced by the 2026-09-11 hand-off session from the owner's confirmed decisions
-(REQ-007 delta rows W15–W17); nothing is authored mid-build. The coordinator sends each fenced
+Every prompt the build coordinator sends to execute `phase-wb-08` (panel rendering fixes —
+terminal fill, HTML Viewer, File Browser scroll; first priority) and `phase-wb-09`
+(layout-assignment redesign), one delimited section per dispatch. Produced by the 2026-09-11
+hand-off session from the owner's confirmed decisions (REQ-007 delta rows W15–W18); nothing
+is authored mid-build. The coordinator sends each fenced
 block **verbatim** to the named agent and sends nothing that is not in this pack. The
 conventions are [PROMPT-021](PROMPT-021-workbench-delegation-pack.md)'s, restated:
 
@@ -42,7 +43,7 @@ conventions are [PROMPT-021](PROMPT-021-workbench-delegation-pack.md)'s, restate
   item after two sonnet attempts with validator findings attached.
 
 The specifications every prompt cites: the workbench requirements delta
-(`docs/06-requirements/REQ-007-workbench.md`, rows W15–W17 and the three amendments above
+(`docs/06-requirements/REQ-007-workbench.md`, rows W15–W18 and the three amendments above
 them), the terminal capability decision
 (`docs/04-decisions/ADR-014-workbench-terminal-capability.md`), the layout persistence decision
 (`docs/04-decisions/ADR-016-workbench-layout-persistence.md`), and the evidence trail: idea
@@ -50,13 +51,21 @@ them), the terminal capability decision
 rehearsal session record `docs/03-sessions/SESS-2026-09-11-05-rehearsal-refresh.md`.
 
 Sequencing constraint the coordinator enforces: `phase-wb-08` completes and integrates before
-`phase-wb-09` is claimed (`depends_on` encodes it), and both precede `phase-wb-07`'s remaining
-owner-machine checks, which are blocked on the terminal being visible. The live demo is
-2026-09-15.
+`phase-wb-09` is claimed, and `phase-wb-10` (the runbook refresh — dispatched outside this
+pack, completes via `/session-close`) follows `phase-wb-09`; `depends_on` encodes the chain.
+The post-fix Windows confirmations are owner checks recorded in the build kick-off record
+(`PROMPT-023`). The live demo is 2026-09-15.
+
+One convention addition over `PROMPT-021`: a **diagnosis dispatch** (`W08-M`,
+`demo-validator-web`). The creator agents carry no browser tool, so live measurements a
+creator prompt depends on are captured by `demo-validator-web` first and handed to the creator
+as recorded evidence — measurements are observed by the agent that can observe them, never
+asserted by one that cannot. `W08-M` may be re-dispatched after a fix is committed to confirm
+the measurements changed, without spending a fix cycle.
 
 ---
 
-## W08 — phase-wb-08: terminal panel truncation fix (orchestrator: `demo-orch-stage`)
+## W08 — phase-wb-08: panel rendering fixes (orchestrator: `demo-orch-stage`)
 
 ### W08-K — kickoff
 
@@ -64,23 +73,29 @@ owner-machine checks, which are blocked on the terminal being visible. The live 
 Assess the current state of the worktree and repository against the deliverables below; do only
 what is missing; report what already existed.
 
-Agent: demo-orch-stage. Phase: phase-wb-08 (terminal panel truncation fix — shell panels
-visibly fill their slot; see docs/09-backlog/backlog.yaml and
+Agent: demo-orch-stage. Phase: phase-wb-08 (panel rendering fixes — terminal fill, HTML
+Viewer, File Browser scroll; see docs/09-backlog/backlog.yaml and
 docs/01-plans/PLAN-022-workbench.md, delta section). Worktree:
 /code/d-system-worktrees/phase-wb-08. Branch: agent/phase-wb-08, from dev.
 Ports: backend 8010, frontend 5180.
 
 1. On an up-to-date dev in /code/d-system, claim phase-wb-08 per AGENTS.md (status: active,
    agent: agent-demo-stage, catalog updated date) in one small commit; the governance run must
-   accept the claim. Before claiming, confirm the max_active budget has room (active count + 1
-   <= 3); if it is full, report up and wait rather than claiming into a validator rejection.
+   accept the claim. Before claiming, run uv run python -m src.governance --ready and confirm
+   BOTH that phase-wb-08's Conflicts column is empty (no active peer locks a shared system or
+   path — the validator rejects a systems overlap regardless of the budget) AND that the
+   max_active budget has room (active count + 1 <= 3); if either fails, report up and wait
+   rather than claiming into a validator rejection.
 2. Create the worktree and set it up: uv venv && uv sync --extra dev; cd ts && npm install
    (worktree-local node_modules, never a symlink).
-3. Dispatch W08-C1 then W08-V1 — each prompt verbatim from PROMPT-024
+3. Dispatch W08-M (pre-fix diagnosis) first, then W08-C1 with W08-M's recorded measurements
+   attached as evidence, then W08-V1 — each prompt verbatim from PROMPT-024
    (docs/02-prompts/PROMPT-024-workbench-fixes-delegation-pack.md). At most two fix cycles,
    then report up. When the creator reports its item done, commit it on the phase branch
    (narrow, one concern per commit) BEFORE dispatching the validator — the validator judges
-   git diff dev...agent/phase-wb-08, which is empty until the work is committed.
+   git diff dev...agent/phase-wb-08, which is empty until the work is committed. You may
+   re-dispatch W08-M after a committed fix to confirm the measurements changed; that does not
+   spend a fix cycle.
 4. Dispatch W08-G (demo-validator-check) as the phase gate.
 5. Run the phase's verification commands yourself in the worktree and paste real output:
    cd ts && npm run build; uv run python -m src.governance;
@@ -92,6 +107,47 @@ Phase deliverables (verbatim from the backlog): ts/src.
 
 Stop when the deliverable exists in the worktree, W08-G is green, and the verification output
 is pasted — or when a blocking finding is reported up.
+```
+
+### W08-M — diagnosis: live measurements before the fix (demo-validator-web)
+
+```
+Assess the current state of the worktree and repository against the deliverables below; do only
+what is missing; report what already existed.
+
+Agent: demo-validator-web. Worktree: /code/d-system-worktrees/phase-wb-08. Branch:
+agent/phase-wb-08. Ports: backend 8010, frontend 5180.
+
+This is a DIAGNOSIS dispatch, not a verification: the state of dev is expected to be broken,
+and your job is to measure exactly how, so the creator (which has no browser tool) can
+root-cause from your recorded evidence. Change no repository file. On a re-dispatch after a
+committed fix, take the same measurements and report what changed.
+
+Start the backend (D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010) and the
+frontend WITH the flag (D_SYSTEM_DEMO_TERMINAL=1 cd ts && npm run dev -- --port 5180). Record,
+with real numbers:
+
+1. Terminal collapse (idea 000104): in both layouts at 1366x768, for the bash panel, the
+   getBoundingClientRect() height of every element in the chain .stage-workbench-slot →
+   .stage-region → .stage-region__body--terminal → .stage-terminal-sessions → the session div
+   → .stage-terminal-mount → .xterm → .xterm-screen, plus each element's computed display,
+   flex, min-height, height and overflow. Name the first element whose height diverges from
+   its parent's available space.
+2. The same chain measured in a slot WITHOUT the multi-panel wrapper if one renders a panel
+   (compare single-panel vs stage-workbench-slot--multi wrapping — the wrapper is the suspect;
+   the related double-header issue is idea 000101).
+3. HTML Viewer (owner-reported blank on Windows): in both layouts (layout 2's main slot is
+   multi-panel), record whether the viewer renders a known overview figure, the same
+   height-chain measurements for the viewer's slot, and whether the file-serving route
+   responds (GET a known .html through it). Then restart the frontend WITHOUT the flag and
+   record what the viewer shows — this distinguishes the launch-flag gap (the phase-wb-04
+   follow-on) from a height collapse.
+4. File Browser (REQ-007 W18): point it at docs/, expand folders until content exceeds the
+   panel, and record the panel body's scrollHeight, clientHeight and computed overflow-y —
+   the evidence that no internal scroll exists today.
+
+Stop each server you started. Stop when every measurement above is recorded with real numbers
+and element identifications — this report is the creator's input, so precision beats brevity.
 ```
 
 ### W08-C1 — creator: root-cause and fix the xterm height collapse
@@ -110,16 +166,31 @@ white (the terminal body's dark background has zero height, so .stage-region's w
 ts/src/stage/StagePage.css shows). The shell inside stays alive — content is readable from
 .xterm-rows innerText but not on screen.
 
-ROOT-CAUSE FIRST — verify, do not assume. The suspected mechanism is the height chain breaking
+ROOT-CAUSE FIRST — verify, do not assume. Your evidence is the W08-M diagnosis report the
+orchestrator attaches to this dispatch: live measurements taken by demo-validator-web. You
+have no browser tool — never report a measurement you did not receive from W08-M; if the
+report is missing or does not settle the mechanism, report that as blocking rather than
+guessing. The suspected mechanism is the height chain breaking
 inside the multi-panel slot wrapper: ts/src/workbench/Slot.tsx wraps the panel in an extra
 section.stage-region.stage-workbench-slot--multi once a slot admits more than one implemented
 panel, and the chain .stage-workbench-slot → .stage-region → .stage-region__body--terminal →
 .stage-terminal-sessions (flex 1 1 auto, min-height: 0) → absolutely-inset session divs →
 .stage-terminal-mount (height: 100%) → .xterm loses its height somewhere in that wrapper.
-Reproduce it live (start backend D_SYSTEM_DEMO_TERMINAL=1 on 8010 and frontend on 5180,
-measure getBoundingClientRect), identify the actual break, and state it in your report before
-fixing. The related double-header cosmetic issue in the same wrapper is idea 000101 — fix it
-only if the same root cause covers it; do not widen scope otherwise.
+Reconcile W08-M's measurements with the code, identify the actual break, and state it in your
+report before fixing. The related double-header cosmetic issue in the same wrapper is idea
+000101 — fix it only if the same root cause covers it; do not widen scope otherwise.
+
+Two further items belong to this same work item (REQ-007 W15 viewer half and W18):
+
+A. HTML Viewer blank rendering: W08-M's item 3 distinguishes the launch-flag gap (the
+   phase-wb-04 follow-on — with the frontend flag unset the file-serving route is absent by
+   design; that is a runbook matter for phase-wb-10, NOT a code fix here) from a height
+   collapse in the viewer's slot (layout 2's main slot carries the multi-panel wrapper). Fix
+   only what the diagnosis confirms is code; state plainly which cause was confirmed.
+B. File Browser internal scroll: make the panel body scroll vertically within its own bounds
+   when the tree exceeds it (with or without filters), in any slot and layout, without
+   introducing page scroll — consistent with the same height chain you are repairing, not a
+   hard-coded height.
 
 Constraints on the fix:
 1. It covers all three shell panels equally — Terminal (bash), CMD, PowerShell are
@@ -132,14 +203,16 @@ Constraints on the fix:
 4. Session persistence across layout switches must not regress (StagePage.tsx keys slots by
    slot_id in one grid — do not break that mechanism).
 
-Verify your fix live before reporting: in both layouts, assert via evaluation that the .xterm
-container's bounding-box height is non-zero and tracks the slot body, and that a command
-round-trip's output is readable on screen.
+You cannot verify the fix in a browser yourself. Instead, state the exact post-fix
+measurements you expect (which chain elements' heights change and to what relation), and ask
+the orchestrator to re-dispatch W08-M to confirm them — never report the fix as live-verified
+on your own authority.
 
 Run in the worktree and paste real output: cd ts && npm run build.
 
-Stop when the root cause is stated, the fix exists, the live measurements are pasted and the
-build output is pasted — or report the blocking finding.
+Stop when the root cause is stated, the fixes (terminal chain, viewer where code-confirmed,
+File Browser scroll) exist, the expected post-fix measurements are stated and the build output
+is pasted — or report the blocking finding.
 ```
 
 ### W08-V1 — validator: truncation fix
@@ -153,15 +226,18 @@ agent/phase-wb-08.
 
 Diff: git diff dev...agent/phase-wb-08 -- ts/
 
-Requirement text: REQ-007 W15; REQ-006 R02 and R10 unchanged. Check the code: the fix applies
-to the shared TerminalRegion component or the slot wrapper's generic height chain, not to one
-shell panel; no hard-coded pixel height or terminal-slot-specific dimension is introduced (a
-fix keyed to the terminal slot's geometry is a failing finding — W15 requires it to hold in
-any slot a shell can occupy); the zero-scroll structure (fixed page height, internal panel
-overflow) is intact in both layouts; the slot-keying that preserves sessions across layout
-switches is untouched; no xterm content is made visible by suppressing or restyling symptoms
-(e.g. forcing .xterm-screen visible while the container stays 0-height) rather than repairing
-the height chain.
+Requirement text: REQ-007 W15 and W18; REQ-006 R02 and R10 unchanged. Check the code: the fix
+applies to the shared TerminalRegion component or the slot wrapper's generic height chain, not
+to one shell panel; no hard-coded pixel height or terminal-slot-specific dimension is
+introduced (a fix keyed to the terminal slot's geometry is a failing finding — W15 requires it
+to hold in any slot a shell can occupy); the zero-scroll structure (fixed page height,
+internal panel overflow) is intact in both layouts; the slot-keying that preserves sessions
+across layout switches is untouched; no xterm content is made visible by suppressing or
+restyling symptoms (e.g. forcing .xterm-screen visible while the container stays 0-height)
+rather than repairing the height chain; the HTML Viewer change (if any) matches the cause the
+W08-M diagnosis confirmed — a code change compensating for the launch-flag gap (which is
+runbook scope, phase-wb-10) is a failing finding; the File Browser body scrolls via its own
+overflow within the repaired chain, not a hard-coded height.
 
 Commands: cd ts && npm run build.
 
@@ -197,8 +273,8 @@ what is missing; report what already existed.
 Agent: demo-adversary. Worktree: /code/d-system-worktrees/phase-wb-08. Branch: agent/phase-wb-08.
 
 Adversarially review phase-wb-08 (terminal panel truncation fix). Assume it is broken; find
-where it fails. Specifications: the phase's backlog entry; REQ-007 W15; REQ-006 R02, R10, R11;
-ideas 000104 and 000101. Attack at minimum: whether the fix is a symptom patch (styling the
+where it fails. Specifications: the phase's backlog entry; REQ-007 W15 and W18; REQ-006 R02,
+R10, R11; ideas 000104 and 000101; the W08-M diagnosis report. Attack at minimum: whether the fix is a symptom patch (styling the
 collapsed state visible) rather than a repair of the height chain; whether it survives the
 multi-panel wrapper AND the single-panel path — both slot states Slot.tsx can render; whether
 it holds when the panel is CMD or PowerShell showing the unavailable-shell message rather than
@@ -206,8 +282,10 @@ a live xterm; whether it depends on the terminal slot's geometry in either layou
 phase-wb-09's main-slot assignment will break; whether collapse, drop-in-place and restore
 (REQ-007 W02/W03) still render correctly inside the fixed chain; whether any hard-coded pixel
 height sneaks in via CSS; whether layout switching still preserves sessions or the fix
-re-keys/remounts the terminal. Run the build, read the code, and run the page if needed to
-turn suspicion into evidence. W08-W measures rendered behavior — your job is what the code
+re-keys/remounts the terminal; whether the HTML Viewer change (if any) matches the W08-M
+diagnosis or papers over the launch-flag gap in code; whether the File Browser scroll holds
+with filters active and in layout 2, or reintroduces page scroll at any of the four sizes.
+Run the build, read the code, and run the page if needed to turn suspicion into evidence. W08-W measures rendered behavior — your job is what the code
 does outside the happy path.
 
 Stop when your ranked findings (blocker/major/minor, each with file:line and a concrete failure
@@ -242,7 +320,14 @@ Verify mechanically:
    connections before and after).
 4. Collapse and re-expand via the ellipsis menu, drop and restore: after each restore or
    re-expand, re-assert the fill check from item 1 at 1366x768 in layout 1.
-5. Zero-scroll: document scrollHeight <= viewport height and no two region bounding boxes
+5. HTML Viewer (W15 viewer half): with the flag-set frontend, assert the viewer renders a
+   known overview figure in BOTH layouts — including layout 2's multi-panel main slot — and
+   that its panel body's bounding-box height is non-zero and within 60px of its slot body's.
+6. File Browser scroll (W18): point it at docs/, expand folders until content exceeds the
+   panel; assert the body's scrollHeight exceeds its clientHeight, scrolling the body reaches
+   the last entry, document scrollHeight stays within the viewport, and the same holds with a
+   text filter active and in layout 2.
+7. Zero-scroll: document scrollHeight <= viewport height and no two region bounding boxes
    intersect, both layouts, all four sizes. browser_console_messages shows no uncaught errors
    across the above.
 
@@ -269,9 +354,10 @@ Worktree: /code/d-system-worktrees/phase-wb-09. Branch: agent/phase-wb-09, from 
 Ports: backend 8010, frontend 5180.
 
 1. On an up-to-date dev in /code/d-system, claim phase-wb-09 per AGENTS.md (status: active,
-   agent: agent-demo-stage, catalog updated date) in one small commit. Before claiming,
-   confirm the max_active budget has room (active count + 1 <= 3); if it is full, report up
-   and wait.
+   agent: agent-demo-stage, catalog updated date) in one small commit. Before claiming, run
+   uv run python -m src.governance --ready and confirm BOTH that phase-wb-09's Conflicts
+   column is empty (no active peer locks a shared system or path) AND that the max_active
+   budget has room (active count + 1 <= 3); if either fails, report up and wait.
 2. Create the worktree; uv venv && uv sync --extra dev; cd ts && npm install.
 3. Dispatch, in order: W09-C1 then W09-V1; W09-C2 then W09-V2; W09-C3 then W09-V3 — each
    prompt verbatim from PROMPT-024. At most two fix cycles per item, then report up. Commit
@@ -317,8 +403,8 @@ do not widen it beyond the two changes below:
    the availability logic the unavailable-shell refusal already has, not duplicating it. Read
    docs/04-decisions/ADR-015-workbench-api-surface.md first: the route is read-only, GET-only,
    absent (404) when the flag is unset, and takes no path input.
-3. Update ADR-014's cap wording (the "bounds concurrent sessions to four" statements) to six,
-   citing the 2026-09-11 owner decision recorded in REQ-007's delta — a wording correction to
+3. Update ADR-014's cap wording (its "four-session cap" statements) to six, citing the
+   2026-09-11 owner decision recorded in REQ-007's delta — a wording correction to
    match the decided behavior, nothing else in the ADR changes.
 
 Update tests: in test/test_demo_terminal.py, the cap tests move to six — a seventh concurrent
