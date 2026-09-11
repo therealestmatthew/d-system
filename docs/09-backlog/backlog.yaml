@@ -4528,7 +4528,6 @@ items:
   - ts/src/stage/StagePage.tsx
   - ts/src/stage/StagePage.css
   - ts/src/stage/TerminalRegion.tsx
-  - ts/src/stage/TalkingPointsRegion.tsx
   - ts/src/stage/OverviewRegion.tsx
   - ts/src/stage/Tooltip.tsx
   - ts/src/stage/Popover.tsx

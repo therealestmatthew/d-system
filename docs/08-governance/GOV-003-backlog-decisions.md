@@ -277,3 +277,22 @@ coordinator may not mark that phase complete on agent evidence alone.
 Semantic provider, private/cloud data boundary, storage and quality targets belong to deferred `phase-mem-15`. No provider was selected or memory transmission authorized by the questionnaire. Agentic refinement additionally requires evidence that the simpler retrieval stages leave useful work unresolved. The optional periodic memory-review phase packages an opt-in trigger; it does not activate a scheduler or automate approval/deletion.
 
 These are tracked gates with resume conditions, not missing backlog coverage. All feature plans remain open until their mapped phases are completed or explicitly cancelled with rationale.
+
+## A completed phase's evidence entry retires when a later phase legitimately deletes the file
+
+Coordinator decision, 2026-09-10, during the workbench build (PROMPT-022/PROMPT-023).
+`phase-wb-02`'s pack instruction (PROMPT-021 W02-C2, owner-ratified) replaces the
+talking-points panel with the notes strip and removes the old component,
+`ts/src/stage/TalkingPointsRegion.tsx` — a file pinned in the completed `phase-demo-02`'s
+`completion_evidence`. The governance evidence check requires listed files to exist, so the
+mandated deletion made governance red in the `phase-wb-02` worktree, and the phase's
+orchestrator correctly stopped and reported rather than editing a closed phase's record.
+
+Resolution: the deleted file's single evidence line is removed from `phase-demo-02`'s
+`completion_evidence`; the entry's remaining eight files (StagePage, TerminalRegion,
+OverviewRegion, Tooltip, Popover, the CSS, `talking-points.json`, `vite.config.ts`) still
+demonstrate the phase. The general rule this records: completion evidence pins what existed
+when the phase closed, and when a later phase's sanctioned scope deletes such a file, the
+evidence line retires with it — in the same diff as a GOV-003 note, never silently. The
+session record (`SESS-2026-09-10-05`-era records and git history) remains the durable proof
+of what the phase produced.
