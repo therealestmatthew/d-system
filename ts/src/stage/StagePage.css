@@ -595,7 +595,24 @@ body {
   gap: 0.4rem;
 }
 
+/* Fix for idea 000104 (REQ-007 W15): this body wraps a single implemented panel's own
+   `.stage-region` root as a *child* element whenever the slot admits more than one implemented
+   panel (Slot.tsx's multi-panel branch). `.stage-region__body`'s base rule above never sets
+   `display`, so without this rule the wrapper stayed the default `display: block` — a block
+   container ignores a flex child's `flex: 1 1 auto` (that property only has an effect inside a
+   flex/grid formatting context), so the nested `.stage-region` sized to `height: auto` /
+   content instead of stretching to fill the space this wrapper actually has available. Every
+   panel downstream inherited that content-sized starvation (confirmed for the terminal, the
+   HTML Viewer and the File Browser — see PROMPT dispatch W08-M diagnosis, phase-wb-08).
+   `display: flex; flex-direction: column` here restores the exact formatting context the
+   single-panel branch already gets for free (there, the panel's own `.stage-region` is the
+   grid cell's direct flex child, per `.stage-workbench-slot` above) — the nested `.stage-region`
+   child's own `flex: 1 1 auto` (declared on the base `.stage-region` rule) now applies and it
+   stretches to this wrapper's full height, in any slot geometry, not just the terminal slot's
+   current dimensions. */
 .stage-workbench-slot__body {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: hidden;
 }
