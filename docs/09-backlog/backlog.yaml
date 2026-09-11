@@ -3,7 +3,6 @@ updated: '2026-09-11'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-05
 - phase-wb-06
 - phase-wb-07
 - phase-port-02
@@ -5403,12 +5402,11 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-05
   title: File Browser panel
-  next_action: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend
-    fix cycle for copy-absolute-path), W05-G, W05-A's fix cycle 1 (blocker +
-    minor), and W05-W with its fix cycle 2 (React duplicate-key, the last fix
-    cycle for this phase's gate) all passed. Remaining - only the owner's
-    integration decision and /session-close; no further coordinator dispatch
-    is outstanding against this phase.
+  next_action: 'None — phase complete: W05-A clean after its two fix cycles (oracle
+    exclusion and stale-render key collision), W05-W green on every item with
+    measured evidence, and the branch integrated into dev fast-forward at 041cf45
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5416,7 +5414,7 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-data
   session: doc-session-file-browser-panel
   result: 'In progress (evidence lives on the unmerged agent/phase-wb-05 worktree
@@ -5462,7 +5460,10 @@ items:
     current contextFolder; confirmed gone via a live before/after repro.
     Re-verified npm run build clean in the foreground. Every dispatch this
     pack assigns to this orchestrator or the coordinator for phase-wb-05 has
-    now run and passed.'
+    now run and passed. Integrated into dev fast-forward at 041cf45 under
+    PROMPT-023 delta 1 (pre-approved, gate green); post-rebase build, governance,
+    staged private-content check and pytest (552 passed, 3 environmental PTY
+    failures, ideas 000097/000099) all verified by the coordinator.'
   priority: 1
   session_budget: 1
   depends_on:
