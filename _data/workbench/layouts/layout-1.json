@@ -1,33 +1,37 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "layout_id": "layout-1",
   "name": "Layout 1 — Terminal Left",
   "slots": [
-    {
-      "slot_id": "terminal",
-      "display_name": "Terminal",
-      "admits": ["terminal", "terminal-cmd", "terminal-powershell"],
-      "default_panel": "terminal"
-    },
-    {
-      "slot_id": "notes-strip",
-      "display_name": "Notes",
-      "admits": ["notes-strip"],
-      "default_panel": "notes-strip"
-    },
-    {
-      "slot_id": "main",
-      "display_name": "Main",
-      "admits": ["html-viewer"],
-      "default_panel": "html-viewer"
-    },
-    {
-      "slot_id": "explorer",
-      "display_name": "Explorer",
-      "admits": ["file-browser", "idea-explorer", "backlog-explorer"],
-      "default_panel": null
-    }
+    { "slot_id": "terminal", "display_name": "Terminal" },
+    { "slot_id": "notes-strip", "display_name": "Notes" },
+    { "slot_id": "main", "display_name": "Main" },
+    { "slot_id": "explorer", "display_name": "Explorer" }
   ],
+  "panels": [
+    { "panel_id": "terminal", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "terminal-cmd", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "terminal-powershell", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "html-viewer", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "notes-strip", "eligible_slots": ["notes-strip"] },
+    { "panel_id": "file-browser", "eligible_slots": ["explorer"] },
+    { "panel_id": "idea-explorer", "eligible_slots": ["explorer"] },
+    { "panel_id": "backlog-explorer", "eligible_slots": ["explorer"] }
+  ],
+  "default_assignment": {
+    "terminal": "terminal",
+    "terminal-cmd": "terminal",
+    "terminal-powershell": "terminal",
+    "html-viewer": "main",
+    "notes-strip": "notes-strip",
+    "file-browser": "explorer",
+    "idea-explorer": "explorer",
+    "backlog-explorer": "explorer"
+  },
+  "default_visible_panel": {
+    "terminal": "terminal",
+    "explorer": "file-browser"
+  },
   "grid": {
     "columns": ["1.4fr", "1fr"],
     "rows": ["0.25fr", "1.3fr", "1.15fr"],

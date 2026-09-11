@@ -1,33 +1,40 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "layout_id": "layout-2",
   "name": "Layout 2 — Terminal Bottom",
   "slots": [
-    {
-      "slot_id": "notes-strip",
-      "display_name": "Notes",
-      "admits": ["notes-strip"],
-      "default_panel": "notes-strip"
-    },
-    {
-      "slot_id": "main",
-      "display_name": "Main",
-      "admits": ["overview", "html-viewer"],
-      "default_panel": "overview"
-    },
-    {
-      "slot_id": "explorer",
-      "display_name": "Explorer",
-      "admits": ["file-browser", "idea-explorer", "backlog-explorer"],
-      "default_panel": null
-    },
-    {
-      "slot_id": "terminal",
-      "display_name": "Terminal",
-      "admits": ["terminal", "terminal-cmd", "terminal-powershell"],
-      "default_panel": "terminal"
-    }
+    { "slot_id": "notes-strip", "display_name": "Notes" },
+    { "slot_id": "main", "display_name": "Main" },
+    { "slot_id": "explorer", "display_name": "Explorer" },
+    { "slot_id": "terminal", "display_name": "Terminal" }
   ],
+  "panels": [
+    { "panel_id": "terminal", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "terminal-cmd", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "terminal-powershell", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "html-viewer", "eligible_slots": ["terminal", "main"] },
+    { "panel_id": "overview", "eligible_slots": ["main"] },
+    { "panel_id": "notes-strip", "eligible_slots": ["notes-strip"] },
+    { "panel_id": "file-browser", "eligible_slots": ["explorer"] },
+    { "panel_id": "idea-explorer", "eligible_slots": ["explorer"] },
+    { "panel_id": "backlog-explorer", "eligible_slots": ["explorer"] }
+  ],
+  "default_assignment": {
+    "terminal": "terminal",
+    "terminal-cmd": "terminal",
+    "terminal-powershell": "terminal",
+    "html-viewer": "main",
+    "overview": "main",
+    "notes-strip": "notes-strip",
+    "file-browser": "explorer",
+    "idea-explorer": "explorer",
+    "backlog-explorer": "explorer"
+  },
+  "default_visible_panel": {
+    "terminal": "terminal",
+    "main": "html-viewer",
+    "explorer": "file-browser"
+  },
   "grid": {
     "columns": ["1fr", "1fr", "1fr"],
     "rows": ["1fr", "1.6fr"],

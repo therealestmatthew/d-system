@@ -14,8 +14,27 @@ function storageKey(schemaVersion: number): string {
 /** Every field beyond `schema_version` is optional (see `StoredWorkbenchState`'s doc comment) —
  * this validates only the fields actually present, so one owner's stored field (e.g. the notes
  * strip's `active_notes_file`) never fails validation just because another owner's field (e.g.
- * the layout engine's `slot_selections`) has not been written yet in a fresh browser.
+ * the layout engine's `panel_assignments`/`slot_visible_panel`) has not been written yet in a
+ * fresh browser.
  */
+/** Structural check only — every value is a `Record<string, Record<string, string>>` regardless
+ * of which of `panel_assignments`/`slot_visible_panel` is being checked (REQ-007 W16: one maps
+ * layout_id -> panel_id -> slot_id, the other layout_id -> slot_id -> panel_id, but both are the
+ * same nested-string-record shape at this layer). Per-layout/per-panel/per-slot *validity*
+ * against the loaded layouts is the caller's job (`useWorkbenchLayouts`), same as before the W16
+ * delta. */
+function isNestedStringRecord(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null) return false
+  return Object.values(value as Record<string, unknown>).every(
+    (perLayout) =>
+      typeof perLayout === 'object' &&
+      perLayout !== null &&
+      Object.values(perLayout as Record<string, unknown>).every(
+        (entry) => typeof entry === 'string',
+      ),
+  )
+}
+
 function isStoredWorkbenchState(
   value: unknown,
   schemaVersion: number,
@@ -26,21 +45,14 @@ function isStoredWorkbenchState(
   if (record.active_layout !== undefined && typeof record.active_layout !== 'string') {
     return false
   }
-  if (record.slot_selections !== undefined) {
-    if (typeof record.slot_selections !== 'object' || record.slot_selections === null) {
-      return false
-    }
-    const validSlotSelections = Object.values(
-      record.slot_selections as Record<string, unknown>,
-    ).every(
-      (perLayout) =>
-        typeof perLayout === 'object' &&
-        perLayout !== null &&
-        Object.values(perLayout as Record<string, unknown>).every(
-          (panelId) => typeof panelId === 'string',
-        ),
-    )
-    if (!validSlotSelections) return false
+  if (record.panel_assignments !== undefined && !isNestedStringRecord(record.panel_assignments)) {
+    return false
+  }
+  if (
+    record.slot_visible_panel !== undefined &&
+    !isNestedStringRecord(record.slot_visible_panel)
+  ) {
+    return false
   }
   if (
     record.active_notes_file !== undefined &&
@@ -111,7 +123,8 @@ export function saveStoredState(state: StoredWorkbenchState): void {
  * Merge-on-write: reads whatever is currently stored under `schemaVersion` (falling back to an
  * empty object, not the caller's own stale copy), overlays `patch`, and writes the result back.
  * This is how two independent owners of the one ADR-016-mandated key — the layout engine
- * (`useWorkbenchLayouts`, fields `active_layout`/`slot_selections`) and the notes strip
+ * (`useWorkbenchLayouts`, fields `active_layout`/`panel_assignments`/`slot_visible_panel`) and
+ * the notes strip
  * (`NotesStripRegion`, field `active_notes_file`) — each persist their own field without
  * clobbering the other's, since every write re-reads from localStorage immediately beforehand
  * rather than reconstructing the whole object from one owner's in-memory state.
