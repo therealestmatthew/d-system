@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-11'
 systems: [sys-demo-stage, sys-ui, sys-api]
 depends_on: [doc-prompt-workbench-pre-plan-package, doc-live-demo-requirements]
 ---
@@ -51,6 +51,37 @@ Zero-scroll (REQ-006 R02) remains binding for every layout at 1280×720, 1366×7
 | W12 | Terminal (bash), CMD and PowerShell are three separate panel options in the slot dropdown, functionally identical through the existing PTY adapter's shell override and ConPTY backend. A shell unavailable on the host (CMD/PowerShell on Linux) shows a clear in-panel message naming the unavailable shell — never a raw error or a broken terminal. | Playwright on Linux: select the bash panel and assert a command round-trip; select CMD and PowerShell and assert each renders the in-panel unavailability message with no uncaught console errors. A pytest asserts the shell-selection plumbing passes the requested shell to the adapter override. The Windows round-trip for CMD and PowerShell is part of the W13 checklist. |
 | W13 | The live segment works end to end on the presentation machine (Windows) against the final workbench UI: the runbook is rewritten to the workbench's controls in the rehearsal gate's step shape (`PROMPT-017`), the REQ-006 R06 terminal smoke check is re-run and recorded, CMD and PowerShell panels each complete a command round-trip, and two owner-driven timed dry-runs complete within 15 minutes with every step inside its timebox (closing REQ-006 R09's deferred conditions). | The updated Windows checklist is executed on the presentation machine and its results recorded in the runbook: R06 smoke check, a CMD and a PowerShell round-trip, and both owner-driven dry-runs' per-step times, all within their timeboxes. |
 | W14 | The workbench read/action API is loopback-only and mounted only under its env-flag gate per the workbench capability decisions: enumeration, directory-listing, file-search, idea and backlog routes are read-only and bounded to the repository root (path traversal and symlink escape rejected; `_private/` and gitignored content never listed); reveal-in-explorer is the sole action route and validates its path the same way. | pytest: with the flag unset every workbench route is absent (404); with it set, traversal (`..`), absolute-path and symlink-escape requests are rejected; a listing of the repository root contains no `_private/` or gitignored entry; every route but reveal responds to GET only; the reveal route rejects a path outside the repository. |
+
+## Delta 2026-09-11 — terminal visibility and layout assignment
+
+Two defects surfaced by the rehearsal refresh (`phase-wb-07`) and the owner's 2026-09-10/11
+review, decided by the owner on 2026-09-11 and confirmed in the hand-off session. Rows W15–W17
+below extend the table above; they are verified the same way (Playwright assertions by
+`demo-validator-web`, pytest for backend halves). Three earlier statements are amended:
+
+- **W05/W06 (eligibility and the configuration surface).** Eligibility moves from the slot to
+  the panel: each panel declares the set of slots it may occupy, and the layout configuration
+  assigns every panel to exactly one eligible slot — a total mapping of panels to slots. The
+  configuration dialog is the assignment surface only; it no longer offers per-slot
+  visible-panel selects (that duplication of the slot-header dropdowns was never intended).
+  Slot-header dropdowns remain pure switchers over the panels currently assigned to their slot
+  and never re-assign. W06's "assigned to exactly one slot per layout" stands and now describes
+  this model.
+- **ADR-016 decision 1 (`admits` lists).** The per-slot `admits` list in the layout files is
+  superseded by per-panel eligibility carried in the same files under a bumped
+  `schema_version`. ADR-016's other rules stand unchanged; in particular rule 3 covers the
+  migration — stored browser state written against the old schema is silently discarded in
+  favor of the new defaults (owner decision 2026-09-11: version bump, no ADR amendment).
+- **ADR-014 / REQ-006 R10 (session caps).** The backend's global concurrent-PTY cap rises from
+  four to six; the per-panel session-tab cap stays four (owner decision 2026-09-11). R10's
+  wording is updated to state both numbers, and ADR-014's cap wording is updated by the
+  implementing phase.
+
+| ID | Required observable behavior | Verification method |
+|---|---|---|
+| W15 | Every shell panel — Terminal (bash), CMD, PowerShell — visibly fills its slot's body in any slot a shell panel can occupy, in both layouts, at all four required window sizes, on Linux and Windows: the xterm container has non-zero measured height tracking the slot body, typed input and output are readable on screen without DOM inspection, and the panel is never blank or clipped to a few rows (idea `000104`; the Windows blank-white panel is the same collapse). The fix is root-caused, not hard-coded to the terminal slot's current geometry — the suspected break is the multi-panel slot wrapper's height chain (`Slot.tsx`, related cosmetic double header: idea `000101`). Zero page scroll (REQ-006 R02) still holds, and session persistence across layout switches does not regress. | Playwright: for each of the three shell panels, in both layouts at 1280×720, 1366×768, 1920×1080 and 1024×768, assert the `.xterm` container's bounding-box height is non-zero and within tolerance of its slot body's height, and a command round-trip's output is present in the visible rendered area; regression guard: set `MARKER=persist$RANDOM` in layout 1, switch to layout 2 and back, `echo check-$MARKER` prints the same value both times, and no new terminal websocket opens during the switches. The same fill assertions re-run with a shell panel assigned to the main slot as part of W16's verification, so a terminal-slot-only fix fails there. |
+| W16 | The layout files carry per-panel eligibility and a default assignment; the configuration dialog assigns each panel to exactly one of its eligible slots and offers nothing else (no per-slot visible-panel selects, no geometry editing); slot-header dropdowns switch among a slot's assigned panels and never re-assign. Shipped eligibility: Terminal (bash), CMD, PowerShell and HTML Viewer are each eligible for both the terminal slot and the main slot in both layouts; Overview is eligible for the main slot only; the notes strip and the explorer slot and its panels are unchanged. Defaults reproduce the pre-delta arrangement (shells in the terminal slot, HTML Viewer in the main slot), so a cleared browser looks unchanged. Stored state written against the old schema is silently discarded (ADR-016 rule 3). Re-assigning a panel between slots never silently kills a shell session: live sessions survive re-assignment where feasible; where a remount is unavoidable its behavior is explicit and stated, never a silent kill. | Playwright: assert the dialog lists one slot-selector per panel scoped to that panel's eligible slots and contains no per-slot panel select; assign HTML Viewer to the terminal slot and a shell to the main slot, assert both render there, reload and assert the assignment persisted; re-run W15's fill assertions with each shell panel in the main slot in both layouts; seed localStorage with old-schema state and assert defaults load with no error; on a cleared store assert the rendered arrangement equals the pre-delta default. A test asserts the layout files' bumped `schema_version` and per-panel eligibility shape. |
+| W17 | Two live shells may render simultaneously (e.g. bash in the terminal slot and PowerShell in the main slot), each fully interactive. The backend session registry bounds concurrent PTY sessions to six globally (up from four); the per-panel tab cap stays four, and the server-side refusal of a session past six remains a clear structured refusal. The default visible shell in the terminal slot is platform-conditional: the workbench API reports the host platform and per-shell availability, and a fresh browser defaults the terminal slot to PowerShell on Windows and bash elsewhere; the layout data files stay platform-neutral. | pytest: a seventh concurrent session is refused while six are open and admitted after one closes; the platform route reports the host platform and shell availability, GET-only, under the existing gate. Playwright on Linux: two shell panels visible at once each complete an independent command round-trip; a fresh store defaults the terminal slot to bash. The Windows default (PowerShell visible on a fresh store) and a Windows two-shell round-trip join the phase-wb-07 owner checklist. |
 
 ## Descope ladder
 

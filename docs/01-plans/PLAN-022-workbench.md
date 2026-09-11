@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-11'
 systems: [sys-ui, sys-demo-stage, sys-api]
 depends_on: [doc-workbench-requirements, doc-workbench-terminal-decision, doc-workbench-api-decision, doc-workbench-layout-decision]
 ---
@@ -75,6 +75,32 @@ claim is rejected numerically; and `phase-wb-03`..`06` all deliver into `ts/src`
 lock forbids parallel claims. Real data dependencies reinforce it: `phase-wb-02`'s notes-file
 picker consumes `phase-wb-01`'s listing route, and `phase-wb-05`'s open-in-viewer submenu needs
 `phase-wb-04`'s viewer tabs.
+
+## Delta 2026-09-11 — fix phases
+
+Two phases added from the 2026-09-11 rehearsal findings and owner decisions (REQ-007 delta rows
+W15–W17; hand-off `docs/00-working/handoff-workbench-layout-and-terminal-fixes.md`), dispatched
+under a new delegation pack ([PROMPT-024](../02-prompts/PROMPT-024-workbench-fixes-delegation-pack.md))
+with the same execution model as the seven phases above:
+
+- **`phase-wb-08` — terminal panel truncation fix (first priority).** Root-cause and fix the
+  shell panels' collapsing xterm area (idea `000104`; blank-white on Windows), covering all
+  three shell panels and any slot a shell can occupy, with the layout-switch session-persistence
+  regression guard. W15. It blocks `phase-wb-07`'s owner-driven dry-runs and Windows checks, so
+  it runs before everything else.
+- **`phase-wb-09` — layout-assignment redesign (second).** Eligibility moves from slot to
+  panel; the configuration dialog becomes the assignment-only surface; header dropdowns stay
+  switchers; two live shells allowed; the backend cap rises to six with a platform/shell
+  availability report feeding the OS-conditional default visible shell (PowerShell on Windows,
+  bash elsewhere); layout files bump `schema_version` with ADR-016 rule-3 silent fallback.
+  W16, W17. Its verification re-runs W15's fill assertions with a shell in the main slot.
+
+Order: `phase-wb-08` → `phase-wb-09`, encoded as `depends_on`; both precede the remaining
+owner-machine work of `phase-wb-07` in `next_up`, because that work is blocked on the terminal
+being visible. Follow-up noted, not folded in: after `phase-wb-09` changes the configuration
+dialog, the runbook and Windows checklist need an update pass (they describe the old dialog);
+that update belongs to the rehearsal-refresh work (`phase-wb-07`'s owner-facing documents) and
+is dispatched separately, not inside these phases.
 
 ## Descope ladder
 

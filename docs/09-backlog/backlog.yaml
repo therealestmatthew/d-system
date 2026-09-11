@@ -3,6 +3,8 @@ updated: '2026-09-11'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-wb-08
+- phase-wb-09
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
@@ -5657,3 +5659,129 @@ items:
   deliverables:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
+- id: phase-wb-08
+  title: Terminal panel truncation fix — shell panels visibly fill their slot
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-06
+  scope:
+  - Root-cause the shell panels' collapsing xterm area (idea 000104; the panel
+    renders blank white on Windows) - the suspected break is the height chain
+    through the multi-panel slot wrapper in ts/src/workbench/Slot.tsx (related
+    cosmetic double header, idea 000101), but the mechanism must be verified
+    before fixing, not assumed.
+  - Fix it for all three shell panels equally (Terminal/bash, CMD, PowerShell
+    share one TerminalRegion component) and for any slot a shell panel can
+    occupy - the fix must not hard-code the terminal slot's current geometry,
+    because phase-wb-09 makes shells assignable to the main slot and re-runs the
+    fill checks there (REQ-007 W15).
+  - Preserve zero page scroll (REQ-006 R02) and session persistence across
+    layout switches.
+  acceptance:
+  - Each shell panel's xterm container has non-zero measured height tracking its
+    slot body in both layouts at 1280x720, 1366x768, 1920x1080 and 1024x768,
+    with a command round-trip's output readable in the visible rendered area
+    (REQ-007 W15).
+  - Zero page scroll and no overlapping regions still hold in both layouts at
+    all four sizes.
+  - 'The layout-switch persistence guard passes: MARKER set in layout 1 echoes
+    identically after switching to layout 2 and back, with no new terminal
+    websocket opened during the switches.'
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W08-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W08-W) covering
+    W15's fill assertions for all three shell panels in both layouts at the four
+    sizes plus the persistence guard
+  deliverables:
+  - ts/src
+  next_action: Root-cause the xterm height collapse in the multi-panel slot
+    wrapper's height chain before writing any fix.
+- id: phase-wb-09
+  title: Layout assignment model — per-panel eligibility, assignment-only dialog
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-layout-decision
+  - doc-workbench-terminal-decision
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-08
+  scope:
+  - Move eligibility from the slot to the panel in the layout data files under a
+    bumped schema_version - each panel declares its eligible slots and the file
+    carries a default total assignment reproducing the pre-delta arrangement;
+    shipped eligibility per REQ-007 W16 (bash/CMD/PowerShell/HTML Viewer each
+    eligible for the terminal and main slots in both layouts; Overview main slot
+    only; notes strip and explorer slot unchanged). Old-schema stored browser
+    state is silently discarded per ADR-016 rule 3.
+  - Rework the configuration dialog into the assignment-only surface - one
+    selector per panel over that panel's eligible slots, no per-slot
+    visible-panel selects, still no geometry editing; slot-header dropdowns stay
+    pure switchers over a slot's assigned panels (REQ-007 W16).
+  - Allow two live shells at once and raise the backend session registry's
+    global concurrent-PTY cap from four to six (per-panel tab cap stays four);
+    update ADR-014's cap wording and REQ-006 R10 stays as amended. Add a gated
+    GET route reporting host platform and per-shell availability, and default
+    the terminal slot's visible shell to PowerShell on Windows and bash
+    elsewhere on a fresh store, keeping layout files platform-neutral (REQ-007
+    W17).
+  - Re-assignment between slots never silently kills a shell session - keep
+    instances alive across re-assignment where feasible; where a remount is
+    unavoidable make the behavior explicit and stated (REQ-007 W16).
+  - Re-run REQ-007 W15's fill assertions with each shell panel assigned to the
+    main slot in both layouts, and the layout-switch persistence guard.
+  acceptance:
+  - The dialog offers exactly one eligible-slot selector per panel and nothing
+    else; assigning HTML Viewer to the terminal slot and a shell to the main
+    slot renders both there and survives reload; a cleared or old-schema store
+    yields the pre-delta default arrangement (REQ-007 W16).
+  - Two shell panels visible at once each complete an independent command
+    round-trip; a seventh concurrent session is refused while six are open and
+    admitted after one closes; the platform route reports host platform and
+    shell availability (REQ-007 W17).
+  - Each shell panel renders unclipped and fully interactive assigned to the
+    main slot in both layouts (REQ-007 W15 re-run), and the persistence guard
+    passes.
+  - On Linux a fresh store defaults the terminal slot to bash; the Windows
+    default (PowerShell) and a Windows two-shell round-trip are recorded in the
+    phase-wb-07 owner checklist, not closed here.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W09-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W09-W) covering
+    W16, W17's Linux assertions and the W15 main-slot re-run
+  deliverables:
+  - ts/src
+  - _data/workbench/layouts
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+  - docs/04-decisions/ADR-014-workbench-terminal-capability.md
+  next_action: Bump the layout schema_version and move eligibility onto the
+    panel entries before touching the dialog.
