@@ -5007,3 +5007,60 @@ CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). 
 **Created 2026-09-11T17:19:19-04:00 · Status: `open`**
 
 Owner report, 2026-09-11, on the Windows machine during early workbench checks: selecting the html selector in the HTML Viewer opens a popup dialog that shows only two html files at a time. It should appear below the control and be taller - at least 8-10 files visible - plus internal scroll for longer lists; allowing the user to resize the popup is worth considering. Outside PROMPT-024's rows (REQ-007 W15-W18) and not covered by phase-wb-09 or phase-wb-10, so recorded for the owner's scheduling rather than built into the fix build. Touches the HTML Viewer's selector UI in ts/src (HtmlViewerRegion or its dropdown component).
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-11T17:24:26-04:00): Part of the owner's 2026-09-11 batch for the next workbench prompt pack, together with 000109 (double-click tab opens new browser tab), 000110 (markdown rendering in the viewer), 000111 (file bookmark categories and their system integration) and 000112 (File Explorer right-click open-in-viewer).
+
+**Links**
+
+- relates_to ← `000109`
+- relates_to ← `000110`
+
+---
+
+## 000109 · HTML Viewer: double-clicking a file tab opens it in a new browser tab
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Double-clicking a tab in the HTML Viewer should automatically open that file in a new browser tab - the full page, outside the workbench iframe. Complements idea 000108 (selector popup sizing) in the same viewer surface; touches ts/src HtmlViewerRegion and its tab strip.
+
+**Links**
+
+- relates_to → `000108`
+
+---
+
+## 000110 · HTML Viewer renders markdown files with proper formatting, not raw text
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Expand the HTML Viewer to support .md files, rendering them as formatted markdown (headings, lists, code blocks, links) rather than showing raw source text. Needs a markdown-to-HTML step on either the serving route or the frontend, applied when the selected file is markdown; the existing sandboxed-iframe model and the D_SYSTEM_DEMO_TERMINAL gating of the file-serving route stay as they are. Repository docs are the obvious immediate beneficiaries (docs/, README.md).
+
+**Links**
+
+- relates_to → `000108`
+
+---
+
+## 000111 · File bookmark categories: named groupings of files, referenceable across the system
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). A bookmark-type system where the owner creates named categories that group files together - e.g. "favorites", or "live-demo" holding every file relevant to the demo - and can later reference a category to pull up its files as a set. Two halves the pack must design, not just build: (1) the grouping surface itself (create/rename categories, add and remove files, list a category's files); (2) how these file references integrate into the wider system so groupings are simple to reference in future - storage shape (a tracked _data/ entity vs localStorage; tracked feels right since categories like live-demo outlive one browser), how other surfaces consume a category (HTML Viewer selector, File Explorer, possibly the terminal injection dropdowns), and how file paths stay valid as the repo moves. This is requirement-and-ADR-first work: the storage and reference model needs an owner-reviewed decision before creators build panels against it.
+
+**Links**
+
+- relates_to ← `000112`
+
+---
+
+## 000112 · File Explorer: right-click option to open a file in the HTML Viewer
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). File Explorer (File Browser panel) entries get a right-click context-menu option that opens the selected file in the HTML Viewer panel. Implies a cross-panel action channel (the browser telling the viewer what to load) that does not currently exist; pairs naturally with markdown rendering (so docs opened this way display formatted) and with bookmark categories (open-in-viewer from a category listing).
+
+**Links**
+
+- relates_to → `000111`
