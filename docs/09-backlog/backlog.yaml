@@ -4973,9 +4973,10 @@ items:
     alongside phase-demo-05/06.
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
-  next_action: Once the owner approves the pack, claim per AGENTS.md (checking the max_active
-    budget first) and dispatch pack section W01 (PROMPT-021); the track runs strictly
-    sequentially from here.
+  next_action: All work items built and validated on agent/phase-wb-01 (W01-V1 after one fix
+    cycle, W01-V2 and W01-V3 green; gate W01-G green except pytest, which fails only on three
+    pre-existing dev PTY failures from host pyenv shim contention). Remaining - adversarial
+    review W01-A (coordinator-dispatched), then owner-approved integration.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -4985,6 +4986,7 @@ items:
   - sys-api
   owner: repository-owner
   agent: agent-demo-stage
+  session: doc-session-workbench-backend-api
   status: active
   priority: 1
   session_budget: 1
