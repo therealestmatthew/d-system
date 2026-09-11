@@ -9,8 +9,14 @@ re-runs `enforce_loopback_bind()` (ADR-015 rule 1: "one gate, one binding"), so 
 flag set on a non-loopback bind host fails fast here too, independent of whether
 `src.api.routes.demo_terminal` happened to be imported first.
 
-Five capabilities, all read-only except the one named action (ADR-015 rule 4):
+Six capabilities, all read-only except the one named action (ADR-015 rule 4):
 
+- `GET /platform` reports the host platform (`windows`/`linux`/`other`) and, per allowlisted
+  shell (bash, cmd, powershell), whether it is available on this host — REQ-007 W17, so a fresh
+  browser can default the terminal slot to the shell that actually runs here. It reuses
+  `src.api.routes.demo_terminal`'s own `_shell_is_available_on_host` and `SHELL_ALLOWLIST`, the
+  same availability logic behind that route's unavailable-shell refusal, rather than
+  duplicating it.
 - `GET /injection-sources` live-enumerates `.claude/skills/`, `.claude/agents/` and
   `docs/02-prompts/` (governed `PROMPT-*` files only), applying the curated overrides file
   `_data/workbench/injection-overrides.json` (relabel, replace injected text, or hide, per entry).
@@ -58,7 +64,11 @@ import yaml  # type: ignore[import-untyped]
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from src.api.routes.demo_terminal import enforce_loopback_bind
+from src.api.routes.demo_terminal import (
+    SHELL_ALLOWLIST,
+    _shell_is_available_on_host,
+    enforce_loopback_bind,
+)
 from src.db.ideas import fold, load_events
 from src.governance.backlog import queue_order, readiness
 
@@ -85,6 +95,59 @@ INJECTION_CATEGORIES: Final[tuple[str, ...]] = ("skills", "agents", "prompts")
 ALWAYS_EXCLUDED_NAMES: Final[frozenset[str]] = frozenset({".git"})
 
 router = APIRouter()
+
+
+# --- Host platform and shell availability (ADR-014 section 5, REQ-007 W17) --------------------
+
+#: The three platform labels this route reports — `windows` when `platform.system()` says so,
+#: `linux` for the platform every dev/CI machine here actually runs, and `other` for anything
+#: else (macOS included) rather than a guessed fourth label this route has no way to verify.
+PLATFORM_WINDOWS: Final[str] = "windows"
+PLATFORM_LINUX: Final[str] = "linux"
+PLATFORM_OTHER: Final[str] = "other"
+
+#: Deterministic report order — `SHELL_ALLOWLIST` (`src.api.routes.demo_terminal`) is a
+#: frozenset built from the union of two smaller frozensets, so its iteration order is not
+#: something to depend on; sorting it here is what makes the response order stable across runs.
+_PLATFORM_SHELL_NAMES: Final[tuple[str, ...]] = tuple(sorted(SHELL_ALLOWLIST))
+
+
+class ShellAvailability(BaseModel):
+    shell: str
+    available: bool
+
+
+class PlatformInfo(BaseModel):
+    platform: str
+    shells: list[ShellAvailability]
+
+
+def _host_platform_label() -> str:
+    """`windows`, `linux`, or `other` — never raises, never guesses a fourth value."""
+    system = platform.system()
+    if system == "Windows":
+        return PLATFORM_WINDOWS
+    if system == "Linux":
+        return PLATFORM_LINUX
+    return PLATFORM_OTHER
+
+
+@router.get("/platform", response_model=PlatformInfo)
+async def get_platform() -> PlatformInfo:
+    """The host platform and, per allowlisted shell, whether it runs here.
+
+    Reuses `_shell_is_available_on_host` from `src.api.routes.demo_terminal` — the identical
+    check that route's unavailable-shell refusal already performs — rather than a second copy
+    of the platform-family rule (bash is POSIX-only, cmd/powershell are Windows-only). This is a
+    read: it never spawns a shell to test it, and it never mutates `SESSIONS`.
+    """
+    return PlatformInfo(
+        platform=_host_platform_label(),
+        shells=[
+            ShellAvailability(shell=shell, available=_shell_is_available_on_host(shell))
+            for shell in _PLATFORM_SHELL_NAMES
+        ],
+    )
 
 
 class InjectionSourceEntry(BaseModel):

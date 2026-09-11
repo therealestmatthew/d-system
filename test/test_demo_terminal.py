@@ -388,12 +388,13 @@ def test_two_concurrent_websocket_sessions_are_independent_shells(
     assert b"session-one-value" not in output_two
 
 
-def test_fifth_concurrent_session_is_refused_while_four_are_open(
+def test_seventh_concurrent_session_is_refused_while_six_are_open(
     rebuild_app: Callable[..., FastAPI],
 ) -> None:
-    """ADR-014 section 4: the four-session cap is enforced by the route's own registry, not
-    merely trusted from the UI (idea `000087`) — a fifth concurrent websocket is refused with a
-    clear close reason while four genuine sessions are still open.
+    """ADR-014 section 4: the six-session cap (raised from four, owner decision 2026-09-11,
+    REQ-007 W17) is enforced by the route's own registry, not merely trusted from the UI (idea
+    `000087`) — a seventh concurrent websocket is refused with a clear close reason while six
+    genuine sessions are still open.
     """
     app = rebuild_app(flag="1")
     client = TestClient(app)
@@ -402,6 +403,8 @@ def test_fifth_concurrent_session_is_refused_while_four_are_open(
         client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_two,
         client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_three,
         client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_four,
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_five,
+        client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_six,
     ):
         with pytest.raises(WebSocketDisconnect) as exc_info:
             with client.websocket_connect(DEMO_TERMINAL_WS_PATH):
@@ -410,11 +413,11 @@ def test_fifth_concurrent_session_is_refused_while_four_are_open(
         assert str(MAX_CONCURRENT_SESSIONS) in (exc_info.value.reason or "")
 
 
-def test_refusal_is_absent_once_one_of_four_sessions_closes(
+def test_refusal_is_absent_once_one_of_six_sessions_closes(
     rebuild_app: Callable[..., FastAPI],
 ) -> None:
-    """The cap tracks sessions genuinely alive right now: closing one of four open sessions
-    frees a slot, and a fifth connection attempt then succeeds — proven with a real command
+    """The cap tracks sessions genuinely alive right now: closing one of six open sessions
+    frees a slot, and a seventh connection attempt then succeeds — proven with a real command
     round trip through the newly admitted session, not merely an absence of the refusal.
     """
     app = rebuild_app(flag="1")
@@ -429,8 +432,12 @@ def test_refusal_is_absent_once_one_of_four_sessions_closes(
     session_three.__enter__()
     session_four = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
     session_four.__enter__()
+    session_five = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_five.__enter__()
+    session_six = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+    session_six.__enter__()
     try:
-        # Close one of the four — the server-side `finally:` in `terminal_websocket` pops the
+        # Close one of the six — the server-side `finally:` in `terminal_websocket` pops the
         # registry entry as part of tearing the session down.
         session_one.__exit__(None, None, None)
         deadline = time.monotonic() + 5.0
@@ -442,17 +449,17 @@ def test_refusal_is_absent_once_one_of_four_sessions_closes(
         assert len(reloaded_demo_terminal_module.SESSIONS) < MAX_CONCURRENT_SESSIONS
 
         output = b""
-        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as fifth_websocket:
-            fifth_websocket.send_bytes(b"echo demo-terminal-fifth-after-close-marker\n")
+        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as seventh_websocket:
+            seventh_websocket.send_bytes(b"echo demo-terminal-seventh-after-close-marker\n")
             deadline = time.monotonic() + 5.0
             while (
-                b"demo-terminal-fifth-after-close-marker" not in output
+                b"demo-terminal-seventh-after-close-marker" not in output
                 and time.monotonic() < deadline
             ):
-                output += fifth_websocket.receive_bytes()
-        assert b"demo-terminal-fifth-after-close-marker" in output
+                output += seventh_websocket.receive_bytes()
+        assert b"demo-terminal-seventh-after-close-marker" in output
     finally:
-        for session in (session_two, session_three, session_four):
+        for session in (session_two, session_three, session_four, session_five, session_six):
             with contextlib.suppress(Exception):
                 session.__exit__(None, None, None)
 

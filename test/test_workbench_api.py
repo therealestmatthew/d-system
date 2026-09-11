@@ -1,7 +1,9 @@
 """Tests for the workbench read routes (`src/api/routes/workbench.py`, ADR-015).
 
 Covers: the routes exist only when `D_SYSTEM_DEMO_TERMINAL=1` (404, not merely refusing, with
-the flag unset — REQ-007 W14); injection-source enumeration matches a direct listing of
+the flag unset — REQ-007 W14); the platform route reports the host platform and per-shell
+availability by reusing `src.api.routes.demo_terminal`'s own availability check (REQ-007 W17);
+injection-source enumeration matches a direct listing of
 `.claude/skills/`, `.claude/agents/` and the governed `PROMPT-*` files under `docs/02-prompts/`;
 the curated overrides file relabels, replaces injected text, and hides entries; path
 validation rejects `..` traversal, an absolute path, and a symlink whose target leaves the
@@ -48,6 +50,7 @@ from src.api.routes.workbench import (
 from src.db.ideas import fold, load_events
 from src.governance.backlog import queue_order, readiness
 
+WORKBENCH_PLATFORM_PATH = "/api/v1/workbench/platform"
 WORKBENCH_INJECTION_SOURCES_PATH = "/api/v1/workbench/injection-sources"
 WORKBENCH_LIST_PATH = "/api/v1/workbench/list"
 WORKBENCH_SEARCH_PATH = "/api/v1/workbench/search"
@@ -120,6 +123,7 @@ def test_every_workbench_route_absent_with_flag_unset(
     app = rebuild_app(flag=None)
     assert "src.api.routes.workbench" not in sys.modules
     client = TestClient(app)
+    assert client.get(WORKBENCH_PLATFORM_PATH).status_code == 404
     assert client.get(WORKBENCH_INJECTION_SOURCES_PATH).status_code == 404
     assert client.get(WORKBENCH_LIST_PATH).status_code == 404
     assert client.get(WORKBENCH_SEARCH_PATH).status_code == 404
@@ -130,8 +134,40 @@ def test_routes_registered_with_flag_set(rebuild_app: Callable[..., FastAPI]) ->
     app = rebuild_app(flag="1")
     assert "src.api.routes.workbench" in sys.modules
     client = TestClient(app)
+    assert client.get(WORKBENCH_PLATFORM_PATH).status_code == 200
     assert client.get(WORKBENCH_INJECTION_SOURCES_PATH).status_code == 200
     assert client.get(WORKBENCH_LIST_PATH).status_code == 200
+
+
+# --- host platform and shell availability (REQ-007 W17) ----------------------------------------
+
+
+def test_platform_route_reports_linux_and_bash_available_but_not_cmd_or_powershell(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """On this (Linux) host: `platform` reports `linux`, bash is available, and the two
+    Windows-only shells are not — the identical family rule
+    `src.api.routes.demo_terminal._shell_is_available_on_host` applies to the unavailable-shell
+    refusal, exercised here through the reused function rather than a second copy of it.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    response = client.get(WORKBENCH_PLATFORM_PATH)
+    assert response.status_code == 200
+    body = response.json()
+
+    assert body["platform"] == "linux"
+    availability = {entry["shell"]: entry["available"] for entry in body["shells"]}
+    assert availability == {"bash": True, "cmd": False, "powershell": False}
+
+
+def test_platform_route_rejects_non_get(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    assert client.post(WORKBENCH_PLATFORM_PATH).status_code == 405
+    assert client.put(WORKBENCH_PLATFORM_PATH).status_code == 405
+    assert client.delete(WORKBENCH_PLATFORM_PATH).status_code == 405
 
 
 # --- injection-source enumeration (REQ-007 W04) ------------------------------------------------

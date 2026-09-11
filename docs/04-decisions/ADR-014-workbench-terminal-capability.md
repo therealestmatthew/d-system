@@ -7,7 +7,7 @@ kind: adr
 status: accepted
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-11'
 systems: [sys-demo-stage, sys-api, sys-ui]
 depends_on: [doc-workbench-requirements, doc-demo-terminal-decision]
 supersedes: [doc-demo-terminal-decision]
@@ -42,10 +42,12 @@ panels (REQ-007 W12).
    product-named flag is deliberately deferred to a post-demo record. Unset, the route does not
    exist — not registered, not merely disabled.
 4. **A backend session registry bounds and identifies sessions.** The websocket route keeps a
-   registry mapping session id → adapter for the sessions it owns; the four-session cap is
-   enforced there, not only in the UI, and a fifth connection is refused with a clear close
-   reason. One PTY per websocket stays; sessions still die with their websocket. This adopts the
-   registry half of idea `000087` only — the outside-the-page inject/read HTTP API, detach/
+   registry mapping session id → adapter for the sessions it owns; the concurrent-session cap is
+   enforced there, not only in the UI, and a session past the cap is refused with a clear close
+   reason. The cap is six, raised from the original four by the owner's 2026-09-11 decision
+   (REQ-007 W17 delta); the per-panel session-tab cap enforced in the UI stays four and is
+   unaffected. One PTY per websocket stays; sessions still die with their websocket. This adopts
+   the registry half of idea `000087` only — the outside-the-page inject/read HTTP API, detach/
    reattach, and output buffering stay parked in that idea and would start from a further record.
 5. **The shell is selected per session over the existing adapter override.** Terminal (bash), CMD
    and PowerShell are three panel options, all through the one adapter interface (POSIX pty;

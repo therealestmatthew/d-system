@@ -7,9 +7,10 @@ does not exist, it does not exist-but-refuse. Importing this module is also what
 fails fast at import time, before the app finishes constructing.
 
 ADR-014 adds two things on top of that unchanged gating/binding posture: a server-side session
-registry that bounds concurrent sessions to four (section 4), and per-session shell selection
-against a fixed allowlist — bash, cmd, powershell — with a structured in-panel refusal for a
-shell the host cannot run (section 5).
+registry that bounds concurrent sessions to six (section 4; raised from four by the owner
+decision of 2026-09-11, REQ-007 W17), and per-session shell selection against a fixed
+allowlist — bash, cmd, powershell — with a structured in-panel refusal for a shell the host
+cannot run (section 5).
 """
 
 from __future__ import annotations
@@ -56,11 +57,13 @@ MAX_TERMINAL_DIMENSION: Final[int] = 65535
 IDLE_TIMEOUT_ENV_VAR: Final[str] = "D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS"
 DEFAULT_IDLE_TIMEOUT_SECONDS: Final[float] = 300.0
 
-# ADR-014 section 4: the four-session cap moves from UI-only (idea `000087`, `phase-demo-06`) to
+# ADR-014 section 4: the session cap moves from UI-only (idea `000087`, `phase-demo-06`) to
 # server-side, enforced against this registry rather than trusted from the client. One PTY per
 # websocket stays; a session still ends the moment its websocket does (`finally` below), so the
 # registry's size is always "sessions genuinely alive right now", not a count that can drift.
-MAX_CONCURRENT_SESSIONS: Final[int] = 4
+# Raised from four to six by the owner on 2026-09-11 (REQ-007 W17 delta); the per-panel
+# session-tab cap enforced in the UI stays four and is untouched by this change.
+MAX_CONCURRENT_SESSIONS: Final[int] = 6
 SESSION_LIMIT_CLOSE_CODE: Final[int] = 4001
 SESSION_LIMIT_CLOSE_REASON: Final[str] = (
     f"Maximum of {MAX_CONCURRENT_SESSIONS} concurrent terminal sessions reached"
