@@ -5589,11 +5589,15 @@ items:
   title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
   next_action: All agent-executable work is done - W07-C1, talking points, W07-V1 (clean
     on re-validation), both agent-driven rehearsal passes (recorded; pass 2's two runbook
-    gaps fixed, its one code defect routed to idea 000104 rather than fixed here), and
-    W07-G (green on re-check). What remains is entirely owner-machine, owner-driven work
-    that no agent can perform - the REQ-006 R06 terminal smoke check, the CMD and
-    PowerShell round-trips (REQ-007 W12), and both owner-driven timed dry-runs closing
-    REQ-006 R09. The phase cannot close until the owner performs and records these.
+    gaps fixed, its one code defect routed to idea 000104 rather than fixed here), W07-G
+    (green on re-check) and W07-W (Playwright rehearsal pass, clean). A 2026-09-11
+    session-close audit independently re-verified acceptance condition 1 against the real
+    current UI and confirmed this work is solid enough to build on for phase-wb-08; it is
+    not blocked by phase-wb-07 remaining open. What remains is entirely owner-machine,
+    owner-driven work that no agent can perform - the REQ-006 R06 terminal smoke check,
+    the CMD and PowerShell round-trips (REQ-007 W12), and both owner-driven timed
+    dry-runs closing REQ-006 R09. The phase cannot close until the owner performs and
+    records these.
   session: doc-session-rehearsal-refresh
   result: 'In progress (evidence lives on the unmerged agent/phase-wb-07 worktree branch:
     docs/00-working/demo-runbook.md, docs/00-working/demo-windows-setup.md). Runbook and
@@ -5613,9 +5617,23 @@ items:
     flagged prominently as demo-wrecking if unaddressed), and a repeat of pass 1''s cosmetic
     _parked dropdown finding. W07-G passed all six items on re-check (first check''s item-6
     fail was a two-dot vs triple-dot diff artifact against dev''s own independent commits,
-    not a real deliverable-path violation). Owner-machine items (R06 smoke check,
+    not a real deliverable-path violation). W07-W (Playwright rehearsal pass,
+    demo-validator-web) then passed with no blocking finding: every control the runbook
+    names in its browser-marked steps exists and behaves as described; two non-blocking
+    notes recorded (idea 000105, the HTML Viewer Embedded/Open-in-tab toggle undocumented;
+    multi-size zero-scroll confirmable only at the rehearsal environment''s single
+    available window size). A supplementary owner-requested check confirmed terminal
+    session persistence across layout switches. Owner-machine items (R06 smoke check,
     CMD/PowerShell round-trips, both owner-driven timed dry-runs) not started; they close
-    only on the owner''s own recorded results.'
+    only on the owner''s own recorded results. **[Session-close audit, 2026-09-11]**
+    Independent review confirmed acceptance condition 1 (REQ-007 W13) holds against the
+    real current UI (control names, dialog text and timeboxes independently re-verified,
+    not taken on the record''s word) and found the agent-executable work solid enough to
+    build on for phase-wb-08. It also found the branch tip''s overview page under-reporting
+    by one idea (the final commit never reran the generator) - fixed on the
+    agent/phase-wb-07 branch (commit 14094bb) and the missing drift-test coverage recorded
+    as idea 000106 on that same branch (commit 7cd3a70), both per the owner''s direction.
+    Conditions 2 and 3 remain not met; the phase stays active.'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements

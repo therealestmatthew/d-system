@@ -175,3 +175,124 @@ depends_on: [doc-workbench]
   `000102` (caught before commit, reverted, re-appended at the branch tip as `000105`).
   Until the branch merges, `_data/ideas.jsonl` must only be appended to on
   `agent/phase-wb-07`.
+
+## Review
+
+Independent sub-agent review at close (fresh general-purpose agent, merge-base-relative diff
+`dev...agent/phase-wb-07` — merge-base `7b6f39a`, branch tip `c43bd7d` at review time — run from
+the `phase-wb-07` worktree, no access to this record's conclusions beyond the claims it was asked
+to check). Since acceptance conditions 2 and 3 were already known unmet (owner-machine work never
+performed by anyone), the review's brief was narrowed to condition 1 and the surrounding
+agent-executable claims — the owner's actual question was whether that work is solid enough to
+build on while starting `phase-wb-08`. Findings pasted verbatim:
+
+- **Rerun results**: "Both mechanically rerunnable checks were rerun independently in the worktree
+  and reproduced the session record's claims exactly: `uv run python -m src.governance` printed
+  `Governance OK: 18 systems, 163 documents, 16 memories, 119 backlog phases`; `uv run python
+  tools/check_no_private_content.py` (with changes staged, then reset — nothing left staged
+  afterward) printed `check_no_private_content: OK (497 tracked files, 0 identifiers checked)`. The
+  Playwright rehearsal pass (W07-W) could not be rerun by this reviewer and is taken on the
+  record's word, consistent with its detailed, specific description."
+- **Acceptance condition 1 (REQ-007 W13) — HOLDS.** "The runbook (`docs/00-working/demo-runbook.md`,
+  264 lines) describes only the current workbench UI. Cross-checking its control inventory against
+  `ts/src/workbench/panelRegistry.tsx` and `ts/src/workbench/Slot.tsx` on `dev` confirms every
+  named control is real and correctly described: the panel registry's exact display names
+  (`Terminal (bash)`, `CMD`, `PowerShell`, `Notes`, `HTML Viewer`, `File Browser`, `Idea Explorer`,
+  `Backlog Explorer`) all appear verbatim in the runbook; `Slot.tsx`'s multi-panel dropdown renders
+  a popover titled `'{slot.display_name}: choose a panel'` with a `'{currentPanel} ▾'` trigger —
+  the runbook's 'Terminal: choose a panel' dialog description and 'Terminal (bash) ▾' header text
+  match this exactly, down to which two panels the picker lists. `NotesStripRegion.tsx` confirms
+  the `?` tooltip at the strip's far left, the single dropdown holding all controls, and no title
+  label — all as the runbook states. `TerminalMenu.tsx` confirms the ellipsis menu's
+  Collapse/Drop-Restore semantics. No references to retired UI elements were found anywhere in
+  either deliverable. Every step in both Dry-Run tables carries a command, a fallback, and a
+  timebox. I added the timeboxes myself rather than trusting the claimed sum: Dry-Run 1 is
+  1+2+2+3+4+3 = 15m and Dry-Run 2 is 1+2+2+3+4+3 = 15m — both exactly at, not merely inside, the
+  15-minute ceiling, matching the record's claim precisely."
+- **Acceptance conditions 2 and 3 — remain not met**, as already known: "no owner-machine work
+  (the R06 smoke check, the CMD/PowerShell round-trips, the two owner-driven timed dry-runs) has
+  been performed by anyone. `docs/00-working/demo-windows-setup.md`'s result blocks are all still
+  template placeholders, and the runbook's `__ACTUAL_n__`/`__TOTAL_n__`/`__DATE_TIME_n__`
+  placeholders are all unfilled. This is not in dispute."
+- **Spot-checks, all confirmed**: "'Talking points' does not appear anywhere in either deliverable
+  — W07-V1's claimed fix genuinely holds. Idea `000104` is recorded in `_data/ideas.jsonl` with
+  body text that includes, verbatim, 'This would wreck the live demo if unaddressed...', matching
+  the severity the record claims. The `/orient` step in both Dry-Run tables and in the Step
+  Markers/Workbench UI Reference sections genuinely instructs starting a Claude Code session via
+  `claude` before proceeding, and genuinely documents the terminal panel picker dialog by name —
+  both claimed pass-1/pass-2 fixes are real, not just claimed. `tools/demo_reset.py` and
+  `docs/08-governance/OPS-013-demo-reset.md` are untouched by this branch's diff — confirmed via
+  `git diff dev...agent/phase-wb-07 --stat -- tools/ src/`, zero changes under either path."
+- **Discrepancy found — overview page drift.** "`_data/ideas.jsonl` (+6 lines) and
+  `docs/00-working/ideas.md` (+53/-2) contain exactly what the record claims: ideas `000102` and
+  `000103`, idea `000087` annotated and moved `open`→`triaged`, and idea `000104` — all matching
+  the record's description, nothing unrelated. However, `_public/overview/index.html` as committed
+  at the branch tip (`c43bd7d`) is stale by one idea (reporting '104 ideas' when the committed
+  `ideas.jsonl` actually contains 105). The cause is structural: the final commit's own message
+  says 'ideas.md regenerated alongside per the drift test' — accurate, since an enforced pytest
+  covers `ideas.md` — but no equivalent test covers the overview page, and that commit simply never
+  reran the generator. This is a pre-existing gap in the tooling, not a new defect this phase
+  introduced, and it does not affect acceptance condition 1."
+- **Bottom line (verbatim)**: "Acceptance condition 1 genuinely holds — the runbook is accurate
+  against the real current UI, fully step-shaped, and its timeboxes sum to exactly 15 minutes in
+  both tables, all independently verified against source rather than taken from the record.
+  Conditions 2 and 3 remain unmet on owner-machine grounds alone, as expected. Every specific claim
+  I checked — the talking-points fix, the `claude`-session fix, the panel-picker documentation fix,
+  idea 000104's severity language, the governance and privacy reruns — held up exactly as
+  described. The one thing that does not hold up is cosmetic and narrow: the committed overview
+  page under-reports by one idea because no test enforces its freshness the way one enforces
+  `ideas.md`'s. This has no bearing on `phase-wb-08`, which inherits idea `000104` as a work item
+  (correctly and prominently recorded, independent of the overview page's staleness) and does not
+  depend on the overview page's idea count being current. The agent-executable work this phase
+  claims is genuinely solid and safe to build on top of; the one flaw found is worth a one-line fix
+  but is not a blocker for starting `phase-wb-08`."
+
+## Decisions
+
+- The owner invoked `/session-close phase-wb-07` believing it might already be closed (it was not
+  — unlike `phase-wb-04`/`-05`/`-06`, closed earlier this session via the GOV-003 retroactive-audit
+  path, `phase-wb-07` remains genuinely `status: active` with two acceptance conditions the owner's
+  own hardware and presence are required for). The owner's actual goal, stated directly, was
+  confirming it is safe to proceed on `phase-wb-08` — a phase that does not formally `depends_on`
+  `phase-wb-07` in `backlog.yaml`, but substantively inherits idea `000104` (the terminal
+  clipped-height bug) as its own work item. This session confirmed both: the phase cannot close
+  today, and the agent-executable work it has already done is solid.
+- The independent review's discovery of the overview-page drift was surfaced to the owner via
+  `AskUserQuestion` rather than fixed silently, since it required touching the unmerged
+  `agent/phase-wb-07` branch specifically (not this primary checkout) and the owner had not asked
+  for any code change. The owner chose to fix it now; it was fixed on that branch (commit
+  `14094bb`) rather than here, and reran/reconfirmed governance, the private-content check, and
+  `test/test_ideas.py` (62 passed) before committing.
+- The owner was also asked whether to record the missing-drift-test gap as an idea, matching how
+  `000104`/`000105` were captured during rehearsal. The owner chose yes; idea `000106` was appended
+  on the `agent/phase-wb-07` branch (commit `7cd3a70`), not on `dev`, per this phase's own recorded
+  process hazard that `dev`'s idea log tip (`000101`) trails the branch's (`000102`-`000106` now)
+  until the branch merges.
+- Because two of three acceptance conditions remain unmet, this session's step-6 decision is that
+  the phase **stays `active`** — not a close, and not a failure to paper over. This is the intended
+  outcome for a phase whose acceptance conditions genuinely require the owner's own hardware.
+
+## Corrections
+
+- None to this session record's own content — it was already current and accurate at the start of
+  this close (the prior checkpoint, `455331d`, had already recomputed it against the final W07-W
+  result). The corrections made this session were to the `agent/phase-wb-07` branch itself: the
+  overview-page drift (commit `14094bb`) and the resulting new idea (`000106`, commit `7cd3a70`),
+  both described above.
+
+## Left undone
+
+- The owner-machine, owner-driven items remain entirely outstanding, unchanged from before this
+  close: the REQ-006 R06 terminal smoke check, the CMD and PowerShell round-trips (REQ-007 W12),
+  and both owner-driven timed dry-runs closing REQ-006 R09. None of these can be performed by an
+  agent; the phase stays `active` until the owner performs and records them.
+- The `agent/phase-wb-07` branch remains unmerged into `dev`. Its deliverables
+  (`docs/00-working/demo-runbook.md`, `docs/00-working/demo-windows-setup.md`) and this session's
+  two follow-up commits (`14094bb`, `7cd3a70`) all live there only.
+- Idea `000104` (terminal panel clipped-height bug) remains the owner's to route; `phase-wb-08`
+  (retitled by a parallel session during this close to "Panel rendering fixes — terminal fill, HTML
+  Viewer, File Browser scroll") already picks it up as a work item, confirmed independent of
+  anything in this close.
+- Idea `000105` (HTML Viewer Embedded/Open-in-tab toggle undocumented) and the newly recorded idea
+  `000106` (no drift test for the overview page) both remain open, unrouted beyond their own
+  recorded text.
