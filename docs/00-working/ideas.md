@@ -4924,3 +4924,19 @@ With D_SYSTEM_DEMO_TERMINAL unset, the frontend still fetches /api/v1/workbench/
 **Created 2026-09-11T03:39:18-04:00 · Status: `open`**
 
 When a slot admitting several panels swaps one in via its header dropdown (REQ-007 W06), the swapped-in panel still renders its own inner .stage-region header below the slot-level header, so the panel shows two stacked headers. Deliberately left as a cosmetic case by phase-wb-02 (noted in ts/src/workbench/Slot.tsx and ts/src/workbench/panelRegistry.tsx) when no multi-panel slot was reachable; it became reachable when phase-wb-03 shipped the shell panel options and phase-wb-05/06 filled layout-1's explorer slot (file-browser, idea-explorer, backlog-explorer). Candidate polish: suppress or merge the inner header when a panel renders inside a multi-panel slot, keeping the slot-level dropdown header as the single title row. Touches REQ-007 W06's rendered look but not its stated behavior, so recorded for the owner rather than built (workbench build enhancement lane, PROMPT-023 delta 3). Found during the phase-wb-06 coordinator scout, 2026-09-11.
+
+---
+
+## 000102 · Rehearsal idea from demo-validator-web dry-run
+
+**Created 2026-09-11T04:10:22-04:00 · Status: `open`**
+
+Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
+
+---
+
+## 000103 · Rehearsal pass 2 test entry for the live terminal /idea command
+
+**Created 2026-09-11T04:19:18-04:00 · Status: `open`**
+
+Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
