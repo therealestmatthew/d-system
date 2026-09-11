@@ -112,6 +112,26 @@ confirming closure of the MAJOR and no regression in W03-C2's original R12/W04 o
 (route-only content, active-tab un-executed injection, disable/degrade semantics, and no
 `demo-commands.json` string leaking into `ts/src`, all re-confirmed).
 
+W03-W (browser verification, coordinator-dispatched) — **PASS on all six items** with measured
+evidence: (1) only the two menu controls exist; a live `seq`-loop survived collapse/re-expand
+(tick counter matched wall time) and was still ticking at the drop confirmation, its child
+process gone from `ps` within 2 seconds of confirming; (2) drop-in-place — outer panel bbox
+byte-identical before/after (`716.9 × 778.4`), all four dropdowns carrying real `disabled`
+(click timed out as "not enabled", focus refused), restore round-tripped `echo`; (3) enumeration
+matched the filesystem exactly (3 skills, 11 agents, 23 prompts), one injection per category
+exact and un-executed with Enter then executing; the overrides live-edit (relabel, replace,
+hide) took effect on refresh with zero rebuild, verified in API and UI; the fix confirmed
+behaviorally — one malformed entry dropped only itself (3→2 skills) with no console errors;
+(4) bash round-trips; CMD and PowerShell each render the in-panel unavailable message naming
+the shell; (5) flag-off degradation correct — labeled disabled dropdowns, the ADR-013 absent
+message, no uncaught exceptions — with a recorded cosmetic caveat: four network-404 resource
+logs from the app probing the designed-absent workbench routes (idea `000100`); (6) zero
+scroll (`{x:0, y:0}`) and no overlapping regions at all four sizes.
+
+At close, re-run by the coordinator on dev after integration (`72506f4`, completion `1d81d08`):
+`uv run python -m src.governance` — exit 0; staged `check_no_private_content.py` — `OK (486
+tracked files, 31 identifiers checked)`.
+
 ## Acceptance
 
 - No standalone collapse or page-level drop control renders; both live in the ellipsis menu with
@@ -119,35 +139,110 @@ confirming closure of the MAJOR and no regression in W03-C2's original R12/W04 o
   by W03-V1's grep and mount-state review.
 - Dropped state shows the info page inside unchanged panel bounds with all four injection
   dropdowns visible, disabled and unclickable; restore returns a working terminal (REQ-007 W03)
-  — **Met for the mechanism reviewed** (the Commands dropdown, real `disabled` attribute
-  confirmed by W03-V1; the Skills/Prompts/Agents dropdowns share the identical `Popover`
-  `disabled` mechanism, re-confirmed post-fix by W03-V2), but this remains code-reviewed, not
-  browser-measured — W03-W (browser verification, coordinator-dispatched, not run in this
-  session) is the measurement of record for the rendered claim.
+  — **Met**: W03-W measured identical panel bounds before/after drop, click and keyboard both
+  refused on every dropdown, and a working round-trip after restore.
 - Each category injects its exact agreed text un-executed; an overrides-file relabel,
-  replacement and hide take effect with no rebuild (REQ-007 W04) — **Met on the reviewed half,
-  and now resilient to a malformed override entry**: W03-V2 (both passes) confirmed route-only
-  content and the R12 injection path; W03-A's MAJOR and its fix specifically hardened the
-  overrides-file path against one bad entry hiding the other 36+ valid ones; the overrides-file
-  live-effect claim itself is a browser-observable behavior (W03-W's job), not exercised in this
-  session.
+  replacement and hide take effect with no rebuild (REQ-007 W04) — **Met**: W03-W verified all
+  three per category (exact text, un-executed, Enter executes) and the live overrides edit
+  effective on refresh with no rebuild; the W03-A fix confirmed behaviorally (one malformed
+  entry drops only itself).
 - CMD and PowerShell panels on Linux show the in-panel unavailability message with no uncaught
-  console errors; bash round-trips (REQ-007 W12) — **Met on the reviewed half**: W03-V3 confirmed
-  the shared-implementation and refusal-rendering code paths; "no uncaught console errors" is a
-  browser-observable claim for W03-W, not exercised here.
+  console errors; bash round-trips (REQ-007 W12) — **Met**: W03-W measured both in-panel
+  messages naming the shell, bash round-trips, and no uncaught exceptions (the only console
+  entries anywhere were flag-off network-404 resource logs, recorded as cosmetic under idea
+  `000100`).
 
 ## Backlog
 
-`status: active`, `agent: agent-demo-stage` unchanged. `next_action`: W03-A's one MAJOR is fixed
-and re-validated clean (fix cycle 1 of 2 used, 1 remaining if a further finding surfaces); the
-gate's item-6 scope finding is closed by the coordinator's deliverables-widening ruling
-(`6a63f67`); W03-W (browser verification) remains outstanding, coordinator-dispatched; the three
-`test_demo_terminal.py` pytest failures are the recorded environmental defect, not phase work
-remaining.
+`status: complete`, `agent: agent-demo-stage` retained as the record of who did the work.
+`next_action` is the "None — phase complete" close note. `completion_evidence` names the nine
+shipped files plus this session record. `result` records the full arc: first-pass items, the
+gate with its two rulings (environmental pytest; the ADR-016 deliverables widening), the W03-A
+major and its fix, W03-W's six measured passes with the flag-off caveat, the orchestrator's
+self-reported process deviation, and the fast-forward integration at `72506f4` (completion
+commit `1d81d08`). `phase-wb-03` removed from `next_up`.
 
 ## Unresolved
 
-- W03-W (browser verification) has not run this session — coordinator-dispatched per the pack.
-- The three `test_demo_terminal.py` PTY failures are the recurrent host-wide `pyenv` shim
-  contention (tracked previously as environmental, e.g. idea `000097` for `phase-wb-02`'s
-  identical failures) — not phase-wb-03-specific.
+- The three `test_demo_terminal.py` PTY failures remain the recurrent host-wide pyenv shim
+  contention (ideas `000097`, `000099` — the latter annotated with the evidence clearing the
+  suspected wb-01 commit). Host-level fix is the owner's.
+- Flag-off console 404 noise is cosmetic, tracked as idea `000100`.
+- Owner-side commands pending: `git push origin dev`, and worktree/branch cleanup for the three
+  merged phases (`phase-wb-01`, `phase-wb-02`, `phase-wb-03`).
+
+## Review
+
+Independent sub-agent review at close (fresh agent, range `f62611e..1d81d08`, its own reruns).
+Findings pasted:
+
+- **Scope containment**: "The phase's four own commits touch only `ts/src/stage/*`,
+  `ts/src/workbench/panelRegistry.tsx`, `ts/public/demo-commands.json`, and the two
+  `_data/workbench/layouts/*.json` files (admits-line change only, exactly matching the
+  ADR-016 widening ruling). Nothing outside the declared deliverables; no `test/` or `src/`
+  file touched, which confirms the attribution of the three `test_demo_terminal.py` PTY
+  failures to the pre-existing host pyenv defect without a rerun."
+- **Condition 1 (W02) — HOLDS.** "Controls only in `TerminalMenu.tsx` (the sole home;
+  in-bubble confirm before `onConfirmDrop` fires). Sessions survive collapse structurally:
+  `TerminalRegion.tsx:495-505` always mounts every `TerminalSession`; collapse flips only a
+  CSS class and the `visible` prop."
+- **Condition 2 (W03) — HOLDS.** "Dropped state swaps only the body div inside the same
+  section/header structure; the disabled mechanism is a real HTML attribute (`Popover.tsx:163`)
+  plus force-close-on-disable. W03-W's bbox/click-refusal measurements are consistent with
+  this code."
+- **Condition 3 (W04) — HOLDS.** "`sendToActiveSession(injection, false)` with send-time
+  `\r\n` stripping — un-executed by construction; entries come solely from the runtime fetch,
+  so an overrides edit needs a refresh, never a rebuild. The W03-A fix is real in merged code:
+  shape-only top-level check, per-category `.filter`, no whole-payload `.every` gate anywhere;
+  `CONTROL_CHARACTER_PATTERN` intact in both dropdown components."
+- **Condition 4 (W12) — HOLDS.** "All three panel ids share one `TerminalRegion` via two thin
+  wrappers — no duplicated terminal component. The refusal is shape-parsed and rendered as the
+  backend's own shell-naming message in-panel, never thrown."
+- **Reruns**: build ✓, governance exit 0, staged private-content check byte-identical to the
+  record's close line. `demo-commands.json` strings absent from `ts/src` (zero grep matches);
+  the startup-race fix present.
+- **Discrepancies: none material.** Two notes, neither a record error: the governance document
+  count moved 158→160 from later coordinator/peer commits (the record attributes its number to
+  the earlier run correctly), and the record's close edits were staged-but-uncommitted at
+  review time, as expected mid-close.
+- **Verdict (verbatim)**: "all four acceptance conditions hold; the record's claims are
+  supported by the diff and reruns. No blocker to marking the phase complete."
+
+## Decisions
+
+- The gate's item-6 scope red ("diff touches nothing outside ts/") was ruled a checklist-wording
+  lag, not a violation: ADR-016 deliberately puts a slot's `admits` list in layout data, so
+  registering the shell panels required editing the two layout JSON files. The coordinator
+  widened the phase's declared deliverables (`6a63f67`) per AGENTS.md's declaration-widening
+  rule — the second phase in a row where the pack's file-scope wording lagged the ratified
+  architecture (wb-02's `vite.config.ts` was the first).
+- W03-W's item-5 caveat (four network-404 console resource logs with the flag off) was ruled
+  within the requirement's intent — degradation is correct, no uncaught exceptions — and the
+  cosmetic noise recorded as idea `000100` rather than spent as a fix cycle.
+- A peer session's mid-build report suspecting a wb-01 commit for the PTY test failures was
+  answered with timeline evidence rather than a code change: the failures pre-dated that
+  commit's merge, and the suite ran 46/46 green with the commit in place the moment the pyenv
+  lock was removed. The evidence went into idea `000099` as a finding annotation; no
+  `src/demo/posix.py` change was made.
+- Session-limit interruptions (the orchestrator and one gate dispatch died mid-run when the
+  API session limit hit) were handled by resuming the same agents with verified repository
+  state, never re-running from scratch — the pack's idempotency held.
+
+## Corrections
+
+- The orchestrator dispatched W03-V3 before committing W03-C3's work, against the explicit
+  commit-before-validate instruction; it flagged the deviation itself, the validator assessed
+  the real worktree state, and the commit followed immediately — no rework needed, recorded as
+  a process error.
+- The W03-G gate's first dispatch was cut off by the session limit before any result and was
+  correctly discarded and re-dispatched, not treated as a verdict.
+
+## Left undone
+
+- The Windows halves of W12 (CMD/PowerShell round-trips on the owner's machine) belong to
+  phase-wb-07's owner-machine conditions, as the pack defines.
+- The host-level pyenv fix, the dev push, and the three merged worktree cleanups — owner's
+  hands, listed above.
+- Phases wb-04 through wb-07: the coordinator session pauses here by the owner's direction;
+  the handoff file `_working/coordinator-handoff.md` carries the resume state, and the next
+  coordinator session continues at phase-wb-04 (W04-K, demo-orch-data).
