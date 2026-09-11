@@ -35,16 +35,19 @@ function isInjectionSourceEntry(value: unknown): value is InjectionSourceEntry {
   )
 }
 
-function isInjectionSources(value: unknown): value is InjectionSources {
+// Shape-only check: are the three category keys present and arrays? Deliberately does NOT
+// validate individual entries — that is `isInjectionSourceEntry`'s job, applied per-entry via
+// `.filter()` below so one malformed entry (e.g. an embedded newline from a supported operator's
+// edit of `_data/workbench/injection-overrides.json`) drops only itself, not its whole category
+// and not the other two categories' valid entries. Only a malformed top-level payload (not an
+// object, or a category that isn't an array at all) is an `error` state here.
+function isInjectionSourcesShape(
+  value: unknown
+): value is { skills: unknown[]; agents: unknown[]; prompts: unknown[] } {
   if (typeof value !== 'object' || value === null) return false
   const candidate = value as { skills?: unknown; agents?: unknown; prompts?: unknown }
   return (
-    Array.isArray(candidate.skills) &&
-    Array.isArray(candidate.agents) &&
-    Array.isArray(candidate.prompts) &&
-    candidate.skills.every(isInjectionSourceEntry) &&
-    candidate.agents.every(isInjectionSourceEntry) &&
-    candidate.prompts.every(isInjectionSourceEntry)
+    Array.isArray(candidate.skills) && Array.isArray(candidate.agents) && Array.isArray(candidate.prompts)
   )
 }
 
@@ -82,11 +85,15 @@ function useInjectionSources() {
         }
         return response.json().then((body: unknown) => {
           if (generation !== fetchGeneration.current) return
-          if (!isInjectionSources(body)) {
+          if (!isInjectionSourcesShape(body)) {
             setLoadState('error')
             return
           }
-          setSources(body)
+          setSources({
+            skills: body.skills.filter(isInjectionSourceEntry),
+            agents: body.agents.filter(isInjectionSourceEntry),
+            prompts: body.prompts.filter(isInjectionSourceEntry),
+          })
           setLoadState('loaded')
         })
       })
