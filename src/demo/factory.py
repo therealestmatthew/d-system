@@ -18,10 +18,14 @@ import os
 import platform
 
 from src.demo.adapter import TerminalAdapter
-from src.demo.posix import DEFAULT_SHELL as DEFAULT_POSIX_SHELL
 from src.demo.windows import DEFAULT_SHELL as DEFAULT_WINDOWS_SHELL
 
 SHELL_ENV_VAR = "D_SYSTEM_DEMO_SHELL"
+
+# Duplicated from src.demo.posix rather than imported: posix.py imports fcntl, pty and
+# termios at module scope, none of which exist on Windows, so importing it here would
+# crash the app on Windows before it could start.
+_DEFAULT_POSIX_SHELL = "/bin/bash"
 
 
 def is_windows() -> bool:
@@ -41,7 +45,7 @@ def resolve_shell(shell: str | None = None, *, windows: bool | None = None) -> s
     if env_shell:
         return env_shell
     on_windows = is_windows() if windows is None else windows
-    return DEFAULT_WINDOWS_SHELL if on_windows else DEFAULT_POSIX_SHELL
+    return DEFAULT_WINDOWS_SHELL if on_windows else _DEFAULT_POSIX_SHELL
 
 
 def create_adapter(shell: str | None = None, *, cwd: str | None = None) -> TerminalAdapter:
