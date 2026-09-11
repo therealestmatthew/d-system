@@ -52,8 +52,15 @@ Windows checks (REQ-006 R09, REQ-007 W12) while the terminal is invisible, and t
 
 **Acceptance sketch** (the fresh session refines into REQ-007 delta language):
 
+- The fix covers all three shell panels equally — Terminal (bash), CMD and PowerShell — not
+  just the bash panel it was first observed on (owner-confirmed 2026-09-11).
 - The active shell panel visibly fills its slot's body in both layouts at the demo window sizes,
   on Linux and Windows; typed input and output are visible without DOM inspection.
+- The fix must hold in **any slot a shell panel can occupy**, not only the terminal slot's
+  current geometry. Once Fix 2 lands, all three shells become assignable to the smaller main
+  slot (owner-confirmed 2026-09-11): phase-wb-09's verification must re-run the visible-fill
+  check with a shell assigned to the main slot in both layouts, so a fix that hard-codes the
+  terminal slot's dimensions fails the later phase rather than slipping through.
 - The zero-page-scroll rule (REQ-006 R02) still holds.
 - Session persistence across layout switches does not regress. Regression guard (already proven
   green today, keep as a verification step): set `MARKER=persist$RANDOM` in Layout 1, switch to
@@ -130,7 +137,9 @@ re-parent the terminal in the DOM. Where feasible keep component instances alive
 re-assignment (the layout-switch persistence works because `StagePage.tsx` keys slots by
 `slot_id` in one grid); where a re-assignment must remount a shell panel, the behavior must be
 explicit and stated, never a silent session kill. The Fix 1 regression guard above applies to
-Fix 2's verification too.
+Fix 2's verification too, and so does Fix 1's slot-independence obligation: after Fix 2, each
+of the three shell panels must render unclipped and fully interactive when assigned to the
+smaller (main) slot, exactly as in the terminal slot.
 
 ---
 
