@@ -5257,6 +5257,7 @@ items:
   deliverables:
   - ts/src
   - ts/public/demo-commands.json
+  - _data/workbench/layouts
 - id: phase-wb-04
   title: HTML Viewer panel with tabs
   next_action: After phase-wb-03 (shared ts/src lock), dispatch pack section W04
