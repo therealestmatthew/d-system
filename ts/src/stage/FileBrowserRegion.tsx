@@ -262,6 +262,19 @@ export default function FileBrowserRegion() {
   const [typeFilter, setTypeFilter] = useState(NO_FILTER)
   const [searchText, setSearchText] = useState('')
   const [entries, setEntries] = useState<DirectoryEntry[]>([])
+  // The folder `entries` was actually fetched for. `contextFolder` changing is what triggers the
+  // next fetch (the effect below), but React commits at least one render in between — new
+  // `contextFolder`, still-old `entries` — before that effect's `setLoadState('loading')` takes
+  // effect. `buildTree(contextFolder, entries)` during that one stale render mismatches directory
+  // against file list: an old-folder entry whose path doesn't start with the new prefix falls
+  // through `buildTree`'s unstripped-path branch and can compute a path that collides with a
+  // genuine entry already inside the new folder (e.g. a stale top-level `README.md` under a new
+  // `contextFolder` of `docs` computes to `docs/README.md`, colliding with the real
+  // `docs/README.md`) — React's "two children with the same key" warning, logged at that commit
+  // regardless of how quickly the following render replaces it with "Loading…". Comparing this
+  // against `contextFolder` below lets the render treat that one stale commit as loading too,
+  // instead of ever building a tree from a directory/file-list pair that don't match.
+  const [entriesFolder, setEntriesFolder] = useState<string>('.')
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set())
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
@@ -284,6 +297,7 @@ export default function FileBrowserRegion() {
       .then((body) => {
         if (cancelled) return
         setEntries(body)
+        setEntriesFolder(contextFolder)
         setLoadState('loaded')
       })
       .catch(() => {
@@ -321,7 +335,15 @@ export default function FileBrowserRegion() {
     })
   }, [entries, searchText, typeFilter])
 
-  const tree = useMemo(() => buildTree(contextFolder, filteredEntries), [contextFolder, filteredEntries])
+  // `filteredEntries` was filtered from `entries`, which belongs to `entriesFolder`, not
+  // necessarily `contextFolder` — see the field comment above `entriesFolder`'s declaration. Feed
+  // `buildTree` an empty list rather than `filteredEntries` while they disagree, so a stale-folder
+  // entry list is never turned into a tree keyed by the new folder's prefix; the render below
+  // shows "Loading…" for that same window instead of this (empty, never displayed) tree.
+  const tree = useMemo(
+    () => buildTree(contextFolder, entriesFolder === contextFolder ? filteredEntries : []),
+    [contextFolder, entriesFolder, filteredEntries],
+  )
 
   const effectiveExpandedPaths = useMemo(() => {
     if (!filtersActive) return expandedPaths
@@ -550,7 +572,7 @@ export default function FileBrowserRegion() {
           </select>
         </div>
         <div className="stage-file-browser__tree" role="tree" aria-label="File Browser tree">
-          {loadState === 'loading' ? (
+          {loadState === 'loading' || entriesFolder !== contextFolder ? (
             <p className="stage-placeholder-text">Loading…</p>
           ) : loadState === 'error' ? (
             <p className="stage-placeholder-text stage-placeholder-text--absent">
