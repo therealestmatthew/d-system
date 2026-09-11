@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import TerminalRegion from '../stage/TerminalRegion'
+import TerminalRegion, { TerminalRegionCmd, TerminalRegionPowerShell } from '../stage/TerminalRegion'
 import NotesStripRegion from '../stage/NotesStripRegion'
 import OverviewRegion from '../stage/OverviewRegion'
 
@@ -15,12 +15,23 @@ import OverviewRegion from '../stage/OverviewRegion'
  * dispatch item 5: "existing regions become panels of this engine") — each already renders its
  * own `.stage-region` section, which is what satisfies a single-panel slot's "plain header"
  * (REQ-007 W06) with no extra wrapper needed (the notes strip's own header carries no title,
- * per REQ-007 W01, but is still that same single `.stage-region` box). A slot resolving to more
- * than one *implemented* panel (none do in the two shipped layouts yet — see the layout JSON
- * files) is wrapped by `Slot.tsx` in an outer dropdown header instead; whichever future phase
- * first populates such a slot should note that the wrapped panel still renders its own inner
- * header too, and may want to drop it in that configuration — out of this phase's scope to
- * resolve for panels that do not exist yet.
+ * per REQ-007 W01, but is still that same single `.stage-region` box).
+ *
+ * `terminal-cmd` and `terminal-powershell` (REQ-007 W12) are the CMD and PowerShell panel
+ * options — the terminal slot's `admits` list (`_data/workbench/layouts/*.json`) now names all
+ * three terminal ids, so the terminal slot is this repo's first slot to actually reach `Slot.tsx`'s
+ * "more than one implemented panel" branch below: a slot-level header showing the current panel's
+ * name beside a dropdown listing the other two, wrapping whichever terminal panel is selected in
+ * an outer box. The wrapped panel still renders its own inner header too (the double-header
+ * cosmetic case flagged below) — left as-is, per the note this comment already carried before
+ * this slot became the one to exercise it. All three ids share the one `TerminalRegion`
+ * component, parameterized by its `shell` prop — never three copies of the terminal panel's
+ * logic.
+ *
+ * A slot resolving to more than one *implemented* panel is wrapped by `Slot.tsx` in an outer
+ * dropdown header instead; whichever future phase first populates such a slot should note that
+ * the wrapped panel still renders its own inner header too, and may want to drop it in that
+ * configuration — out of this phase's scope to resolve for panels that do not exist yet.
  */
 export interface PanelDefinition {
   displayName: string
@@ -28,7 +39,9 @@ export interface PanelDefinition {
 }
 
 export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
-  terminal: { displayName: 'Terminal', Component: TerminalRegion },
+  terminal: { displayName: 'Terminal (bash)', Component: TerminalRegion },
+  'terminal-cmd': { displayName: 'CMD', Component: TerminalRegionCmd },
+  'terminal-powershell': { displayName: 'PowerShell', Component: TerminalRegionPowerShell },
   'notes-strip': { displayName: 'Notes', Component: NotesStripRegion },
   overview: { displayName: 'Overview', Component: OverviewRegion },
   'html-viewer': { displayName: 'HTML Viewer', Component: null },

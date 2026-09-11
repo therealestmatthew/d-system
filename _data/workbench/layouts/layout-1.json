@@ -6,7 +6,7 @@
     {
       "slot_id": "terminal",
       "display_name": "Terminal",
-      "admits": ["terminal"],
+      "admits": ["terminal", "terminal-cmd", "terminal-powershell"],
       "default_panel": "terminal"
     },
     {

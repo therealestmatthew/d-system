@@ -16,6 +16,62 @@ const TERMINAL_WEBSOCKET_PATH = '/api/v1/demo/terminal/ws'
 const MAX_SESSIONS = 4
 const FIRST_SESSION_ID = 1
 
+// REQ-007 W12: the fixed shell allowlist mirrored from the backend's own
+// (`src/api/routes/demo_terminal.py`, `SHELL_ALLOWLIST`, ADR-014 section 5) — bash is the POSIX
+// panel, cmd/powershell the two Windows panels. Kept as a literal union (not imported — the two
+// sides are independent, and a mismatch here only ever produces the same "unavailable_shell"
+// in-panel message the backend already renders correctly) rather than a shared module, matching
+// this repo's existing pattern of small runtime-checked literals per side (`isCommandsFile`,
+// `isNotesFile`).
+export type TerminalShell = 'bash' | 'cmd' | 'powershell'
+
+const SHELL_LABELS: Record<TerminalShell, string> = {
+  bash: 'bash',
+  cmd: 'CMD',
+  powershell: 'PowerShell',
+}
+
+// The structured refusal frame the backend sends (`SHELL_REFUSAL_MESSAGE_TYPE` /
+// `_refuse_shell_request` in `src/api/routes/demo_terminal.py`) over an accepted-then-closed
+// socket when the requested shell is unlisted or unavailable on this host (ADR-014 section 5).
+// Recognized by shape, not trusted blindly — an unrecognized text frame falls through to the
+// existing `term.write()` path unchanged, so this addition never intercepts real shell output.
+interface ShellRefusal {
+  shell: string
+  reason: string
+  message: string
+}
+
+function parseShellRefusal(raw: string): ShellRefusal | null {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return null
+  }
+  if (typeof parsed !== 'object' || parsed === null) return null
+  const record = parsed as Record<string, unknown>
+  if (
+    record.type === 'shell_refusal' &&
+    typeof record.shell === 'string' &&
+    typeof record.reason === 'string' &&
+    typeof record.message === 'string'
+  ) {
+    return { shell: record.shell, reason: record.reason, message: record.message }
+  }
+  return null
+}
+
+// REQ-007 W12: "a clear in-panel message naming the unavailable shell" — the backend's own
+// `message` field already names the shell (e.g. "cmd is not available on this host") and is
+// authored server-side, so this prefers it over inventing frontend copy; the fallback only
+// covers a `message` that is present but empty, which the backend never actually sends.
+function refusalDisplayMessage(refusal: ShellRefusal): string {
+  if (refusal.message.trim().length > 0) return refusal.message
+  const label = SHELL_LABELS[refusal.shell as TerminalShell] ?? refusal.shell
+  return `${label} is not available on this host.`
+}
+
 // The imperative handle TerminalSession exposes to its parent (TerminalRegion) so the command
 // panel (REQ-006 R12) — rendered in TerminalRegion's own header, not inside TerminalSession —
 // can reach the *active* session's live socket without new shared state. This is the repo's
@@ -38,12 +94,17 @@ export interface TerminalSessionHandle {
  * only when TerminalRegion removes this session's id from its list (the guarded-drop / guarded
  * tab-close path in the parent).
  */
-const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(function TerminalSession(
-  { visible },
-  ref,
-) {
+const TerminalSession = forwardRef<
+  TerminalSessionHandle,
+  { visible: boolean; shell: TerminalShell }
+>(function TerminalSession({ visible, shell }, ref) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting')
+  // REQ-007 W12: set only when the backend refuses this session's requested shell (unlisted, or
+  // unavailable on this host — e.g. CMD/PowerShell on Linux). Once set, it takes over this
+  // session's body in place of the xterm mount, exactly like the existing `connectionState ===
+  // 'closed'` overlay below — never a raw error, never an unmounted/broken terminal.
+  const [shellRefusal, setShellRefusal] = useState<ShellRefusal | null>(null)
   // Holds the mount effect's `attemptFit` closure so the visibility-triggered effect below can
   // call the same guarded-fit-and-resize-frame logic without redefining it.
   const attemptFitRef = useRef<() => void>(() => {})
@@ -99,7 +160,12 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
     term.open(container)
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const socket = new WebSocket(`${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}`)
+    // REQ-007 W12 / ADR-014 section 5: every session requests its shell explicitly, including
+    // "bash" — the backend's own `_executable_for_shell` treats an explicit "bash" exactly like
+    // the query param's absence (still `D_SYSTEM_DEMO_SHELL`-overridable), so this never changes
+    // the existing bash panel's behavior; it only gives cmd/powershell sessions a name to ask for.
+    const socketUrl = `${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}?shell=${encodeURIComponent(shell)}`
+    const socket = new WebSocket(socketUrl)
     socket.binaryType = 'arraybuffer'
     socketRef.current = socket
 
@@ -141,6 +207,14 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
       if (event.data instanceof ArrayBuffer) {
         term.write(new Uint8Array(event.data))
       } else if (typeof event.data === 'string') {
+        // A shell-refusal text frame (ADR-014 section 5) is recognized by shape and diverted to
+        // in-panel state, never painted into the terminal and never thrown as an uncaught error;
+        // any other text frame falls through to the pre-existing `term.write()` path unchanged.
+        const refusal = parseShellRefusal(event.data)
+        if (refusal) {
+          setShellRefusal(refusal)
+          return
+        }
         term.write(event.data)
       }
     })
@@ -181,6 +255,8 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
     }
     // Mount once per TerminalSession instance — a session's socket and shell live for the
     // instance's whole lifetime, ending only when the parent unmounts it (guarded drop/close).
+    // `shell` is read once here (it names the panel instance's fixed shell, e.g. every "CMD"
+    // panel session always requests "cmd") and never changes for an already-mounted session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -196,7 +272,15 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
   return (
     <div className={'stage-terminal-session' + (visible ? ' stage-terminal-session--active' : '')}>
       <div ref={containerRef} className="stage-terminal-mount" />
-      {connectionState === 'closed' ? (
+      {shellRefusal ? (
+        // Takes priority over the plain "connection closed" message below: the backend accepts
+        // the socket, sends this frame, then closes it (ADR-014 section 5), so `connectionState`
+        // also reaches 'closed' shortly after — but the refusal's own named-shell message is the
+        // one that belongs on screen, not the generic reconnect prompt.
+        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
+          {refusalDisplayMessage(shellRefusal)}
+        </p>
+      ) : connectionState === 'closed' ? (
         <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
           Terminal connection closed. Reload the page to reconnect.
         </p>
@@ -242,8 +326,16 @@ const TerminalSession = forwardRef<TerminalSessionHandle, { visible: boolean }>(
  * Both `collapsed` and `dropped` are local state here (`phase-wb-02`), not lifted to a parent —
  * a panel's own drop/collapse only ever changes what renders *inside* its fixed slot box, never
  * the grid around it.
+ *
+ * REQ-007 W12: `shell` selects which of the three workbench panel dropdown options
+ * (`ts/src/workbench/panelRegistry.tsx`: "Terminal (bash)", "CMD", "PowerShell") this instance
+ * is — the three are functionally identical through this one component; nothing below forks on
+ * it except the query param each session's socket opens with (`TerminalSession`, ADR-014
+ * section 5's per-session shell selection) and the header's own label. Tabs, collapse, drop and
+ * every injection dropdown behave identically regardless of shell, exactly once, here — never
+ * copy-pasted per shell.
  */
-export default function TerminalRegion() {
+export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShell }) {
   const [enabledState, setEnabledState] = useState<TerminalEnabledState>('checking')
   const [collapsed, setCollapsed] = useState(false)
   const [dropped, setDropped] = useState(false)
@@ -296,13 +388,18 @@ export default function TerminalRegion() {
     }
   }
 
+  // REQ-007 W12: bash keeps the pre-existing bare "Terminal" title (nothing about the bash
+  // panel's own label changes), cmd/powershell name themselves so the presenter can tell the
+  // three dropdown-selected panel instances apart once one is placed in a slot.
+  const regionTitle = shell === 'bash' ? 'Terminal' : `Terminal (${SHELL_LABELS[shell]})`
+
   return (
     <section
       className={'stage-region stage-region--terminal' + (collapsed ? ' stage-region--terminal-collapsed' : '')}
-      aria-label="Terminal"
+      aria-label={regionTitle}
     >
       <header className="stage-region__header">
-        <h2>Terminal</h2>
+        <h2>{regionTitle}</h2>
         <Tooltip label="About the terminal region">
           Up to four independent xterm.js terminals, each over its own websocket to a real
           shell, when the backend's terminal capability is enabled (ADR-013). Absent by default.
@@ -399,6 +496,7 @@ export default function TerminalRegion() {
                 <TerminalSession
                   key={id}
                   visible={!collapsed && id === activeSessionId}
+                  shell={shell}
                   ref={(handle) => {
                     if (handle) sessionHandlesRef.current.set(id, handle)
                     else sessionHandlesRef.current.delete(id)
@@ -426,4 +524,17 @@ export default function TerminalRegion() {
       )}
     </section>
   )
+}
+
+// REQ-007 W12: the two additional panel-registry entries (`ts/src/workbench/panelRegistry.tsx`)
+// for the CMD and PowerShell slot-dropdown options. Each is a parameter fixed to a prop value —
+// not a fork of `TerminalRegion` — so the shared tabs/collapse/drop/injection behavior stays in
+// exactly one place, per this phase's dispatch ("shared, not duplicated"). The bash panel option
+// uses the default export directly with its default `shell="bash"`.
+export function TerminalRegionCmd() {
+  return <TerminalRegion shell="cmd" />
+}
+
+export function TerminalRegionPowerShell() {
+  return <TerminalRegion shell="powershell" />
 }
