@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-11'
 systems: [sys-ui, sys-demo-stage]
 depends_on: [doc-workbench, doc-prompt-workbench-delegation-pack]
 ---
@@ -24,11 +24,11 @@ enumeration route, and the Terminal (bash)/CMD/PowerShell shell panel options.
 ## Verification
 
 Run in the worktree (`/code/d-system-worktrees/phase-wb-03`, branch `agent/phase-wb-03`, rebased
-onto `dev` at `b044b1a`):
+twice onto `dev` as it advanced — most recently onto `6a63f67`):
 
-- `cd ts && npm run build` — `tsc -b && vite build` succeeds, `✓ 47 modules transformed`, `✓
-  built in 1.05s-1.16s` across reruns (the chunk-size-over-500kB note is Vite's informational
-  warning, not an error).
+- `cd ts && npm run build` — `tsc -b && vite build` succeeds, `✓ 47 modules transformed`, built
+  in ~1.0-1.2s across every rerun including the post-fix rerun (the chunk-size-over-500kB note is
+  Vite's informational warning, not an error).
 - `uv run pytest` — `546 passed, 3 failed`. The three failures
   (`test_posix_adapter_reports_alive_then_not_alive`,
   `test_resize_text_frame_applies_to_pty_window_size`,
@@ -39,9 +39,9 @@ onto `dev` at `b044b1a`):
 - `uv run python -m src.governance` — exit 0, `Governance OK: 18 systems, 158 documents, 16
   memories, 119 backlog phases`.
 - `uv run python tools/check_no_private_content.py` with all changes staged (`git add -A`
-  first) — `check_no_private_content: OK (484 tracked files, 0 identifiers checked)`.
+  first) — `check_no_private_content: OK (484-485 tracked files, 0 identifiers checked)`.
 
-Work-item creator/validator cycles, all first-pass, no findings:
+Work-item creator/validator cycles:
 
 - W03-C1 (ellipsis menu, drop-in-place, injection deactivation, websocket startup-race fix),
   committed `0c36034` (pre-rebase `b7d4f3d`). W03-V1 — **PASS, no findings**: no standalone
@@ -52,14 +52,16 @@ Work-item creator/validator cycles, all first-pass, no findings:
   startup-race fix guards socket handlers with a `disposed` flag and defers closing a
   still-`CONNECTING` socket rather than swallowing errors.
 - W03-C2 (Skills/Prompts/Agents injection dropdowns; real `demo-commands.json` entries),
-  committed `d3b9553` (pre-rebase `f0d024d`). W03-V2 — **PASS, no findings**: all three
-  dropdowns render only content fetched from phase-wb-01's `/api/v1/workbench/injection-sources`
-  route (no hardcoded skill/agent/prompt names — grep confirmed); injection reuses the R12 path
-  (`sendToActiveSession(injection, false)`, no trailing newline, active tab's websocket only);
-  dropdowns disable with drop state and degrade cleanly (404) when the route is absent;
-  `demo-commands.json`'s placeholder entries are replaced with the real orient/idea/idea-triage/
-  overview commands from `docs/00-working/demo-runbook.md`, and none of the four command/label
-  strings appear anywhere in `ts/src` (grepped individually, zero matches).
+  committed `d3b9553` (pre-rebase `f0d024d`). W03-V2 first pass — **PASS, no findings**
+  (subsequently superseded by W03-A's finding below, on the same code W03-V2 had reviewed): all
+  three dropdowns render only content fetched from phase-wb-01's
+  `/api/v1/workbench/injection-sources` route (no hardcoded skill/agent/prompt names — grep
+  confirmed); injection reuses the R12 path (`sendToActiveSession(injection, false)`, no
+  trailing newline, active tab's websocket only); dropdowns disable with drop state and degrade
+  cleanly (404) when the route is absent; `demo-commands.json`'s placeholder entries are
+  replaced with the real orient/idea/idea-triage/overview commands from
+  `docs/00-working/demo-runbook.md`, and none of the four command/label strings appear anywhere
+  in `ts/src` (grepped individually, zero matches).
 - W03-C3 (Terminal (bash)/CMD/PowerShell shell panels), committed `7cf995a` (pre-rebase
   `6c41843`). W03-V3 — **PASS, no findings**: all three panel ids share one `TerminalRegion`
   implementation parameterized by a `shell` prop, via two thin wrapper exports
@@ -76,35 +78,39 @@ V3 evaluated the actual worktree state, which matched what was then committed, s
 was needed.
 
 Phase gate (W03-G), two dispatches: the first was cut off by an orchestrator-side API session
-limit before producing any checklist result (discarded, not treated as a verdict — the same
-"resume, never restart from scratch" principle governing truncated subagents was applied here by
-re-dispatching cleanly after the session reset, since no partial work existed to resume). The
-second dispatch, run after rebasing the branch onto `dev` (`b044b1a`), recorded:
+limit before producing any checklist result (discarded, not treated as a verdict). The second
+dispatch, run after the first rebase onto `dev` (`b044b1a`), recorded governance PASS, staged
+private-content PASS, deliverables present PASS, `npm run build` PASS, no
+collapse/drop/command-string remnants PASS, `uv run pytest` **FAIL as reported** (the same three
+known `pyenv`-contention failures), and "diff touches nothing outside `ts/`" **FAIL as
+reported**: `_data/workbench/layouts/layout-1.json` and `layout-2.json` were also modified. That
+item-6 finding was reported up rather than resolved unilaterally, since `ADR-016` (workbench
+layout persistence) makes a slot's `admits` list layout data, not component code, with no
+`ts/`-only way to satisfy REQ-007 W12 under that design. The coordinator resolved it by widening
+`phase-wb-03`'s declared deliverables to include `_data/workbench/layouts/` (commit `6a63f67`,
+"W03-G item-6 ruling") — **closed**.
 
-1. Governance — PASS, `Governance OK: 18 systems, 158 documents, 16 memories, 119 backlog
-   phases`.
-2. Staged private-content check — PASS, `check_no_private_content: OK (484 tracked files, 0
-   identifiers checked)`.
-3. Deliverables present — PASS: `ts/src` reworked, `ts/public/demo-commands.json` carries
-   non-placeholder entries.
-4. `npm run build` — PASS. `uv run pytest` — **FAIL as reported**, `3 failed, 546 passed`, the
-   same three known `pyenv`-contention failures listed above.
-5. No standalone collapse/page-level drop remnants, no `demo-commands.json` command string
-   embedded in `ts/src` — PASS.
-6. Diff against `dev` touches nothing outside `ts/` — **FAIL as reported**:
-   `_data/workbench/layouts/layout-1.json` and `layout-2.json` are also modified.
-
-Item 6's finding is a real, reported mismatch between the gate's literal checklist and the
-phase's own documented architecture: `ADR-016` (workbench layout persistence) makes a slot's
-`admits` list layout data, not component code — `ts/src/workbench/panelRegistry.tsx`'s own
-comment states the mechanism explicitly, and `phase-wb-02`'s prior session record shows the same
-pattern already accepted at that phase's gate (its close note: "diff against `dev` touched only
-`ts/` and `_data/workbench/layouts/`"). Widening the terminal slot's `admits` array to include
-`terminal-cmd` and `terminal-powershell` is the only way the new shell panels become selectable
-in the layout engine's dropdown; there is no `ts/`-only way to satisfy REQ-007 W12 under
-`ADR-016`'s design. This orchestrator did not revert the `_data/` change or otherwise improvise
-around the gate wording — reporting the mismatch rather than resolving it unilaterally, per its
-charter.
+W03-A (adversarial review, coordinator-dispatched) then reported one MAJOR, no blocker, against
+W03-C2: `InjectionDropdowns.tsx`'s `isInjectionSources` validated the *whole*
+`/api/v1/workbench/injection-sources` response with `.every(isInjectionSourceEntry)` per
+category, so one malformed entry in any single category (e.g. an embedded control character from
+a supported operator's edit of `_data/workbench/injection-overrides.json`) set one shared
+`loadState` to `'error'` and blanked **all three** dropdowns behind "Could not load the list,"
+hiding every valid entry across every category — reproduced end-to-end against the live route.
+Fix cycle 1 of 2 against W03-C2, dispatched to `demo-creator-web` with the finding verbatim and
+the constraint that both load-bearing defense layers (the `CONTROL_CHARACTER_PATTERN` load-time
+rejection and the send-time newline stripping in `TerminalRegion`/`TerminalSession`) stay
+unweakened. Fix committed narrowly (`196410b`, only `InjectionDropdowns.tsx` touched): the
+whole-payload gate (`isInjectionSources`) is replaced by a shape-only check
+(`isInjectionSourcesShape` — are `skills`/`agents`/`prompts` present and arrays?) plus a
+per-category `.filter(isInjectionSourceEntry)`, so one bad entry now drops only itself from its
+own category; `loadState` becomes `'error'` only for a genuinely malformed top-level payload.
+`cd ts && npm run build` after the fix: `✓ 47 modules transformed`, `✓ built in 1.19s`/`1.08s`/
+`1.24s` (reproduced independently by the creator, the re-validator and this orchestrator).
+W03-V2 was re-dispatched verbatim against the post-fix diff and returned **PASS, no findings** —
+confirming closure of the MAJOR and no regression in W03-C2's original R12/W04 obligations
+(route-only content, active-tab un-executed injection, disable/degrade semantics, and no
+`demo-commands.json` string leaking into `ts/src`, all re-confirmed).
 
 ## Acceptance
 
@@ -114,14 +120,17 @@ charter.
 - Dropped state shows the info page inside unchanged panel bounds with all four injection
   dropdowns visible, disabled and unclickable; restore returns a working terminal (REQ-007 W03)
   — **Met for the mechanism reviewed** (the Commands dropdown, real `disabled` attribute
-  confirmed by W03-V1); the Skills/Prompts/Agents dropdowns share the identical `Popover`
-  `disabled` mechanism per W03-V2, but this was code-reviewed, not browser-measured — W03-W
-  (browser verification, dispatched by the coordinator, not run in this session) is the
-  measurement of record for the rendered claim.
+  confirmed by W03-V1; the Skills/Prompts/Agents dropdowns share the identical `Popover`
+  `disabled` mechanism, re-confirmed post-fix by W03-V2), but this remains code-reviewed, not
+  browser-measured — W03-W (browser verification, coordinator-dispatched, not run in this
+  session) is the measurement of record for the rendered claim.
 - Each category injects its exact agreed text un-executed; an overrides-file relabel,
-  replacement and hide take effect with no rebuild (REQ-007 W04) — **Met on the reviewed half**:
-  W03-V2 confirmed route-only content and the R12 injection path; the overrides-file live-effect
-  claim is a browser-observable behavior (W03-W's job), not exercised in this session.
+  replacement and hide take effect with no rebuild (REQ-007 W04) — **Met on the reviewed half,
+  and now resilient to a malformed override entry**: W03-V2 (both passes) confirmed route-only
+  content and the R12 injection path; W03-A's MAJOR and its fix specifically hardened the
+  overrides-file path against one bad entry hiding the other 36+ valid ones; the overrides-file
+  live-effect claim itself is a browser-observable behavior (W03-W's job), not exercised in this
+  session.
 - CMD and PowerShell panels on Linux show the in-panel unavailability message with no uncaught
   console errors; bash round-trips (REQ-007 W12) — **Met on the reviewed half**: W03-V3 confirmed
   the shared-implementation and refusal-rendering code paths; "no uncaught console errors" is a
@@ -129,22 +138,16 @@ charter.
 
 ## Backlog
 
-`status: active`, `agent: agent-demo-stage` unchanged. `next_action`: W03-A (adversarial review)
-and W03-W (browser verification) remain outstanding — both are dispatched by the coordinator, not
-this orchestrator, per the pack's own attribution; the gate's item 6 finding (the `_data/`
-layout-file scope conflict with the "touches nothing outside `ts/`" checklist wording) is
-reported up for the coordinator to resolve, since it traces to `ADR-016`'s documented
-architecture rather than a defect in the work; the three `test_demo_terminal.py` pytest failures
-are the recorded environmental defect, not phase work remaining.
+`status: active`, `agent: agent-demo-stage` unchanged. `next_action`: W03-A's one MAJOR is fixed
+and re-validated clean (fix cycle 1 of 2 used, 1 remaining if a further finding surfaces); the
+gate's item-6 scope finding is closed by the coordinator's deliverables-widening ruling
+(`6a63f67`); W03-W (browser verification) remains outstanding, coordinator-dispatched; the three
+`test_demo_terminal.py` pytest failures are the recorded environmental defect, not phase work
+remaining.
 
 ## Unresolved
 
-- W03-G's item 6 finding: the phase's diff against `dev` touches `_data/workbench/layouts/*.json`
-  in addition to `ts/`, required by `ADR-016`'s data-driven `admits` model to make the CMD/
-  PowerShell panel options selectable — a gate-wording/architecture mismatch, not a defect,
-  reported up rather than resolved unilaterally.
-- W03-A (adversarial review) and W03-W (browser verification) have not run this session — both
-  are coordinator-dispatched per the pack.
+- W03-W (browser verification) has not run this session — coordinator-dispatched per the pack.
 - The three `test_demo_terminal.py` PTY failures are the recurrent host-wide `pyenv` shim
   contention (tracked previously as environmental, e.g. idea `000097` for `phase-wb-02`'s
   identical failures) — not phase-wb-03-specific.

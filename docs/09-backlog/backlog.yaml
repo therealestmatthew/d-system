@@ -5194,13 +5194,17 @@ items:
     PROMPT-023 delta 1.'
 - id: phase-wb-03
   title: Terminal panel rework, injection dropdowns and shell panels
-  next_action: W03-C1/V1, W03-C2/V2 and W03-C3/V3 all passed with no findings; W03-G's
-    gate reported two results - uv run pytest's 3 test_demo_terminal.py PTY failures
-    (known host-wide pyenv rehash contention, environmental) and the diff touching
-    _data/workbench/layouts/*.json in addition to ts/ (required by ADR-016's
-    data-driven admits model for the CMD/PowerShell panel options, not a defect) -
-    reported to the coordinator rather than resolved unilaterally. W03-A (adversarial
-    review) and W03-W (browser verification) remain, both coordinator-dispatched.
+  next_action: W03-C1/V1 and W03-C3/V3 passed with no findings. W03-C2/V2 passed first
+    pass, then W03-A found one MAJOR (InjectionDropdowns.tsx's whole-payload .every()
+    gate blanking all three dropdowns on one malformed entry); fixed narrowly (fix
+    cycle 1 of 2, commit 196410b - per-category .filter(isInjectionSourceEntry)
+    replacing the whole-payload gate, both load-bearing defenses unweakened) and
+    re-validated PASS with no regression. W03-G's item-6 scope finding (diff touching
+    _data/workbench/layouts/*.json, required by ADR-016's data-driven admits model)
+    was closed by the coordinator's deliverables-widening ruling (6a63f67). uv run
+    pytest's 3 test_demo_terminal.py PTY failures remain the known host-wide pyenv
+    rehash contention, environmental. W03-W (browser verification) remains,
+    coordinator-dispatched.
   session: doc-session-workbench-terminal-panel-rework
   plan: doc-workbench
   sources:
