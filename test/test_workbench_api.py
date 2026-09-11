@@ -51,6 +51,7 @@ from src.governance.backlog import queue_order, readiness
 WORKBENCH_INJECTION_SOURCES_PATH = "/api/v1/workbench/injection-sources"
 WORKBENCH_LIST_PATH = "/api/v1/workbench/list"
 WORKBENCH_SEARCH_PATH = "/api/v1/workbench/search"
+WORKBENCH_ABSOLUTE_PATH_PATH = "/api/v1/workbench/absolute-path"
 WORKBENCH_IDEAS_PATH = "/api/v1/workbench/ideas"
 WORKBENCH_IDEAS_QUEUE_PATH = "/api/v1/workbench/ideas/queue"
 WORKBENCH_BACKLOG_PATH = "/api/v1/workbench/backlog"
@@ -122,6 +123,7 @@ def test_every_workbench_route_absent_with_flag_unset(
     assert client.get(WORKBENCH_INJECTION_SOURCES_PATH).status_code == 404
     assert client.get(WORKBENCH_LIST_PATH).status_code == 404
     assert client.get(WORKBENCH_SEARCH_PATH).status_code == 404
+    assert client.get(WORKBENCH_ABSOLUTE_PATH_PATH).status_code == 404
 
 
 def test_routes_registered_with_flag_set(rebuild_app: Callable[..., FastAPI]) -> None:
@@ -351,6 +353,70 @@ def test_search_text_filter_narrows_by_name(rebuild_app: Callable[..., FastAPI])
     body = response.json()
     assert body, "fixture assumption: at least one prompt filename contains 'workbench'"
     assert all("workbench" in entry["name"].lower() for entry in body)
+
+
+# --- Copy absolute path (ADR-015 consequences, REQ-007 W09) ------------------------------------
+
+
+def test_absolute_path_route_matches_an_independent_repo_root_join(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """The returned absolute path equals a repo-root join computed here, independently of the
+    route's own `resolve_repo_relative_path` call.
+    """
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_ABSOLUTE_PATH_PATH, params={"path": "src/main.py"})
+    assert response.status_code == 200
+    expected = str((REPO_ROOT / "src" / "main.py").resolve())
+    assert response.json()["absolute_path"] == expected
+
+
+def test_absolute_path_route_rejects_dotdot_traversal(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_ABSOLUTE_PATH_PATH, params={"path": "../../etc/passwd"})
+    assert response.status_code == 400
+
+
+def test_absolute_path_route_rejects_absolute_input(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    response = client.get(WORKBENCH_ABSOLUTE_PATH_PATH, params={"path": "/etc/passwd"})
+    assert response.status_code == 400
+
+
+def test_absolute_path_route_rejects_symlink_escape(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+
+    outside_target = tempfile.mkdtemp(prefix="workbench-abspath-escape-target-")
+    link_path = REPO_ROOT / "test" / "_workbench_abspath_symlink_escape_tmp"
+    try:
+        link_path.symlink_to(outside_target, target_is_directory=True)
+        response = client.get(
+            WORKBENCH_ABSOLUTE_PATH_PATH,
+            params={"path": "test/_workbench_abspath_symlink_escape_tmp"},
+        )
+        assert response.status_code == 400
+    finally:
+        if link_path.is_symlink() or link_path.exists():
+            link_path.unlink()
+        os.rmdir(outside_target)
+
+
+def test_absolute_path_route_rejects_non_get(rebuild_app: Callable[..., FastAPI]) -> None:
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    assert client.post(WORKBENCH_ABSOLUTE_PATH_PATH).status_code == 405
+    assert client.put(WORKBENCH_ABSOLUTE_PATH_PATH).status_code == 405
+    assert client.delete(WORKBENCH_ABSOLUTE_PATH_PATH).status_code == 405
 
 
 # --- GET-only (REQ-007 W14) ---------------------------------------------------------------------

@@ -21,6 +21,10 @@ Five capabilities, all read-only except the one named action (ADR-015 rule 4):
   `git check-ignore` reports as ignored (ADR-015 rule 3): the repository's own ignore rules, not a
   hand-kept list, so `_private/`, `.venv/`, `data/`, `node_modules/`, etc. are never listed while
   `_public/` and the tracked tree are.
+- `GET /absolute-path` resolves a caller-supplied repository-relative path the same way (ADR-015
+  rule 2) and reports the absolute filesystem path it names — "the repository root joined
+  server-side", per ADR-015's consequences ("Copy-absolute-path (W09) is served from the
+  backend's knowledge of the repository root"), for the File Browser's copy-absolute-path action.
 - `GET /ideas` and `GET /ideas/queue` read idea state exclusively through `load_events()` and
   `fold()` (`src/db/ideas.py`) — never a direct parse of `_data/ideas.jsonl` — and report id,
   title, status, created/updated, annotation count and link count per idea; the `queue` variant
@@ -97,6 +101,10 @@ class DirectoryEntry(BaseModel):
     name: str
     path: str
     is_dir: bool
+
+
+class AbsolutePathResult(BaseModel):
+    absolute_path: str
 
 
 class PathEscapesRepositoryError(ValueError):
@@ -382,6 +390,24 @@ async def search_files(
         entry for entry in files if _matches_filters(entry, extensions=extensions, text_filter=q)
     ]
     return [_to_entry(entry) for entry in sorted(matched)]
+
+
+# --- Copy absolute path (ADR-015 consequences, REQ-007 W09) -----------------------------------
+
+
+@router.get("/absolute-path", response_model=AbsolutePathResult)
+async def get_absolute_path(path: str = ".") -> AbsolutePathResult:
+    """The absolute filesystem path a repository-relative `path` resolves to, validated
+    identically to `/list` and `/search` (ADR-015 rule 2) — the repository root joined
+    server-side, never trusting a client-supplied absolute path.
+    """
+    try:
+        resolved = resolve_repo_relative_path(path)
+    except PathEscapesRepositoryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    if not resolved.exists():
+        raise HTTPException(status_code=404, detail=f"No such path: {path!r}")
+    return AbsolutePathResult(absolute_path=str(resolved))
 
 
 # --- Idea Explorer (ADR-015 rule 4, REQ-007 W10) -----------------------------------------------
