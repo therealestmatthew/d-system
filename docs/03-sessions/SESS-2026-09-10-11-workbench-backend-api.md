@@ -39,14 +39,25 @@ All commands run in the worktree at `/code/d-system-worktrees/phase-wb-01` on br
   119 backlog phases`, exit 0.
 - `uv run python tools/check_no_private_content.py` with all changes staged (`git add -A`
   first) — `check_no_private_content: OK (462 tracked files, 0 identifiers checked)`.
-- Adversarial review (pack W01-A) — not yet run; dispatched by the coordinator, not this
-  orchestrator.
+- Adversarial review (pack W01-A) — run by the coordinator; one BLOCKER reported and closed
+  (see below). Post-fix, in the worktree: `uv run pytest test/test_workbench_api.py` —
+  `36 passed, 2 warnings`; `uv run ruff check src/ test/` — `All checks passed!`;
+  `uv run mypy src/` — `Success: no issues found in 24 source files`.
+
+W01-A blocker and closure: `/reveal` could be pointed at `_private/` or any gitignored path
+and would spawn a real opener — only the path-escape check (`resolve_repo_relative_path`)
+ran on the reveal path; the listings' private/gitignored exclusion was never applied. Fixed
+in W01-C2 fix cycle 1 (`991df62`): `reveal_in_explorer` now passes the resolved path through
+`_is_reveal_excluded` (the same `git check-ignore` mechanism the listing routes use) before
+any spawn, refusing with 400; two new tests assert no spawn for a `_private/` path and for a
+gitignored fixture path. W01-V2 was re-dispatched after the fix and returned PASS with no
+findings.
 
 Work-item validators: W01-V1 ran and produced one fix cycle (`ca7fd8e`, proving the
-`_private/` exclusion with a real fixture dir); W01-V2 and W01-V3 both returned PASS with no
-findings against the diff. The phase gate (W01-G) recorded 5 of 6 items green; its single red
-item is the mechanical `pytest` exit code, caused solely by the three pre-existing dev
-failures above.
+`_private/` exclusion with a real fixture dir); W01-V2 passed (re-validated green after the
+W01-A fix cycle, `991df62`) and W01-V3 passed with no findings against the diff. The phase
+gate (W01-G) recorded 5 of 6 items green; its single red item is the mechanical `pytest`
+exit code, caused solely by the three pre-existing dev failures above.
 
 ## Acceptance
 

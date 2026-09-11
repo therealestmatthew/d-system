@@ -4973,10 +4973,11 @@ items:
     alongside phase-demo-05/06.
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
-  next_action: All work items built and validated on agent/phase-wb-01 (W01-V1 after one fix
-    cycle, W01-V2 and W01-V3 green; gate W01-G green except pytest, which fails only on three
-    pre-existing dev PTY failures from host pyenv shim contention). Remaining - adversarial
-    review W01-A (coordinator-dispatched), then owner-approved integration.
+  next_action: All work items built and validated on agent/phase-wb-01; adversarial review
+    W01-A ran and its one blocker (reveal spawning on _private//gitignored paths) is fixed
+    (991df62) and re-validated green by W01-V2. Gate W01-G green except pytest, which fails
+    only on three pre-existing dev PTY failures from host pyenv shim contention (handled at
+    the host level). Remaining - owner-approved integration.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
