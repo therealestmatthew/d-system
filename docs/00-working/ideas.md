@@ -5018,6 +5018,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T17:28:41-04:00): Batch extended 2026-09-11: also 000113 (terminal persistence and performance audit, all three shells) and 000114 (general performance audit with caching) for the same next planning session.
 - **note** by repository-owner (2026-09-11T17:48:07-04:00): Batch extended again 2026-09-11: 000115 (duplication/modularity audit, e.g. multi-panel slot support) and 000116 (code structure and file-size audit with proposed target structures). Planning-session instruction from the owner: before authoring the pack, review ALL items in this batch (000108-000116) and determine the optimal ordering for both investigating and executing them - audits (000113-000116) likely inform the design and sequencing of the feature items (000108-000112), and the bookmark system (000111) needs its storage/reference ADR before anything builds against it.
 - **note** by repository-owner (2026-09-11T18:01:55-04:00): Batch extended 2026-09-11 with five agent-scouted, owner-approved companions: 000117 (Popover-wide fix scope, extends 000108), 000118 (COMPATIBLE_EXTENSIONS gate for markdown), 000119 (markdown render-location decision), 000120 (batch panel-bridge for categories), 000121 (cache invalidation vs demo-week overview regeneration, extends 000114). Scout also confirmed terminal reconnect is already idea 000087 and the bookmark-store write ADR is inside 000111.
+- **note** by repository-owner (2026-09-11T19:32:52-04:00): Batch extended 2026-09-11 (evening): 000123 (audit the pre-build HTML generation plans against the built reality - accomplished/open/superseded/retire disposition per requirement) and 000124 (formalize the system's vocabulary - e.g. the terminal slot is named after its initial occupant, wrong once panels are assignable; governed glossary plus rename-vs-alias migration). 000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names.
 
 **Links**
 
@@ -5116,6 +5117,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to ← `000116`
+- relates_to ← `000124`
 
 ---
 
@@ -5128,6 +5130,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to → `000115`
+- relates_to ← `000124`
 
 ---
 
@@ -5199,3 +5202,24 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening id
 **Created 2026-09-11T18:14:30-04:00 · Status: `open`**
 
 Owner idea, 2026-09-11, deliberately standalone - not part of the next-pack batch; for future consideration. The application is becoming something like an integrated development environment: a fully customizable workspace shaped to the owner's perfect workflow (panels, terminals, file viewers, explorers, notes, agent triggering). That vision does not have to live in a web app. This idea is to think through a rebuild in a different language and platform - candidates the owner named: Rust, Go, C# - weighing what each offers for a desktop-class IDE-style application (native windowing/terminal integration, performance, packaging, long-term maintainability, ecosystem for embedding editors/terminals/webviews). Constraints for the evaluation: the rebuild would START from the same functionality the current FastAPI + React workbench already has (feature parity as the baseline, not a redesign), and the evaluation should also weigh hybrid paths (e.g. keeping the Python data/agent layer and replacing only the shell) against a full rewrite. Output when picked up: a comparison with a recommendation, not code.
+
+---
+
+## 000123 · Audit the pre-build HTML generation plans against what the workbench actually became
+
+**Created 2026-09-11T19:32:38-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The repository carried HTML generation plan documents from before this product was built (the HTML generation framework plans and requirements in docs/01-plans/ and docs/06-requirements/ predating the demo/workbench tracks - e.g. the phase-html-* line, whose phase-html-01 "Define strict page contracts and generated-output ownership" still sits ready in the backlog). Run a full audit of those documents against what exists now: which of their requirements and ideas the demo/workbench builds already accomplished (perhaps under different names), which remain untouched and still wanted, which are superseded by how the product actually evolved, and which should be retired. Output: a document-by-document reconciliation with a disposition for every requirement/idea - accomplished (with evidence), still open (fed into planning), superseded (with the decision that superseded it), or proposed for retirement - so the old plans stop silently drifting from the built reality.
+
+---
+
+## 000124 · Formalize the vocabulary and terminology of the HTML generation and workbench system
+
+**Created 2026-09-11T19:32:38-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The system's names grew by accident and some are now wrong: the owner's example is the "terminal slot", named after the panel that started in it - but with per-panel eligibility (REQ-007 W16) any shell or the HTML Viewer can occupy it, so the name misdescribes the thing. Formalize the vocabulary: slots named for their geometry or role (not their initial occupant), and settled definitions for the recurring nouns - slot, panel, region, layout, assignment, visible panel, session, the generation pipeline's terms (template family, generated page, overview) - recorded in a governed glossary document that requirements, ADRs, prompts and code identifiers all use consistently. Include the migration question: where existing identifiers (slot_id "terminal" in _data/workbench/layouts, CSS class names, REQ-007 row wording) should be renamed versus aliased, since stored state and tests reference the current names. A shared vocabulary is also what makes the duplication audit (000115) and structure audit (000116) legible.
+
+**Links**
+
+- relates_to → `000115`
+- relates_to → `000116`
