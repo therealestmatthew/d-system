@@ -6,26 +6,17 @@ import { useTerminalBridge, useViewerBridge } from './panelBridge'
 
 const SEARCH_URL = '/api/v1/workbench/search'
 const REVEAL_URL = '/api/v1/workbench/reveal'
-
-// REQ-007 W09's "copy absolute path" action, and ADR-015's own "served from the backend's
-// knowledge of the repository root": no route in `src/api/routes/workbench.py` resolves and
-// returns a repo-relative path's absolute, server-side location — `/list`/`/search` report only
-// the repo-relative `path` field (`DirectoryEntry`), and `/reveal`'s response is the argument
-// handed to the OS opener it just spawned as a side effect, not a standalone path lookup. This
-// menu item is shown for every entry (never hidden — the action is applicable in principle to
-// any path) but always surfaces this in-place message instead of a real path, since there is
-// nothing this frontend-only phase can correctly compute client-side: the repository root is a
-// server-side filesystem location this component has no way to know. See this phase's dispatch
-// report for the finding.
-const ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE =
-  'Copy absolute path is not available: no backend route resolves the repository root server-side yet ' +
-  '(ADR-015 names this capability; src/api/routes/workbench.py has no route for it). Flagged as a ' +
-  'blocking finding rather than guessed at client-side.'
+const ABSOLUTE_PATH_URL = '/api/v1/workbench/absolute-path'
 
 interface DirectoryEntry {
   name: string
   path: string
   is_dir: boolean
+}
+
+/** `GET /absolute-path`'s response shape (`src/api/routes/workbench.py`'s `AbsolutePathResult`). */
+interface AbsolutePathResult {
+  absolute_path: string
 }
 
 type LoadState = 'loading' | 'loaded' | 'error'
@@ -255,19 +246,16 @@ function TreeLevel({
  * The context menu (REQ-007 W09's second half): right-clicking any tree entry opens
  * `FileTreeContextMenu` at the pointer with five actions — reveal in file explorer, open in HTML
  * Viewer (compatible files only, nested submenu choosing the target tab), copy relative path,
- * copy absolute path, and inject path into terminal. The first, third and fifth are wired here
- * directly (a `POST /reveal` call, `navigator.clipboard.writeText`, and the terminal bridge's
- * `injectPath`); "open in HTML Viewer" and "inject path into terminal" reach a *different*,
- * independently-mounted panel, which this component has no other way to reach — see
- * `panelBridge.ts`'s doc comment for why a small cross-panel registry exists at all. Every
- * outcome (a reveal refusal's message, a copy confirmation, an injection confirmation) is shown
- * in `actionStatus`, a single-line status this panel owns, rather than a transient `alert()` —
- * consistent with this app's general posture of an in-place message over a native dialog.
- * "Copy absolute path" is the one action with no working backend behind it yet: ADR-015 says it
- * "is served from the backend's knowledge of the repository root," but `src/api/routes/
- * workbench.py` has no route that resolves and returns one — see this component's own
- * `ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE` for what is shown instead, and this phase's dispatch
- * report for the finding.
+ * copy absolute path, and inject path into terminal. Four of the five are wired here directly (a
+ * `POST /reveal` call, `navigator.clipboard.writeText` for the relative path, a `GET
+ * /absolute-path` call whose result is likewise handed to `navigator.clipboard.writeText`, and
+ * the terminal bridge's `injectPath`); "open in HTML Viewer" and "inject path into terminal"
+ * reach a *different*, independently-mounted panel, which this component has no other way to
+ * reach — see `panelBridge.ts`'s doc comment for why a small cross-panel registry exists at all.
+ * Every outcome (a reveal refusal's message, a copy confirmation, an injection confirmation) is
+ * shown in `actionStatus`, a single-line status this panel owns, rather than a transient
+ * `alert()` — consistent with this app's general posture of an in-place message over a native
+ * dialog.
  */
 export default function FileBrowserRegion() {
   const [contextFolder, setContextFolder] = useState('.')
@@ -420,10 +408,48 @@ export default function FileBrowserRegion() {
     )
   }
 
-  // REQ-007 W09 action 4 — see `ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE`'s own comment for why this
-  // reports absence rather than a path.
-  function handleCopyAbsolutePath(): void {
-    setActionStatus({ kind: 'error', message: ABSENT_ABSOLUTE_PATH_ROUTE_MESSAGE })
+  // REQ-007 W09 action 4: GET the entry's repo-relative path against phase-wb-05's
+  // `/absolute-path` route (`src/api/routes/workbench.py`, `AbsolutePathResult`) and copy the
+  // server-resolved absolute path it returns — the same `navigator.clipboard.writeText`
+  // mechanism `handleCopyRelativePath` above uses. A fetch failure (400 escape, 404 the entry no
+  // longer exists, or the backend unreachable) is surfaced as a visible status message, the same
+  // way `handleReveal` above surfaces its refusal.
+  async function handleCopyAbsolutePath(node: FileTreeNode): Promise<void> {
+    try {
+      const response = await fetch(`${ABSOLUTE_PATH_URL}?path=${encodeURIComponent(node.path)}`)
+      if (!response.ok) {
+        let detail = `request failed (status ${response.status})`
+        try {
+          const body: unknown = await response.json()
+          if (
+            typeof body === 'object' &&
+            body !== null &&
+            typeof (body as { detail?: unknown }).detail === 'string'
+          ) {
+            detail = (body as { detail: string }).detail
+          }
+        } catch {
+          // Falls through with the status-only message above, same defensive fallback
+          // `handleReveal` applies for a non-JSON body.
+        }
+        setActionStatus({ kind: 'error', message: `Copy absolute path failed: ${detail}` })
+        return
+      }
+      const body = (await response.json()) as AbsolutePathResult
+      navigator.clipboard.writeText(body.absolute_path).then(
+        () => setActionStatus({ kind: 'info', message: `Copied absolute path: ${body.absolute_path}` }),
+        () =>
+          setActionStatus({
+            kind: 'error',
+            message: 'Could not copy the absolute path — the clipboard was not reachable.',
+          }),
+      )
+    } catch {
+      setActionStatus({
+        kind: 'error',
+        message: 'Copy absolute path failed: could not reach the backend.',
+      })
+    }
   }
 
   // REQ-007 W09 action 2: hands the entry's path to whichever HTML Viewer tab the submenu chose,
@@ -559,7 +585,9 @@ export default function FileBrowserRegion() {
           }}
           onOpenInViewer={(tabId) => handleOpenInViewer(contextMenu.node, tabId)}
           onCopyRelativePath={() => handleCopyRelativePath(contextMenu.node)}
-          onCopyAbsolutePath={handleCopyAbsolutePath}
+          onCopyAbsolutePath={() => {
+            void handleCopyAbsolutePath(contextMenu.node)
+          }}
           onInjectPath={() => handleInjectPath(contextMenu.node)}
           onClose={() => setContextMenu(null)}
         />
