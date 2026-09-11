@@ -5581,8 +5581,25 @@ items:
   - ts/src
 - id: phase-wb-07
   title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
-  next_action: After all six build phases, dispatch pack section W07 (PROMPT-021);
-    the Windows checks and both dry-runs are owner-machine, owner-driven work.
+  next_action: W07-C1, talking points, W07-V1 (pass on re-validation) and agent-driven
+    rehearsal pass 1 are done. Agent-driven rehearsal pass 2 (W07-R) has been dispatched
+    twice and truncated by its turn limit both times before reporting, without a
+    SendMessage tool available to resume the truncated agent; a third dispatch was
+    withheld per the no-third-retry rule and reported up. Once pass 2 completes and is
+    recorded, dispatch W07-G, then the owner-machine Windows checks and both timed
+    dry-runs remain outstanding, owner-driven only.
+  session: doc-session-rehearsal-refresh
+  result: 'In progress (evidence lives on the unmerged agent/phase-wb-07 worktree branch:
+    docs/00-working/demo-runbook.md, docs/00-working/demo-windows-setup.md). Runbook and
+    Windows checklist rewritten against the final workbench UI (W07-C1); validator W07-V1
+    found one finding (a surviving "talking points" label in presenter narration), fixed
+    directly by the orchestrator as audience-facing prose, and passed on re-validation.
+    Agent-driven rehearsal pass 1 completed and recorded with three findings (one
+    addressed: /orient now starts a Claude Code session). Agent-driven rehearsal pass 2
+    not yet completed - two dispatch attempts truncated by turn limits. W07-G gate not
+    yet run. Owner-machine items (R06 smoke check, CMD/PowerShell round-trips, both
+    owner-driven timed dry-runs) not started; they close only on the owner''s own
+    recorded results.'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
