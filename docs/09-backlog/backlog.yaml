@@ -5802,10 +5802,14 @@ items:
     available space and tracking the slot body at every size (REQ-007 W15''s
     stated bar); its layout-1 viewer failure was retracted by the validator as
     its own selector bug (correct measurement: 47.35px gap, pass); its
-    persistence failure was confirmed pre-existing on dev by an identical
-    baseline run without the diff (layout 2 defaults its terminal slot to
-    PowerShell, so layout round-trips remount shells — recorded as idea
-    000107, intersects phase-wb-09''s rework; not a wb-08 regression).
+    persistence failure was shown by a dev baseline not to be caused by the
+    diff, and the session-close independent review then established it was a
+    measurement artifact of the validator''s stale localStorage (PowerShell
+    stored as layout 2''s visible panel from its own fill testing) — on a
+    clean session the guard passes and both layout files default the terminal
+    slot to bash; idea 000107 amended to the corrected diagnosis (a stored
+    visible-panel choice differing between layouts silently kills the hidden
+    shell''s session — intersects phase-wb-09''s W16 obligation).
     Post-rebase validation before integration: governance OK, npm run build
     clean, pytest 552 passed / 3 failed — the known environmental PTY
     failures (ideas 000097/000099), unchanged in kind and count.'
