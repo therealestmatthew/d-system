@@ -4831,3 +4831,11 @@ Motivating examples from the workbench build:
 The proposed system would capture failures like these as structured records: what failed, the signal that revealed it, the wrong first interpretation if there was one, and the effective fix. From those records it would derive anti-pattern rules — for example: never pipe a gating command's output in the same shell invocation that acts on success; run long commands in the foreground inside an agent turn; compare against a baseline before attributing a failure to new work. Those rules would then be surfaced to future sessions. It could integrate with brain/procedures/, which already holds model-agnostic corrections, or use a new structured store that the governance tooling can check.
 
 The open design question is where the capture happens — at session close, at checkpoint, or through a dedicated tool — and how the derived rules reach agents without bloating every session's context.
+
+---
+
+## 000098 · Ship the layout-schema test ADR-016 promised
+
+**Created 2026-09-10T22:18:33-04:00 · Status: `open`**
+
+ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
