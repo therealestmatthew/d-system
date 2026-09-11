@@ -6,8 +6,8 @@
     {
       "slot_id": "notes-strip",
       "display_name": "Notes",
-      "admits": ["talking-points"],
-      "default_panel": "talking-points"
+      "admits": ["notes-strip"],
+      "default_panel": "notes-strip"
     },
     {
       "slot_id": "main",

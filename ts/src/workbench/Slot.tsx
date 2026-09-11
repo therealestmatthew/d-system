@@ -9,9 +9,9 @@ import type { LayoutSlotDefinition } from './types'
  *   naming the slot and a clear in-page placeholder — the same "say so in place" posture ADR-013
  *   applies to the absent terminal route, generalized to an absent panel.
  * - Exactly one implemented panel admitted: rendered directly, no extra chrome. Every panel this
- *   phase ships (`TerminalRegion`, `TalkingPointsRegion`, `OverviewRegion`) already renders its
- *   own `.stage-region` section with its own plain header, which is what satisfies "a
- *   single-panel slot renders a plain header" here.
+ *   phase ships (`TerminalRegion`, `NotesStripRegion`, `OverviewRegion`) already renders its own
+ *   `.stage-region` section, which is what satisfies "a single-panel slot renders a plain
+ *   header" here (the notes strip's own header carries no title, per REQ-007 W01).
  * - More than one implemented panel admitted (not reachable by either shipped layout file today —
  *   every implemented panel type is admitted by exactly one slot — but built for the layouts a
  *   later phase ships once phase-wb-05/06's explorer panels exist): a slot-level header shows the

@@ -351,9 +351,8 @@ body {
 }
 
 /* Shared small toggle-button style for a panel's own header controls (rung-2/rung-3 style
-   layout-state toggles that now live inside each panel — TalkingPointsRegion's rotator/static
-   toggle, OverviewRegion's embed/open-in-tab toggle — since phase-wb-02 moved them out of
-   StagePage's page-level header). */
+   layout-state toggles that now live inside each panel — OverviewRegion's embed/open-in-tab
+   toggle — since phase-wb-02 moved them out of StagePage's page-level header). */
 .stage-region__header-toggle {
   margin-left: auto;
   font-size: 0.75rem;
@@ -369,13 +368,36 @@ body {
   border-color: #6b7fa8;
 }
 
-/* The rotator's current-point transition. Only rendered in rotator mode — static-list mode
-   (PLAN-021 rung 2) renders every point as a plain list with no animation at all. */
-.stage-talking-points__current {
-  animation: stage-talking-points-fade-in 0.3s ease;
+/* The notes strip (REQ-007 W01): a short, wide, display-only strip with no title — one row
+   holding the far-left `?` tooltip, the active entry's text, and the single controls dropdown at
+   the far right. Unlike the other panels, it renders this one row directly inside `.stage-region`
+   rather than the usual `.stage-region__header` / `.stage-region__body` split (there is no
+   separate header to give a title to). The strip surface itself has no click behavior; every
+   interactive control other than the tooltip lives inside the dropdown's bubble
+   (`.stage-notes-strip__menu*` below). */
+.stage-notes-strip__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.4rem 0.6rem;
 }
 
-@keyframes stage-talking-points-fade-in {
+.stage-notes-strip__current {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding-right: 0.25rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  white-space: pre-line;
+  overflow-y: auto;
+  animation: stage-notes-strip-fade-in 0.3s ease;
+}
+
+@keyframes stage-notes-strip-fade-in {
   from {
     opacity: 0;
   }
@@ -384,14 +406,20 @@ body {
   }
 }
 
-.stage-talking-points__controls {
-  margin-bottom: 0.5rem;
+.stage-notes-strip__menu {
   display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.stage-talking-points__controls button {
+.stage-notes-strip__menu-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stage-notes-strip__menu-nav button,
+.stage-notes-strip__menu-auto-advance {
   font-size: 0.78rem;
   padding: 0.3rem 0.55rem;
   border-radius: 4px;
@@ -400,21 +428,40 @@ body {
   cursor: pointer;
 }
 
-.stage-talking-points__controls button[aria-pressed='true'] {
+.stage-notes-strip__menu-nav button:disabled,
+.stage-notes-strip__menu-auto-advance:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stage-notes-strip__menu-index {
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.stage-notes-strip__menu-auto-advance[aria-pressed='true'] {
   background: #d9e0ec;
   border-color: #6b7fa8;
 }
 
-.stage-talking-points__list {
-  margin: 0;
-  padding-left: 1.1rem;
-  font-size: 0.82rem;
+.stage-notes-strip__menu-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
 }
 
-.stage-talking-points__list--static {
-  overflow-y: auto;
-  min-height: 0;
-  max-height: 100%;
+.stage-notes-strip__menu-picker select {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+}
+
+.stage-notes-strip__menu-list-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #b34700;
 }
 
 .stage-region__body--overview {

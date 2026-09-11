@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 import TerminalRegion from '../stage/TerminalRegion'
-import TalkingPointsRegion from '../stage/TalkingPointsRegion'
+import NotesStripRegion from '../stage/NotesStripRegion'
 import OverviewRegion from '../stage/OverviewRegion'
 
 /**
@@ -11,15 +11,16 @@ import OverviewRegion from '../stage/OverviewRegion'
  * it into a slot today, so a future phase's only change is registering the component here and
  * (if needed) a layout-file edit, never new engine code (ADR-016 consequences).
  *
- * `terminal`, `talking-points` and `overview` are this phase's three existing regions (REQ-007
+ * `terminal`, `notes-strip` and `overview` are this phase's three existing regions (REQ-007
  * dispatch item 5: "existing regions become panels of this engine") — each already renders its
- * own `.stage-region` section with its own header, which is what satisfies a single-panel slot's
- * "plain header" (REQ-007 W06) with no extra wrapper needed. A slot resolving to more than one
- * *implemented* panel (none do in the two shipped layouts yet — see the layout JSON files) is
- * wrapped by `Slot.tsx` in an outer dropdown header instead; whichever future phase first
- * populates such a slot should note that the wrapped panel still renders its own inner header
- * too, and may want to drop it in that configuration — out of this phase's scope to resolve for
- * panels that do not exist yet.
+ * own `.stage-region` section, which is what satisfies a single-panel slot's "plain header"
+ * (REQ-007 W06) with no extra wrapper needed (the notes strip's own header carries no title,
+ * per REQ-007 W01, but is still that same single `.stage-region` box). A slot resolving to more
+ * than one *implemented* panel (none do in the two shipped layouts yet — see the layout JSON
+ * files) is wrapped by `Slot.tsx` in an outer dropdown header instead; whichever future phase
+ * first populates such a slot should note that the wrapped panel still renders its own inner
+ * header too, and may want to drop it in that configuration — out of this phase's scope to
+ * resolve for panels that do not exist yet.
  */
 export interface PanelDefinition {
   displayName: string
@@ -28,7 +29,7 @@ export interface PanelDefinition {
 
 export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
   terminal: { displayName: 'Terminal', Component: TerminalRegion },
-  'talking-points': { displayName: 'Talking Points', Component: TalkingPointsRegion },
+  'notes-strip': { displayName: 'Notes', Component: NotesStripRegion },
   overview: { displayName: 'Overview', Component: OverviewRegion },
   'html-viewer': { displayName: 'HTML Viewer', Component: null },
   'file-browser': { displayName: 'File Browser', Component: null },

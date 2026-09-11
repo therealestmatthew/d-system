@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { isLayoutDefinition, type LayoutDefinition, type LayoutSlotDefinition } from './types'
-import { loadStoredState, saveStoredState } from './storage'
+import { loadStoredState, patchStoredState } from './storage'
 
 // The two shipped layout files (REQ-007 W05, ADR-016 rule 1) — served at runtime by the Vite dev
 // plugin `serveWorkbenchLayouts` (`ts/vite.config.ts`) from `_data/workbench/layouts/`, never
@@ -52,7 +52,7 @@ export function useWorkbenchLayouts() {
         const validatedSelections: Record<string, Record<string, string>> = {}
         if (stored) {
           for (const layout of valid) {
-            const perLayoutStored = stored.slot_selections[layout.layout_id]
+            const perLayoutStored = stored.slot_selections?.[layout.layout_id]
             if (!perLayoutStored) continue
             const slotsById = new Map(layout.slots.map((slot) => [slot.slot_id, slot]))
             const validPerLayout: Record<string, string> = {}
@@ -68,7 +68,9 @@ export function useWorkbenchLayouts() {
 
         setLayouts(valid)
         setActiveLayoutIdState(
-          stored && knownLayoutIds.has(stored.active_layout) ? stored.active_layout : valid[0].layout_id,
+          stored?.active_layout && knownLayoutIds.has(stored.active_layout)
+            ? stored.active_layout
+            : valid[0].layout_id,
         )
         setSelections(validatedSelections)
         setLoadState('loaded')
@@ -84,8 +86,10 @@ export function useWorkbenchLayouts() {
 
   useEffect(() => {
     if (!hydratedRef.current || layouts.length === 0 || !activeLayoutId) return
-    saveStoredState({
-      schema_version: layouts[0].schema_version,
+    // Merge-on-write (`patchStoredState`), not a full overwrite: this hook owns
+    // `active_layout`/`slot_selections` only, and must never clobber another owner's field
+    // stored under the same ADR-016 key (e.g. the notes strip's `active_notes_file`).
+    patchStoredState(layouts[0].schema_version, {
       active_layout: activeLayoutId,
       slot_selections: selections,
     })

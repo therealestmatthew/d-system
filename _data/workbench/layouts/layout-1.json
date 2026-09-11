@@ -12,8 +12,8 @@
     {
       "slot_id": "notes-strip",
       "display_name": "Notes",
-      "admits": ["talking-points"],
-      "default_panel": "talking-points"
+      "admits": ["notes-strip"],
+      "default_panel": "notes-strip"
     },
     {
       "slot_id": "main",
@@ -30,7 +30,7 @@
   ],
   "grid": {
     "columns": ["1.4fr", "1fr"],
-    "rows": ["0.55fr", "1.15fr", "1fr"],
+    "rows": ["0.25fr", "1.3fr", "1.15fr"],
     "areas": [
       "terminal notes-strip",
       "terminal main",

@@ -65,8 +65,8 @@ function isLayoutGridDefinition(value: unknown): value is LayoutGridDefinition {
 }
 
 /** Defensive runtime validation of a fetched layout file — mirrors this codebase's existing
- * pattern for other runtime-loaded data (`TalkingPointsRegion`'s `isTalkingPointsFile`,
- * `CommandPanel`'s `isCommandsFile`): a malformed file is reported as absent, never a crash. The
+ * pattern for other runtime-loaded data (`NotesStripRegion`'s `isNotesFile`, `CommandPanel`'s
+ * `isCommandsFile`): a malformed file is reported as absent, never a crash. The
  * repository-side JSON-schema assertion ADR-016 calls for is a separate, backend-side concern
  * outside this phase's `ts/src` deliverable. */
 export function isLayoutDefinition(value: unknown): value is LayoutDefinition {
@@ -82,11 +82,27 @@ export function isLayoutDefinition(value: unknown): value is LayoutDefinition {
   )
 }
 
-/** The browser's stored selections (ADR-016 rule 3): active layout id and per-layout per-slot
- * panel choices, under one key namespaced by the layouts' `schema_version`. Never geometry, never
- * copy — selections only. */
+/** The layout files' current `schema_version` (ADR-016 rule 1: each layout file "carries a
+ * `schema_version` integer"; both shipped files declare `1`). The single namespaced storage key
+ * ADR-016 rule 3 describes is shared by every kind of selection it lists — the layout engine's
+ * own active-layout/slot choices (`useWorkbenchLayouts`) and the notes strip's chosen file
+ * (`NotesStripRegion`, REQ-007 W01) both key off this same constant, so they read and write the
+ * same key rather than two different ones. Bumping a layout file's `schema_version` is a
+ * coordinated change: this constant moves with it. */
+export const WORKBENCH_SCHEMA_VERSION = 1
+
+/** The browser's stored selections (ADR-016 rule 3): active layout id, per-layout per-slot panel
+ * choices, and the notes strip's chosen file, under one key namespaced by the layouts'
+ * `schema_version`. Never geometry, never copy — selections only. Every field beyond
+ * `schema_version` is optional: different owners (the layout engine, the notes strip) write only
+ * the field they own, via `storage.ts`'s merge-on-write helper, so one owner's write never
+ * clobbers another's already-stored field. */
 export interface StoredWorkbenchState {
   schema_version: number
-  active_layout: string
-  slot_selections: Record<string, Record<string, string>>
+  active_layout?: string
+  slot_selections?: Record<string, Record<string, string>>
+  /** The notes strip's chosen file, by filename under `ts/public/` (e.g. `talking-points.json`).
+   * `null`/absent means no choice has ever been persisted — the strip falls back to its own
+   * default file (ADR-016 rule 4: repository defaults are the fallback state). */
+  active_notes_file?: string | null
 }

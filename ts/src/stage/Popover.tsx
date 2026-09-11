@@ -36,7 +36,7 @@ export default function Popover({
 }: {
   triggerLabel: string
   title: string
-  // Most callers (e.g. TalkingPointsRegion's "show all" list) pass static content. Callers that
+  // Most callers (e.g. NotesStripRegion's controls menu) pass static content. Callers that
   // need a confirm action inside the bubble (R11's guarded drop / guarded tab close) pass a
   // function instead, so they can close the popover themselves once the confirmed action has
   // run, without Popover exposing its internal `open` state as a wider API.

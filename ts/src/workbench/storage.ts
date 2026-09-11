@@ -11,6 +11,11 @@ function storageKey(schemaVersion: number): string {
   return `${STORAGE_KEY_PREFIX}:v${schemaVersion}`
 }
 
+/** Every field beyond `schema_version` is optional (see `StoredWorkbenchState`'s doc comment) —
+ * this validates only the fields actually present, so one owner's stored field (e.g. the notes
+ * strip's `active_notes_file`) never fails validation just because another owner's field (e.g.
+ * the layout engine's `slot_selections`) has not been written yet in a fresh browser.
+ */
 function isStoredWorkbenchState(
   value: unknown,
   schemaVersion: number,
@@ -18,16 +23,33 @@ function isStoredWorkbenchState(
   if (typeof value !== 'object' || value === null) return false
   const record = value as Record<string, unknown>
   if (record.schema_version !== schemaVersion) return false
-  if (typeof record.active_layout !== 'string') return false
-  if (typeof record.slot_selections !== 'object' || record.slot_selections === null) return false
-  return Object.values(record.slot_selections as Record<string, unknown>).every(
-    (perLayout) =>
-      typeof perLayout === 'object' &&
-      perLayout !== null &&
-      Object.values(perLayout as Record<string, unknown>).every(
-        (panelId) => typeof panelId === 'string',
-      ),
-  )
+  if (record.active_layout !== undefined && typeof record.active_layout !== 'string') {
+    return false
+  }
+  if (record.slot_selections !== undefined) {
+    if (typeof record.slot_selections !== 'object' || record.slot_selections === null) {
+      return false
+    }
+    const validSlotSelections = Object.values(
+      record.slot_selections as Record<string, unknown>,
+    ).every(
+      (perLayout) =>
+        typeof perLayout === 'object' &&
+        perLayout !== null &&
+        Object.values(perLayout as Record<string, unknown>).every(
+          (panelId) => typeof panelId === 'string',
+        ),
+    )
+    if (!validSlotSelections) return false
+  }
+  if (
+    record.active_notes_file !== undefined &&
+    record.active_notes_file !== null &&
+    typeof record.active_notes_file !== 'string'
+  ) {
+    return false
+  }
+  return true
 }
 
 /**
@@ -62,4 +84,33 @@ export function saveStoredState(state: StoredWorkbenchState): void {
   } catch {
     // Best-effort, as above.
   }
+}
+
+/**
+ * Merge-on-write: reads whatever is currently stored under `schemaVersion` (falling back to an
+ * empty object, not the caller's own stale copy), overlays `patch`, and writes the result back.
+ * This is how two independent owners of the one ADR-016-mandated key — the layout engine
+ * (`useWorkbenchLayouts`, fields `active_layout`/`slot_selections`) and the notes strip
+ * (`NotesStripRegion`, field `active_notes_file`) — each persist their own field without
+ * clobbering the other's, since every write re-reads from localStorage immediately beforehand
+ * rather than reconstructing the whole object from one owner's in-memory state.
+ */
+export function patchStoredState(
+  schemaVersion: number,
+  patch: Partial<Omit<StoredWorkbenchState, 'schema_version'>>,
+): void {
+  const existing = loadStoredState(schemaVersion) ?? { schema_version: schemaVersion }
+  saveStoredState({ ...existing, ...patch, schema_version: schemaVersion })
+}
+
+/** The notes strip's persisted file choice, or `null` when nothing valid is stored — the
+ * strip falls back to its own default filename in that case (ADR-016 rule 4). */
+export function loadActiveNotesFile(schemaVersion: number): string | null {
+  return loadStoredState(schemaVersion)?.active_notes_file ?? null
+}
+
+/** Persists the notes strip's chosen file, merging into whatever else is stored under this key
+ * (see `patchStoredState`) — never overwriting the layout engine's own stored fields. */
+export function saveActiveNotesFile(schemaVersion: number, fileName: string | null): void {
+  patchStoredState(schemaVersion, { active_notes_file: fileName })
 }
