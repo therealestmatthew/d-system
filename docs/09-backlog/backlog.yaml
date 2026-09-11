@@ -8,7 +8,7 @@ next_up:
 - phase-wb-05
 - phase-wb-06
 - phase-wb-07
-- phase-port-01
+- phase-port-02
 - phase-ses-01
 items:
 - id: phase-rel-01
@@ -4244,7 +4244,7 @@ items:
   - sys-governance
   - sys-delivery
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-codex-port
   priority: 2
   session_budget: 1
@@ -4283,8 +4283,22 @@ items:
   - .agents/skills/orient/SKILL.md
   - .agents/skills/checkpoint/SKILL.md
   - docs/02-prompts/PROMPT-008-execute-a-phase.md
-  next_action: Define the canonical manifest and authority/capability schema, then
-    prove it by rendering orientation and checkpoint before porting more workflows.
+  next_action: Complete. Continue the prioritized portability sequence with phase-port-02.
+  session: doc-session-portable-workflow-foundation
+  completion_evidence:
+  - agent-workflows/workflows.yaml
+  - agent-workflows/orient.md
+  - agent-workflows/checkpoint.md
+  - tools/generate_agent_workflows.py
+  - test/test_agent_workflows.py
+  - docs/08-governance/OPS-010-generate-agent-workflows.md
+  - docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md
+  result: Four generated adapters match two canonical workflow bodies; 12 targeted
+    tests and all 407 repository tests pass, governance reports 117 documents and
+    105 phases, targeted Ruff passes, and mypy reports no issues. The first independent
+    review found three defects; all were corrected with regression tests, and a fresh
+    independent review confirmed all four acceptance conditions with no unresolved
+    implementation discrepancy.
 - id: phase-port-02
   title: Port safe commands and the idea-triage agent
   plan: doc-portable-agent-workflows

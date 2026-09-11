@@ -45,6 +45,7 @@ CI regenerates it and fails on any difference.
 | OPS-007 | operation | active | repository-owner | docs/08-governance/OPS-007-generate-tool-docs.md |
 | OPS-008 | operation | active | repository-owner | docs/08-governance/OPS-008-capture.md |
 | OPS-009 | operation | active | repository-owner | docs/08-governance/OPS-009-check-no-private-content.md |
+| OPS-010 | operation | active | repository-owner | docs/08-governance/OPS-010-generate-agent-workflows.md |
 | OPS-011 | operation | active | repository-owner | docs/08-governance/OPS-011-overview-metrics.md |
 | OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
 | OPS-013 | operation | active | repository-owner | docs/08-governance/OPS-013-demo-reset.md |
@@ -151,6 +152,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-18-idea-triage-agent.md |
 | SESS-2026-09-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md |
 | SESS-2026-09-09-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-02-post-sweep-policy-and-prompts.md |
+| SESS-2026-09-09-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md |
 | SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
 | SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
 | SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
@@ -181,7 +183,7 @@ CI regenerates it and fails on any difference.
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 3 | 1 | 3 | agent-checkpoint, agent-codex-port, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 4 | agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
@@ -198,9 +200,9 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
-| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 1 | 0 | agent-codex-port |
+| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
-| PLAN-022 | doc-workbench | active | 5 | 0 | 2 | agent-demo-stage |
+| PLAN-022 | doc-workbench | active | 4 | 1 | 2 | agent-demo-stage |
 
 ## Held codes
 
@@ -208,7 +210,6 @@ CI regenerates it and fails on any difference.
 |---|---|---|
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
-| OPS-010 | reserved | Portable workflow generator operations document; deliverable of phase-port-01. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-156 documents — adr: 15, architecture: 5, governance: 9, operation: 13, plan: 33, prompt: 23, requirement: 7, session: 51.
+158 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 23, requirement: 7, session: 52.

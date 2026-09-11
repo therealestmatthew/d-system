@@ -77,7 +77,9 @@ Reusable. This is the working loop — run it repeatedly to advance the backlog 
 >
 > ### Record and stop
 >
-> Follow `.claude/skills/checkpoint/SKILL.md` — its session-record contract is authoritative; do not
+> Follow the canonical checkpoint workflow in `agent-workflows/checkpoint.md`. Invoke the repository's
+> discovered checkpoint skill when the host supports one; otherwise read that canonical workflow
+> directly as the plain-prompt fallback. Its session-record contract is authoritative, so do not
 > restate or reinvent it here. It writes one record per session and regenerates its sections from
 > observed state.
 >
