@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import TerminalRegion, { TerminalRegionCmd, TerminalRegionPowerShell } from '../stage/TerminalRegion'
 import NotesStripRegion from '../stage/NotesStripRegion'
 import OverviewRegion from '../stage/OverviewRegion'
+import HtmlViewerRegion from '../stage/HtmlViewerRegion'
 
 /**
  * The panel type registry (REQ-007 W05/W06): every panel type id a layout's slots may name, and
@@ -16,6 +17,14 @@ import OverviewRegion from '../stage/OverviewRegion'
  * own `.stage-region` section, which is what satisfies a single-panel slot's "plain header"
  * (REQ-007 W06) with no extra wrapper needed (the notes strip's own header carries no title,
  * per REQ-007 W01, but is still that same single `.stage-region` box).
+ *
+ * `html-viewer` (`phase-wb-04`, `HtmlViewerRegion`) generalizes and replaces `overview` as
+ * layout 1's main slot default (`_data/workbench/layouts/layout-1.json`): the generated overview
+ * page is now one selectable entry inside the HTML Viewer's file dropdown rather than a
+ * separately-admitted panel type, so layout 1's main slot admits `html-viewer` only. `overview`
+ * stays registered here — `OverviewRegion` is untouched and layout 2's main slot still admits it
+ * — this phase's dispatched deliverable paths did not include layout 2 or removing the older
+ * component.
  *
  * `terminal-cmd` and `terminal-powershell` (REQ-007 W12) are the CMD and PowerShell panel
  * options — the terminal slot's `admits` list (`_data/workbench/layouts/*.json`) now names all
@@ -44,7 +53,7 @@ export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
   'terminal-powershell': { displayName: 'PowerShell', Component: TerminalRegionPowerShell },
   'notes-strip': { displayName: 'Notes', Component: NotesStripRegion },
   overview: { displayName: 'Overview', Component: OverviewRegion },
-  'html-viewer': { displayName: 'HTML Viewer', Component: null },
+  'html-viewer': { displayName: 'HTML Viewer', Component: HtmlViewerRegion },
   'file-browser': { displayName: 'File Browser', Component: null },
   'idea-explorer': { displayName: 'Idea Explorer', Component: null },
   'backlog-explorer': { displayName: 'Backlog Explorer', Component: null },

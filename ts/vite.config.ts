@@ -1,5 +1,6 @@
+import { spawnSync } from 'node:child_process'
 import { createReadStream, existsSync, statSync } from 'node:fs'
-import { join, normalize, resolve, sep } from 'node:path'
+import { extname, join, normalize, resolve, sep } from 'node:path'
 import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -12,6 +13,7 @@ const workbenchLayoutsDir = join(repoRoot, '_data', 'workbench', 'layouts')
 
 const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
 const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
+const WORKBENCH_FILE_PREFIX = '/workbench-file/'
 
 // Serves files under `_public/` at `/generated-overview/<path>` so `OverviewRegion` can embed
 // the generated overview page (its actual location is reported at runtime by the backend's
@@ -97,6 +99,104 @@ function serveWorkbenchLayouts(): Plugin {
   }
 }
 
+// The extensions the HTML Viewer's served pages are ever expected to reference: the compatible
+// documents themselves (`.html`/`.svg`, REQ-007 W07) plus the ordinary assets a static page can
+// link to relatively (stylesheets, scripts, images, fonts) — a `.html` page's own relative links
+// resolve against this same prefix, so they need to be servable too, not just the page itself.
+// Anything outside this map falls back to `application/octet-stream`.
+const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.htm': 'text/html; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=utf-8',
+}
+
+// `git check-ignore`, one path per request — mirrors the backend workbench routes' own rule
+// (ADR-015 rule 3: "Listings exclude private and derived content ... using the repository's
+// ignore rules rather than a hand-kept list") applied here as this dev-server route's own
+// security boundary, independent of whatever the HTML Viewer's dropdown happens to have listed
+// (ADR-015 rule 2: "the in-app pickers ... are convenience, not the security boundary").
+function isGitIgnored(repoRelativePath: string): boolean {
+  const result = spawnSync('git', ['check-ignore', '-q', repoRelativePath], { cwd: repoRoot })
+  return result.status === 0
+}
+
+// Serves any non-ignored file under the repository root at `/workbench-file/<repo-relative
+// path>`, so the HTML Viewer panel (`ts/src/stage/HtmlViewerRegion.tsx`, REQ-007 W07) can embed a
+// selected `.html`/`.svg` page (and that page's own relatively-linked assets) found via the
+// workbench search/listing routes — those routes report paths only, never content (ADR-015), so
+// this is the piece that actually serves bytes, the same role `serveGeneratedOverview` already
+// plays for the narrower `_public/` case above. Repository-root-bounded and `.git`/ignored-path
+// rejecting, the same two checks `src/api/routes/workbench.py`'s `resolve_repo_relative_path` and
+// `_git_ignored_paths` apply server-side — this loopback-only dev tool holds itself to the same
+// boundary the backend API does, even though nothing here is reachable off-machine.
+function serveRepositoryFiles(): Plugin {
+  const attach = (middlewares: Connect.Server) => {
+    middlewares.use(WORKBENCH_FILE_PREFIX, (req, res) => {
+      const requestedPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+      const relative = requestedPath.replace(/^\/+/, '')
+      if (!relative) {
+        res.statusCode = 400
+        res.end('A repository-relative file path is required.')
+        return
+      }
+      const resolved = normalize(join(repoRoot, relative))
+      if (resolved !== repoRoot && !resolved.startsWith(repoRoot + sep)) {
+        res.statusCode = 403
+        res.end('Forbidden')
+        return
+      }
+      if (relative.split('/').includes('.git')) {
+        res.statusCode = 403
+        res.end('Forbidden')
+        return
+      }
+      if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+        res.statusCode = 404
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end(`Not found: ${relative}`)
+        return
+      }
+      if (isGitIgnored(relative)) {
+        res.statusCode = 404
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end(`Not found: ${relative}`)
+        return
+      }
+      const contentType = CONTENT_TYPE_BY_EXTENSION[extname(resolved).toLowerCase()]
+      res.statusCode = 200
+      res.setHeader('Content-Type', contentType ?? 'application/octet-stream')
+      // Never cached — the HTML Viewer's refresh control (REQ-007 W07) re-fetches the current
+      // page on demand specifically so an on-disk edit shows up immediately, which a cached
+      // response would defeat.
+      res.setHeader('Cache-Control', 'no-store')
+      createReadStream(resolved).pipe(res)
+    })
+  }
+
+  return {
+    name: 'serve-workbench-repository-files',
+    configureServer(server) {
+      attach(server.middlewares)
+    },
+    configurePreviewServer(server) {
+      attach(server.middlewares)
+    },
+  }
+}
+
 // The proxy target is configurable so each worktree/demo launch can point at its own backend
 // port without repointing the shared default. `VITE_API_TARGET` (read via `loadEnv`, not
 // `import.meta.env`, since this file runs in Node at config-load time, not in the browser)
@@ -108,7 +208,7 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_TARGET || 'http://localhost:8000'
 
   return {
-    plugins: [react(), serveGeneratedOverview(), serveWorkbenchLayouts()],
+    plugins: [react(), serveGeneratedOverview(), serveWorkbenchLayouts(), serveRepositoryFiles()],
     server: {
       proxy: {
         '/api': {

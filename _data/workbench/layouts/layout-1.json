@@ -18,8 +18,8 @@
     {
       "slot_id": "main",
       "display_name": "Main",
-      "admits": ["overview", "html-viewer"],
-      "default_panel": "overview"
+      "admits": ["html-viewer"],
+      "default_panel": "html-viewer"
     },
     {
       "slot_id": "explorer",
