@@ -167,6 +167,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-10-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-12-workbench-layout-notes-strip.md |
 | SESS-2026-09-10-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-13-workbench-terminal-panel-rework.md |
 | SESS-2026-09-11-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md |
+| SESS-2026-09-11-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-02-workbench-html-viewer-panel.md |
 
 ## Plans and their phases
 
@@ -214,4 +215,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-160 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 23, requirement: 7, session: 54.
+161 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 23, requirement: 7, session: 55.

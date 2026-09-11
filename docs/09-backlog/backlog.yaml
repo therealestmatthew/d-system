@@ -5290,8 +5290,11 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-04
   title: HTML Viewer panel with tabs
-  next_action: After phase-wb-03 (shared ts/src lock), dispatch pack section W04
-    (PROMPT-021).
+  next_action: W04-C1/V1 and W04-C2/V2 passed first-pass, W04-G green apart from the
+    3 known-environmental PTY test failures. Remaining before close - coordinator
+    dispatches W04-A (adversarial review) and W04-W (Playwright browser
+    verification), then integration into dev with the owner's approval.
+  session: doc-session-workbench-html-viewer-panel
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5301,6 +5304,22 @@ items:
   owner: repository-owner
   status: active
   agent: agent-demo-data
+  completion_evidence:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/DirectoryPickerDialog.tsx
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/src/workbench/storage.ts
+  - ts/src/workbench/types.ts
+  - ts/vite.config.ts
+  - _data/workbench/layouts/layout-1.json
+  result: 'In progress. W04-C1/V1 (viewer panel and controls) and W04-C2/V2 (viewer
+    tabs) each passed on the first creator/validator cycle. W04-G''s mechanical
+    checklist passed apart from pytest''s 3 known-environmental PTY failures
+    (ideas 000097/000099). A pre-existing governance drift (this phase''s own claim
+    commit had not regenerated docs/08-governance/catalog.md) was caught by W04-G''s
+    pytest run and fixed on dev at eb5c1cf; the worktree was rebased onto it.
+    W04-A and W04-W remain, dispatched by the coordinator per PROMPT-021, not this
+    orchestrator.'
   priority: 1
   session_budget: 1
   depends_on:
