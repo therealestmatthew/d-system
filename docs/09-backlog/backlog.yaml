@@ -3,7 +3,6 @@ updated: '2026-09-11'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-04
 - phase-wb-05
 - phase-wb-06
 - phase-wb-07
@@ -5290,12 +5289,11 @@ items:
   - _data/workbench/layouts
 - id: phase-wb-04
   title: HTML Viewer panel with tabs
-  next_action: W04-A adversarial review complete across both fix cycles (2 of 2
-    used) - fix cycle 1 (300b6ac) fixed 2 blockers/1 major/1 minor; re-review found
-    1 new blocker plus 2 small items; fix cycle 2 (1f45371) fixed all three,
-    re-verified with no regression. Remaining before close - W04-W (Playwright
-    browser verification, coordinator-dispatched), then integration into dev with
-    the owner's approval.
+  next_action: 'None — phase complete: both work items passed first-cycle, W04-A
+    clean after its two fix cycles, W04-W green on every item with measured
+    evidence, and the branch integrated into dev fast-forward at 983164d under
+    PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
   session: doc-session-workbench-html-viewer-panel
   plan: doc-workbench
   sources:
@@ -5304,7 +5302,7 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-data
   completion_evidence:
   - ts/src/stage/HtmlViewerRegion.tsx
@@ -5351,8 +5349,23 @@ items:
     cache-busting, two-tab isolation, reload restoration, zero-scroll structure,
     registration) is untouched. Re-verified after fix cycle 2: npm run build clean,
     uv run pytest 546 passed/3 failed unchanged (environmental), governance and
-    check_no_private_content both green. W04-W remains, dispatched by the
-    coordinator per PROMPT-021, not this orchestrator.'
+    check_no_private_content both green. W04-W (coordinator-dispatched,
+    demo-validator-web) then passed every item with measured evidence: dropdown
+    lists exactly the selected directory''s recursive .html/.svg files
+    (substitute directories _public and templates/html - the pack''s named
+    fixture path docs/07-architecture/diagrams/demo exists only on the unmerged
+    agent/phase-demo-07 branch, recorded here rather than rounded into a pass),
+    search filtering, known overview figure render, on-disk change + refresh,
+    dialog re-scope, .svg render (against a temporary untracked coordinator
+    fixture, removed after), two-tab isolation and reload persistence of both
+    tabs, zero-scroll and non-overlap at 1280x720/1366x768/1920x1080/1024x768,
+    no uncaught console errors (only the intended sandbox script-blocking
+    messages), and the deferred REQ-007 W06 rider from phase-wb-02: layout-2''s
+    overview/html-viewer slot dropdown swaps both directions and layout-1''s
+    single-admit slot renders a plain header. Integrated into dev fast-forward
+    at 983164d under PROMPT-023 delta 1 (pre-approved, gate green). Follow-on
+    for phase-wb-07: demo launches must now set D_SYSTEM_DEMO_TERMINAL=1 on the
+    frontend process too - the runbook''s launch section does not yet say so.'
   priority: 1
   session_budget: 1
   depends_on:
