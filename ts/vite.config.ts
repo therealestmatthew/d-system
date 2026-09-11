@@ -175,8 +175,17 @@ function serveRepositoryFiles(): Plugin {
       // filesystem would let a segment spelled `.GIT` reach this far were the comparison
       // case-sensitive, and `git check-ignore` (the `isGitIgnored` check below) does not flag
       // `.git` itself — it is not a tracked-vs-ignored question, it is always excluded, the same
-      // rule the backend applies via `ALWAYS_EXCLUDED_NAMES`.
-      if (relative.split('/').some((segment) => segment.toLowerCase() === '.git')) {
+      // rule the backend applies via `ALWAYS_EXCLUDED_NAMES`. Each segment is also stripped of
+      // trailing dots/spaces before the comparison: Win32 silently strips trailing dots and
+      // spaces from path components when resolving a path on disk, so a literal segment spelled
+      // `.git.` or `.git ` never equals `.git` textually here but still resolves to the real
+      // `.git` directory on that presentation machine — stripping first closes that gap even
+      // though it cannot be exercised (and so verified) on this Linux worktree.
+      if (
+        relative
+          .split('/')
+          .some((segment) => segment.replace(/[. ]+$/, '').toLowerCase() === '.git')
+      ) {
         res.statusCode = 403
         res.end('Forbidden')
         return
@@ -217,7 +226,26 @@ function serveRepositoryFiles(): Plugin {
       // page on demand specifically so an on-disk edit shows up immediately, which a cached
       // response would defeat.
       res.setHeader('Cache-Control', 'no-store')
-      createReadStream(resolved).pipe(res)
+      // `Content-Security-Policy: sandbox` (no tokens, i.e. every restriction applied): unlike
+      // the iframe's own `sandbox=""` attribute (`HtmlViewerRegion.tsx`), the "open page in a new
+      // tab" fallback is a full top-level navigation, which an iframe attribute cannot reach — but
+      // the CSP `sandbox` directive applies to top-level navigations the same way it applies to
+      // frames (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox),
+      // blocking script execution and giving the navigated document an opaque origin, so opening
+      // any served repository file directly in a new tab can no longer read/write this app's
+      // origin (its `localStorage`, `POST /api/v1/workbench/reveal`, etc.) even though it is
+      // served same-origin. The generated overview page this route also serves has no `<script>`
+      // tags (W04-W), so it keeps rendering under this header exactly as it does under the
+      // iframe's `sandbox=""`. Applies to every response from this route, not just the fallback
+      // path, since the same URL is reachable either way.
+      res.setHeader('Content-Security-Policy', 'sandbox')
+      // Stream from the already-`realpathSync`-resolved path, not the textually-normalized
+      // `resolved` re-opened here: re-deriving bytes from `resolved` after the symlink-boundary
+      // check above passed would reopen the original (possibly symlinked) path, leaving a
+      // TOCTOU window between the check and the read where the symlink target could change: the
+      // check would have validated one file but the stream would read whatever `resolved` points
+      // to at read time. `realResolved` is the same file the check just validated.
+      createReadStream(realResolved).pipe(res)
     })
   }
 
