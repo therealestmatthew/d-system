@@ -5404,10 +5404,11 @@ items:
 - id: phase-wb-05
   title: File Browser panel
   next_action: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend
-    fix cycle for copy-absolute-path), W05-G, and W05-A's fix cycle 1 (blocker
-    + minor, fixed and re-verified) all passed. Remaining before this phase
-    can close - the coordinator's own W05-W (Playwright browser verification)
-    dispatch, then the owner's integration decision.
+    fix cycle for copy-absolute-path), W05-G, W05-A's fix cycle 1 (blocker +
+    minor), and W05-W with its fix cycle 2 (React duplicate-key, the last fix
+    cycle for this phase's gate) all passed. Remaining - only the owner's
+    integration decision and /session-close; no further coordinator dispatch
+    is outstanding against this phase.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5448,8 +5449,20 @@ items:
     npm run build clean, uv run pytest test/test_workbench_api.py 42 passed
     (was 41), full uv run pytest 552 passed/3 failed (same environmental set,
     ideas 000097/000099), governance clean, private-content clean (staged).
-    W05-W remains, dispatched by the coordinator rather than this orchestrator
-    per the pack.'
+    The coordinator then dispatched W05-W (Playwright browser verification),
+    which passed every item with measured evidence and surfaced one
+    incidental defect: a React duplicate-key warning rendering docs/
+    (docs/README.md and docs/04-decisions/README.md implicated). Fix cycle 2
+    of 2 (the last before owner escalation), commit e700c85: demo-creator-web
+    reproduced it live with a real dev server and Playwright, finding the
+    actual mechanism - a one-render race where buildTree briefly receives the
+    new contextFolder paired with the previous folders stale entries before
+    the re-fetch effect runs. Fixed by tracking which folder entries was
+    actually fetched for and gating the tree build on that matching the
+    current contextFolder; confirmed gone via a live before/after repro.
+    Re-verified npm run build clean in the foreground. Every dispatch this
+    pack assigns to this orchestrator or the coordinator for phase-wb-05 has
+    now run and passed.'
   priority: 1
   session_budget: 1
   depends_on:

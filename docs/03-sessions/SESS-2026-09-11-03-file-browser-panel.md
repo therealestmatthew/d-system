@@ -20,7 +20,7 @@ depends_on: [doc-workbench]
 
 ## Verification
 
-- `cd ts && npm run build`:
+- `cd ts && npm run build` (re-run after the W05-G fix cycle 2 duplicate-key fix):
   ```
   > d-system-ui@0.0.1 build
   > tsc -b && vite build
@@ -32,10 +32,10 @@ depends_on: [doc-workbench]
   computing gzip size...
   dist/index.html                   0.39 kB │ gzip:   0.27 kB
   dist/assets/index-C1FZ2Xc5.css   20.09 kB │ gzip:   4.58 kB
-  dist/assets/index-BNgKZzox.js   528.72 kB │ gzip: 145.09 kB
+  dist/assets/index-CBwMI6Is.js   528.80 kB │ gzip: 145.12 kB
 
   (!) Some chunks are larger than 500 kB after minification. ...
-  ✓ built in 1.14s
+  ✓ built in 1.21s
   ```
 - `uv run python -m src.governance`:
   ```
@@ -63,10 +63,14 @@ depends_on: [doc-workbench]
   pyenv-rehash issue (ideas 000097/000099), not a phase failure. This phase's diff does not touch
   `test/test_demo_terminal.py` or `src/demo`.
 - Adversarial review (pack W05-A, dispatched by the coordinator): returned 1 BLOCKER and 1 MINOR,
-  both fixed this cycle — see Acceptance.
-- Playwright browser verification (pack W05-W): not yet dispatched — it is the coordinator's
-  dispatch per the pack, not this orchestrator's; the coordinator will dispatch it after this
-  report.
+  both fixed in fix cycle 1 — see Acceptance.
+- Playwright browser verification (pack W05-W, dispatched by the coordinator): passed every
+  checklist item with measured evidence (tree/filters/preset, all five context-menu actions with
+  clipboard strings asserted via a stub, inject un-executed, reveal 200, open-in-viewer into tab
+  2, menu dismissal, zero-scroll/non-overlap at all four sizes). One real defect surfaced
+  incidentally: a React duplicate-key warning in `FileBrowserRegion.tsx`'s `TreeLevel`, reproduced
+  for `docs/04-decisions/README.md` and `docs/README.md`. Fixed in fix cycle 2 (the last for this
+  gate) — see Acceptance.
 
 ## Acceptance
 
@@ -105,16 +109,32 @@ depends_on: [doc-workbench]
   stale `panelRegistry.tsx` comment W05-V2 had already flagged non-blocking — was fixed in the
   same cycle by `demo-creator-web` (also `65d3909`). Re-verified: `test/test_workbench_api.py`
   42 passed (was 41), full suite 552 passed/3 failed (unchanged environmental set), build clean,
-  governance clean, private-content clean.
+  governance clean, private-content clean. The coordinator then dispatched W05-W (Playwright
+  browser verification), which passed every item and surfaced one incidental defect: a React
+  "two children with the same key" warning when rendering `docs/` (both `docs/README.md` and
+  `docs/04-decisions/README.md` implicated). Fix cycle 2 of 2 (the last before owner escalation),
+  commit `e700c85`: `demo-creator-web` reproduced it live with a real dev server and Playwright
+  (confirming `TreeLevel`'s keys and `buildTree`'s path construction were already correct in
+  isolation) and found the actual mechanism — a one-render race where `setContextFolder` commits
+  before the `useEffect` that re-fetches `entries` runs, so `buildTree` briefly receives the new
+  `contextFolder` paired with the *previous* folder's `entries`; a stale entry whose path doesn't
+  share the new prefix falls through `buildTree`'s unstripped-path fallback and collides with a
+  real node under the new folder. Fixed by tracking which folder `entries` was actually fetched
+  for (`entriesFolder`) and gating both the `tree` memo and the loading-state render on
+  `entriesFolder === contextFolder`, so the mismatched pairing is never fed to `buildTree` — the
+  UI shows "Loading…" for that one render instead. Confirmed gone via a live Playwright repro
+  against `docs/` (including an expanded `docs/04-decisions/`) both before (warning present) and
+  after (clean) the fix.
 
 ## Backlog
 
 - `status: active`, `agent: agent-demo-data`.
 - `next_action`: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend fix cycle),
-  W05-G, and now W05-A's fix cycle 1 (blocker + minor, both fixed and re-verified green) have all
-  passed; this orchestrator's own verification commands are pasted above. Remaining before this
-  phase can close: the coordinator's own W05-W (Playwright browser verification) dispatch, then
-  the owner's integration decision and `/session-close`.
+  W05-G, W05-A's fix cycle 1 (blocker + minor), and W05-W with its fix cycle 2 (React
+  duplicate-key, the last fix cycle for this phase's gate) have all passed; this orchestrator's
+  own verification commands are pasted above. Remaining before this phase can close: the owner's
+  integration decision and `/session-close` — no further coordinator dispatch is outstanding
+  against this orchestrator per the pack.
 - `completion_evidence`: not recorded on `dev` yet — the files exist only on the unmerged
   `agent/phase-wb-05` worktree branch: `ts/src/stage/FileBrowserRegion.tsx`,
   `ts/src/stage/FileTreeContextMenu.tsx`, `ts/src/stage/panelBridge.ts`,
@@ -142,12 +162,22 @@ depends_on: [doc-workbench]
     docstring, and added a gitignore-exclusion test; demo-creator-web corrected the comment.
     Re-verified: test/test_workbench_api.py 42 passed (was 41), full suite 552 passed/3 failed
     (same environmental set, ideas 000097/000099), build clean, governance clean, private-content
-    clean. W05-W (Playwright) remains, dispatched by the coordinator rather than this
-    orchestrator per the pack.'
+    clean. The coordinator then dispatched W05-W (Playwright browser verification), which passed
+    every checklist item with measured evidence and surfaced one incidental defect: a React
+    duplicate-key warning rendering docs/ (docs/README.md and docs/04-decisions/README.md).
+    Fix cycle 2 of 2 (the last before owner escalation), commit e700c85: demo-creator-web
+    reproduced it live (real dev server + Playwright) and found the actual mechanism - a
+    one-render race where buildTree briefly receives the new contextFolder paired with the
+    previous folders stale entries before the re-fetch effect runs, producing a colliding path
+    via buildTrees unstripped-path fallback. Fixed by tracking which folder entries was actually
+    fetched for and gating the tree build on that matching contextFolder. Confirmed gone via a
+    live before/after Playwright repro. Re-verified: npm run build clean (foreground, pasted
+    above). Every dispatch this pack assigns to this orchestrator or the coordinator for
+    phase-wb-05 has now run and passed.'
 
 ## Unresolved
 
-None blocking this orchestrator's charter. W05-W (Playwright browser verification) is still
-open, but the pack assigns it as a coordinator dispatch, not a `demo-orch-data` dispatch — this
-orchestrator's stop condition (deliverable exists, W05-G green, verification output pasted) is
-met, and the coordinator's W05-A fix-cycle instructions have been carried out and re-verified.
+None blocking this orchestrator's charter. Every W05 work item, the phase gate, and both rounds
+of coordinator-dispatched review (W05-A, W05-W) have passed, each fix cycle within the two-cycle
+limit. What remains is the owner's integration decision and `/session-close` — neither of which
+this orchestrator performs.
