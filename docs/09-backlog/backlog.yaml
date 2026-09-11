@@ -5508,8 +5508,10 @@ items:
   - test/test_workbench_api.py
 - id: phase-wb-06
   title: Idea and Backlog explorer panels
-  next_action: After phase-wb-05 (shared ts/src lock), dispatch pack section W06
-    (PROMPT-021).
+  next_action: W06-C1/V1 and W06-C2/V2 passed clean first-cycle; W06-G (phase
+    gate) passed every item. Outstanding before close - the coordinator's
+    W06-A (adversarial review) and W06-W (Playwright browser verification)
+    dispatch, then the owner's integration decision and /session-close.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5519,6 +5521,23 @@ items:
   owner: repository-owner
   status: active
   agent: agent-demo-data
+  session: doc-session-idea-backlog-explorer-panels
+  result: 'In progress. W06-C1 (Idea Explorer) passed first-cycle: build clean,
+    W06-V1 clean PASS with no findings - idea data comes only from the
+    phase-wb-01 idea route, six columns render, sort/filter work on route
+    data, queue view uses the route''s own ordering. W06-C2 (Backlog
+    Explorer) passed first-cycle, factoring the shared table/sort/filter/
+    queue-toggle surface out of the Idea Explorer into
+    ts/src/stage/explorer/ExplorerRegion.tsx so both panels are thin
+    wrappers over one generic component - build clean, W06-V2 clean PASS
+    with no findings. W06-G (demo-validator-check) passed every item:
+    governance OK, private-content OK staged, deliverable confirmed, build
+    clean, full pytest 552 passed/3 failed (environmental, ideas
+    000097/000099), no direct ideas.jsonl reference, diff confined to ts/.
+    This orchestrator''s own verification commands (npm run build,
+    governance, check_no_private_content) all ran clean. No fix cycles were
+    needed on either work item. W06-A and W06-W are the coordinator''s
+    dispatches and have not yet been run.'
   priority: 1
   session_budget: 1
   depends_on:
