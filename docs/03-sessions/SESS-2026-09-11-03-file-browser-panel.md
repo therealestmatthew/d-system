@@ -35,7 +35,7 @@ depends_on: [doc-workbench]
   dist/assets/index-BNgKZzox.js   528.72 kB │ gzip: 145.09 kB
 
   (!) Some chunks are larger than 500 kB after minification. ...
-  ✓ built in 1.21s
+  ✓ built in 1.14s
   ```
 - `uv run python -m src.governance`:
   ```
@@ -46,26 +46,27 @@ depends_on: [doc-workbench]
   note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
   check_no_private_content: OK (493 tracked files, 0 identifiers checked)
   ```
-- `uv run pytest test/test_workbench_api.py -v` (the coordinator's added deliverable, the new
-  `/absolute-path` route's own test file):
+- `uv run pytest test/test_workbench_api.py -v` (re-run after the W05-A fix cycle, includes the
+  new gitignore-exclusion test):
   ```
-  41 passed, 2 warnings in 1.81s
+  42 passed, 2 warnings in 1.87s
   ```
-- `uv run pytest` (full suite, run by W05-G/demo-validator-check):
+- `uv run pytest` (full suite, re-run after the W05-A fix cycle):
   ```
-  551 passed, 3 failed in 153.88s
+  552 passed, 3 failed in 153.51s (0:02:33)
   ```
-  The 3 failures are all in `test/test_demo_terminal.py`
+  The 3 failures are unchanged from before the fix cycle, all in `test/test_demo_terminal.py`
   (`test_posix_adapter_reports_alive_then_not_alive`,
   `test_resize_text_frame_applies_to_pty_window_size`,
   `test_two_concurrent_websocket_sessions_are_independent_shells`), each showing
   `pyenv: cannot rehash: couldn't acquire lock ... .pyenv-shim` — the recorded host-wide
   pyenv-rehash issue (ideas 000097/000099), not a phase failure. This phase's diff does not touch
   `test/test_demo_terminal.py` or `src/demo`.
-- Adversarial review (pack W05-A): not yet dispatched — it is the coordinator's dispatch per the
-  pack, not this orchestrator's.
+- Adversarial review (pack W05-A, dispatched by the coordinator): returned 1 BLOCKER and 1 MINOR,
+  both fixed this cycle — see Acceptance.
 - Playwright browser verification (pack W05-W): not yet dispatched — it is the coordinator's
-  dispatch per the pack, not this orchestrator's.
+  dispatch per the pack, not this orchestrator's; the coordinator will dispatch it after this
+  report.
 
 ## Acceptance
 
@@ -92,16 +93,28 @@ depends_on: [doc-workbench]
   full five-action diff, with one non-blocking note: a stale doc comment in
   `ts/src/workbench/panelRegistry.tsx:17-18` still describes the context menu as not yet built —
   a documentation-accuracy defect only, not fixed here (no functional finding to trigger a fix
-  cycle). W05-G (demo-validator-check) then passed every item.
+  cycle). W05-G (demo-validator-check) then passed every item. The coordinator's W05-A
+  (adversarial review) then found 1 BLOCKER: `GET /absolute-path` applied only ADR-015 rule 2
+  (repo-boundary), never rule 3 (gitignore/`_private` exclusion), making it an existence/location
+  oracle over content `/list`, `/search` and `/reveal` all hide (`.venv` returned 200 with its
+  absolute path where the sibling routes make it invisible or refuse it). Fix cycle 1 of 2 on
+  this W05-A finding: `demo-creator-py` reused the existing `_is_reveal_excluded` helper in
+  `get_absolute_path`, folding an excluded path into the same 404 as a nonexistent one (matching
+  "not shown, not merely refused"), corrected the route's docstring, and added a test asserting
+  `.venv` 404s (commit `65d3909`, combined with the fix below). The review's 1 MINOR — the same
+  stale `panelRegistry.tsx` comment W05-V2 had already flagged non-blocking — was fixed in the
+  same cycle by `demo-creator-web` (also `65d3909`). Re-verified: `test/test_workbench_api.py`
+  42 passed (was 41), full suite 552 passed/3 failed (unchanged environmental set), build clean,
+  governance clean, private-content clean.
 
 ## Backlog
 
 - `status: active`, `agent: agent-demo-data`.
-- `next_action`: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend fix cycle) and
-  W05-G all passed; this orchestrator's own verification commands are pasted above. Remaining
-  before this phase can close: the coordinator's own W05-A (adversarial review) and W05-W
-  (Playwright browser verification) dispatches, then the owner's integration decision and
-  `/session-close`.
+- `next_action`: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend fix cycle),
+  W05-G, and now W05-A's fix cycle 1 (blocker + minor, both fixed and re-verified green) have all
+  passed; this orchestrator's own verification commands are pasted above. Remaining before this
+  phase can close: the coordinator's own W05-W (Playwright browser verification) dispatch, then
+  the owner's integration decision and `/session-close`.
 - `completion_evidence`: not recorded on `dev` yet — the files exist only on the unmerged
   `agent/phase-wb-05` worktree branch: `ts/src/stage/FileBrowserRegion.tsx`,
   `ts/src/stage/FileTreeContextMenu.tsx`, `ts/src/stage/panelBridge.ts`,
@@ -120,16 +133,21 @@ depends_on: [doc-workbench]
     GET-only, gated, resolved-path-validated route with 41 passing tests (commit 73c7676);
     demo-creator-web wired the frontend action to it (commit f186010). W05-V2 then passed clean
     on the full five-action diff (one non-blocking stale-comment note). W05-G
-    (demo-validator-check) passed every item: governance OK, private-content OK, deliverable
-    confirmed present, build clean, full pytest 551 passed/3 failed (environmental, ideas
-    000097/000099), diff confined to the corrected scope (ts/, src/api/routes/workbench.py,
-    test/test_workbench_api.py). This orchestrator re-ran the verification commands itself with
-    matching results. W05-A and W05-W remain, dispatched by the coordinator rather than this
+    (demo-validator-check) passed every item. The coordinator then dispatched W05-A (adversarial
+    review), which found 1 BLOCKER (the new /absolute-path route applied only ADR-015 rule 2, not
+    rule 3, making it a gitignore/_private existence oracle - proven live against .venv) and 1
+    MINOR (the same stale panelRegistry.tsx comment W05-V2 had already flagged non-blocking).
+    Fix cycle 1 of 2 on this finding, commit 65d3909: demo-creator-py reused the existing
+    _is_reveal_excluded helper to fold excluded paths into the routes 404 branch, corrected the
+    docstring, and added a gitignore-exclusion test; demo-creator-web corrected the comment.
+    Re-verified: test/test_workbench_api.py 42 passed (was 41), full suite 552 passed/3 failed
+    (same environmental set, ideas 000097/000099), build clean, governance clean, private-content
+    clean. W05-W (Playwright) remains, dispatched by the coordinator rather than this
     orchestrator per the pack.'
 
 ## Unresolved
 
-None blocking this orchestrator's charter. W05-A (adversarial review) and W05-W (Playwright
-browser verification) are still open, but the pack assigns both as coordinator dispatches, not
-`demo-orch-data` dispatches — this orchestrator's stop condition (deliverable exists, W05-G
-green, verification output pasted) is met.
+None blocking this orchestrator's charter. W05-W (Playwright browser verification) is still
+open, but the pack assigns it as a coordinator dispatch, not a `demo-orch-data` dispatch — this
+orchestrator's stop condition (deliverable exists, W05-G green, verification output pasted) is
+met, and the coordinator's W05-A fix-cycle instructions have been carried out and re-verified.

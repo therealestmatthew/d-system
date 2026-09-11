@@ -5404,10 +5404,10 @@ items:
 - id: phase-wb-05
   title: File Browser panel
   next_action: W05-C1/V1, W05-C2/V2 (including the coordinator-approved backend
-    fix cycle for copy-absolute-path) and W05-G all passed. Remaining before
-    this phase can close - the coordinator's own W05-A (adversarial review)
-    and W05-W (Playwright browser verification) dispatches, then the owner's
-    integration decision.
+    fix cycle for copy-absolute-path), W05-G, and W05-A's fix cycle 1 (blocker
+    + minor, fixed and re-verified) all passed. Remaining before this phase
+    can close - the coordinator's own W05-W (Playwright browser verification)
+    dispatch, then the owner's integration decision.
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
@@ -5437,10 +5437,19 @@ items:
     (demo-validator-check) passed every item: governance OK, private-content
     OK, deliverable confirmed, build clean, full pytest 551 passed/3 failed
     (environmental, ideas 000097/000099), diff confined to the corrected
-    scope. This orchestrator re-ran the verification commands itself with
-    matching results, including uv run pytest test/test_workbench_api.py
-    (41 passed). W05-A and W05-W remain, dispatched by the coordinator rather
-    than this orchestrator per the pack.'
+    scope. The coordinator then dispatched W05-A (adversarial review), which
+    found 1 BLOCKER (the new /absolute-path route applied only ADR-015 rule 2,
+    not rule 3, making it a gitignore/_private existence oracle - proven live
+    against .venv) and 1 MINOR (the same stale panelRegistry.tsx comment).
+    Fix cycle 1 of 2, commit 65d3909: demo-creator-py reused the existing
+    _is_reveal_excluded helper to fold excluded paths into the routes 404
+    branch, corrected the docstring, added a gitignore-exclusion test;
+    demo-creator-web corrected the comment. Re-verified in the foreground:
+    npm run build clean, uv run pytest test/test_workbench_api.py 42 passed
+    (was 41), full uv run pytest 552 passed/3 failed (same environmental set,
+    ideas 000097/000099), governance clean, private-content clean (staged).
+    W05-W remains, dispatched by the coordinator rather than this orchestrator
+    per the pack.'
   priority: 1
   session_budget: 1
   depends_on:
