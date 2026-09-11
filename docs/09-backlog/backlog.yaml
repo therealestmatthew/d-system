@@ -5581,25 +5581,35 @@ items:
   - ts/src
 - id: phase-wb-07
   title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
-  next_action: W07-C1, talking points, W07-V1 (pass on re-validation) and agent-driven
-    rehearsal pass 1 are done. Agent-driven rehearsal pass 2 (W07-R) has been dispatched
-    twice and truncated by its turn limit both times before reporting, without a
-    SendMessage tool available to resume the truncated agent; a third dispatch was
-    withheld per the no-third-retry rule and reported up. Once pass 2 completes and is
-    recorded, dispatch W07-G, then the owner-machine Windows checks and both timed
-    dry-runs remain outstanding, owner-driven only.
+  next_action: All agent-executable work is done - W07-C1, talking points, W07-V1 (clean
+    on re-validation), both agent-driven rehearsal passes (recorded; pass 2's two runbook
+    gaps fixed, its one code defect routed to idea 000104 rather than fixed here), and
+    W07-G (green on re-check). What remains is entirely owner-machine, owner-driven work
+    that no agent can perform - the REQ-006 R06 terminal smoke check, the CMD and
+    PowerShell round-trips (REQ-007 W12), and both owner-driven timed dry-runs closing
+    REQ-006 R09. The phase cannot close until the owner performs and records these.
   session: doc-session-rehearsal-refresh
   result: 'In progress (evidence lives on the unmerged agent/phase-wb-07 worktree branch:
     docs/00-working/demo-runbook.md, docs/00-working/demo-windows-setup.md). Runbook and
     Windows checklist rewritten against the final workbench UI (W07-C1); validator W07-V1
     found one finding (a surviving "talking points" label in presenter narration), fixed
     directly by the orchestrator as audience-facing prose, and passed on re-validation.
-    Agent-driven rehearsal pass 1 completed and recorded with three findings (one
-    addressed: /orient now starts a Claude Code session). Agent-driven rehearsal pass 2
-    not yet completed - two dispatch attempts truncated by turn limits. W07-G gate not
-    yet run. Owner-machine items (R06 smoke check, CMD/PowerShell round-trips, both
-    owner-driven timed dry-runs) not started; they close only on the owner''s own
-    recorded results.'
+    Both agent-driven rehearsal passes are recorded. Pass 1: three findings, one addressed
+    (/orient now starts a Claude Code session). Pass 2: dispatched twice by the
+    orchestrator and truncated by turn limits both times with no SendMessage tool
+    available to resume a truncated agent, reported up as a blocker; the coordinator
+    dispatched it directly and resumed it past truncation, delivering a complete report.
+    Pass 2 found four issues: an undocumented terminal panel picker/default (fixed as a
+    runbook gap), /idea-triage triaging the whole backlog rather than one idea (fixed
+    within runbook scope with an explicit Ctrl-C fallback; the command''s own behavior is
+    not this phase''s to change), a real terminal-panel clipped-height layout bug (a code
+    defect outside this phase''s deliverables, recorded as idea 000104 rather than fixed,
+    flagged prominently as demo-wrecking if unaddressed), and a repeat of pass 1''s cosmetic
+    _parked dropdown finding. W07-G passed all six items on re-check (first check''s item-6
+    fail was a two-dot vs triple-dot diff artifact against dev''s own independent commits,
+    not a real deliverable-path violation). Owner-machine items (R06 smoke check,
+    CMD/PowerShell round-trips, both owner-driven timed dry-runs) not started; they close
+    only on the owner''s own recorded results.'
   plan: doc-workbench
   sources:
   - doc-workbench-requirements

@@ -20,12 +20,12 @@ depends_on: [doc-workbench]
 
 ## Verification
 
-- `uv run python -m src.governance` (orchestrator run, in the worktree):
+- `uv run python -m src.governance` (orchestrator run, in the worktree, after W07-G):
   ```
   Governance OK: 18 systems, 163 documents, 16 memories, 119 backlog phases
   ```
 - `uv run python tools/check_no_private_content.py` with the changes staged (orchestrator
-  run, in the worktree):
+  run, in the worktree, after W07-G):
   ```
   note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
   check_no_private_content: OK (497 tracked files, 0 identifiers checked)
@@ -54,31 +54,57 @@ depends_on: [doc-workbench]
   observations (the `_parked` skill entry rendering in the dropdown; the ~85s `/orient`
   measurement against its 1m timebox, attributed to cold-start latency rather than the
   live-segment's on-stage time).
-- Agent-driven rehearsal pass 2 (W07-R), attempt 1: dispatched after a fresh
-  `demo_reset.py prepare`; truncated by its turn limit mid-investigation of a "collapse"
-  finding before delivering a final report. No `SendMessage` tool was available to this
-  orchestrator to resume the truncated agent (despite the task-notification instructing
-  its use), so a fresh general-purpose agent was asked to pick up the work; it correctly
-  reported it had no memory of the original investigation rather than fabricating a report,
-  and flagged an unverified observation (a blank terminal panel in its own screenshots) it
-  declined to characterize without further driving the browser.
-- Agent-driven rehearsal pass 2 (W07-R), attempt 2: worktree state cleaned (stray
-  backend/frontend processes on 8010/5180 killed, `demo_reset.py restore` then a fresh
-  `prepare` run), dispatched again from a clean state with an explicit instruction not to
-  get sidetracked by side findings before completing the full step-by-step pass. Truncated
-  again by its turn limit mid-investigation of the zero-scroll/viewport checks, before
-  delivering a final report.
-- Per the binding two-cycle rule (no third quiet retry), this orchestrator stopped after
-  the second truncated attempt and is reporting the blocker up rather than dispatching a
-  third time. Worktree cleaned again afterward: stray servers killed, `demo_reset.py
-  restore` run, `git status` confirmed clean with no stray artifacts from either aborted
-  attempt.
+- Agent-driven rehearsal pass 2 (W07-R): two dispatches by this orchestrator were each
+  truncated by their turn limit mid-investigation before delivering a final report, with no
+  `SendMessage` tool available in this orchestrator's toolset to resume a truncated agent.
+  Reported up as a blocking finding. The coordinator then dispatched pass 2 itself, resumed
+  the truncated agent past its cutoff, and delivered the complete report. Recorded in the
+  runbook (commits `b799a53`, `a96443b`): /orient took ~232s against its 1m timebox (a
+  blocking finding inside the step, not just a timing overage — see below); /idea used the
+  pre-seeded fallback as designed; /idea-triage completed one idea's triage in ~115s only
+  after the dispatching agent intervened to stop broader scope; the overview-skill rebuild
+  and test steps passed well under their timeboxes.
+- Four findings from pass 2, all recorded in the runbook's Rehearsal Findings list:
+  (4) the terminal slot's panel picker and non-guaranteed default panel were undocumented —
+  a Linux rehearsal host defaulted to a non-functional CMD panel; **fixed** as a runbook gap
+  (the `/orient` step and Workbench UI Reference now document the picker and instruct
+  confirming a working panel first, commit `a96443b`); (5) `/idea-triage` triages the whole
+  open backlog rather than just the captured idea and resists `Escape` (only `Ctrl-C`
+  stops it) — a real mismatch with the runbook's single-idea narrative and 2-minute
+  timebox; **fixed** within the runbook's own scope (the step's narration and timebox now
+  state the real behavior and give an explicit `Ctrl-C` fallback, commit `a96443b`) since
+  the underlying command's behavior is not this phase's deliverable to change; (6) the
+  terminal panel renders clipped to ~85px (`.xterm` container `height: 0` against a child
+  `.xterm-screen` height of 372.99) — a real CSS/layout sizing bug that would hide almost
+  all live output; this is a code defect outside this phase's deliverables (application
+  code, not the runbook/checklist) and is **not fixed here** — recorded instead as idea
+  `000104` (commit `b799a53`), flagged prominently: this would wreck the live demo if
+  unaddressed; (7) repeat of pass 1's already-noted cosmetic `_parked` dropdown entry, no
+  new action.
+- Pass 2's side effects on the idea log (idea `000087` annotated and moved `open` → `triaged`
+  via the sanctioned `append_idea.py` calls, as the intended result of exercising
+  `/idea-triage`) and this orchestrator's own idea `000104` write are committed, with
+  `docs/00-working/ideas.md` and `_public/overview/index.html` regenerated alongside per the
+  drift test (commit `b799a53`).
+- W07-G (phase gate, `demo-validator-check`), first dispatch: **RED** on item 6 only — the
+  validator used a two-dot `git diff dev --name-only`, which picked up `dev`'s own
+  independent commits (made directly on `dev` in the primary checkout, not on this branch —
+  a session-record file, catalog and backlog updates) as if they were part of this branch's
+  diff. Items 1-5 passed clean. Re-dispatched with a note to use the merge-base-relative
+  `git diff dev...HEAD` instead (the same triple-dot form `W07-V1` already used) and to
+  treat the rehearsal's sanctioned idea-log/regenerated-view side effects as expected,
+  since the checklist item itself does not specify diff notation and the pack's prompt was
+  not altered. Re-check: **PASS on all six items** — governance OK; private-content OK
+  staged; both deliverables present and updated; runbook timeboxes sum to exactly 15m in
+  both Dry-Run tables; `tools/demo_reset.py`/OPS-013 untouched; the merge-base diff against
+  `dev` touches only the two deliverables plus the three sanctioned rehearsal-side-effect
+  paths (`_data/ideas.jsonl`, `docs/00-working/ideas.md`, `_public/overview/index.html`).
 
 ## Acceptance
 
 - The runbook describes the workbench UI only, with per-step commands, fallbacks and
   timeboxes summing inside 15 minutes (REQ-007 W13) — **Met**: W07-V1 passed clean on
-  re-validation confirming this exact obligation, quoting the step rows and the 15m total.
+  re-validation and W07-G independently confirmed the 15m sum in both Dry-Run tables.
 - The R06 smoke check and both shell round-trips are recorded as passing on the
   presentation machine — **Not met**: owner-machine, owner-driven work not yet performed by
   the owner. Cannot be performed by an agent.
@@ -86,33 +112,32 @@ depends_on: [doc-workbench]
   per-step times recorded — the REQ-006 R09 conditions deferred from phase-demo-05 are
   closed, not re-deferred — **Not met**: owner-driven work not yet performed. The
   agent-driven mechanics-check passes (pack W07-R) are explicitly distinct from these and
-  do not close R09 per the runbook's own labeling; pass 1 is recorded, pass 2 is not yet
-  completed after two truncated dispatch attempts.
+  do not close R09 per the runbook's own labeling; both passes are now recorded, but they
+  are mechanics checks, not the owner's own timed dry-runs.
 
 ## Backlog
 
 - `status: active`, `agent: agent-demo-content`.
-- `next_action`: W07-C1, talking points, W07-V1 (pass on re-validation) and agent-driven
-  rehearsal pass 1 are done. Agent-driven rehearsal pass 2 (W07-R) has been dispatched
-  twice and truncated by its turn limit both times before reporting, without a SendMessage
-  tool available to resume the truncated agent; a third dispatch was withheld per the
-  no-third-retry rule and reported up. Once pass 2 completes and is recorded, dispatch
-  W07-G, then the owner-machine Windows checks and both timed dry-runs remain outstanding,
-  owner-driven only.
+- `next_action`: All agent-executable work for this orchestrator's charter is done — W07-C1,
+  talking points, W07-V1 (clean on re-validation), both agent-driven rehearsal passes
+  (recorded, with runbook gaps from pass 2 fixed and the one code defect routed to idea
+  `000104` rather than fixed here), and W07-G (green on re-check with the correct
+  merge-base diff). What remains is entirely owner-machine, owner-driven: the REQ-006 R06
+  terminal smoke check, the CMD and PowerShell round-trips (REQ-007 W12's Windows half),
+  and both owner-driven timed dry-runs closing REQ-006 R09's deferred conditions — none of
+  which can be performed by an agent. The phase cannot close until the owner performs and
+  records these.
 - `result`: see `backlog.yaml`'s `result` field for this phase, mirrored from the same
   facts recorded above.
 
 ## Unresolved
 
-- Agent-driven rehearsal pass 2 (pack W07-R) has not completed: two dispatch attempts, both
-  truncated by the subagent's turn limit mid-investigation before delivering a final
-  step-by-step report. This orchestrator has no `SendMessage` tool in its current toolset
-  to resume a truncated agent as the standing lesson (idea `000077`) requires, and stopped
-  short of a third dispatch per the binding two-cycle rule. Reported up as a blocking
-  finding: the coordinator should decide whether to grant a larger turn budget for this
-  dispatch, split it into smaller sub-checks, or otherwise resolve the resume-tooling gap.
-- W07-G (phase gate) has not been dispatched — it depends on pass 2 being recorded first.
 - The owner-machine, owner-driven items (REQ-006 R06 terminal smoke check, the CMD and
   PowerShell round-trips of REQ-007 W12, and both owner-driven timed dry-runs closing
   REQ-006 R09) remain entirely outstanding. None of these can be performed by an agent;
   they close only on the owner's own recorded results in the runbook and Windows checklist.
+- Idea `000104` (terminal panel clipped to ~85px, a real layout sizing bug found during
+  pass 2) is flagged prominently for the owner: it would wreck the live demo if
+  unaddressed, and is outside this phase's deliverables to fix.
+- The Playwright rehearsal pass over the runbook's browser-marked steps (pack W07-W) is the
+  coordinator's dispatch, not this orchestrator's, and has not yet been run.
