@@ -105,10 +105,12 @@ with the same execution model as the seven phases above:
   frontend process as well as the backend. Completes through `/session-close`, not the
   coordinator (GOV-003).
 
-Order: `phase-wb-08` → `phase-wb-09` → `phase-wb-10`, encoded as `depends_on`. The rehearsal
-refresh (`phase-wb-07`) is being closed by the owner (2026-09-11) on their own recorded
-results; the post-fix Windows confirmations (W15 fill, W17 default and two-shell round-trip)
-are owner checks recorded in the build kick-off record rather than a re-opened `phase-wb-07`.
+Order: `phase-wb-08` → `phase-wb-09` → `phase-wb-10` → `phase-wb-07`, encoded as
+`depends_on`. The rehearsal refresh (`phase-wb-07`) moved to blocked on 2026-09-11 (owner
+decision, claim released): its agent-executable work is done and audited, and what remains —
+the R06 smoke check, the shell round-trips, the timed dry-runs, plus the post-fix Windows
+confirmations (W15 fill, W17 default and two-shell round-trip) — is owner-machine work run
+against the runbook `phase-wb-10` refreshes, which is why it now depends on that phase.
 
 ## Descope ladder
 

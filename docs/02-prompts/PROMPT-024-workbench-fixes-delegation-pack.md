@@ -53,8 +53,8 @@ rehearsal session record `docs/03-sessions/SESS-2026-09-11-05-rehearsal-refresh.
 Sequencing constraint the coordinator enforces: `phase-wb-08` completes and integrates before
 `phase-wb-09` is claimed, and `phase-wb-10` (the runbook refresh — dispatched outside this
 pack, completes via `/session-close`) follows `phase-wb-09`; `depends_on` encodes the chain.
-The post-fix Windows confirmations are owner checks recorded in the build kick-off record
-(`PROMPT-023`). The live demo is 2026-09-15.
+The post-fix Windows confirmations are owner checks belonging to `phase-wb-07`, blocked
+behind `phase-wb-10` (see the kick-off record's delta 4). The live demo is 2026-09-15.
 
 One convention addition over `PROMPT-021`: a **diagnosis dispatch** (`W08-M`,
 `demo-validator-web`). The creator agents carry no browser tool, so live measurements a

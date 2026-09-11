@@ -79,22 +79,29 @@ The owner ratified the fix-phase extension in the 2026-09-11 planning session (R
 rows W15–W18; delegation pack [PROMPT-024](PROMPT-024-workbench-fixes-delegation-pack.md);
 completion authority extended in `GOV-003`). For the fix build, this delta governs:
 
-- **Starting state (2026-09-11).** `phase-wb-01`..`07` are complete (the owner closed
-  `phase-wb-06`/`07` on their own recorded results). `phase-wb-08`, `phase-wb-09` and
-  `phase-wb-10` sit at the front of `next_up`, strictly sequential via `depends_on`. The
-  dispatch source for wb-08/09 is PROMPT-024 — not PROMPT-021. The live demo is 2026-09-15.
+- **Starting state (2026-09-11).** `phase-wb-01`..`06` are complete and closed by the
+  owner's session-close audits. `phase-wb-07` is **blocked** (owner decision 2026-09-11,
+  claim released): its agent-executable work is done and audited, its remaining owner-machine
+  checks depend on `phase-wb-10`, and its evidence lives on the unmerged `agent/phase-wb-07`
+  branch pending the owner's integration. `phase-wb-08`, `phase-wb-09` and `phase-wb-10` sit
+  at the front of `next_up`, strictly sequential via `depends_on`, with `phase-wb-07` behind
+  them. The dispatch source for wb-08/09 is PROMPT-024 — not PROMPT-021. The live demo is
+  2026-09-15.
 - **Integration into `dev` is pre-approved for `phase-wb-08` and `phase-wb-09`** on delta 1's
   exact terms (green completion gate — including the new `W08-M` diagnosis convention — then
   merge, mark complete, report; critical concerns get the dual adversarial review before any
   pause). **`phase-wb-10` is not covered**: it is documentation-only, completes through
   `/session-close`, and its integration asks the owner.
-- **Owner checks recorded here** (replacing the closed `phase-wb-07`'s checklist as their
-  home): after `phase-wb-08` integrates, the owner confirms on the Windows presentation
-  machine that the terminal and the HTML Viewer visibly fill their slots (REQ-007 W15's
-  Windows half — launch with `D_SYSTEM_DEMO_TERMINAL=1` on backend AND frontend). After
-  `phase-wb-09` integrates, the owner confirms the fresh-store PowerShell default and a
-  two-shell round-trip (W17's Windows half). The coordinator reminds the owner at each point
-  and records the results here or in the runbook; agent evidence never closes these.
+- **Owner checks stay `phase-wb-07`'s.** The blocked rehearsal phase owns every
+  owner-machine confirmation: the R06 smoke check, the W12 shell round-trips, the R09 timed
+  dry-runs, plus the post-fix additions — after `phase-wb-08` integrates, terminal and HTML
+  Viewer visibly filling their slots on the Windows machine (REQ-007 W15's Windows half —
+  launch with `D_SYSTEM_DEMO_TERMINAL=1` on backend AND frontend); after `phase-wb-09`
+  integrates, the fresh-store PowerShell default and a two-shell round-trip (W17's Windows
+  half). The coordinator reminds the owner at each integration; results are recorded in
+  `phase-wb-07`'s runbook/checklist, and agent evidence never closes them. An early
+  post-wb-08 Windows look is encouraged (the owner ratified the split schedule), but the
+  phase itself closes only after `phase-wb-10`.
 - Deltas 2 (no descoping) and 3 (the bounded enhancement lane) apply to the fix build
   unchanged.
 
@@ -123,4 +130,5 @@ completion authority extended in `GOV-003`). For the fix build, this delta gover
 > both phases is pre-approved behind a green gate; after each integration, remind the owner
 > of the Windows checks delta 4 records and note their results. When `phase-wb-09` is
 > complete, report that `phase-wb-10` (the runbook refresh) is ready for a documentation
-> session — it is not yours to dispatch from this pack. Stop there.
+> session and that the blocked `phase-wb-07` (the owner-machine checks) follows it — neither
+> is yours to dispatch from this pack. Stop there.
