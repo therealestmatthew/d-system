@@ -4,11 +4,14 @@ import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // The repo root, one directory above `ts/` (this file's own directory) — where `_public/` (the
-// generated overview page's home, `phase-demo-04`) lives.
+// generated overview page's home, `phase-demo-04`) and `_data/` (repository data, including the
+// workbench layout definitions, `phase-wb-02`) live.
 const repoRoot = resolve(__dirname, '..')
 const publicDir = join(repoRoot, '_public')
+const workbenchLayoutsDir = join(repoRoot, '_data', 'workbench', 'layouts')
 
 const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
+const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
 
 // Serves files under `_public/` at `/generated-overview/<path>` so `OverviewRegion` can embed
 // the generated overview page (its actual location is reported at runtime by the backend's
@@ -56,6 +59,44 @@ function serveGeneratedOverview(): Plugin {
   }
 }
 
+// Serves `_data/workbench/layouts/<id>.json` at `/workbench-layouts/<id>.json` so the workbench
+// layout engine (`ts/src/workbench/`, `phase-wb-02`, ADR-016) loads layout definitions at
+// runtime — never bundled — matching this file's own rule for the generated overview page and
+// the existing `talking-points.json`/`demo-commands.json` runtime-fetch convention: editing a
+// shipped layout file changes the page's geometry with no frontend rebuild.
+function serveWorkbenchLayouts(): Plugin {
+  const attach = (middlewares: Connect.Server) => {
+    middlewares.use(WORKBENCH_LAYOUTS_PREFIX, (req, res) => {
+      const requestedPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+      const resolved = normalize(join(workbenchLayoutsDir, requestedPath))
+      if (resolved !== workbenchLayoutsDir && !resolved.startsWith(workbenchLayoutsDir + sep)) {
+        res.statusCode = 403
+        res.end('Forbidden')
+        return
+      }
+      if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+        res.statusCode = 404
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end(`Layout definition not found at ${resolved}.`)
+        return
+      }
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'application/json; charset=utf-8')
+      createReadStream(resolved).pipe(res)
+    })
+  }
+
+  return {
+    name: 'serve-workbench-layouts',
+    configureServer(server) {
+      attach(server.middlewares)
+    },
+    configurePreviewServer(server) {
+      attach(server.middlewares)
+    },
+  }
+}
+
 // The proxy target is configurable so each worktree/demo launch can point at its own backend
 // port without repointing the shared default. `VITE_API_TARGET` (read via `loadEnv`, not
 // `import.meta.env`, since this file runs in Node at config-load time, not in the browser)
@@ -67,7 +108,7 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_TARGET || 'http://localhost:8000'
 
   return {
-    plugins: [react(), serveGeneratedOverview()],
+    plugins: [react(), serveGeneratedOverview(), serveWorkbenchLayouts()],
     server: {
       proxy: {
         '/api': {

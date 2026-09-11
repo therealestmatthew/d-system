@@ -18,10 +18,13 @@ type LocationState = 'loading' | 'ready' | 'outside-public-dir' | 'error'
  * (`src/api/routes/demo_stage.py`, `phase-demo-01`), which reports the configured path whether
  * or not the file exists yet (it is genuinely absent until `phase-demo-04` runs).
  *
- * `embedded` is `StagePage`'s layout state (`D02-C1`): PLAN-021's descope rung 3 — the embed
- * becomes an open-in-tab link — as a switchable layout state independent of the other rungs.
+ * The embed/open-in-tab toggle (`D02-C1`, PLAN-021's descope rung 3) is local state here
+ * (`phase-wb-02`), not a prop from a parent — since the workbench layout engine
+ * (`ts/src/workbench/`) gives this panel's slot a fixed geometry regardless of which mode is
+ * active, the toggle no longer needs to be lifted to trigger a page-level reflow.
  */
-export default function OverviewRegion({ embedded }: { embedded: boolean }) {
+export default function OverviewRegion() {
+  const [embedded, setEmbedded] = useState(true)
   const [locationState, setLocationState] = useState<LocationState>('loading')
   const [relativePath, setRelativePath] = useState<string | null>(null)
   const [rawPath, setRawPath] = useState<string | null>(null)
@@ -81,6 +84,14 @@ export default function OverviewRegion({ embedded }: { embedded: boolean }) {
           the <code>d-system-overview</code> skill, <code>phase-demo-04</code>). Switch to the
           "open in tab" layout state to see the rung-3 descope fallback.
         </Tooltip>
+        <button
+          type="button"
+          className="stage-region__header-toggle"
+          aria-pressed={!embedded}
+          onClick={() => setEmbedded((value) => !value)}
+        >
+          {embedded ? 'Embedded' : 'Open-in-tab link (rung 3)'}
+        </button>
       </header>
       <div
         className={

@@ -102,7 +102,7 @@ export default function TalkingPointsRegion() {
         </Tooltip>
         <button
           type="button"
-          className="stage-talking-points__mode-toggle"
+          className="stage-region__header-toggle"
           aria-pressed={staticMode}
           onClick={() => setStaticMode((value) => !value)}
         >

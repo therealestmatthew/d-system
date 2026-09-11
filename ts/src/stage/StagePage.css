@@ -52,23 +52,6 @@ body {
   flex-wrap: wrap;
 }
 
-.stage-page__layout-controls button {
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid #666;
-  background: #2a2e37;
-  color: #fff;
-  cursor: pointer;
-}
-
-.stage-page__layout-controls button[aria-pressed='true'] {
-  background: #4a5468;
-  border-color: #8fa1c7;
-}
-
-/* The rung-4 drop control is a Popover trigger (guarded, R11) rather than a plain toggle button
-   when a terminal region exists to drop — matches the other layout-control buttons' look. */
 .stage-page__layout-controls .stage-popover__trigger {
   font-size: 0.8rem;
   padding: 0.3rem 0.6rem;
@@ -78,32 +61,33 @@ body {
   color: #fff;
 }
 
-/* Default grid: terminal on the left spanning both rows, talking points and overview stacked
-   on the right. minmax(0, ...) on every track keeps children from forcing the grid — and so
-   the page — to grow past the viewport. */
+/* The workbench layout engine's grid (REQ-007 W05/W06, ADR-016): `grid-template-columns`,
+   `-rows` and `-areas` are set inline by WorkbenchStage.tsx from the active layout file's
+   fractional/grid geometry (`_data/workbench/layouts/*.json`) — never hardcoded here, since a
+   geometry change is meant to be a data-file edit with no frontend rebuild. Every track is
+   wrapped in `minmax(0, ...)` at render time so no slot's content can force the grid — and so
+   the page — to grow past the viewport (REQ-006 R02), matching this file's previous static rule
+   for the same reason.
+   Each slot renders as a direct grid child (`.stage-workbench-slot`) positioned by
+   `grid-area: <slot_id>` (also set inline, since slot ids are data, not fixed class names). */
 .stage-page__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-areas:
-    'terminal talking'
-    'terminal overview';
   gap: 0.75rem;
   padding: 0.75rem;
   min-height: 0;
   overflow: hidden;
 }
 
-/* Rung 4: the embedded terminal is dropped. Talking points and overview fill the freed space
-   and never overlap — the grid reflows to a single row of two columns. */
-.stage-page__grid--no-terminal {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-  grid-template-areas: 'talking overview';
+.stage-workbench-slot {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stage-region {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
   min-width: 0;
@@ -111,18 +95,6 @@ body {
   border: 1px solid #d7dbe2;
   border-radius: 6px;
   overflow: hidden;
-}
-
-.stage-region--terminal {
-  grid-area: terminal;
-}
-
-.stage-region--talking-points {
-  grid-area: talking;
-}
-
-.stage-region--overview {
-  grid-area: overview;
 }
 
 .stage-region__header {
@@ -378,7 +350,11 @@ body {
   color: #b34700;
 }
 
-.stage-talking-points__mode-toggle {
+/* Shared small toggle-button style for a panel's own header controls (rung-2/rung-3 style
+   layout-state toggles that now live inside each panel — TalkingPointsRegion's rotator/static
+   toggle, OverviewRegion's embed/open-in-tab toggle — since phase-wb-02 moved them out of
+   StagePage's page-level header). */
+.stage-region__header-toggle {
   margin-left: auto;
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
@@ -388,7 +364,7 @@ body {
   cursor: pointer;
 }
 
-.stage-talking-points__mode-toggle[aria-pressed='true'] {
+.stage-region__header-toggle[aria-pressed='true'] {
   background: #d9e0ec;
   border-color: #6b7fa8;
 }
@@ -443,6 +419,72 @@ body {
 
 .stage-region__body--overview {
   padding: 0;
+}
+
+/* Workbench engine: a multi-panel slot's dropdown header and swap-list (REQ-007 W06). Not
+   reachable by either shipped layout file today — see `panelRegistry.tsx` — but styled ahead of
+   the first phase that populates a slot with more than one implemented panel. */
+.stage-workbench-slot__header {
+  gap: 0.4rem;
+}
+
+.stage-workbench-slot__body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stage-workbench-slot__panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stage-workbench-slot__panel-option {
+  width: 100%;
+  text-align: left;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #99a3b3;
+  background: #eef1f6;
+  cursor: pointer;
+}
+
+/* The layout-configuration surface (REQ-007 W05, ADR-016): active-layout radio group plus one
+   panel-assignment `<select>` per slot — no geometry control, per ADR-016 rule 2. */
+.stage-workbench-config {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.stage-workbench-config fieldset {
+  border: 1px solid #d7dbe2;
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+}
+
+.stage-workbench-config legend {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0 0.3rem;
+}
+
+.stage-workbench-config__layout-option,
+.stage-workbench-config__slot-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0;
+}
+
+.stage-workbench-config__layout-option {
+  justify-content: flex-start;
 }
 
 .stage-overview__iframe {

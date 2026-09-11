@@ -32,6 +32,7 @@ export default function Popover({
   triggerLabel,
   title,
   children,
+  width = BUBBLE_WIDTH_PX,
 }: {
   triggerLabel: string
   title: string
@@ -40,6 +41,9 @@ export default function Popover({
   // function instead, so they can close the popover themselves once the confirmed action has
   // run, without Popover exposing its internal `open` state as a wider API.
   children: ReactNode | ((close: () => void) => ReactNode)
+  // Overrides the bubble's default width in px — the layout-configuration surface
+  // (`LayoutConfigDialog`, `phase-wb-02`) needs more room than the default list/confirm bubbles.
+  width?: number
 }) {
   const [open, setOpen] = useState(false)
   const [style, setStyle] = useState<CSSProperties>({})
@@ -54,10 +58,10 @@ export default function Popover({
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
 
-    const width = Math.min(BUBBLE_WIDTH_PX, viewportWidth - VIEWPORT_MARGIN * 2)
+    const clampedWidth = Math.min(width, viewportWidth - VIEWPORT_MARGIN * 2)
     let left = rect.left
-    if (left + width > viewportWidth - VIEWPORT_MARGIN) {
-      left = viewportWidth - VIEWPORT_MARGIN - width
+    if (left + clampedWidth > viewportWidth - VIEWPORT_MARGIN) {
+      left = viewportWidth - VIEWPORT_MARGIN - clampedWidth
     }
     left = Math.max(VIEWPORT_MARGIN, left)
 
@@ -73,7 +77,7 @@ export default function Popover({
 
     const next: CSSProperties = {
       left,
-      width,
+      width: clampedWidth,
       maxHeight,
     }
     if (openUpward) {
