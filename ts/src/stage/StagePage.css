@@ -993,25 +993,30 @@ body {
   color: #555;
 }
 
-/* The Idea Explorer panel (`IdeaExplorerRegion`, REQ-007 W10, `phase-wb-06`): a standard/
-   priority-queue view toggle sits in the header; the filter row and the scrollable table fill
-   the body as a flex column, so the table is the one part that grows/scrolls — the filters stay
-   a fixed height regardless of row count. Structurally the same "filters row above a scrollable
-   list" shape `.stage-file-browser__*` already uses, kept as its own `stage-idea-explorer__*`
-   namespace since the list here is tabular, not a tree. */
-.stage-idea-explorer__controls {
+/* The shared explorer table/sort/filter/queue-toggle surface (`ExplorerRegion`,
+   `stage/explorer/ExplorerRegion.tsx`, REQ-007 W10/W11, `phase-wb-06`): a standard/priority-queue
+   view toggle sits in the header; the filter row and the scrollable table fill the body as a flex
+   column, so the table is the one part that grows/scrolls — the filters stay a fixed height
+   regardless of row count. Structurally the same "filters row above a scrollable list" shape
+   `.stage-file-browser__*` already uses, kept as its own `stage-explorer__*` namespace since the
+   list here is tabular, not a tree. Both the Idea Explorer and Backlog Explorer panels render
+   this same markup via `ExplorerRegion` — one namespace serves both, per REQ-007 W11's "same
+   configuration surface" requirement — so no `--idea-` or `--backlog-` variant of these rules
+   exists; only the outer `.stage-region--idea-explorer` / `.stage-region--backlog-explorer`
+   modifier classes stay panel-specific, as cosmetic hooks with no rules of their own yet. */
+.stage-explorer__controls {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   margin-left: auto;
 }
 
-.stage-idea-explorer__view-toggle {
+.stage-explorer__view-toggle {
   display: flex;
   gap: 0.2rem;
 }
 
-.stage-idea-explorer__view-button {
+.stage-explorer__view-button {
   font-size: 0.76rem;
   padding: 0.3rem 0.55rem;
   border-radius: 4px;
@@ -1020,25 +1025,25 @@ body {
   cursor: pointer;
 }
 
-.stage-idea-explorer__view-button[aria-pressed='true'] {
+.stage-explorer__view-button[aria-pressed='true'] {
   background: #2a2e37;
   color: #fff;
   border-color: #2a2e37;
 }
 
-.stage-region__body--idea-explorer {
+.stage-region__body--explorer {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
 }
 
-.stage-idea-explorer__filters {
+.stage-explorer__filters {
   display: flex;
   gap: 0.4rem;
   flex: 0 0 auto;
 }
 
-.stage-idea-explorer__search {
+.stage-explorer__search {
   flex: 1 1 auto;
   min-width: 0;
   font-size: 0.8rem;
@@ -1047,7 +1052,7 @@ body {
   border: 1px solid #99a3b3;
 }
 
-.stage-idea-explorer__status-filter {
+.stage-explorer__status-filter {
   flex: 0 0 auto;
   font-size: 0.8rem;
   padding: 0.3rem 0.45rem;
@@ -1056,7 +1061,7 @@ body {
   background: #eef1f6;
 }
 
-.stage-idea-explorer__table-wrap {
+.stage-explorer__table-wrap {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
@@ -1064,27 +1069,27 @@ body {
   border-radius: 4px;
 }
 
-.stage-idea-explorer__table {
+.stage-explorer__table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.78rem;
 }
 
-.stage-idea-explorer__table thead {
+.stage-explorer__table thead {
   position: sticky;
   top: 0;
   background: #fafbfc;
 }
 
-.stage-idea-explorer__table th,
-.stage-idea-explorer__table td {
+.stage-explorer__table th,
+.stage-explorer__table td {
   text-align: left;
   padding: 0.3rem 0.5rem;
   border-bottom: 1px solid #e5e8ee;
   word-break: break-word;
 }
 
-.stage-idea-explorer__sort-button {
+.stage-explorer__sort-button {
   width: 100%;
   text-align: left;
   font-size: 0.78rem;
@@ -1096,7 +1101,7 @@ body {
   color: inherit;
 }
 
-.stage-idea-explorer__sort-button:hover {
+.stage-explorer__sort-button:hover {
   text-decoration: underline;
 }
 
