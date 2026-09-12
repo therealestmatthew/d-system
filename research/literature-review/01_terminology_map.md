@@ -152,3 +152,94 @@ draft — Pass 1 in progress
 | Provenance itself treated as a defeasible argument for a result's validity (H3) | Evidence graphs: FAIR computation with defeasible reasoning over data, methods and results | `evidence-graphs-fair-computation-defeasible-reasoning-2021` — this domain's strongest collision candidate |
 | Defeasible conflict-resolution bridged to epistemic-logic-style knowledge representation (cross-relevant to D09) | Reasoning about knowledge using defeasible logic | `walton-reasoning-about-knowledge-defeasible-logic` |
 | Defeasible-conditional semantics connected to a concrete knowledge-base reasoning system | Defeasible conditionals via answer set programming | `defeasible-conditionals-answer-set-programming-2026` |
+
+## D12 — Computational argumentation
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Non-monotonic conflict resolution among competing knowledge-state claims (H3) | Abstract argumentation framework (arguments plus attack relation; conflict-free / admissible / complete / preferred / grounded / stable semantics) | Bench-Capon, Dunne, "Argumentation in artificial intelligence," Artificial Intelligence 2007 (`bench-capon-dunne-argumentation-ai-survey-2007`) — the domain's vocabulary-map anchor, covering Dung's framework |
+| Rule/preference/defeat machinery deciding whether a transition is accepted (H3) | ASPIC+ structured argumentation | Modgil, Prakken, "The ASPIC+ framework for structured argumentation: a tutorial" (`modgil-prakken-aspicplus-tutorial-2013`) |
+| Append-only growth of the argument/knowledge-state graph (H2) | Change in abstract argumentation frameworks via argument addition | `change-abstract-argumentation-frameworks-adding-argument` |
+| Evidence attached to individual claims within a conflict-resolution structure, itself possibly unreliable (H3) | Argumentation frameworks with fallible evidence (AAFE) | Skiba, `skiba-argumentation-frameworks-fallible-evidence-2020`; extended in `evidence-retrieval-cost-reduction-argumentation-fallible-evidence-2022` |
+| Provenance-weighted conflict resolution propagated through a graph (H3) | Labeled argumentation framework (source-reliability label algebra propagated over the attack graph) | `labeled-argumentation-framework-2015` |
+| Evidence combined directly with argumentation-framework structure (H3, H4) | Evidential-based higher-order set argumentation framework | `evidential-higher-order-set-argumentation-framework-2026` |
+| Typed-transition provenance generalized to attacks on attacks | AFRA: argumentation framework with recursive attacks | `afra-argumentation-framework-recursive-attacks` |
+| Mature tooling answering this domain's implementation-availability question | Dung-style AF semantics solver (conflict-free / admissible / complete / preferred / grounded / stable) | `afsolver-oss-github` |
+
+## D13 — Truth discovery
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Source-reliability/authority weighting over conflicting claims | Truth discovery, source-reliability estimation | Li, Gao, Meng, Han, Su, Zhang, SIGKDD Explorations 2016 (`li-etal-truth-discovery-survey-2016`) — the domain's vocabulary-map anchor |
+| Conflict resolution among competing knowledge-state claims from multiple providers (H3) | Fact-finding / TruthFinder framework | Yin, Han, Yu, SIGKDD 2007 (`yin-han-yu-truth-discovery-conflicting-providers-2007`) — the foundational fact-finding paper |
+| Provenance/copying discount applied to conflicting sources so agreement is not counted as independent (H4) | Copying detection in truth discovery | Dong, Berti-Equille, Srivastava, VLDB 2009 (`dong-berti-equille-srivastava-truth-discovery-copying-detection-2009`) — one shared research lineage with the D14 data-fusion papers by the same authors, not an independent invention |
+| Dependence-aware source weighting claimed as a protectable invention (anti-novelty evidence for H4) | Source-dependence patent | `uspto-8190546-dependency-sources-truth-discovery-patent` |
+| Claim-level provenance grading modeled on a historical chain-of-narrators methodology (H3, H4) | Isnad-Rijal framework for claim-level provenance in multi-agent knowledge systems | `grading-narrators-isnad-rijal-claim-provenance-2026` — a striking direct collision |
+| Current retrieval-augmented conflict resolution with explicit source-credibility incorporation | Automated fact-checking over conflicting evidence | `resolving-conflicting-evidence-automated-factchecking-2025` |
+| Mature tooling answering this domain's implementation-availability question | truthdiscovery OSS library (multiple algorithms) | `truthdiscovery-oss-github` |
+
+## D14 — Data fusion
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Conflicting-claims resolution across database records (H3) — **terminology homonym**: this is *not* the sensor/signal-fusion sense of "data fusion" (autonomous-vehicle, remote-sensing and bioinformatics fusion are an unrelated field sharing only the name) | "Data fusion" in the conflicting-claims / record-integration sense | Dong, Berti-Equille, Srivastava, VLDB 2009 (`dong-berti-equille-srivastava-data-fusion-resolving-conflicts-2009`); homonym collision documented at ledger row `LIT-01-S153` (ten off-topic sensor/bio hits returned by the bare query) |
+| Dependence-aware discounting of copying/correlated sources as a convergence input (H4) | Source-dependence-aware fusion (DEPEN Bayesian model; correlation-aware fusion) | One shared Dong/Berti-Equille/Srivastava research programme, not independent inventions: `integrating-conflicting-data-role-source-dependence-2009`, `fusing-data-with-correlations`, `scaling-up-copy-detection`, `sailing-information-ocean-source-dependence-2009`, with `domain-aware-multitruth-fusion-copy-based-authority-2022` as a later derivative |
+| Independent-vs-derivative evidence discount, from a structurally distinct tradition converging on the same H4 concern | Dempster-Shafer contextual / rank-correlation discounting of dependent evidence | `fusion-dependent-evidence-rank-correlation-2017`; `contextual-discounting-belief-functions-theory` |
+| Conflict resolution over graph-structured / linked knowledge state | Linked-data conflict resolution and fusion tooling | `linked-data-integration-conflicts`; `ld-fusiontool-oss-github` |
+| Current trajectory toward learned, non-hand-coded conflict resolution | LLM-era end-to-end data integration | `automatic-end-to-end-data-integration-llm-2026` |
+
+## D15 — Subjective logic
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Epistemic classification (`E`) as a graded (belief, disbelief, uncertainty) state rather than a binary one | Subjective logic's opinion triangle and uncertainty mass | Josang, "Subjective Logic: A Formalism for Reasoning Under Uncertainty," Springer 2016 (`josang-subjective-logic-book-2016`) — the field's authoritative reference |
+| Convergence/corroboration operator combining multiple sources' epistemic states (H4) | Subjective-logic fusion/discount operator family | `multi-source-fusion-operations-subjective-logic`; `subjective-logic-operators-trust-assessment-empirical-2014` |
+| Provenance-weighted trust propagated over a graph of actors (H3) | Trust network analysis with subjective logic, over directed series-parallel graphs | Josang, Hayward, Pope, ACSC 2006 (`josang-hayward-pope-trust-network-analysis-subjective-logic-2006`) — this domain's strongest collision candidate |
+| Source-reliability and evidence combined directly in one mechanism (H3) | Collaborative assessment of information-provider reliability and expertise using subjective logic | `collaborative-assessment-information-provider-reliability-sl-2011` |
+| An adversarial counterpoint to the fusion-operator mechanism itself, appropriate to this campaign's own adversarial stance | "Can We Trust Subjective Logic For Information Fusion?" | `can-we-trust-subjective-logic-information-fusion` |
+| Trust discount propagated along a provenance/referral path (H3, H4) | Subjective-logic trust discount for referral paths | `subjective-logic-trust-discount-referral-paths-2024` |
+| Agentic knowledge verification framed directly as a confidence algebra (H1, H3) | trustandverify OSS implementation | `trustandverify-oss-github` |
+
+## D16 — Trust and reputation systems
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Domain-specific epistemic authority weighting trust propagation (H3) — **terminology homonym**: this is *not* Moz/SEO's "Domain Authority" ranking metric, an unrelated marketing-analytics measure sharing only the name | "Domain authority" in the epistemic-authority-over-a-graph sense | `domain-aware-trust-network-extraction-propagation-2016`; homonym collision documented at ledger row `LIT-01-S168` (BrightEdge SEO blog, excluded as a lead only) |
+| Graph-based transitivity underlying provenance-weighted trust propagation (H3) | Trust transitivity in social networks (A trusts B, B trusts C, therefore A partially trusts C) | `trust-transitivity-social-networks` |
+| Web-of-trust mechanism claimed as protectable IP (anti-novelty evidence for H3) | Distributed web-of-trust provisioning patent | `uspto-9866392-distributed-web-of-trust-patent` |
+| Claim/evidence/actor primitives formalized as one of several named categories of inter-agent trust (H3) | Six-category inter-agent trust model: Brief, Claim, Proof, Stake, Reputation, Constraint | `inter-agent-trust-models-comparative-study-2025` — a striking direct collision with D-System's own primitive vocabulary |
+| Multi-dimensional (not scalar) domain/topic-authority-aware propagation across agents (H3, H5) | TrustFlow topic-aware vector reputation propagation | `trustflow-topic-aware-reputation-propagation-2026` |
+| Claim-level trust scoring propagated through a retrieval pipeline (H3) | ClaimTrust propagation scoring for retrieval-augmented generation | `claimtrust-propagation-trust-scoring-rag-2025` |
+| Domain-authority-weighted epistemic reasoning for an autonomous knowledge system (H3) | Bayesian epistemology with weighted authority | `bayesian-epistemology-weighted-authority-2026` |
+| Backward-traceability of trust/accountability through a system (H9) | Enforcing trust accountability with backward propagation | `enforcing-trust-accountability-backward-propagation-2026` |
+
+## D17 — Multi-agent belief systems
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Ground, primitive belief representation as the base of a multi-agent epistemic architecture (H1) — **terminology homonym**: this is *not* the POMDP/reinforcement-learning "belief state" sense, which dominated eight of ten hits on the bare query | "Belief base" in the knowledge-representation/epistemic-logic sense | `base-based-model-checking-multiagent-only-believing`; cross-referenced against D10's `rethinking-epistemic-logic-belief-bases-2020`; homonym collision documented at ledger row `LIT-01-S181` |
+| Multiple agents' beliefs combined into one shared knowledge state (H1, H4) | Modal logic framework for multi-agent belief fusion | `modal-logic-framework-multiagent-belief-fusion` |
+| Two named but formally distinct mechanisms for reconciling the same underlying multi-agent conflict | Belief merging versus judgment aggregation | Stanford Encyclopedia of Philosophy (`sep-belief-merging-judgment-aggregation-entry`); direct comparison in `everaere-belief-merging-vs-judgment-aggregation-2015` |
+| Credibility-weighted merging of multiple agents' knowledge-state claims (H3) | Credibility accrual over existential-rules programs in multi-agent contexts | `merging-existential-rules-credibility-accrual-2020` |
+| Belief, evidence and trust unified in one multi-agent representational framework (H3, H4) | Reasoning about belief, evidence and trust in a multi-agent setting | `reasoning-belief-evidence-trust-multiagent-setting` — this domain's strongest collision candidate |
+| Append-only sequence of typed transitions over a shared belief state (H2) | Handling sequences of belief change in a multi-agent context | `handling-sequences-belief-change-multiagent-context` |
+| Versioned, append-only agent-system state treated as a merge target | Semantic merging of versions of BDI agent systems | `semantic-merging-versions-bdi-agent-systems` |
+| Independence-aware convergence applied to the agents themselves, not just their claims (H4) | Epistemic Sybil resistance — not letting derivative/duplicated agents count as independent confirmation | `epistemic-sybil-resistance-multiplying-agents-2026` — the multi-agent-AI analog of D13/D14's copying detection |
+| Multi-agent epistemic planning explicitly over inconsistent beliefs, trust and deception (H3, H4) | Multi-agent epistemic planning with inconsistent beliefs, trust and lies | `multiagent-epistemic-planning-inconsistent-beliefs-trust-lies` |
+
+## H4 — Independence-aware convergence (cross-domain)
+
+Collision searches for H4 (independent reasoning/evidence paths arriving at equivalent states strengthen
+epistemic weight; derivative agreement is discounted), logged under `domain_id: H4` rather than a `D`-numbered
+research domain. Included here as its own section because the searches span multiple established fields
+rather than mapping onto one.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| H4 itself: independent paths converging on a claim strengthen it; derivative agreement does not (H4) | Corroboration via provenance patterns — confirmation/witness patterns derived across abstraction levels to estimate a claim's reliability from other sources' reports | Barakat, TaPP 2017 (`barakat-corroboration-provenance-patterns-tapp2017`) — the single most directly on-topic paper this entire campaign has produced for H4 |
+| Provenance directly informing whether an aggregate claim should be believed (H3, H4) | Digital provenance's interpretation / verification / corroboration triad | `digital-provenance-interpretation-verification-corroboration-2005` |
+| H4's own thesis restated in the literature's own words: agreement alone is not corroboration without provenance-aware independence | Provenance-conserving multi-view fusion, distinguishing agreement from corroboration | `not-all-agreement-counts-as-corroboration-2026` |
+| Confidence propagated jointly with provenance over a knowledge graph (H3, H4) | Provenance of query-result probabilities in uncertain knowledge graphs | `computing-maintaining-provenance-query-result-probabilities-ukg` |
+| Philosophical grounding for why independence, not mere multiplicity, confers epistemic weight | Robustness and independent evidence (philosophy of science) | Schupbach, Philosophy of Science 2017 (`schupbach-robustness-independent-evidence-2017`) |
+| Independent/dependent evidential relations formalized within a probabilistic-argumentation graph, bridging to D12 | Epistemic graphs | `hunter-thimm-epistemic-graphs` |
+| Temporal/evolving-information dimension combined with multi-agent provenance for convergence (H2, H4) | Chronology of multi-agent interactions for provenance of evolving information | `chronology-multiagent-interactions-provenance-evolving-info` |
