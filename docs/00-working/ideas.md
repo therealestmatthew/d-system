@@ -3361,6 +3361,10 @@ The idea requires a plan before implementation per AGENTS.md's plan-before-code 
 
 </details>
 
+**Links**
+
+- relates_to ← `000156`
+
 ---
 
 ## 000067 · Portable agent workflows from a single source of truth
@@ -7235,6 +7239,7 @@ validated, so the first version may want to be a report.
 
 - relates_to → `000153`
 - relates_to ← `000155`
+- relates_to ← `000156`
 
 ---
 
@@ -7268,3 +7273,47 @@ context, including ones with no slash commands.
 **Links**
 
 - relates_to → `000154`
+
+---
+
+## 000156 · A version-control request queue, with one triage agent owning the primary checkout and dev
+
+**Created 2026-09-12T17:44:21-04:00 · Status: `open`**
+
+When MCP and shared-state logic are in place, no agent should act directly on the primary checkout
+or the dev branch. Instead every agent files a request into a version-control queue, and a single
+dedicated agent handles that queue: triaging requests, prioritising them, and carrying out the
+operation on the agents' behalf.
+
+Scope of what must go through the queue: any change to the primary checkout, any change to the dev
+branch, pull requests, and by extension the operations that today are each an agent's own
+responsibility — the phase claim commit on dev, the catalog regeneration that claim forces, the
+integration merge, worktree removal and branch deletion.
+
+That triage agent also becomes the point of inter-agent communication. Requests are queued, ordered
+and answered in one place rather than negotiated implicitly through a shared file that no check
+reads.
+
+Why this is worth doing: the current protocol coordinates entirely by convention across separate
+worktrees. backlog.yaml on dev is the lock table and the governance validator is the lock check,
+but nothing serialises the acts themselves. On 2026-09-12 a single session hit the resulting race
+twice — a merge that failed --ff-only because a peer had integrated roughly 55 commits mid-session,
+and a candidate file built against a dev commit that had moved before it could be applied. Both were
+recoverable by rebasing, and neither would have occurred with a serialising queue.
+
+Relationship to existing work: idea 000066 plans to gate main behind a pull request from dev, which
+this would subsume or sit in front of. _tmpagent/claims.jsonl is the nearest existing mechanism and
+its own contract admits it is enforced by convention with no check reading it; a queue with an owner
+is the stronger form of the same intent. ADR-003 records the current multi-agent concurrency design
+that this would revise.
+
+Open questions worth settling before any of it is built: whether the queue serialises only writes to
+dev and the primary checkout or every git operation; whether the triage agent runs continuously or
+is invoked per request; what happens to a request whose branch goes stale while queued; and whether
+the owner's integration approval is requested by the triage agent or still by the agent that did the
+work.
+
+**Links**
+
+- relates_to → `000154`
+- relates_to → `000066`
