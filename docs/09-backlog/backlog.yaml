@@ -5958,7 +5958,8 @@ items:
   systems:
   - sys-demo-stage
   owner: repository-owner
-  status: queued
+  agent: agent-fable
+  status: active
   priority: 1
   session_budget: 1
   depends_on:
