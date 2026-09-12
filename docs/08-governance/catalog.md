@@ -50,6 +50,7 @@ CI regenerates it and fails on any difference.
 | OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
 | OPS-013 | operation | active | repository-owner | docs/08-governance/OPS-013-demo-reset.md |
 | OPS-014 | operation | active | repository-owner | docs/08-governance/OPS-014-generate-overview.md |
+| OPS-015 | operation | active | repository-owner | docs/08-governance/OPS-015-build-idea-corpus.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -118,6 +119,8 @@ CI regenerates it and fails on any difference.
 | PROMPT-029 | prompt | active | repository-owner | docs/02-prompts/PROMPT-029-literature-review-delegation-pack.md |
 | PROMPT-030 | prompt | active | repository-owner | docs/02-prompts/PROMPT-030-literature-review-coordinator.md |
 | PROMPT-031 | prompt | active | repository-owner | docs/02-prompts/PROMPT-031-literature-review-kickoff.md |
+| PROMPT-032 | prompt | active | repository-owner | docs/02-prompts/PROMPT-032-idea-batching-delegation-pack.md |
+| PROMPT-033 | prompt | active | repository-owner | docs/02-prompts/PROMPT-033-idea-batching-kickoff.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -242,4 +245,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-184 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 37, prompt: 31, requirement: 7, session: 66.
+187 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 37, prompt: 33, requirement: 7, session: 66.
