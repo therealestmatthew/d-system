@@ -7111,6 +7111,16 @@ integration-time check. This idea is the durable fix.
 Found by the coordinator of phase-lit-01, the first real execution of the research protocol
 (GOV-009).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-12T11:11:09-04:00): Sharpened by peer session d-system-ff on 2026-09-12. The defect is that the tool fails silently rather than loudly: the only signal separating a real run from a vacuous one is the identifier count inside its own OK line, which is easy to read past, and the exit code is 0 either way. A worktree run is the common case rather than the exception, because AGENTS.md requires a worktree whenever any peer holds an active claim. So the fix belongs in the tool rather than in every caller's vigilance - a check that cannot verify should exit non-zero and say so instead of printing OK. Correction to how this finding was first reported: the coordinator of phase-lit-01 told that peer its close review had recorded a worktree run as a passing verification. That was false. SESS-2026-09-12-04 line 47 records 31 identifiers checked from the primary checkout, and the coordinator had already read that line before asserting otherwise.
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
