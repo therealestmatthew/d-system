@@ -6941,3 +6941,17 @@ the light tier to a full pack once it outgrows the smaller one.
 
 Raised during the idea-batching planning session; related to the prompt-pack protocol (GOV-008)
 and its methodology decision (ADR-017).
+
+---
+
+## 000146 · SESS-2026-09-11-01 misstates the literature-review handoff note as requiring an external review before the campaign
+
+**Created 2026-09-12T07:03:03-04:00 · Status: `open`**
+
+The session record that produced the research pack protocol (GOV-009) says, under "Left undone", that its first campaign is "the pending adversarial D-System literature review, for which research/literature-review/HANDOFF.md says external review of the codebase audit must come first". The handoff note says no such thing: its ten numbered instructions cover reading order, the seed-inventory caveat, the null hypothesis, falsifying H1-H11, not modifying the frozen baseline, recording collisions before proposing changes, and not beginning implementation. Nothing in it mentions external review, and nothing makes the codebase audit a precondition.
+
+The owner ruled on 2026-09-12, while ratifying the literature-review pre-plan package (PROMPT-027), that the stricter paraphrase is an error and that the adversarial codebase review is a frozen input with no precondition. PROMPT-027 records that ruling, so the campaign is not blocked and no downstream work depends on resolving this. What remains is only that the session record itself still carries the wrong claim, where a future reader looking for the campaign's preconditions would find it and believe it.
+
+What it would touch: docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md, one sentence in its "Left undone" section. Session records are historical accounts rather than live instructions, which is the argument for amending in place with a dated correction note rather than silently rewriting, and also the argument for leaving it alone entirely.
+
+What is unresolved: whether a session record should be corrected at all once written, or whether the correct treatment of a misstatement in a historical record is an appended note rather than an edit. The repository has no stated convention for amending a closed session record, and that convention question is the more general thing worth settling - this instance is just the occasion for it. The owner was asked about correcting it on 2026-09-12 and did not rule either way, so it is recorded here rather than left in conversation memory.
