@@ -7171,3 +7171,66 @@ What is unresolved: whether the registry is a new file or a field on the existin
 
 - relates_to → `000151`
 - relates_to → `000025`
+
+---
+
+## 000153 · The session hand-off protocol is now described in three places and drifts between them
+
+**Created 2026-09-12T14:47:02-04:00 · Status: `open`**
+
+AGENTS.md's three "Concurrent agents" sections, .claude/commands/session-start.md and
+.claude/commands/session-close.md each describe part of the claim-work-hand-off sequence.
+
+On 2026-09-12 two contradictions inside AGENTS.md alone were found and fixed in commit 0bbcf60:
+the "claim a phase" section still said "ask the owner before pushing" while citing the
+Confidentiality and publishing section that commit 6374071 had already corrected to the opposite,
+and the hand-off's step 7 told an agent to integrate onto dev whenever dev was clean, contradicting
+the standing rule at line 52 that the merge is the owner's call. Both were stale halves of earlier
+corrections that updated one location and not the other.
+
+The commands were then aligned by hand in c80e23e, which is the same manual reconciliation that
+will be needed after every future change to any of the three. CLAUDE.md's "What belongs in this
+file" section already names this exact failure mode — "Duplicating a fact means owning its drift" —
+and cites the no-remote rule that sat stale in two files as its cautionary case.
+
+Worth deciding: whether the commands should stop restating the protocol and instead cite AGENTS.md
+section by section, whether a check should assert that the ordered steps in the commands match
+AGENTS.md's, or whether the duplication is accepted with a named owner for reconciling it. No
+option is obviously right — the commands exist partly because AGENTS.md prose is not an ordered
+procedure a session can execute.
+
+**Links**
+
+- relates_to ← `000154`
+
+---
+
+## 000154 · A check for unreleased _tmpagent claims, now that the hand-off carries another convention-only rule
+
+**Created 2026-09-12T14:47:02-04:00 · Status: `open`**
+
+_tmpagent/AGENTS.md states plainly that its contract is "enforced by convention, not by a check" —
+no test reads claims.jsonl and no validator fails on it — and that this is deliberate while the
+directory is small, with the explicit note that "if it starts drifting from reality, the fix is a
+check, not a stricter rule".
+
+On 2026-09-12 commit 0bbcf60 added a new step to AGENTS.md's hand-off requiring every _tmpagent
+claim opened in a session to be released before integration, and c80e23e put the same step in
+.claude/commands/session-start.md. Both are conventions with nothing enforcing them, which is
+exactly the condition the contract warned would eventually need a check.
+
+The check is small and derivable from the rules already written down: fold claims.jsonl in order,
+and for every open (file, kind, ref) triple whose kind is branch, report it when that branch no
+longer exists. A claim whose branch was deleted at integration cannot be closed by anyone and
+blocks its file's deletion permanently. Eligibility for deletion is already defined as derived
+state — latest status active, every claimed matched by a later released — so the same fold serves
+both.
+
+Open question the contract itself raises: whether this becomes a governance failure that exits
+non-zero, or a report surfaced by --inventory or the orient skill. The contract's wording suggests
+a check, but making an unreleased claim red would block integration on a ledger no test has ever
+validated, so the first version may want to be a report.
+
+**Links**
+
+- relates_to → `000153`
