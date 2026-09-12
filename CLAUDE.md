@@ -202,6 +202,7 @@ Source data (`_data/`) → templates (`templates/html/`, `templates/styles/`) �
 | `docs/06-requirements/` | Feature requirements |
 | `docs/07-architecture/` | Architecture diagrams and docs |
 | `.claude/skills/checkpoint/` | Mid-session progress recording skill — see `SKILL.md` there, invoked per `AGENTS.md`'s Session backlog section |
+| `.claude/commands/session-start.md` | `/session-start` — the claim, branch, worktree and merge-back protocol as an ordered procedure. `AGENTS.md`'s "Concurrent agents" sections are the rule; this is their runnable form |
 | `.claude/commands/session-close.md` | Owner-only `/session-close` command — finalizes the session record and is the only place a phase reaches `status: complete` |
 | `_working/` | Ephemeral working plans and task detail. Gitignored and ungoverned by design; never deleted without the owner's explicit approval ([PLAN-015](docs/01-plans/PLAN-015-ephemeral-working-plans.md)) |
 | `_tmpagent/` | Files agents in sibling worktrees must read. Tracked, ungoverned, read-only once active; claimed and released through `_tmpagent/claims.jsonl` ([contract](_tmpagent/AGENTS.md)) |
