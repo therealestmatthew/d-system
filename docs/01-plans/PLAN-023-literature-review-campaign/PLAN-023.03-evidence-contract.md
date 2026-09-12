@@ -56,6 +56,7 @@ not happen.** Columns:
 | `inclusion_rationale` | Why kept rows were kept (short) |
 | `exclusion_rationale` | Why inspected-but-dropped rows were dropped (short) |
 | `duplicate_handling` | Ids already present and how deduplicated; `none` if none |
+| `subject_source_id` | **Required for strategy B/C rows**: the inventory/matrix `source_id` whose citations this chaining search followed, so "this source has been chained" is computable from the ledger; `none` for all other rows |
 | `chain_decision` | For strategy B/C rows: which citations were followed and why |
 
 ## Source inventory format (deliverable 03)

@@ -24,13 +24,25 @@ prompt is a blocking finding for the owner, never something to improvise.
 
 Dispatch rules:
 
-- Sections are dispatched **verbatim, one at a time** (selective injection). Every `S`, `X`
-  and `R` dispatch is the **common block below plus its own section** and nothing else — never
-  the whole pack, never the whole domain matrix.
-- **Models**: `K` and `G` run on **Haiku** (mechanical); `S`, `X`, `R` and `A` run on
+- Sections are dispatched **verbatim, one at a time** (selective injection) — never the whole
+  pack, never the whole domain matrix. Each dispatch is assembled from the shared blocks below
+  plus the section's own payload:
+  - **`S` search dispatch** = Block C + Block S + the section.
+  - **`X` Pass 1 extraction dispatch** = Block C + Block X + the section.
+  - **`X` deep-extraction dispatch (LIT-04, LIT-05)** = Block C + Block D + the section.
+  - **`C` close-out and synthesis-writing dispatches (LIT-03 C, LIT-06 X1/X2, LIT-07
+    X1/X2/X3)** = Block C + the section.
+  - **`R` review dispatch** = Block C + the section.
+  - **`G` gate dispatch** = Block G + the section.
+  - **`K` kickoff dispatches** are self-contained.
+- **Models**: `K` and `G` run on **Haiku** (mechanical); `S`, `X`, `R`, `C` and `A` run on
   **Sonnet**. Opus is never pre-assigned; at most one documented escalation per campaign, and
   the session record names it. At most **two fix cycles** per work item; what survives them is
   reported, not looped on.
+- **Branch model (owner ruling, 2026-09-12)**: one long-lived campaign branch,
+  **`agent/lit-campaign`**. Every phase commits to it, so the ledger, inventory, matrix and
+  deliverables are always present for the next kickoff. The owner integrates it into `dev`
+  twice: at the pre-synthesis check-in and at close-out. No per-phase branches.
 - **Every section is idempotent**: a re-dispatch is a resume. Output that already exists is
   verified against its contract and extended from the first missing item, never re-created.
 - Where a section conflicts with the search-domain matrix (`PLAN-023.02`) or the evidence
@@ -39,7 +51,7 @@ Dispatch rules:
 
 ---
 
-## Block C — common constraints (prepended verbatim to every S, X and R dispatch)
+## Block C — common constraints (in every S, X, R and C dispatch)
 
 > You are one worker in the adversarial D-System literature-review campaign. The campaign
 > works to support **H0: D-System is primarily a recombination of known ideas**. Rules that
@@ -51,8 +63,9 @@ Dispatch rules:
 >   authoritative secondary coverage, and the evidence row's `access_limitation` field records
 >   that; never present such an assessment as a full-text read.
 > - **Ledger**: every search you run appends one row to
->   `research/literature-review/00_search_ledger.csv` in the evidence contract's format, with
->   the `domain_id` it served. A search that logged nothing did not happen.
+>   `research/literature-review/00_search_ledger.csv` in the evidence contract's format
+>   (`docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md`),
+>   with the `domain_id` it served. A search that logged nothing did not happen.
 > - **Evidence**: generated summaries (including your own) are leads, never evidence. Blogs
 >   and product pages are leads. Every claim you record carries a locator into primary
 >   material. Do not write "no prior work exists" — a failed search is a ledger row with its
@@ -66,7 +79,75 @@ Dispatch rules:
 >   `research/sources/`. Read the methodology at `research/literature-review/CLAUDE.md` (never
 >   a root-level copy).
 > - Never edit `AGENTS.md` or `CLAUDE.md`; never touch a peer's backlog claim; never write a
->   confidential identifier into a tracked file. Commit your output before any review of it.
+>   confidential identifier into a tracked file. Work on the campaign branch
+>   `agent/lit-campaign` and commit your output there before any review of it.
+
+## Block S — search procedure (in every S dispatch, after Block C)
+
+> Your section lists domains, each with an id (`D01`–`D72` or a hypothesis id), mandated
+> minimum terminology variants, and one or more pre-crafted collision queries. For **each**
+> domain:
+>
+> 1. Run strategy **Phase A** — vocabulary discovery: surveys, standards, canonical models,
+>    major taxonomies, historically important papers. Extend the variant list with the
+>    field's own terminology as you find it, and log the extensions (they become part of the
+>    domain's variant set for later passes).
+> 2. Run strategy **Phase D** — system search across arXiv, Semantic Scholar, OpenAlex,
+>    Crossref, GitHub, W3C and relevant lab/industrial pages.
+> 3. Run **every pre-crafted collision query** listed for the domain, verbatim, plus any
+>    sharper variant your Phase A vocabulary suggests.
+> 4. Coverage floor: at least **two distinct-query searches per domain**, and **every
+>    mandated minimum variant must appear in at least one logged query for its domain** —
+>    the phase gate measures both from the ledger.
+>
+> One ledger row per search, at the time it runs. Report which result identifiers you kept
+> and why. Do **not** fill the source inventory — that is the paired extraction dispatch's
+> job, from your ledger rows.
+
+## Block X — Pass 1 extraction procedure (in every Pass 1 X dispatch, after Block C)
+
+> Your section names the domain ids whose ledger rows you process. Read the ledger rows for
+> those domains; for every kept result, add a `03_source_inventory.csv` row per the evidence
+> contract: identity, type, domain ids, `found_by`, component and architecture pre-scores
+> (0–5 triage, rubric in the contract), `collision_candidate`, dedup and status fields.
+> Apply the search protocol's inclusion (§6) and exclusion (§7) criteria; excluded rows are
+> marked with a reason, never deleted. Add draft terminology-map entries for your domains to
+> `research/literature-review/01_terminology_map.md`: D-System term ↔ field term, with the
+> source that establishes the field term. Commit.
+
+## Block D — deep-extraction procedure (in every LIT-04/LIT-05 X dispatch, after Block C)
+
+> Your section names the exact source ids to deep-read, in rank order. For each source:
+>
+> 1. Obtain the fullest legal access (open version, preprint, abstract; record
+>    `access_limitation` honestly).
+> 2. Fill **every** evidence-matrix field per the contract
+>    (`docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md`)
+>    — `NOT_APPLICABLE` / `NOT_DETERMINABLE_FROM_ACCESS` where true, blank never. Compare
+>    against **both** the conceptual architecture (`research/two_system_architecture.md`,
+>    the glossaries) and the implemented architecture (the frozen adversarial codebase
+>    review) when scoring overlap.
+> 3. Run backward citation chaining (strategy Phase B): identify the mechanism's theoretical
+>    ancestors; log each chaining search as a ledger row with `strategy_phase: B` and
+>    **`subject_source_id` set to the source you are chaining from**; fill
+>    `derivative_ancestor` — five papers inheriting one mechanism are one lineage plus four
+>    derivatives.
+> 4. Score both overlap scales and set `critical_collision` strictly per the contract's flag
+>    rules; a `yes` sets `second_review: pending`.
+>
+> Absence claims require reading the source's scope; from `abstract_only` access, absence
+> claims cap `interpretation_confidence` at `medium`. Commit after each source, so a
+> truncated run resumes at the first missing row.
+
+## Block G — gate procedure (in every G dispatch)
+
+> You are a mechanical gate. Read **only the files your section names**, take every
+> measurement it lists, and report real output — numbers, lists, exit codes — never
+> assertions. Name every gate that fails and every item that fails it. Do not fix anything:
+> fixes go back to the responsible section as a fix cycle (at most two per work item; what
+> survives them is reported, not looped on). Always finish with:
+> `uv run python -m src.governance` (exit code) and
+> `uv run python tools/check_no_private_content.py` with all changes staged.
 
 ---
 
@@ -75,8 +156,10 @@ Dispatch rules:
 ### LIT-01 K — kickoff (Haiku)
 
 > Claim `phase-lit-01` per `AGENTS.md` (status `active`, your agent id, catalog `updated`
-> bumped, validator green before the claim commit; work on branch `agent/phase-lit-01`). Then
-> create, if they do not already exist:
+> bumped, validator green before the claim commit). Create the campaign branch
+> `agent/lit-campaign` from current `dev` if it does not exist; otherwise continue on it —
+> every campaign phase commits to this one branch (owner ruling, 2026-09-12). Then create,
+> if they do not already exist:
 > `research/literature-review/00_search_ledger.csv` and
 > `research/literature-review/03_source_inventory.csv`, each with exactly the header row the
 > evidence contract (`docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md`)
@@ -85,145 +168,155 @@ Dispatch rules:
 > S1/X1 → S2/X2 → S3/X3 → S4/X4 → S5/X5 → S6/X6 → G. If any file already exists, verify its
 > header against the contract and proceed without recreating it.
 
-### LIT-01 S1 — search: graphs and provenance foundations (Sonnet; pair X1)
+### LIT-01 S1 — search payload: graphs and provenance foundations (Sonnet; pair X1)
 
-> Block C applies. Your domains, variants and starting collision queries (carried from
-> `PLAN-023.02`, which wins on conflict):
+> Your domains (carried from `PLAN-023.02`, which wins on conflict):
 >
-> - **D01 Knowledge graphs**: knowledge graph, ontology, RDF graph, property graph, knowledge
->   base construction, entity-relation model. Collision: `"knowledge graph" epistemic status
->   lifecycle state classification`.
-> - **D02 Semantic Web**: Semantic Web, RDF/OWL, linked data, SPARQL, named graphs,
->   reification. Collision: `"named graph" provenance belief statement-level metadata`.
-> - **D03 W3C PROV / provenance**: W3C PROV, PROV-O, provenance ontology,
->   prov:Activity/Agent/Entity, derivation, attribution, delegation. Collision: `PROV-O
->   reasoning lineage conflict resolution authority`.
+> - **D01 Knowledge graphs** — variants: knowledge graph, ontology, RDF graph, property
+>   graph, knowledge base construction, entity-relation model. Collision: `"knowledge graph"
+>   epistemic status lifecycle state classification`.
+> - **D02 Semantic Web** — variants: Semantic Web, RDF/OWL, linked data, SPARQL, named
+>   graphs, reification. Collision: `"named graph" provenance belief statement-level
+>   metadata`.
+> - **D03 W3C PROV / provenance** — variants: W3C PROV, PROV-O, provenance ontology,
+>   prov:Activity/Agent/Entity, derivation, attribution, delegation, epistemic provenance.
+>   Collisions: `PROV-O reasoning lineage conflict resolution authority`; `"epistemic
+>   provenance" knowledge graph`.
+
+### LIT-01 X1 — extraction payload (Sonnet)
+
+> Domains: D01–D03.
+
+### LIT-01 S2 — search payload: temporal and append-only substrates (Sonnet; pair X2)
+
+> Your domains:
 >
-> For each domain run strategy Phase A (surveys, standards, canonical models, taxonomies,
-> historically important papers — extend the variant list with what you find and log the
-> extensions), Phase D (system search: arXiv, Semantic Scholar, OpenAlex, Crossref, GitHub,
-> W3C), and the collision query above, at least two distinct variant queries per domain.
-> Ledger row per search. Report the result identifiers you kept and why; do not fill the
-> inventory — that is X1's job from your ledger rows.
+> - **D04 Temporal knowledge graphs** — variants: temporal knowledge graph, TKG, time-aware
+>   embedding, temporal fact, quadruple (s,p,o,t). Collision: `"temporal knowledge graph"
+>   belief revision provenance`.
+> - **D05 Bi-temporal systems** — variants: bi-temporal, valid time, transaction time,
+>   temporal versioning, as-of query. Collision: `bitemporal knowledge base belief validity
+>   transaction time`.
+> - **D06 Event sourcing** — variants: event sourcing, append-only log, CQRS, event store,
+>   projection, immutable log. Collision: `"event sourced" knowledge graph state transition
+>   provenance`.
+> - **D30 Temporal databases** — variants: temporal database, valid-time table, Allen
+>   intervals, temporal query, history table. Collision: `temporal database belief state
+>   supersession history`.
+> - **D31 Event calculus** — variants: event calculus, fluent, situation calculus, narrative
+>   reasoning, action effects. Collision: `event calculus knowledge state fluent provenance
+>   reasoning history`.
 
-### LIT-01 X1 — extraction (Sonnet)
+### LIT-01 X2 — extraction payload (Sonnet)
 
-> Block C applies. Read ledger rows `LIT-01-S*` for domains D01–D03. For every kept result,
-> add a `03_source_inventory.csv` row per the evidence contract: identity, type, domain ids,
-> `found_by`, component and architecture pre-scores (0–5 triage, rubric in the contract),
-> `collision_candidate`, dedup and status fields. Apply the protocol's inclusion (§6) and
-> exclusion (§7) criteria; excluded rows are marked with a reason, never deleted. Add draft
-> terminology-map entries for D01–D03 to `01_terminology_map.md`: D-System term ↔ field term,
-> with the source that establishes the field term. Commit.
+> Domains: D04–D06, D30–D31.
 
-### LIT-01 S2 — search: temporal and append-only substrates (Sonnet; pair X2)
+### LIT-01 S3 — search payload: belief dynamics and nonmonotonic reasoning (Sonnet; pair X3)
 
-> Block C applies. Domains: **D04 Temporal knowledge graphs** (temporal knowledge graph, TKG,
-> time-aware embedding, temporal fact, quadruple (s,p,o,t); collision: `"temporal knowledge
-> graph" belief revision provenance`); **D05 Bi-temporal systems** (bi-temporal, valid time,
-> transaction time, temporal versioning, as-of query; collision: `bitemporal knowledge base
-> belief validity transaction time`); **D06 Event sourcing** (event sourcing, append-only log,
-> CQRS, event store, projection, immutable log; collision: `"event sourced" knowledge graph
-> state transition provenance`); **D30 Temporal databases** (temporal database, valid-time
-> table, Allen intervals, temporal query, history table; collision: `temporal database belief
-> state supersession history`); **D31 Event calculus** (event calculus, fluent, situation
-> calculus, narrative reasoning, action effects; collision: `event calculus knowledge state
-> fluent provenance reasoning history`). Same procedure as S1.
-
-### LIT-01 X2 — extraction (Sonnet)
-
-> As X1, for ledger rows covering D04–D06, D30–D31.
-
-### LIT-01 S3 — search: belief dynamics and nonmonotonic reasoning (Sonnet; pair X3)
-
-> Block C applies. Domains: **D07 Belief revision / AGM** (belief revision, AGM theory, belief
-> contraction, belief update, epistemic entrenchment, iterated revision; collision: `AGM
-> belief revision provenance implementation agent memory`; also run the protocol's example
-> `"belief revision" provenance knowledge graph`); **D08 Truth-maintenance systems** (truth
-> maintenance system, TMS, ATMS, JTMS, reason maintenance, dependency-directed backtracking,
-> justification network; collision: `truth maintenance justification network assumption
-> retraction impact`); **D09 Epistemic logic** (epistemic logic, knowledge operator, S5,
-> common knowledge, dynamic epistemic logic; collision: `dynamic epistemic logic multi-agent
-> knowledge base implementation`); **D10 Doxastic logic** (doxastic logic, belief operator,
-> KD45, belief base, graded belief; collision: `doxastic logic belief base software agent
-> architecture`); **D11 Defeasible reasoning** (defeasible reasoning, non-monotonic logic,
-> default logic, defeaters, prima facie justification; collision: `defeasible reasoning
-> knowledge base conflicting evidence provenance`). Same procedure as S1.
-
-### LIT-01 X3 — extraction (Sonnet)
-
-> As X1, for ledger rows covering D07–D11.
-
-### LIT-01 S4 — search: argumentation, truth discovery and trust (Sonnet; pair X4)
-
-> Block C applies. Domains: **D12 Computational argumentation** (argumentation framework, Dung
-> semantics, abstract argumentation, structured argumentation, ASPIC+, argument
-> attack/support; collision: `argumentation framework source reliability evidence graph`);
-> **D13 Truth discovery** (truth discovery, source reliability estimation, fact-finding
-> algorithms, conflicting claims resolution; collision: `"truth discovery" "source
-> dependence" copying detection graph`); **D14 Data fusion** (data fusion, conflict
-> resolution, source accuracy, copy detection, dependence-aware fusion; collision: `data
-> fusion source dependence independent confirmation discount`); **D15 Subjective logic**
-> (subjective logic, opinion triangle, uncertainty mass, trust fusion operators, Jøsang;
-> collision: `subjective logic provenance trust fusion knowledge graph`); **D16 Trust and
-> reputation systems** (trust model, reputation system, trust propagation, web of trust,
-> domain authority; collision: `trust propagation domain authority claim arbitration
-> multi-agent`); **D17 Multi-agent belief systems** (multi-agent beliefs, BDI, belief base
-> merging, judgment aggregation, epistemic multi-agent systems; collision: `multi-agent
-> belief merging conflicting sources provenance human agent`). These domains carry H3/H4
-> collision weight — also run the protocol's H4 examples: `"provenance" "independent sources"
-> knowledge graph confidence`; `"corroboration" provenance paths`; `"independent evidence"
-> epistemic graph`; `"convergence" multi-agent belief provenance`. Same procedure as S1.
-
-### LIT-01 X4 — extraction (Sonnet)
-
-> As X1, for ledger rows covering D12–D17.
-
-### LIT-01 S5 — search: scientific discourse and claim networks (Sonnet; pair X5)
-
-> Block C applies. Domains: **D18 Scientific discourse representation** (scientific discourse
-> ontology, SWAN, SALT, discourse elements, claim-evidence networks, hypothesis ontology;
-> collision: `scientific claim evidence network provenance corroboration ontology`); **D19
-> Nanopublications** (nanopublication, assertion graph, provenance graph, publication info
-> graph, trusty URI; collision: `nanopublication assertion provenance independent
-> corroboration`); **D20 Micropublications** (micropublication, claim network, evidence
-> chain, statement-level citation; collision: `micropublications evidence chain claim support
-> falsification`). Same procedure as S1.
-
-### LIT-01 X5 — extraction (Sonnet)
-
-> As X1, for ledger rows covering D18–D20.
-
-### LIT-01 S6 — search: lineage, evidence graphs and evolution (Sonnet; pair X6)
-
-> Block C applies. Domains: **D28 Data lineage** (data lineage, dataflow provenance, lineage
-> tracing, impact of upstream change; collision: `data lineage upstream change downstream
-> impact knowledge`); **D29 Evidence graphs** (evidence graph, evidence network, Bayesian
-> evidence combination, evidential reasoning; collision: `evidence graph independent sources
-> confidence propagation`); **D32 Ontology evolution** (ontology evolution, ontology
-> versioning, change management, concept drift, schema evolution; collision: `ontology
-> evolution change propagation dependent artifacts`). Same procedure as S1.
-
-### LIT-01 X6 — extraction (Sonnet)
-
-> As X1, for ledger rows covering D28–D29, D32.
-
-### LIT-01 G — phase gate (Haiku; measurements, never assertions)
-
-> Read `research/literature-review/00_search_ledger.csv` and
-> `research/literature-review/03_source_inventory.csv` — these two files, nothing else — and
-> report with real output:
+> Your domains:
 >
-> 1. Per domain in {D01–D20, D28–D32}: count of ledger rows and count of distinct `query`
->    values. **Gate: ≥ 2 rows with distinct queries per domain.** Name any domain that fails.
+> - **D07 Belief revision / AGM** — variants: belief revision, AGM theory, belief
+>   contraction, belief update, epistemic entrenchment, iterated revision. Collisions: `AGM
+>   belief revision provenance implementation agent memory`; `"belief revision" provenance
+>   knowledge graph`.
+> - **D08 Truth-maintenance systems** — variants: truth maintenance system, TMS, ATMS, JTMS,
+>   reason maintenance, dependency-directed backtracking, justification network. Collision:
+>   `truth maintenance justification network assumption retraction impact`.
+> - **D09 Epistemic logic** — variants: epistemic logic, knowledge operator, S5, common
+>   knowledge, dynamic epistemic logic. Collision: `dynamic epistemic logic multi-agent
+>   knowledge base implementation`.
+> - **D10 Doxastic logic** — variants: doxastic logic, belief operator, KD45, belief base,
+>   graded belief. Collision: `doxastic logic belief base software agent architecture`.
+> - **D11 Defeasible reasoning** — variants: defeasible reasoning, non-monotonic logic,
+>   default logic, defeaters, prima facie justification. Collision: `defeasible reasoning
+>   knowledge base conflicting evidence provenance`.
+
+### LIT-01 X3 — extraction payload (Sonnet)
+
+> Domains: D07–D11.
+
+### LIT-01 S4 — search payload: argumentation, truth discovery and trust (Sonnet; pair X4)
+
+> Your domains:
+>
+> - **D12 Computational argumentation** — variants: argumentation framework, Dung semantics,
+>   abstract argumentation, structured argumentation, ASPIC+, argument attack/support.
+>   Collision: `argumentation framework source reliability evidence graph`.
+> - **D13 Truth discovery** — variants: truth discovery, source reliability estimation,
+>   fact-finding algorithms, conflicting claims resolution. Collision: `"truth discovery"
+>   "source dependence" copying detection graph`.
+> - **D14 Data fusion** — variants: data fusion, conflict resolution, source accuracy, copy
+>   detection, dependence-aware fusion. Collision: `data fusion source dependence independent
+>   confirmation discount`.
+> - **D15 Subjective logic** — variants: subjective logic, opinion triangle, uncertainty
+>   mass, trust fusion operators, Jøsang. Collision: `subjective logic provenance trust
+>   fusion knowledge graph`.
+> - **D16 Trust and reputation systems** — variants: trust model, reputation system, trust
+>   propagation, web of trust, domain authority. Collision: `trust propagation domain
+>   authority claim arbitration multi-agent`.
+> - **D17 Multi-agent belief systems** — variants: multi-agent beliefs, BDI, belief base
+>   merging, judgment aggregation, epistemic multi-agent systems. Collision: `multi-agent
+>   belief merging conflicting sources provenance human agent`.
+>
+> These domains carry H3/H4 collision weight — additionally run the protocol's H4 collision
+> set, logging each row with **`domain_id: H4`** (cross-domain hypothesis queries log the
+> hypothesis id, and the Pass 3 gate counts them toward H4's coverage): `"provenance"
+> "independent sources" knowledge graph confidence`; `"corroboration" provenance paths`;
+> `"independent evidence" epistemic graph`; `"convergence" multi-agent belief provenance`.
+
+### LIT-01 X4 — extraction payload (Sonnet)
+
+> Domains: D12–D17, plus any `domain_id: H4` ledger rows from S4.
+
+### LIT-01 S5 — search payload: scientific discourse and claim networks (Sonnet; pair X5)
+
+> Your domains:
+>
+> - **D18 Scientific discourse representation** — variants: scientific discourse ontology,
+>   SWAN, SALT, discourse elements, claim-evidence networks, hypothesis ontology. Collision:
+>   `scientific claim evidence network provenance corroboration ontology`.
+> - **D19 Nanopublications** — variants: nanopublication, assertion graph, provenance graph,
+>   publication info graph, trusty URI. Collision: `nanopublication assertion provenance
+>   independent corroboration`.
+> - **D20 Micropublications** — variants: micropublication, claim network, evidence chain,
+>   statement-level citation. Collision: `micropublications evidence chain claim support
+>   falsification`.
+
+### LIT-01 X5 — extraction payload (Sonnet)
+
+> Domains: D18–D20.
+
+### LIT-01 S6 — search payload: lineage, evidence graphs and evolution (Sonnet; pair X6)
+
+> Your domains:
+>
+> - **D28 Data lineage** — variants: data lineage, dataflow provenance, lineage tracing,
+>   impact of upstream change. Collision: `data lineage upstream change downstream impact
+>   knowledge`.
+> - **D29 Evidence graphs** — variants: evidence graph, evidence network, Bayesian evidence
+>   combination, evidential reasoning. Collision: `evidence graph independent sources
+>   confidence propagation`.
+> - **D32 Ontology evolution** — variants: ontology evolution, ontology versioning, change
+>   management, concept drift, schema evolution. Collision: `ontology evolution change
+>   propagation dependent artifacts`.
+
+### LIT-01 X6 — extraction payload (Sonnet)
+
+> Domains: D28–D29, D32.
+
+### LIT-01 G — phase gate (Haiku)
+
+> Files: `research/literature-review/00_search_ledger.csv`,
+> `research/literature-review/03_source_inventory.csv`. Measurements:
+>
+> 1. Per domain in {D01–D20, D28–D32}: count of ledger rows, count of distinct `query`
+>    values, and mandated-variant coverage — every minimum variant listed in this phase's S
+>    payloads appears in at least one logged query for its domain. **Gates: ≥ 2 rows with
+>    distinct queries per domain; no uncovered mandated variant.** Name every domain and
+>    variant that fails.
 > 2. Count of inventory rows for those domains, split kept/excluded; count of excluded rows
 >    missing an `exclusion_reason` (**gate: 0**).
 > 3. Count of ledger rows whose `kept` names a source absent from the inventory (**gate: 0**).
-> 4. `uv run python -m src.governance` exit code, and
->    `uv run python tools/check_no_private_content.py` with all changes staged.
->
-> Report failures as failures. Do not fix anything; fixes go back to the responsible S/X as a
-> fix cycle (at most two).
 
 *No R section: Pass 1 pre-scores are triage, no `CRITICAL_COLLISION` flag is final before the
 evidence matrix exists, so second reviews are dispatched in LIT-06. No A section: no synthesis
@@ -235,108 +328,140 @@ here.*
 
 ### LIT-02 K — kickoff (Haiku)
 
-> Claim `phase-lit-02` per `AGENTS.md` (as LIT-01 K, branch `agent/phase-lit-02`). Verify the
-> ledger and inventory exist from phase-lit-01; do not recreate them. Item order:
-> S1/X1 → S2/X2 → S3/X3 → S4/X4 → S5/X5 → G.
+> Claim `phase-lit-02` per `AGENTS.md` (as LIT-01 K). Continue on the campaign branch
+> `agent/lit-campaign` — do not create a new branch. Verify the ledger and inventory exist
+> from phase-lit-01; do not recreate them. Item order: S1/X1 → S2/X2 → S3/X3 → S4/X4 →
+> S5/X5 → G.
 
-### LIT-02 S1 — search: agent memory and retrieval (Sonnet; pair X1)
+### LIT-02 S1 — search payload: agent memory and retrieval (Sonnet; pair X1)
 
-> Block C applies. Domains: **D21 Agent memory** (agent memory, memory architecture,
-> working/long-term memory, memory consolidation, cognitive architecture SOAR/ACT-R;
-> collision: `"agent memory" provenance temporal belief update contradiction`; also the
-> protocol's `"agent memory" provenance temporal knowledge graph`); **D22 Long-term memory
-> for LLM agents** (LLM agent memory, persistent memory, memory stream, reflection,
-> MemGPT-style paging, vector memory; collision: `LLM agent long-term memory belief revision
-> provenance retrieval`); **D23 Episodic memory** (episodic memory, autobiographical memory,
-> episode segmentation, event boundaries, experience replay; collision: `episodic memory
-> agent session boundary consolidation retrieval`); **D24 RAG / Graph-RAG**
-> (retrieval-augmented generation, RAG, GraphRAG, hybrid retrieval, context assembly,
-> chunking; collision: `GraphRAG provenance-aware retrieval reasoning lineage context
-> selection`). These carry H5's collision weight. Same procedure as LIT-01 S1.
+> Your domains:
+>
+> - **D21 Agent memory** — variants: agent memory, memory architecture, working/long-term
+>   memory, memory consolidation, cognitive architecture SOAR/ACT-R. Collisions: `"agent
+>   memory" provenance temporal belief update contradiction`; `"agent memory" provenance
+>   temporal knowledge graph`.
+> - **D22 Long-term memory for LLM agents** — variants: LLM agent memory, persistent memory,
+>   memory stream, reflection, MemGPT-style paging, vector memory. Collision: `LLM agent
+>   long-term memory belief revision provenance retrieval`.
+> - **D23 Episodic memory** — variants: episodic memory, autobiographical memory, episode
+>   segmentation, event boundaries, experience replay. Collision: `episodic memory agent
+>   session boundary consolidation retrieval`.
+> - **D24 RAG / Graph-RAG** — variants: retrieval-augmented generation, RAG, GraphRAG,
+>   hybrid retrieval, context assembly, chunking. Collision: `GraphRAG provenance-aware
+>   retrieval reasoning lineage context selection`.
+>
+> These carry H5's collision weight.
 
-### LIT-02 X1 — extraction (Sonnet)
+### LIT-02 X1 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for ledger rows covering D21–D24; terminology-map entries for the same.
+> Domains: D21–D24.
 
-### LIT-02 S2 — search: human-AI knowledge and decision provenance (Sonnet; pair X2)
+### LIT-02 S2 — search payload: human-AI knowledge and decision provenance (Sonnet; pair X2)
 
-> Block C applies. Domains: **D25 Human-AI collective intelligence** (human-AI collaboration,
-> collective intelligence, hybrid intelligence, human-in-the-loop knowledge curation;
-> collision: `human-AI shared knowledge base co-evolution provenance authority`); **D26
-> Decision provenance** (decision provenance, decision trace, accountable decisions, PROV for
-> decisions; collision: `"decision provenance" architecture knowledge graph downstream
-> impact`; also the protocol's `"decision provenance" ontology`); **D27 Decision
-> intelligence** (decision intelligence, decision modeling, decision records, DMN, decision
-> automation; collision: `decision intelligence lineage requirements implementation
-> feedback`). H6's end-to-end collision weight starts here. Same procedure.
+> Your domains:
+>
+> - **D25 Human-AI collective intelligence** — variants: human-AI collaboration, collective
+>   intelligence, hybrid intelligence, human-in-the-loop knowledge curation. Collision:
+>   `human-AI shared knowledge base co-evolution provenance authority`.
+> - **D26 Decision provenance** — variants: decision provenance, decision trace, accountable
+>   decisions, PROV for decisions. Collisions: `"decision provenance" architecture knowledge
+>   graph downstream impact`; `"decision provenance" ontology`.
+> - **D27 Decision intelligence** — variants: decision intelligence, decision modeling,
+>   decision records, DMN, decision automation. Collision: `decision intelligence lineage
+>   requirements implementation feedback`.
+>
+> H6's end-to-end collision weight starts here.
 
-### LIT-02 X2 — extraction (Sonnet)
+### LIT-02 X2 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for ledger rows covering D25–D27.
+> Domains: D25–D27.
 
-### LIT-02 S3 — search: requirements engineering and evolution (Sonnet; pair X3)
+### LIT-02 S3 — search payload: requirements engineering and evolution (Sonnet; pair X3)
 
-> Block C applies. Domains: **D33 Requirements engineering** (requirements engineering, RE
-> lifecycle, elicitation, specification, validation, goal-oriented RE KAOS/i*; collision:
-> `goal-oriented requirements knowledge evolution assumption revision`); **D34 Requirements
-> traceability** (requirements traceability, RTM, forward/backward traceability, trace links,
-> pre/post-RS traceability; collision: `requirements traceability matrix reasoning evidence
-> bidirectional runtime`); **D35 Requirements provenance** (requirements provenance,
-> requirement origin, rationale capture, stakeholder attribution; collision: `requirements
-> provenance origin evidence decision lineage`); **D36 Requirements evolution** (requirements
-> evolution, requirements change management, volatility, change propagation; collision:
-> `requirements change propagation downstream artifacts impact assessment`). H7/H9 collision
-> weight. Same procedure.
+> Your domains:
+>
+> - **D33 Requirements engineering** — variants: requirements engineering, RE lifecycle,
+>   elicitation, specification, validation, goal-oriented RE KAOS/i*. Collision:
+>   `goal-oriented requirements knowledge evolution assumption revision`.
+> - **D34 Requirements traceability** — variants: requirements traceability, RTM,
+>   forward/backward traceability, trace links, pre/post-RS traceability. Collision:
+>   `requirements traceability matrix reasoning evidence bidirectional runtime`.
+> - **D35 Requirements provenance** — variants: requirements provenance, requirement origin,
+>   rationale capture, stakeholder attribution. Collision: `requirements provenance origin
+>   evidence decision lineage`.
+> - **D36 Requirements evolution** — variants: requirements evolution, requirements change
+>   management, volatility, change propagation. Collision: `requirements change propagation
+>   downstream artifacts impact assessment`.
+>
+> H7/H9 collision weight.
 
-### LIT-02 X3 — extraction (Sonnet)
+### LIT-02 X3 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for ledger rows covering D33–D36.
+> Domains: D33–D36.
 
-### LIT-02 S4 — search: rationale capture traditions (Sonnet; pair X4)
+### LIT-02 S4 — search payload: rationale capture traditions (Sonnet; pair X4)
 
-> Block C applies. Domains: **D37 Design rationale** (design rationale, DR capture,
-> argumentation-based design, rationale management systems; collision: `design rationale
-> capture retrieval impact assumption change`); **D38 Architecture rationale** (architecture
-> rationale, architectural decision rationale, rationale documentation; collision:
-> `architecture rationale traceability code requirements runtime`; also the methodology's
-> `"architecture rationale" requirements code traceability`); **D39 Architecture knowledge
-> management** (architecture knowledge management, AKM, architectural knowledge vaporization,
-> knowledge codification; collision: `architecture knowledge management decision evidence
-> lineage tool`); **D40 Architecture Decision Records** (ADR, architecture decision record,
-> MADR, decision log, superseded decisions; collision: `ADR supersession lineage automated
-> impact analysis`); **D41 IBIS** (IBIS, issue-based information systems, gIBIS, Compendium,
-> issue-position-argument; collision: `IBIS issue position argument software traceability
-> implementation`); **D42 QOC** (QOC, questions options criteria, design space analysis;
-> collision: `QOC design space analysis decision traceability`). Same procedure.
+> Your domains:
+>
+> - **D37 Design rationale** — variants: design rationale, DR capture, argumentation-based
+>   design, rationale management systems. Collision: `design rationale capture retrieval
+>   impact assumption change`.
+> - **D38 Architecture rationale** — variants: architecture rationale, architectural
+>   decision rationale, rationale documentation. Collisions: `architecture rationale
+>   traceability code requirements runtime`; `"architecture rationale" requirements code
+>   traceability`.
+> - **D39 Architecture knowledge management** — variants: architecture knowledge management,
+>   AKM, architectural knowledge vaporization, knowledge codification. Collision:
+>   `architecture knowledge management decision evidence lineage tool`.
+> - **D40 Architecture Decision Records** — variants: ADR, architecture decision record,
+>   MADR, decision log, superseded decisions. Collision: `ADR supersession lineage automated
+>   impact analysis`.
+> - **D41 IBIS** — variants: IBIS, issue-based information systems, gIBIS, Compendium,
+>   issue-position-argument. Collision: `IBIS issue position argument software traceability
+>   implementation`.
+> - **D42 QOC** — variants: QOC, questions options criteria, design space analysis.
+>   Collision: `QOC design space analysis decision traceability`.
 
-### LIT-02 X4 — extraction (Sonnet)
+### LIT-02 X4 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for ledger rows covering D37–D42.
+> Domains: D37–D42.
 
-### LIT-02 S5 — search: traceability mechanics and impact (Sonnet; pair X5)
+### LIT-02 S5 — search payload: traceability mechanics and impact (Sonnet; pair X5)
 
-> Block C applies. Domains: **D43 Software traceability** (software traceability, trace link,
-> traceability information model, end-to-end traceability; collision: `software traceability
-> reasoning decisions tests runtime end-to-end`); **D44 Trace-link recovery** (trace link
-> recovery, traceability recovery, IR-based tracing, LLM trace recovery; collision:
-> `automated trace recovery rationale evidence links code`); **D45 Change impact analysis**
-> (change impact analysis, ripple effect, dependency analysis, impact propagation, program
-> slicing; collision: `"impact analysis" assumption requirements code test propagation`; also
-> the methodology's `"assumption" impact analysis requirements code`). H10's collision weight.
-> Same procedure.
+> Your domains:
+>
+> - **D43 Software traceability** — variants: software traceability, trace link,
+>   traceability information model, end-to-end traceability. Collision: `software
+>   traceability reasoning decisions tests runtime end-to-end`.
+> - **D44 Trace-link recovery** — variants: trace link recovery, traceability recovery,
+>   IR-based tracing, LLM trace recovery. Collision: `automated trace recovery rationale
+>   evidence links code`.
+> - **D45 Change impact analysis** — variants: change impact analysis, ripple effect,
+>   dependency analysis, impact propagation, program slicing. Collisions: `"impact analysis"
+>   assumption requirements code test propagation`; `"assumption" impact analysis
+>   requirements code`.
+>
+> H10's collision weight.
 
-### LIT-02 X5 — extraction (Sonnet)
+### LIT-02 X5 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for ledger rows covering D43–D45.
+> Domains: D43–D45.
 
 ### LIT-02 G — phase gate (Haiku)
 
-> As LIT-01 G, over domains {D21–D27, D33–D45}: per-domain ledger counts and distinct queries
-> (**gate: ≥ 2 distinct-query rows per domain**), inventory integrity checks (gates: 0
-> missing exclusion reasons, 0 kept-but-uninventoried), governance and staged private-content
-> checks. Failures are results; fixes go back to the responsible S/X (at most two cycles).
+> Files: `research/literature-review/00_search_ledger.csv`,
+> `research/literature-review/03_source_inventory.csv`. Measurements over domains {D21–D27,
+> D33–D45}:
+>
+> 1. Per-domain ledger row counts, distinct-query counts, and mandated-variant coverage from
+>    this phase's S payloads. **Gates: ≥ 2 distinct-query rows per domain; no uncovered
+>    mandated variant.**
+> 2. Inventory rows for those domains, kept/excluded split; excluded rows missing an
+>    `exclusion_reason` (**gate: 0**).
+> 3. Ledger `kept` entries absent from the inventory (**gate: 0**).
 
-*No R, no A (as LIT-01).*
+*No R, no A (as stated under LIT-01 G).*
 
 ---
 
@@ -344,128 +469,161 @@ here.*
 
 ### LIT-03 K — kickoff (Haiku)
 
-> Claim `phase-lit-03` per `AGENTS.md` (branch `agent/phase-lit-03`). Verify ledger and
-> inventory exist; do not recreate. Item order: S1/X1 → … → S7/X7 → close-out C → G.
+> Claim `phase-lit-03` per `AGENTS.md` (as LIT-01 K). Continue on the campaign branch
+> `agent/lit-campaign`. Verify ledger and inventory exist; do not recreate. Item order:
+> S1/X1 → … → S7/X7 → close-out C → G.
 
-### LIT-03 S1 — search: systems-engineering threads (Sonnet; pair X1)
+### LIT-03 S1 — search payload: systems-engineering threads (Sonnet; pair X1)
 
-> Block C applies. Domains: **D46 Model-based systems engineering** (MBSE, SysML,
-> model-centric engineering, system model integration; collision: `MBSE requirement design
-> verification runtime thread provenance`); **D47 Digital thread** (digital thread, digital
-> continuity, authoritative source of truth, lifecycle data integration; collision: `"digital
-> thread" requirements design code test runtime evidence` — the methodology's own example);
-> **D48 Digital engineering** (digital engineering, digital engineering ecosystem,
-> model-based acquisition; collision: `digital engineering knowledge provenance decision
-> lifecycle`). H7 collision weight. Same procedure as LIT-01 S1.
+> Your domains:
+>
+> - **D46 Model-based systems engineering** — variants: MBSE, SysML, model-centric
+>   engineering, system model integration. Collision: `MBSE requirement design verification
+>   runtime thread provenance`.
+> - **D47 Digital thread** — variants: digital thread, digital continuity, authoritative
+>   source of truth, lifecycle data integration. Collision: `"digital thread" requirements
+>   design code test runtime evidence`.
+> - **D48 Digital engineering** — variants: digital engineering, digital engineering
+>   ecosystem, model-based acquisition. Collision: `digital engineering knowledge provenance
+>   decision lifecycle`.
+>
+> H7 collision weight.
 
-### LIT-03 X1 — extraction (Sonnet)
+### LIT-03 X1 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D46–D48.
+> Domains: D46–D48.
 
-### LIT-03 S2 — search: specification-first development (Sonnet; pair X2)
+### LIT-03 S2 — search payload: specification-first development (Sonnet; pair X2)
 
-> Block C applies. Domains: **D49 Specification-driven development** (specification-driven
-> development, spec-first, contract-first, spec-as-source-of-truth; collision: `specification
-> driven agent development lineage verification`); **D50 Executable specifications**
-> (executable specification, living documentation, specification by example,
-> acceptance-test driven; collision: `executable specification traceability implementation
-> verification loop`); **D51 Formal specification** (formal specification, formal methods, Z,
-> TLA+, Alloy, refinement; collision: `formal specification refinement traceability
-> implementation evidence`); **D52 Behavior-driven development** (BDD, Gherkin,
-> given-when-then, feature files, scenario-based testing; collision: `BDD scenarios
-> requirements traceability runtime verification`). Same procedure.
+> Your domains:
+>
+> - **D49 Specification-driven development** — variants: specification-driven development,
+>   spec-first, contract-first, spec-as-source-of-truth. Collision: `specification driven
+>   agent development lineage verification`.
+> - **D50 Executable specifications** — variants: executable specification, living
+>   documentation, specification by example, acceptance-test driven. Collision: `executable
+>   specification traceability implementation verification loop`.
+> - **D51 Formal specification** — variants: formal specification, formal methods, Z, TLA+,
+>   Alloy, refinement. Collision: `formal specification refinement traceability
+>   implementation evidence`.
+> - **D52 Behavior-driven development** — variants: BDD, Gherkin, given-when-then, feature
+>   files, scenario-based testing. Collision: `BDD scenarios requirements traceability
+>   runtime verification`.
 
-### LIT-03 X2 — extraction (Sonnet)
+### LIT-03 X2 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D49–D52.
+> Domains: D49–D52.
 
-### LIT-03 S3 — search: software and build provenance (Sonnet; pair X3)
+### LIT-03 S3 — search payload: software and build provenance (Sonnet; pair X3)
 
-> Block C applies. Domains: **D53 Software provenance** (software provenance, code
-> provenance, SBOM, supply-chain provenance, SLSA; collision: `software provenance decision
-> reasoning artifact lineage`); **D54 Build provenance** (build provenance, reproducible
-> builds, in-toto, attestation, artifact signing; collision: `build attestation lineage
-> requirements decision traceability`); **D55 Artifact lineage** (artifact lineage, artifact
-> graph, derivation chain, pipeline lineage; collision: `artifact lineage idea decision
-> requirement code test chain`). Same procedure.
+> Your domains:
+>
+> - **D53 Software provenance** — variants: software provenance, code provenance, SBOM,
+>   supply-chain provenance, SLSA. Collision: `software provenance decision reasoning
+>   artifact lineage`.
+> - **D54 Build provenance** — variants: build provenance, reproducible builds, in-toto,
+>   attestation, artifact signing. Collision: `build attestation lineage requirements
+>   decision traceability`.
+> - **D55 Artifact lineage** — variants: artifact lineage, artifact graph, derivation chain,
+>   pipeline lineage. Collision: `artifact lineage idea decision requirement code test
+>   chain`.
 
-### LIT-03 X3 — extraction (Sonnet)
+### LIT-03 X3 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D53–D55.
+> Domains: D53–D55.
 
-### LIT-03 S4 — search: agentic software engineering (Sonnet; pair X4)
+### LIT-03 S4 — search payload: agentic software engineering (Sonnet; pair X4)
 
-> Block C applies. Domains: **D56 Agentic software engineering** (agentic software
-> engineering, AI software agents, autonomous coding, SWE agents, agent-driven development;
-> collision: `agentic software engineering knowledge provenance phase context`); **D57
-> Coding-agent memory** (coding agent memory, repository memory, project memory, codebase
-> knowledge persistence; collision: `coding agent persistent memory session knowledge
-> provenance`; also the methodology's `"agent memory" coding "session" persistent`); **D58
-> Cross-session coding agents** (cross-session agent, session persistence, context carryover,
-> resumable agents; collision: `"cross-session" coding agent context carryover memory
-> architecture`); **D59 Agent handoff** (agent handoff, task handoff, context transfer,
-> delegation protocol, baton passing; collision: `agent handoff context package lineage
-> evidence transfer`); **D60 Agent checkpointing** (agent checkpointing, state snapshot,
-> resumption, recovery point, workflow checkpoint; collision: `agent checkpoint resume
-> context state provenance`). H8's collision weight concentrates here. Same procedure.
+> Your domains:
+>
+> - **D56 Agentic software engineering** — variants: agentic software engineering, AI
+>   software agents, autonomous coding, SWE agents, agent-driven development. Collision:
+>   `agentic software engineering knowledge provenance phase context`.
+> - **D57 Coding-agent memory** — variants: coding agent memory, repository memory, project
+>   memory, codebase knowledge persistence. Collisions: `coding agent persistent memory
+>   session knowledge provenance`; `"agent memory" coding "session" persistent`.
+> - **D58 Cross-session coding agents** — variants: cross-session agent, session
+>   persistence, context carryover, resumable agents. Collision: `"cross-session" coding
+>   agent context carryover memory architecture`.
+> - **D59 Agent handoff** — variants: agent handoff, task handoff, context transfer,
+>   delegation protocol, baton passing. Collision: `agent handoff context package lineage
+>   evidence transfer`.
+> - **D60 Agent checkpointing** — variants: agent checkpointing, state snapshot, resumption,
+>   recovery point, workflow checkpoint. Collision: `agent checkpoint resume context state
+>   provenance`.
+>
+> H8's collision weight concentrates here.
 
-### LIT-03 X4 — extraction (Sonnet)
+### LIT-03 X4 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D56–D60.
+> Domains: D56–D60.
 
-### LIT-03 S5 — search: planning and execution monitoring (Sonnet; pair X5)
+### LIT-03 S5 — search payload: planning and execution monitoring (Sonnet; pair X5)
 
-> Block C applies. Domains: **D61 Hierarchical task networks** (HTN, hierarchical task
-> network, task decomposition, method decomposition; collision: `HTN task decomposition
-> context boundary execution memory`); **D62 AI planning** (AI planning, PDDL, plan
-> representation, plan execution, replanning; collision: `AI planning execution monitoring
-> knowledge update replanning`); **D63 Execution monitoring** (execution monitoring, plan
-> monitoring, discrepancy detection, expectation monitoring; collision: `plan execution
-> monitoring outcome knowledge revision`). Same procedure.
+> Your domains:
+>
+> - **D61 Hierarchical task networks** — variants: HTN, hierarchical task network, task
+>   decomposition, method decomposition. Collision: `HTN task decomposition context boundary
+>   execution memory`.
+> - **D62 AI planning** — variants: AI planning, PDDL, plan representation, plan execution,
+>   replanning. Collision: `AI planning execution monitoring knowledge update replanning`.
+> - **D63 Execution monitoring** — variants: execution monitoring, plan monitoring,
+>   discrepancy detection, expectation monitoring. Collision: `plan execution monitoring
+>   outcome knowledge revision`.
 
-### LIT-03 X5 — extraction (Sonnet)
+### LIT-03 X5 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D61–D63.
+> Domains: D61–D63.
 
-### LIT-03 S6 — search: verification and runtime evidence (Sonnet; pair X6)
+### LIT-03 S6 — search payload: verification and runtime evidence (Sonnet; pair X6)
 
-> Block C applies. Domains: **D64 Verification and validation** (V&V, verification and
-> validation, test evidence, assurance case, safety case; collision: `assurance case evidence
-> requirements claims argumentation`); **D65 Runtime verification** (runtime verification,
-> monitor synthesis, temporal-logic monitoring, trace checking; collision: `"runtime
-> verification" requirements feedback knowledge base update` — the methodology's example);
-> **D66 Requirements monitoring** (requirements monitoring, requirements at runtime,
-> awareness requirements, requirement reflection; collision: `requirements monitoring runtime
-> evidence requirement revision loop`); **D67 Observability-driven development**
-> (observability-driven development, telemetry-informed development, production feedback;
-> collision: `observability telemetry development decision feedback knowledge`). H11
-> collision weight. Same procedure.
+> Your domains:
+>
+> - **D64 Verification and validation** — variants: V&V, verification and validation, test
+>   evidence, assurance case, safety case. Collision: `assurance case evidence requirements
+>   claims argumentation`.
+> - **D65 Runtime verification** — variants: runtime verification, monitor synthesis,
+>   temporal-logic monitoring, trace checking. Collision: `"runtime verification"
+>   requirements feedback knowledge base update`.
+> - **D66 Requirements monitoring** — variants: requirements monitoring, requirements at
+>   runtime, awareness requirements, requirement reflection. Collision: `requirements
+>   monitoring runtime evidence requirement revision loop`.
+> - **D67 Observability-driven development** — variants: observability-driven development,
+>   telemetry-informed development, production feedback. Collision: `observability telemetry
+>   development decision feedback knowledge`.
+>
+> H11 collision weight.
 
-### LIT-03 X6 — extraction (Sonnet)
+### LIT-03 X6 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D64–D67.
+> Domains: D64–D67.
 
-### LIT-03 S7 — search: adaptive loops and DevOps traceability (Sonnet; pair X7)
+### LIT-03 S7 — search payload: adaptive loops and DevOps traceability (Sonnet; pair X7)
 
-> Block C applies. Domains: **D68 Self-adaptive systems** (self-adaptive systems, adaptation
-> logic, managed/managing system, models@runtime; collision: `self-adaptive system knowledge
-> model runtime evidence adaptation`); **D69 MAPE-K** (MAPE-K, monitor-analyze-plan-execute,
-> knowledge base loop, autonomic manager; collision: `MAPE-K knowledge base development
-> lifecycle integration`); **D70 Autonomic computing** (autonomic computing, self-management,
-> self-configuration, self-healing; collision: `autonomic computing knowledge provenance
-> policy evolution`); **D71 Continuous requirements engineering** (continuous RE, just-in-time
-> requirements, agile RE, requirements in DevOps; collision: `continuous requirements
-> engineering runtime feedback knowledge`); **D72 DevOps traceability** (DevOps traceability,
-> CI/CD traceability, deployment traceability, release evidence; collision: `DevOps
-> traceability commit requirement deployment runtime evidence`). Same procedure.
+> Your domains:
+>
+> - **D68 Self-adaptive systems** — variants: self-adaptive systems, adaptation logic,
+>   managed/managing system, models@runtime. Collision: `self-adaptive system knowledge
+>   model runtime evidence adaptation`.
+> - **D69 MAPE-K** — variants: MAPE-K, monitor-analyze-plan-execute, knowledge base loop,
+>   autonomic manager. Collision: `MAPE-K knowledge base development lifecycle integration`.
+> - **D70 Autonomic computing** — variants: autonomic computing, self-management,
+>   self-configuration, self-healing. Collision: `autonomic computing knowledge provenance
+>   policy evolution`.
+> - **D71 Continuous requirements engineering** — variants: continuous RE, just-in-time
+>   requirements, agile RE, requirements in DevOps. Collision: `continuous requirements
+>   engineering runtime feedback knowledge`.
+> - **D72 DevOps traceability** — variants: DevOps traceability, CI/CD traceability,
+>   deployment traceability, release evidence. Collision: `DevOps traceability commit
+>   requirement deployment runtime evidence`.
 
-### LIT-03 X7 — extraction (Sonnet)
+### LIT-03 X7 — extraction payload (Sonnet)
 
-> As LIT-01 X1, for D68–D72.
+> Domains: D68–D72.
 
 ### LIT-03 C — Pass 1 close-out (Sonnet)
 
-> Block C applies. Using only the ledger, the inventory and the terminology-map draft:
+> Using only the ledger, the inventory and the terminology-map draft:
 >
 > 1. Finalize `research/literature-review/01_terminology_map.md`: every D-System term from
 >    the methodology's §6 table mapped to established terminology found in Pass 1, plus any
@@ -481,12 +639,17 @@ here.*
 
 ### LIT-03 G — phase gate (Haiku)
 
-> As LIT-01 G, but over **all 72 domains**: per-domain ledger row counts and distinct-query
-> counts (**gate: ≥ 2 distinct-query rows for every one of D01–D72**); total inventory row
-> count (**gate: ≥ 75 kept candidates across all domains** per the protocol's Pass 1 target);
-> `01_terminology_map.md` and `02_domain_map.md` exist and the domain map has all 72 entries
-> and a ranked top-20 list; inventory integrity gates as before; governance and staged
-> private-content checks. Real output; failures named.
+> Files: the ledger, the inventory, `01_terminology_map.md`, `02_domain_map.md`.
+> Measurements over **all 72 domains**:
+>
+> 1. Per-domain ledger row counts, distinct-query counts, and mandated-variant coverage
+>    (variants from all three Pass 1 phases' S payloads). **Gates: ≥ 2 distinct-query rows
+>    for every one of D01–D72; no uncovered mandated variant.**
+> 2. Total kept inventory rows (**gate: ≥ 75 across all domains**, the protocol's Pass 1
+>    target).
+> 3. `01_terminology_map.md` and `02_domain_map.md` exist; the domain map has all 72 entries
+>    and a ranked top-20 list.
+> 4. Inventory integrity gates as in LIT-01 G items 2–3.
 
 *No R, no A.*
 
@@ -496,40 +659,28 @@ here.*
 
 ### LIT-04 K — kickoff (Haiku)
 
-> Claim `phase-lit-04` per `AGENTS.md` (branch `agent/phase-lit-04`). Create
-> `research/literature-review/04_evidence_matrix.csv` with exactly the evidence contract's
-> header (43 fields) if it does not exist. Item order: X1 → X2 → X3 → G, splitting the top-20
-> list into three consecutive batches in rank order.
+> Claim `phase-lit-04` per `AGENTS.md`. Continue on the campaign branch
+> `agent/lit-campaign`. Create `research/literature-review/04_evidence_matrix.csv` with
+> exactly the evidence contract's header (44 fields) if it does not exist. Item order:
+> X1 → X2 → X3 → G. Split the top-20 list from `02_domain_map.md` into three consecutive
+> batches in rank order (7/7/6) and write the exact source ids into each X dispatch's
+> fill-in slot before dispatching it.
 
-### LIT-04 X1 / X2 / X3 — deep extraction batches (Sonnet; dispatched separately, same text)
+### LIT-04 X1 / X2 / X3 — deep-extraction payloads (Sonnet; dispatched separately)
 
-> Block C applies. Your batch: the next unprocessed ranked collision candidates from
-> `02_domain_map.md`'s top-20 list (batch of 5–7; K names the exact ids in the dispatch).
-> For each source:
+> Deep-read each source in your batch per the procedure block, in the order given.
 >
-> 1. Obtain the fullest legal access (open version, preprint, abstract; record
->    `access_limitation` honestly).
-> 2. Fill **every** evidence-matrix field per the contract — `NOT_APPLICABLE` /
->    `NOT_DETERMINABLE_FROM_ACCESS` where true, blank never. Compare against **both** the
->    conceptual architecture (`research/two_system_architecture.md`, the glossaries) and the
->    implemented architecture (the frozen adversarial codebase review) when scoring overlap.
-> 3. Run backward citation chaining (strategy Phase B): identify the mechanism's theoretical
->    ancestors, log chain decisions in the ledger, and fill `derivative_ancestor` — five
->    papers inheriting one mechanism are one lineage plus four derivatives.
-> 4. Score both overlap scales and set `critical_collision` strictly per the contract's flag
->    rules; a `yes` sets `second_review: pending`.
->
-> Absence claims require reading the source's scope; from `abstract_only` access, absence
-> claims cap `interpretation_confidence` at `medium`. Commit after each source, so a
-> truncated run resumes at the first missing row.
+> *(Dispatcher: fill in — batch ids, in rank order: `____`.)*
 
 ### LIT-04 G — phase gate (Haiku)
 
-> Read the evidence matrix and ledger; report with real output: matrix row count for this
-> phase's batches (**gate: every batch id has a row**); count of blank required fields
-> (**gate: 0**); count of rows with `critical_collision: yes` lacking `second_review:
-> pending` (**gate: 0**); count of deep-read sources with no strategy-B ledger row
-> (**gate: 0**); governance and staged private-content checks.
+> Files: the evidence matrix, the ledger. Measurements:
+>
+> 1. A matrix row exists for every batch id the K dispatch assigned (**gate: all present**).
+> 2. Blank required fields across this phase's rows (**gate: 0**).
+> 3. Rows with `critical_collision: yes` lacking `second_review: pending` (**gate: 0**).
+> 4. Deep-read sources with no `strategy_phase: B` ledger row carrying their id in
+>    `subject_source_id` (**gate: 0**).
 
 *R deferred to LIT-06 (flags set here are reviewed there). No A.*
 
@@ -539,32 +690,41 @@ here.*
 
 ### LIT-05 K — kickoff (Haiku)
 
-> Claim `phase-lit-05` per `AGENTS.md` (branch `agent/phase-lit-05`). Verify the evidence
-> matrix exists with LIT-04's rows. Item order: S1 → X1 → X2 → G.
+> Claim `phase-lit-05` per `AGENTS.md`. Continue on the campaign branch
+> `agent/lit-campaign`. Verify the evidence matrix exists with LIT-04's rows. Item order:
+> S1 → X1 → X2 → G. Name the exact source ids for X1 and X2 (from LIT-04's
+> backward-chaining ancestors and S1's forward finds, in rank order) in each dispatch's
+> fill-in slot before dispatching it.
 
 ### LIT-05 S1 — forward chaining on the strongest collisions (Sonnet)
 
-> Block C applies. For each evidence-matrix row with either overlap score ≥ 3: run strategy
-> Phase C (forward chaining) — extensions, critiques, replications, implementations, newer
-> systems using the same mechanism — via citation indices (Semantic Scholar, OpenAlex).
-> Ledger row per search with `chain_decision`. Report new sources worth deep reading, with a
-> one-line reason each; add them to the inventory.
+> For each evidence-matrix row with either overlap score ≥ 3: run strategy Phase C (forward
+> chaining) — extensions, critiques, replications, implementations, newer systems using the
+> same mechanism — via citation indices (Semantic Scholar, OpenAlex). One ledger row per
+> chaining search with `strategy_phase: C`, **`subject_source_id` set to the row's source
+> id**, and the `chain_decision` recorded. Report new sources worth deep reading, with a
+> one-line reason each; add them to the inventory. (Block S's per-domain coverage floors do
+> not apply to this dispatch; it is chaining, not domain sweeping.)
 
-### LIT-05 X1 / X2 — deep extraction batches (Sonnet; same text, dispatched separately)
+### LIT-05 X1 / X2 — deep-extraction payloads (Sonnet; dispatched separately)
 
-> Block C applies. Your batch (K names the ids): the foundational ancestors LIT-04's backward
-> chaining surfaced, plus S1's strongest forward finds, in rank order, until the matrix holds
-> **20–30 deeply compared sources overall**. Fill rows exactly as LIT-04 X1 (all 43 fields,
-> chaining, scores, flags). Commit after each source.
+> Deep-read each source in your batch per the procedure block, in the order given, until the
+> matrix holds **20–30 deeply compared sources overall**.
+>
+> *(Dispatcher: fill in — batch ids, in rank order: `____`.)*
 
 ### LIT-05 G — phase gate (Haiku)
 
-> Read the matrix and ledger; report with real output: total matrix rows (**gate: 20–30,
-> per the methodology's stop condition**); blank required fields (**gate: 0**); every row
-> with overlap ≥ 3 has both a strategy-B and strategy-C ledger row (**gate: 0 missing**);
-> distribution of `hypotheses_challenged` across H1–H11 — name every hypothesis with **zero**
-> challengers so LIT-06 knows where its collision searches must dig; `derivative_ancestor`
-> filled on every row (**gate: 0 blank**); governance and staged private-content checks.
+> Files: the evidence matrix, the ledger. Measurements:
+>
+> 1. Total matrix rows (**gate: 20–30**, the methodology's stop condition).
+> 2. Blank required fields (**gate: 0**).
+> 3. Every row with either overlap score ≥ 3 has both a `strategy_phase: B` and a
+>    `strategy_phase: C` ledger row with its id in `subject_source_id` (**gate: 0
+>    missing**).
+> 4. Distribution of `hypotheses_challenged` across H1–H11 — name every hypothesis with
+>    **zero** challengers so LIT-06 knows where its collision searches must dig.
+> 5. `derivative_ancestor` filled on every row (**gate: 0 blank**).
 
 *R deferred to LIT-06. No A.*
 
@@ -574,24 +734,26 @@ here.*
 
 ### LIT-06 K — kickoff (Haiku)
 
-> Claim `phase-lit-06` per `AGENTS.md` (branch `agent/phase-lit-06`). Item order:
-> S1 → X1 → R (one dispatch per critical collision) → X2 → G.
+> Claim `phase-lit-06` per `AGENTS.md`. Continue on the campaign branch
+> `agent/lit-campaign`. Item order: S1 → X1 → R (one dispatch per critical collision, to
+> agents that produced neither the collision's matrix row nor 05/06) → X2 → G.
 
 ### LIT-06 S1 — per-hypothesis collision search (Sonnet)
 
-> Block C applies. For each hypothesis H1–H11 (register text and falsification criterion in
-> the scope record, `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`):
-> run the matrix's pre-crafted collision queries for the domains bearing on it, plus
+> For each hypothesis H1–H11 (register text and falsification criterion in the scope record,
+> `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`): run the
+> search-domain matrix's pre-crafted collision queries for the domains bearing on it, plus
 > gap-driven variants for any hypothesis LIT-05's gate reported with zero challengers.
 > Construct queries specifically intended to find systems that already do what the
 > hypothesis claims — you are trying to support H0, not defend the hypothesis. Ledger rows
-> use the hypothesis id as `domain_id`. Deep-extract any genuinely new strong candidate into
-> the matrix (full contract row).
+> use the hypothesis id (`H1`–`H11`) as `domain_id`. Deep-extract any genuinely new strong
+> candidate into the matrix (full contract row). (Block S's per-domain coverage floors apply
+> per hypothesis here: at least two distinct-query rows per hypothesis id.)
 
 ### LIT-06 X1 — hypothesis tests (Sonnet)
 
-> Block C applies. Write `research/literature-review/06_hypothesis_tests.md`: for each of
-> H1–H11 the methodology's block —
+> Write `research/literature-review/06_hypothesis_tests.md`: for each of H1–H11 the
+> methodology's block —
 >
 > ```yaml
 > hypothesis:
@@ -617,27 +779,31 @@ here.*
 > You are an independent reviewer in an adversarial literature review. You receive exactly
 > two inputs and must not seek the first assessor's reasoning: (1) the source named below;
 > (2) its evidence-matrix row (all fields, from
-> `research/literature-review/04_evidence_matrix.csv`). The row's scores flag this source as
-> a critical collision against the D-System hypothesis set (scope record:
+> `research/literature-review/04_evidence_matrix.csv`). **Do not open
+> `research/literature-review/05_critical_collisions.md` or
+> `research/literature-review/06_hypothesis_tests.md`** — they contain the first
+> assessment's rationale, which must not reach you. The row's scores flag this source as a
+> critical collision against the D-System hypothesis set (scope record:
 > `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`).
 >
 > Independently: inspect the source at the fullest legal access; verify the row's factual
-> fields against it; re-derive both overlap scores from the contract's rubric
-> (`PLAN-023.03`); state whether the critical-collision flag stands, and whether the row
-> overstates or understates the collision. Output: `confirmed` or `disputed: <what differs
-> and the evidence locator for it>`, plus any factual corrections, into the row's
-> `second_review` field and a dated subsection of `05_critical_collisions.md`. You never
-> receive, and must not request, the first assessment's rationale. Disagreement is a result
-> to record, not to negotiate away.
+> fields against it; re-derive both overlap scores from the evidence contract's rubric
+> (`docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md`);
+> state whether the critical-collision flag stands, and whether the row overstates or
+> understates the collision. **Your entire output is your report**: `confirmed` or
+> `disputed: <what differs and the evidence locator for it>`, plus any factual corrections,
+> returned to the dispatcher. You write no repository file — LIT-06 X2 alone folds review
+> verdicts into the record. Disagreement is a result to record, not to negotiate away.
 >
 > *(Dispatcher: fill in — source citation and access path: `____`; matrix row: `____`.
 > Dispatch one R per `critical_collision: yes` row, to an agent that produced neither the
-> row nor 05/06.)*
+> row nor 05/06; collect each R's report for X2.)*
 
-### LIT-06 X2 — reconcile reviews (Sonnet)
+### LIT-06 X2 — reconcile reviews (Sonnet; runs after all R reports are collected, and is the only writer of review outcomes)
 
-> Block C applies. Fold the R outcomes into `05_critical_collisions.md` and the matrix's
-> `second_review` fields. A `disputed` outcome is recorded with both positions visible;
+> Inputs: the R reports the dispatcher collected. Serially, one collision at a time: write
+> each verdict into the matrix row's `second_review` field and into a dated subsection of
+> `05_critical_collisions.md`. A `disputed` outcome is recorded with both positions visible;
 > apply at most two fix cycles against factual errors, then report what stands. If any
 > collision **falsifies scope** — a source that materially subsumes a hypothesis such that
 > continuing the campaign as scoped makes no sense — that is a critical issue: it gets
@@ -646,17 +812,23 @@ here.*
 
 ### LIT-06 G — phase gate (Haiku)
 
-> Read `06_hypothesis_tests.md`, `05_critical_collisions.md`, the matrix and the ledger;
-> report with real output: every H1–H11 has a challenger block with a permitted status
-> (**gate: 11 of 11**; per the methodology, each hypothesis needs at least one serious
-> challenger before stopping); every `critical_collision: yes` row has `second_review` set
-> to `confirmed` or `disputed` (**gate: 0 pending**); every H1–H11 has ledger rows with the
-> hypothesis id as `domain_id` (**gate: ≥ 2 each**); duplicate rate in this phase's searches
-> (share of `result_ids` already in the inventory) — report the number as the saturation
-> signal; governance and staged private-content checks.
+> Files: `06_hypothesis_tests.md`, `05_critical_collisions.md`, the matrix, the ledger.
+> Measurements:
 >
-> **After this gate: the campaign stops for the owner's one check-in (ratified decision 3).
-> LIT-07 is not dispatched until the owner has held it.**
+> 1. Every H1–H11 has a challenger block with a permitted status (**gate: 11 of 11**; per
+>    the methodology, each hypothesis needs at least one serious challenger before
+>    stopping).
+> 2. Every `critical_collision: yes` row has `second_review` set to `confirmed` or
+>    `disputed` (**gate: 0 pending**).
+> 3. Ledger rows with a hypothesis id as `domain_id`, per hypothesis — counting rows from
+>    any phase (LIT-01 S4's `H4` rows count toward H4) (**gate: ≥ 2 each**).
+> 4. Duplicate rate in this phase's searches (share of `result_ids` already in the
+>    inventory) — report the number as the saturation signal.
+>
+> **After this gate: the campaign stops for the owner's one check-in (ratified decision 3),
+> which is also the first owner integration of `agent/lit-campaign` into `dev`. LIT-07 is
+> not dispatched until the kick-off record carries the dated check-in entry LIT-07 K
+> requires.**
 
 *No A: 05/06 are evidence documents; the synthesis review runs in LIT-07.*
 
@@ -666,13 +838,17 @@ here.*
 
 ### LIT-07 K — kickoff (Haiku)
 
-> Confirm the pre-synthesis owner check-in has been held (the kick-off record carries the
-> ruling; without it, stop — do not dispatch further items). Claim `phase-lit-07` per
-> `AGENTS.md` (branch `agent/phase-lit-07`). Item order: X1 → X2 → X3 → A → G.
+> Confirm the pre-synthesis owner check-in has been held: the kick-off record must contain a
+> dated entry of the form **`pre-synthesis check-in held: <date>, ruling: proceed`** — an
+> entry absent at campaign start by construction, appended only when the owner holds the
+> check-in. If the entry is missing, stop and report; do not dispatch further items. Then
+> claim `phase-lit-07` per `AGENTS.md` and continue on the campaign branch
+> `agent/lit-campaign` (the owner will have integrated it into `dev` at the check-in; rebase
+> onto `dev` if the branches have diverged). Item order: X1 → X2 → X3 → A → G.
 
 ### LIT-07 X1 — the anti-novelty case, then survivors (Sonnet)
 
-> Block C applies. Write, in this order:
+> Write, in this order:
 >
 > 1. `research/literature-review/07_anti_novelty_case.md` — the strongest coherent argument
 >    that D-System requires no new mechanism: the methodology's §14 decomposition (Knowledge
@@ -691,22 +867,23 @@ here.*
 
 ### LIT-07 X2 — implications, questions, experiments (Sonnet)
 
-> Block C applies. Write: `09_reuse_recommendations.md` (standards, ontologies, models and
-> implementations D-System should inherit rather than recreate — each with the matrix row
-> that establishes it); `10_architecture_implications.md` (what the literature implies for
-> the conceptual architecture and the implemented one — recorded implications only, no code,
-> no edits outside `research/literature-review/`); `11_open_research_questions.md`
-> (questions prior art does not resolve); `12_experiment_proposals.md` (experiments capable
-> of distinguishing D-System mechanisms from simpler baselines, tied to hypotheses that
-> ended `POTENTIALLY_DISTINCT` or `INSUFFICIENT_EVIDENCE`). Commit after each file.
+> Write: `research/literature-review/09_reuse_recommendations.md` (standards, ontologies,
+> models and implementations D-System should inherit rather than recreate — each with the
+> matrix row that establishes it); `research/literature-review/10_architecture_implications.md`
+> (what the literature implies for the conceptual architecture and the implemented one —
+> recorded implications only, no code, no edits outside `research/literature-review/`);
+> `research/literature-review/11_open_research_questions.md` (questions prior art does not
+> resolve); `research/literature-review/12_experiment_proposals.md` (experiments capable of
+> distinguishing D-System mechanisms from simpler baselines, tied to hypotheses that ended
+> `POTENTIALLY_DISTINCT` or `INSUFFICIENT_EVIDENCE`). Commit after each file.
 
 ### LIT-07 X3 — validated bibliography (Sonnet)
 
-> Block C applies. Write `research/literature-review/13_validated_bibliography.md`: every
-> source a synthesis claim rests on, plus every seed source from `research/sources/` that
-> was promoted — each seed through the contract's five steps with the outcome recorded per
-> step; a seed that fails a step is listed with the failing step named. The historical seed
-> ledger is not edited. Commit.
+> Write `research/literature-review/13_validated_bibliography.md`: every source a synthesis
+> claim rests on, plus every seed source from `research/sources/` that was promoted — each
+> seed through the evidence contract's five steps with the outcome recorded per step; a seed
+> that fails a step is listed with the failing step named. The historical seed ledger is not
+> edited. Commit.
 
 ### LIT-07 A — adversarial synthesis review (Sonnet; a different agent from X1–X3)
 
@@ -728,21 +905,25 @@ here.*
 
 ### LIT-07 G — final gate: the campaign's stop conditions, measured (Haiku)
 
-> Read the ledger, inventory, matrix and deliverables; report with real output, each
-> stop-condition measured never asserted:
+> Files: the ledger, the inventory, the matrix, the thirteen deliverables. Measurements,
+> each stop-condition measured never asserted:
 >
-> 1. All 72 domains searched with ≥ 2 distinct-query ledger rows (per-domain counts).
-> 2. Strongest collisions have strategy-B and strategy-C chain rows (count missing: gate 0).
+> 1. All 72 domains searched with ≥ 2 distinct-query ledger rows and full mandated-variant
+>    coverage (per-domain counts; variants from the Pass 1 S payloads).
+> 2. Strongest collisions (either overlap score ≥ 3) have `strategy_phase: B` and
+>    `strategy_phase: C` ledger rows carrying their id in `subject_source_id` (count
+>    missing: gate 0).
 > 3. Every H1–H11 has ≥ 1 serious challenger with a permitted status in 06 (list).
 > 4. Matrix rows 20–30, no blank required fields.
-> 5. Saturation: duplicate rate of the last two phases' searches against the inventory —
->    report the trend (rising duplicates = saturation demonstrated).
+> 5. Saturation: duplicate rate of phase-lit-06's searches, compared against phase-lit-05's,
+>    measured against the inventory — report the trend (rising duplicates = saturation
+>    demonstrated).
 > 6. Every critical collision `second_review` is `confirmed` or `disputed` (count pending:
 >    gate 0).
 > 7. All thirteen deliverables exist in `research/literature-review/`.
-> 8. A-review blocking findings: count outstanding (gate 0; at most two fix cycles were
->    available — survivors are reported to the owner, not looped on).
-> 9. `uv run python -m src.governance` exit code; staged private-content check.
+> 8. A-review blocking findings: every one is either addressed or recorded for the owner's
+>    report (**gate: 0 unaddressed-and-unrecorded**; at most two fix cycles were available —
+>    survivors are reported, not looped on, and a recorded survivor passes this gate).
 >
 > This closes the first formal review: a research memo, not a final novelty claim.
 
@@ -753,6 +934,7 @@ here.*
 Each phase's session record reports spend posture per `GOV-009`: searches run (ledger row
 count), sources deep-read, fix cycles used, any Opus escalation (at most one per campaign,
 documented), wall-clock against the seven-session runway (owner-accepted range six to eight).
-A campaign that stops early stops at a phase boundary with resume state in the session record.
-No descope-ladder rung (campaign plan, `PLAN-023`) is taken without the owner's explicit
-direction.
+Close-out is the second owner integration of `agent/lit-campaign` into `dev`. A campaign that
+stops early stops at a phase boundary with resume state in the session record. No
+descope-ladder rung (campaign plan, `PLAN-023`) is taken without the owner's explicit
+direction; each rung's gate re-parameterization is stated alongside it there.

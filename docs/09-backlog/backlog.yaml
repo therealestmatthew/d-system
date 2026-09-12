@@ -6020,7 +6020,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6049,7 +6048,8 @@ items:
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   - Run delegation-pack section LIT-01 G (PROMPT-029) and record real output - per-domain
-    ledger counts for D01-D20 and D28-D32 with at least two distinct queries each, zero
+    ledger counts for D01-D20 and D28-D32 with at least two distinct queries each and
+    every mandated minimum variant appearing in some logged query for its domain, zero
     excluded inventory rows missing a reason, zero kept-but-uninventoried sources
   deliverables:
   - research/literature-review/00_search_ledger.csv
@@ -6067,7 +6067,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6092,7 +6091,8 @@ items:
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   - Run delegation-pack section LIT-02 G (PROMPT-029) and record real output - per-domain
-    ledger counts for D21-D27 and D33-D45 with at least two distinct queries each, zero
+    ledger counts for D21-D27 and D33-D45 with at least two distinct queries each and
+    every mandated minimum variant appearing in some logged query for its domain, zero
     excluded inventory rows missing a reason, zero kept-but-uninventoried sources
   deliverables:
   - research/literature-review/00_search_ledger.csv
@@ -6109,7 +6109,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6135,8 +6134,9 @@ items:
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   - Run delegation-pack section LIT-03 G (PROMPT-029) and record real output - all 72 domains
-    with at least two distinct-query ledger rows, at least 75 kept inventory candidates, the
-    domain map complete with all 72 entries and a ranked top-20 collision list
+    with at least two distinct-query ledger rows and full mandated-variant coverage, at
+    least 75 kept inventory candidates, the domain map complete with all 72 entries and
+    a ranked top-20 collision list
   deliverables:
   - research/literature-review/00_search_ledger.csv
   - research/literature-review/03_source_inventory.csv
@@ -6153,7 +6153,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6162,8 +6161,8 @@ items:
   - phase-lit-03
   scope:
   - Execute the delegation pack's LIT-04 section verbatim - create the evidence matrix
-    at the evidence contract's path and deep-read the top collision candidates (roughly
-    the top 15 by pre-score), filling every extraction-schema field including strongest
+    at the evidence contract's path and deep-read the top-20 collision candidates
+    in ranked batches, filling every extraction-schema field including strongest
     overlap, strongest difference, hypotheses challenged, evidence locator, interpretation
     confidence and access limitation.
   - Backward citation chaining on each candidate - identify theoretical ancestors
@@ -6197,7 +6196,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6240,7 +6238,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6287,7 +6284,6 @@ items:
   - doc-prompt-literature-review-delegation-pack
   systems:
   - sys-research
-  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 3
@@ -6297,7 +6293,10 @@ items:
   scope:
   - 'Entry condition (ratified decision 3, PROMPT-027): the owner''s one campaign
     check-in happens before this phase starts - it does not begin, even if ready,
-    until the kick-off record''s pre-synthesis check-in is held.'
+    until the kick-off record carries a dated "pre-synthesis check-in held: <date>,
+    ruling: proceed" entry, which is absent at campaign start by construction; the
+    LIT-07 K kickoff verifies that exact entry and stops without it. The check-in
+    is also the first of the two owner integrations of agent/lit-campaign into dev.'
   - Execute the delegation pack's LIT-07 section verbatim - write the anti-novelty
     case (07) first, then only after it the surviving distinctions (08), then reuse
     recommendations (09), architecture implications (10), open research questions

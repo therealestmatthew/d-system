@@ -79,18 +79,29 @@ phase-lit-07  Pass 4   synthesis: 07–13, adversarial synthesis review (A),
 ```
 
 The Pass 1 phases run sequentially (not in parallel) because all three append to one shared
-reproducibility ledger and one running terminology map. The pre-synthesis owner check-in is
-encoded as `phase-lit-07`'s stated entry condition in the backlog; the `depends_on` chain
-guarantees no synthesis while any evidence phase is open. A critical issue mid-campaign — a
+reproducibility ledger and one running terminology map.
+
+**Branch model (owner ruling, 2026-09-12): one long-lived campaign branch,
+`agent/lit-campaign`.** Every phase commits to it, so the ledger, inventory, matrix and
+deliverables are always present for the next phase's kickoff without cross-branch archaeology.
+The owner integrates the campaign branch into `dev` exactly twice: at the pre-synthesis
+check-in and at close-out. No per-phase branches.
+
+The pre-synthesis owner check-in is encoded as `phase-lit-07`'s stated entry condition in the
+backlog: it is held when the kick-off record carries a dated
+`pre-synthesis check-in held: <date>, ruling: proceed` entry — absent at campaign start by
+construction — and it is also the first of the two owner integrations of `agent/lit-campaign`
+into `dev`. The `depends_on` chain guarantees no synthesis while any evidence phase is open. A critical issue mid-campaign — a
 collision that falsifies scope, a methodology defect invalidating collected evidence — gets
 `GOV-009`'s dual adversarial review first and pauses the campaign outside the gate only if it
 survives unresolved.
 
 ## Deliverable coverage
 
-Each of the thirteen campaign deliverables is owned by the phase whose backlog `deliverables`
-list it — a deliverable no phase produces is impossible by construction. `01`–`03` are built
-incrementally from `phase-lit-01` on; the completing phase owns each.
+Each of the thirteen campaign deliverables is owned by **the phase that completes it**, and
+appears in that phase's backlog `deliverables` — so a deliverable no phase produces is
+impossible by construction. `01`–`03` are built incrementally from `phase-lit-01` on; the
+completing phase is the owner in every case.
 
 | Deliverable | Owning phase |
 |---|---|
@@ -129,26 +140,43 @@ modified. The second reviewer for critical collisions runs as a **pack-supplied 
 general-purpose agent** (owner ruling, 2026-09-12) — no committed charter; the delegation
 pack's `R` sections carry the reviewer prompt verbatim.
 
-## Descope ladder (drafter's proposal — ratified at the stage-5 pack-audit gate)
+## Descope ladder (ratified by the owner 2026-09-12, with two amendments applied)
 
 Emergencies only. **No rung is taken without the owner's explicit direction** (`GOV-009`); a
 campaign that stops early stops at a phase boundary with resume state in its session record.
-Rungs in order, first cut first:
+Per the owner's first amendment, every rung states the gate re-parameterization it implies —
+a rung that changes what the campaign does must change what its gates measure, in the same
+direction. Rungs in the owner's ratified order, first cut first:
 
 1. **Fold near-synonym domains into their parents for Pass 1 breadth** — doxastic logic (D10)
    under epistemic logic (D09), micropublications (D20) under nanopublications (D19), digital
    engineering (D48) under digital thread (D47), autonomic computing (D70) under MAPE-K (D69),
    QOC (D42) under IBIS/design rationale (D41/D37) — survey plus the pre-crafted collision
    query only, each fold logged in the ledger as a fold, not silently skipped.
+   *Gate re-parameterization*: for a folded domain, the Pass 1 gates (LIT-01/02/03 G and final
+   stop-condition 1) require one collision-query ledger row under the folded domain's own id
+   instead of the two-distinct-query and variant-coverage gates, which then apply to the
+   parent domain only.
 2. **Reduce Pass 2 deep reads from 20–30 to the top 15** by collision pre-score. Every
    `CRITICAL_COLLISION` always keeps its deep read regardless of this rung.
-3. **Drop forward citation chaining (Phase C) for non-critical sources.** Backward chaining
+   *Gate re-parameterization*: LIT-05 G's row-count gate and final stop-condition 4 are
+   rewritten to "≥ 15 rows, every `CRITICAL_COLLISION` present".
+3. **Restrict seed-ledger validation to seeds actually cited in synthesis claims**, with
+   `13_validated_bibliography.md` recording the restriction explicitly.
+   *Gate re-parameterization*: the final gate's deliverable check counts `13` complete when
+   every synthesis-cited seed has its five promotion steps recorded; uncited seeds are listed
+   as `not validated under descope rung 3` rather than gating.
+4. **Drop forward citation chaining (Phase C) for non-critical sources.** Backward chaining
    stays everywhere — ancestry is what the independence rules depend on.
-4. **Thin synthesis deliverables 09, 10 and 12** (reuse recommendations, architecture
+   *Gate re-parameterization*: LIT-05 G's chaining gate and final stop-condition 2 require
+   strategy-C rows only for `critical_collision: yes` sources; strategy-B rows remain required
+   for every row scoring ≥ 3.
+5. **Thin synthesis deliverables 09, 10 and 12** (reuse recommendations, architecture
    implications, experiment proposals) to structured findings lists. 07, 08 and 11 are never
    thinned — the anti-novelty case and what survives it are the campaign's point.
-5. **Restrict seed-ledger validation to seeds actually cited in synthesis claims**, with
-   `13_validated_bibliography.md` recording the restriction explicitly.
+   *Gate re-parameterization*: the final gate still requires all thirteen files to exist; the
+   content standard for 09/10/12 becomes a structured findings list, and the A review audits
+   them against that standard rather than the full-prose one.
 
 Never cut, at any rung: at least one serious challenger per H1–H11; second reviews of critical
 collisions; the reproducibility ledger; the anti-novelty case; the hypothesis tests; any pass

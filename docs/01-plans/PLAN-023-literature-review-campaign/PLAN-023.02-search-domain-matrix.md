@@ -43,7 +43,7 @@ logged in the ledger. The collision queries are starting points for Phase E; Pas
 |---|---|---|---|
 | D01 | Knowledge graphs | knowledge graph, ontology, RDF graph, property graph, knowledge base construction, entity-relation model | "knowledge graph" epistemic status lifecycle state classification |
 | D02 | Semantic Web | Semantic Web, RDF/OWL, linked data, SPARQL, named graphs, reification | "named graph" provenance belief statement-level metadata |
-| D03 | W3C PROV / provenance | W3C PROV, PROV-O, provenance ontology, prov:Activity/Agent/Entity, derivation, attribution, delegation | PROV-O reasoning lineage conflict resolution authority |
+| D03 | W3C PROV / provenance | W3C PROV, PROV-O, provenance ontology, prov:Activity/Agent/Entity, derivation, attribution, delegation, epistemic provenance | PROV-O reasoning lineage conflict resolution authority; "epistemic provenance" knowledge graph |
 | D04 | Temporal knowledge graphs | temporal knowledge graph, TKG, time-aware embedding, temporal fact, quadruple (s,p,o,t) | "temporal knowledge graph" belief revision provenance |
 | D05 | Bi-temporal systems | bi-temporal, valid time, transaction time, temporal versioning, as-of query | bitemporal knowledge base belief validity transaction time |
 | D06 | Event sourcing | event sourcing, append-only log, CQRS, event store, projection, immutable log | "event sourced" knowledge graph state transition provenance |
