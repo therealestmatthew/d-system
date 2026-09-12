@@ -98,7 +98,7 @@ None.
 ## Review
 
 Independent review by a fresh, non-fork sub-agent, given the phase's `scope`/`acceptance`/
-`verification` from `backlog.yaml`, the commit range `the commit “Claim phase-idea-08 for agent-claude”..HEAD` (single commit “phase-idea-08: annotations and typed relationships”),
+`verification` from `backlog.yaml`, the commit range from “Claim phase-idea-08 for agent-claude” to HEAD (single commit “phase-idea-08: annotations and typed relationships”),
 and this session record's content — instructed to reach its own verdicts from the diff and its own
 reruns, not to check whether the record's claims read plausibly. Pasted verbatim:
 

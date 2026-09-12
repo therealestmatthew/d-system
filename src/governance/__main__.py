@@ -15,11 +15,11 @@ from typing import Any
 import yaml  # type: ignore[import-untyped]
 from jsonschema import Draft7Validator, FormatChecker  # type: ignore[import-untyped]
 
+from src.db.ideas import fold, load_events
+from src.db.source_validation import data_root
 from src.governance.backlog import inspect_backlog, render_backlog
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
-from src.db.ideas import fold, load_events
-from src.db.source_validation import data_root
 
 ROOT = Path(__file__).resolve().parents[2]
 # Navigation and the user's execution input are explicitly exempt, not all README files.

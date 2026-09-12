@@ -1,0 +1,103 @@
+<!--
+  D-System overview — page template.
+
+  Consumed by the (not-yet-built) tools/generate_overview.py generator, which fills every
+  {{TOKEN}} below with plain string substitution — no templating dependency is assumed or
+  required, since none is declared in pyproject.toml. The generator is the only place that
+  ever computes a number; this file only arranges markup around numbers the deterministic
+  tools already produced (REQ-006 R07/R08).
+
+  Token contract:
+    {{PAGE_TITLE}}            - plain text, e.g. "D-System Overview"
+    {{INLINE_STYLES}}         - the full contents of templates/styles/overview.css, inlined
+                                 here so the rendered page is one self-contained file with no
+                                 external network dependency and no repository-relative link
+                                 that could break when embedded from a different origin/path.
+    {{GENERATED_AT}}          - tools/overview_metrics.py meta.reference_at (the idea log's
+                                 latest event timestamp) — never a wall-clock render timestamp.
+                                 tools/generate_overview.py requires this for its determinism
+                                 guarantee: two generations against an unchanged repository must
+                                 produce byte-identical output (REQ-006 R08), which a wall-clock
+                                 value would break
+    {{IDEA_COUNT}}            - tools/overview_metrics.py meta.idea_count
+    {{EVENT_COUNT}}           - tools/overview_metrics.py meta.event_count
+    {{BACKLOG_PHASE_COUNT}}   - tools/overview_metrics.py meta.backlog_phase_count
+    {{CONCEPT_COUNT}}         - tools/overview_inventory.py meta.concept_count
+    {{TERM_COUNT}}            - tools/overview_inventory.py meta.term_count
+    {{SYSTEM_COUNT}}          - tools/overview_inventory.py meta.system_count
+    {{METRICS_SECTIONS}}      - one overview-metrics-section.html render per key in
+                                 tools/overview_metrics.py's output (funnel, cycle_time,
+                                 annotation_coverage, link_distribution, link_orphans,
+                                 throughput_by_day, age_of_open_ideas, backlog_by_status),
+                                 concatenated in that order
+    {{CONCEPTS_PANEL}}        - one overview-concepts-panel.html render
+    {{SYSTEMS_PANEL}}         - one overview-systems-panel.html render
+
+  Layout: three sections (Metrics / Concepts & Terminology / Systems) behind CSS-only radio
+  tabs — no JavaScript, so the page still works if the embedding context blocks scripts.
+  Overflow inside a section is revealed in place via the native <details> fallback each
+  overview-metrics-section.html component carries, never by growing the page past its
+  container. This page is meant to sit inside the stage panel (phase-demo-02); it does not
+  itself assume zero page scrolling — the panel embedding it supplies the scroll boundary.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}}</title>
+<style>
+{{INLINE_STYLES}}
+</style>
+</head>
+<body>
+<div class="overview">
+  <header class="overview__header">
+    <h1 class="overview__title">{{PAGE_TITLE}}</h1>
+    <p class="overview__meta">
+      Generated {{GENERATED_AT}}
+      &middot; {{IDEA_COUNT}} ideas
+      &middot; {{EVENT_COUNT}} events
+      &middot; {{BACKLOG_PHASE_COUNT}} backlog phases
+      &middot; {{CONCEPT_COUNT}} concepts
+      &middot; {{TERM_COUNT}} terms
+      &middot; {{SYSTEM_COUNT}} systems
+    </p>
+  </header>
+
+  <div class="overview__tabset">
+    <input type="radio" name="overview-tab" id="tab-metrics" class="overview__tab-input" checked>
+    <label for="tab-metrics" class="overview__tab-label">Metrics</label>
+
+    <input type="radio" name="overview-tab" id="tab-concepts" class="overview__tab-input">
+    <label for="tab-concepts" class="overview__tab-label">Concepts &amp; Terminology</label>
+
+    <input type="radio" name="overview-tab" id="tab-systems" class="overview__tab-input">
+    <label for="tab-systems" class="overview__tab-label">Systems</label>
+
+    <section id="panel-metrics" class="overview__panel overview__panel--metrics" aria-labelledby="tab-metrics">
+      <h2 class="overview__panel-title">Idea and backlog metrics</h2>
+      <div class="metric-grid">
+        {{METRICS_SECTIONS}}
+      </div>
+    </section>
+
+    <section id="panel-concepts" class="overview__panel overview__panel--concepts" aria-labelledby="tab-concepts">
+      {{CONCEPTS_PANEL}}
+    </section>
+
+    <section id="panel-systems" class="overview__panel overview__panel--systems" aria-labelledby="tab-systems">
+      {{SYSTEMS_PANEL}}
+    </section>
+  </div>
+
+  <footer class="overview__footer">
+    <p>
+      Rendered by <code>tools/generate_overview.py</code> from
+      <code>tools/overview_metrics.py</code> and <code>tools/overview_inventory.py</code>.
+      No figure on this page is computed at render time.
+    </p>
+  </footer>
+</div>
+</body>
+</html>

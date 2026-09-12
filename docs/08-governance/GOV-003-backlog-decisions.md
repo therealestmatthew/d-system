@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-07'
+updated: '2026-09-12'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -118,7 +118,7 @@ which instructed a reader or an agent to write the old field name, PROMPT-001 of
 `phase-cap-02`. Historical records — ADR-008, PLAN-009, PROMPT-002 and the session logs — keep the old
 name, because they describe what was true when they were written.
 
-Both widenings were committed to `backlog.yaml` on `dev` before the work, so the wider lock was
+Both widenings were committed to `backlog.yaml` on `main` before the work, so the wider lock was
 visible first. The owner chose this over filing a separate migration phase; the alternative would
 have split one rename across two sessions with the data invalid in between. The owner also supplied
 the three replacement cadence values in the same session, which satisfies `phase-cap-08`'s cadence
@@ -218,8 +218,141 @@ governance discovery loop, not merely emptied of files — the same cost ADR-006
 the original code-system migration. See [PLAN-018](../01-plans/PLAN-018-plans-directory-consolidation.md)
 and [REQ-004](../06-requirements/REQ-004-plans-directory-consolidation.md), delivered by `phase-plc-01`.
 
-## Decisions reserved until evidence exists
+## The demo track completes through its testing gate, not through /session-close
+
+Owner decision, 2026-09-10, for the five `phase-demo-*` phases only. The backlog validator rejects
+an active phase whose prerequisite is not `status: complete`, and the demo build (PROMPT-014)
+cannot pause for an owner-run `/session-close` at every phase boundary on demo day. The owner
+substituted the completion authority for this track: a demo phase is marked `complete` by the
+build coordinator once its gate has passed — every verification command green with output
+captured, the phase's adversarial review (`demo-adversary`) with findings fixed or explicitly
+reported, and, for phases with a browser-facing deliverable, the Playwright-driven web checks
+(`demo-validator-web`) — and the branch is integrated onto `dev` with the owner's approval. The
+completion edit is one small commit on `dev` immediately after that integration.
+
+What is bought and what is conceded. The section above this one records why an agent must never
+decide a session is over; this decision consciously narrows that rule for one track, trading the
+owner's synchronous judgment for an adversarial gate plus **retroactive** owner review — the owner
+reads the session records and may run `/session-close` afterwards as an audit of phases already
+complete. The integration ask is unchanged: merging onto `dev` still requires the owner each time,
+so a human remains in the loop at every boundary; what moved is only which authority flips the
+status field. Everywhere outside `phase-demo-*`, `/session-close` remains the only path to
+`status: complete`, and the checkpoint skill's never-complete rule stands unmodified (its text is
+currently a `phase-port-01` deliverable and was deliberately not edited for this exception).
+
+## phase-demo-06 inserted ahead of the rehearsal phase
+
+Owner decision, 2026-09-10, after testing the integrated stage (phases 01–04): the stage terminal
+interaction upgrade (`phase-demo-06` — session tabs that survive collapse, a confirmation-guarded
+drop control, in-page command injection from a data file, resize wiring; REQ-006 rows R10–R12)
+folds into the demo track ahead of the rehearsals rather than waiting for a post-demo phase.
+`phase-demo-05` was returned to `queued` — its claim released with zero commits on its branch,
+its worktree kept — and gained `phase-demo-06` as a dependency so the runbook and rehearsals
+describe the final UI. The demo-track completion decision above extends to `phase-demo-06` on the
+same terms ("five phases" reads as the track's phases). A backend inject/read API for driving the
+terminal from outside the page was considered and parked as an idea: per ADR-013's closing
+consequence, that capability starts from its own decision record.
+
+## The demo-track completion gate extends to the workbench track
+
+Owner decision, 2026-09-10, ratified through the workbench pre-plan package (`PROMPT-020`, item
+5 of its production list). The completion-authority substitution recorded above for
+`phase-demo-*` extends on identical terms to the seven `phase-wb-*` phases of the workbench
+build ([PLAN-022](../01-plans/PLAN-022-workbench.md)): a workbench phase is marked
+`status: complete` by the build coordinator (`PROMPT-022`) once its gate has passed — every
+verification command green with output captured, the phase's adversarial review
+(`demo-adversary`, pack `WNN-A`) with findings fixed or explicitly reported, and, for phases
+with a browser-facing deliverable, the Playwright-driven checks (`demo-validator-web`, pack
+`WNN-W`) — and the branch is integrated onto `dev` with the owner's approval. The completion
+edit is one small commit on `dev` immediately after that integration.
+
+The same trade and the same limits apply: the owner's synchronous judgment is substituted by
+the adversarial gate plus retroactive review, integration onto `dev` still requires the owner
+each time, and everywhere outside `phase-demo-*` and `phase-wb-*`, `/session-close` remains the
+only path to `status: complete`. One addition specific to this track: `phase-wb-07`'s
+owner-machine conditions — the REQ-006 R06 Windows smoke check, the REQ-007 W12 Windows shell
+round-trips, and the owner-driven R09 timing — close only on the owner's recorded results; the
+coordinator may not mark that phase complete on agent evidence alone.
 
 Semantic provider, private/cloud data boundary, storage and quality targets belong to deferred `phase-mem-15`. No provider was selected or memory transmission authorized by the questionnaire. Agentic refinement additionally requires evidence that the simpler retrieval stages leave useful work unresolved. The optional periodic memory-review phase packages an opt-in trigger; it does not activate a scheduler or automate approval/deletion.
 
 These are tracked gates with resume conditions, not missing backlog coverage. All feature plans remain open until their mapped phases are completed or explicitly cancelled with rationale.
+
+## The workbench completion gate extends to the fix phases
+
+Owner decision, 2026-09-11, ratified in the workbench-fixes planning session (AskUserQuestion,
+recorded in `PROMPT-024`'s planning trail). The workbench completion-authority substitution
+above extends on identical terms to `phase-wb-08` and `phase-wb-09`, the two fix phases the
+2026-09-11 delta added to [PLAN-022](../01-plans/PLAN-022-workbench.md) ("the seven
+`phase-wb-*` phases" reads as the track's phases, the same reading the `phase-demo-06`
+insertion established for the demo track). Integration onto `dev` is pre-approved for both
+behind a green gate per the kick-off record's delta. The extension does **not** cover
+`phase-wb-10` (the runbook refresh): that documentation phase completes through
+`/session-close` as normal, and its integration asks the owner.
+
+Coordinator decision, 2026-09-10, during the workbench build (PROMPT-022/PROMPT-023).
+`phase-wb-02`'s pack instruction (PROMPT-021 W02-C2, owner-ratified) replaces the
+talking-points panel with the notes strip and removes the old component,
+`ts/src/stage/TalkingPointsRegion.tsx` — a file pinned in the completed `phase-demo-02`'s
+`completion_evidence`. The governance evidence check requires listed files to exist, so the
+mandated deletion made governance red in the `phase-wb-02` worktree, and the phase's
+orchestrator correctly stopped and reported rather than editing a closed phase's record.
+
+Resolution: the deleted file's single evidence line is removed from `phase-demo-02`'s
+`completion_evidence`; the entry's remaining eight files (StagePage, TerminalRegion,
+OverviewRegion, Tooltip, Popover, the CSS, `talking-points.json`, `vite.config.ts`) still
+demonstrate the phase. The general rule this records: completion evidence pins what existed
+when the phase closed, and when a later phase's sanctioned scope deletes such a file, the
+evidence line retires with it — in the same diff as a GOV-003 note, never silently. The
+session record (`SESS-2026-09-10-05`-era records and git history) remains the durable proof
+of what the phase produced.
+
+## Every session works in a worktree; the documentation-only exception is withdrawn
+
+Owner ruling, 2026-09-12. **Every session's work happens in a worktree.** What the work touches
+is irrelevant — a documentation- or skill-only change is not an exception, and neither is the
+absence of a peer claim. This supersedes the 2026-09-06 decision recorded above ("A solo agent on
+a documentation-only phase works in the primary checkout"), which stands unedited as the
+historical record of what was accepted then and why.
+
+The only work done in the primary checkout is what the claim system itself requires there:
+committing the phase claim, because `backlog.yaml` on the integration branch is the lock table
+peers read and a claim held anywhere else is invisible; and the catalog regeneration that claim
+forces, because the claim moves generated output and leaving it unregenerated leaves the
+integration branch red on `test_committed_catalog_matches_regenerated_output`. Both go in the same
+commit. Everything else — the work, its verification, checkpoints and the session record — happens
+in the worktree and reaches the integration branch by integration.
+
+**Why the earlier reasoning no longer holds.** The 2026-09-06 decision argued that with no peer
+claim and nothing outside `docs/`, there is nothing to isolate: "a Markdown edit cannot corrupt a
+run that is not happening." That is true of *runs* and false of *branches*, which is the part the
+original reasoning did not consider. Three incidents on 2026-09-12 made the gap concrete, none of
+them involving a test run or a dev server:
+
+- A session working in the primary checkout switched its branch, and another session's next two
+  commits landed on that branch instead of the integration branch. One was repaired by a ratified
+  fast-forward; the second was caught only because `git branch -d` refused to delete a branch that
+  was not fully merged.
+- Inside the same window, both sessions drew false conclusions from accurate reads of a tree that
+  was mid-switch: one briefly believed a commit had been lost, the other nearly recorded a genuine
+  ordering failure as an intermittent test.
+- A third session, reasoning from the primary checkout's state, inferred that a peer's campaign was
+  running there and relayed an instruction to move work that was already correctly isolated.
+
+The common factor is that the shared resource is the *branch pointer and the index*, not the
+virtualenv. A documentation-only session mutates both exactly as much as a code session does, so
+the exception was drawn around the wrong axis. A second virtualenv still buys nothing; a second
+branch pointer is the whole point.
+
+**Where the operative rule lives.** `AGENTS.md`'s "Concurrent agents: work in a worktree" section,
+with `GOV-001` and `GOV-002` carrying the same conditions. `CLAUDE.md` carries a pointer to it
+rather than a copy, per its own scope policy. Note that `AGENTS.md` and `CLAUDE.md` are protected
+from agent edits by the repository's permission settings as well as by their own standing rule, so
+those two files are updated by the owner; an agent proposes the wording and stops.
+
+**Two follow-ups the owner raised when ratifying this**, recorded as ideas rather than decided
+here: `000151` (the claim system depends on every agent sharing one primary checkout, which is in
+tension with this rule by construction; an MCP-held claim is the candidate substitute because it
+does not depend on which checkout is primary — see `000020`) and `000152` (a registry of active
+worktrees that agents must register in before starting work and deregister from when finished, so
+where each agent is working is a fact to read rather than an inference to draw).

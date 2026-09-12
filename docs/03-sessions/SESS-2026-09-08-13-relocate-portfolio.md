@@ -135,7 +135,7 @@ question, not a documentation correction.
 
 ## Review
 
-Independent sub-agent review, run against commit range `the commit “Claim phase-priv-03 for agent-clay, correct its scope”..HEAD` (dev), reproduced verbatim:
+Independent sub-agent review, run against commit range from “Claim phase-priv-03 for agent-clay, correct its scope” to HEAD (dev), reproduced verbatim:
 
 > **Acceptance conditions**
 >

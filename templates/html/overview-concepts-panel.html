@@ -1,0 +1,48 @@
+<!--
+  D-System overview — concepts & terminology panel component, rendered once into
+  overview-page.html's {{CONCEPTS_PANEL}} slot from tools/overview_inventory.py's
+  "concepts" and "terms" arrays.
+
+  Token contract:
+    {{CONCEPT_COUNT}}  - tools/overview_inventory.py meta.concept_count
+    {{TERM_COUNT}}     - tools/overview_inventory.py meta.term_count
+    {{CONCEPT_ROWS}}   - concatenated overview-concept-row.html renders, one per entry in
+                          the "concepts" array
+    {{TERM_ROWS}}      - concatenated overview-term-row.html renders, one per entry in the
+                          "terms" array
+-->
+<div class="inventory">
+  <h2 class="overview__panel-title">Concepts &amp; terminology</h2>
+
+  <section class="inventory__group">
+    <h3 class="inventory__group-title">Concepts ({{CONCEPT_COUNT}})</h3>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Title</th>
+          <th scope="col">Tags</th>
+          <th scope="col">Systems</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{CONCEPT_ROWS}}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="inventory__group">
+    <h3 class="inventory__group-title">Terms ({{TERM_COUNT}})</h3>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th scope="col">Term</th>
+          <th scope="col">Concept</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{TERM_ROWS}}
+      </tbody>
+    </table>
+  </section>
+</div>

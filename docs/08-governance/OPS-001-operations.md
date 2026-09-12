@@ -117,23 +117,24 @@ phase complete with an unmet acceptance condition.
 **When the owner directs work outside any claimed phase**, that work still needs a session record.
 Governed work is normally phase-shaped; the record is what keeps unphased work from being invisible.
 
-There is no remote, so nothing is fetched, pulled or pushed. A worktree is required only under the
+A remote exists, so `git fetch`, `git pull` and `git push` all work — but ask the owner before
+pushing (see `AGENTS.md`, *Confidentiality and publishing*). A worktree is required only under the
 conditions in [GOV-003](GOV-003-backlog-decisions.md); a solo agent on a documentation-only phase
-closes in the primary checkout on `dev`.
+closes in the primary checkout on `main`.
 
 ## Claim and run a phase as an agent
 
-Claim on `dev` first — the catalog is the lock table and this command is the lock check — then work
+Claim on `main` first — the catalog is the lock table and this command is the lock check — then work
 in an isolated worktree. [AGENTS.md](../../AGENTS.md) has the full step list; the mechanics are:
 
 ```bash
-git switch dev                                   # git pull too, once a remote exists
+git switch main                                   # git pull too, once a remote exists
 uv run python -m src.governance --ready          # pick a phase whose Conflicts column is —
 # edit docs/09-backlog/backlog.yaml: status: active, agent: agent-<name>, bump updated
 uv run python -m src.governance                  # the lock check; must pass before committing
 git commit -am "Claim phase-html-03"
 
-git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 dev
+git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 main
 cd ../d-system-worktrees/phase-html-03
 uv venv && uv sync --extra dev
 ```
@@ -147,9 +148,9 @@ To finish: run the phase's `verification` commands, write the dated session reco
 with `session`, `completion_evidence` and `result`, then
 
 ```bash
-git rebase dev
+git rebase main
 uv run python -m src.governance && uv run pytest   # after the rebase; this run gates integration
-git switch dev && git merge --ff-only agent/phase-html-03
+git switch main && git merge --ff-only agent/phase-html-03
 git worktree remove ../d-system-worktrees/phase-html-03 && git branch -d agent/phase-html-03
 ```
 

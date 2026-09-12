@@ -73,13 +73,13 @@ below, not as blockers to this phase.
 ## Review
 
 Independent sub-agent review, fresh context, no access to this session's conclusions. Ran
-`git diff the commit “Claim phase-idea-02 for agent-claude”..HEAD` / `git log the commit “Claim phase-idea-02 for agent-claude”..HEAD`, its own `uv run pytest`, and inspected
+a diff from “Claim phase-idea-02 for agent-claude” to HEAD / the log from “Claim phase-idea-02 for agent-claude” to HEAD, its own `uv run pytest`, and inspected
 `_data/ideas.jsonl` directly rather than trusting any record's claims. Verbatim:
 
 > **Verification run:** `uv run pytest` → 395 passed, 0 failed (2 unrelated deprecation
 > warnings). Full suite, own run, not trusted from any record.
 >
-> **Diff reviewed:** `git diff the commit “Claim phase-idea-02 for agent-claude”..HEAD` / `git log the commit “Claim phase-idea-02 for agent-claude”..HEAD` — 9 commits, 6 files
+> **Diff reviewed:** a diff from “Claim phase-idea-02 for agent-claude” to HEAD / the log from “Claim phase-idea-02 for agent-claude” to HEAD — 9 commits, 6 files
 > touched. New deliverables are exactly `.claude/agents/idea-triage.md` (111 lines) and
 > `.claude/commands/idea-triage.md` (77 lines); everything else in `.claude/` (`idea.md`,
 > `session-close.md`, `backlog.md`, `settings.local.json`, `scheduled_tasks.lock`,

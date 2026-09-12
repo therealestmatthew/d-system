@@ -1,0 +1,12 @@
+{
+  "points": [
+    "A live example, not slides.\nThe idea system in this repository, walked end to end.\nThe point: skill vs. command vs. subagent vs. tool.\nAnd why one decision stays behind a command only the owner types.",
+    "/orient — what this agent can do here, right now.\nEvery command, skill and tool is read from disk at run time.\nNot from a stored list.\nAn empty category is reported as empty, not guessed.",
+    "/idea — recording an idea through the sanctioned writer.\nHands the idea to tools/append_idea.py.\nIt assigns an id and validates the entry.\nThe idea log is append-only: no line is ever edited or deleted.",
+    "/idea-triage — a subagent reads the idea and reports.\nFinds related plans and documents.\nWrites one finding.\nCan move the idea to triaged, and no further — deliberately.",
+    "Plan beat — from idea to governed work.\nThe idea becomes a requirement, a plan, backlog phases.\nThe same hand-off every piece of work here goes through.\nNo command runs during this step.",
+    "Overview-skill rebuild — one script, run, reported.\nThe d-system-overview skill calls tools/generate_overview.py.\nIt reports exactly what the script printed.\nIt never recomputes a number itself.",
+    "Test — the same page, updated with real data.\nThe overview now shows the idea just recorded.\nNot a placeholder.\nTerminal and talking points keep working through the same run.",
+    "Four different things, one protected boundary.\nA skill, a command, a subagent and a tool each do a different job.\n/session-close stays behind a command a person types.\nNo agent can reach it."
+  ]
+}

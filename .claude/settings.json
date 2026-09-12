@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(AGENTS.md)",
+      "Write(AGENTS.md)",
+      "Edit(CLAUDE.md)",
+      "Write(CLAUDE.md)",
+      "Edit(_private/**)",
+      "Write(_private/**)",
+      "Edit(.agents/**)",
+      "Write(.agents/**)",
+      "Edit(.codex/**)",
+      "Write(.codex/**)",
+      "Edit(_data/ideas.jsonl)",
+      "Write(_data/ideas.jsonl)",
+      "Edit(//code/d-system-worktrees/*/AGENTS.md)",
+      "Write(//code/d-system-worktrees/*/AGENTS.md)",
+      "Edit(//code/d-system-worktrees/*/CLAUDE.md)",
+      "Write(//code/d-system-worktrees/*/CLAUDE.md)",
+      "Edit(//code/d-system-worktrees/*/_private/**)",
+      "Write(//code/d-system-worktrees/*/_private/**)",
+      "Edit(//code/d-system-worktrees/*/.agents/**)",
+      "Write(//code/d-system-worktrees/*/.agents/**)",
+      "Edit(//code/d-system-worktrees/*/.codex/**)",
+      "Write(//code/d-system-worktrees/*/.codex/**)",
+      "Edit(//code/d-system-worktrees/*/_data/ideas.jsonl)",
+      "Write(//code/d-system-worktrees/*/_data/ideas.jsonl)"
+    ]
+  }
+}

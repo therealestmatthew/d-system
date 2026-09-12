@@ -4,10 +4,18 @@ id: doc-confidentiality-sweep
 code: PLAN-006
 title: Separate structure from content before the first remote push
 kind: plan
-status: draft
+status: complete
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-06'
+updated: '2026-09-09'
+completion_evidence:
+- docs/03-sessions/SESS-2026-09-08-12-scrub-tracked-structure.md
+- docs/03-sessions/SESS-2026-09-08-13-relocate-portfolio.md
+- docs/03-sessions/SESS-2026-09-08-14-leak-check.md
+- docs/03-sessions/SESS-2026-09-08-15-purge-course-identifier.md
+- docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md
+- tools/check_no_private_content.py
+- test/test_private_content.py
 systems: [sys-portfolio, sys-governance, sys-brain, sys-projection, sys-retrieval, sys-delivery]
 depends_on: [doc-governance-protocol]
 ---
@@ -60,6 +68,13 @@ retroactive licensing decision.
 a private remote. Rewriting local history costs nothing today; rewriting after any push means
 force-pushing over published refs, and unreachable objects can survive server-side until garbage
 collection.
+
+**Resolved 2026-09-09.** `phase-priv-05` completed: history was squashed to a single commit,
+verified against every acceptance condition, and only then pushed to `origin`. The gate above has
+done its job and no longer applies — the current publishing rule lives in `AGENTS.md`'s
+*Confidentiality and publishing* section, which now reads "ask before pushing" rather than "never
+push". This paragraph is kept as the record of why the gate existed; see
+`docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md`.
 
 The sweep is not sequenced ahead of the capture and reliability work — those proceed locally. It
 gates *publishing*, not building. If a remote becomes urgent before the sweep is done, that is a

@@ -85,13 +85,13 @@ later document can inherit a withdrawn number's history.
 
 ## Permanence
 
-A code is never reused and never renumbered once it reaches `dev`. Superseded and deprecated
+A code is never reused and never renumbered once it reaches `main`. Superseded and deprecated
 documents keep theirs — the code identifies the document, not its lifecycle state. Renaming a
 document's slug is fine; changing its code is not.
 
 ## Concurrent agents
 
-The register on `dev` is the ledger and `uv run python -m src.governance` is the check, exactly as
+The register on `main` is the ledger and `uv run python -m src.governance` is the check, exactly as
 [ADR-003](../04-decisions/ADR-003-multi-agent-concurrency.md) treats the backlog. Two agents that
 independently take the same counter code collide at the second agent's post-rebase run, as a
 duplicate-code error naming both files.

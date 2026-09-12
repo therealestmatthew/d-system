@@ -4,6 +4,28 @@ The working agreement for every agent in this repository, human-directed or auto
 orientation files (e.g., `CLAUDE.md`, `GEMINI.md`) orient you to what the project is and where things live;
 this file governs how you work. Where the two ever disagree, this file wins.
 
+## Never edit this file or CLAUDE.md without explicit approval
+
+**No agent modifies `AGENTS.md` or `CLAUDE.md` for any reason without the owner's explicit approval
+for that specific change.** There is no exception. Not to fix something you are certain is wrong.
+Not to record something you learned this session. Not because a phase's scope appears to cover it.
+Not because another document contradicts them. Not as tidy-up alongside a change you were asked to
+make.
+
+These two files are the instructions every agent reads before doing anything. An agent that edits
+them rewrites its own governing rules and every future agent's, and the edit outlives the session
+that made it — usually without anyone reviewing it, because it arrives inside a diff about something
+else.
+
+**If you believe either file is wrong, out of date, or missing something: say so and stop.** Describe
+the problem, quote the passage, propose exact replacement wording, and let the owner decide. Reading
+these files is your job; rewriting them is not.
+
+This rule exists because it was broken. On 2026-09-09 an agent was asked to correct stale references
+to a branch and a remote. While doing so it replaced this file's publishing policy with a standing
+rule to "ask before pushing" — wording the owner had never requested, inferred from a single
+one-time instruction not to push, and shipped inside a commit about unrelated staleness.
+
 ## Before you start
 
 1. **Pick up work from the backlog.** Run `uv run python -m src.governance --ready` and take the
@@ -21,15 +43,27 @@ this file governs how you work. Where the two ever disagree, this file wins.
 
 ## Confidentiality and publishing
 
-- **This repository has no remote, and no agent adds one.** Nothing is pushed until `phase-priv-05`
-  of [PLAN-006](docs/01-plans/PLAN-006-confidentiality-sweep.md) completes — private remote included.
-  Real portfolio content is not yet separated from the tracked structure, and it is in every commit.
-  Rewriting local history is free; rewriting after a push is not.
-- `_private/` is gitignored. Never read or write there unless the owner directs you to.
-- `_data/` currently holds the owner's real projects, including named client engagements and
-  personal finances and health. Do not quote its contents into documents, commit messages or
-  summaries that are not themselves private.
-- If you believe a push is warranted, say so and stop. Do not add a remote to find out.
+- **The repository has a remote, and history is public-capable.** The confidentiality sweep
+  ([PLAN-006](docs/01-plans/PLAN-006-confidentiality-sweep.md)) completed on 2026-09-09: history was
+  squashed to a single commit, verified to name no confidential identifier in any path or blob, and
+  only then pushed to `origin`.
+- **Pushing your own branch to `origin` needs no approval.** Publish `agent/<phase-id>` freely;
+  `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing.
+- **Ask before integrating a feature branch into the integration branch.** The merge that lands work
+  on the trunk is the owner's call — not the push that backs it up. `dev` is the integration branch
+  today; idea `000066` plans to gate `main` behind a pull request from `dev`.
+- **Never write a confidential identifier into a tracked file** — not in code, a document, a commit
+  message, or a session record *describing* the identifiers. `tools/check_no_private_content.py`
+  reads `git ls-files`, so it cannot see a file until that file is staged. Run it **with your
+  changes staged**, or the gate passes by not looking. This is not hypothetical: during the sweep,
+  the record documenting the fix twice contained the client token, and only the staged run caught it.
+- `_private/` is gitignored and holds the owner's real portfolio — named client engagements,
+  personal finances and health. Never read or write there unless the owner directs you to.
+- `_data/` is the tracked fictional example set, and `_data/tags.json` the shared taxonomy. The real
+  records moved to `_private/portfolio/` in `phase-priv-03`; see
+  [ADR-009](docs/04-decisions/ADR-009-structure-content-boundary.md).
+- Rewriting local history is cheap; rewriting after a push is not. If history ever needs rewriting
+  again, say so and stop rather than forcing anything to `origin`.
 
 ## Stack
 
@@ -142,18 +176,22 @@ cd ts && npm run dev
 
 ## Concurrent agents: claim a phase
 
-`dev` is the integration branch — the trunk every agent claims on and integrates back into. `main`
-is reserved for future tagged release versions and does not exist yet; do not create it, and read
-any older reference to `main` as `dev`. There is also no remote (see *Confidentiality and
-publishing*), so every command below is local: nothing is fetched, pulled or pushed until a remote
-exists.
+`dev` is the integration branch — the trunk every agent claims on and integrates back into. Agent
+work happens on `agent/<phase-id>` branches that are integrated and deleted. Read any older
+reference to `main` as `dev`: `main` was the trunk until 2026-09-09, when `phase-priv-05` squashed
+history onto it and pushed; day-to-day work then moved to `dev`, and idea `000066` plans to gate
+`main` behind pull requests from `dev`. Release tagging, if it is ever introduced, will use tags
+rather than another long-lived branch.
+
+A remote now exists, so `git fetch`, `git pull` and `git push` all work — but **ask the owner before
+pushing** (see *Confidentiality and publishing*).
 
 Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the lock table, and
 `uv run python -m src.governance` is the lock check. See [ADR-003](docs/04-decisions/ADR-003-multi-agent-concurrency.md).
 
 - Pick your own agent ID once and reuse it: lowercase `agent-<name>`, e.g. `agent-blue`. One agent
   holds at most one active phase.
-- Start on an up-to-date `dev`: `git switch dev` (add `&& git pull` once a remote exists).
+- Start on an up-to-date `dev`: `git switch dev && git pull`.
 - Run `uv run python -m src.governance --ready`. Choose a phase whose **Conflicts** column is `—`.
   A non-empty Conflicts column means a peer already locked one of your systems or paths — pick
   something else; do not wait, and do not edit a peer's claim.
@@ -161,18 +199,32 @@ Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the 
   add `agent: agent-<name>`, and bump the catalog `updated` date.
 - Run `uv run python -m src.governance` before committing the claim. It rejects your claim if it
   overlaps a peer's systems, deliverable paths, or dependency chain, or if `max_active` is reached.
-- Commit the claim on `dev`. Once a remote exists and the push is rejected as non-fast-forward,
+- Commit the claim on `dev`. If the push is rejected as non-fast-forward,
   `git pull --rebase`, re-run the validator, and re-check that your claim is still safe — a peer
   claimed between your check and your push, and their systems may now collide with yours.
 
 ## Concurrent agents: work in a worktree
 
-A worktree is required, and the primary checkout's branch must never be switched, whenever a peer
-holds an active claim or the phase touches `src/`, `ts/`, `schemas/`, `sql/`, `tools/` or `test/`.
-Each agent gets a physically separate directory, so tests, rebuilds and dev servers cannot corrupt a
-peer's run. A solo agent on a documentation- or skill-only phase, with no peer claim and no
-deliverable outside `docs/` or framework-specific directories (e.g., `.claude/`), may instead work directly in the primary checkout on
-`dev` — see [GOV-003](docs/08-governance/GOV-003-backlog-decisions.md).
+**Every session works in a worktree, and the primary checkout's branch must never be switched.**
+This holds regardless of what the work touches — a documentation-only or skill-only change is not
+an exception, and neither is the absence of a peer claim. Each agent gets a physically separate
+directory, so tests, rebuilds, dev servers and branch switches cannot corrupt a peer's run.
+
+The **only** work that happens in the primary checkout on `dev` is what the claim system itself
+requires there:
+
+- **committing the phase claim** — `backlog.yaml` on `dev` is the lock table peers read, so a
+  claim held anywhere else is invisible and therefore not a lock;
+- **the catalog regeneration that claim forces** — the claim moves generated output, and leaving
+  it unregenerated leaves `dev` red on `test_committed_catalog_matches_regenerated_output`. Commit
+  it with the claim, not afterwards.
+
+Everything else — the work, its verification, checkpoints and the session record — happens in the
+worktree and reaches `dev` by integration. Do nothing else in the primary checkout while you are
+there, and return to your worktree immediately.
+
+This withdraws the narrower documentation-only exception that stood until 2026-09-12, recorded in
+[GOV-003](docs/08-governance/GOV-003-backlog-decisions.md) with the incidents that withdrew it.
 
 ```bash
 # from the primary checkout, on an up-to-date dev

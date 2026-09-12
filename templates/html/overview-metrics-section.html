@@ -1,0 +1,46 @@
+<!--
+  D-System overview — metrics section component (one instance per key in
+  tools/overview_metrics.py's output object: funnel, cycle_time, annotation_coverage,
+  link_distribution, link_orphans, throughput_by_day, age_of_open_ideas, backlog_by_status).
+
+  Each of those keys is already chart-ready: {"labels": [...], "series": [{"label": ...,
+  "values": [...]}, ...]}, values[i] aligned to labels[i]. This component charts one series
+  (the generator's choice of primary series, e.g. "count") as a plain CSS bar list, and
+  always carries every series and every label as a plain HTML table behind a native
+  <details> expander — the table fallback PLAN-021 descope rung 1 asks for. Per rung 1,
+  the generator may render only the <details> table and leave {{CHART_BARS}} empty; the
+  table alone is a complete, correct rendering of the section.
+
+  Token contract:
+    {{SECTION_ID}}           - a slug, e.g. "funnel" (used as an element id anchor)
+    {{SECTION_TITLE}}        - human title, e.g. "Idea funnel by status"
+    {{SECTION_PRIMARY_LABEL}}- the series label charted as bars, e.g. "count"
+    {{CHART_BARS}}           - concatenated overview-bar.html renders, one per label, for
+                                the primary series only (may be empty per descope rung 1)
+    {{TABLE_HEAD_CELLS}}     - concatenated <th scope="col">{{series label}}</th>, one per
+                                series in the section, in the order overview_metrics.py
+                                emits them (already sorted by series label)
+    {{TABLE_BODY_ROWS}}      - concatenated <tr> rows, one per label, each with a leading
+                                <td> for the label and one <td> per series value at that
+                                label's index
+-->
+<article class="metric-section" id="metric-{{SECTION_ID}}">
+  <h3 class="metric-section__title">{{SECTION_TITLE}}</h3>
+  <div class="metric-section__chart" role="img" aria-label="{{SECTION_TITLE}} by {{SECTION_PRIMARY_LABEL}}">
+    {{CHART_BARS}}
+  </div>
+  <details class="metric-section__table-fallback">
+    <summary>Show data table</summary>
+    <table class="metric-table">
+      <thead>
+        <tr>
+          <th scope="col">Label</th>
+          {{TABLE_HEAD_CELLS}}
+        </tr>
+      </thead>
+      <tbody>
+        {{TABLE_BODY_ROWS}}
+      </tbody>
+    </table>
+  </details>
+</article>

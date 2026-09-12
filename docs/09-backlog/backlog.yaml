@@ -1,9 +1,12 @@
 schema_version: 1
-updated: '2026-09-08'
+updated: '2026-09-12'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-wb-07
+- phase-port-02
 - phase-ses-01
+- phase-lit-01
 items:
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
@@ -2306,7 +2309,7 @@ items:
   systems:
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -2338,12 +2341,28 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/03-sessions
-  next_action: Confirm phases 1 to 4 are merged and verified, then choose squash or
-    filter-repo.
-  blocked_reason: History rewriting is irreversible and must follow the working-tree
-    cleanup, not precede it.
-  resume_when: Phases priv-01 to priv-04 and priv-06 are complete and the working
-    tree passes the leak check.
+  next_action: Complete. The repository has one commit and a live remote. Remaining
+    confidentiality work is the owner's alone — confirming the GitHub repository is
+    set to private, which cannot be checked from the local tooling.
+  session: doc-session-history-rewrite-and-remote
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md
+  - docs/09-backlog/backlog.yaml
+  result: 'History squashed to a single commit b2b564b and pushed to
+    github.com/therealestmatthew/d-system as main. Acceptance verified: one commit
+    across all refs, with commits reachable including reflogs also one, no tags and
+    no stash; the only _data paths remaining are the tracked fictional example set;
+    the leak checker passes over 356 tracked files against 31 identifiers, run with
+    this session record staged so the gate could see it; no hex string in a tracked
+    document resolves to a commit except the surviving commit itself. Commit-hash
+    references were rewritten to descriptions across 27 files before the squash,
+    with a follow-up pass over 14 files converting git commands left holding a prose
+    commit name. Three rounds of independent sub-agent review; the second round
+    found a blocking leak — the session record itself printed the client identifier,
+    invisible to the checker while the file was untracked — which was redacted
+    before any commit. The ordering claim, that every check ran before the remote
+    was added, is recorded as unverifiable after the fact because the rewrite
+    destroyed the reflog that would evidence it.'
 - id: phase-priv-06
   title: Remove the standing checker exemption and purge the remaining identifier
   plan: doc-confidentiality-sweep
@@ -4212,3 +4231,2107 @@ items:
   - AGENTS.md
   - docs/03-sessions/SESS-2026-09-08-09-agents-update.md
   result: AGENTS.md updated successfully and strictly verified.
+- id: phase-port-01
+  title: Establish canonical workflows and portable skill adapters
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-session-lifecycle
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: complete
+  agent: agent-codex-port
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Define the versioned canonical workflow manifest, neutral instruction bodies,
+    authority classes, capability declarations, and deterministic rendering contract.
+  - Build the renderer and OPS-010, with exact regeneration, idempotence, malformed-source,
+    unsupported-capability, and hand-edit drift tests.
+  - Move orientation and checkpoint behavior into canonical sources and generate Claude
+    and Open Agent Skills adapters without changing their repository decisions.
+  - Replace Claude-only checkpoint references in the reusable execution prompt with
+    the canonical workflow lookup and plain-prompt fallback.
+  acceptance:
+  - Orientation and checkpoint each have one behavioral source and byte-reproducible
+    Claude and Open Agent Skills representations.
+  - Generation refuses an owner-only workflow targeted at an agent-discoverable adapter
+    and refuses required capabilities that have neither a target mapping nor an explicit
+    unsupported declaration.
+  - A hand edit to any generated adapter fails the drift check, while two clean generations
+    produce identical bytes.
+  - PROMPT-008 resolves checkpoint without requiring a Claude path and still preserves
+    the no-completion checkpoint boundary.
+  verification:
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run pytest test/test_agent_workflows.py
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - agent-workflows
+  - tools/generate_agent_workflows.py
+  - docs/08-governance/OPS-010-generate-agent-workflows.md
+  - test/test_agent_workflows.py
+  - .claude/skills/orient/SKILL.md
+  - .claude/skills/checkpoint/SKILL.md
+  - .agents/skills/orient/SKILL.md
+  - .agents/skills/checkpoint/SKILL.md
+  - docs/02-prompts/PROMPT-008-execute-a-phase.md
+  next_action: Complete. Continue the prioritized portability sequence with phase-port-02.
+  session: doc-session-portable-workflow-foundation
+  completion_evidence:
+  - agent-workflows/workflows.yaml
+  - agent-workflows/orient.md
+  - agent-workflows/checkpoint.md
+  - tools/generate_agent_workflows.py
+  - test/test_agent_workflows.py
+  - docs/08-governance/OPS-010-generate-agent-workflows.md
+  - docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md
+  result: Four generated adapters match two canonical workflow bodies; 12 targeted
+    tests and all 407 repository tests pass, governance reports 117 documents and
+    105 phases, targeted Ruff passes, and mypy reports no issues. The first independent
+    review found three defects; all were corrected with regression tests, and a fresh
+    independent review confirmed all four acceptance conditions with no unresolved
+    implementation discrepancy.
+- id: phase-port-02
+  title: Port safe commands and the idea-triage agent
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-idea-record-system
+  systems:
+  - sys-governance
+  - sys-backlog
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-port-01
+  scope:
+  - Convert idea capture, backlog orientation, and idea-triage driver behavior into
+    canonical workflows with Claude and Codex-compatible adapters.
+  - Convert the idea-triage role from one canonical instruction body into Claude and
+    Codex custom-agent formats, preserving Haiku/medium/bounded Claude configuration
+    and recording verified Codex model, effort, sandbox, and unsupported limits.
+  - Preserve sanctioned idea writes, folded-state reads, one-idea scope, finding-only
+    authority, question batching, and owner review of proposed links and promotions.
+  - Exclude session-close from every agent-discoverable target and add refusal tests
+    for an owner-only workflow requested as a skill.
+  acceptance:
+  - The three safe command workflows are discoverable through supported Claude and
+    Codex surfaces and produce equivalent allowed and refused outcomes in fixtures.
+  - Claude and Codex idea-triage definitions render from one body; no path, behavioral
+    instruction, or required target setting differs without a declared mapping.
+  - The Claude triage adapter retains Haiku, medium effort, and its bounded run; the
+    Codex adapter exposes its reviewed economical-model mapping, medium reasoning,
+    sandbox, and every execution limit the host cannot enforce.
+  - No generated agent or skill can apply a link, promotion, discard, or backlog
+    completion transition.
+  verification:
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run pytest test/test_agent_workflows.py test/test_ideas.py
+  - Run one synthetic idea through each generated triage-agent definition and compare
+    the folded finding and refused operations.
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - agent-workflows
+  - .claude/commands/idea.md
+  - .claude/commands/idea-triage.md
+  - .claude/commands/backlog.md
+  - .claude/agents/idea-triage.md
+  - .agents/skills/idea/SKILL.md
+  - .agents/skills/idea-triage/SKILL.md
+  - .agents/skills/backlog/SKILL.md
+  - .codex/agents/idea-triage.toml
+  - test/test_agent_workflows.py
+  next_action: After phase-port-01 fixes the adapter contract, port the smallest
+    command first and compare its accepted and refused behavior across both hosts.
+- id: phase-port-03
+  title: Verify cross-host discovery and fallback behavior
+  plan: doc-portable-agent-workflows
+  sources:
+  - doc-portable-agent-workflow-requirements
+  - doc-prompt-idea-capture-and-triage
+  - doc-prompt-idea-to-plan
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-port-02
+  scope:
+  - Run clean-session discovery and invocation checks in Claude Code and Codex for
+    orientation, checkpoint, idea capture, backlog orientation, and idea triage.
+  - Run the governed plain-prompt fallback with native skill discovery disabled and
+    compare its decisions, writes, and authority refusals with the native runs.
+  - Update Gemini orientation and repository workflow documentation to use the verified
+    native mechanism if one is available, otherwise the tested prompt fallback.
+  - Remove or replace the two pre-plan untracked conversion experiments only after
+    their generated successors pass, and record unsupported host capabilities plainly.
+  acceptance:
+  - Fresh Claude and Codex sessions enumerate and invoke every supported native workflow
+    from live repository state without manually pasting its procedure.
+  - A clean agent session with no native skill mechanism completes the same synthetic
+    orientation and phase-flow checks through the governed prompt fallback.
+  - Repository documentation distinguishes native, fallback-only, unavailable, and
+    owner-only workflows; session-close is absent from autonomous discovery everywhere.
+  - No duplicate hand-maintained workflow body remains, and the working tree contains
+    no superseded untracked portability experiment.
+  verification:
+  - Record clean-session Claude, Codex, and fallback walkthroughs with the discovered
+    workflow inventory and observed effects.
+  - uv run python tools/generate_agent_workflows.py --check
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - GEMINI.md
+  - docs/08-governance/GOV-007-repo-orientation.md
+  - docs/03-sessions
+  - agent-workflows
+  - .claude
+  - .agents
+  - .codex
+  next_action: After all adapters land, run each host from a clean session and use
+    observed discovery and authority behavior to correct the documentation.
+- id: phase-demo-01
+  title: Build the demo terminal backend and stage read routes
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  - doc-demo-terminal-decision
+  systems:
+  - sys-api
+  - sys-demo-stage
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-stage
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Implement the PTY adapter with a POSIX pty + bash implementation and a ConPTY via
+    pywinpty + cmd/PowerShell implementation, platform auto-detected with a config
+    override for shell choice; declare pywinpty as a Windows-only optional dependency.
+  - Add the terminal websocket route under src/api/routes/, registered in
+    src/api/__init__.py, mounted only when D_SYSTEM_DEMO_TERMINAL=1 and served on
+    127.0.0.1 only, per ADR-013.
+  - Add the read routes the stage page needs (talking-points content, generated
+    overview location).
+  acceptance:
+  - With D_SYSTEM_DEMO_TERMINAL unset the terminal route does not exist; with it set,
+    a websocket client on 127.0.0.1 reaches a real shell and receives command output
+    (REQ-006 R04 and R05).
+  - With the flag set, startup on a non-loopback bind host fails fast, proven by a
+    test — the loopback restriction is enforced in code, not documented in a comment
+    (ADR-013).
+  - The shell override selects the configured shell; platform detection picks the
+    POSIX adapter on Linux without pywinpty installed.
+  - Stage read routes return the talking-points data file content unchanged.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D01-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  deliverables:
+  - src/demo
+  - src/api/routes/__init__.py
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/demo_stage.py
+  - src/api/__init__.py
+  - pyproject.toml
+  - uv.lock
+  - test/test_demo_terminal.py
+  next_action: 'None — phase complete: D01-A adversarial findings fixed, branch integrated
+    into dev with the owner''s approval (GOV-003 demo-track completion gate).'
+  session: doc-session-demo-stage-terminal-backend
+  completion_evidence:
+  - src/demo/adapter.py
+  - src/demo/factory.py
+  - src/demo/posix.py
+  - src/demo/windows.py
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/demo_stage.py
+  - test/test_demo_terminal.py
+  result: 'Integrated into dev at 12b019b (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. PTY adapter package (POSIX pty + bash; ConPTY
+    via pywinpty deferred to start()), flag-gated websocket route absent by default
+    per ADR-013, loopback fail-fast enforced for argv --host, D_SYSTEM_BIND_HOST and
+    UVICORN_HOST, and read-only stage routes including GET
+    /api/v1/demo/stage/terminal-enabled. D01-G gate green (items 1-4 pass; scope
+    residuals were checkpoint files plus the declared routes package init). D01-A
+    adversarial review: one blocker (UVICORN_HOST loopback bypass, proven by live
+    LAN handshake), one major (no absent-route signal for the frontend), one minor
+    (factory docstring) — all fixed and re-verified, including a live repro of both
+    refused non-loopback launches. Final verification: 458 tests pass; ruff and mypy
+    clean; governance OK (132 documents); staged private-content check OK.'
+- id: phase-demo-02
+  title: Build the stage frontend with the zero-scroll layout
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-stage
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  scope:
+  - Build the stage page in ts/ with an xterm.js terminal component connected to the
+    phase-demo-01 websocket, a talking-points rotator whose content loads from a data
+    file rather than being hardcoded, and an embedded panel showing the generated
+    overview page.
+  - Implement the zero-scroll layout — fits the viewport at common window sizes,
+    elements resize dynamically and never overlap, overflow content is revealed in
+    place via tabs, expanders or buttons; hover popups collapse on pointer leave and
+    click popups are dismissible (REQ-006 R02 and R03).
+  - Implement the descope fallbacks from PLAN-021 — the overview panel as an
+    open-in-tab link and the stage without the embedded terminal — as switchable
+    layout states, and a clear in-page message when the terminal route is absent.
+  acceptance:
+  - At 1280x720, 1366x768, 1920x1080 and 1024x768 the page shows no page scrollbar
+    and no overlapping elements, and hidden content is reachable in place (REQ-006
+    R02).
+  - A command typed in the embedded terminal against a flag-enabled backend returns
+    real shell output end to end.
+  - Editing the talking-points data file changes the rotator content without a change
+    to page code.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D02-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright browser verification (demo-validator-web, pack D02-W) covering zero page
+    scroll
+    and no overlap at the four sizes, popup behavior, terminal echo, rotator content
+  deliverables:
+  - ts/src
+  - ts/package.json
+  - ts/package-lock.json
+  - ts/public/talking-points.json
+  - ts/vite.config.ts
+  - test/test_demo_terminal.py
+  next_action: 'None — phase complete: D02-A blocker (clipped popover) fixed in fix
+    cycle 2 and re-verified by a full 7/7 D02-W browser pass; branch integrated into
+    dev with the owner''s approval (GOV-003 demo-track completion gate).'
+  session: doc-session-demo-stage-frontend
+  completion_evidence:
+  - ts/src/stage/StagePage.tsx
+  - ts/src/stage/StagePage.css
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/OverviewRegion.tsx
+  - ts/src/stage/Tooltip.tsx
+  - ts/src/stage/Popover.tsx
+  - ts/public/talking-points.json
+  - ts/vite.config.ts
+  result: 'Integrated into dev at 6616b18 (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. The stage page renders three
+    zero-scroll regions (terminal, talking-points, overview) in a CSS grid with
+    minmax(0,...) tracks and overflow:hidden on html/body; hover Tooltip and click-dismissible
+    Popover components; two switchable descope states (overview open-in-tab link,
+    terminal hidden). Terminal region mounts a real xterm.js Terminal only when the
+    backend reports terminal_enabled, piped over a websocket through a now-configurable
+    Vite proxy (VITE_API_TARGET, default unchanged). Talking-points rotator loads
+    from ts/public/talking-points.json (placeholder copy) via the phase-demo-01 route,
+    with manual next/previous, optional auto-advance, and a rung-2 static-list degrade.
+    Overview panel embeds the generated page from _public/ via a dedicated dev-server
+    middleware, with the rung-3 open-in-tab fallback. Completion gate: D02-G green
+    (scope residuals documented as checkpoint files plus the coordinator-declared
+    test/test_demo_terminal.py); D02-A adversarial review found one blocker (the
+    click popover clipped by the zero-scroll containers), fixed in fix cycle 2 via
+    a body portal with viewport clamping; D02-W browser verification passed all 7
+    items on the fixed branch, including zero scroll at all four sizes, the terminal
+    echo round-trip, and the absent-flag in-page message. Final verification: cd ts
+    && npm run build clean; uv run pytest 458 passed; governance OK; staged
+    private-content check OK.'
+- id: phase-demo-03
+  title: Build the deterministic overview tools
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-overview
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-data
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build tools/overview_metrics.py emitting chart-ready JSON metrics over the idea
+    log — read via fold() in src/db/ideas.py, never raw — and the backlog, covering
+    the idea 000071 metric set (funnel counts and rates, cycle times, annotation
+    coverage, link distribution and orphan count, throughput, age of open ideas)
+    with zero counts reported as zero.
+  - Build tools/overview_inventory.py emitting consolidated inventories of concepts
+    and terminology (from the brain/ glossary sources) and of systems (from
+    docs/08-governance/systems.yaml).
+  - Both tools are deterministic — same inputs, same outputs, no model or network
+    calls — and ship with OPS-011 and OPS-012, generated reference blocks filled by
+    tools/generate_tool_docs.py, and tests.
+  acceptance:
+  - Running each tool twice against an unchanged repository produces byte-identical
+    output (REQ-006 R07).
+  - Reported idea metrics match an independent recomputation over the same log in the
+    tests.
+  - OPS-011 and OPS-012 exist with filled generated blocks and the governance check
+    passes.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D03-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  deliverables:
+  - tools/overview_metrics.py
+  - tools/overview_inventory.py
+  - docs/08-governance/OPS-011-overview-metrics.md
+  - docs/08-governance/OPS-012-overview-inventory.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
+  - test/test_overview_tools.py
+  next_action: 'None — phase complete: D03-A adversarial findings fixed, branch integrated
+    into dev with the owner''s approval (GOV-003 demo-track completion gate).'
+  session: doc-session-demo-data-overview-tools
+  completion_evidence:
+  - tools/overview_metrics.py
+  - tools/overview_inventory.py
+  - docs/08-governance/OPS-011-overview-metrics.md
+  - docs/08-governance/OPS-012-overview-inventory.md
+  - test/test_overview_tools.py
+  result: 'Integrated into dev at 58503b2 (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. overview_metrics.py and overview_inventory.py
+    emit deterministic chart-ready JSON (funnel, cycle time, annotation coverage,
+    link distribution/orphans, throughput, age of open ideas, backlog-by-status;
+    concepts/terms; systems), each reading idea state only through fold()/load_events().
+    D03-G verdict: all checklist items green. D03-A adversarial review: no blocker
+    or major findings; two minors fixed (stale self-reported governance counts;
+    independent recomputation tests extended to every metrics section). Final
+    verification: uv run pytest passes 424 tests; ruff and mypy clean; governance
+    OK (131 documents); each tool run twice against the unchanged tree diffs empty;
+    staged private-content check OK.'
+- id: phase-demo-04
+  title: Build the overview skill, templates and page generation
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-html
+  - sys-demo-overview
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-data
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-03
+  scope:
+  - Build tools/generate_overview.py, which runs the phase-demo-03 tools and renders
+    templates/html/ and templates/styles/ overview templates into a generated
+    overview page under _public/, with OPS-014 and tests.
+  - Write .claude/skills/d-system-overview/SKILL.md orchestrating the deterministic
+    tools and the generator; the skill calls the scripts and never recomputes their
+    outputs (REQ-006 R08).
+  - Render metrics as charts from the chart-ready JSON with a table fallback per
+    PLAN-021 descope rung 1.
+  acceptance:
+  - Invoking the skill produces the overview page under _public/ and every figure on
+    it matches the corresponding tool output.
+  - Two generations against an unchanged repository produce an identical page.
+  - The skill definition contains no recomputation of tool-owned numbers.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D04-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright verification of the generated page (demo-validator-web, pack D04-W)
+  deliverables:
+  - tools/generate_overview.py
+  - docs/08-governance/OPS-014-generate-overview.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
+  - .claude/skills/d-system-overview/SKILL.md
+  - templates/html
+  - templates/styles
+  - _public/overview
+  - test/test_generate_overview.py
+  next_action: 'None — phase complete: D04-A findings fixed, D04-W browser verification
+    passed 5/5, branch integrated into dev with the owner''s approval (GOV-003
+    demo-track completion gate).'
+  session: doc-session-demo-data-overview-skill
+  completion_evidence:
+  - tools/generate_overview.py
+  - docs/08-governance/OPS-014-generate-overview.md
+  - .claude/skills/d-system-overview/SKILL.md
+  - templates/html/overview-page.html
+  - templates/styles/overview.css
+  - _public/overview/index.html
+  - test/test_generate_overview.py
+  result: 'Integrated into dev at a89828d (fast-forward) with the owner''s approval
+    after the GOV-003 demo-track gate. Templates, generator, overview skill and
+    OPS-014 all validator-passed; double generation byte-identical end to end. D04-A
+    adversarial review: no blockers; two major documentation-contract findings fixed
+    (template GENERATED_AT comment corrected to meta.reference_at; SKILL.md
+    provenance split between fold()-sourced metrics and brain//systems.yaml-sourced
+    inventories). D04-W browser verification passed all 5 items: page figures match
+    the tools'' own JSON exactly, inventories non-empty with the systems count
+    matching the registry, no external network dependency. Final verification: 470
+    tests pass; governance OK; staged private-content check OK.'
+- id: phase-demo-05
+  title: Demo content, runbook, reset tool and rehearsals
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-stage
+  - sys-demo-overview
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-content
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  - phase-demo-02
+  - phase-demo-03
+  - phase-demo-04
+  - phase-demo-06
+  scope:
+  - Write the final talking-points copy into the stage data file and the live-segment
+    runbook in the rehearsal gate's step shape (orient, record an idea, triage it,
+    plan beat, overview-skill rebuild, test — PROMPT-017), each step carrying its
+    commands, its fallback action and a timebox, the timeboxes summing inside 15
+    minutes (REQ-006 R09).
+  - Build tools/demo_reset.py with OPS-013, with two subcommands — prepare (regenerate
+    overview outputs, clear scratch state, park the pre-built overview skill, seed
+    the fallback audience idea through tools/append_idea.py) and restore (put the
+    parked skill back and regenerate from current data) — without ever deleting or
+    rewriting idea-log content or governed documents. Page bytes regenerate forward
+    from the append-only log; only the skill returns to its pre-built state.
+  - Write the Windows machine setup checklist per PLAN-021, including the pre-demo
+    git tag step and screen hygiene, and run the REQ-006 R06 terminal smoke check on
+    the presentation machine.
+  - Run two timed dry-runs of the live segment and record per-step times in the
+    runbook.
+  acceptance:
+  - Both dry-runs complete within 15 minutes with every step inside its timebox, and
+    their times are recorded in the runbook (REQ-006 R09).
+  - The R06 smoke check on the presentation machine is recorded as passing in the
+    runbook.
+  - demo_reset.py prepare parks the skill, seeds the fallback idea without
+    duplication, and regenerates outputs; demo_reset.py restore returns the
+    pre-built skill byte-identical; both are double-run idempotent and never delete
+    or rewrite idea-log content or governed documents — the only idea-log access is
+    appending through tools/append_idea.py.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D05-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright rehearsal pass over the runbook's browser-marked steps (demo-validator-web,
+    pack D05-W)
+  deliverables:
+  - ts/public/talking-points.json
+  - tools/demo_reset.py
+  - test/test_demo_reset.py
+  - docs/08-governance/OPS-013-demo-reset.md
+  - docs/08-governance/codes.yaml
+  - docs/08-governance/catalog.md
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  - _public/overview
+  - src/api/routes/demo_stage.py
+  - test/test_demo_terminal.py
+  session: doc-session-demo-content-runbook-reset-rehearsals
+  next_action: 'None — phase complete and integrated into dev at ea2c3ed with the
+    owner''s approval (GOV-003 demo-track completion gate). Deferred items are
+    recorded in the result; the REQ-006 R06 Windows smoke check and the
+    owner-driven R09 timing move to the workbench track''s rehearsal-refresh phase
+    (PROMPT-020 decision 7).'
+  completion_evidence:
+  - tools/demo_reset.py
+  - test/test_demo_reset.py
+  - docs/08-governance/OPS-013-demo-reset.md
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  - ts/public/talking-points.json
+  result: 'D05-G is green on all 9 items. D05-A''s two majors and D05-W''s one
+    code-level finding are fixed on agent/phase-demo-05: the Windows checklist runs
+    PROMPT-017''s full 7-item fresh-eyes checklist plus a prepare/restore
+    verification against the tagged state; ts/public/talking-points.json is
+    reshaped to D05-O''s headline-plus-three-lines rule; the runbook and Windows
+    checklist name VITE_API_TARGET on the frontend start command and define
+    half-width as 960x1080; src/api/routes/demo_stage.py''s
+    DEFAULT_OVERVIEW_PAGE_PATH now matches generate_overview.py''s real output
+    path (_public/overview/index.html), with its test tightened to assert the
+    exact value. Recorded only, not fixed: a stale placeholder comment in
+    ts/src/stage/TalkingPointsRegion.tsx (D05-A minor), ts/public/demo-commands.json''s
+    placeholder entries (a phase-demo-06 deliverable created after this phase was
+    scoped), and a websocket startup-race console warning in TerminalRegion.tsx
+    (D05-W) — all three outside this phase''s deliverables, deferred to the
+    workbench track (PROMPT-020). D05-A''s two blockers (R09''s partial timing
+    evidence; agent-driven rather than owner-driven dry-runs) are deferred by
+    owner decision (PROMPT-020 decision 7): the workbench track''s
+    rehearsal-refresh phase re-times the live segment owner-driven against the
+    final UI. uv run pytest, npm run build, governance and the staged
+    private-content check all pass on the rebased tree (495 tests). Integrated
+    fast-forward at ea2c3ed with the owner''s approval after an owner-sanctioned
+    third fix cycle. Still outstanding, owner-machine work: the REQ-006 R06
+    Windows smoke check, alongside the deferred owner-driven R09 timing.'
+- id: phase-demo-06
+  title: Stage terminal interaction — session tabs, guarded drop, command injection
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  agent: agent-demo-stage
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-demo-01
+  - phase-demo-02
+  - phase-demo-03
+  - phase-demo-04
+  scope:
+  - Host up to four terminal sessions as tabs in the terminal region, each an
+    independent shell over its own websocket; keep every session's component mounted
+    (CSS-hidden when inactive) so tab switches and region collapse never terminate a
+    session (REQ-006 R10).
+  - Separate collapse from drop — collapse hides the region with sessions intact;
+    the drop control (descope rung 4) and closing an individual tab each require an
+    explicit confirmation before the session terminates (REQ-006 R11).
+  - Build the command list revealed in place within the terminal region, loaded from
+    ts/public/demo-commands.json with no command text hardcoded in components;
+    selecting an entry sends its command into the active terminal's websocket
+    without a trailing newline (entries with run true append one); degrade cleanly
+    when the terminal route is absent (REQ-006 R12).
+  - Wire resize end to end — the frontend fit sends a JSON control frame the
+    websocket route parses into the adapter's resize(); binary frames stay raw
+    input; malformed text frames are ignored safely. No new endpoints, one PTY per
+    websocket, ADR-013's gating and binding unchanged.
+  acceptance:
+  - A long-running command in one tab survives switching tabs and collapsing and
+    re-expanding the region, and a fifth tab cannot be opened (REQ-006 R10).
+  - Nothing terminates a session before its confirmation step; the confirmed drop
+    and tab close genuinely terminate with no orphaned shell processes (REQ-006 R11).
+  - An injected command appears un-executed on the active tab's input line, a run
+    true entry executes on selection, and editing demo-commands.json changes the
+    list with no page-code rebuild (REQ-006 R12).
+  - A resize in the browser reaches the PTY (adapter resize called), proven by a
+    test.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack D06-A) with findings fixed or explicitly
+    reported (GOV-003 demo-track completion gate)
+  - Playwright browser verification (demo-validator-web, pack D06-W) covering session
+    persistence, the confirmation guards, injection and zero-scroll at the four sizes
+  deliverables:
+  - ts/src
+  - ts/public/demo-commands.json
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  next_action: 'None — phase complete: both fix cycles green (D06-A blocker and
+    majors; D06-W collapse path), the coordinator''s targeted browser re-check and
+    live-edit check passed, and the branch integrated into dev with the owner''s
+    approval (GOV-003 demo-track completion gate, extended to this phase by the
+    phase-demo-06 insertion decision).'
+  session: doc-session-demo-stage-terminal-interaction
+  completion_evidence:
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/CommandPanel.tsx
+  - ts/public/demo-commands.json
+  result: 'All three creator/validator item pairs (D06-C1/V1, D06-C2/V2, D06-C3/V3)
+    pass with no findings, each committed narrowly on agent/phase-demo-06. D06-G
+    (phase gate, run and resumed once after a truncated first pass) confirmed:
+    governance OK; check_no_private_content OK with changes staged; all four
+    deliverables exist; npm run build, ruff and mypy all clean; no placeholder
+    command string from demo-commands.json leaks into ts/src; the diff against dev
+    touches only the phase''s declared deliverable paths. The coordinator''s D06-A
+    adversarial review then found one blocker (embedded-newline injection bypassing
+    run:false) and two majors (unbounded resize crashing the session; abrupt
+    disconnect orphaning the shell) — all three fixed and independently validated
+    (commits e474ccb, 2e6fda3), plus one minor (no session registry at the
+    websocket route bounding the four-session cap) recorded against idea 000087
+    per the coordinator''s explicit instruction, not fixed. The coordinator''s D06-W
+    Playwright browser verification then confirmed session persistence, both R11
+    guards with /proc-level termination proof, R12 injection semantics and
+    zero-scroll at all four sizes on measured evidence, but found R10
+    collapse/re-expand broken (the collapse control''s CSS hid its own re-expand
+    toggle, leaving no UI path back) — fixed with a one-file CSS-scope narrowing
+    (commit bde64df) and independently validated. Full re-verification after both
+    fix cycles: uv run pytest 476 passed (the earlier catalog-drift failure is
+    resolved on this branch, see the session record); ruff and mypy clean; npm run
+    build clean. Not marking the phase complete; the coordinator''s re-run of the
+    fixed collapse path, their demo-commands.json live-edit check, and integration
+    into dev all remain outstanding and require the coordinator/owner, not this
+    orchestrator. Completion (coordinator, post-integration): the targeted browser
+    re-check passed the fixed collapse path with real clicks and zero-scroll held
+    in both states; the live-edit check confirmed an appended demo-commands.json
+    entry appears and injects un-executed with no rebuild; the branch was rebased
+    onto dev (three checkpoint conflicts resolved keeping both sides) and
+    integrated fast-forward at 0f1723c with the owner''s approval; final
+    verification on dev: 476 tests pass, governance OK, staged private-content
+    check OK.'
+- id: phase-demo-07
+  title: Skills-and-agents glossary and diagram library
+  plan: doc-live-demo
+  sources:
+  - doc-live-demo-requirements
+  systems:
+  - sys-brain
+  - sys-portfolio
+  owner: repository-owner
+  status: active
+  agent: agent-demo-glossary
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add brain/concepts/terms-skills-and-agents-demo.md, one concept memory following the
+    terms-systems-vocabulary.md grouped-entry convention, tagged demo-glossary, defining
+    the seventeen terms finalized by the PROMPT-019 audit — LLM, Token, Context, Prompt
+    and system prompt, Tool, Tool call, Agent, Agentic loop, Sub-agent, Orchestration and
+    multi-agent, Skill, Progressive disclosure, Command, MCP, MCP server, Session, Memory
+    — each defined against this repository's actual .claude/ and .mcp.json conventions
+    rather than generically, plus a one-line entry for the advanced topics named out of
+    scope for depth (Hooks, Agent permissions, Observability, Agent SDK) (REQ-006 R13).
+  - Register the demo-glossary tag in _data/tags.json (category context). The governance
+    check rejects any memory tag absent from that taxonomy, so without this the phase
+    fails its own first verification command.
+  - Regenerate both glossaries — the committed unfiltered docs/08-governance/GLOSSARY.md,
+    which goes stale the moment any concept memory is added and is asserted by
+    test/test_glossary.py, and the filtered view at docs/00-working/demo-glossary.md
+    (docs/00-working per ADR-010 — regenerable working output, not the canonical
+    committed glossary OPS-004 governs).
+  - Build six standalone SVG diagrams under docs/07-architecture/diagrams/demo/ — LLM vs
+    agent, skill architecture (YAML front matter, SKILL.md, directory structure, assets),
+    the agentic loop, sub-agents and context isolation, MCP architecture, and the
+    command/skill/tool distinction — each legible at a projector-safe 1024x768 with no
+    external asset or network dependency, plus an index.html contact sheet linking them
+    with a one-line caption each and a pointer to it from docs/07-architecture/README.md.
+    The index is HTML rather than a README.md because docs/ subdirectories are not exempt
+    from the governance front-matter scan, and because the presenter opens it from the
+    filesystem with no dev server running.
+  acceptance:
+  - Every term the owner listed (LLM, Agent/Sub-Agent, Tool, MCP, Context, Command, Skill)
+    and every addition the PROMPT-019 audit finalized has a concept entry; the regenerated
+    filtered glossary lists all of them (REQ-006 R13).
+  - Each of the six SVGs opens standalone in a browser from the filesystem with no dev
+    server, is legible at 1024x768, and its labels match the corresponding glossary
+    entry's terminology exactly.
+  - Running both glossary generations twice against an unchanged repository produces
+    byte-identical output, and test/test_glossary.py passes.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/generate_glossary.py (unfiltered; run twice, diff empty)
+  - uv run python tools/generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md
+    (run twice, diff empty)
+  - uv run pytest test/test_glossary.py
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Visual review of each SVG and of index.html in a browser at 1024x768
+  deliverables:
+  - brain/concepts/terms-skills-and-agents-demo.md
+  - _data/tags.json
+  - docs/08-governance/GLOSSARY.md
+  - docs/00-working/demo-glossary.md
+  - docs/07-architecture/diagrams/demo
+  - docs/07-architecture/README.md
+  next_action: Claim the phase and write the concept memory first — the diagrams take
+    their labels from its entries, and the acceptance check is that they match exactly.
+    Content-only phase, no lock on sys-demo-stage or sys-demo-overview, so it can run
+    alongside phase-demo-05/06.
+- id: phase-wb-01
+  title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
+  next_action: 'None — phase complete: all items validated, the W01-A blocker fixed
+    and re-validated, and the branch integrated into dev fast-forward at 1bafba3
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension). The three pre-existing PTY test failures are a host
+    environment defect tracked outside this phase.'
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-terminal-decision
+  - doc-workbench-api-decision
+  systems:
+  - sys-api
+  owner: repository-owner
+  agent: agent-demo-stage
+  session: doc-session-workbench-backend-api
+  completion_evidence:
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - src/api/__init__.py
+  - src/demo/factory.py
+  - _data/workbench/injection-overrides.json
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+  - docs/03-sessions/SESS-2026-09-10-11-workbench-backend-api.md
+  result: 'All three creator/validator pairs (W01-C1/V1 with one fix cycle proving
+    the _private/ exclusion against a real fixture, W01-C2/V2, W01-C3/V3) validated
+    green on agent/phase-wb-01. W01-G gate: governance OK; staged private-content
+    check OK; all seven deliverables present; ruff and mypy clean. The coordinator-run
+    W01-A adversarial review found one blocker — the reveal route spawned an opener
+    on _private//gitignored paths, proven live — fixed by guarding the resolved path
+    with the listings git check-ignore exclusion plus two no-spawn tests (1bafba3)
+    and re-validated green by a second W01-V2 pass; its remaining observations were
+    recorded as ideas 000095 (session-cap TOCTOU, theoretical, never manifested
+    under real concurrent load) and 000096 (D_SYSTEM_DEMO_SHELL override vs shell
+    selection). Post-rebase verification: governance OK (18 systems, 155 documents);
+    pytest 534 passed, 3 failed — the three test_demo_terminal.py PTY failures
+    reproduce identically on the dev baseline and trace to host pyenv shim-lock
+    contention polluting PTY output, an environment defect predating the phase,
+    reported to the owner with the removal command. Orchestration note: the phase
+    orchestrator was replaced mid-phase by a Fable-model agent on explicit owner
+    authorization after repeated background-command stalls (documented PROMPT-012
+    deviation). Integration pre-approved per PROMPT-023 delta 1; merged fast-forward
+    at 1bafba3.'
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the gated workbench route family per ADR-015, mounted only under
+    D_SYSTEM_DEMO_TERMINAL=1 and the loopback binding, all read-only except the
+    reveal action - injection-source enumeration of .claude/skills/, .claude/agents/
+    and docs/02-prompts/ merged with the curated-overrides file
+    _data/workbench/injection-overrides.json (labels, injected text, hidden entries;
+    seed the file with a valid empty-override shape); repo-bounded directory listing
+    and recursive file search with an extension filter, excluding _private/ and
+    gitignored entries; an idea route reading exclusively through fold()
+    (src/db/ideas.py); a backlog route over docs/09-backlog/backlog.yaml whose queue
+    ordering matches the governance --ready rendering (next_up first, then ready
+    phases by priority).
+  - Build the reveal-in-explorer action route per ADR-015 - POST only, path
+    validated repo-relative on the resolved path, spawning exactly explorer.exe
+    /select on Windows or xdg-open of the containing directory on Linux via an
+    argument list, never a shell string.
+  - Add ADR-014's backend session registry to the terminal websocket route - session
+    id to adapter, the four-session cap enforced server-side with a clear refusal
+    for a fifth, and per-session shell selection validated against the fixed
+    allowlist (bash, cmd, powershell) with a structured unavailable-shell refusal
+    on hosts lacking the shell. One PTY per websocket, gating and binding unchanged.
+  - Cover REQ-007 W14 in tests - absent-by-default routes, traversal and
+    symlink-escape rejection, no _private/ or gitignored listings, GET-only reads,
+    reveal path validation - plus the registry cap, the shell allowlist and the
+    enumeration/override merge.
+  acceptance:
+  - With the flag unset every workbench route is absent (404); with it set, the W14
+    rejection matrix passes - traversal, absolute-path and symlink-escape requests
+    refused, listings free of _private/ and gitignored entries, reads GET-only.
+  - Enumeration output matches the three directories minus hidden overrides, and an
+    override's relabel and text replacement are reflected in the route response.
+  - The idea route's rows match an independent fold() run; the backlog route's queue
+    view matches uv run python -m src.governance --ready for next_up and ready
+    ordering.
+  - A fifth concurrent terminal session is refused by the backend; cmd and
+    powershell requests on Linux return the structured unavailable-shell refusal;
+    a non-allowlisted shell request is rejected.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W01-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  deliverables:
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - src/api/__init__.py
+  - src/demo
+  - _data/workbench/injection-overrides.json
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+- id: phase-wb-02
+  title: Layout engine and notes strip
+  next_action: 'None — phase complete: all items validated, the W02-A majors fixed and
+    re-validated, W02-W passed on every reachable check with the multi-panel-dropdown and
+    panel-reassignment sub-checks deferred to phase-wb-04..06 whose panels first make them
+    exercisable, and the branch integrated into dev fast-forward at 622c558 under PROMPT-023
+    delta 1 pre-approved integration (GOV-003 completion gate, workbench extension).'
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-layout-decision
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  agent: agent-demo-stage
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-01
+  scope:
+  - Build the layout engine per ADR-016 - a slot model where every panel is
+    assigned to exactly one slot per layout, layout definitions loaded from
+    _data/workbench/layouts/ (schema_version, stable layout and slot ids,
+    fractional geometry, default assignments), the two shipped layouts (layout-1
+    terminal-left, layout-2 terminal full-width bottom), a slot-header dropdown
+    (small downward triangle beside the name) on any slot holding several panels
+    that swaps the selected panel into view, and a layout-configuration button at
+    the page top right opening a surface that selects the active layout and
+    assigns panels to slots - no geometry editing (REQ-007 W05, W06).
+  - Persist the active layout and per-layout per-slot selections in localStorage
+    under one namespaced versioned key, discarding unknown or version-mismatched
+    stored state in favor of the layout file's defaults (ADR-016).
+  - Replace the talking-points panel with the notes strip (REQ-007 W01) - a short
+    wide display-only strip at the top right, no title, the tooltip moved to its
+    far left, every control in one downward-triangle dropdown including the
+    notes-file picker over a fixed notes directory, the chosen file persisted like
+    layout selections; the picker's file list comes from phase-wb-01's workbench listing
+    route (ADR-015), never a hardcoded list; remove the stale placeholder comment that panel
+    carried.
+  - Preserve zero-scroll and non-overlap at 1280x720, 1366x768, 1920x1080 and
+    1024x768 in both layouts (REQ-006 R02 remains binding).
+  acceptance:
+  - Switching layouts moves the terminal region per each layout's geometry, panel
+    reassignment renders in the chosen slot, and both survive reload; a cleared
+    store yields layout-1 defaults (REQ-007 W05).
+  - A multi-panel slot's header dropdown lists and swaps its panels; a single-panel
+    slot renders a plain header (REQ-007 W06).
+  - The notes strip is display-only with all controls in its dropdown, the file
+    picker switches and persists the notes file, and the tooltip sits far left
+    (REQ-007 W01).
+  - Zero page scroll and no overlapping regions in both layouts at all four sizes.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W02-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W02-W) covering W01,
+    W05, W06 and zero-scroll in both layouts at the four sizes
+  deliverables:
+  - ts/src
+  - ts/vite.config.ts
+  - _data/workbench/layouts
+  session: doc-session-workbench-layout-notes-strip
+  completion_evidence:
+  - ts/src/workbench/types.ts
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/src/workbench/LayoutConfigDialog.tsx
+  - ts/src/workbench/storage.ts
+  - ts/src/workbench/Slot.tsx
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  - ts/src/stage/NotesStripRegion.tsx
+  - ts/src/workbench/schemaVersionContext.ts
+  - ts/vite.config.ts
+  - _data/workbench/layouts/layout-1.json
+  - _data/workbench/layouts/layout-2.json
+  - docs/03-sessions/SESS-2026-09-10-12-workbench-layout-notes-strip.md
+  result: 'Complete. W02-C1 (layout engine) and W02-C2 (notes strip) committed on
+    agent/phase-wb-02 and each validated by its dispatched validator with no findings. W02-G
+    (phase gate) recorded a full pass on the second dispatch (the first run''s transcript
+    truncated and was re-dispatched, never treated as a result): governance exit 0,
+    check_no_private_content OK, both deliverables present, npm run build passes, pytest 534
+    passed/3 failed (the three failures are the known host-wide pyenv shim rehash contention in
+    test_demo_terminal.py, an environmental defect, not a phase finding), and the diff against
+    dev touches only ts/ and _data/workbench/layouts/. A mid-session blocking finding (W02-C2''s
+    sanctioned deletion of ts/src/stage/TalkingPointsRegion.tsx broke governance''s
+    completion-evidence check for the already-complete phase-demo-02) was reported up and
+    resolved by the coordinator on dev (commit 0ab5aa4, GOV-003). W02-A (adversarial review)
+    then reported no blocker, two majors (a split ADR-016 schema-version source of truth between
+    the layout engine and the notes strip; the notes-file picker listing incompatible JSON
+    files) and two minors (an unbuilt layout-schema test, recorded as idea 000098 by the
+    coordinator; ts/vite.config.ts missing from this phase''s declared deliverables, fixed
+    directly on dev in 9cc8fd8). Both majors fixed in one dispatch to demo-creator-web
+    (schemaVersionContext.ts as the single schema-version source; a probe-and-filter step in the
+    notes-file picker), committed narrowly (38f56b3), and confirmed by re-dispatching W02-V1 and
+    W02-V2 verbatim - both PASS, no findings, no regression. npm run build and governance
+    reproduced green after the fix and the rebase onto dev''s widened-deliverables commit.
+    W02-W (coordinator-dispatched) then passed every reachable check with measured evidence -
+    zero-scroll and non-overlap at all four sizes in both layouts, layout switch/reload/
+    clear-storage geometry round-trips, the full notes-strip battery, no application console
+    errors - with two sub-checks (multi-panel dropdown swap, panel reassignment) recorded as
+    not exercisable until phase-wb-04..06 register real panels; their gates cover them. A
+    coordinator-dispatched targeted browser re-check after the fix confirmed the picker lists
+    only notes-shaped files (demo-commands.json absent), persistence shares the one ADR-016
+    key, and layouts still round-trip. Integrated fast-forward into dev at 622c558 under
+    PROMPT-023 delta 1.'
+- id: phase-wb-03
+  title: Terminal panel rework, injection dropdowns and shell panels
+  next_action: 'None — phase complete: all items validated, the W03-A major fixed and
+    re-validated with its behavior confirmed in the browser, W03-W passed all six items
+    with measured evidence, and the branch integrated into dev fast-forward at 72506f4
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
+  session: doc-session-workbench-terminal-panel-rework
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-terminal-decision
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-stage
+  completion_evidence:
+  - ts/src/stage/TerminalMenu.tsx
+  - ts/src/stage/InjectionDropdowns.tsx
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/CommandPanel.tsx
+  - ts/src/stage/Popover.tsx
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/public/demo-commands.json
+  - _data/workbench/layouts/layout-1.json
+  - _data/workbench/layouts/layout-2.json
+  - docs/03-sessions/SESS-2026-09-10-13-workbench-terminal-panel-rework.md
+  result: 'Complete. All three creator/validator pairs passed first pass (W03-C1/V1
+    ellipsis menu and drop-in-place; W03-C2/V2 injection dropdowns; W03-C3/V3 shell
+    panels). W03-G green apart from the environmental pytest red (3 known host pyenv
+    PTY failures) and an item-6 scope finding closed by the coordinator ruling that
+    ADR-016 puts slot admits in layout data (deliverables widened, 6a63f67). W03-A
+    found one major, no blocker: one malformed injection-overrides entry blanked all
+    three dropdowns via a whole-payload .every() gate; fixed with per-category
+    .filter() (196410b, fix cycle 1 of 2 for W03-C2), both injection-execution
+    defenses untouched, re-validated PASS by W03-V2. W03-W passed all six items with
+    measured evidence: menu-only collapse/drop with a live process surviving
+    collapse and dying only after confirmation; drop-in-place with identical panel
+    bbox and truly disabled dropdowns; per-category injection exact and un-executed
+    with the overrides live-edit (relabel, replace, hide) effective on refresh with
+    no rebuild, and the fix confirmed behaviorally (one bad entry drops only itself,
+    3 to 2, no console errors); bash round-trips with CMD/PowerShell in-panel
+    unavailable messages; flag-off degradation correct with a recorded cosmetic
+    caveat (four network-404 resource logs from probing designed-absent routes, no
+    uncaught exceptions - idea 000100); zero scroll and no overlaps at all four
+    sizes. Orchestrator self-reported one process deviation: W03-V3 dispatched
+    before W03-C3 was committed; the validator assessed the real worktree state and
+    no rework was needed. Integrated fast-forward into dev at 72506f4 under
+    PROMPT-023 delta 1.'
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-01
+  - phase-wb-02
+  scope:
+  - Rework the terminal panel per REQ-007 W02 and W03 - a (...) ellipsis menu at
+    the panel top right holding Collapse terminal and Drop/restore terminal, the
+    standalone collapse control and page-level drop control removed, drop replacing
+    the terminal area in place with an inactive-terminal info page (no layout
+    reflow) while the injection dropdowns stay visible but grayed and unclickable;
+    collapse and drop keep REQ-006 R10/R11 semantics unchanged.
+  - Add the Skills, Prompts and Agents injection dropdowns next to Commands, fed by
+    phase-wb-01's enumeration route with overrides applied, injecting each
+    category's agreed text un-executed per REQ-006 R12 semantics (REQ-007 W04),
+    sharing the drop deactivation behavior.
+  - Add Terminal (bash), CMD and PowerShell as three panel options in the slot
+    dropdown over the per-session shell selection, rendering the structured
+    unavailable-shell refusal as a clear in-panel message (REQ-007 W12, Linux half).
+  - Sweep the recorded demo-track minors in this region - replace
+    ts/public/demo-commands.json's placeholder entries with real demo commands and
+    fix the websocket startup-race console warning in the terminal component.
+  acceptance:
+  - No standalone collapse or page-level drop control renders; both live in the
+    ellipsis menu with sessions surviving collapse and confirmation guarding drop
+    (REQ-007 W02).
+  - Dropped state shows the info page inside unchanged panel bounds with all four
+    injection dropdowns visible, disabled and unclickable; restore returns a
+    working terminal (REQ-007 W03).
+  - Each category injects its exact agreed text un-executed; an overrides-file
+    relabel, replacement and hide take effect with no rebuild (REQ-007 W04).
+  - CMD and PowerShell panels on Linux show the in-panel unavailability message
+    with no uncaught console errors; bash round-trips (REQ-007 W12).
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W03-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W03-W) covering W02,
+    W03, W04 and W12's Linux assertions
+  deliverables:
+  - ts/src
+  - ts/public/demo-commands.json
+  - _data/workbench/layouts
+- id: phase-wb-04
+  title: HTML Viewer panel with tabs
+  next_action: 'None — phase complete: both work items passed first-cycle, W04-A
+    clean after its two fix cycles, W04-W green on every item with measured
+    evidence, and the branch integrated into dev fast-forward at 983164d under
+    PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
+  session: doc-session-workbench-html-viewer-panel
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-data
+  completion_evidence:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/DirectoryPickerDialog.tsx
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/src/workbench/storage.ts
+  - ts/src/workbench/types.ts
+  - ts/vite.config.ts
+  - _data/workbench/layouts/layout-1.json
+  result: 'Complete. W04-C1/V1 (viewer panel and controls) and W04-C2/V2 (viewer
+    tabs) each passed on the first creator/validator cycle. W04-G''s mechanical
+    checklist passed apart from pytest''s 3 known-environmental PTY failures
+    (ideas 000097/000099). A pre-existing governance drift (this phase''s own claim
+    commit had not regenerated docs/08-governance/catalog.md) was caught by W04-G''s
+    pytest run and fixed on dev at eb5c1cf; the worktree was rebased onto it, then
+    onto 8142de3 which widened this phase''s deliverables to ts/vite.config.ts and
+    _data/workbench/layouts. The coordinator dispatched W04-A (adversarial review),
+    which returned 2 blockers (the file-serving dev route had no demo-gate, live on
+    every plain npm run dev, ADR-015 rule 1; its boundary check did not resolve
+    symlinks, so a symlink under the repo pointing outside it served the outside
+    file''s bytes, ADR-015 rule 2), 1 major (the viewer iframe had no sandbox
+    attribute, letting embedded scripts run same-origin with the app) and 1 minor
+    (case-sensitive .git exclusion, missing .GIT on the Windows presentation
+    machine). Fix cycle 1 of at most 2 fixed all four (300b6ac): gated
+    serveRepositoryFiles behind D_SYSTEM_DEMO_TERMINAL=1 in the frontend process''s
+    own environment, added a realpathSync boundary check mirroring the backend''s
+    Path.resolve(), set sandbox="" on the viewer iframe (the generated overview page
+    has no <script> tags so it still renders), and made the .git segment check
+    case-insensitive. The re-review confirmed all four fix-cycle-1 fixes hold live
+    and found 1 new blocker plus 2 small items. Fix cycle 2 of 2 (last before owner
+    escalation), commit 1f45371: BLOCKER - the open-in-tab fallback served the same
+    untrusted content as a full top-level navigation with no sandboxing, defeating
+    the iframe sandbox fix in one click; per the owner-ratified constraint to keep
+    the fallback rather than descope it, serveRepositoryFiles now sets
+    Content-Security-Policy: sandbox on every /workbench-file/* response, which
+    applies to top-level navigations the same as to frames; the generated overview
+    has no <script> tags so it still renders through both the iframe and the
+    open-in-tab path. FLAGGED - the .git segment check now strips trailing
+    dots/spaces before the case-insensitive comparison, closing the Win32
+    trailing-dot/space path-stripping bypass. MINOR - fixed a TOCTOU where the
+    symlink-boundary check validated realpathSync(resolved) but createReadStream
+    re-opened the original path; now streams from the validated realResolved path.
+    Everything held from fix cycle 1 and the original W04-A pass (refresh
+    cache-busting, two-tab isolation, reload restoration, zero-scroll structure,
+    registration) is untouched. Re-verified after fix cycle 2: npm run build clean,
+    uv run pytest 546 passed/3 failed unchanged (environmental), governance and
+    check_no_private_content both green. W04-W (coordinator-dispatched,
+    demo-validator-web) then passed every item with measured evidence: dropdown
+    lists exactly the selected directory''s recursive .html/.svg files
+    (substitute directories _public and templates/html - the pack''s named
+    fixture path docs/07-architecture/diagrams/demo exists only on the unmerged
+    agent/phase-demo-07 branch, recorded here rather than rounded into a pass),
+    search filtering, known overview figure render, on-disk change + refresh,
+    dialog re-scope, .svg render (against a temporary untracked coordinator
+    fixture, removed after), two-tab isolation and reload persistence of both
+    tabs, zero-scroll and non-overlap at 1280x720/1366x768/1920x1080/1024x768,
+    no uncaught console errors (only the intended sandbox script-blocking
+    messages), and the deferred REQ-007 W06 rider from phase-wb-02: layout-2''s
+    overview/html-viewer slot dropdown swaps both directions and layout-1''s
+    single-admit slot renders a plain header. Integrated into dev fast-forward
+    at 983164d under PROMPT-023 delta 1 (pre-approved, gate green). Follow-on
+    for phase-wb-07: demo launches must now set D_SYSTEM_DEMO_TERMINAL=1 on the
+    frontend process too - the runbook''s launch section does not yet say so.'
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-03
+  scope:
+  - Build the HTML Viewer panel generalizing the overview panel (REQ-007 W07) - it
+    displays a selected page with the generated overview one selectable entry;
+    header controls right of the title are a refresh button, a searchable dropdown
+    over the compatible files (.html and .svg) found recursively under the selected
+    directory via phase-wb-01's search route, and a button opening the in-app
+    directory dialog fed by the listing route, repo-relative only.
+  - Add tabs exactly like the terminal's session tabs (REQ-007 W08) - directory,
+    search text and displayed page scoped per tab, shared header controls, tab
+    state persisted in the browser per ADR-016's selections split.
+  - Register the panel as a panel type assignable by the layout engine, defaulting
+    to layout-1's main right slot.
+  acceptance:
+  - The dropdown lists exactly the recursive .html/.svg files of the selected
+    directory, filters by the search input, and renders both an .html page (a
+    known overview figure) and an .svg; refresh re-fetches a changed file; the
+    dialog re-scopes the directory (REQ-007 W07).
+  - Two tabs hold different directory/search/page state, switch cleanly, and
+    survive reload (REQ-007 W08).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W04-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W04-W) covering W07
+    and W08
+  deliverables:
+  - ts/src
+  - ts/vite.config.ts
+  - _data/workbench/layouts
+- id: phase-wb-05
+  title: File Browser panel
+  next_action: 'None — phase complete: W05-A clean after its two fix cycles (oracle
+    exclusion and stale-render key collision), W05-W green on every item with
+    measured evidence, and the branch integrated into dev fast-forward at 041cf45
+    under PROMPT-023 delta 1 pre-approved integration (GOV-003 completion gate,
+    workbench extension).'
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-data
+  session: doc-session-file-browser-panel
+  completion_evidence:
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/FileTreeContextMenu.tsx
+  - ts/src/stage/panelBridge.ts
+  - ts/src/workbench/panelRegistry.tsx
+  - src/api/routes/workbench.py
+  - test/test_workbench_api.py
+  result: 'Complete. W05-C1 (tree, filters, documentation-explorer preset) passed
+    first-cycle: build
+    clean, W05-V1 clean PASS with no findings. W05-C2 (context menu) built 4
+    of 5 actions first-cycle (reveal, open-in-viewer with tab submenu,
+    copy-relative-path, inject-path); the 5th, copy-absolute-path, needed a
+    backend route ADR-015 specifies but phase-wb-01 never shipped, reported up
+    as a blocking prompt/reality mismatch. The coordinator ruled it an
+    implementation-shortfall fix within this phase (W03-G item-6 precedent)
+    and widened the deliverables on dev (commit 7b67f80) to add
+    src/api/routes/workbench.py and test/test_workbench_api.py. Fix cycle 1 of
+    2 on the W05-C2 item: demo-creator-py added GET /api/v1/workbench/absolute-path
+    under the existing gate and validation helper with 41 passing tests
+    (commit 73c7676); demo-creator-web wired the frontend action to it
+    (commit f186010). W05-V2 then passed clean on the full five-action diff
+    (one non-blocking stale-comment note in panelRegistry.tsx). W05-G
+    (demo-validator-check) passed every item: governance OK, private-content
+    OK, deliverable confirmed, build clean, full pytest 551 passed/3 failed
+    (environmental, ideas 000097/000099), diff confined to the corrected
+    scope. The coordinator then dispatched W05-A (adversarial review), which
+    found 1 BLOCKER (the new /absolute-path route applied only ADR-015 rule 2,
+    not rule 3, making it a gitignore/_private existence oracle - proven live
+    against .venv) and 1 MINOR (the same stale panelRegistry.tsx comment).
+    Fix cycle 1 of 2, commit 65d3909: demo-creator-py reused the existing
+    _is_reveal_excluded helper to fold excluded paths into the routes 404
+    branch, corrected the docstring, added a gitignore-exclusion test;
+    demo-creator-web corrected the comment. Re-verified in the foreground:
+    npm run build clean, uv run pytest test/test_workbench_api.py 42 passed
+    (was 41), full uv run pytest 552 passed/3 failed (same environmental set,
+    ideas 000097/000099), governance clean, private-content clean (staged).
+    The coordinator then dispatched W05-W (Playwright browser verification),
+    which passed every item with measured evidence and surfaced one
+    incidental defect: a React duplicate-key warning rendering docs/
+    (docs/README.md and docs/04-decisions/README.md implicated). Fix cycle 2
+    of 2 (the last before owner escalation), commit e700c85: demo-creator-web
+    reproduced it live with a real dev server and Playwright, finding the
+    actual mechanism - a one-render race where buildTree briefly receives the
+    new contextFolder paired with the previous folders stale entries before
+    the re-fetch effect runs. Fixed by tracking which folder entries was
+    actually fetched for and gating the tree build on that matching the
+    current contextFolder; confirmed gone via a live before/after repro.
+    Re-verified npm run build clean in the foreground. Every dispatch this
+    pack assigns to this orchestrator or the coordinator for phase-wb-05 has
+    now run and passed. Integrated into dev fast-forward at 041cf45 under
+    PROMPT-023 delta 1 (pre-approved, gate green); post-rebase build, governance,
+    staged private-content check and pytest (552 passed, 3 environmental PTY
+    failures, ideas 000097/000099) all verified by the coordinator.'
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-04
+  scope:
+  - Build the File Browser panel (REQ-007 W09) - context folder chosen through the
+    in-app dialog, collapsible treeview of subdirectories and files from
+    phase-wb-01's listing route, text-search and file-type filters hiding folders
+    with no matches.
+  - Implement the right-click context menu for every entry - reveal in file
+    explorer / open containing folder through the action route; open in HTML
+    Viewer with a nested submenu choosing the target tab (compatible files); copy
+    relative path; copy absolute path; inject path into terminal un-executed via
+    the R12 injection mechanics.
+  - Ship the documentation-explorer mode (plans, decisions, requirements, ...) as
+    a File Browser configuration preset, not a separate panel.
+  acceptance:
+  - The tree matches the filesystem for a known folder; filters hide non-matching
+    files and empty folders; the documentation-explorer preset re-scopes the tree
+    (REQ-007 W09).
+  - All five context-menu actions work - open-in-viewer lands in the chosen tab,
+    inject-path appears un-executed on the active terminal, both copies place the
+    expected strings, and the reveal request reaches the backend action route
+    (Linux assertion; Windows behavior is exercised by phase-wb-07's checklist).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W05-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W05-W) covering W09
+  deliverables:
+  - ts/src
+  - src/api/routes/workbench.py
+  - test/test_workbench_api.py
+- id: phase-wb-06
+  title: Idea and Backlog explorer panels
+  next_action: 'None — phase complete: both work items passed first-cycle with zero
+    fix cycles, W06-A found nothing (numbers cross-verified against independent
+    fold() and --ready recomputations), W06-W green on every item including the
+    explorer-slot dropdown rider deferred from phase-wb-02, and the branch
+    integrated into dev fast-forward under PROMPT-023 delta 1 pre-approved
+    integration (GOV-003 completion gate, workbench extension).'
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-api-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-data
+  session: doc-session-idea-backlog-explorer-panels
+  completion_evidence:
+  - ts/src/stage/explorer/ExplorerRegion.tsx
+  - ts/src/stage/IdeaExplorerRegion.tsx
+  - ts/src/stage/BacklogExplorerRegion.tsx
+  - ts/src/workbench/panelRegistry.tsx
+  - ts/src/workbench/Slot.tsx
+  result: 'Complete. W06-C1 (Idea Explorer) passed first-cycle: build clean,
+    W06-V1 clean PASS with no findings - idea data comes only from the
+    phase-wb-01 idea route, six columns render, sort/filter work on route
+    data, queue view uses the route''s own ordering. W06-C2 (Backlog
+    Explorer) passed first-cycle, factoring the shared table/sort/filter/
+    queue-toggle surface out of the Idea Explorer into
+    ts/src/stage/explorer/ExplorerRegion.tsx so both panels are thin
+    wrappers over one generic component - build clean, W06-V2 clean PASS
+    with no findings. W06-G (demo-validator-check) passed every item:
+    governance OK, private-content OK staged, deliverable confirmed, build
+    clean, full pytest 552 passed/3 failed (environmental, ideas
+    000097/000099), no direct ideas.jsonl reference, diff confined to ts/.
+    This orchestrator''s own verification commands (npm run build,
+    governance, check_no_private_content) all ran clean. No fix cycles were
+    needed on either work item. W06-A (adversarial review) and W06-W
+    (Playwright browser verification), the coordinator''s dispatches, have
+    since both run and passed: W06-A found nothing, numbers cross-verified
+    against independent fold() and --ready recomputations; W06-W was green
+    on every item including the explorer-slot dropdown rider deferred from
+    phase-wb-02. Integrated into dev fast-forward at cdd773b under
+    PROMPT-023 delta 1 (pre-approved, gate green).'
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-05
+  scope:
+  - Build the Idea Explorer panel (REQ-007 W10) over phase-wb-01's fold()-only
+    route - columns id, title, status, age, annotation count, link count; sortable
+    and filterable; a toggle between the standard view and a priority-queue view
+    ranking by status precedence (open, triaged, reviewing) then age. No code path
+    reads _data/ideas.jsonl directly.
+  - Build the Backlog Explorer panel (REQ-007 W11) as the same configuration
+    surface over the backlog route - columns id, title, status, priority, queue
+    position, depends_on; its priority-queue view ordered next_up first, then
+    ready phases by priority, matching the governance --ready rendering.
+  - Register both as panel types in layout-1's explorer slot behind the slot-header
+    dropdown, File Browser remaining the default-visible panel.
+  acceptance:
+  - Idea rows match an independent fold() run and the queue view ranks by status
+    precedence then age (REQ-007 W10).
+  - Backlog rows match backlog.yaml and the queue view's top rows equal next_up in
+    order followed by ready phases by priority, cross-checked against the --ready
+    report (REQ-007 W11).
+  - Layout-1's explorer slot lists all three explorers in its header dropdown with
+    File Browser visible by default (REQ-007 W06).
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W06-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W06-W) covering W10,
+    W11 and the W06 slot-dropdown assertions
+  deliverables:
+  - ts/src
+- id: phase-wb-07
+  title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
+  next_action: All agent-executable work is done - W07-C1, talking points, W07-V1 (clean
+    on re-validation), both agent-driven rehearsal passes (recorded; pass 2's two runbook
+    gaps fixed, its one code defect routed to idea 000104 rather than fixed here), W07-G
+    (green on re-check) and W07-W (Playwright rehearsal pass, clean). A 2026-09-11
+    session-close audit independently re-verified acceptance condition 1 against the real
+    current UI and confirmed this work is solid enough to build on for phase-wb-08; it is
+    not blocked by phase-wb-07 remaining open. What remains is entirely owner-machine,
+    owner-driven work that no agent can perform - the REQ-006 R06 terminal smoke check,
+    the CMD and PowerShell round-trips (REQ-007 W12), and both owner-driven timed
+    dry-runs closing REQ-006 R09. The phase cannot close until the owner performs and
+    records these. Moved to blocked 2026-09-11 (owner decision, agent claim released) -
+    the owner checks wait on the fix phases, and holding an active claim blocked
+    phase-wb-08's sys-demo-stage lock; resume after phase-wb-10 refreshes the runbook so
+    the checks run against the post-fix UI.
+  session: doc-session-rehearsal-refresh
+  result: 'In progress (evidence lives on the unmerged agent/phase-wb-07 worktree branch:
+    docs/00-working/demo-runbook.md, docs/00-working/demo-windows-setup.md). Runbook and
+    Windows checklist rewritten against the final workbench UI (W07-C1); validator W07-V1
+    found one finding (a surviving "talking points" label in presenter narration), fixed
+    directly by the orchestrator as audience-facing prose, and passed on re-validation.
+    Both agent-driven rehearsal passes are recorded. Pass 1: three findings, one addressed
+    (/orient now starts a Claude Code session). Pass 2: dispatched twice by the
+    orchestrator and truncated by turn limits both times with no SendMessage tool
+    available to resume a truncated agent, reported up as a blocker; the coordinator
+    dispatched it directly and resumed it past truncation, delivering a complete report.
+    Pass 2 found four issues: an undocumented terminal panel picker/default (fixed as a
+    runbook gap), /idea-triage triaging the whole backlog rather than one idea (fixed
+    within runbook scope with an explicit Ctrl-C fallback; the command''s own behavior is
+    not this phase''s to change), a real terminal-panel clipped-height layout bug (a code
+    defect outside this phase''s deliverables, recorded as idea 000104 rather than fixed,
+    flagged prominently as demo-wrecking if unaddressed), and a repeat of pass 1''s cosmetic
+    _parked dropdown finding. W07-G passed all six items on re-check (first check''s item-6
+    fail was a two-dot vs triple-dot diff artifact against dev''s own independent commits,
+    not a real deliverable-path violation). W07-W (Playwright rehearsal pass,
+    demo-validator-web) then passed with no blocking finding: every control the runbook
+    names in its browser-marked steps exists and behaves as described; two non-blocking
+    notes recorded (idea 000105, the HTML Viewer Embedded/Open-in-tab toggle undocumented;
+    multi-size zero-scroll confirmable only at the rehearsal environment''s single
+    available window size). A supplementary owner-requested check confirmed terminal
+    session persistence across layout switches. Owner-machine items (R06 smoke check,
+    CMD/PowerShell round-trips, both owner-driven timed dry-runs) not started; they close
+    only on the owner''s own recorded results. **[Session-close audit, 2026-09-11]**
+    Independent review confirmed acceptance condition 1 (REQ-007 W13) holds against the
+    real current UI (control names, dialog text and timeboxes independently re-verified,
+    not taken on the record''s word) and found the agent-executable work solid enough to
+    build on for phase-wb-08. It also found the branch tip''s overview page under-reporting
+    by one idea (the final commit never reran the generator) - fixed on the
+    agent/phase-wb-07 branch (commit 14094bb) and the missing drift-test coverage recorded
+    as idea 000106 on that same branch (commit 7cd3a70), both per the owner''s direction.
+    Conditions 2 and 3 remain not met; the phase stays active.'
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: blocked
+  blocked_reason: Only owner-machine checks remain and they must run against the
+    post-fix UI and refreshed runbook; holding an active claim blocked phase-wb-08's
+    sys-demo-stage lock, so the claim was released (owner decision 2026-09-11).
+  resume_when: phase-wb-10 is complete and the owner is at the Windows presentation
+    machine to run and record the R06 smoke check, the W12/W17 shell checks, the W15
+    fill confirmations and both R09 timed dry-runs.
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-01
+  - phase-wb-02
+  - phase-wb-03
+  - phase-wb-04
+  - phase-wb-05
+  - phase-wb-06
+  - phase-wb-10
+  scope:
+  - Rewrite the live-segment runbook against the final workbench UI in the
+    rehearsal gate's step shape (PROMPT-017), each step carrying its commands,
+    fallback action and timebox, the timeboxes summing inside 15 minutes; update
+    the Windows setup checklist to the workbench launch (REQ-007 W13).
+  - Run the deferred owner-machine checks on the presentation machine and record
+    them in the runbook - the REQ-006 R06 terminal smoke check, and a CMD and a
+    PowerShell panel round-trip (REQ-007 W12's Windows half).
+  - Run two owner-driven timed dry-runs of the live segment against the final UI
+    and record per-step times, closing REQ-006 R09's deferred conditions.
+  - Re-run the rehearsal gate semantics (PROMPT-017) including a demo_reset.py
+    prepare/restore verification; the reset tool, OPS-013 and their behavior stay
+    unchanged per PROMPT-020 decision 7.
+  acceptance:
+  - The runbook describes the workbench UI only, with per-step commands, fallbacks
+    and timeboxes summing inside 15 minutes (REQ-007 W13).
+  - The R06 smoke check and both shell round-trips are recorded as passing on the
+    presentation machine.
+  - Both owner-driven dry-runs complete within 15 minutes with every step inside
+    its timebox, per-step times recorded - the REQ-006 R09 conditions deferred
+    from phase-demo-05 are closed, not re-deferred.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Playwright rehearsal pass over the runbook's browser-marked steps
+    (demo-validator-web, pack W07-W)
+  - The executed Windows checklist and both dry-runs' recorded times in the runbook
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+- id: phase-wb-08
+  title: Panel rendering fixes — terminal fill, HTML Viewer, File Browser scroll
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  agent: agent-demo-stage
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-06
+  scope:
+  - Root-cause the shell panels' collapsing xterm area (idea 000104; the panel
+    renders blank white on Windows) - the suspected break is the height chain
+    through the multi-panel slot wrapper in ts/src/workbench/Slot.tsx (related
+    cosmetic double header, idea 000101), but the mechanism must be verified
+    before fixing, not assumed.
+  - Fix it for all three shell panels equally (Terminal/bash, CMD, PowerShell
+    share one TerminalRegion component) and for any slot a shell panel can
+    occupy - the fix must not hard-code the terminal slot's current geometry,
+    because phase-wb-09 makes shells assignable to the main slot and re-runs the
+    fill checks there (REQ-007 W15).
+  - Diagnose the HTML Viewer's blank rendering (owner report 2026-09-11) before
+    fixing, distinguishing the phase-wb-04 launch-flag follow-on
+    (D_SYSTEM_DEMO_TERMINAL=1 required on the frontend process) from the same
+    wrapper height collapse (layout 2's main slot is multi-panel); fix
+    whichever the diagnosis confirms is code (REQ-007 W15, viewer half). A
+    pre-fix diagnosis dispatch (pack W08-M, demo-validator-web) records the
+    live measurements the creator consumes - the creator agent has no browser
+    tool of its own.
+  - Give the File Browser tree internal vertical scrolling within the panel
+    body, holding in any slot and layout, with the page never scrolling
+    (REQ-007 W18).
+  - Preserve zero page scroll (REQ-006 R02) and session persistence across
+    layout switches.
+  acceptance:
+  - Each shell panel's xterm container has non-zero measured height tracking its
+    slot body in both layouts at 1280x720, 1366x768, 1920x1080 and 1024x768,
+    with a command round-trip's output readable in the visible rendered area
+    (REQ-007 W15).
+  - Zero page scroll and no overlapping regions still hold in both layouts at
+    all four sizes.
+  - 'The layout-switch persistence guard passes: MARKER set in layout 1 echoes
+    identically after switching to layout 2 and back, with no new terminal
+    websocket opened during the switches.'
+  - With the frontend launched flag-set, the HTML Viewer renders a known
+    overview figure in both layouts, including layout 2's multi-panel main
+    slot; the diagnosis report states the confirmed cause of the blank-viewer
+    report (REQ-007 W15).
+  - The File Browser body scrolls internally over an expanded docs/ tree, its
+    last entry reachable, with document scroll unchanged, in both layouts
+    (REQ-007 W18).
+  - The Windows confirmations (terminal and viewer visibly filled on the
+    presentation machine) are owner checks belonging to phase-wb-07's
+    checklist (blocked behind phase-wb-10), not closed here on agent
+    evidence.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W08-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Pre-fix diagnosis (demo-validator-web, pack W08-M) with recorded live
+    measurements consumed by the creator
+  - Playwright browser verification (demo-validator-web, pack W08-W) covering
+    W15's fill assertions for all three shell panels and the HTML Viewer in
+    both layouts at the four sizes, W18's internal-scroll assertions, and the
+    persistence guard
+  deliverables:
+  - ts/src
+  next_action: 'None — phase complete and integrated into dev (fast-forward to the
+    rebased branch, commit bf1749b) under the kick-off record''s delta-4
+    pre-approval. The post-fix Windows confirmations remain owner checks in
+    phase-wb-07''s checklist.'
+  session: doc-session-phase-wb-08-panel-fixes
+  completion_evidence:
+  - ts/src/stage/StagePage.css
+  result: 'Complete; integrated into dev at bf1749b (the 17-line CSS fix rebased
+    onto dev, fast-forward merge, coordinator-integrated under the delta-4
+    pre-approval). W08-M diagnosis (demo-validator-web, resumed by the coordinator
+    past two turn-limit truncations) found the shared root cause:
+    .stage-workbench-slot__body never set display, defaulting to block and
+    starving every panel wrapped in a multi-panel slot (terminal, HTML Viewer
+    in layout 2, File Browser) down to content height. W08-C1 (demo-creator-web)
+    fixed it with a single 17-line CSS change (display: flex; flex-direction:
+    column), covering all three shell panels, any slot geometry, and the File
+    Browser scroll per REQ-007 W18; the HTML Viewer''s no-flag blank state was
+    confirmed by W08-M as the separate launch-flag gap (runbook scope,
+    phase-wb-10), left untouched. W08-V1 (demo-validator-code) passed with no
+    findings on first review. W08-G (demo-validator-check, the phase gate)
+    initially failed on a stale docs/08-governance/catalog.md
+    (test_committed_catalog_matches_regenerated_output) caused by this
+    orchestrator''s own claim commit not regenerating the catalog; fixed
+    directly on dev (commit d34ac7a) and merged into the phase branch
+    (84937bb), then W08-G re-ran green (all five checklist items pass).
+    Completion gate (GOV-003, coordinator-dispatched): W08-A adversarial review
+    found no blocker or major findings — the fix is structural (verified live:
+    .xterm 760x570, not 0), slot-generic, with collapse/drop/restore and the
+    unavailable-shell overlays intact. W08-W browser verification passed the
+    requirement bar after coordinator-directed re-verification: echo round-trip
+    visible, File Browser internal scroll in both layouts with filters, zero
+    page scroll and no region overlap at all four sizes in both layouts; its
+    literal fill-proxy failures (98.16px gap vs the pack''s 60px tolerance)
+    decompose exactly into the nested duplicate header (idea 000101, out of
+    scope per W08-C1) + tabbar + padding, with the xterm filling 100% of its
+    available space and tracking the slot body at every size (REQ-007 W15''s
+    stated bar); its layout-1 viewer failure was retracted by the validator as
+    its own selector bug (correct measurement: 47.35px gap, pass); its
+    persistence failure was shown by a dev baseline not to be caused by the
+    diff, and the session-close independent review then established it was a
+    measurement artifact of the validator''s stale localStorage (PowerShell
+    stored as layout 2''s visible panel from its own fill testing) — on a
+    clean session the guard passes and both layout files default the terminal
+    slot to bash; idea 000107 amended to the corrected diagnosis (a stored
+    visible-panel choice differing between layouts silently kills the hidden
+    shell''s session — intersects phase-wb-09''s W16 obligation).
+    Post-rebase validation before integration: governance OK, npm run build
+    clean, pytest 552 passed / 3 failed — the known environmental PTY
+    failures (ideas 000097/000099), unchanged in kind and count.'
+- id: phase-wb-09
+  title: Layout assignment model — per-panel eligibility, assignment-only dialog
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-layout-decision
+  - doc-workbench-terminal-decision
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  agent: agent-demo-stage
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-08
+  scope:
+  - Move eligibility from the slot to the panel in the layout data files under a
+    bumped schema_version - each panel declares its eligible slots and the file
+    carries a default total assignment reproducing the pre-delta arrangement;
+    shipped eligibility per REQ-007 W16 (bash/CMD/PowerShell/HTML Viewer each
+    eligible for the terminal and main slots in both layouts; Overview main slot
+    only; notes strip and explorer slot unchanged). Old-schema stored browser
+    state is silently discarded per ADR-016 rule 3.
+  - Rework the configuration dialog into the assignment-only surface - one
+    selector per panel over that panel's eligible slots, no per-slot
+    visible-panel selects, still no geometry editing; slot-header dropdowns stay
+    pure switchers over a slot's assigned panels (REQ-007 W16).
+  - Allow two live shells at once and raise the backend session registry's
+    global concurrent-PTY cap from four to six (per-panel tab cap stays four);
+    update ADR-014's cap wording and REQ-006 R10 stays as amended. Add a gated
+    GET route reporting host platform and per-shell availability, and default
+    the terminal slot's visible shell to PowerShell on Windows and bash
+    elsewhere on a fresh store, keeping layout files platform-neutral (REQ-007
+    W17).
+  - Re-assignment between slots never silently kills a shell session - keep
+    instances alive across re-assignment where feasible; where a remount is
+    unavoidable make the behavior explicit and stated (REQ-007 W16).
+  - Re-run REQ-007 W15's fill assertions with each shell panel assigned to the
+    main slot in both layouts, and the layout-switch persistence guard.
+  acceptance:
+  - The dialog offers exactly one eligible-slot selector per panel and nothing
+    else; assigning HTML Viewer to the terminal slot and a shell to the main
+    slot renders both there and survives reload; a cleared or old-schema store
+    yields the pre-delta default arrangement (REQ-007 W16).
+  - Two shell panels visible at once each complete an independent command
+    round-trip; a seventh concurrent session is refused while six are open and
+    admitted after one closes; the platform route reports host platform and
+    shell availability (REQ-007 W17).
+  - Each shell panel renders unclipped and fully interactive assigned to the
+    main slot in both layouts (REQ-007 W15 re-run), and the persistence guard
+    passes.
+  - On Linux a fresh store defaults the terminal slot to bash; the Windows
+    default (PowerShell) and a Windows two-shell round-trip are owner checks
+    belonging to phase-wb-07's checklist (blocked behind phase-wb-10), not
+    closed here.
+  verification:
+  - cd ts && npm run build
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Adversarial review (demo-adversary, pack W09-A) with findings fixed or
+    explicitly reported (GOV-003 completion gate, workbench extension)
+  - Playwright browser verification (demo-validator-web, pack W09-W) covering
+    W16, W17's Linux assertions and the W15 main-slot re-run
+  deliverables:
+  - ts/src
+  - _data/workbench/layouts
+  - src/api/routes/workbench.py
+  - src/api/routes/demo_terminal.py
+  - test/test_workbench_api.py
+  - test/test_demo_terminal.py
+  - docs/04-decisions/ADR-014-workbench-terminal-capability.md
+  next_action: 'None — phase complete and integrated into dev (fast-forward to the
+    rebased branch, commit 08305cc) under the kick-off record''s delta-4
+    pre-approval. The post-fix Windows confirmations (fresh-store PowerShell
+    default, two-shell round-trip) remain owner checks in phase-wb-07''s
+    checklist.'
+  session: doc-session-phase-wb-09-layout-assignment
+  completion_evidence:
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/workbench.py
+  - _data/workbench/layouts/layout-1.json
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  result: 'Complete; integrated into dev at 08305cc (rebased, fast-forward,
+    coordinator-integrated under the delta-4 pre-approval). W09-C1 (demo-creator-py)
+    raised the global concurrent-PTY cap in src/api/routes/demo_terminal.py from
+    four to six and added a gated GET /platform route to
+    src/api/routes/workbench.py reusing the existing shell-availability check;
+    W09-V1 passed with no findings. W09-C2 (demo-creator-web) bumped both
+    shipped layout files to schema_version 2, replacing per-slot admits lists
+    with per-panel eligible_slots plus a default_assignment/default_visible_panel
+    reproducing the pre-delta arrangement, and reworked the storage/loading
+    layer to a per-panel-assignment-plus-per-slot-visible-choice shape that
+    silently discards old-schema or ineligible stored state (ADR-016 rule 3);
+    W09-V2 passed with no findings. W09-C3 (demo-creator-web, resumed once after
+    a turn-limit truncation) reworked LayoutConfigDialog.tsx into a per-panel
+    eligible-slot selector, made Slot.tsx''s header dropdown switcher-only, and
+    added a per-slot React-portal mechanism in StagePage.tsx keyed by panel id
+    so re-assigning a panel between slots relocates its live component instance
+    instead of remounting it - closing idea 000107''s layout round-trip
+    regression - plus a platform-conditional fresh-store default shell; W09-V3
+    passed with no findings, having specifically checked and confirmed the idea
+    000107 fix and that the multi-occupant header-switcher''s existing
+    remount-on-visibility-change behavior is unchanged, not a new regression.
+    W09-G (the mechanical phase gate) initially failed on a stale
+    docs/00-working/ideas.md (test_the_committed_markdown_matches_regenerated_output)
+    caused by the worktree branching before several unrelated dev commits
+    landed (idea-log appends and the owner''s own src/demo/factory.py Windows
+    fix); resolved by merging dev forward into the phase branch (73ef92d, no
+    conflicts), after which W09-G re-ran green (all six checklist items pass).
+    Completion gate (GOV-003, coordinator-dispatched): the first W09-A found a
+    BLOCKER - the stage page crashed on load (infinite ref/setState loop from a
+    per-render registerSlotBody closure), invisible to build/pytest/W09-G by
+    construction and caught only by the gate''s live browser launch. Fix cycle 1
+    repaired the render loop (verified live in dev and production builds) but
+    left re-assignment killing a live shell session after two creator attempts;
+    the coordinator spent PROMPT-012''s single documented opus escalation, which
+    found the real mechanism (React treats a portal whose containerInfo changes
+    as insert+delete, never an update) and reworked to permanent per-panel host
+    divs moved via appendChild, a NO_VISIBLE_PANEL sentinel ending the vacated-
+    slot CMD thrash, and an explicit confirm notice for displacement (commit
+    851e5c5); W09-V3 then passed (one cosmetic styling note). The W09-A re-run
+    confirmed both findings closed and no blocker/major survived (true-
+    concurrency cap check 6-of-12 admitted with slot recovery, storage fallback
+    seeding, notice double-click idempotence, host-div stress under rapid
+    reassignment, main-slot height chain exact). W09-W passed all seven items
+    with measured evidence, including the persistence guard (zero new
+    websockets across layout switches, MARKER preserved) and the announced-
+    displacement round-trip. Post-rebase validation before integration:
+    governance OK, build clean, ruff and mypy pass, pytest 575 passed / 3
+    failed - the known environmental PTY failures (ideas 000097/000099, fix
+    recorded as idea 000129), unchanged. Post-mortem of the gate''s lesson:
+    brain/procedures/runtime-behavior-needs-runtime-evidence.md and idea
+    000136. The backend cap refusal''s unreachable close reason is idea 000137.'
+- id: phase-wb-10
+  title: Runbook and checklist refresh for the post-fix workbench UI
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  agent: agent-fable
+  status: complete
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-wb-09
+  scope:
+  - Update the runbook and Windows setup checklist to the post-fix UI - the
+    assignment-only configuration dialog and the platform-conditional default
+    visible shell (PowerShell on Windows) replacing the descriptions of the old
+    per-slot dialog and bash-first default, in the rehearsal gate's step shape
+    (PROMPT-017); timeboxes stay inside 15 minutes.
+  - Add the phase-wb-04 follow-on launch line - D_SYSTEM_DEMO_TERMINAL=1 must
+    be set on the frontend process as well as the backend, or the HTML
+    Viewer's file-serving route is absent - to the launch sections of both
+    documents.
+  - Documentation only; no code, no reset-tool or OPS-013 changes (PROMPT-020
+    decision 7 stands).
+  acceptance:
+  - Both documents describe only the post-fix UI; no reference to the retired
+    per-slot configuration selects or a bash-first Windows default remains.
+  - Both launch sections state the frontend flag requirement.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - grep both documents for retired-dialog and bash-default phrasing - none
+    present
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  next_action: None - closed by the owner-invoked /session-close on 2026-09-12.
+  session: doc-session-phase-wb-10-runbook-refresh
+  completion_evidence:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  - docs/03-sessions/SESS-2026-09-12-02-phase-wb-10-runbook-refresh.md
+  result: 'Complete (deliverables commit 93bb924 on agent/phase-wb-10, integrated
+    into dev with owner approval 2026-09-12): both documents rewritten against the
+    integrated phase-wb-08/09 UI, verified in code rather than from phase text -
+    the assignment-only "Configure layout" dialog (one eligible-slot selector per
+    panel, in-place displacement confirm notice, no per-slot visible-panel selects),
+    switcher-only slot-header dropdowns, and the platform-conditional fresh-store
+    default shell (PowerShell on Windows, bash elsewhere); both launch sections
+    state the frontend D_SYSTEM_DEMO_TERMINAL=1 requirement and the
+    silently-blank-viewer failure mode it prevents (owner-confirmed on Windows
+    2026-09-11). Historical rehearsal findings 4 and 6 annotated as
+    superseded/resolved by wb-09/wb-08. Verification: governance OK (170 documents),
+    check_no_private_content OK (509 tracked files, 31 identifiers, run with
+    _private symlinked into the worktree), retired-phrasing grep clean, full suite
+    578 passed post-rebase. Independent close review: both acceptance conditions
+    HOLD; three bookkeeping discrepancies (stale pre-rebase hash, uncommitted
+    verification-count correction, unpushed rebase) resolved in the close commit.'
+- id: phase-lit-01
+  title: Literature review Pass 1a — broad map of knowledge representation, provenance
+    and epistemics domains
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: active
+  agent: agent-lit
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Execute the delegation pack's LIT-01 section verbatim - kickoff K creates the
+    reproducibility ledger and source inventory at the evidence contract's locations,
+    then the S/X pairs sweep matrix domains D01-D06, D07-D20 and D28-D32 (knowledge
+    graphs through event sourcing, belief revision through micropublications, data
+    lineage through ontology evolution) with the terminology variants and collision
+    queries the search-domain matrix assigns to each.
+  - Every search appends a ledger row with its domain id; extraction fills source-inventory
+    rows only from sources the paired search logged. Web search and free/open endpoints
+    only; paywalled sources assessed from abstract, preprint or secondary coverage
+    with the access limitation recorded.
+  - Draft terminology-map entries for the domains swept. No deep reading, no hypothesis
+    verdicts, no architecture revision - collisions are recorded, never resolved here.
+  acceptance:
+  - The ledger and source inventory exist at the evidence contract's paths and every
+    matrix domain D01-D06, D07-D20, D28-D32 has at least two ledger rows with distinct
+    terminology variants.
+  - Candidate sources for these domains are in the inventory with inclusion or exclusion
+    rationale; no evidence row cites a generated summary as evidence.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-01 G (PROMPT-029) and record real output - per-domain
+    ledger counts for D01-D20 and D28-D32 with at least two distinct queries each and
+    every mandated minimum variant appearing in some logged query for its domain, zero
+    excluded inventory rows missing a reason, zero kept-but-uninventoried sources
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  next_action: Resume phase-lit-01 mid-phase. Delegation-pack sections K, S1, X1, S2
+    and X2 are complete and coordinator-verified (98 ledger rows, 139 inventory rows,
+    domains D01-D06 and D30-D31 swept); S3 is in flight. Dispatch the remainder of
+    PROMPT-029's LIT-01 section in order - X3, S4/X4, S5/X5, S6/X6, then the G gate -
+    assembled per its dispatch rules, on the campaign branch agent/lit-campaign in the
+    worktree ../d-system-worktrees/lit-campaign. See SESS-2026-09-12-05.
+- id: phase-lit-02
+  title: Literature review Pass 1b — broad map of agent memory, decision intelligence
+    and requirements-engineering domains
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-01
+  scope:
+  - Execute the delegation pack's LIT-02 section verbatim - S/X pairs sweep matrix
+    domains D21-D27 and D33-D45 (agent memory through decision intelligence, requirements
+    engineering through change impact analysis) with their assigned terminology variants
+    and collision queries, appending to the ledger and inventory phase-lit-01 created.
+  - Same evidence hygiene as phase-lit-01 - ledger row per search with domain id,
+    provider constraint, access limitations recorded, generated summaries as leads
+    only.
+  - Extend the terminology-map draft for the domains swept. No deep reading, no verdicts.
+  acceptance:
+  - Every matrix domain D21-D27 and D33-D45 has at least two ledger rows with distinct
+    terminology variants.
+  - Candidate sources for these domains are in the inventory with inclusion or exclusion
+    rationale.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-02 G (PROMPT-029) and record real output - per-domain
+    ledger counts for D21-D27 and D33-D45 with at least two distinct queries each and
+    every mandated minimum variant appearing in some logged query for its domain, zero
+    excluded inventory rows missing a reason, zero kept-but-uninventoried sources
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  next_action: Dispatch delegation-pack section LIT-02 after phase-lit-01 completes.
+- id: phase-lit-03
+  title: Literature review Pass 1c — broad map of digital-thread, specification and
+    agentic-SE domains; close Pass 1
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-02
+  scope:
+  - Execute the delegation pack's LIT-03 section verbatim - S/X pairs sweep matrix
+    domains D46-D72 (model-based systems engineering through DevOps traceability,
+    including agentic software engineering, planning and the runtime-feedback domains)
+    with their assigned terminology variants and collision queries.
+  - Close Pass 1 - finalize the terminology map (01) and domain map (02), flag the
+    top-20 collision candidates in the source inventory and list them in the domain
+    map, and run the LIT-03 G gate measuring Pass 1 stop conditions against the ledger.
+  - Same evidence hygiene as the prior phases. No deep reading, no verdicts.
+  acceptance:
+  - Every one of the 72 matrix domains has at least two ledger rows with distinct
+    terminology variants, measured from the ledger's domain-id column, and the candidate
+    inventory holds at least 75 sources across all domains.
+  - 01_terminology_map.md and 02_domain_map.md are complete for all 72 domains and
+    the top-20 collision candidate list exists with component/architecture pre-scores.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-03 G (PROMPT-029) and record real output - all 72 domains
+    with at least two distinct-query ledger rows and full mandated-variant coverage, at
+    least 75 kept inventory candidates, the domain map complete with all 72 entries and
+    a ranked top-20 collision list
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/01_terminology_map.md
+  - research/literature-review/02_domain_map.md
+  next_action: Dispatch delegation-pack section LIT-03 after phase-lit-02 completes.
+- id: phase-lit-04
+  title: Literature review Pass 2a — deep-read the top collision candidates
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-03
+  scope:
+  - Execute the delegation pack's LIT-04 section verbatim - create the evidence matrix
+    at the evidence contract's path and deep-read the top-20 collision candidates
+    in ranked batches, filling every extraction-schema field including strongest
+    overlap, strongest difference, hypotheses challenged, evidence locator, interpretation
+    confidence and access limitation.
+  - Backward citation chaining on each candidate - identify theoretical ancestors
+    and record shared-ancestor lineage so derivative sources are never counted as
+    independent.
+  - Apply the two similarity scores and flag CRITICAL_COLLISION rows per the methodology's
+    rules. Collisions are recorded, not resolved; no hypothesis verdicts yet.
+  acceptance:
+  - The evidence matrix exists with a fully populated row for each deep-read candidate;
+    no required field is blank and every row carries an evidence locator to primary
+    material.
+  - Every CRITICAL_COLLISION flag traces to the scoring rules and backward chaining
+    is logged in the ledger for each deep-read source.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-04 G (PROMPT-029) and record real output - a matrix row
+    for every batch id, zero blank required fields, every critical-collision row marked
+    second_review pending, a backward-chaining ledger row for every deep-read source
+  deliverables:
+  - research/literature-review/04_evidence_matrix.csv
+  next_action: Dispatch delegation-pack section LIT-04 after phase-lit-03 completes.
+- id: phase-lit-05
+  title: Literature review Pass 2b — deep-read foundational works and complete the
+    evidence matrix
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-04
+  scope:
+  - Execute the delegation pack's LIT-05 section verbatim - deep-read the remaining
+    strongest sources (foundational works and standards the top candidates inherit
+    from) to bring the deeply-compared total to the methodology's 20-30, completing
+    the evidence matrix.
+  - Forward citation chaining on the strongest collision candidates - extensions,
+    critiques, implementations - with chain decisions logged in the ledger.
+  - Run the LIT-05 G gate measuring Pass 2 stop conditions - 20-30 sources deeply
+    compared, chaining complete on the strongest collisions - against the matrix
+    and ledger.
+  acceptance:
+  - The evidence matrix holds 20-30 fully populated rows and both chaining directions
+    are logged for the strongest collision candidates.
+  - Derivative-ancestry lineage is recorded wherever multiple sources inherit one
+    mechanism.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-05 G (PROMPT-029) and record real output - 20-30 total
+    matrix rows with zero blank required fields, both chaining directions logged for every
+    row scoring 3 or higher, derivative_ancestor filled everywhere, and the list of any
+    hypotheses still lacking a challenger
+  deliverables:
+  - research/literature-review/04_evidence_matrix.csv
+  next_action: Dispatch delegation-pack section LIT-05 after phase-lit-04 completes.
+- id: phase-lit-06
+  title: Literature review Pass 3 — adversarial hypothesis testing and collision second
+    reviews
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-05
+  scope:
+  - Execute the delegation pack's LIT-06 section verbatim - for each hypothesis H1-H11,
+    run the matrix's pre-crafted Phase E collision queries plus any gap-driven variants,
+    identify the strongest prior-art challenger, and articulate the best argument
+    that D-System is not distinct.
+  - Write 05_critical_collisions.md and 06_hypothesis_tests.md using only the pack's
+    status vocabulary - LIKELY_ALREADY_KNOWN, KNOWN_COMPONENT_NEW_INTEGRATION, POTENTIALLY_DISTINCT,
+    INSUFFICIENT_EVIDENCE; NOVEL only under the stronger-scrutiny rule; "no prior
+    work exists" is not a permitted verdict.
+  - Dispatch the R second review for every CRITICAL_COLLISION to an agent that did
+    not produce the first assessment, passing the source and the evidence row, never
+    the first rationale. Run the LIT-06 G gate.
+  acceptance:
+  - 06_hypothesis_tests.md gives every H1-H11 a strongest challenger, evidence, assessment
+    and a status from the permitted vocabulary, each traceable to evidence-matrix
+    rows.
+  - Every CRITICAL_COLLISION in 05_critical_collisions.md carries a recorded independent
+    second review; disagreements are recorded, not averaged away.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-06 G (PROMPT-029) and record real output - all eleven
+    hypotheses with a challenger block and permitted status, zero pending second reviews,
+    at least two hypothesis-id ledger rows per hypothesis, and the measured duplicate rate
+    as the saturation signal
+  deliverables:
+  - research/literature-review/05_critical_collisions.md
+  - research/literature-review/06_hypothesis_tests.md
+  next_action: Dispatch delegation-pack section LIT-06 after phase-lit-05 completes.
+- id: phase-lit-07
+  title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
+    bibliography
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-06
+  scope:
+  - 'Entry condition (ratified decision 3, PROMPT-027): the owner''s one campaign
+    check-in happens before this phase starts - it does not begin, even if ready,
+    until the kick-off record carries a dated "pre-synthesis check-in held: <date>,
+    ruling: proceed" entry, which is absent at campaign start by construction; the
+    LIT-07 K kickoff verifies that exact entry and stops without it. The check-in
+    is also the first of the two owner integrations of agent/lit-campaign into dev.'
+  - Execute the delegation pack's LIT-07 section verbatim - write the anti-novelty
+    case (07) first, then only after it the surviving distinctions (08), then reuse
+    recommendations (09), architecture implications (10), open research questions
+    (11) and experiment proposals (12).
+  - Promote seed sources through the methodology's five verification steps into 13_validated_bibliography.md;
+    the historical seed ledger is never altered. Dispatch the A adversarial synthesis
+    review against the evidence matrix, apply at most two fix cycles, and run the
+    final G gate measuring the full stop conditions.
+  acceptance:
+  - All seven synthesis deliverables (07-13) exist; every synthesis claim traces to
+    a primary source with a locator, and 08 lists only distinctions that survive
+    07's strongest decomposition argument.
+  - The A review ran against the evidence matrix and its findings are applied or recorded;
+    the final gate measurements show the methodology's stop conditions met against
+    the ledger and matrix, demonstrated rather than declared.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-07 G (PROMPT-029), the final gate, and record real
+    output - all eight stop-condition measurements taken against the ledger, inventory,
+    matrix and deliverables, including the saturation trend and zero outstanding blocking
+    findings from the A review
+  deliverables:
+  - research/literature-review/07_anti_novelty_case.md
+  - research/literature-review/08_surviving_distinctions.md
+  - research/literature-review/09_reuse_recommendations.md
+  - research/literature-review/10_architecture_implications.md
+  - research/literature-review/11_open_research_questions.md
+  - research/literature-review/12_experiment_proposals.md
+  - research/literature-review/13_validated_bibliography.md
+  next_action: Hold the pre-synthesis owner check-in (ratified decision 3), then dispatch
+    delegation-pack section LIT-07.

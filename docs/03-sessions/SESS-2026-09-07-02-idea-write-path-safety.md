@@ -175,8 +175,9 @@ Pasted verbatim:
 > preflight path that guards `rebuild_db.py`'s table drop, not a synthetic stand-in.
 >
 > **4. No schema/DDL changed, log byte-identical — HOLDS.**
-> `git diff the commit “Single-source the idea event replay and check history, not just shape”~1..“Complete phase-idea-04: the idea write path is safe and single-sourced” --
-> _data/ideas.jsonl schemas/idea.schema.json sql/001_schema.sql` returns empty. Confirmed
+> A diff from “Single-source the idea event replay and check history, not just shape” to
+> “Complete phase-idea-04: the idea write path is safe and single-sourced”, over
+> `_data/ideas.jsonl`, `schemas/idea.schema.json` and `sql/001_schema.sql`, returns empty. Confirmed
 > independently.
 >
 > **General findings.** Session record accuracy: everything I checked — commit contents,

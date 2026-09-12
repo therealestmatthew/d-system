@@ -59,7 +59,7 @@ None on this phase.
 ## Review
 
 Independent sub-agent review, given the phase's scope/acceptance/verification, the commit range
-`the commit “Claim phase-rel-11 for agent-rel11”..HEAD`, and this session record, with instructions to rerun everything itself rather than
+from “Claim phase-rel-11 for agent-rel11” to HEAD, and this session record, with instructions to rerun everything itself rather than
 trust the record. Reported verbatim:
 
 > This confirms the preflight (`src/db/source_validation.py:87`) already used
@@ -84,7 +84,7 @@ trust the record. Reported verbatim:
 >
 > **Acceptance condition 2** — "Both suites reject the same values; no source file or schema
 > changes": **Verdict: Holds.**
-> - `git diff the commit “Claim phase-rel-11 for agent-rel11”..HEAD --name-only` touches only `test/test_schemas.py`,
+> - The file list of a diff from “Claim phase-rel-11 for agent-rel11” to HEAD, unscoped, touches only `test/test_schemas.py`,
 >   `docs/03-sessions/SESS-2026-09-08-10-contract-tests-date-format.md`,
 >   `docs/08-governance/catalog.md`, `docs/09-backlog/backlog.yaml` — confirmed no file under
 >   `schemas/`, `src/`, or `sql/` changed.
@@ -147,8 +147,8 @@ dependency; `format: "date-time"` does).
 Nothing on `phase-rel-11` itself. Two things noticed but out of scope for this phase, left for the
 owner or a future session:
 
-- The primary checkout held a git stash (`WIP on dev: the commit “Close phase-plc-01 via /session-close” Close phase-plc-01 via
-  /session-close`, based on a commit not reachable from current `dev`) and an untracked
+- The primary checkout held a git stash (a WIP stash on `dev`, taken atop the commit “Close phase-plc-01 via /session-close”, based on a
+  commit not reachable from current `dev`) and an untracked
   `docs/00-working/gemini-knowledge-retrieval-report.md`, neither created by this session. Left
   untouched; may indicate concurrent activity on the primary checkout worth the owner's attention.
 - `phase-idea-02` remains queued with a stale `next_action` ("Deferred until phase-idea-01 lands")

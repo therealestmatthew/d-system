@@ -1,0 +1,28 @@
+<!--
+  D-System overview — systems registry panel component, rendered once into
+  overview-page.html's {{SYSTEMS_PANEL}} slot from tools/overview_inventory.py's "systems"
+  array (itself a restatement of docs/08-governance/systems.yaml — nothing inferred or
+  reconciled against actual imports).
+
+  Token contract:
+    {{SYSTEM_COUNT}}  - tools/overview_inventory.py meta.system_count
+    {{SYSTEM_ROWS}}   - concatenated overview-system-row.html renders, one per entry in the
+                         "systems" array
+-->
+<div class="inventory">
+  <h2 class="overview__panel-title">Systems registry ({{SYSTEM_COUNT}})</h2>
+  <table class="inventory-table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Domain</th>
+        <th scope="col">Status</th>
+        <th scope="col">Depends on</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{SYSTEM_ROWS}}
+    </tbody>
+  </table>
+</div>

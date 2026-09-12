@@ -35,10 +35,13 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-2. `000038` — Formalize the requirements-vs-plans process and design
-3. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-4. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+1. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+2. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+3. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+4. `000038` — Formalize the requirements-vs-plans process and design
+5. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+6. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+7. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -430,6 +433,7 @@ This idea is not a proposal for new work — it is a detailed naming of work alr
 **Links**
 
 - relates_to ← `000010`
+- relates_to ← `000071`
 
 ---
 
@@ -536,6 +540,7 @@ PROPOSED LINK: 000010 --relates_to--> 000008 (dashboard would render metrics der
 
 - relates_to → `000008`
 - extends → `000050`
+- relates_to ← `000071`
 
 ---
 
@@ -964,6 +969,7 @@ Open questions: how this relates to the existing file-based governance system (r
 
 **Annotations**
 
+- **note** by repository-owner (2026-09-12T11:25:51-04:00): Owner direction, 2026-09-12: when an MCP solution is deployed, evaluate it as a substitute for the phase-claim system specifically, because a service-held claim does not depend on which checkout is primary - the dependency that forces every claim into the shared primary checkout today. Recorded as 000151, which revisits the claim system on its own merits in case MCP does not happen.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -984,6 +990,8 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 
 - relates_to ← `000028`
 - relates_to ← `000031`
+- relates_to ← `000128`
+- relates_to ← `000151`
 
 ---
 
@@ -1086,6 +1094,10 @@ The governance question is whether a tracked file meant to be read by agents in 
 
 </details>
 
+**Links**
+
+- relates_to ← `000128`
+
 ---
 
 ## 000024 · Four entity schemas are validated in the pipeline with no DDL table, no data directory, and no CLAUDE.md mention
@@ -1151,6 +1163,9 @@ No existing plan, requirement, or phase currently covers claim recovery. PLAN-01
 
 - relates_to ← `000041`
 - relates_to ← `000059`
+- relates_to ← `000082`
+- relates_to ← `000151`
+- relates_to ← `000152`
 
 ---
 
@@ -1821,6 +1836,7 @@ PROPOSED LINK: 000040 --relates_to--> 000039 (deterministic search generates can
 - relates_to → `000006`
 - relates_to → `000039`
 - relates_to ← `000004`
+- relates_to ← `000081`
 
 ---
 
@@ -1892,6 +1908,10 @@ Related ideas by title overlap (title-only inspection, not body verified):
 The key unresolved design questions in 000042's body (generator location, static vs. dynamic serving, dependency-graph depth) align with the kinds of decisions PLAN-003's framework phases document. No existing governed document fully covers the combined ideas+backlog HTML view as specified.
 
 </details>
+
+**Links**
+
+- relates_to ← `000071`
 
 ---
 
@@ -2065,6 +2085,8 @@ No existing backlog phase covers this ground: the `phase-idea-*` track (phase-id
 - relates_to → `000047`
 - relates_to ← `000018`
 - relates_to ← `000049`
+- relates_to ← `000072`
+- relates_to ← `000125`
 
 ---
 
@@ -2302,6 +2324,7 @@ No overlapping umbrella ideas or related parent-level concepts found. The specif
 
 - extended_by ← `000012`
 - extended_by ← `000014`
+- relates_to ← `000079`
 
 ---
 
@@ -2440,6 +2463,10 @@ Idea 000030 (Always-on worker host and watchdog for supervised agent runs) is lo
 The scope questions named in 000054's body — what to instrument first, where telemetry data lives, how it differs from provenance — are genuinely open design questions with no prior governed analysis.
 
 </details>
+
+**Links**
+
+- relates_to ← `000080`
 
 ---
 
@@ -2611,6 +2638,7 @@ No related plan, phase or document found that already addresses a coherent testi
 - relates_to → `000026`
 - relates_to → `000001`
 - relates_to → `000035`
+- relates_to ← `000106`
 
 ---
 
@@ -2746,7 +2774,7 @@ The idea would likely benefit from position relative to PLAN-001: clarify whethe
 
 ## 000061 · Classify idea nodes by ontological, epistemic, and lifecycle type, not just tags and links
 
-**Created 2026-09-09T03:42:09-04:00 · Status: `open`**
+**Created 2026-09-09T03:42:09-04:00 · Status: `triaged`**
 
 Owner's framing (2026-09-09, recorded verbatim as given, per ADR-010): classifying nodes in
 an append-only knowledge graph transforms a flat web of tags into a rigorous ontology, allowing
@@ -2810,6 +2838,41 @@ Open questions, deliberately unresolved here pending discussion:
 - Whether "NetworkX" or a similar graph-processing framework is the intended query surface, or
   whether DuckDB (the existing derived layer) can express the same traversal queries adequately.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:20:59-04:00): Related Plans and Decisions
+
+PLAN-017.04 (Annotations and relationship contributions) explicitly defers tags and classification with a stated gate condition: "60 captured ideas, or one recorded instance of failing to find an idea that was known to exist." The idea log now holds 86 ideas, exceeding the 60-idea threshold. PLAN-017.04 reserves this gate as a resumption point rather than a deferred-indefinitely task: "resolving it under time pressure is how a vocabulary becomes permanent by accident" — the condition exists precisely to enable work like 000061 to proceed when the corpus is large enough to justify structured classification.
+
+Related Ideas
+
+Idea 000061 relates to several existing concepts already recorded as linked ideas:
+
+- 000018 (tagging and plan-mapping system for ideas) is extended by this idea — 000061 proposes a different approach, structured type classification rather than free-form tags.
+- 000053 (allow ideas to link directly to plan/document IDs) addresses link targets; 000061 focuses on node types as an orthogonal dimension.
+- 000060 (memory and context management) touches similar classification concerns in the brain/ system; PLAN-001 (Agent Memory System) implements type-based discrimination there (concept, entity, procedure, episode, decision).
+- 000032 (evidence-backed provenance graph for memories, reports and recommendations) covers related ground in provenance and graph traversal.
+- 000062 (a pure classification agent for idea nodes) explicitly extends this idea and proposes a dedicated agent to perform the classification work.
+- 000063 (two more idea link types: abstraction and forking) relates to the edge-type expansion, orthogonal to the node-type proposal here.
+
+Retrieval System Context
+
+The idea mentions 000004/000005/000043/000044/000045 (vector/graph retrieval work) as stakeholders in how node type becomes a first-class filter in the retrieval layer. No specific plan governs that retrieval layer yet — PLAN-001 covers memory retrieval contracts but reserves semantic/vector search for future phases. The question of whether node classification interacts with semantic retrieval remains open.
+
+Schema and Implementation Questions
+
+The body acknowledges several open technical questions about whether the three axes apply to all ideas, whether this becomes a new field on the existing idea schema or a separate graph layer, and whether DuckDB can express the traversal queries or if NetworkX/graph-specific tooling is needed. These are genuine architectural questions, not blockers to the proposal itself.
+
+Backfill Consideration
+
+The body raises a backfill question for ~86 existing ideas. PLAN-016 (`phase-idea-01`) delivered the schema and structure; PLAN-017 series delivered the write path, amendments, and annotations. No phase yet addresses retroactive classification of the existing corpus, which would be required before this system could be operationalized as a working retrieval facet.
+
+</details>
+
 **Links**
 
 - extends → `000018`
@@ -2823,7 +2886,7 @@ Open questions, deliberately unresolved here pending discussion:
 
 ## 000062 · A pure classification agent for idea nodes, deliberately doing neither tagging nor linking
 
-**Created 2026-09-09T03:57:57-04:00 · Status: `open`**
+**Created 2026-09-09T03:57:57-04:00 · Status: `triaged`**
 
 The owner's proposal (2026-09-09): an agent whose sole purpose is interpreting a single idea's
 own merits and essence, and assigning it a value on each axis of ARCH-005's ontological /
@@ -2843,6 +2906,46 @@ has anything concrete to write into. Also depends on the backfill question ARCH-
 if the taxonomy adds fields to schemas/idea.schema.json, this agent is presumably how the
 existing ~60 ideas get retroactively classified, not just new ones going forward.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:22:24-04:00): Idea 000062 proposes a dedicated classification agent whose sole purpose is assigning values on the ontological, epistemic, and lifecycle axes of ARCH-005's taxonomy — deliberately excluding tagging (000018's domain) and relationship-building (000055's domain). The separation of concerns is deliberate: classification should assess an idea in isolation to reflect its intrinsic nature rather than being biased by nearby nodes in the graph.
+
+Related Plan and Architecture
+
+ARCH-005 (Idea node classification) is the foundational document this idea depends on. It defines the three-axis taxonomy — ontological (nature of the idea), epistemic (truth status), and lifecycle/temporal (execution stage) — and proposes PLAN-017 was the immediate predecessor, handling the core idea-record and lifecycle architecture; PLAN-017.04 defers tagging/classification until "60 captured ideas or a recorded failed retrieval," naming this as the gate condition to resume that work. The idea corpus has now grown to 86 ideas (as of this session), exceeding the 60-idea threshold. ARCH-005's "recommended build order" places the classification agent (000062) at step 5, after schema additions ship (step 3), backfill happens (step 4), and before the connection-builder agent (000055) lands.
+
+Related Ideas
+
+The effective state shows 000062 already carries the right links:
+- extends -> 000061 (the taxonomy definition captured before ARCH-005 was written)
+- relates_to -> 000055 (the connection-builder agent that maintains relationships and tags separately)
+
+Idea 000065 (decomposition procedure for compound ideas) relates_to 000062 and 000055, depending on both agents existing to execute the procedure. Ideas 000018 (tagging system) and 000053 (document-code links) are orthogonal extensions to the idea schema, already linked to 000061 and deferred under the same gate condition.
+
+Open Technical Questions
+
+ARCH-005 section "Open questions" names several unresolved issues this agent would depend on:
+- Whether every idea needs values on all three axes, or if some axes are optional for certain idea types
+- Whether classification lives as new fields on schemas/idea.schema.json or as a separate typed-node system
+- How node type interacts with 000004/000005/000043/000044/000045's vector/graph retrieval layer once that lands
+- Whether DuckDB can express the traversal queries the taxonomy unlocks, or if NetworkX or similar graph-processing library is needed
+
+Backfill Dependency
+
+The idea correctly flags a backfill requirement: if the taxonomy adds fields to the schema, the existing ~86 ideas would need retroactive classification for the system to be operationally useful. ARCH-005 names this as step 4 in the recommended build order, explicitly requiring the agent (step 5) to exist before backfill can proceed at scale.
+
+No Related Plan or Document
+
+No specific plan (REQ/PLAN) has been written yet to govern this agent's design or implementation. ARCH-005 itself is `status: draft`, confirming it is a reference architecture, not an implementation commitment. PLAN-017.04 (Annotations and relationship contributions) defers this gate; its acceptance would need to be refreshed to trigger work on the governing REQ/PLAN for idea system work (steps 2-5 of ARCH-005's build order).
+
+No promotion or existing delivery found.
+
+</details>
+
 **Links**
 
 - extends → `000061`
@@ -2853,7 +2956,7 @@ existing ~60 ideas get retroactively classified, not just new ones going forward
 
 ## 000063 · Two more idea link types: abstraction (atomic to general) and forking (compound to split parts)
 
-**Created 2026-09-09T03:58:13-04:00 · Status: `open`**
+**Created 2026-09-09T03:58:13-04:00 · Status: `triaged`**
 
 The owner's proposal (2026-09-09), raised while discussing ARCH-005's classification taxonomy:
 extend the three existing link types (extends/supersedes/relates_to, schemas/idea.schema.json)
@@ -2937,6 +3040,40 @@ See also: idea 000064 (a lineage annotation kind for thought-progression, replac
 and idea 000065 (a decomposition procedure for compound ideas that don't form a cohesive
 emergent whole).
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:23:58-04:00): **State of the idea as of 2026-09-09:**
+
+Idea 000063 proposes two new link types: abstraction (generalizes/specializes) and forking (forked_from). The owner's assessment annotation on 000063 itself records that the design was resolved during the same session:
+
+**Forking half — RESOLVED and partially superseded:**
+The forking link type proposal was dropped. Instead:
+- 000064 (lineage annotation kind) provides a new annotation kind to record thought progression ("this idea originated from thinking through idea NNNNNN") — queryable but structurally inert, not participation in the relationship graph.
+- 000065 (decomposition procedure for compound ideas) operationalizes the actual decomposition workflow, using 000064's lineage annotations rather than a new link type.
+- A new link type `component_of` (atomic idea → compound idea) was introduced for composition semantics — many-to-many, allowing one atomic idea to function in multiple compound contexts. This is distinct from forking.
+- "Atomic" and "compound" are now structural positions derivable from the graph (does anything assert component_of into this node?), not hand-classified node types.
+
+ARCH-005 (section "Composition and abstraction (resolved 2026-09-09)") confirms the resolution: composition runs bottom-up via component_of; forking as originally proposed was abandoned in favor of the annotation + procedure approach.
+
+**Abstraction half — UNRESOLVED:**
+The assessment annotation explicitly resolves forking and confirms component_of and composition semantics, but does not address the abstraction question: whether abstraction (generalizes/specializes) deserves its own directional link type pair, or whether it is better understood as a tightened, explicit reading of the existing `extends` type where "specific idea extends its broader/abstract parent" becomes the canonical semantics. This remains open.
+
+**Related documents and ideas:**
+- ARCH-005: Idea node classification taxonomy; sections on composition/abstraction confirm the forking resolution and describe how component_of fits the model, but leave the abstraction distinction unresolved.
+- 000061: Classify idea nodes (triaged); introduces the ontological/epistemic/lifecycle axes that provide the framework for distinguishing node kinds.
+- 000064: Lineage annotation kind (open); implements the replacement mechanism for forked_from as annotation rather than link.
+- 000065: Decomposition procedure (open); depends on 000064 and operationalizes compound idea splitting.
+- 000055: Connection-builder agent (relates_to 000063); already scoped in ARCH-005's build order.
+- 000062: Pure classification agent (relates_to 000055); scoped in ARCH-005.
+
+No governing plan (PLAN) or requirement (REQ) yet exists for the schema changes (component_of link type and lineage annotation kind). ARCH-005's section 7 ("Recommended build order") names this as item 2: "Write the governing REQ/PLAN, turning this document plus 000061–000065, 000053 and 000018 into an accepted requirement and implementation plan."
+
+**Assessment:**
+The forking half of 000063 is effectively superseded by the resolved design captured in 000064 and 000065. The abstraction half remains genuinely open and unresolved. This idea's own assessment annotation serves as the resolution record, making further promotion of 000063 itself premature until the abstraction semantics question is settled (either a new link type or a tightened reading of extends).
+
+</details>
+
 **Links**
 
 - relates_to → `000061`
@@ -2947,7 +3084,7 @@ emergent whole).
 
 ## 000064 · A lineage annotation kind for recording thought-progression without shaping the idea graph
 
-**Created 2026-09-09T04:37:02-04:00 · Status: `open`**
+**Created 2026-09-09T04:37:02-04:00 · Status: `triaged`**
 
 Surfaced resolving idea 000063: the original "forked_from" link-type proposal was dropped
 because it recorded provenance of *thought* (how the owner actually arrived at an idea), not
@@ -2970,6 +3107,39 @@ event does. That is exactly the property this needs: queryable, but structurally
 Depends on nothing else shipping first; this is a small, independent schema addition (one new
 enum value) that could land alongside or ahead of 000063's `component_of` link type.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:25:24-04:00): **State of the idea as of 2026-09-10:**
+
+Idea 000064 proposes a fourth annotation kind, `lineage`, for recording how an idea's content originated during the owner's thinking through another idea — e.g., "this idea was pulled out of a brainstorm dump that also produced NNNNNN" — without participating in the relationship graph. It was surfaced from 000063 (Two more idea link types) as a resolution to that idea's forking half: the original `forked_from` link type was dropped because it records *provenance of thought* (owner's process), not *provenance of meaning* (structural relationships), and those need different mechanisms.
+
+**Current implementation status: Proposed only, not yet implemented.**
+- Not in schema: schemas/idea.schema.json currently has annotation kinds `["note", "finding", "assessment"]` only; `lineage` does not yet exist.
+- No governing plan or requirement yet exists.
+- ARCH-005 (Idea node classification, draft status) fully describes and justifies this idea and three related schema changes (lineage annotation, component_of link type, classification fields) as a bundled unit. ARCH-005's "Recommended build order" (item 2) explicitly names this: write the governing REQ/PLAN as a gate before any schema change lands (item 3).
+
+**Existing justified context:**
+- ARCH-005 (draft architecture document) confirms on line 108 that lineage is proposed as "a new annotation kind (`000064`) — queryable, but structurally inert, same as `note`/`assessment` today."
+- The assessment annotation on 000063 itself records the resolution: forking is dropped, replaced by the annotation + decomposition procedure approach (000064 and 000065).
+- PLAN-017.04 (Annotations and relationship contributions, draft from 2026-09-06) anticipated this exact case: "An unknown kind fails validation rather than being accepted as free text, so adding a fourth is a deliberate schema change and not a typo." (line 48-49).
+
+**Related ideas already linked:**
+- 000063 (Two more idea link types) — the parent from which this idea was surfaced; its resolution assessment names 000064 as replacing forked_from.
+- 000065 (Decomposition procedure for compound ideas) — operationalizes the workflow using 000064's lineage annotations; already links to 000064.
+- 000062 (Pure classification agent, relates_to 000065) and 000055 (Connection-builder agent, relates_to 000065) — agents that would interact with lineage annotations once deployed.
+
+**Open design questions:**
+ARCH-005 does not yet settle whether this lives as three new fields on schemas/idea.schema.json (alongside component_of and classification fields), a separate typed-node system, or the seed of a distinct knowledge-graph layer (section "Where does this live?"). This affects implementation shape, not proposal validity.
+
+**Assessment:**
+000064 is complete as a proposal and properly justified. It awaits step 2 of ARCH-005's build order: the governing REQ/PLAN that bundling this with 000061–000065, 000053, and 000018 into an accepted requirement and implementation plan. Until that document exists and is accepted, promotion is premature. This is exactly the case ARCH-005 describes as "the gate before any schema change lands."
+
+</details>
+
 **Links**
 
 - relates_to → `000063`
@@ -2979,7 +3149,7 @@ enum value) that could land alongside or ahead of 000063's `component_of` link t
 
 ## 000065 · A decomposition procedure for compound ideas that don't form a cohesive emergent whole
 
-**Created 2026-09-09T04:37:15-04:00 · Status: `open`**
+**Created 2026-09-09T04:37:15-04:00 · Status: `triaged`**
 
 Follows from resolving idea 000063: a "compound idea" that turns out to be a disjoint
 brainstorm-dump, not a real emergent system, needs a defined procedure for pulling it apart —
@@ -3012,9 +3182,3992 @@ Open questions: whether steps 1-4 are ever automated (agent-driven) or always ow
 how "already exists" in step 2 is actually checked (semantic search implies 000004/000045's
 retrieval work needs to exist first, or this stays a manual/approximate check until then).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:26:52-04:00): Idea 000065 proposes a decomposition procedure for handling compound ideas that are disjoint brainstorm dumps rather than coherent emergent systems. The finding below confirms the idea's dependencies, its design grounding, and current implementation status.
+
+## Current state of dependencies
+
+ARCH-005 (idea node classification), a draft architecture document created 2026-09-09, explicitly describes this resolution and names 000065 as one of three ideas it produced. ARCH-005 defines the principles (bottom-up composition via `component_of`, lineage as annotation not link type) that make the decomposition procedure in 000065 possible. The document's recommended build order positions 000065 as step 9, to be written "once `component_of` exists and there's a real backlog worth decomposing."
+
+Ideas 000063 and 000064, both created 2026-09-09, have already been triaged:
+
+- 000063 (two more idea link types) has an owner assessment resolving the design: `forked_from` was dropped as a link type and replaced with a lineage annotation (000064), leaving `component_of` as the sole new link type for composition.
+
+- 000064 (lineage annotation kind) proposes adding a fourth annotation kind to schemas/idea.schema.json alongside the existing note/finding/assessment. Currently the schema only defines those three enum values; lineage is unimplemented.
+
+Ideas 000062 (pure classification agent) and 000055 (connection-builder agent) both exist as open ideas with appropriate cross-links recorded, but neither has been promoted to a plan or begun implementation. 000065's body states both are prerequisites: "neither does yet" and "depends on both 000062 and 000055 existing" to execute the procedure.
+
+## What exists and what does not
+
+- **ARCH-005 exists (draft status)**: design grounding is durable and documented.
+- **000063 and 000064 exist (open status, triaged)**: the design proposals they represent are resolved.
+- **000064's schema change (lineage annotation) does not exist**: would require a small addition to schemas/idea.schema.json to support the new kind value.
+- **000062 and 000055 exist as ideas (open status)**: neither has been promoted to a plan yet.
+- **000065 as a procedure exists as idea text (open status)**: no governing REQ/PLAN has been written, no implementation has begun.
+
+## Relationship to governance
+
+ARCH-005's recommended build order (step 2) explicitly calls for "Write the governing REQ/PLAN, turning this document plus `000061`–`000065`, `000053` and `000018` into an accepted requirement and implementation plan, per this repo's plan-before-code rule. The gate before any schema change lands." This idea (000065) is named as part of that unified scope and is not actionable independently until the gating requirement/plan exists.
+
+The idea already carries appropriate relates_to edges to 000063, 000064, 000062, and 000055, recorded as part of its creation.
+
+</details>
+
 **Links**
 
 - relates_to → `000063`
 - relates_to → `000064`
 - relates_to → `000062`
 - relates_to → `000055`
+
+---
+
+## 000066 · Protect main and require PRs from dev, with a multi-agent developer protocol to match
+
+**Created 2026-09-09T20:16:50-04:00 · Status: `triaged`**
+
+Nothing currently prevents a direct commit to `main`. As of 2026-09-09 `main` is the only branch, it
+is the remote's default, and `AGENTS.md` instructs agents to claim phases and integrate work onto it
+directly. That was a deliberate choice made in the same session that squashed history and added the
+remote (`SESS-2026-09-09-01`), but it was chosen for a repository with no remote and no collaborators,
+and it stops fitting the moment either changes.
+
+The owner's stated direction, recorded 2026-09-09: **work should not merge into `main` directly.
+`dev` becomes the integration branch again, and `main` only ever receives work through a pull
+request opened from `dev`.** Branch protection on the remote should enforce that rather than relying
+on every agent remembering it.
+
+This idea therefore revises a decision made hours earlier in the same day. That is deliberate and
+worth stating plainly: the branch model committed in `0c82996` rewrote 31 references across
+`AGENTS.md`, `GOV-001`, `GOV-002`, `GOV-003`, `GOV-005` and `OPS-001` from `dev` to `main`, on the
+reasoning that `main` had just been chosen as the pushed default. If this idea is built, most of
+those references move back, and the two-branch model the documents originally described is restored
+with a PR gate added on top. Whoever picks this up should read that commit before touching anything,
+because a naive revert would also undo the post-push policy corrections that shipped alongside it.
+
+What it would cover:
+
+- **Branch protection on GitHub** for `main`: require a pull request before merging, disallow direct
+  pushes, and decide whether to require review approval, passing status checks, linear history, and
+  whether the owner's own account is exempt. The repository is currently private and single-owner, so
+  some of these are ceremony today and load-bearing later; the decision should say which is which and
+  why, rather than enabling everything by reflex.
+- **Recreate `dev`** as the integration branch and set it as the default branch for day-to-day work,
+  leaving `main` as the released/reviewed trunk.
+- **Reconcile the governance documents** with whichever model is chosen — `AGENTS.md`'s "Concurrent
+  agents: claim a phase" and "complete and hand off" sections, `GOV-001`'s catalog-lock language,
+  `GOV-002`, `GOV-003`'s worktree conditions, `GOV-005`'s "never reused once it reaches" rule, and
+  `OPS-001`. These are the same passages `0c82996` touched.
+- **The multi-agent developer protocol itself.** Today `ADR-003` and `AGENTS.md` describe agents
+  claiming a phase in `backlog.yaml` and integrating onto the trunk directly. With a PR gate the
+  protocol needs answers it does not currently have: does each agent open its own PR from
+  `agent/<phase-id>` into `dev`, or do agents integrate onto `dev` and only `dev`-to-`main` is gated?
+  Who opens the `dev` to `main` PR, and on what cadence — per phase, per plan, or per session? What
+  happens to the existing claim/lock mechanism when merges become asynchronous and a PR can sit open
+  across sessions? How does an agent know whether its work has landed?
+- **CI as the enforcement point.** `.github/workflows/ci.yaml` already runs tests and builds. Branch
+  protection is most useful when it requires those checks to pass, which makes CI a merge gate rather
+  than a report. That interacts with the leak checker: `tools/check_no_private_content.py` should
+  almost certainly be a required check, since the sweep session showed it only sees staged or tracked
+  files and a PR is exactly where an untracked-until-now file becomes visible.
+
+What is unresolved:
+
+- Whether a single-owner private repository benefits from PR review gates now, or whether the value
+  is entirely in the habit and the audit trail. Worth deciding explicitly rather than assuming.
+- Whether agents can realistically open pull requests, which needs `gh` auth available to them, and
+  whether that is desirable given the confidentiality history — an agent that can open a PR can push
+  a branch, and `AGENTS.md` currently says to ask before pushing anything.
+- How this interacts with the primary-checkout exception in `GOV-003`. A documentation-only phase
+  currently commits straight to the trunk; under a PR gate it cannot, which either removes the
+  exception or gives it a narrower meaning.
+- Whether `phase-priv-05`'s "no force-push to origin" caution needs restating as branch protection
+  rather than prose, now that force-push protection is a setting rather than a rule to remember.
+
+Verification, if built: a direct push to `main` is rejected by the remote; a PR from `dev` with a
+failing check cannot merge; an agent following the updated `AGENTS.md` end to end lands work without
+touching `main` directly; and the governance documents contain no reference to a branch model that is
+not the one in force — the exact failure class that produced `0c82996`.
+
+Raised by the owner on 2026-09-09, immediately after reviewing the post-push policy corrections and
+the four workflow prompts (PROMPT-006 through PROMPT-009). Needs a requirement and a plan before any
+implementation, per AGENTS.md's plan-before-code rule.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:28:50-04:00): ## Finding: Idea 000066 — Branch Protection and Multi-Agent PR Protocol
+
+**Overlap with Other Ideas:** No direct idea-to-idea overlap found. Related concerns (concurrency protocol, git tooling, workflow refinement) exist in ideas 000025, 000041, and 000059, but these address different problems.
+
+**Recent Changes and Current State:**
+
+The branch model described in this idea has been partially addressed:
+
+- **Branch structure:** Both `dev` and `main` branches exist locally and remotely; the current working branch is `dev` per git status.
+- **AGENTS.md corrected:** Commit `bed6731` (2026-09-10, "Correct the trunk to dev in AGENTS.md and add the demo prompt packs") explicitly restored `dev` as the integration branch throughout AGENTS.md with owner approval, and noted that "main stays gated pending 000066".
+- **ADR-003 already in place:** The accepted "Worktree-isolated concurrent agents" decision (`ADR-003`, created 2026-09-05) already describes `dev` as the lock-table integration branch, confirming that the intended model is already decided and partly documented.
+
+**Stale References Requiring Reconciliation:**
+
+Governance documents still carry post-2026-09-09 references to `main` as the integration branch:
+
+- `GOV-001-protocol.md` line 181-182: "The catalog on `main` — the integration branch — is the lock table"; lines 188-191 reference `main` as the primary checkout location.
+- `OPS-001-operations.md` lines 123, 127, 131, 137, 151, 153: operational procedures still direct agents to claim, checkout, and rebase against `main` rather than `dev`.
+
+These are the exact references mentioned in the idea as touched by commit `0c82996` when the push went out.
+
+**Infrastructure Gaps:**
+
+- **Branch protection rules:** GitHub's branch protection API is not accessible for this private repository on a free plan (`HTTP 403: "Upgrade to GitHub Pro or make this repository public"`). The protection rules themselves cannot be configured until the account tier changes or the repository becomes public, which is outside the scope of governance documents but is prerequisite infrastructure for enforcement.
+- **PR requirement:** No pull request gate currently exists from `dev` to `main`. The protocol update needed to describe when/how agents or the owner opens that PR, who merges it, and how agents know when work has landed is still open.
+- **CI as merge gate:** The existing `.github/workflows/ci.yaml` runs tests and builds but is not currently a required check for merges; linking it to branch protection requires both the protection rules to exist and the CI configuration to be updated.
+
+**Unresolved Design Decisions from the Idea:**
+
+The idea itself identifies several open questions that any requirement/plan would need to address:
+
+- Whether a single-owner private repository benefits from PR review gates now versus later (value may be entirely in habit and audit trail).
+- Whether agents can realistically open pull requests (requires `gh` auth, raises confidentiality concerns).
+- How PR gating interacts with the primary-checkout exception in `GOV-003` (documentation-only phases may lose the exception or have it narrowed).
+- Whether force-push protection should be restated as branch protection rather than prose rule.
+
+**Relevant Governed Documents and Plans:**
+
+- `AGENTS.md` (root) — describes the concurrent agent protocol and integration workflow; already corrected to `dev` per commit `bed6731`.
+- `ADR-003-multi-agent-concurrency.md` — already accepts the `dev`-based integration model and lock-table mechanism.
+- `GOV-001-protocol.md` — describes governance structure and concurrent agent execution; carries stale `main` references requiring update.
+- `GOV-003-backlog-decisions.md` — carries decisions about worktree and checkout rules; may interact with any PR gate design.
+- `OPS-001-operations.md` — carries operational procedures; requires update to reference `dev` instead of `main`.
+- `ADR-007-capture-routing.md`, `docs/08-governance/` catalog — governance model structure that would inform any PR protocol design.
+
+**Summary:**
+
+The idea's core request — move from direct `main` commits to a gated PR model with `dev` as the working integration branch — is partially implemented (branches exist, AGENTS.md corrected) but incomplete:
+
+1. Governance documents contain stale references requiring reconciliation to match the intended model now described in AGENTS.md and ADR-003.
+2. GitHub infrastructure (branch protection, required status checks) cannot be configured on the current free-plan account.
+3. The multi-agent PR protocol itself — who opens PRs, when, approval flow, cadence — is still open design work.
+
+The idea requires a plan before implementation per AGENTS.md's plan-before-code rule. That plan should clarify the unresolved design decisions, address the GitHub infrastructure constraint, and produce a reconciliation checklist for the governance documents that currently describe the wrong model.
+
+</details>
+
+---
+
+## 000067 · Portable agent workflows from a single source of truth
+
+**Created 2026-09-09T22:47:01-04:00 · Status: `promoted` · became PLAN-020**
+
+Make D-System's reusable agent workflows usable by Codex, Gemini, and other agents without treating Claude Code's `.claude/skills`, slash commands, or subagent frontmatter as the canonical form. The work should separate framework-neutral behavioral instructions from each framework's invocation and configuration wrapper, identify which workflows are safe and meaningful to expose to agents, and preserve owner-only boundaries such as session closure.
+
+This would touch the workflow definitions under `.claude/`, the existing untracked experiments under `.agents/` and `.codex/`, reusable prompts under `docs/02-prompts/`, and whatever governed source, generator, validation, and drift tests are chosen. It may also require framework-specific generated adapters, but should not duplicate hand-maintained instruction bodies across formats.
+
+Verification should prove that supported workflows can be discovered and invoked from at least Claude Code and Codex, that generated adapters match their canonical source, that framework-only metadata remains in the correct wrapper, and that owner-only workflows are not accidentally made agent-reachable. Governance and the full test suite must stay green.
+
+Unresolved questions include what canonical representation should own shared workflow content, whether existing reusable prompts already provide enough of that source, how to model agents that have no native skill mechanism, which current skills and commands should be portable, and whether the half-finished `.agents/` copy or `.codex/` format translation contains anything worth preserving.
+
+This idea came from a Codex session on 2026-09-09: the repository's orient workflow existed only as `.claude/skills/orient/SKILL.md`, so Codex could read and follow it but could not invoke it as a native skill. The mismatch exposed the broader portability problem.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-codex (2026-09-09T22:54:55-04:00): Verified audit finding for 000067 (portable agent workflows from a single source of truth):
+
+The working assumption is substantially correct. Most behavioral content is already ordinary repository prose; Claude coupling is concentrated in discovery location, invocation syntax, tool names, and agent configuration. The idea-triage agent's Claude front matter declares `tools: Read, Grep, Bash`, `model: haiku`, `effort: medium`, and `maxTurns: 30` at `.claude/agents/idea-triage.md:1-7`, while its body states repository behavior such as reading effective idea state through `fold()` and never deciding promotion (`:12-22`). The commands similarly embed Claude surfaces: `$ARGUMENTS` in `.claude/commands/backlog.md:13`, `AskUserQuestion` at `:117-128`, and the Agent tool in `.claude/commands/session-close.md:48-60`. The orient skill hardcodes `.claude/commands`, `.claude/skills`, and `.claude/agents` as the inventory at `.claude/skills/orient/SKILL.md:35-41`. Those wrappers cannot be treated as universal interfaces.
+
+The existing portable layer is strong. `AGENTS.md` explicitly governs agents regardless of framework. PROMPT-006 says the same at `docs/02-prompts/PROMPT-006-idea-capture-and-triage.md:29-44`, and PROMPT-007 separates framework-neutral idea-to-plan behavior from invocation at `docs/02-prompts/PROMPT-007-idea-to-plan.md:29-107`. Governance documents and the Python tools are callable without a Claude runtime. Every current `tools/*.py` has an OPS document. This implies durable policy and workflow decisions should live in governed, host-neutral sources; host packages should translate discovery, arguments, permissions, and tool calls.
+
+The half-finished port is useful evidence but is not a safe final pattern. `git status --short .agents .codex` reports both directories as untracked, and `git ls-files .agents .codex` returns nothing. `git diff --no-index` confirms `.agents/skills/checkpoint/SKILL.md` is byte-identical to `.claude/skills/checkpoint/SKILL.md`: it proves Codex can consume essentially the same skill format, but two hand-maintained copies would drift. `.codex/agents/idea-triage.toml` is a real host translation with Codex fields (`name`, `description`, `model_reasoning_effort`, `developer_instructions`), but it already demonstrates drift: line 104 changes the valid Claude source reference to the nonexistent `.Codex/commands/idea.md`, omits Claude's explicit Haiku model and 30-turn cap, and has no generated-equivalence check. These files should remain untracked until canonical ownership and generation are designed.
+
+Current official Codex documentation verifies that repository skills use the open Agent Skills `SKILL.md` format under `.agents/skills`, can be explicitly or implicitly invoked, and that project custom agents use `.codex/agents/*.toml` with separate model, reasoning, sandbox, and instruction configuration. It also documents importing Claude skills, commands, and subagents as a migration path. This verifies Codex support, but does not establish that Gemini or every future host has a native skill mechanism. A portable contract therefore cannot require a Skill tool; it needs a plain-prompt/manual fallback and capability-specific adapters. Sources checked: https://learn.chatgpt.com/docs/build-skills and https://learn.chatgpt.com/docs/agent-configuration/subagents.
+
+The repository already has the right anti-drift precedent. `tools/generate_tool_docs.py:1-20` owns a generated block derived from tool source, while `test/test_tool_docs.py:34-77` checks pairing, exact regeneration, determinism, and tamper detection. `tools/generate_glossary.py:1-13` and `test/test_glossary.py` apply the same single-source rule. Portable workflow adapters should use that pattern: one canonical behavioral source, deterministic generation or equivalence validation for checked-in host adapters, and CI failure on drift. Symlinks may be an optional host-specific optimization, but are not a sufficient cross-host contract because only Codex support was verified.
+
+Recommended portability boundary:
+- Port `orient` and `checkpoint` first. Their procedures are broadly framework-neutral and both are useful to autonomous agents. Remove host paths from their canonical behavior and translate discovery/invocation in adapters.
+- Expose the governed PROMPT-006 through PROMPT-009 workflow chain as the universal fallback for hosts with no skill feature. PROMPT-008 still contains a Claude checkpoint path, so adapter work must eliminate that leak rather than copying it.
+- Port `idea`, `idea-triage`, and `backlog` behavior only through explicit adapters that preserve their sanctioned writers, folded-state reads, question batching, and ownership boundaries. Their current command files are Claude invocation wrappers, not canonical content.
+- Translate the idea-triage custom agent from one canonical instruction body into Claude and Codex metadata. Model choice, reasoning effort, turn/token controls, sandbox, and tool allowlists remain adapter configuration because hosts expose different controls.
+- Do not make `session-close` an autonomous skill. `.claude/commands/session-close.md:12-19` intentionally makes it owner-only and the sole completion path. Other hosts may receive an owner-invoked command or documented procedure, but no agent-discoverable adapter may weaken that boundary.
+
+Related work: 000013 (investigate other useful commands) asks how repeated routines should be classified as commands versus skills and whether they belong in a portable set. 000003 (a skill for mid-session notes updates) produced the checkpoint skill now needing portability. 000007 (an agent for triaging parked ideas) produced the custom agent translation case. 000051 (agent harness and guardrails) is adjacent because generated adapters must preserve permission and authority boundaries, but it addresses enforcement rather than workflow portability.
+
+PROPOSED LINK: 000067 --relates_to--> 000013 (000013 explicitly leaves command-versus-skill classification and portable ownership unresolved)
+PROPOSED LINK: 000067 --extends--> 000003 (generalizes the delivered checkpoint skill from a Claude-only location into a portable workflow)
+PROPOSED LINK: 000067 --relates_to--> 000051 (portable adapters must preserve the guardrails and authority boundaries that 000051 governs)
+
+No existing governed requirement or plan was found that delivers cross-agent skill portability. PLAN-008 created Claude-specific lifecycle entry points, while the complete phase-agnt-02 only generalized repository working rules in AGENTS.md. The remaining material design choice is the canonical source location and adapter schema; the plan should choose one and require drift detection rather than preserve duplicate hand-maintained bodies.
+
+</details>
+
+**Links**
+
+- relates_to ← `000069`
+- relates_to ← `000072`
+- relates_to ← `000079`
+
+---
+
+## 000068 · Scout research/ for application ideas and enhancements not yet captured
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+`research/` holds roughly 10,700 lines across ~90 files — the proposed knowledge architecture, two
+glossaries, the transition vocabulary, the two-system model, the traceability model, the phase context
+contract, twelve adversarial codebase-review reports, and an evidence register. Almost none of it has
+been mined for actionable application ideas. The adversarial review in particular was written to
+surface gaps, and its findings were deliberately never executed: `research/adversarial-codebase-review/12_recommendations.md`
+ends "Stop here; do not start the prepared literature-review workflow."
+
+Idea: run a systematic scouting pass over `research/` and record every actionable enhancement it
+implies as its own idea in the log, so the research corpus stops being a document nobody reads and
+becomes queued work. This is deliberately a capture exercise, not a build one.
+
+Candidate seams, from a first skim rather than a full read:
+- The twelve ranked findings F01-F14 in `10_adversarial_findings.md` — several describe concrete
+  defects with reproductions (non-atomic rebuild, projection field omissions, context scope
+  semantics, capture fidelity under CRLF normalisation). Some may already be covered by existing
+  backlog phases; that overlap is exactly what triage exists to establish.
+- `09_preserve_list.md`'s PRESERVE_UNLESS_DISPROVEN patterns, which are design constraints on any
+  future work rather than tasks.
+- The seventeen research questions in `11_research_questions_generated.md`.
+- `implementation_glossary.md`'s "epistemic blast radius" and the traceability queries in
+  `development_traceability_model.md` §4, several of which are plausible product features.
+
+What it would touch: `_data/ideas.jsonl` (many new ideas), and nothing else. No research file is
+edited — the corpus is evidence and stays as written.
+
+Verification: every recorded idea cites the research file and line range it came from; a second pass
+over the same source produces no duplicates; and ideas that merely restate an existing backlog phase
+are annotated as such rather than recorded as new.
+
+What is unresolved: how much of the adversarial review is already covered by existing phases, and
+whether the research architecture ideas (append-only knowledge states, provenance-weighted
+convergence) belong in this repository's backlog at all or are a separate research track. The review
+itself says the recommended next action is external review, not execution.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:34:54-04:00): ## Finding for Idea 000068: Scout research/ for application ideas and enhancements not yet captured
+
+The idea proposes a systematic scouting pass over `research/` (roughly 10,700 lines across ~90 files) to extract actionable application ideas and enhancements — a capture exercise, not a build one. The central open question it raises is precisely which adversarial findings are already covered by existing backlog phases and therefore not new work.
+
+### What was found
+
+**Coverage overlap with backlog phases:** Systematic review of the backlog reveals that some (but not all) adversarial findings are already planned:
+
+- **F02 (context scope semantically wrong, all-mode incomplete)**: Directly addressed by **phase-rel-08** "Correct global-memory and all-results retrieval" (queued, depends on phase-rel-02). Scope explicitly includes "Include scope: global memories alongside a requested project, including repository-scoped memories" and "Make --all unbounded unless an explicit --limit is supplied."
+
+- **F03 (non-atomic rebuild, PK failure leaves old projection gone and new partial)**: Directly addressed by **phase-rel-05** "Specify failure-safe projection publication" (queued) and **phase-rel-06** "Implement atomic rebuild and failure recovery" (queued, depends on phase-rel-04 and phase-rel-05). Phase-rel-06 scope explicitly includes "Close all connections on success and failure; preserve the previous usable projection" with acceptance criteria including "Injected mid-load failure leaves the previous database queryable with its old rows."
+
+**Unaddressed findings:** The backlog does not yet plan work for several HIGH findings:
+- F01 (global append-only architecture not fully implemented across all source records/checkpoints, only ideas)
+- F04 (exact original capture evidence not guaranteed due to CRLF normalization and repeated basenames)
+- F05 (reasoning-to-runtime traceability cannot be completed; assumption identities, artifact versions, deployment feedback incomplete)
+- F06 (query projection omits provenance and relationship information: entity capture pointer, project repository/stakeholders, commitment tags not projected)
+- F07-F14 (various MEDIUM findings on corrections/chronology equivalence, attribution authority, relationship guarantees, effective state hiding disagreement, operational concurrency control, policy/memory drift, and the OPEN_QUESTION F14 about whether boundary should be governance rather than universal ontology)
+
+The adversarial review's own guidance (12_recommendations.md: "Stop here; do not start the prepared literature-review workflow") appears not yet acted on, and no phase explicitly dedicates work to extracting and recording these as new ideas.
+
+**No related idea or plan document found:** No existing idea proposes mining `research/` for enhancement ideas. No existing plan document includes this scouting as a phase. Ideas 000021, 000040, and others address related concerns (disaster recovery, deterministic search, etc.) but none propose the systematic extraction of actionable ideas from the adversarial review findings or other research files. The research corpus itself (10,700 lines) remains ungoverned and unqueued as actionable work.
+
+**Design note:** The research directory is explicitly "evidence and stays as written" — the idea correctly avoids proposing edits to research files. The work is capture only, recording ideas in `_data/ideas.jsonl` with citations to source line ranges.
+
+### Why it matters
+
+The idea identifies a genuine gap: the adversarial review was written to surface gaps in the system and its research explicitly provides candidate seams (F01-F14, PRESERVE_UNLESS_DISPROVEN patterns, 17 research questions, implementation glossary concepts). Some gaps are already in the backlog (F02, F03); others are not. The overlap is exactly what the idea flags as unresolved, and triage confirms it: backlog phases exist for some findings but not others, and no unified plan yet captures "extract and record all actionable findings as ideas." The research corpus in `/code/d-system/research/` remains a body of work the system does not yet harvest.
+
+No overlap with another idea or promotion to an existing plan was found.
+
+</details>
+
+---
+
+## 000069 · Should Claude Code remain a dependency once agent workflows are portable?
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+An open question rather than a proposal, recorded so it gets answered deliberately instead of by
+drift.
+
+`PLAN-020` (portable agent workflows, promoted from idea `000067`) is building a single source of
+truth that generates framework-specific agent workflows. If that succeeds, the Claude-specific
+surface — `.claude/skills/`, `.claude/commands/`, `.claude/agents/` — becomes generated output rather
+than authored content. At that point the question is worth asking plainly: does this repository still
+need Claude Code specifically, or does it need *an* agent runner, with Claude Code as one
+interchangeable option?
+
+Arguments for dropping it, to be tested rather than assumed:
+- Framework lock-in is a real cost, and `AGENTS.md` was deliberately written framework-agnostic from
+  the start ("every agent in this repository, human-directed or autonomous").
+- Every governed document, tool and prompt is already neutral. The Claude-specific layer is thin.
+
+Arguments against, equally untested:
+- Some mechanisms have no clean equivalent elsewhere. `/session-close` is owner-only *by virtue of
+  being a slash command a person types*; that guard may not survive translation to a framework
+  without the same concept, which would weaken a control rather than port it.
+- Subagent review — used three times in one session on 2026-09-09 and which caught a confidentiality
+  leak — depends on spawning independent agents with fresh context. Not every runner offers that.
+
+What it would touch: nothing directly. This is a decision to make, and its outcome would touch
+`.claude/`, `AGENTS.md`, `CLAUDE.md` and `PLAN-020`'s scope.
+
+Verification: the question is answered when there is a written decision (an ADR) naming what is kept,
+what is dropped, and which capabilities have no equivalent elsewhere — not when someone deletes a
+directory.
+
+What is unresolved: essentially all of it, including whether the question is premature. `PLAN-020`
+has one phase in flight; asking this before that lands risks deciding against evidence that does not
+exist yet. The honest answer today may be "revisit when phase-port-01 and its siblings are complete."
+
+Raised by the owner on 2026-09-10, phrased as a question.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-10T03:39:25-04:00): Owner elaboration, 2026-09-10. The question is sharper than framework portability alone. Once there is an orchestrated swarm of collaborative, specialised agents covering everything that needs doing, do we need Claude Code at all — or only an input that an always-on agent monitors? The shape the owner has in mind: a deterministic script watching an inbox, whose arrivals trigger a cascading series of loops and agent productivity, with no interactive session in the middle. Claude Code becomes one possible driver of that cascade rather than the thing the system is built around. Two caveats the owner stated explicitly: we may still want Claude Code even in that scenario, and this is not a case for discarding the question — the always-on framing makes it more worth answering, not less. Note the tension with the existing owner-only controls: an inbox-triggered cascade with no interactive session has no obvious place for /session-close, which is a command a person types precisely so an agent cannot reach the completion decision. Whatever replaces the interactive session has to preserve that boundary or consciously drop it.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:38:39-04:00): PLAN-020 (portable agent workflows, promoted from 000067) creates the technical conditions to answer this question but does not itself decide it. The plan explicitly states in its "Out of scope" section that it "does not edit AGENTS.md or CLAUDE.md; any future need to change either requires the owner's separate, exact approval" — which reserves the framework-choice decision for after the portability contract is proven.
+
+REQ-005 (portable workflow requirements) specifies that workflows must be discoverable and invocable by Claude Code, Codex, and plain-prompt fallback, but does not mandate or forbid Claude Code as a retained dependency.
+
+The idea correctly identifies two mechanisms that lack equivalents in other frameworks: (1) owner-only slash commands like `/session-close`, which PLAN-020 explicitly keeps owner-only and does not port into any agent surface, and (2) subagent review — spawning independent agents with fresh context to catch errors. PLAN-020's scope and OPS-010 will make both visible but do not decide whether they justify retaining Claude Code.
+
+Related work: idea 000072 (Agents covering the full lifecycle) faces a parallel coordination problem: whether to build lifecycle agents in Claude-specific format now and port them to PLAN-020's portable manifest later, or to defer their construction until the manifest is ready. That idea explicitly notes the risk of "building four agents in a Claude-specific format that a portable manifest will then regenerate is wasted work," which is structurally the same dependency-lock question 000069 raises but applied to future agent definitions rather than existing infrastructure.
+
+The honest answer today, as the idea itself notes, is: "revisit when phase-port-01 and its siblings are complete." PLAN-020 is currently in phase-port-01 (active with agent-codex-port), and the manifest contract — which will make host capability differences explicit — is the evidence needed to decide whether the specific mechanisms identified (slash commands, subagent spawning) justify keeping Claude Code as a framework or not.
+
+PROPOSED LINK: 000069 --relates_to--> 000072 (both coordinate around PLAN-020's scope: retaining a dependency vs deferring work until the portable contract is proven)
+
+</details>
+
+**Links**
+
+- relates_to → `000067`
+- relates_to → `000072`
+- relates_to ← `000076`
+
+---
+
+## 000070 · Build a demo of the idea system for the skills-and-agents training session
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+The owner is facilitating a training session on skills and agents and needs a worked, live example
+rather than slides. This repository's idea system is a good candidate: it is small enough to explain
+in minutes, it exercises skills, slash commands, subagents and a sanctioned CLI writer together, and
+it has real data behind it — 67 ideas across 262 events as of 2026-09-10.
+
+Idea: assemble a demo path through the idea system that shows each mechanism doing something real,
+in an order an audience can follow. A rough shape:
+1. `/orient` — what can an agent do here at all, enumerated live from disk.
+2. Record an idea from the audience through `/idea`, showing the sanctioned writer allocating an id
+   and validating the event rather than a file being hand-edited.
+3. `/idea-triage` — a subagent scouting that idea and writing a finding annotation, demonstrating
+   agent-to-agent delegation and the deliberate limit that triage can never close an idea.
+4. Metrics over the log (see the companion idea on metric commands) to show that an append-only event
+   log answers questions a mutable list cannot: cycle time, funnel, orphan rate.
+5. `PROMPT-007` turning the idea into a requirement, plan and phases — the hand-off from capture to
+   governed work.
+
+The point to land is not the tooling but the separation: what a *skill* is versus a *command* versus
+a *subagent* versus a *tool*, and why this repository puts the owner-only decision (`/session-close`)
+behind a command a person types rather than something an agent can reach.
+
+What it would touch: possibly a demo script or runbook document; ideally nothing in the production
+path, so the demo exercises the real system rather than a mock.
+
+Verification: the demo runs end to end against the real repository without a manual fix-up; every
+step produces visible output an audience can read; and a dry run finds no step that needs the
+presenter to explain away an error.
+
+What is unresolved: whether to demo against real data or a seeded fixture set — real data is more
+convincing but the log is append-only, so a live demo permanently adds whatever is recorded during
+it. Also unresolved: session length, audience familiarity with git, and whether the demo should end
+at a plan or carry through to an executed phase.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. Every mechanism the demo needs already exists and works: the orient skill, the idea and idea-triage commands backed by a subagent, the sanctioned writer append_idea.py, and 76 real ideas across 289 events as of today. PROMPT-006 through PROMPT-009 are the reusable path the demo walks, and PLAN-016 delivered the append-only log and schema underneath it. Step 4 depends on 000071, which was raised in the same conversation and proposes the metrics command that does not yet exist. The gap worth knowing before planning: the distinction between a skill, a command, a subagent and a tool — the point the demo exists to land — is implicit in PLAN-020's capability mapping and authority declarations but has no dedicated teaching document anywhere, so the demo would have to write that explanatory material rather than point at it. The idea's own two unresolved questions stand: real data versus a seeded fixture set, and whether to end at a plan or carry through to an executed phase.
+- **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Realized by the live-demo pack recorded 2026-09-10: the live demo requirements (REQ-006), the live demo plan (PLAN-021), the demo terminal decision (ADR-013) and the five phase-demo-* backlog phases now govern the build, queued at the front of next_up. The demo prompt pack (PROMPT-010 through PROMPT-017) drives the factory and build sessions.
+
+</details>
+
+**Links**
+
+- relates_to → `000071`
+- relates_to ← `000071`
+- relates_to ← `000077`
+- relates_to ← `000087`
+
+---
+
+## 000071 · Commands that report idea metrics, and a second command that shows what commands can do
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+Two related gaps, both surfaced while preparing the skills-and-agents demo.
+
+First: there is no way to ask the idea log a question without writing a throwaway script. On
+2026-09-10 an ad-hoc script produced real, useful numbers from `_data/ideas.jsonl` — 67 ideas from 262
+events; a funnel of 6 open, 56 triaged, 5 promoted, 0 discarded; a 7.5% promotion rate against an
+83.6% triaged-but-unacted bulge; median created-to-triaged cycle time of 28.2 hours across 59
+transitions; 91% of ideas carrying at least one annotation; 66 typed links (54 `relates_to`, 12
+`extends`) with 16 ideas orphaned; and zero discard events in the entire history. None of that is
+reachable without rewriting the script.
+
+Idea: a command — and the tool beneath it — that reports these as a standing view. Candidate metrics,
+all computable from the log today: funnel counts and rates, cycle time between any two statuses,
+annotation coverage, link-type distribution and orphan count, throughput by day, amendment rate as a
+proxy for rework, and age of open ideas.
+
+Second, and the reason this is one idea rather than two: the demo needs a command that *illustrates
+what commands are for*. A metrics command is a good example precisely because it is read-only,
+produces output an audience can read, and answers a question no single file can. Pairing it with
+something that visibly changes state — recording an idea, or triaging one — shows the two shapes a
+command takes.
+
+What it would touch: a new `tools/*.py` with its paired `OPS-*` document, a slash command wrapping
+it, and the existing fold in `src/db/ideas.py` (reuse it; do not re-implement state derivation).
+Possibly `sql/` if the metrics are better computed over the DuckDB projection than the raw log.
+
+Verification: every reported number is reproducible by an independent script over the same log; the
+command reports zero counts as zero rather than omitting the row; a metric derived from the fold
+matches the same metric derived from the projection; and running it twice against an unchanged log
+produces identical output.
+
+What is unresolved: whether metrics should read the append-only log directly or the DuckDB projection
+— the log is authoritative but the projection is queryable, and idea `000004` and the `phase-mem-*`
+line already circle this question. Also unresolved: whether "0 discards in 262 events" indicates a
+healthy backlog or an unused code path, which is a question the metric surfaces but cannot answer.
+
+Raised by the owner on 2026-09-10, alongside the training-demo idea.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. This overlaps an existing idea: 000008 'Metrics and analysis over the ideas data' is already triaged and covers the metrics half; 000010 (ideation dashboard) names idea metrics as a component, and 000042 proposes an ideas and backlog HTML view that metrics could feed. What 000071 adds beyond those is the second command — one that demonstrates what commands are for — and the training context from 000070. The owner should decide whether this supersedes 000008, merges into it, or narrows to the demo-specific part. The infrastructure is in place either way: fold() in src/db/ideas.py replays the log into current state, sql/001_schema.sql defines ideas, idea_annotations and idea_links, and rebuild_db.py shows the fold populating DuckDB. The convention that a new tool ships with a paired OPS document is well established (OPS-002, OPS-005, OPS-006). No existing tool or command reports metrics over any dataset. On the log-versus-projection question the idea raises: the log is authoritative, but fold() already abstracts the difference — both rebuild_db.py and generate_ideas_md.py read the log through it — so reading through the fold makes the choice an implementation detail rather than a contract decision.
+- **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Metrics design subsumed into the deterministic overview tools on 2026-09-10: phase-demo-03 (build the deterministic overview tools, under PLAN-021) builds tools/overview_metrics.py reading the log via fold() and emitting the funnel, cycle-time, annotation-coverage, link-distribution, throughput and age metrics as chart-ready JSON, with OPS-011 reserved for its operations document. The command-wrapper half of the idea stays open here.
+
+</details>
+
+**Links**
+
+- relates_to → `000070`
+- relates_to → `000008`
+- relates_to → `000010`
+- relates_to → `000042`
+- relates_to ← `000070`
+- relates_to ← `000077`
+
+---
+
+## 000072 · Agents covering the full lifecycle from idea to working product
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+Today one subagent exists — `idea-triage`, which scouts a single open idea and annotates it. Every
+other stage of the path from idea to shipped functionality is carried by a prompt a human pastes
+(`PROMPT-006` through `PROMPT-009`) or by the owner directly. The prompts encode the procedure well;
+what they do not do is run without a person driving each step.
+
+Idea: build out the agent roster so each stage of the lifecycle has an agent with a bounded remit,
+mirroring how `idea-triage` is deliberately incapable of closing an idea. Candidate roles, to be
+argued rather than assumed:
+- A **planner** that turns a triaged idea into a requirement, plan and phases (`PROMPT-007`'s job).
+- An **executor** that works a single claimed phase (`PROMPT-008`'s job).
+- A **verifier** or reviewer that independently checks acceptance from the diff, of the kind used
+  three times on 2026-09-09 and which caught a confidentiality leak the author had missed twice.
+- An **auditor** for read-only plan-versus-implementation drift (`PROMPT-009`'s job).
+
+The design constraint that matters more than the roster: each agent's authority must be bounded and
+stated, the way triage's is. The value of triage is not that it scouts but that it *cannot promote*.
+An executor that can mark its own phase complete would destroy the independent-review property that
+`/session-close` exists to protect.
+
+This idea is the umbrella; the "just one more", "minimalist" and "product owner" agents recorded
+alongside it are specific members of a different family — deliberative rather than procedural — and
+should be planned together with these but not merged into them.
+
+What it would touch: `.claude/agents/`, and — given `PLAN-020` — probably the portable agent-workflow
+manifest rather than any framework-specific directory. `AGENTS.md`'s concurrency protocol, since more
+agents means more simultaneous claims against `max_active`. Possibly `docs/02-prompts/`, if a prompt
+becomes an agent's instruction body rather than a separate artifact.
+
+Verification: each agent has a written remit naming what it may not do; an agent asked to exceed its
+remit refuses and says why; the lifecycle runs end to end on a real idea with the owner intervening
+only at the sanctioned decision points; and `max_active` still holds under concurrent agents.
+
+What is unresolved: how much of this should wait for `PLAN-020` to land, since building four agents
+in a Claude-specific format that a portable manifest will then regenerate is wasted work. Also
+unresolved: whether a "verifier" agent can be genuinely independent when spawned by the agent whose
+work it reviews, and whether prompts and agents should remain separate artifacts at all.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:54-04:00): Scouted 2026-09-10. The dependency this idea flags is real and load-bearing: PLAN-020 (promoted from 000067) designs one canonical source for portable workflows with generated host-specific adapters, so building a planner, executor, verifier and auditor in Claude-specific .claude/ format now creates work PLAN-020 will regenerate. REQ-005 and the 000067 audit establish the shape — framework-neutral behaviour lives in governed documents, and PROMPT-006 through PROMPT-009 already are those documents; only discovery and invocation wrappers translate per host. ADR-003's concurrency protocol is the other pressure point: max_active is 3, and four procedural agents plus the deliberation trio (000073, 000074, 000075, all already linked as extends) strain both the lock table and session context. The /session-close boundary is correctly identified as the model for each agent's authority limit, and PLAN-016 already delivered idea-triage as a worked example of a bounded remit; the checkpoint skill is the precedent for recording evidence without claiming completion. PLAN-017 addresses idea-plan consistency but automates none of these stages.
+
+</details>
+
+**Links**
+
+- relates_to → `000067`
+- relates_to → `000046`
+- relates_to ← `000069`
+- extended_by ← `000073`
+- extended_by ← `000074`
+- extended_by ← `000075`
+- relates_to ← `000077`
+- relates_to ← `000078`
+- relates_to ← `000082`
+
+---
+
+## 000073 · The "just one more" agent — an agent whose only job is breadth
+
+**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+
+An adversarial-deliberation agent whose sole purpose is expansion: more options, more possibilities,
+more of what is not currently being considered. Its remit is breadth of search, and it is judged on
+what it surfaces that nobody had thought of, not on whether the suggestions are practical.
+
+Given a list, a set of requirements, a design, or a decision, it asks: what is missing? What is the
+adjacent option nobody named? What assumption is silently narrowing the space? What would a different
+discipline propose here? It should be willing to produce candidates it expects to be rejected — a
+suggestion that survives the minimalist's cut is a bonus, not the objective.
+
+Deliberately paired with the "minimalist" agent, which does the opposite, and refereed by the
+"product owner" agent which has the final say. None of the three is useful alone: an unopposed
+expander produces an unbuildable wishlist, and this repository already carries an explicit warning
+about that failure — the adversarial codebase review's first opposing argument is "D-System is
+over-modeled", and it survives contact ("premature universal modeling is a credible risk").
+
+What it would touch: `.claude/agents/` or, given `PLAN-020`, the portable agent-workflow manifest.
+Likely a shared harness with the other two deliberation agents, since they must operate on the same
+input and produce comparably-shaped output for the arbiter to weigh.
+
+Verification: given a deliberately narrow input, it produces options outside the frame of the input;
+given the same input twice it produces materially different sets, since a breadth agent that
+converges is not doing its job; and its output is explicitly labelled as candidates rather than
+recommendations, so nothing downstream mistakes volume for endorsement.
+
+What is unresolved: how to stop it degenerating into noise — an agent rewarded for volume will
+produce volume. Whether it should be bounded (produce at most N) or unbounded and filtered downstream.
+Whether it should see the minimalist's objections and respond, or argue blind to avoid anchoring.
+And whether "breadth" is even the right framing, or whether the useful axis is *unconsidered* rather
+than *more*.
+
+Raised by the owner on 2026-09-10, as one of a trio with the minimalist and product-owner agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. The repository already contains the argument this agent is designed to produce, but not the mechanism: research/adversarial-codebase-review/10_adversarial_findings.md runs ten opposing arguments in a survives / does not survive format, and its first is 'D-System is over-modeled', which survives contact — the exact risk this idea names. That review was written by hand for one audit; nothing generates breadth on demand. Today the function appears only as the 'alternatives considered' section PROMPT-007 asks a planner to write, which is a human remembering to look outward rather than an agent whose remit is looking outward. First of the deliberation trio under 000072; none of the three exists operationally. The idea-triage agent's bounded remit — scouts, cannot promote — is the available precedent for constraining what this agent may do with what it finds.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to → `000074`
+- relates_to ← `000075`
+
+---
+
+## 000074 · The "minimalist" agent — an agent that argues for exactly what is necessary
+
+**Created 2026-09-10T03:33:14-04:00 · Status: `triaged`**
+
+An adversarial-deliberation agent whose remit is necessity: exactly what is required, no more and no
+less. Given a set of candidate requirements, options or scope items, it ranks them by how essential
+each is, recommends the minimum set that satisfies the actual need, and argues its case rather than
+merely listing.
+
+The "and defends it vigorously" part is the design point, not a flourish. An agent that produces a
+ranked list and shrugs adds nothing over sorting. The value is in it holding a position against the
+"just one more" agent's expansion and forcing the disagreement to be about reasons, so the "product
+owner" agent has an argument to arbitrate rather than two lists to merge.
+
+This has direct precedent in the repository. The adversarial codebase review's opposing arguments are
+exactly this shape — for each claim it states the strongest case, then what survives contact and what
+does not ("Survives: premature universal modeling is a credible risk. Does not survive: 'every current
+distinction is waste'"). That format is a good candidate for this agent's output.
+
+What it would touch: `.claude/agents/` or the portable agent-workflow manifest under `PLAN-020`;
+a shared harness with the other two deliberation agents.
+
+Verification: given a padded requirement set, it identifies the padding and says why each cut is
+safe; given a genuinely minimal set, it says so rather than cutting to appear useful — an agent that
+always cuts is as useless as one that never does; its rankings cite the need each requirement serves;
+and it distinguishes "not necessary" from "not necessary yet", which are different recommendations.
+
+What is unresolved: necessary *for what* — the agent needs a stated objective to measure necessity
+against, and where that comes from is unspecified. Whether it should see the expander's full output or
+only the merged candidate set. How it handles a requirement that is cheap but not necessary, where
+strict minimalism gives the wrong answer. And whether it should be able to escalate "this whole thing
+is unnecessary" rather than only trimming within a frame it was handed.
+
+Raised by the owner on 2026-09-10, as one of a trio with the just-one-more and product-owner agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. Grounded in concrete precedent rather than a general principle: the adversarial review's final challenge section already argues 'D-System is over-modeled' and 'the three classifications are unnecessary', and its survives / does not survive format is exactly the output shape this idea proposes. The same review supplies the opposing voice this agent must argue against — the PRESERVE_UNLESS_DISPROVEN list in 09_preserve_list.md, which records complexity that earned its place. PROMPT-007's requirement that statements be observable and testable is aligned with the idea's core move, separating what can be verified as necessary from what merely seems useful. No governed document or backlog phase delivers an adversarial-deliberation agent; PLAN-020 covers portable workflows for agents that already exist, not new agent types.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to ← `000073`
+- relates_to ← `000075`
+
+---
+
+## 000075 · The "product owner" agent — the arbiter with the final say between breadth and minimalism
+
+**Created 2026-09-10T03:33:14-04:00 · Status: `triaged`**
+
+The third of a deliberation trio. The "just one more" agent expands, the "minimalist" agent cuts, and
+this agent decides — weighing both arguments and issuing a ruling with reasons.
+
+Its remit is judgement, which makes it the most dangerous of the three to build and the one whose
+authority needs the sharpest boundary. Deciding scope is close to the owner's own role, and this
+repository has already drawn that line explicitly elsewhere: `idea-triage` may scout but never
+promote or decline, and `/session-close` is a command a person types precisely so an agent cannot
+reach the completion decision. The same question applies here — is this agent's ruling a
+*recommendation the owner accepts*, or a *decision that stands*? Recorded as an open question, because
+getting it wrong hands away the judgement the other two agents exist to inform.
+
+What it must produce is not a merged list. It should state which argument won on each contested item
+and why, what it rejected from both sides, what it is deferring rather than deciding, and what
+evidence would change its mind. A ruling with no losing side means the arbitration did not happen.
+
+What it would touch: `.claude/agents/` or the `PLAN-020` manifest; the shared deliberation harness;
+and, if its rulings are to be durable, some record of the decision and its rationale — an ADR, an idea
+annotation, or a decision record, which is itself an open question.
+
+Verification: given genuinely opposed inputs it produces a ruling that contradicts at least one side
+rather than splitting the difference; its rulings cite the arguments rather than restating the
+options; the same inputs produce a stable ruling across runs; and it declines to rule where the
+inputs do not support one, rather than manufacturing a decision.
+
+What is unresolved: the authority boundary above, which is the important one. Also: whether it sees
+the two agents' arguments only, or the original input too. Whether it can send an item back for more
+argument rather than ruling on it. How its ruling relates to the owner's — if the owner disagrees, is
+that a correction to the agent, a new input, or simply the owner's prerogative. And whether three
+agents is the right number, or whether a fourth for evidence-gathering would prevent both sides
+arguing from assertion.
+
+Raised by the owner on 2026-09-10, as the arbiter of the trio.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T03:47:55-04:00): Scouted 2026-09-10. The authority question this idea raises has a consistent answer everywhere else in the repository: agents propose, the owner decides. GOV-003 states it directly — 'agents propose; owner resolves conflicts and approves promotion'. The idea-triage agent's acceptance record (SESS-2026-09-08-18) establishes that triage never advances an idea beyond triaged and that recorded overlap is never used to decline or merge; its findings emit PROPOSED LINK and PROPOSED PROMOTION lines that the owner executes. session-close is blunter still: an agent must never invoke it on its own judgement, and it is the only route to status complete. PLAN-020 preserves the same boundary for future portable workflows. So a binding ruling would be the first mechanism in this repository to cross that line, while a recommendation fits the existing model exactly — which makes this idea's open question a genuine architectural choice rather than a detail. No existing plan, phase or document addresses deliberative multi-agent arbitration.
+
+</details>
+
+**Links**
+
+- extends → `000072`
+- relates_to → `000073`
+- relates_to → `000074`
+
+---
+
+## 000076 · Should we delete Claude Code?
+
+**Created 2026-09-10T03:39:39-04:00 · Status: `discarded`**
+
+The question stated point-blank, without qualification: should this repository stop using Claude Code?
+
+Recorded because it was raised in that form on 2026-09-10 and the log should show what was actually
+asked, not only the improved version of it. As a decision to make, it is a worse question than the one
+recorded at 000069 ("Should Claude Code remain a dependency once agent workflows are portable?"), for
+two reasons.
+
+First, it has no gate. Asked point-blank it invites an answer today, against evidence that does not
+exist yet — PLAN-020 has one phase in flight and the capability matrix it will produce is precisely
+what the answer depends on. 000069 ties the question to that evidence.
+
+Second, it presumes the alternative is deletion rather than substitution. The real question is what
+replaces the capabilities Claude Code currently supplies — owner-only slash commands, and independent
+subagent review of the kind that caught a confidentiality leak on 2026-09-09 — and whether anything
+else offers them. "Delete?" does not ask that; "remain a dependency?" does.
+
+Expected disposition: discard, superseded by 000069. Retained in the log rather than deleted, because
+the append-only contract keeps rejected framings visible so the same question is not re-litigated from
+scratch later.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-10T03:39:48-04:00): Discarding this framing, not the question. The owner is not willing to discard the question as phrased at 000069 — the always-on orchestration framing makes it more worth answering — but is willing to discard 'should we delete Claude Code' asked point-blank. A question with no gate and a presumed answer is a worse instrument than the same question tied to the evidence that would settle it. 000069 carries it forward.
+
+**Links**
+
+- relates_to → `000069`
+
+---
+
+## 000077 · Handle subagent tool-use truncation: resume to recover, do not re-run
+
+**Created 2026-09-10T03:57:14-04:00 · Status: `triaged`**
+
+Subagents in this repository silently hit a tool-use cap and stop mid-work, before they write their
+conclusion. Observed directly on 2026-09-10 while running six read-only triage scouts in parallel: two
+of the six returned truncated output with no finding, both having used exactly 30 tool calls. The four
+that completed used 14 to 19. The cap is not documented anywhere in this repository, and nothing in
+the agent's own output says it was cut off — the report simply ends mid-sentence, in one case at "Now
+let me check if there's any existing metrics or report command anywhere:".
+
+The important part is what a truncated agent still holds. Resuming one preserves its context, so the
+work it already did is recoverable rather than lost. Measured on the metrics scout (000071):
+
+  run 1   30 tool uses   42,909 tokens   87s   truncated, no finding
+  run 2    0 tool uses   42,783 tokens   12s   complete finding, three proposed links
+
+Near-identical token counts across the two runs is the evidence that the 30 prior tool results were
+still in context. Run 2 was not recall from training data; it was reporting research already done but
+never delivered. Every claim it made checked out on independent verification: the four proposed link
+targets, fold() in src/db/ideas.py, the four idea tables in sql/001_schema.sql, both rebuild_db.py and
+generate_ideas_md.py reading through the fold, the OPS-002/005/006 pairings, and the absence of any
+existing metrics tool.
+
+The resume instruction decides the behaviour. The scout told to "stop searching and answer from what
+you already found" used 0 further tool calls and finished in 12 seconds. A sibling scout (000070)
+resumed without that instruction spent another 30 tool calls and hit the cap a second time. So
+tool_uses is per-invocation, not cumulative, and a resume can burn the whole budget again on work that
+was already done.
+
+Idea: make this a known, handled condition rather than something each driver rediscovers.
+
+What it would touch:
+- The triage agent's instructions (.claude/agents/idea-triage.md), and by extension whatever PLAN-020's
+  portable manifest generates: an agent approaching its budget should write its conclusion from what it
+  has rather than continuing to search, so truncation costs a worse finding instead of no finding.
+- Driver-side guidance in AGENTS.md or a governance document on recognising truncation and resuming
+  with an explicit "stop and report" instruction. Note AGENTS.md and CLAUDE.md may not be edited
+  without the owner's separate approval.
+- PROMPT-006, which instructs triage but says nothing about budgets.
+- Possibly the demo material in 000070, since a live audience will hit this.
+
+Verification: a scout deliberately given a task larger than its budget still returns a usable finding
+rather than stopping mid-sentence; a resumed agent instructed to stop searching returns without
+further tool calls; and a driver following the written guidance recovers a truncated scout's work
+without re-running it from scratch.
+
+What is unresolved:
+- Whether the cap is fixed at 30, configurable, or varies by agent type and model. It was 30 in both
+  observed cases but two samples is not a measurement.
+- Whether truncation can be detected programmatically. The usage metadata reports tool_uses but nothing
+  that distinguishes "finished" from "cut off"; today the only signal is a human noticing the report
+  ends mid-sentence.
+- Whether an agent can observe its own remaining budget. If it cannot, "write your conclusion before
+  you run out" is advice it has no way to act on, and the fix has to be structural — for instance
+  requiring a finding to be drafted early and revised, rather than composed at the end.
+- How this interacts with running scouts in parallel. Six at once multiplied the chance that at least
+  one truncated; two of six did.
+
+Raised on 2026-09-10 after the owner asked what had happened to the agent that answered with no tool
+calls. Relates to 000072 (lifecycle agents), which inherits this problem for every agent it proposes,
+and to 000070 (training demo), which would hit it in front of an audience.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by repository-owner (2026-09-10T04:06:37-04:00): Correction, 2026-09-10, same day as the idea. The cap is not undocumented and not a platform limit: .claude/agents/idea-triage.md sets maxTurns: 30 in its own frontmatter, alongside model: haiku and effort: medium. The owner recalled configuring it when the triage agent was first built, and the file confirms it. That settles two of the idea's open questions — the cap is 30 because it was chosen to be 30, and it is configurable by editing one line. Two consequences follow. First, the model matters: triage runs on haiku, and a smaller model may need more turns to reach the same conclusion, so turns and model should be tuned together rather than separately. Second, this is a portability gap for PLAN-020 — the Codex port at .codex/agents/idea-triage.toml carries model_reasoning_effort but has no turn-budget equivalent, so the same agent has a bounded budget under one host and an unbounded one under another. The idea's remaining open questions stand: whether an agent can observe its own remaining budget, and whether a third party can observe it live rather than only in the completion metadata after the fact.
+- **finding** by agent-idea-triage (2026-09-10T06:30:43-04:00): Idea 000077 raises a concrete truncation problem observed on 2026-09-10 when six triage scouts ran in parallel, with two hitting a 30-tool-call cap mid-sentence. The issue is well-documented: truncation is silent (no signal in the agent's own output), but context is preserved (near-identical token counts show the work was cached), so resuming without re-running is recoverable — the metrics scout resumed without the "keep searching" instruction, used 0 further tool calls, and finished in 12 seconds.
+
+Related governed documents:
+- PROMPT-016 (demo guardrails) explicitly references this idea: "Truncated agent output: resume the agent, never re-run (idea `000077`)" — the principle is recorded but implemented only as a brief note, not as formal guidance for detecting or recovering from truncation.
+- PLAN-020 (portable agent workflows) discusses agent capabilities and host-specific settings but does not address truncation recovery or budget constraints.
+- PROMPT-006 (idea capture and triage) is silent on agent budgets and truncation.
+
+The triage agent's own instructions (.claude/agents/idea-triage.md) do not mention budget constraints, approaching-limit behavior, or how to write a conclusion when context is approaching exhaustion. The instruction to "write your conclusion before you run out" would require the agent to observe its own remaining budget, which is unresolved.
+
+Existing linked ideas are appropriate: 000072 (lifecycle agents inherits this for every proposed agent), 000070 (demo would hit this in front of an audience), 000071 (metrics command, one of the affected scouts).
+
+Related idea 000080 (agent engineering: sensors) explicitly uses this truncation problem as its motivating example and discusses live monitoring as a detection mechanism. The relationship is complementary: 000077 proposes recovery (stop and report from what you have), while 000080 proposes monitoring (alert before exhaustion). Both address the same truncation problem from different angles.
+
+The idea is not fully delivered. PROMPT-016's mention is acknowledgement, not implementation. The triage agent still lacks explicit recovery instructions, drivers lack formal guidance on resuming with "stop and report" directives, and no detection or verification procedure is documented.
+
+PROPOSED LINK: 000077 --relates_to--> 000080 (both address agent truncation; 080 proposes monitoring as detection, 077 proposes recovery as handling)
+
+</details>
+
+**Links**
+
+- relates_to → `000072`
+- relates_to → `000070`
+- relates_to → `000071`
+- relates_to → `000080`
+- relates_to ← `000080`
+- relates_to ← `000082`
+- relates_to ← `000128`
+
+---
+
+## 000078 · Agent engineering as a discipline with its own framework
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
+
+An umbrella for the practice of building agents deliberately, rather than writing one agent at a time
+and rediscovering the same problems. The proposition is that agent construction has recurring concerns
+that deserve to be named, reasoned about once, and reused — and that the artefact this produces may be
+a framework for planning many agents rather than a plan for building any particular one.
+
+Four sub-topics are recorded as their own ideas alongside this umbrella:
+- **Guides** — system prompts, AGENTS.md files, constraint documents: what an agent is told.
+- **Sensors** — evals, validation loops, output parsers, monitoring live while an agent runs: how its
+  behaviour is observed.
+- **Context pipelines** — metadata graphs, RAG systems, semantic layers: what an agent is given.
+- **Orchestration** — routing, multi-agent coordination, recovery paths: how agents fit together.
+
+The dimensions are not obviously exhaustive and are not obviously orthogonal. Evaluation could be read
+as a sensor or as its own concern; a recovery path is orchestration but depends on a sensor firing;
+constraint documents are guides but shade into authority, which is arguably a fifth axis this
+repository already treats as first-class. Testing that decomposition is part of the work, not a
+preliminary to it.
+
+This repository is already an unusually good substrate for the question, because it has agent
+construction evidence rather than opinion. One agent exists (idea-triage) with a deliberately bounded
+remit. PLAN-020 is building a portable workflow manifest with authority declarations and a capability
+matrix. Four workflow prompts encode procedure as governed documents. AGENTS.md is a constraint
+document that has already drifted and been corrected. And 000077 records a concrete, measured failure
+mode with numbers attached. That is more raw material than most agent-engineering discussions have.
+
+What it would touch: probably nothing directly at first. If it becomes a framework it would inform
+PLAN-020, the agent roster in 000072, the deliberation trio in 000073-000075, and any future agent —
+as a lens applied during planning rather than code written.
+
+Verification: the framework earns its place if applying it to an agent that already exists surfaces
+something its authors missed, and if applying it to a proposed agent changes what gets built. A
+taxonomy that only relabels existing practice has failed, and should be discarded rather than kept
+for tidiness.
+
+What is unresolved: whether this is one framework or four separate concerns that happen to co-occur;
+whether it belongs in this repository at all or is general practice that should live somewhere reusable;
+and whether the right output is a governed document, a set of prompts, or a checklist applied during
+planning. Also unresolved: how it relates to the adversarial review's warning about premature universal
+modelling, which applies to frameworks about agents exactly as much as to knowledge ontologies.
+
+Raised by the owner on 2026-09-10.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:32:30-04:00): ## Agent engineering as a discipline: Umbrella framework for building agents systematically
+
+This idea proposes a framework for agent construction discipline covering four dimensions (Guides, Sensors, Context pipelines, Orchestration), with the core claim that agent construction has recurring concerns worth naming and reasoning about once rather than rediscovering in each agent.
+
+**Existing agent construction evidence in the repository:**
+
+The idea correctly identifies abundant raw material. AGENTS.md (doc-adr-multi-agent-concurrency in AGENTS.md enforcement) is a constraint document that has drifted and been corrected. Four workflow prompts encode procedure as governed documents: PROMPT-006 (idea capture and triage), PROMPT-007 (idea to plan), PROMPT-008 (execute a phase), PROMPT-009 (plan audit), plus demo-specific prompts PROMPT-010 through PROMPT-016. PLAN-020 deals directly with authority declarations, capability matrices, and host-specific adapter generation for portable agent workflows. ADR-003 (doc-adr-multi-agent-concurrency) covers the orchestration dimension explicitly—worktree isolation, claiming protocols, and safety rules for concurrent agent work. REQ-005 captures portable agent workflow requirements including behavioral definitions, discovery, authority mapping, and capability matrices. Idea 000077 provides concrete, measured evidence of a failure mode (tool-use truncation at 30 calls, resumption preserving context) with three control cases. The idea-triage agent itself is a deliberately bounded, single-concern implementation (.claude/agents/idea-triage.md).
+
+**Dimension-specific overlaps with existing work:**
+
+- **Guides** (000079): AGENTS.md as constraint document; PROMPT-006, -007, -008, -009 as governed procedure prompts; CLAUDE.md as framework-specific orientation; PLAN-020 manifest metadata.
+- **Sensors** (000080): 000077 as measured failure mode; governance checking (`uv run python -m src.governance`); pytest validation gates; `ruff` and `mypy` lint/type checks. Connection between observed truncation behavior and how resumption preserves context is directly relevant.
+- **Context pipelines** (000081): Existing overlap with 000040 (deterministic search algorithms for ideas, backlog, memories, decisions), already recorded as relates_to.
+- **Orchestration** (000082): ADR-003 covers worktree isolation, claiming, disjointness checking, and handoff. Relates to 000072 (lifecycle agents) and 000020 (MCP-mediated multi-agent coordination), both already recorded in the idea graph.
+
+**The core unresolved question:**
+
+The idea itself identifies the critical bar: "A taxonomy that only relabels existing practice has failed, and should be discarded rather than kept for tidiness." The framework earns its place only if applying it surfaces something the authors of AGENTS.md, PLAN-020, ADR-003 and the existing prompts missed, or if applying it to a proposed agent (000072's lifecycle agents, 000020's Librarian service) changes what gets built. The idea names three specific open questions: whether this is one framework or four separate concerns that co-occur; whether it belongs in this repository or is general practice belonging elsewhere reusable; and whether the output is a governed document, a set of prompts, or a planning checklist.
+
+**Caution from adversarial review:**
+
+The idea correctly flags the adversarial review's warning about premature universal modeling. The review's first opposing argument to D-System's current state is "over-modeled," and it survives contact ("premature universal modeling is a credible risk"). A framework about agents runs exactly the same risk if it abstracts too early—naming concerns that turn out to be context-specific, inventing a universal dimension that three agents use and the fourth ignores, or producing a model that is elegant but orthogonal to what actually matters when the next agent gets built.
+
+**Verification criterion already stated in the idea:**
+
+The idea's own bar is precise: applying the framework to the idea-triage agent or the proposed lifecycle agents (000072) must surface something the authors missed, or the framework should be discarded. Testing the decomposition (whether the four dimensions are exhaustive and orthogonal) is explicitly part of the work, not a preliminary to it.
+
+No related plan, requirement, or backlog phase found that already covers agent construction as a named discipline with a framework. PLAN-020 addresses portable workflows; ADR-003 addresses multi-agent coordination; the prompts address specific procedures. The umbrella idea of systematizing agent construction from first principles as its own discipline is distinct from all of these, though it would inform their evolution if the framework proves to surface real gaps.
+
+The four sub-ideas (000079-000082) are already properly linked via extends relationships and should proceed as parallel research supporting the umbrella question.
+
+</details>
+
+**Links**
+
+- relates_to → `000072`
+- extended_by ← `000079`
+- extended_by ← `000080`
+- extended_by ← `000081`
+- extended_by ← `000082`
+
+---
+
+## 000079 · Agent engineering: Guides — system prompts, AGENTS.md files, constraint documents
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
+
+One of four sub-topics under the agent-engineering umbrella. Guides are what an agent is told: its
+system prompt, the working agreement it reads, and the constraint documents that bound what it may do.
+
+This repository has more evidence about guides than about any other agent-engineering concern, most of
+it from things going wrong.
+
+AGENTS.md is a constraint document read by every agent regardless of framework, and it has already
+demonstrated the failure modes worth studying. It drifted: five documents asserted there was no remote
+for a day after there was one, and nothing detected it. It was edited by an agent that then generalised
+a one-time instruction into standing policy, which is why it now carries a rule forbidding agents from
+editing it at all. And CLAUDE.md's own "what belongs in this file" section already reasons explicitly
+about the tradeoff — reference pointers stay correct when their target changes, duplicated facts drift,
+and duplication is only justified when being unaware for one turn causes irreversible harm.
+
+The four workflow prompts (PROMPT-006 to PROMPT-009) are guides in a different shape: procedure encoded
+as governed documents that a human pastes, deliberately framework-neutral so they work for any runner.
+The idea-triage agent's instruction body is a third shape — a system prompt with an authority boundary
+stated in it. PLAN-020 is currently deciding how all of these translate across hosts.
+
+Questions worth answering:
+- What belongs in a system prompt versus a constraint document versus a governed procedure? This
+  repository has all three and no stated rule for choosing.
+- How is drift detected? Guides are prose, and prose has no test. The catalog has a drift test and the
+  glossary has one; AGENTS.md has nothing.
+- How much should a guide restate versus point at? CLAUDE.md answers this for itself and the answer
+  cost a day when it was got wrong.
+- What makes a constraint enforceable rather than advisory? A rule an agent can ignore silently is a
+  suggestion. Some rules here are enforced by tests, some by validators, most by prose.
+
+What it would touch: AGENTS.md and CLAUDE.md, which may not be edited without the owner's separate
+approval; docs/02-prompts/; .claude/agents/; PLAN-020's manifest.
+
+Verification: an agent given only the guides can complete a task correctly without the owner
+intervening to supply a rule that was written down somewhere it did not read; and a deliberately
+introduced drift in a guide is detected by something other than a person noticing.
+
+What is unresolved: whether "guide" is one concept or several wearing one name, and whether the
+enforceability question makes this really a sub-topic of Sensors.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:33:59-04:00): **Guides work is distributed across PLAN-020 and existing governance documents; drift detection remains unresolved.**
+
+Idea 000079 identifies guides as system prompts (like the idea-triage agent's instruction body), constraint documents (AGENTS.md and CLAUDE.md), and procedure-shaped guides (PROMPT-006 through PROMPT-009). The idea correctly names this repository's core evidence: AGENTS.md itself has drifted (the "no remote" rule stood stale), CLAUDE.md already names the tradeoff between reference pointers and drift (line 74-75), and the two files now carry an explicit no-edit-without-approval rule enforced by prose alone.
+
+PLAN-020 (Portable agent workflows) is actively addressing part of this landscape by creating a canonical source for workflow guide bodies, generating host-specific adapters from it, and planning drift tests (line 94). PLAN-020's "Canonical behavior is independent of every host directory" section (lines 39-60) and the requirement R09 of REQ-005 directly speak to the byte-identical regeneration and tampering detection the idea names as unresolved. However, PLAN-020 only covers portable workflows — it does not address the drift-detection gap for AGENTS.md, CLAUDE.md, or the relationship between system prompts (like the triage agent's body) and constraint documents.
+
+PLAN-013 (Tooling documentation) discusses "no drift enforcement yet" for the glossary and catalog, noting that "generation already removes drift from the mechanical half" but that "the remaining risk is prose" (lines 70-76). The issue the idea names — "guides are prose, and prose has no test" — appears verbatim in PLAN-013's reasoning, but that plan defers enforcement.
+
+PLAN-020 does explicitly name the no-edit rule when it states "any future need to change either [AGENTS.md or CLAUDE.md] requires the owner's separate, exact approval" (line 139), making the rule visible in the portable-workflows manifest. But the four unresolved questions the idea poses remain open:
+- What belongs in a system prompt versus a constraint document versus a governed procedure — no stated rule exists
+- How drift is detected — PLAN-020 adds drift tests for generated workflows, but not for hand-maintained guides
+- How much a guide should restate versus point — CLAUDE.md answers this for itself, but the principle is not generalized
+- What makes a constraint enforceable — PLAN-020 maps capabilities and marks unsupported ones, but most AGENTS.md rules remain prose
+
+No overlapping idea-to-idea relationships found beyond the umbrella structure (000079 extends 000078). The related governance and plan documents are already recorded.
+
+PROPOSED LINK: 000079 --relates_to--> 000067 (Portable agent workflows: PLAN-020 is the delivery vehicle for guide manifestation and drift tests, one of the four guide topics this idea raises)
+PROPOSED LINK: 000079 --relates_to--> 000051 (Agent harness and guardrails: enforceability of constraints is a shared concern with guide rules)
+
+</details>
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000067`
+- relates_to → `000051`
+
+---
+
+## 000080 · Agent engineering: Sensors — evals, validation loops, output parsers, live monitoring
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
+
+One of four sub-topics under the agent-engineering umbrella. Sensors are how an agent's behaviour is
+observed: evaluations run against it, validation loops that check its output, parsers that turn prose
+into something checkable, and monitoring while it is still running rather than after it has stopped.
+
+The live-monitoring half is the gap this repository can already name precisely. On 2026-09-10 two of six
+triage scouts hit their configured maxTurns of 30 and stopped mid-sentence with no finding (000077). The
+completion metadata reported tool_uses afterwards, but nothing observed them while they ran, so the
+truncation was noticed only because a human read the output and saw it end mid-thought. The owner's
+framing of the opportunity: if a third party can see an agent's remaining budget while it runs, that
+third party can alert the agent before it is cut off — which turns a silent failure into a handled one.
+
+Three questions that follow, none currently answerable here:
+- Can an agent observe its own remaining budget? If not, no instruction of the form "wrap up before you
+  run out" is actionable, and the fix has to be structural.
+- Can a third party observe it live rather than only in the completion metadata? Today the driver sees
+  tool_uses only after the agent finishes.
+- Is truncation detectable programmatically? tool_uses equal to the configured maxTurns is a strong
+  signal, though not a certain one, since an agent could legitimately finish on its last permitted turn.
+
+Sensors in the non-live sense already exist here and are worth cataloguing as prior art, because they
+show what "checked" looks like when it works: the governance validator, which must exit 0; the leak
+checker, which reads git ls-files and therefore cannot see an unstaged file; drift tests on the catalog
+and the glossary that fail when generated output diverges from its source; and the independent sub-agent
+review used at session close, which on 2026-09-09 caught a confidentiality leak the author had missed
+twice. That last one is the strongest evidence in the repository that a sensor with genuine independence
+beats a more careful author.
+
+What it would touch: potentially test/, tools/, the agent definitions, and whatever monitoring surface
+does not yet exist. Interacts directly with 000077 and with 000072's proposed verifier agent.
+
+Verification: a truncated agent is detected without a human reading its output; a monitored agent
+receives a warning before its budget is exhausted and produces a usable partial result; and an eval
+suite distinguishes an agent that followed its remit from one that produced plausible output outside it.
+
+What is unresolved: whether monitoring belongs in this repository or in the host running the agents;
+whether an alert can even reach a running agent mid-flight; and whether evaluating an agent's judgement
+is possible without a reference answer, which is the hard case for every agent here whose output is a
+finding rather than a computation.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:35:45-04:00): Sensors for agent behavior are partially in place but fragmented. The idea's own body accurately catalogs the existing non-live sensors: a governance validator exits 0 or fails at `src/governance/__main__.py:audit()`, a leak checker in `tools/check_no_private_content.py` scans tracked files, drift tests in `test/test_codes.py` (committed catalog vs. regenerated) and `test/test_glossary.py` (glossary parity) catch divergence between source and generated output, and session-close review via an independent sub-agent (mentioned in `docs/03-sessions/` records and confirmed in `phase-doc-01`'s acceptance criteria) has surfaced confidentiality leaks the author missed.
+
+The live-monitoring gap is real and specific: on 2026-09-10, two triage scouts (000077) hit their maxTurns cap at exactly 30 tool calls and stopped mid-sentence with no finding, yet `completion.tool_uses` appeared only in the response metadata after the agent finished. Nothing observed them while they ran, so recovery and graceful degradation are impossible today. The owner's framing is precise: if a third party can observe an agent's remaining budget in flight, it can alert the agent before truncation, turning a silent failure into a handled one.
+
+Three open technical questions follow directly: can an agent observe its own remaining budget (if not, the fix is structural); can a third party observe it live rather than only post-completion (the completion metadata is retrospective); and is truncation detectable programmatically (tool_uses equal to maxTurns is a strong but not certain signal).
+
+This idea relates directly to 000077 (Handle subagent tool-use truncation: resume to recover, do not re-run), where 000077 addresses recovery and resumption after truncation, while 000080 addresses detection and the alert mechanism — complementary angles on the same failure mode. Idea 000054 (Observability and telemetry) is a broader umbrella for watching the system run (structured logging, metrics, tracing across backend and agent runs), and sensors are a specialized instance of observability. Idea 000051 (Agent harness and guardrails) covers enforcement mechanisms (hooks, tests, settings.json) and is thematically adjacent but distinct — guardrails block bad behavior, while sensors report it.
+
+No existing plan document found; the governance and verification infrastructure is scattered across test/, tools/, and src/governance/ rather than consolidated under a single plan or requirement.
+
+PROPOSED LINK: 000080 --relates_to--> 000054 (both about observing agent and system behavior; 080 focuses on agent-specific sensors, 054 on system-wide telemetry)
+
+</details>
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000077`
+- relates_to → `000054`
+- relates_to ← `000077`
+
+---
+
+## 000081 · Agent engineering: Context pipelines — metadata graphs, RAG systems, semantic layers
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
+
+One of four sub-topics under the agent-engineering umbrella. Context pipelines are what an agent is
+given: how relevant material is selected, structured and delivered before it starts, and what shape that
+material arrives in.
+
+This is the sub-topic with the deepest existing groundwork, most of it unbuilt. research/ contains a
+whole proposed architecture on exactly this question — that retrieval should consider reasoning lineage,
+evidence, dissent, authority, convergence and unresolved uncertainty rather than semantic similarity
+alone, and that context is selected rather than stored. The phase context contract argues a phase should
+be executable without an agent rediscovering the entire project history. The adversarial review then
+falsified most of it as implemented: current retrieval is substring and metadata filtering ranked by
+confidence and date, it does not query rationale or dissent, and the memory loader does not retrieve
+ideas, captures, decisions or phase outputs as a unified graph.
+
+The repository already has the raw material a pipeline would draw on, in several unconnected shapes:
+the append-only idea log with typed links and annotations; the DuckDB projection; brain/ memories with
+types, confidence and scope; governed documents with a dependency graph; and the backlog with phase
+dependencies. Idea 000040 proposes deterministic search across several of these. The phase-mem-* line is
+deferred pending recorded retrieval failures that nothing currently collects — which is itself a sensor
+gap, and a dependency worth noting.
+
+Questions worth answering:
+- What does an agent actually need, versus what is available? Every agent here currently gets whatever
+  the driver pastes plus whatever it greps. That is a pipeline, just an undesigned one.
+- Should context be assembled deterministically, semantically, or both? The research proposes both with
+  deterministic first; nothing has tested either.
+- How is a context package evaluated? The phase context contract asks this and does not answer it.
+- What must be excluded? Superseded states, retracted annotations and stale confidence are all reachable
+  today, and the fold exists precisely because raw reads show them as current.
+
+What it would touch: tools/load_context.py, the DuckDB projection, brain/, the fold in src/db/ideas.py,
+and any agent that currently improvises its own context gathering.
+
+Verification: two agents given the same task and the same pipeline produce comparable context sets; an
+agent given a pipeline-assembled package completes a phase without needing to grep for something the
+pipeline should have supplied; and superseded or retracted material never appears in an assembled
+package.
+
+What is unresolved: how much of the research architecture is worth building versus how much was
+falsified by the review; whether this belongs to the application or to agent engineering, since it is
+plausibly both; and the standing warning that the review's strongest surviving argument against the
+research model was premature universal modelling.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:37:49-04:00): ## Context Pipelines: Research Existing, Current Implementation Incomplete
+
+The research architecture for context pipelines is documented in `research/architecture/architecture.md` and proposes a rich retrieval model that considers reasoning lineage, evidence, dissent, authority, convergence, and unresolved uncertainty — not semantic similarity alone. It models knowledge as typed state-transition graphs with provenance, asking: what evidence supported this decision, who made it, and under what authority?
+
+The `phase_context_contract.md` in the same directory articulates the pipeline's purpose: a phase should be executable without requiring an agent to rediscover the entire project history. It asks whether context packages can be generated automatically from graph lineage and what information maximizes execution quality without overload.
+
+Current implementation falls short. `tools/load_context.py` implements only Layer 3 of PLAN-001's five-layer retrieval pipeline: substring/ILIKE keyword search ranked by confidence and recency. Layers 4 (semantic similarity) and 5 (agentic RAG refinement) remain proposed only. More critically, the current retrieval does not query rationale, does not retrieve ideas, captures, decisions or phase outputs as a unified graph, and does not traverse reasoning lineage. The `fold()` function in `src/db/ideas.py` successfully resolves effective idea state — applying amendments correctly and detecting cycles in extends links — but the rest of the system does not use it to assemble context packages.
+
+The backlog phases `phase-mem-07` through `phase-mem-09` plan to implement the nonsemantic Librarian retrieval contract and blended retrieval hints, but these are improvements to Layer 3, not approaches to Layers 4–5 or to graph-aware selection.
+
+The adversarial review (research/CLAUDE.codebase-review.md, section 6) flagged the gap explicitly: it determined that retrieval is currently recency-based with keyword filtering, that prior reasoning lineage is not preserved, that superseded information can reappear if raw reads bypass fold(), and that context selection lacks explainability. Its strongest surviving argument was "premature universal modelling" — that the research architecture attempts to solve too many problems simultaneously.
+
+The idea correctly identifies this as unresolved: whether the full research model is worth building, whether it belongs to the application or to agent engineering, and how much of it was falsified by review. The fold() and load_context.py pieces work, but neither yet connects to the graph-based retrieval the research proposes.
+
+Overlaps with existing work:
+- PLAN-001 (Agent Memory System) describes Layer 3–5 retrieval in Section 9; this idea asks whether all five layers are worth building
+- `phase-mem-07` through `phase-mem-09` implement parts of Layer 3 and tagging strategy, not the graph-aware selection
+- 000040 (Research deterministic search algorithms) proposes one path forward on selecting from multiple sources; this idea asks what "context pipeline" means if not deterministic or semantic selection
+- 000072 (Agents covering full lifecycle) and 000082 (Orchestration) are siblings in the agent-engineering umbrella and will depend on what context pipelines actually deliver
+
+</details>
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000040`
+
+---
+
+## 000082 · Agent engineering: Orchestration — routing, multi-agent coordination, recovery paths
+
+**Created 2026-09-10T04:08:11-04:00 · Status: `triaged`**
+
+One of four sub-topics under the agent-engineering umbrella. Orchestration is how agents fit together:
+which agent gets which work, how simultaneous agents avoid colliding, and what happens when one fails
+partway.
+
+Coordination is the part this repository has actually built, and it works. ADR-003 and AGENTS.md define
+a claim protocol: a phase is claimed in backlog.yaml before work starts, the governance validator is the
+lock check and rejects a claim overlapping a peer's systems, deliverable paths or dependency chain, and
+max_active caps concurrent work at three. On 2026-09-10 that machinery answered a real question — a peer
+agent held phase-port-01 across a worktree, and checking its declared paths established there was no
+collision before proceeding. The lock table is a genuine mechanism, not a convention.
+
+Recovery is where it thins out. Several failure modes have now been observed rather than theorised:
+- An agent that runs out of budget mid-work leaves a claim held and a finding unwritten (000077).
+- An agent whose host budget expires stalls with a phase claimed and a worktree open, which happened on
+  2026-09-10 and resolved only because the owner said so.
+- A claim commit that changes phase counts without regenerating the catalog leaves the tree red for
+  everyone else until that agent returns.
+None of these has a defined recovery path. There is no timeout on a claim, no way for a peer to
+determine whether a claim is active or abandoned, and no reclaim procedure.
+
+Routing barely exists. Work is currently selected by the first ready phase in rendered order, which is
+deliberate and requires no judgement — but it assigns work to whoever asks next rather than to whichever
+agent suits it. Once the roster in 000072 exists, and the deliberation trio in 000073-000075 alongside
+it, something has to decide which agent handles what.
+
+The owner's raised question about parallelism belongs here: if every agent carries the same
+configuration and the same budget, running one or a thousand does not change any individual agent's
+odds of truncating — only the odds that at least one does. The observed correlation on 2026-09-10 was
+with task breadth, not concurrency: the two scouts that truncated had the broadest scouting scopes, and
+the three narrow ones finished in 14 to 19 turns.
+
+What it would touch: ADR-003, AGENTS.md's concurrent-agent protocol, backlog.yaml's claim fields,
+src/governance/backlog.py's lock check, and 000072's roster.
+
+Verification: an abandoned claim is detectable and reclaimable without the owner adjudicating; two
+agents given overlapping work are refused by the lock check rather than colliding; and an agent that
+fails partway leaves the repository in a state a peer can pick up.
+
+What is unresolved: whether claims need leases or heartbeats; whether recovery is automatic or always
+owner-mediated, given every existing authority boundary here puts the owner in the loop; and whether
+routing should be a mechanism at all or stay a queue the owner orders.
+
+Raised by the owner on 2026-09-10 as a sub-topic of agent engineering.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:39:35-04:00): Idea 000082 asks for a cohesive orchestration framework covering three topics: routing (assigning work to agents), coordination (preventing collisions), and recovery paths (handling failure modes). The finding addresses each.
+
+**Coordination and the lock mechanism are built.** ADR-003 (worktree-isolated concurrent agents over a disjoint backlog) and AGENTS.md's concurrent-agent sections document the claim protocol: backlog.yaml on dev is the lock table, a phase becomes active with a small commit that sets status: active and names the agent, the governance validator (src/governance/backlog.py) is the lock check rejecting overlapping systems/deliverables/dependencies, and max_active caps concurrent work at three. This machinery was tested on 2026-09-10 when a peer agent held phase-port-01 across a worktree; checking its declared paths established there was no collision before proceeding — the lock table is a genuine mechanism, not a convention.
+
+**Recovery is identified but unimplemented.** Three specific failure modes have been observed:
+- An agent that runs out of budget mid-work leaves a claim held and a finding unwritten — idea 000077 (Handle subagent tool-use truncation) names this scenario.
+- An agent whose host budget expires or whose session limit is hit stalls with a phase claimed and a worktree orphaned. This happened on 2026-09-10; resolution required owner intervention. Idea 000025 (No recovery procedure exists for an abandoned agent claim in the concurrency protocol) documents this scenario exactly — no timeout on a claim, no way to detect whether a claim is active or abandoned, no reclaim procedure.
+- A claim commit that changes phase counts without regenerating the catalog leaves the tree red for all peers until the claiming agent returns.
+
+ADR-003 and AGENTS.md cover claiming, working in a worktree, completing and handing off, and resolving merge collisions, but name no procedure for recovering from abandonment.
+
+**Routing barely exists.** Work is currently selected by taking the first ready phase in rendered order from backlog.yaml. This is deliberate and requires no judgement — but it assigns work to whoever asks next rather than to whichever agent suits it. Idea 000072 (Agents covering the full lifecycle from idea to working product) establishes the roster; ideas 000073–000075 (the deliberation trio: "just one more", "minimalist", "product owner") propose agents that would have different selection criteria and preferences. Once that deliberation machinery is built, routing must decide which agent handles what — the observation noted in 000082 is apt: the owner's question about parallelism correlates truncation with task breadth (the two scouts with the broadest scopes truncated; the three narrow ones finished in 14–19 turns), not with concurrency itself. A routing mechanism that matches task scope to agent capability could reduce the observed correlation.
+
+Unresolved: whether claims need leases or heartbeats for staleness detection; whether recovery is automatic (governance check that flags stale claims, semi-automated owner action) or always owner-mediated (fully manual procedure); and whether routing becomes a first-class mechanism or remains a queue the owner orders.
+
+PROPOSED LINK: 000082 --relates_to--> 000025 (both address recovery of abandoned claims in the concurrent-agent protocol)
+PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents fail mid-work and leave incomplete state)
+
+</details>
+
+**Links**
+
+- extends → `000078`
+- relates_to → `000072`
+- relates_to → `000025`
+- relates_to → `000077`
+- relates_to ← `000128`
+
+---
+
+## 000083 · Template library with deterministic or AI population
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A growing library of template files that can be dynamically populated — either deterministically (data merged into slots by code) or by AI (a model filling or adapting the template). Came up alongside the dynamic HTML generation direction: the repo already has templates/html/ and templates/styles/ as the template layer of the generation pipeline (source data → templates → generation scripts → UI), so this idea is about making that layer a first-class, growing library rather than a fixed set — templates as reusable assets that accumulate over time. It would touch templates/, the generation scripts in tools/ and src/, and potentially the React UI for browsing or triggering population. Unresolved: what the template format and slot/placeholder convention is, how a template declares whether it is deterministic-fill or AI-fill (or both), and how the library is indexed so templates are discoverable. Overlaps the existing HTML generation framework described in CLAUDE.md; recorded anyway — triage can connect it to whatever plan governs that work. Related new ideas recorded in the same batch: the HTML component library and the color palette library, both of which would feed the same generation pipeline.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:41:32-04:00): **Finding: Template library governs implementation of existing framework**
+
+Idea 000083 proposes a template library with deterministic or AI-fill capabilities — reusable template assets that accumulate over time, living in templates/html/ and templates/styles/ with generation scripts in tools/ and src/. This directly serves the HTML generation framework that CLAUDE.md describes and that the repository is building to implement.
+
+Current state of the framework:
+- **PLAN-003** ("Dynamic HTML Generation Website Tool," code `doc-html-00-overview`, status `approved`) designs a page rendering system that uses block-based composition from YAML/JSON configuration with a tools/build_pages.py converter and runtime validation.
+- **phase-html-01** through **phase-html-10** (queued in `docs/09-backlog/backlog.yaml`) implement PLAN-003 in phases, starting with schema definition and build tooling.
+- **PLAN-021** ("Live demo stage and overview build") includes **phase-demo-04** (overview generation), which explicitly uses templates/html/ and templates/styles/ template families to generate an overview page into _public/.
+- **REQ-006** ("Live-demo requirements," R08) specifies that a skill renders templates/html/ templates into the generated overview page.
+- The templates/html/ and templates/styles/ directories exist but are empty (only .gitkeep); no build_pages.py or generation scripts exist yet.
+
+Related ideas 000084 (HTML component library) and 000085 (color palette library) are being triaged separately. All three would feed the same generation pipeline and represent complementary abstractions within the framework PLAN-003 governs: components are reusable UI building blocks, templates are pages or page sections composed of components, and palettes are optional styling configuration applied during generation.
+
+The template library idea is not formally linked to PLAN-003 yet, though it clearly describes the asset layer that the plan's generation pipeline depends on. No overlap with other ideas' content; 000083 addresses a distinct concern (the template asset library) that the existing plan governs at the architectural level but has not yet explicitly scoped.
+
+</details>
+
+**Links**
+
+- relates_to ← `000084`
+- relates_to ← `000092`
+
+---
+
+## 000084 · HTML component library for the dynamic HTML generation plan
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A library of reusable HTML/UI components to serve as the building blocks for the dynamic HTML generation plan: menu bars, dialog boxes that pop up and disappear on hover-over events, toolbars, tooltips, in-page UI search functionality, an embedded terminal, and similar. The point is composability — page generation assembles pages from these known-good blocks instead of emitting bespoke markup each time. It would touch templates/html/ and templates/styles/ (where component markup and styles would live), the generation tooling in tools/ and src/, and possibly ts/ if components need script behavior (hover dialogs, search, the embedded terminal). Note the live-demo build already includes an xterm.js embedded terminal and stage components — that work is a likely first source or consumer of library entries. Unresolved: whether components are plain HTML/CSS fragments, templated fragments, or JS-bearing widgets; how a component declares its inputs; and where the boundary sits between this library and the React frontend's own components. Related ideas from the same batch: the template library (components are what templates compose) and the color palette library (an optional styling configuration for the same generation tool).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:43:16-04:00): PLAN-003 (Dynamic HTML Generation Website Tool, approved) already governs the framework for composable page generation, with phase-html-01 through phase-html-10 queued in the backlog. However, this idea and PLAN-003 describe different component models:
+
+PLAN-003.04 implements React/TypeScript block components (HeroBlock, TextBlock, ImageBlock, ColumnsBlock) as the rendering layer in ts/src/components/blocks/. These components are fetched as page configurations from FastAPI and rendered client-side.
+
+This idea proposes a component library for templates/html/ and templates/styles/, addressing an unresolved architectural question: whether components are plain HTML/CSS fragments, templated fragments, or JS-bearing widgets. This is distinct from PLAN-003's block-component approach, which answers that question for the React frontend specifically. The library described here appears to exist at a different layer — potentially for template population, static site generation, or content assembly before delivery to React.
+
+Current state of cited concrete work:
+- templates/html/ and templates/styles/ contain only .gitkeep placeholders. phase-demo-04 (queued in PLAN-021) will write demo-specific templates here for the overview page, but this is not a general component library.
+- The xterm.js embedded terminal mentioned as a "likely first source or consumer" is not yet implemented. phase-demo-02 (queued in PLAN-021, depends on phase-demo-01) is scoped to build the xterm.js terminal component wired to a websocket backend, but the component has not been built or added to templates/html/.
+
+Related work in the same generation pipeline: 000083 (template library) and 000085 (color palette library) both address pieces of the HTML generation framework at different layers — templates address content structure and slots, palettes address styling configuration, and this idea addresses reusable UI building blocks. These three ideas are related but orthogonal in focus.
+
+The architectural question this idea raises is genuine: PLAN-003 leaves unresolved whether components are fragments, templated fragments, or widgets, and how they declare their inputs. The existing block-component implementation in PLAN-003 answers that for React, but this idea may be asking about a complementary library for other generation contexts. No related plan, phase or document found that specifically addresses composable component libraries as described here — the closest governed work is PLAN-003's block components, which solve a related but distinct problem at the React rendering layer.
+
+PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building blocks in the HTML generation pipeline, at different layers)
+
+</details>
+
+**Links**
+
+- relates_to → `000083`
+- relates_to ← `000085`
+- relates_to ← `000092`
+- relates_to ← `000132`
+
+---
+
+## 000085 · Color palette library for the HTML generation tool
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A library of color combinations that are known to work well together, offered as an optional configuration input to the HTML generation library tool: a generated page or template family picks (or is assigned) a palette rather than hard-coding colors, and every palette in the library is pre-vetted for coherence. It would touch templates/styles/ (palettes as a style asset, likely CSS variables or a small data file per palette) and the generation tooling that applies a chosen palette during page generation. Unresolved: the palette format (how many roles per palette — background, surface, accent, text, etc.), whether palettes carry light/dark variants, whether accessibility contrast checks are part of admission to the library, and how a template or generation run selects one. Related ideas from the same batch: the template library and the HTML component library — a palette is the optional third input alongside templates and components in the same generation pipeline.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:44:57-04:00): **Related governed documents:**
+
+PLAN-003 (Dynamic HTML Generation Website Tool) governs the HTML generation framework via phases phase-html-01 through phase-html-10. PLAN-003.03 specifies a Tailwind CSS v4 setup with static, hardcoded color tokens in `ts/src/index.css` — ten roles defined (`--color-primary`, `--color-secondary`, `--color-surface`, `--color-text`, `--color-text-muted`, `--color-accent`, `--color-danger`, and three primary variants). These are compile-time CSS tokens; they do not vary at runtime or per-page. phase-html-05 will implement this styling foundation as a deliverable.
+
+The adversarial audit (ARCH-003, finding L1) flags that PLAN-003's overview promises "configuration-driven theming," but the current design delivers only static compile-time CSS. The audit recommends clarifying whether theming should be "compile-time CSS" or "deliberately added" as configurable. Idea 000085 proposes making theming configurable via a pre-vetted color palette library: pages or template families would select from a library of coherent palettes rather than hard-coding colors.
+
+**Current state of color/theming in the repo:**
+
+templates/styles/ contains only .gitkeep. No palettes, no per-theme CSS variations and no configuration mechanism for palette selection currently exist. ts/src/index.css does not yet exist (phase-html-05 not started).
+
+**Fit within PLAN-003's scope:**
+
+000085 addresses a deliberate design question that ARCH-003 flagged as unresolved: whether configuration-driven theming is in scope for the HTML generation tool. If approved, a palette library would:
+
+1. Extend the current static `@theme` block to support multiple pre-vetted palettes
+2. Live in templates/styles/ as CSS or data files (per-palette CSS variables, or a data structure mapping palette IDs to color objects)
+3. Require a selection mechanism — likely a configuration field in site.yaml or page YAML specifying which palette to apply
+4. Touch the generation tooling (tools/build_pages.py) to apply the selected palette during page generation, and the frontend (React components) to consume the palette via Tailwind utilities
+
+The idea leaves unresolved: palette format (how many roles, whether to include light/dark variants), accessibility contrast requirements for admission, and the selection mechanism (site-wide default vs. per-page override). These are design choices within PLAN-003's existing contract.
+
+**Relationship to sibling ideas:**
+
+000083 (Template library) and 000084 (HTML component library) are related libraries for the same HTML generation pipeline; all three are optional inputs to the page generation and rendering system described by PLAN-003. Unlike templates and components, a palette library is purely presentational — it does not introduce new block types or visual structures, only color schemes.
+
+**No promotion applicable:** the idea's ask (a pre-vetted color palette library) is not yet delivered by any governed document. It is a candidate feature addition to PLAN-003, not fulfillment of an existing plan or requirement.
+
+PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable libraries for the HTML generation tool's design system)
+
+</details>
+
+**Links**
+
+- relates_to → `000084`
+- relates_to ← `000092`
+
+---
+
+## 000086 · Repo tracker and multi-repo memory agent
+
+**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+
+A tracked list of all of the owner's repositories — both personally created repos and external repos the owner has starred or marked for future reference — paired with a multi-repo memory and awareness agent whose purpose is connecting the dots across them: knowing what exists where, and pointing someone at the right existing repo when they need something so nothing gets rebuilt that already exists ("don't rebuild the wheel"). The owner specifically notes the autoclaude-api repo, which scouts repositories for Claude skills, and says these should tie in together somehow — the repo tracker's list is plausibly the corpus that agent (and autoclaude-api's scouting) operates over. It would touch the data layer (a new tracked entity or list — repos are not currently a d-system entity), possibly a new schema in schemas/, and an agentic workflow for the awareness agent, which fits the system's stated purpose as a platform for agentic workflow triggering. Unresolved: whether the tracker and the agent are one effort or two (recorded here as one idea because the owner presented them together — triage may split them), where the repo list lives (tracked _data/ entity vs. pulled live from GitHub stars/API), what "marked for future reference" means mechanically, exactly how the autoclaude-api tie-in works, and what memory the awareness agent keeps versus derives on demand.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-10T06:46:13-04:00): **Repo Tracker and Multi-Repo Memory Agent (000086) — Triage Finding**
+
+**Overlap with other ideas:** No direct overlap with existing ideas. The idea stands alone as a novel data entity (repos) and agentic workflow distinct from the knowledge retrieval and agent engineering ideas (000002, 000004, 000020, 000067, 000072-075, 000081), which address mechanics and tooling that *could support* a repo awareness agent but do not propose repo tracking itself.
+
+**Existing governed documents:** No related plan, requirement, or backlog phase found. Search results:
+- No `repo.schema.json` exists; repos are not yet a d-system entity (confirmed via schemas/ directory listing)
+- Zero references to "autoclaude-api" outside this idea's body — it is an external repository the owner mentioned, not a local system
+- Backlog (backlog.yaml) contains phases for reliability, HTML generation, signals, synthesis, memory agents, and demo work — no phase for repo tracking or multi-repo awareness
+- Knowledge retrieval research documents (`gemini-knowledge-retrieval-*.md`) exist but address documentation graph queries within d-system (~1,400 nodes), not cross-repo tracking or a repo-as-entity data layer
+
+**Key unresolved questions from the body remain:** The idea correctly flags that tracker and agent may be two efforts; where repo metadata lives (pulled live vs. tracked _data/); what "marked for future reference" means mechanically; how autoclaude-api ties in; and whether the memory agent computes or caches. These are open for the owner's decision, not addressed by existing work.
+
+**Summary:** This is a greenfield feature touching a new data domain (repos), requiring new schema, new entity in _data/, and a novel agentic pattern. No existing document, phase, or idea covers repo-as-entity tracking or multi-repo awareness. The owner's reference to autoclaude-api appears to be context on an external tool that might *consume* the repo tracker's list, not an existing system in this repository to integrate with.
+
+</details>
+
+---
+
+## 000087 · Terminal interaction API for driving demo shell sessions from outside the stage page
+
+**Created 2026-09-10T12:55:38-04:00 · Status: `triaged`**
+
+Flag-gated HTTP endpoints (inject input, read buffered output) plus a session registry so scripts and agents outside the stage page can drive the demo terminal's shell sessions programmatically.
+
+Why it came up: while scoping the stage terminal interaction upgrade (phase-demo-06, 2026-09-10) the owner asked for ways to interact with the embedded terminal from outside it. In-page injection (a command panel sending into the existing websocket) made the cut; this API half was deliberately parked, per the GOV-003 decision inserting phase-demo-06 ahead of the rehearsal phase.
+
+What it would touch: the demo terminal decision (ADR-013) says a shell capability beyond the demo stage starts from its own decision record, so this begins with a new ADR covering gating (its own env flag or the existing one), loopback binding, session identity, authentication if any, and output buffering. Implementation lives in the route layer (src/api/routes/demo_terminal.py or a sibling registered behind the same gate): a registry mapping session id to adapter, and a broadcast output buffer so an HTTP reader does not steal bytes from the websocket pump (adapter reads are destructive). The adapter contract (src/demo/adapter.py) needs no change — write() is already the injection primitive.
+
+Unresolved: whether sessions should outlive their websocket (detach/reattach), how much output history to buffer, and whether this generalises into the workflow-triggering UI the platform vision names — in which case it may deserve requirement work rather than a demo-track bolt-on.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-workbench-planner (2026-09-10T17:28:57-04:00): Narrowed by the workbench planning session (2026-09-10): the session-registry half — a backend registry bounding the four-session cap with per-session allowlisted shell selection — is adopted into the workbench terminal capability decision (ADR-014, built by phase-wb-01, PLAN-022). The idea's remaining open scope is the outside-the-page inject/read HTTP API (detach/reattach, output buffering), which still starts from its own decision record.
+- **finding** by agent-idea-triage (2026-09-11T10:15:59-04:00): ## Scope Partially Delivered; Remaining Work Explicitly Parked
+
+Idea 000087 proposes a Terminal interaction API for driving demo shell sessions from outside the stage page, including HTTP endpoints for inject/read plus session registry, with unresolved questions about session detach/reattach, output buffering, and generalization into workflow triggering.
+
+**Partial delivery via ADR-014 (Workbench Terminal Capability):**
+ADR-014, accepted 2026-09-10, addresses the session registry component: it mandates "a backend session registry bounds and identifies sessions" at the websocket route, enforcing the four-session cap there rather than only in the UI (resolving the minor issue recorded during phase-demo-06). However, ADR-014 explicitly keeps parked the remaining scope of 000087: "the outside-the-page inject/read HTTP API, detach/reattach, and output buffering stay parked in that idea and would start from a further record." ADR-014 concludes: "Idea 000087 stays open, narrowed: its registry half is delivered here; annotate it so the remaining scope is the inject/read API alone."
+
+**Related governance:**
+- ADR-013 (Demo Terminal Capability) established the principle: "If a future feature wants shell execution, it starts from its own decision record, not from this one" — applied here to the beyond-demo API half.
+- PLAN-021 (Live Demo, phase-demo-06 scope) deliberately excluded the API: "a backend inject/read API for driving the terminal from outside the page is deliberately excluded and parked as an idea — per ADR-013 it starts from its own decision record."
+- Phase-demo-06 (completed) recorded the missing session registry as a minor against 000087, now resolved by ADR-014's mandate.
+
+**Current state:**
+The idea's registry requirement is satisfied. The inject/read API, detach/reattach capability, and output buffering remain open work. ADR-014 calls explicitly for this idea to be narrowed via annotation so remaining scope surfaces clearly. No new ADR yet exists for the HTTP API surface; that work would begin from a separate decision record following the precedent ADR-013 establishes.
+
+**Existing link:**
+000087 already relates_to 000070 (Build a demo of the idea system), recording the connection for training-session demo context.
+
+</details>
+
+**Links**
+
+- relates_to → `000070`
+
+---
+
+## 000088 · Rehearsal idea from dry-run 1
+
+**Created 2026-09-10T14:46:13-04:00 · Status: `triaged`**
+
+Recorded during the 2026-09-10 dry-run 1 rehearsal, phase-demo-05 (demo-validator-code timed
+walkthrough of the live-segment runbook). [Rehearsal entry: this idea is part of the demo record,
+not a real audience suggestion.] Placeholder content standing in for whatever prose an audience
+member offers on demo day; recorded solely to time the /idea step's sanctioned-writer path.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:30-04:00): Idea 000088 is a demo artifact recorded during phase-demo-05's dry-run rehearsal (2026-09-10), explicitly labeled as a rehearsal entry, not a real audience suggestion. The body states its sole purpose: placeholder content recorded to time the /idea step's sanctioned-writer path during the live-segment runbook walkthrough. It carries no substantive content.
+
+No overlap with other ideas: the fold shows no links yet, and sibling rehearsal ideas (000089, 000090) are similarly demo artifacts. No related governance documentation beyond the demo infrastructure itself (PLAN-021, phase-demo-05, REQ-006 R09, REQ-007 W13), which define the live segment's step shape and timing requirements that this idea's recording was meant to validate.
+
+This idea's status should reflect its nature: it is a demo fixture recorded for rehearsal purposes, not a real platform request to triage or action.
+
+</details>
+
+**Links**
+
+- relates_to ← `000090`
+
+---
+
+## 000089 · Demo fallback: audience idea seeded by tools/demo_reset.py
+
+**Created 2026-09-10T14:47:54-04:00 · Status: `triaged`**
+
+Seeded by `tools/demo_reset.py prepare` so the live-rebuild segment (REQ-006 R09) always has an idea to triage even if the audience does not supply one live. Labelled as the fallback seed by this exact title — `prepare` checks the folded idea state for this title before appending, so re-running `prepare` never seeds a duplicate. Real work per PLAN-021's afterlife decision: not reverted after the demo.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:41-04:00): Idea 000089 is a deliberately created fallback scaffold seeded by `tools/demo_reset.py prepare` — not a feature request or user-supplied idea, but infrastructure that ensures the live-demo segment (REQ-006 R09) always has an idea to triage, even if the audience does not supply one during the live run.
+
+**Governance and Intent**
+
+The idea's exact title and body are controlled by constants in `tools/demo_reset.py` (lines 76-84, `FALLBACK_SEED_TITLE` and `FALLBACK_SEED_BODY`). The `prepare` subcommand checks the folded idea state for this title before appending, preventing duplicates on consecutive runs. This is intentional: the title serves as the label that prevents re-seeding.
+
+The idea is part of the delivery of two governed documents:
+- PLAN-021 (the live demo plan), which names the fallback seed in lines 109-116 as part of the demo reset tool's contract
+- REQ-006 R09 (the live segment requirement), which defines the triage step as part of the 15-minute live-rebuild segment that must complete with per-step timeboxes
+
+**Afterlife and Retention**
+
+PLAN-021's "Afterlife" section (lines 149-154) explicitly decides that "everything the demo produces is kept as real work, not reverted." This idea is kept in the append-only log after the demo concludes; the afterlife decision keeps it as part of the permanent record, not ephemeral demo scaffolding.
+
+**No Related Overlaps**
+
+A search across all 129 ideas finds no overlap with other ideas' scope or intention. Ideas 000088 and 000090 are rehearsal ideas from dry-runs; idea 000087 is a terminal API feature request; idea 000070 is the main demo request. None address the fallback-idea-seeding pattern, which is unique to this idea.
+
+No search of governed documents (plans, requirements, ADRs, backlog phases) found prior work or related guidance outside PLAN-021 and REQ-006.
+
+PROPOSED LINK: 000089 --relates_to--> 000070 (both serve the live demo session; 000089 provides fallback triage content, 000070 is the main demo request)
+
+</details>
+
+---
+
+## 000090 · Rehearsal idea from phase-demo-05 second dry-run
+
+**Created 2026-09-10T14:49:28-04:00 · Status: `triaged`**
+
+Recorded during the 2026-09-10 dry-run rehearsal (demo-validator-code, phase-demo-05 worktree). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:31-04:00): Rehearsal test artifact from phase-demo-05 (completed). Idea 000090 is a placeholder entry recorded during the 2026-09-10 dry-run rehearsal to time the /idea step of the live-segment runbook (phase-demo-05's REQ-006 R09 requirement). The body explicitly states "[Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]" and carries no product content beyond the placeholder marker.
+
+**Related rehearsal/demo entries:**
+- 000088 (Rehearsal idea from dry-run 1) — earlier placeholder from the same phase, same purpose
+- 000089 (Demo fallback: audience idea seeded by tools/demo_reset.py) — the real fallback seed used when no audience input arrives; this is kept permanently per PLAN-021's afterlife decision
+- 000102 (Rehearsal idea from demo-validator-web dry-run) — similar placeholder from phase-wb-07 (later)
+- 000103 (Rehearsal pass 2 test entry for the live terminal /idea command) — phase-wb-07 test entry, also explicitly discardable
+
+**Governance context:**
+Phase-demo-05 (Demo content, runbook, reset tool and rehearsals, `doc-live-demo` / PLAN-021) completed in the 2026-09-10 session. The runbook's final form, Windows checklist, and reset tool (tools/demo_reset.py) were all delivered and are permanent. Rehearsal-only timing entries like 000090 served their purpose during the timed dry-runs that validated REQ-006 R09 (the 15-minute live segment with per-step timeboxes).
+
+**Assessment:**
+This idea has completed its intended role: validating the /idea step's execution time during the demo validation process. Unlike 000089 (the fallback seed, which is kept), this rehearsal placeholder has no ongoing product function and was never intended to be promoted or retained as work. No related plan, requirement, ADR or backlog phase names it; the only governing reference is the phase-demo-05 scope that used it for timing.
+
+PROPOSED LINK: 000090 --relates_to--> 000088 (parallel rehearsal timing test from earlier dry-run in same phase)
+
+</details>
+
+**Links**
+
+- relates_to → `000088`
+
+---
+
+## 000091 · Rewrite the AGENTS.md push rule so its general/exception structure is legible
+
+**Created 2026-09-10T18:16:47-04:00 · Status: `triaged`**
+
+AGENTS.md states the push rule twice, and each passage states only half of it without saying which half:
+
+- Lines 50-51, "Confidentiality and publishing", states only the exception, phrased as an absolute: "Pushing your own branch to `origin` needs no approval. Publish `agent/<phase-id>` freely; `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing."
+- Lines 186-187, "Concurrent agents: claim a phase", states only the general rule, also as an absolute: "A remote now exists, so `git fetch`, `git pull` and `git push` all work — but ask the owner before pushing (see Confidentiality and publishing)."
+
+Both are correct. Together they are one general rule (ask the owner before pushing to `origin`) plus one standing exception (your own `agent/<phase-id>` branch needs no approval, because backing up your own work is not publishing). Nothing in either passage says so, and line 186's cross-reference points at the passage that appears to contradict it — so an agent following the pointer finds the opposite instruction with no way to tell which governs. This lands at exactly the moment an agent finishes a phase and has to decide what to do with its branch.
+
+Came up on 2026-09-10 while auditing README.md and GOV-007-repo-orientation.md for stale claims. I initially read the two passages as a contradiction and proposed picking a survivor; the owner corrected that — the exception is deliberate, and only the wording needs to make the relationship explicit.
+
+What it would touch: AGENTS.md only, two hunks. A full approved plan with the exact replacement text for both passages is at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md — hunk 1 restates the bullet as general-rule-then-exception; hunk 2 turns the duplicate into a pointer that names the structure instead of repeating an absolute. CLAUDE.md duplicates the exception in its integration-rule sentence; that parenthetical stays accurate under the rewrite and no CLAUDE.md edit is proposed, but it is that file's own named drift risk and is worth a look if the general rule is ever restated there.
+
+Unresolved — this is why the idea exists rather than the change: the owner approved the plan, but `.claude/settings.json` lines 4-7 hard-deny `Edit(AGENTS.md)` and `Write(AGENTS.md)`, and deny rules override approvals at the tool level. So the change needs either the owner applying the two hunks by hand, or the deny lifted for the duration and restored after. That mechanical question was put to the owner and deferred for time, not decided. Also undecided: whether it commits and pushes when applied.
+
+Marked priority-ish at the owner's request: worth doing before the next agent has to act on the rule, not urgent enough to interrupt current work.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-readme-audit (2026-09-10T19:11:22-04:00): Verbatim replacement text for both hunks, copied here so the approved wording survives independently of the plan file at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md, which lives outside the repository and outside backup.
+
+HUNK 1 — AGENTS.md, "Confidentiality and publishing", currently lines 50-51.
+
+Replace this bullet:
+
+- **Pushing your own branch to `origin` needs no approval.** Publish `agent/<phase-id>` freely;
+  `git fetch`, `git pull` and `git push` all work. Backing up your own work is not publishing.
+
+With this bullet:
+
+- **Ask the owner before pushing to `origin`, with one standing exception: your own
+  `agent/<phase-id>` branch.** Publish that freely — backing up your own work is not publishing.
+  Anything else that reaches `origin` is the owner's call: `dev`, a tag, a peer's branch. `git
+  fetch` and `git pull` are never gated.
+
+The bullet immediately after it ("Ask before integrating a feature branch into the integration branch") is unchanged and still draws the separate distinction between backing a branch up and landing it on the trunk.
+
+HUNK 2 — AGENTS.md, "Concurrent agents: claim a phase", currently lines 186-187.
+
+Replace this paragraph:
+
+A remote now exists, so `git fetch`, `git pull` and `git push` all work — but **ask the owner before
+pushing** (see *Confidentiality and publishing*).
+
+With this paragraph:
+
+A remote now exists, so `git fetch`, `git pull` and `git push` all work. Pushing your own
+`agent/<phase-id>` branch is the standing exception to the ask-first rule; every other push to
+`origin` needs the owner, and so does integrating your branch into `dev` — see *Confidentiality and
+publishing*.
+
+WHY THIS WORDING. The two passages are a general rule (ask before pushing to origin) and one deliberate exception (your own agent branch). Neither passage currently says which of the two it is, so each reads as a complete statement and they appear to conflict — and hunk 2's cross-reference points at hunk 1, so an agent following the pointer finds what looks like the opposite instruction. The rewrite keeps both rules intact and makes the relationship explicit in both places. Do not "resolve" this by deleting either passage; the owner rejected that approach explicitly when it was proposed.
+
+LINE NUMBERS WILL DRIFT. Match on the quoted text, not the line numbers above.
+
+STILL BLOCKED. .claude/settings.json denies Edit(AGENTS.md) and Write(AGENTS.md), and a deny rule overrides an approval at the tool level, so an agent cannot apply this even with the owner's approval on record. It needs the owner applying the hunks by hand, or the deny lifted for the duration and restored afterwards. Whether the change commits and pushes when applied was also left undecided.
+- **finding** by agent-idea-triage (2026-09-11T20:38:00-04:00): Idea 000091 aims to rewrite AGENTS.md lines 50-51 and 186-187 to make explicit that the push rule is a general rule ("ask before pushing to origin") plus one standing exception ("your own agent/<phase-id> branch needs no approval"). Currently each passage states only half the rule, and line 186's cross-reference to line 50 makes them appear to contradict each other.
+
+A full approved plan exists at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md with exact replacement text for both hunks. An annotation from agent-readme-audit (2026-09-10T19:11:22-04:00) recorded the hunks verbatim in the idea's history as insurance against plan-file drift.
+
+The change is mechanically blocked: .claude/settings.json lines 4-7 deny Edit(AGENTS.md) and Write(AGENTS.md), and deny rules override approvals at the tool level. The owner approved the plan but deferred the mechanical question of how to apply it (owner applies by hand, or deny rules lifted for the duration and restored after).
+
+Overlap with other ideas: idea 000014 (Investigate hooks for the repository and audit settings.json) and idea 000051 (Agent harness and guardrails) both touch .claude/settings.json and enforcement mechanisms — they frame the broader question of where rules should live (settings, hooks, tests, or written procedures), while 000091 is specific to legibility of an existing rule. The overlap is thematic rather than functional; no merged or skipped idea relationship applies.
+
+Related governed work: OPS-001 (operations) references the push rule and points to AGENTS.md's "Confidentiality and publishing" section; PLAN-008 (session lifecycle protocols) discusses enforcement mechanisms and explicitly names 000014 as the venue for this architectural question.
+
+No related plan, requirement or backlog phase found beyond the approved plan file outside the repository.
+
+</details>
+
+---
+
+## 000092 · HTML Designer agent: extract page designs into durable template families
+
+**Created 2026-09-10T18:58:09-04:00 · Status: `triaged`**
+
+An agent that scans the repository's HTML (_public/ pages, templates/ families, generated
+output) and extracts each page's design essence into durable, reusable templates — building an
+inventory of styles, themes, color palettes and general design schemas over time.
+
+Scope as envisioned by the owner (2026-09-10):
+- Scan a page and extract its token set (:root variables), type scale, component patterns and
+  interaction shell into a named template family under templates/styles/ and templates/html/,
+  following the existing family convention (header comment with provenance and usage, token
+  contract, canonical component markup).
+- Maintain an inventory index of families: palette swatches, theme character, component
+  coverage, which shipped pages render each family.
+- Propose merges when two pages share a scheme, and flag drift when a shipped page and its
+  family stylesheet diverge — drift is reported, not silently reconciled.
+- Registration lives in templates/README.md's family table.
+
+Precedent: the atlas family (templates/styles/atlas.css, templates/html/atlas-page.html,
+templates/html/atlas-components.html) was extracted manually on 2026-09-10 from
+_public/d-system-architecture.html and _public/prompt-pack-protocol.html — it is the
+inventory's first entry and the working example of the output this agent would produce.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:55-04:00): Idea 000092 proposes an agent to extract page designs into durable template families, maintaining an inventory of styles, themes, color palettes and design schemas. The idea cites the atlas family (manually extracted on 2026-09-10) as a working example, and specifies that registration lives in templates/README.md's family table — which already exists with atlas as the first entry.
+
+Overlaps with three closely related ideas in the same batch:
+
+1. 000083 (Template library with deterministic or AI population) — about making templates a first-class, growing library. 000092's extraction agent would be the concrete mechanism to populate it.
+
+2. 000084 (HTML component library for the dynamic HTML generation plan) — 000092 explicitly scopes "component patterns" as part of the design extraction, which is exactly what 000084 proposes as a library of reusable UI building blocks.
+
+3. 000085 (Color palette library for the HTML generation tool) — 000092 explicitly scopes "color palettes" in the inventory it builds; 000085 proposes the same library as an optional styling configuration for the generation pipeline.
+
+All three ideas feed the same template/component/palette pipeline under PLAN-003 (Dynamic HTML generation). The template families registry in templates/README.md is already operational and matches the proposed registration location in 000092's scope.
+
+PROPOSED LINK: 000092 --relates_to--> 000083 (extraction agent mechanism for template library)
+PROPOSED LINK: 000092 --relates_to--> 000084 (component patterns are extraction scope for component library)
+PROPOSED LINK: 000092 --relates_to--> 000085 (color palettes are extraction scope for palette library)
+
+</details>
+
+**Links**
+
+- relates_to → `000083`
+- relates_to → `000084`
+- relates_to → `000085`
+- relates_to ← `000093`
+
+---
+
+## 000093 · Governance atlas page in the atlas design
+
+**Created 2026-09-10T18:58:09-04:00 · Status: `triaged`**
+
+A standalone HTML page covering the whole governance system in the atlas template family's
+design: the document-code series and allocator, the backlog protocol and claim model, the GOV
+document series, the idea lifecycle and sanctioned writer, and how the pieces reference each
+other — the broader companion to _public/prompt-pack-protocol.html, which covers only the
+prompt-pack planning protocol (GOV-008).
+
+Deferred by the owner on 2026-09-10 when scoping the protocol page: the ratified choice was
+"protocol + case studies for now, note to come back and build the broader governance atlas
+later." Build it from the atlas family (templates/styles/atlas.css, templates/html/atlas-*.html)
+rather than from scratch.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:41-04:00): Idea 000093 proposes a standalone HTML page covering the entire governance system — the document-code series and allocator, backlog protocol and claim model, GOV document series, idea lifecycle and sanctioned writer, plus their interconnections — as a broader companion to the existing prompt-pack-protocol.html page (which covers only GOV-008). The idea explicitly notes that this work was deferred by the owner on 2026-09-10 with ratified direction to focus on "protocol + case studies for now" and come back to build the broader governance atlas later.
+
+Relevant governed documents:
+- GOV-001 through GOV-009 and OPS documents in docs/08-governance/ define the systems this idea would document (document-code allocator, backlog protocol, idea lifecycle, sanctioned writer, etc.)
+- The prompt-pack-protocol.html page exists in _public/ and demonstrates the scope of one narrower governance topic rendered in atlas design
+- Templates/styles/atlas.css and templates/html/atlas-*.html exist as the template family this idea proposes to use, manually extracted on 2026-09-10 from existing pages including prompt-pack-protocol.html (see 000092's working example)
+
+Related idea overlap:
+- 000092 (HTML Designer agent: extract page designs into durable template families) — the atlas family that 000093 would use was manually extracted as 000092's working example; 000093 would be a consumer of the extraction process and the resulting family
+- 000042 (Generate an ideas & backlog HTML page for an at-a-glance view) — about HTML page generation from governed data, but for a different topic (idea/backlog prioritization rather than governance system documentation)
+- 000056 (Documentation governance) — about keeping the docs/ tree correct and current, overlaps in scope but focuses on documentation lifecycle rather than presentation
+
+No existing plan document yet covers the governance atlas page. The work is explicitly deferred with owner direction to return to it.
+
+PROPOSED LINK: 000093 --relates_to--> 000092 (governance page would consume the atlas template family extracted by the designer agent)
+
+</details>
+
+**Links**
+
+- relates_to → `000092`
+
+---
+
+## 000094 · Investigate and clean up the unaccounted Codex worktree at ~/.codex/worktrees/511d/d-system
+
+**Created 2026-09-10T19:12:42-04:00 · Status: `discarded`**
+
+`git worktree list` from the primary checkout reports four worktrees, and one of them is not accounted for by any process this repository documents:
+
+/code/d-system                               [dev]
+/code/d-system-worktrees/phase-demo-07       [agent/phase-demo-07]
+/code/d-system-worktrees/phase-port-01       [agent/phase-port-01]
+/home/mimmik/.codex/worktrees/511d/d-system  (detached HEAD)
+
+The first three are exactly what ADR-003 prescribes: the primary checkout on the integration branch, plus one worktree per active claim at ../d-system-worktrees/<phase-id> on branch agent/<phase-id>. Both of those claims were live when this was written (phase-port-01 held by agent-codex-port, phase-demo-07 by agent-demo-glossary), so those two are healthy.
+
+The fourth is not. It sits under ~/.codex/worktrees/, not the sibling directory ADR-003 requires, and it is on a detached HEAD rather than a named agent branch — so it is invisible to `git branch --list 'agent/*'`, carries no phase id, and cannot be matched to a backlog claim. It was found at commit da9547e.
+
+Why it matters. ADR-003 puts worktrees at ../d-system-worktrees/ specifically so that no tool operating on the primary checkout — pytest, ruff, mypy, or the governance Markdown scanner — ever walks a second copy of the repository. A worktree under the home directory does not violate that (it is outside the repo too), so this is not an active correctness hazard. The concerns are different ones: a detached-HEAD worktree holds a commit reachable from nothing, so any work in it is invisible to `git log` on dev and will be garbage-collected if the worktree is removed without first naming the commit; and an unaccounted worktree makes `git worktree list` stop being a reliable answer to "who is working on this repository right now", which is the question an agent asks before assuming a port or a claim is free.
+
+What to do. Do not delete it blind — check first whether it holds unmerged work: `git -C /home/mimmik/.codex/worktrees/511d/d-system status` and `git log --oneline -5` there, and `git log dev..da9547e` to see whether that commit is already on the trunk. If it holds nothing, `git worktree remove` it and prune. If it holds real work, give it a branch name before doing anything else, because a detached HEAD is one `worktree remove` away from being unrecoverable.
+
+Also worth deciding, separately from this instance: whether the Codex harness creating worktrees under ~/.codex/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration to point at ../d-system-worktrees/. ADR-003 was written for the sanctioned agent flow and does not mention other harnesses. That is a decision for the owner, not something to infer from one worktree.
+
+Found on 2026-09-10 during the close of SESS-2026-09-10-10, while checking whether the two peer phase claims were live or stale. Recorded rather than acted on: the session held no backlog claim, and removing another harness's worktree is not a change to make on a hunch at the end of an unrelated session.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-readme-audit (2026-09-11T00:04:10-04:00): Resolved on 2026-09-11. Both halves of this idea are done, and the worktree is gone.
+
+WHAT WAS ESTABLISHED. The owner took the question to Codex directly. The worktree's commit da9547e ("Generate portable workflow skill adapters", authored 2026-09-09) was never merged as that SHA — `git merge-base --is-ancestor da9547e dev` returned false — but its content did reach dev, by rebase onto origin/dev, landing as part of PR #2 (merge commit 818f64b, "portable workflow skill adapters"). The rebase happened because that session had unstaged changes running in a sub-agent at the time.
+
+Content equivalence was verified rather than assumed. Diffing da9547e against dev across agent-workflows/, tools/generate_agent_workflows.py, test/test_agent_workflows.py, .agents/skills/orient/SKILL.md and OPS-010 showed dev holding a superset: every file present, plus 23 added lines in the test and a net 14 in the tool. The only lines dev lacks relative to da9547e were a duplicated GOV-003 link, a path .resolve() call and a small dict comprehension — later refinements, not dropped work. The worktree itself was clean, with no uncommitted changes.
+
+WHAT WAS DONE. With nothing left to protect, the worktree was removed:
+
+    git worktree remove /home/mimmik/.codex/worktrees/511d/d-system
+
+The same pass also removed /code/d-system-worktrees/phase-port-01 and deleted the merged branch agent/phase-port-01 (was 8a62993). phase-port-01 had completed via PR #2 and was no longer an active claim, so its worktree and branch were the cleanup AGENTS.md's hand-off step 7 already prescribes, left undone when that phase closed. `git worktree list` now reports only the primary checkout and the two live claims, phase-demo-07 and phase-wb-03.
+
+THE OPEN QUESTION THIS IDEA RAISED IS NOT ANSWERED. Whether the Codex harness creating worktrees under ~/.codex/worktrees/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration that should point at ../d-system-worktrees/, was not decided — this instance was cleaned up without settling the general case. ADR-003 was written for the sanctioned agent flow and still does not mention other harnesses. If a second such worktree appears, that is the signal to decide it properly rather than clean up again.
+
+Discarded rather than promoted: it was resolved directly and became no document, so there is nothing to name in --promoted-to.
+
+</details>
+
+---
+
+## 000095 · Close the session-cap TOCTOU window in the demo terminal route
+
+**Created 2026-09-10T21:17:43-04:00 · Status: `triaged`**
+
+phase-wb-01's W01-A adversarial review observed (not demonstrated) a structural race: the len(SESSIONS) >= MAX_CONCURRENT_SESSIONS check in src/api/routes/demo_terminal.py is separated from the registry insertion by an await websocket.accept(), so two connections racing the boundary could theoretically both pass the check. Repeated real concurrent-connect storms (8-way and 10-way, multiple runs) never manifested it under the asyncio/uvicorn scheduler. Candidate fix: reserve the registry slot before accept() and release on failure. Deliberately recorded rather than built during the workbench track (PROMPT-023 enhancement lane: cap enforcement is REQ-007 W12 stated behavior).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:24-04:00): TOCTOU race in session-cap enforcement
+
+The race exists between `src/api/routes/demo_terminal.py` line 284 (len check) and line 310 (accept). Two concurrent websockets can both pass the `len(SESSIONS) >= MAX_CONCURRENT_SESSIONS` check, then both call `await websocket.accept()`, then both register in SESSIONS — breaching the cap despite the guard. The adversarial review in phase-wb-01 (W01-A) surfaced this as theoretical: repeated real concurrent-connect storms (8-way and 10-way, multiple runs) never manifested it under the asyncio/uvicorn scheduler, but the window is genuine.
+
+The candidate fix is to atomically reserve the registry slot before accept() — check space, create a placeholder entry in SESSIONS, call accept, then proceed with adapter creation; on any error after accept, release the placeholder. This moves the cap enforcement from check-then-use to check-and-reserve, eliminating the window.
+
+The issue relates to ADR-014 section 4 (the server-side session registry and cap) and sits under REQ-007 W12 (cap enforcement stated behavior). It was deliberately recorded during phase-wb-01 rather than fixed because the work was already complete and circling back would not yield actionable evidence within the phase budget.
+
+No other open idea directly overlaps with this race condition. Idea 000087 (session registry for inject/read HTTP API) is about extending the registry's surface, not fixing its concurrency. Idea 000099 (demo-terminal PTY test failures) is an environmental issue, unrelated.
+
+</details>
+
+---
+
+## 000096 · Document or reconcile D_SYSTEM_DEMO_SHELL override vs per-session shell selection
+
+**Created 2026-09-10T21:17:49-04:00 · Status: `triaged`**
+
+With the operator-side D_SYSTEM_DEMO_SHELL override set (ADR-013 backward-compatibility), a workbench client selecting shell=bash gets the override executable instead of bash — proven live in phase-wb-01's W01-A review (override /usr/bin/whoami ran whoami). Not client-exploitable and intentional per the code's own comment, but 'select bash' not meaning 'run bash' will surprise an operator. Candidate: document the interaction in the demo terminal OPS document, or make the override apply only when no explicit shell is requested. Recorded via the PROMPT-023 enhancement lane (record, do not build).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:42-04:00): ## Finding
+
+000096 identifies a precedence gap between the D_SYSTEM_DEMO_SHELL environment override and per-session shell selection on the workbench terminal. The issue is documented in the idea's body: when the override is set, a client selecting "bash" receives the override executable instead — proven live in phase-wb-01's W01-A adversarial review (where override /usr/bin/whoami correctly ran whoami). This behavior is intentional per code comments and is not a security vulnerability, but the lack of documentation could surprise operators who expect shell selection to override environment config.
+
+**Related governed documents:**
+- ADR-014 (workbench terminal capability): establishes "The shell is selected per session over the existing adapter override" and mentions the allowlist validation, but does not address the precedence question or document the D_SYSTEM_DEMO_SHELL interaction.
+- REQ-007 W12 (workbench requirements): covers shell-selection test coverage ("the shell-selection plumbing passes the requested shell to the adapter override"), confirming the precedence is known, but does not document operator-facing behavior.
+- REQ-006 R04 (live demo requirements): mentions "a config override selects the shell" but does not clarify what "override" means when a client also requests a shell explicitly.
+- OPS-013 (demo reset procedure): handles demo stage preparation but does not document shell override precedence.
+
+**Related ideas:**
+- 000087 (terminal interaction API): broader terminal capability scope, but focused on outside-the-page API surface rather than shell selection semantics.
+- 000095 (close session-cap TOCTOU window): addresses a different terminal issue (session registry concurrency).
+- 000099 (PTY test failures): environmental issue with test execution, unrelated to override precedence.
+
+The idea proposes two candidates: (1) document the D_SYSTEM_DEMO_SHELL override behavior in the OPS documentation, or (2) change the override to apply only when no explicit shell is requested. This is a design choice at the boundary between backward compatibility (the override was introduced for backward-compatibility in ADR-013) and user-facing clarity (selecting "bash" should mean bash). Neither approach is obviously superior without weighing operator surprise against compatibility stability, which is an owner decision.
+
+**No overlapping idea found.** The triage record in backlog.yaml confirms 000096 was recorded via the PROMPT-023 enhancement lane during workbench build work and appropriately left for owner review rather than implemented during that phase.
+
+</details>
+
+---
+
+## 000097 · Session-failure tracking system that derives anti-pattern rules for future sessions
+
+**Created 2026-09-10T21:41:38-04:00 · Status: `triaged`**
+
+The owner requested this on 2026-09-10, during the workbench build, after a cluster of failures whose costs were avoidable in hindsight. The idea is a system that tracks session failures and computes anti-patterns from them, so that future sessions are more robust at identifying and handling errors.
+
+Motivating examples from the workbench build:
+
+1. A stale pyenv shim lock on the host (~/.pyenv/shims/.pyenv-shim) made three PTY tests fail deterministically for every agent. Diagnosing it required comparing the branch against a dev baseline, and the one-line fix needed the owner's hands because host-level deletes are permission-blocked.
+
+2. An orchestrator agent stalled three times by backgrounding long commands and ending its turn, and was eventually replaced mid-phase.
+
+3. A coordinator command chain piped governance output through tail, which masked a nonzero exit code, so a completion commit briefly landed on a red governance check before being caught and amended.
+
+The proposed system would capture failures like these as structured records: what failed, the signal that revealed it, the wrong first interpretation if there was one, and the effective fix. From those records it would derive anti-pattern rules — for example: never pipe a gating command's output in the same shell invocation that acts on success; run long commands in the foreground inside an agent turn; compare against a baseline before attributing a failure to new work. Those rules would then be surfaced to future sessions. It could integrate with brain/procedures/, which already holds model-agnostic corrections, or use a new structured store that the governance tooling can check.
+
+The open design question is where the capture happens — at session close, at checkpoint, or through a dedicated tool — and how the derived rules reach agents without bloating every session's context.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:57-04:00): Idea 000097 proposes a system to track session failures and derive anti-patterns that future sessions can apply to prevent similar failures.
+
+Related ideas and documents:
+
+Idea 000099 (Three demo-terminal PTY tests fail on dev and on origin) and idea 000129 (Fix the three pre-existing environmental PTY test failures) are concrete manifestations of the types of session failures that 000097 proposes to track. The body of 000097 explicitly mentions "A stale pyenv shim lock on the host (~/.pyenv/shims/.pyenv-shim) made three PTY tests fail deterministically for every agent" as a motivating example—this is the exact class of environmental failure that 000099 documents and 000129 addresses. Idea 000129 already links to both 000097 and 000099, establishing the relationship pattern.
+
+Idea 000051 (Agent harness and guardrails) addresses related reliability concerns but focuses on constraining agent behavior within existing guardrails (hooks, settings, gating) rather than learning from failures that escape them.
+
+Plan 008 (Session opening and closing protocols) covers session lifecycle management but does not address failure tracking or anti-pattern derivation. Plan 001 (Agent Memory System) establishes the brain/ system for general shared knowledge, but does not propose a failure-specific tracking mechanism or anti-pattern derivation.
+
+No related plan, requirement, or ADR found that proposes the failure-tracking system with anti-pattern derivation that 000097 describes. The brain/ memory system and agent guardrails infrastructure exist, but the explicit workflow for capturing session failures as structured records and deriving rules from them remains unspecified in governed documents.
+
+PROPOSED LINK: 000097 --relates_to--> 000099 (000099 is a concrete example of the session failure pattern 000097 proposes to track and learn from)
+
+</details>
+
+**Links**
+
+- relates_to → `000099`
+- relates_to ← `000129`
+- relates_to ← `000138`
+
+---
+
+## 000098 · Ship the layout-schema test ADR-016 promised
+
+**Created 2026-09-10T22:18:33-04:00 · Status: `triaged`**
+
+ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:45-04:00): Idea 000098 asks to ship the layout JSON schema and validation test that ADR-016 promised.
+
+**Where the promise originated:** ADR-016 (workbench layout persistence), consequence section, line 59: "the layout JSON schema is asserted by a test so a malformed layout file fails before it ships." REQ-007 W16 strengthens this as a specific verification requirement: "A test asserts the layout files' bumped schema_version and per-panel eligibility shape."
+
+**Current state:** Layout files exist at _data/workbench/layouts/layout-1.json and layout-2.json with schema_version: 1. The W02-A adversarial review (recorded in backlog.yaml) identified this as minor finding 3: "an unbuilt layout-schema test, recorded as idea 000098 by the coordinator." The review noted it was left unbuilt in-phase because test/ files sit outside phase-wb-02's declared deliverable paths, not because the work was intentionally deferred.
+
+**What's missing:** No schemas/*layout* JSON Schema definition exists, and no test file validates that both shipped layouts conform to the schema or that the W06 invariants hold (every grid.areas token names a real slot; every panel type is admitted by exactly one slot per layout).
+
+**Related broader work:** Ideas 000001 (test fixtures for HTML generation), 000057 (testing strategy), 000052 (schema-driven consistency), 000035 (contract compiler and mutation-driven fixtures), and 000024 (schema validation coverage) all touch schema testing across the system. None of them specifically propose or cover the layout schema itself. Idea 000057 frames the gap: "no test runner or lint gate for ts/... and no systematic approach ties schema changes to fixture/contract regeneration." The layout schema is a concrete case of that broader gap, but the promise it fulfills is specific to ADR-016 and REQ-007.
+
+**Related governed documents:** ADR-016 promises the test (consequence section); REQ-007 W16 specifies its verification method; backlog.yaml phase-wb-02 section records it as surfaced but deferred; PLAN-004 (reliability follow-up) and PLAN-009 (capture-build) establish the principle that schemas precede code.
+
+No existing plan, requirement, decision or other idea fully covers the concrete ask to ship the layout schema and its validation test.
+
+</details>
+
+---
+
+## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+
+**Created 2026-09-11T00:11:20-04:00 · Status: `triaged`**
+
+`uv run pytest` on dev reports `3 failed, 546 passed` as of 2026-09-11. All three failures are in test/test_demo_terminal.py:
+
+    test_posix_adapter_reports_alive_then_not_alive
+    test_resize_text_frame_applies_to_pty_window_size
+    test_two_concurrent_websocket_sessions_are_independent_shells
+
+The first one's assertion, which is probably the root of the other two:
+
+    adapter.write(b"exit\n")
+    deadline = time.monotonic() + 5.0
+    while adapter.alive and time.monotonic() < deadline:
+        adapter.read(size=4096, timeout=0.5)
+    assert adapter.alive is False
+    E   assert True is False
+    E    +  where True = <src.demo.posix.PosixPtyAdapter object at 0x...>.alive
+
+So the PTY adapter's `alive` property stays True after the shell is told to exit and given five seconds to do it. Either the child is not exiting or `alive` no longer observes that it did.
+
+NOT FLAKY, AND NOT LOCAL. The failure reproduces identically on repeated single-test runs (two consecutive runs, same assertion, 5.05s each). It is not caused by any uncommitted or unpushed work: the three commits sitting unpushed on dev at the time of writing touch no path under src/demo/ or test/test_demo_terminal.py, and the most recent change to the adapter — f0801af, "phase-wb-01: session registry and shell allowlist (W01-C3)" — is already an ancestor of origin/dev. `git merge-base --is-ancestor f0801af origin/dev` returns true. Anyone who clones or pulls dev right now gets a red suite.
+
+LIKELY CAUSE, NOT VERIFIED. f0801af is the prime suspect on recency and subject matter — a session registry that tracks live shells is exactly the kind of change that can hold a reference to a child process and keep it from being reaped, or change what `alive` consults. This was not confirmed by bisect or by reading the diff; it is a starting point, not a diagnosis.
+
+WHY THIS WAS RECORDED RATHER THAN FIXED. src/demo/ belongs to sys-demo-stage, which is under an active claim: phase-wb-03, held by agent-demo-stage, locking sys-ui and sys-demo-stage. The session that found this held no claim at all, so touching that code would have meant editing a peer's locked system without one — the precise collision ADR-003's disjointness rule exists to prevent. The right owner for the fix is whoever holds sys-demo-stage, and the fastest route is to tell that agent rather than to open a phase.
+
+WHAT THE NEXT PERSON SHOULD DO. Confirm the cause before changing anything: `git log --oneline -5 -- src/demo/posix.py` and read f0801af's diff against the `alive` property and whatever the session registry retains. Check whether the registry keeps a file descriptor or Popen handle open past shell exit. Then decide whether the bug is in the adapter or the test's assumption — the test has been in the suite since the demo track and passed throughout it, which argues for the adapter.
+
+Found on 2026-09-11 while running the full suite during an unrelated session's final checks. The suite had passed at 495 earlier in the same session; it is now 549 tests, so roughly 54 tests arrived with merged workbench work and three of the pre-existing demo tests broke alongside them.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
+- **finding** by agent-idea-triage (2026-09-11T20:42:18-04:00): The three failing PTY tests in test_demo_terminal.py have been thoroughly investigated and documented. 
+
+**Governed documents:** The failures relate to two ADRs and a live demo plan. ADR-013 (demo-terminal-capability) authorizes the POSIX PTY adapter with bash on Linux/macOS; ADR-014 (workbench-terminal-capability) supersedes it and extends the capability to the workbench with a session registry and shell selection. PLAN-021 (live-demo) implements phase-demo-01 (terminal backend) which includes the adapter itself, src/demo/posix.py, and test/test_demo_terminal.py. Requirements REQ-006 (live-demo) and REQ-007 (workbench) both specify the PTY-based terminal requirement (R04, W12/W17).
+
+**Investigation status:** The workbench-coordinator's finding (annotated 2026-09-11) clears the suspected cause (commit f0801af, phase-wb-01's session registry). Timeline evidence shows the failures were present on dev before that commit merged, and the failures reproduce reliably when a host-level ~/.pyenv/shims/.pyenv-shim lock file exists but clear completely when removed. The root cause is environmental (pyenv rehash contention polluting PTY output), not src/demo/posix.py. Every phase gate from phase-wb-01 through phase-wb-09 has carried the caveat "3 failed, known environmental" — the failures are not a new regression but a pre-existing host environment defect.
+
+**Related ideas:** 000097 (session-failure tracking system) is linked as the parent tracking environmental anti-patterns; 000129 (fix the three pre-existing environmental PTY test failures) is the owner's explicit request to eliminate the caveat, either by making the tests robust to the shim environment or by fixing the host-level contention. Both relationships are already recorded.
+
+**What remains:** Idea 000099's purpose was complete once the coordinator's finding arrived — it surfaced a red suite and provided a starting point. The action item is now 000129, which owns the solution path (make tests robust, fix host contention, or isolate from shim mechanism) and the done condition (full suite passes with zero expected failures, caveat removed from gates).
+
+PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the parent for environmental anti-patterns like pyenv lock contention)
+
+</details>
+
+**Links**
+
+- relates_to ← `000097`
+- relates_to ← `000129`
+
+---
+
+## 000100 · Silence the flag-off 404 probes from the workbench frontend
+
+**Created 2026-09-11T00:27:59-04:00 · Status: `triaged`**
+
+With D_SYSTEM_DEMO_TERMINAL unset, the frontend still fetches /api/v1/workbench/injection-sources and /list on load, producing four browser console 404 resource-log entries per reload (measured in phase-wb-03's W03-W item 5). Degradation is otherwise correct — disabled dropdowns, absent-terminal message, no uncaught exceptions — so this is cosmetic console noise, not a defect. Candidate: probe the existing /api/v1/demo/stage/terminal-enabled endpoint first and skip workbench fetches when false. Recorded via the PROMPT-023 enhancement lane (record, do not build) during the phase-wb-03 scout pass.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:42:05-04:00): ## Scout Finding: Silence the flag-off 404 probes from the workbench frontend
+
+This idea proposes silencing four browser console 404 resource-log entries generated when `D_SYSTEM_DEMO_TERMINAL` is unset. The frontend components `InjectionDropdowns.tsx` and `NotesStripRegion.tsx` unconditionally fetch `/api/v1/workbench/injection-sources` and `/api/v1/workbench/list` on load; with the flag unset, these routes do not exist per ADR-015's design ("Every workbench route mounts only when `D_SYSTEM_DEMO_TERMINAL=1` is set... Unset, none of these routes exist"). The degradation is behaviorally correct — dropdowns disable, absence messages display, no uncaught exceptions — making the 404 noise a cosmetic issue only.
+
+The issue is already documented in phase-wb-03's backlog completion report as a "recorded cosmetic caveat (four network-404 resource logs from probing designed-absent routes, no uncaught exceptions - idea 000100)", confirming the findings. The proposed solution — probe `/api/v1/demo/stage/terminal-enabled` first and skip workbench fetches when false — is viable: that endpoint already exists in `src/api/routes/demo_stage.py`, is registered unconditionally, and returns `{"terminal_enabled": bool}` for exactly this purpose (per its docstring: "A plain GET here always succeeds and reports the flag's actual value").
+
+No related ideas found. Related governed documents: PLAN-022 (Workbench plan, structure and phases), ADR-015 (Workbench API surface decision, gating logic), REQ-007 (Workbench requirements, W14 verification for gating behavior).
+
+This is a valid refinement for future work. The fix belongs in a follow-on phase if the owner prioritizes reducing console noise in flag-off scenarios, likely as part of a broader frontend-initialization audit. No dependencies exist; the change is isolated to frontend initialization logic.
+
+</details>
+
+---
+
+## 000101 · Workbench multi-panel slots render a double header after a dropdown swap
+
+**Created 2026-09-11T03:39:18-04:00 · Status: `triaged`**
+
+When a slot admitting several panels swaps one in via its header dropdown (REQ-007 W06), the swapped-in panel still renders its own inner .stage-region header below the slot-level header, so the panel shows two stacked headers. Deliberately left as a cosmetic case by phase-wb-02 (noted in ts/src/workbench/Slot.tsx and ts/src/workbench/panelRegistry.tsx) when no multi-panel slot was reachable; it became reachable when phase-wb-03 shipped the shell panel options and phase-wb-05/06 filled layout-1's explorer slot (file-browser, idea-explorer, backlog-explorer). Candidate polish: suppress or merge the inner header when a panel renders inside a multi-panel slot, keeping the slot-level dropdown header as the single title row. Touches REQ-007 W06's rendered look but not its stated behavior, so recorded for the owner rather than built (workbench build enhancement lane, PROMPT-023 delta 3). Found during the phase-wb-06 coordinator scout, 2026-09-11.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:42:05-04:00): Idea 000101 is explicitly referenced in REQ-007 W15 (the workbench requirements' terminal visibility delta), where the requirement notes "the suspected break is the multi-panel slot wrapper's height chain (`Slot.tsx`, related cosmetic double header: idea `000101`)." This establishes that the double-header rendering is a known cosmetic issue tied to the multi-panel slot wrapper's CSS/layout chain in the Slot component.
+
+The idea addresses a cosmetic enhancement to REQ-007 W06 (the multi-panel slot dropdown swap feature). The body correctly notes this was deliberately deferred as a cosmetic case during phase-wb-02, and became reachable after phase-wb-03/05/06 filled the explorer slot. The body also correctly marks it as a "workbench build enhancement lane" improvement rather than a bug — it touches the rendered look, not stated behavior.
+
+Related documents:
+- REQ-007 W06 defines the multi-panel slot dropdown swap behavior itself
+- REQ-007 W15 (delta section added 2026-09-11) explicitly cites this issue when discussing the multi-panel slot wrapper height chain as the suspected root cause of terminal clipping (idea 000104)
+- PLAN-022 phase-wb-02 scope: built the layout engine and notes strip, with slot-header dropdowns for multi-panel slots (REQ-007 W05, W06)
+
+Overlap with other ideas:
+- Idea 000104 (terminal panel clipped to ~85px) shares the same suspected root cause: the multi-panel slot wrapper's height chain in Slot.tsx
+- Idea 000134 (audit all slots and panels for content fit) explicitly lists 000104 as part of its evidence base and would encompass this cosmetic issue as part of its methodology for preventing visibility/content-fit problems across all panels
+
+No related plan, phase or document found beyond REQ-007's explicit reference. This is a catalogued cosmetic case awaiting owner decision on whether to address in a future workbench polish phase.
+
+PROPOSED LINK: 000101 --relates_to--> 000104 (both touch the multi-panel slot wrapper height chain in Slot.tsx)
+PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass this cosmetic issue as part of its content-fit methodology)
+
+</details>
+
+**Links**
+
+- relates_to → `000104`
+- relates_to → `000134`
+- relates_to ← `000141`
+
+---
+
+## 000102 · Rehearsal idea from demo-validator-web dry-run
+
+**Created 2026-09-11T04:10:22-04:00 · Status: `triaged`**
+
+Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:42:01-04:00): Rehearsal idea from the demo-validator-web agent's dry-run pass, recorded during phase-wb-07 timing exercises. Marked as a rehearsal entry, not a production feature request.
+
+The suggestion is to add a "last refreshed" timestamp badge to the HTML Viewer's header (REQ-007 W07) to visually confirm the displayed data is current during the live demo's test step — a presenter can point to it instead of clicking refresh and waiting for a reload.
+
+Examined related work: The HTML Viewer already ships a refresh button per W07. No related requirement, plan or prior idea documents this UI enhancement. The broader workbench build is complete; this is a polish suggestion for the rehearsal/demo context specifically.
+
+No related ideas found. This suggestion does not overlap with other open ideas or existing governed work.
+
+</details>
+
+---
+
+## 000103 · Rehearsal pass 2 test entry for the live terminal /idea command
+
+**Created 2026-09-11T04:19:18-04:00 · Status: `triaged`**
+
+Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:41:40-04:00): Idea 000103 is a validation artifact from the phase-wb-07 (rehearsal refresh) agent-driven rehearsal pass 2 (2026-09-11), explicitly created to test the live-terminal /idea command end to end. The body plainly states its purpose: confirming that ideas typed into the terminal during rehearsal flow through tools/append_idea.py, land in _data/ideas.jsonl with a generated id and timestamp, and appear in the regenerated markdown view. It also plainly states "It carries no product content and should be discarded during a later triage pass rather than promoted."
+
+Related rehearsal-and-demo ideas:
+- 000088 (Rehearsal idea from dry-run 1, phase-demo-05) — placeholder recorded to time the /idea step during earlier rehearsal
+- 000090 (Rehearsal idea from phase-demo-05 second dry-run) — timing placeholder from phase-demo-05 (already triaged 2026-09-11)
+- 000102 (Rehearsal idea from demo-validator-web dry-run) — test entry from the same phase-wb-07 rehearsal session
+- 000089 (Demo fallback seed) — deliberately kept per PLAN-021's afterlife decision; differs in being the fallback content scaffold, not a validation test
+
+Governance context: phase-wb-07 is the rehearsal-refresh phase under PLAN-022 (Workbench), which rescopes workbench testing and runbook updates to the final workbench UI. The live-segment requirement (REQ-006 R09, REQ-007 W13) defines the triage step's place in the 15-minute workflow, but neither document names validation of the /idea command infrastructure itself — the command's implementation is already complete in earlier phases.
+
+This idea's role is complete: it validated that the /idea command integration works end to end before the live demo. Unlike 000089 (the persistent fallback seed), this test entry has no ongoing function and aligns with its explicit directive: discard during triage rather than promote.
+
+No related plan, requirement, ADR or backlog phase beyond PLAN-022 and REQ-007 which govern the rehearsal phase itself. The fold shows no links.
+
+</details>
+
+---
+
+## 000104 · Workbench terminal panel renders clipped to ~85px (.xterm container height 0), hiding almost all live output
+
+**Created 2026-09-11T10:20:15-04:00 · Status: `promoted` · became PLAN-022**
+
+Found during phase-wb-07 agent-driven rehearsal pass 2 (W07-R, demo-validator-web, 2026-09-11). Once a working terminal panel is selected and a Claude Code session is running inside it, the panel renders at a severely clipped height (~85px, about 2 visible text rows). Confirmed via getBoundingClientRect(): the .xterm container reports height: 0 while its child .xterm-screen reports height: 372.99 — a real CSS/layout sizing bug in the terminal panel, not a small window or a content issue. The session content is present and interactive (confirmed via .xterm-rows.innerText) but is not visible to a presenter without scripted inspection. This is new since rehearsal pass 1 and was not present there. This would wreck the live demo if unaddressed — the terminal panel is the primary visual surface for the entire live segment. Not fixed as part of phase-wb-07 (its deliverables are docs/00-working/demo-runbook.md and docs/00-working/demo-windows-setup.md only, not application code); recorded here for the owner to route to a build phase or hotfix. Likely touches the terminal panel's CSS/layout in ts/src/workbench (the .xterm/.xterm-screen sizing chain) — worth checking flex/height inheritance through the slot and panel containers.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:43:47-04:00): Idea 000104 records the workbench terminal panel rendering bug (clipped to ~85px, xterm container height 0) found during phase-wb-07 rehearsal pass 2. This is explicitly addressed in PLAN-022 (Workbench — the stage becomes the chartered management UI, code doc-workbench): phase-wb-08 "Panel rendering fixes (first priority)" lists idea 000104 as its core issue and schedules root-cause diagnosis and fix across all shell panels.
+
+Phase-wb-08 has completed: the backlog.yaml records status: complete and completion_evidence shows ts/src/stage/StagePage.css as the deliverable. The result notes confirm the fix — a 17-line CSS change setting display: flex on .stage-workbench-slot__body — which resolved the shared root cause affecting the terminal, HTML Viewer, and File Browser panels. The fix integrated into dev at commit bf1749b on 2026-09-11.
+
+No overlap with other ideas. The closest related ideas are 000130 (Rotator help tooltip cut off at the panel bottom), 000107 (Terminal session lost on layout switch), and 000134 (Audit all slots and panels for content fit), but these address different symptoms or are broader audits — the terminal rendering bug itself is specific to idea 000104 and fully addressed.
+
+PROPOSED PROMOTION: 000104 -> PLAN-022 (Fix delivered and integrated in phase-wb-08, 17-line CSS change to StagePage.css, committed 2026-09-11)
+
+</details>
+
+**Links**
+
+- relates_to ← `000101`
+- relates_to ← `000134`
+
+---
+
+## 000105 · Runbook does not document the HTML Viewer's Embedded/Open-in-tab toggle
+
+**Created 2026-09-11T11:37:27-04:00 · Status: `triaged`**
+
+Found during the phase-wb-07 W07-W rehearsal verification (demo-validator-web, 2026-09-11). The HTML Viewer's header carries an "Embedded" toggle button that switches the page display to an "Open-in-tab link (rung 3)" mode - the Descope Ladder rung mechanism implemented as a manual UI control. Nothing the runbook names is missing or mislabeled (W07-W passed), but this control appears nowhere in the runbook's control inventory, so a presenter who clicks it mid-demo cannot explain or reverse it from the script. Candidate: either document the toggle in the runbook's Workbench UI Reference (a small runbook follow-up, not a wb-07 reopen) or hide the control behind the demo flag. Recorded for the owner rather than fixed; the layout-assignment redesign staged in docs/00-working/handoff-workbench-layout-and-terminal-fixes.md will touch the same header region, so the two should be reconciled together.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:46-04:00): Found during W07-W rehearsal (phase-wb-07), idea 000105 documents a missing runbook entry for the HTML Viewer's "Embedded" toggle — a UI control in the panel header that switches to "Open-in-tab link" mode (Descope Ladder rung 3, per PLAN-021). The toggle exists and functions; the issue is that it appears nowhere in the runbook's control inventory (docs/00-working/demo-runbook.md line 246, which lists refresh button, searchable dropdown, and directory button but not the toggle). A presenter clicking it mid-demo cannot explain or reverse it from the script.
+
+The idea body proposes two options: document the toggle in the runbook's Workbench UI Reference, or hide it behind the demo flag. It notes the decision should be reconciled with phase-wb-10 (Runbook and checklist refresh for the post-fix workbench UI), which updates the runbook after phase-wb-09's layout-assignment redesign lands. Phase-wb-10's current scope in backlog.yaml does not explicitly include documenting this toggle.
+
+Related work: the layout-assignment redesign (phase-wb-09, handoff in docs/00-working/handoff-workbench-layout-and-terminal-fixes.md) will touch the same HTML Viewer header region. The handoff document explicitly notes "the runbook will need a follow-up update after Fix 2 changes the config dialog — note that in the plan, do not fold it into these phases without asking," suggesting the runbook refresh should be a separate decision.
+
+No existing governed document covers the toggle's documentation status. The backlog.yaml already recorded this as a non-blocking W07-W finding. No related ideas found with overlapping scope.
+
+</details>
+
+---
+
+## 000106 · No drift test covers _public/overview/index.html, unlike ideas.md
+
+**Created 2026-09-11T13:03:35-04:00 · Status: `triaged`**
+
+Found during the phase-wb-07 session-close audit's independent review, 2026-09-11. The idea log has an enforced drift test (test_ideas.py's test_the_committed_markdown_matches_regenerated_output) asserting docs/00-working/ideas.md always matches a fresh regeneration from _data/ideas.jsonl. No equivalent test exists for _public/overview/index.html (generated by tools/generate_overview.py from the same underlying data plus backlog/governance state). This let a real drift ship silently: the phase-wb-07 branch's final commit (c43bd7d, "Record idea 000105") updated ideas.jsonl and ideas.md but never reran the overview generator, so the committed overview page under-reported idea counts by one until caught by this audit and fixed in commit 14094bb. Candidate: a test mirroring test_ideas.py's pattern — regenerate the overview page in-memory or to a temp path and assert it matches the committed one, failing the same way a stale ideas.md would. Recorded for the owner rather than built.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:06-04:00): Found: 000106 describes a real gap in test coverage that was caught and fixed during the phase-wb-07 session-close audit. The idea correctly identifies the missing drift test for _public/overview/index.html — test_ideas.py's `test_the_committed_markdown_matches_regenerated_output()` (line 775) enforces that docs/00-working/ideas.md matches a fresh regeneration from _data/ideas.jsonl, but no equivalent test exists for the overview page.
+
+The overview generation is specified in REQ-006 R08-R09, which require deterministic, byte-identical output across generations. REQ-006 R09 explicitly calls for repeatability: "Repeating generation against unchanged sources is byte-identical, and ordinary repository checks detect hand edits or omitted generated representations."
+
+Currently, test_generate_overview.py includes determinism tests (test_two_generations_via_generate_produce_byte_identical_output, test_two_cli_runs_write_byte_identical_files) that verify in-memory generation is repeatable, but no test compares the generated page to the committed _public/overview/index.html. This creates a maintenance gap: the committed page can drift out of sync with the current state silently, as idea 000106 itself demonstrates (commit c43bd7d updated the idea log without regenerating the overview, and the discrepancy was only caught by manual audit).
+
+Proposed fix: a test modeled directly on test_ideas.py's pattern — regenerate the overview to a temp path or capture it in memory, assert it matches the committed _public/overview/index.html byte-for-byte, and fail if drift is detected. This would prevent the same silent drift on future commits.
+
+Related: 000057 (Testing strategy across the system) covers the broader testing landscape, but is not specifically about generated artifacts; 000001 (Test fixtures for the HTML generation system) is about fixtures, not drift checks.
+
+PROPOSED LINK: 000106 --relates_to--> 000057 (both address system testing strategy)
+
+</details>
+
+**Links**
+
+- relates_to → `000057`
+- relates_to ← `000121`
+
+---
+
+## 000107 · Terminal session lost on layout switch when the stored visible panel differs between layouts
+
+**Created 2026-09-11T15:56:15-04:00 · Status: `triaged`**
+
+CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). The original root-cause claim - that layout 2's terminal slot DEFAULTS to PowerShell - is wrong: both _data/workbench/layouts files set the terminal slot's default_panel to "terminal" (bash), and on a clean browser session the layout-switch persistence guard passes (zero new websockets, MARKER survives; verified independently twice - the W08-A adversarial run and the session-close review). The failing measurements (4 new websockets per round-trip, session lost) came from the W08-W validator's own stale localStorage: it had switched layout 2's visible panel to PowerShell during fill testing, and that stored choice persisted across its reloads and its 'dev baseline' run, so every round-trip genuinely unmounted bash and mounted PowerShell. The real residual behavior worth attention: when a user's stored visible-panel choice differs between layouts (or a panel is otherwise hidden by a visibility change), the hidden shell panel unmounts and its PTY session dies silently. That intersects phase-wb-09's W16 obligation that re-assignment and visibility changes never silently kill a shell session, and W09-W's persistence guard should be run from a CLEAN store to avoid repeating the measurement artifact.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-coordinator (2026-09-11T17:14:47-04:00): Session-close review evidence: layout-1.json and layout-2.json both carry default_panel: terminal for the terminal slot (verified by direct read); independent reviewer's clean-session run of the persistence guard on integrated dev passed cleanly (2 initial websockets only, zero during switches, MARKER echoed back); W08-A's earlier passing run is consistent. The only failing runs shared one browser profile that had PowerShell stored as layout 2's visible panel.
+- **finding** by agent-idea-triage (2026-09-11T20:44:25-04:00): ## Scout findings for 000107: Terminal session lost on layout switch when stored visible panel differs
+
+The idea documents a residual behavior where hidden shell panels unmount and their PTY sessions die silently when a user's stored visible-panel choice differs between layouts. The original root-cause diagnosis (layout 2 defaulting to PowerShell) was corrected during phase-wb-08; the real issue is that hidden panels die on visibility change, intersecting with phase-wb-09's W16 obligation that "re-assignment and visibility changes never silently kill a shell session."
+
+**Related work identified:**
+
+The main concern was addressed in phase-wb-09's W09-C3 closure. The phase reworked the layout configuration to use per-panel eligibility assignments and implemented a React-portal mechanism in StagePage.tsx to preserve component instances across re-assignment—specifically closing "idea 000107's layout round-trip regression." The validator W09-V3 confirmed the fix and verified the multi-occupant header-switcher's remount-on-visibility-change behavior was not a regression. Phase-wb-09 is currently in progress, awaiting the coordinator-owned completion gate (W09-A adversarial review, W09-W Playwright browser verification).
+
+**Related requirements and phases:**
+
+- REQ-007 W15 and W16: W15 governs shell panel fill across layouts and sizes with a persistence regression guard; W16 specifies that re-assignment between slots never silently kills a shell session, though remount where unavoidable must be explicit and stated. The idea's residual concern (hidden panels dying on visibility change) sits at the boundary of what W16 defines as unacceptable.
+- REQ-007 W09 and the File Browser visibility handling: the same visibility/remount pattern affects other panels, suggesting the residual behavior may be systemic to slot-header switching rather than terminal-specific.
+- Phase-wb-08 (panel fixes, completed): diagnosed the original layout-switch failure via adversarial review and pre-fix validation; clarified that the measurement artifact (4 new websockets per round-trip) came from the validator's own stale localStorage, not a code defect.
+- Phase-wb-09 (layout assignment, in progress): explicitly targets the "re-assignment between slots never silently kills a shell session" obligation and implements the portal mechanism to preserve instances across re-assignment. The W09-W Playwright browser verification (awaiting dispatch) will verify the persistence guard and fill assertions across both layouts.
+- Idea 000113 (audit terminal persistence and performance) explicitly links to this idea and may overlap on the residual visibility-change behavior.
+
+**Candidate for follow-up work:**
+
+The residual behavior—hidden panels dying on visibility-change (distinct from re-assignment)—is noted in the idea body as "worth attention" and intersects W16's stated obligation. It is narrower than W16's full scope (re-assignment is addressed) but sits in the same problem space. The behavior may be expected (unmounting a hidden component frees resources), explicit (if the code documents that hiding a shell terminates its session), or a regression (if W16 implies visibility changes should also preserve sessions). The distinction between re-assignment and visibility change is worth surface clarity.
+
+**Governance references:**
+
+- PLAN-009 (workbench plan, covers phase-wb-01 through phase-wb-10)
+- REQ-007 rows W15, W16, W09 and W17 (workbench requirements)
+- ADR-016 (workbench layout persistence and schema versioning)
+- ADR-014 (workbench terminal capability and session caps)
+- Phase-wb-08 and phase-wb-09 (active implementation tracks)
+
+**Related ideas:**
+
+- 000113 (audit terminal persistence and performance across all three shells): already linked `relates_to->000107` and may surface the residual visibility-change behavior in a systemic audit.
+
+**No related plan, phase or document found** that specifically addresses hidden-panel unmounting as a known design decision (as opposed to a code defect). The residual behavior is documented in this idea but not yet surfaced in governance, and W09-W's verification will clarify whether it is acceptable under the current W16 wording or requires separate attention.
+
+</details>
+
+**Links**
+
+- relates_to ← `000113`
+
+---
+
+## 000108 · HTML Viewer file-selector popup is too short: show 8-10 entries with scroll, open below, consider resizing
+
+**Created 2026-09-11T17:19:19-04:00 · Status: `triaged`**
+
+Owner report, 2026-09-11, on the Windows machine during early workbench checks: selecting the html selector in the HTML Viewer opens a popup dialog that shows only two html files at a time. It should appear below the control and be taller - at least 8-10 files visible - plus internal scroll for longer lists; allowing the user to resize the popup is worth considering. Outside PROMPT-024's rows (REQ-007 W15-W18) and not covered by phase-wb-09 or phase-wb-10, so recorded for the owner's scheduling rather than built into the fix build. Touches the HTML Viewer's selector UI in ts/src (HtmlViewerRegion or its dropdown component).
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-11T17:24:26-04:00): Part of the owner's 2026-09-11 batch for the next workbench prompt pack, together with 000109 (double-click tab opens new browser tab), 000110 (markdown rendering in the viewer), 000111 (file bookmark categories and their system integration) and 000112 (File Explorer right-click open-in-viewer).
+- **note** by repository-owner (2026-09-11T17:28:41-04:00): Batch extended 2026-09-11: also 000113 (terminal persistence and performance audit, all three shells) and 000114 (general performance audit with caching) for the same next planning session.
+- **note** by repository-owner (2026-09-11T17:48:07-04:00): Batch extended again 2026-09-11: 000115 (duplication/modularity audit, e.g. multi-panel slot support) and 000116 (code structure and file-size audit with proposed target structures). Planning-session instruction from the owner: before authoring the pack, review ALL items in this batch (000108-000116) and determine the optimal ordering for both investigating and executing them - audits (000113-000116) likely inform the design and sequencing of the feature items (000108-000112), and the bookmark system (000111) needs its storage/reference ADR before anything builds against it.
+- **note** by repository-owner (2026-09-11T18:01:55-04:00): Batch extended 2026-09-11 with five agent-scouted, owner-approved companions: 000117 (Popover-wide fix scope, extends 000108), 000118 (COMPATIBLE_EXTENSIONS gate for markdown), 000119 (markdown render-location decision), 000120 (batch panel-bridge for categories), 000121 (cache invalidation vs demo-week overview regeneration, extends 000114). Scout also confirmed terminal reconnect is already idea 000087 and the bookmark-store write ADR is inside 000111.
+- **note** by repository-owner (2026-09-11T19:32:52-04:00): Batch extended 2026-09-11 (evening): 000123 (audit the pre-build HTML generation plans against the built reality - accomplished/open/superseded/retire disposition per requirement) and 000124 (formalize the system's vocabulary - e.g. the terminal slot is named after its initial occupant, wrong once panels are assignable; governed glossary plus rename-vs-alias migration). 000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names.
+- **note** by repository-owner (2026-09-11T19:40:47-04:00): Batch reframed 2026-09-11 (000125): the batch has outgrown one plan - the planning session opens with holistic triage of ALL these ideas (categorize, prioritize, group into multiple plans with an ordering across them) before any deep-dive development. Added: 000126 (thorough audit of commands/skills/agents - codebase design first, demo effectiveness second), 000127 (idea skill delegates capture to a subagent to protect main-session context; one instance of a recurring owner pattern), 000128 (shared state model for multi-agent planning sessions).
+- **note** by repository-owner (2026-09-11T20:41:03-04:00): Batch extended 2026-09-11 (night): rotator-panel set - 000130 (help-tooltip cutoff at panel bottom + font-size/text-capacity rethink; likely another 000117 Popover consumer), 000131 (horizontal auto-scroll ticker for longer texts, possibly a substitute panel), 000132 (rotate images, not just text); plus 000133 (revisit slot geometries and custom reconfiguration - explicitly FUTURE phase, lower priority than any demo work; per-slot constraints and resize-vs-content effects) and 000134 (content-fit audit of all slots/panels producing enforced methodologies, not spot fixes). Priority note from the owner: 000133 yields to demo-specific fixes; 000130 is a live display bug worth demo-week attention.
+- **note** by repository-owner (2026-09-11T22:46:09-04:00): Batch extended 2026-09-11 (late): 000138 (agent anti-pattern tracking system - starter catalog from this session: turn-budget truncations, assumption-based runtime fixes, stale-browser-state false defects, orphaned servers, missing resume paths) and 000139 (delegation-scoping methodology with continual improvement as a system property - dispatch cost estimation, splitting rules, mandatory dispatch contents, model assignment, post-session retrospectives feeding the rules). Companion brain procedures: runtime-behavior-needs-runtime-evidence.md and scope-dispatches-to-the-turn-budget.md.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:34-04:00): **Overlap with related ideas and scope boundaries:**
+
+Idea 000108 addresses a UI issue in the HTML Viewer's file-selector dropdown — the popup shows only two entries instead of the needed 8-10. The idea correctly identifies this as outside PROMPT-024's scope (which covers W15-W18: terminal fill, layout assignment, and File Browser scroll) and outside phase-wb-09 and phase-wb-10's deliverables.
+
+The critical connection is idea 000117 (extends 000108), which was already linked during agent scouting and the owner's approval. 000117 identifies the root cause: the issue is not specific to the HTML Viewer's selector. It flows from the shared `ts/src/stage/Popover.tsx` component, which applies a hard MIN_BUBBLE_HEIGHT_PX = 120 floor that reproduces the symptom across nine callers — InjectionDropdowns.tsx, TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx, and two more. 000117 proposes that the fix should scope to "Popover.tsx's height math plus an audit of every consumer", not just the HTML Viewer.
+
+Related ideas 000109 (double-clicking file tabs) and 000110 (markdown rendering support) are distinct enhancements that would pair with a Popover fix post-shipment. Idea 000130, relating to 000117, surfaces the same Popover height ceiling in the rotator's help tooltip — confirming the pattern across the codebase.
+
+**Governed documents:**
+
+REQ-007 W07 specifies the HTML Viewer's searchable dropdown for file filtering and is bundled into PROMPT-024's W15-W18 window. REQ-006 R03 covers popup behavior (hover popups collapse on pointer leave, click popups are dismissible) but does not specify sizing. No plan, requirement row or backlog phase currently scopes Popover component work or a shared popup height audit — the fix is genuinely unassigned to a deliverable.
+
+**Conclusion:**
+
+Idea 000108's linking to 000117 is correct and complete. The scope is clear: the work belongs in a future workbench enhancement batch after PROMPT-024/phase-wb-08/09/10 ship, and should be framed as a Popover component fix affecting all nine consumers, not a one-off HTML Viewer dropdown fix. No new links are needed; the existing edge to 000117 (extends) captures the relationship.
+
+</details>
+
+**Links**
+
+- relates_to ← `000109`
+- relates_to ← `000110`
+- extended_by ← `000117`
+
+---
+
+## 000109 · HTML Viewer: double-clicking a file tab opens it in a new browser tab
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Double-clicking a tab in the HTML Viewer should automatically open that file in a new browser tab - the full page, outside the workbench iframe. Complements idea 000108 (selector popup sizing) in the same viewer surface; touches ts/src HtmlViewerRegion and its tab strip.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:24-04:00): Idea 000109 requests double-clicking a file tab in the HTML Viewer to open that file in a new browser tab outside the workbench iframe. The idea complements 000108 (HTML Viewer file-selector popup sizing), and touches ts/src/stage/HtmlViewerRegion.tsx.
+
+Related ideas already identified:
+- 000108: HTML Viewer file-selector popup sizing (already linked via fold as relates_to)
+- 000119: Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source (agent-scouted 2026-09-11, links both 000109 and 000110, addresses rendering implications of the new-tab feature)
+- 000110: HTML Viewer renders markdown files with proper formatting, not raw text (part of same viewer surface batch)
+
+Governed documents covering the HTML Viewer:
+- REQ-007 W08 specifies the HTML Viewer has tabs with scoped state (directory, search text, displayed page), and W09 describes File Browser's context menu for opening files in the viewer
+- REQ-007 W07 defines the core HTML Viewer panel functionality (file selection dropdown, refresh control, directory picker)
+- PLAN-022 mentions the HTML Viewer panel (phase-wb-04)
+- backlog.yaml: phase-wb-04 (HTML Viewer panel with tabs) is complete; phase-wb-08 (panel rendering fixes including HTML Viewer blank state) is complete; phase-wb-09 (layout assignment) is active
+
+The HTML Viewer tabs feature itself is already governed (REQ-007 W08), and the File Browser context menu supports opening files in a specific tab (W09). The double-click-to-new-browser-tab feature extends the viewer's tab interaction model but is not currently covered by a requirement or plan. This is a UI enhancement for the same component surface. Idea 000119 has already identified and documented the key design question this feature raises: where markdown-to-HTML rendering happens affects whether opening files new-tab shows rendered content or raw source.
+
+No related plan, phase or document found beyond REQ-007's tab and file-opening requirements.
+
+PROPOSED LINK: 000109 --relates_to--> 000119 (markdown rendering location decision directly impacts this feature's new-tab behavior)
+
+</details>
+
+**Links**
+
+- relates_to → `000108`
+- relates_to → `000119`
+- relates_to ← `000119`
+
+---
+
+## 000110 · HTML Viewer renders markdown files with proper formatting, not raw text
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Expand the HTML Viewer to support .md files, rendering them as formatted markdown (headings, lists, code blocks, links) rather than showing raw source text. Needs a markdown-to-HTML step on either the serving route or the frontend, applied when the selected file is markdown; the existing sandboxed-iframe model and the D_SYSTEM_DEMO_TERMINAL gating of the file-serving route stay as they are. Repository docs are the obvious immediate beneficiaries (docs/, README.md).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:17-04:00): Related ideas and overlap: Two sibling ideas already capture the dependencies of this feature. Idea 000118 (Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) and idea 000119 (Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source) both link directly to 000110 and address the implementation follow-on: extending file-type support and selecting the markdown-to-HTML conversion location (serving route vs frontend). These links are already recorded.
+
+Governed documents: The HTML Viewer is specified in REQ-007 (Workbench requirements), requirement W07, which currently scopes supported files to ".html and .svg" found recursively in a selected directory. PLAN-022 (Workbench plan) describes phase-wb-04, which delivered the HTML Viewer panel with that scope; the phase is complete (per backlog.yaml status). Rendering markdown files is a planned extension beyond the current workbench specification, explicitly positioned by the idea body as post-PROMPT-024 work (after the current fixpack for terminal and layout issues). REQ-007 W07 would require amendment to include markdown rendering when this feature ships, and COMPATIBLE_EXTENSIONS in ts/src/stage/HtmlViewerRegion.tsx is the code choke point 000118 identifies.
+
+Status: This is a new feature request, not yet integrated into any plan phase. No promotion to a governed document is warranted; the idea is properly situated as a candidate for the next workbench prompt pack after the current PROMPT-024 cycle closes (phase-wb-08 and phase-wb-09).
+
+</details>
+
+**Links**
+
+- relates_to → `000108`
+- relates_to ← `000118`
+- relates_to ← `000119`
+
+---
+
+## 000111 · File bookmark categories: named groupings of files, referenceable across the system
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). A bookmark-type system where the owner creates named categories that group files together - e.g. "favorites", or "live-demo" holding every file relevant to the demo - and can later reference a category to pull up its files as a set. Two halves the pack must design, not just build: (1) the grouping surface itself (create/rename categories, add and remove files, list a category's files); (2) how these file references integrate into the wider system so groupings are simple to reference in future - storage shape (a tracked _data/ entity vs localStorage; tracked feels right since categories like live-demo outlive one browser), how other surfaces consume a category (HTML Viewer selector, File Explorer, possibly the terminal injection dropdowns), and how file paths stay valid as the repo moves. This is requirement-and-ADR-first work: the storage and reference model needs an owner-reviewed decision before creators build panels against it.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:16-04:00): Idea 000111 requests design for a file bookmark categories feature — named groupings of files referenceable across the workbench — addressing storage model (tracked _data/ vs localStorage), cross-panel integration (HTML Viewer, File Explorer, terminal injection), and path durability as the repo moves.
+
+The idea is already connected to two approved companion ideas: 000112 (File Explorer: right-click option to open a file in the HTML Viewer) and 000120 (Extend the panel bridge to batch, multi-target actions for bookmark categories). These relationships are already recorded as links and reflect the integrated design: 000112 provides the single-file open-in-viewer action that pairs naturally with bookmark categories, and 000120 identifies the bridge extension needed to handle batch/multi-target actions (opening entire categories at once).
+
+Workbench plan (PLAN-022) and requirements (REQ-007) document the File Browser and HTML Viewer panels that will be the primary surfaces consuming bookmark categories, and define their current capabilities and constraints (zero-scroll, panel slot assignment, context folders). ADR-016 (workbench layout persistence) provides a precedent for the storage design question: layouts ship as versioned JSON in _data/workbench/layouts/ with browser selections in localStorage, silent fallback to repository defaults on version mismatch. That model directly informs this idea's storage design choice.
+
+No related plan, requirement or ADR exists yet for the bookmark categories feature itself — this idea is asking for the design work that must precede implementation.
+
+</details>
+
+**Links**
+
+- relates_to ← `000112`
+- relates_to ← `000120`
+- relates_to ← `000132`
+
+---
+
+## 000112 · File Explorer: right-click option to open a file in the HTML Viewer
+
+**Created 2026-09-11T17:24:17-04:00 · Status: `promoted` · became PLAN-022**
+
+Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). File Explorer (File Browser panel) entries get a right-click context-menu option that opens the selected file in the HTML Viewer panel. Implies a cross-panel action channel (the browser telling the viewer what to load) that does not currently exist; pairs naturally with markdown rendering (so docs opened this way display formatted) and with bookmark categories (open-in-viewer from a category listing).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:16-04:00): ## Finding
+
+Idea 000112 requests a right-click context-menu option in the File Explorer to open files in the HTML Viewer panel, noting this implies a cross-panel action channel that did not previously exist.
+
+This functionality is already explicitly specified and fully delivered:
+
+**Governed specification:** REQ-007 (Workbench requirements), row W09, describes the File Browser's context menu offering five actions including "open in HTML Viewer with a nested submenu choosing the target tab." The cross-panel action channel is implicit in the design: the HTML Viewer maintains tabs scoped to directory and search context, and the File Browser's context menu targets them.
+
+**Governing plan:** PLAN-022 (Workbench), phase-wb-05 (File Browser panel) explicitly lists "the five context-menu actions (reveal, open-in-viewer with tab submenu, copy relative, copy absolute, inject path)" as a deliverable. Phase-wb-04 (HTML Viewer panel with tabs) established the tab infrastructure that phase-wb-05's open-in-viewer action targets.
+
+**Implementation status:** Both phase-wb-04 and phase-wb-05 are marked complete in the backlog with all items validated and integrated into dev (backlog.yaml records phase-wb-04 and phase-wb-05 as complete).
+
+**Related ideas:** The idea relates to 000111 (File bookmark categories) via fold(); both are part of the same workbench build batch. No other idea overlaps the right-click open-in-viewer feature.
+
+The idea's actual ask — a right-click context menu on files that opens them in the HTML Viewer — was delivered by phase-wb-05 and is now shipped.
+
+PROPOSED PROMOTION: 000112 -> PLAN-022 (File Browser right-click open-in-viewer action delivered in phase-wb-05, completed and integrated into dev)
+
+</details>
+
+**Links**
+
+- relates_to → `000111`
+- relates_to ← `000118`
+- relates_to ← `000120`
+
+---
+
+## 000113 · Audit terminal persistence and performance across all three shells
+
+**Created 2026-09-11T17:28:34-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). A deliberate audit - not a bug fix - of the terminal panels' persistence and performance, covering bash, CMD and PowerShell equally: when sessions survive (layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload) and when they die, whether each survival/death is intended and communicated, and how the panels perform (connect latency, echo latency, resize behavior, scrollback handling, behavior at the six-session cap). The persistence half should build on idea 000107's corrected diagnosis (a stored visible-panel choice differing between layouts silently kills the hidden shell's session) and on whatever phase-wb-09's W16 rework ships; CMD and PowerShell need real coverage on the Windows machine, which agent evidence cannot supply - the audit should say which measurements are owner-machine checks.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:45-04:00): ## Finding for 000113: Audit terminal persistence and performance across all three shells
+
+**Relationships found:**
+
+Idea 000113 already links to 000107 (terminal session loss on layout switches when stored visible panel differs between layouts), and this relationship is well-founded: the corrected diagnosis in 000107's amendment describes how hidden shell panels unmount and their PTY sessions die silently when visibility changes — exactly what 000113 intends to audit. Idea 000114 (general workbench performance audit with caching focus) also relates_to 000113; both are post-build audit ideas, though 000114 targets general workbench performance while 000113 narrows to terminal persistence and performance across shells.
+
+**Governed documents:**
+
+PLAN-022 (Workbench — the stage becomes the chartered management UI) establishes the terminal panel work through phases phase-wb-08 (panel rendering fixes, including terminal clipping issue 000104 and HTML Viewer blank rendering) and phase-wb-09 (layout-assignment redesign with W16 obligation: re-assignment and visibility changes must never silently kill shell sessions). REQ-007 (Workbench requirements) rows W15–W17 specify terminal visibility requirements (shells fill their slots at all four window sizes and layouts), layout assignment behavior (per-panel eligibility, default assignments with platform-conditional defaults), and session caps (global cap of six PTY sessions, per-panel tab cap of four). ADR-016 (Layouts are versioned repository JSON) and ADR-014 (The workbench terminal is a gated capability with session registry and selectable shells) establish the persistence and shell-selection architecture.
+
+**Scope distinction:**
+
+The workbench plan phases (wb-08 and wb-09) deliver features and include mechanical verification (Playwright assertions, pytest for backend halves) against their requirements. Idea 000113 proposes a separate, post-build audit: deliberate measurement and validation of persistence behavior (when sessions survive layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload and when death occurs, marking intended vs unintended outcomes) and performance (connect latency, echo latency, resize behavior, scrollback handling, six-session cap behavior) across all three shells equally. The audit's scope extends to owner-machine checks for CMD and PowerShell coverage since agent evidence cannot supply real Windows terminal behavior.
+
+**No related plan, phase or document found** that covers this post-build audit work. The workbench build delivers features with integrated verification; this audit is a subsequent measurement and validation task suited for the next planning session after PROMPT-024's batch completes.
+
+</details>
+
+**Links**
+
+- relates_to → `000107`
+- relates_to ← `000114`
+
+---
+
+## 000114 · General workbench performance audit, with caching as the primary improvement lever
+
+**Created 2026-09-11T17:28:34-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the workbench's general performance - page load, panel mount/switch times, API round-trips (enumeration, filesystem, explorers), HTML Viewer file serving, overview generation - and then evaluate where caching can improve it: candidates include backend response caching for the enumeration/filesystem routes, frontend caching of layout and panel data, memoizing expensive renders, and cache headers on the file-serving route. The audit half produces measurements first (what is actually slow, with numbers); the caching half is designed against those numbers, not assumed - each cache needs an invalidation story (repository files change under the app) before it ships.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:09-04:00): Idea 000114 requests a performance audit of the workbench with caching as the primary improvement lever, covering page load, panel mount/switch times, API round-trips, HTML Viewer file serving, and overview generation. The audit should measure first, then design caching solutions with invalidation stories before shipping.
+
+Related ideas and links:
+- 000113 (Audit terminal persistence and performance across all three shells) already relates_to 000114, covering a parallel performance audit for the terminal subsystem specifically.
+- 000121 (Cache invalidation must cover the regenerate-overview-during-demo-week flow) extends 000114, sharpening its invalidation requirement with a concrete instance (the overview regeneration during demo week).
+
+Broader context:
+Idea 000114 is part of a batch of owner-requested audits for the next workbench planning session (post-PROMPT-024), issued 2026-09-11. Related audit ideas in the same batch include 000115 (duplication audit), 000116 (code structure audit), 000123 (reconcile pre-build plans vs workbench reality), 000124 (formalize terminology), and 000134 (audit slots and panels for content fit). These all sit in the same planning session but address different concerns — code structure, modularity, vocabulary, UI layout, and now performance.
+
+Governed documents:
+PLAN-022 (Workbench — the stage becomes the chartered management UI) is the active workbench plan with seven phases covering the workbench build through the demo rehearsal refresh. It does not currently include a performance audit phase. No existing requirement or ADR addresses workbench performance measurement or caching strategy. This idea proposes a new investigation into a system area not yet formally chartered as a plan deliverable.
+
+No related plan, requirement or ADR currently covers the performance audit itself, though PLAN-022 and REQ-007 describe the workbench that will be audited. The idea's own work (measuring, then caching design against those measurements) is not yet delivered.
+
+</details>
+
+**Links**
+
+- relates_to → `000113`
+- extended_by ← `000121`
+
+---
+
+## 000115 · Duplication audit: find what is done multiple times and generalize toward modularity
+
+**Created 2026-09-11T17:48:01-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the application for duplication - logic, components and patterns implemented more than once - and identify where a generalization would make the application more modular. The owner's motivating example: multi-panel support in a slot (the wrapper/header/switcher machinery in Slot.tsx and its CSS chain, which phase-wb-08's fix and idea 000101's duplicate header both touched) should be one generic mechanism, not per-slot or per-panel reimplementation. The audit names each duplication with file references, judges whether generalizing pays for itself, and proposes the shared abstraction where it does.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:05-04:00): ## Finding: Duplication Audit
+
+**Overlap with existing ideas:** Ideas 000116 (Code structure and file-size audit), 000124 (Formalize the vocabulary and terminology), and 000134 (Audit all slots and panels for content fit) are already linked as relates_to; each addresses complementary aspects of the same codebase audit dimension. Idea 000101 (Workbench multi-panel slots render a double header) is a concrete instance of the duplication problem this audit seeks to generalize — the double header in Slot.tsx and its CSS chain, specifically mentioned in the body as motivating the audit.
+
+**Related governed documents:** PLAN-022 (Workbench — the stage becomes the chartered management UI) and its phase-wb-08 (Panel rendering fixes) directly touched the Slot.tsx multi-panel wrapper issue the body cites as the motivating example. Phase-wb-08 fixed the xterm area collapse in ts/src/workbench/Slot.tsx and related multi-panel slot geometry, but this was a targeted fix to a single duplication instance, not a systematic audit of all duplication patterns across the application.
+
+**No comprehensive duplication audit plan yet exists** — the workbench construction phases address specific components as they are built, but no governed plan or backlog phase is allocated to the systematic discovery and generalization of duplicated logic, components, and patterns that this idea proposes. The related ideas (000116, 000124, 000134) remain open and unlinked to a plan.
+
+**Assessment:** The idea is distinct from the active workbench work (PLAN-022). It proposes a cross-cutting audit activity that complements the existing refactoring and vocabulary-formalization ideas already in the backlog.
+
+</details>
+
+**Links**
+
+- relates_to ← `000116`
+- relates_to ← `000120`
+- relates_to ← `000124`
+- relates_to ← `000134`
+- relates_to ← `000135`
+
+---
+
+## 000116 · Code structure and file-size audit: identify refactoring needs and propose target structures
+
+**Created 2026-09-11T17:48:01-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the structure of the code and file sizes - lines of code per file across ts/src and src/ - and identify where refactoring is necessary (oversized files, mixed responsibilities, components or modules grown past one clear purpose). For each place refactoring is warranted, the audit proposes what the new structure would look like (the split, the new module boundaries, what moves where) rather than only flagging the size. Pairs with the duplication audit: a shared abstraction extracted there often IS the refactor proposed here.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:31-04:00): Idea 000116 is an owner-requested audit for the workbench planning session, paired with 000115 (duplication audit). The two form a complementary pair: 000115 identifies what is done multiple times and proposes generalizations toward modularity; 000116 audits code structure and file sizes (lines of code per file across ts/src and src/) to identify refactoring needs, then proposes target structures for each identified refactoring opportunity.
+
+The idea is already correctly linked to 000115 via relates_to. Both audit requests are part of a larger workbench batch (000108-000116, extended through 000134) that the owner has explicitly instructed must be triaged and categorized into multiple plans rather than forced into one pack (idea 000125). The owner noted in the annotation to 000108 that the audits (000113-000116) will likely inform the design and sequencing of the feature items (000108-000112).
+
+Related audit ideas with distinct but complementary scope:
+- 000113 (Audit terminal persistence and performance across all three shells) — examines runtime behavior and performance
+- 000114 (General workbench performance audit, with caching as the primary improvement lever) — examines performance across the application
+- 000123 (Audit the pre-build HTML generation plans against what the workbench actually became) — reconciles planned vs. actual work
+- 000124 (Formalize the vocabulary and terminology of the HTML generation and workbench system) — names system concepts consistently (relates_to both 000115 and 000116)
+- 000126 (Thorough audit of the repository's commands, skills, and agents) — examines tool/skill/agent design and scope
+- 000134 (Audit all slots and panels for content fit, with a methodology for preventing visibility issues) — examines UI layout and content organization (relates_to 000115)
+
+Governed documents examined: ARCH-002 (system audit) addresses architecture and governance at a system level but does not cover code-level structure and file-size audits for ts/src and src/. No existing plan, requirement, ADR or backlog phase specifically addresses code structure refactoring or file-size audits.
+
+This is a forward-looking audit request to inform subsequent refactoring work; no existing work has delivered what the idea asks for, so no promotion applies.
+
+PROPOSED LINK: 000116 --relates_to--> 000124 (both address code organization: 000116 proposes structural refactors, 000124 formalizes vocabulary so terms are consistent across those refactors)
+
+</details>
+
+**Links**
+
+- relates_to → `000115`
+- relates_to → `000124`
+- relates_to ← `000124`
+
+---
+
+## 000117 · Popup sizing fix belongs in the shared Popover component - audit all its consumers
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), extending idea 000108. The owner-reported "only two entries visible" symptom is not specific to the HTML Viewer's file selector: it renders through the shared ts/src/stage/Popover.tsx, whose reposition() computes maxHeight with a hard MIN_BUBBLE_HEIGHT_PX = 120 floor that reproduces the symptom for any caller. Eight other components use the same Popover - InjectionDropdowns.tsx (skills/agents/prompts lists, open-ended length), TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx. The pack should scope the 000108 fix as "Popover.tsx's height math plus an audit of every consumer", not "the HTML Viewer's dropdown", or the same bug ships unfixed in every sibling and resurfaces as a fresh report.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:24-04:00): **Systemic Popover height floor issue across multiple consumers**
+
+Idea 000117 correctly identifies that idea 000108's "only two entries visible" symptom in the HTML Viewer's file selector is not a one-off UI quirk but a systemic flaw in the shared `ts/src/stage/Popover.tsx` component. The hard MIN_BUBBLE_HEIGHT_PX = 120 floor in Popover's reposition() method reproduces the symptom across all nine consumers: InjectionDropdowns.tsx (skills/agents/prompts lists), TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx, and two others. The idea correctly proposes that the fix should scope to "Popover.tsx's height math plus an audit of every consumer" rather than treating the HTML Viewer as the isolated source.
+
+**Related ideas and links:**
+
+The link to 000108 (extends) is already recorded and correct. Idea 000130 (Rotator help tooltip cut off at the panel bottom) surfaces the same Popover height ceiling in the rotator's help tooltip and was explicitly annotated by the owner as "likely the same shared Popover positioning/height math as idea 000117", confirming the pattern. The 000130 link was not part of this agent's findings but reflects the same underlying issue across the codebase.
+
+**Governed documents:**
+
+The components mentioned (InjectionDropdowns.tsx, TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx, CommandPanel.tsx) are referenced in `docs/09-backlog/backlog.yaml` as delivery artifacts within phases phase-wb-02 (layout engine and notes strip), phase-wb-03 (terminal panel rework), and phase-wb-04 (HTML Viewer panel), all of which are complete or in progress. No current plan, phase or requirement document scopes a shared Popover component fix or a systemic height audit across all nine consumers. The issue is unassigned to a deliverable.
+
+**Conclusion:**
+
+This is a properly scoped refinement of 000108 that moves the owner's scheduling decision from a one-off HTML Viewer fix to a systemic component issue affecting nine consumers. The existing link to 000108 (extends) captures this correctly. The fix belongs in a future workbench enhancement batch after PROMPT-024/phase-wb-08/09/10 ship, and the owner's planning session should treat it as a Popover-wide audit, not as part of the HTML Viewer's scope.
+
+</details>
+
+**Links**
+
+- extends → `000108`
+- relates_to ← `000130`
+- relates_to ← `000134`
+
+---
+
+## 000118 · Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000110 and 000112. HtmlViewerRegion.tsx exports COMPATIBLE_EXTENSIONS = ['.html', '.svg'] as the single list FileBrowserRegion.tsx's right-click menu reads to decide viewerCompatible - deliberately one list, no second hand-kept copy. When 000110 teaches the viewer to render markdown, this constant is the choke point that decides whether "Open in HTML Viewer" even appears on a .md file. Today the File Browser's own built-in "Documentation" preset (directory docs/, typeFilter .md) cannot open any of its own files into the viewer for exactly this reason. The pack must update the list in the same work item that adds markdown rendering, and the validator should assert the context-menu action appears on .md files.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:55-04:00): Idea 000118 correctly identifies a code choke point that needs updating when markdown rendering ships. The HtmlViewerRegion.tsx file exports `COMPATIBLE_EXTENSIONS = ['.html', '.svg']` (line 18, ts/src/stage/HtmlViewerRegion.tsx), which is the single authoritative list both the viewer component and the File Browser's right-click context menu read to decide whether "Open in HTML Viewer" should appear on a file. Currently governed by REQ-007 W07 ("the compatible files (.html and .svg)"). 
+
+The idea's core observation is sound: when idea 000110 (HTML Viewer renders markdown files with proper formatting) lands, this constant must be extended to include '.md' in the same work item, and REQ-007 W07's verification must be updated to confirm the "Open in HTML Viewer" action appears on .md files in the File Browser (REQ-007 W09's test coverage).
+
+The existing relates_to links (000110 and 000112) are appropriate — both are necessary for markdown to be openable in the viewer. Idea 000119 (Decide where markdown-to-HTML rendering happens) is also part of the same integration: it covers the rendering mechanism itself (inline in iframe vs. new-tab), while 000118 covers making the action available in the menu. Both need shipping together to close the user workflow.
+
+No existing plan, phase, or requirement currently covers markdown rendering in the HTML Viewer. The workbench phases (phase-wb-*) focus on the existing .html/.svg capability.
+
+PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdown rendering into the HTML Viewer workflow)
+
+</details>
+
+**Links**
+
+- relates_to → `000110`
+- relates_to → `000112`
+- relates_to → `000119`
+
+---
+
+## 000119 · Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000109 and 000110. 000110 leaves the markdown conversion location open ("either the serving route or the frontend"). If it lands as a frontend-only render step inside HtmlViewerRegion, then 000109's double-click-to-new-tab - which loads the raw /workbench-file/ bytes directly, bypassing the component - shows unrendered markdown source for exactly the file type the same batch adds rendering for. The security half is already solved: ts/vite.config.ts's serveRepositoryFiles plugin sets a Content-Security-Policy: sandbox header so a top-level navigation gets the iframe's restrictions. The planning session should decide the render location explicitly (route-side rendering makes both surfaces consistent) rather than letting two build items collide by accident.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:35-04:00): Idea 000119 identifies a decision point already made explicit in the agent scout's framing: when ideas 000109 (new-tab open) and 000110 (markdown rendering) both land in the same workbench batch, they create a collision unless the render location is chosen first. The issue is precise and real — if markdown rendering is implemented only in the frontend component (HtmlViewerRegion), then 000109's double-click behavior, which loads raw /workbench-file/ bytes directly, bypasses that rendering entirely and shows unrendered markdown source to the user.
+
+The idea correctly notes that the security half is already solved: `ts/vite.config.ts`'s `serveRepositoryFiles` plugin sets `Content-Security-Policy: sandbox` on every response from the /workbench-file/* route, so opening any file in a new tab is sandboxed the same way an iframe is. The generated overview page (which currently has no <script> tags) renders correctly through both paths under this header.
+
+The decision itself — whether markdown-to-HTML conversion happens route-side (in the backend or vite dev server's middleware) or frontend-side (inside HtmlViewerRegion) — is genuinely reserved for the planning session. Route-side rendering makes both surfaces (embedded and new-tab) consistent without duplication. Frontend-side rendering keeps rendering logic in the UI layer, at the cost of having to handle the raw-bytes fallback path separately.
+
+Related ideas are already recorded: 000109 (double-click new-tab) and 000110 (markdown rendering) are both linked. Idea 000118 (grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) depends on this decision as well — it will be the task to update the compatible-files list after the render location is chosen and 000110 ships.
+
+No related plan, requirement or ADR found that reserves or predetermines the render location. PLAN-022-workbench.md and REQ-007-workbench.md cover the HTML Viewer's current scope (W07–W08: .html and .svg files with refresh, directory dialog, tabs, and tab persistence), but neither mentions markdown rendering or render-location choice. The decision belongs in the planning session for whichever phase undertakes 000110.
+
+</details>
+
+**Links**
+
+- relates_to → `000109`
+- relates_to → `000110`
+- relates_to ← `000109`
+- relates_to ← `000118`
+
+---
+
+## 000120 · Extend the panel bridge to batch, multi-target actions for bookmark categories
+
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000111 and 000112. ts/src/stage/panelBridge.ts is deliberately a single-handle, single-action bridge: each BridgeSlot holds one live handle for one panel instance, and an action with nothing registered reads null and disables - never throws, never queues. 000112's open-in-viewer fits that shape (one file, one target). 000111's categories imply "pull up a category's files as a set" - N files at once, plausibly across several viewer tabs or across File Browser and Viewer together. Without extending the bridge to a batch/multi-target contract, the category feature either builds an ad hoc parallel mechanism (duplicating what panelBridge already solved - the 000115 duplication audit's exact concern) or silently degrades to opening the first file only.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:25-04:00): Found in ts/src/stage/panelBridge.ts: the bridge is deliberately single-handle, single-action by design. The terminalBridge publishes only injectPath (one relative path), and viewerBridge publishes only openInTab (one file, one tab). Both read null when their target panel is absent or unmounted, disabling actions gracefully without throwing or queuing.
+
+The idea's prerequisite ideas are already triaged with recorded links: 000111 (File bookmark categories) and 000112 (File Explorer open-in-viewer) both exist as owner requests for the post-PROMPT-024 workbench pack. The problem is architectural: categories (000111) will group multiple files, but opening them as a set requires either (1) extending the bridge to batch/multi-target operations, or (2) building a parallel ad hoc mechanism. The latter duplicates the bridge's own solution to the cross-panel-communication problem, which conflicts with the modularity goal stated in 000115 (duplication audit). 
+
+Found in REQ-007 W09 and PLAN-022: the workbench requirements define the File Browser's open-in-viewer action and its submenu of tabs, and the plan discusses the broader viewer panel architecture, but do not yet specify the bridge extension for batch operations or the contract shape for multi-file handling.
+
+The links 000120 -> 000111 and 000120 -> 000112 are already recorded and correct. The idea has no remaining open overlaps, and is not yet delivered — the bridge extension itself is the work this idea describes.
+
+PROPOSED LINK: 000120 --relates_to--> 000115 (batch operations requirement conflicts with duplication audit's modularity goal if handled ad hoc instead of extending the bridge)
+
+</details>
+
+**Links**
+
+- relates_to → `000111`
+- relates_to → `000112`
+- relates_to → `000115`
+
+---
+
+## 000121 · Cache invalidation must cover the regenerate-overview-during-demo-week flow
+
+**Created 2026-09-11T18:01:48-04:00 · Status: `triaged`**
+
+Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening idea 000114's invalidation requirement with its specific, dated instance. The HTML Viewer's file dropdown is fed by GET /api/v1/workbench/search and a fresh tab's default page by GET /api/v1/demo/stage/overview-location - both reflect what exists on disk under _public/overview/. The d-system-overview flow (tools/generate_overview.py) is explicitly meant to be re-run whenever the live demo needs a fresh page, i.e. during demo-prep week itself. A cache with a naive TTL or no file-mtime invalidation on these routes would hide a just-regenerated overview from the viewer's own picker on exactly the week it matters (demo 2026-09-15). The 000114 audit should measure these routes first and any cache on them must key on file mtimes or be explicitly busted by the generator.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:36-04:00): Idea 000121 sharpens idea 000114 (General workbench performance audit, with caching as the primary improvement lever) with a specific, date-critical constraint: the demo overview regeneration flow during demo-prep week (2026-09-15) depends on cache invalidation keyed to file mtimes, not naive TTLs.
+
+The idea correctly identifies the routes involved:
+- GET /api/v1/workbench/search — fed by the HTML Viewer's file dropdown; lists files under _public/overview/
+- GET /api/v1/demo/stage/overview-location — returns the path to the generated overview file
+
+Both routes reflect files on disk generated by tools/generate_overview.py. REQ-006 (Live demo requirements, R08) documents the overview skill that orchestrates this tool. If either route gains a cache with naive TTL or no file-mtime validation, a just-regenerated _public/overview/index.html during demo prep would remain hidden from the viewer's picker, breaking the demo's live overview-rebuild step (covered in the demo runbook).
+
+The workbench.py /search route (lines 373–394) currently reads the filesystem on every call; demo_stage.py's /overview-location route (lines 90–102) returns the configured path without caching. However, 000114's performance audit is a governed forward commitment to measure and optimize these routes, so the audit must discover both routes and document whether they require caching and, if so, what invalidation strategy preserves the demo's timing guarantees.
+
+Already linked: 000114 (extends). No other ideas overlap directly; the audit and caching decision belong in 000114's scope.
+
+PROPOSED LINK: 000121 --relates_to--> 000106 (Both flag the need for drift testing: 000106 wants a test for the committed overview page, like the enforced test for ideas.md; 000121 identifies the live-rebuild timing dependency that makes such a test load-bearing)
+
+</details>
+
+**Links**
+
+- extends → `000114`
+- relates_to → `000106`
+
+---
+
+## 000122 · Evaluate alternative languages and platforms for a non-web rebuild of the application
+
+**Created 2026-09-11T18:14:30-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, deliberately standalone - not part of the next-pack batch; for future consideration. The application is becoming something like an integrated development environment: a fully customizable workspace shaped to the owner's perfect workflow (panels, terminals, file viewers, explorers, notes, agent triggering). That vision does not have to live in a web app. This idea is to think through a rebuild in a different language and platform - candidates the owner named: Rust, Go, C# - weighing what each offers for a desktop-class IDE-style application (native windowing/terminal integration, performance, packaging, long-term maintainability, ecosystem for embedding editors/terminals/webviews). Constraints for the evaluation: the rebuild would START from the same functionality the current FastAPI + React workbench already has (feature parity as the baseline, not a redesign), and the evaluation should also weigh hybrid paths (e.g. keeping the Python data/agent layer and replacing only the shell) against a full rewrite. Output when picked up: a comparison with a recommendation, not code.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:26-04:00): Scanned all 134 recorded ideas and the governed document set (plans, requirements, ADRs, backlog).
+
+**Finding:** No related idea or document addresses this evaluation directly. The current plans and requirements (PLAN-022, REQ-007, and the workbench capability decisions ADR-013–016) are fully committed to building out the existing FastAPI + React web-based workbench. These documents describe the trajectory through the demo week and beyond, but contain no planning for platform or language alternatives.
+
+Three tangential idea overlaps exist but address different questions:
+- 000067 (Portable agent workflows from a single source of truth) aims for workflow independence across host environments, not platform evaluation
+- 000069 (Should Claude Code remain a dependency once agent workflows are portable?) questions dependencies but not language/platform choices
+- 000076 (Should we delete Claude Code?) is even more tangential — it questions whether Claude Code should be used at all, not what platform the application itself should run on
+
+The idea's constraint (feature parity as baseline, hybrid paths included) and stated output (comparison with recommendation, not code) distinguish it cleanly: this is exploratory due-diligence, deliberately decoupled from active build work.
+
+No document appears to fully deliver this idea's ask, and no strong candidate for a proposed link was found.
+
+</details>
+
+---
+
+## 000123 · Audit the pre-build HTML generation plans against what the workbench actually became
+
+**Created 2026-09-11T19:32:38-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The repository carried HTML generation plan documents from before this product was built (the HTML generation framework plans and requirements in docs/01-plans/ and docs/06-requirements/ predating the demo/workbench tracks - e.g. the phase-html-* line, whose phase-html-01 "Define strict page contracts and generated-output ownership" still sits ready in the backlog). Run a full audit of those documents against what exists now: which of their requirements and ideas the demo/workbench builds already accomplished (perhaps under different names), which remain untouched and still wanted, which are superseded by how the product actually evolved, and which should be retired. Output: a document-by-document reconciliation with a disposition for every requirement/idea - accomplished (with evidence), still open (fed into planning), superseded (with the decision that superseded it), or proposed for retirement - so the old plans stop silently drifting from the built reality.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:51:08-04:00): Related Plans and Documents
+
+PLAN-003 (Dynamic HTML Generation Website Tool, approved 2026-09-05) specifies a framework for data-driven page rendering through YAML authoring, JSON generation, schema validation, and React component rendering. Nine backlog phases (phase-html-01 through phase-html-09) remain queued. An adversarial design audit (ARCH-003, 2026-09-05) identified seven high-priority defects in PLAN-003's design before implementation began, focusing on schema/contract contradictions, publication boundaries, site integrity, phase dependencies, URL policy, and failure recovery.
+
+The HTML generation framework was actually realized through PLAN-021 (Live Demo Stage and Overview Build) and PLAN-022 (Workbench), which implement generation of overview pages via templates/html/ and templates/styles/. PLAN-021 explicitly acknowledges this: "The overview page is the first working product of the HTML generation framework that PLAN-003 designs and the phase-html-* track queues." The demo/workbench implementation diverged from the PLAN-003 design: rather than configurable YAML pages with block-based composition, it produced deterministic scripts computing page content, with Claude orchestrating the templates.
+
+Related ideas exist in the corpus: idea 000001 (fixture governance for the HTML generation system), 000084 (HTML component library), 000085 (color palette library), 000092 (HTML Designer agent for template extraction), 000105/000106/000114/000121 (minor issues in workbench UI/visibility/performance that touch HTML rendering). All share overlapping concerns with 000123 about what was built, what remains wanted, and what should be retired.
+
+Companion Issue
+
+Idea 000124 (Formalize the vocabulary and terminology of the HTML generation and workbench system) was recorded in the same batch (2026-09-11 owner request). The owner's decision note explicitly links them: "000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names."
+
+PROPOSED LINK: 000123 --relates_to--> 000124 (Companion audit and terminology effort for the same planning session, explicitly coordinated in owner notes)
+
+</details>
+
+**Links**
+
+- relates_to → `000124`
+
+---
+
+## 000124 · Formalize the vocabulary and terminology of the HTML generation and workbench system
+
+**Created 2026-09-11T19:32:38-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The system's names grew by accident and some are now wrong: the owner's example is the "terminal slot", named after the panel that started in it - but with per-panel eligibility (REQ-007 W16) any shell or the HTML Viewer can occupy it, so the name misdescribes the thing. Formalize the vocabulary: slots named for their geometry or role (not their initial occupant), and settled definitions for the recurring nouns - slot, panel, region, layout, assignment, visible panel, session, the generation pipeline's terms (template family, generated page, overview) - recorded in a governed glossary document that requirements, ADRs, prompts and code identifiers all use consistently. Include the migration question: where existing identifiers (slot_id "terminal" in _data/workbench/layouts, CSS class names, REQ-007 row wording) should be renamed versus aliased, since stored state and tests reference the current names. A shared vocabulary is also what makes the duplication audit (000115) and structure audit (000116) legible.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:49-04:00): ## Finding: Formalize Workbench Vocabulary and Terminology
+
+**Related Governance and Plans**
+
+The terminology system infrastructure already exists: PLAN-012 (Terminology system — canonical definitions and generated glossaries, draft status) establishes the mechanism for settling definitions in `brain/concepts/` and generating governed glossary documents. Idea 000124 applies that mechanism to the specific domain of the workbench and HTML generation system, providing the content that PLAN-012's framework was built to hold.
+
+Concretely, the workbench system vocabulary is already used across multiple governed documents — REQ-007 (Workbench requirements), ADR-016 (Workbench layout persistence), and PLAN-022 (Workbench — the stage becomes the chartered management UI, active status) — but no settled definitions exist. The specific problem cited in the idea's body is illustrative: "terminal slot" is named after the panel that started in it, but per-panel eligibility (REQ-007 W16) means any shell or the HTML Viewer can occupy it, making the name a misdescription. The idea asks for terms (slot, panel, region, layout, assignment, visible panel, session, template family, generated page, overview) to be settled and recorded in a glossary.
+
+**Related Ideas and Links**
+
+The idea is already correctly linked to 000115 (Duplication audit) and 000116 (Code structure and file-size audit), both of which depend on settled terminology to be legible. A proposed link also emerged: 000133 (Revisit slot geometries and custom layout reconfiguration) explicitly names idea 000124 as foundational, stating "Geometry work should build on the formalized slot vocabulary (idea 000124)."
+
+The companion audit 000123 (Audit the pre-build HTML generation plans against what the workbench actually became) was recorded in the same owner request batch (2026-09-11); the owner's decision note explicitly pairs them: "000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names."
+
+**Assessment**
+
+Idea 000124 is not a duplicate of PLAN-012. PLAN-012 builds the general infrastructure; 000124 applies it to the workbench domain and provides the specific vocabulary content. The work is not yet delivered — existing documents use slot/panel/layout terminology informally, the rename-vs-alias migration question for existing identifiers (slot_id "terminal" in `_data/workbench/layouts`, CSS class names, REQ-007 wording) has not been decided, and no glossary document has been written to consolidate these terms for requirements, ADRs, prompts and code identifiers to use consistently.
+
+PROPOSED LINK: 000124 --relates_to--> 000133 (Geometry redesign builds on the formalized slot vocabulary that idea 000124 proposes to provide)
+
+</details>
+
+**Links**
+
+- relates_to → `000115`
+- relates_to → `000116`
+- relates_to → `000133`
+- relates_to ← `000116`
+- relates_to ← `000123`
+- relates_to ← `000133`
+- relates_to ← `000135`
+- relates_to ← `000141`
+- relates_to ← `000144`
+
+---
+
+## 000125 · Holistic triage of the accumulated idea batch: categorize, prioritize, and split into plans
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
+
+Owner direction, 2026-09-11, governing how the next planning session opens. The idea batch anchored at 000108 has grown past what one plan should contain, and the owner expects to keep adding. Before any deep dive into comprehensive development, the planning session must take a holistic look at ALL open ideas in the batch (and any that join later): categorize them, prioritize them, and figure out how they group into DIFFERENT plans - plural - rather than forcing one prompt pack to hold everything. Only after that grouping is settled does comprehensive development of each plan begin. This supersedes the earlier framing of "the next prompt pack" as a single container: the pack-planning session becomes a triage-and-grouping session first, producing multiple plan boundaries with an ordering across them.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:53-04:00): Idea 000125 reframes the upcoming planning session as a holistic triage and categorization exercise before implementation planning. Instead of forcing the accumulated idea batch into a single plan container, the session must first take all open ideas in the batch, categorize them, prioritize them, and determine how they naturally group into multiple distinct plans — only then proceeding to comprehensive development of each plan.
+
+This is a meta-workflow directive about how planning sessions should be conducted, not a feature or system capability request. It directly addresses the batch anchored by 000108 (workbench issues: HTML Viewer, rotator, caching, performance) which has grown to include diverse concerns: workbench audits (000115-000116), demo system fixes (000129), and agent/skill improvements (000126-000128).
+
+Related governed documents:
+- PLAN-016 (idea record system) provides the foundational infrastructure for tracking, analyzing and reasoning about batches of ideas
+- PLAN-019 (idea priority queue) establishes a priority ordering mechanism for open ideas awaiting promotion, but does not address categorization or plan-grouping
+- PLAN-008 (session lifecycle protocols) notes that "nothing distinguishes session types" and proposes differentiated entry points, but does not yet specify triage-and-grouping as a defined planning phase
+
+Related ideas that connect to different aspects of idea analysis:
+- 000046 (idea planner agent that turns a promoted idea into a governed plan) — handles conversion of a single promoted idea to a plan, but assumes the idea has already been decided upon
+- 000055 (connection-builder agent for the full idea corpus) — maintains the relationship graph and can analyze connections across all ideas, regardless of status
+- 000062 (pure classification agent for idea nodes) — interprets each idea on its own merits and assigns ontological/epistemic/lifecycle classifications, providing taxonomy without linking or tagging
+- 000038 (formalize requirements-vs-plans process and design) — audits how requirements and plans relate, but from a quality/formalization angle rather than from batch-triage perspective
+
+No existing governed document (plan, requirement, or decision) fully specifies or delivers the holistic batch-triage-then-split-into-plans workflow that 000125 directs. This is owner direction governing how the next planning session opens, distinct from the work itself.
+
+PROPOSED LINK: 000125 --relates_to--> 000046 (idea planner agent will take the output of batch triage to draft plans for each grouped category)
+
+</details>
+
+**Links**
+
+- relates_to → `000046`
+
+---
+
+## 000126 · Thorough audit of the repository's commands, skills, and agents
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Audit everything under .claude/ (commands, skills) and the agent definitions this repository ships: first and foremost for efficient and proper design of the codebase - each command/skill/agent judged on whether its scope, tooling, model assignment and context cost fit its job - and second for creating effective demos, like the live demo of 2026-09-15 (which skills/agents make good on-stage material, which need hardening before being shown). The audit should produce per-item findings (keep / redesign / retire / missing-and-needed) and feed the recurring pattern the owner has flagged: work that runs in the main session context but should not (see the idea-skill subagent example and the shared-state model idea recorded alongside this one).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:51-04:00): TRIAGED: 000126 seeks an audit of the repository's commands, skills, and agents to surface design and context-fitness concerns. The audit's secondary purpose is identifying demo-ready material.
+
+Scanned idea graph for overlaps: ideas 000127 (idea skill delegates capture to a subagent) and 000128 (shared state model for multi-agent planning sessions) already link to this idea—they are companion batch items recorded alongside, addressing recurring patterns the owner flagged as context-spending inefficiencies. No other ideas overlap directly.
+
+Governed documents examined for related audits or frameworks:
+
+- **PLAN-008** (Session lifecycle protocols) discusses skills and slash commands under `.claude/` as entry points for opening sessions by type, but the plan's scope is narrowly session protocols, not a design audit of commands/skills/agents themselves.
+
+- **PLAN-021** (Live demo) mentions agents under `.claude/agents/` created for the demo build, but those are demo-specific agents with no claim to represent the full agent ecosystem or command/skill design.
+
+- **ARCH-002** (System audit, 2026-09-05) provides general architectural findings and risk prioritization, but does not examine agent/command/skill scope, tooling, model assignment or context cost fit—it addresses data flow, API/UI capability, schema, and transactional safety instead.
+
+- **Agent engineering ideas (000078–000082)**: an umbrella framework with sub-topics on guides, sensors, orchestration and context pipelines. These are design principles for building agents deliberately, not an audit of the existing agent and command inventory.
+
+No existing plan or requirement document covers the specific ask: a per-item audit of commands, skills and agents already in the repository, judged on scope/tooling/model fit, context cost, and suitability for demonstration. The audit's findings would naturally feed into the agent-engineering framework (000078) as evidence, but the framework is not a substitute for conducting the audit itself.
+
+Outcome: auditable ask with no existing governed delivery. The audit sits cleanly between system governance (ARCH-002) and agent-engineering principles (000078–000082) as a factual assessment of the current state.
+
+</details>
+
+**Links**
+
+- relates_to ← `000127`
+- relates_to ← `000128`
+- relates_to ← `000136`
+- relates_to ← `000139`
+
+---
+
+## 000127 · Idea skill delegates capture to a subagent instead of spending main-session context
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108); named by the owner as one example of a recurring pattern to expect in their working style. The idea skill currently performs capture directly in the main conversation context. In sessions where the context window is precious - like a long coordination or planning session - the skill should instead spin up a subagent that handles the capture (writing the idea through the sanctioned writer, linking, regenerating the markdown, committing per protocol) and returns only the created ids, keeping the tool output and file churn out of the main context. The general principle to extract during the commands/skills/agents audit: any skill whose work is mechanical and self-contained should run in a subagent by default, with the main session receiving just the result. Constraint: the subagent must still obey the idea-system rules (sanctioned writer only, ids taken from the writer's output, post-processed reads).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:03-04:00): Idea 000127 proposes delegating the idea skill's capture work to a subagent, keeping only result IDs in the main session context, and extracting a general principle during the commands/skills/agents audit (000126).
+
+Related work and precedent:
+- Already linked to 000126 (Thorough audit of the repository's commands, skills, and agents), which is the broader audit this idea is part of
+- Phase-idea-02 built the idea-triage subagent, which demonstrates the pattern of mechanical, self-contained idea work running in a separate agent context
+- Phase-idea-10 is currently queued to harden idea-triage with a wrapper for misdirected writes
+- PLAN-020 (Portable agent workflows) discusses when a "subagent role is not necessarily a skill" and the boundaries between skill vs. agent work; the workflow manifest records "authority" as agent-invocable vs owner-invocable
+
+The principle itself—"any skill whose work is mechanical and self-contained should run in a subagent by default"—is stated in this idea's own body as the generalisation to extract. It is currently applied in idea-triage (phase-idea-02, shipped); applying the same pattern to the /idea command's capture path would defer document churn, markdown regeneration, and commits from the main session to a subagent, returning only the created idea IDs, per the exact constraint that "the subagent must still obey the idea-system rules (sanctioned writer only, ids taken from the writer's output, post-processed reads)."
+
+No related plan, phase, or requirement document found that specifically covers this particular design choice for the /idea command itself.
+
+</details>
+
+**Links**
+
+- relates_to → `000126`
+
+---
+
+## 000128 · Shared state model for multi-agent planning sessions
+
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Develop a shared state model that tracks relevant information for use across multiple agents during highly variable, complex planning sessions like the 2026-09-11 workbench sessions: facts established mid-session (environment quirks such as the port-8000 conflict, corrected diagnoses like idea 000107's, decisions taken, batch membership and ordering), available to every dispatched agent without the coordinator re-pasting them into each prompt. Design questions: where the state lives (the tracked _tmpagent/ mechanism already exists for files sibling worktree agents must read - extend it, or a new structured store), its shape (append-only facts vs a curated current-state document), who may write it (coordinator only, or any agent with attribution), how staleness is handled, and how it relates to the session record (which is the human-facing account, not an agent data bus). Relates to the truncation/resume frictions and repeated coordinator addenda observed in the wb-08/09 builds - much of what the coordinator hand-carried between agents is exactly this state.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:20-04:00): This idea proposes a shared state model to track facts established mid-session during complex multi-agent planning sessions, making information available to every dispatched agent without repeated coordinator context-passing. Design questions center on where the state lives, its shape, write authority, staleness handling, and relationship to the session record.
+
+**Related ideas found:**
+
+- **000082 (Agent engineering: Orchestration)** addresses the broader multi-agent coordination problem, including routing, failure recovery, and how agents fit together. A shared state model would directly support the coordination mechanisms 000082 describes.
+- **000077 (Handle subagent tool-use truncation)** documents truncation at a 30-tool-use cap, with recovery via context preservation and resumption. The body of 000128 explicitly mentions "truncation/resume frictions" observed in recent workbench sessions; a shared state model would give agents a way to resume by reading established facts rather than requiring the coordinator to re-paste context.
+- **000020 (MCP-mediated multi-agent coordination)** proposes an MCP server as the single source of truth for coordination, with a vector database backend and a Librarian agent for context curation. This is a broader infrastructure proposal that could be one implementation strategy for the state store 000128 is designing.
+- **000023 (_tmpagent/ claim protocol registry)** concerns adding _tmpagent to systems.yaml maturity registry. The body of 000128 explicitly identifies _tmpagent as an existing tracked mechanism for "files sibling worktree agents must read" and lists extending it as a design candidate for where shared state would live.
+
+**Existing plans and documents:**
+
+No plan specifically covers shared state for multi-agent planning sessions. PLAN-020 (portable-agent-workflows) addresses workflow portability and manifest generation. PLAN-008 (session-lifecycle-protocols) addresses session types and opening/closing procedures. PLAN-001 (agent-memory-system) addresses memory retrieval across agents through a Librarian interface. None of these directly specify a shared state model for mid-session facts across concurrent agents, though PLAN-008's session-lifecycle work and PLAN-001's memory-coordination approach are adjacent areas.
+
+**Proposed links:**
+
+PROPOSED LINK: 000128 --relates_to--> 000082 (shared state would support orchestration's multi-agent coordination)
+PROPOSED LINK: 000128 --relates_to--> 000077 (shared state provides resumption path for truncated agents)
+PROPOSED LINK: 000128 --relates_to--> 000020 (MCP-mediated coordination is a potential implementation strategy for the state store)
+PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location for the shared state mechanism)
+
+</details>
+
+**Links**
+
+- relates_to → `000126`
+- relates_to → `000082`
+- relates_to → `000077`
+- relates_to → `000020`
+- relates_to → `000023`
+- relates_to ← `000138`
+
+---
+
+## 000129 · Fix the three pre-existing environmental PTY test failures so the suite runs green
+
+**Created 2026-09-11T20:31:54-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11. The full pytest suite has carried the same three failures through every wb-08/wb-09 verification run: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size and test_two_concurrent_websocket_sessions_are_independent_shells in test/test_demo_terminal.py, all with the pyenv "cannot rehash: couldn't acquire lock" / ".pyenv-shim: cannot overwrite existing file" signature already recorded as environmental in ideas 000097 and 000099. Every gate and audit now has to carry the caveat "3 failed, known environmental" - a standing hole in the evidence that a genuinely new PTY regression could hide inside. Fix them for real: either make the tests robust to the pyenv shim environment (e.g. spawn the PTY shell with a clean environment or an absolute shell path that bypasses shim rehashing), fix the host-level pyenv lock contention, or isolate the tests from the shim mechanism - whichever the investigation supports. Done means the full suite passes with zero expected failures on this machine, and the "known environmental" caveat disappears from gate checklists.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:18-04:00): ## Finding
+
+This idea asks for concrete work to fix three recurring pytest failures in test_demo_terminal.py that have been documented as environmental since at least wb-08/wb-09 phases: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size, and test_two_concurrent_websocket_sessions_are_independent_shells, all traced to host pyenv shim rehash/lock contention.
+
+**Related ideas:** The issue is already properly documented through links to 000097 (session-failure tracking and environmental signatures) and 000099 (the exact test failures documented as trunk-red). These ideas are already linked from 000129 as `relates_to` relationships, and no additional idea overlaps were found.
+
+**Governed documents:** The failures appear extensively in docs/09-backlog/backlog.yaml across phases phase-wb-01 through phase-wb-09, consistently noted with the caveat "known environmental PTY failures" or "3 failed (environmental)" to distinguish them from phase-introduced regressions. PTY adapter design and requirements are covered in ADR-013 (demo-terminal-capability), ADR-014 (workbench-terminal-capability), PLAN-021 (live-demo phase), REQ-006 (live-demo), and REQ-007 (workbench). However, no existing PLAN, phase, or document addresses *fixing* these environmental failures — they are documented as standing defects that every phase must caveat around.
+
+**Assessment:** The idea is currently unstarted work. The existing links to 000097 and 000099 correctly surface the problem statement and environmental diagnosis. No new overlaps or proposed links emerge from the search.
+
+</details>
+
+**Links**
+
+- relates_to → `000097`
+- relates_to → `000099`
+
+---
+
+## 000130 · Rotator help tooltip cut off at the panel bottom; rethink its font size and text capacity
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
+
+Owner report, 2026-09-11, for the planning triage (batch anchor 000108). In the top-right rotating-text panel (the talking-points rotator), hovering the question-mark tooltip opens a popup dialog that cuts off at the bottom of the panel - the bottom portion is unreadable. Fix the cutoff, and at the same time reconsider the panel's font size and how much text realistically fits in that area. Likely the same shared Popover positioning/height math as idea 000117 (the popup-sizing bug lives in ts/src/stage/Popover.tsx with many consumers) - verify rather than assume, but if so, this is another consumer the 000117 fix must cover, plus rotator-specific typography decisions.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:01-04:00): Rotator tooltip cutoff is a Popover component sizing issue; related documents and ideas confirmed.
+
+The tooltip popup cutting off at the panel bottom is already linked to 000117 (Popover sizing fix belongs in the shared Popover component - audit all its consumers). Idea 000117 identifies that ts/src/stage/Popover.tsx has a hard MIN_BUBBLE_HEIGHT_PX = 120 floor in its reposition() method, and that NotesStripRegion.tsx (which contains the rotator) is one of eight components using the shared Popover. The owner's note in 000130's body correctly flags this: the fix must be holistic across all Popover consumers to avoid the same bug shipping in sibling components.
+
+Related governed documents:
+- PLAN-021-live-demo.md documents the rotator as phase-demo-02's scope and notes "hover popups collapse on pointer leave" is a zero-scroll requirement (REQ-006 R02/R03).
+- REQ-007-workbench.md row W01 specifies the notes strip (which replaced the talking-points panel): "a short, wide, display-only strip at the top right with no title... The `?` tooltip sits at the strip's far left" and the Playwright assertion checks that "hover the far-left `?` and assert the tooltip appears and collapses on pointer leave."
+- backlog.yaml lists Popover.tsx as a phase-demo-02 deliverable with note of its many consumers.
+
+Related ideas:
+- 000108 (HTML Viewer file-selector popup too short) — the original reported symptom of the Popover height floor, which 000117 extends.
+- 000131, 000132 (rotator variants: auto-scrolling text, image rotation) — future enhancements that may depend on fixing the current panel geometry.
+- 000134 (Audit all slots and panels for content fit, with a methodology for preventing visibility issues) — broader effort to prevent similar visibility problems system-wide.
+
+No separate promotion candidate; this is an actionable bug report that ties to an already-scoped fix (000117).
+
+</details>
+
+**Links**
+
+- relates_to → `000117`
+- relates_to ← `000131`
+- relates_to ← `000132`
+
+---
+
+## 000131 · Rotator variant: horizontally auto-scrolling text for longer entries
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the top-right rotating-text panel: support longer texts with text that automatically scrolls horizontally, right to left (ticker/marquee style), instead of truncating or overflowing. May be an expansion of the existing rotator or a different panel that can be substituted into that slot - the per-panel eligibility model phase-wb-09 ships (REQ-007 W16) makes a substitute panel a natural fit. Design points: scroll speed and readability, pausing on hover, and how rotation-between-entries interacts with scrolling-within-an-entry.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:17-04:00): Idea 000131 proposes adding horizontal auto-scrolling text (ticker/marquee style) to the rotator panel to handle longer text entries that would otherwise truncate or overflow. This is a well-scoped enhancement to the notes strip being shipped in PLAN-022 phase-wb-02 (REQ-007 W01).
+
+Related governed documents:
+- REQ-007 (Workbench requirements): W01 specifies the notes strip as "display-only, short, wide" at top right; the idea proposes expanding this with auto-scroll capability for longer entries
+- PLAN-022 (Workbench plan): phase-wb-02 ships the foundational notes strip; phase-wb-09 ships the per-panel eligibility model that makes the idea's proposed variant-panel approach viable (REQ-007 W16)
+
+Related ideas already linked:
+- 000130 (Rotator help tooltip cut off at panel bottom) — relates_to link in place; this idea extends that bug report with a specific solution approach
+- 000132 (Rotate images through panel) — relates_to link in place; builds on the scrolling-variant approach to also support image rotation
+
+The per-panel eligibility model from phase-wb-09 (REQ-007 W16) makes the idea's key design point feasible: the rotator could be either expanded in place or replaced with a variant panel, since the eligibility system allows substituting panels in the same slot. The idea correctly identifies this and names the design questions worth settling: scroll speed/readability, pausing on hover, and interaction between rotation-between-entries and scrolling-within-an-entry.
+
+No overlap with other ideas beyond the documented links. The notes strip ships without scrolling (PLAN-022 phase-wb-02), so this is new functionality, not a duplicate or rediscovery. The owner's batch annotation (000108) flags 000130 as "live display bug worth demo-week attention" but places 000131 as a follow-on enhancement after the core work lands, which the documentation structure (phase-wb-09 dependency) aligns with.
+
+</details>
+
+**Links**
+
+- relates_to → `000130`
+- relates_to ← `000132`
+- relates_to ← `000132`
+
+---
+
+## 000132 · Rotator variant: rotate images through the panel, not just text
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the same top-right rotating panel: the ability to rotate images through it instead of only text entries - e.g. charts, logos or figures cycling on the same cadence the text rotator uses. Design points: where the image set comes from (a directory, a bookmark category once idea 000111 exists, or generated overview figures), sizing/letterboxing inside the small panel, and whether text and image entries can mix in one rotation.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:08-04:00): Rotator image cycling belongs in a chain of three related rotator enhancements, all anchored to batch 000108 and proposed for the planning triage.
+
+The demo stage (phase-demo-02, now complete) shipped a talking-points rotator — a small panel that cycles through text entries loaded from a data file. The workbench requirements (REQ-007 W01) replace it with a "notes strip" that carries the same text-rotation semantics: a short, wide, display-only strip at the top right with controls for cycling, timed advance, and file selection.
+
+This idea proposes adding image rotation to that same panel: the ability to cycle through charts, logos, or figures on the same cadence as text entries, with design choices around image sources (directory, bookmark categories per 000111, or generated overview figures), sizing and letterboxing in the small panel bounds, and whether text and image entries can mix in one rotation.
+
+The idea sits downstream of two related rotator proposals: 000130 (fixing the rotator's tooltip cutoff and reconsidering font size and text capacity) and 000131 (horizontal auto-scrolling text for longer entries). Together the three ideas form a coherent enhancement family for the rotator/notes-strip component.
+
+Governance touch points: The per-panel eligibility model shipped in phase-wb-09 (REQ-007 W16) supports swapping panels into a slot, which makes the notes strip a natural anchor for variants like an image rotator; the HTML component library (000084) and template library (000083) are parked ideas that eventually cover reusable UI components; file bookmarks (000111) is a candidate source for image sets once it ships.
+
+No related plan, phase or document found that covers image cycling specifically. The existing rotator code lives in the demo stage implementation; the workbench notes strip is part of phase-wb-* work in progress.
+
+PROPOSED LINK: 000132 --relates_to--> 000130 (tooltip and font-size fixes to the same rotator panel)
+PROPOSED LINK: 000132 --relates_to--> 000131 (text-scrolling variant of the same rotator enhancement family)
+PROPOSED LINK: 000132 --relates_to--> 000111 (bookmark categories as a candidate image source once they exist)
+PROPOSED LINK: 000132 --relates_to--> 000084 (HTML component library where image-rotation variants eventually belong)
+
+</details>
+
+**Links**
+
+- relates_to → `000131`
+- relates_to → `000130`
+- relates_to → `000131`
+- relates_to → `000111`
+- relates_to → `000084`
+
+---
+
+## 000133 · Revisit slot geometries and custom layout reconfiguration - future phase, after the demo
+
+**Created 2026-09-11T20:40:51-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), explicitly LOWER priority than any demo-specific fix or update - a future phase, not for the 2026-09-15 demo. Revisit the slot-geometry customization originally discarded from the workbench design (geometry editing was deliberately excluded from the configuration dialog per REQ-007 W16 and ADR-016). When it is revisited, the owner's stated requirement: consider the constraints on each slot, and how resizing slots to fit different layouts affects the content inside them - a shell's rows/cols reflow, an iframe's scaling, an explorer tree's visible depth. Geometry work should build on the formalized slot vocabulary (idea 000124) and the content-fit methodology audit recorded alongside this idea, so constraints are stated per slot role rather than per current occupant.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:12-04:00): Idea 000133 records a future consideration for geometry customization after the 2026-09-15 demo, explicitly positioned as lower priority than demo-specific fixes. The idea correctly cites ADR-016's deliberate exclusion of geometry editing from the workbench demo design (decision 2: "Geometry changes are data-file edits... This keeps the demo-week UI small and every geometry change diffable"), matching REQ-007 W05/W16's constraint that "the configuration surface... assigns panels to slots — slot geometry is not editable there." 
+
+PLAN-022's execution plan aligns: geometry customization is descoped for demo delivery in favor of fixing panel-visibility and layout-assignment issues (phase-wb-08 through phase-wb-10). No current plan or requirement covers the future geometry work this idea describes.
+
+The idea's stated dependencies are sound: it correctly names 000124 (formalized slot vocabulary, which relates to duplication and code-structure audits) and 000134 (content-fit methodology, another future audit pairing with this idea per the body text: "recorded alongside this idea"). Both are already linked from 000133; no additional oversight-links are missing.
+
+The idea makes a substantive constraint explicit: geometry work must account for how slot resizing affects occupant reflow — shell rows/cols, iframe scaling, explorer tree depth — and should express constraints per slot role, not per current panel type. This framing aligns with 000124's vocabulary-formalization goal and 000134's methodology development, confirming a well-formed dependency chain for future work.
+
+No related plan, requirement or backlog phase found for geometry customization beyond the deliberate demo-week exclusion recorded in the decisions.
+
+</details>
+
+**Links**
+
+- relates_to → `000124`
+- relates_to → `000134`
+- relates_to ← `000124`
+
+---
+
+## 000134 · Audit all slots and panels for content fit, with a methodology for preventing visibility issues
+
+**Created 2026-09-11T20:40:51-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). A general audit of the available slots and panels and the content they contain, producing methodologies - not just spot fixes - for making sure content fits its panel and there are no visibility issues in how it is displayed. The session's evidence base is already rich: the wb-08 height-collapse (idea 000104), the File Browser clip (W18), the rotator tooltip cutoff, the popup height floor (000117), and the ~98px chrome offset that defeats naive fill checks. The methodology half should define per-panel content-fit contracts (what overflows, what scrolls, what truncates, what reflows), how they are asserted mechanically (the Playwright fill/scroll checks generalized), and how new panels inherit them - so fit bugs are caught by contract, not by owner reports. Feeds the geometry revisit recorded alongside this idea and the duplication audit 000115.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:35-04:00): Idea 000134 seeks a generalizable methodology for preventing panel content-fit and visibility issues through per-panel content-fit contracts, mechanical assertion patterns, and inheritance rules for new panels.
+
+**Related governance documents:**
+
+The workbench plan (PLAN-022) includes two fix phases directly addressing this territory:
+
+- **phase-wb-08** ("panel rendering fixes") roots-causes and fixes the terminal height-collapse (000104), HTML Viewer rendering blanks, and File Browser clipping issues — providing repair of specific failures but not a generalizable pattern.
+- **phase-wb-09** (layout-assignment redesign) modifies the eligibility model and multi-panel slot behavior, but again focuses on implementation rather than formalizing methodology.
+
+The workbench requirements (REQ-007) establish specific content-fit verification methods in W15–W18:
+
+- **W15** mandates measured fill assertions: each shell panel's xterm container must have non-zero measured height tracking its slot body, with mechanical bounding-box checks at all four required window sizes. The HTML Viewer rendering-blank failure is diagnosed to distinguish it from the wrapper height collapse.
+- **W18** specifies internal scrolling: the File Browser tree must scroll within its body when content exceeds bounds, with mechanical assertions that panel overflow-y allows scrolling and document scrollHeight stays within the viewport.
+
+These requirements capture specific assertions but codify them per-requirement, not as a reusable contract pattern. The demo-validator-web agent executes mechanical checks (element bounding boxes, scrollability evaluation) using Playwright, establishing the technical foundation for generalization.
+
+The workbench layout decision (ADR-016) defines slot geometry contracts — what each slot's fixed grid-template areas permit — but does not establish panel-level content-fit contracts describing what each panel declares it will do when content exceeds its bounds (overflow, scroll, truncate, reflow).
+
+**Related ideas:**
+
+- **000115** (duplication audit): already linked, identifies spots where behavior is re-implemented rather than generalized — a precursor concern to formalizing contract patterns.
+- **000104** (terminal height-collapse): a specific instance of the visibility problem; phase-wb-08 will fix it but the fix is not generalized to other panels.
+- **000117** (popup sizing fix, extends 000108): another instance of content-fit failure; moves popup sizing into the shared Popover component, which is a partial approach to generalization but does not establish a per-panel contract model.
+- **000130** (rotator tooltip cutoff, relates_to 000117): another instance; 000117's Popover fix partially addresses it but reflects the scattered approach this methodology is meant to replace.
+- **000133** (revisit slot geometries): explicitly relates_to 000134 and is sequenced after the demo; a follow-on phase that will benefit from the methodology this idea proposes.
+
+**Assessment:**
+
+000134's ask is distinct from both the specific fixes in phase-wb-08/09 and the per-requirement verification in REQ-007 W15–W18. It proposes formalizing contracts and generalization to prevent _future_ visibility issues, not just fixing present ones. No existing plan, phase or document records this pattern in a reusable form — the closest is the collection of ad-hoc assertions in W15–W18 and the demo-validator pattern. A phase turning 000134 into governed deliverables would define:
+
+1. A per-panel schema capturing what each panel declares about its content-fit behavior (e.g., `{ scrolls: ['vertical'], overflows: false, truncates: ['text'] }`).
+2. A generalized Playwright assertion library that interprets these contracts and validates them mechanically across panels, sizes and layouts.
+3. An inheritance rule for new panels claiming visibility budgets and inheriting assertion requirements.
+
+PROPOSED LINK: 000134 --relates_to--> 000104 (specific instance of height-collapse visibility problem)
+PROPOSED LINK: 000134 --relates_to--> 000117 (related instance of content-fit failure in shared Popover)
+
+</details>
+
+**Links**
+
+- relates_to → `000115`
+- relates_to → `000104`
+- relates_to → `000117`
+- relates_to ← `000101`
+- relates_to ← `000133`
+
+---
+
+## 000135 · Modular multi-instance system for slots and panels: multiple copies of the same thing
+
+**Created 2026-09-11T21:37:25-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), recorded as described with terminology deliberately left unresolved. Make the slots, and the panels allocated into them, modular enough that the system supports multiple copies: technically able to create multiple copies of the same object within a panel, and multiple copies of the same panel type across the workbench - which requires first classifying what the different panel types are, or rather (the owner's correction mid-thought) the different SLOT types. The owner then flagged that the terminology may be backwards as currently used: it may make more sense that panels are the containers things get placed into, not slots - but they are explicitly unsure, and directed that NOTHING terminology-related be changed yet; this idea records the intent as spoken. The naming question is exactly idea 000124's glossary work, which must settle container-vs-content vocabulary before this multi-instance design is specified; the modularity half feeds the duplication/modularity audit 000115. Today's implementation constraint worth noting for the eventual design: panel identity is currently singleton by panel_id (one bash terminal, one html-viewer) in the layout data, storage shape, and panel registry - multi-instance support touches all three plus session ownership.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T21:46:44-04:00): Idea 000135 proposes making slots and panels modular to support multiple copies of the same object within a panel and multiple copies of the same panel type across the workbench, addressing the current singleton constraint where panel identity is bound to panel_id in the layout data, storage shape, and panel registry.
+
+Existing governed coverage and relationships:
+
+**Plans and Requirements:**
+- PLAN-022 (Workbench plan) and REQ-007 (Workbench requirements) together define the current slot-and-panel architecture after phase-wb-09: per-panel eligibility, per-layout assignment, slot-header dropdowns to switch between panels in multi-panel slots. ADR-016 specifies the layout persistence model — layouts as versioned JSON with browser-only state storage.
+- The current design establishes singleton panel identity by panel_id as a foundational constraint (one bash terminal, one html-viewer per layout). Ideas 000135 is marked as future work requiring architectural changes to support multi-instance.
+
+**Related ideas with explicit dependencies:**
+- **Idea 000124** (Formalize the vocabulary and terminology of the HTML generation and workbench system) — explicitly cited in 000135's body as foundational: "The naming question is exactly idea 000124's glossary work, which must settle container-vs-content vocabulary before this multi-instance design is specified." 000124 also flags that terminology may be backwards ("it may make more sense that panels are the containers things get placed into, not slots") and addresses the owner's direction that nothing be changed yet.
+- **Idea 000115** (Duplication audit: find what is done multiple times and generalize toward modularity) — explicitly cited as receiving the modularity half: "the modularity half feeds the duplication/modularity audit 000115." Multi-instance support requires identifying what logic is duplicated across single instances and what can be generalized into reusable patterns.
+- **Idea 000133** (Revisit slot geometries and custom layout reconfiguration) — relates to 000135 implicitly; geometry work will interact with multi-instance design, particularly how slot resizing affects multiple occupants of the same type.
+- **Idea 000134** (Audit all slots and panels for content fit) — relates to 000135 implicitly; multi-instance panels require content-fit methodologies that account for multiple concurrent instances of the same type.
+
+All related ideas are already linked in the ideas system. No additional overlap with other ideas beyond those recorded in 000135's links and the citations within 000124, 000115, 000133, and 000134's own annotations.
+
+No additional plan, requirement, ADR or backlog phase is needed to capture this overlap — it is already recorded in the ideas.jsonl links and cross-referenced in their annotations as a prerequisite/dependent relationship chain. The work remains unscheduled pending the completion of 000124's terminology formalization.
+
+</details>
+
+**Links**
+
+- relates_to → `000124`
+- relates_to → `000115`
+- relates_to ← `000141`
+- relates_to ← `000144`
+
+---
+
+## 000136 · Pack convention: browser smoke dispatch and named runtime instruments for every frontend item
+
+**Created 2026-09-11T21:50:58-04:00 · Status: `triaged`**
+
+Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning triage (batch anchor 000108). The wb-09 blocker (page crashed on load; caught only by the final adversarial review because build/lint/pytest/mechanical gate are all blind to runtime rendering) and the two burned fix cycles on the reassignment session-kill (creator patched from a batching assumption instead of a websocket-lifecycle measurement) share one structural cause: browser-less creators plus back-loaded browser checks. The next pack adopts two conventions, generalizing wb-08's W08-M pattern that worked: (1) every frontend work item gets a cheap browser smoke dispatch - clean profile, page renders real content, no uncaught console errors, dev AND production build - runnable after each creator commit, before the validator; (2) every stateful runtime requirement (session survival, persistence, fill) names its measurement instrument in the pack (e.g. the websocket open/close lifecycle trace correlated with backend logs), the creator prompt must state the expected post-fix trace signature, and no second fix attempt is dispatched without the first attempt's live measurements attached. Full write-up: brain/procedures/runtime-behavior-needs-runtime-evidence.md.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:28-04:00): ## Finding: Pack convention for runtime behavior testing
+
+This idea proposes to standardize browser smoke testing and named measurement instruments as formal pack conventions for all future frontend-facing work. It derives directly from the post-mortem of phase-wb-09's gate failures (documented in phase-wb-09's backlog result, which explicitly names idea 000136 and brain/procedures/runtime-behavior-needs-runtime-evidence.md as the recorded lessons).
+
+### What already exists
+
+The core procedure is already documented in brain/procedures/runtime-behavior-needs-runtime-evidence.md (created 2026-09-11 after phase-wb-09's gate). It specifies:
+- Cheap browser smoke dispatch per frontend work item (page loads, root renders, no console errors, dev and production builds)
+- Named measurement instruments for stateful runtime requirements (e.g., websocket lifecycle traces)
+- The rule "never dispatch a second fix attempt without attaching live measurements from the first"
+
+The W08-M convention (diagnosis dispatch collecting live measurements before creator work) is already implemented and referenced in PROMPT-024 (workbench-fixes-delegation-pack), PROMPT-023 (workbench-build-kickoff), and the phase-wb-08 backlog entry. Phase-wb-08 successfully used this pattern to land a rendering fix first-try, while phase-wb-09 did not use it consistently and incurred two fix cycles plus an escalation.
+
+### Scope and integration points
+
+The idea proposes making these empirically-successful conventions standard in:
+1. Pack authoring — require every frontend item to include a browser smoke dispatch and measurement instruments before dispatch
+2. Fix cycles — coordinators/orchestrators enforce that no second attempt goes out without the first attempt's live measurements attached
+3. Coordinator/orchestrator reporting — treat "build passes" on frontend work as compile verification, not runtime verification
+
+### Related work and ideas
+
+- **Idea 000126** (Thorough audit of the repository's commands, skills, and agents) — the idea already links here; the audit is the place to ensure packs follow these conventions going forward
+- **Ideas 000138 and 000139** (from the same 2026-09-11 batch) — these propose broader agent anti-pattern tracking and delegation-scoping methodology; idea 000136 is the first concrete worked example of the runtime-evidence methodology
+- **ADR-017** (The two-session prompt-pack methodology is the standard for multi-agent builds) — defines the general prompt-pack pipeline but does not yet mention testing conventions; this idea's formalization would extend ADR-017's scope
+- **PLAN-022** (Workbench) — references the W08-M convention and its payoff in phase-wb-08 (lines 92-93), providing proof that the pattern works
+
+### No prior overlap found
+
+The idea's stated scope (formalizing pack conventions for browser testing and measurement instruments) is novel as a typed governance item. The procedure exists, the W08-M pattern exists in PROMPT-024, and the phase results reference both, but no prior plan or requirement document codifies these conventions formally. ADR-017 covers the general pack structure but not testing specifics; REQ-007 covers workbench requirements but not pack authoring conventions.
+
+### Recommendation
+
+The idea is ready for owner triage. Its content is fully supported by evidence (the procedure, the W08-M precedent, the phase-wb-08 success vs. phase-wb-09 failures), and a natural home for it would be either an extension to ADR-017 or a new ADR focusing specifically on testing conventions in multi-agent builds. It should be paired with idea 000126's audit to ensure packs going forward actually adopt these conventions.
+
+PROPOSED LINK: 000136 --relates_to--> 000139 (Both specify methodologies for improving agent dispatch outcomes: 000139 is the general scoping methodology, 000136 is its runtime-evidence sub-pattern)
+
+</details>
+
+**Links**
+
+- relates_to → `000126`
+- relates_to → `000139`
+
+---
+
+## 000137 · Global-cap websocket refusal should reach the browser as a structured close reason
+
+**Created 2026-09-11T21:56:55-04:00 · Status: `triaged`**
+
+Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's global-cap refusal in src/api/routes/demo_terminal.py closes the websocket BEFORE accept() (code 4001), and uvicorn converts a pre-accept close into an HTTP 403 handshake rejection - so the browser receives CloseEvent code 1006 with an empty reason and can never display the structured refusal (or the session count). The frontend now infers the refusal structurally (socket closed without ever opening) and shows a generic could-not-start message. The proper fix is backend: accept first, then close with the structured frame - exactly the pattern _refuse_shell_request already uses for unavailable shells - so the panel can quote the real reason. Small, ADR-014-adjacent change; was out of scope for the wb-09 frontend item that discovered it.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:02-04:00): ## Finding: Global-cap refusal differs from shell-refusal pattern in ADR-014
+
+Idea 000137 identifies a websocket protocol issue in the backend's session-limit enforcement (`src/api/routes/demo_terminal.py` lines 287-289). The route closes the socket before accepting it, which causes uvicorn to convert the close into an HTTP 403 handshake rejection; the browser receives a generic CloseEvent code 1006 with no reason, losing the structured refusal the spec intends.
+
+**Relationship to Governed Documents:**
+
+ADR-014 section 4 mandates: "a session past the cap is refused with a clear close reason." Section 5 establishes a working pattern for structured refusals via `_refuse_shell_request()` (lines 122-143 in demo_terminal.py): accept the socket first, send a structured message the frontend can render, then close with a semantic close code and reason. The shell-refusal case (invalid or unavailable shell) follows this pattern correctly and reaches the browser as a displayable message. The session-limit check does not: it closes before accepting, which breaks the channel for the close reason to reach the client.
+
+The fix is to apply the shell-refusal pattern to the session-limit check — accept first, send a refusal message with the session count and cap, close with code 4001 and a structured reason. This aligns the session-limit refusal with the shell-refusal established by ADR-014 section 5 and fixes the browser's ability to display the real reason.
+
+**Related Ideas:**
+
+Idea 000140 (Learn websockets: owner education deep dive, created 2026-09-11) explicitly lists "idea 000137's 403-vs-close-frame distinction" as a worked example in the HTTP upgrade handshake teaching material, confirming the issue is known and educationally valuable.
+
+Idea 000095 (Close the session-cap TOCTOU window) addresses a separate concurrency race in the same code lines but does not overlap with 000137's refusal-pattern problem — 000095 is about enforcement, 000137 is about notification.
+
+Idea 000087 (Terminal interaction API) uses the session registry ADR-014 established but focuses on the outside-the-page HTTP API surface, not the websocket close semantics.
+
+**Pattern already in use:**
+
+The codebase already demonstrates the correct pattern in `_refuse_shell_request()` for unavailable shells — the session-limit refusal is the only case that deviates. The fix is small, ADR-014-adjacent as the idea states, and unblocked.
+
+PROPOSED LINK: 000137 --relates_to--> 000140 (000140 explicitly uses 000137's close-frame issue as a websocket-education example)
+
+</details>
+
+**Links**
+
+- relates_to → `000140`
+- relates_to ← `000140`
+
+---
+
+## 000138 · System for tracking and managing agent anti-patterns
+
+**Created 2026-09-11T22:45:55-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Build a system that tracks and manages agent anti-patterns - the recurring failure modes of dispatched agents - so each one is recorded once, detected when it recurs, and fed back into how future work is authored. The 2026-09-11 build session alone produced a starter catalog: dispatches scoped past the turn budget (seven truncations across two phases; brain/procedures/scope-dispatches-to-the-turn-budget.md), fixing runtime behavior from assumption instead of measurement (brain/procedures/runtime-behavior-needs-runtime-evidence.md), validators poisoned by their own stale browser state (idea 000107's artifact), orphaned dev servers left by cut-off agents, and orchestrators lacking a resume path for truncated subagents. Today these live as scattered brain procedures, idea annotations and session-record notes; the system should give them one home with a shape per entry (name, signature/how it manifests, root cause, prevention, occurrences with dates), a lightweight way for any coordinator/orchestrator to log a new occurrence mid-session, and a standing step in pack authoring and the commands/skills/agents audit (000126) that checks new prompts against the catalog. Relates to the shared state model (000128) - an occurrence log is exactly the kind of cross-agent state it would carry.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-11T22:49:41-04:00): Owner addition 2026-09-11: the anti-pattern system should include a track-anti-pattern SKILL - a sanctioned, low-friction way to log a new anti-pattern occurrence (or a new pattern) from inside any session, the way the idea skill captures ideas. Candidate shape: a .claude skill wrapping the catalog's writer so coordinators/orchestrators/agents record occurrences mid-session without breaking their flow; pairs with idea 000127's principle that mechanical capture work runs in a subagent to protect main-session context.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:27-04:00): Idea 000138 proposes consolidating scattered agent anti-pattern tracking into a governed system. The work builds on existing starter materials found across the codebase and relates closely to parallel initiatives in agent engineering and multi-agent coordination.
+
+**Existing scattered materials:** Brain procedures at `brain/procedures/scope-dispatches-to-the-turn-budget.md` and `brain/procedures/runtime-behavior-needs-runtime-evidence.md` document two of the specific anti-patterns the idea names (dispatches exceeding turn budget, runtime behavior fixed by assumption rather than evidence). These currently live as scattered prose rather than a consolidated catalog with occurrence logs and structured prevention steps.
+
+**Related governed work:**
+- PLAN-022 (Workbench) mentions the principle that "truncated agents [are] resumed rather than re-run" — one of the orchestration failure modes the idea names
+- ADR-003 (Multi-agent concurrency) covers worktree isolation and logical collision detection between concurrent agents — related to safe orchestration and recovery paths
+- PLAN-016 (Idea record system) and its event-log pattern show how to structure immutable occurrence records, directly applicable to the anti-pattern occurrence log the idea proposes
+
+**Linked ideas:**
+- 000128 (Shared state model for multi-agent planning sessions): already linked by 000138; the occurrence log is exactly the kind of cross-agent state it would carry
+- 000126 (Thorough audit of repository's commands, skills, and agents): mentioned in 000138's body as a standing step in pack authoring that should check new prompts against the catalog
+- 000097 (Session-failure tracking system that derives anti-pattern rules for future sessions): narrower scope focused on session failures, but overlaps with 000138's goal of recording anti-patterns once and detecting recurrence. 000097 is triaged; 000138 is broader and structural.
+
+**No related plan, requirement, or backlog phase found** that fully covers the anti-pattern tracking system as described.
+
+PROPOSED LINK: 000138 --relates_to--> 000097 (both address agent failure/anti-pattern tracking; 000138 is broader system, 000097 narrower session-failure derivation)
+
+</details>
+
+**Links**
+
+- relates_to → `000128`
+- relates_to → `000097`
+- relates_to ← `000139`
+- extended_by ← `000139`
+
+---
+
+## 000139 · Delegation-scoping methodology with built-in continual improvement
+
+**Created 2026-09-11T22:45:55-04:00 · Status: `triaged`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Create - or improve where partial versions exist (PROMPT-012's model policy, PROMPT-021/024's dispatch conventions, the GOV-003 completion gate) - the protocols, strategies, calculations and methodologies for scoping delegated work, so every agent is created with optimal efficiency: the right task size (tool-call/turn-budget estimate before dispatch), the right model for the job, the right context attached (recorded evidence in, irrelevant history out), the right verification instrument named up front, and the right escalation/resume path when it fails or truncates. The owner's explicit requirement is CONTINUAL improvement as a property of the system, not a one-time audit: each build session's outcomes (fix cycles spent, truncations, escalations, gate catches) feed back into the scoping rules so performance and accuracy do not drop as the complexity of everything built on top keeps increasing - growth in capability must at least match growth in complexity. Concretely the methodology should define: how to estimate a dispatch's cost before sending it, when to split an item, what every dispatch must carry (idempotency clause, resume expectation, evidence, expected-output shape), per-role model assignment rules, and the post-session retrospective step that updates the rules and the anti-pattern catalog (recorded alongside this idea) from what actually happened. Relates to 000126 (the agents audit supplies the baseline), 000128 (shared state carries the session telemetry), and 000136 (the runtime-evidence pack convention is this methodology's first worked example).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:38-04:00): ## Finding
+
+Idea 000139 proposes a comprehensive delegation-scoping methodology that formalizes how agents should be dispatched with optimal task sizing, model assignment, context attachment, and continual improvement cycles. The finding identifies substantial partial coverage in existing governance, alongside the work proposed in related ideas.
+
+### Existing governance addressing parts of the methodology
+
+The repository already implements several pieces of this framework:
+
+- **Model policy** (PROMPT-012): Haiku for mechanical gates, Sonnet for judgment, Opus only as a single documented escalation. This binding policy is quoted in PLAN-021 and PLAN-022, and reinforced in ADR-017 ("cost policy").
+- **Completion gate with escalation** (GOV-003, PLAN-022 section "The demo-track completes through its testing gate"): Completion authority exercised by adversarial review plus retroactive owner judgment, replacing synchronous /session-close pauses for demo and workbench tracks.
+- **Budgets and descope ladder** (PROMPT-016, referenced in PLAN-021): Already defines ordered degradation when time runs short, with model and phase-specific budget caps (e.g., `max_active: 3` in PLAN-022).
+- **Dispatch conventions** (PROMPT-021, PROMPT-024): Delegation packs carry pre-crafted prompts, and coordinators dispatch verbatim — no mid-build prompt authorship. Idempotency is explicit: "one-shot completion and multi-session resume are the same prompt" (PLAN-021).
+- **Resume mechanics** (PROMPT-012, idea 000077): When a subagent's output is truncated by turn limit, the dispatcher resumes to recover work, never re-runs from scratch. `maxTurns` is set generously per agent role, and output truncation is treated as a result requiring recovery, not failure to ignore.
+- **Verification up-front** (PROMPT-013 validation gate in PLAN-021): Validators receive requirement text and verification commands — never rationale from the creator — signalling the stop condition is contractual verification, not author sign-off.
+
+### What the methodology explicitly requires that is not yet formalized
+
+- **Pre-dispatch cost estimation**: No documented formula for estimating tool-call/turn-budget consumption before dispatch. Current practice assigns `maxTurns` by role and effort heuristic (PROMPT-012 table) but not from first-principles breakdown of expected steps.
+- **Context pipeline strategy**: No documented rules for what evidence must travel in vs. what history should be discarded per agent role. PROMPT-012 names "working directory," "read-only paths," and "never edit these files," but systematic context scoping (what to include, what to exclude, signal-to-noise tradeoffs) is not written.
+- **Idempotency clause and resume expectation**: Dispatcher hygiene is stated (idempotency explicit, one-shot = multi-session resume), but the working contract that travels in every dispatch is not documented as a binding checklist — agents read it informally from examples rather than a specification.
+- **Anti-pattern catalog and retrospective loop**: Idea 000097 and 000138 both propose tracking session failures to derive anti-pattern rules. Currently failures are reported (ADR-013 review catches them, PLAN-022 escalation ladder handles them), but the feedback loop that updates scoping rules for future sessions is not automated or formalized.
+
+### Overlaps with related ideas
+
+- **000138 (System for tracking and managing agent anti-patterns)**: Directly overlaps — the retrospective step in 000139 ("outcomes feed back into the scoping rules") is 000138's entire premise. The idea body's "recorded alongside this idea" phrase suggests they could be jointly designed. Already linked (`relates_to->000138`).
+- **000097 (Session-failure tracking system that derives anti-pattern rules)**: Covers the same request as 000138, filed separately during the workbench build. 000138 is the newer owner request; 000097 predates it by one day but addresses the same gap.
+- **000128 (Shared state model for multi-agent planning sessions)**: Carries session telemetry that 000139's retrospective loop would consume (fix cycles spent, truncations, escalations, gate catches). Already linked (`relates_to->000126`).
+- **000126 (Thorough audit of the repository's commands, skills, and agents)**: Supplies the baseline inventory of what currently exists. Already linked.
+- **000136 (Pack convention for browser smoke dispatch)**: Is explicitly named as "the methodology's first worked example" in the idea body. Coordinator post-mortem from phase-wb-09 shows exactly the runtime-evidence pack convention this methodology would formalize.
+- **000078-000082 (Agent engineering framework)**: Broader umbrella covering guides, sensors, context pipelines, and orchestration. 000139 is narrower (delegation scoping only) but would feed into orchestration (000082, "routing, multi-agent coordination, recovery paths").
+
+### Status summary
+
+The repository has working implementations of model policy, escalation, budgets, and resume mechanics — tactical practices are in place. What is missing is the strategic methodology that ties them together, formalizes cost estimation, documents context pipelines as a binding contract, and closes the feedback loop from session outcomes into updated scoping rules. The methodology proposed by 000139 would consolidate PROMPT-012, PROMPT-016, GOV-003, and the demo/workbench execution records into an operationalizable framework suitable for hand-off to agents when they dispatch subagents.
+
+No related plan, phase, or ADR currently covers the full methodology.
+
+PROPOSED LINK: 000139 --extends--> 000138 (both define the anti-pattern tracking system; joint design of the retrospective loop would avoid duplication)
+
+</details>
+
+**Links**
+
+- relates_to → `000138`
+- relates_to → `000126`
+- extends → `000138`
+- relates_to ← `000136`
+
+---
+
+## 000140 · Learn websockets: an owner-education deep dive grounded in this repository's terminal stack
+
+**Created 2026-09-11T22:49:41-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, for their own education - not a build item. Investigate how websockets actually work, using the D-System terminal stack as the concrete study material since it exercises the full lifecycle end to end: the browser's WebSocket API and its open/close/error events (the lifecycle traces from the 2026-09-11 gate work are real worked examples), the HTTP upgrade handshake and what a pre-accept rejection looks like on the wire (idea 000137's 403-vs-close-frame distinction), FastAPI/uvicorn's server-side accept/close semantics, close codes (1006 vs 4000+ application codes) and why reasons sometimes cannot reach the client, per-connection state and the six-session registry, and how React component lifecycles interact with socket lifetimes (the portal remount lesson from phase-wb-09). Output could be a personal explainer document or annotated walkthrough of src/api/routes/demo_terminal.py and ts/src/stage/TerminalRegion.tsx - whatever teaches best.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:37-04:00): Idea 000140 proposes an owner-education deep dive on websockets using the D-System terminal stack as concrete study material. This is not a build item but a personal learning project grounded in working code.
+
+The repository's websocket implementation and supporting material are well-documented across multiple systems:
+
+**Architecture Decisions (ADRs):**
+- ADR-013 (demo-terminal-capability) establishes the original security posture for shell-over-websocket
+- ADR-014 (workbench-terminal-capability) supersedes ADR-013, formalizing the session registry, concurrent-session cap enforcement (six sessions), shell allowlist, and structured refusal semantics
+- ADR-015 (workbench-api-surface) defines the HTTP API routing that mounts alongside the terminal routes
+- ADR-016 (workbench-layout-persistence) addresses websocket lifecycle stability across browser layout switches and component remounting
+
+**Plans:**
+- PLAN-021 (Live demo) — phase-demo-01 implements the terminal backend (src/api/routes/demo_terminal.py, PTY adapter, websocket route, session registry)
+- PLAN-022 (Workbench) — phases phase-wb-01 through phase-wb-09 extend the terminal to a product capability with the six-session cap, shell selection, and React component lifecycle interactions
+
+**Requirements:**
+- REQ-006 (live-demo) rows R04–R05, R10–R11 specify websocket requirements (xterm.js client, POSIX pty/ConPTY server, loopback-only binding, per-tab session lifecycle)
+- REQ-007 (workbench) rows W12, W14–W17 refine workbench terminal requirements including the six-session global cap, shell allowlist validation, and refusal messaging
+
+**Relevant Session Records:**
+- SESS-2026-09-11-08 (phase-wb-09) documents the "portal remount lesson" at length: React treats a portal whose `containerInfo` changes as insert+delete rather than update, causing session disruption during layout reassignment. The fix rework shows how permanent per-panel host divs moved between slot bodies via `appendChild` preserve websocket lifetime across React component remounting.
+
+**Related Ideas:**
+- Idea 000137 ("Global-cap websocket refusal should reach the browser as a structured close reason") is already linked (relates_to); it documents why the browser receives CloseEvent code 1006 with empty reason when uvicorn converts a pre-accept close into an HTTP 403 rejection, addressing one of the topics the education idea mentions explicitly.
+
+The study material exists in production: src/api/routes/demo_terminal.py (websocket route, registry, cap enforcement, close codes) and ts/src/stage/TerminalRegion.tsx (plus related components in phase-wb-09's fixes). The owner's exploration will likely find real examples of the HTTP upgrade handshake, per-connection state management, React lifecycle interactions, and the structural communication gap between pre-accept closures and client-side events that idea 000137 addresses.
+
+No related plan, requirement, or ADR is missing. The governance documents provide enough context to ground the learning project.
+
+</details>
+
+**Links**
+
+- relates_to → `000137`
+- relates_to ← `000137`
+
+---
+
+## 000141 · Slots as configuration schemas with nested sub-slots; panel eligibility by element-configuration match
+
+**Created 2026-09-11T23:00:37-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, raised while reviewing the double-header links during the triage sign-off (idea 000101's defect prompted the question "why does this issue exist at all?"). Recorded as given.
+
+The owner's proposed model: each slot should have a set configuration schema - fixed structure, such as containing the top bar with slots for buttons or dropdown menus and so on - and panels would populate the sub-slots within the slot. Meaning each slot is technically either (a) a truly single slot for a single element-type panel to inhabit, or (b) a nested structure of sub-slots that each support certain element types. Panels are then eligible for a slot when the element configuration of the panel matches the configurations supported by the nested sub-slots.
+
+Under this model the double-header defect (000101) could not arise: the top bar would be a schema-owned sub-slot populated once, not something both the slot wrapper and the hosted panel each render independently.
+
+Context worth carrying into exploration: this reshapes the eligibility model REQ-007 W16 ships (per-panel eligibility lists) into structural matching; it presupposes the container-vs-content vocabulary question idea 000124 must settle (and which 000135 deliberately left unresolved); and it generalizes the multi-instance modularity 000135 asks for. Flagged by the owner as worth tracking immediately for further exploration.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:36-04:00): 000141 proposes an architectural refinement to the slot-and-panel design: configuration schemas with nested sub-slots that would structurally solve the double-header defect (000101) by making the top bar a schema-owned sub-slot populated once, rather than independently rendered by both the slot wrapper and the hosted panel.
+
+This idea builds on three concurrent pieces of work:
+
+1. **REQ-007 W16 and phase-wb-09**: The current workbench plan already moves eligibility from per-slot to per-panel (implemented in phase-wb-09). 000141 proposes a more fundamental architectural change — using configuration schemas and nested sub-slots — rather than just changing the eligibility mechanism. The model can be thought of as a refinement of W16's per-panel eligibility into a structural matching system.
+
+2. **Vocabulary work (000124)**: The proposal presupposes the container-vs-content vocabulary question 000124 is meant to settle. 000135 deliberately left this question unresolved; 000141 requires it to be resolved before the schema-based design is specified.
+
+3. **Multi-instance modularity (000135)**: The proposal generalizes the multi-instance design 000135 asks for. Where 000135 focuses on enabling multiple copies of the same panel type, 000141 provides a structural framework (nested sub-slots under a configuration schema) that would make modularity systematic.
+
+The double-header defect (000101) is currently deferred as cosmetic by phase-wb-02, and acknowledged in phase-wb-08's session record as a root-cause issue stemming from the multi-panel slot wrapper's height chain — the suspected break being that both the wrapper and the hosted panel render headers independently. 000141's schema-based approach would prevent this by making the header a slot-level structural element, not a panel-level one.
+
+Related future work: 000133 (revisit slot geometries and custom layout reconfiguration) and 000134 (audit slots and panels for content fit) are adjacent but lower-priority audits. ADR-016 (Layouts are versioned repository JSON) defines the current persistence model and would need extension to support nested sub-slot definitions.
+
+No existing plan, phase or requirement currently specifies the nested sub-slot architecture or configuration schema model 000141 proposes. This is a forward-looking architectural idea beyond the scope of PLAN-022 (Workbench) and its phases.
+
+PROPOSED LINK: 000141 --relates_to--> 000101 (proposes to solve the double-header defect by structurally constraining header rendering)
+PROPOSED LINK: 000141 --relates_to--> 000124 (presupposes container-vs-content vocabulary work before schema design is specified)
+PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modularity into a structural framework with nested sub-slots)
+
+</details>
+
+**Links**
+
+- relates_to → `000101`
+- relates_to → `000124`
+- relates_to → `000135`
+- relates_to ← `000144`
+
+---
+
+## 000142 · Explore ports and system processes and their management: lifecycle, when and how to kill them
+
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, recorded as given. An exploration of ports and system processes and the management of them: what their lifecycle is, when and how to 'kill' them, and how they should be managed in general. Kin to the websocket education idea (000140) in spirit - understanding grounded in this repository's real material - and the repository supplies concrete cases: the port-8000 conflict noted mid-session during the workbench builds, the orphaned dev servers left behind by cut-off agents (named in 000138's anti-pattern starter catalog), and the demo terminal's PTY child processes whose reaping the alive-property investigations (000099/000129) turned on.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:29-04:00): ## Governed Coverage of Process and Port Management
+
+This idea touches system process lifecycle, port binding, and terminal session management — all of which are already documented in active decision records and requirements:
+
+**Terminal and PTY process management:** ADR-013 (demo terminal decision) and ADR-014 (workbench terminal capability) establish the full lifecycle posture: localhost-only binding, environment-flag gating, per-session registry, and the explicit control-separation rule (session drop and tab close require confirmation, never collapse alone). REQ-006 R10/R11 verify these session semantics mechanically.
+
+**Port binding and conflict:** REQ-006 R04 specifies the cross-platform PTY adapter (POSIX pty + bash on Linux/macOS; ConPTY via pywinpty + PowerShell/cmd on Windows). PLAN-021 phase-demo-01 implements the websocket route itself. The concrete port-8000 conflict during workbench builds mentioned in the idea's body was resolved in the most recent session (SESS-2026-09-11-08, which records "orphaned dev servers from a truncated gate dispatch were killed").
+
+**Orphaned process pattern:** The issue of orphaned dev servers from interrupted agent runs surfaces in the operational notes of SESS-2026-09-11-08 as a resolved incident, and the idea references this pattern as kin to 000138 (agent anti-pattern tracking) and the PTY test failures (000099/000129).
+
+**Existing related ideas:** 000143 (small application for visualizing port/process usage) already extends 000142; 000144 extends 000143 to integrate it into the workbench as a modular panel. 000140 (websocket education) is mentioned in the body as kin in spirit and covers the underlying socket protocol. 000097/000129 track the PTY test failures directly.
+
+The governance documents establish the current understanding of process/session lifecycle management; the ideas 000143/000144 are already targeted at building visualization and tooling around ports/processes. This idea's distinctive ask—a comprehensive exploration of when and how to manage process lifecycle—is neither delivered nor planned in the current documents.
+
+</details>
+
+**Links**
+
+- extended_by ← `000143`
+
+---
+
+## 000143 · Small application for managing and visualizing port usage and system processes
+
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, recorded as given; the build companion to the ports-and-processes exploration recorded alongside it. A small application that manages and visualizes port usage and system processes: what is listening on which port, which processes are running and their state, and management actions on them (killing a process, freeing a port). Immediate practical motivators from this repository's sessions: spotting the port-8000 conflict without ad hoc shell forensics, and finding/cleaning the orphaned dev servers left by cut-off agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:06-04:00): Idea 000143 naturally extends 000142 (the ports-and-processes exploration), with 000144 already capturing the next step: packaging the app as a modular panel for the workbench (PLAN-022, REQ-007). The chain 000142 → 000143 → 000144 reflects the natural progression from investigation to prototype to integration. The workbench panel architecture (REQ-007 W05, defining panels as slot-assignable UI components) is where this app will eventually live, already noted in 000144's relatedness to 000141 (slots as configuration schemas) and 000135 (modular multi-instance panel system).
+
+Related terminal/process infrastructure ideas exist (000087 terminal interaction API, 000113 terminal persistence audit, 000140 websockets learning), but none directly overlap with 000143's ask for a ports-and-processes visualization tool. The motivators—spotting port-8000 conflicts without ad hoc shell forensics, and finding/cleaning orphaned dev servers—are concrete pain points from this repository's own workflow.
+
+No existing plan, requirement, or decision document explicitly covers a port/process visualization application. The closest touch point is the workbench itself (PLAN-022, REQ-007, ADR-015), which defines the read-only API surface (filesystem listings, OS actions) that a ports app would depend on if it calls system APIs or spawns queries. The idea stands as a greenfield feature request, not a duplicate or overlapping ask.
+
+</details>
+
+**Links**
+
+- extends → `000142`
+- extended_by ← `000144`
+
+---
+
+## 000144 · Package the port/process app for the modular panel pages; general model for integrating sub-apps into slots
+
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
+
+Owner idea, 2026-09-11, recorded as given; extends the port/process manager app recorded alongside it. Two halves: (1) that application becomes a package of sorts that can be integrated into the modular panel pages - a sub-app occupying a workbench slot like the existing panels do; (2) the general question of how we modularize to support integrating sub-apps in the slots at all - what a sub-app package looks like (its boundary, its API surface toward the workbench, how it registers as a panel type, how it gets its data), so future sub-apps plug in the same way rather than each being hand-wired. Sits directly on the slot/panel modularity thread: the multi-instance modularity ask (000135), the slot-configuration-schema model (000141), and the vocabulary work (000124) that has to settle what containers and contents are called before a packaging contract is specified.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:30-04:00): Idea 000144 proposes a sub-app packaging model and integration pattern for the modular workbench panel system. It depends on and relates to existing governed work at the architectural level.
+
+**Governed documents already covering related ground:**
+
+The workbench plan (PLAN-022) and its supporting decisions define a slot/panel integration architecture: ADR-016 (workbench-layout-persistence) establishes the core model — each panel declares a panel type id once and becomes assignable wherever a layout's slots admit it, with per-panel eligibility stored in the layout JSON schema. REQ-007 (workbench-requirements) specifies this at the requirement level in rows W05-W06 (amended by W16), defining how panels declare eligibility for slots and how the configuration surface assigns them. These documents describe the *container* layer — how slots, layouts, and panel type registration work at the UI/configuration boundary. 
+
+Idea 000144 builds on top of that foundation to ask for the *sub-app packaging contract* — what the internal structure, API surface toward the workbench, registration mechanism, and data flow should look like so future sub-apps "plug in the same way rather than each being hand-wired." This is a distinct layer: the documents define what the workbench can *accept*, 000144 asks what a sub-app must *provide* to fit that contract.
+
+**Related idea dependencies:**
+
+The idea body correctly names three existing ideas: 000135 (multi-instance modularity), 000141 (slot-configuration-schema), and 000124 (vocabulary work). The fold shows 000135 and 000141 are already linked as `relates_to`. However, 000124 is mentioned as a critical blocking dependency ("has to settle what containers and contents are called before a packaging contract is specified") but is not yet formally linked. This dependency should be recorded.
+
+Ideas 000142 and 000143 are also related: 000143 (the port/process manager app) is already extended by 000144, and 000142 (the ports/processes exploration) provides the immediate motivating use case. These chains are correct in the fold.
+
+**No existing promotion candidate:** The idea is undelivered — the sub-app packaging contract and general integration model do not yet exist in the governed documents, though ADR-016 and REQ-007 provide the architectural foundation on which it must sit.
+
+PROPOSED LINK: 000144 --relates_to--> 000124 (vocabulary work must settle terminology before the sub-app packaging contract can be specified)
+
+</details>
+
+**Links**
+
+- extends → `000143`
+- relates_to → `000141`
+- relates_to → `000135`
+- relates_to → `000124`
+
+---
+
+## 000145 · Capture alternative planning methodologies for work that does not merit a full prompt pack
+
+**Created 2026-09-12T04:23:13-04:00 · Status: `open`**
+
+The prompt-pack protocol (GOV-008) is an eight-stage pipeline with four gates, designed for
+multi-agent code builds spanning several sessions. Two builds proved it: the live demo and the
+workbench.
+
+While planning the idea-batching analysis on 2026-09-12, the owner observed that this kind of
+work — a documents-only analysis of three to five agent dispatches over a text corpus, producing
+an ungoverned staging document — may not fully merit the pack. The pipeline's worktrees, ports,
+browser verification, schema gates and coordinator-prompt resumability were all inapplicable, and
+stages 6 and 7 were collapsed into the kick-off record as a documented deviation. When that many
+parts of a protocol have to be explicitly disapplied, the protocol may be the wrong instrument
+rather than a protocol being bent.
+
+What is missing is a lighter tier: a named, governed methodology for planning work that needs
+more rigour than an ad-hoc session but less machinery than a full pack. Open questions such a
+methodology would answer — what distinguishes work that merits a pack from work that does not
+(dispatch count, session span, whether code is written, whether the deliverable is governed);
+which GOV-008 stages survive into the lighter tier and which are dropped; whether the tiers are
+named variants of one protocol or separate documents; and whether a build can be promoted from
+the light tier to a full pack once it outgrows the smaller one.
+
+Raised during the idea-batching planning session; related to the prompt-pack protocol (GOV-008)
+and its methodology decision (ADR-017).
+
+---
+
+## 000146 · SESS-2026-09-11-01 misstates the literature-review handoff note as requiring an external review before the campaign
+
+**Created 2026-09-12T07:03:03-04:00 · Status: `open`**
+
+The session record that produced the research pack protocol (GOV-009) says, under "Left undone", that its first campaign is "the pending adversarial D-System literature review, for which research/literature-review/HANDOFF.md says external review of the codebase audit must come first". The handoff note says no such thing: its ten numbered instructions cover reading order, the seed-inventory caveat, the null hypothesis, falsifying H1-H11, not modifying the frozen baseline, recording collisions before proposing changes, and not beginning implementation. Nothing in it mentions external review, and nothing makes the codebase audit a precondition.
+
+The owner ruled on 2026-09-12, while ratifying the literature-review pre-plan package (PROMPT-027), that the stricter paraphrase is an error and that the adversarial codebase review is a frozen input with no precondition. PROMPT-027 records that ruling, so the campaign is not blocked and no downstream work depends on resolving this. What remains is only that the session record itself still carries the wrong claim, where a future reader looking for the campaign's preconditions would find it and believe it.
+
+What it would touch: docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md, one sentence in its "Left undone" section. Session records are historical accounts rather than live instructions, which is the argument for amending in place with a dated correction note rather than silently rewriting, and also the argument for leaving it alone entirely.
+
+What is unresolved: whether a session record should be corrected at all once written, or whether the correct treatment of a misstatement in a historical record is an appended note rather than an edit. The repository has no stated convention for amending a closed session record, and that convention question is the more general thing worth settling - this instance is just the occasion for it. The owner was asked about correcting it on 2026-09-12 and did not rule either way, so it is recorded here rather than left in conversation memory.
+
+---
+
+## 000147 · Give the literature-review evidence contract a fixed identifier format for the ledger's kept column
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) defines what the reproducibility ledger's `kept` column
+means but never fixes the *format* of an identifier written into it. In phase-lit-01, the
+campaign's first execution session, four dispatches used four conventions and the drift was
+measurable against the phase gate:
+
+    distinct kept identifiers: 216
+    kept-but-uninventoried, identifiers resolved: 0      <- the true figure
+    kept-but-uninventoried, literal string match: 32     <- false failures
+    by form: doi: prefix 26, semanticscholar URL vs scheme 4, uspto URL vs scheme 2
+
+Every one of those 32 sources was in fact present in the source inventory, under a different
+spelling of the same identifier: `doi:10.x/y` against `10.x/y`,
+`semanticscholar.org/paper/<hash>` against `semanticscholar:<hash>`,
+`image-ppubs.uspto.gov/.../downloadPdf/<n>` against `uspto:<n>`.
+
+This matters because the LIT-01 G gate's third measurement is "count of ledger rows whose
+`kept` names a source absent from the inventory (gate: 0)", it runs on Haiku as a deliberately
+mechanical gate, and a literal string match is the straightforward reading of that sentence.
+The gate can therefore report up to 32 failures that are not real, in a campaign whose entire
+value rests on its gates being trustworthy. The same exposure applies to every later phase and
+to the final stop-condition gate, which computes chaining coverage from `subject_source_id`
+the same way.
+
+Two candidate fixes, not mutually exclusive:
+
+1. PLAN-023.03 gains an identifier-format rule — one canonical scheme-prefixed form per
+   provider — binding on both the ledger's `kept` and the inventory's `url_or_doi`.
+2. The gate's measurement is specified to resolve identifiers rather than string-match, so a
+   format difference cannot masquerade as a missing source.
+
+The owner ruled on 2026-09-12 that the 32 affected cells be normalised in place before the
+LIT-01 G gate ran, which repairs the instance. This idea is the durable fix: nothing yet stops
+the next dispatch inventing a fifth convention.
+
+Found by the coordinator of phase-lit-01. Anchor for the batch of instrument gaps that the
+first real execution of the research protocol (GOV-009) surfaced.
+
+**Links**
+
+- relates_to ← `000148`
+- relates_to ← `000149`
+- relates_to ← `000150`
+
+---
+
+## 000148 · The literature-review evidence contract's source_type enum has no bucket for a patent
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) fixes the source inventory's `source_type` to
+standard / peer-reviewed / conference / preprint / OSS / tech report / lead. Phase-lit-01
+encountered granted patents as genuine prior art — `uspto:11544323` (enterprise knowledge-graph
+annotations, Microsoft, granted 2023-01-03), `uspto:4918621` (ATMS world representation) and
+`uspto:11481658` (BDI multi-agent architecture) — and there is no value that fits.
+
+They were filed under `tech report`, which is the closest available and is wrong: a granted
+patent has a different evidentiary character from a technical report, and the anti-novelty case
+the campaign is building will want to distinguish them. Patents are among the strongest
+possible evidence for H0 (that D-System is a recombination of known ideas), because a granted
+claim is a dated, examined assertion that a mechanism was already known.
+
+The fix is a `patent` value in the enum, and a note in the contract on how to cite one
+(grant number, assignee, filing and grant dates). Doing it mid-campaign was deliberately
+avoided — no agent may edit a ratified contract to make its own data fit — so the existing rows
+stay as `tech report` until the contract changes and they are migrated deliberately.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000149 · The literature-review ledger's strategy_phase enum has no value for bibliographic verification
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) fixes the reproducibility ledger's `strategy_phase` to
+A vocabulary / B backward chain / C forward chain / D system search / E collision, mirroring the
+search protocol's five strategies. That covers every search run to *find* a source.
+
+It does not cover a lookup run to *verify* a source already kept — confirming a publication
+year, a venue, an authorship, or whether a ResearchGate posting corresponds to a peer-reviewed
+paper. Phase-lit-01 ran sixteen such lookups across two extraction dispatches. Block C is
+categorical that every search gets a ledger row ("a search that logged nothing did not
+happen"), so they had to be logged, and they were filed under `D` (system search) as the
+closest fit, with the mismatch noted rather than papered over.
+
+This is not cosmetic. Once verification lookups are indistinguishable from system searches, the
+ledger stops supporting the measurement it exists for: "how thoroughly was this domain
+searched" is computed per domain from row counts, and rows that found nothing new inflate that
+count. In phase-lit-01 sixteen of the ledger's rows are verification, not search.
+
+The fix is a sixth value — `V` verification, or similar — and a line in the contract saying
+that gate measurements of search breadth exclude it. Worth settling before Pass 2, where
+deep reading will generate many more verification lookups per source than Pass 1 did.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000150 · The private-content check silently does nothing in a worktree, because _private is gitignored
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+`tools/check_no_private_content.py` has two halves: a path check that always runs, and a
+content check that runs only when `_private/portfolio/` exists on disk. `_private/` is
+gitignored, so it exists in the primary checkout and in no worktree, ever. Run inside an agent
+worktree the tool prints:
+
+    note: _private/portfolio/ not found — content check skipped (path check still ran; this is
+    expected in CI / a fresh clone)
+    check_no_private_content: OK (526 tracked files, 0 identifiers checked)
+
+Zero identifiers, against 31 in the primary checkout — and it exits 0 either way. An agent that
+runs it in its worktree, sees OK, and records that as a passing verification has recorded
+nothing. AGENTS.md already warns that this gate "passes by not looking" when run unstaged; this
+is a second route to the same outcome, and the more dangerous one, because the note is easy to
+read past and the exit code is green.
+
+The exposure scales with how long work stays off the trunk. In the literature-review campaign
+the owner ratified a single long-lived branch (`agent/lit-campaign`) integrated into `dev`
+exactly twice, so campaign content written across six phases is not content-checked against the
+real identifier list until the first of those integrations. The branch-model ruling and this
+blind spot were decided independently and their interaction was not considered.
+
+Candidate fixes:
+
+1. Give the tool a `--root` or `--identifiers-from` argument so it can be aimed at another
+   checkout, and have worktree agents call it that way. Needs its own requirement, plan and
+   OPS document per AGENTS.md's rule for tools.
+2. Make the skipped content check non-silent — exit non-zero, or print a warning that an agent
+   cannot honestly record as a pass, when invoked somewhere the identifier list is absent.
+3. State in AGENTS.md that a worktree run of this check is not a verification, and that the
+   real check belongs to integration.
+
+The owner ruled on 2026-09-12 to accept the gap for the current campaign and rely on the
+integration-time check. This idea is the durable fix.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-12T11:11:09-04:00): Sharpened by peer session d-system-ff on 2026-09-12. The defect is that the tool fails silently rather than loudly: the only signal separating a real run from a vacuous one is the identifier count inside its own OK line, which is easy to read past, and the exit code is 0 either way. A worktree run is the common case rather than the exception, because AGENTS.md requires a worktree whenever any peer holds an active claim. So the fix belongs in the tool rather than in every caller's vigilance - a check that cannot verify should exit non-zero and say so instead of printing OK. Correction to how this finding was first reported: the coordinator of phase-lit-01 told that peer its close review had recorded a worktree run as a passing verification. That was false. SESS-2026-09-12-04 line 47 records 31 identifiers checked from the primary checkout, and the coordinator had already read that line before asserting otherwise.
+
+</details>
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000151 · Revisit the claim system, whose lock table only works because every agent shares one primary checkout
+
+**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+
+The owner directed this on 2026-09-12: "we definitely need to revisit this claim system," and separately, "when we deploy an MCP solution we'll look into using that as a substitution because it will not rely on whatever the main checkout is."
+
+The structural problem the owner is pointing at. The claim system's lock table is `docs/09-backlog/backlog.yaml` on `dev`, and a claim is a commit to it. That works only because every agent can reach the same `dev` in the same primary checkout — which is exactly the thing the repository otherwise tries to stop agents from sharing. The consequence showed up the same day the worktree-everywhere rule was ratified: the rule says work in a worktree, and the claim system says commit your claim to `dev` in the primary checkout, so every phase now begins with a trip into the shared resource the rule exists to keep agents out of. The exception is narrow and justified (a lock nobody can see is not a lock), but it means the coordination mechanism and the isolation mechanism are in tension by construction rather than by accident.
+
+Why MCP is the owner's candidate substitute: a service that owns claims does not care which checkout an agent has, or whether it has one. Idea 000020 already proposes exactly that — an MCP server as the authoritative interface for documentation, file and phase claims, and worktree checkouts — so this idea is the claim-system half of that, recorded separately because the owner asked for the claim system to be revisited on its own merits and not only as something MCP might absorb. If MCP does not happen, the claim system still needs this examination.
+
+What it would touch: ADR-003 (the accepted worktree-and-lock-table concurrency decision), AGENTS.md's three concurrent-agent sections, `src/governance/backlog.py` (the collision validator that reads the lock table), and GOV-003 where the accepted decisions are recorded. Any replacement has to preserve what the current design gets right: the lock is inspectable by a human with no tooling, it survives a crashed agent because it is a committed file, and its validator already catches system, deliverable-path and dependency-chain overlap.
+
+What is unresolved, and worth settling before any replacement is designed: whether a service-held claim can keep the crash-survivability of a committed file (a process holding a lock in memory is strictly worse than a commit when the process dies — see idea 000025 on abandoned claims); whether the owner still wants to be able to read the lock state from a file without running anything; and whether the primary-checkout dependency is actually the problem or merely where the problem becomes visible, since the deeper constraint is that any lock must be readable by every agent before it starts work, and a shared file is the cheapest thing that satisfies that.
+
+**Links**
+
+- relates_to → `000020`
+- relates_to → `000025`
+- relates_to ← `000152`
+
+---
+
+## 000152 · A registry of active worktrees that agents must register in before starting work and deregister from when finished
+
+**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+
+The owner directed this on 2026-09-12, while ratifying the rule that every session works in a worktree except for the claim-system operations that must happen in the primary checkout. The ask, in the owner's framing: "we need to make sure that we have a running list of active worktrees and that agents are required to register their worktrees in that list before beginning any work. That way there's no ambiguity about it, and they would be required to deregister when they finish their work."
+
+The motivation is a concrete ambiguity that cost real time on 2026-09-12. Two sessions were working in the same repository and neither could reliably tell where the other was. One session read the primary checkout, inferred from it that a peer's campaign was running there too, and relayed an instruction to move to a worktree that the peer had already created during its own preflight. The peer, separately, read a session record line and asserted its opposite. Both errors were inferences from accurate reads of state that did not describe the thing being reasoned about — and a registry would have answered "where is each agent working" directly rather than by inference. Earlier the same day, a peer's branch switch in the shared primary checkout silently redirected two commits from another session onto the peer's branch, which a registry would not have prevented but would have made immediately diagnosable.
+
+Note that git already knows this: `git worktree list` enumerates every worktree and its branch. The value of a registry over that command is therefore not enumeration but intent and lifecycle — who is working there, on what phase, since when, and whether they are still alive — plus the discipline of a required register/deregister step whose absence is itself detectable. That distinction is worth settling before building anything, because if the answer is "git already tells us," the right fix may be a convention that agents run `git worktree list` at preflight rather than a new file to keep consistent.
+
+What it would touch: probably a tracked registry file in the shape of `_tmpagent/claims.jsonl` (an append-only log already used for a similar claim/activate/release lifecycle across worktrees), or an addition to the backlog's existing claim record; AGENTS.md's concurrency sections to require registration before work and deregistration at hand-off; and possibly a governance check that flags a registered worktree whose directory no longer exists, or an existing worktree nobody registered.
+
+What is unresolved: whether the registry is a new file or a field on the existing phase claim, given that a claim already names an agent and a phase and the worktree path is derivable from the phase id by AGENTS.md's own naming convention — in which case the registry may be redundant with the claim for phase work and only genuinely new for sessions that work without claiming one. Also unresolved: what enforces deregistration, since the failure mode this shares with idea 000025 (abandoned claims) is an agent that stops without cleaning up, and a registry with no staleness signal inherits exactly that problem rather than solving it.
+
+**Links**
+
+- relates_to → `000151`
+- relates_to → `000025`

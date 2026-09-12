@@ -1,0 +1,105 @@
+<!--
+  Atlas family — canonical component markup.
+
+  Not a page: a reference sheet of the family's building blocks, one block per component,
+  copied into an atlas-page.html's {{MASTHEAD}} / {{SECTIONS}} and edited in place. The class
+  names are the contract with templates/styles/atlas.css; the rendered references are
+  _public/d-system-architecture.html and _public/prompt-pack-protocol.html.
+
+  Color roles, applied consistently across every component:
+    green    = structure and state (brand, stats, tick markers, .leaf cards, .st diagram nodes)
+    mahogany = attention and action (active nav, gates, notes, .accent cards, .ac nodes, .hot)
+-->
+
+<!-- ==== MASTHEAD ====================================================
+     Fills {{MASTHEAD}}. The .stats grid is left empty and rendered by
+     {{PAGE_SCRIPT}} from data arrays — numbers are computed, never typed. -->
+<header class="mast">
+  <div class="eyebrow">Eyebrow label &middot; DOC&#8209;CODE</div>
+  <h1>A headline with an <em>emphasized phrase</em> in green.</h1>
+  <p class="lede">One or two sentences of lede; <strong>bold spans</strong> lift to full text color.</p>
+  <div class="status">
+    <b>Status.</b> The authority note: where the governed source lives and which copy wins.
+  </div>
+  <div class="stats"></div>
+</header>
+
+<!-- ==== SECTION SHELL ===============================================
+     Repeats inside {{SECTIONS}}. id doubles as the deep-link anchor; the
+     two-digit .sec-n is the nav number; drop `open` for sections that
+     should start collapsed (deep-linking reopens them). -->
+<details class="sec" id="section-id" open>
+  <summary><span class="sec-n">01</span><span class="sec-h"><h2>Section title<a class="anchor" href="#section-id">#</a></h2><p>One-line summary shown under the title.</p></span><span class="chev">&#9662;</span></summary>
+  <div class="sec-body">
+    <!-- section content: any mix of the components below -->
+  </div>
+</details>
+
+<!-- ==== QUOTE (green, for the section's central claim) ==== -->
+<div class="quote">The one sentence the section exists to say, with <strong>bold</strong> for its load-bearing terms.</div>
+
+<!-- ==== NOTE (mahogany, for caveats and authority) ==== -->
+<div class="note"><b>Label.</b> The caveat, exception or pointer the reader must not miss.</div>
+
+<!-- ==== CARD GRID (g2 / g3 / g4 set the minimum column width) ====
+     .leaf tints green (structural / state things), .accent tints mahogany
+     (decisions / attention), plain is neutral. The .k kicker names the
+     card's category in mono caps. -->
+<div class="grid g3">
+  <div class="card leaf"><h3><span class="k">Kicker</span>Card title</h3><p>Card body text.</p></div>
+  <div class="card accent"><h3><span class="k">Kicker</span>Card title</h3><p>Card body text.</p></div>
+  <div class="card"><h3><span class="k">Kicker</span>Card title</h3><p>Card body text.</p></div>
+</div>
+
+<!-- ==== SUB-HEADING (mono caps divider inside a section body) ==== -->
+<div class="h4">Sub-heading</div>
+
+<!-- ==== TICK LIST (.mah swaps the diamond markers to mahogany) ==== -->
+<ul class="tick">
+  <li><b>Lead phrase.</b> The rest of the point.</li>
+</ul>
+
+<!-- ==== PILLS (mono tags; .m for the mahogany variant) ==== -->
+<div class="pills">
+  <span class="pill">green pill</span><span class="pill m">mahogany pill</span>
+</div>
+
+<!-- ==== TABLE ==== -->
+<div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Column</th><th>Column</th></tr></thead>
+    <tbody>
+      <tr><td><code>code cell</code></td><td>Body cell.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==== CODE BLOCK (optional .code-head labels it; spans colorize:
+     .key green, .val text, .cm faint italic, .vb mahogany) ==== -->
+<div class="code-head">label for the block</div>
+<pre><span class="cm"># comment</span>
+<span class="key">key</span>: <span class="val">value</span>   <span class="vb">VERB</span></pre>
+
+<!-- ==== DIAGRAM SHELL ===============================================
+     data-dgm opts the SVG into initDiagrams() focus behavior. Nodes are
+     <g class="nd" data-node="id"> (add .st for green/state, .ac for
+     mahogany/action); edges are <path class="ed" data-e="from" data-t="to">
+     with marker-end="url(#ah)" (neutral) or "url(#ahm)" (mahogany); .vb
+     texts are verb labels on edges, .sub texts are node subtitles; a
+     dashed .zone rect with a .zone-t caption annotates a region. Reuse
+     the two arrowhead <marker> defs verbatim — their fills are literal
+     because CSS variables do not reach marker content. -->
+<div class="dgm" data-dgm>
+  <svg viewBox="0 0 900 200" role="img" aria-label="Describe the diagram for screen readers.">
+    <title>Diagram title</title>
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#31423A"/></marker>
+      <marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#A85D48"/></marker>
+    </defs>
+    <g class="nd st" data-node="a"><rect x="60" y="60" width="300" height="46" rx="8"/><text x="210" y="80" text-anchor="middle">State node</text><text class="sub" x="210" y="96" text-anchor="middle">subtitle</text></g>
+    <path class="ed" data-e="a" data-t="b" d="M360 83 L520 83" marker-end="url(#ahm)"/>
+    <text class="vb" x="390" y="73">VERB</text>
+    <g class="nd ac" data-node="b"><rect x="520" y="60" width="300" height="46" rx="8"/><text x="670" y="80" text-anchor="middle">Action node</text><text class="sub" x="670" y="96" text-anchor="middle">subtitle</text></g>
+  </svg>
+  <div class="dgm-cap">Italic caption under the diagram.</div>
+</div>

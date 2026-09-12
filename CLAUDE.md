@@ -2,14 +2,53 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Do not assume. Ask.
+
+**Do not make assumptions.** When something is unclear, unstated, or open to more than one reading,
+the answer is a question — not your best guess written into a file.
+
+**Do not turn a one-time instruction into a standing rule.** If the owner tells you to do something
+once, that is what they told you: once. It is not a policy, not a preference to generalise from, and
+not a principle to encode in a governing document. Do not invent rules, conventions or ideas the
+owner never asked for. If a pattern seems worth making permanent, propose it and let the owner
+decide.
+
+**Use the AskUserQuestion tool.** It is the preferred way to ask — for resolving uncertainty, for
+choosing between approaches, and for surfacing information the owner needs before the work goes
+further. Prefer it to burying a question in prose, and prefer asking to guessing whenever a wrong
+guess would send the work in a materially different direction.
+
+Ask at the point the work reaches the uncertainty, not at the end. Where a question genuinely can
+wait, state the assumption plainly, keep working, and surface it — but an assumption that changes
+what gets built is a question, not an assumption.
+
+## Never edit this file or AGENTS.md without explicit approval
+
+**Do not modify `CLAUDE.md` or `AGENTS.md` for any reason without the owner's explicit approval for
+that specific change.** There is no exception — not to correct an error, not to record something you
+learned, not because a phase seems to cover it, and not as tidy-up alongside other work.
+
+If you believe either file is wrong or stale: **say so and stop.** Quote the passage, propose the
+replacement wording, and let the owner decide. `AGENTS.md` carries the same rule and the account of
+why it exists.
+
+## Important Writing Style
+Mannered prose substitute metaphor and flourish for direct statement. Instead of "a parameter worth varying," the mannered writer produces "a dial worth turning." Instead of "this point still matters," they write "this point earns its keep." The phrases exist to display the writer, not to convey the idea, and readers can tell. That is why mannered prose irritates: it makes the reader work harder so the writer can perform. It is also imprecise. Metaphors drag in connotations the writer did not choose and cannot control. The fix is to say what you mean. When a literal phrase is available, use it.
+
 ## Read AGENTS.md first
 
 **→ [AGENTS.md](AGENTS.md) is the working agreement and governs everything you do here.**
 
 It carries the rules this file deliberately does not repeat: how to pick up work from the backlog
 queue, the requirement-and-plan-before-code expectation, document code allocation, the governance
-check, the concurrent-agent protocol, and the standing rule that **no agent adds a remote or pushes**
-until the confidentiality sweep completes.
+check, the concurrent-agent protocol, and the standing rules that an agent **asks before integrating
+a feature branch into the integration branch** — though pushing its own branch to `origin` needs no
+approval — and **never writes a confidential identifier into a tracked file**.
+
+It also carries the rule that **every session works in a worktree** — including documentation-only
+work. The only exceptions are the claim commit and the catalog regeneration it forces, which must
+happen in the primary checkout. See AGENTS.md's "Concurrent agents: work in a worktree" section and
+[GOV-003](docs/08-governance/GOV-003-backlog-decisions.md) for the incidents behind it.
 
 This file is orientation only — what the project is and where things live. If it ever contradicts
 AGENTS.md, AGENTS.md wins.
@@ -32,9 +71,13 @@ Keep it to three things:
 2. **Explicit instructions** an agent must act on before it can do anything else, like reading
    AGENTS.md first.
 3. **Mission-critical facts worth duplicating** despite the drift risk. The bar is that being
-   unaware of it for one turn causes irreversible harm. The no-remote rule above clears it: an
-   agent that pushes before the confidentiality sweep cannot take it back. Convenience never
-   clears it.
+   unaware of it for one turn causes irreversible harm. The integration rule above clears it: work
+   merged onto the trunk without approval cannot be cleanly taken back once peers build on it.
+   Convenience never clears it.
+
+   The no-remote rule that stood here until 2026-09-09 is the cautionary case for this whole
+   section. It was correct when written and false the moment `phase-priv-05` pushed, and it sat
+   stale in two files until someone went looking. Duplicating a fact means owning its drift.
 
 Everything else — conventions, commands, workflow, lifecycle rules — belongs in AGENTS.md or under
 `docs/08-governance/`, and is referenced from here rather than restated. When this file starts

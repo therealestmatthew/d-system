@@ -17,6 +17,11 @@ CI regenerates it and fails on any difference.
 | ADR-010 | adr | accepted | repository-owner | docs/04-decisions/ADR-010-idea-staging.md |
 | ADR-011 | adr | accepted | repository-owner | docs/04-decisions/ADR-011-governance-model.md |
 | ADR-012 | adr | accepted | repository-owner | docs/04-decisions/ADR-012-systems-review.md |
+| ADR-013 | adr | superseded | repository-owner | docs/04-decisions/ADR-013-demo-terminal-capability.md |
+| ADR-014 | adr | accepted | repository-owner | docs/04-decisions/ADR-014-workbench-terminal-capability.md |
+| ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
+| ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
+| ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -29,6 +34,8 @@ CI regenerates it and fails on any difference.
 | GOV-005 | governance | active | repository-owner | docs/08-governance/GOV-005-document-codes.md |
 | GOV-006 | governance | active | repository-owner | docs/08-governance/GOV-006-conversation-guidelines.md |
 | GOV-007 | governance | active | repository-owner | docs/08-governance/GOV-007-repo-orientation.md |
+| GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
+| GOV-009 | governance | active | repository-owner | docs/08-governance/GOV-009-research-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -38,6 +45,11 @@ CI regenerates it and fails on any difference.
 | OPS-007 | operation | active | repository-owner | docs/08-governance/OPS-007-generate-tool-docs.md |
 | OPS-008 | operation | active | repository-owner | docs/08-governance/OPS-008-capture.md |
 | OPS-009 | operation | active | repository-owner | docs/08-governance/OPS-009-check-no-private-content.md |
+| OPS-010 | operation | active | repository-owner | docs/08-governance/OPS-010-generate-agent-workflows.md |
+| OPS-011 | operation | active | repository-owner | docs/08-governance/OPS-011-overview-metrics.md |
+| OPS-012 | operation | active | repository-owner | docs/08-governance/OPS-012-overview-inventory.md |
+| OPS-013 | operation | active | repository-owner | docs/08-governance/OPS-013-demo-reset.md |
+| OPS-014 | operation | active | repository-owner | docs/08-governance/OPS-014-generate-overview.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -49,7 +61,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.06 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.06-verification.md |
 | PLAN-004 | plan | approved | repository-owner | docs/01-plans/PLAN-004-reliability-follow-up.md |
 | PLAN-005 | plan | complete | repository-owner | docs/01-plans/PLAN-005-document-code-system.md |
-| PLAN-006 | plan | draft | repository-owner | docs/01-plans/PLAN-006-confidentiality-sweep.md |
+| PLAN-006 | plan | complete | repository-owner | docs/01-plans/PLAN-006-confidentiality-sweep.md |
 | PLAN-007 | plan | complete | repository-owner | docs/01-plans/PLAN-007-capture-and-structuring-system.md |
 | PLAN-008 | plan | draft | repository-owner | docs/01-plans/PLAN-008-session-lifecycle-protocols.md |
 | PLAN-009 | plan | draft | repository-owner | docs/01-plans/PLAN-009-capture-build.md |
@@ -68,15 +80,51 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | plan | draft | repository-owner | docs/01-plans/PLAN-017-idea-plan-lifecycle/Plan Architecture/PLAN-017.06-governance-integration-and-delivery.md |
 | PLAN-018 | plan | approved | repository-owner | docs/01-plans/PLAN-018-plans-directory-consolidation.md |
 | PLAN-019 | plan | draft | repository-owner | docs/01-plans/PLAN-019-idea-priority-queue.md |
+| PLAN-020 | plan | draft | repository-owner | docs/01-plans/PLAN-020-portable-agent-workflows.md |
+| PLAN-021 | plan | draft | repository-owner | docs/01-plans/PLAN-021-live-demo.md |
+| PLAN-022 | plan | active | repository-owner | docs/01-plans/PLAN-022-workbench.md |
+| PLAN-023 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023-overview.md |
+| PLAN-023.01 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md |
+| PLAN-023.02 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.02-search-domain-matrix.md |
+| PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
 | PROMPT-004 | prompt | active | repository-owner | docs/02-prompts/PROMPT-004-terminology-and-architecture.md |
 | PROMPT-005 | prompt | active | repository-owner | docs/02-prompts/PROMPT-005-governance-model-review.md |
+| PROMPT-006 | prompt | active | repository-owner | docs/02-prompts/PROMPT-006-idea-capture-and-triage.md |
+| PROMPT-007 | prompt | active | repository-owner | docs/02-prompts/PROMPT-007-idea-to-plan.md |
+| PROMPT-008 | prompt | active | repository-owner | docs/02-prompts/PROMPT-008-execute-a-phase.md |
+| PROMPT-009 | prompt | active | repository-owner | docs/02-prompts/PROMPT-009-plan-audit.md |
+| PROMPT-010 | prompt | active | repository-owner | docs/02-prompts/PROMPT-010-demo-agent-factory.md |
+| PROMPT-011 | prompt | active | repository-owner | docs/02-prompts/PROMPT-011-demo-governance-docs-spec.md |
+| PROMPT-012 | prompt | active | repository-owner | docs/02-prompts/PROMPT-012-demo-agent-roster-spec.md |
+| PROMPT-013 | prompt | active | repository-owner | docs/02-prompts/PROMPT-013-demo-delegation-pack-spec.md |
+| PROMPT-014 | prompt | active | repository-owner | docs/02-prompts/PROMPT-014-demo-build-orchestration.md |
+| PROMPT-015 | prompt | active | repository-owner | docs/02-prompts/PROMPT-015-demo-phase-protocol.md |
+| PROMPT-016 | prompt | active | repository-owner | docs/02-prompts/PROMPT-016-demo-guardrails.md |
+| PROMPT-017 | prompt | active | repository-owner | docs/02-prompts/PROMPT-017-demo-rehearsal-gate.md |
+| PROMPT-018 | prompt | active | repository-owner | docs/02-prompts/PROMPT-018-demo-build-delegation-pack.md |
+| PROMPT-019 | prompt | active | repository-owner | docs/02-prompts/PROMPT-019-demo-glossary-diagram-audit.md |
+| PROMPT-020 | prompt | active | repository-owner | docs/02-prompts/PROMPT-020-workbench-pre-plan-package.md |
+| PROMPT-021 | prompt | active | repository-owner | docs/02-prompts/PROMPT-021-workbench-delegation-pack.md |
+| PROMPT-022 | prompt | active | repository-owner | docs/02-prompts/PROMPT-022-workbench-build-orchestration.md |
+| PROMPT-023 | prompt | active | repository-owner | docs/02-prompts/PROMPT-023-workbench-build-kickoff.md |
+| PROMPT-024 | prompt | active | repository-owner | docs/02-prompts/PROMPT-024-workbench-fixes-delegation-pack.md |
+| PROMPT-025 | prompt | active | repository-owner | docs/02-prompts/PROMPT-025-idea-batching-pre-plan-package.md |
+| PROMPT-026 | prompt | active | repository-owner | docs/02-prompts/PROMPT-026-idea-batching-pack-factory.md |
+| PROMPT-027 | prompt | active | repository-owner | docs/02-prompts/PROMPT-027-literature-review-pre-plan-package.md |
+| PROMPT-028 | prompt | active | repository-owner | docs/02-prompts/PROMPT-028-literature-review-pack-factory.md |
+| PROMPT-029 | prompt | active | repository-owner | docs/02-prompts/PROMPT-029-literature-review-delegation-pack.md |
+| PROMPT-030 | prompt | active | repository-owner | docs/02-prompts/PROMPT-030-literature-review-coordinator.md |
+| PROMPT-031 | prompt | active | repository-owner | docs/02-prompts/PROMPT-031-literature-review-kickoff.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
 | REQ-004 | requirement | active | repository-owner | docs/06-requirements/REQ-004-plans-directory-consolidation.md |
+| REQ-005 | requirement | draft | repository-owner | docs/06-requirements/REQ-005-portable-agent-workflows.md |
+| REQ-006 | requirement | draft | repository-owner | docs/06-requirements/REQ-006-live-demo.md |
+| REQ-007 | requirement | draft | repository-owner | docs/06-requirements/REQ-007-workbench.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -114,6 +162,35 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-08-16 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-16-event-identity-and-amendment-fold.md |
 | SESS-2026-09-08-17 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-17-annotations-and-typed-relationships.md |
 | SESS-2026-09-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-08-18-idea-triage-agent.md |
+| SESS-2026-09-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-01-history-rewrite-and-remote.md |
+| SESS-2026-09-09-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-02-post-sweep-policy-and-prompts.md |
+| SESS-2026-09-09-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-09-03-portable-workflow-foundation.md |
+| SESS-2026-09-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-01-demo-agent-factory.md |
+| SESS-2026-09-10-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-02-demo-data-overview-tools.md |
+| SESS-2026-09-10-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-03-demo-stage-terminal-backend.md |
+| SESS-2026-09-10-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-04-demo-stage-frontend.md |
+| SESS-2026-09-10-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-05-demo-data-overview-skill.md |
+| SESS-2026-09-10-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-06-demo-stage-terminal-interaction.md |
+| SESS-2026-09-10-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-07-demo-content-runbook-reset-rehearsals.md |
+| SESS-2026-09-10-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-08-demo-build-coordination.md |
+| SESS-2026-09-10-09 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-09-workbench-planning.md |
+| SESS-2026-09-10-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-10-readme-orientation-audit.md |
+| SESS-2026-09-10-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-11-workbench-backend-api.md |
+| SESS-2026-09-10-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-12-workbench-layout-notes-strip.md |
+| SESS-2026-09-10-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-13-workbench-terminal-panel-rework.md |
+| SESS-2026-09-11-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md |
+| SESS-2026-09-11-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-02-workbench-html-viewer-panel.md |
+| SESS-2026-09-11-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-03-file-browser-panel.md |
+| SESS-2026-09-11-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-04-idea-backlog-explorer-panels.md |
+| SESS-2026-09-11-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-05-rehearsal-refresh.md |
+| SESS-2026-09-11-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-06-workbench-fixes-planning.md |
+| SESS-2026-09-11-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-07-phase-wb-08-panel-fixes.md |
+| SESS-2026-09-11-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-08-phase-wb-09-layout-assignment.md |
+| SESS-2026-09-12-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-01-idea-triage-sweep.md |
+| SESS-2026-09-12-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-02-phase-wb-10-runbook-refresh.md |
+| SESS-2026-09-12-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-03-idea-batching-pack-planning.md |
+| SESS-2026-09-12-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-04-literature-review-research-pack.md |
+| SESS-2026-09-12-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-05-literature-review-pass-1a.md |
 
 ## Plans and their phases
 
@@ -130,16 +207,16 @@ CI regenerates it and fails on any difference.
 | PLAN-003.06 | doc-html-06-verification | approved | 2 | 0 | 0 | — |
 | PLAN-004 | doc-reliability-follow-up | approved | 8 | 0 | 3 | agent-architect, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
-| PLAN-006 | doc-confidentiality-sweep | draft | 1 | 0 | 5 | agent-architect, agent-clay, agent-fern |
+| PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 3 | agent-checkpoint, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 4 | agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
 | PLAN-013 | doc-tooling-documentation | draft | 1 | 0 | 1 | agent-tool01 |
 | PLAN-014 | doc-governance-model | draft | 1 | 0 | 4 | agent-gemini, agent-gov02, agent-gov03 |
 | PLAN-015 | doc-ephemeral-working-plans | draft | 0 | 0 | 1 | agent-codex-architecture |
-| PLAN-016 | doc-idea-record-system | draft | 1 | 0 | 3 | agent-claude, agent-codex-architecture, agent-slate |
+| PLAN-016 | doc-idea-record-system | draft | 2 | 0 | 3 | agent-claude, agent-codex-architecture, agent-slate |
 | PLAN-017 | doc-idea-plan-lifecycle | draft | 2 | 0 | 3 | agent-claude, agent-fold, agent-idea04 |
 | PLAN-017.01 | doc-idea-plan-idea-lifecycle | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-017.02 | doc-idea-plan-plan-lifecycle | draft | 2 | 0 | 0 | — |
@@ -149,6 +226,13 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
+| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
+| PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
+| PLAN-022 | doc-workbench | active | 0 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
+| PLAN-023 | doc-lit-campaign | draft | 6 | 1 | 0 | agent-lit |
+| PLAN-023.01 | doc-lit-campaign-scope | draft | 6 | 1 | 0 | agent-lit |
+| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 6 | 1 | 0 | agent-lit |
+| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 6 | 1 | 0 | agent-lit |
 
 ## Held codes
 
@@ -158,4 +242,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-107 documents — adr: 10, architecture: 5, governance: 7, operation: 9, plan: 30, prompt: 5, requirement: 4, session: 37.
+184 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 37, prompt: 31, requirement: 7, session: 66.

@@ -235,8 +235,8 @@ after both were already closed — a check on the two self-reviews above, not a 
 independently re-verified all five acceptance conditions against the diff and, notably, cross-checked
 this record's own claims against raw git history rather than accepting them: it confirmed the
 `SESS-*-02`→`SESS-*-03` renumbering really happened (the collision with `phase-idea-04`'s
-the commit “Complete phase-idea-04: the idea write path is safe and single-sourced” landing between the commit “Claim phase-ses-05 (agent-checkpoint)” and the commit “Add the session-close command with sub-agent review” is real, visible in `git log`) and that
-`git diff the commit “Add the session-close command with sub-agent review” the commit “Add the session-close command with sub-agent review” -- .claude/commands/session-close.md AGENTS.md CLAUDE.md` is empty,
+commit “Complete phase-idea-04: the idea write path is safe and single-sourced” landing between the commit “Claim phase-ses-05 (agent-checkpoint)” and the commit “Add the session-close command with sub-agent review” is real, visible in `git log`) and that
+a diff over `.claude/commands/session-close.md`, `AGENTS.md` and `CLAUDE.md` between the pre- and post-rebase commits — two distinct commits that shared the subject line “Add the session-close command with sub-agent review”, and which the history squash left indistinguishable, so this particular comparison can no longer be reproduced — was empty,
 meaning the deliverable content survived the rebase byte-for-byte. It could not inspect the original
 two review sub-agents' transcripts directly, but judged the two corrections above as specific and
 technically verifiable against real repository state rather than generic filler, and concluded this

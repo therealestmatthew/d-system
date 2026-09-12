@@ -1,0 +1,289 @@
+/*
+  D-System overview — stylesheet for the templates/html/overview-*.html family.
+
+  Inlined verbatim into overview-page.html's {{INLINE_STYLES}} token by the generator so the
+  rendered page carries no external stylesheet link (self-contained, no network dependency,
+  safe to embed by srcdoc or same-origin src). System font stack only — no webfont fetch.
+
+  Selectors are scoped under .overview so this file can be inlined into a page that also
+  carries the stage's own styles (phase-demo-02) without collision.
+*/
+
+.overview {
+  box-sizing: border-box;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1b1f24;
+  background: #ffffff;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.75rem 1rem 1.25rem;
+}
+
+.overview *,
+.overview *::before,
+.overview *::after {
+  box-sizing: inherit;
+}
+
+/* ---- header ---- */
+
+.overview__header {
+  margin-bottom: 0.75rem;
+}
+
+.overview__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.overview__meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #57606a;
+}
+
+/* ---- tabs (CSS-only, no JavaScript) ---- */
+
+.overview__tabset {
+  display: flex;
+  flex-wrap: wrap;
+  border-top: 1px solid #d0d7de;
+}
+
+.overview__tab-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overview__tab-label {
+  order: 1;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #57606a;
+  border-bottom: 2px solid transparent;
+  user-select: none;
+}
+
+.overview__tab-input:checked + .overview__tab-label {
+  color: #0969da;
+  border-bottom-color: #0969da;
+}
+
+.overview__tab-input:focus-visible + .overview__tab-label {
+  outline: 2px solid #0969da;
+  outline-offset: -2px;
+}
+
+.overview__panel {
+  order: 2;
+  display: none;
+  width: 100%;
+  padding-top: 0.75rem;
+}
+
+#tab-metrics:checked ~ #panel-metrics,
+#tab-concepts:checked ~ #panel-concepts,
+#tab-systems:checked ~ #panel-systems {
+  display: block;
+}
+
+.overview__panel-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ---- metrics: chart blocks + table fallback ---- */
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-section {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  min-width: 0;
+}
+
+.metric-section__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metric-section__chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 0.5rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(3.5rem, 30%) 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+}
+
+.bar-row__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #24292f;
+}
+
+.bar-row__track {
+  display: block;
+  height: 0.6rem;
+  background: #eaeef2;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-row__fill {
+  display: block;
+  height: 100%;
+  background: #0969da;
+  border-radius: 3px 0 0 3px;
+}
+
+.bar-row__value {
+  text-align: right;
+  color: #57606a;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-section__table-fallback {
+  margin-top: 0.5rem;
+}
+
+.metric-section__table-fallback summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #0969da;
+}
+
+.metric-table {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.metric-table th,
+.metric-table td {
+  text-align: left;
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid #eaeef2;
+}
+
+.metric-table th {
+  color: #57606a;
+  font-weight: 600;
+}
+
+/* ---- inventories: concepts, terms, systems ---- */
+
+.inventory__group {
+  margin-bottom: 1rem;
+}
+
+.inventory__group-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.inventory-table th,
+.inventory-table td {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid #eaeef2;
+  vertical-align: top;
+}
+
+.inventory-table th {
+  color: #57606a;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+}
+
+.inventory-table__id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  color: #57606a;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #eaeef2;
+  color: #24292f;
+}
+
+.status-badge--implemented {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+
+.status-badge--scaffold {
+  background: #fff8c5;
+  color: #9a6700;
+}
+
+.status-badge--planned {
+  background: #ddf4ff;
+  color: #0969da;
+}
+
+.status-badge--deprecated {
+  background: #ffebe9;
+  color: #cf222e;
+}
+
+/* ---- footer ---- */
+
+.overview__footer {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #d0d7de;
+  font-size: 0.7rem;
+  color: #57606a;
+}
+
+.overview__footer code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---- narrow embedding widths ---- */
+
+@media (max-width: 480px) {
+  .bar-row {
+    grid-template-columns: minmax(2.5rem, 25%) 1fr auto;
+    font-size: 0.7rem;
+  }
+
+  .overview__tab-label {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.78rem;
+  }
+}

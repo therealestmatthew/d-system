@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-06'
+updated: '2026-09-10'
 # Series definitions are the only source of truth for prefix, numbering and location.
 # The register holds nothing derivable from documents: no titles, statuses or owners.
 series:
