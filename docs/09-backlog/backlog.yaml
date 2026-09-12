@@ -1,9 +1,8 @@
 schema_version: 1
-updated: '2026-09-11'
+updated: '2026-09-12'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-10
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
@@ -5959,7 +5958,7 @@ items:
   - sys-demo-stage
   owner: repository-owner
   agent: agent-fable
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -5988,23 +5987,25 @@ items:
   deliverables:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
-  next_action: Owner approved integration 2026-09-12, but the primary dev checkout
-    holds a peer session's uncommitted work (idea-triage sweep, including the
-    open-idea test-fixture fix), so the merge waits per AGENTS.md hand-off step 6.
-    Once the peer commits, rebase agent/phase-wb-10 onto dev, re-run the gate and
-    fast-forward integrate; then the owner invokes /session-close.
+  next_action: None - closed by the owner-invoked /session-close on 2026-09-12.
   session: doc-session-phase-wb-10-runbook-refresh
   completion_evidence:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
-  result: 'In progress on branch agent/phase-wb-10 (commit 54e8390): both documents
-    rewritten against the integrated phase-wb-08/09 UI, verified in code rather than
-    from phase text - the assignment-only "Configure layout" dialog (one eligible-slot
-    selector per panel, in-place displacement confirm notice, no per-slot visible-panel
-    selects), switcher-only slot-header dropdowns, and the platform-conditional
-    fresh-store default shell (PowerShell on Windows, bash elsewhere); both launch
-    sections state the frontend D_SYSTEM_DEMO_TERMINAL=1 requirement and the
-    silently-blank-viewer failure mode it prevents. Historical rehearsal findings 4
-    and 6 annotated as superseded/resolved by wb-09/wb-08. Governance green;
-    private-content check OK with changes staged (31 identifiers); retired-phrasing
-    grep clean. Integration awaits the owner.'
+  - docs/03-sessions/SESS-2026-09-12-02-phase-wb-10-runbook-refresh.md
+  result: 'Complete (deliverables commit 93bb924 on agent/phase-wb-10, integrated
+    into dev with owner approval 2026-09-12): both documents rewritten against the
+    integrated phase-wb-08/09 UI, verified in code rather than from phase text -
+    the assignment-only "Configure layout" dialog (one eligible-slot selector per
+    panel, in-place displacement confirm notice, no per-slot visible-panel selects),
+    switcher-only slot-header dropdowns, and the platform-conditional fresh-store
+    default shell (PowerShell on Windows, bash elsewhere); both launch sections
+    state the frontend D_SYSTEM_DEMO_TERMINAL=1 requirement and the
+    silently-blank-viewer failure mode it prevents (owner-confirmed on Windows
+    2026-09-11). Historical rehearsal findings 4 and 6 annotated as
+    superseded/resolved by wb-09/wb-08. Verification: governance OK (170 documents),
+    check_no_private_content OK (509 tracked files, 31 identifiers, run with
+    _private symlinked into the worktree), retired-phrasing grep clean, full suite
+    578 passed post-rebase. Independent close review: both acceptance conditions
+    HOLD; three bookkeeping discrepancies (stale pre-rebase hash, uncommitted
+    verification-count correction, unpushed rebase) resolved in the close commit.'
