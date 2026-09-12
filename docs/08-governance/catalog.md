@@ -116,6 +116,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-027 | prompt | active | repository-owner | docs/02-prompts/PROMPT-027-literature-review-pre-plan-package.md |
 | PROMPT-028 | prompt | active | repository-owner | docs/02-prompts/PROMPT-028-literature-review-pack-factory.md |
 | PROMPT-029 | prompt | active | repository-owner | docs/02-prompts/PROMPT-029-literature-review-delegation-pack.md |
+| PROMPT-030 | prompt | active | repository-owner | docs/02-prompts/PROMPT-030-literature-review-coordinator.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -238,4 +239,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-180 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 37, prompt: 29, requirement: 7, session: 64.
+181 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 37, prompt: 30, requirement: 7, session: 64.
