@@ -6056,12 +6056,29 @@ items:
   deliverables:
   - research/literature-review/00_search_ledger.csv
   - research/literature-review/03_source_inventory.csv
-  next_action: Resume phase-lit-01 mid-phase. Delegation-pack sections K, S1, X1, S2
-    and X2 are complete and coordinator-verified (98 ledger rows, 139 inventory rows,
-    domains D01-D06 and D30-D31 swept); S3 is in flight. Dispatch the remainder of
-    PROMPT-029's LIT-01 section in order - X3, S4/X4, S5/X5, S6/X6, then the G gate -
-    assembled per its dispatch rules, on the campaign branch agent/lit-campaign in the
-    worktree ../d-system-worktrees/lit-campaign. See SESS-2026-09-12-05.
+  session: doc-session-literature-review-pass-1a
+  completion_evidence:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/01_terminology_map.md
+  - docs/03-sessions/SESS-2026-09-12-05-literature-review-pass-1a.md
+  result: All fourteen LIT-01 delegation-pack sections dispatched and verified. LIT-01
+    G passed all three gates on its second run - every one of the 25 domains D01-D20
+    and D28-D32 clears two rows with distinct queries, no mandated variant uncovered,
+    zero excluded inventory rows missing a reason, zero kept-but-uninventoried sources.
+    267 ledger rows (S001-S267, contiguous), 438 inventory rows (427 candidate, 11
+    excluded), 159 flagged collision_candidate, 26 terminology-map sections. G's first
+    run failed two gates - both recorded - one a real variant gap closed by two
+    supplementary searches, one a defect in the gate's own column choice. Post-rebase
+    onto dev at 33f931a - governance exit 0, 578 tests passing. No Opus escalation, no
+    descope rung.
+  next_action: Owner review. The phase's work is finished and gate-measured; what
+    remains is not an agent's. Run /session-close to decide whether acceptance genuinely
+    holds, then integrate agent/lit-campaign into dev - the first of the two integrations
+    PLAN-023 schedules. Note the private-content check verified nothing in the worktree
+    (0 identifiers; _private/ is gitignored and absent there), so the integration-time
+    run in the primary checkout is the first real one - see idea 000150. phase-lit-02
+    becomes ready once this phase is complete. See SESS-2026-09-12-05.
 - id: phase-lit-02
   title: Literature review Pass 1b — broad map of agent memory, decision intelligence
     and requirements-engineering domains
