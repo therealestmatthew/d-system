@@ -6,6 +6,7 @@ next_up:
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
+- phase-lit-01
 items:
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
