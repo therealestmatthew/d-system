@@ -5104,6 +5104,7 @@ PROPOSED LINK: 000097 --relates_to--> 000099 (000099 is a concrete example of th
 
 - relates_to → `000099`
 - relates_to ← `000129`
+- relates_to ← `000138`
 
 ---
 
@@ -5259,6 +5260,7 @@ PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass thi
 
 - relates_to → `000104`
 - relates_to → `000134`
+- relates_to ← `000141`
 
 ---
 
@@ -6064,6 +6066,7 @@ PROPOSED LINK: 000124 --relates_to--> 000133 (Geometry redesign builds on the fo
 - relates_to ← `000123`
 - relates_to ← `000133`
 - relates_to ← `000135`
+- relates_to ← `000141`
 
 ---
 
@@ -6499,6 +6502,7 @@ No additional plan, requirement, ADR or backlog phase is needed to capture this 
 
 - relates_to → `000124`
 - relates_to → `000115`
+- relates_to ← `000141`
 
 ---
 
@@ -6556,6 +6560,7 @@ PROPOSED LINK: 000136 --relates_to--> 000139 (Both specify methodologies for imp
 **Links**
 
 - relates_to → `000126`
+- relates_to → `000139`
 
 ---
 
@@ -6599,6 +6604,7 @@ PROPOSED LINK: 000137 --relates_to--> 000140 (000140 explicitly uses 000137's cl
 
 **Links**
 
+- relates_to → `000140`
 - relates_to ← `000140`
 
 ---
@@ -6639,7 +6645,9 @@ PROPOSED LINK: 000138 --relates_to--> 000097 (both address agent failure/anti-pa
 **Links**
 
 - relates_to → `000128`
+- relates_to → `000097`
 - relates_to ← `000139`
+- extended_by ← `000139`
 
 ---
 
@@ -6700,6 +6708,8 @@ PROPOSED LINK: 000139 --extends--> 000138 (both define the anti-pattern tracking
 
 - relates_to → `000138`
 - relates_to → `000126`
+- extends → `000138`
+- relates_to ← `000136`
 
 ---
 
@@ -6748,6 +6758,7 @@ No related plan, requirement, or ADR is missing. The governance documents provid
 **Links**
 
 - relates_to → `000137`
+- relates_to ← `000137`
 
 ---
 
@@ -6790,3 +6801,9 @@ PROPOSED LINK: 000141 --relates_to--> 000124 (presupposes container-vs-content v
 PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modularity into a structural framework with nested sub-slots)
 
 </details>
+
+**Links**
+
+- relates_to → `000101`
+- relates_to → `000124`
+- relates_to → `000135`

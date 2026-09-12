@@ -612,3 +612,10 @@
 {"idea": "000141", "event": "status", "at": "2026-09-11T23:06:09-04:00", "eid": "e18d473e2ad0c9799", "from": "open", "to": "triaged"}
 {"idea": "000136", "event": "status", "at": "2026-09-11T23:06:09-04:00", "eid": "e18d473e2b3f2d5a6", "from": "open", "to": "triaged"}
 {"idea": "000139", "event": "status", "at": "2026-09-11T23:06:09-04:00", "eid": "e18d473e2b9f80fca", "from": "open", "to": "triaged"}
+{"idea": "000137", "event": "linked", "at": "2026-09-11T23:07:51-04:00", "eid": "e18d473fa91d0accf", "type": "relates_to", "target": "000140"}
+{"idea": "000138", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473fa97d02f70", "type": "relates_to", "target": "000097"}
+{"idea": "000136", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473fa9e577038", "type": "relates_to", "target": "000139"}
+{"idea": "000139", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473faa484397a", "type": "extends", "target": "000138"}
+{"idea": "000141", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473faab056487", "type": "relates_to", "target": "000101"}
+{"idea": "000141", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473fab1e21e55", "type": "relates_to", "target": "000124"}
+{"idea": "000141", "event": "linked", "at": "2026-09-11T23:07:52-04:00", "eid": "e18d473fab7f9cf0a", "type": "relates_to", "target": "000135"}
