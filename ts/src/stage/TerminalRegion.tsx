@@ -43,6 +43,34 @@ interface ShellRefusal {
   message: string
 }
 
+// REQ-007 W17 item 3 / ADR-014 section 4: the backend caps *concurrent sessions across every
+// terminal panel on the page* (`MAX_CONCURRENT_SESSIONS` in `src/api/routes/demo_terminal.py`),
+// which is what makes two live shells in two slots safe and what a fifth or seventh session runs
+// into. Unlike the shell refusal above, this refusal happens during the websocket handshake —
+// the backend closes before `accept()`, and uvicorn turns a pre-accept close into an HTTP 403
+// handshake rejection, so the browser reports a generic `CloseEvent` (code 1006, empty reason)
+// and the server's own close code and reason never reach this file. The signal available here is
+// therefore structural, not textual: the socket closed without ever having opened.
+//
+// That is still specific enough to say something true and useful. A session whose socket never
+// opens was refused by the server; with the availability check above already reporting the
+// terminal route as enabled, a refusal at this point is the session cap. The message says so
+// without asserting a number this file cannot see, and the `event.reason` branch takes over if a
+// future refusal path closes *after* accepting (where the reason does survive) — the server's own
+// wording beats anything invented here.
+const CAP_REFUSAL_MIN_CLOSE_CODE = 4000
+
+function connectionRefusalMessage(event: CloseEvent): string {
+  if (event.code >= CAP_REFUSAL_MIN_CLOSE_CODE && event.reason.trim().length > 0) {
+    return event.reason
+  }
+  return (
+    'This session could not start: the backend refused the connection before it opened. That is ' +
+    'what happens when the limit on concurrent terminal sessions across all panels is reached. ' +
+    'Close a session tab here or in another terminal panel, then open a new session.'
+  )
+}
+
 function parseShellRefusal(raw: string): ShellRefusal | null {
   let parsed: unknown
   try {
@@ -106,6 +134,12 @@ const TerminalSession = forwardRef<
   // session's body in place of the xterm mount, exactly like the existing `connectionState ===
   // 'closed'` overlay below — never a raw error, never an unmounted/broken terminal.
   const [shellRefusal, setShellRefusal] = useState<ShellRefusal | null>(null)
+  // REQ-007 W17 item 3: set when this session's socket closed without ever opening — a refused
+  // connection, in practice the backend's global concurrent-session cap. Kept separate from
+  // `connectionState` because the two say different things to the presenter: a socket that opened
+  // and later closed is a finished session, a socket that never opened is one that was never
+  // allowed to start, and only the second is fixed by closing another tab.
+  const [connectionRefusal, setConnectionRefusal] = useState<string | null>(null)
   // Holds the mount effect's `attemptFit` closure so the visibility-triggered effect below can
   // call the same guarded-fit-and-resize-frame logic without redefining it.
   const attemptFitRef = useRef<() => void>(() => {})
@@ -146,8 +180,13 @@ const TerminalSession = forwardRef<
     // Without it, the first (StrictMode-only) instance's `message` handler could still call
     // `term.write()` after `term.dispose()` had already run.
     let disposed = false
+    // Distinguishes "closed after running" from "never allowed to start" for the close handler
+    // below (REQ-007 W17 item 3). A ref-free local is enough: it is only ever read by handlers
+    // this same effect registers, and it resets with the effect on a genuine remount.
+    let everOpened = false
 
     setConnectionState('connecting')
+    setConnectionRefusal(null)
 
     const term = new Terminal({
       cursorBlink: true,
@@ -191,13 +230,15 @@ const TerminalSession = forwardRef<
     attemptFit()
 
     socket.addEventListener('open', () => {
+      everOpened = true
       if (disposed) return
       setConnectionState('open')
       attemptFit()
     })
-    socket.addEventListener('close', () => {
+    socket.addEventListener('close', (event) => {
       if (disposed) return
       setConnectionState('closed')
+      if (!everOpened) setConnectionRefusal(connectionRefusalMessage(event))
     })
     socket.addEventListener('error', () => {
       if (disposed) return
@@ -280,6 +321,13 @@ const TerminalSession = forwardRef<
         // one that belongs on screen, not the generic reconnect prompt.
         <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
           {refusalDisplayMessage(shellRefusal)}
+        </p>
+      ) : connectionRefusal ? (
+        // A session the backend never let start (the global session cap, in practice) — a
+        // different situation from a session that ran and ended, and it gets its own message
+        // rather than the generic "reload the page" one below, which would not help here.
+        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
+          {connectionRefusal}
         </p>
       ) : connectionState === 'closed' ? (
         <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">

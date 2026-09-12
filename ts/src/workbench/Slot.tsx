@@ -2,127 +2,131 @@ import Popover from '../stage/Popover'
 import { PANEL_REGISTRY, panelDisplayName } from './panelRegistry'
 import type { LayoutSlotDefinition } from './types'
 
-/** The panel type id this slot should actually show: `resolvedPanelId` (from
- * `useWorkbenchLayouts`'s `getSlotPanel`) when it is both still admitted here and implemented
- * (`PANEL_REGISTRY[id].Component` non-null), else the first implemented panel `admits` lists,
- * else `null` when none of this slot's admitted panels are implemented yet (e.g. `explorer`
- * before `phase-wb-05`/`phase-wb-06` landed). Exported so `StagePage.tsx`'s portal-host
- * computation (REQ-007 W17 item 4, below) resolves the *same* panel id this file's own header
- * resolves, from the same inputs — one rule, not two copies that could drift apart. */
-export function resolveImplementedPanel(
-  admits: string[],
-  resolvedPanelId: string | null,
-): string | null {
-  const implementedAdmits = admits.filter((id) => PANEL_REGISTRY[id]?.Component)
-  if (implementedAdmits.length === 0) return null
-  return resolvedPanelId && implementedAdmits.includes(resolvedPanelId)
-    ? resolvedPanelId
-    : implementedAdmits[0]
-}
-
 /**
- * One layout slot's chrome (REQ-007 W05/W06/W16/W17):
+ * One layout slot's chrome (REQ-007 W05/W06/W16/W17).
  *
- * - Zero implemented panels admitted (e.g. `explorer` before phase-wb-05/06 land): a plain header
- *   naming the slot and a clear in-page placeholder — the same "say so in place" posture ADR-013
- *   applies to the absent terminal route, generalized to an absent panel.
- * - Exactly one implemented panel admitted: a plain header, satisfied entirely by that panel's
- *   own `.stage-region` (every panel this engine hosts already renders one) — this component
- *   renders no header markup of its own in that case, only the portal body container below.
- * - More than one implemented panel admitted (the terminal slot, since `phase-wb-03`'s CMD and
- *   PowerShell shell options landed, and layout 1's explorer slot, since `phase-wb-06`'s
- *   `idea-explorer` joined `phase-wb-05`'s `file-browser`): a slot-level header shows the current
- *   panel's name beside a small downward-triangle dropdown listing the *other panels currently
- *   assigned to this slot* — REQ-007 W16/W17: this dropdown is a visibility switcher only, never
- *   a reassignment; it lists exactly `slot.admits` (whatever the configuration dialog's per-panel
- *   assignment currently places here) and only ever calls `onSelectPanel` (`setSlotPanel`), which
- *   changes which of those is shown, never which slot a panel belongs to. Moving a panel to a
- *   *different* slot is the assignment-only configuration dialog's job now
- *   (`LayoutConfigDialog.tsx`, "one selector per panel over its eligible slots"). The swapped-in
- *   panel still renders its own inner header too — a double-header cosmetic case left as-is,
- *   noted in `panelRegistry.tsx`.
+ * `visiblePanelId` arrives already fully resolved by `useWorkbenchLayouts`'s `getSlotPanel` — the
+ * one resolver, which accounts for the stored choice, the deliberate "nothing visible" state, the
+ * terminal slot's platform-conditional default, the layout file's default and whether a panel type
+ * is implemented yet. This file never re-resolves it (the former exported `resolveImplementedPanel`
+ * helper, which both this file and `StagePage.tsx` had to wrap every call in, is gone: see
+ * `getSlotPanel`'s doc for why one function with one answer replaced it).
  *
- * REQ-007 W17 item 4: the resolved panel's component is no longer rendered inline in this file's
- * own JSX tree. Instead, this slot renders a stable body container `<div>` (registered with
- * `StagePage.tsx` via `registerBody`) that `StagePage.tsx` portals the resolved panel's component
- * into, keyed by *panel id* rather than by this slot. That is what lets a panel reassigned to a
- * different slot (via the configuration dialog) keep its component instance — and so a live
- * terminal session — mounted instead of unmounting here and remounting fresh over there: the
- * portal's target container changes, but the React element at that keyed position does not, so
- * the underlying component is never torn down. This `Slot` instance itself (and so this container
- * div) never remounts across a layout switch either, for the same reason `StagePage.tsx` already
- * relied on before this delta: both shipped layout files declare the identical four slot ids, so
- * `StagePage.tsx`'s one grid keeps rendering the same slot-keyed `<div>` regardless of which
- * layout is active.
+ * The header has exactly two shapes:
+ *
+ * - **A plain header** naming the slot, when there is nothing to choose: the slot has no
+ *   implemented panel assigned to it at all (e.g. a slot admitting only panel ids a later phase
+ *   will implement), or it has exactly one and that one is showing. REQ-007 W16/W17: "a slot with
+ *   one assigned panel renders a plain header."
+ * - **A switcher dropdown** — the current panel's name beside a small downward triangle, opening a
+ *   list of the slot's other assigned panels — when the slot holds more than one implemented panel,
+ *   or when it currently shows nothing but still holds at least one. That second case is the way
+ *   back from the "nothing visible" state a reassignment can leave behind (`NO_VISIBLE_PANEL` in
+ *   `useWorkbenchLayouts.ts`): a slot showing nothing must offer a way to show something, even when
+ *   only one panel remains assigned to it, or that panel would be reachable only through the
+ *   configuration dialog.
+ *
+ * The dropdown is a *visibility switcher only*, never a reassignment (REQ-007 W16/W17): it lists
+ * exactly the panels currently assigned here (`slot.admits`, whatever the configuration dialog's
+ * per-panel assignment places in this slot) and only ever calls `onSelectPanel` (`setSlotPanel`).
+ * Moving a panel to a *different* slot is the assignment-only configuration dialog's job
+ * (`LayoutConfigDialog.tsx`, "one selector per panel over its eligible slots").
+ *
+ * REQ-007 W17 item 4: the resolved panel's component is not rendered in this file's own JSX tree.
+ * This slot renders a stable body container `<div>` (registered with `StagePage.tsx` via
+ * `registerBody`), and `StagePage.tsx` appends the visible panel's own persistent host element into
+ * it. Every branch below returns the *same* root shape — `<section>`, then an unconditional
+ * `<header>`, then that body `<div>` — regardless of how many panels are assigned or whether one is
+ * showing, varying only their *contents*. That uniformity is load-bearing, not tidiness: React
+ * cannot reuse a DOM node across a change of returned root element type, so a reassignment that
+ * changed a slot's panel count across the 1 <-> (0 or >1) boundary used to tear this whole subtree
+ * down and rebuild it — taking the registered body container, and any panel mounted inside it, with
+ * it (verified live in W09 fix cycle 1: a reassignment closed the moved terminal's websocket and
+ * opened a brand new one). An ordinary prop/children update reconciles in place instead, so the
+ * body `<div>` is the same DOM node across every 0/1/>1 transition.
  */
 export default function Slot({
   slot,
-  resolvedPanelId,
+  visiblePanelId,
   onSelectPanel,
   registerBody,
 }: {
   slot: LayoutSlotDefinition
-  resolvedPanelId: string | null
+  visiblePanelId: string | null
   onSelectPanel: (panelId: string) => void
   registerBody: (element: HTMLDivElement | null) => void
 }) {
   const implementedAdmits = slot.admits.filter((id) => PANEL_REGISTRY[id]?.Component)
+  const isEmpty = implementedAdmits.length === 0
+  const isMulti = implementedAdmits.length > 1
+  const showsNothing = !isEmpty && visiblePanelId === null
+  const hasSwitcher = isMulti || showsNothing
+  const otherPanelIds = implementedAdmits.filter((id) => id !== visiblePanelId)
 
-  if (implementedAdmits.length === 0) {
-    return (
-      <section className="stage-region stage-workbench-slot--empty" aria-label={slot.display_name}>
-        <header className="stage-region__header">
+  return (
+    <section
+      className={
+        'stage-region' +
+        (isEmpty ? ' stage-workbench-slot--empty' : '') +
+        (isMulti ? ' stage-workbench-slot--multi' : '')
+      }
+      aria-label={slot.display_name}
+    >
+      <header className="stage-region__header stage-workbench-slot__header">
+        {hasSwitcher ? (
+          <Popover
+            triggerLabel={`${visiblePanelId ? panelDisplayName(visiblePanelId) : 'Choose a panel'} ▾`}
+            title={`${slot.display_name}: choose a panel`}
+          >
+            {(close) => (
+              <ul className="stage-workbench-slot__panel-list">
+                {otherPanelIds.map((panelId) => (
+                  <li key={panelId}>
+                    <button
+                      type="button"
+                      className="stage-workbench-slot__panel-option"
+                      onClick={() => {
+                        onSelectPanel(panelId)
+                        close()
+                      }}
+                    >
+                      {panelDisplayName(panelId)}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Popover>
+        ) : (
+          // Nothing to switch to — a slot with no implemented panel, or with exactly one and that
+          // one already showing — so the header just names the slot.
           <h2>{slot.display_name}</h2>
-        </header>
-        <div className="stage-region__body">
+        )}
+      </header>
+      <div
+        className={
+          isMulti
+            ? 'stage-region__body stage-workbench-slot__body'
+            : isEmpty
+              ? 'stage-region__body stage-workbench-slot__portal-body'
+              : 'stage-workbench-slot__portal-body'
+        }
+        ref={registerBody}
+      >
+        {/* Only ever React children *or* `StagePage.tsx`'s appended panel host, never both: the
+            two placeholders below render exactly when no panel is visible here, which is exactly
+            when no host is appended into this container. */}
+        {isEmpty ? (
           <p className="stage-placeholder-text stage-placeholder-text--absent">
             No panels are available in this slot yet.
           </p>
-        </div>
-      </section>
-    )
-  }
-
-  const currentPanelId = resolveImplementedPanel(slot.admits, resolvedPanelId) ?? implementedAdmits[0]
-
-  if (implementedAdmits.length === 1) {
-    // No extra chrome here — the portaled panel's own `.stage-region` is what renders the "plain
-    // header" REQ-007 W06 calls for. This container is a transparent flex pass-through (see
-    // `.stage-workbench-slot__portal-body` in `StagePage.css`), sized identically to the plain
-    // `<Component />` this branch rendered directly before the W17 portal delta.
-    return <div className="stage-workbench-slot__portal-body" ref={registerBody} />
-  }
-
-  const otherPanelIds = implementedAdmits.filter((id) => id !== currentPanelId)
-
-  return (
-    <section className="stage-region stage-workbench-slot--multi" aria-label={slot.display_name}>
-      <header className="stage-region__header stage-workbench-slot__header">
-        <Popover
-          triggerLabel={`${panelDisplayName(currentPanelId)} ▾`}
-          title={`${slot.display_name}: choose a panel`}
-        >
-          {(close) => (
-            <ul className="stage-workbench-slot__panel-list">
-              {otherPanelIds.map((panelId) => (
-                <li key={panelId}>
-                  <button
-                    type="button"
-                    className="stage-workbench-slot__panel-option"
-                    onClick={() => {
-                      onSelectPanel(panelId)
-                      close()
-                    }}
-                  >
-                    {panelDisplayName(panelId)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Popover>
-      </header>
-      <div className="stage-region__body stage-workbench-slot__body" ref={registerBody} />
+        ) : showsNothing ? (
+          <p className="stage-placeholder-text stage-placeholder-text--absent">
+            No panel is shown here. Use this slot's header menu to choose one of the panels
+            assigned to it.
+          </p>
+        ) : null}
+      </div>
     </section>
   )
 }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Popover from '../stage/Popover'
 import { PANEL_REGISTRY, panelDisplayName } from './panelRegistry'
 import type { LayoutDefinition } from './types'
@@ -33,30 +34,64 @@ function slotDisplayName(layout: LayoutDefinition, slotId: string): string {
  * a slot's visible-panel choice at all — that stays the header dropdown's job alone (`Slot.tsx`,
  * "switchers only... they never re-assign").
  *
- * REQ-007 W17 item 4: picking a different slot here applies immediately, with no confirmation
- * step, because it does not kill anything to confirm against — `StagePage.tsx` portals a panel's
- * component into whichever slot's container is currently assigned to it, keyed by panel id, so
- * moving a panel to a new (already-mounted) slot container relocates its live component instance
- * rather than remounting it. There is no case reachable from this dialog today where that portal
- * target is unavailable (every slot named in a panel's `eligible_slots` is a slot the active
- * layout actually declares, by the layout-schema test idea `000098` already enforces), so no
- * "remount is unavoidable" fallback notice applies here; if a future layout ever named an
- * eligible slot the active layout does not have, `StagePage.tsx`'s portal simply does not render
- * until that slot exists, same as any other panel with no registered container yet — never a
- * crash, and never a silent loss of an already-mounted instance, since nothing already mounted
- * would need moving in that case.
+ * REQ-007 W16, "re-assigning a panel to another slot never silently kills a shell session":
+ *
+ * The panel *being moved* is never killed and needs no confirmation. `StagePage.tsx` portals every
+ * panel into its own stable host element and moves that element between slot bodies, so a
+ * reassignment does not re-render the panel, let alone remount it — a live shell keeps its
+ * websocket, its process and its scrollback across the move (see `StagePage.tsx`'s file doc for
+ * the mechanism, and for why the previous "the portal relocates itself" assumption was false).
+ *
+ * What a move *can* end is the panel already visible in the destination slot. A slot shows one
+ * panel at a time, so moving a panel into an occupied slot hides the occupant, and a hidden panel
+ * is unmounted (mounting hidden panels would open shell sessions nobody is watching, against the
+ * backend's six-session global cap). That unmount is genuinely unavoidable, so this dialog takes
+ * W16's other branch for it: the move is *not* applied on selection. The dialog states in place
+ * which panel would be closed and what that costs, and applies only when the presenter confirms.
+ * Moving a panel into a slot that currently shows nothing applies immediately — there is nothing
+ * to close and so nothing to warn about.
  */
 export default function LayoutConfigDialog({
   layouts,
   activeLayout,
   onSelectLayout,
   onAssignPanelSlot,
+  visiblePanelInSlot,
 }: {
   layouts: LayoutDefinition[]
   activeLayout: LayoutDefinition | null
   onSelectLayout: (layoutId: string) => void
   onAssignPanelSlot: (layoutId: string, panelId: string, slotId: string) => void
+  /** The panel currently visible (and so currently mounted) in `slotId`, or `null` when that slot
+   * shows nothing — `StagePage.tsx` passes the same resolved answer the slots themselves render
+   * from. */
+  visiblePanelInSlot: (slotId: string) => string | null
 }) {
+  // A move selected but not yet applied, because it would close the destination slot's current
+  // occupant. Exactly one can be pending at a time: the selector that opened it is the only one
+  // showing a value that is not yet real.
+  const [pendingMove, setPendingMove] = useState<{
+    panelId: string
+    slotId: string
+    displacedPanelId: string
+  } | null>(null)
+
+  const requestMove = (layoutId: string, panelId: string, slotId: string) => {
+    const displacedPanelId = visiblePanelInSlot(slotId)
+    if (displacedPanelId && displacedPanelId !== panelId) {
+      setPendingMove({ panelId, slotId, displacedPanelId })
+      return
+    }
+    setPendingMove(null)
+    onAssignPanelSlot(layoutId, panelId, slotId)
+  }
+
+  const applyPendingMove = (layoutId: string) => {
+    if (!pendingMove) return
+    onAssignPanelSlot(layoutId, pendingMove.panelId, pendingMove.slotId)
+    setPendingMove(null)
+  }
+
   return (
     <Popover
       triggerLabel="Configure layout ▾"
@@ -87,22 +122,65 @@ export default function LayoutConfigDialog({
               .filter((panel) => PANEL_REGISTRY[panel.panel_id]?.Component)
               .map((panel) => {
                 const assignedSlotId = findAssignedSlotId(activeLayout, panel.panel_id)
+                const pendingHere = pendingMove?.panelId === panel.panel_id ? pendingMove : null
                 return (
-                  <label key={panel.panel_id} className="stage-workbench-config__panel-option">
-                    <span>{panelDisplayName(panel.panel_id)}</span>
-                    <select
-                      value={assignedSlotId ?? panel.eligible_slots[0]}
-                      onChange={(event) =>
-                        onAssignPanelSlot(activeLayout.layout_id, panel.panel_id, event.target.value)
-                      }
-                    >
-                      {panel.eligible_slots.map((slotId) => (
-                        <option key={slotId} value={slotId}>
-                          {slotDisplayName(activeLayout, slotId)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <div key={panel.panel_id}>
+                    <label className="stage-workbench-config__panel-option">
+                      <span>{panelDisplayName(panel.panel_id)}</span>
+                      <select
+                        // While a move is pending confirmation the selector shows the slot the
+                        // presenter picked, not the one still in force — otherwise the control
+                        // would snap back under the notice asking them to confirm it.
+                        value={pendingHere?.slotId ?? assignedSlotId ?? panel.eligible_slots[0]}
+                        onChange={(event) =>
+                          requestMove(activeLayout.layout_id, panel.panel_id, event.target.value)
+                        }
+                      >
+                        {panel.eligible_slots.map((slotId) => (
+                          <option key={slotId} value={slotId}>
+                            {slotDisplayName(activeLayout, slotId)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {pendingHere ? (
+                      <div
+                        className="stage-workbench-config__notice"
+                        role="alert"
+                        aria-live="polite"
+                      >
+                        <p className="stage-placeholder-text stage-placeholder-text--absent">
+                          {slotDisplayName(activeLayout, pendingHere.slotId)} is showing{' '}
+                          {panelDisplayName(pendingHere.displacedPanelId)}. A slot shows one panel
+                          at a time, so moving {panelDisplayName(panel.panel_id)} there closes{' '}
+                          {panelDisplayName(pendingHere.displacedPanelId)} — any live session or
+                          unsaved state in it ends and it starts fresh when shown again.{' '}
+                          {panelDisplayName(panel.panel_id)} itself is not restarted by the move.
+                        </p>
+                        <button
+                          type="button"
+                          // Reuses the workbench family's existing small-button style: adding a
+                          // rule for a new class would mean editing `StagePage.css`, which is
+                          // outside this work item's deliverable paths.
+                          className="stage-workbench-config__notice-action stage-workbench-slot__panel-option"
+                          onClick={() => applyPendingMove(activeLayout.layout_id)}
+                        >
+                          Confirm: move {panelDisplayName(panel.panel_id)} and close{' '}
+                          {panelDisplayName(pendingHere.displacedPanelId)}
+                        </button>
+                        <button
+                          type="button"
+                          // Reuses the workbench family's existing small-button style: adding a
+                          // rule for a new class would mean editing `StagePage.css`, which is
+                          // outside this work item's deliverable paths.
+                          className="stage-workbench-config__notice-action stage-workbench-slot__panel-option"
+                          onClick={() => setPendingMove(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 )
               })}
           </fieldset>

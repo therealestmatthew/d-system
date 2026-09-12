@@ -6,6 +6,7 @@ import {
   type RawLayoutFile,
 } from './types'
 import { loadStoredState, patchStoredState } from './storage'
+import { PANEL_REGISTRY } from './panelRegistry'
 
 // The two shipped layout files (REQ-007 W05, ADR-016 rule 1) — served at runtime by the Vite dev
 // plugin `serveWorkbenchLayouts` (`ts/vite.config.ts`) from `_data/workbench/layouts/`, never
@@ -32,6 +33,29 @@ const TERMINAL_SLOT_ID = 'terminal'
 const BASH_PANEL_ID = 'terminal'
 const POWERSHELL_PANEL_ID = 'terminal-powershell'
 const PLATFORM_ROUTE = '/api/v1/workbench/platform'
+
+/**
+ * The stored `slot_visible_panel` value meaning "this slot deliberately shows nothing right now"
+ * — distinct from *no stored entry at all*, which still resolves to the layout file's own default
+ * (and, for the terminal slot, the platform-conditional default above).
+ *
+ * It exists for exactly one situation (REQ-007 W16, W09 fix cycle 3): a reassignment that moves a
+ * slot's *currently visible* panel out of it. Without this, `getSlotPanel` fell through to that
+ * slot's "first still-assigned panel" default the instant the moved panel left `admits` — and for
+ * the terminal slot, whose remaining assigned panels are CMD and PowerShell, that meant moving the
+ * live bash panel to another slot spontaneously mounted a *CMD* panel, which opens a websocket and
+ * spawns a shell nobody asked for, consuming one of the backend's six global session slots
+ * (`MAX_CONCURRENT_SESSIONS`, ADR-014 section 4). A websocket-opening panel must never mount as a
+ * side effect of moving a different panel, so the vacated slot resolves to "nothing visible"
+ * instead and `Slot.tsx` offers its header dropdown to pick one of the panels still assigned there.
+ *
+ * The empty string is safe as the sentinel: it is not a legal panel id (every id in
+ * `panelRegistry.tsx` and in the layout files is a non-empty string), and it survives
+ * `storage.ts`'s structural `typeof entry === 'string'` check unchanged, so persisting it needs no
+ * storage-layer change and an older build reading it simply finds no matching panel and falls back
+ * to its own default (ADR-016 rule 4).
+ */
+const NO_VISIBLE_PANEL = ''
 
 /** The terminal slot's platform-conditional fresh-store default panel id (REQ-007 W17): bash
  * unless the backend's `/platform` route (`src/api/routes/workbench.py`, W09-C1) reports
@@ -199,7 +223,12 @@ export function useWorkbenchLayouts() {
             const validVisible: Record<string, string> = {}
             for (const [slotId, panelId] of Object.entries(storedVisible)) {
               const slot = slotsById.get(slotId)
-              if (slot && slot.admits.includes(panelId)) validVisible[slotId] = panelId
+              if (!slot) continue
+              // `NO_VISIBLE_PANEL` is a valid stored value for any declared slot (see its doc
+              // above) — it names no panel on purpose, so the `admits` check does not apply to it.
+              if (panelId === NO_VISIBLE_PANEL || slot.admits.includes(panelId)) {
+                validVisible[slotId] = panelId
+              }
             }
             if (Object.keys(validVisible).length > 0) {
               validatedVisiblePanels[layout.layout_id] = validVisible
@@ -268,12 +297,38 @@ export function useWorkbenchLayouts() {
 
   const activeLayout = layouts.find((layout) => layout.layout_id === activeLayoutId) ?? null
 
-  /** The panel type id resolved as visible for `slot` within `layout`: the stored visible-panel
-   * choice when it still names a panel currently assigned to that slot, else the slot's own
-   * computed default (which may be `null`). */
+  /**
+   * The panel type id `slot` actually shows within `layout` — `null` for "show no panel here".
+   * This is the *single* resolver: it already accounts for the stored visible-panel choice, the
+   * explicit `NO_VISIBLE_PANEL` sentinel, the terminal slot's platform-conditional fresh-store
+   * default, the layout file's declared default, and whether the resolved panel type is actually
+   * implemented yet (`PANEL_REGISTRY[id].Component` non-null — e.g. a slot admitting a panel id a
+   * later phase will fill in). Both consumers — `Slot.tsx`'s header and `StagePage.tsx`'s portal
+   * host — take this value verbatim.
+   *
+   * W09 fix cycle 3 folded the implemented-panel step in from `Slot.tsx`'s former exported
+   * `resolveImplementedPanel` helper, which both consumers had to remember to wrap this call in.
+   * That split made "nothing is visible here" unrepresentable: the helper turned every `null` back
+   * into "the first implemented admitted panel", so the deliberate `NO_VISIBLE_PANEL` state above
+   * could not survive the trip to either consumer. One function, one answer, no wrapper to forget.
+   *
+   * Resolution order:
+   *  1. the stored choice, when it is the sentinel (-> `null`) or names an implemented panel
+   *     currently assigned here;
+   *  2. the terminal slot's platform-conditional default (REQ-007 W17), when that panel is
+   *     currently assigned here — fresh store only, since a stored choice already returned above;
+   *  3. the layout file's own default for this slot (`buildSlots`), when implemented;
+   *  4. the first implemented panel assigned here — what a slot whose declared default names an
+   *     unimplemented panel, or declares none at all (layout 1's explorer slot), has always shown;
+   *  5. `null`, when no panel assigned here is implemented yet.
+   */
   const getSlotPanel = (layout: LayoutDefinition, slot: LayoutSlotDefinition): string | null => {
+    const implemented = (panelId: string | null | undefined): boolean =>
+      !!panelId && slot.admits.includes(panelId) && !!PANEL_REGISTRY[panelId]?.Component
+
     const stored = slotVisiblePanel[layout.layout_id]?.[slot.slot_id]
-    if (stored && slot.admits.includes(stored)) return stored
+    if (stored === NO_VISIBLE_PANEL) return null
+    if (implemented(stored)) return stored as string
     // REQ-007 W17: only the terminal slot's *fresh-store* default (no stored choice survived
     // validation above) is platform-conditional, and only when the platform-preferred panel is
     // actually one of this slot's currently-assigned panels — a user who has reassigned
@@ -281,18 +336,18 @@ export function useWorkbenchLayouts() {
     // not having PowerShell available, both fall straight through to the layout file's own
     // (platform-neutral) `default_panel` below, same as ADR-016 rule 4's "no valid override falls
     // back to the file's own default" posture elsewhere in this hook.
-    if (
-      slot.slot_id === TERMINAL_SLOT_ID &&
-      slot.admits.includes(terminalPlatformDefaultPanelId)
-    ) {
+    if (slot.slot_id === TERMINAL_SLOT_ID && implemented(terminalPlatformDefaultPanelId)) {
       return terminalPlatformDefaultPanelId
     }
-    return slot.default_panel
+    if (implemented(slot.default_panel)) return slot.default_panel
+    return slot.admits.find((panelId) => PANEL_REGISTRY[panelId]?.Component) ?? null
   }
 
   /** Changes which of a slot's currently-assigned panels is visible — never a reassignment (see
-   * `setPanelSlot` for that). This is what `Slot.tsx`'s header dropdown and
-   * `LayoutConfigDialog.tsx`'s per-slot select both call today. */
+   * `setPanelSlot` for that). `Slot.tsx`'s header dropdown is its only caller (REQ-007 W16/W17:
+   * the header dropdowns are switchers only, and the configuration dialog no longer duplicates
+   * them). Also the way out of the `NO_VISIBLE_PANEL` state a reassignment can leave behind: any
+   * pick here overwrites the sentinel with a real panel id. */
   const setSlotPanel = (layoutId: string, slotId: string, panelId: string) => {
     setSlotVisiblePanel((previous) => ({
       ...previous,
@@ -303,15 +358,54 @@ export function useWorkbenchLayouts() {
   /** Moves `panelId` to `slotId` within `layoutId` — the REQ-007 W16 primitive the W17
    * assignment-only configuration dialog calls ("one selector per panel over its eligible
    * slots"). Silently a no-op if `slotId` is not one of the panel's eligible slots in the loaded
-   * layout, matching this hook's existing "invalid input is dropped, never an error" posture. */
+   * layout, matching this hook's existing "invalid input is dropped, never an error" posture.
+   *
+   * It writes three things in one batched event-handler call, and each one is required:
+   *
+   *  1. `panelAssignments[layoutId][panelId] = slotId` — the move itself.
+   *  2. `slotVisiblePanel[layoutId][slotId] = panelId` — the moved panel becomes the destination
+   *     slot's visible panel. Without this (W09 fix cycle 1's state), a panel moved into a slot
+   *     that already had a different visible occupant was the visible panel of *neither* slot, so
+   *     `StagePage.tsx` rendered no portal for it at all and it was genuinely unmounted — a silent
+   *     kill routed straight through the one primitive W16 exists to make safe. The panel this
+   *     *displaces* from the destination slot's visibility does unmount (one visible panel per
+   *     slot), which is why `LayoutConfigDialog.tsx` states that consequence and takes a confirm
+   *     before ever calling this — REQ-007 W16's "where a remount is unavoidable, the dialog
+   *     states it explicitly before applying".
+   *  3. `slotVisiblePanel[layoutId][sourceSlotId] = NO_VISIBLE_PANEL`, when the panel being moved
+   *     was the source slot's visible panel. See `NO_VISIBLE_PANEL`'s own doc: this is what stops
+   *     the vacated slot from spontaneously promoting the next panel assigned to it, which for the
+   *     terminal slot meant auto-mounting a CMD panel — a websocket, a shell process and one of
+   *     the backend's six global session slots, all as a side effect of moving a different panel.
+   *
+   * What this function deliberately no longer relies on is React batching *rescuing* a doomed
+   * portal: the moved panel's component instance now survives because `StagePage.tsx` portals each
+   * panel into its own stable per-panel host element whose identity never changes, not because
+   * these two state writes land in the same commit. See `StagePage.tsx`'s file doc for why the
+   * previous "same key, new container" assumption could never have worked.
+   */
   const setPanelSlot = (layoutId: string, panelId: string, slotId: string) => {
-    const layout = rawLayouts.find((candidate) => candidate.layout_id === layoutId)
-    const panel = layout?.panels.find((candidate) => candidate.panel_id === panelId)
+    const rawLayout = rawLayouts.find((candidate) => candidate.layout_id === layoutId)
+    const panel = rawLayout?.panels.find((candidate) => candidate.panel_id === panelId)
     if (!panel || !panel.eligible_slots.includes(slotId)) return
+    const layout = layouts.find((candidate) => candidate.layout_id === layoutId)
+    if (!layout) return
+    const sourceSlot = layout.slots.find((candidate) => candidate.admits.includes(panelId)) ?? null
+    if (sourceSlot?.slot_id === slotId) return // already there — nothing to move, nothing to write.
+    const sourceSlotLosesItsVisiblePanel =
+      sourceSlot !== null && getSlotPanel(layout, sourceSlot) === panelId
+
     setPanelAssignments((previous) => ({
       ...previous,
       [layoutId]: { ...previous[layoutId], [panelId]: slotId },
     }))
+    setSlotVisiblePanel((previous) => {
+      const forLayout: Record<string, string> = { ...previous[layoutId], [slotId]: panelId }
+      if (sourceSlot && sourceSlotLosesItsVisiblePanel) {
+        forLayout[sourceSlot.slot_id] = NO_VISIBLE_PANEL
+      }
+      return { ...previous, [layoutId]: forLayout }
+    })
   }
 
   return {
