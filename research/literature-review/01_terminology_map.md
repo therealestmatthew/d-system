@@ -243,3 +243,46 @@ rather than mapping onto one.
 | Philosophical grounding for why independence, not mere multiplicity, confers epistemic weight | Robustness and independent evidence (philosophy of science) | Schupbach, Philosophy of Science 2017 (`schupbach-robustness-independent-evidence-2017`) |
 | Independent/dependent evidential relations formalized within a probabilistic-argumentation graph, bridging to D12 | Epistemic graphs | `hunter-thimm-epistemic-graphs` |
 | Temporal/evolving-information dimension combined with multi-agent provenance for convergence (H2, H4) | Chronology of multi-agent interactions for provenance of evolving information | `chronology-multiagent-interactions-provenance-evolving-info` |
+
+## D18 — Scientific discourse representation
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Claim / hypothesis / evidence primitives linked by typed relationships (H1, H3) | HypER (Hypotheses, Evidence and Relationships) approach | de Waard, Schneider, CEUR-WS Vol-523, ISWC 2009 SWASD workshop (`hyper-scientific-knowledge-claims-2009`) — the anchor this domain's mandated variants trace to |
+| Discourse-element ontological classification (`O`) of a passage (background / hypothesis / method / result / conclusion) | Discourse Elements Ontology (DEO) | sparontologies.github.io canonical spec (`deo-discourse-elements-ontology-spec`); implementation at `deo-oss-github`; standards-track W3C-adjacent counterpart in biomedicine, SWAN (`swan-biomedical-discourse-ontology-2008`, `w3c-hcls-swan-ontology-note`) |
+| Claim + evidence + provenance + argumentative-relation unified in one representation (H1, H3) | Reasoning and Discourse Ontology (RDO), introduced by the SEE paper | `see-reasoning-discourse-ontology-2014` |
+| Epistemic classification (`E`) of a hypothesis as a confidence-weighted state, not binary (H1) | HELO (HypothEsis and Law Ontology) — hypotheses/models/laws/conclusions linked to probability of truth | `helo-representation-research-hypotheses`; extended in `representation-probabilistic-scientific-knowledge` |
+| Typed transition (`T`) as a citation edge between claims, forming a network (H2, H4) | Typed claim network | `typed-claim-network-scientific-literature` |
+| Evidence lineage / evidence-type classification attached to a conclusion (H3) | Evidence and Conclusion Ontology (ECO) | OBO Foundry registry (`eco-evidence-conclusion-ontology-obo-registry`); community-standard papers `eco-nucleic-acids-research-standard-paper`, `eco-go-annotations-protocol-chapter` |
+| Provenance-based corroboration/certainty grading of a knowledge-state link, outside the scientific-publishing domain proper (H3, H4) | Evidential-link grading and corroboration for intelligence analysis (patent family) | `uspto-9472115-grading-ontological-links-certainty-patent`; `uspto-11244113-evidential-links-corroboration-patent` — access-limited: assessed from search-snippet text only, patent PDFs not machine-readable |
+| Vocabulary-map anchor surveying claim/evidence/provenance ontologies as one field (Phase A) | Survey of 23 assertion, evidence and provenance ontologies | `bridging-scientific-knowledge-gap-reproducibility-survey-2025` |
+| Rhetorical/document-structure annotation of a paper's own claims, tied to authoring tooling (H1) | SALT (Semantically Annotated LaTeX) and its LaTeX-annotation descendants | `salt-semantically-annotated-latex-2007`; `scikgtex-latex-annotation-2023`; `seal-semantically-enriched-latex-authoring-2022` |
+
+## D19 — Nanopublications
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Knowledge state packaged as content + provenance + publication-metadata, separated into three graphs (H1) | Nanopublication anatomy (assertion / provenance / publication-info graphs) | Groth, Gibson, Velterop, 2010 (`anatomy-of-a-nanopublication-2010`) — the foundational paper for the whole domain |
+| Append-only, content-addressed, immutable identifier for a knowledge unit (H2) | Trusty URIs | Kuhn, Dumontier, ESWC 2014 (`trusty-uris-kuhn-dumontier-2014`); journal extension `trusty-uris-verifiable-reliable-tkde-2015` |
+| Independence-aware convergence via a dedicated component tracking supporting/conflicting evidence bodies behind an assertion (H3, H4) | Proposed fourth nanopublication component: knowledge provenance | `extending-nanopublications-knowledge-provenance` — a direct, explicit collision arising inside the nanopublication model itself |
+| Decentralized, actor-run publishing architecture for knowledge units, without a central publisher (H5, H6) | Decentralized nanopublication server network; "publishing without publishers" | `decentralized-provenance-aware-nanopublication-publishing`; `nanopub-server-oss-github`; `nanopub-services-oss-github`; `publishing-without-publishers-decentralized-dissemination` |
+| Underspecified or unresolved epistemic status attached to an assertion (H1) | Underspecified scientific claims in nanopublications | `underspecified-scientific-claims-nanopublications` |
+| Community-run de facto specification standing in for a ratified standard (reuse candidate) | nanopub.org guidelines — no dedicated W3C Recommendation governs nanopublications specifically | `nanopublication-guidelines-spec` |
+| Provenance model designed specifically for an assertion-bearing knowledge unit, distinct from the assertion itself (H3) | Supporting nanopublication provenance | `supporting-nanopublication-provenance-2011` — an early companion to the founding anatomy paper, not an independent invention |
+| Assertion-level knowledge unit generalized into an explicit claim network (bridges to D20) (H1, H4) | Nanopublication-based claim networks | `physician-suicide-claims-nanopublications-claim-networks-2022` |
+
+## D20 — Micropublications
+
+Nine Pass 1 searches in this domain resolved to only five distinct kept sources, with eight of the nine
+rows (`LIT-01-S217`–`LIT-01-S225`, excepting the rate-limited `LIT-01-S224`) converging on the same
+canonical paper. Recorded here rather than silently collapsed: per the protocol's stop conditions (§12),
+a late-search duplicate rate this high is itself evidence of domain saturation, not merely a small
+literature.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Claim + evidence + argument + annotation semantic model with statement-level citation and transitive evidence-chain closure (H1, H2, H3) | Micropublications | Clark, Ciccarese, Mitchell, 2014 (`micropublications-semantic-model-claims-evidence-2014`) — the founding paper for three of this domain's four mandated variants at once |
+| Claim / contribution / named-entity network laid over the Linked Open Data cloud (H1, H4) | Semantic representation of scientific literature | `semantic-representation-scientific-literature-claims-lod-2015` — an earlier system in the same claim-network lineage as D18's typed claim network |
+| Implementation-standard vocabulary counterpart to the conceptual claim/evidence model (reuse candidate) | Micropublication OWL vocabulary (mp) | `micropublication-owl-vocabulary-mp` |
+| Applied domain-specific implementation of the model for evidence synthesis (H3) | DIKB-Micropublication (drug-drug interaction evidence) | `dikb-micropublication-oss-github` |
+| Incentivized community curation extending the model to unpublished/negative data (H6) | Micropublication for community curation | `micropublication-incentivizing-community-curation-2018` |
