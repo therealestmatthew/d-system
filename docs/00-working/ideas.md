@@ -5106,7 +5106,7 @@ No existing plan, requirement, decision or other idea fully covers the concrete 
 
 ## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
 
-**Created 2026-09-11T00:11:20-04:00 · Status: `open`**
+**Created 2026-09-11T00:11:20-04:00 · Status: `triaged`**
 
 `uv run pytest` on dev reports `3 failed, 546 passed` as of 2026-09-11. All three failures are in test/test_demo_terminal.py:
 
@@ -5140,9 +5140,20 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
+- **finding** by agent-idea-triage (2026-09-11T20:42:18-04:00): The three failing PTY tests in test_demo_terminal.py have been thoroughly investigated and documented. 
+
+**Governed documents:** The failures relate to two ADRs and a live demo plan. ADR-013 (demo-terminal-capability) authorizes the POSIX PTY adapter with bash on Linux/macOS; ADR-014 (workbench-terminal-capability) supersedes it and extends the capability to the workbench with a session registry and shell selection. PLAN-021 (live-demo) implements phase-demo-01 (terminal backend) which includes the adapter itself, src/demo/posix.py, and test/test_demo_terminal.py. Requirements REQ-006 (live-demo) and REQ-007 (workbench) both specify the PTY-based terminal requirement (R04, W12/W17).
+
+**Investigation status:** The workbench-coordinator's finding (annotated 2026-09-11) clears the suspected cause (commit f0801af, phase-wb-01's session registry). Timeline evidence shows the failures were present on dev before that commit merged, and the failures reproduce reliably when a host-level ~/.pyenv/shims/.pyenv-shim lock file exists but clear completely when removed. The root cause is environmental (pyenv rehash contention polluting PTY output), not src/demo/posix.py. Every phase gate from phase-wb-01 through phase-wb-09 has carried the caveat "3 failed, known environmental" — the failures are not a new regression but a pre-existing host environment defect.
+
+**Related ideas:** 000097 (session-failure tracking system) is linked as the parent tracking environmental anti-patterns; 000129 (fix the three pre-existing environmental PTY test failures) is the owner's explicit request to eliminate the caveat, either by making the tests robust to the shim environment or by fixing the host-level contention. Both relationships are already recorded.
+
+**What remains:** Idea 000099's purpose was complete once the coordinator's finding arrived — it surfaced a red suite and provided a starting point. The action item is now 000129, which owns the solution path (make tests robust, fix host contention, or isolate from shim mechanism) and the done condition (full suite passes with zero expected failures, caveat removed from gates).
+
+PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the parent for environmental anti-patterns like pyenv lock contention)
 
 </details>
 
@@ -5154,65 +5165,9 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 
 ## 000100 · Silence the flag-off 404 probes from the workbench frontend
 
-**Created 2026-09-11T00:27:59-04:00 · Status: `open`**
+**Created 2026-09-11T00:27:59-04:00 · Status: `triaged`**
 
 With D_SYSTEM_DEMO_TERMINAL unset, the frontend still fetches /api/v1/workbench/injection-sources and /list on load, producing four browser console 404 resource-log entries per reload (measured in phase-wb-03's W03-W item 5). Degradation is otherwise correct — disabled dropdowns, absent-terminal message, no uncaught exceptions — so this is cosmetic console noise, not a defect. Candidate: probe the existing /api/v1/demo/stage/terminal-enabled endpoint first and skip workbench fetches when false. Recorded via the PROMPT-023 enhancement lane (record, do not build) during the phase-wb-03 scout pass.
-
----
-
-## 000101 · Workbench multi-panel slots render a double header after a dropdown swap
-
-**Created 2026-09-11T03:39:18-04:00 · Status: `open`**
-
-When a slot admitting several panels swaps one in via its header dropdown (REQ-007 W06), the swapped-in panel still renders its own inner .stage-region header below the slot-level header, so the panel shows two stacked headers. Deliberately left as a cosmetic case by phase-wb-02 (noted in ts/src/workbench/Slot.tsx and ts/src/workbench/panelRegistry.tsx) when no multi-panel slot was reachable; it became reachable when phase-wb-03 shipped the shell panel options and phase-wb-05/06 filled layout-1's explorer slot (file-browser, idea-explorer, backlog-explorer). Candidate polish: suppress or merge the inner header when a panel renders inside a multi-panel slot, keeping the slot-level dropdown header as the single title row. Touches REQ-007 W06's rendered look but not its stated behavior, so recorded for the owner rather than built (workbench build enhancement lane, PROMPT-023 delta 3). Found during the phase-wb-06 coordinator scout, 2026-09-11.
-
----
-
-## 000102 · Rehearsal idea from demo-validator-web dry-run
-
-**Created 2026-09-11T04:10:22-04:00 · Status: `open`**
-
-Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
-
----
-
-## 000103 · Rehearsal pass 2 test entry for the live terminal /idea command
-
-**Created 2026-09-11T04:19:18-04:00 · Status: `open`**
-
-Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
-
----
-
-## 000104 · Workbench terminal panel renders clipped to ~85px (.xterm container height 0), hiding almost all live output
-
-**Created 2026-09-11T10:20:15-04:00 · Status: `open`**
-
-Found during phase-wb-07 agent-driven rehearsal pass 2 (W07-R, demo-validator-web, 2026-09-11). Once a working terminal panel is selected and a Claude Code session is running inside it, the panel renders at a severely clipped height (~85px, about 2 visible text rows). Confirmed via getBoundingClientRect(): the .xterm container reports height: 0 while its child .xterm-screen reports height: 372.99 — a real CSS/layout sizing bug in the terminal panel, not a small window or a content issue. The session content is present and interactive (confirmed via .xterm-rows.innerText) but is not visible to a presenter without scripted inspection. This is new since rehearsal pass 1 and was not present there. This would wreck the live demo if unaddressed — the terminal panel is the primary visual surface for the entire live segment. Not fixed as part of phase-wb-07 (its deliverables are docs/00-working/demo-runbook.md and docs/00-working/demo-windows-setup.md only, not application code); recorded here for the owner to route to a build phase or hotfix. Likely touches the terminal panel's CSS/layout in ts/src/workbench (the .xterm/.xterm-screen sizing chain) — worth checking flex/height inheritance through the slot and panel containers.
-
----
-
-## 000105 · Runbook does not document the HTML Viewer's Embedded/Open-in-tab toggle
-
-**Created 2026-09-11T11:37:27-04:00 · Status: `open`**
-
-Found during the phase-wb-07 W07-W rehearsal verification (demo-validator-web, 2026-09-11). The HTML Viewer's header carries an "Embedded" toggle button that switches the page display to an "Open-in-tab link (rung 3)" mode - the Descope Ladder rung mechanism implemented as a manual UI control. Nothing the runbook names is missing or mislabeled (W07-W passed), but this control appears nowhere in the runbook's control inventory, so a presenter who clicks it mid-demo cannot explain or reverse it from the script. Candidate: either document the toggle in the runbook's Workbench UI Reference (a small runbook follow-up, not a wb-07 reopen) or hide the control behind the demo flag. Recorded for the owner rather than fixed; the layout-assignment redesign staged in docs/00-working/handoff-workbench-layout-and-terminal-fixes.md will touch the same header region, so the two should be reconciled together.
-
----
-
-## 000106 · No drift test covers _public/overview/index.html, unlike ideas.md
-
-**Created 2026-09-11T13:03:35-04:00 · Status: `open`**
-
-Found during the phase-wb-07 session-close audit's independent review, 2026-09-11. The idea log has an enforced drift test (test_ideas.py's test_the_committed_markdown_matches_regenerated_output) asserting docs/00-working/ideas.md always matches a fresh regeneration from _data/ideas.jsonl. No equivalent test exists for _public/overview/index.html (generated by tools/generate_overview.py from the same underlying data plus backlog/governance state). This let a real drift ship silently: the phase-wb-07 branch's final commit (c43bd7d, "Record idea 000105") updated ideas.jsonl and ideas.md but never reran the overview generator, so the committed overview page under-reported idea counts by one until caught by this audit and fixed in commit 14094bb. Candidate: a test mirroring test_ideas.py's pattern — regenerate the overview page in-memory or to a temp path and assert it matches the committed one, failing the same way a stale ideas.md would. Recorded for the owner rather than built.
-
----
-
-## 000107 · Terminal session lost on layout switch when the stored visible panel differs between layouts
-
-**Created 2026-09-11T15:56:15-04:00 · Status: `open`**
-
-CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). The original root-cause claim - that layout 2's terminal slot DEFAULTS to PowerShell - is wrong: both _data/workbench/layouts files set the terminal slot's default_panel to "terminal" (bash), and on a clean browser session the layout-switch persistence guard passes (zero new websockets, MARKER survives; verified independently twice - the W08-A adversarial run and the session-close review). The failing measurements (4 new websockets per round-trip, session lost) came from the W08-W validator's own stale localStorage: it had switched layout 2's visible panel to PowerShell during fill testing, and that stored choice persisted across its reloads and its 'dev baseline' run, so every round-trip genuinely unmounted bash and mounted PowerShell. The real residual behavior worth attention: when a user's stored visible-panel choice differs between layouts (or a panel is otherwise hidden by a visibility change), the hidden shell panel unmounts and its PTY session dies silently. That intersects phase-wb-09's W16 obligation that re-assignment and visibility changes never silently kill a shell session, and W09-W's persistence guard should be run from a CLEAN store to avoid repeating the measurement artifact.
 
 **Annotations**
 
@@ -5220,7 +5175,230 @@ CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). 
 <details>
 <summary>1 finding(s)</summary>
 
+- **finding** by agent-idea-triage (2026-09-11T20:42:05-04:00): ## Scout Finding: Silence the flag-off 404 probes from the workbench frontend
+
+This idea proposes silencing four browser console 404 resource-log entries generated when `D_SYSTEM_DEMO_TERMINAL` is unset. The frontend components `InjectionDropdowns.tsx` and `NotesStripRegion.tsx` unconditionally fetch `/api/v1/workbench/injection-sources` and `/api/v1/workbench/list` on load; with the flag unset, these routes do not exist per ADR-015's design ("Every workbench route mounts only when `D_SYSTEM_DEMO_TERMINAL=1` is set... Unset, none of these routes exist"). The degradation is behaviorally correct — dropdowns disable, absence messages display, no uncaught exceptions — making the 404 noise a cosmetic issue only.
+
+The issue is already documented in phase-wb-03's backlog completion report as a "recorded cosmetic caveat (four network-404 resource logs from probing designed-absent routes, no uncaught exceptions - idea 000100)", confirming the findings. The proposed solution — probe `/api/v1/demo/stage/terminal-enabled` first and skip workbench fetches when false — is viable: that endpoint already exists in `src/api/routes/demo_stage.py`, is registered unconditionally, and returns `{"terminal_enabled": bool}` for exactly this purpose (per its docstring: "A plain GET here always succeeds and reports the flag's actual value").
+
+No related ideas found. Related governed documents: PLAN-022 (Workbench plan, structure and phases), ADR-015 (Workbench API surface decision, gating logic), REQ-007 (Workbench requirements, W14 verification for gating behavior).
+
+This is a valid refinement for future work. The fix belongs in a follow-on phase if the owner prioritizes reducing console noise in flag-off scenarios, likely as part of a broader frontend-initialization audit. No dependencies exist; the change is isolated to frontend initialization logic.
+
+</details>
+
+---
+
+## 000101 · Workbench multi-panel slots render a double header after a dropdown swap
+
+**Created 2026-09-11T03:39:18-04:00 · Status: `triaged`**
+
+When a slot admitting several panels swaps one in via its header dropdown (REQ-007 W06), the swapped-in panel still renders its own inner .stage-region header below the slot-level header, so the panel shows two stacked headers. Deliberately left as a cosmetic case by phase-wb-02 (noted in ts/src/workbench/Slot.tsx and ts/src/workbench/panelRegistry.tsx) when no multi-panel slot was reachable; it became reachable when phase-wb-03 shipped the shell panel options and phase-wb-05/06 filled layout-1's explorer slot (file-browser, idea-explorer, backlog-explorer). Candidate polish: suppress or merge the inner header when a panel renders inside a multi-panel slot, keeping the slot-level dropdown header as the single title row. Touches REQ-007 W06's rendered look but not its stated behavior, so recorded for the owner rather than built (workbench build enhancement lane, PROMPT-023 delta 3). Found during the phase-wb-06 coordinator scout, 2026-09-11.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:42:05-04:00): Idea 000101 is explicitly referenced in REQ-007 W15 (the workbench requirements' terminal visibility delta), where the requirement notes "the suspected break is the multi-panel slot wrapper's height chain (`Slot.tsx`, related cosmetic double header: idea `000101`)." This establishes that the double-header rendering is a known cosmetic issue tied to the multi-panel slot wrapper's CSS/layout chain in the Slot component.
+
+The idea addresses a cosmetic enhancement to REQ-007 W06 (the multi-panel slot dropdown swap feature). The body correctly notes this was deliberately deferred as a cosmetic case during phase-wb-02, and became reachable after phase-wb-03/05/06 filled the explorer slot. The body also correctly marks it as a "workbench build enhancement lane" improvement rather than a bug — it touches the rendered look, not stated behavior.
+
+Related documents:
+- REQ-007 W06 defines the multi-panel slot dropdown swap behavior itself
+- REQ-007 W15 (delta section added 2026-09-11) explicitly cites this issue when discussing the multi-panel slot wrapper height chain as the suspected root cause of terminal clipping (idea 000104)
+- PLAN-022 phase-wb-02 scope: built the layout engine and notes strip, with slot-header dropdowns for multi-panel slots (REQ-007 W05, W06)
+
+Overlap with other ideas:
+- Idea 000104 (terminal panel clipped to ~85px) shares the same suspected root cause: the multi-panel slot wrapper's height chain in Slot.tsx
+- Idea 000134 (audit all slots and panels for content fit) explicitly lists 000104 as part of its evidence base and would encompass this cosmetic issue as part of its methodology for preventing visibility/content-fit problems across all panels
+
+No related plan, phase or document found beyond REQ-007's explicit reference. This is a catalogued cosmetic case awaiting owner decision on whether to address in a future workbench polish phase.
+
+PROPOSED LINK: 000101 --relates_to--> 000104 (both touch the multi-panel slot wrapper height chain in Slot.tsx)
+PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass this cosmetic issue as part of its content-fit methodology)
+
+</details>
+
+---
+
+## 000102 · Rehearsal idea from demo-validator-web dry-run
+
+**Created 2026-09-11T04:10:22-04:00 · Status: `triaged`**
+
+Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:42:01-04:00): Rehearsal idea from the demo-validator-web agent's dry-run pass, recorded during phase-wb-07 timing exercises. Marked as a rehearsal entry, not a production feature request.
+
+The suggestion is to add a "last refreshed" timestamp badge to the HTML Viewer's header (REQ-007 W07) to visually confirm the displayed data is current during the live demo's test step — a presenter can point to it instead of clicking refresh and waiting for a reload.
+
+Examined related work: The HTML Viewer already ships a refresh button per W07. No related requirement, plan or prior idea documents this UI enhancement. The broader workbench build is complete; this is a polish suggestion for the rehearsal/demo context specifically.
+
+No related ideas found. This suggestion does not overlap with other open ideas or existing governed work.
+
+</details>
+
+---
+
+## 000103 · Rehearsal pass 2 test entry for the live terminal /idea command
+
+**Created 2026-09-11T04:19:18-04:00 · Status: `triaged`**
+
+Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:41:40-04:00): Idea 000103 is a validation artifact from the phase-wb-07 (rehearsal refresh) agent-driven rehearsal pass 2 (2026-09-11), explicitly created to test the live-terminal /idea command end to end. The body plainly states its purpose: confirming that ideas typed into the terminal during rehearsal flow through tools/append_idea.py, land in _data/ideas.jsonl with a generated id and timestamp, and appear in the regenerated markdown view. It also plainly states "It carries no product content and should be discarded during a later triage pass rather than promoted."
+
+Related rehearsal-and-demo ideas:
+- 000088 (Rehearsal idea from dry-run 1, phase-demo-05) — placeholder recorded to time the /idea step during earlier rehearsal
+- 000090 (Rehearsal idea from phase-demo-05 second dry-run) — timing placeholder from phase-demo-05 (already triaged 2026-09-11)
+- 000102 (Rehearsal idea from demo-validator-web dry-run) — test entry from the same phase-wb-07 rehearsal session
+- 000089 (Demo fallback seed) — deliberately kept per PLAN-021's afterlife decision; differs in being the fallback content scaffold, not a validation test
+
+Governance context: phase-wb-07 is the rehearsal-refresh phase under PLAN-022 (Workbench), which rescopes workbench testing and runbook updates to the final workbench UI. The live-segment requirement (REQ-006 R09, REQ-007 W13) defines the triage step's place in the 15-minute workflow, but neither document names validation of the /idea command infrastructure itself — the command's implementation is already complete in earlier phases.
+
+This idea's role is complete: it validated that the /idea command integration works end to end before the live demo. Unlike 000089 (the persistent fallback seed), this test entry has no ongoing function and aligns with its explicit directive: discard during triage rather than promote.
+
+No related plan, requirement, ADR or backlog phase beyond PLAN-022 and REQ-007 which govern the rehearsal phase itself. The fold shows no links.
+
+</details>
+
+---
+
+## 000104 · Workbench terminal panel renders clipped to ~85px (.xterm container height 0), hiding almost all live output
+
+**Created 2026-09-11T10:20:15-04:00 · Status: `triaged`**
+
+Found during phase-wb-07 agent-driven rehearsal pass 2 (W07-R, demo-validator-web, 2026-09-11). Once a working terminal panel is selected and a Claude Code session is running inside it, the panel renders at a severely clipped height (~85px, about 2 visible text rows). Confirmed via getBoundingClientRect(): the .xterm container reports height: 0 while its child .xterm-screen reports height: 372.99 — a real CSS/layout sizing bug in the terminal panel, not a small window or a content issue. The session content is present and interactive (confirmed via .xterm-rows.innerText) but is not visible to a presenter without scripted inspection. This is new since rehearsal pass 1 and was not present there. This would wreck the live demo if unaddressed — the terminal panel is the primary visual surface for the entire live segment. Not fixed as part of phase-wb-07 (its deliverables are docs/00-working/demo-runbook.md and docs/00-working/demo-windows-setup.md only, not application code); recorded here for the owner to route to a build phase or hotfix. Likely touches the terminal panel's CSS/layout in ts/src/workbench (the .xterm/.xterm-screen sizing chain) — worth checking flex/height inheritance through the slot and panel containers.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:43:47-04:00): Idea 000104 records the workbench terminal panel rendering bug (clipped to ~85px, xterm container height 0) found during phase-wb-07 rehearsal pass 2. This is explicitly addressed in PLAN-022 (Workbench — the stage becomes the chartered management UI, code doc-workbench): phase-wb-08 "Panel rendering fixes (first priority)" lists idea 000104 as its core issue and schedules root-cause diagnosis and fix across all shell panels.
+
+Phase-wb-08 has completed: the backlog.yaml records status: complete and completion_evidence shows ts/src/stage/StagePage.css as the deliverable. The result notes confirm the fix — a 17-line CSS change setting display: flex on .stage-workbench-slot__body — which resolved the shared root cause affecting the terminal, HTML Viewer, and File Browser panels. The fix integrated into dev at commit bf1749b on 2026-09-11.
+
+No overlap with other ideas. The closest related ideas are 000130 (Rotator help tooltip cut off at the panel bottom), 000107 (Terminal session lost on layout switch), and 000134 (Audit all slots and panels for content fit), but these address different symptoms or are broader audits — the terminal rendering bug itself is specific to idea 000104 and fully addressed.
+
+PROPOSED PROMOTION: 000104 -> PLAN-022 (Fix delivered and integrated in phase-wb-08, 17-line CSS change to StagePage.css, committed 2026-09-11)
+
+</details>
+
+---
+
+## 000105 · Runbook does not document the HTML Viewer's Embedded/Open-in-tab toggle
+
+**Created 2026-09-11T11:37:27-04:00 · Status: `triaged`**
+
+Found during the phase-wb-07 W07-W rehearsal verification (demo-validator-web, 2026-09-11). The HTML Viewer's header carries an "Embedded" toggle button that switches the page display to an "Open-in-tab link (rung 3)" mode - the Descope Ladder rung mechanism implemented as a manual UI control. Nothing the runbook names is missing or mislabeled (W07-W passed), but this control appears nowhere in the runbook's control inventory, so a presenter who clicks it mid-demo cannot explain or reverse it from the script. Candidate: either document the toggle in the runbook's Workbench UI Reference (a small runbook follow-up, not a wb-07 reopen) or hide the control behind the demo flag. Recorded for the owner rather than fixed; the layout-assignment redesign staged in docs/00-working/handoff-workbench-layout-and-terminal-fixes.md will touch the same header region, so the two should be reconciled together.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:46-04:00): Found during W07-W rehearsal (phase-wb-07), idea 000105 documents a missing runbook entry for the HTML Viewer's "Embedded" toggle — a UI control in the panel header that switches to "Open-in-tab link" mode (Descope Ladder rung 3, per PLAN-021). The toggle exists and functions; the issue is that it appears nowhere in the runbook's control inventory (docs/00-working/demo-runbook.md line 246, which lists refresh button, searchable dropdown, and directory button but not the toggle). A presenter clicking it mid-demo cannot explain or reverse it from the script.
+
+The idea body proposes two options: document the toggle in the runbook's Workbench UI Reference, or hide it behind the demo flag. It notes the decision should be reconciled with phase-wb-10 (Runbook and checklist refresh for the post-fix workbench UI), which updates the runbook after phase-wb-09's layout-assignment redesign lands. Phase-wb-10's current scope in backlog.yaml does not explicitly include documenting this toggle.
+
+Related work: the layout-assignment redesign (phase-wb-09, handoff in docs/00-working/handoff-workbench-layout-and-terminal-fixes.md) will touch the same HTML Viewer header region. The handoff document explicitly notes "the runbook will need a follow-up update after Fix 2 changes the config dialog — note that in the plan, do not fold it into these phases without asking," suggesting the runbook refresh should be a separate decision.
+
+No existing governed document covers the toggle's documentation status. The backlog.yaml already recorded this as a non-blocking W07-W finding. No related ideas found with overlapping scope.
+
+</details>
+
+---
+
+## 000106 · No drift test covers _public/overview/index.html, unlike ideas.md
+
+**Created 2026-09-11T13:03:35-04:00 · Status: `triaged`**
+
+Found during the phase-wb-07 session-close audit's independent review, 2026-09-11. The idea log has an enforced drift test (test_ideas.py's test_the_committed_markdown_matches_regenerated_output) asserting docs/00-working/ideas.md always matches a fresh regeneration from _data/ideas.jsonl. No equivalent test exists for _public/overview/index.html (generated by tools/generate_overview.py from the same underlying data plus backlog/governance state). This let a real drift ship silently: the phase-wb-07 branch's final commit (c43bd7d, "Record idea 000105") updated ideas.jsonl and ideas.md but never reran the overview generator, so the committed overview page under-reported idea counts by one until caught by this audit and fixed in commit 14094bb. Candidate: a test mirroring test_ideas.py's pattern — regenerate the overview page in-memory or to a temp path and assert it matches the committed one, failing the same way a stale ideas.md would. Recorded for the owner rather than built.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:06-04:00): Found: 000106 describes a real gap in test coverage that was caught and fixed during the phase-wb-07 session-close audit. The idea correctly identifies the missing drift test for _public/overview/index.html — test_ideas.py's `test_the_committed_markdown_matches_regenerated_output()` (line 775) enforces that docs/00-working/ideas.md matches a fresh regeneration from _data/ideas.jsonl, but no equivalent test exists for the overview page.
+
+The overview generation is specified in REQ-006 R08-R09, which require deterministic, byte-identical output across generations. REQ-006 R09 explicitly calls for repeatability: "Repeating generation against unchanged sources is byte-identical, and ordinary repository checks detect hand edits or omitted generated representations."
+
+Currently, test_generate_overview.py includes determinism tests (test_two_generations_via_generate_produce_byte_identical_output, test_two_cli_runs_write_byte_identical_files) that verify in-memory generation is repeatable, but no test compares the generated page to the committed _public/overview/index.html. This creates a maintenance gap: the committed page can drift out of sync with the current state silently, as idea 000106 itself demonstrates (commit c43bd7d updated the idea log without regenerating the overview, and the discrepancy was only caught by manual audit).
+
+Proposed fix: a test modeled directly on test_ideas.py's pattern — regenerate the overview to a temp path or capture it in memory, assert it matches the committed _public/overview/index.html byte-for-byte, and fail if drift is detected. This would prevent the same silent drift on future commits.
+
+Related: 000057 (Testing strategy across the system) covers the broader testing landscape, but is not specifically about generated artifacts; 000001 (Test fixtures for the HTML generation system) is about fixtures, not drift checks.
+
+PROPOSED LINK: 000106 --relates_to--> 000057 (both address system testing strategy)
+
+</details>
+
+---
+
+## 000107 · Terminal session lost on layout switch when the stored visible panel differs between layouts
+
+**Created 2026-09-11T15:56:15-04:00 · Status: `triaged`**
+
+CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). The original root-cause claim - that layout 2's terminal slot DEFAULTS to PowerShell - is wrong: both _data/workbench/layouts files set the terminal slot's default_panel to "terminal" (bash), and on a clean browser session the layout-switch persistence guard passes (zero new websockets, MARKER survives; verified independently twice - the W08-A adversarial run and the session-close review). The failing measurements (4 new websockets per round-trip, session lost) came from the W08-W validator's own stale localStorage: it had switched layout 2's visible panel to PowerShell during fill testing, and that stored choice persisted across its reloads and its 'dev baseline' run, so every round-trip genuinely unmounted bash and mounted PowerShell. The real residual behavior worth attention: when a user's stored visible-panel choice differs between layouts (or a panel is otherwise hidden by a visibility change), the hidden shell panel unmounts and its PTY session dies silently. That intersects phase-wb-09's W16 obligation that re-assignment and visibility changes never silently kill a shell session, and W09-W's persistence guard should be run from a CLEAN store to avoid repeating the measurement artifact.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
 - **finding** by agent-coordinator (2026-09-11T17:14:47-04:00): Session-close review evidence: layout-1.json and layout-2.json both carry default_panel: terminal for the terminal slot (verified by direct read); independent reviewer's clean-session run of the persistence guard on integrated dev passed cleanly (2 initial websockets only, zero during switches, MARKER echoed back); W08-A's earlier passing run is consistent. The only failing runs shared one browser profile that had PowerShell stored as layout 2's visible panel.
+- **finding** by agent-idea-triage (2026-09-11T20:44:25-04:00): ## Scout findings for 000107: Terminal session lost on layout switch when stored visible panel differs
+
+The idea documents a residual behavior where hidden shell panels unmount and their PTY sessions die silently when a user's stored visible-panel choice differs between layouts. The original root-cause diagnosis (layout 2 defaulting to PowerShell) was corrected during phase-wb-08; the real issue is that hidden panels die on visibility change, intersecting with phase-wb-09's W16 obligation that "re-assignment and visibility changes never silently kill a shell session."
+
+**Related work identified:**
+
+The main concern was addressed in phase-wb-09's W09-C3 closure. The phase reworked the layout configuration to use per-panel eligibility assignments and implemented a React-portal mechanism in StagePage.tsx to preserve component instances across re-assignment—specifically closing "idea 000107's layout round-trip regression." The validator W09-V3 confirmed the fix and verified the multi-occupant header-switcher's remount-on-visibility-change behavior was not a regression. Phase-wb-09 is currently in progress, awaiting the coordinator-owned completion gate (W09-A adversarial review, W09-W Playwright browser verification).
+
+**Related requirements and phases:**
+
+- REQ-007 W15 and W16: W15 governs shell panel fill across layouts and sizes with a persistence regression guard; W16 specifies that re-assignment between slots never silently kills a shell session, though remount where unavoidable must be explicit and stated. The idea's residual concern (hidden panels dying on visibility change) sits at the boundary of what W16 defines as unacceptable.
+- REQ-007 W09 and the File Browser visibility handling: the same visibility/remount pattern affects other panels, suggesting the residual behavior may be systemic to slot-header switching rather than terminal-specific.
+- Phase-wb-08 (panel fixes, completed): diagnosed the original layout-switch failure via adversarial review and pre-fix validation; clarified that the measurement artifact (4 new websockets per round-trip) came from the validator's own stale localStorage, not a code defect.
+- Phase-wb-09 (layout assignment, in progress): explicitly targets the "re-assignment between slots never silently kills a shell session" obligation and implements the portal mechanism to preserve instances across re-assignment. The W09-W Playwright browser verification (awaiting dispatch) will verify the persistence guard and fill assertions across both layouts.
+- Idea 000113 (audit terminal persistence and performance) explicitly links to this idea and may overlap on the residual visibility-change behavior.
+
+**Candidate for follow-up work:**
+
+The residual behavior—hidden panels dying on visibility-change (distinct from re-assignment)—is noted in the idea body as "worth attention" and intersects W16's stated obligation. It is narrower than W16's full scope (re-assignment is addressed) but sits in the same problem space. The behavior may be expected (unmounting a hidden component frees resources), explicit (if the code documents that hiding a shell terminates its session), or a regression (if W16 implies visibility changes should also preserve sessions). The distinction between re-assignment and visibility change is worth surface clarity.
+
+**Governance references:**
+
+- PLAN-009 (workbench plan, covers phase-wb-01 through phase-wb-10)
+- REQ-007 rows W15, W16, W09 and W17 (workbench requirements)
+- ADR-016 (workbench layout persistence and schema versioning)
+- ADR-014 (workbench terminal capability and session caps)
+- Phase-wb-08 and phase-wb-09 (active implementation tracks)
+
+**Related ideas:**
+
+- 000113 (audit terminal persistence and performance across all three shells): already linked `relates_to->000107` and may surface the residual visibility-change behavior in a systemic audit.
+
+**No related plan, phase or document found** that specifically addresses hidden-panel unmounting as a known design decision (as opposed to a code defect). The residual behavior is documented in this idea but not yet surfaced in governance, and W09-W's verification will clarify whether it is acceptable under the current W16 wording or requires separate attention.
 
 </details>
 
@@ -5232,7 +5410,7 @@ CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). 
 
 ## 000108 · HTML Viewer file-selector popup is too short: show 8-10 entries with scroll, open below, consider resizing
 
-**Created 2026-09-11T17:19:19-04:00 · Status: `open`**
+**Created 2026-09-11T17:19:19-04:00 · Status: `triaged`**
 
 Owner report, 2026-09-11, on the Windows machine during early workbench checks: selecting the html selector in the HTML Viewer opens a popup dialog that shows only two html files at a time. It should appear below the control and be taller - at least 8-10 files visible - plus internal scroll for longer lists; allowing the user to resize the popup is worth considering. Outside PROMPT-024's rows (REQ-007 W15-W18) and not covered by phase-wb-09 or phase-wb-10, so recorded for the owner's scheduling rather than built into the fix build. Touches the HTML Viewer's selector UI in ts/src (HtmlViewerRegion or its dropdown component).
 
@@ -5246,6 +5424,27 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T19:40:47-04:00): Batch reframed 2026-09-11 (000125): the batch has outgrown one plan - the planning session opens with holistic triage of ALL these ideas (categorize, prioritize, group into multiple plans with an ordering across them) before any deep-dive development. Added: 000126 (thorough audit of commands/skills/agents - codebase design first, demo effectiveness second), 000127 (idea skill delegates capture to a subagent to protect main-session context; one instance of a recurring owner pattern), 000128 (shared state model for multi-agent planning sessions).
 - **note** by repository-owner (2026-09-11T20:41:03-04:00): Batch extended 2026-09-11 (night): rotator-panel set - 000130 (help-tooltip cutoff at panel bottom + font-size/text-capacity rethink; likely another 000117 Popover consumer), 000131 (horizontal auto-scroll ticker for longer texts, possibly a substitute panel), 000132 (rotate images, not just text); plus 000133 (revisit slot geometries and custom reconfiguration - explicitly FUTURE phase, lower priority than any demo work; per-slot constraints and resize-vs-content effects) and 000134 (content-fit audit of all slots/panels producing enforced methodologies, not spot fixes). Priority note from the owner: 000133 yields to demo-specific fixes; 000130 is a live display bug worth demo-week attention.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:44:34-04:00): **Overlap with related ideas and scope boundaries:**
+
+Idea 000108 addresses a UI issue in the HTML Viewer's file-selector dropdown — the popup shows only two entries instead of the needed 8-10. The idea correctly identifies this as outside PROMPT-024's scope (which covers W15-W18: terminal fill, layout assignment, and File Browser scroll) and outside phase-wb-09 and phase-wb-10's deliverables.
+
+The critical connection is idea 000117 (extends 000108), which was already linked during agent scouting and the owner's approval. 000117 identifies the root cause: the issue is not specific to the HTML Viewer's selector. It flows from the shared `ts/src/stage/Popover.tsx` component, which applies a hard MIN_BUBBLE_HEIGHT_PX = 120 floor that reproduces the symptom across nine callers — InjectionDropdowns.tsx, TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx, and two more. 000117 proposes that the fix should scope to "Popover.tsx's height math plus an audit of every consumer", not just the HTML Viewer.
+
+Related ideas 000109 (double-clicking file tabs) and 000110 (markdown rendering support) are distinct enhancements that would pair with a Popover fix post-shipment. Idea 000130, relating to 000117, surfaces the same Popover height ceiling in the rotator's help tooltip — confirming the pattern across the codebase.
+
+**Governed documents:**
+
+REQ-007 W07 specifies the HTML Viewer's searchable dropdown for file filtering and is bundled into PROMPT-024's W15-W18 window. REQ-006 R03 covers popup behavior (hover popups collapse on pointer leave, click popups are dismissible) but does not specify sizing. No plan, requirement row or backlog phase currently scopes Popover component work or a shared popup height audit — the fix is genuinely unassigned to a deliverable.
+
+**Conclusion:**
+
+Idea 000108's linking to 000117 is correct and complete. The scope is clear: the work belongs in a future workbench enhancement batch after PROMPT-024/phase-wb-08/09/10 ship, and should be framed as a Popover component fix affecting all nine consumers, not a one-off HTML Viewer dropdown fix. No new links are needed; the existing edge to 000117 (extends) captures the relationship.
+
+</details>
+
 **Links**
 
 - relates_to ← `000109`
@@ -5256,9 +5455,36 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 
 ## 000109 · HTML Viewer: double-clicking a file tab opens it in a new browser tab
 
-**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Double-clicking a tab in the HTML Viewer should automatically open that file in a new browser tab - the full page, outside the workbench iframe. Complements idea 000108 (selector popup sizing) in the same viewer surface; touches ts/src HtmlViewerRegion and its tab strip.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:24-04:00): Idea 000109 requests double-clicking a file tab in the HTML Viewer to open that file in a new browser tab outside the workbench iframe. The idea complements 000108 (HTML Viewer file-selector popup sizing), and touches ts/src/stage/HtmlViewerRegion.tsx.
+
+Related ideas already identified:
+- 000108: HTML Viewer file-selector popup sizing (already linked via fold as relates_to)
+- 000119: Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source (agent-scouted 2026-09-11, links both 000109 and 000110, addresses rendering implications of the new-tab feature)
+- 000110: HTML Viewer renders markdown files with proper formatting, not raw text (part of same viewer surface batch)
+
+Governed documents covering the HTML Viewer:
+- REQ-007 W08 specifies the HTML Viewer has tabs with scoped state (directory, search text, displayed page), and W09 describes File Browser's context menu for opening files in the viewer
+- REQ-007 W07 defines the core HTML Viewer panel functionality (file selection dropdown, refresh control, directory picker)
+- PLAN-022 mentions the HTML Viewer panel (phase-wb-04)
+- backlog.yaml: phase-wb-04 (HTML Viewer panel with tabs) is complete; phase-wb-08 (panel rendering fixes including HTML Viewer blank state) is complete; phase-wb-09 (layout assignment) is active
+
+The HTML Viewer tabs feature itself is already governed (REQ-007 W08), and the File Browser context menu supports opening files in a specific tab (W09). The double-click-to-new-browser-tab feature extends the viewer's tab interaction model but is not currently covered by a requirement or plan. This is a UI enhancement for the same component surface. Idea 000119 has already identified and documented the key design question this feature raises: where markdown-to-HTML rendering happens affects whether opening files new-tab shows rendered content or raw source.
+
+No related plan, phase or document found beyond REQ-007's tab and file-opening requirements.
+
+PROPOSED LINK: 000109 --relates_to--> 000119 (markdown rendering location decision directly impacts this feature's new-tab behavior)
+
+</details>
 
 **Links**
 
@@ -5269,9 +5495,23 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 
 ## 000110 · HTML Viewer renders markdown files with proper formatting, not raw text
 
-**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). Expand the HTML Viewer to support .md files, rendering them as formatted markdown (headings, lists, code blocks, links) rather than showing raw source text. Needs a markdown-to-HTML step on either the serving route or the frontend, applied when the selected file is markdown; the existing sandboxed-iframe model and the D_SYSTEM_DEMO_TERMINAL gating of the file-serving route stay as they are. Repository docs are the obvious immediate beneficiaries (docs/, README.md).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:17-04:00): Related ideas and overlap: Two sibling ideas already capture the dependencies of this feature. Idea 000118 (Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) and idea 000119 (Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source) both link directly to 000110 and address the implementation follow-on: extending file-type support and selecting the markdown-to-HTML conversion location (serving route vs frontend). These links are already recorded.
+
+Governed documents: The HTML Viewer is specified in REQ-007 (Workbench requirements), requirement W07, which currently scopes supported files to ".html and .svg" found recursively in a selected directory. PLAN-022 (Workbench plan) describes phase-wb-04, which delivered the HTML Viewer panel with that scope; the phase is complete (per backlog.yaml status). Rendering markdown files is a planned extension beyond the current workbench specification, explicitly positioned by the idea body as post-PROMPT-024 work (after the current fixpack for terminal and layout issues). REQ-007 W07 would require amendment to include markdown rendering when this feature ships, and COMPATIBLE_EXTENSIONS in ts/src/stage/HtmlViewerRegion.tsx is the code choke point 000118 identifies.
+
+Status: This is a new feature request, not yet integrated into any plan phase. No promotion to a governed document is warranted; the idea is properly situated as a candidate for the next workbench prompt pack after the current PROMPT-024 cycle closes (phase-wb-08 and phase-wb-09).
+
+</details>
 
 **Links**
 
@@ -5283,9 +5523,25 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 
 ## 000111 · File bookmark categories: named groupings of files, referenceable across the system
 
-**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). A bookmark-type system where the owner creates named categories that group files together - e.g. "favorites", or "live-demo" holding every file relevant to the demo - and can later reference a category to pull up its files as a set. Two halves the pack must design, not just build: (1) the grouping surface itself (create/rename categories, add and remove files, list a category's files); (2) how these file references integrate into the wider system so groupings are simple to reference in future - storage shape (a tracked _data/ entity vs localStorage; tracked feels right since categories like live-demo outlive one browser), how other surfaces consume a category (HTML Viewer selector, File Explorer, possibly the terminal injection dropdowns), and how file paths stay valid as the repo moves. This is requirement-and-ADR-first work: the storage and reference model needs an owner-reviewed decision before creators build panels against it.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:16-04:00): Idea 000111 requests design for a file bookmark categories feature — named groupings of files referenceable across the workbench — addressing storage model (tracked _data/ vs localStorage), cross-panel integration (HTML Viewer, File Explorer, terminal injection), and path durability as the repo moves.
+
+The idea is already connected to two approved companion ideas: 000112 (File Explorer: right-click option to open a file in the HTML Viewer) and 000120 (Extend the panel bridge to batch, multi-target actions for bookmark categories). These relationships are already recorded as links and reflect the integrated design: 000112 provides the single-file open-in-viewer action that pairs naturally with bookmark categories, and 000120 identifies the bridge extension needed to handle batch/multi-target actions (opening entire categories at once).
+
+Workbench plan (PLAN-022) and requirements (REQ-007) document the File Browser and HTML Viewer panels that will be the primary surfaces consuming bookmark categories, and define their current capabilities and constraints (zero-scroll, panel slot assignment, context folders). ADR-016 (workbench layout persistence) provides a precedent for the storage design question: layouts ship as versioned JSON in _data/workbench/layouts/ with browser selections in localStorage, silent fallback to repository defaults on version mismatch. That model directly informs this idea's storage design choice.
+
+No related plan, requirement or ADR exists yet for the bookmark categories feature itself — this idea is asking for the design work that must precede implementation.
+
+</details>
 
 **Links**
 
@@ -5296,9 +5552,35 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 
 ## 000112 · File Explorer: right-click option to open a file in the HTML Viewer
 
-**Created 2026-09-11T17:24:17-04:00 · Status: `open`**
+**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). File Explorer (File Browser panel) entries get a right-click context-menu option that opens the selected file in the HTML Viewer panel. Implies a cross-panel action channel (the browser telling the viewer what to load) that does not currently exist; pairs naturally with markdown rendering (so docs opened this way display formatted) and with bookmark categories (open-in-viewer from a category listing).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:16-04:00): ## Finding
+
+Idea 000112 requests a right-click context-menu option in the File Explorer to open files in the HTML Viewer panel, noting this implies a cross-panel action channel that did not previously exist.
+
+This functionality is already explicitly specified and fully delivered:
+
+**Governed specification:** REQ-007 (Workbench requirements), row W09, describes the File Browser's context menu offering five actions including "open in HTML Viewer with a nested submenu choosing the target tab." The cross-panel action channel is implicit in the design: the HTML Viewer maintains tabs scoped to directory and search context, and the File Browser's context menu targets them.
+
+**Governing plan:** PLAN-022 (Workbench), phase-wb-05 (File Browser panel) explicitly lists "the five context-menu actions (reveal, open-in-viewer with tab submenu, copy relative, copy absolute, inject path)" as a deliverable. Phase-wb-04 (HTML Viewer panel with tabs) established the tab infrastructure that phase-wb-05's open-in-viewer action targets.
+
+**Implementation status:** Both phase-wb-04 and phase-wb-05 are marked complete in the backlog with all items validated and integrated into dev (backlog.yaml records phase-wb-04 and phase-wb-05 as complete).
+
+**Related ideas:** The idea relates to 000111 (File bookmark categories) via fold(); both are part of the same workbench build batch. No other idea overlaps the right-click open-in-viewer feature.
+
+The idea's actual ask — a right-click context menu on files that opens them in the HTML Viewer — was delivered by phase-wb-05 and is now shipped.
+
+PROPOSED PROMOTION: 000112 -> PLAN-022 (File Browser right-click open-in-viewer action delivered in phase-wb-05, completed and integrated into dev)
+
+</details>
 
 **Links**
 
@@ -5310,9 +5592,33 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 
 ## 000113 · Audit terminal persistence and performance across all three shells
 
-**Created 2026-09-11T17:28:34-04:00 · Status: `open`**
+**Created 2026-09-11T17:28:34-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). A deliberate audit - not a bug fix - of the terminal panels' persistence and performance, covering bash, CMD and PowerShell equally: when sessions survive (layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload) and when they die, whether each survival/death is intended and communicated, and how the panels perform (connect latency, echo latency, resize behavior, scrollback handling, behavior at the six-session cap). The persistence half should build on idea 000107's corrected diagnosis (a stored visible-panel choice differing between layouts silently kills the hidden shell's session) and on whatever phase-wb-09's W16 rework ships; CMD and PowerShell need real coverage on the Windows machine, which agent evidence cannot supply - the audit should say which measurements are owner-machine checks.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:46:45-04:00): ## Finding for 000113: Audit terminal persistence and performance across all three shells
+
+**Relationships found:**
+
+Idea 000113 already links to 000107 (terminal session loss on layout switches when stored visible panel differs between layouts), and this relationship is well-founded: the corrected diagnosis in 000107's amendment describes how hidden shell panels unmount and their PTY sessions die silently when visibility changes — exactly what 000113 intends to audit. Idea 000114 (general workbench performance audit with caching focus) also relates_to 000113; both are post-build audit ideas, though 000114 targets general workbench performance while 000113 narrows to terminal persistence and performance across shells.
+
+**Governed documents:**
+
+PLAN-022 (Workbench — the stage becomes the chartered management UI) establishes the terminal panel work through phases phase-wb-08 (panel rendering fixes, including terminal clipping issue 000104 and HTML Viewer blank rendering) and phase-wb-09 (layout-assignment redesign with W16 obligation: re-assignment and visibility changes must never silently kill shell sessions). REQ-007 (Workbench requirements) rows W15–W17 specify terminal visibility requirements (shells fill their slots at all four window sizes and layouts), layout assignment behavior (per-panel eligibility, default assignments with platform-conditional defaults), and session caps (global cap of six PTY sessions, per-panel tab cap of four). ADR-016 (Layouts are versioned repository JSON) and ADR-014 (The workbench terminal is a gated capability with session registry and selectable shells) establish the persistence and shell-selection architecture.
+
+**Scope distinction:**
+
+The workbench plan phases (wb-08 and wb-09) deliver features and include mechanical verification (Playwright assertions, pytest for backend halves) against their requirements. Idea 000113 proposes a separate, post-build audit: deliberate measurement and validation of persistence behavior (when sessions survive layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload and when death occurs, marking intended vs unintended outcomes) and performance (connect latency, echo latency, resize behavior, scrollback handling, six-session cap behavior) across all three shells equally. The audit's scope extends to owner-machine checks for CMD and PowerShell coverage since agent evidence cannot supply real Windows terminal behavior.
+
+**No related plan, phase or document found** that covers this post-build audit work. The workbench build delivers features with integrated verification; this audit is a subsequent measurement and validation task suited for the next planning session after PROMPT-024's batch completes.
+
+</details>
 
 **Links**
 
@@ -5323,9 +5629,31 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 
 ## 000114 · General workbench performance audit, with caching as the primary improvement lever
 
-**Created 2026-09-11T17:28:34-04:00 · Status: `open`**
+**Created 2026-09-11T17:28:34-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the workbench's general performance - page load, panel mount/switch times, API round-trips (enumeration, filesystem, explorers), HTML Viewer file serving, overview generation - and then evaluate where caching can improve it: candidates include backend response caching for the enumeration/filesystem routes, frontend caching of layout and panel data, memoizing expensive renders, and cache headers on the file-serving route. The audit half produces measurements first (what is actually slow, with numbers); the caching half is designed against those numbers, not assumed - each cache needs an invalidation story (repository files change under the app) before it ships.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:09-04:00): Idea 000114 requests a performance audit of the workbench with caching as the primary improvement lever, covering page load, panel mount/switch times, API round-trips, HTML Viewer file serving, and overview generation. The audit should measure first, then design caching solutions with invalidation stories before shipping.
+
+Related ideas and links:
+- 000113 (Audit terminal persistence and performance across all three shells) already relates_to 000114, covering a parallel performance audit for the terminal subsystem specifically.
+- 000121 (Cache invalidation must cover the regenerate-overview-during-demo-week flow) extends 000114, sharpening its invalidation requirement with a concrete instance (the overview regeneration during demo week).
+
+Broader context:
+Idea 000114 is part of a batch of owner-requested audits for the next workbench planning session (post-PROMPT-024), issued 2026-09-11. Related audit ideas in the same batch include 000115 (duplication audit), 000116 (code structure audit), 000123 (reconcile pre-build plans vs workbench reality), 000124 (formalize terminology), and 000134 (audit slots and panels for content fit). These all sit in the same planning session but address different concerns — code structure, modularity, vocabulary, UI layout, and now performance.
+
+Governed documents:
+PLAN-022 (Workbench — the stage becomes the chartered management UI) is the active workbench plan with seven phases covering the workbench build through the demo rehearsal refresh. It does not currently include a performance audit phase. No existing requirement or ADR addresses workbench performance measurement or caching strategy. This idea proposes a new investigation into a system area not yet formally chartered as a plan deliverable.
+
+No related plan, requirement or ADR currently covers the performance audit itself, though PLAN-022 and REQ-007 describe the workbench that will be audited. The idea's own work (measuring, then caching design against those measurements) is not yet delivered.
+
+</details>
 
 **Links**
 
@@ -5336,23 +5664,68 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 
 ## 000115 · Duplication audit: find what is done multiple times and generalize toward modularity
 
-**Created 2026-09-11T17:48:01-04:00 · Status: `open`**
+**Created 2026-09-11T17:48:01-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the application for duplication - logic, components and patterns implemented more than once - and identify where a generalization would make the application more modular. The owner's motivating example: multi-panel support in a slot (the wrapper/header/switcher machinery in Slot.tsx and its CSS chain, which phase-wb-08's fix and idea 000101's duplicate header both touched) should be one generic mechanism, not per-slot or per-panel reimplementation. The audit names each duplication with file references, judges whether generalizing pays for itself, and proposes the shared abstraction where it does.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:05-04:00): ## Finding: Duplication Audit
+
+**Overlap with existing ideas:** Ideas 000116 (Code structure and file-size audit), 000124 (Formalize the vocabulary and terminology), and 000134 (Audit all slots and panels for content fit) are already linked as relates_to; each addresses complementary aspects of the same codebase audit dimension. Idea 000101 (Workbench multi-panel slots render a double header) is a concrete instance of the duplication problem this audit seeks to generalize — the double header in Slot.tsx and its CSS chain, specifically mentioned in the body as motivating the audit.
+
+**Related governed documents:** PLAN-022 (Workbench — the stage becomes the chartered management UI) and its phase-wb-08 (Panel rendering fixes) directly touched the Slot.tsx multi-panel wrapper issue the body cites as the motivating example. Phase-wb-08 fixed the xterm area collapse in ts/src/workbench/Slot.tsx and related multi-panel slot geometry, but this was a targeted fix to a single duplication instance, not a systematic audit of all duplication patterns across the application.
+
+**No comprehensive duplication audit plan yet exists** — the workbench construction phases address specific components as they are built, but no governed plan or backlog phase is allocated to the systematic discovery and generalization of duplicated logic, components, and patterns that this idea proposes. The related ideas (000116, 000124, 000134) remain open and unlinked to a plan.
+
+**Assessment:** The idea is distinct from the active workbench work (PLAN-022). It proposes a cross-cutting audit activity that complements the existing refactoring and vocabulary-formalization ideas already in the backlog.
+
+</details>
 
 **Links**
 
 - relates_to ← `000116`
 - relates_to ← `000124`
 - relates_to ← `000134`
+- relates_to ← `000135`
 
 ---
 
 ## 000116 · Code structure and file-size audit: identify refactoring needs and propose target structures
 
-**Created 2026-09-11T17:48:01-04:00 · Status: `open`**
+**Created 2026-09-11T17:48:01-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-024 batch). Audit the structure of the code and file sizes - lines of code per file across ts/src and src/ - and identify where refactoring is necessary (oversized files, mixed responsibilities, components or modules grown past one clear purpose). For each place refactoring is warranted, the audit proposes what the new structure would look like (the split, the new module boundaries, what moves where) rather than only flagging the size. Pairs with the duplication audit: a shared abstraction extracted there often IS the refactor proposed here.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:31-04:00): Idea 000116 is an owner-requested audit for the workbench planning session, paired with 000115 (duplication audit). The two form a complementary pair: 000115 identifies what is done multiple times and proposes generalizations toward modularity; 000116 audits code structure and file sizes (lines of code per file across ts/src and src/) to identify refactoring needs, then proposes target structures for each identified refactoring opportunity.
+
+The idea is already correctly linked to 000115 via relates_to. Both audit requests are part of a larger workbench batch (000108-000116, extended through 000134) that the owner has explicitly instructed must be triaged and categorized into multiple plans rather than forced into one pack (idea 000125). The owner noted in the annotation to 000108 that the audits (000113-000116) will likely inform the design and sequencing of the feature items (000108-000112).
+
+Related audit ideas with distinct but complementary scope:
+- 000113 (Audit terminal persistence and performance across all three shells) — examines runtime behavior and performance
+- 000114 (General workbench performance audit, with caching as the primary improvement lever) — examines performance across the application
+- 000123 (Audit the pre-build HTML generation plans against what the workbench actually became) — reconciles planned vs. actual work
+- 000124 (Formalize the vocabulary and terminology of the HTML generation and workbench system) — names system concepts consistently (relates_to both 000115 and 000116)
+- 000126 (Thorough audit of the repository's commands, skills, and agents) — examines tool/skill/agent design and scope
+- 000134 (Audit all slots and panels for content fit, with a methodology for preventing visibility issues) — examines UI layout and content organization (relates_to 000115)
+
+Governed documents examined: ARCH-002 (system audit) addresses architecture and governance at a system level but does not cover code-level structure and file-size audits for ts/src and src/. No existing plan, requirement, ADR or backlog phase specifically addresses code structure refactoring or file-size audits.
+
+This is a forward-looking audit request to inform subsequent refactoring work; no existing work has delivered what the idea asks for, so no promotion applies.
+
+PROPOSED LINK: 000116 --relates_to--> 000124 (both address code organization: 000116 proposes structural refactors, 000124 formalizes vocabulary so terms are consistent across those refactors)
+
+</details>
 
 **Links**
 
@@ -5363,9 +5736,33 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 
 ## 000117 · Popup sizing fix belongs in the shared Popover component - audit all its consumers
 
-**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
 
 Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), extending idea 000108. The owner-reported "only two entries visible" symptom is not specific to the HTML Viewer's file selector: it renders through the shared ts/src/stage/Popover.tsx, whose reposition() computes maxHeight with a hard MIN_BUBBLE_HEIGHT_PX = 120 floor that reproduces the symptom for any caller. Eight other components use the same Popover - InjectionDropdowns.tsx (skills/agents/prompts lists, open-ended length), TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx. The pack should scope the 000108 fix as "Popover.tsx's height math plus an audit of every consumer", not "the HTML Viewer's dropdown", or the same bug ships unfixed in every sibling and resurfaces as a fresh report.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:24-04:00): **Systemic Popover height floor issue across multiple consumers**
+
+Idea 000117 correctly identifies that idea 000108's "only two entries visible" symptom in the HTML Viewer's file selector is not a one-off UI quirk but a systemic flaw in the shared `ts/src/stage/Popover.tsx` component. The hard MIN_BUBBLE_HEIGHT_PX = 120 floor in Popover's reposition() method reproduces the symptom across all nine consumers: InjectionDropdowns.tsx (skills/agents/prompts lists), TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx's panel switcher, CommandPanel.tsx, and two others. The idea correctly proposes that the fix should scope to "Popover.tsx's height math plus an audit of every consumer" rather than treating the HTML Viewer as the isolated source.
+
+**Related ideas and links:**
+
+The link to 000108 (extends) is already recorded and correct. Idea 000130 (Rotator help tooltip cut off at the panel bottom) surfaces the same Popover height ceiling in the rotator's help tooltip and was explicitly annotated by the owner as "likely the same shared Popover positioning/height math as idea 000117", confirming the pattern. The 000130 link was not part of this agent's findings but reflects the same underlying issue across the codebase.
+
+**Governed documents:**
+
+The components mentioned (InjectionDropdowns.tsx, TerminalMenu.tsx, NotesStripRegion.tsx, DirectoryPickerDialog.tsx, LayoutConfigDialog.tsx, Slot.tsx, CommandPanel.tsx) are referenced in `docs/09-backlog/backlog.yaml` as delivery artifacts within phases phase-wb-02 (layout engine and notes strip), phase-wb-03 (terminal panel rework), and phase-wb-04 (HTML Viewer panel), all of which are complete or in progress. No current plan, phase or requirement document scopes a shared Popover component fix or a systemic height audit across all nine consumers. The issue is unassigned to a deliverable.
+
+**Conclusion:**
+
+This is a properly scoped refinement of 000108 that moves the owner's scheduling decision from a one-off HTML Viewer fix to a systemic component issue affecting nine consumers. The existing link to 000108 (extends) captures this correctly. The fix belongs in a future workbench enhancement batch after PROMPT-024/phase-wb-08/09/10 ship, and the owner's planning session should treat it as a Popover-wide audit, not as part of the HTML Viewer's scope.
+
+</details>
 
 **Links**
 
@@ -5376,9 +5773,27 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), extending ide
 
 ## 000118 · Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands
 
-**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
 
 Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000110 and 000112. HtmlViewerRegion.tsx exports COMPATIBLE_EXTENSIONS = ['.html', '.svg'] as the single list FileBrowserRegion.tsx's right-click menu reads to decide viewerCompatible - deliberately one list, no second hand-kept copy. When 000110 teaches the viewer to render markdown, this constant is the choke point that decides whether "Open in HTML Viewer" even appears on a .md file. Today the File Browser's own built-in "Documentation" preset (directory docs/, typeFilter .md) cannot open any of its own files into the viewer for exactly this reason. The pack must update the list in the same work item that adds markdown rendering, and the validator should assert the context-menu action appears on .md files.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:48:55-04:00): Idea 000118 correctly identifies a code choke point that needs updating when markdown rendering ships. The HtmlViewerRegion.tsx file exports `COMPATIBLE_EXTENSIONS = ['.html', '.svg']` (line 18, ts/src/stage/HtmlViewerRegion.tsx), which is the single authoritative list both the viewer component and the File Browser's right-click context menu read to decide whether "Open in HTML Viewer" should appear on a file. Currently governed by REQ-007 W07 ("the compatible files (.html and .svg)"). 
+
+The idea's core observation is sound: when idea 000110 (HTML Viewer renders markdown files with proper formatting) lands, this constant must be extended to include '.md' in the same work item, and REQ-007 W07's verification must be updated to confirm the "Open in HTML Viewer" action appears on .md files in the File Browser (REQ-007 W09's test coverage).
+
+The existing relates_to links (000110 and 000112) are appropriate — both are necessary for markdown to be openable in the viewer. Idea 000119 (Decide where markdown-to-HTML rendering happens) is also part of the same integration: it covers the rendering mechanism itself (inline in iframe vs. new-tab), while 000118 covers making the action available in the menu. Both need shipping together to close the user workflow.
+
+No existing plan, phase, or requirement currently covers markdown rendering in the HTML Viewer. The workbench phases (phase-wb-*) focus on the existing .html/.svg capability.
+
+PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdown rendering into the HTML Viewer workflow)
+
+</details>
 
 **Links**
 
@@ -5389,9 +5804,27 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 ## 000119 · Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source
 
-**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
 
 Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000109 and 000110. 000110 leaves the markdown conversion location open ("either the serving route or the frontend"). If it lands as a frontend-only render step inside HtmlViewerRegion, then 000109's double-click-to-new-tab - which loads the raw /workbench-file/ bytes directly, bypassing the component - shows unrendered markdown source for exactly the file type the same batch adds rendering for. The security half is already solved: ts/vite.config.ts's serveRepositoryFiles plugin sets a Content-Security-Policy: sandbox header so a top-level navigation gets the iframe's restrictions. The planning session should decide the render location explicitly (route-side rendering makes both surfaces consistent) rather than letting two build items collide by accident.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:35-04:00): Idea 000119 identifies a decision point already made explicit in the agent scout's framing: when ideas 000109 (new-tab open) and 000110 (markdown rendering) both land in the same workbench batch, they create a collision unless the render location is chosen first. The issue is precise and real — if markdown rendering is implemented only in the frontend component (HtmlViewerRegion), then 000109's double-click behavior, which loads raw /workbench-file/ bytes directly, bypasses that rendering entirely and shows unrendered markdown source to the user.
+
+The idea correctly notes that the security half is already solved: `ts/vite.config.ts`'s `serveRepositoryFiles` plugin sets `Content-Security-Policy: sandbox` on every response from the /workbench-file/* route, so opening any file in a new tab is sandboxed the same way an iframe is. The generated overview page (which currently has no <script> tags) renders correctly through both paths under this header.
+
+The decision itself — whether markdown-to-HTML conversion happens route-side (in the backend or vite dev server's middleware) or frontend-side (inside HtmlViewerRegion) — is genuinely reserved for the planning session. Route-side rendering makes both surfaces (embedded and new-tab) consistent without duplication. Frontend-side rendering keeps rendering logic in the UI layer, at the cost of having to handle the raw-bytes fallback path separately.
+
+Related ideas are already recorded: 000109 (double-click new-tab) and 000110 (markdown rendering) are both linked. Idea 000118 (grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) depends on this decision as well — it will be the task to update the compatible-files list after the render location is chosen and 000110 ships.
+
+No related plan, requirement or ADR found that reserves or predetermines the render location. PLAN-022-workbench.md and REQ-007-workbench.md cover the HTML Viewer's current scope (W07–W08: .html and .svg files with refresh, directory dialog, tabs, and tab persistence), but neither mentions markdown rendering or render-location choice. The decision belongs in the planning session for whichever phase undertakes 000110.
+
+</details>
 
 **Links**
 
@@ -5402,9 +5835,27 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 ## 000120 · Extend the panel bridge to batch, multi-target actions for bookmark categories
 
-**Created 2026-09-11T18:01:47-04:00 · Status: `open`**
+**Created 2026-09-11T18:01:47-04:00 · Status: `triaged`**
 
 Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting ideas 000111 and 000112. ts/src/stage/panelBridge.ts is deliberately a single-handle, single-action bridge: each BridgeSlot holds one live handle for one panel instance, and an action with nothing registered reads null and disables - never throws, never queues. 000112's open-in-viewer fits that shape (one file, one target). 000111's categories imply "pull up a category's files as a set" - N files at once, plausibly across several viewer tabs or across File Browser and Viewer together. Without extending the bridge to a batch/multi-target contract, the category feature either builds an ad hoc parallel mechanism (duplicating what panelBridge already solved - the 000115 duplication audit's exact concern) or silently degrades to opening the first file only.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:25-04:00): Found in ts/src/stage/panelBridge.ts: the bridge is deliberately single-handle, single-action by design. The terminalBridge publishes only injectPath (one relative path), and viewerBridge publishes only openInTab (one file, one tab). Both read null when their target panel is absent or unmounted, disabling actions gracefully without throwing or queuing.
+
+The idea's prerequisite ideas are already triaged with recorded links: 000111 (File bookmark categories) and 000112 (File Explorer open-in-viewer) both exist as owner requests for the post-PROMPT-024 workbench pack. The problem is architectural: categories (000111) will group multiple files, but opening them as a set requires either (1) extending the bridge to batch/multi-target operations, or (2) building a parallel ad hoc mechanism. The latter duplicates the bridge's own solution to the cross-panel-communication problem, which conflicts with the modularity goal stated in 000115 (duplication audit). 
+
+Found in REQ-007 W09 and PLAN-022: the workbench requirements define the File Browser's open-in-viewer action and its submenu of tabs, and the plan discusses the broader viewer panel architecture, but do not yet specify the bridge extension for batch operations or the contract shape for multi-file handling.
+
+The links 000120 -> 000111 and 000120 -> 000112 are already recorded and correct. The idea has no remaining open overlaps, and is not yet delivered — the bridge extension itself is the work this idea describes.
+
+PROPOSED LINK: 000120 --relates_to--> 000115 (batch operations requirement conflicts with duplication audit's modularity goal if handled ad hoc instead of extending the bridge)
+
+</details>
 
 **Links**
 
@@ -5415,9 +5866,31 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 ## 000121 · Cache invalidation must cover the regenerate-overview-during-demo-week flow
 
-**Created 2026-09-11T18:01:48-04:00 · Status: `open`**
+**Created 2026-09-11T18:01:48-04:00 · Status: `triaged`**
 
 Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening idea 000114's invalidation requirement with its specific, dated instance. The HTML Viewer's file dropdown is fed by GET /api/v1/workbench/search and a fresh tab's default page by GET /api/v1/demo/stage/overview-location - both reflect what exists on disk under _public/overview/. The d-system-overview flow (tools/generate_overview.py) is explicitly meant to be re-run whenever the live demo needs a fresh page, i.e. during demo-prep week itself. A cache with a naive TTL or no file-mtime invalidation on these routes would hide a just-regenerated overview from the viewer's own picker on exactly the week it matters (demo 2026-09-15). The 000114 audit should measure these routes first and any cache on them must key on file mtimes or be explicitly busted by the generator.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:36-04:00): Idea 000121 sharpens idea 000114 (General workbench performance audit, with caching as the primary improvement lever) with a specific, date-critical constraint: the demo overview regeneration flow during demo-prep week (2026-09-15) depends on cache invalidation keyed to file mtimes, not naive TTLs.
+
+The idea correctly identifies the routes involved:
+- GET /api/v1/workbench/search — fed by the HTML Viewer's file dropdown; lists files under _public/overview/
+- GET /api/v1/demo/stage/overview-location — returns the path to the generated overview file
+
+Both routes reflect files on disk generated by tools/generate_overview.py. REQ-006 (Live demo requirements, R08) documents the overview skill that orchestrates this tool. If either route gains a cache with naive TTL or no file-mtime validation, a just-regenerated _public/overview/index.html during demo prep would remain hidden from the viewer's picker, breaking the demo's live overview-rebuild step (covered in the demo runbook).
+
+The workbench.py /search route (lines 373–394) currently reads the filesystem on every call; demo_stage.py's /overview-location route (lines 90–102) returns the configured path without caching. However, 000114's performance audit is a governed forward commitment to measure and optimize these routes, so the audit must discover both routes and document whether they require caching and, if so, what invalidation strategy preserves the demo's timing guarantees.
+
+Already linked: 000114 (extends). No other ideas overlap directly; the audit and caching decision belong in 000114's scope.
+
+PROPOSED LINK: 000121 --relates_to--> 000106 (Both flag the need for drift testing: 000106 wants a test for the committed overview page, like the enforced test for ideas.md; 000121 identifies the live-rebuild timing dependency that makes such a test load-bearing)
+
+</details>
 
 **Links**
 
@@ -5427,47 +5900,172 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), sharpening id
 
 ## 000122 · Evaluate alternative languages and platforms for a non-web rebuild of the application
 
-**Created 2026-09-11T18:14:30-04:00 · Status: `open`**
+**Created 2026-09-11T18:14:30-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, deliberately standalone - not part of the next-pack batch; for future consideration. The application is becoming something like an integrated development environment: a fully customizable workspace shaped to the owner's perfect workflow (panels, terminals, file viewers, explorers, notes, agent triggering). That vision does not have to live in a web app. This idea is to think through a rebuild in a different language and platform - candidates the owner named: Rust, Go, C# - weighing what each offers for a desktop-class IDE-style application (native windowing/terminal integration, performance, packaging, long-term maintainability, ecosystem for embedding editors/terminals/webviews). Constraints for the evaluation: the rebuild would START from the same functionality the current FastAPI + React workbench already has (feature parity as the baseline, not a redesign), and the evaluation should also weigh hybrid paths (e.g. keeping the Python data/agent layer and replacing only the shell) against a full rewrite. Output when picked up: a comparison with a recommendation, not code.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:50:26-04:00): Scanned all 134 recorded ideas and the governed document set (plans, requirements, ADRs, backlog).
+
+**Finding:** No related idea or document addresses this evaluation directly. The current plans and requirements (PLAN-022, REQ-007, and the workbench capability decisions ADR-013–016) are fully committed to building out the existing FastAPI + React web-based workbench. These documents describe the trajectory through the demo week and beyond, but contain no planning for platform or language alternatives.
+
+Three tangential idea overlaps exist but address different questions:
+- 000067 (Portable agent workflows from a single source of truth) aims for workflow independence across host environments, not platform evaluation
+- 000069 (Should Claude Code remain a dependency once agent workflows are portable?) questions dependencies but not language/platform choices
+- 000076 (Should we delete Claude Code?) is even more tangential — it questions whether Claude Code should be used at all, not what platform the application itself should run on
+
+The idea's constraint (feature parity as baseline, hybrid paths included) and stated output (comparison with recommendation, not code) distinguish it cleanly: this is exploratory due-diligence, deliberately decoupled from active build work.
+
+No document appears to fully deliver this idea's ask, and no strong candidate for a proposed link was found.
+
+</details>
 
 ---
 
 ## 000123 · Audit the pre-build HTML generation plans against what the workbench actually became
 
-**Created 2026-09-11T19:32:38-04:00 · Status: `open`**
+**Created 2026-09-11T19:32:38-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The repository carried HTML generation plan documents from before this product was built (the HTML generation framework plans and requirements in docs/01-plans/ and docs/06-requirements/ predating the demo/workbench tracks - e.g. the phase-html-* line, whose phase-html-01 "Define strict page contracts and generated-output ownership" still sits ready in the backlog). Run a full audit of those documents against what exists now: which of their requirements and ideas the demo/workbench builds already accomplished (perhaps under different names), which remain untouched and still wanted, which are superseded by how the product actually evolved, and which should be retired. Output: a document-by-document reconciliation with a disposition for every requirement/idea - accomplished (with evidence), still open (fed into planning), superseded (with the decision that superseded it), or proposed for retirement - so the old plans stop silently drifting from the built reality.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:51:08-04:00): Related Plans and Documents
+
+PLAN-003 (Dynamic HTML Generation Website Tool, approved 2026-09-05) specifies a framework for data-driven page rendering through YAML authoring, JSON generation, schema validation, and React component rendering. Nine backlog phases (phase-html-01 through phase-html-09) remain queued. An adversarial design audit (ARCH-003, 2026-09-05) identified seven high-priority defects in PLAN-003's design before implementation began, focusing on schema/contract contradictions, publication boundaries, site integrity, phase dependencies, URL policy, and failure recovery.
+
+The HTML generation framework was actually realized through PLAN-021 (Live Demo Stage and Overview Build) and PLAN-022 (Workbench), which implement generation of overview pages via templates/html/ and templates/styles/. PLAN-021 explicitly acknowledges this: "The overview page is the first working product of the HTML generation framework that PLAN-003 designs and the phase-html-* track queues." The demo/workbench implementation diverged from the PLAN-003 design: rather than configurable YAML pages with block-based composition, it produced deterministic scripts computing page content, with Claude orchestrating the templates.
+
+Related ideas exist in the corpus: idea 000001 (fixture governance for the HTML generation system), 000084 (HTML component library), 000085 (color palette library), 000092 (HTML Designer agent for template extraction), 000105/000106/000114/000121 (minor issues in workbench UI/visibility/performance that touch HTML rendering). All share overlapping concerns with 000123 about what was built, what remains wanted, and what should be retired.
+
+Companion Issue
+
+Idea 000124 (Formalize the vocabulary and terminology of the HTML generation and workbench system) was recorded in the same batch (2026-09-11 owner request). The owner's decision note explicitly links them: "000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names."
+
+PROPOSED LINK: 000123 --relates_to--> 000124 (Companion audit and terminology effort for the same planning session, explicitly coordinated in owner notes)
+
+</details>
 
 ---
 
 ## 000124 · Formalize the vocabulary and terminology of the HTML generation and workbench system
 
-**Created 2026-09-11T19:32:38-04:00 · Status: `open`**
+**Created 2026-09-11T19:32:38-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the next workbench prompt-pack planning session (batch anchor 000108). The system's names grew by accident and some are now wrong: the owner's example is the "terminal slot", named after the panel that started in it - but with per-panel eligibility (REQ-007 W16) any shell or the HTML Viewer can occupy it, so the name misdescribes the thing. Formalize the vocabulary: slots named for their geometry or role (not their initial occupant), and settled definitions for the recurring nouns - slot, panel, region, layout, assignment, visible panel, session, the generation pipeline's terms (template family, generated page, overview) - recorded in a governed glossary document that requirements, ADRs, prompts and code identifiers all use consistently. Include the migration question: where existing identifiers (slot_id "terminal" in _data/workbench/layouts, CSS class names, REQ-007 row wording) should be renamed versus aliased, since stored state and tests reference the current names. A shared vocabulary is also what makes the duplication audit (000115) and structure audit (000116) legible.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:49-04:00): ## Finding: Formalize Workbench Vocabulary and Terminology
+
+**Related Governance and Plans**
+
+The terminology system infrastructure already exists: PLAN-012 (Terminology system — canonical definitions and generated glossaries, draft status) establishes the mechanism for settling definitions in `brain/concepts/` and generating governed glossary documents. Idea 000124 applies that mechanism to the specific domain of the workbench and HTML generation system, providing the content that PLAN-012's framework was built to hold.
+
+Concretely, the workbench system vocabulary is already used across multiple governed documents — REQ-007 (Workbench requirements), ADR-016 (Workbench layout persistence), and PLAN-022 (Workbench — the stage becomes the chartered management UI, active status) — but no settled definitions exist. The specific problem cited in the idea's body is illustrative: "terminal slot" is named after the panel that started in it, but per-panel eligibility (REQ-007 W16) means any shell or the HTML Viewer can occupy it, making the name a misdescription. The idea asks for terms (slot, panel, region, layout, assignment, visible panel, session, template family, generated page, overview) to be settled and recorded in a glossary.
+
+**Related Ideas and Links**
+
+The idea is already correctly linked to 000115 (Duplication audit) and 000116 (Code structure and file-size audit), both of which depend on settled terminology to be legible. A proposed link also emerged: 000133 (Revisit slot geometries and custom layout reconfiguration) explicitly names idea 000124 as foundational, stating "Geometry work should build on the formalized slot vocabulary (idea 000124)."
+
+The companion audit 000123 (Audit the pre-build HTML generation plans against what the workbench actually became) was recorded in the same owner request batch (2026-09-11); the owner's decision note explicitly pairs them: "000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names."
+
+**Assessment**
+
+Idea 000124 is not a duplicate of PLAN-012. PLAN-012 builds the general infrastructure; 000124 applies it to the workbench domain and provides the specific vocabulary content. The work is not yet delivered — existing documents use slot/panel/layout terminology informally, the rename-vs-alias migration question for existing identifiers (slot_id "terminal" in `_data/workbench/layouts`, CSS class names, REQ-007 wording) has not been decided, and no glossary document has been written to consolidate these terms for requirements, ADRs, prompts and code identifiers to use consistently.
+
+PROPOSED LINK: 000124 --relates_to--> 000133 (Geometry redesign builds on the formalized slot vocabulary that idea 000124 proposes to provide)
+
+</details>
 
 **Links**
 
 - relates_to → `000115`
 - relates_to → `000116`
 - relates_to ← `000133`
+- relates_to ← `000135`
 
 ---
 
 ## 000125 · Holistic triage of the accumulated idea batch: categorize, prioritize, and split into plans
 
-**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
 
 Owner direction, 2026-09-11, governing how the next planning session opens. The idea batch anchored at 000108 has grown past what one plan should contain, and the owner expects to keep adding. Before any deep dive into comprehensive development, the planning session must take a holistic look at ALL open ideas in the batch (and any that join later): categorize them, prioritize them, and figure out how they group into DIFFERENT plans - plural - rather than forcing one prompt pack to hold everything. Only after that grouping is settled does comprehensive development of each plan begin. This supersedes the earlier framing of "the next prompt pack" as a single container: the pack-planning session becomes a triage-and-grouping session first, producing multiple plan boundaries with an ordering across them.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:53-04:00): Idea 000125 reframes the upcoming planning session as a holistic triage and categorization exercise before implementation planning. Instead of forcing the accumulated idea batch into a single plan container, the session must first take all open ideas in the batch, categorize them, prioritize them, and determine how they naturally group into multiple distinct plans — only then proceeding to comprehensive development of each plan.
+
+This is a meta-workflow directive about how planning sessions should be conducted, not a feature or system capability request. It directly addresses the batch anchored by 000108 (workbench issues: HTML Viewer, rotator, caching, performance) which has grown to include diverse concerns: workbench audits (000115-000116), demo system fixes (000129), and agent/skill improvements (000126-000128).
+
+Related governed documents:
+- PLAN-016 (idea record system) provides the foundational infrastructure for tracking, analyzing and reasoning about batches of ideas
+- PLAN-019 (idea priority queue) establishes a priority ordering mechanism for open ideas awaiting promotion, but does not address categorization or plan-grouping
+- PLAN-008 (session lifecycle protocols) notes that "nothing distinguishes session types" and proposes differentiated entry points, but does not yet specify triage-and-grouping as a defined planning phase
+
+Related ideas that connect to different aspects of idea analysis:
+- 000046 (idea planner agent that turns a promoted idea into a governed plan) — handles conversion of a single promoted idea to a plan, but assumes the idea has already been decided upon
+- 000055 (connection-builder agent for the full idea corpus) — maintains the relationship graph and can analyze connections across all ideas, regardless of status
+- 000062 (pure classification agent for idea nodes) — interprets each idea on its own merits and assigns ontological/epistemic/lifecycle classifications, providing taxonomy without linking or tagging
+- 000038 (formalize requirements-vs-plans process and design) — audits how requirements and plans relate, but from a quality/formalization angle rather than from batch-triage perspective
+
+No existing governed document (plan, requirement, or decision) fully specifies or delivers the holistic batch-triage-then-split-into-plans workflow that 000125 directs. This is owner direction governing how the next planning session opens, distinct from the work itself.
+
+PROPOSED LINK: 000125 --relates_to--> 000046 (idea planner agent will take the output of batch triage to draft plans for each grouped category)
+
+</details>
 
 ---
 
 ## 000126 · Thorough audit of the repository's commands, skills, and agents
 
-**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Audit everything under .claude/ (commands, skills) and the agent definitions this repository ships: first and foremost for efficient and proper design of the codebase - each command/skill/agent judged on whether its scope, tooling, model assignment and context cost fit its job - and second for creating effective demos, like the live demo of 2026-09-15 (which skills/agents make good on-stage material, which need hardening before being shown). The audit should produce per-item findings (keep / redesign / retire / missing-and-needed) and feed the recurring pattern the owner has flagged: work that runs in the main session context but should not (see the idea-skill subagent example and the shared-state model idea recorded alongside this one).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:52:51-04:00): TRIAGED: 000126 seeks an audit of the repository's commands, skills, and agents to surface design and context-fitness concerns. The audit's secondary purpose is identifying demo-ready material.
+
+Scanned idea graph for overlaps: ideas 000127 (idea skill delegates capture to a subagent) and 000128 (shared state model for multi-agent planning sessions) already link to this idea—they are companion batch items recorded alongside, addressing recurring patterns the owner flagged as context-spending inefficiencies. No other ideas overlap directly.
+
+Governed documents examined for related audits or frameworks:
+
+- **PLAN-008** (Session lifecycle protocols) discusses skills and slash commands under `.claude/` as entry points for opening sessions by type, but the plan's scope is narrowly session protocols, not a design audit of commands/skills/agents themselves.
+
+- **PLAN-021** (Live demo) mentions agents under `.claude/agents/` created for the demo build, but those are demo-specific agents with no claim to represent the full agent ecosystem or command/skill design.
+
+- **ARCH-002** (System audit, 2026-09-05) provides general architectural findings and risk prioritization, but does not examine agent/command/skill scope, tooling, model assignment or context cost fit—it addresses data flow, API/UI capability, schema, and transactional safety instead.
+
+- **Agent engineering ideas (000078–000082)**: an umbrella framework with sub-topics on guides, sensors, orchestration and context pipelines. These are design principles for building agents deliberately, not an audit of the existing agent and command inventory.
+
+No existing plan or requirement document covers the specific ask: a per-item audit of commands, skills and agents already in the repository, judged on scope/tooling/model fit, context cost, and suitability for demonstration. The audit's findings would naturally feed into the agent-engineering framework (000078) as evidence, but the framework is not a substitute for conducting the audit itself.
+
+Outcome: auditable ask with no existing governed delivery. The audit sits cleanly between system governance (ARCH-002) and agent-engineering principles (000078–000082) as a factual assessment of the current state.
+
+</details>
 
 **Links**
 
@@ -5478,9 +6076,29 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Audit 
 
 ## 000127 · Idea skill delegates capture to a subagent instead of spending main-session context
 
-**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108); named by the owner as one example of a recurring pattern to expect in their working style. The idea skill currently performs capture directly in the main conversation context. In sessions where the context window is precious - like a long coordination or planning session - the skill should instead spin up a subagent that handles the capture (writing the idea through the sanctioned writer, linking, regenerating the markdown, committing per protocol) and returns only the created ids, keeping the tool output and file churn out of the main context. The general principle to extract during the commands/skills/agents audit: any skill whose work is mechanical and self-contained should run in a subagent by default, with the main session receiving just the result. Constraint: the subagent must still obey the idea-system rules (sanctioned writer only, ids taken from the writer's output, post-processed reads).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:03-04:00): Idea 000127 proposes delegating the idea skill's capture work to a subagent, keeping only result IDs in the main session context, and extracting a general principle during the commands/skills/agents audit (000126).
+
+Related work and precedent:
+- Already linked to 000126 (Thorough audit of the repository's commands, skills, and agents), which is the broader audit this idea is part of
+- Phase-idea-02 built the idea-triage subagent, which demonstrates the pattern of mechanical, self-contained idea work running in a separate agent context
+- Phase-idea-10 is currently queued to harden idea-triage with a wrapper for misdirected writes
+- PLAN-020 (Portable agent workflows) discusses when a "subagent role is not necessarily a skill" and the boundaries between skill vs. agent work; the workflow manifest records "authority" as agent-invocable vs owner-invocable
+
+The principle itself—"any skill whose work is mechanical and self-contained should run in a subagent by default"—is stated in this idea's own body as the generalisation to extract. It is currently applied in idea-triage (phase-idea-02, shipped); applying the same pattern to the /idea command's capture path would defer document churn, markdown regeneration, and commits from the main session to a subagent, returning only the created idea IDs, per the exact constraint that "the subagent must still obey the idea-system rules (sanctioned writer only, ids taken from the writer's output, post-processed reads)."
+
+No related plan, phase, or requirement document found that specifically covers this particular design choice for the /idea command itself.
+
+</details>
 
 **Links**
 
@@ -5490,9 +6108,37 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108); named 
 
 ## 000128 · Shared state model for multi-agent planning sessions
 
-**Created 2026-09-11T19:40:36-04:00 · Status: `open`**
+**Created 2026-09-11T19:40:36-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Develop a shared state model that tracks relevant information for use across multiple agents during highly variable, complex planning sessions like the 2026-09-11 workbench sessions: facts established mid-session (environment quirks such as the port-8000 conflict, corrected diagnoses like idea 000107's, decisions taken, batch membership and ordering), available to every dispatched agent without the coordinator re-pasting them into each prompt. Design questions: where the state lives (the tracked _tmpagent/ mechanism already exists for files sibling worktree agents must read - extend it, or a new structured store), its shape (append-only facts vs a curated current-state document), who may write it (coordinator only, or any agent with attribution), how staleness is handled, and how it relates to the session record (which is the human-facing account, not an agent data bus). Relates to the truncation/resume frictions and repeated coordinator addenda observed in the wb-08/09 builds - much of what the coordinator hand-carried between agents is exactly this state.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:20-04:00): This idea proposes a shared state model to track facts established mid-session during complex multi-agent planning sessions, making information available to every dispatched agent without repeated coordinator context-passing. Design questions center on where the state lives, its shape, write authority, staleness handling, and relationship to the session record.
+
+**Related ideas found:**
+
+- **000082 (Agent engineering: Orchestration)** addresses the broader multi-agent coordination problem, including routing, failure recovery, and how agents fit together. A shared state model would directly support the coordination mechanisms 000082 describes.
+- **000077 (Handle subagent tool-use truncation)** documents truncation at a 30-tool-use cap, with recovery via context preservation and resumption. The body of 000128 explicitly mentions "truncation/resume frictions" observed in recent workbench sessions; a shared state model would give agents a way to resume by reading established facts rather than requiring the coordinator to re-paste context.
+- **000020 (MCP-mediated multi-agent coordination)** proposes an MCP server as the single source of truth for coordination, with a vector database backend and a Librarian agent for context curation. This is a broader infrastructure proposal that could be one implementation strategy for the state store 000128 is designing.
+- **000023 (_tmpagent/ claim protocol registry)** concerns adding _tmpagent to systems.yaml maturity registry. The body of 000128 explicitly identifies _tmpagent as an existing tracked mechanism for "files sibling worktree agents must read" and lists extending it as a design candidate for where shared state would live.
+
+**Existing plans and documents:**
+
+No plan specifically covers shared state for multi-agent planning sessions. PLAN-020 (portable-agent-workflows) addresses workflow portability and manifest generation. PLAN-008 (session-lifecycle-protocols) addresses session types and opening/closing procedures. PLAN-001 (agent-memory-system) addresses memory retrieval across agents through a Librarian interface. None of these directly specify a shared state model for mid-session facts across concurrent agents, though PLAN-008's session-lifecycle work and PLAN-001's memory-coordination approach are adjacent areas.
+
+**Proposed links:**
+
+PROPOSED LINK: 000128 --relates_to--> 000082 (shared state would support orchestration's multi-agent coordination)
+PROPOSED LINK: 000128 --relates_to--> 000077 (shared state provides resumption path for truncated agents)
+PROPOSED LINK: 000128 --relates_to--> 000020 (MCP-mediated coordination is a potential implementation strategy for the state store)
+PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location for the shared state mechanism)
+
+</details>
 
 **Links**
 
@@ -5502,9 +6148,27 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Develo
 
 ## 000129 · Fix the three pre-existing environmental PTY test failures so the suite runs green
 
-**Created 2026-09-11T20:31:54-04:00 · Status: `open`**
+**Created 2026-09-11T20:31:54-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11. The full pytest suite has carried the same three failures through every wb-08/wb-09 verification run: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size and test_two_concurrent_websocket_sessions_are_independent_shells in test/test_demo_terminal.py, all with the pyenv "cannot rehash: couldn't acquire lock" / ".pyenv-shim: cannot overwrite existing file" signature already recorded as environmental in ideas 000097 and 000099. Every gate and audit now has to carry the caveat "3 failed, known environmental" - a standing hole in the evidence that a genuinely new PTY regression could hide inside. Fix them for real: either make the tests robust to the pyenv shim environment (e.g. spawn the PTY shell with a clean environment or an absolute shell path that bypasses shim rehashing), fix the host-level pyenv lock contention, or isolate the tests from the shim mechanism - whichever the investigation supports. Done means the full suite passes with zero expected failures on this machine, and the "known environmental" caveat disappears from gate checklists.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:53:18-04:00): ## Finding
+
+This idea asks for concrete work to fix three recurring pytest failures in test_demo_terminal.py that have been documented as environmental since at least wb-08/wb-09 phases: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size, and test_two_concurrent_websocket_sessions_are_independent_shells, all traced to host pyenv shim rehash/lock contention.
+
+**Related ideas:** The issue is already properly documented through links to 000097 (session-failure tracking and environmental signatures) and 000099 (the exact test failures documented as trunk-red). These ideas are already linked from 000129 as `relates_to` relationships, and no additional idea overlaps were found.
+
+**Governed documents:** The failures appear extensively in docs/09-backlog/backlog.yaml across phases phase-wb-01 through phase-wb-09, consistently noted with the caveat "known environmental PTY failures" or "3 failed (environmental)" to distinguish them from phase-introduced regressions. PTY adapter design and requirements are covered in ADR-013 (demo-terminal-capability), ADR-014 (workbench-terminal-capability), PLAN-021 (live-demo phase), REQ-006 (live-demo), and REQ-007 (workbench). However, no existing PLAN, phase, or document addresses *fixing* these environmental failures — they are documented as standing defects that every phase must caveat around.
+
+**Assessment:** The idea is currently unstarted work. The existing links to 000097 and 000099 correctly surface the problem statement and environmental diagnosis. No new overlaps or proposed links emerge from the search.
+
+</details>
 
 **Links**
 
@@ -5515,9 +6179,33 @@ Owner request, 2026-09-11. The full pytest suite has carried the same three fail
 
 ## 000130 · Rotator help tooltip cut off at the panel bottom; rethink its font size and text capacity
 
-**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
 
 Owner report, 2026-09-11, for the planning triage (batch anchor 000108). In the top-right rotating-text panel (the talking-points rotator), hovering the question-mark tooltip opens a popup dialog that cuts off at the bottom of the panel - the bottom portion is unreadable. Fix the cutoff, and at the same time reconsider the panel's font size and how much text realistically fits in that area. Likely the same shared Popover positioning/height math as idea 000117 (the popup-sizing bug lives in ts/src/stage/Popover.tsx with many consumers) - verify rather than assume, but if so, this is another consumer the 000117 fix must cover, plus rotator-specific typography decisions.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:01-04:00): Rotator tooltip cutoff is a Popover component sizing issue; related documents and ideas confirmed.
+
+The tooltip popup cutting off at the panel bottom is already linked to 000117 (Popover sizing fix belongs in the shared Popover component - audit all its consumers). Idea 000117 identifies that ts/src/stage/Popover.tsx has a hard MIN_BUBBLE_HEIGHT_PX = 120 floor in its reposition() method, and that NotesStripRegion.tsx (which contains the rotator) is one of eight components using the shared Popover. The owner's note in 000130's body correctly flags this: the fix must be holistic across all Popover consumers to avoid the same bug shipping in sibling components.
+
+Related governed documents:
+- PLAN-021-live-demo.md documents the rotator as phase-demo-02's scope and notes "hover popups collapse on pointer leave" is a zero-scroll requirement (REQ-006 R02/R03).
+- REQ-007-workbench.md row W01 specifies the notes strip (which replaced the talking-points panel): "a short, wide, display-only strip at the top right with no title... The `?` tooltip sits at the strip's far left" and the Playwright assertion checks that "hover the far-left `?` and assert the tooltip appears and collapses on pointer leave."
+- backlog.yaml lists Popover.tsx as a phase-demo-02 deliverable with note of its many consumers.
+
+Related ideas:
+- 000108 (HTML Viewer file-selector popup too short) — the original reported symptom of the Popover height floor, which 000117 extends.
+- 000131, 000132 (rotator variants: auto-scrolling text, image rotation) — future enhancements that may depend on fixing the current panel geometry.
+- 000134 (Audit all slots and panels for content fit, with a methodology for preventing visibility issues) — broader effort to prevent similar visibility problems system-wide.
+
+No separate promotion candidate; this is an actionable bug report that ties to an already-scoped fix (000117).
+
+</details>
 
 **Links**
 
@@ -5528,9 +6216,31 @@ Owner report, 2026-09-11, for the planning triage (batch anchor 000108). In the 
 
 ## 000131 · Rotator variant: horizontally auto-scrolling text for longer entries
 
-**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the top-right rotating-text panel: support longer texts with text that automatically scrolls horizontally, right to left (ticker/marquee style), instead of truncating or overflowing. May be an expansion of the existing rotator or a different panel that can be substituted into that slot - the per-panel eligibility model phase-wb-09 ships (REQ-007 W16) makes a substitute panel a natural fit. Design points: scroll speed and readability, pausing on hover, and how rotation-between-entries interacts with scrolling-within-an-entry.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:17-04:00): Idea 000131 proposes adding horizontal auto-scrolling text (ticker/marquee style) to the rotator panel to handle longer text entries that would otherwise truncate or overflow. This is a well-scoped enhancement to the notes strip being shipped in PLAN-022 phase-wb-02 (REQ-007 W01).
+
+Related governed documents:
+- REQ-007 (Workbench requirements): W01 specifies the notes strip as "display-only, short, wide" at top right; the idea proposes expanding this with auto-scroll capability for longer entries
+- PLAN-022 (Workbench plan): phase-wb-02 ships the foundational notes strip; phase-wb-09 ships the per-panel eligibility model that makes the idea's proposed variant-panel approach viable (REQ-007 W16)
+
+Related ideas already linked:
+- 000130 (Rotator help tooltip cut off at panel bottom) — relates_to link in place; this idea extends that bug report with a specific solution approach
+- 000132 (Rotate images through panel) — relates_to link in place; builds on the scrolling-variant approach to also support image rotation
+
+The per-panel eligibility model from phase-wb-09 (REQ-007 W16) makes the idea's key design point feasible: the rotator could be either expanded in place or replaced with a variant panel, since the eligibility system allows substituting panels in the same slot. The idea correctly identifies this and names the design questions worth settling: scroll speed/readability, pausing on hover, and interaction between rotation-between-entries and scrolling-within-an-entry.
+
+No overlap with other ideas beyond the documented links. The notes strip ships without scrolling (PLAN-022 phase-wb-02), so this is new functionality, not a duplicate or rediscovery. The owner's batch annotation (000108) flags 000130 as "live display bug worth demo-week attention" but places 000131 as a follow-on enhancement after the core work lands, which the documentation structure (phase-wb-09 dependency) aligns with.
+
+</details>
 
 **Links**
 
@@ -5541,9 +6251,34 @@ Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the t
 
 ## 000132 · Rotator variant: rotate images through the panel, not just text
 
-**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+**Created 2026-09-11T20:40:50-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the same top-right rotating panel: the ability to rotate images through it instead of only text entries - e.g. charts, logos or figures cycling on the same cadence the text rotator uses. Design points: where the image set comes from (a directory, a bookmark category once idea 000111 exists, or generated overview figures), sizing/letterboxing inside the small panel, and whether text and image entries can mix in one rotation.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:08-04:00): Rotator image cycling belongs in a chain of three related rotator enhancements, all anchored to batch 000108 and proposed for the planning triage.
+
+The demo stage (phase-demo-02, now complete) shipped a talking-points rotator — a small panel that cycles through text entries loaded from a data file. The workbench requirements (REQ-007 W01) replace it with a "notes strip" that carries the same text-rotation semantics: a short, wide, display-only strip at the top right with controls for cycling, timed advance, and file selection.
+
+This idea proposes adding image rotation to that same panel: the ability to cycle through charts, logos, or figures on the same cadence as text entries, with design choices around image sources (directory, bookmark categories per 000111, or generated overview figures), sizing and letterboxing in the small panel bounds, and whether text and image entries can mix in one rotation.
+
+The idea sits downstream of two related rotator proposals: 000130 (fixing the rotator's tooltip cutoff and reconsidering font size and text capacity) and 000131 (horizontal auto-scrolling text for longer entries). Together the three ideas form a coherent enhancement family for the rotator/notes-strip component.
+
+Governance touch points: The per-panel eligibility model shipped in phase-wb-09 (REQ-007 W16) supports swapping panels into a slot, which makes the notes strip a natural anchor for variants like an image rotator; the HTML component library (000084) and template library (000083) are parked ideas that eventually cover reusable UI components; file bookmarks (000111) is a candidate source for image sets once it ships.
+
+No related plan, phase or document found that covers image cycling specifically. The existing rotator code lives in the demo stage implementation; the workbench notes strip is part of phase-wb-* work in progress.
+
+PROPOSED LINK: 000132 --relates_to--> 000130 (tooltip and font-size fixes to the same rotator panel)
+PROPOSED LINK: 000132 --relates_to--> 000131 (text-scrolling variant of the same rotator enhancement family)
+PROPOSED LINK: 000132 --relates_to--> 000111 (bookmark categories as a candidate image source once they exist)
+PROPOSED LINK: 000132 --relates_to--> 000084 (HTML component library where image-rotation variants eventually belong)
+
+</details>
 
 **Links**
 
@@ -5553,9 +6288,27 @@ Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the s
 
 ## 000133 · Revisit slot geometries and custom layout reconfiguration - future phase, after the demo
 
-**Created 2026-09-11T20:40:51-04:00 · Status: `open`**
+**Created 2026-09-11T20:40:51-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), explicitly LOWER priority than any demo-specific fix or update - a future phase, not for the 2026-09-15 demo. Revisit the slot-geometry customization originally discarded from the workbench design (geometry editing was deliberately excluded from the configuration dialog per REQ-007 W16 and ADR-016). When it is revisited, the owner's stated requirement: consider the constraints on each slot, and how resizing slots to fit different layouts affects the content inside them - a shell's rows/cols reflow, an iframe's scaling, an explorer tree's visible depth. Geometry work should build on the formalized slot vocabulary (idea 000124) and the content-fit methodology audit recorded alongside this idea, so constraints are stated per slot role rather than per current occupant.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:12-04:00): Idea 000133 records a future consideration for geometry customization after the 2026-09-15 demo, explicitly positioned as lower priority than demo-specific fixes. The idea correctly cites ADR-016's deliberate exclusion of geometry editing from the workbench demo design (decision 2: "Geometry changes are data-file edits... This keeps the demo-week UI small and every geometry change diffable"), matching REQ-007 W05/W16's constraint that "the configuration surface... assigns panels to slots — slot geometry is not editable there." 
+
+PLAN-022's execution plan aligns: geometry customization is descoped for demo delivery in favor of fixing panel-visibility and layout-assignment issues (phase-wb-08 through phase-wb-10). No current plan or requirement covers the future geometry work this idea describes.
+
+The idea's stated dependencies are sound: it correctly names 000124 (formalized slot vocabulary, which relates to duplication and code-structure audits) and 000134 (content-fit methodology, another future audit pairing with this idea per the body text: "recorded alongside this idea"). Both are already linked from 000133; no additional oversight-links are missing.
+
+The idea makes a substantive constraint explicit: geometry work must account for how slot resizing affects occupant reflow — shell rows/cols, iframe scaling, explorer tree depth — and should express constraints per slot role, not per current panel type. This framing aligns with 000124's vocabulary-formalization goal and 000134's methodology development, confirming a well-formed dependency chain for future work.
+
+No related plan, requirement or backlog phase found for geometry customization beyond the deliberate demo-week exclusion recorded in the decisions.
+
+</details>
 
 **Links**
 
@@ -5566,11 +6319,69 @@ Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), explicitl
 
 ## 000134 · Audit all slots and panels for content fit, with a methodology for preventing visibility issues
 
-**Created 2026-09-11T20:40:51-04:00 · Status: `open`**
+**Created 2026-09-11T20:40:51-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). A general audit of the available slots and panels and the content they contain, producing methodologies - not just spot fixes - for making sure content fits its panel and there are no visibility issues in how it is displayed. The session's evidence base is already rich: the wb-08 height-collapse (idea 000104), the File Browser clip (W18), the rotator tooltip cutoff, the popup height floor (000117), and the ~98px chrome offset that defeats naive fill checks. The methodology half should define per-panel content-fit contracts (what overflows, what scrolls, what truncates, what reflows), how they are asserted mechanically (the Playwright fill/scroll checks generalized), and how new panels inherit them - so fit bugs are caught by contract, not by owner reports. Feeds the geometry revisit recorded alongside this idea and the duplication audit 000115.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:55:35-04:00): Idea 000134 seeks a generalizable methodology for preventing panel content-fit and visibility issues through per-panel content-fit contracts, mechanical assertion patterns, and inheritance rules for new panels.
+
+**Related governance documents:**
+
+The workbench plan (PLAN-022) includes two fix phases directly addressing this territory:
+
+- **phase-wb-08** ("panel rendering fixes") roots-causes and fixes the terminal height-collapse (000104), HTML Viewer rendering blanks, and File Browser clipping issues — providing repair of specific failures but not a generalizable pattern.
+- **phase-wb-09** (layout-assignment redesign) modifies the eligibility model and multi-panel slot behavior, but again focuses on implementation rather than formalizing methodology.
+
+The workbench requirements (REQ-007) establish specific content-fit verification methods in W15–W18:
+
+- **W15** mandates measured fill assertions: each shell panel's xterm container must have non-zero measured height tracking its slot body, with mechanical bounding-box checks at all four required window sizes. The HTML Viewer rendering-blank failure is diagnosed to distinguish it from the wrapper height collapse.
+- **W18** specifies internal scrolling: the File Browser tree must scroll within its body when content exceeds bounds, with mechanical assertions that panel overflow-y allows scrolling and document scrollHeight stays within the viewport.
+
+These requirements capture specific assertions but codify them per-requirement, not as a reusable contract pattern. The demo-validator-web agent executes mechanical checks (element bounding boxes, scrollability evaluation) using Playwright, establishing the technical foundation for generalization.
+
+The workbench layout decision (ADR-016) defines slot geometry contracts — what each slot's fixed grid-template areas permit — but does not establish panel-level content-fit contracts describing what each panel declares it will do when content exceeds its bounds (overflow, scroll, truncate, reflow).
+
+**Related ideas:**
+
+- **000115** (duplication audit): already linked, identifies spots where behavior is re-implemented rather than generalized — a precursor concern to formalizing contract patterns.
+- **000104** (terminal height-collapse): a specific instance of the visibility problem; phase-wb-08 will fix it but the fix is not generalized to other panels.
+- **000117** (popup sizing fix, extends 000108): another instance of content-fit failure; moves popup sizing into the shared Popover component, which is a partial approach to generalization but does not establish a per-panel contract model.
+- **000130** (rotator tooltip cutoff, relates_to 000117): another instance; 000117's Popover fix partially addresses it but reflects the scattered approach this methodology is meant to replace.
+- **000133** (revisit slot geometries): explicitly relates_to 000134 and is sequenced after the demo; a follow-on phase that will benefit from the methodology this idea proposes.
+
+**Assessment:**
+
+000134's ask is distinct from both the specific fixes in phase-wb-08/09 and the per-requirement verification in REQ-007 W15–W18. It proposes formalizing contracts and generalization to prevent _future_ visibility issues, not just fixing present ones. No existing plan, phase or document records this pattern in a reusable form — the closest is the collection of ad-hoc assertions in W15–W18 and the demo-validator pattern. A phase turning 000134 into governed deliverables would define:
+
+1. A per-panel schema capturing what each panel declares about its content-fit behavior (e.g., `{ scrolls: ['vertical'], overflows: false, truncates: ['text'] }`).
+2. A generalized Playwright assertion library that interprets these contracts and validates them mechanically across panels, sizes and layouts.
+3. An inheritance rule for new panels claiming visibility budgets and inheriting assertion requirements.
+
+PROPOSED LINK: 000134 --relates_to--> 000104 (specific instance of height-collapse visibility problem)
+PROPOSED LINK: 000134 --relates_to--> 000117 (related instance of content-fit failure in shared Popover)
+
+</details>
 
 **Links**
 
 - relates_to → `000115`
 - relates_to ← `000133`
+
+---
+
+## 000135 · Modular multi-instance system for slots and panels: multiple copies of the same thing
+
+**Created 2026-09-11T21:37:25-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), recorded as described with terminology deliberately left unresolved. Make the slots, and the panels allocated into them, modular enough that the system supports multiple copies: technically able to create multiple copies of the same object within a panel, and multiple copies of the same panel type across the workbench - which requires first classifying what the different panel types are, or rather (the owner's correction mid-thought) the different SLOT types. The owner then flagged that the terminology may be backwards as currently used: it may make more sense that panels are the containers things get placed into, not slots - but they are explicitly unsure, and directed that NOTHING terminology-related be changed yet; this idea records the intent as spoken. The naming question is exactly idea 000124's glossary work, which must settle container-vs-content vocabulary before this multi-instance design is specified; the modularity half feeds the duplication/modularity audit 000115. Today's implementation constraint worth noting for the eventual design: panel identity is currently singleton by panel_id (one bash terminal, one html-viewer) in the layout data, storage shape, and panel registry - multi-instance support touches all three plus session ownership.
+
+**Links**
+
+- relates_to → `000124`
+- relates_to → `000115`
