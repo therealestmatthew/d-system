@@ -661,7 +661,7 @@ here.*
 
 > Claim `phase-lit-04` per `AGENTS.md`. Continue on the campaign branch
 > `agent/lit-campaign`. Create `research/literature-review/04_evidence_matrix.csv` with
-> exactly the evidence contract's header (44 fields) if it does not exist. Item order:
+> exactly the evidence contract's header (43 fields) if it does not exist. Item order:
 > X1 → X2 → X3 → G. Split the top-20 list from `02_domain_map.md` into three consecutive
 > batches in rank order (7/7/6) and write the exact source ids into each X dispatch's
 > fill-in slot before dispatching it.

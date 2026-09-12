@@ -125,7 +125,11 @@ instructions' §9 set plus the search protocol's §8 minimums plus the contract 
 41. `interpretation_confidence` — `high` / `medium` / `low`
 42. `verbatim_notes` — short quotes with locators
 43. `second_review` (+) — for `critical_collision: yes` rows after Pass 3: `confirmed` /
-    `disputed: <summary>` / `pending`; filled only by the independent R reviewer
+    `disputed: <summary>` / `pending`; **filled only by `LIT-06 X2`, from the independent R
+    reviewer's report.** The R reviewer itself writes no repository file and never opens
+    `05_critical_collisions.md` or `06_hypothesis_tests.md`, which carry the first assessor's
+    rationale — the independence rule this field exists to serve would be broken by the
+    reviewer editing the record it is reviewing
 
 ## Similarity scoring (verbatim from the methodology)
 

@@ -64,10 +64,12 @@ Then confirm, and stop rather than proceed if any fails:
 - **The kick-off record exists and is read.** It carries the pinned starting state and the
   owner's per-campaign deltas, and it wins over this document. Without it you do not know which
   rulings are live.
-- **The checkout is clean and on the campaign branch** (`agent/lit-campaign` per `PLAN-023`'s
-  branch model). Every phase commits to that one branch, so the ledger, inventory and matrix
-  from earlier phases are present without cross-branch archaeology. Integration into `dev` is
-  the owner's act, at the two points `PLAN-023` names — never yours.
+- **The checkout is clean, and on the campaign branch — or this is phase one**, where the
+  campaign branch does not exist yet and `LIT-01 K` creates it (`agent/lit-campaign`, per
+  `PLAN-023`'s branch model). From `phase-lit-02` on, being on any other branch is a stop. Every
+  phase commits to that one branch, so the ledger, inventory and matrix from earlier phases are
+  present without cross-branch archaeology. Integration into `dev` is the owner's act, at the two
+  points `PLAN-023` names — never yours.
 - **Baseline integrity.** The frozen baseline is unmodified: `research/pre-literature-baseline.md`,
   `research/pre-literature-hypotheses.yaml`, `research/adversarial-codebase-review/`, and the
   rest of Prompt A's frozen inventory ([`PROMPT-027`](PROMPT-027-literature-review-pre-plan-package.md)).

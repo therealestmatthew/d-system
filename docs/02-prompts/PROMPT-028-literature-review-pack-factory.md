@@ -91,6 +91,12 @@ Then confirm:
 - The catalog matches `uv run python -m src.governance --catalog`; regenerate it whenever you
   add documents, committing the plan family as the one change described above.
 
+**Settled on 2026-09-12, when this prompt was executed: the owner ruled delete, and
+`research/CLAUDE.literature-review.md` no longer exists.** The `cmp` line above therefore now
+errors on a missing file, and the question below has no subject. Both are left as written because
+this is the historical record of what the pack factory was told; a re-run skips this question
+rather than re-asking it.
+
 **Ask the duplicate-file question here** (open question 3, the only up-front one): the byte
 check above just told you whether `research/CLAUDE.literature-review.md` still duplicates the
 authoritative copy. Ask the owner once, via `AskUserQuestion`, whether to delete it, replace it

@@ -55,9 +55,10 @@ ledger, never squeezed into a budget, and the descope ladder below exists for em
 ## Phase graph
 
 Seven phases, sized one session each, dependency-ordered so no pass starts before the pass it
-feeds on closes. All enter the backlog `queued` and are never added to `next_up` — demo work
-wins every conflict (ratified decision 4); promotion to the queue front is the owner's act at
-kick-off.
+feeds on closes. All enter the backlog `queued`, and **no agent adds one to `next_up`** — demo
+work wins every conflict (ratified decision 4); promotion is the owner's act at kick-off. The
+owner promoted `phase-lit-01` on 2026-09-12, appending it **behind** the existing entries rather
+than at the front, so the promotion does not displace demo work.
 
 ```text
 phase-lit-01  Pass 1a  broad map: D01–D20, D28–D32 (knowledge representation,

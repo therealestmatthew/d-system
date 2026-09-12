@@ -6317,7 +6317,7 @@ items:
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged
   - Run delegation-pack section LIT-07 G (PROMPT-029), the final gate, and record real
-    output - all nine stop-condition measurements taken against the ledger, inventory,
+    output - all eight stop-condition measurements taken against the ledger, inventory,
     matrix and deliverables, including the saturation trend and zero outstanding blocking
     findings from the A review
   deliverables:
