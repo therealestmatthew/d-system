@@ -6504,9 +6504,54 @@ No additional plan, requirement, ADR or backlog phase is needed to capture this 
 
 ## 000136 · Pack convention: browser smoke dispatch and named runtime instruments for every frontend item
 
-**Created 2026-09-11T21:50:58-04:00 · Status: `open`**
+**Created 2026-09-11T21:50:58-04:00 · Status: `triaged`**
 
 Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning triage (batch anchor 000108). The wb-09 blocker (page crashed on load; caught only by the final adversarial review because build/lint/pytest/mechanical gate are all blind to runtime rendering) and the two burned fix cycles on the reassignment session-kill (creator patched from a batching assumption instead of a websocket-lifecycle measurement) share one structural cause: browser-less creators plus back-loaded browser checks. The next pack adopts two conventions, generalizing wb-08's W08-M pattern that worked: (1) every frontend work item gets a cheap browser smoke dispatch - clean profile, page renders real content, no uncaught console errors, dev AND production build - runnable after each creator commit, before the validator; (2) every stateful runtime requirement (session survival, persistence, fill) names its measurement instrument in the pack (e.g. the websocket open/close lifecycle trace correlated with backend logs), the creator prompt must state the expected post-fix trace signature, and no second fix attempt is dispatched without the first attempt's live measurements attached. Full write-up: brain/procedures/runtime-behavior-needs-runtime-evidence.md.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:28-04:00): ## Finding: Pack convention for runtime behavior testing
+
+This idea proposes to standardize browser smoke testing and named measurement instruments as formal pack conventions for all future frontend-facing work. It derives directly from the post-mortem of phase-wb-09's gate failures (documented in phase-wb-09's backlog result, which explicitly names idea 000136 and brain/procedures/runtime-behavior-needs-runtime-evidence.md as the recorded lessons).
+
+### What already exists
+
+The core procedure is already documented in brain/procedures/runtime-behavior-needs-runtime-evidence.md (created 2026-09-11 after phase-wb-09's gate). It specifies:
+- Cheap browser smoke dispatch per frontend work item (page loads, root renders, no console errors, dev and production builds)
+- Named measurement instruments for stateful runtime requirements (e.g., websocket lifecycle traces)
+- The rule "never dispatch a second fix attempt without attaching live measurements from the first"
+
+The W08-M convention (diagnosis dispatch collecting live measurements before creator work) is already implemented and referenced in PROMPT-024 (workbench-fixes-delegation-pack), PROMPT-023 (workbench-build-kickoff), and the phase-wb-08 backlog entry. Phase-wb-08 successfully used this pattern to land a rendering fix first-try, while phase-wb-09 did not use it consistently and incurred two fix cycles plus an escalation.
+
+### Scope and integration points
+
+The idea proposes making these empirically-successful conventions standard in:
+1. Pack authoring — require every frontend item to include a browser smoke dispatch and measurement instruments before dispatch
+2. Fix cycles — coordinators/orchestrators enforce that no second attempt goes out without the first attempt's live measurements attached
+3. Coordinator/orchestrator reporting — treat "build passes" on frontend work as compile verification, not runtime verification
+
+### Related work and ideas
+
+- **Idea 000126** (Thorough audit of the repository's commands, skills, and agents) — the idea already links here; the audit is the place to ensure packs follow these conventions going forward
+- **Ideas 000138 and 000139** (from the same 2026-09-11 batch) — these propose broader agent anti-pattern tracking and delegation-scoping methodology; idea 000136 is the first concrete worked example of the runtime-evidence methodology
+- **ADR-017** (The two-session prompt-pack methodology is the standard for multi-agent builds) — defines the general prompt-pack pipeline but does not yet mention testing conventions; this idea's formalization would extend ADR-017's scope
+- **PLAN-022** (Workbench) — references the W08-M convention and its payoff in phase-wb-08 (lines 92-93), providing proof that the pattern works
+
+### No prior overlap found
+
+The idea's stated scope (formalizing pack conventions for browser testing and measurement instruments) is novel as a typed governance item. The procedure exists, the W08-M pattern exists in PROMPT-024, and the phase results reference both, but no prior plan or requirement document codifies these conventions formally. ADR-017 covers the general pack structure but not testing specifics; REQ-007 covers workbench requirements but not pack authoring conventions.
+
+### Recommendation
+
+The idea is ready for owner triage. Its content is fully supported by evidence (the procedure, the W08-M precedent, the phase-wb-08 success vs. phase-wb-09 failures), and a natural home for it would be either an extension to ADR-017 or a new ADR focusing specifically on testing conventions in multi-agent builds. It should be paired with idea 000126's audit to ensure packs going forward actually adopt these conventions.
+
+PROPOSED LINK: 000136 --relates_to--> 000139 (Both specify methodologies for improving agent dispatch outcomes: 000139 is the general scoping methodology, 000136 is its runtime-evidence sub-pattern)
+
+</details>
 
 **Links**
 
@@ -6516,9 +6561,41 @@ Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning tria
 
 ## 000137 · Global-cap websocket refusal should reach the browser as a structured close reason
 
-**Created 2026-09-11T21:56:55-04:00 · Status: `open`**
+**Created 2026-09-11T21:56:55-04:00 · Status: `triaged`**
 
 Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's global-cap refusal in src/api/routes/demo_terminal.py closes the websocket BEFORE accept() (code 4001), and uvicorn converts a pre-accept close into an HTTP 403 handshake rejection - so the browser receives CloseEvent code 1006 with an empty reason and can never display the structured refusal (or the session count). The frontend now infers the refusal structurally (socket closed without ever opening) and shows a generic could-not-start message. The proper fix is backend: accept first, then close with the structured frame - exactly the pattern _refuse_shell_request already uses for unavailable shells - so the panel can quote the real reason. Small, ADR-014-adjacent change; was out of scope for the wb-09 frontend item that discovered it.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:02-04:00): ## Finding: Global-cap refusal differs from shell-refusal pattern in ADR-014
+
+Idea 000137 identifies a websocket protocol issue in the backend's session-limit enforcement (`src/api/routes/demo_terminal.py` lines 287-289). The route closes the socket before accepting it, which causes uvicorn to convert the close into an HTTP 403 handshake rejection; the browser receives a generic CloseEvent code 1006 with no reason, losing the structured refusal the spec intends.
+
+**Relationship to Governed Documents:**
+
+ADR-014 section 4 mandates: "a session past the cap is refused with a clear close reason." Section 5 establishes a working pattern for structured refusals via `_refuse_shell_request()` (lines 122-143 in demo_terminal.py): accept the socket first, send a structured message the frontend can render, then close with a semantic close code and reason. The shell-refusal case (invalid or unavailable shell) follows this pattern correctly and reaches the browser as a displayable message. The session-limit check does not: it closes before accepting, which breaks the channel for the close reason to reach the client.
+
+The fix is to apply the shell-refusal pattern to the session-limit check — accept first, send a refusal message with the session count and cap, close with code 4001 and a structured reason. This aligns the session-limit refusal with the shell-refusal established by ADR-014 section 5 and fixes the browser's ability to display the real reason.
+
+**Related Ideas:**
+
+Idea 000140 (Learn websockets: owner education deep dive, created 2026-09-11) explicitly lists "idea 000137's 403-vs-close-frame distinction" as a worked example in the HTTP upgrade handshake teaching material, confirming the issue is known and educationally valuable.
+
+Idea 000095 (Close the session-cap TOCTOU window) addresses a separate concurrency race in the same code lines but does not overlap with 000137's refusal-pattern problem — 000095 is about enforcement, 000137 is about notification.
+
+Idea 000087 (Terminal interaction API) uses the session registry ADR-014 established but focuses on the outside-the-page HTTP API surface, not the websocket close semantics.
+
+**Pattern already in use:**
+
+The codebase already demonstrates the correct pattern in `_refuse_shell_request()` for unavailable shells — the session-limit refusal is the only case that deviates. The fix is small, ADR-014-adjacent as the idea states, and unblocked.
+
+PROPOSED LINK: 000137 --relates_to--> 000140 (000140 explicitly uses 000137's close-frame issue as a websocket-education example)
+
+</details>
 
 **Links**
 
@@ -6528,13 +6605,36 @@ Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's glo
 
 ## 000138 · System for tracking and managing agent anti-patterns
 
-**Created 2026-09-11T22:45:55-04:00 · Status: `open`**
+**Created 2026-09-11T22:45:55-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Build a system that tracks and manages agent anti-patterns - the recurring failure modes of dispatched agents - so each one is recorded once, detected when it recurs, and fed back into how future work is authored. The 2026-09-11 build session alone produced a starter catalog: dispatches scoped past the turn budget (seven truncations across two phases; brain/procedures/scope-dispatches-to-the-turn-budget.md), fixing runtime behavior from assumption instead of measurement (brain/procedures/runtime-behavior-needs-runtime-evidence.md), validators poisoned by their own stale browser state (idea 000107's artifact), orphaned dev servers left by cut-off agents, and orchestrators lacking a resume path for truncated subagents. Today these live as scattered brain procedures, idea annotations and session-record notes; the system should give them one home with a shape per entry (name, signature/how it manifests, root cause, prevention, occurrences with dates), a lightweight way for any coordinator/orchestrator to log a new occurrence mid-session, and a standing step in pack authoring and the commands/skills/agents audit (000126) that checks new prompts against the catalog. Relates to the shared state model (000128) - an occurrence log is exactly the kind of cross-agent state it would carry.
 
 **Annotations**
 
 - **note** by repository-owner (2026-09-11T22:49:41-04:00): Owner addition 2026-09-11: the anti-pattern system should include a track-anti-pattern SKILL - a sanctioned, low-friction way to log a new anti-pattern occurrence (or a new pattern) from inside any session, the way the idea skill captures ideas. Candidate shape: a .claude skill wrapping the catalog's writer so coordinators/orchestrators/agents record occurrences mid-session without breaking their flow; pairs with idea 000127's principle that mechanical capture work runs in a subagent to protect main-session context.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:27-04:00): Idea 000138 proposes consolidating scattered agent anti-pattern tracking into a governed system. The work builds on existing starter materials found across the codebase and relates closely to parallel initiatives in agent engineering and multi-agent coordination.
+
+**Existing scattered materials:** Brain procedures at `brain/procedures/scope-dispatches-to-the-turn-budget.md` and `brain/procedures/runtime-behavior-needs-runtime-evidence.md` document two of the specific anti-patterns the idea names (dispatches exceeding turn budget, runtime behavior fixed by assumption rather than evidence). These currently live as scattered prose rather than a consolidated catalog with occurrence logs and structured prevention steps.
+
+**Related governed work:**
+- PLAN-022 (Workbench) mentions the principle that "truncated agents [are] resumed rather than re-run" — one of the orchestration failure modes the idea names
+- ADR-003 (Multi-agent concurrency) covers worktree isolation and logical collision detection between concurrent agents — related to safe orchestration and recovery paths
+- PLAN-016 (Idea record system) and its event-log pattern show how to structure immutable occurrence records, directly applicable to the anti-pattern occurrence log the idea proposes
+
+**Linked ideas:**
+- 000128 (Shared state model for multi-agent planning sessions): already linked by 000138; the occurrence log is exactly the kind of cross-agent state it would carry
+- 000126 (Thorough audit of repository's commands, skills, and agents): mentioned in 000138's body as a standing step in pack authoring that should check new prompts against the catalog
+- 000097 (Session-failure tracking system that derives anti-pattern rules for future sessions): narrower scope focused on session failures, but overlaps with 000138's goal of recording anti-patterns once and detecting recurrence. 000097 is triaged; 000138 is broader and structural.
+
+**No related plan, requirement, or backlog phase found** that fully covers the anti-pattern tracking system as described.
+
+PROPOSED LINK: 000138 --relates_to--> 000097 (both address agent failure/anti-pattern tracking; 000138 is broader system, 000097 narrower session-failure derivation)
+
+</details>
 
 **Links**
 
@@ -6545,9 +6645,56 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Build 
 
 ## 000139 · Delegation-scoping methodology with built-in continual improvement
 
-**Created 2026-09-11T22:45:55-04:00 · Status: `open`**
+**Created 2026-09-11T22:45:55-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Create - or improve where partial versions exist (PROMPT-012's model policy, PROMPT-021/024's dispatch conventions, the GOV-003 completion gate) - the protocols, strategies, calculations and methodologies for scoping delegated work, so every agent is created with optimal efficiency: the right task size (tool-call/turn-budget estimate before dispatch), the right model for the job, the right context attached (recorded evidence in, irrelevant history out), the right verification instrument named up front, and the right escalation/resume path when it fails or truncates. The owner's explicit requirement is CONTINUAL improvement as a property of the system, not a one-time audit: each build session's outcomes (fix cycles spent, truncations, escalations, gate catches) feed back into the scoping rules so performance and accuracy do not drop as the complexity of everything built on top keeps increasing - growth in capability must at least match growth in complexity. Concretely the methodology should define: how to estimate a dispatch's cost before sending it, when to split an item, what every dispatch must carry (idempotency clause, resume expectation, evidence, expected-output shape), per-role model assignment rules, and the post-session retrospective step that updates the rules and the anti-pattern catalog (recorded alongside this idea) from what actually happened. Relates to 000126 (the agents audit supplies the baseline), 000128 (shared state carries the session telemetry), and 000136 (the runtime-evidence pack convention is this methodology's first worked example).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:38-04:00): ## Finding
+
+Idea 000139 proposes a comprehensive delegation-scoping methodology that formalizes how agents should be dispatched with optimal task sizing, model assignment, context attachment, and continual improvement cycles. The finding identifies substantial partial coverage in existing governance, alongside the work proposed in related ideas.
+
+### Existing governance addressing parts of the methodology
+
+The repository already implements several pieces of this framework:
+
+- **Model policy** (PROMPT-012): Haiku for mechanical gates, Sonnet for judgment, Opus only as a single documented escalation. This binding policy is quoted in PLAN-021 and PLAN-022, and reinforced in ADR-017 ("cost policy").
+- **Completion gate with escalation** (GOV-003, PLAN-022 section "The demo-track completes through its testing gate"): Completion authority exercised by adversarial review plus retroactive owner judgment, replacing synchronous /session-close pauses for demo and workbench tracks.
+- **Budgets and descope ladder** (PROMPT-016, referenced in PLAN-021): Already defines ordered degradation when time runs short, with model and phase-specific budget caps (e.g., `max_active: 3` in PLAN-022).
+- **Dispatch conventions** (PROMPT-021, PROMPT-024): Delegation packs carry pre-crafted prompts, and coordinators dispatch verbatim — no mid-build prompt authorship. Idempotency is explicit: "one-shot completion and multi-session resume are the same prompt" (PLAN-021).
+- **Resume mechanics** (PROMPT-012, idea 000077): When a subagent's output is truncated by turn limit, the dispatcher resumes to recover work, never re-runs from scratch. `maxTurns` is set generously per agent role, and output truncation is treated as a result requiring recovery, not failure to ignore.
+- **Verification up-front** (PROMPT-013 validation gate in PLAN-021): Validators receive requirement text and verification commands — never rationale from the creator — signalling the stop condition is contractual verification, not author sign-off.
+
+### What the methodology explicitly requires that is not yet formalized
+
+- **Pre-dispatch cost estimation**: No documented formula for estimating tool-call/turn-budget consumption before dispatch. Current practice assigns `maxTurns` by role and effort heuristic (PROMPT-012 table) but not from first-principles breakdown of expected steps.
+- **Context pipeline strategy**: No documented rules for what evidence must travel in vs. what history should be discarded per agent role. PROMPT-012 names "working directory," "read-only paths," and "never edit these files," but systematic context scoping (what to include, what to exclude, signal-to-noise tradeoffs) is not written.
+- **Idempotency clause and resume expectation**: Dispatcher hygiene is stated (idempotency explicit, one-shot = multi-session resume), but the working contract that travels in every dispatch is not documented as a binding checklist — agents read it informally from examples rather than a specification.
+- **Anti-pattern catalog and retrospective loop**: Idea 000097 and 000138 both propose tracking session failures to derive anti-pattern rules. Currently failures are reported (ADR-013 review catches them, PLAN-022 escalation ladder handles them), but the feedback loop that updates scoping rules for future sessions is not automated or formalized.
+
+### Overlaps with related ideas
+
+- **000138 (System for tracking and managing agent anti-patterns)**: Directly overlaps — the retrospective step in 000139 ("outcomes feed back into the scoping rules") is 000138's entire premise. The idea body's "recorded alongside this idea" phrase suggests they could be jointly designed. Already linked (`relates_to->000138`).
+- **000097 (Session-failure tracking system that derives anti-pattern rules)**: Covers the same request as 000138, filed separately during the workbench build. 000138 is the newer owner request; 000097 predates it by one day but addresses the same gap.
+- **000128 (Shared state model for multi-agent planning sessions)**: Carries session telemetry that 000139's retrospective loop would consume (fix cycles spent, truncations, escalations, gate catches). Already linked (`relates_to->000126`).
+- **000126 (Thorough audit of the repository's commands, skills, and agents)**: Supplies the baseline inventory of what currently exists. Already linked.
+- **000136 (Pack convention for browser smoke dispatch)**: Is explicitly named as "the methodology's first worked example" in the idea body. Coordinator post-mortem from phase-wb-09 shows exactly the runtime-evidence pack convention this methodology would formalize.
+- **000078-000082 (Agent engineering framework)**: Broader umbrella covering guides, sensors, context pipelines, and orchestration. 000139 is narrower (delegation scoping only) but would feed into orchestration (000082, "routing, multi-agent coordination, recovery paths").
+
+### Status summary
+
+The repository has working implementations of model policy, escalation, budgets, and resume mechanics — tactical practices are in place. What is missing is the strategic methodology that ties them together, formalizes cost estimation, documents context pipelines as a binding contract, and closes the feedback loop from session outcomes into updated scoping rules. The methodology proposed by 000139 would consolidate PROMPT-012, PROMPT-016, GOV-003, and the demo/workbench execution records into an operationalizable framework suitable for hand-off to agents when they dispatch subagents.
+
+No related plan, phase, or ADR currently covers the full methodology.
+
+PROPOSED LINK: 000139 --extends--> 000138 (both define the anti-pattern tracking system; joint design of the retrospective loop would avoid duplication)
+
+</details>
 
 **Links**
 
@@ -6558,9 +6705,45 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Create
 
 ## 000140 · Learn websockets: an owner-education deep dive grounded in this repository's terminal stack
 
-**Created 2026-09-11T22:49:41-04:00 · Status: `open`**
+**Created 2026-09-11T22:49:41-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, for their own education - not a build item. Investigate how websockets actually work, using the D-System terminal stack as the concrete study material since it exercises the full lifecycle end to end: the browser's WebSocket API and its open/close/error events (the lifecycle traces from the 2026-09-11 gate work are real worked examples), the HTTP upgrade handshake and what a pre-accept rejection looks like on the wire (idea 000137's 403-vs-close-frame distinction), FastAPI/uvicorn's server-side accept/close semantics, close codes (1006 vs 4000+ application codes) and why reasons sometimes cannot reach the client, per-connection state and the six-session registry, and how React component lifecycles interact with socket lifetimes (the portal remount lesson from phase-wb-09). Output could be a personal explainer document or annotated walkthrough of src/api/routes/demo_terminal.py and ts/src/stage/TerminalRegion.tsx - whatever teaches best.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:37-04:00): Idea 000140 proposes an owner-education deep dive on websockets using the D-System terminal stack as concrete study material. This is not a build item but a personal learning project grounded in working code.
+
+The repository's websocket implementation and supporting material are well-documented across multiple systems:
+
+**Architecture Decisions (ADRs):**
+- ADR-013 (demo-terminal-capability) establishes the original security posture for shell-over-websocket
+- ADR-014 (workbench-terminal-capability) supersedes ADR-013, formalizing the session registry, concurrent-session cap enforcement (six sessions), shell allowlist, and structured refusal semantics
+- ADR-015 (workbench-api-surface) defines the HTTP API routing that mounts alongside the terminal routes
+- ADR-016 (workbench-layout-persistence) addresses websocket lifecycle stability across browser layout switches and component remounting
+
+**Plans:**
+- PLAN-021 (Live demo) — phase-demo-01 implements the terminal backend (src/api/routes/demo_terminal.py, PTY adapter, websocket route, session registry)
+- PLAN-022 (Workbench) — phases phase-wb-01 through phase-wb-09 extend the terminal to a product capability with the six-session cap, shell selection, and React component lifecycle interactions
+
+**Requirements:**
+- REQ-006 (live-demo) rows R04–R05, R10–R11 specify websocket requirements (xterm.js client, POSIX pty/ConPTY server, loopback-only binding, per-tab session lifecycle)
+- REQ-007 (workbench) rows W12, W14–W17 refine workbench terminal requirements including the six-session global cap, shell allowlist validation, and refusal messaging
+
+**Relevant Session Records:**
+- SESS-2026-09-11-08 (phase-wb-09) documents the "portal remount lesson" at length: React treats a portal whose `containerInfo` changes as insert+delete rather than update, causing session disruption during layout reassignment. The fix rework shows how permanent per-panel host divs moved between slot bodies via `appendChild` preserve websocket lifetime across React component remounting.
+
+**Related Ideas:**
+- Idea 000137 ("Global-cap websocket refusal should reach the browser as a structured close reason") is already linked (relates_to); it documents why the browser receives CloseEvent code 1006 with empty reason when uvicorn converts a pre-accept close into an HTTP 403 rejection, addressing one of the topics the education idea mentions explicitly.
+
+The study material exists in production: src/api/routes/demo_terminal.py (websocket route, registry, cap enforcement, close codes) and ts/src/stage/TerminalRegion.tsx (plus related components in phase-wb-09's fixes). The owner's exploration will likely find real examples of the HTTP upgrade handshake, per-connection state management, React lifecycle interactions, and the structural communication gap between pre-accept closures and client-side events that idea 000137 addresses.
+
+No related plan, requirement, or ADR is missing. The governance documents provide enough context to ground the learning project.
+
+</details>
 
 **Links**
 
@@ -6570,7 +6753,7 @@ Owner idea, 2026-09-11, for their own education - not a build item. Investigate 
 
 ## 000141 · Slots as configuration schemas with nested sub-slots; panel eligibility by element-configuration match
 
-**Created 2026-09-11T23:00:37-04:00 · Status: `open`**
+**Created 2026-09-11T23:00:37-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, raised while reviewing the double-header links during the triage sign-off (idea 000101's defect prompted the question "why does this issue exist at all?"). Recorded as given.
 
@@ -6579,3 +6762,31 @@ The owner's proposed model: each slot should have a set configuration schema - f
 Under this model the double-header defect (000101) could not arise: the top bar would be a schema-owned sub-slot populated once, not something both the slot wrapper and the hosted panel each render independently.
 
 Context worth carrying into exploration: this reshapes the eligibility model REQ-007 W16 ships (per-panel eligibility lists) into structural matching; it presupposes the container-vs-content vocabulary question idea 000124 must settle (and which 000135 deliberately left unresolved); and it generalizes the multi-instance modularity 000135 asks for. Flagged by the owner as worth tracking immediately for further exploration.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T23:05:36-04:00): 000141 proposes an architectural refinement to the slot-and-panel design: configuration schemas with nested sub-slots that would structurally solve the double-header defect (000101) by making the top bar a schema-owned sub-slot populated once, rather than independently rendered by both the slot wrapper and the hosted panel.
+
+This idea builds on three concurrent pieces of work:
+
+1. **REQ-007 W16 and phase-wb-09**: The current workbench plan already moves eligibility from per-slot to per-panel (implemented in phase-wb-09). 000141 proposes a more fundamental architectural change — using configuration schemas and nested sub-slots — rather than just changing the eligibility mechanism. The model can be thought of as a refinement of W16's per-panel eligibility into a structural matching system.
+
+2. **Vocabulary work (000124)**: The proposal presupposes the container-vs-content vocabulary question 000124 is meant to settle. 000135 deliberately left this question unresolved; 000141 requires it to be resolved before the schema-based design is specified.
+
+3. **Multi-instance modularity (000135)**: The proposal generalizes the multi-instance design 000135 asks for. Where 000135 focuses on enabling multiple copies of the same panel type, 000141 provides a structural framework (nested sub-slots under a configuration schema) that would make modularity systematic.
+
+The double-header defect (000101) is currently deferred as cosmetic by phase-wb-02, and acknowledged in phase-wb-08's session record as a root-cause issue stemming from the multi-panel slot wrapper's height chain — the suspected break being that both the wrapper and the hosted panel render headers independently. 000141's schema-based approach would prevent this by making the header a slot-level structural element, not a panel-level one.
+
+Related future work: 000133 (revisit slot geometries and custom layout reconfiguration) and 000134 (audit slots and panels for content fit) are adjacent but lower-priority audits. ADR-016 (Layouts are versioned repository JSON) defines the current persistence model and would need extension to support nested sub-slot definitions.
+
+No existing plan, phase or requirement currently specifies the nested sub-slot architecture or configuration schema model 000141 proposes. This is a forward-looking architectural idea beyond the scope of PLAN-022 (Workbench) and its phases.
+
+PROPOSED LINK: 000141 --relates_to--> 000101 (proposes to solve the double-header defect by structurally constraining header rendering)
+PROPOSED LINK: 000141 --relates_to--> 000124 (presupposes container-vs-content vocabulary work before schema design is specified)
+PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modularity into a structural framework with nested sub-slots)
+
+</details>
