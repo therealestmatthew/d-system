@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-07'
+updated: '2026-09-12'
 systems: [sys-backlog, sys-governance]
 depends_on: [doc-backlog-decisions]
 ---
@@ -125,7 +125,7 @@ the alphabetical accident of the track name.
 
 At session start, run validation and `--ready`, select the highest-priority useful phase that has satisfied prerequisites and an empty **Conflicts** column, set it active with an `agent`, and create a governed dated session record. Update the source plan from approved to active when its implementation begins. Use the phase's `next_action`, scope and acceptance as the work boundary.
 
-The claim is committed to `main` (the integration branch) before work starts, on its own, and the validator runs against it: the catalog is the lock table and the check is the lock. Work itself happens on `agent/<phase-id>` in a separate worktree whenever a peer holds an active claim or the phase touches `src/`, `ts/`, `schemas/`, `sql/`, `tools/` or `test/`; a solo agent on a documentation- or skill-only phase with no peer claim and no deliverable outside `docs/` or `.claude/` may instead work directly in the primary checkout on `main` (see [GOV-003](GOV-003-backlog-decisions.md)). A claim rejected because a peer holds an overlapping system is not a queue to wait in — select different work.
+The claim is committed to `main` (the integration branch) before work starts, on its own, and the validator runs against it: the catalog is the lock table and the check is the lock. Work itself always happens on `agent/<phase-id>` in a separate worktree, whatever the work touches and whether or not a peer holds a claim; the only things done in the primary checkout are committing the claim and the catalog regeneration that claim forces (see [GOV-003](GOV-003-backlog-decisions.md), which records this rule and the narrower documentation-only exception it withdrew on 2026-09-12). A claim rejected because a peer holds an overlapping system is not a queue to wait in — select different work.
 
 At session end, run relevant checks, record actual results/evidence and update `next_action`. Rebase onto current `main` and re-run the full governance command and test suite *after* the rebase; that post-rebase run, made against peers' merged work, is what qualifies a branch for integration. Mark complete only if all acceptance conditions are met. If interrupted, preserve unfinished work as queued or blocked with an exact handoff, release the `agent` claim when returning a phase to `queued`, and remove the worktree so no stale directory outlives the claim; do not claim completion. If the outcome exceeds one session, split remaining outcomes into new IDs, preserve the original rationale/history, and rewire dependent phases before continuing. Do not leave an oversized phase permanently labeled as one session.
 

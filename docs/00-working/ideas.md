@@ -969,6 +969,7 @@ Open questions: how this relates to the existing file-based governance system (r
 
 **Annotations**
 
+- **note** by repository-owner (2026-09-12T11:25:51-04:00): Owner direction, 2026-09-12: when an MCP solution is deployed, evaluate it as a substitute for the phase-claim system specifically, because a service-held claim does not depend on which checkout is primary - the dependency that forces every claim into the shared primary checkout today. Recorded as 000151, which revisits the claim system on its own merits in case MCP does not happen.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -990,6 +991,7 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 - relates_to ← `000028`
 - relates_to ← `000031`
 - relates_to ← `000128`
+- relates_to ← `000151`
 
 ---
 
@@ -1162,6 +1164,8 @@ No existing plan, requirement, or phase currently covers claim recovery. PLAN-01
 - relates_to ← `000041`
 - relates_to ← `000059`
 - relates_to ← `000082`
+- relates_to ← `000151`
+- relates_to ← `000152`
 
 ---
 
@@ -7124,3 +7128,46 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 **Links**
 
 - relates_to → `000147`
+
+---
+
+## 000151 · Revisit the claim system, whose lock table only works because every agent shares one primary checkout
+
+**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+
+The owner directed this on 2026-09-12: "we definitely need to revisit this claim system," and separately, "when we deploy an MCP solution we'll look into using that as a substitution because it will not rely on whatever the main checkout is."
+
+The structural problem the owner is pointing at. The claim system's lock table is `docs/09-backlog/backlog.yaml` on `dev`, and a claim is a commit to it. That works only because every agent can reach the same `dev` in the same primary checkout — which is exactly the thing the repository otherwise tries to stop agents from sharing. The consequence showed up the same day the worktree-everywhere rule was ratified: the rule says work in a worktree, and the claim system says commit your claim to `dev` in the primary checkout, so every phase now begins with a trip into the shared resource the rule exists to keep agents out of. The exception is narrow and justified (a lock nobody can see is not a lock), but it means the coordination mechanism and the isolation mechanism are in tension by construction rather than by accident.
+
+Why MCP is the owner's candidate substitute: a service that owns claims does not care which checkout an agent has, or whether it has one. Idea 000020 already proposes exactly that — an MCP server as the authoritative interface for documentation, file and phase claims, and worktree checkouts — so this idea is the claim-system half of that, recorded separately because the owner asked for the claim system to be revisited on its own merits and not only as something MCP might absorb. If MCP does not happen, the claim system still needs this examination.
+
+What it would touch: ADR-003 (the accepted worktree-and-lock-table concurrency decision), AGENTS.md's three concurrent-agent sections, `src/governance/backlog.py` (the collision validator that reads the lock table), and GOV-003 where the accepted decisions are recorded. Any replacement has to preserve what the current design gets right: the lock is inspectable by a human with no tooling, it survives a crashed agent because it is a committed file, and its validator already catches system, deliverable-path and dependency-chain overlap.
+
+What is unresolved, and worth settling before any replacement is designed: whether a service-held claim can keep the crash-survivability of a committed file (a process holding a lock in memory is strictly worse than a commit when the process dies — see idea 000025 on abandoned claims); whether the owner still wants to be able to read the lock state from a file without running anything; and whether the primary-checkout dependency is actually the problem or merely where the problem becomes visible, since the deeper constraint is that any lock must be readable by every agent before it starts work, and a shared file is the cheapest thing that satisfies that.
+
+**Links**
+
+- relates_to → `000020`
+- relates_to → `000025`
+- relates_to ← `000152`
+
+---
+
+## 000152 · A registry of active worktrees that agents must register in before starting work and deregister from when finished
+
+**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+
+The owner directed this on 2026-09-12, while ratifying the rule that every session works in a worktree except for the claim-system operations that must happen in the primary checkout. The ask, in the owner's framing: "we need to make sure that we have a running list of active worktrees and that agents are required to register their worktrees in that list before beginning any work. That way there's no ambiguity about it, and they would be required to deregister when they finish their work."
+
+The motivation is a concrete ambiguity that cost real time on 2026-09-12. Two sessions were working in the same repository and neither could reliably tell where the other was. One session read the primary checkout, inferred from it that a peer's campaign was running there too, and relayed an instruction to move to a worktree that the peer had already created during its own preflight. The peer, separately, read a session record line and asserted its opposite. Both errors were inferences from accurate reads of state that did not describe the thing being reasoned about — and a registry would have answered "where is each agent working" directly rather than by inference. Earlier the same day, a peer's branch switch in the shared primary checkout silently redirected two commits from another session onto the peer's branch, which a registry would not have prevented but would have made immediately diagnosable.
+
+Note that git already knows this: `git worktree list` enumerates every worktree and its branch. The value of a registry over that command is therefore not enumeration but intent and lifecycle — who is working there, on what phase, since when, and whether they are still alive — plus the discipline of a required register/deregister step whose absence is itself detectable. That distinction is worth settling before building anything, because if the answer is "git already tells us," the right fix may be a convention that agents run `git worktree list` at preflight rather than a new file to keep consistent.
+
+What it would touch: probably a tracked registry file in the shape of `_tmpagent/claims.jsonl` (an append-only log already used for a similar claim/activate/release lifecycle across worktrees), or an addition to the backlog's existing claim record; AGENTS.md's concurrency sections to require registration before work and deregistration at hand-off; and possibly a governance check that flags a registered worktree whose directory no longer exists, or an existing worktree nobody registered.
+
+What is unresolved: whether the registry is a new file or a field on the existing phase claim, given that a claim already names an agent and a phase and the worktree path is derivable from the phase id by AGENTS.md's own naming convention — in which case the registry may be redundant with the claim for phase work and only genuinely new for sessions that work without claiming one. Also unresolved: what enforces deregistration, since the failure mode this shares with idea 000025 (abandoned claims) is an agent that stops without cleaning up, and a registry with no staleness signal inherits exactly that problem rather than solving it.
+
+**Links**
+
+- relates_to → `000151`
+- relates_to → `000025`

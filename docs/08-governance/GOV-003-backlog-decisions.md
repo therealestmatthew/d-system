@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-11'
+updated: '2026-09-12'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -306,3 +306,53 @@ when the phase closed, and when a later phase's sanctioned scope deletes such a 
 evidence line retires with it — in the same diff as a GOV-003 note, never silently. The
 session record (`SESS-2026-09-10-05`-era records and git history) remains the durable proof
 of what the phase produced.
+
+## Every session works in a worktree; the documentation-only exception is withdrawn
+
+Owner ruling, 2026-09-12. **Every session's work happens in a worktree.** What the work touches
+is irrelevant — a documentation- or skill-only change is not an exception, and neither is the
+absence of a peer claim. This supersedes the 2026-09-06 decision recorded above ("A solo agent on
+a documentation-only phase works in the primary checkout"), which stands unedited as the
+historical record of what was accepted then and why.
+
+The only work done in the primary checkout is what the claim system itself requires there:
+committing the phase claim, because `backlog.yaml` on the integration branch is the lock table
+peers read and a claim held anywhere else is invisible; and the catalog regeneration that claim
+forces, because the claim moves generated output and leaving it unregenerated leaves the
+integration branch red on `test_committed_catalog_matches_regenerated_output`. Both go in the same
+commit. Everything else — the work, its verification, checkpoints and the session record — happens
+in the worktree and reaches the integration branch by integration.
+
+**Why the earlier reasoning no longer holds.** The 2026-09-06 decision argued that with no peer
+claim and nothing outside `docs/`, there is nothing to isolate: "a Markdown edit cannot corrupt a
+run that is not happening." That is true of *runs* and false of *branches*, which is the part the
+original reasoning did not consider. Three incidents on 2026-09-12 made the gap concrete, none of
+them involving a test run or a dev server:
+
+- A session working in the primary checkout switched its branch, and another session's next two
+  commits landed on that branch instead of the integration branch. One was repaired by a ratified
+  fast-forward; the second was caught only because `git branch -d` refused to delete a branch that
+  was not fully merged.
+- Inside the same window, both sessions drew false conclusions from accurate reads of a tree that
+  was mid-switch: one briefly believed a commit had been lost, the other nearly recorded a genuine
+  ordering failure as an intermittent test.
+- A third session, reasoning from the primary checkout's state, inferred that a peer's campaign was
+  running there and relayed an instruction to move work that was already correctly isolated.
+
+The common factor is that the shared resource is the *branch pointer and the index*, not the
+virtualenv. A documentation-only session mutates both exactly as much as a code session does, so
+the exception was drawn around the wrong axis. A second virtualenv still buys nothing; a second
+branch pointer is the whole point.
+
+**Where the operative rule lives.** `AGENTS.md`'s "Concurrent agents: work in a worktree" section,
+with `GOV-001` and `GOV-002` carrying the same conditions. `CLAUDE.md` carries a pointer to it
+rather than a copy, per its own scope policy. Note that `AGENTS.md` and `CLAUDE.md` are protected
+from agent edits by the repository's permission settings as well as by their own standing rule, so
+those two files are updated by the owner; an agent proposes the wording and stops.
+
+**Two follow-ups the owner raised when ratifying this**, recorded as ideas rather than decided
+here: `000151` (the claim system depends on every agent sharing one primary checkout, which is in
+tension with this rule by construction; an MCP-held claim is the candidate substitute because it
+does not depend on which checkout is primary — see `000020`) and `000152` (a registry of active
+worktrees that agents must register in before starting work and deregister from when finished, so
+where each agent is working is a fact to read rather than an inference to draw).
