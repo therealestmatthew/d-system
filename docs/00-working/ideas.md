@@ -6912,3 +6912,32 @@ PROPOSED LINK: 000144 --relates_to--> 000124 (vocabulary work must settle termin
 - relates_to → `000141`
 - relates_to → `000135`
 - relates_to → `000124`
+
+---
+
+## 000145 · Capture alternative planning methodologies for work that does not merit a full prompt pack
+
+**Created 2026-09-12T04:23:13-04:00 · Status: `open`**
+
+The prompt-pack protocol (GOV-008) is an eight-stage pipeline with four gates, designed for
+multi-agent code builds spanning several sessions. Two builds proved it: the live demo and the
+workbench.
+
+While planning the idea-batching analysis on 2026-09-12, the owner observed that this kind of
+work — a documents-only analysis of three to five agent dispatches over a text corpus, producing
+an ungoverned staging document — may not fully merit the pack. The pipeline's worktrees, ports,
+browser verification, schema gates and coordinator-prompt resumability were all inapplicable, and
+stages 6 and 7 were collapsed into the kick-off record as a documented deviation. When that many
+parts of a protocol have to be explicitly disapplied, the protocol may be the wrong instrument
+rather than a protocol being bent.
+
+What is missing is a lighter tier: a named, governed methodology for planning work that needs
+more rigour than an ad-hoc session but less machinery than a full pack. Open questions such a
+methodology would answer — what distinguishes work that merits a pack from work that does not
+(dispatch count, session span, whether code is written, whether the deliverable is governed);
+which GOV-008 stages survive into the lighter tier and which are dropped; whether the tiers are
+named variants of one protocol or separate documents; and whether a build can be promoted from
+the light tier to a full pack once it outgrows the smaller one.
+
+Raised during the idea-batching planning session; related to the prompt-pack protocol (GOV-008)
+and its methodology decision (ADR-017).
