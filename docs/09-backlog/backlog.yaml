@@ -6056,8 +6056,12 @@ items:
   deliverables:
   - research/literature-review/00_search_ledger.csv
   - research/literature-review/03_source_inventory.csv
-  next_action: Await campaign kick-off (GOV-009 stages 5-8); dispatch delegation-pack
-    section LIT-01 K first.
+  next_action: Resume phase-lit-01 mid-phase. Delegation-pack sections K, S1, X1, S2
+    and X2 are complete and coordinator-verified (98 ledger rows, 139 inventory rows,
+    domains D01-D06 and D30-D31 swept); S3 is in flight. Dispatch the remainder of
+    PROMPT-029's LIT-01 section in order - X3, S4/X4, S5/X5, S6/X6, then the G gate -
+    assembled per its dispatch rules, on the campaign branch agent/lit-campaign in the
+    worktree ../d-system-worktrees/lit-campaign. See SESS-2026-09-12-05.
 - id: phase-lit-02
   title: Literature review Pass 1b — broad map of agent memory, decision intelligence
     and requirements-engineering domains
