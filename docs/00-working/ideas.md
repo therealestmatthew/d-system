@@ -6814,9 +6814,31 @@ PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modular
 
 ## 000142 · Explore ports and system processes and their management: lifecycle, when and how to kill them
 
-**Created 2026-09-11T23:09:01-04:00 · Status: `open`**
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, recorded as given. An exploration of ports and system processes and the management of them: what their lifecycle is, when and how to 'kill' them, and how they should be managed in general. Kin to the websocket education idea (000140) in spirit - understanding grounded in this repository's real material - and the repository supplies concrete cases: the port-8000 conflict noted mid-session during the workbench builds, the orphaned dev servers left behind by cut-off agents (named in 000138's anti-pattern starter catalog), and the demo terminal's PTY child processes whose reaping the alive-property investigations (000099/000129) turned on.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:29-04:00): ## Governed Coverage of Process and Port Management
+
+This idea touches system process lifecycle, port binding, and terminal session management — all of which are already documented in active decision records and requirements:
+
+**Terminal and PTY process management:** ADR-013 (demo terminal decision) and ADR-014 (workbench terminal capability) establish the full lifecycle posture: localhost-only binding, environment-flag gating, per-session registry, and the explicit control-separation rule (session drop and tab close require confirmation, never collapse alone). REQ-006 R10/R11 verify these session semantics mechanically.
+
+**Port binding and conflict:** REQ-006 R04 specifies the cross-platform PTY adapter (POSIX pty + bash on Linux/macOS; ConPTY via pywinpty + PowerShell/cmd on Windows). PLAN-021 phase-demo-01 implements the websocket route itself. The concrete port-8000 conflict during workbench builds mentioned in the idea's body was resolved in the most recent session (SESS-2026-09-11-08, which records "orphaned dev servers from a truncated gate dispatch were killed").
+
+**Orphaned process pattern:** The issue of orphaned dev servers from interrupted agent runs surfaces in the operational notes of SESS-2026-09-11-08 as a resolved incident, and the idea references this pattern as kin to 000138 (agent anti-pattern tracking) and the PTY test failures (000099/000129).
+
+**Existing related ideas:** 000143 (small application for visualizing port/process usage) already extends 000142; 000144 extends 000143 to integrate it into the workbench as a modular panel. 000140 (websocket education) is mentioned in the body as kin in spirit and covers the underlying socket protocol. 000097/000129 track the PTY test failures directly.
+
+The governance documents establish the current understanding of process/session lifecycle management; the ideas 000143/000144 are already targeted at building visualization and tooling around ports/processes. This idea's distinctive ask—a comprehensive exploration of when and how to manage process lifecycle—is neither delivered nor planned in the current documents.
+
+</details>
 
 **Links**
 
@@ -6826,9 +6848,23 @@ Owner idea, 2026-09-11, recorded as given. An exploration of ports and system pr
 
 ## 000143 · Small application for managing and visualizing port usage and system processes
 
-**Created 2026-09-11T23:09:01-04:00 · Status: `open`**
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, recorded as given; the build companion to the ports-and-processes exploration recorded alongside it. A small application that manages and visualizes port usage and system processes: what is listening on which port, which processes are running and their state, and management actions on them (killing a process, freeing a port). Immediate practical motivators from this repository's sessions: spotting the port-8000 conflict without ad hoc shell forensics, and finding/cleaning the orphaned dev servers left by cut-off agents.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:06-04:00): Idea 000143 naturally extends 000142 (the ports-and-processes exploration), with 000144 already capturing the next step: packaging the app as a modular panel for the workbench (PLAN-022, REQ-007). The chain 000142 → 000143 → 000144 reflects the natural progression from investigation to prototype to integration. The workbench panel architecture (REQ-007 W05, defining panels as slot-assignable UI components) is where this app will eventually live, already noted in 000144's relatedness to 000141 (slots as configuration schemas) and 000135 (modular multi-instance panel system).
+
+Related terminal/process infrastructure ideas exist (000087 terminal interaction API, 000113 terminal persistence audit, 000140 websockets learning), but none directly overlap with 000143's ask for a ports-and-processes visualization tool. The motivators—spotting port-8000 conflicts without ad hoc shell forensics, and finding/cleaning orphaned dev servers—are concrete pain points from this repository's own workflow.
+
+No existing plan, requirement, or decision document explicitly covers a port/process visualization application. The closest touch point is the workbench itself (PLAN-022, REQ-007, ADR-015), which defines the read-only API surface (filesystem listings, OS actions) that a ports app would depend on if it calls system APIs or spawns queries. The idea stands as a greenfield feature request, not a duplicate or overlapping ask.
+
+</details>
 
 **Links**
 
@@ -6839,9 +6875,35 @@ Owner idea, 2026-09-11, recorded as given; the build companion to the ports-and-
 
 ## 000144 · Package the port/process app for the modular panel pages; general model for integrating sub-apps into slots
 
-**Created 2026-09-11T23:09:01-04:00 · Status: `open`**
+**Created 2026-09-11T23:09:01-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, recorded as given; extends the port/process manager app recorded alongside it. Two halves: (1) that application becomes a package of sorts that can be integrated into the modular panel pages - a sub-app occupying a workbench slot like the existing panels do; (2) the general question of how we modularize to support integrating sub-apps in the slots at all - what a sub-app package looks like (its boundary, its API surface toward the workbench, how it registers as a panel type, how it gets its data), so future sub-apps plug in the same way rather than each being hand-wired. Sits directly on the slot/panel modularity thread: the multi-instance modularity ask (000135), the slot-configuration-schema model (000141), and the vocabulary work (000124) that has to settle what containers and contents are called before a packaging contract is specified.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-12T00:24:30-04:00): Idea 000144 proposes a sub-app packaging model and integration pattern for the modular workbench panel system. It depends on and relates to existing governed work at the architectural level.
+
+**Governed documents already covering related ground:**
+
+The workbench plan (PLAN-022) and its supporting decisions define a slot/panel integration architecture: ADR-016 (workbench-layout-persistence) establishes the core model — each panel declares a panel type id once and becomes assignable wherever a layout's slots admit it, with per-panel eligibility stored in the layout JSON schema. REQ-007 (workbench-requirements) specifies this at the requirement level in rows W05-W06 (amended by W16), defining how panels declare eligibility for slots and how the configuration surface assigns them. These documents describe the *container* layer — how slots, layouts, and panel type registration work at the UI/configuration boundary. 
+
+Idea 000144 builds on top of that foundation to ask for the *sub-app packaging contract* — what the internal structure, API surface toward the workbench, registration mechanism, and data flow should look like so future sub-apps "plug in the same way rather than each being hand-wired." This is a distinct layer: the documents define what the workbench can *accept*, 000144 asks what a sub-app must *provide* to fit that contract.
+
+**Related idea dependencies:**
+
+The idea body correctly names three existing ideas: 000135 (multi-instance modularity), 000141 (slot-configuration-schema), and 000124 (vocabulary work). The fold shows 000135 and 000141 are already linked as `relates_to`. However, 000124 is mentioned as a critical blocking dependency ("has to settle what containers and contents are called before a packaging contract is specified") but is not yet formally linked. This dependency should be recorded.
+
+Ideas 000142 and 000143 are also related: 000143 (the port/process manager app) is already extended by 000144, and 000142 (the ports/processes exploration) provides the immediate motivating use case. These chains are correct in the fold.
+
+**No existing promotion candidate:** The idea is undelivered — the sub-app packaging contract and general integration model do not yet exist in the governed documents, though ADR-016 and REQ-007 provide the architectural foundation on which it must sit.
+
+PROPOSED LINK: 000144 --relates_to--> 000124 (vocabulary work must settle terminology before the sub-app packaging contract can be specified)
+
+</details>
 
 **Links**
 
