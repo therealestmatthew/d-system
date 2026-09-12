@@ -4874,6 +4874,10 @@ The proposed system would capture failures like these as structured records: wha
 
 The open design question is where the capture happens — at session close, at checkpoint, or through a dedicated tool — and how the derived rules reach agents without bloating every session's context.
 
+**Links**
+
+- relates_to ← `000129`
+
 ---
 
 ## 000098 · Ship the layout-schema test ADR-016 promised
@@ -4925,6 +4929,10 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 - **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
 
 </details>
+
+**Links**
+
+- relates_to ← `000129`
 
 ---
 
@@ -5269,3 +5277,16 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Develo
 **Links**
 
 - relates_to → `000126`
+
+---
+
+## 000129 · Fix the three pre-existing environmental PTY test failures so the suite runs green
+
+**Created 2026-09-11T20:31:54-04:00 · Status: `open`**
+
+Owner request, 2026-09-11. The full pytest suite has carried the same three failures through every wb-08/wb-09 verification run: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size and test_two_concurrent_websocket_sessions_are_independent_shells in test/test_demo_terminal.py, all with the pyenv "cannot rehash: couldn't acquire lock" / ".pyenv-shim: cannot overwrite existing file" signature already recorded as environmental in ideas 000097 and 000099. Every gate and audit now has to carry the caveat "3 failed, known environmental" - a standing hole in the evidence that a genuinely new PTY regression could hide inside. Fix them for real: either make the tests robust to the pyenv shim environment (e.g. spawn the PTY shell with a clean environment or an absolute shell path that bypasses shim rehashing), fix the host-level pyenv lock contention, or isolate the tests from the shim mechanism - whichever the investigation supports. Done means the full suite passes with zero expected failures on this machine, and the "known environmental" caveat disappears from gate checklists.
+
+**Links**
+
+- relates_to → `000097`
+- relates_to → `000099`
