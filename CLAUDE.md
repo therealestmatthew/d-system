@@ -45,6 +45,11 @@ check, the concurrent-agent protocol, and the standing rules that an agent **ask
 a feature branch into the integration branch** — though pushing its own branch to `origin` needs no
 approval — and **never writes a confidential identifier into a tracked file**.
 
+It also carries the rule that **every session works in a worktree** — including documentation-only
+work. The only exceptions are the claim commit and the catalog regeneration it forces, which must
+happen in the primary checkout. See AGENTS.md's "Concurrent agents: work in a worktree" section and
+[GOV-003](docs/08-governance/GOV-003-backlog-decisions.md) for the incidents behind it.
+
 This file is orientation only — what the project is and where things live. If it ever contradicts
 AGENTS.md, AGENTS.md wins.
 

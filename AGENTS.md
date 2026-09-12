@@ -205,12 +205,26 @@ Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the 
 
 ## Concurrent agents: work in a worktree
 
-A worktree is required, and the primary checkout's branch must never be switched, whenever a peer
-holds an active claim or the phase touches `src/`, `ts/`, `schemas/`, `sql/`, `tools/` or `test/`.
-Each agent gets a physically separate directory, so tests, rebuilds and dev servers cannot corrupt a
-peer's run. A solo agent on a documentation- or skill-only phase, with no peer claim and no
-deliverable outside `docs/` or framework-specific directories (e.g., `.claude/`), may instead work directly in the primary checkout on
-`dev` — see [GOV-003](docs/08-governance/GOV-003-backlog-decisions.md).
+**Every session works in a worktree, and the primary checkout's branch must never be switched.**
+This holds regardless of what the work touches — a documentation-only or skill-only change is not
+an exception, and neither is the absence of a peer claim. Each agent gets a physically separate
+directory, so tests, rebuilds, dev servers and branch switches cannot corrupt a peer's run.
+
+The **only** work that happens in the primary checkout on `dev` is what the claim system itself
+requires there:
+
+- **committing the phase claim** — `backlog.yaml` on `dev` is the lock table peers read, so a
+  claim held anywhere else is invisible and therefore not a lock;
+- **the catalog regeneration that claim forces** — the claim moves generated output, and leaving
+  it unregenerated leaves `dev` red on `test_committed_catalog_matches_regenerated_output`. Commit
+  it with the claim, not afterwards.
+
+Everything else — the work, its verification, checkpoints and the session record — happens in the
+worktree and reaches `dev` by integration. Do nothing else in the primary checkout while you are
+there, and return to your worktree immediately.
+
+This withdraws the narrower documentation-only exception that stood until 2026-09-12, recorded in
+[GOV-003](docs/08-governance/GOV-003-backlog-decisions.md) with the incidents that withdrew it.
 
 ```bash
 # from the primary checkout, on an up-to-date dev
