@@ -50,6 +50,7 @@ brain/
 - [Auditing a Document for Accuracy Introduces New False Claims](procedures/audit-your-own-corrections.md)
 - [Runtime Behavior Needs Runtime Evidence](procedures/runtime-behavior-needs-runtime-evidence.md)
 - [Scope Dispatches to the Turn Budget](procedures/scope-dispatches-to-the-turn-budget.md)
+- [A Question You Want Answered Belongs in the Tool, Not in Your Closing Paragraph](procedures/ask-through-the-tool.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
