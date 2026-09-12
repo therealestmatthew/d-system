@@ -5889,8 +5889,46 @@ items:
   - test/test_workbench_api.py
   - test/test_demo_terminal.py
   - docs/04-decisions/ADR-014-workbench-terminal-capability.md
-  next_action: Bump the layout schema_version and move eligibility onto the
-    panel entries before touching the dialog.
+  next_action: 'Dispatch the coordinator-owned completion gate (W09-A adversarial
+    review, W09-W Playwright browser verification) against agent/phase-wb-09 commit
+    73ef92d (merged forward with dev to resolve an idea-log staleness failure).
+    The creator/validator loop (W09-C1/V1, W09-C2/V2, W09-C3/V3) and the mechanical
+    phase gate (W09-G) are all green.'
+  session: doc-session-phase-wb-09-layout-assignment
+  completion_evidence:
+  - src/api/routes/demo_terminal.py
+  - src/api/routes/workbench.py
+  - _data/workbench/layouts/layout-1.json
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  result: 'In progress (not complete; evidence lives on the unmerged
+    agent/phase-wb-09 worktree branch, commit 73ef92d). W09-C1 (demo-creator-py)
+    raised the global concurrent-PTY cap in src/api/routes/demo_terminal.py from
+    four to six and added a gated GET /platform route to
+    src/api/routes/workbench.py reusing the existing shell-availability check;
+    W09-V1 passed with no findings. W09-C2 (demo-creator-web) bumped both
+    shipped layout files to schema_version 2, replacing per-slot admits lists
+    with per-panel eligible_slots plus a default_assignment/default_visible_panel
+    reproducing the pre-delta arrangement, and reworked the storage/loading
+    layer to a per-panel-assignment-plus-per-slot-visible-choice shape that
+    silently discards old-schema or ineligible stored state (ADR-016 rule 3);
+    W09-V2 passed with no findings. W09-C3 (demo-creator-web, resumed once after
+    a turn-limit truncation) reworked LayoutConfigDialog.tsx into a per-panel
+    eligible-slot selector, made Slot.tsx''s header dropdown switcher-only, and
+    added a per-slot React-portal mechanism in StagePage.tsx keyed by panel id
+    so re-assigning a panel between slots relocates its live component instance
+    instead of remounting it - closing idea 000107''s layout round-trip
+    regression - plus a platform-conditional fresh-store default shell; W09-V3
+    passed with no findings, having specifically checked and confirmed the idea
+    000107 fix and that the multi-occupant header-switcher''s existing
+    remount-on-visibility-change behavior is unchanged, not a new regression.
+    W09-G (the mechanical phase gate) initially failed on a stale
+    docs/00-working/ideas.md (test_the_committed_markdown_matches_regenerated_output)
+    caused by the worktree branching before several unrelated dev commits
+    landed (idea-log appends and the owner''s own src/demo/factory.py Windows
+    fix); resolved by merging dev forward into the phase branch (73ef92d, no
+    conflicts), after which W09-G re-ran green (all six checklist items pass).
+    Remaining: the coordinator-owned completion gate (W09-A adversarial review,
+    W09-W Playwright browser verification) per GOV-003.'
 - id: phase-wb-10
   title: Runbook and checklist refresh for the post-fix workbench UI
   plan: doc-workbench
