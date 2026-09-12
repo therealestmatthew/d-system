@@ -28,18 +28,23 @@ one-time instruction not to push, and shipped inside a commit about unrelated st
 
 ## Before you start
 
-1. **Pick up work from the backlog.** Run `uv run python -m src.governance --ready` and take the
+1. **Open the session properly.** Any session that will write code or create a document runs the
+   claim-and-worktree protocol first: claim the phase on `dev`, cut `agent/<phase-id>`, work in
+   `../d-system-worktrees/<phase-id>`. The three *Concurrent agents* sections below are the rule;
+   `.claude/commands/session-start.md` is the same rule as an ordered procedure a Claude Code
+   session can run. Where they differ, this file wins.
+2. **Pick up work from the backlog.** Run `uv run python -m src.governance --ready` and take the
    **first ready phase in the rendered order**. `next_up` in `docs/09-backlog/backlog.yaml` is the
    front of the queue and overrides priority; the report shows it as the Queue column. When the
    owner says "execute the next task", that is the phase they mean — no judgment call needed. Use
    the phase's `scope`, `acceptance` and `verification` as the work boundary.
-2. **Plan before implementing.** For any non-trivial change, write a `requirement` document
+3. **Plan before implementing.** For any non-trivial change, write a `requirement` document
    (observable statements with verification methods) and a `plan` document, then add backlog phases,
    *before* writing implementation code. An open plan with no phases fails the governance check.
    Approval of one plan is not permission to skip the documents for the next piece of work.
-3. **Allocate a code for every governed document** with
+4. **Allocate a code for every governed document** with
    `uv run python -m src.governance --next-code <kind>`. Never pick a number by reading a directory.
-4. **Run `uv run python -m src.governance` before you finish.** It must exit 0.
+5. **Run `uv run python -m src.governance` before you finish.** It must exit 0.
 
 ## Confidentiality and publishing
 
@@ -183,8 +188,9 @@ history onto it and pushed; day-to-day work then moved to `dev`, and idea `00006
 `main` behind pull requests from `dev`. Release tagging, if it is ever introduced, will use tags
 rather than another long-lived branch.
 
-A remote now exists, so `git fetch`, `git pull` and `git push` all work — but **ask the owner before
-pushing** (see *Confidentiality and publishing*).
+A remote now exists, so `git fetch`, `git pull` and `git push` all work. Pushing your own
+`agent/<phase-id>` branch needs no approval; **ask before integrating into `dev`** (see
+*Confidentiality and publishing*).
 
 Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the lock table, and
 `uv run python -m src.governance` is the lock check. See [ADR-003](docs/04-decisions/ADR-003-multi-agent-concurrency.md).
@@ -202,6 +208,12 @@ Several agents may work at once. `docs/09-backlog/backlog.yaml` on `dev` is the 
 - Commit the claim on `dev`. If the push is rejected as non-fast-forward,
   `git pull --rebase`, re-run the validator, and re-check that your claim is still safe — a peer
   claimed between your check and your push, and their systems may now collide with yours.
+
+**Owner-directed work with no backlog phase** — a one-off document, a fix asked for directly — has
+nothing to claim. Skip the claim commit, name the branch and worktree after the work
+(`agent/<slug>`), and say plainly in your first report that the session is running unclaimed and
+peers therefore hold no lock against it. Do not manufacture a backlog phase to have something to
+claim.
 
 ## Concurrent agents: work in a worktree
 
@@ -238,7 +250,12 @@ uv run python tools/rebuild_db.py         # each worktree has its own gitignored
   `../d-system-worktrees/<phase-id>` — a sibling of the repository, never inside it, so that
   `pytest`, `ruff`, `mypy` and the governance Markdown scanner never walk a second copy of the tree.
 - `.venv/`, `data/` and `ts/node_modules/` are gitignored and therefore per-worktree. Install them
-  in the worktree; do not symlink a peer's.
+  in the worktree; do not symlink a peer's. `uv sync` without `--extra dev` leaves the governance
+  check unable to import `jsonschema`; sync the extra or the first validator run fails for the
+  wrong reason.
+- **Gitignored content never travels.** A merge does not carry it and `git worktree remove`
+  destroys it. If the work produced anything under an ignored path that must survive, copy it out
+  by hand before removing the worktree.
 - If you run a dev server, pick a free port explicitly
   (`uv run uvicorn src.main:app --reload --port 8010`). Do not assume `:8000` or `:5173` is yours.
 - Stay inside your phase's declared `systems` and `deliverables`. If the work genuinely requires a
@@ -259,21 +276,35 @@ Perform these in order. Do not mark a phase complete before the post-rebase vali
    and anything unresolved. Allocate its code with
    `uv run python -m src.governance --next-code session` and name the file `<code>-<topic>.md`; the
    code's date must equal the document's `created` date.
-3. Confirm each `acceptance` condition is genuinely met. If any is not, leave the phase `active` or
+3. Release every `_tmpagent/` claim this session opened — one `released` line per open
+   `(file, kind, ref)` triple, per [`_tmpagent/AGENTS.md`](_tmpagent/AGENTS.md). A claim nobody
+   closed blocks that file's deletion indefinitely, and no check will catch it.
+4. Confirm each `acceptance` condition is genuinely met. If any is not, leave the phase `active` or
    return it to `queued` with an exact `next_action` — and release your `agent` claim when you do.
-4. Update your phase: `status: complete`, `session:`, `completion_evidence:` (files that exist now),
+5. Update your phase: `status: complete`, `session:`, `completion_evidence:` (files that exist now),
    and `result:` summarizing the actual verification output. Keep the `agent` field as the record of
    who did the work.
-5. `git rebase dev`, then re-run `uv run python -m src.governance` and
+6. `git rebase dev`, then re-run `uv run python -m src.governance` and
    `uv run pytest`. This run — after the rebase, against your peers' merged work — is the one that
    decides whether the branch may integrate. If it fails, fix it on your branch; never integrate a
    red rebase.
-6. Check that the primary `dev` checkout is completely clean (`git status` shows no unstaged changes).
+7. Check that the primary `dev` checkout is completely clean (`git status` shows no unstaged changes).
    **Never use `git stash` or force an integration if a peer agent has left uncommitted work.**
-7. If `dev` is clean, integrate the branch onto `dev` (fast-forward after the rebase), then clean up:
-   `git worktree remove ../d-system-worktrees/<phase-id>` and `git branch -d agent/<phase-id>`.
-   If `dev` is dirty or manual review is required, leave your branch unmerged. Report that the work is ready
-   for review so the owner (or a peer) can `git diff dev..agent/<phase-id>` and merge it manually.
+8. **Ask the owner before integrating.** The merge onto the trunk is theirs to authorise, and a
+   green branch on a clean `dev` is a branch that is *ready* to integrate, not one that is cleared
+   to. If they decline or are not present, leave the branch unmerged and report that it is ready for
+   review, naming the command that shows it: `git diff dev..agent/<phase-id>`.
+9. On their yes, and only if `dev` is clean, integrate (fast-forward after the rebase), then clean
+   up:
+
+   ```bash
+   git -C <primary checkout> merge --ff-only agent/<phase-id>
+   git worktree remove ../d-system-worktrees/<phase-id>
+   git branch -d agent/<phase-id>
+   ```
+
+   If the merge is not a fast-forward, step 6's rebase was not done or `dev` has moved since. Rebase
+   again and re-run the validator; do not paper over it with a merge commit that skips the green run.
 
 ## Concurrent agents: resolve collisions
 
