@@ -3,7 +3,6 @@ updated: '2026-09-11'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-09
 - phase-wb-10
 - phase-wb-07
 - phase-port-02
@@ -5825,7 +5824,7 @@ items:
   - sys-api
   owner: repository-owner
   agent: agent-demo-stage
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -5889,19 +5888,19 @@ items:
   - test/test_workbench_api.py
   - test/test_demo_terminal.py
   - docs/04-decisions/ADR-014-workbench-terminal-capability.md
-  next_action: 'Dispatch the coordinator-owned completion gate (W09-A adversarial
-    review, W09-W Playwright browser verification) against agent/phase-wb-09 commit
-    73ef92d (merged forward with dev to resolve an idea-log staleness failure).
-    The creator/validator loop (W09-C1/V1, W09-C2/V2, W09-C3/V3) and the mechanical
-    phase gate (W09-G) are all green.'
+  next_action: 'None — phase complete and integrated into dev (fast-forward to the
+    rebased branch, commit 08305cc) under the kick-off record''s delta-4
+    pre-approval. The post-fix Windows confirmations (fresh-store PowerShell
+    default, two-shell round-trip) remain owner checks in phase-wb-07''s
+    checklist.'
   session: doc-session-phase-wb-09-layout-assignment
   completion_evidence:
   - src/api/routes/demo_terminal.py
   - src/api/routes/workbench.py
   - _data/workbench/layouts/layout-1.json
   - ts/src/workbench/useWorkbenchLayouts.ts
-  result: 'In progress (not complete; evidence lives on the unmerged
-    agent/phase-wb-09 worktree branch, commit 73ef92d). W09-C1 (demo-creator-py)
+  result: 'Complete; integrated into dev at 08305cc (rebased, fast-forward,
+    coordinator-integrated under the delta-4 pre-approval). W09-C1 (demo-creator-py)
     raised the global concurrent-PTY cap in src/api/routes/demo_terminal.py from
     four to six and added a gated GET /platform route to
     src/api/routes/workbench.py reusing the existing shell-availability check;
@@ -5927,8 +5926,30 @@ items:
     landed (idea-log appends and the owner''s own src/demo/factory.py Windows
     fix); resolved by merging dev forward into the phase branch (73ef92d, no
     conflicts), after which W09-G re-ran green (all six checklist items pass).
-    Remaining: the coordinator-owned completion gate (W09-A adversarial review,
-    W09-W Playwright browser verification) per GOV-003.'
+    Completion gate (GOV-003, coordinator-dispatched): the first W09-A found a
+    BLOCKER - the stage page crashed on load (infinite ref/setState loop from a
+    per-render registerSlotBody closure), invisible to build/pytest/W09-G by
+    construction and caught only by the gate''s live browser launch. Fix cycle 1
+    repaired the render loop (verified live in dev and production builds) but
+    left re-assignment killing a live shell session after two creator attempts;
+    the coordinator spent PROMPT-012''s single documented opus escalation, which
+    found the real mechanism (React treats a portal whose containerInfo changes
+    as insert+delete, never an update) and reworked to permanent per-panel host
+    divs moved via appendChild, a NO_VISIBLE_PANEL sentinel ending the vacated-
+    slot CMD thrash, and an explicit confirm notice for displacement (commit
+    851e5c5); W09-V3 then passed (one cosmetic styling note). The W09-A re-run
+    confirmed both findings closed and no blocker/major survived (true-
+    concurrency cap check 6-of-12 admitted with slot recovery, storage fallback
+    seeding, notice double-click idempotence, host-div stress under rapid
+    reassignment, main-slot height chain exact). W09-W passed all seven items
+    with measured evidence, including the persistence guard (zero new
+    websockets across layout switches, MARKER preserved) and the announced-
+    displacement round-trip. Post-rebase validation before integration:
+    governance OK, build clean, ruff and mypy pass, pytest 575 passed / 3
+    failed - the known environmental PTY failures (ideas 000097/000099, fix
+    recorded as idea 000129), unchanged. Post-mortem of the gate''s lesson:
+    brain/procedures/runtime-behavior-needs-runtime-evidence.md and idea
+    000136. The backend cap refusal''s unreachable close reason is idea 000137.'
 - id: phase-wb-10
   title: Runbook and checklist refresh for the post-fix workbench UI
   plan: doc-workbench
