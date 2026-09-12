@@ -6424,3 +6424,11 @@ Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning tria
 **Links**
 
 - relates_to → `000126`
+
+---
+
+## 000137 · Global-cap websocket refusal should reach the browser as a structured close reason
+
+**Created 2026-09-11T21:56:55-04:00 · Status: `open`**
+
+Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's global-cap refusal in src/api/routes/demo_terminal.py closes the websocket BEFORE accept() (code 4001), and uvicorn converts a pre-accept close into an HTTP 403 handshake rejection - so the browser receives CloseEvent code 1006 with an empty reason and can never display the structured refusal (or the session count). The frontend now infers the refusal structurally (socket closed without ever opening) and shows a generic could-not-start message. The proper fix is backend: accept first, then close with the structured frame - exactly the pattern _refuse_shell_request already uses for unavailable shells - so the panel can quote the real reason. Small, ADR-014-adjacent change; was out of scope for the wb-09 frontend item that discovered it.
