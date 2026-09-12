@@ -4656,34 +4656,102 @@ The idea's registry requirement is satisfied. The inject/read API, detach/reatta
 
 ## 000088 · Rehearsal idea from dry-run 1
 
-**Created 2026-09-10T14:46:13-04:00 · Status: `open`**
+**Created 2026-09-10T14:46:13-04:00 · Status: `triaged`**
 
 Recorded during the 2026-09-10 dry-run 1 rehearsal, phase-demo-05 (demo-validator-code timed
 walkthrough of the live-segment runbook). [Rehearsal entry: this idea is part of the demo record,
 not a real audience suggestion.] Placeholder content standing in for whatever prose an audience
 member offers on demo day; recorded solely to time the /idea step's sanctioned-writer path.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:30-04:00): Idea 000088 is a demo artifact recorded during phase-demo-05's dry-run rehearsal (2026-09-10), explicitly labeled as a rehearsal entry, not a real audience suggestion. The body states its sole purpose: placeholder content recorded to time the /idea step's sanctioned-writer path during the live-segment runbook walkthrough. It carries no substantive content.
+
+No overlap with other ideas: the fold shows no links yet, and sibling rehearsal ideas (000089, 000090) are similarly demo artifacts. No related governance documentation beyond the demo infrastructure itself (PLAN-021, phase-demo-05, REQ-006 R09, REQ-007 W13), which define the live segment's step shape and timing requirements that this idea's recording was meant to validate.
+
+This idea's status should reflect its nature: it is a demo fixture recorded for rehearsal purposes, not a real platform request to triage or action.
+
+</details>
+
 ---
 
 ## 000089 · Demo fallback: audience idea seeded by tools/demo_reset.py
 
-**Created 2026-09-10T14:47:54-04:00 · Status: `open`**
+**Created 2026-09-10T14:47:54-04:00 · Status: `triaged`**
 
 Seeded by `tools/demo_reset.py prepare` so the live-rebuild segment (REQ-006 R09) always has an idea to triage even if the audience does not supply one live. Labelled as the fallback seed by this exact title — `prepare` checks the folded idea state for this title before appending, so re-running `prepare` never seeds a duplicate. Real work per PLAN-021's afterlife decision: not reverted after the demo.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:41-04:00): Idea 000089 is a deliberately created fallback scaffold seeded by `tools/demo_reset.py prepare` — not a feature request or user-supplied idea, but infrastructure that ensures the live-demo segment (REQ-006 R09) always has an idea to triage, even if the audience does not supply one during the live run.
+
+**Governance and Intent**
+
+The idea's exact title and body are controlled by constants in `tools/demo_reset.py` (lines 76-84, `FALLBACK_SEED_TITLE` and `FALLBACK_SEED_BODY`). The `prepare` subcommand checks the folded idea state for this title before appending, preventing duplicates on consecutive runs. This is intentional: the title serves as the label that prevents re-seeding.
+
+The idea is part of the delivery of two governed documents:
+- PLAN-021 (the live demo plan), which names the fallback seed in lines 109-116 as part of the demo reset tool's contract
+- REQ-006 R09 (the live segment requirement), which defines the triage step as part of the 15-minute live-rebuild segment that must complete with per-step timeboxes
+
+**Afterlife and Retention**
+
+PLAN-021's "Afterlife" section (lines 149-154) explicitly decides that "everything the demo produces is kept as real work, not reverted." This idea is kept in the append-only log after the demo concludes; the afterlife decision keeps it as part of the permanent record, not ephemeral demo scaffolding.
+
+**No Related Overlaps**
+
+A search across all 129 ideas finds no overlap with other ideas' scope or intention. Ideas 000088 and 000090 are rehearsal ideas from dry-runs; idea 000087 is a terminal API feature request; idea 000070 is the main demo request. None address the fallback-idea-seeding pattern, which is unique to this idea.
+
+No search of governed documents (plans, requirements, ADRs, backlog phases) found prior work or related guidance outside PLAN-021 and REQ-006.
+
+PROPOSED LINK: 000089 --relates_to--> 000070 (both serve the live demo session; 000089 provides fallback triage content, 000070 is the main demo request)
+
+</details>
 
 ---
 
 ## 000090 · Rehearsal idea from phase-demo-05 second dry-run
 
-**Created 2026-09-10T14:49:28-04:00 · Status: `open`**
+**Created 2026-09-10T14:49:28-04:00 · Status: `triaged`**
 
 Recorded during the 2026-09-10 dry-run rehearsal (demo-validator-code, phase-demo-05 worktree). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:31-04:00): Rehearsal test artifact from phase-demo-05 (completed). Idea 000090 is a placeholder entry recorded during the 2026-09-10 dry-run rehearsal to time the /idea step of the live-segment runbook (phase-demo-05's REQ-006 R09 requirement). The body explicitly states "[Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]" and carries no product content beyond the placeholder marker.
+
+**Related rehearsal/demo entries:**
+- 000088 (Rehearsal idea from dry-run 1) — earlier placeholder from the same phase, same purpose
+- 000089 (Demo fallback: audience idea seeded by tools/demo_reset.py) — the real fallback seed used when no audience input arrives; this is kept permanently per PLAN-021's afterlife decision
+- 000102 (Rehearsal idea from demo-validator-web dry-run) — similar placeholder from phase-wb-07 (later)
+- 000103 (Rehearsal pass 2 test entry for the live terminal /idea command) — phase-wb-07 test entry, also explicitly discardable
+
+**Governance context:**
+Phase-demo-05 (Demo content, runbook, reset tool and rehearsals, `doc-live-demo` / PLAN-021) completed in the 2026-09-10 session. The runbook's final form, Windows checklist, and reset tool (tools/demo_reset.py) were all delivered and are permanent. Rehearsal-only timing entries like 000090 served their purpose during the timed dry-runs that validated REQ-006 R09 (the 15-minute live segment with per-step timeboxes).
+
+**Assessment:**
+This idea has completed its intended role: validating the /idea step's execution time during the demo validation process. Unlike 000089 (the fallback seed, which is kept), this rehearsal placeholder has no ongoing product function and was never intended to be promoted or retained as work. No related plan, requirement, ADR or backlog phase names it; the only governing reference is the phase-demo-05 scope that used it for timing.
+
+PROPOSED LINK: 000090 --relates_to--> 000088 (parallel rehearsal timing test from earlier dry-run in same phase)
+
+</details>
 
 ---
 
 ## 000091 · Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
-**Created 2026-09-10T18:16:47-04:00 · Status: `open`**
+**Created 2026-09-10T18:16:47-04:00 · Status: `triaged`**
 
 AGENTS.md states the push rule twice, and each passage states only half of it without saying which half:
 
@@ -4704,7 +4772,7 @@ Marked priority-ish at the owner's request: worth doing before the next agent ha
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-readme-audit (2026-09-10T19:11:22-04:00): Verbatim replacement text for both hunks, copied here so the approved wording survives independently of the plan file at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md, which lives outside the repository and outside backup.
 
@@ -4743,6 +4811,17 @@ WHY THIS WORDING. The two passages are a general rule (ask before pushing to ori
 LINE NUMBERS WILL DRIFT. Match on the quoted text, not the line numbers above.
 
 STILL BLOCKED. .claude/settings.json denies Edit(AGENTS.md) and Write(AGENTS.md), and a deny rule overrides an approval at the tool level, so an agent cannot apply this even with the owner's approval on record. It needs the owner applying the hunks by hand, or the deny lifted for the duration and restored afterwards. Whether the change commits and pushes when applied was also left undecided.
+- **finding** by agent-idea-triage (2026-09-11T20:38:00-04:00): Idea 000091 aims to rewrite AGENTS.md lines 50-51 and 186-187 to make explicit that the push rule is a general rule ("ask before pushing to origin") plus one standing exception ("your own agent/<phase-id> branch needs no approval"). Currently each passage states only half the rule, and line 186's cross-reference to line 50 makes them appear to contradict each other.
+
+A full approved plan exists at /home/mimmik/.claude/plans/cool-please-explain-the-tidy-island.md with exact replacement text for both hunks. An annotation from agent-readme-audit (2026-09-10T19:11:22-04:00) recorded the hunks verbatim in the idea's history as insurance against plan-file drift.
+
+The change is mechanically blocked: .claude/settings.json lines 4-7 deny Edit(AGENTS.md) and Write(AGENTS.md), and deny rules override approvals at the tool level. The owner approved the plan but deferred the mechanical question of how to apply it (owner applies by hand, or deny rules lifted for the duration and restored after).
+
+Overlap with other ideas: idea 000014 (Investigate hooks for the repository and audit settings.json) and idea 000051 (Agent harness and guardrails) both touch .claude/settings.json and enforcement mechanisms — they frame the broader question of where rules should live (settings, hooks, tests, or written procedures), while 000091 is specific to legibility of an existing rule. The overlap is thematic rather than functional; no merged or skipped idea relationship applies.
+
+Related governed work: OPS-001 (operations) references the push rule and points to AGENTS.md's "Confidentiality and publishing" section; PLAN-008 (session lifecycle protocols) discusses enforcement mechanisms and explicitly names 000014 as the venue for this architectural question.
+
+No related plan, requirement or backlog phase found beyond the approved plan file outside the repository.
 
 </details>
 
@@ -4750,7 +4829,7 @@ STILL BLOCKED. .claude/settings.json denies Edit(AGENTS.md) and Write(AGENTS.md)
 
 ## 000092 · HTML Designer agent: extract page designs into durable template families
 
-**Created 2026-09-10T18:58:09-04:00 · Status: `open`**
+**Created 2026-09-10T18:58:09-04:00 · Status: `triaged`**
 
 An agent that scans the repository's HTML (_public/ pages, templates/ families, generated
 output) and extracts each page's design essence into durable, reusable templates — building an
@@ -4772,11 +4851,35 @@ templates/html/atlas-components.html) was extracted manually on 2026-09-10 from
 _public/d-system-architecture.html and _public/prompt-pack-protocol.html — it is the
 inventory's first entry and the working example of the output this agent would produce.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:37:55-04:00): Idea 000092 proposes an agent to extract page designs into durable template families, maintaining an inventory of styles, themes, color palettes and design schemas. The idea cites the atlas family (manually extracted on 2026-09-10) as a working example, and specifies that registration lives in templates/README.md's family table — which already exists with atlas as the first entry.
+
+Overlaps with three closely related ideas in the same batch:
+
+1. 000083 (Template library with deterministic or AI population) — about making templates a first-class, growing library. 000092's extraction agent would be the concrete mechanism to populate it.
+
+2. 000084 (HTML component library for the dynamic HTML generation plan) — 000092 explicitly scopes "component patterns" as part of the design extraction, which is exactly what 000084 proposes as a library of reusable UI building blocks.
+
+3. 000085 (Color palette library for the HTML generation tool) — 000092 explicitly scopes "color palettes" in the inventory it builds; 000085 proposes the same library as an optional styling configuration for the generation pipeline.
+
+All three ideas feed the same template/component/palette pipeline under PLAN-003 (Dynamic HTML generation). The template families registry in templates/README.md is already operational and matches the proposed registration location in 000092's scope.
+
+PROPOSED LINK: 000092 --relates_to--> 000083 (extraction agent mechanism for template library)
+PROPOSED LINK: 000092 --relates_to--> 000084 (component patterns are extraction scope for component library)
+PROPOSED LINK: 000092 --relates_to--> 000085 (color palettes are extraction scope for palette library)
+
+</details>
+
 ---
 
 ## 000093 · Governance atlas page in the atlas design
 
-**Created 2026-09-10T18:58:09-04:00 · Status: `open`**
+**Created 2026-09-10T18:58:09-04:00 · Status: `triaged`**
 
 A standalone HTML page covering the whole governance system in the atlas template family's
 design: the document-code series and allocator, the backlog protocol and claim model, the GOV
@@ -4788,6 +4891,30 @@ Deferred by the owner on 2026-09-10 when scoping the protocol page: the ratified
 "protocol + case studies for now, note to come back and build the broader governance atlas
 later." Build it from the atlas family (templates/styles/atlas.css, templates/html/atlas-*.html)
 rather than from scratch.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:41-04:00): Idea 000093 proposes a standalone HTML page covering the entire governance system — the document-code series and allocator, backlog protocol and claim model, GOV document series, idea lifecycle and sanctioned writer, plus their interconnections — as a broader companion to the existing prompt-pack-protocol.html page (which covers only GOV-008). The idea explicitly notes that this work was deferred by the owner on 2026-09-10 with ratified direction to focus on "protocol + case studies for now" and come back to build the broader governance atlas later.
+
+Relevant governed documents:
+- GOV-001 through GOV-009 and OPS documents in docs/08-governance/ define the systems this idea would document (document-code allocator, backlog protocol, idea lifecycle, sanctioned writer, etc.)
+- The prompt-pack-protocol.html page exists in _public/ and demonstrates the scope of one narrower governance topic rendered in atlas design
+- Templates/styles/atlas.css and templates/html/atlas-*.html exist as the template family this idea proposes to use, manually extracted on 2026-09-10 from existing pages including prompt-pack-protocol.html (see 000092's working example)
+
+Related idea overlap:
+- 000092 (HTML Designer agent: extract page designs into durable template families) — the atlas family that 000093 would use was manually extracted as 000092's working example; 000093 would be a consumer of the extraction process and the resulting family
+- 000042 (Generate an ideas & backlog HTML page for an at-a-glance view) — about HTML page generation from governed data, but for a different topic (idea/backlog prioritization rather than governance system documentation)
+- 000056 (Documentation governance) — about keeping the docs/ tree correct and current, overlaps in scope but focuses on documentation lifecycle rather than presentation
+
+No existing plan document yet covers the governance atlas page. The work is explicitly deferred with owner direction to return to it.
+
+PROPOSED LINK: 000093 --relates_to--> 000092 (governance page would consume the atlas template family extracted by the designer agent)
+
+</details>
 
 ---
 
@@ -4842,23 +4969,68 @@ Discarded rather than promoted: it was resolved directly and became no document,
 
 ## 000095 · Close the session-cap TOCTOU window in the demo terminal route
 
-**Created 2026-09-10T21:17:43-04:00 · Status: `open`**
+**Created 2026-09-10T21:17:43-04:00 · Status: `triaged`**
 
 phase-wb-01's W01-A adversarial review observed (not demonstrated) a structural race: the len(SESSIONS) >= MAX_CONCURRENT_SESSIONS check in src/api/routes/demo_terminal.py is separated from the registry insertion by an await websocket.accept(), so two connections racing the boundary could theoretically both pass the check. Repeated real concurrent-connect storms (8-way and 10-way, multiple runs) never manifested it under the asyncio/uvicorn scheduler. Candidate fix: reserve the registry slot before accept() and release on failure. Deliberately recorded rather than built during the workbench track (PROMPT-023 enhancement lane: cap enforcement is REQ-007 W12 stated behavior).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:24-04:00): TOCTOU race in session-cap enforcement
+
+The race exists between `src/api/routes/demo_terminal.py` line 284 (len check) and line 310 (accept). Two concurrent websockets can both pass the `len(SESSIONS) >= MAX_CONCURRENT_SESSIONS` check, then both call `await websocket.accept()`, then both register in SESSIONS — breaching the cap despite the guard. The adversarial review in phase-wb-01 (W01-A) surfaced this as theoretical: repeated real concurrent-connect storms (8-way and 10-way, multiple runs) never manifested it under the asyncio/uvicorn scheduler, but the window is genuine.
+
+The candidate fix is to atomically reserve the registry slot before accept() — check space, create a placeholder entry in SESSIONS, call accept, then proceed with adapter creation; on any error after accept, release the placeholder. This moves the cap enforcement from check-then-use to check-and-reserve, eliminating the window.
+
+The issue relates to ADR-014 section 4 (the server-side session registry and cap) and sits under REQ-007 W12 (cap enforcement stated behavior). It was deliberately recorded during phase-wb-01 rather than fixed because the work was already complete and circling back would not yield actionable evidence within the phase budget.
+
+No other open idea directly overlaps with this race condition. Idea 000087 (session registry for inject/read HTTP API) is about extending the registry's surface, not fixing its concurrency. Idea 000099 (demo-terminal PTY test failures) is an environmental issue, unrelated.
+
+</details>
 
 ---
 
 ## 000096 · Document or reconcile D_SYSTEM_DEMO_SHELL override vs per-session shell selection
 
-**Created 2026-09-10T21:17:49-04:00 · Status: `open`**
+**Created 2026-09-10T21:17:49-04:00 · Status: `triaged`**
 
 With the operator-side D_SYSTEM_DEMO_SHELL override set (ADR-013 backward-compatibility), a workbench client selecting shell=bash gets the override executable instead of bash — proven live in phase-wb-01's W01-A review (override /usr/bin/whoami ran whoami). Not client-exploitable and intentional per the code's own comment, but 'select bash' not meaning 'run bash' will surprise an operator. Candidate: document the interaction in the demo terminal OPS document, or make the override apply only when no explicit shell is requested. Recorded via the PROMPT-023 enhancement lane (record, do not build).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:42-04:00): ## Finding
+
+000096 identifies a precedence gap between the D_SYSTEM_DEMO_SHELL environment override and per-session shell selection on the workbench terminal. The issue is documented in the idea's body: when the override is set, a client selecting "bash" receives the override executable instead — proven live in phase-wb-01's W01-A adversarial review (where override /usr/bin/whoami correctly ran whoami). This behavior is intentional per code comments and is not a security vulnerability, but the lack of documentation could surprise operators who expect shell selection to override environment config.
+
+**Related governed documents:**
+- ADR-014 (workbench terminal capability): establishes "The shell is selected per session over the existing adapter override" and mentions the allowlist validation, but does not address the precedence question or document the D_SYSTEM_DEMO_SHELL interaction.
+- REQ-007 W12 (workbench requirements): covers shell-selection test coverage ("the shell-selection plumbing passes the requested shell to the adapter override"), confirming the precedence is known, but does not document operator-facing behavior.
+- REQ-006 R04 (live demo requirements): mentions "a config override selects the shell" but does not clarify what "override" means when a client also requests a shell explicitly.
+- OPS-013 (demo reset procedure): handles demo stage preparation but does not document shell override precedence.
+
+**Related ideas:**
+- 000087 (terminal interaction API): broader terminal capability scope, but focused on outside-the-page API surface rather than shell selection semantics.
+- 000095 (close session-cap TOCTOU window): addresses a different terminal issue (session registry concurrency).
+- 000099 (PTY test failures): environmental issue with test execution, unrelated to override precedence.
+
+The idea proposes two candidates: (1) document the D_SYSTEM_DEMO_SHELL override behavior in the OPS documentation, or (2) change the override to apply only when no explicit shell is requested. This is a design choice at the boundary between backward compatibility (the override was introduced for backward-compatibility in ADR-013) and user-facing clarity (selecting "bash" should mean bash). Neither approach is obviously superior without weighing operator surprise against compatibility stability, which is an owner decision.
+
+**No overlapping idea found.** The triage record in backlog.yaml confirms 000096 was recorded via the PROMPT-023 enhancement lane during workbench build work and appropriately left for owner review rather than implemented during that phase.
+
+</details>
 
 ---
 
 ## 000097 · Session-failure tracking system that derives anti-pattern rules for future sessions
 
-**Created 2026-09-10T21:41:38-04:00 · Status: `open`**
+**Created 2026-09-10T21:41:38-04:00 · Status: `triaged`**
 
 The owner requested this on 2026-09-10, during the workbench build, after a cluster of failures whose costs were avoidable in hindsight. The idea is a system that tracks session failures and computes anti-patterns from them, so that future sessions are more robust at identifying and handling errors.
 
@@ -4874,6 +5046,28 @@ The proposed system would capture failures like these as structured records: wha
 
 The open design question is where the capture happens — at session close, at checkpoint, or through a dedicated tool — and how the derived rules reach agents without bloating every session's context.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:57-04:00): Idea 000097 proposes a system to track session failures and derive anti-patterns that future sessions can apply to prevent similar failures.
+
+Related ideas and documents:
+
+Idea 000099 (Three demo-terminal PTY tests fail on dev and on origin) and idea 000129 (Fix the three pre-existing environmental PTY test failures) are concrete manifestations of the types of session failures that 000097 proposes to track. The body of 000097 explicitly mentions "A stale pyenv shim lock on the host (~/.pyenv/shims/.pyenv-shim) made three PTY tests fail deterministically for every agent" as a motivating example—this is the exact class of environmental failure that 000099 documents and 000129 addresses. Idea 000129 already links to both 000097 and 000099, establishing the relationship pattern.
+
+Idea 000051 (Agent harness and guardrails) addresses related reliability concerns but focuses on constraining agent behavior within existing guardrails (hooks, settings, gating) rather than learning from failures that escape them.
+
+Plan 008 (Session opening and closing protocols) covers session lifecycle management but does not address failure tracking or anti-pattern derivation. Plan 001 (Agent Memory System) establishes the brain/ system for general shared knowledge, but does not propose a failure-specific tracking mechanism or anti-pattern derivation.
+
+No related plan, requirement, or ADR found that proposes the failure-tracking system with anti-pattern derivation that 000097 describes. The brain/ memory system and agent guardrails infrastructure exist, but the explicit workflow for capturing session failures as structured records and deriving rules from them remains unspecified in governed documents.
+
+PROPOSED LINK: 000097 --relates_to--> 000099 (000099 is a concrete example of the session failure pattern 000097 proposes to track and learn from)
+
+</details>
+
 **Links**
 
 - relates_to ← `000129`
@@ -4882,9 +5076,31 @@ The open design question is where the capture happens — at session close, at c
 
 ## 000098 · Ship the layout-schema test ADR-016 promised
 
-**Created 2026-09-10T22:18:33-04:00 · Status: `open`**
+**Created 2026-09-10T22:18:33-04:00 · Status: `triaged`**
 
 ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T20:39:45-04:00): Idea 000098 asks to ship the layout JSON schema and validation test that ADR-016 promised.
+
+**Where the promise originated:** ADR-016 (workbench layout persistence), consequence section, line 59: "the layout JSON schema is asserted by a test so a malformed layout file fails before it ships." REQ-007 W16 strengthens this as a specific verification requirement: "A test asserts the layout files' bumped schema_version and per-panel eligibility shape."
+
+**Current state:** Layout files exist at _data/workbench/layouts/layout-1.json and layout-2.json with schema_version: 1. The W02-A adversarial review (recorded in backlog.yaml) identified this as minor finding 3: "an unbuilt layout-schema test, recorded as idea 000098 by the coordinator." The review noted it was left unbuilt in-phase because test/ files sit outside phase-wb-02's declared deliverable paths, not because the work was intentionally deferred.
+
+**What's missing:** No schemas/*layout* JSON Schema definition exists, and no test file validates that both shipped layouts conform to the schema or that the W06 invariants hold (every grid.areas token names a real slot; every panel type is admitted by exactly one slot per layout).
+
+**Related broader work:** Ideas 000001 (test fixtures for HTML generation), 000057 (testing strategy), 000052 (schema-driven consistency), 000035 (contract compiler and mutation-driven fixtures), and 000024 (schema validation coverage) all touch schema testing across the system. None of them specifically propose or cover the layout schema itself. Idea 000057 frames the gap: "no test runner or lint gate for ts/... and no systematic approach ties schema changes to fixture/contract regeneration." The layout schema is a concrete case of that broader gap, but the promise it fulfills is specific to ADR-016 and REQ-007.
+
+**Related governed documents:** ADR-016 promises the test (consequence section); REQ-007 W16 specifies its verification method; backlog.yaml phase-wb-02 section records it as surfaced but deferred; PLAN-004 (reliability follow-up) and PLAN-009 (capture-build) establish the principle that schemas precede code.
+
+No existing plan, requirement, decision or other idea fully covers the concrete ask to ship the layout schema and its validation test.
+
+</details>
 
 ---
 
@@ -5028,6 +5244,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T18:01:55-04:00): Batch extended 2026-09-11 with five agent-scouted, owner-approved companions: 000117 (Popover-wide fix scope, extends 000108), 000118 (COMPATIBLE_EXTENSIONS gate for markdown), 000119 (markdown render-location decision), 000120 (batch panel-bridge for categories), 000121 (cache invalidation vs demo-week overview regeneration, extends 000114). Scout also confirmed terminal reconnect is already idea 000087 and the bookmark-store write ADR is inside 000111.
 - **note** by repository-owner (2026-09-11T19:32:52-04:00): Batch extended 2026-09-11 (evening): 000123 (audit the pre-build HTML generation plans against the built reality - accomplished/open/superseded/retire disposition per requirement) and 000124 (formalize the system's vocabulary - e.g. the terminal slot is named after its initial occupant, wrong once panels are assignable; governed glossary plus rename-vs-alias migration). 000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names.
 - **note** by repository-owner (2026-09-11T19:40:47-04:00): Batch reframed 2026-09-11 (000125): the batch has outgrown one plan - the planning session opens with holistic triage of ALL these ideas (categorize, prioritize, group into multiple plans with an ordering across them) before any deep-dive development. Added: 000126 (thorough audit of commands/skills/agents - codebase design first, demo effectiveness second), 000127 (idea skill delegates capture to a subagent to protect main-session context; one instance of a recurring owner pattern), 000128 (shared state model for multi-agent planning sessions).
+- **note** by repository-owner (2026-09-11T20:41:03-04:00): Batch extended 2026-09-11 (night): rotator-panel set - 000130 (help-tooltip cutoff at panel bottom + font-size/text-capacity rethink; likely another 000117 Popover consumer), 000131 (horizontal auto-scroll ticker for longer texts, possibly a substitute panel), 000132 (rotate images, not just text); plus 000133 (revisit slot geometries and custom reconfiguration - explicitly FUTURE phase, lower priority than any demo work; per-slot constraints and resize-vs-content effects) and 000134 (content-fit audit of all slots/panels producing enforced methodologies, not spot fixes). Priority note from the owner: 000133 yields to demo-specific fixes; 000130 is a live display bug worth demo-week attention.
 
 **Links**
 
@@ -5127,6 +5344,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 
 - relates_to ← `000116`
 - relates_to ← `000124`
+- relates_to ← `000134`
 
 ---
 
@@ -5152,6 +5370,7 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), extending ide
 **Links**
 
 - extends → `000108`
+- relates_to ← `000130`
 
 ---
 
@@ -5232,6 +5451,7 @@ Owner request, 2026-09-11, for the next workbench prompt-pack planning session (
 
 - relates_to → `000115`
 - relates_to → `000116`
+- relates_to ← `000133`
 
 ---
 
@@ -5290,3 +5510,67 @@ Owner request, 2026-09-11. The full pytest suite has carried the same three fail
 
 - relates_to → `000097`
 - relates_to → `000099`
+
+---
+
+## 000130 · Rotator help tooltip cut off at the panel bottom; rethink its font size and text capacity
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+
+Owner report, 2026-09-11, for the planning triage (batch anchor 000108). In the top-right rotating-text panel (the talking-points rotator), hovering the question-mark tooltip opens a popup dialog that cuts off at the bottom of the panel - the bottom portion is unreadable. Fix the cutoff, and at the same time reconsider the panel's font size and how much text realistically fits in that area. Likely the same shared Popover positioning/height math as idea 000117 (the popup-sizing bug lives in ts/src/stage/Popover.tsx with many consumers) - verify rather than assume, but if so, this is another consumer the 000117 fix must cover, plus rotator-specific typography decisions.
+
+**Links**
+
+- relates_to → `000117`
+- relates_to ← `000131`
+
+---
+
+## 000131 · Rotator variant: horizontally auto-scrolling text for longer entries
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the top-right rotating-text panel: support longer texts with text that automatically scrolls horizontally, right to left (ticker/marquee style), instead of truncating or overflowing. May be an expansion of the existing rotator or a different panel that can be substituted into that slot - the per-panel eligibility model phase-wb-09 ships (REQ-007 W16) makes a substitute panel a natural fit. Design points: scroll speed and readability, pausing on hover, and how rotation-between-entries interacts with scrolling-within-an-entry.
+
+**Links**
+
+- relates_to → `000130`
+- relates_to ← `000132`
+
+---
+
+## 000132 · Rotator variant: rotate images through the panel, not just text
+
+**Created 2026-09-11T20:40:50-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108). For the same top-right rotating panel: the ability to rotate images through it instead of only text entries - e.g. charts, logos or figures cycling on the same cadence the text rotator uses. Design points: where the image set comes from (a directory, a bookmark category once idea 000111 exists, or generated overview figures), sizing/letterboxing inside the small panel, and whether text and image entries can mix in one rotation.
+
+**Links**
+
+- relates_to → `000131`
+
+---
+
+## 000133 · Revisit slot geometries and custom layout reconfiguration - future phase, after the demo
+
+**Created 2026-09-11T20:40:51-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), explicitly LOWER priority than any demo-specific fix or update - a future phase, not for the 2026-09-15 demo. Revisit the slot-geometry customization originally discarded from the workbench design (geometry editing was deliberately excluded from the configuration dialog per REQ-007 W16 and ADR-016). When it is revisited, the owner's stated requirement: consider the constraints on each slot, and how resizing slots to fit different layouts affects the content inside them - a shell's rows/cols reflow, an iframe's scaling, an explorer tree's visible depth. Geometry work should build on the formalized slot vocabulary (idea 000124) and the content-fit methodology audit recorded alongside this idea, so constraints are stated per slot role rather than per current occupant.
+
+**Links**
+
+- relates_to → `000124`
+- relates_to → `000134`
+
+---
+
+## 000134 · Audit all slots and panels for content fit, with a methodology for preventing visibility issues
+
+**Created 2026-09-11T20:40:51-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). A general audit of the available slots and panels and the content they contain, producing methodologies - not just spot fixes - for making sure content fits its panel and there are no visibility issues in how it is displayed. The session's evidence base is already rich: the wb-08 height-collapse (idea 000104), the File Browser clip (W18), the rotator tooltip cutoff, the popup height floor (000117), and the ~98px chrome offset that defeats naive fill checks. The methodology half should define per-panel content-fit contracts (what overflows, what scrolls, what truncates, what reflows), how they are asserted mechanically (the Playwright fill/scroll checks generalized), and how new panels inherit them - so fit bugs are caught by contract, not by owner reports. Feeds the geometry revisit recorded alongside this idea and the duplication audit 000115.
+
+**Links**
+
+- relates_to → `000115`
+- relates_to ← `000133`
