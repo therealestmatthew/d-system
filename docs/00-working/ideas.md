@@ -6436,6 +6436,10 @@ Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning tria
 
 Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's global-cap refusal in src/api/routes/demo_terminal.py closes the websocket BEFORE accept() (code 4001), and uvicorn converts a pre-accept close into an HTTP 403 handshake rejection - so the browser receives CloseEvent code 1006 with an empty reason and can never display the structured refusal (or the session count). The frontend now infers the refusal structurally (socket closed without ever opening) and shows a generic could-not-start message. The proper fix is backend: accept first, then close with the structured frame - exactly the pattern _refuse_shell_request already uses for unavailable shells - so the panel can quote the real reason. Small, ADR-014-adjacent change; was out of scope for the wb-09 frontend item that discovered it.
 
+**Links**
+
+- relates_to ← `000140`
+
 ---
 
 ## 000138 · System for tracking and managing agent anti-patterns
@@ -6443,6 +6447,10 @@ Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's glo
 **Created 2026-09-11T22:45:55-04:00 · Status: `open`**
 
 Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Build a system that tracks and manages agent anti-patterns - the recurring failure modes of dispatched agents - so each one is recorded once, detected when it recurs, and fed back into how future work is authored. The 2026-09-11 build session alone produced a starter catalog: dispatches scoped past the turn budget (seven truncations across two phases; brain/procedures/scope-dispatches-to-the-turn-budget.md), fixing runtime behavior from assumption instead of measurement (brain/procedures/runtime-behavior-needs-runtime-evidence.md), validators poisoned by their own stale browser state (idea 000107's artifact), orphaned dev servers left by cut-off agents, and orchestrators lacking a resume path for truncated subagents. Today these live as scattered brain procedures, idea annotations and session-record notes; the system should give them one home with a shape per entry (name, signature/how it manifests, root cause, prevention, occurrences with dates), a lightweight way for any coordinator/orchestrator to log a new occurrence mid-session, and a standing step in pack authoring and the commands/skills/agents audit (000126) that checks new prompts against the catalog. Relates to the shared state model (000128) - an occurrence log is exactly the kind of cross-agent state it would carry.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-11T22:49:41-04:00): Owner addition 2026-09-11: the anti-pattern system should include a track-anti-pattern SKILL - a sanctioned, low-friction way to log a new anti-pattern occurrence (or a new pattern) from inside any session, the way the idea skill captures ideas. Candidate shape: a .claude skill wrapping the catalog's writer so coordinators/orchestrators/agents record occurrences mid-session without breaking their flow; pairs with idea 000127's principle that mechanical capture work runs in a subagent to protect main-session context.
 
 **Links**
 
@@ -6461,3 +6469,15 @@ Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Create
 
 - relates_to → `000138`
 - relates_to → `000126`
+
+---
+
+## 000140 · Learn websockets: an owner-education deep dive grounded in this repository's terminal stack
+
+**Created 2026-09-11T22:49:41-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, for their own education - not a build item. Investigate how websockets actually work, using the D-System terminal stack as the concrete study material since it exercises the full lifecycle end to end: the browser's WebSocket API and its open/close/error events (the lifecycle traces from the 2026-09-11 gate work are real worked examples), the HTTP upgrade handshake and what a pre-accept rejection looks like on the wire (idea 000137's 403-vs-close-frame distinction), FastAPI/uvicorn's server-side accept/close semantics, close codes (1006 vs 4000+ application codes) and why reasons sometimes cannot reach the client, per-connection state and the six-session registry, and how React component lifecycles interact with socket lifetimes (the portal remount lesson from phase-wb-09). Output could be a personal explainer document or annotated walkthrough of src/api/routes/demo_terminal.py and ts/src/stage/TerminalRegion.tsx - whatever teaches best.
+
+**Links**
+
+- relates_to → `000137`
