@@ -165,6 +165,7 @@ draft — Pass 1 in progress
 | Evidence combined directly with argumentation-framework structure (H3, H4) | Evidential-based higher-order set argumentation framework | `evidential-higher-order-set-argumentation-framework-2026` |
 | Typed-transition provenance generalized to attacks on attacks | AFRA: argumentation framework with recursive attacks | `afra-argumentation-framework-recursive-attacks` |
 | Mature tooling answering this domain's implementation-availability question | Dung-style AF semantics solver (conflict-free / admissible / complete / preferred / grounded / stable) | `afsolver-oss-github` |
+| Corroborating/reinforcing relation between knowledge states, formalized as independent of and paired with the conflict relation (H3 attack side vs. H4 convergence side) | Bipolar argumentation framework's support relation, paired with and independent of the attack relation | Cayrol, Lagasquie-Schiex, ECSQARU 2005 (`cayrol-lagasquie-schiex-bipolar-argumentation-acceptability-2005`) — the foundational paper pairing attack and support as independent relations, extending Dung's framework already anchored above; applied to explanation-generation in `computing-argumentative-explanations-bipolar-argumentation-2019` and extended to collective multi-argument relations in `splitting-argumentation-frameworks-collective-attacks-supports-2026` |
 
 ## D13 — Truth discovery
 
