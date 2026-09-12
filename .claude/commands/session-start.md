@@ -163,6 +163,11 @@ is precisely why it has to be deliberate.
 
 Perform these in order, in the worktree. Do not skip ahead to the merge.
 
+These are `AGENTS.md`'s *Concurrent agents: complete and hand off* steps, minus its steps 4 and 5 —
+confirming each `acceptance` condition and writing `status: complete` on the phase. Those belong to
+`/session-close` and its independent review, and a session that writes them here has skipped that
+review. Where this list and `AGENTS.md` differ, `AGENTS.md` wins.
+
 1. Run every command in the phase's `verification` list and keep the **real output**. A failing check
    is a result to record, not a step to retry until quiet.
 2. Write the session record (`kind: session`), with its code from
@@ -173,10 +178,13 @@ Perform these in order, in the worktree. Do not skip ahead to the merge.
    after the rebase, against peers' merged work — is the one that decides whether the branch may
    integrate.** If it fails, fix it on the branch; never integrate a red rebase.
 5. Confirm the primary checkout is clean: `git -C /code/d-system status --short` shows nothing.
-   **Never `git stash` a peer's uncommitted work and never force an integration around it.**
+   **Never `git stash` a peer's uncommitted work and never force an integration around it.** Four
+   worktrees may be live at once; uncommitted changes in the primary checkout are someone's work in
+   progress, to be reported and waited on, never tidied away.
 6. **Ask the owner before merging into `dev`.** The merge onto the trunk is the owner's call —
-   `AGENTS.md`'s confidentiality section is explicit that this is the gate, and the push that backs
-   up your branch is not. If the owner declines or is not present, leave the branch unmerged and
+   `AGENTS.md` says so in both its confidentiality section and its hand-off step 8, and the push
+   that backs up your branch is not the gate. A green branch on a clean `dev` is *ready* to
+   integrate, not cleared to. If the owner declines or is not present, leave the branch unmerged and
    report that it is ready for review, naming the command that shows it:
    `git diff dev..agent/<phase-id>`.
 
