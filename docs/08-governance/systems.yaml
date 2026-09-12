@@ -277,3 +277,18 @@ systems:
     checked open-plan coverage. Bounded concurrent claims require disjoint systems, deliverable paths
     and dependency chains. It cannot see whether an agent's actual edits strayed outside a phase's
     declared systems and deliverables — that boundary is enforced by diff review, not the checker.
+- id: sys-research
+  name: Research corpus and literature review
+  domain: memory
+  status: scaffold
+  owner: repository-owner
+  paths:
+  - research
+  depends_on: []
+  description: The D-System research corpus - the frozen pre-literature baseline and hypothesis
+    register, the adversarial codebase review, the content methodology under research/literature-review/
+    and research/protocols/, and the seed source ledgers. Campaign agents treat the baseline and
+    seed ledgers as read-only per the PROMPT-027 inventory marks; the literature-review phases
+    write only the thirteen campaign deliverables, the evidence matrix, the source inventory and
+    the reproducibility ledger, all under research/literature-review/ and the locations the
+    evidence contract (PLAN-023.03) fixes.

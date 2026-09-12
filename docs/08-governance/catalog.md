@@ -83,6 +83,10 @@ CI regenerates it and fails on any difference.
 | PLAN-020 | plan | draft | repository-owner | docs/01-plans/PLAN-020-portable-agent-workflows.md |
 | PLAN-021 | plan | draft | repository-owner | docs/01-plans/PLAN-021-live-demo.md |
 | PLAN-022 | plan | active | repository-owner | docs/01-plans/PLAN-022-workbench.md |
+| PLAN-023 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023-overview.md |
+| PLAN-023.01 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md |
+| PLAN-023.02 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.02-search-domain-matrix.md |
+| PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -111,6 +115,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-026 | prompt | active | repository-owner | docs/02-prompts/PROMPT-026-idea-batching-pack-factory.md |
 | PROMPT-027 | prompt | active | repository-owner | docs/02-prompts/PROMPT-027-literature-review-pre-plan-package.md |
 | PROMPT-028 | prompt | active | repository-owner | docs/02-prompts/PROMPT-028-literature-review-pack-factory.md |
+| PROMPT-029 | prompt | active | repository-owner | docs/02-prompts/PROMPT-029-literature-review-delegation-pack.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -219,6 +224,10 @@ CI regenerates it and fails on any difference.
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 0 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
+| PLAN-023 | doc-lit-campaign | draft | 7 | 0 | 0 | — |
+| PLAN-023.01 | doc-lit-campaign-scope | draft | 7 | 0 | 0 | — |
+| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 7 | 0 | 0 | — |
+| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 7 | 0 | 0 | — |
 
 ## Held codes
 
@@ -228,4 +237,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-174 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 28, requirement: 7, session: 63.
+179 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 37, prompt: 29, requirement: 7, session: 63.

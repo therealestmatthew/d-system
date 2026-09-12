@@ -6009,3 +6009,324 @@ items:
     578 passed post-rebase. Independent close review: both acceptance conditions
     HOLD; three bookkeeping discrepancies (stale pre-rebase hash, uncommitted
     verification-count correction, unpushed rebase) resolved in the close commit.'
+- id: phase-lit-01
+  title: Literature review Pass 1a — broad map of knowledge representation, provenance
+    and epistemics domains
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Execute the delegation pack's LIT-01 section verbatim - kickoff K creates the
+    reproducibility ledger and source inventory at the evidence contract's locations,
+    then the S/X pairs sweep matrix domains D01-D06, D07-D20 and D28-D32 (knowledge
+    graphs through event sourcing, belief revision through micropublications, data
+    lineage through ontology evolution) with the terminology variants and collision
+    queries the search-domain matrix assigns to each.
+  - Every search appends a ledger row with its domain id; extraction fills source-inventory
+    rows only from sources the paired search logged. Web search and free/open endpoints
+    only; paywalled sources assessed from abstract, preprint or secondary coverage
+    with the access limitation recorded.
+  - Draft terminology-map entries for the domains swept. No deep reading, no hypothesis
+    verdicts, no architecture revision - collisions are recorded, never resolved here.
+  acceptance:
+  - The ledger and source inventory exist at the evidence contract's paths and every
+    matrix domain D01-D06, D07-D20, D28-D32 has at least two ledger rows with distinct
+    terminology variants.
+  - Candidate sources for these domains are in the inventory with inclusion or exclusion
+    rationale; no evidence row cites a generated summary as evidence.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-01 G (PROMPT-029) and record real output - per-domain
+    ledger counts for D01-D20 and D28-D32 with at least two distinct queries each, zero
+    excluded inventory rows missing a reason, zero kept-but-uninventoried sources
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  next_action: Await campaign kick-off (GOV-009 stages 5-8); dispatch delegation-pack
+    section LIT-01 K first.
+- id: phase-lit-02
+  title: Literature review Pass 1b — broad map of agent memory, decision intelligence
+    and requirements-engineering domains
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-01
+  scope:
+  - Execute the delegation pack's LIT-02 section verbatim - S/X pairs sweep matrix
+    domains D21-D27 and D33-D45 (agent memory through decision intelligence, requirements
+    engineering through change impact analysis) with their assigned terminology variants
+    and collision queries, appending to the ledger and inventory phase-lit-01 created.
+  - Same evidence hygiene as phase-lit-01 - ledger row per search with domain id,
+    provider constraint, access limitations recorded, generated summaries as leads
+    only.
+  - Extend the terminology-map draft for the domains swept. No deep reading, no verdicts.
+  acceptance:
+  - Every matrix domain D21-D27 and D33-D45 has at least two ledger rows with distinct
+    terminology variants.
+  - Candidate sources for these domains are in the inventory with inclusion or exclusion
+    rationale.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-02 G (PROMPT-029) and record real output - per-domain
+    ledger counts for D21-D27 and D33-D45 with at least two distinct queries each, zero
+    excluded inventory rows missing a reason, zero kept-but-uninventoried sources
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  next_action: Dispatch delegation-pack section LIT-02 after phase-lit-01 completes.
+- id: phase-lit-03
+  title: Literature review Pass 1c — broad map of digital-thread, specification and
+    agentic-SE domains; close Pass 1
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-02
+  scope:
+  - Execute the delegation pack's LIT-03 section verbatim - S/X pairs sweep matrix
+    domains D46-D72 (model-based systems engineering through DevOps traceability,
+    including agentic software engineering, planning and the runtime-feedback domains)
+    with their assigned terminology variants and collision queries.
+  - Close Pass 1 - finalize the terminology map (01) and domain map (02), flag the
+    top-20 collision candidates in the source inventory and list them in the domain
+    map, and run the LIT-03 G gate measuring Pass 1 stop conditions against the ledger.
+  - Same evidence hygiene as the prior phases. No deep reading, no verdicts.
+  acceptance:
+  - Every one of the 72 matrix domains has at least two ledger rows with distinct
+    terminology variants, measured from the ledger's domain-id column, and the candidate
+    inventory holds at least 75 sources across all domains.
+  - 01_terminology_map.md and 02_domain_map.md are complete for all 72 domains and
+    the top-20 collision candidate list exists with component/architecture pre-scores.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-03 G (PROMPT-029) and record real output - all 72 domains
+    with at least two distinct-query ledger rows, at least 75 kept inventory candidates, the
+    domain map complete with all 72 entries and a ranked top-20 collision list
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/01_terminology_map.md
+  - research/literature-review/02_domain_map.md
+  next_action: Dispatch delegation-pack section LIT-03 after phase-lit-02 completes.
+- id: phase-lit-04
+  title: Literature review Pass 2a — deep-read the top collision candidates
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-03
+  scope:
+  - Execute the delegation pack's LIT-04 section verbatim - create the evidence matrix
+    at the evidence contract's path and deep-read the top collision candidates (roughly
+    the top 15 by pre-score), filling every extraction-schema field including strongest
+    overlap, strongest difference, hypotheses challenged, evidence locator, interpretation
+    confidence and access limitation.
+  - Backward citation chaining on each candidate - identify theoretical ancestors
+    and record shared-ancestor lineage so derivative sources are never counted as
+    independent.
+  - Apply the two similarity scores and flag CRITICAL_COLLISION rows per the methodology's
+    rules. Collisions are recorded, not resolved; no hypothesis verdicts yet.
+  acceptance:
+  - The evidence matrix exists with a fully populated row for each deep-read candidate;
+    no required field is blank and every row carries an evidence locator to primary
+    material.
+  - Every CRITICAL_COLLISION flag traces to the scoring rules and backward chaining
+    is logged in the ledger for each deep-read source.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-04 G (PROMPT-029) and record real output - a matrix row
+    for every batch id, zero blank required fields, every critical-collision row marked
+    second_review pending, a backward-chaining ledger row for every deep-read source
+  deliverables:
+  - research/literature-review/04_evidence_matrix.csv
+  next_action: Dispatch delegation-pack section LIT-04 after phase-lit-03 completes.
+- id: phase-lit-05
+  title: Literature review Pass 2b — deep-read foundational works and complete the
+    evidence matrix
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-04
+  scope:
+  - Execute the delegation pack's LIT-05 section verbatim - deep-read the remaining
+    strongest sources (foundational works and standards the top candidates inherit
+    from) to bring the deeply-compared total to the methodology's 20-30, completing
+    the evidence matrix.
+  - Forward citation chaining on the strongest collision candidates - extensions,
+    critiques, implementations - with chain decisions logged in the ledger.
+  - Run the LIT-05 G gate measuring Pass 2 stop conditions - 20-30 sources deeply
+    compared, chaining complete on the strongest collisions - against the matrix
+    and ledger.
+  acceptance:
+  - The evidence matrix holds 20-30 fully populated rows and both chaining directions
+    are logged for the strongest collision candidates.
+  - Derivative-ancestry lineage is recorded wherever multiple sources inherit one
+    mechanism.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-05 G (PROMPT-029) and record real output - 20-30 total
+    matrix rows with zero blank required fields, both chaining directions logged for every
+    row scoring 3 or higher, derivative_ancestor filled everywhere, and the list of any
+    hypotheses still lacking a challenger
+  deliverables:
+  - research/literature-review/04_evidence_matrix.csv
+  next_action: Dispatch delegation-pack section LIT-05 after phase-lit-04 completes.
+- id: phase-lit-06
+  title: Literature review Pass 3 — adversarial hypothesis testing and collision second
+    reviews
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-05
+  scope:
+  - Execute the delegation pack's LIT-06 section verbatim - for each hypothesis H1-H11,
+    run the matrix's pre-crafted Phase E collision queries plus any gap-driven variants,
+    identify the strongest prior-art challenger, and articulate the best argument
+    that D-System is not distinct.
+  - Write 05_critical_collisions.md and 06_hypothesis_tests.md using only the pack's
+    status vocabulary - LIKELY_ALREADY_KNOWN, KNOWN_COMPONENT_NEW_INTEGRATION, POTENTIALLY_DISTINCT,
+    INSUFFICIENT_EVIDENCE; NOVEL only under the stronger-scrutiny rule; "no prior
+    work exists" is not a permitted verdict.
+  - Dispatch the R second review for every CRITICAL_COLLISION to an agent that did
+    not produce the first assessment, passing the source and the evidence row, never
+    the first rationale. Run the LIT-06 G gate.
+  acceptance:
+  - 06_hypothesis_tests.md gives every H1-H11 a strongest challenger, evidence, assessment
+    and a status from the permitted vocabulary, each traceable to evidence-matrix
+    rows.
+  - Every CRITICAL_COLLISION in 05_critical_collisions.md carries a recorded independent
+    second review; disagreements are recorded, not averaged away.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-06 G (PROMPT-029) and record real output - all eleven
+    hypotheses with a challenger block and permitted status, zero pending second reviews,
+    at least two hypothesis-id ledger rows per hypothesis, and the measured duplicate rate
+    as the saturation signal
+  deliverables:
+  - research/literature-review/05_critical_collisions.md
+  - research/literature-review/06_hypothesis_tests.md
+  next_action: Dispatch delegation-pack section LIT-06 after phase-lit-05 completes.
+- id: phase-lit-07
+  title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
+    bibliography
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  systems:
+  - sys-research
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-06
+  scope:
+  - 'Entry condition (ratified decision 3, PROMPT-027): the owner''s one campaign
+    check-in happens before this phase starts - it does not begin, even if ready,
+    until the kick-off record''s pre-synthesis check-in is held.'
+  - Execute the delegation pack's LIT-07 section verbatim - write the anti-novelty
+    case (07) first, then only after it the surviving distinctions (08), then reuse
+    recommendations (09), architecture implications (10), open research questions
+    (11) and experiment proposals (12).
+  - Promote seed sources through the methodology's five verification steps into 13_validated_bibliography.md;
+    the historical seed ledger is never altered. Dispatch the A adversarial synthesis
+    review against the evidence matrix, apply at most two fix cycles, and run the
+    final G gate measuring the full stop conditions.
+  acceptance:
+  - All seven synthesis deliverables (07-13) exist; every synthesis claim traces to
+    a primary source with a locator, and 08 lists only distinctions that survive
+    07's strongest decomposition argument.
+  - The A review ran against the evidence matrix and its findings are applied or recorded;
+    the final gate measurements show the methodology's stop conditions met against
+    the ledger and matrix, demonstrated rather than declared.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run delegation-pack section LIT-07 G (PROMPT-029), the final gate, and record real
+    output - all nine stop-condition measurements taken against the ledger, inventory,
+    matrix and deliverables, including the saturation trend and zero outstanding blocking
+    findings from the A review
+  deliverables:
+  - research/literature-review/07_anti_novelty_case.md
+  - research/literature-review/08_surviving_distinctions.md
+  - research/literature-review/09_reuse_recommendations.md
+  - research/literature-review/10_architecture_implications.md
+  - research/literature-review/11_open_research_questions.md
+  - research/literature-review/12_experiment_proposals.md
+  - research/literature-review/13_validated_bibliography.md
+  next_action: Hold the pre-synthesis owner check-in (ratified decision 3), then dispatch
+    delegation-pack section LIT-07.
