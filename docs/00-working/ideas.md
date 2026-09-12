@@ -989,6 +989,7 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 
 - relates_to ← `000028`
 - relates_to ← `000031`
+- relates_to ← `000128`
 
 ---
 
@@ -1090,6 +1091,10 @@ Related: PLAN-015 (emphemeral working plans, describes _tmpagent/ protocol), AGE
 The governance question is whether a tracked file meant to be read by agents in sibling worktrees, with an explicit protocol documented in a plan and cross-referenced in AGENTS.md, belongs in the maturity/component registry. No decision has been recorded either way.
 
 </details>
+
+**Links**
+
+- relates_to ← `000128`
 
 ---
 
@@ -2077,6 +2082,7 @@ No existing backlog phase covers this ground: the `phase-idea-*` track (phase-id
 - relates_to ← `000018`
 - relates_to ← `000049`
 - relates_to ← `000072`
+- relates_to ← `000125`
 
 ---
 
@@ -2628,6 +2634,7 @@ No related plan, phase or document found that already addresses a coherent testi
 - relates_to → `000026`
 - relates_to → `000001`
 - relates_to → `000035`
+- relates_to ← `000106`
 
 ---
 
@@ -4040,6 +4047,7 @@ PROPOSED LINK: 000077 --relates_to--> 000080 (both address agent truncation; 080
 - relates_to → `000080`
 - relates_to ← `000080`
 - relates_to ← `000082`
+- relates_to ← `000128`
 
 ---
 
@@ -4455,6 +4463,7 @@ PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents 
 - relates_to → `000072`
 - relates_to → `000025`
 - relates_to → `000077`
+- relates_to ← `000128`
 
 ---
 
@@ -4490,6 +4499,7 @@ The template library idea is not formally linked to PLAN-003 yet, though it clea
 **Links**
 
 - relates_to ← `000084`
+- relates_to ← `000092`
 
 ---
 
@@ -4527,6 +4537,8 @@ PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building b
 
 - relates_to → `000083`
 - relates_to ← `000085`
+- relates_to ← `000092`
+- relates_to ← `000132`
 
 ---
 
@@ -4576,6 +4588,7 @@ PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable librari
 **Links**
 
 - relates_to → `000084`
+- relates_to ← `000092`
 
 ---
 
@@ -4677,6 +4690,10 @@ This idea's status should reflect its nature: it is a demo fixture recorded for 
 
 </details>
 
+**Links**
+
+- relates_to ← `000090`
+
 ---
 
 ## 000089 · Demo fallback: audience idea seeded by tools/demo_reset.py
@@ -4746,6 +4763,10 @@ This idea has completed its intended role: validating the /idea step's execution
 PROPOSED LINK: 000090 --relates_to--> 000088 (parallel rehearsal timing test from earlier dry-run in same phase)
 
 </details>
+
+**Links**
+
+- relates_to → `000088`
 
 ---
 
@@ -4875,6 +4896,13 @@ PROPOSED LINK: 000092 --relates_to--> 000085 (color palettes are extraction scop
 
 </details>
 
+**Links**
+
+- relates_to → `000083`
+- relates_to → `000084`
+- relates_to → `000085`
+- relates_to ← `000093`
+
 ---
 
 ## 000093 · Governance atlas page in the atlas design
@@ -4915,6 +4943,10 @@ No existing plan document yet covers the governance atlas page. The work is expl
 PROPOSED LINK: 000093 --relates_to--> 000092 (governance page would consume the atlas template family extracted by the designer agent)
 
 </details>
+
+**Links**
+
+- relates_to → `000092`
 
 ---
 
@@ -5070,6 +5102,7 @@ PROPOSED LINK: 000097 --relates_to--> 000099 (000099 is a concrete example of th
 
 **Links**
 
+- relates_to → `000099`
 - relates_to ← `000129`
 
 ---
@@ -5159,6 +5192,7 @@ PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the pa
 
 **Links**
 
+- relates_to ← `000097`
 - relates_to ← `000129`
 
 ---
@@ -5221,6 +5255,11 @@ PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass thi
 
 </details>
 
+**Links**
+
+- relates_to → `000104`
+- relates_to → `000134`
+
 ---
 
 ## 000102 · Rehearsal idea from demo-validator-web dry-run
@@ -5279,7 +5318,7 @@ No related plan, requirement, ADR or backlog phase beyond PLAN-022 and REQ-007 w
 
 ## 000104 · Workbench terminal panel renders clipped to ~85px (.xterm container height 0), hiding almost all live output
 
-**Created 2026-09-11T10:20:15-04:00 · Status: `triaged`**
+**Created 2026-09-11T10:20:15-04:00 · Status: `promoted` · became PLAN-022**
 
 Found during phase-wb-07 agent-driven rehearsal pass 2 (W07-R, demo-validator-web, 2026-09-11). Once a working terminal panel is selected and a Claude Code session is running inside it, the panel renders at a severely clipped height (~85px, about 2 visible text rows). Confirmed via getBoundingClientRect(): the .xterm container reports height: 0 while its child .xterm-screen reports height: 372.99 — a real CSS/layout sizing bug in the terminal panel, not a small window or a content issue. The session content is present and interactive (confirmed via .xterm-rows.innerText) but is not visible to a presenter without scripted inspection. This is new since rehearsal pass 1 and was not present there. This would wreck the live demo if unaddressed — the terminal panel is the primary visual surface for the entire live segment. Not fixed as part of phase-wb-07 (its deliverables are docs/00-working/demo-runbook.md and docs/00-working/demo-windows-setup.md only, not application code); recorded here for the owner to route to a build phase or hotfix. Likely touches the terminal panel's CSS/layout in ts/src/workbench (the .xterm/.xterm-screen sizing chain) — worth checking flex/height inheritance through the slot and panel containers.
 
@@ -5298,6 +5337,11 @@ No overlap with other ideas. The closest related ideas are 000130 (Rotator help 
 PROPOSED PROMOTION: 000104 -> PLAN-022 (Fix delivered and integrated in phase-wb-08, 17-line CSS change to StagePage.css, committed 2026-09-11)
 
 </details>
+
+**Links**
+
+- relates_to ← `000101`
+- relates_to ← `000134`
 
 ---
 
@@ -5350,6 +5394,11 @@ Related: 000057 (Testing strategy across the system) covers the broader testing 
 PROPOSED LINK: 000106 --relates_to--> 000057 (both address system testing strategy)
 
 </details>
+
+**Links**
+
+- relates_to → `000057`
+- relates_to ← `000121`
 
 ---
 
@@ -5490,6 +5539,7 @@ PROPOSED LINK: 000109 --relates_to--> 000119 (markdown rendering location decisi
 **Links**
 
 - relates_to → `000108`
+- relates_to → `000119`
 - relates_to ← `000119`
 
 ---
@@ -5548,12 +5598,13 @@ No related plan, requirement or ADR exists yet for the bookmark categories featu
 
 - relates_to ← `000112`
 - relates_to ← `000120`
+- relates_to ← `000132`
 
 ---
 
 ## 000112 · File Explorer: right-click option to open a file in the HTML Viewer
 
-**Created 2026-09-11T17:24:17-04:00 · Status: `triaged`**
+**Created 2026-09-11T17:24:17-04:00 · Status: `promoted` · became PLAN-022**
 
 Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 batch). File Explorer (File Browser panel) entries get a right-click context-menu option that opens the selected file in the HTML Viewer panel. Implies a cross-panel action channel (the browser telling the viewer what to load) that does not currently exist; pairs naturally with markdown rendering (so docs opened this way display formatted) and with bookmark categories (open-in-viewer from a category listing).
 
@@ -5690,6 +5741,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 **Links**
 
 - relates_to ← `000116`
+- relates_to ← `000120`
 - relates_to ← `000124`
 - relates_to ← `000134`
 - relates_to ← `000135`
@@ -5731,6 +5783,7 @@ PROPOSED LINK: 000116 --relates_to--> 000124 (both address code organization: 00
 **Links**
 
 - relates_to → `000115`
+- relates_to → `000124`
 - relates_to ← `000124`
 
 ---
@@ -5769,6 +5822,7 @@ This is a properly scoped refinement of 000108 that moves the owner's scheduling
 
 - extends → `000108`
 - relates_to ← `000130`
+- relates_to ← `000134`
 
 ---
 
@@ -5800,6 +5854,7 @@ PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdow
 
 - relates_to → `000110`
 - relates_to → `000112`
+- relates_to → `000119`
 
 ---
 
@@ -5831,6 +5886,8 @@ No related plan, requirement or ADR found that reserves or predetermines the ren
 
 - relates_to → `000109`
 - relates_to → `000110`
+- relates_to ← `000109`
+- relates_to ← `000118`
 
 ---
 
@@ -5862,6 +5919,7 @@ PROPOSED LINK: 000120 --relates_to--> 000115 (batch operations requirement confl
 
 - relates_to → `000111`
 - relates_to → `000112`
+- relates_to → `000115`
 
 ---
 
@@ -5896,6 +5954,7 @@ PROPOSED LINK: 000121 --relates_to--> 000106 (Both flag the need for drift testi
 **Links**
 
 - extends → `000114`
+- relates_to → `000106`
 
 ---
 
@@ -5956,6 +6015,10 @@ PROPOSED LINK: 000123 --relates_to--> 000124 (Companion audit and terminology ef
 
 </details>
 
+**Links**
+
+- relates_to → `000124`
+
 ---
 
 ## 000124 · Formalize the vocabulary and terminology of the HTML generation and workbench system
@@ -5996,6 +6059,9 @@ PROPOSED LINK: 000124 --relates_to--> 000133 (Geometry redesign builds on the fo
 
 - relates_to → `000115`
 - relates_to → `000116`
+- relates_to → `000133`
+- relates_to ← `000116`
+- relates_to ← `000123`
 - relates_to ← `000133`
 - relates_to ← `000135`
 
@@ -6033,6 +6099,10 @@ No existing governed document (plan, requirement, or decision) fully specifies o
 PROPOSED LINK: 000125 --relates_to--> 000046 (idea planner agent will take the output of batch triage to draft plans for each grouped category)
 
 </details>
+
+**Links**
+
+- relates_to → `000046`
 
 ---
 
@@ -6146,6 +6216,10 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 **Links**
 
 - relates_to → `000126`
+- relates_to → `000082`
+- relates_to → `000077`
+- relates_to → `000020`
+- relates_to → `000023`
 - relates_to ← `000138`
 
 ---
@@ -6215,6 +6289,7 @@ No separate promotion candidate; this is an actionable bug report that ties to a
 
 - relates_to → `000117`
 - relates_to ← `000131`
+- relates_to ← `000132`
 
 ---
 
@@ -6249,6 +6324,7 @@ No overlap with other ideas beyond the documented links. The notes strip ships w
 **Links**
 
 - relates_to → `000130`
+- relates_to ← `000132`
 - relates_to ← `000132`
 
 ---
@@ -6287,6 +6363,10 @@ PROPOSED LINK: 000132 --relates_to--> 000084 (HTML component library where image
 **Links**
 
 - relates_to → `000131`
+- relates_to → `000130`
+- relates_to → `000131`
+- relates_to → `000111`
+- relates_to → `000084`
 
 ---
 
@@ -6318,6 +6398,7 @@ No related plan, requirement or backlog phase found for geometry customization b
 
 - relates_to → `000124`
 - relates_to → `000134`
+- relates_to ← `000124`
 
 ---
 
@@ -6375,6 +6456,9 @@ PROPOSED LINK: 000134 --relates_to--> 000117 (related instance of content-fit fa
 **Links**
 
 - relates_to → `000115`
+- relates_to → `000104`
+- relates_to → `000117`
+- relates_to ← `000101`
 - relates_to ← `000133`
 
 ---
@@ -6481,3 +6565,17 @@ Owner idea, 2026-09-11, for their own education - not a build item. Investigate 
 **Links**
 
 - relates_to → `000137`
+
+---
+
+## 000141 · Slots as configuration schemas with nested sub-slots; panel eligibility by element-configuration match
+
+**Created 2026-09-11T23:00:37-04:00 · Status: `open`**
+
+Owner idea, 2026-09-11, raised while reviewing the double-header links during the triage sign-off (idea 000101's defect prompted the question "why does this issue exist at all?"). Recorded as given.
+
+The owner's proposed model: each slot should have a set configuration schema - fixed structure, such as containing the top bar with slots for buttons or dropdown menus and so on - and panels would populate the sub-slots within the slot. Meaning each slot is technically either (a) a truly single slot for a single element-type panel to inhabit, or (b) a nested structure of sub-slots that each support certain element types. Panels are then eligible for a slot when the element configuration of the panel matches the configurations supported by the nested sub-slots.
+
+Under this model the double-header defect (000101) could not arise: the top bar would be a schema-owned sub-slot populated once, not something both the slot wrapper and the hosted panel each render independently.
+
+Context worth carrying into exploration: this reshapes the eligibility model REQ-007 W16 ships (per-panel eligibility lists) into structural matching; it presupposes the container-vs-content vocabulary question idea 000124 must settle (and which 000135 deliberately left unresolved); and it generalizes the multi-instance modularity 000135 asks for. Flagged by the owner as worth tracking immediately for further exploration.
