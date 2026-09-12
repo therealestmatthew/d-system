@@ -5988,9 +5988,11 @@ items:
   deliverables:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
-  next_action: All acceptance conditions verified met on branch agent/phase-wb-10
-    (commit 54e8390, pushed); awaiting the owner's integration decision (outside
-    PROMPT-023 delta 4's pre-approval) and the owner-invoked /session-close.
+  next_action: Owner approved integration 2026-09-12, but the primary dev checkout
+    holds a peer session's uncommitted work (idea-triage sweep, including the
+    open-idea test-fixture fix), so the merge waits per AGENTS.md hand-off step 6.
+    Once the peer commits, rebase agent/phase-wb-10 onto dev, re-run the gate and
+    fast-forward integrate; then the owner invokes /session-close.
   session: doc-session-phase-wb-10-runbook-refresh
   completion_evidence:
   - docs/00-working/demo-runbook.md

@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-phase-wb-10-runbook-refresh
-code: SESS-2026-09-12-01
+code: SESS-2026-09-12-02
 title: Runbook and checklist refresh for the post-fix workbench UI (phase-wb-10)
 kind: session
 status: active
