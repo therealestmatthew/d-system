@@ -6,7 +6,6 @@ next_up:
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
-- phase-lit-01
 items:
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
@@ -6022,7 +6021,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6071,14 +6070,20 @@ items:
     run failed two gates - both recorded - one a real variant gap closed by two
     supplementary searches, one a defect in the gate's own column choice. Post-rebase
     onto dev at 33f931a - governance exit 0, 578 tests passing. No Opus escalation, no
-    descope rung.
-  next_action: Owner review. The phase's work is finished and gate-measured; what
-    remains is not an agent's. Run /session-close to decide whether acceptance genuinely
-    holds, then integrate agent/lit-campaign into dev - the first of the two integrations
-    PLAN-023 schedules. Note the private-content check verified nothing in the worktree
-    (0 identifiers; _private/ is gitignored and absent there), so the integration-time
-    run in the primary checkout is the first real one - see idea 000150. phase-lit-02
-    becomes ready once this phase is complete. See SESS-2026-09-12-05.
+    descope rung. An independent sub-agent review of the 49-commit range, started with
+    no context from the session, found both acceptance conditions HOLD independently and
+    no fabrication across 18 externally-verified citations spanning every dispatch; it
+    found two cosmetic errors in the session record's own prose (a strategy-phase count
+    and a stale commit hash), both since corrected, and nothing touching the
+    deliverables or either acceptance condition.
+  next_action: Integrate agent/lit-campaign into dev - the first of the two integrations
+    PLAN-023 schedules, and the owner's to perform. 49 commits, rebased onto dev at
+    33f931a, tree clean, governance exit 0, 578 tests passing. Note the private-content
+    check verified nothing in the worktree (0 identifiers; _private/ is gitignored and
+    absent there), so the integration-time run in the primary checkout is the first real
+    one - see idea 000150. Optionally amend f147b50 to drop a stray drafting fragment
+    from its message before integrating; cosmetic, and cheap only while unpushed.
+    phase-lit-02 (Pass 1b, D21-D27 and D33-D45) is now unblocked.
 - id: phase-lit-02
   title: Literature review Pass 1b — broad map of agent memory, decision intelligence
     and requirements-engineering domains

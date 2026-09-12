@@ -110,7 +110,8 @@ governance exit 0; check_no_private_content exit 0 (0 identifiers checked, see a
 
 ```text
 ledger:    267 rows, LIT-01-S001..LIT-01-S267, contiguous, 268 lines all CRLF
-           strategy_phase distribution: {'A': 77, 'D': 148, 'E': 34}
+           strategy_phase distribution: {'A': 77, 'D': 148, 'E': 42}  (sums to 267)
+           of which the 8 H4 rows are all strategy E; excluding them: E = 34
            26 domain ids present: D01-D20, D28-D32, H4
 inventory: 438 rows | 427 candidate, 11 excluded (every one with a reason)
            159 rows flagged collision_candidate: yes
@@ -131,22 +132,22 @@ terminology map: 26 domain sections
   identifiers resolving to an inventory row. No row cites a generated summary: the one
   AI-generated topic-summary page encountered (`LIT-01-S266`) was excluded as a lead.
 
-Acceptance being met is **not** a completion claim. `phase-lit-01` stays `active`; only the
-owner's `/session-close`, after its own independent review, moves a phase to `complete`.
+Both conditions were recomputed at close against the repository as it stands, and independently
+corroborated by the sub-agent review in `## Review` below, which derived the mandated variant
+lists from `PROMPT-029` itself rather than from this record.
 
 ## Backlog
 
-`phase-lit-01` stays `status: active`, `agent: agent-lit`. `next_up` unchanged — the phase is
-not complete and was not pruned.
+`phase-lit-01` is `status: complete`, `agent: agent-lit`, with `session`,
+`completion_evidence` and `result` set to what actually exists and was actually measured. It
+was removed from `next_up` in the same change.
 
-`completion_evidence` and `result` are recorded because the evidence exists now and the gate
-has measured it, which `CLAIMED_STATES` permits on an active phase.
+The phase reached `complete` through the owner's `/session-close`, after the independent review
+recorded below — not by an agent's own judgement that the work looked finished.
 
-`next_action`: Owner review. The phase's own work is finished and gate-measured; what remains
-is not an agent's. Run `/session-close` to decide whether acceptance genuinely holds, and
-integrate `agent/lit-campaign` into `dev` — the first of the two integrations `PLAN-023`
-schedules. `phase-lit-02` (Pass 1b, D21–D27 and D33–D45) becomes ready once this phase is
-complete.
+`next_action`: Integrate `agent/lit-campaign` into `dev` — the first of the two integrations
+`PLAN-023` schedules, and the owner's to perform. `phase-lit-02` (Pass 1b, D21–D27 and
+D33–D45) is now unblocked.
 
 ## Unresolved
 
@@ -180,14 +181,106 @@ complete.
 - **Two USPTO patents were assessed from search snippets only.** `uspto:9472115` and
   `uspto:11244113` (evidence-corroboration grading, D18) have image-based PDFs that are not
   machine-readable. Recorded in the inventory as such, never as a full-text read.
-- **A commit message carries a drafting artifact.** `8bc8d24` (pre-rebase; now `1e7bcf1`'s
-  ancestor after the rebase) contains a stray fragment, `"(388 -> wait, 331+58=389 total)"`.
+- **A commit message carries a drafting artifact.** `f147b50` ("Extract LIT-01 X5 inventory
+  rows for D18-D20") contains a stray fragment, `"(388 -> wait, 331+58=389 total)"`.
   Cosmetic, no content effect. The branch is unpushed, so amending is cheap until integration.
 - **Provider access was uneven and is a spend factor for later phases.**
   `api.semanticscholar.org` returned HTTP 429 for most domains and HTTP 200 for a few;
   `export.arxiv.org` was intermittent and needs `-L`. OpenAlex and Crossref worked directly
   throughout. Every rate-limited attempt is a real zero-yield ledger row with its query, not
   an omission.
+
+## Review
+
+An independent sub-agent, started fresh with no context from this session and explicitly not a
+fork, reviewed the 49-commit range `dev..agent/lit-campaign` (`33f931a`..`bd169ad`) against the
+phase's acceptance conditions. It re-derived the mandated variant lists from `PROMPT-029`
+itself rather than trusting this record, re-ran the verification commands, and externally
+verified sampled citations. Its findings, verbatim:
+
+> **Acceptance condition 1 — HOLDS.** Both files exist at the contract's paths, and both
+> headers match the evidence contract's column lists verbatim. I independently transcribed the
+> mandated minimum variant list for all 25 domains from PROMPT-029's S1–S6 payloads (not
+> trusting the record's summary), then wrote a parser against the raw CSV. Result: all 25
+> domains clear ≥2 rows with ≥2 distinct queries (narrowest: D11, 6 rows/6 distinct queries,
+> matching the record), and every single mandated variant string appears verbatim
+> (case-insensitive) in some logged query for its domain — including the two the gate's first
+> run flagged as missing: D12's "argument attack/support" (only in `LIT-01-S266`'s query,
+> verbatim with the slash — other D12 rows say "argument attack support" without it) and D17's
+> "multi-agent beliefs" (only in `LIT-01-S267`, plural — other rows say singular "belief").
+> This is a real, narrow gate distinction, not a data problem.
+>
+> **Acceptance condition 2 — HOLDS.** Inventory: 438 rows, 427 `candidate` + 11 `excluded`,
+> and all 11 excluded rows carry a real (non-blank, non-"none") `exclusion_reason` — 0 missing.
+> For the kept-column/inventory-linkage question: I judged `url_or_doi` the meaningful
+> comparison column (`source_id` is a human-chosen slug that was never intended to equal a
+> DOI/URL — comparing against it is what produced the gate's own false "435 missing" first-run
+> result). Against `url_or_doi`: 441 ledger (row, source) kept pairs resolve to 434 distinct
+> identifiers, and 0 of those 434 are absent from the inventory.
+>
+> **No evidence row cites a generated summary — HOLDS, more robustly than the record claims.**
+> The record cites one instance (an emergentmind.com AI-topic-summary page at `S266`,
+> excluded). I grepped the whole ledger for aggregator/blog/topic-summary signatures and found
+> roughly ten instances (`nature.com/research-intelligence`, `nature.com/nature-index`,
+> `medium.com`, multiple `emergentmind.com` pages) across rows `S026, S047, S074, S096, S116,
+> S141, S175, S184, S217, S266`. In every single case the flagged item appears only in
+> `result_ids` (inspected), never in `kept`, and consequently never entered the inventory at
+> all. Only three vendor-domain pages made it into the inventory as rows, and all three are
+> honestly typed `source_type: lead` (the contract's sanctioned bucket for exactly this) with
+> low prescores; none is asserted as evidence for any verdict.
+>
+> **Fabrication check — NO FABRICATION FOUND.** I sampled 8+ ledger rows spanning every
+> dispatch (S1 through S6) plus both supplementary rows, and verified 18 distinct cited
+> identifiers by fetching arXiv abstract pages, resolving DOIs, and cross-checking USPTO patent
+> numbers via web search. [Full list in the review: S001/S002, S057, S106, S201, S236, S078,
+> S018, S247, S266, S267.] Zero fabrications, zero citation/identifier mismatches, across every
+> dispatch and several 2026-dated (post-training-cutoff, pre-today) arXiv papers that could
+> plausibly have been invented — none were.
+>
+> **S266/S267 — genuine searches, not manufactured.** Both rows carry substantive,
+> cross-referenced dedup reasoning against earlier rows, real inclusion/exclusion rationale, and
+> citations that verify externally. I also confirmed the counterfactual: removing S266/S267, no
+> other row in D12 or D17 contains the exact mandated string — the gap was real, and the fix was
+> a real search, not a string-matching trick.
+>
+> **Internal consistency — all claimed figures reproduce, with one real error and one resolved
+> false alarm.** Confirmed exactly: 267 ledger rows (`S001`–`S267`, contiguous, no duplicates),
+> 438 inventory rows, 427 candidate/11 excluded, 159 `collision_candidate: yes`, 26
+> terminology-map sections (25 domains + H4), 441 kept pairs → 434 distinct identifiers.
+> **Real error**: the record's strategy_phase distribution, `{'A': 77, 'D': 148, 'E': 34}`, is
+> wrong — the ledger actually contains `{'A': 77, 'D': 148, 'E': 42}`. Notably the record's own
+> printed numbers don't even sum to 267 (77+148+34=259); mine do (267). This is a
+> transcription/arithmetic slip in the record's prose, not a defect in the deliverable itself.
+> **Minor, stale citation**: the record's "Unresolved" section names commit
+> `8bc8d24`/`1e7bcf1` as carrying a stray drafting fragment. That exact text does exist in the
+> current range, but in commit `f147b50`, not `1e7bcf1` — the hash the record cites is stale.
+> The underlying fact is true; the pointer to it is wrong.
+>
+> **Scope discipline — HOLDS.** The full 49-commit range touches exactly 5 files: the session
+> record, `backlog.yaml`, and the three literature-review deliverables. `git diff --stat`
+> against every frozen path returns empty — none touched. Searching the terminology map, ledger,
+> and inventory for verdict-style language ("confirms H", "refutes", "falsifies", "H0
+> is/true/false") returns zero hits.
+>
+> One soft observation, not a violation: the terminology map uses the phrase "flagged
+> CRITICAL_COLLISION candidate" seven times — borrowing the name of a field that formally
+> belongs to the downstream evidence matrix (LIT-04+), not Pass 1's schema. Every instance says
+> "candidate," never asserts the flag as decided, so I don't read this as a scope violation —
+> just a wording choice worth a raised eyebrow.
+>
+> **Overall judgement.** Both acceptance conditions hold, independently, and every one of the
+> six specific scrutiny items the task named comes back clean or better than claimed — most
+> importantly, the fabrication check (the one that would invalidate the phase outright) found
+> zero problems across 18 externally-verified identifiers spanning every dispatch. The only
+> defects I found are cosmetic and confined to the session record's own prose (a wrong
+> strategy-phase count, a stale commit hash in a footnote) — none touch the deliverables, the
+> gate logic, or either acceptance condition. **In my independent judgement: acceptance
+> genuinely holds, and I found nothing that should block this phase from being marked
+> complete.**
+
+Both errors the review found were real and are corrected above: the strategy-phase distribution
+now reads `{'A': 77, 'D': 148, 'E': 42}` and sums to 267, and the drafting-artifact footnote now
+names `f147b50`. Neither correction touches a deliverable.
 
 ## Decisions
 
@@ -232,6 +325,17 @@ everywhere. A literal-match count of 118 was read as catastrophic when 112 of th
 simply identifiers awaiting an extraction that had not yet run. The common shape: a check
 built quickly, producing a clean-looking number, measuring the wrong thing. Insisting on the
 underlying file rather than the summary is what caught each one.
+
+**The close-out record itself carried two errors, both caught by the independent review rather
+than by this session.** The strategy-phase distribution was transcribed from a verifier whose
+domain list deliberately excludes `H4`, so it reported `E: 34` for what the record presented as
+a whole-ledger figure; the true count is 42, the eight H4 rows all being strategy E. The tell
+was sitting in the record two lines above: the distribution summed to 259 against a stated 267
+rows, and nobody added them up. And the drafting-artifact footnote cited a commit hash guessed
+at from the pre-rebase history rather than looked up — `8bc8d24`/`1e7bcf1` instead of the actual
+`f147b50`. The repository already has a standing rule against guessing an identifier when a tool
+will produce it; that rule was written for idea ids and applies exactly as well to commit hashes.
+Both are corrected in place.
 
 **A false claim was made to a peer session and corrected.** This session told the peer that
 its close review had recorded a worktree run of `check_no_private_content.py` as a passing
