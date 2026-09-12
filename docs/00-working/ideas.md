@@ -5423,6 +5423,7 @@ Owner report, 2026-09-11, on the Windows machine during early workbench checks: 
 - **note** by repository-owner (2026-09-11T19:32:52-04:00): Batch extended 2026-09-11 (evening): 000123 (audit the pre-build HTML generation plans against the built reality - accomplished/open/superseded/retire disposition per requirement) and 000124 (formalize the system's vocabulary - e.g. the terminal slot is named after its initial occupant, wrong once panels are assignable; governed glossary plus rename-vs-alias migration). 000123's reconciliation and 000124's glossary both feed the ordering review: reconcile and name things before authoring new pack rows against stale plans or misleading names.
 - **note** by repository-owner (2026-09-11T19:40:47-04:00): Batch reframed 2026-09-11 (000125): the batch has outgrown one plan - the planning session opens with holistic triage of ALL these ideas (categorize, prioritize, group into multiple plans with an ordering across them) before any deep-dive development. Added: 000126 (thorough audit of commands/skills/agents - codebase design first, demo effectiveness second), 000127 (idea skill delegates capture to a subagent to protect main-session context; one instance of a recurring owner pattern), 000128 (shared state model for multi-agent planning sessions).
 - **note** by repository-owner (2026-09-11T20:41:03-04:00): Batch extended 2026-09-11 (night): rotator-panel set - 000130 (help-tooltip cutoff at panel bottom + font-size/text-capacity rethink; likely another 000117 Popover consumer), 000131 (horizontal auto-scroll ticker for longer texts, possibly a substitute panel), 000132 (rotate images, not just text); plus 000133 (revisit slot geometries and custom reconfiguration - explicitly FUTURE phase, lower priority than any demo work; per-slot constraints and resize-vs-content effects) and 000134 (content-fit audit of all slots/panels producing enforced methodologies, not spot fixes). Priority note from the owner: 000133 yields to demo-specific fixes; 000130 is a live display bug worth demo-week attention.
+- **note** by repository-owner (2026-09-11T22:46:09-04:00): Batch extended 2026-09-11 (late): 000138 (agent anti-pattern tracking system - starter catalog from this session: turn-budget truncations, assumption-based runtime fixes, stale-browser-state false defects, orphaned servers, missing resume paths) and 000139 (delegation-scoping methodology with continual improvement as a system property - dispatch cost estimation, splitting rules, mandatory dispatch contents, model assignment, post-session retrospectives feeding the rules). Companion brain procedures: runtime-behavior-needs-runtime-evidence.md and scope-dispatches-to-the-turn-budget.md.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -6072,6 +6073,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 - relates_to ← `000127`
 - relates_to ← `000128`
 - relates_to ← `000136`
+- relates_to ← `000139`
 
 ---
 
@@ -6144,6 +6146,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 **Links**
 
 - relates_to → `000126`
+- relates_to ← `000138`
 
 ---
 
@@ -6432,3 +6435,29 @@ Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning tria
 **Created 2026-09-11T21:56:55-04:00 · Status: `open`**
 
 Found during phase-wb-09's escalated fix, 2026-09-11. The session registry's global-cap refusal in src/api/routes/demo_terminal.py closes the websocket BEFORE accept() (code 4001), and uvicorn converts a pre-accept close into an HTTP 403 handshake rejection - so the browser receives CloseEvent code 1006 with an empty reason and can never display the structured refusal (or the session count). The frontend now infers the refusal structurally (socket closed without ever opening) and shows a generic could-not-start message. The proper fix is backend: accept first, then close with the structured frame - exactly the pattern _refuse_shell_request already uses for unavailable shells - so the panel can quote the real reason. Small, ADR-014-adjacent change; was out of scope for the wb-09 frontend item that discovered it.
+
+---
+
+## 000138 · System for tracking and managing agent anti-patterns
+
+**Created 2026-09-11T22:45:55-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Build a system that tracks and manages agent anti-patterns - the recurring failure modes of dispatched agents - so each one is recorded once, detected when it recurs, and fed back into how future work is authored. The 2026-09-11 build session alone produced a starter catalog: dispatches scoped past the turn budget (seven truncations across two phases; brain/procedures/scope-dispatches-to-the-turn-budget.md), fixing runtime behavior from assumption instead of measurement (brain/procedures/runtime-behavior-needs-runtime-evidence.md), validators poisoned by their own stale browser state (idea 000107's artifact), orphaned dev servers left by cut-off agents, and orchestrators lacking a resume path for truncated subagents. Today these live as scattered brain procedures, idea annotations and session-record notes; the system should give them one home with a shape per entry (name, signature/how it manifests, root cause, prevention, occurrences with dates), a lightweight way for any coordinator/orchestrator to log a new occurrence mid-session, and a standing step in pack authoring and the commands/skills/agents audit (000126) that checks new prompts against the catalog. Relates to the shared state model (000128) - an occurrence log is exactly the kind of cross-agent state it would carry.
+
+**Links**
+
+- relates_to → `000128`
+- relates_to ← `000139`
+
+---
+
+## 000139 · Delegation-scoping methodology with built-in continual improvement
+
+**Created 2026-09-11T22:45:55-04:00 · Status: `open`**
+
+Owner request, 2026-09-11, for the planning triage (batch anchor 000108). Create - or improve where partial versions exist (PROMPT-012's model policy, PROMPT-021/024's dispatch conventions, the GOV-003 completion gate) - the protocols, strategies, calculations and methodologies for scoping delegated work, so every agent is created with optimal efficiency: the right task size (tool-call/turn-budget estimate before dispatch), the right model for the job, the right context attached (recorded evidence in, irrelevant history out), the right verification instrument named up front, and the right escalation/resume path when it fails or truncates. The owner's explicit requirement is CONTINUAL improvement as a property of the system, not a one-time audit: each build session's outcomes (fix cycles spent, truncations, escalations, gate catches) feed back into the scoping rules so performance and accuracy do not drop as the complexity of everything built on top keeps increasing - growth in capability must at least match growth in complexity. Concretely the methodology should define: how to estimate a dispatch's cost before sending it, when to split an item, what every dispatch must carry (idempotency clause, resume expectation, evidence, expected-output shape), per-role model assignment rules, and the post-session retrospective step that updates the rules and the anti-pattern catalog (recorded alongside this idea) from what actually happened. Relates to 000126 (the agents audit supplies the baseline), 000128 (shared state carries the session telemetry), and 000136 (the runtime-evidence pack convention is this methodology's first worked example).
+
+**Links**
+
+- relates_to → `000138`
+- relates_to → `000126`

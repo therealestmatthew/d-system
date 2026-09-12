@@ -49,6 +49,7 @@ brain/
 - [Resolving Staged Idea-Triage Follow-ups via AskUserQuestion](procedures/resolve-idea-triage-followups.md)
 - [Auditing a Document for Accuracy Introduces New False Claims](procedures/audit-your-own-corrections.md)
 - [Runtime Behavior Needs Runtime Evidence](procedures/runtime-behavior-needs-runtime-evidence.md)
+- [Scope Dispatches to the Turn Budget](procedures/scope-dispatches-to-the-turn-budget.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
