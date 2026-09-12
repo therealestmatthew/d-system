@@ -71,12 +71,19 @@ Ratified by the owner on 2026-09-12.
 
 5. **Input varies across the four as a bias control.**
 
-   - **Analysts 1, 2 and 3** read title, body, links **and** the triage finding for every idea.
+   - **Analysts 1, 2 and 3** read title, body, links **and** every finding for each idea.
    - **Analyst 4** reads title, body and links **only** — no findings. It is the control.
 
-   Analyst 4 exists because every triaged idea carries a finding written by one agent charter
-   (`agent-idea-triage`). Anything the three finding-readers agree on that analyst 4 reproduces
-   independently is not inherited framing.
+   Analyst 4 exists because nearly every triaged idea carries a finding written by one agent
+   charter (`agent-idea-triage`), and that charter's framing of what each idea is about would
+   otherwise be invisible baseline rather than evidence. Anything the three finding-readers agree
+   on that analyst 4 reproduces independently is not inherited framing.
+
+   "Findings" means every annotation of `kind == "finding"`, any author, chronologically — the
+   owner ratified this on 2026-09-12 after the stage 3 audit established that the data does not
+   hold one tidy triage finding per idea. Seven findings in the corpus come from other authors,
+   including the owner's own, and eight ideas carry more than one; those eight are flagged to the
+   analysts as layered and possibly contradictory evidence rather than a settled account.
 
    The three finding-readers additionally receive the corpus in **different presentation
    orders** — id ascending, id descending, and shuffled under a recorded seed. This controls for

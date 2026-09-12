@@ -48,6 +48,7 @@ Run these before writing anything, and record the real output:
 ```bash
 uv run python -m src.governance --inventory     # must exit 0
 uv run python -m src.governance --ready         # active claims and locked systems
+uv run pytest                                   # must be green before and after
 git status --short                              # clean checkout expected
 ```
 
@@ -69,25 +70,33 @@ A failing check is a result to record, not a step to retry until it goes quiet.
 The owner ratified a **light artifact set** on 2026-09-12: no requirement, no plan, no backlog
 phase, no decision record. `GOV-008` stage 4's requirement-and-plan machinery exists to govern code
 builds; this build writes no code and its deliverable is one ungoverned staging document. The
-tension that makes this reasonable is recorded as idea `000145`; do not attempt to resolve it here.
+tension that makes this reasonable is recorded as `000145` (alternative planning methodologies
+below a full prompt pack); do not attempt to resolve it here.
 
 Take every code from `uv run python -m src.governance --next-code prompt` at the moment you create
-the document — never guess a code, and never reuse one you saw earlier in the session.
+the document — never guess a code, and never reuse one you saw earlier in the session. **No code is
+predicted here on purpose.** Peers allocate prompt codes concurrently: `PROMPT-027` was taken by
+another session's literature-review package while this document was being drafted, which is exactly
+why a code read at drafting time is worthless by the time you write.
 
-### 1. The delegation pack (expected `PROMPT-027`)
+### 1. The delegation pack
 
 A governed prompt document holding every prompt the build session dispatches verbatim, one section
 at a time. Nothing is authored mid-build: if this document does not contain it, the build session
 does not send it.
 
-Required sections, in the established `PROMPT-018`/`PROMPT-021` shape adapted to a documents-only
-build:
+Required sections. The precedents (`PROMPT-018`, `PROMPT-021`) fix `K` for kickoff, `C*`/`V*` for
+creator/validator pairs, `G` for the phase gate and `A` for adversarial review. This build has no
+creators and no validators — it has replicate analysts and two adversarial audits — so `C*`/`V*`
+go unused and the replicates take `R*`. **`A` keeps its established meaning: adversarial review.**
+Do not repurpose `V*` for the audits; a reader arriving from the precedents would read the letters
+backwards.
 
 **`K` — kickoff.** Preflight, the corpus build, the dispatch order, and the gate schedule from
 Prompt A's decision 12 (pause when the four analyst reports land; pause when audit 1 returns; pause
 when audit 2 has checked the merge).
 
-**`A1`–`A4` — the four analyst prompts.** Each idempotent and dispatchable verbatim. Every one
+**`R1`–`R4` — the four analyst prompts.** Each idempotent and dispatchable verbatim. Every one
 carries:
 
 - the partition criterion from decision 9, **quoted verbatim and unaltered** — it is the
@@ -111,19 +120,38 @@ The four prompts differ in **exactly two** respects and no others:
 
 | Analyst | Triage findings | Presentation order |
 |---|---|---|
-| `A1` | included | id ascending |
-| `A2` | included | id descending |
-| `A3` | included | shuffled, seed recorded |
-| `A4` | **withheld** | id ascending |
+| `R1` | included | id ascending |
+| `R2` | included | id descending |
+| `R3` | included | shuffled, seed recorded |
+| `R4` | **withheld** | id ascending |
 
-`A4` is the control. Do not tell it that it is a control, that findings exist, or that other
+`R4` is the control. Do not tell it that it is a control, that findings exist, or that other
 analysts are running — a control that knows it is a control is not one.
 
-**`V1` — audit 1, the four partitions.** The adversary over all four reports: does each partition
+**`A1` — adversarial audit 1, the four partitions.** The adversary over all four reports: does each partition
 actually cover the corpus (verify the count arithmetically, do not trust the analyst's claim); are
 the groups genuinely independent under decision 9; and the convergence check — *did the four agree
 for the right reasons, or did they inherit the same framing from the prompt?* State plainly that a
-3–1 split with `A4` dissenting is the **expected shape of finding bias**, not a settled vote.
+3–1 split with `R4` dissenting is the **expected shape of finding bias**, not a settled vote.
+
+Then require the audit to weigh the competing explanation, because the control is confounded and
+the pack must say so rather than pretend otherwise. `R4` differs from `R1` in exactly one variable,
+which is a clean design — but any divergence has **two** explanations, and they are not
+distinguishable from the split alone:
+
+- `R1`–`R3` inherited the triage charter's framing, and `R4` did not; or
+- `R4` simply had less evidence and produced a weaker partition.
+
+The brief must force the audit to argue which explanation fits **each specific divergence**, citing
+the ideas involved, and to say plainly when it cannot tell. Without this the audit can rubber-stamp
+any 3–1 split as bias-validated-by-design, which would make the control worse than useless: it
+would launder a quality artifact as a finding.
+
+The audit must also report whether the presentation-order manipulation did anything at all — did
+`R1`, `R2` and `R3` differ in ways that track their ordering, or did order make no observable
+difference? Order-sensitivity in a whole-corpus read is plausible but unverified for these agents,
+and the pack spends real budget on it. If the manipulation has no effect, that is a finding worth
+having: it means a future sweep can drop the variation and run cheaper.
 
 **`S` — synthesis.** Not a dispatch: the protocol the integrator follows in the main session.
 Covers how a disagreement about independence is resolved (check the repository and rule — never
@@ -132,7 +160,7 @@ the three decline tiers are assembled (nominated by all four / by a majority / b
 analyst, each carrying its reasons), and how the two levels are reconciled when analysts disagree
 about which level a boundary belongs to.
 
-**`V2` — audit 2, the merge.** The adversary again, after synthesis: does the integrated partition
+**`A2` — adversarial audit 2, the merge.** The adversary again, after synthesis: does the integrated partition
 follow from the four inputs, or did the integrator introduce groupings no analyst proposed? This
 audit exists because synthesis is where the most judgment is applied and was otherwise unchecked.
 Give it the four reports, the merge, and audit 1's findings.
@@ -141,9 +169,9 @@ Give it the four reports, the merge, and audit 1's findings.
 accounted for, the programme count inside 8–12 or justified, audit 2 returned, the decline tiers
 assembled, governance exits 0.
 
-**Descope ladder**, in decision 16's order: third finding-reader (`A3`), then second (`A2`), then
-audit 2 (`V2`), then audit 1 (`V1`), with the control (`A4`) surrendered last. Flag that the
-ladder's placement of `V2` is the drafter's proposal, not the owner's ruling. No rung is taken
+**Descope ladder**, in decision 16's order: third finding-reader (`R3`), then second (`R2`), then
+audit 2 (`A2`), then audit 1 (`A1`), with the control (`R4`) surrendered last. Flag that the
+ladder's placement of `A2` is the drafter's proposal, not the owner's ruling. No rung is taken
 without the owner's explicit direction.
 
 ### 2. The adversary charter (`.claude/agents/`)
@@ -167,14 +195,30 @@ it. It assembles each analyst's input and must:
 - read idea state through `fold()` in `src/db/ideas.py` — **never** the raw JSONL;
 - select `triaged` ideas only, excluding `promoted` and `discarded`;
 - subtract every id in the demo fast lane's exclusion file (see below);
-- emit title, body and links always; include or withhold the triage finding per analyst;
+- emit title, body and links always; include or withhold **findings** per analyst, where "findings"
+  means **every annotation with `kind == "finding"`, any author, in chronological order** — not
+  only `agent-idea-triage`'s. `fold()` returns `annotations` as a flat, unfiltered list mixing
+  `note`, `finding` and `assessment` kinds from any author, so the builder must filter by kind
+  rather than assume a single field exists. Seven findings in the current corpus were written by
+  other authors (`agent-demo-factory`, `agent-workbench-planner`, `agent-coordinator`,
+  `agent-workbench-coordinator`, `agent-readme-audit`, and the owner directly) and all of them
+  count;
+- **flag the ideas carrying more than one finding**, so an analyst knows the evidence there is
+  layered and may be internally contradictory rather than a single settled account. Eight triaged
+  ideas qualify as of 2026-09-12 — `000014`, `000070`, `000071`, `000077`, `000087`, `000091`,
+  `000099`, `000107` — but the builder computes the set rather than hard-coding it, since the log
+  is append-only and the set grows;
 - emit the three presentation orders, recording the shuffle seed so a run is reproducible;
 - report the resulting corpus size, so the build session knows what the analysts actually received
   rather than assuming 135.
 
-Decide its location and name by the conventions in `tools/`, and give it an OPS document if the
-per-tool documentation pattern in `docs/` requires one for new tools — check before assuming
-either way.
+Decide its location and name by the conventions in `tools/`. **Every tool under `tools/` requires a
+paired `OPS-*` document — there is no exception.** `test/test_tool_docs.py` asserts it
+(`test_every_existing_tool_is_paired_with_a_document`), and a second test
+(`test_every_paired_document_matches_regenerated_output`) asserts the document matches what
+`tools/generate_tool_docs.py` regenerates from the tool's own docstring and argparse definitions.
+Write the tool, generate its document, and run `uv run pytest` before calling the artifact done —
+governance exiting 0 does not cover this, and the suite goes red if either test is unsatisfied.
 
 **The exclusion file does not exist yet.** The demo fast lane has not run. Specify its path under
 `docs/00-working/`, its key names, and its disposition values (queued as a phase / fixed directly /
@@ -183,7 +227,7 @@ error, so the pack is runnable before the fast lane finishes. Record that an exc
 lane does not ship returns to the corpus, which is why the file records disposition rather than
 bare membership.
 
-### 4. The kick-off record (expected `PROMPT-028`)
+### 4. The kick-off record
 
 `GOV-008` stages 6 and 7 collapse into this document per decision 13 — no separate coordinator
 prompt is written. It carries:
@@ -222,9 +266,9 @@ it is generated, and CI fails on any difference.
 ## Stop condition
 
 Stop when all four artifacts exist — delegation pack, adversary charter, corpus builder, kick-off
-record — `uv run python -m src.governance --inventory` exits 0, the catalog is in sync, and the
-owner has a review summary naming what the pack contains, what it deliberately omits and why, and
-the dispatch order the build session will follow.
+record — `uv run python -m src.governance --inventory` exits 0, **`uv run pytest` is green**, the
+catalog is in sync, and the owner has a review summary naming what the pack contains, what it
+deliberately omits and why, and the dispatch order the build session will follow.
 
 Do not start the build. The pack is audited (`GOV-008` stage 5) and the owner approves it before
 any analyst is dispatched.
@@ -240,8 +284,12 @@ any analyst is dispatched.
 > decisions — and then this document
 > (`docs/02-prompts/PROMPT-026-idea-batching-pack-factory.md`) in full.
 >
-> Run the preflight above and record the real output. Then produce the four artifacts in the order
-> given: the delegation pack, the adversary charter, the corpus builder, and the kick-off record.
+> **Work in plan mode first.** `GOV-008` stage 4 — which is what executing this document is —
+> requires the pack be planned before it is written, with auto execution only after the owner
+> confirms the plan. Run the preflight, record the real output, present the plan, and wait.
+>
+> Once the owner confirms, produce the four artifacts in the order given: the delegation pack, the
+> adversary charter, the corpus builder, and the kick-off record.
 >
 > You write documents and investigate the repository. You do **not** read or group ideas, dispatch
 > agents, write the staging document, or re-ask any ratified decision. If drafting exposes
