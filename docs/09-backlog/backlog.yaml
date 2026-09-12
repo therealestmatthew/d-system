@@ -4,6 +4,8 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-wb-07
+- phase-wb-11
+- phase-wb-12
 - phase-port-02
 - phase-ses-01
 items:
@@ -6009,6 +6011,105 @@ items:
     578 passed post-rebase. Independent close review: both acceptance conditions
     HOLD; three bookkeeping discrepancies (stale pre-rebase hash, uncommitted
     verification-count correction, unpushed rebase) resolved in the close commit.'
+- id: phase-wb-11
+  title: Popover height math and the multi-panel double header
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  - doc-workbench-layout-decision
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Correct the shared popover height math in ts/src/stage/Popover.tsx. reposition()
+    computes maxHeight = Math.max(MIN_BUBBLE_HEIGHT_PX, Math.min(available, viewportHeight
+    * 0.6)) at line 92, so the 120px floor wins whenever the available space is smaller
+    than it: the bubble is simultaneously too short to list more than about two entries
+    and tall enough to overflow its container. Both reported symptoms follow from
+    that one expression (idea 000117''s diagnosis, confirmed in code 2026-09-12).'
+  - Verify the fix against all eleven Popover consumers rather than the reporting one
+    - HtmlViewerRegion, InjectionDropdowns, TerminalMenu, NotesStripRegion, DirectoryPickerDialog,
+    LayoutConfigDialog, CommandPanel, FileTreeContextMenu, TerminalRegion and Slot's
+    panel switcher. The owner-reported instance (000108, the HTML Viewer file selector
+    showing two entries, seen on the Windows presentation machine) and the rotator
+    help tooltip cut off at the panel bottom (000130) are two consumers of the same
+    expression, not two bugs.
+  - 'Suppress the inner panel header when a panel renders inside a multi-panel slot
+    (idea 000101). Slot.tsx renders its own .stage-region__header and the wrapped panel
+    renders a second one below it; panelRegistry.tsx documents this as a known cosmetic
+    case left unfixed while no multi-panel slot was reachable. phase-wb-09 made every
+    shell and the HTML Viewer eligible for both the terminal and main slots, so it is
+    now reachable on the demo''s primary surfaces. The markup hook already exists: Slot.tsx
+    sets stage-workbench-slot--multi and no CSS rule consumes it.'
+  acceptance:
+  - With the terminal slot sized as it is in both shipped layouts, the HTML Viewer file
+    selector shows at least eight entries with internal scroll and opens without extending
+    past its panel; the rotator help tooltip renders fully inside the panel.
+  - A panel swapped into a multi-panel slot via the slot-header dropdown shows exactly
+    one header in both layouts, for a shell panel and for the HTML Viewer.
+  - No popover regresses in the other consumers - each still opens, positions within
+    the viewport, and closes.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - cd ts && npm run build
+  - Browser pass (demo-validator-web) over both shipped layouts at the REQ-007 W15 window
+    sizes, recording entry counts and measured popover and header geometry rather than
+    a visual impression
+  deliverables:
+  - ts/src/stage/Popover.tsx
+  - ts/src/workbench/Slot.tsx
+  - ts/src/stage/StagePage.css
+  next_action: Consumes ideas 000117, 000108, 000130 and 000101, ratified into the demo
+    fast lane by the owner on 2026-09-12. There is no frontend test framework in ts/,
+    so the browser pass is the only real gate on this phase - do not accept a green build
+    as evidence.
+- id: phase-wb-12
+  title: Runbook additions for the two demo-week presenter risks
+  plan: doc-workbench
+  sources:
+  - doc-workbench-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Add a clean-browser-profile step to the runbook''s setup section (idea 000107).
+    The idea''s original root-cause claim was retracted, but a real presenter risk
+    survives it: a visible-panel choice stored from an earlier session, differing between
+    layouts, silently kills the hidden shell on a layout switch. Both shipped layout
+    files default the terminal slot correctly, so this only bites a machine carrying
+    stale localStorage - which is exactly what the presentation machine will be after
+    rehearsals.'
+  - Document the HTML Viewer's Embedded / Open-in-tab toggle in the runbook's control
+    inventory (idea 000105), including what it does, what the presenter sees after
+    clicking it, and how to reverse it mid-demo. The control is real and reachable
+    on the viewer header, and W07-W passed without noticing it because nothing the
+    runbook names was missing - the gap is a control the runbook never names.
+  acceptance:
+  - The runbook's setup section names the clean-profile step with the exact browser
+    action, and states the failure it prevents.
+  - Every control on the HTML Viewer header appears in the runbook's control inventory,
+    the Embedded toggle among them, each with its reversal.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Read the runbook against the running workbench UI and confirm every named control
+    exists and every existing header control is named
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  next_action: Consumes ideas 000107 and 000105, ratified into the demo fast lane by
+    the owner on 2026-09-12. Overlaps phase-wb-07's declared deliverables, but wb-07
+    is blocked on owner-machine checks only and phase-wb-10 already superseded its
+    document work on dev - confirm that still holds before claiming, and coordinate
+    if wb-07 has been resumed.
 - id: phase-lit-01
   title: Literature review Pass 1a — broad map of knowledge representation, provenance
     and epistemics domains

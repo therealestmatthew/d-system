@@ -1,0 +1,152 @@
+schema_version: 1
+updated: '2026-09-12'
+# Ideas the demo fast lane consumed, and what became of each.
+#
+# The fast lane runs outside the idea-batching prompt pack entirely (PROMPT-025
+# decision 2): demo-blocking and demo-improving ideas are cut, ranked and handed to
+# the build already in flight, and the pack does not wait for it. This file is the
+# seam between the two lanes. The pack's corpus builder reads it and removes every
+# id listed here with a disposition of `queued` or `fixed` from the batching corpus.
+#
+# `dropped` is the important case. PROMPT-025 decision 14: an idea the fast lane
+# considered but does not ship must RETURN to the batching corpus rather than fall
+# between the two lanes. A dropped entry is therefore a record of a decision, not an
+# exclusion - the corpus builder must NOT remove it. It is listed so the batching
+# session can see the fast lane looked at it and why it passed, without having to
+# reconstruct that from conversation.
+#
+# A missing file is not an error. The corpus builder treats absence as an empty
+# exclusion set, which is what keeps the two workstreams independent.
+#
+# Cut drafted and ratified 2026-09-12 (items 1-4 of the ranked cut ship; 5-8 dropped).
+# Audience: novice practitioners. Subject: skills and agents. Demo: 2026-09-15.
+
+dispositions:
+  queued: Handed to the in-flight build as a backlog phase. Removed from the corpus.
+  fixed: Fixed directly in the fast lane, no phase. Removed from the corpus.
+  dropped: Considered by the fast lane and not shipped. RETURNS to the corpus.
+
+consumed:
+
+  # --- Shipped: item 1 of the ranked cut -------------------------------------
+  # One root cause in ts/src/stage/Popover.tsx line 92, three reported symptoms.
+  '000117':
+    disposition: queued
+    phase: phase-wb-11
+    criteria: [blocks, visible, story]
+    note: >-
+      The shared Popover height math. Confirmed in code 2026-09-12: the
+      MIN_BUBBLE_HEIGHT_PX=120 floor wins over available space, so popovers are both
+      too short and overflowing. Eleven consumers, including InjectionDropdowns -
+      the skills/agents/prompts lists, which are the demo's own subject.
+  '000108':
+    disposition: queued
+    phase: phase-wb-11
+    criteria: [blocks, visible]
+    note: >-
+      Owner-reported on the Windows presentation machine: HTML Viewer file selector
+      shows two entries. A consumer of 000117's expression, not a separate defect.
+  '000130':
+    disposition: queued
+    phase: phase-wb-11
+    criteria: [blocks, visible, story]
+    note: >-
+      Rotator help tooltip cut off at the panel bottom. Same expression again, and
+      the rotator is the panel carrying the skills-and-agents narration on stage.
+      The typography half of the idea (font size, text capacity) is NOT in
+      phase-wb-11 and returns with the batch.
+
+  # --- Shipped: item 2 ---------------------------------------------------------
+  '000101':
+    disposition: queued
+    phase: phase-wb-11
+    criteria: [blocks, visible]
+    note: >-
+      Double header on multi-panel slots. Documented as a deliberate cosmetic
+      deferral in panelRegistry.tsx while no multi-panel slot was reachable;
+      phase-wb-09 made every shell and the HTML Viewer eligible for the terminal and
+      main slots, so it now renders on the demo's primary surfaces.
+
+  # --- Shipped: items 3 and 4 --------------------------------------------------
+  '000107':
+    disposition: queued
+    phase: phase-wb-12
+    criteria: [blocks]
+    note: >-
+      Terminal session lost on layout switch. The code root-cause claim was retracted
+      (it was the validator's own stale localStorage), but the presenter risk is real
+      on a machine carrying rehearsal state. Shipped as a runbook clean-profile step,
+      not a code fix.
+  '000105':
+    disposition: queued
+    phase: phase-wb-12
+    criteria: [blocks]
+    note: >-
+      Runbook does not document the HTML Viewer's Embedded / Open-in-tab toggle. A
+      presenter who clicks it mid-demo cannot explain or reverse it from the script.
+
+  # --- Dropped: items 5-8, RETURN to the batching corpus -----------------------
+  '000110':
+    disposition: dropped
+    criteria: [visible, story]
+    note: >-
+      Markdown rendering in the HTML Viewer. Ranked item 5 and the strongest story
+      carrier available - a novice understands "a skill is a markdown file of
+      instructions" on seeing a rendered SKILL.md. Dropped on schedule risk only:
+      three coupled ideas plus an unmade design decision, three days from the demo.
+      Should be near the front of the batch.
+  '000118':
+    disposition: dropped
+    criteria: [visible]
+    note: >-
+      COMPATIBLE_EXTENSIONS is ['.html', '.svg'], so the File Browser's own
+      Documentation preset (docs/, .md) cannot open any of its files in the viewer.
+      Dropped with 000110, which it depends on; it is the choke point that decides
+      whether "Open in HTML Viewer" appears on a .md file at all.
+  '000119':
+    disposition: dropped
+    criteria: []
+    note: >-
+      Where markdown-to-HTML rendering happens. A design decision, not a fix, and
+      meaningless before 000110 is scheduled. Dropped with it.
+  '000137':
+    disposition: dropped
+    criteria: [blocks]
+    note: >-
+      Global-cap websocket refusal arrives as close code 1006 with no reason. Real
+      but conditional - the cap is six after phase-wb-09, and the demo is unlikely to
+      open a seventh shell. Accepted as a residual risk for 2026-09-15.
+  '000106':
+    disposition: dropped
+    criteria: [blocks]
+    note: >-
+      No drift test on _public/overview/index.html. Already let a stale overview ship
+      once. Mitigated for the demo by regenerating the page live, so it is insurance
+      rather than a fix.
+  '000132':
+    disposition: dropped
+    criteria: [visible, story]
+    note: >-
+      Rotator variant that cycles images. Well-timed - phase-demo-07 is authoring the
+      skills-and-agents concept diagrams now, and rotating those would carry the
+      narrative visually - but a new panel variant three days out. Worth revisiting
+      early in the batch while the diagrams are fresh.
+
+# --- Measured, not consumed --------------------------------------------------
+# 000099 and 000129 were investigated by the fast lane and are NOT excluded. Six
+# consecutive full-suite runs on 2026-09-12 (five in the primary checkout on dev, one
+# in an isolated worktree) produced ZERO PTY failures; the three tests 000099 names
+# never failed. ~/.pyenv/shims/.pyenv-shim did not exist during the measurement,
+# consistent with both ideas' environmental diagnosis but not proof of it - the lock
+# recurs under concurrent agent load. 000099 is resolved in current conditions.
+# 000129 stays open as "make the tests immune to the shim so gates stop carrying the
+# caveat", which is batch work, not demo work. Both remain in the corpus.
+#
+# 000093 (governance atlas page) is excluded from the demo by owner ruling and was
+# not reconsidered. It is not listed here because that ruling is about the demo, not
+# about the batch.
+#
+# 000104 and 000112 are absent deliberately: both were already built (phase-wb-08 at
+# bf1749b, and the File Browser right-click menu respectively) and both already carry
+# promoted_to: PLAN-022 in the idea log, so the corpus builder's own promoted-state
+# filter should drop them without help from this file.
