@@ -6071,6 +6071,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 
 - relates_to ← `000127`
 - relates_to ← `000128`
+- relates_to ← `000136`
 
 ---
 
@@ -6411,3 +6412,15 @@ No additional plan, requirement, ADR or backlog phase is needed to capture this 
 
 - relates_to → `000124`
 - relates_to → `000115`
+
+---
+
+## 000136 · Pack convention: browser smoke dispatch and named runtime instruments for every frontend item
+
+**Created 2026-09-11T21:50:58-04:00 · Status: `open`**
+
+Coordinator post-mortem of phase-wb-09's gate, 2026-09-11, for the planning triage (batch anchor 000108). The wb-09 blocker (page crashed on load; caught only by the final adversarial review because build/lint/pytest/mechanical gate are all blind to runtime rendering) and the two burned fix cycles on the reassignment session-kill (creator patched from a batching assumption instead of a websocket-lifecycle measurement) share one structural cause: browser-less creators plus back-loaded browser checks. The next pack adopts two conventions, generalizing wb-08's W08-M pattern that worked: (1) every frontend work item gets a cheap browser smoke dispatch - clean profile, page renders real content, no uncaught console errors, dev AND production build - runnable after each creator commit, before the validator; (2) every stateful runtime requirement (session survival, persistence, fill) names its measurement instrument in the pack (e.g. the websocket open/close lifecycle trace correlated with backend logs), the creator prompt must state the expected post-fix trace signature, and no second fix attempt is dispatched without the first attempt's live measurements attached. Full write-up: brain/procedures/runtime-behavior-needs-runtime-evidence.md.
+
+**Links**
+
+- relates_to → `000126`

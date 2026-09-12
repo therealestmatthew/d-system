@@ -48,6 +48,7 @@ brain/
 - [Handling /session-close When No Phase Is Active](procedures/session-close-with-no-active-phase.md)
 - [Resolving Staged Idea-Triage Follow-ups via AskUserQuestion](procedures/resolve-idea-triage-followups.md)
 - [Auditing a Document for Accuracy Introduces New False Claims](procedures/audit-your-own-corrections.md)
+- [Runtime Behavior Needs Runtime Evidence](procedures/runtime-behavior-needs-runtime-evidence.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
