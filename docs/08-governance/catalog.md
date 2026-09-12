@@ -175,6 +175,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-11-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-06-workbench-fixes-planning.md |
 | SESS-2026-09-11-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-07-phase-wb-08-panel-fixes.md |
 | SESS-2026-09-11-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-08-phase-wb-09-layout-assignment.md |
+| SESS-2026-09-12-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-12-01-idea-triage-sweep.md |
 
 ## Plans and their phases
 
@@ -212,7 +213,7 @@ CI regenerates it and fails on any difference.
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
-| PLAN-022 | doc-workbench | active | 1 | 0 | 8 | agent-demo-data, agent-demo-stage |
+| PLAN-022 | doc-workbench | active | 0 | 1 | 8 | agent-demo-data, agent-demo-stage, agent-fable |
 
 ## Held codes
 
@@ -222,4 +223,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-168 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 24, requirement: 7, session: 61.
+169 documents — adr: 15, architecture: 5, governance: 9, operation: 14, plan: 33, prompt: 24, requirement: 7, session: 62.

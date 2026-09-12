@@ -567,9 +567,11 @@ def test_ideas_queue_route_orders_by_status_precedence_then_age(
     assert [row["id"] for row in body] == expected_order
 
     # Every idea still open or triaged outranks every promoted or discarded idea.
-    open_or_triaged = {idea_id for idea_id, entry in state.items() if entry["status"] == "open"}
+    open_or_triaged = {
+        idea_id for idea_id, entry in state.items() if entry["status"] in ("open", "triaged")
+    }
     terminal = {idea_id for idea_id, entry in state.items() if entry["status"] == "discarded"}
-    assert open_or_triaged, "fixture assumption: at least one open idea exists"
+    assert open_or_triaged, "fixture assumption: at least one open or triaged idea exists"
     assert terminal, "fixture assumption: at least one discarded idea exists"
     ranks = {row["id"]: index for index, row in enumerate(body)}
     assert max(ranks[idea_id] for idea_id in open_or_triaged) < min(
