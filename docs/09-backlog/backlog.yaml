@@ -6076,14 +6076,17 @@ items:
     found two cosmetic errors in the session record's own prose (a strategy-phase count
     and a stale commit hash), both since corrected, and nothing touching the
     deliverables or either acceptance condition.
-  next_action: Integrate agent/lit-campaign into dev - the first of the two integrations
-    PLAN-023 schedules, and the owner's to perform. 49 commits, rebased onto dev at
-    33f931a, tree clean, governance exit 0, 578 tests passing. Note the private-content
-    check verified nothing in the worktree (0 identifiers; _private/ is gitignored and
-    absent there), so the integration-time run in the primary checkout is the first real
-    one - see idea 000150. Optionally amend f147b50 to drop a stray drafting fragment
-    from its message before integrating; cosmetic, and cheap only while unpushed.
-    phase-lit-02 (Pass 1b, D21-D27 and D33-D45) is now unblocked.
+  next_action: None outstanding. On the owner's direction, agent/lit-campaign was
+    rebased onto dev at 0bbcf60 and fast-forwarded in at this phase boundary - earlier
+    than the pre-synthesis check-in PLAN-023 schedules. 50 commits, tree clean,
+    governance exit 0, 578 tests passing. The integration-time private-content check ran
+    clean in the primary checkout with the live identifier list - OK (528 tracked files,
+    31 identifiers checked) - so no confidential identifier reached any campaign
+    deliverable; the tool defect behind the vacuous worktree run remains idea 000150.
+    The branch and worktree were deliberately kept, since PLAN-023 has every campaign
+    phase commit to that one branch. phase-lit-02 (Pass 1b, D21-D27 and D33-D45) is
+    unblocked and continues on it. Commit f147b50 carries a stray drafting fragment in
+    its message; cosmetic, now on the trunk, and no longer cheap to amend.
 - id: phase-lit-02
   title: Literature review Pass 1b — broad map of agent memory, decision intelligence
     and requirements-engineering domains

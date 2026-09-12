@@ -145,16 +145,24 @@ was removed from `next_up` in the same change.
 The phase reached `complete` through the owner's `/session-close`, after the independent review
 recorded below — not by an agent's own judgement that the work looked finished.
 
-`next_action`: Integrate `agent/lit-campaign` into `dev` — the first of the two integrations
-`PLAN-023` schedules, and the owner's to perform. `phase-lit-02` (Pass 1b, D21–D27 and
-D33–D45) is now unblocked.
+`next_action`: None outstanding. The owner directed integration at this phase boundary, and
+`agent/lit-campaign` was rebased onto `dev` at `0bbcf60` and fast-forwarded in. `phase-lit-02`
+(Pass 1b, D21–D27 and D33–D45) is unblocked and continues on the same campaign branch.
 
 ## Unresolved
 
-- **The campaign branch is unintegrated.** 48 commits on `agent/lit-campaign`, rebased onto
-  `dev` at `33f931a`, tree clean, governance green, 578 tests passing. Integration is the
-  owner's, at the point `PLAN-023` names.
-- **The private-content gate verified nothing** — see `## Verification`. Idea `000150`.
+- **Integrated, earlier than `PLAN-023` schedules.** The owner directed integration at this
+  phase boundary rather than at the pre-synthesis check-in, and `agent/lit-campaign` was
+  rebased onto `dev` at `0bbcf60` and fast-forwarded in — 50 commits, 6 files, tree clean.
+  The branch and its worktree were deliberately **not** deleted: `PLAN-023`'s branch model has
+  every campaign phase commit to that one branch, and removing it would force the
+  cross-branch archaeology the model exists to prevent. `phase-lit-02` continues on it.
+- **The private-content gate verified nothing in the worktree, and the integration-time run
+  cleared it.** See `## Verification` for the vacuous worktree run. The real check, in the
+  primary checkout with the live identifier list, was run immediately after the merge:
+  `check_no_private_content: OK (528 tracked files, 31 identifiers checked)`, exit 0. No
+  confidential identifier reached any campaign deliverable. The mitigation the owner ruled on
+  worked; the underlying tool defect is unchanged and remains idea `000150`.
 - **Four instrument gaps were recorded as ideas** `000147`–`000150`, anchored on `000147`:
   the evidence contract fixes no identifier format for the ledger's `kept` column; its
   `source_type` enum has no bucket for a patent; its `strategy_phase` enum has no value for
