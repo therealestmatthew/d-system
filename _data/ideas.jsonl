@@ -632,3 +632,4 @@
 {"idea": "000143", "event": "status", "at": "2026-09-12T00:24:32-04:00", "eid": "e18d47829a549ee0d", "from": "open", "to": "triaged"}
 {"idea": "000142", "event": "status", "at": "2026-09-12T00:24:51-04:00", "eid": "e18d4782e27b07db1", "from": "open", "to": "triaged"}
 {"idea": "000144", "event": "status", "at": "2026-09-12T00:25:01-04:00", "eid": "e18d4783070599f82", "from": "open", "to": "triaged"}
+{"idea": "000144", "event": "linked", "at": "2026-09-12T00:33:23-04:00", "eid": "e18d478a56ec85a86", "type": "relates_to", "target": "000124"}

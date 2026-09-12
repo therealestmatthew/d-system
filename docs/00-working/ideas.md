@@ -6067,6 +6067,7 @@ PROPOSED LINK: 000124 --relates_to--> 000133 (Geometry redesign builds on the fo
 - relates_to ← `000133`
 - relates_to ← `000135`
 - relates_to ← `000141`
+- relates_to ← `000144`
 
 ---
 
@@ -6910,3 +6911,4 @@ PROPOSED LINK: 000144 --relates_to--> 000124 (vocabulary work must settle termin
 - extends → `000143`
 - relates_to → `000141`
 - relates_to → `000135`
+- relates_to → `000124`
