@@ -7234,3 +7234,37 @@ validated, so the first version may want to be a report.
 **Links**
 
 - relates_to → `000153`
+- relates_to ← `000155`
+
+---
+
+## 000155 · GOV-006 points agents at append_idea.py directly, which leaves the tree red until the generator runs
+
+**Created 2026-09-12T14:54:24-04:00 · Status: `open`**
+
+docs/00-working/ideas.md is generated from _data/ideas.jsonl and committed, and
+test_the_committed_markdown_matches_regenerated_output diffs the two. Appending an idea therefore
+leaves the suite failing until tools/generate_ideas_md.py runs.
+
+The slash commands handle this: .claude/commands/idea.md line 91 and
+.claude/commands/idea-triage.md line 92 both run the generator as part of their procedure. The gap
+is in GOV-006's capture rule, which tells every agent in every session to record an ask "at once
+through the sanctioned idea writer (tools/append_idea.py)" — naming the tool, not the skill. An
+agent following that sentence literally, mid-session and without invoking /idea, appends and moves
+on, and the failure surfaces later as a red pytest run that looks unrelated to whatever the session
+was actually doing.
+
+On 2026-09-12 this happened while capturing 000153 and 000154: two appends, then
+"1 failed, 577 passed" on a branch whose diff was a memory file. The message names the generator, so
+the fix took a minute — but the test ran only because the session was heading for integration, and a
+session that appends an idea without running the suite hands the red tree to whoever merges next.
+
+Options worth weighing, none obviously right: have append_idea.py regenerate the markdown itself
+(couples an append-only writer to a rendering step, and the tool's OPS document would need to say
+so); have GOV-006 name the regeneration alongside the tool; or point GOV-006 at /idea and let the
+command stay the single sanctioned path, which conflicts with GOV-006 applying to agents in every
+context, including ones with no slash commands.
+
+**Links**
+
+- relates_to → `000154`
