@@ -6377,9 +6377,35 @@ PROPOSED LINK: 000134 --relates_to--> 000117 (related instance of content-fit fa
 
 ## 000135 · Modular multi-instance system for slots and panels: multiple copies of the same thing
 
-**Created 2026-09-11T21:37:25-04:00 · Status: `open`**
+**Created 2026-09-11T21:37:25-04:00 · Status: `triaged`**
 
 Owner idea, 2026-09-11, for the planning triage (batch anchor 000108), recorded as described with terminology deliberately left unresolved. Make the slots, and the panels allocated into them, modular enough that the system supports multiple copies: technically able to create multiple copies of the same object within a panel, and multiple copies of the same panel type across the workbench - which requires first classifying what the different panel types are, or rather (the owner's correction mid-thought) the different SLOT types. The owner then flagged that the terminology may be backwards as currently used: it may make more sense that panels are the containers things get placed into, not slots - but they are explicitly unsure, and directed that NOTHING terminology-related be changed yet; this idea records the intent as spoken. The naming question is exactly idea 000124's glossary work, which must settle container-vs-content vocabulary before this multi-instance design is specified; the modularity half feeds the duplication/modularity audit 000115. Today's implementation constraint worth noting for the eventual design: panel identity is currently singleton by panel_id (one bash terminal, one html-viewer) in the layout data, storage shape, and panel registry - multi-instance support touches all three plus session ownership.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-11T21:46:44-04:00): Idea 000135 proposes making slots and panels modular to support multiple copies of the same object within a panel and multiple copies of the same panel type across the workbench, addressing the current singleton constraint where panel identity is bound to panel_id in the layout data, storage shape, and panel registry.
+
+Existing governed coverage and relationships:
+
+**Plans and Requirements:**
+- PLAN-022 (Workbench plan) and REQ-007 (Workbench requirements) together define the current slot-and-panel architecture after phase-wb-09: per-panel eligibility, per-layout assignment, slot-header dropdowns to switch between panels in multi-panel slots. ADR-016 specifies the layout persistence model — layouts as versioned JSON with browser-only state storage.
+- The current design establishes singleton panel identity by panel_id as a foundational constraint (one bash terminal, one html-viewer per layout). Ideas 000135 is marked as future work requiring architectural changes to support multi-instance.
+
+**Related ideas with explicit dependencies:**
+- **Idea 000124** (Formalize the vocabulary and terminology of the HTML generation and workbench system) — explicitly cited in 000135's body as foundational: "The naming question is exactly idea 000124's glossary work, which must settle container-vs-content vocabulary before this multi-instance design is specified." 000124 also flags that terminology may be backwards ("it may make more sense that panels are the containers things get placed into, not slots") and addresses the owner's direction that nothing be changed yet.
+- **Idea 000115** (Duplication audit: find what is done multiple times and generalize toward modularity) — explicitly cited as receiving the modularity half: "the modularity half feeds the duplication/modularity audit 000115." Multi-instance support requires identifying what logic is duplicated across single instances and what can be generalized into reusable patterns.
+- **Idea 000133** (Revisit slot geometries and custom layout reconfiguration) — relates to 000135 implicitly; geometry work will interact with multi-instance design, particularly how slot resizing affects multiple occupants of the same type.
+- **Idea 000134** (Audit all slots and panels for content fit) — relates to 000135 implicitly; multi-instance panels require content-fit methodologies that account for multiple concurrent instances of the same type.
+
+All related ideas are already linked in the ideas system. No additional overlap with other ideas beyond those recorded in 000135's links and the citations within 000124, 000115, 000133, and 000134's own annotations.
+
+No additional plan, requirement, ADR or backlog phase is needed to capture this overlap — it is already recorded in the ideas.jsonl links and cross-referenced in their annotations as a prerequisite/dependent relationship chain. The work remains unscheduled pending the completion of 000124's terminology formalization.
+
+</details>
 
 **Links**
 
