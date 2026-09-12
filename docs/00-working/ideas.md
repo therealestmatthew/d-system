@@ -6503,6 +6503,7 @@ No additional plan, requirement, ADR or backlog phase is needed to capture this 
 - relates_to → `000124`
 - relates_to → `000115`
 - relates_to ← `000141`
+- relates_to ← `000144`
 
 ---
 
@@ -6807,6 +6808,7 @@ PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modular
 - relates_to → `000101`
 - relates_to → `000124`
 - relates_to → `000135`
+- relates_to ← `000144`
 
 ---
 
@@ -6816,6 +6818,10 @@ PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modular
 
 Owner idea, 2026-09-11, recorded as given. An exploration of ports and system processes and the management of them: what their lifecycle is, when and how to 'kill' them, and how they should be managed in general. Kin to the websocket education idea (000140) in spirit - understanding grounded in this repository's real material - and the repository supplies concrete cases: the port-8000 conflict noted mid-session during the workbench builds, the orphaned dev servers left behind by cut-off agents (named in 000138's anti-pattern starter catalog), and the demo terminal's PTY child processes whose reaping the alive-property investigations (000099/000129) turned on.
 
+**Links**
+
+- extended_by ← `000143`
+
 ---
 
 ## 000143 · Small application for managing and visualizing port usage and system processes
@@ -6824,6 +6830,11 @@ Owner idea, 2026-09-11, recorded as given. An exploration of ports and system pr
 
 Owner idea, 2026-09-11, recorded as given; the build companion to the ports-and-processes exploration recorded alongside it. A small application that manages and visualizes port usage and system processes: what is listening on which port, which processes are running and their state, and management actions on them (killing a process, freeing a port). Immediate practical motivators from this repository's sessions: spotting the port-8000 conflict without ad hoc shell forensics, and finding/cleaning the orphaned dev servers left by cut-off agents.
 
+**Links**
+
+- extends → `000142`
+- extended_by ← `000144`
+
 ---
 
 ## 000144 · Package the port/process app for the modular panel pages; general model for integrating sub-apps into slots
@@ -6831,3 +6842,9 @@ Owner idea, 2026-09-11, recorded as given; the build companion to the ports-and-
 **Created 2026-09-11T23:09:01-04:00 · Status: `open`**
 
 Owner idea, 2026-09-11, recorded as given; extends the port/process manager app recorded alongside it. Two halves: (1) that application becomes a package of sorts that can be integrated into the modular panel pages - a sub-app occupying a workbench slot like the existing panels do; (2) the general question of how we modularize to support integrating sub-apps in the slots at all - what a sub-app package looks like (its boundary, its API surface toward the workbench, how it registers as a panel type, how it gets its data), so future sub-apps plug in the same way rather than each being hand-wired. Sits directly on the slot/panel modularity thread: the multi-instance modularity ask (000135), the slot-configuration-schema model (000141), and the vocabulary work (000124) that has to settle what containers and contents are called before a packaging contract is specified.
+
+**Links**
+
+- extends → `000143`
+- relates_to → `000141`
+- relates_to → `000135`
