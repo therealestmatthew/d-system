@@ -5988,5 +5988,21 @@ items:
   deliverables:
   - docs/00-working/demo-runbook.md
   - docs/00-working/demo-windows-setup.md
-  next_action: Rewrite the configuration and launch sections of both documents
-    against the integrated phase-wb-09 UI.
+  next_action: All acceptance conditions verified met on branch agent/phase-wb-10
+    (commit 54e8390, pushed); awaiting the owner's integration decision (outside
+    PROMPT-023 delta 4's pre-approval) and the owner-invoked /session-close.
+  session: doc-session-phase-wb-10-runbook-refresh
+  completion_evidence:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  result: 'In progress on branch agent/phase-wb-10 (commit 54e8390): both documents
+    rewritten against the integrated phase-wb-08/09 UI, verified in code rather than
+    from phase text - the assignment-only "Configure layout" dialog (one eligible-slot
+    selector per panel, in-place displacement confirm notice, no per-slot visible-panel
+    selects), switcher-only slot-header dropdowns, and the platform-conditional
+    fresh-store default shell (PowerShell on Windows, bash elsewhere); both launch
+    sections state the frontend D_SYSTEM_DEMO_TERMINAL=1 requirement and the
+    silently-blank-viewer failure mode it prevents. Historical rehearsal findings 4
+    and 6 annotated as superseded/resolved by wb-09/wb-08. Governance green;
+    private-content check OK with changes staged (31 identifiers); retired-phrasing
+    grep clean. Integration awaits the owner.'
