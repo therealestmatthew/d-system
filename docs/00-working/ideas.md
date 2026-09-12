@@ -6955,3 +6955,162 @@ The owner ruled on 2026-09-12, while ratifying the literature-review pre-plan pa
 What it would touch: docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md, one sentence in its "Left undone" section. Session records are historical accounts rather than live instructions, which is the argument for amending in place with a dated correction note rather than silently rewriting, and also the argument for leaving it alone entirely.
 
 What is unresolved: whether a session record should be corrected at all once written, or whether the correct treatment of a misstatement in a historical record is an appended note rather than an edit. The repository has no stated convention for amending a closed session record, and that convention question is the more general thing worth settling - this instance is just the occasion for it. The owner was asked about correcting it on 2026-09-12 and did not rule either way, so it is recorded here rather than left in conversation memory.
+
+---
+
+## 000147 · Give the literature-review evidence contract a fixed identifier format for the ledger's kept column
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) defines what the reproducibility ledger's `kept` column
+means but never fixes the *format* of an identifier written into it. In phase-lit-01, the
+campaign's first execution session, four dispatches used four conventions and the drift was
+measurable against the phase gate:
+
+    distinct kept identifiers: 216
+    kept-but-uninventoried, identifiers resolved: 0      <- the true figure
+    kept-but-uninventoried, literal string match: 32     <- false failures
+    by form: doi: prefix 26, semanticscholar URL vs scheme 4, uspto URL vs scheme 2
+
+Every one of those 32 sources was in fact present in the source inventory, under a different
+spelling of the same identifier: `doi:10.x/y` against `10.x/y`,
+`semanticscholar.org/paper/<hash>` against `semanticscholar:<hash>`,
+`image-ppubs.uspto.gov/.../downloadPdf/<n>` against `uspto:<n>`.
+
+This matters because the LIT-01 G gate's third measurement is "count of ledger rows whose
+`kept` names a source absent from the inventory (gate: 0)", it runs on Haiku as a deliberately
+mechanical gate, and a literal string match is the straightforward reading of that sentence.
+The gate can therefore report up to 32 failures that are not real, in a campaign whose entire
+value rests on its gates being trustworthy. The same exposure applies to every later phase and
+to the final stop-condition gate, which computes chaining coverage from `subject_source_id`
+the same way.
+
+Two candidate fixes, not mutually exclusive:
+
+1. PLAN-023.03 gains an identifier-format rule — one canonical scheme-prefixed form per
+   provider — binding on both the ledger's `kept` and the inventory's `url_or_doi`.
+2. The gate's measurement is specified to resolve identifiers rather than string-match, so a
+   format difference cannot masquerade as a missing source.
+
+The owner ruled on 2026-09-12 that the 32 affected cells be normalised in place before the
+LIT-01 G gate ran, which repairs the instance. This idea is the durable fix: nothing yet stops
+the next dispatch inventing a fifth convention.
+
+Found by the coordinator of phase-lit-01. Anchor for the batch of instrument gaps that the
+first real execution of the research protocol (GOV-009) surfaced.
+
+**Links**
+
+- relates_to ← `000148`
+- relates_to ← `000149`
+- relates_to ← `000150`
+
+---
+
+## 000148 · The literature-review evidence contract's source_type enum has no bucket for a patent
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) fixes the source inventory's `source_type` to
+standard / peer-reviewed / conference / preprint / OSS / tech report / lead. Phase-lit-01
+encountered granted patents as genuine prior art — `uspto:11544323` (enterprise knowledge-graph
+annotations, Microsoft, granted 2023-01-03), `uspto:4918621` (ATMS world representation) and
+`uspto:11481658` (BDI multi-agent architecture) — and there is no value that fits.
+
+They were filed under `tech report`, which is the closest available and is wrong: a granted
+patent has a different evidentiary character from a technical report, and the anti-novelty case
+the campaign is building will want to distinguish them. Patents are among the strongest
+possible evidence for H0 (that D-System is a recombination of known ideas), because a granted
+claim is a dated, examined assertion that a mechanism was already known.
+
+The fix is a `patent` value in the enum, and a note in the contract on how to cite one
+(grant number, assignee, filing and grant dates). Doing it mid-campaign was deliberately
+avoided — no agent may edit a ratified contract to make its own data fit — so the existing rows
+stay as `tech report` until the contract changes and they are migrated deliberately.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000149 · The literature-review ledger's strategy_phase enum has no value for bibliographic verification
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) fixes the reproducibility ledger's `strategy_phase` to
+A vocabulary / B backward chain / C forward chain / D system search / E collision, mirroring the
+search protocol's five strategies. That covers every search run to *find* a source.
+
+It does not cover a lookup run to *verify* a source already kept — confirming a publication
+year, a venue, an authorship, or whether a ResearchGate posting corresponds to a peer-reviewed
+paper. Phase-lit-01 ran sixteen such lookups across two extraction dispatches. Block C is
+categorical that every search gets a ledger row ("a search that logged nothing did not
+happen"), so they had to be logged, and they were filed under `D` (system search) as the
+closest fit, with the mismatch noted rather than papered over.
+
+This is not cosmetic. Once verification lookups are indistinguishable from system searches, the
+ledger stops supporting the measurement it exists for: "how thoroughly was this domain
+searched" is computed per domain from row counts, and rows that found nothing new inflate that
+count. In phase-lit-01 sixteen of the ledger's rows are verification, not search.
+
+The fix is a sixth value — `V` verification, or similar — and a line in the contract saying
+that gate measurements of search breadth exclude it. Worth settling before Pass 2, where
+deep reading will generate many more verification lookups per source than Pass 1 did.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000150 · The private-content check silently does nothing in a worktree, because _private is gitignored
+
+**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+
+`tools/check_no_private_content.py` has two halves: a path check that always runs, and a
+content check that runs only when `_private/portfolio/` exists on disk. `_private/` is
+gitignored, so it exists in the primary checkout and in no worktree, ever. Run inside an agent
+worktree the tool prints:
+
+    note: _private/portfolio/ not found — content check skipped (path check still ran; this is
+    expected in CI / a fresh clone)
+    check_no_private_content: OK (526 tracked files, 0 identifiers checked)
+
+Zero identifiers, against 31 in the primary checkout — and it exits 0 either way. An agent that
+runs it in its worktree, sees OK, and records that as a passing verification has recorded
+nothing. AGENTS.md already warns that this gate "passes by not looking" when run unstaged; this
+is a second route to the same outcome, and the more dangerous one, because the note is easy to
+read past and the exit code is green.
+
+The exposure scales with how long work stays off the trunk. In the literature-review campaign
+the owner ratified a single long-lived branch (`agent/lit-campaign`) integrated into `dev`
+exactly twice, so campaign content written across six phases is not content-checked against the
+real identifier list until the first of those integrations. The branch-model ruling and this
+blind spot were decided independently and their interaction was not considered.
+
+Candidate fixes:
+
+1. Give the tool a `--root` or `--identifiers-from` argument so it can be aimed at another
+   checkout, and have worktree agents call it that way. Needs its own requirement, plan and
+   OPS document per AGENTS.md's rule for tools.
+2. Make the skipped content check non-silent — exit non-zero, or print a warning that an agent
+   cannot honestly record as a pass, when invoked somewhere the identifier list is absent.
+3. State in AGENTS.md that a worktree run of this check is not a verification, and that the
+   real check belongs to integration.
+
+The owner ruled on 2026-09-12 to accept the gap for the current campaign and rely on the
+integration-time check. This idea is the durable fix.
+
+Found by the coordinator of phase-lit-01, the first real execution of the research protocol
+(GOV-009).
+
+**Links**
+
+- relates_to → `000147`
