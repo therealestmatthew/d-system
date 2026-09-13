@@ -6390,7 +6390,7 @@ items:
   next_action: Hold the pre-synthesis owner check-in (ratified decision 3), then dispatch
     delegation-pack section LIT-07.
 - id: phase-kit-01
-  title: Build the fictional source corpus the kit's entries operate on
+  title: Build the kit's six commands
   plan: doc-consultant-demo-kit
   sources:
   - doc-consultant-demo-kit-requirements
@@ -6402,51 +6402,25 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Write the per-subsidiary close process documents, the partly-sourced draft, and the
-    raw meeting notes, for one fictional company with one consistent set of figures.
-  - Ensure the corpus carries the human obstacle and contains more than the presenter
-    narrates, so entries can surface something unstated.
-  acceptance:
-  - Every file K01 names exists with the content it specifies.
-  - At least two commitments in the meeting notes have neither owner nor date.
-  - The draft contains both traceable and untraceable numbers.
-  - No real client name, engagement, person or figure appears anywhere in the corpus.
-  verification:
-  - Read each corpus file against REQ-008 K01.
-  - Run uv run python tools/check_no_private_content.py with the corpus staged.
-  deliverables:
-  - demo-kit/corpus/
-  next_action: Write the three per-subsidiary close process documents with one consistent
-    set of figures.
-- id: phase-kit-02
-  title: Build the kit's six commands
-  plan: doc-consultant-demo-kit
-  sources:
-  - doc-consultant-demo-kit-requirements
-  systems:
-  - sys-demo-kit
-  owner: repository-owner
-  status: queued
-  priority: 1
-  session_budget: 1
-  depends_on:
-  - phase-kit-01
-  scope:
-  - Create context-me, whats-load-bearing, stakeholder-read, capture-this, one-pager and
-    client-ready under .claude/commands/, each with frontmatter and a body using $ARGUMENTS.
-  - Point context-me at the kit's own context file; no command writes a governed file.
+  - Create context-me, whats-load-bearing, stakeholder-read, capture-this, one-pager
+    and client-ready under .claude/commands/, each with frontmatter and a body using
+    $ARGUMENTS.
+  - context-me drafts the context file's content to the screen and writes nothing; the
+    consultant saves it themselves.
   - Give client-ready an argument-hint covering audience, length and format.
   acceptance:
   - Each command loads and is listed as a slash command.
-  - No command writes CLAUDE.md, AGENTS.md or any governed document.
-  - client-ready declares its arguments in frontmatter and documents them in its body.
+  - No command writes CLAUDE.md, AGENTS.md or any other file in this repository.
+  - context-me outputs content for the reader to save and never claims to have written
+    a file.
+  - client-ready declares its arguments in frontmatter and documents them in a table.
   verification:
   - Invoke each command once in a session and record the result.
   - Read every command definition for a write target, per REQ-008 K05.
   deliverables:
   - .claude/commands/
-  next_action: Create whats-load-bearing, the entry that carries the kit's central idea.
-- id: phase-kit-03
+  next_action: Create whats-load-bearing, the command that carries the kit's central idea.
+- id: phase-kit-02
   title: Build the kit's two self-announcing skills
   plan: doc-consultant-demo-kit
   sources:
@@ -6457,24 +6431,24 @@ items:
   status: queued
   priority: 1
   session_budget: 1
-  depends_on:
-  - phase-kit-01
+  depends_on: []
   scope:
-  - Create load-bearing-details and notes-to-commitments under .claude/skills/, each naming
-    itself in the first line of its output.
-  - Write each description to fire on a cue present in the input, with an explicit statement
-    of when it must not fire.
+  - Create load-bearing-details and notes-to-commitments under .claude/skills/, each
+    naming itself in the first line of its output.
+  - Write each description as a trigger firing on a cue present in the input, with an
+    explicit statement of when it must not fire.
   acceptance:
   - Each skill names itself in its first output line when it fires.
-  - Each skill fires on three inputs that should fire it and on none of three that should not.
+  - Each skill's description states both its firing phrasings and its non-firing cases.
   - notes-to-commitments never invents an owner or a date, and flags unowned commitments.
   verification:
-  - Run the six-input firing test per REQ-008 K08 and record which fired.
-  - Provoke each skill and read the first line of output.
+  - Read each SKILL.md against REQ-008 K07 and K08.
+  - Confirm each skill appears in the skill listing.
   deliverables:
   - .claude/skills/
-  next_action: Write load-bearing-details' description as a trigger, with its non-firing clause.
-- id: phase-kit-04
+  next_action: Write load-bearing-details' description as a trigger, with its non-firing
+    clause, since it fires on an absence and is the hardest of the two to write.
+- id: phase-kit-03
   title: Build the reordered prompt ladder and the anti-pattern gallery
   plan: doc-consultant-demo-kit
   sources:
@@ -6485,25 +6459,23 @@ items:
   status: queued
   priority: 1
   session_budget: 1
-  depends_on:
-  - phase-kit-01
+  depends_on: []
   scope:
   - Write the six prompt files with the interview rung before the obstacle rung, one
     ingredient added per rung, and the obstacle entering because the model asked for it.
-  - Pin the outputs for every rung marked pre-baked, including the before-and-after that
-    demonstrates the recommendation inverting.
+  - Write the anti-pattern gallery with four entries, each naming the failure, showing
+    it, and stating the fix in one line.
   acceptance:
-  - Each rung names the single ingredient it adds.
-  - The interview rung's output asks for the obstacle before any rung states it.
-  - The recorded rung-3 and rung-4 outputs differ in recommendation, not only in wording.
+  - Each rung names the single ingredient it adds over the previous rung.
+  - The interview rung precedes the rung that states the human obstacle.
+  - The gallery contains no entry whose failure costs only tokens.
   verification:
   - Read the six files in order against REQ-008 K11.
-  - Run the ladder end to end and compare the pinned outputs per K12.
   deliverables:
-  - demo-kit/prompts/
-  next_action: Draft the interview rung and run it against rung 2 to confirm it surfaces the
-    obstacle unprompted.
-- id: phase-kit-05
+  - .claude/prompts/
+  next_action: Draft the interview rung, which the triage found must come before the
+    obstacle or the kit describes its central idea instead of embodying it.
+- id: phase-kit-04
   title: Build the kit's two agents with explicit tool lists
   plan: doc-consultant-demo-kit
   sources:
@@ -6514,111 +6486,19 @@ items:
   status: queued
   priority: 1
   session_budget: 1
-  depends_on:
-  - phase-kit-01
+  depends_on: []
   scope:
-  - Create objection-panel and evidence-checker under .claude/agents/ with explicit tools
-    and model frontmatter.
+  - Create objection-panel and evidence-checker under .claude/agents/ with explicit
+    tools and model frontmatter and a stated stop condition.
   - Exclude Bash as well as every write tool from any agent presented as read-only.
   acceptance:
   - evidence-checker declares only Read, Grep and Glob.
   - objection-panel declares its tool posture explicitly rather than leaving it unstated.
-  - Each agent returns within its stated timebox or has a committed pre-run fallback.
+  - Each agent's body states what it must never do and when it stops.
   verification:
-  - Read each agent's frontmatter per REQ-008 K09.
-  - Time one dispatch of each agent and record the result.
+  - Read each agent's frontmatter against REQ-008 K09.
+  - Confirm each agent appears in the agent listing.
   deliverables:
   - .claude/agents/
-  next_action: Create evidence-checker, whose read-only posture is genuinely enforceable.
-- id: phase-kit-06
-  title: Extend demo_reset.py to park and restore the kit as a set
-  plan: doc-consultant-demo-kit
-  sources:
-  - doc-consultant-demo-kit-requirements
-  systems:
-  - sys-demo-kit
-  - sys-demo-stage
-  owner: repository-owner
-  status: queued
-  priority: 1
-  session_budget: 1
-  depends_on:
-  - phase-kit-02
-  - phase-kit-03
-  - phase-kit-05
-  scope:
-  - Replace the hardcoded single-skill parking in tools/demo_reset.py with a mechanism that
-    parks and restores every kit command, skill and agent.
-  acceptance:
-  - With the kit parked, no kit entry appears in orient's command enumeration or the
-    workbench agent picker.
-  - Unparking restores every entry, and re-parking returns the listings to their parked state.
-  verification:
-  - Run the orient skill and the workbench agent listing parked, unparked and re-parked,
-    per REQ-008 K04.
-  deliverables:
-  - tools/demo_reset.py
-  - docs/08-governance/OPS-005-demo-reset.md
-  next_action: Read the hardcoded parking block at tools/demo_reset.py and design its
-    replacement.
-- id: phase-kit-07
-  title: Write the manifest, context file, facilitator guide and cut record
-  plan: doc-consultant-demo-kit
-  sources:
-  - doc-consultant-demo-kit-requirements
-  systems:
-  - sys-demo-kit
-  owner: repository-owner
-  status: queued
-  priority: 1
-  session_budget: 1
-  depends_on:
-  - phase-kit-02
-  - phase-kit-03
-  - phase-kit-04
-  - phase-kit-05
-  scope:
-  - Write demo-kit-manifest.json with one array per type and every field REQ-008 K13 names.
-  - Write the kit's context file in the owner's consultant voice, and the facilitator guide
-    with the run of show, per-entry timeboxes and the fifteen-minute cut line.
-  - Record every cut entry with its reason, reachable from the kit's documentation.
-  acceptance:
-  - Every manifest file path resolves to a file that exists.
-  - No more than five entries are marked headline.
-  - The cut line removes no beat-1 entry, and beat 1 survives it with more than one entry.
-  verification:
-  - Parse the manifest and assert the field set, blurb length and path existence per K13.
-  - Read the guide against REQ-008 K16 and K17.
-  deliverables:
-  - demo-kit/demo-kit-manifest.json
-  - demo-kit/README.md
-  - demo-kit/CONTEXT.md
-  next_action: Write the manifest from the built entries so the paths are real rather than
-    predicted.
-- id: phase-kit-08
-  title: Rehearse the kit twice and commit the fallbacks
-  plan: doc-consultant-demo-kit
-  sources:
-  - doc-consultant-demo-kit-requirements
-  systems:
-  - sys-demo-kit
-  owner: repository-owner
-  status: queued
-  priority: 1
-  session_budget: 1
-  depends_on:
-  - phase-kit-06
-  - phase-kit-07
-  scope:
-  - Run the kit end to end twice, recording per-entry times.
-  - Commit a pre-run recorded output for every entry that cannot meet its timebox live.
-  acceptance:
-  - Per-entry times are recorded for two full runs.
-  - Every entry marked pre-baked has a committed fallback artefact.
-  - The fifteen-minute cut line is confirmed against measured times rather than estimates.
-  verification:
-  - Read the runbook's recorded times against REQ-008 K10.
-  deliverables:
-  - demo-kit/runbook.md
-  next_action: Run the first timed rehearsal and record every per-entry time, including the
-    ones that overrun.
+  next_action: Create evidence-checker, whose read-only posture is genuinely enforceable
+    because it needs no Bash.
