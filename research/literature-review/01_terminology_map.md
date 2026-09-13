@@ -1084,3 +1084,19 @@ Automated Planning and Acting sources below), so it is recorded here as observed
 | Typed transition semantics as reasoning memory (H2): plan modification triggered by an explicit knowledge update | Integrating Planning, Action Execution, Knowledge Updates and Plan Modifications via Logic Programming | `hayashi-cho-ohsuga-planning-execution-knowledge-updates-2002` -- direct H2 collision candidate, terminology-independent (title is a near-literal restatement of D62's mandated collision query) |
 | "Replanning" as a single D-System mechanism name, against a field that treats it as several incompatible flavors | The Metrics Matter! On the Incompatibility of Different Flavors of Replanning | `metrics-matter-replanning-flavors-taxonomy-2014` |
 | Implementation-availability anchor for classical AI planning/execution, paired with its canonical description paper | Fast Downward -- domain-independent classical PDDL planning system | `fast-downward-planner-oss`; `helmert-fast-downward-planning-system-jair-2006` |
+
+## D63 — Execution monitoring
+
+"Execution monitoring", "plan monitoring" and "discrepancy detection" were confirmed as the
+field's own established terms for this whole sub-area via Fritz's 2005 survey at
+`LIT-03-S185`; the survey itself was not independently kept (its taxonomy role is subsumed by
+the sources below), so it is recorded here as observed vocabulary only.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Runtime-to-knowledge closure (H11): expectation-versus-observation discrepancy triggers goal/knowledge revision | Bounded Expectations for Discrepancy Detection in Goal-Driven Autonomy -- expectations generated from plans, discrepancies detected against observations, goals revised | `bounded-expectations-discrepancy-detection-gda-workshop` -- direct H11 collision candidate, strongest D63 finding |
+| Historical origin of runtime observation feeding back into plan/knowledge state, predating agentic AI by five decades | PLANEX (Learning and Executing Generalized Robot Plans, Shakey robot) and its direct successor formalism | `fikes-hart-nilsson-learning-executing-generalized-robot-plans-planex-1972`; `nilsson-teleo-reactive-programs-agent-control-jair-1994` |
+| Epistemic blast-radius / change-impact reasoning (H10) applied to plan preconditions rather than requirements or code | Approximately Optimal Monitoring of Plan Preconditions -- resource-bounded precondition-monitoring decision problem | `approximately-optimal-monitoring-plan-preconditions-2013` |
+| D63's own domain definition ("an execution-monitoring system for replanning"), restated near-exactly by a 2001 system name | SimPlanner: An Execution-Monitoring System for Replanning in Dynamic Worlds | `simplanner-execution-monitoring-replanning-dynamic-worlds-2001` -- direct collision candidate |
+| Provenance/evidence-lineage triggering conflict resolution and a knowledge-state transition (H2, H3): a diagnosis result triggers plan revision | Action Failure Recovery via Model-Based Diagnosis and Conformant Planning (model-based diagnosis triggers conformant replanning) | `micalizio-action-failure-recovery-diagnosis-conformant-planning-2013` -- direct collision candidate; recurrence: first surfaced under D62 (`LIT-03-S176`), verified and kept under D63 as its more central domain (`LIT-03-S194`) |
+| Implementation-availability anchor for integrated execution-monitoring-plus-resolution, robotics domain | execution_monitoring -- plan execution, monitoring and resolution framework for long-term autonomous outdoor robots | `execution-monitoring-tbohne-oss` |
