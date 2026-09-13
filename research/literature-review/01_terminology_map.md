@@ -1182,3 +1182,19 @@ with no single source kept for it (observed at `LIT-03-S232`).
 | "Production feedback" / continuous-experimentation vocabulary, field's consolidating account | Controlled experimentation in continuous experimentation: Knowledge and challenges | `fabijan-dmitriev-olsson-bosch-controlled-experimentation-continuous-2021` |
 | Observability integrated directly into DevOps development practice | Integrating Observability with DevOps Practices in Financial Services Technologies | `ijacsa-integrating-observability-devops-financial-services-2024` |
 | Event-sourced architecture directly connected to production observability and development decisions | Event-sourced, observable software architectures: An experience report | `event-sourced-observable-software-architectures-experience-report-2022` |
+
+## D68 — Self-adaptive systems
+
+The managed-system/managing-system architectural split predates MAPE-K's own formalization
+(Kramer and Magee's 2007 FOSE statement, `LIT-03-S245`/`LIT-03-S247`); "models@runtime" is the
+field's own term for a causally-connected runtime model kept in sync with the running system,
+directly comparable to any runtime-state-synchronization claim D-System makes.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| D-System's own runtime control-loop framing, historically prior architectural split | "Managed system" / "managing system" split -- the field's foundational architectural-challenge statement, predating MAPE-K | `kramer-magee-self-managed-systems-architectural-challenge-fose2007` |
+| D-System's candidate state abstraction and any runtime-state-synchronization claim | "Models@run.time" -- causally-connected runtime models kept in sync with the running system | `bencomo-gotz-song-models-at-runtime-guided-tour-sosym-2019` |
+| Formal state/transition model counterpart to D-System's own S=(O,E,L,Content,TemporalScope,Metadata) abstraction | FORMS -- formally specified reference model of managed/managing elements, roles and relationships for distributed self-adaptive systems | `weyns-etal-forms-reference-model-taas-2012` -- direct H1 collision candidate |
+| Overall field research agenda D-System's own lifecycle and design-space claims should be checked against | Software Engineering for Self-Adaptive Systems: A Research Roadmap / A Second Research Roadmap | `cheng-delemos-etal-self-adaptive-systems-research-roadmap-2009`; `delemos-giese-etal-self-adaptive-systems-second-roadmap-2013` |
+| Runtime-to-knowledge closure (H11) applied specifically to self-adaptive systems | Runtime verification and validation chapter of the Second Roadmap | `self-adaptive-systems-second-roadmap-runtime-vv-chapter-2013` |
+| Learned/adaptive analyze-plan stages, relevant to any ML-augmented adaptation claim in D-System | Applying Machine Learning in Self-adaptive Systems | `applying-ml-self-adaptive-systems-acm-csur-2020` |
