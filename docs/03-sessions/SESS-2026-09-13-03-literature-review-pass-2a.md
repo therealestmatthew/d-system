@@ -326,13 +326,34 @@ campaign stops at phase boundaries; Pass 2b brings the matrix from 20 to the met
 forward chaining and foundational works, and `LIT-05 G` additionally reports which of H1–H11 have
 zero challengers, which is what tells `phase-lit-06` where to dig.
 
-**Seven findings are recorded as ideas and none is resolved**, because none of them is an agent's to
-resolve mid-campaign. Two need the owner specifically: `000208` proposes wording changes to
-`AGENTS.md` and `CLAUDE.md`, which no agent may edit; `000210` asks whether a `source_id` that names
-the wrong author is renamed across four files or frozen with a correction elsewhere. The rest —
-`000209`, `000211`, `000212`, `000213`, `000214`, `000215` — are contract and instrument gaps that
-will recur in `phase-lit-05` through `phase-lit-07` if left, and `000214` in particular bears on
-gates that re-measure blank fields over a larger matrix.
+**Eight findings are recorded as ideas.** They were open at close; the owner ruled on four of them
+immediately afterwards, and those rulings are recorded as annotations on the ideas themselves so
+`phase-lit-05` picks them up without re-asking:
+
+- `000209` — **the evidence matrix is authoritative for any deep-read source, and a deep read may now
+  write bibliographic corrections back into the inventory**, not only `status`. This supersedes the
+  narrower Pass 2a ruling from `phase-lit-05` onward. The five known-wrong rows this phase found are
+  that rule's first backlog.
+- `000210` — **freeze the slug, correct the citation.** `source_id` is an opaque stable key once
+  committed evidence points at it; the ledger is not rewritten to fix a fact a slug appears to encode.
+- `000214` — **approved and applied**: Block G in `PROMPT-029` now requires every gate to report the
+  population it measured, to name every trigger it tested where a rule has more than one, and to
+  derive a field list from its contract rather than choosing a subset.
+- `000208` — **fix the tool, not the documentation.** Dispatched as owner-directed work on
+  `agent/catalog-writer`, outside this campaign's branch and without a backlog phase.
+
+`000211`, `000212`, `000213` and `000215` remain open. They are contract and instrument gaps that
+will recur through `phase-lit-07` if left, none of them blocking.
+
+**A correction to this record's own account of `000208`.** It is written above as a discovery. It was
+a rediscovery: `brain/procedures/a-check-that-cannot-fail-is-not-a-check.md`, dated 2026-09-12, names
+this exact flag as its worked example, states that it prints rather than writes, and gives the
+correct drift check. `SESS-2026-09-13-01` records the same thing again from Pass 1b. The coordinator
+read neither and ran the anti-pattern the procedure exists to prevent. That is the third recurrence in
+three days, and it is the reason the owner directed a tooling fix rather than a fourth warning —
+documentation had already been tried. The retrieval gap it exposes, that a brain procedure naming the
+exact command did not reach the session that needed it, is the more general problem and is not fixed
+by fixing this tool.
 
 **The inventory was left carrying values the campaign has verified are wrong** — five bibliographic
 disagreements and one misattributed slug. That is correct under the deep-read-marking ruling, which

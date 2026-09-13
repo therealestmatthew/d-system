@@ -10399,10 +10399,11 @@ Same family as [[000147]], [[000148]], [[000149]] and [[000201]]: an instrument'
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-13T16:55:26-04:00): Second instance in the same session, different tool, same shape. tools/append_idea.py appends to _data/ideas.jsonl but does not regenerate docs/00-working/ideas.md, which is generated output that test_ideas.py::test_the_committed_markdown_matches_regenerated_output diffs in CI. Appending 000208-000214 in phase-lit-04 therefore left the tree red until tools/generate_ideas_md.py was run (commit 79580b0). Neither the idea skill nor the tool's own output mentions the projection; the tool prints "created NNNNNN at <timestamp>" and exits 0, so nothing signals that a second command is owed. That is the same failure shape as the --catalog case this idea records: a sanctioned writer completes successfully while leaving a derived artifact stale, and only the full test suite detects it. Worth considering whether the two fixes are one fix - a writer that regenerates its own projection, or a single pre-commit hook that regenerates every derived file and fails on drift, rather than each tool growing its own follow-up step for callers to remember.
 - **finding** by agent-lit (2026-09-13T18:56:10-04:00): The redirect this idea proposes as the fix has its own failure mode, hit during the phase-lit-04 close. `uv run python -m src.governance --catalog > docs/08-governance/catalog.md` truncates the target file before the command runs, so any run where validation fails destroys the catalog instead of leaving it stale. At close, a YAML syntax error introduced into backlog.yaml (a colon-space inside a plain scalar in a `result:` field) made the validator exit non-zero; the catalog was already truncated from 26266 bytes to 227 and had to be restored with `git checkout`. Nothing warned: the shell reports the redirect's success, not the generator's, and the `&&` chain that followed simply short-circuited. So the documented one-liner converts a recoverable stale-file state into a destroyed-file state exactly when the repository is already in an invalid state and the operator is least likely to be looking for a second failure. Safer form, and worth writing into whatever wording the owner approves: generate to a temporary file, check the exit status, and only then move it into place. Same reasoning applies to `tools/generate_ideas_md.py`, which writes its own target directly and would face the same question if it ever fails mid-write.
+- **finding** by agent-lit (2026-09-13T19:07:14-04:00): Correction to this idea's framing: the behaviour was already known and already recorded, and this phase rediscovered it rather than discovering it. brain/procedures/a-check-that-cannot-fail-is-not-a-check.md, written 2026-09-12 - the day before phase-lit-04 - names this exact flag as its worked example ("A flag named --catalog sounds like it regenerates the catalog file; it may only print the catalog to stdout"), states plainly that it prints rather than writes, and gives the correct drift check: `diff <(uv run python -m src.governance --catalog) docs/08-governance/catalog.md`. SESS-2026-09-13-01 records the same thing again from Pass 1b. The phase-lit-04 coordinator read neither and ran the anti-pattern the procedure exists to prevent, then reported it as a novel finding. Two consequences worth keeping. First, the prior record was documentation, and documentation did not stop the third recurrence in three days across different sessions - which is the argument for changing the tool rather than writing the warning a fourth time, and is what the owner directed on 2026-09-13. Second, the recurrence is itself evidence about where this repository's knowledge actually lands: a brain procedure naming the exact command did not reach the session that needed it, because nothing in the session's entry path surfaces brain/procedures by topic. That retrieval gap is the more general problem and is not fixed by fixing this tool.
 
 </details>
 
@@ -10438,6 +10439,10 @@ What needs settling, none of it an agent's call mid-campaign:
 
 Same family as [[000199]]: the contract fixes a column's vocabulary but not the mechanical rule a downstream deliverable depends on.
 
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: the evidence matrix is authoritative for any deep-read source, and a deep-read dispatch may write bibliographic corrections back into the source inventory, not only the status field. This relaxes the narrower phase-lit-04 ruling that confined inventory edits to status - that ruling governed Pass 2a only and is superseded from phase-lit-05 onward. Practical effect for LIT-05 and later: when a deep read establishes from the source's own page that an inventory field is wrong (source_type, citation, year, url_or_doi), correct the inventory row in the same commit as the matrix row, so the two deliverables do not drift and the 400+ row inventory improves as reading proceeds. The correction is still evidence: log the verification lookup as a ledger row the way phase-lit-04 did (strategy_phase D, with the enum mismatch noted), so the change is traceable rather than silent. LIT-07 X3 builds the validated bibliography from the matrix for deep-read sources and from the inventory for everything else. The five known-wrong rows from phase-lit-04 (em-llm, evidence-graphs, keim-kaplan source_type; de-boer authorship; us20250165226a1 grant status) are the first backlog for this rule and should be corrected early in phase-lit-05.
+
 **Links**
 
 - relates_to → `000203`
@@ -10461,6 +10466,10 @@ What needs deciding:
 - whether source_id should stop encoding authorship at all in future campaigns, since an opaque identifier cannot become wrong.
 
 Worth checking whether other slugs in the 400+ row inventory carry the same defect; this one surfaced only because the source happened to be deep-read. Relates to [[000203]] (verify identity at the source, not the aggregator) — this is that rule finding an error inside the campaign's own data rather than in a provider's.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: freeze the slug, correct the citation. source_id is an opaque stable key once committed evidence points at it, and is not rewritten to fix a fact it appears to encode - the ledger rows that already reference solozobov-verify-gated-completion-admission-control-2026 are the reproducibility record and are not rewritten. The correct authorship (Hai-Duong Nguyen and Xuan-The Tran, Vietnam Maritime University) already stands in the evidence matrix citation field. phase-lit-05 additionally records the correction where a reader of the inventory will hit it, so the wrong name is not silently propagated by anyone reading that file alone; under the 000209 ruling the inventory citation may now be corrected directly. The general consequence, worth carrying into any future campaign rather than just this one: a source_id that encodes authorship can become false, and an opaque identifier cannot. That is a design question for the evidence contract, not something to settle by renaming one row.
 
 **Links**
 
@@ -10565,6 +10574,10 @@ What would fix it:
 The general principle, which is the part worth keeping: a gate that reports only a count cannot be distinguished from a gate that measured the wrong thing. Reporting the population measured is what makes a PASS verifiable.
 
 Same family as [[000147]] and [[000201]], and directly relevant to the LIT-05, LIT-06 and LIT-07 gates, which re-measure blank fields and variant coverage over a larger matrix.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: approved - Block G in PROMPT-029 now requires every gate to report the population it measured, not only the count, to name every trigger it tested where a rule has more than one, and to derive a field list from its contract rather than choosing a subset. Applied to the delegation pack in this session; binds the LIT-05, LIT-06 and LIT-07 gates.
 
 **Links**
 

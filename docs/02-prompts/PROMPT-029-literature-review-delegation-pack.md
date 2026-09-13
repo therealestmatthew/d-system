@@ -145,7 +145,17 @@ Dispatch rules:
 > measurement it lists, and report real output — numbers, lists, exit codes — never
 > assertions. Name every gate that fails and every item that fails it. Do not fix anything:
 > fixes go back to the responsible section as a fix cycle (at most two per work item; what
-> survives them is reported, not looped on). Always finish with:
+> survives them is reported, not looped on).
+>
+> **Report the population you measured, not only the count.** Every measurement states what
+> it ranged over, so a reader can tell a real pass from a gate that measured the wrong thing:
+> "0 blanks across 43 fields × 20 rows = 860 cells", never "0 blank required fields". Where a
+> measurement applies a rule with more than one trigger, name every trigger you tested. Where
+> a field list comes from a contract, derive it from that contract rather than choosing a
+> subset that looks sufficient — a gate that narrows its own scope silently reports PASS on
+> the part it skipped, and no fix cycle is ever opened for a false PASS.
+>
+> Always finish with:
 > `uv run python -m src.governance` (exit code) and
 > `uv run python tools/check_no_private_content.py` with all changes staged.
 
