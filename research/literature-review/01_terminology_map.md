@@ -666,3 +666,24 @@ though it does not touch belief/convergence/authority on the Knowledge Construct
 | AI/LLM techniques applied directly on top of the 1991 QOC notation for transparent, insightful decision-making — a direct precedent for D-System's own decision/rationale-plus-AI combination | AI-Enhanced QOC-Analysis: A Framework for Transparent and Insightful Decision-Making | Schmidt, Pehlke, Jansen, IFIP AICT 2024 (`schmidt-pehlke-jansen-ai-enhanced-qoc-analysis-2024`) — flagged collision candidate |
 | Broader, independently-useful survey of design-decisions-in-code tooling generally, surfaced alongside the Aporia collision | A Survey of Tool Support for Working with Design Decisions in Code | Mehrpour, LaToza, ACM Computing Surveys 2024 (`mehrpour-latoza-survey-tool-support-design-decisions-code-2024`) |
 | Negative vocabulary finding, recorded plainly: QOC is genuinely ambiguous outside its own literature — AcronymFinder lists 15 distinct meanings, with "Quality of Care" and "Qatar Olympic Committee" dominating general search above the HCI design-rationale sense | Bare "QOC" acronym | Deliberate bare-acronym collision test, `LIT-02-S243`, paralleling the AKM test at D39/`LIT-02-S215` and the IBIS GitHub test at D41/`LIT-02-S232` — zero results on the page concerned design rationale at all |
+
+## D43 — Software traceability
+
+This domain's own vocabulary turned out to be the most heavily overloaded of the entire campaign so
+far: "traceability," "trace link," and "end-to-end traceability" each collide with at least one
+completely unrelated field using the identical phrase. None of the three collisions below share any
+mechanism with software-artifact traceability; they are recorded here because the methodology's
+vocabulary-translation requirement (Sec.6) cuts both ways — false positives are as much a finding as
+false negatives.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Structured planning of what links to what, before recovery — a taxonomy of trace-link types and query strategies | Traceability Information Model (TIM) — strategic / document-management / stored-query / executable layers | Cleland-Huang, Chang, Christensen, TEFSE 2009 (`tefse2009-tim-origin-2009`); applied to architectural-tactic traceability by Cleland-Huang et al., ICSM 2011 (`icsm2011-tim-architectural-tactics-2011`); revisited as an adoption retrospective by IEEE Software, 2021 (`ms2021-tim-retrospective`) — one lineage, not three confirmations (methodology Sec.12) |
+| A specified association between a source artifact and a target artifact — this domain's own working definition of a trace link | Trace link / traceability-artifact assessment | Assessing Traceability of Software Engineering Artifacts, Requirements Engineering 2010 (`assessing-traceability-se-artifacts-2010`) |
+| D-System's H9 (bidirectional epistemic traceability) applied specifically to requirements-through-tests | End-to-end traceability spanning requirements to test coverage | Towards End-to-End Traceability: Insights and Implications from Five Case Studies, ICSEA 2009 (`towards-e2e-traceability-five-case-studies-2009`); An Integrated System for End-to-End Traceability and Requirements Test Coverage, ICSESS 2014 (`integrated-e2e-traceability-test-coverage-2014`) — flagged collision candidate |
+| A current, actively-developed model-driven engine for end-to-end trace analysis | ProMoTA | arXiv 2026 (`promota-model-driven-e2e-traceability-2026`) — flagged collision candidate |
+| Real, working, CI-integrated implementation of trace-matrix verification | OpenFastTrace — Gradle/Maven CI plugins, Java, actively maintained | `openfasttrace-oss-github`; the concrete OSS exemplar for D43, paralleling D34's Eclipse Capra and D45's WALA |
+| **Negative vocabulary finding #1**, recorded plainly: "traceability" and "end-to-end traceability" are equally established terms of art in physical-goods supply-chain, pharmaceutical, semiconductor anti-counterfeiting, and food-product traceability — zero mechanism overlap with software artifacts | Physical/supply-chain traceability (product provenance) | Homonym collision surfaced repeatedly at `LIT-02-S259` and `LIT-02-S261`; recorded as a terminology hazard for the D-System glossary rather than a false lead |
+| **Negative vocabulary finding #2**: "trace"/"tracing" is also the term of art for distributed-systems observability (request/span tracing across microservices) — a wholly different mechanism sharing only the word | Distributed tracing / observability (e.g. Sieve) | `LIT-02-S261` (ICWS 2021 hit excluded as homonym) |
+| **Negative vocabulary finding #3**: "traces"/"traceability" also names trusted-execution-environment (TEE) runtime auditing | TRACES — TEE-based Runtime Auditing for Commodity Embedded Systems | `LIT-02-S263` (arXiv 2409.19125, excluded as homonym) |
+
