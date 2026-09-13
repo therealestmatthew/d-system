@@ -1228,3 +1228,18 @@ precedent for any goal-to-action policy/directive translation D-System proposes.
 | D-System's directive/policy concepts -- goal-to-action translation | Policy-based autonomic computing -- policy enablement toolkits and policy-centric technique composition | `icac2004-policy-enablement-toolkit-autonomic-computing`; `icac2007-policy-centric-integration-dynamic-composition-autonomic` |
 | Goal/objective-function formalism, a direct precedent for any goal/objective-function element in D-System's own adaptation logic | Utility functions in autonomic systems | `icac2004-utility-functions-autonomic-systems` |
 | Multi-agent/multi-loop coordination, a direct precedent for any multi-agent or multi-loop coordination claim in D-System's architecture | Coordinating Multiple Autonomic Managers to Achieve Specified Power-Performance Tradeoffs | `icac2007-coordinating-multiple-autonomic-managers` |
+
+## D71 — Continuous requirements engineering
+
+Klaus Pohl's 2010 textbook chapter is the term's own defining source; FAME and ACon are the
+closest structural parallels to D-System's own runtime-evidence-to-knowledge-update loop (H11),
+applied specifically to requirements rather than general knowledge state.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| "Continuous requirements engineering" itself, the term's own defining source | Continuous Requirements Engineering, chapter in Pohl's standard RE textbook | `pohl-continuous-requirements-engineering-chapter-2010` |
+| Runtime-to-knowledge closure (H11) applied to requirements: monitoring plus user feedback feeding a continuous requirements-elicitation loop | FAME -- combining user feedback and monitoring for continuous requirements elicitation | `oriol-etal-fame-continuous-requirements-elicitation-re2018` -- direct H11 collision candidate |
+| D-System's own context/uncertainty-at-runtime claims, learning-based counterpart | ACon -- learning-based approach to contextual-requirements uncertainty at runtime | `knauss-etal-acon-contextual-requirements-uncertainty-runtime-2016` |
+| Requirements-to-deployment traceability bridging D71 and D72, D-System's own bidirectional traceability claim (H9) | Requirements management in DevOps environments: a multivocal mapping study | `requirements-management-devops-multivocal-mapping-2023` |
+| Empirical grounding for how requirements are actually practiced in agile settings, independent of any single mechanism | Requirements Engineering Practice and Problems in Agile Projects: Results from an International Survey (Naming the Pain in Requirements Engineering initiative) | `wagner-etal-agile-re-practice-international-survey-2017` |
+| "Preventing requirements violations at runtime" framed as a security-adaptation problem, structural parallel to D-System's own runtime requirements-violation/evidence concerns | Engineering topology aware adaptive security | `topology-aware-adaptive-security-requirements-runtime-re2014` |
