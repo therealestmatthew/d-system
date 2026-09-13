@@ -1100,3 +1100,19 @@ the sources below), so it is recorded here as observed vocabulary only.
 | D63's own domain definition ("an execution-monitoring system for replanning"), restated near-exactly by a 2001 system name | SimPlanner: An Execution-Monitoring System for Replanning in Dynamic Worlds | `simplanner-execution-monitoring-replanning-dynamic-worlds-2001` -- direct collision candidate |
 | Provenance/evidence-lineage triggering conflict resolution and a knowledge-state transition (H2, H3): a diagnosis result triggers plan revision | Action Failure Recovery via Model-Based Diagnosis and Conformant Planning (model-based diagnosis triggers conformant replanning) | `micalizio-action-failure-recovery-diagnosis-conformant-planning-2013` -- direct collision candidate; recurrence: first surfaced under D62 (`LIT-03-S176`), verified and kept under D63 as its more central domain (`LIT-03-S194`) |
 | Implementation-availability anchor for integrated execution-monitoring-plus-resolution, robotics domain | execution_monitoring -- plan execution, monitoring and resolution framework for long-term autonomous outdoor robots | `execution-monitoring-tbohne-oss` |
+
+## D64 — Verification and validation
+
+"V&V" and "verification and validation" are the field's own umbrella terms (IEEE 1012), while
+"assurance case" / "safety case" name the argument-structuring sub-tradition (GSN) that gives
+D-System's claim/evidence/inference primitives their closest established analogue.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Verification/test linkage spanning the Implementation & Experience lifecycle | IEEE 1012 V&V process and task model -- management, technical and acquisition-support V&V activities across the software lifecycle | `ieee-1012-2016-verification-validation-standard` |
+| Claim / evidence / inference primitives, argued and linked to support a decision | Goal Structuring Notation (GSN) -- a goal decomposed into sub-goals supported by evidence via an explicit argument structure | `kelly-weaver-goal-structuring-notation-2004` -- canonical safety-argument notation |
+| Deep theoretical ancestor of the claim-evidence-argument primitive, predating software engineering entirely | Toulmin's claim-data-warrant argument model | `toulmin-uses-of-argument-1958` |
+| "Test evidence" vocabulary, grounded independently of any single certification standard | Design Dimensions for Software Certification -- grounded-theory account of what certification regimes require as lifecycle evidence | `design-dimensions-software-certification-grounded-analysis-2019` |
+| Runtime-to-knowledge closure (H11): runtime monitoring evidence dynamically revises an argument/knowledge structure | Dynamic assurance cases -- a self-adaptive system's assurance argument revised at runtime from monitoring evidence | `calinescu-dynamic-assurance-cases-self-adaptive-tse-2017` -- direct H11 collision candidate; shares an author lineage with the D65 runtime-quantitative-verification paper (`10.1145/2330667.2330686`), recorded as two distinct papers/rows per the independence discipline |
+| Notation-plurality context for the D-System argument-structure claim | Structured Assurance Cases: Three Common Standards -- comparative survey of GSN, CAE and related notations | `structured-assurance-cases-three-common-standards-hase-2005` |
+| Bidirectional epistemic traceability (H9): safety-assurance argumentation structured directly FROM requirements | Toward a Harmonized Approach -- requirement-based structuring of a safety assurance argumentation for automated vehicles | `harmonized-requirement-based-safety-assurance-argumentation-2025` -- direct H11 collision candidate, terminology-independent |
