@@ -1157,3 +1157,28 @@ written.
 | Runtime-to-knowledge closure (H11): a requirement itself revised as a consequence of runtime monitoring outcomes ("requirement revision loop") | (Requirement) evolution requirements for adaptive systems | `requirement-evolution-requirements-adaptive-systems-seams-2012` |
 | Awareness-requirements-to-adaptation link formalized as a feedback controller | From awareness requirements to adaptive systems: A control-theoretic approach | `awareness-requirements-adaptive-systems-control-theoretic-2011` |
 | Implementation-availability anchor, deployed rule-based continuous requirements-monitoring framework | Implementing Rule-Based Monitors within a Framework for Continuous Requirements Monitoring (ReqMon) | `robinson-reqmon-rule-based-continuous-requirements-monitoring-hicss-2005` |
+
+## D67 — Observability-driven development
+
+Every result naming or defining "observability-driven development" itself is a vendor page,
+product blog, or conference talk rather than peer-reviewed literature (`LIT-03-S225`,
+confirmed by an essentially-empty title-restricted academic search at `LIT-03-S231`) -- the term
+circulates entirely in industry/practitioner venues, not academic ones, so the OpenTelemetry
+primer is kept as the campaign's `lead` precedent (vocabulary anchor, not evidence) rather than
+a peer-reviewed source. Separately, "observability" carries a long-standing, unrelated prior
+meaning in formal-methods/testability/control-theory software literature (component
+observability-and-controllability, POMDP planning, coverage-directed validation) dating to at
+least 1991, entirely distinct from the telemetry/production-monitoring sense this domain
+targets and pre-dating it by roughly two decades -- a terminology collision worth recording but
+with no single source kept for it (observed at `LIT-03-S232`).
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| "Observability-driven development" itself, vocabulary anchor for an industry-only term | OpenTelemetry observability primer -- CNCF graduated project defining telemetry's three pillars (logs, metrics, traces) | `opentelemetry-observability-primer` -- campaign `lead` precedent, vocabulary anchor not evidence |
+| Runtime observation linkage informing in-IDE development decisions ("telemetry-informed development") | Mind the Metrics -- patterns for telemetry-aware in-IDE AI application development using MCP | `mind-the-metrics-telemetry-aware-ide-development-2025` |
+| "Production feedback" vocabulary, empirical state-of-practice anchor | User Feedback in Continuous Software Engineering: Revealing the State-of-Practice | `user-feedback-continuous-software-engineering-state-of-practice-2024` |
+| Production telemetry and end-user feedback relayed into engineering decisions, empirical gap-in-practice finding ("dashboards often not used systematically") | Continuous Software Engineering in the Wild | `continuous-software-engineering-in-the-wild-2022` |
+| Historical academic anchor predating "telemetry-informed"/"observability-driven development" by roughly a decade | Improving Software Development Management through Software Project Telemetry (Hackystat) | `johnson-hackystat-software-project-telemetry-ieee-software-2005` |
+| "Production feedback" / continuous-experimentation vocabulary, field's consolidating account | Controlled experimentation in continuous experimentation: Knowledge and challenges | `fabijan-dmitriev-olsson-bosch-controlled-experimentation-continuous-2021` |
+| Observability integrated directly into DevOps development practice | Integrating Observability with DevOps Practices in Financial Services Technologies | `ijacsa-integrating-observability-devops-financial-services-2024` |
+| Event-sourced architecture directly connected to production observability and development decisions | Event-sourced, observable software architectures: An experience report | `event-sourced-observable-software-architectures-experience-report-2022` |
