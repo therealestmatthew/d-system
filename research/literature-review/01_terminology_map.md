@@ -1028,3 +1028,14 @@ instance of the cross-vendor convention below.
 | Memory-lifecycle transition (consolidation/pruning) between sessions (H2) | Active Context Compression ("Focus Agent") | `active-context-compression-focus-agent-2026` |
 | Cross-session recall of prior reasoning state | Drawing on Memory: Dual-Trace Encoding | `drawing-on-memory-dual-trace-cross-session-2026` |
 | Context carryover from one task/phase into the next, already implemented and patented in conversational assistants a decade-plus before agentic coding | Context carryover in language understanding systems (Microsoft, 2017); Context carryover across tasks for assistant systems (Meta, 2024) | `uspto-9747279-context-carryover-language-understanding-patent`; `uspto-12019685-context-carryover-across-tasks-assistant-patent` -- direct terminology AND mechanism collision, domain-adjacent (conversational assistants, not coding agents) |
+
+## D59 — Agent handoff
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Context-package transfer between agents/phases and its failure modes | AgentAsk: empirical handoff-failure taxonomy (Data Gap, Referential Drift, Signal Corruption, Capability Gap) | `agentask-multi-agent-handoff-failure-taxonomy-2025` |
+| Delegation / authority model for transferring work between agents | AWCP: Workspace Delegation Protocol; CADMAS-CTX: Contextual Capability Calibration for Multi-Agent Delegation | `awcp-workspace-delegation-protocol-2026`; `cadmas-ctx-contextual-capability-calibration-2026` |
+| Transition provenance carried across a handoff, bearing on both provenance-as-conflict-input (H3) and topology-aware context transfer (H5) | Context Lineage Assurance for Non-Human Identities in Critical Multi-Agent Systems | `context-lineage-assurance-non-human-identities-2025` -- strongest D59 collision candidate |
+| Actor/authority/delegation model (architecture.md's "actor, authority" primitives) | Classical formal delegation calculus ("speaks for" semantics), predating agentic AI by three decades | `lampson-abadi-authentication-distributed-systems-1992` -- vocabulary/history anchor, different domain (security/authentication, not epistemic provenance) |
+| Cross-agent context-package wire format for handoff/task/context fields | Agent2Agent (A2A) Protocol, Linux-Foundation-stewarded | `a2a-protocol-spec-linux-foundation`; survey `a2a-protocol-review-techrxiv-2025` |
+| "Handoff" as a structured, information-package-based transfer concept -- already formalized with decades of RCT-level evidence in a different domain | SBAR / I-PASS clinical handoff protocols (AHRQ Making Healthcare Safer IV systematic review) | `ahrq-mhs4-structured-handoff-protocols-sbar-ipass-2023` -- cross-domain analogy, not itself a software architecture |
