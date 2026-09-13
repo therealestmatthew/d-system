@@ -853,3 +853,28 @@ lineage above though the two threads converge on the same D50 vocabulary.
 | Executable-specification-driven runtime verification (H11) | Runtime verification based on executable models | `runtime-verification-executable-models-timed-traces-2013` |
 | Agentic evaluation of spec-to-code autoformalization, bridging to D51's Verus | Verus-SpecGym | `verus-specgym-agentic-spec-autoformalization-2026` |
 | Negative evidence: no existing generative system simultaneously achieves full automation and formal traceability (bears on H9) | AI-driven test case generation from NL requirements, survey | `ai-driven-test-case-generation-nl-requirements-survey-2026` |
+
+## D51 — Formal specification
+
+**Three parallel formal-notation lineages anchor this domain's vocabulary**: Z (state-schema
+specification, ISO-standardized, IBM CICS), TLA+ (Lamport's temporal-logic-of-actions state-machine
+specification, with TLC model checking and TLAPS mechanical proof), and Alloy (Jackson's
+"lightweight formal methods" relational-logic notation, the closest single vocabulary match to
+D-System's own cost/rigor tradeoff framing). A separate refinement-calculus lineage (Back, Morgan)
+supplies the field's own term for a specification-to-implementation transition step. The strongest
+mechanism collision in this domain, VeriSpecGen, was independently re-verified (LIT-03-S067) rather
+than accepted on the source search's own framing.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchors: industrial formal-methods adoption surveys | Formal methods: practice and experience; formal methods in dependable systems engineering; survey of static formal methods for industrial automation | `formal-methods-practice-experience-woodcock-2009`; `formal-methods-dependable-systems-survey-2020`; `survey-static-formal-methods-industrial-automation-2021` |
+| Vocabulary-map anchor: state-schema formal specification notation | Z notation | `z-formal-specification-notation-chapter`; `introduction-z-formal-specifications-1989` |
+| Vocabulary-map anchor: temporal-logic-of-actions state-machine specification, its model checker, and its mechanical proof system | TLA+; TLC; TLAPS | `model-checking-tla-plus-specifications-1999`; `tla-plus-proof-system-2008` |
+| LLM-driven, verifiable formal-specification synthesis (H7, H9) | TLA-Prover | `tla-prover-verifiable-spec-synthesis-lora-2026` |
+| Negative evidence: a quantified, large correctness gap in LLM-generated formal specifications (bears on H7/H9 optimism) | Can LLMs write correct TLA+ specifications? | `can-llms-write-correct-tla-plus-specs-2026` |
+| Vocabulary-map anchor: "lightweight formal methods" — the closest single field term to D-System's own cost/rigor tradeoff | Alloy | `alloy-lightweight-object-modelling-notation-2002`; `alloy-language-tool-exploring-designs-2019`; `towards-classification-lightweight-formal-methods-2018` |
+| Vocabulary-map anchor: the field's own term for a specification-to-implementation transition step | Refinement calculus | `back-stepwise-refinement-programming-calculus-1987`; `morgan-refinement-calculus-1988` |
+| A full specification→refinement→implementation methodology (H7) | Formal refinement methodology (object-oriented; path planning) | `oo-spec-to-implementation-formal-refinement-dissertation`; `formal-spec-refinement-implementation-path-planning-2016` |
+| Requirements-to-formal-refinement tracing (H7, H9) | Requirements tracing in formal refinement; traceability-based formal specification inspection | `requirements-tracing-formal-refinement-vstte-2010`; `traceability-based-formal-spec-inspection-2014` |
+| Requirement-level attribution with per-requirement traceability maps and localized repair (H7, H9, H10) — independently re-verified (LIT-03-S067) rather than accepted on the source search's framing | VeriSpecGen: intent-aligned formal specification synthesis via traceable refinement | `verispecgen-intent-aligned-formal-spec-synthesis-traceable-refinement-2026` — flagged collision candidate |
+| NL-requirement-to-formal-proof pipelines with retrieval augmentation (H7, H9; also touches D-System's own retrieval/context model) | Retrieval-augmented TLAPS proof generation; from informal to formal | `retrieval-augmented-tlaps-proof-generation-llms-2025`; `informal-to-formal-nl-requirements-verifiable-proofs-2025` |
