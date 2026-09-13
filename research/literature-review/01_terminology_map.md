@@ -1116,3 +1116,22 @@ D-System's claim/evidence/inference primitives their closest established analogu
 | Runtime-to-knowledge closure (H11): runtime monitoring evidence dynamically revises an argument/knowledge structure | Dynamic assurance cases -- a self-adaptive system's assurance argument revised at runtime from monitoring evidence | `calinescu-dynamic-assurance-cases-self-adaptive-tse-2017` -- direct H11 collision candidate; shares an author lineage with the D65 runtime-quantitative-verification paper (`10.1145/2330667.2330686`), recorded as two distinct papers/rows per the independence discipline |
 | Notation-plurality context for the D-System argument-structure claim | Structured Assurance Cases: Three Common Standards -- comparative survey of GSN, CAE and related notations | `structured-assurance-cases-three-common-standards-hase-2005` |
 | Bidirectional epistemic traceability (H9): safety-assurance argumentation structured directly FROM requirements | Toward a Harmonized Approach -- requirement-based structuring of a safety assurance argumentation for automated vehicles | `harmonized-requirement-based-safety-assurance-argumentation-2025` -- direct H11 collision candidate, terminology-independent |
+
+## D65 — Runtime verification
+
+The field's own author lineage (Havelund, Rosu, Leucker, Schallhart, Bartocci, Falcone) supplies
+both "monitor synthesis" and "temporal-logic monitoring" as established terms of art; the
+Calinescu CACM 2012 paper kept here shares its author programme with D64's kept dynamic-assurance-
+case paper, a cross-domain recurrence recorded rather than merged into one row.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Runtime-to-knowledge closure (H11), applied to bulk/batch evidence rather than a single continuous stream | Trace checking -- offline/batch analysis of an execution trace against a specification, distinguished from online monitoring | `large-scale-trace-checking-mapreduce-2015` |
+| Runtime verification feeding a requirement/knowledge update -- the most direct H11 bridge from D65 into D66 | Runtime Verification of Self-Adaptive Systems with Changing Requirements -- RV inside a MAPE-K loop where the monitored properties are themselves adapted as requirements change | `runtime-verification-self-adaptive-changing-requirements-2023` -- direct H11 collision candidate, terminology-independent |
+| Runtime observation explicitly framed as feeding a knowledge component | Runtime Verification: Monitoring, Knowledge, and Uncertainty -- lecture notes framing RV output as a knowledge-component input | `runtime-verification-monitoring-knowledge-uncertainty-lecture-notes` |
+| "Monitor synthesis" vocabulary, originating mechanism | Synthesizing Monitors for Safety Properties -- safety properties compiled to finite-state monitors | `havelund-rosu-synthesizing-monitors-safety-properties-tacas-2002` |
+| "Temporal-logic monitoring" vocabulary, canonical formal semantics | Runtime Verification for LTL and TLTL -- three-valued LTL/TLTL semantics for finite-prefix monitoring | `bauer-leucker-schallhart-runtime-verification-ltl-tltl-tosem-2011` |
+| Field-defining survey anchor for the whole runtime-verification tradition | A Brief Account of Runtime Verification | `leucker-schallhart-brief-account-runtime-verification-2009` |
+| Current canonical field-definition anchor (2018 RV handbook) | Introduction to Runtime Verification | `bartocci-falcone-introduction-runtime-verification-2018` |
+| Runtime-to-knowledge closure (H11): runtime-checked properties directly informing self-adaptation decisions | Self-adaptive software needs quantitative verification at runtime | `calinescu-self-adaptive-quantitative-verification-runtime-cacm-2012` -- shares an author lineage with D64's kept dynamic-assurance-case paper (`10.1109/tse.2017.2738640`); recorded as two distinct papers/rows |
+| Implementation-availability anchor for monitor synthesis, in mature production infrastructure | Linux kernel runtime-verification (rv) subsystem -- LTL/automaton specification compiled to a C monitor skeleton | `linux-kernel-rv-monitor-synthesis-subsystem` |
