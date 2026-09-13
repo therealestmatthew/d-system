@@ -139,7 +139,7 @@ campaign and continues on the same branch.
   LIT-04 actually reads them"), and the 13-column schema has no other field. Per the
   no-improvisation rule nothing was invented: the inventory is untouched, the domain map's
   ranked top-20 list is the de-facto deep-read designation, and the conflict is recorded in that
-  file's preamble. `LIT-04 K` needs a ruling on how deep-read candidacy is marked.
+  file's preamble. `LIT-04 K` needs a ruling on how deep-read candidacy is marked. Idea `000202`.
 - **The top-20 ranking's status-filter gap (idea `000199`) was decided and recorded, not
   silently absorbed.** `LIT-03 C` ranked only `status: candidate` rows, excluding the one
   deliberate `excluded`+`yes` row (`structured-belief-state-llm-memory-benchmark-2026-d22-recur`,
@@ -154,21 +154,23 @@ campaign and continues on the same branch.
   Pass 1b's coordinator relayed 76 variants against a true 91 (under-derivation); this phase's
   gate first derived 346 by splitting slash compounds (over-derivation). The comma-item rule the
   fix cycle applied reproduces the independently reviewed 91 anchor and should be written into
-  the instrument rather than rediscovered per phase. Recorded as an idea (see below).
+  the instrument rather than rediscovered per phase. Idea `000201`, linked to `000199`.
 - **OpenAlex served mistitled/mis-DOI'd records at least three times this session** (SWE-bench
   retitled "Persistent memory for AI coding agents...", a GPT-4-report record at `LIT-03-S142`,
   and relevance-search misses on known-correct targets). Every keep survived because workers
-  verified identity at the source; Pass 2's deep reads inherit this trap. Recorded as an idea
-  (see below).
+  verified identity at the source; Pass 2's deep reads inherit this trap. Idea `000203`,
+  linked to `000147`.
 - **A phase-wide provider outage continued from Pass 1b.** `export.arxiv.org` failed on
   effectively every direct attempt across the phase (HTTP 429, curl timeouts, one 503, one
   redirect-timeout — a new signature); `api.semanticscholar.org` was 429 throughout except two
   200s, one of which served paper-mill noise that was excluded with rationale. Every attempt is
   a logged zero-yield row. Coverage rests on web search, OpenAlex and Crossref, with the same
   caveat Pass 1b recorded.
-- **Ideas are appended only after the final rebase onto `dev`** (owner direction for this
-  session, after the id race fired twice in Pass 1b). At checkpoint time the appends have not
-  yet happened; the session's close-out appends them and cites the ids in the final report.
+- **Ideas were appended only after the final rebase onto `dev`** (owner direction for this
+  session, after the id race fired twice in Pass 1b): `000201`–`000203` created through the
+  writer post-rebase with no collision, `000199` annotated with `LIT-03 C`'s recorded
+  status-filter decision, and the three new ideas linked (`000201`/`000202` → `000199`,
+  `000203` → `000147`).
 
 ## Fix cycles and worker-issued repairs
 
