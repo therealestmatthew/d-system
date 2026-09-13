@@ -947,3 +947,31 @@ overlap heavily in the literature's own usage.
 | Full-pipeline attack/defense systematization spanning source, build, distribution and dependency stages | SoK: Taxonomy of Attacks on Open-Source Software Supply Chains | `sok-taxonomy-attacks-oss-supply-chains-sp2023` |
 | Generalization of the in-toto/SLSA attestation model to arbitrary supply-chain claims (H3) | Software Supply Chain Attribute Integrity (SCAI) | `scai-software-supply-chain-attribute-integrity-2022` |
 | Package-level cryptographic signing, narrower than the chain-of-custody family above | Cryptographic package integrity verification | `cryptographic-package-integrity-verification-southeastcon2026` |
+
+
+## D55 — Artifact lineage
+
+**OmniBOR is recorded as one mechanism, not two candidates**: its arXiv paper
+(`omnibor-verifiable-artifact-resolution-2024`) is the canonical row; its own specification
+repository is a dedup pointing back at it, per the addressing facts' explicit instruction. The
+strongest re-scored finding in this domain is negative: Cofano's 2026 PhD dissertation was
+characterized upstream as a "strong architecture-overlap candidate," but its own abstract
+(fetched at LIT-03-S100/S101) shows it to be a dependency-visibility *tooling-accuracy*
+contribution — an improved Python SBOM generator plus the same Classport runtime-introspection
+mechanism already independently inventoried — not a novel cross-stage lineage architecture; its
+pre-scores were downgraded accordingly. Kettle's TEE-attested-build mechanism, independently
+confirmed at LIT-03-S099, is this domain's strongest genuine collision candidate alongside
+OmniBOR and the in-toto paper already inventoried under D54.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Artifact Dependency Graph: content-addressed identifiers distinguishing derived (build-output) from leaf (source) artifacts (H2, H3) | OmniBOR: automatic, verifiable artifact resolution | `omnibor-verifiable-artifact-resolution-2024` (dedup: `omnibor-spec-repo-github-dedup`) |
+| Hardware-rooted attested provenance document binding source commit, dependencies, toolchain, environment and output digests to a TEE signing identity (H3) — confirmed via LIT-03-S099 | Kettle: attested builds for verifiable software provenance | `kettle-attested-builds-verifiable-provenance-2026` |
+| Build-graph model: artifacts as dependency-graph nodes with declared inputs/outputs | Bazel artifact-based builds | `bazel-artifact-based-builds-docs` |
+| Content-addressed derivation-chain identity at scale, empirically evaluated | Nix functional package management / reproducible builds | `nix-functional-package-management-reproducible-builds-scale-2025`; `build-environment-reproducibility-space-time-2024` |
+| Cross-stage pipeline lineage (data -> training -> deployment), scoped to ML rather than general software artifacts | Atlas: ML lifecycle provenance & transparency | `atlas-ml-lifecycle-provenance-transparency-2025` |
+| Artifact-graph extension into the execution/runtime stage (H11) | Classport: runtime dependency introspection for Java | `classport-runtime-dependency-introspection-java-2025` |
+| Canonical peer-reviewed metamodel of software artifacts and their relationships — direct vocabulary anchor for this domain | Software Artifact Metamodel | `software-artifact-metamodel-sbes2009` |
+| Automated SBOM/dependency-graph generation from build artifacts, bridging D53/D55 | Automatic Bill of Materials | `automatic-bill-of-materials-2023` |
+| Downgraded on independent abstract verification (LIT-03-S100/S101): dependency-visibility tooling accuracy, not a novel lineage architecture | Transparent Dependencies (Cofano PhD dissertation) | `cofano-transparent-dependencies-phd-2026` |
+| Distinct research-reproducibility sense of "artifact" (SE-research code/data sharing), not build/pipeline lineage | Understanding and improving artifact sharing in SE research | `artifact-sharing-se-research-emse2021` |
