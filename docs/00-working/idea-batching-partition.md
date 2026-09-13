@@ -51,10 +51,18 @@ group's scope. Each was verified in this session or by the audit, not taken from
 | `000097` | Session-failure tracking is unbuilt | **Half delivered.** `.claude/skills/log-anti-patterns/SKILL.md` covers capture; derivation remains open |
 
 The systemic gap behind the first three — a fix lands and the idea that reported it never gets a
-status event, so later planning re-plans finished work — is captured as idea **`000201`**. Three
-further observations outside the partition task are captured as **`000202`** (corpus presentation
-order changed no substantive answer), **`000203`** (subagents cannot write report files in this
-harness) and **`000204`** (`REQ-008`'s artifact count does not sum to the roster size it states).
+status event, so later planning re-plans finished work — is captured as idea **`000204`**. Three
+further observations outside the partition task are captured as **`000205`** (corpus presentation
+order changed no substantive answer), **`000206`** (subagents cannot write report files in this
+harness) and **`000207`** (`REQ-008`'s artifact count does not sum to the roster size it states).
+
+These carry ids `000204`–`000207` rather than `000201`–`000204` because the idea-id race fired
+again during integration: a peer recorded `000201`–`000203` on `dev` between this session's append
+and its rebase. The colliding commit was dropped and the four re-appended through
+`tools/append_idea.py`, taking fresh ids from the writer's own output rather than renumbering the
+log by hand. That is itself a second instance of what `000204` describes — recorded state going
+stale under a concurrent writer — and the ledger entry belongs with the existing idea-id-race
+record rather than as a new idea.
 
 ---
 
@@ -117,7 +125,7 @@ phases; every member is small.
 |---|---|---|---|---|---|
 | `G05` Document contract | 038, 056 | `038` fixes the requirement-vs-plan boundary; `056` governs document staleness and retirement — both define what a correct governed document is | Kept out of `G04` deliberately: `056`'s own text admits unresolved overlap with `047`. An unresolved scope question is a reason for the owner to scope it, not to merge it | None | 2 phases |
 | `G06` Backlog substrate | 006, 011, 037 | Three capacity/scaling questions against the same registry — index widths, a reprioritisation recipe, and splitting `backlog.yaml` before it clogs agent context | Each independently shippable; grouped for readability, not dependency | None | 1 phase each |
-| `G07` Phase containment check | 027 | Nothing diffs a completed phase's actual change set against its declared paths | Independent. Nearest mechanism to hang `000201` on | None | <1 phase |
+| `G07` Phase containment check | 027 | Nothing diffs a completed phase's actual change set against its declared paths | Independent. Nearest mechanism to hang `000204` on | None | <1 phase |
 | `G08` `_tmpagent` registry | 023 | A load-bearing mechanism missing from `systems.yaml`'s maturity registry | Independent, near-mechanical | None | trivial |
 
 ### P3 — Concurrency, git safety and enforcement · 10 ideas · `G09`–`G13`

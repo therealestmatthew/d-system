@@ -9274,3 +9274,117 @@ During phase-lit-03, OpenAlex served at least three defective bibliographic reco
 **Links**
 
 - relates_to → `000147`
+
+---
+
+## 000204 · Resolved work leaves its idea open, so later planning re-plans finished work
+
+**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+
+When a fix lands, nothing gives the idea that reported it a status event. The idea stays
+`triaged` with a finding describing the defect as live, and every later reader — a triage
+sweep, a planning session, an agent partitioning the corpus — treats finished work as open.
+
+Observed concretely during the idea-batching build on 2026-09-13. Three analysts (R1, R2, R3)
+carried 000098 (the layout-schema test ADR-016 promised) and 000099/000129 (three failing PTY
+tests) into their partitions as open work, sized them, and in one case nominated a decline.
+The adversarial audit verified against the live tree that all of it was already done:
+`test/test_workbench_layout_schema.py` passes 21 tests, `test/test_demo_terminal.py` passes 46,
+and `schemas/workbench-layout.schema.json` exists with the exact invariants 000098 asked for.
+The fix had landed; the idea had not been told.
+
+The same class of staleness, one level up, put a blocker in that build: ideas 000171-000193 each
+assert in their bodies that "no requirement, plan or phase exists" for the consultant demo kit,
+when REQ-008, PLAN-024 and phase-kit-01 through phase-kit-08 all exist and REQ-008 records the
+roster already cut from 23 entries to 13. All four analysts inherited the claim. Because it sits
+in the body rather than a finding, the findings-free control inherited it too — the bias control
+could not catch it.
+
+Worth deciding: whether closure is a session-close obligation (a phase that resolves an idea
+records the status event before it completes), a mechanical check (a phase naming an idea in its
+scope must move that idea), or a periodic reconciliation pass. Related: 000027 proposes a
+mechanical containment check comparing a completed phase's diff to its declared paths, which is
+the nearest existing mechanism to hang this on.
+
+The cost of leaving it is measured now rather than hypothetical: an entire agent sweep's sizing
+and decline calls for several ideas were built on facts the repository had already overtaken.
+
+---
+
+## 000205 · Corpus presentation-order variation changed no substantive answer and can be dropped from future sweeps
+
+**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+
+The idea-batching build (PROMPT-025 decision 5, PROMPT-032) gave three analysts the same
+152-idea corpus in ascending, descending and shuffled order, to control for anchoring. The
+adversarial audit was asked whether the manipulation had any observable effect, and measured
+one.
+
+It does change presentation. Fine-group granularity swung widely — roughly 84 lettered
+subgroups under ascending, 64 under descending, 32 under shuffle — and programme write-up
+sequence tracked reading order directly: the demo-kit ideas, the highest ids in the corpus, came
+out as programme 1 of 12 under descending and last under both ascending reads.
+
+It does not change the answer. Level-2 programme composition — which ideas end up batched
+together, the decision the exercise exists to produce — was highly convergent across all three
+orderings, with only minor boundary disagreements. The audit's recommendation: a future sweep
+runs one ordering and keeps the findings ablation, which is the manipulation that actually
+surfaced distinct information gaps.
+
+That is descope-ladder rungs 1 and 2 (PROMPT-025 decision 16) vindicated after the fact rather
+than in advance, and it is worth recording as a measured result rather than a hunch, because the
+variation costs a full extra corpus read per ordering — roughly 143k tokens of input each at the
+2026-09-13 corpus size.
+
+Scope: applies to any future full-corpus analyst sweep, not only idea batching. Does not
+generalise to the findings/no-findings control, which earned its cost in the same run.
+
+---
+
+## 000206 · Prompt packs cannot instruct a subagent to write its report to a file; the harness refuses it
+
+**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+
+Every dispatch in the idea-batching build named an output path and told the agent to write its
+report there — `_working/idea-corpus/report-R1.md` and siblings, per PROMPT-032. All four
+analysts refused, each returning the same harness message: "Subagents should return findings as
+text, not write report files." The restriction is on the subagent, not the path: the coordinating
+session wrote the identical files without trouble, and the agents read their corpora from the
+same directory without trouble.
+
+The build recovered by having the coordinator transcribe each returned report verbatim to its
+designated path, which preserved the design — each analyst still read only its own corpus and saw
+no other's output — but at a real cost: four long reports passed through the coordinator's context
+in full, and fidelity then rests on transcription rather than on the agent's own write.
+
+This will recur in every pack that follows the same shape, and two of the three GOV-008 precedents
+(PROMPT-018, PROMPT-021) use report files as the hand-off between a dispatch and the gate that
+reads it. Worth deciding what the convention becomes: dispatches return findings as text and the
+coordinator persists them; or the pack stops routing hand-offs through files an agent cannot
+write; or the restriction is configurable and should be configured.
+
+Also worth noting for whoever writes the next pack: the restriction is silent until dispatch. It
+is not visible when the pack is drafted, reviewed at GOV-008 stage 5, or approved — only when an
+agent is already running and has spent its input budget.
+
+---
+
+## 000207 · REQ-008's artifact count does not sum to the roster size it states
+
+**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+
+Noticed by the adversarial audit during the idea-batching build on 2026-09-13 and flagged as out
+of that build's scope.
+
+REQ-008 (consultant demo kit requirements) records that the roster was reduced from 23 proposed
+entries to 13 by a blind adversarial triage, and enumerates the survivors as "13 artefacts (5
+commands plus 1 converted from a skill, 2 skills, 6 prompts, 2 agents)". Those figures do not add
+to 13 on any reading: 5 + 1 + 2 + 6 + 2 is 16, and 5 + 2 + 6 + 2 is 15.
+
+The document is `status: draft` and governs real queued work — PLAN-024 and phase-kit-01 through
+phase-kit-08 depend on it — so the roster it specifies is what eight phases will build against.
+Whichever number is right, the enumeration and the total should agree before a phase is claimed
+against them.
+
+No attempt was made to work out which figure is correct; that needs the triage record the
+sentence cites, and it is the document owner's call rather than a passing auditor's.
