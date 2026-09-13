@@ -925,3 +925,25 @@ per the same Phase-A canonical-model instruction that kept Cucumber's own Gherki
 | Verifiable derivation-to-artifact binding without revealing build inputs (H3) | Zero-knowledge-compiled software-artifact provenance | `verifiable-provenance-zk-compilation-2026` |
 | SBOM-content-sharing verifiability, a distinct-from-attestation lineage-verification approach (H3) | VeriSBOM: zero-knowledge SBOM sharing | `verisbom-zk-sbom-sharing-2026` |
 | Excluded: industry-advocacy/adoption reporting carries no provenance mechanism and is reclassified as a lead despite a DOI | SBOM adoption/readiness reports (Linux Foundation) | `lf-sbom-guide-haddad-2024`; `lf-sbom-state-cybersecurity-readiness-2022` |
+
+
+## D54 — Build provenance
+
+**The in-toto USENIX 2019 paper is the strongest single-source collision candidate found across
+this dispatch** (component 4 / architecture 3): its layout-of-steps model, per-step functionary
+signing, and verifier-checked link metadata is a chain-of-custody architecture that spans
+build-step actor identity, evidence and lineage in one mechanism — directly bearing on H2/H3/H9.
+It carries no DOI (confirmed absent from Crossref at LIT-03-S085); the authoritative usenix.org
+PDF URL is its canonical identifier. Reproducible builds (Lamb & Zacchiroli) and the IEEE S&P
+supply-chain-attack SoK round out the domain's peer-reviewed anchors; SCAI is the field's own
+generalization of in-toto/SLSA attestation to arbitrary claims. No terminology substitution is
+needed here beyond what D53 already established — "build provenance" and "software provenance"
+overlap heavily in the literature's own usage.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Chain-of-custody: per-step actor identity + evidence + provenance metadata, verifier-checked (H2, H3, H9) — strongest single-source collision found in this dispatch | in-toto: farm-to-table guarantees for bits and bytes | `torres-arias-etal-in-toto-farm-to-table-usenix2019` |
+| Independent-rebuilder corroboration of a build artifact (H3, H4) | Reproducible builds | `reproducible-builds-integrity-supply-chains-2021` |
+| Full-pipeline attack/defense systematization spanning source, build, distribution and dependency stages | SoK: Taxonomy of Attacks on Open-Source Software Supply Chains | `sok-taxonomy-attacks-oss-supply-chains-sp2023` |
+| Generalization of the in-toto/SLSA attestation model to arbitrary supply-chain claims (H3) | Software Supply Chain Attribute Integrity (SCAI) | `scai-software-supply-chain-attribute-integrity-2022` |
+| Package-level cryptographic signing, narrower than the chain-of-custody family above | Cryptographic package integrity verification | `cryptographic-package-integrity-verification-southeastcon2026` |
