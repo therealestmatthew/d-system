@@ -878,3 +878,25 @@ than accepted on the source search's own framing.
 | Requirements-to-formal-refinement tracing (H7, H9) | Requirements tracing in formal refinement; traceability-based formal specification inspection | `requirements-tracing-formal-refinement-vstte-2010`; `traceability-based-formal-spec-inspection-2014` |
 | Requirement-level attribution with per-requirement traceability maps and localized repair (H7, H9, H10) — independently re-verified (LIT-03-S067) rather than accepted on the source search's framing | VeriSpecGen: intent-aligned formal specification synthesis via traceable refinement | `verispecgen-intent-aligned-formal-spec-synthesis-traceable-refinement-2026` — flagged collision candidate |
 | NL-requirement-to-formal-proof pipelines with retrieval augmentation (H7, H9; also touches D-System's own retrieval/context model) | Retrieval-augmented TLAPS proof generation; from informal to formal | `retrieval-augmented-tlaps-proof-generation-llms-2025`; `informal-to-formal-nl-requirements-verifiable-proofs-2025` |
+
+## D52 — Behavior-driven development
+
+**Dan North's 2006 article and Cucumber's own documentation are the founding primary sources**,
+kept and typed `lead` per campaign precedent for vendor/blog material even though they are the
+field's own authoritative account of its origin. A 2001 ICSE paper on scenario-driven traceability
+predates BDD's naming by two years, showing the scenario-as-traceability-unit idea was already in
+circulation before Dan North coined the term. A BDD specification-quality paper
+(`characterising-quality-bdd-specifications-2020`) surfaced first as an excluded lead during the
+D49 search and was independently verified and pulled into this domain, per the coordinator's
+cross-domain recurrence check.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchors: the founding primary-author source and the tool ecosystem's own history/DSL documentation | Introducing Behaviour-Driven Development; BDD History; Gherkin Reference | `dan-north-introducing-bdd-2006`; `cucumber-bdd-history-docs`; `cucumber-gherkin-language-reference-docs` |
+| Scenario-as-traceability-unit (H9), predating BDD's own naming | A scenario-driven approach to traceability | `scenario-driven-approach-traceability-icse-2001` |
+| Agentic-AI-generated BDD test scenarios, current (H7, H9) | Agentic AI for behavior-driven development testing using LLMs | `agentic-ai-bdd-testing-llms-2025` |
+| BDD-lineage extension naming a business-facing specification dialect | Business Language Driven Development | `business-language-driven-development-2010` |
+| Extension of BDD-style validation loops into a distinct methodology, bridging D50/D52 | Validation-Driven Development | `validation-driven-development-2023` |
+| Runtime monitor enforcing formal policy predicates over agent execution traces (H11) — verified via LIT-03-S068 as blocking rather than closing the loop back into knowledge, the strongest difference from H11's own claim | C-Trace: runtime compliance verification for AI agents | `c-trace-runtime-compliance-verification-ai-agents-2026` |
+| Regulation-to-executable-scenario derivation quality (specification representation, requirement derivation) | From Law to Gherkin | `law-to-gherkin-llm-behavioral-specs-food-safety-2025` |
+| BDD specification-representation quality principles — cross-domain recurrence, first surfaced (and excluded) as a D49 lead, independently verified and pulled in here (LIT-03-S069) | Characterising the quality of BDD specifications | `characterising-quality-bdd-specifications-2020` |
