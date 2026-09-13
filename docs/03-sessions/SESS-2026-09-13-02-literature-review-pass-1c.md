@@ -41,13 +41,13 @@ The phase's three `verification` entries, run in the worktree at checkpoint.
 
 ```text
 $ uv run python -m src.governance
-Governance OK: 20 systems, 191 documents, 22 memories, 137 backlog phases
+Governance OK: 20 systems, 192 documents, 22 memories, 133 backlog phases
 (exit 0)
 
 $ uv run python tools/check_no_private_content.py        # in the worktree, tree clean
 note: _private/portfolio/ not found — content check skipped (path check still ran; this is
 expected in CI / a fresh clone)
-check_no_private_content: OK (546 tracked files, 0 identifiers checked)
+check_no_private_content: OK (547 tracked files, 0 identifiers checked)
 (exit 0)
 ```
 
@@ -172,10 +172,83 @@ campaign and continues on the same branch.
   status-filter decision, and the three new ideas linked (`000201`/`000202` → `000199`,
   `000203` → `000147`).
 
+## Review
+
+An independent sub-agent, started fresh with no context from this session and explicitly not a
+fork, reviewed the 61-commit range `dev..agent/lit-campaign` (merge-base the `dev` tip
+`001f400`) against the phase's acceptance conditions, re-running the verification commands and
+re-deriving every acceptance-bearing number itself. Its findings, verbatim:
+
+> **Acceptance condition 1 — HOLDS** (all numbers re-measured from the files). All 72 of
+> D01–D72 have ≥2 rows and ≥2 distinct queries (narrowest: D11 and D48 at 6 rows — matches the
+> gate output verbatim). Mandated variants, derived by me from PROMPT-029: exactly **339**
+> (LIT-01: 132, LIT-02: 91, LIT-03: 116) — reproducing the corrected gate's figures and the
+> prior review's 91-variant LIT-02 anchor. Coverage: **339/339 covered, 0 uncovered**.
+> Compound-token judgment: I used the comma-item reading (slash tokens intact), and I consider
+> it the correct one — the split reading requires fabricating strings the pack never wrote.
+> My derivation was genuinely independent — I hit and fixed my own parsing artifact before my
+> totals converged on 339. Inventory floor: 1,091 data rows, **1,038 status: candidate** vs
+> the 75 floor.
+>
+> **Acceptance condition 2 — HOLDS.** All 72 domain sections in the terminology map plus the
+> §6 index; exactly one domain-map entry per D01–D72 plus the top-20 section. **Top-20
+> verified row by row against the inventory:** all 20 source_ids exist, all pre-scores match,
+> all are status: candidate and collision_candidate: yes. Ranking independently reconstructed:
+> exactly 13 eligible rows at sum 9; under the stated architecture tiebreak the (4,4) eight
+> rank ahead of the (5,3) nineteen at sum 8; the alphabetical cut correctly drops
+> `zep-graphiti-temporal-kg-agent-memory-2025`. The "365 of 366 eligible" claim reproduces
+> exactly; the single excluded+yes row is the named D22/D30 dispute row.
+>
+> **Integrity spot-checks — all reproduce.** Ledger 845/845 CRLF, all rows 15-field,
+> S001..S283 contiguous; inventory pure LF, 13-field, 0 duplicate source_ids, 0 exclusions
+> without reason; kept resolution **572 kept-bearing rows, 0 unresolved** (SICI DOI handled by
+> semicolon-aware re-merge); 260 distinct LIT-03 kept ids, all resolve.
+>
+> **Fabrication sampling — 15 of 16 externally verified, 0 fabrications found**, across
+> dispatches S1–S7 and top-20 rows (Crossref, arXiv abstract pages, Google Patents, GitHub).
+> The one failure is `semanticscholar:54bc974...` (IBM autonomic-computing whitepaper):
+> api.semanticscholar.org returned 429 on every attempt — exactly the outage the record
+> documents; network-kind, not held against the work. Two benign year skews are
+> print-vs-early-access, not identity errors.
+>
+> **Evidence hygiene — clean.** Appends-only: `--numstat` on the two CSVs is 283/**0** and
+> 265/**0** — zero deletions against dev, so no prior phase's row was touched; the documented
+> in-phase cell edits net into additions (in-range commits `da99ec3`, `f1aab08` match the
+> described fixes exactly). Frozen baseline: no diff in the range. No verdicts: domain-map
+> entries record Tradition / Canonical sources / "Bears on: Hn"; the preamble explicitly
+> disclaims adjudication.
+>
+> **Extra claims tested:** X6's S215/S235 repair confirmed in the ledger; the D64
+> commit-message miscount confirmed ("3 candidate" in the message, 7 candidate rows in the
+> inventory — worker-flagged, left unamended by policy); the range adds exactly 3 created
+> events (`000201`–`000203`), 1 annotation on `000199`, 3 links — as claimed; the phase was
+> left `active` by checkpoint, correctly.
+>
+> **Discrepancies (complete list):** 1. Recorded governance/private-check transcript numbers
+> (191/137/546) don't match a rerun on the committed tree (192/133/547) — pre-rebase artifact;
+> both runs exit 0. 2. Record cites pre-rebase fix-cycle hashes; in-range equivalents verified.
+> 3. Narrative spend figures not exactly reproducible ("45 zero-yield rows", "15 verification
+> lookups") — definition-dependent narrative counts, not acceptance-bearing. Nothing else —
+> every acceptance-bearing number in the record reproduced exactly.
+>
+> **Judgment: nothing blocks completion.** Both acceptance conditions hold under my own
+> measurements; the gate's corrected variant derivation is the right reading of the pack and I
+> reproduce it independently; the top-20 list is internally consistent and honest about its
+> ties; the fabrication sample is clean; append-only discipline and the frozen baseline are
+> intact. The three discrepancies are record-accuracy footnotes worth a line at close, not
+> defects in the work.
+
+All three discrepancies are corrected in place above: the Verification transcript now shows the
+close-run output (192 documents / 133 phases / 547 files), the fix-cycle section names the
+in-range hashes, and the spend counts are replaced with enumerated, definition-explicit figures
+(17 verification rows named individually; 124 kept-nothing rows of which 19 returned nothing).
+
 ## Fix cycles and worker-issued repairs
 
 Three coordinator-issued fix cycles, all closed on the first cycle; no work item reached its
-two-cycle limit:
+two-cycle limit. (Commit hashes below are the pre-rebase forms the session observed; after the
+close-of-session rebase onto `dev` their in-range equivalents are `da99ec3` for the S3 fix and
+`f1aab08` for the S4 fix, verified by the independent review.)
 
 1. **`S3` fix cycle 1** — ledger row `LIT-03-S094` kept two arXiv identifiers in the
    non-canonical `10.48550/arxiv.*` DOI form; canonicalized to `arxiv:NNNN.NNNNN` to restore the
@@ -218,11 +291,21 @@ Worker-issued repairs, both verified by the coordinator after the fact:
   this phase's produced a false FAIL. The response was the same both times: verify the
   measurement against the files, then fix the instrument, not the data.
 
+**The generated ideas view was nearly shipped stale.** `docs/00-working/ideas.md` is
+regenerated from `ideas.jsonl` and diffed by `test_the_committed_markdown_matches_regenerated_output`
+— but this session's full-suite run happened before the post-rebase idea appends, and only the
+close-out's mandatory pytest rerun caught the stale view (1 failed / 577 passed). Regenerated
+with `tools/generate_ideas_md.py`; suite then 578 passed. Same class as the stale-catalog trap
+(idea `000198`): an append path whose regeneration step is enforced by a check that had already
+been run.
+
 ## Spend posture
 
-- **Searches:** 283 ledger rows this phase (`LIT-03-S001`–`S283`; 844 across the campaign),
-  including 15 logged bibliographic-verification lookups and 45 zero-yield rows with their
-  queries. No source was deep-read; Pass 1 is triage by design.
+- **Searches:** 283 ledger rows this phase (`LIT-03-S001`–`S283`; 844 across the campaign).
+  17 are bibliographic-verification lookups logged by extraction and fix dispatches
+  (`S064`–`S069`, `S098`–`S103`, `S155`–`S158`, `S235`). 124 rows kept no identifier; 19 of
+  those returned no results at all (the rest returned material assessed and not kept). No
+  source was deep-read; Pass 1 is triage by design.
 - **Dispatches:** 17 pack sections + 3 fix cycles = 20 dispatches, all on the pack's fixed
   models. **No Opus escalation** (0 of 1 spent campaign-wide). **No descope rung.**
 - **Sessions:** 3 of the 7-session runway used (range six to eight). Pass 1 — the three-phase

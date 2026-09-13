@@ -7058,6 +7058,7 @@ first real execution of the research protocol (GOV-009) surfaced.
 - relates_to ← `000197`
 - relates_to ← `000199`
 - relates_to ← `000200`
+- relates_to ← `000203`
 
 ---
 
@@ -9164,9 +9165,21 @@ Same family as [[000147]], [[000148]] and [[000149]]: the evidence contract fixe
 vocabulary but not the mechanical rule a downstream gate or deliverable depends on, and the gap
 surfaces as a distorted measurement rather than as a validation error.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-13T13:41:30-04:00): phase-lit-03 hit this gap and resolved it explicitly rather than silently: LIT-03 C ranked only status: candidate rows for the top-20, excluding the one deliberate excluded+yes row (structured-belief-state-llm-memory-benchmark-2026-d22-recur, the preserved D22/D30 cross-phase scoring dispute) on the stated ground that promoting an excluded row to deep-read candidacy would pre-empt the Pass 2 adjudication it exists to receive. The decision and reason are recorded in 02_domain_map.md's top-20 preamble. The dispute itself still stands for phase-lit-04.
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
+- relates_to ← `000201`
+- relates_to ← `000202`
 
 ---
 
@@ -9221,6 +9234,42 @@ patent), [[000149]] (no `strategy_phase` value for verification) and [[000199]] 
 undefined on a duplicate row): the contract fixes a column's meaning but not the mechanical rule a
 downstream gate depends on, and the gap surfaces as a false measurement rather than a validation
 error.
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000201 · Pin PROMPT-029's mandated-variant grammar: a comma-separated item is one variant, slashes preserved
+
+**Created 2026-09-13T13:41:21-04:00 · Status: `open`**
+
+Both possible misreadings of the delegation pack's "variants:" lists have now occurred in the literature-review campaign. In Pass 1b the coordinator relayed 76 variants against a true 91 (under-derivation, caught by the gate re-deriving from the pack). In Pass 1c the gate itself derived 346 by splitting slash compounds like 'prov:Activity/Agent/Entity', 'argument attack/support', 'forward/backward traceability' into fragments, producing a false FAIL with 5 phantom uncovered variants; a fix cycle with the comma-item rule (each comma-separated item is one variant, matched as one literal string) derived 339 and reproduced the independently reviewed 91-variant Pass 1b anchor exactly. The rule lives only in dispatch addressing and session records; LIT-06/LIT-07 gates re-measure variant coverage and will rediscover the ambiguity unless it is written into the instrument (PROMPT-029 or the evidence contract). Recorded during phase-lit-03.
+
+**Links**
+
+- relates_to → `000199`
+
+---
+
+## 000202 · The evidence contract's only deep-read mark is the status value the Pass 1 close-out is forbidden to set
+
+**Created 2026-09-13T13:41:21-04:00 · Status: `open`**
+
+LIT-03 C must "mark the ranked top rows deep_read candidates in the inventory (status stays candidate until LIT-04 actually reads them)" — but the evidence contract's only deep-read mechanism is status: deep_read itself, and the 13-column inventory schema has no other field. Nothing was invented: the inventory is untouched, the ranked top-20 list in 02_domain_map.md serves as the de-facto designation, and the conflict is recorded in that file's preamble. LIT-04 K needs an owner ruling on how deep-read candidacy is marked before Pass 2a starts — options include ruling the domain-map list authoritative, or amending the contract with an explicit field. Recorded during phase-lit-03.
+
+**Links**
+
+- relates_to → `000199`
+
+---
+
+## 000203 · OpenAlex served mistitled and mis-DOI'd records repeatedly; Pass 2 deep reads must verify identity at the source
+
+**Created 2026-09-13T13:41:22-04:00 · Status: `open`**
+
+During phase-lit-03, OpenAlex served at least three defective bibliographic records: SWE-bench (arxiv:2310.06770) retitled "Persistent memory for AI coding agents...", a GPT-4-report record with mismatched title/DOI at LIT-03-S142, and relevance-ranked searches that failed to surface known-correct targets (the Bercher/Alford/Hoeller survey, the 1972 PLANEX paper) which direct Crossref DOI lookups then resolved. Every Pass 1 keep survived because workers verified identity on the source's own page before writing bibliographic fields. Pass 2's deep reads (phase-lit-04/05) build the evidence matrix from these records and inherit the trap: any LIT-04/LIT-05 dispatch should carry the same verify-at-source addressing, and the validated-bibliography step in phase-lit-07 already requires per-source identity verification. Recorded during phase-lit-03.
 
 **Links**
 

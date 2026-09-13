@@ -6169,7 +6169,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6216,9 +6216,9 @@ items:
     reason; 0 kept identifiers unresolved. 283 ledger rows LIT-03-S001..S283. Three
     coordinator fix cycles (S3, S4, G), all closed first-cycle. No Opus escalation, no
     descope rung.
-  next_action: All acceptance conditions measured met; awaiting the owner's /session-close
-    review. Known open item for phase-lit-04 - the section/contract conflict on deep_read
-    marking, recorded in 02_domain_map.md's preamble and the session record.
+  next_action: None outstanding. phase-lit-04 (Pass 2a, deep reading) is unblocked and
+    continues on the campaign branch; its K needs the owner's ruling on deep_read marking
+    (idea 000202) before Pass 2a starts.
 - id: phase-lit-04
   title: Literature review Pass 2a — deep-read the top collision candidates
   plan: doc-lit-campaign
