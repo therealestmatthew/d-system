@@ -6461,20 +6461,26 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Write the six prompt files with the interview rung before the obstacle rung, one
-    ingredient added per rung, and the obstacle entering because the model asked for it.
+  - Write five ladder rungs - floor, situation, target, audience, interview - plus the
+    anti-pattern gallery. The obstacle is not its own rung; it arrives inside the
+    interview rung as the answer to a question the model asked.
+  - Run every rung and record its real output in the file, including where the result
+    was worse than predicted. No rung is written from imagination.
+  - Ship the audience rung as a paired run against two audiences.
   - Write the anti-pattern gallery with four entries, each naming the failure, showing
-    it, and stating the fix in one line.
+    it, stating the fix in one line, and pointing at the rung or component that fixes it.
   acceptance:
   - Each rung names the single ingredient it adds over the previous rung.
-  - The interview rung precedes the rung that states the human obstacle.
+  - No rung before the interview states the human obstacle.
+  - Every rung carries the real output it produced when run.
+  - The audience rung contains two outputs, not one.
   - The gallery contains no entry whose failure costs only tokens.
   verification:
-  - Read the six files in order against REQ-008 K11.
+  - Read the six files in order against REQ-008 K09, K10, K11 and K12.
   deliverables:
   - .claude/prompts/
-  next_action: Draft the interview rung, which the triage found must come before the
-    obstacle or the kit describes its central idea instead of embodying it.
+  next_action: Run the floor rung and record what it actually produced, since every
+    later rung is a comparison against it.
 - id: phase-kit-04
   title: Build the kit's two agents with explicit tool lists
   plan: doc-consultant-demo-kit

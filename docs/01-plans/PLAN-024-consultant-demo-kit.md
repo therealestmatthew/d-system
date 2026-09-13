@@ -200,6 +200,82 @@ have; anything not listed is the builder's judgement, and anything contradicting
 - **Distinguishes wrong from unsourced** — a number contradicted by a source and a number with no
   source are different problems, and collapsing them sends the consultant chasing the wrong one.
 
+### Prompts
+
+Six files: five ladder rungs and the anti-pattern gallery. The obstacle is **not** its own rung — it
+arrives inside the interview rung, because it is no longer the presenter's move to make.
+
+Every rung file carries the **real output that rung produced**, recorded when it was run. These are
+teaching artefacts about what actually happens, so no rung may be written from imagination; the
+builder runs each one and pastes back what came out, including when the result is worse than hoped.
+
+**Rung 1 — the floor.** A bare, under-specified ask.
+
+- The ask is **one the room would recognise as their own** — something a consultant would genuinely
+  type on a Monday, not a strawman. If nobody sees themselves in it, the whole ladder reads as a
+  setup.
+- **Says what is wrong with the output**, not merely that it is weak: generic advice that would fit
+  any close, any client, any year. Fluent text reads as good text, so the failure has to be named.
+- **Records the actual output.**
+- **Names what a consultant really does next** — gives up on the tool and writes it themselves, which
+  is the habit the ladder exists to interrupt.
+
+**Rung 2 — adds situation.** Three subsidiaries, three closes, one company.
+
+- **Situation only**: the twelve-day and five-day figures are held back for rung 3. The split only
+  works if this rung is disciplined about not leaking the objective.
+- **Shows the diff against rung 1**, not just the new output. The ladder teaches by comparison.
+- **Names what the model still does not know**, which sets up the rungs that follow.
+- **Says honestly if the gain is small.** Triage predicted most of the improvement comes from the
+  target rather than the subsidiary count; if that holds when run, the file says so.
+
+**Rung 3 — adds the target.** Twelve days down to five.
+
+- **The objective only**: current state and target state.
+- **Shows the output becoming specific and decidable** — advice about closes in general becomes
+  advice about a seven-day gap, with tradeoffs a consultant could argue with.
+- **Tests the triage's prediction out loud.** The file states that this rung was expected to
+  outperform rung 2 and reports whether it did. A teaching artefact that records a prediction and its
+  result teaches more than one that only asserts.
+- **Warns that a target invites false precision**: stating a number makes the model produce confident
+  plans built on it, which is useful and is also the moment to check the number is real.
+
+**Rung 4 — adds the audience.** Who receives it and what they do with it.
+
+- **Ships as a paired run** — CFO memo and controller working session, same prompt, side by side. A
+  single output cannot demonstrate that audience changes form; without the pair the presenter is
+  asserting it.
+- **Shows form changing, not only tone**: what gets led with, what is cut, what becomes an appendix.
+- **Names what the audience will do with it.** A memo for approval and a memo for information are
+  different artefacts, and the decision is what drives the form.
+- **Points at `/client-ready`**, so the ladder visibly feeds the component roster rather than sitting
+  beside it.
+
+**Rung 5 — the interview, where the obstacle arrives.** The rung the reordering exists for.
+
+- **The presenter never types the obstacle first.** The controller enters only as an answer to the
+  model's question. This is where the kit's central claim is demonstrated instead of described.
+- **Records the real question the model asked**, verbatim. If it asked something better than expected,
+  that is the artefact; if worse, the file says so.
+- **States the fallback** if the model asks about systems or headcount instead of people: what the
+  rung then teaches, which is weaker, and what the presenter says in that case.
+- **Shows the recommendation inverting, not merely improving** — standardise on the leanest close
+  becomes audit why the slow close is accurate and make its owner the design authority. If it only
+  becomes more polite, the file records that instead.
+
+**The anti-pattern gallery.** Four entries; politeness padding is cut for costing only tokens.
+
+- **Four entries, each with a cost the user pays**: stacked questions, be-comprehensive, manufactured
+  urgency, and asking-for-an-opinion-then-arguing-with-it. Each names the failure, shows it, and
+  states the fix in one line.
+- **Leads with opinion-then-argue** — the model capitulates and the consultant concludes it agreed
+  with them. It destroys value rather than wasting time, and it is the one the room least expects.
+- **Every entry is one actually observed.** The original design note set this bar and recorded no
+  evidence of meeting it; any entry that cannot be traced to a real occurrence is cut rather than
+  invented.
+- **Pairs each anti-pattern with the rung or component that fixes it**, so the gallery closes the kit
+  by pointing back into it rather than ending on a list of mistakes.
+
 ## Build order
 
 Four independent phases, one per component type. Nothing depends on anything else, because the

@@ -28,8 +28,13 @@ names a different Claude feature.
 **Scope is 16 components and nothing else:** 6 commands, 2 skills, 6 prompts, 2 agents.
 
 Explicitly out of scope, having been proposed and withdrawn on 2026-09-13: a fictional source
-corpus, sample inputs, a manifest, a facilitator guide, pinned fallback outputs, timed rehearsals,
-and any parking mechanism. The owner tests and demos the kit; this requirement covers building it.
+corpus, sample inputs, a manifest, a facilitator guide, fallback outputs held against a slow live
+call, timed rehearsals, and any parking mechanism. The owner tests and demos the kit; this
+requirement covers building it.
+
+K10's recorded outputs are not that withdrawn item. A ladder rung's recorded output is the teaching
+content of the file — what actually happened when the rung was run — not a standby copy kept in case
+the live demo stalls.
 Also out of scope: any change to `REQ-006`, which governs a different demo for a different audience
 and separately claims a fifteen-minute run.
 
@@ -49,10 +54,12 @@ originating brief were not treated as binding.
 | K06 | Each skill's description fires on a cue present in the input, not on an absence, an unobservable event, or a cue broad enough to match any consulting request, and states explicitly when it must not fire. | Read each description; for each skill, run three inputs that should fire it and three related inputs that should not, and record which fired. |
 | K07 | Each agent declares its tool list and model explicitly, and any agent presented as read-only excludes `Bash` as well as every write tool. | Read each agent's frontmatter; confirm the read-only agent lists only `Read`, `Grep` and `Glob`. |
 | K08 | Each agent's body states what it must never do and the condition under which it stops, matching the shape every existing agent in this repository uses. | Read each agent body against an existing definition in `.claude/agents/`. |
-| K09 | The prompt ladder adds exactly one ingredient per rung, and the rung that invites the model to interview the consultant precedes the rung that states the human obstacle, so the obstacle enters because the model asked for it. | Read the six prompt files in order and confirm each names the single ingredient it adds and that the interview rung comes first. |
-| K10 | The anti-pattern gallery contains only failures that cost the user an outcome, not failures that cost only tokens. | Read each entry and confirm a stated consequence beyond verbosity. |
-| K11 | `client-ready` is a command, not a skill, and declares its arguments in frontmatter and documents them in a table. | Read the file's location and frontmatter; confirm the argument table exists. |
-| K12 | Every entry cut from the roster is recorded with the reason it was cut. | Read the cut annotations on ideas `000174`, `000178`, `000180`, `000181`, `000182`, `000192` and `000193`. |
+| K09 | The prompt ladder is five rungs plus the anti-pattern gallery, adds exactly one ingredient per rung, and the human obstacle appears only as an answer to a question the model asked in the interview rung — never typed by the presenter in any earlier rung. | Read the six prompt files in order; confirm each names the single ingredient it adds, and confirm no rung before the interview states the obstacle. |
+| K10 | Every ladder rung records the real output that rung produced when run, including where the result was worse than predicted. | Read each rung's recorded output; confirm the rungs that state a prediction also state whether it held. |
+| K11 | The audience rung ships as a paired run — the same prompt against two audiences — rather than a single output the presenter describes as audience-dependent. | Read the rung and confirm two outputs are present. |
+| K12 | The anti-pattern gallery contains only failures that cost the user an outcome, not failures that cost only tokens, and each entry names the rung or component that addresses it. | Read each entry and confirm a stated consequence beyond verbosity and a pointer into the kit. |
+| K13 | `client-ready` is a command, not a skill, and declares its arguments in frontmatter and documents them in a table. | Read the file's location and frontmatter; confirm the argument table exists. |
+| K14 | Every entry cut from the roster is recorded with the reason it was cut. | Read the cut annotations on ideas `000174`, `000178`, `000180`, `000181`, `000182`, `000192` and `000193`. |
 
 ## Known accepted consequence
 
