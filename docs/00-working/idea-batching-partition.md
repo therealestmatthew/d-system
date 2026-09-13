@@ -67,14 +67,16 @@ repository or the idea's own text.
 
 | Contested | Ruling | What decided it |
 |---|---|---|
-| `000081` context pipelines — framework child, or retrieval? | **Retrieval** (`G30`) | Its own body names `tools/load_context.py`, the memory loader, the DuckDB projection and idea `000040` as its subject. Its deliverable shares implementation surface with the retrieval groups and shares only a parent label with `079`/`080`/`082`. Dependency beats taxonomy. R1 left it unbatched calling it "plausibly both"; R2/R3/R4 filed it under the umbrella. |
+| `000081` context pipelines — framework child, or retrieval? | **Framework umbrella** (`G14`) | Synthesis first moved this to retrieval and audit 2 struck the move down: no analyst proposed that group, and the justification re-read the idea's own "plausibly both" ambiguity — text all four already had, and which R4 had explicitly weighed and rejected. The check I should have run first: `tools/load_context.py` queries only the `memories` table, reading no ideas, documents or backlog. That confirms `000081`'s factual premise but distinguishes nothing, since R4's objection was about deliverable *kind* — a framework lens versus `000040`'s concrete query contract — not about the file. With no evidence the analysts lacked, the tie-breaker is the recorded link graph: `000081` is one of `000078`'s four `extends` children, the same class of fact used to place `000106`. Retrieval overlap is carried as a cross-reference on `G14` and `G25`. |
+| `000043`/`000044`/`000045` — one companion set, or split by mechanism? | **One group** (`G28`) | `000045`'s own body opens by naming the other two as "companion ideas recorded alongside this one", deliberately split so one design decision can be made from all three surveys together. Synthesis initially pulled `045` in with `004` on vector-mechanism grounds and did not record the change; audit 2 caught the silent reassignment. The ideas' own self-description is the checkable fact and it governs. `G26` is therefore `000004` alone. |
+| `000046`/`000047`/`000049` — one group, or is `047` separable? | **One group** (`G04`) | A genuine 2–2 split that synthesis wrongly reported as unanimous, corrected after audit 2. R1 pairs `047` with `038`; R2 excludes it from `046`'s group, reasoning that its audit "has value independent of whether the planner agent ever gets built". R3 and R4 group all three. `000047`'s own body supports both readings — it calls itself a prerequisite for `046` **and** claims standalone value. The criterion decides, not the count: `046` cannot be implemented without `047`'s rubric, and a one-directional dependency is exactly what the criterion says to batch. `047` keeping independent value does not make it independent *of* `046`. |
 | `000013` "other useful commands" — own item, or subsumed? | **Subsumed into `G20`** with `000126` | `000126`'s scope explicitly includes "missing-and-needed" findings, which is `000013`'s entire question. Checkable from both bodies. Only R4 saw it. Several of `000013`'s candidates have since shipped as `/session-close`, `/orient`, `/backlog`. |
 | `000054` observability — agent sensors, or retrieval, or standalone? | **Its own group** (`G57`) | No `sys-observability` exists in `systems.yaml`. Its scope (FastAPI latency, DB rebuild timing, generation-script telemetry) spans `sys-api`, `sys-projection` and `sys-html`. It is cross-cutting greenfield, not a child of `080`, whose target is agent-behaviour validation. All four placed it differently; none checked the registry. |
 | `000106` overview drift test — testing, or workbench? | **Testing** (`G35`) | Its own recorded link is `relates_to -> 000057`, the testing-strategy umbrella. Link graph is the checkable fact; subject-matter proximity is not. |
-| `000102` timestamp badge — rehearsal artifact, or viewer feature? | **Viewer feature** (`G48`) | Its content is a "last refreshed" badge on the HTML Viewer — implementable work. Three analysts filed it by provenance (it surfaced during a rehearsal); R4 filed it by content. Content decides whether something is buildable. |
+| `000102` timestamp badge — rehearsal artifact, or viewer feature? | **Viewer feature** (`G48`) | **Ruled on a principle, not a repository check** — flagged as such by audit 2, and the weakest resolution in this table. Its content is a "last refreshed" badge on the HTML Viewer, which is implementable work; three analysts filed it by provenance (it surfaced during a rehearsal), R4 by content. Content decides buildability. R1 concedes the underlying suggestion "has mild merit", so nothing here is settled by a checkable fact and the owner may reasonably reverse it. |
 | `000089` demo fallback seed | **Unbatched, already delivered** | Its own body: seeded by `tools/demo_reset.py prepare`, which checks folded state before appending; "not reverted after the demo" per PLAN-021's afterlife decision. Nothing to build. |
 | `000125` holistic triage direction | **Unbatched, self-discharged** | It is the instruction this document carries out. R2, R3 and R4 — including the control — reached this independently; R1 alone placed it in a programme. |
-| `000055` connection-builder — inside the ARCH-005 bundle? | **Outside it** (`G02`) | ARCH-005's own bundle names `000061`–`000065`, `000053` and `000018`, and does not include `000055`. It depends on that schema; it is not part of it. |
+| `000055` connection-builder — inside the ARCH-005 bundle? | **Outside it** (`G02`) | Corrected citation after audit 2 caught it selectively quoted. ARCH-005 names `000061`–`000065`, `000053` and `000018` as the schema-defining set, and lists `000055` **downstream** — build step 6, depending on step 3 (line 169) — not absent, as synthesis first wrote. Sequenced after is the accurate claim, and it still puts `055` outside the bundle. The analysts split 2–2 here; the build order is the checkable fact. |
 
 **Where unanimity across all four held**, it is recorded as the strongest signal available,
 because the control read different evidence and could not have inherited the framing: the ARCH-005
@@ -102,7 +104,7 @@ deliverables. One line against every other programme. **Precedes:** nothing outs
 | `G01` ARCH-005 schema bundle | 018, 053, 061, 062, 063, 064, 065 | ARCH-005 names exactly these as one governed unit — tagging, doc-code link targets, the three-axis classification, its agent, the withdrawn forking link resolved into a lineage annotation, and the decomposition procedure | Not internally separable by design; the owner's own document already bundled them | A governing REQ/PLAN, not yet written | 1 spec session + 4–5 phases |
 | `G02` Idea-system agents | 048, 127, 055 | `048` and `127` are the same ask six days apart (move `/idea`'s write into a subagent returning only the id); `055` maintains the link graph those writes create | Distinct from `G01` — these consume the schema, they do not define it | `G01` for `055` only | 2–3 phases |
 | `G03` Idea and backlog reporting | 008, 010, 042, 050, 070, 071 | `050` is the umbrella parenting `010`; `008` supplies the metrics `010` renders; `042` is the same instinct over two logs; `071` is already prototyped; `070` walks a training audience through the same surface | Argued in detail against P9: `042` builds on the *existing* generation framework (`templates/html/`, `sys-html`), not on P9's *new* libraries. R2 and R3 never tested this overlap; R1 and R4 both did | None hard | 3–4 phases; `071` and `070` largely delivered |
-| `G04` Idea-to-plan drafting | 046, 047, 049 | `046` names `047` its own prerequisite; `049` (where a promoted document stages before it earns a code) surfaced from triaging `046` and blocks its design | Unanimous across all four analysts | `G05`'s requirement-vs-plan rule informs it | 2–3 phases |
+| `G04` Idea-to-plan drafting | 046, 047, 049 | `046` names `047` its own prerequisite; `049` (where a promoted document stages before it earns a code) surfaced from triaging `046` and blocks its design | **Contested 2–2**, ruled on the one-directional dependency — see the disagreement table. R1 pairs `047` with `038`; R2 argues `047` stands alone | `G05`'s requirement-vs-plan rule informs it | 2–3 phases |
 
 ### P2 — Document and backlog governance · 7 ideas · `G05`–`G08`
 
@@ -131,11 +133,11 @@ shape. **Precedes:** `G10` touches the same `AGENTS.md` passages as `G09` and sh
 |---|---|---|---|---|---|
 | `G09` Claim and clobber hardening | 025, 041 | Two observed failures of one protocol — an abandoned claim with no recovery path, and a `git stash` that destroyed a peer's uncommitted work | Distinct from `G10`: these are mechanism bugs that exist under any branch topology | After `G10`'s document rewrite | 1–2 phases |
 | `G10` Branch protection and PR gate | 066 | Branch topology, GitHub settings, CI-as-gate, and the multi-agent PR protocol that follows | **Correction:** no longer blocked. The repository is public, which was the 403's named workaround. R1 and R2 both carried the stale blocker | None — now actionable | 3–4 phases |
-| `G11` Version control and backup | 021, 058, 059 | `058` is the umbrella; `059` its git slice; `021` the concrete gap for gitignored `_private/` | Unanimous across all four | None | 2–3 phases |
+| `G11` Version control and backup | 021, 058, 059 | `058` is the umbrella; `059` its git slice; `021` the concrete gap for gitignored `_private/` | All four keep these together at programme level; **R1 alone splits `059` into its own fine group** beside `058`/`021`. Grouped here on the `extends`/`relates_to` links all four cite | None | 2–3 phases |
 | `G12` Harness enforcement | 051, 012, 014 | `051` was created to parent `012` and `014`; all three ask where enforcement belongs — hooks, settings, tests or prose | `012`'s "blocked pending remote/CI" is stale; both now exist | None | 2 phases |
 | `G13` `AGENTS.md` push-rule rewrite | 091 | Two hunks in one file, replacement text already approved and recorded twice | Blocked only by `.claude/settings.json`'s `Edit(AGENTS.md)` deny rule — needs the owner to apply by hand or lift it | Owner action | <1 phase |
 
-### P4 — Agent engineering and delegation · 18 ideas · `G14`–`G23`
+### P4 — Agent engineering and delegation · 19 ideas · `G14`–`G23`
 
 **Why together:** how agents in general are instructed, observed, coordinated and reviewed.
 **Independence:** argued against P1 (those are idea-log agents, a specific application) and P5
@@ -146,7 +148,7 @@ pass before any phase count is committed.
 
 | Group | Ids | Why together | Independence | Precede | Size |
 |---|---|---|---|---|---|
-| `G14` Framework umbrella | 078, 079, 080, 082 | `078` and its three remaining named children — guides, sensors, orchestration | `081` was removed to P6 (see rulings). `082` stays here rather than joining `G09`: it is an open survey of orchestration, not the two diagnosed incidents | None | 3–4 phases, mostly writing |
+| `G14` Framework umbrella | 078, 079, 080, 081, 082 | `078` and its four named `extends` children — guides, sensors, context pipelines, orchestration | `081` overlaps P6's `G25` and would touch `tools/load_context.py`, which today queries only the `memories` table; the overlap is a cross-reference, not a merge, because `081`'s deliverable is a selection framework and `G25`'s is a query contract. `082` stays here rather than joining `G09`: it is an open survey of orchestration, not the two diagnosed incidents | None | 4–5 phases, mostly writing |
 | `G15` Truncation handling | 077 | Resume a truncated subagent rather than rerunning it | Split from `G14` on R4's checkable argument: `077` is a prose fix shippable today (`maxTurns` guidance), `080` needs monitoring infrastructure that does not exist | None | <1 phase |
 | `G16` Lifecycle roster | 072, 069 | The planner/executor/verifier/auditor roster, and whether to build it in a Claude-specific format at all | **`072`'s planner bullet duplicates `000046`** (P1 `G04`) — only R4 caught this; recommend striking the bullet rather than building it twice | Gated on PLAN-020 | 2–3 phases |
 | `G17` Deliberation trio | 073, 074, 075 | Expander, minimalist, arbiter — "none of the three is useful alone" | Kept out of `G16` **on `072`'s own instruction**: a different family, planned alongside but not merged | `G16` | 2–3 phases |
@@ -160,7 +162,9 @@ pass before any phase count is committed.
 ### P5 — Autonomous agent operations · 5 ideas · `G24`
 
 **Why together:** all five assume the system operating with no chat session open. **Independence:**
-unanimous across all four analysts, control included — the strongest signal in the set. **Precedes:**
+all four place these five in one programme, control included — the strongest signal in the set,
+because it cannot be inherited framing. **At fine-group level R1 and R4 subdivide them
+per component**, which is a granularity difference, not a disagreement about membership. **Precedes:**
 internally `028` → `029` → `030`, with `031` required before anything runs unsupervised.
 **Size:** 10+ phases if built in full; the most speculative programme here.
 
@@ -168,7 +172,7 @@ internally `028` → `029` → `030`, with `031` required before anything runs u
 |---|---|---|---|---|---|
 | `G24` Gateway, ledger, worker, broker, librarian | 020, 028, 029, 030, 031 | Deliberately decomposed from one proposal so each could be evaluated alone; `030` has "no purpose until" `028` and `029` exist; `031` gates unattended running; `020` links to both `028` and `031` | `020`'s librarian half overlaps P6's retrieval ground and `G21`'s lighter mechanism — see decline tiers | `028`, `029` before `030` | 4 phases + design |
 
-### P6 — Retrieval and knowledge infrastructure · 10 ideas · `G25`–`G30`
+### P6 — Retrieval and knowledge infrastructure · 9 ideas · `G25`–`G29`
 
 **Why together:** how the system finds and judges its own accumulated knowledge. **Independence:**
 one line against P1 (that is the idea graph's shape, not search over it). **Precedes:** nothing;
@@ -178,12 +182,11 @@ code.
 
 | Group | Ids | Why together | Independence | Precede | Size |
 |---|---|---|---|---|---|
-| `G25` Ordering and deterministic search | 002, 040 | `002` is named by `040` as its conceptual parent; `040` is the deterministic layer, explicitly not the vector work | Independent of `G26`; would unblock it by producing the failure evidence `phase-mem-15/16/18/19` wait on | None | 3–4 phases |
-| `G26` Vector retrieval | 004, 045 | Vector/RAG tooling for the same corpus | Complementary to `G27`/`G28`, not a substitute | Gated externally | 1–2 phases |
+| `G25` Ordering and deterministic search | 002, 040 | `002` is named by `040` as its conceptual parent; `040` is the deterministic layer, explicitly not the vector work | Independent of `G26`; would unblock it by producing the failure evidence `phase-mem-15/16/18/19` wait on. Cross-references P4's `G14` for `000081`, which would consume this contract without sharing its deliverable | None | 3–4 phases |
+| `G26` Vector retrieval | 004 | Vector/RAG tooling and the `phase-mem` line it gates | Complementary to `G27`/`G28`, not a substitute. `045` is **not** here — see `G28` | Gated externally | 1–2 phases |
 | `G27` Code-graph retrieval | 005 | GitNexus evaluated against this repository's code | Distinct from `G28`: different corpus (code vs. documents), and resolvable by installing a tool with no design work | None | 1 phase |
-| `G28` Documentation graph and projection | 043, 044 | The structured/front-matter half and the graph half of the same documentation-retrieval question | `043` reverses ADR-001's decision and needs it revisited first | ADR-001 | 2 phases |
+| `G28` Documentation companion set | 043, 044, 045 | `000045`'s own body names the other two as "companion ideas recorded alongside this one", deliberately split so one decision — structured front matter, graph, or vector for the documentation corpus — is made from all three surveys together | Kept whole on that self-description after audit 2 caught synthesis silently splitting `045` out on mechanism grounds. `043` reverses ADR-001's decision and needs it revisited first | ADR-001 | 2–3 phases |
 | `G29` Memory lifecycle and provenance | 060, 032 | Staleness, contradiction and confidence over memory content, with `032`'s lineage graph as its trust layer | Distinct from `G25`–`G28`: whether what is found is trustworthy, not how it is found | None | 2–3 phases |
-| `G30` Context pipelines | 081 | What an agent is given before it starts | Moved here from the framework umbrella by ruling above — its deliverables are this programme's subject | `G25` | 1–2 phases |
 
 ### P7 — Blocked downstream projections · 4 ideas · `G31`–`G32`
 
@@ -332,7 +335,7 @@ agreement cannot be inherited framing.
 
 ### Tier 3 — nominated by one of four (1/4)
 
-R4, the control, is the sole nominator of six of these. That is the expected shape of the
+R4, the control, is the sole nominator of seven of these. That is the expected shape of the
 findings ablation and is **not** evidence against them: R4 reasoned from idea bodies rather than
 from triage verdicts, and in two verified cases it was right where all three finding-readers were
 wrong.
@@ -364,7 +367,7 @@ Verified mechanically by set comparison against the corpus id list, not by hand 
 
 ```
 corpus (post-ruling)        : 129
-placed in fine groups       : 127 across 63 groups
+placed in fine groups       : 127 across 62 groups
 unbatched                   : 2
 total accounted             : 129
 duplicates                  : none
@@ -375,21 +378,25 @@ groups not in any programme : none
 programmes                  : 12
 ```
 
+Audit 2 recomputed this independently from the group tables rather than accepting the figures, and
+confirmed the same 127 + 2 = 129 with zero duplicates and zero gaps. The numbers above are the
+post-correction run.
+
 | Programme | Groups | Ideas |
 |---|---|---|
 | P1 Idea graph and lifecycle | 4 | 19 |
 | P2 Document and backlog governance | 4 | 7 |
 | P3 Concurrency, git safety and enforcement | 5 | 10 |
-| P4 Agent engineering and delegation | 10 | 18 |
+| P4 Agent engineering and delegation | 10 | 19 |
 | P5 Autonomous agent operations | 1 | 5 |
-| P6 Retrieval and knowledge infrastructure | 6 | 10 |
+| P6 Retrieval and knowledge infrastructure | 5 | 9 |
 | P7 Blocked downstream projections | 2 | 4 |
 | P8 Schema consistency and testing | 4 | 8 |
 | P9 HTML generation and design system | 3 | 6 |
 | P10 Workbench architecture and quality | 8 | 13 |
 | P11 Workbench features and defects | 9 | 16 |
 | P12 Standalone explorations and housekeeping | 7 | 11 |
-| **Total** | **63** | **127** |
+| **Total** | **62** | **127** |
 
 Excluded by ruling and not counted above: `000171`–`000193` (23), governed by `REQ-008`,
 `PLAN-024` and `phase-kit-01`–`08`.
@@ -400,8 +407,9 @@ Flagged so a reader who disagrees knows where to look first.
 
 - `000009` (`G23`) — carries no recorded links to anything; filed by subject alone.
 - `000054` (`G57`) — an umbrella with no members; its own scope is unscoped.
-- `000081` (`G30`) — moved against three analysts on a deliverable-surface argument; the taxonomy
-  reading is defensible.
+- `000081` (`G14`) — genuinely dual-natured by its own admission ("plausibly both"); placed on its
+  recorded `extends` link after synthesis's attempt to move it to retrieval was struck down by
+  audit 2. The retrieval reading remains defensible and is carried as a cross-reference.
 - `000102` (`G48`) — content and provenance point to different homes; content was chosen.
 - `000144` (`G44`) — genuinely two halves in one idea; kept whole.
 - `000013` (`G20`) — placed as subsumed, not as distinct content.
@@ -410,6 +418,34 @@ Flagged so a reader who disagrees knows where to look first.
 - `000106` (`G35`) — its stated model sits in testing, its subject in the overview generator.
 
 ---
+
+## What audit 2 changed
+
+Audit 2 checked whether this partition follows from the four inputs or whether synthesis invented
+groupings. It found no blocker and confirmed coverage by recomputing it, but returned four major
+findings against the merge — all upheld, all fixed above. They are recorded rather than quietly
+absorbed, because the pattern in them is worth the owner seeing.
+
+| Finding | What it caught | Fix applied |
+|---|---|---|
+| Major | `G04` was justified as "unanimous across all four" when R1 and R2 both separate `047` from `046` for stated reasons — a 2–2 split reported as settled | Re-ruled on the one-directional dependency and listed as contested |
+| Major | `000081` was placed in a group **no analyst proposed**, justified by re-reading text all four had and that R4 had explicitly rejected | Restored to `G14` on its recorded `extends` link; the real check (`load_context.py` reads only `memories`) is now stated and shown not to settle it |
+| Major | The `043`/`044`/`045` companion set was split with no entry in the disagreement table — a silent reassignment against the ideas' own self-description | Reunited as `G28`; `G26` is `000004` alone |
+| Major | The ARCH-005 citation for excluding `000055` quoted one line and omitted build step 6, which does list `000055` | Citation corrected to "sequenced after, not absent" |
+| Minor | Tier 3 prose said R4 was sole nominator of six; the table listed seven | Corrected to seven |
+| Minor | `000102` was resolved by a general principle while the table's header promises a repository or text check | Labelled as principle-based and the weakest row in the table |
+
+Audit 2's own summary of the pattern is worth quoting, because it is not the failure the brief
+anticipated: it found **no vote-counting**, and instead found "unlisted or overstated convergence
+claims used to close off boundaries that were genuinely contested — which is arguably worse, since
+it's harder for a reader to spot than an admitted vote would be." Three of the four majors are that
+one failure mode.
+
+Taking that finding seriously rather than only patching the row it named, synthesis then re-checked
+its own six other unanimity claims against the four reports. Two more were overstated in the same
+way — `G11` and `G24` conflated programme-level agreement with fine-group agreement, where R1 and R4
+subdivide — and both are corrected above. The remaining four (`G33`, `G48`'s first four members,
+`G49`, `G50`) were verified genuinely unanimous across all four analysts.
 
 ## What the owner is being asked to do
 
