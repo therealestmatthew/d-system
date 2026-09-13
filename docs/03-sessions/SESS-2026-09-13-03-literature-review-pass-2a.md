@@ -29,6 +29,106 @@ source inventory it reads from.
 
 The phase is left `active`. Only the owner's `/session-close` moves a phase to `complete`.
 
+## Verification
+
+The phase's three `verification` entries, run in the worktree after the final rebase onto `dev`.
+
+`uv run python -m src.governance`:
+
+```text
+Governance OK: 20 systems, 193 documents, 22 memories, 133 backlog phases
+exit 0
+```
+
+`uv run python tools/check_no_private_content.py` with the changes staged:
+
+```text
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
+check_no_private_content: OK (550 tracked files, 0 identifiers checked)
+```
+
+**0 identifiers checked is not a passing confidentiality gate.** `_private/` is gitignored and
+absent from a worktree, so the tool builds an empty identifier list (idea `000150`). The real check
+ran in the primary checkout on the catalog commit `2ea3080` and reported **31 identifiers checked**.
+
+Delegation-pack section `LIT-04 G` (`PROMPT-029`), all four measurements — see
+[Gate measurements](#gate-measurements--lit-04-g-real-output) below for the full output and the
+coordinator's independent re-measurement of each. Summary: **4 of 4 PASS** — 20 of 20 assigned batch
+ids present, 0 blank required fields, 0 `critical_collision: yes` rows lacking
+`second_review: pending`, 0 deep-read sources without a `strategy_phase: B` ledger row.
+
+The full test suite, run for the rebase check `AGENTS.md` requires before a branch may integrate:
+
+```text
+uv run pytest    → 578 passed, 2 warnings
+```
+
+The **pre-rebase** run of that suite failed on
+`test_committed_catalog_matches_regenerated_output`. That failure is recorded rather than elided; it
+was diagnosed and fixed in `2ea3080`, not retried until quiet. See
+[Findings](#the-claim-commit-left-dev-red-and-the-documented-regeneration-command-does-not-write).
+
+Deliverable integrity re-measured after the rebase: ledger 889 CRLF lines with 0 bare LF; matrix 20
+rows with 0 blank fields across all 43 columns; inventory 20 rows at `status: deep_read`.
+
+## Acceptance
+
+**Met** — The evidence matrix exists with a fully populated row for each deep-read candidate; no
+required field is blank and every row carries an evidence locator to primary material.
+`04_evidence_matrix.csv` holds 20 rows, one per assigned batch id, every row exactly 43 fields. A
+scan of all 43 columns x 20 rows found **0 blanks**; `NOT_APPLICABLE` (212 uses) and
+`NOT_DETERMINABLE_FROM_ACCESS` (40 uses) appear as the contract's permitted values, always with an
+explanatory reason rather than bare. `evidence_locator` is populated on all 20 rows, none shorter
+than 40 characters.
+
+**Met** — Every CRITICAL_COLLISION flag traces to the scoring rules and backward chaining is logged
+in the ledger for each deep-read source. Checking every row against the contract's flag rules
+(component overlap ≥ 4, or architecture overlap ≥ 4) gives **0 mismatches in either direction**: all
+14 `yes` rows clear a score threshold, and all 6 `no` rows fall below both. All 14 carry
+`second_review: pending`. The ledger holds **20 `strategy_phase: B` rows**, one per deep-read
+source, each with that source's id in `subject_source_id` — measurement 4 of the gate, which
+measured 1 missing on first pass and 0 after fix cycle 1.
+
+## Backlog
+
+`phase-lit-04` — `status: active`, left active deliberately: all work items are complete and
+gate-measured, but only the owner's `/session-close`, after its own independent review, may mark a
+phase `complete`.
+
+`next_action`: Phase work is complete and all four `LIT-04 G` gates pass; the phase awaits the
+owner's `/session-close` review. `phase-lit-05` (Pass 2b) is unblocked and continues on
+`agent/lit-campaign`, numbering its searches from `LIT-05-S001`.
+
+`session`: `doc-session-literature-review-pass-2a`.
+`completion_evidence`: `research/literature-review/04_evidence_matrix.csv`,
+`research/literature-review/00_search_ledger.csv`,
+`docs/03-sessions/SESS-2026-09-13-03-literature-review-pass-2a.md`.
+`result`: 20 sources deeply compared into a new 43-field evidence matrix; 44 ledger rows
+(`LIT-04-S001`–`S044`, 24 verification + 20 backward-chaining); 14 rows flagged
+`critical_collision: yes` with `second_review: pending`; all four gate measurements PASS after one
+fix cycle.
+
+`next_up` was not pruned — `phase-lit-04` is not in it, and nothing else completed this session.
+
+## Unresolved
+
+- **`AGENTS.md` and `CLAUDE.md` both document the catalog regeneration without the redirect that
+  makes it write** (idea `000208`). Neither file was edited; that needs the owner's explicit
+  approval for the specific change. Note that `.claude/skills/checkpoint/SKILL.md` already carries
+  the correct form, so the repository contradicts itself on this command.
+- **The inventory and the matrix now disagree on bibliographic fact** for at least five sources, and
+  the contract names no authority for `LIT-07 X3`'s validated bibliography (idea `000209`).
+- **`solozobov-verify-gated-completion-admission-control-2026` names the wrong author** in a stable
+  identifier already referenced from four files; renaming is the owner's call (idea `000210`).
+- **No gate measures ledger well-formedness**, and five malformed rows shipped this phase before a
+  worker's voluntary audit caught them (idea `000211`).
+- **Line endings remain unspecified** across the three deliverables (idea `000212`).
+- **The top-20 dedup gap** that put one paper in two slots is resolved for this phase by owner
+  ruling but not as a mechanism (idea `000213`).
+- **`LIT-04 G` reported PASS on blank fields having checked 4 of 43** (idea `000214`). The verdict
+  held only because the coordinator's independent measurement covered all 43; the LIT-05, LIT-06 and
+  LIT-07 gates re-measure the same condition over a larger matrix.
+
 ## Preflight
 
 | Check | Result |
@@ -261,24 +361,6 @@ implementation repository), and the IBM blueprint resisted seven access routes i
 - **Descope rungs**: none taken.
 - **Fix cycles**: 1 of the 2 allowed on `LIT-04 X2`; none on `X1`, `X3` or `G`.
 - **Sessions**: 4 of a seven-session runway, range six to eight.
-
-## Verification
-
-Run in the worktree after the final rebase onto `dev`:
-
-```text
-uv run python -m src.governance          → exit 0
-  Governance OK: 20 systems, 192 documents, 22 memories, 133 backlog phases
-
-uv run pytest                            → 578 passed, 2 warnings in 34.93s
-```
-
-Deliverable integrity re-measured after the rebase: ledger 889 CRLF lines with 0 bare LF; matrix 20
-rows with 0 blank fields; inventory 20 rows at `status: deep_read`.
-
-The pre-rebase run of the same suite failed on
-`test_committed_catalog_matches_regenerated_output` — the stale-catalog finding above. That failure
-is recorded rather than elided; it was diagnosed and fixed in `2ea3080`, not retried until quiet.
 
 ## Resume state
 

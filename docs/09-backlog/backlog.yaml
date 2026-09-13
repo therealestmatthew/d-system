@@ -6261,7 +6261,27 @@ items:
     second_review pending, a backward-chaining ledger row for every deep-read source
   deliverables:
   - research/literature-review/04_evidence_matrix.csv
-  next_action: Dispatch delegation-pack section LIT-04 after phase-lit-03 completes.
+  session: doc-session-literature-review-pass-2a
+  completion_evidence:
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/00_search_ledger.csv
+  - docs/03-sessions/SESS-2026-09-13-03-literature-review-pass-2a.md
+  result: Pass 2a executed - LIT-04 K, X1, X2 (one fix cycle), X3 and G dispatched
+    verbatim from PROMPT-029. 20 sources deeply compared into a new 43-field evidence
+    matrix; 44 ledger rows LIT-04-S001 to S044 (24 bibliographic-verification rows
+    under strategy_phase D, 20 backward-chaining rows under strategy_phase B); 14
+    rows flagged critical_collision yes, all carrying second_review pending. All four
+    LIT-04 G gates PASS on both the gate's own measurement and the coordinator's
+    independent re-measurement - 20 of 20 batch ids present, 0 blank required fields
+    across all 43 columns, 0 flagged rows lacking second_review pending, 0 deep-read
+    sources without a strategy_phase B ledger row. Governance exits 0; 578 tests pass
+    after rebase onto dev.
+  next_action: Phase work is complete and all four LIT-04 G gates pass; the phase
+    awaits the owner's /session-close review. phase-lit-05 (Pass 2b) is unblocked and
+    continues on agent/lit-campaign, numbering its searches from LIT-05-S001. Open for
+    the owner, none blocking - ideas 000208 to 000214, in particular 000208 (the
+    --catalog wording in AGENTS.md and CLAUDE.md, which no agent may change) and
+    000210 (whether the misattributed source_id slug is renamed).
 - id: phase-lit-05
   title: Literature review Pass 2b — deep-read foundational works and complete the
     evidence matrix
