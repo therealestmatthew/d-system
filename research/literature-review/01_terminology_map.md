@@ -1039,3 +1039,20 @@ instance of the cross-vendor convention below.
 | Actor/authority/delegation model (architecture.md's "actor, authority" primitives) | Classical formal delegation calculus ("speaks for" semantics), predating agentic AI by three decades | `lampson-abadi-authentication-distributed-systems-1992` -- vocabulary/history anchor, different domain (security/authentication, not epistemic provenance) |
 | Cross-agent context-package wire format for handoff/task/context fields | Agent2Agent (A2A) Protocol, Linux-Foundation-stewarded | `a2a-protocol-spec-linux-foundation`; survey `a2a-protocol-review-techrxiv-2025` |
 | "Handoff" as a structured, information-package-based transfer concept -- already formalized with decades of RCT-level evidence in a different domain | SBAR / I-PASS clinical handoff protocols (AHRQ Making Healthcare Safer IV systematic review) | `ahrq-mhs4-structured-handoff-protocols-sbar-ipass-2023` -- cross-domain analogy, not itself a software architecture |
+
+## D60 — Agent checkpointing
+
+Phase A vocabulary discovery (`LIT-03-S139`) surfaced the field's own live distinction between
+"checkpoint" (a snapshot the developer must detect and trigger) and "durable execution" (state
+persisted automatically after every logical step) -- no source was kept at that search (vendor
+blogs only), so the distinction is recorded here as observed vocabulary rather than a cited row.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Typed-transition-as-reasoning-memory (H2) directly challenged: checkpoints + execution traces argued insufficient as provenance | Reasoning Provenance for Autonomous AI Agents: Structured Behavioral Analytics Beyond State Checkpoints and Execution Traces | `reasoning-provenance-beyond-checkpoints-2026` -- direct H2/H3 challenger |
+| Phase-boundary / session-persistence claims (H8), given a machine-checked formal treatment | Resume Means Resume: a conformance contract for Checkpoint, Interrupt, and Resume semantics | `resume-means-resume-conformance-contract-2026` |
+| "Agent checkpointing" is literally a named research area from two decades before agentic coding | Towards a Verifiable Checkpointing Scheme for Agent-Based Interorganizational Workflow System "Docking Station" Standards (HICSS 2005) | `docking-station-agent-workflow-checkpointing-2005` -- same-name, pre-LLM prior art |
+| Phase-level recovery / resumption, classical workflow-engine sense | Checkpointing for workflow recovery (ACM-SE 2000) | `checkpointing-for-workflow-recovery-2000` |
+| Checkpoint/resume cost analysis for autonomous mobile code, pre-LLM | The cost of checkpointing, logging and recovery for the mobile agent systems (PRDC 2002) | `mobile-agent-checkpointing-logging-recovery-cost-2002` |
+| Append-only history + typed transitions supporting resumability, as mature production infrastructure | LangGraph checkpoint library -- thread-scoped state snapshots per superstep, time-travel debugging | `langgraph-checkpoint-library-oss` -- most directly comparable production system to D-System's phase/checkpoint claims (H8) |
+| Vocabulary/history anchors grounding "recovery point" / "resumption" as formally studied concepts predating agentic AI by two-plus decades | A Survey of Rollback-Recovery Protocols in Message-Passing Systems (2002); HPC checkpoint/restart fault-tolerance survey (2013) | `elnozahy-rollback-recovery-survey-2002`; `hpc-checkpoint-restart-fault-tolerance-survey-2013` |
