@@ -529,7 +529,7 @@ retag-2025,"ReTAG, arXiv preprint",2025,arxiv:2509.25814,preprint,D24,LIT-02-S03
 wildgraphbench-acl-2026,"WildGraphBench, ACL 2026 Findings",2026,10.18653/v1/2026.findings-acl.679,conference,D24,LIT-02-S034,1,1,no,none,candidate,none
 microsoft-graphrag-oss-github,"microsoft/graphrag, GitHub repository (official reference implementation of Edge et al., maintenance mode)",n.d.,github.com/microsoft/graphrag,OSS,D24,LIT-02-S035,3,2,no,none,candidate,none
 hkuds-lightrag-oss-github,"hkuds/lightrag, GitHub repository (EMNLP 2025-backed lightweight GraphRAG alternative)",n.d.,github.com/hkuds/lightrag,OSS,D24,LIT-02-S035,3,2,no,none,candidate,none
-lineagerag-2026,"LineageRAG, arXiv preprint",2026,arxiv:2608.16004,preprint,D24,LIT-02-S036,5,4,yes,none,candidate,none
+lineagerag-2026,"LineageRAG, arXiv preprint",2026,arxiv:2608.16004,preprint,D24,LIT-02-S036,5,4,yes,none,deep_read,none
 neurosymbolic-retrievers-rag-2026,"Neurosymbolic Retrievers for RAG, arXiv preprint",2026,arxiv:2601.04568,preprint,D24,LIT-02-S036,3,3,yes,none,candidate,none
 integrating-graphs-llms-agents-reasoning-retrieval-2026,"Integrating Graphs, LLMs, and Agents: Reasoning and Retrieval, arXiv preprint",2026,arxiv:2604.15951,preprint,D24,LIT-02-S036,3,3,yes,none,candidate,none
 dibowski-full-traceability-provenance-kg-fois-2024,"Dibowski: Full Traceability and Provenance for Knowledge Graphs, FOIS 2024",2024,utwente.nl/en/eemcs/fois2024/resources/papers/dibowski-full-traceability-and-provenance-for-knowledge-graphs.pdf,conference,D24,LIT-02-S037,4,3,yes,none,candidate,none
