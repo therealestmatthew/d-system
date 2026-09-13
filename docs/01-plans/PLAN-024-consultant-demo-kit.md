@@ -206,7 +206,7 @@ Six files: five ladder rungs and the anti-pattern gallery. The obstacle is **not
 arrives inside the interview rung, because it is no longer the presenter's move to make.
 
 Every rung file carries the **real output that rung produced**, recorded when it was run. These are
-teaching artefacts about what actually happens, so no rung may be written from imagination; the
+teaching material about what actually happens, so no rung may be written from imagination; the
 builder runs each one and pastes back what came out, including when the result is worse than hoped.
 
 **Rung 1 — the floor.** A bare, under-specified ask.
@@ -235,7 +235,7 @@ builder runs each one and pastes back what came out, including when the result i
 - **Shows the output becoming specific and decidable** — advice about closes in general becomes
   advice about a seven-day gap, with tradeoffs a consultant could argue with.
 - **Tests the triage's prediction out loud.** The file states that this rung was expected to
-  outperform rung 2 and reports whether it did. A teaching artefact that records a prediction and its
+  outperform rung 2 and reports whether it did. A teaching file that records a prediction and its
   result teaches more than one that only asserts.
 - **Warns that a target invites false precision**: stating a number makes the model produce confident
   plans built on it, which is useful and is also the moment to check the number is real.
@@ -247,7 +247,7 @@ builder runs each one and pastes back what came out, including when the result i
   asserting it.
 - **Shows form changing, not only tone**: what gets led with, what is cut, what becomes an appendix.
 - **Names what the audience will do with it.** A memo for approval and a memo for information are
-  different artefacts, and the decision is what drives the form.
+  different documents, and the decision is what drives the form.
 - **Points at `/client-ready`**, so the ladder visibly feeds the component roster rather than sitting
   beside it.
 
@@ -256,7 +256,7 @@ builder runs each one and pastes back what came out, including when the result i
 - **The presenter never types the obstacle first.** The controller enters only as an answer to the
   model's question. This is where the kit's central claim is demonstrated instead of described.
 - **Records the real question the model asked**, verbatim. If it asked something better than expected,
-  that is the artefact; if worse, the file says so.
+  that is the record; if worse, the file says so.
 - **States the fallback** if the model asks about systems or headcount instead of people: what the
   rung then teaches, which is weaker, and what the presenter says in that case.
 - **Shows the recommendation inverting, not merely improving** — standardise on the leanest close
