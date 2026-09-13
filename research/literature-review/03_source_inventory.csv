@@ -92,7 +92,7 @@ awesome-cqrs-event-sourcing-oss-github,"awesome-cqrs-event-sourcing, GitHub cura
 pyeventsourcing-oss-github,"eventsourcing (pyeventsourcing), GitHub repository",n.d.,github.com/pyeventsourcing/eventsourcing,OSS,D06,LIT-01-S072,3,2,no,none,candidate,none
 revo-oss-github,"Revo, GitHub repository (.NET CQRS/event-sourcing framework)",n.d.,github.com/revoframework/Revo,OSS,D06,LIT-01-S072,3,2,no,none,candidate,none
 esaa-event-sourcing-llm-agents-2026,"ESAA: Event Sourcing for Autonomous Agents in LLM-Based Software Engineering, arXiv preprint",2026,arxiv:2602.23193,preprint,D06,LIT-01-S073,4,3,yes,none,candidate,none
-log-is-the-agent-event-sourced-reactive-graphs-2026,"The Log is the Agent: Event-Sourced Reactive Graphs for Auditable, Forkable Agentic Systems, arXiv preprint",2026,arxiv:2605.21997,preprint,D06,LIT-01-S074,5,4,yes,none,candidate,none
+log-is-the-agent-event-sourced-reactive-graphs-2026,"The Log is the Agent: Event-Sourced Reactive Graphs for Auditable, Forkable Agentic Systems, arXiv preprint",2026,arxiv:2605.21997,preprint,D06,LIT-01-S074,5,4,yes,none,deep_read,none
 eventkg-multilingual-2018,"EventKG: A Multilingual Event-Centric Temporal Knowledge Graph, arXiv preprint",2018,arxiv:1804.04526,preprint,D06,LIT-01-S074,3,2,no,none,candidate,none
 eventkg-hub-biographical-timelines-2019,"EventKG - the Hub of Event Knowledge on the Web and Biographical Timelines, arXiv preprint (extension of eventkg-multilingual-2018)",2019,arxiv:1905.08794,preprint,D06,LIT-01-S075,3,2,no,none,candidate,none
 what-is-event-knowledge-graph-survey-2023,"What is Event Knowledge Graph: A Survey, IEEE Transactions on Knowledge and Data Engineering",2023,computer.org/csdl/journal/tk/2023/07/09792280,peer-reviewed,D06,LIT-01-S097,3,2,no,none,candidate,none
