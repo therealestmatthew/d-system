@@ -763,3 +763,30 @@ rather than as a hypothetical bridge.
 | Concrete model-based requirement-to-verification chain, documented as a community case study | SEBoK (INCOSE-maintained Systems Engineering Body of Knowledge) | `sebokwiki-tmt-model-based-requirements-case-study` |
 | Actor / authority (`prov:Agent`), cross-referenced from D03 | `prov:Agent`, W3C Recommendation (cross-domain recurrence, chained here from Open-MBEE's own PROV-O usage) | `w3c-prov-o-2013-d46-recur` (duplicate of `w3c-prov-o-2013`) |
 | Ontological classification (`O`) reconciled against an upper ontology (bridges to D-System's own O/E/L model) | PROV-O mapped to Basic Formal Ontology | `prov-o-bfo-mapping-nature-2025` |
+
+## D47 — Digital thread
+
+**"Digital thread" originates as a DoD-acquisition coinage (2016) paired from birth with "digital
+twin"** — the two terms have travelled together across every source in this domain, including the
+one patent (`us20250165226a1-ai-digital-thread-patent`, D46) that names "digital thread" and
+"digital engineering" (D48) together. **"Digital continuity" is a documented terminology collision**:
+established vocabulary in the UK-government records-management/digital-preservation community,
+sharing only the surface phrase with the systems-engineering "digital thread continuity" sense this
+domain's variant list intends — recorded as a collision, not folded in as a synonym.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchor: the coining/popularizing origin of the domain's own name | Digital thread (paired from origin with digital twin), USAF/DoD acquisition framing | `usaf-digital-thread-twin-origin-2016` |
+| Append-only, engineering-lifecycle-spanning artifact linkage (H2, H7) — the field's most-cited paper | Engineering Design with Digital Thread | `engineering-design-digital-thread-aiaa-2018` (journal version); `engineering-design-digital-thread-aiaa-scitech-2018-dup` (earlier conference version, dedup) |
+| Early applications of the append-only digital-thread concept to a manufacturing lifecycle | Digital thread in manufacturing | `asme-digital-thread-manufacturing-2016`; `digital-thread-manufacturing-early-open-access-2016` |
+| Cost/affordability and cross-sector-spread framing of the same append-only artifact-linkage concept | Digital thread/twin economics and sector extensions | `dod-digital-thread-twin-cost-affordability-2017`; `digital-thread-twin-aeronautics-2019`; `digital-thread-twin-industry40-shipyards` |
+| Vocabulary-map anchor: an industry-standard document naming the domain's framework and index concepts directly | Digital Thread Framework / Digital Thread Index, SAE Aerospace Information Report | `sae-digital-thread-framework-index-air7161` |
+| **Terminology collision, not a synonym**: a different field's established term sharing only the surface phrase | Digital continuity (UK records-management / digital-preservation sense) | `wikipedia-digital-continuity-terminology-collision` — recorded as a collision per the thesis-discipline rule, not merged with D47's "digital thread continuity" |
+| Provenance model (`P`) realized as ontology-based semantic integration across models (H7) | Semantic integration of models with ontologies for digital engineering | `digital-engineering-semantic-integration-ontologies-2023` |
+| Vocabulary-map anchor: Phase A bibliometric survey of the parent MBSE field | Bibliometric analysis of MBSE | `mbse-bibliometric-analysis-2022` |
+| The "authoritative source of truth" variant term, defined by its own field's community glossary | Authoritative source of truth, OMG MBSE Wiki glossary | `omg-wiki-authoritative-source-of-truth`; primary governing definition cross-referenced at `dodi-5000-97-digital-engineering-ecosystem` (D48) |
+| Integration reference model spanning this domain and D48 at once | Reference model for digital engineering integration | `reference-model-digital-engineering-integration-2024` |
+| Early framing paper for D48's own vocabulary, found via this domain's search | The advent of digital systems engineering | `towards-digital-systems-engineering-2020` — cross-referenced from D48 |
+| Lifecycle-data integration and authoritative-model-as-source-of-truth precedent, from the older PLM tradition this domain's vocabulary partly descends from | Product lifecycle management (PLM) integration | `plm-integration-framework-2008`; `plm-streamlining-survey-2005`; `digital-twin-survey-plm-framed-2019` |
+| Cross-domain recurrence: MBSE-to-digital-twin bridge already inventoried under D46 | MBSE tied to digital twin | `mbse-digital-twin-bridge-systems-2019-d47-recur` (duplicate of `mbse-digital-twin-bridge-systems-2019`) |
+| Cross-domain recurrence: the requirement-design-runtime provenance chain already inventoried under D46 | Model-Based Digital Threads for Socio-Technical Systems | `model-based-digital-threads-sociotechnical-systems-2022-d47-recur` (duplicate of `model-based-digital-threads-sociotechnical-systems-2022`) |
