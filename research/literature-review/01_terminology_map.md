@@ -1069,3 +1069,18 @@ challenges the epistemic/provenance side of H1-H11 directly except MAGE below.
 | Vocabulary-map anchor and unifying taxonomy for hierarchical-decomposition claims generally | A Survey on Hierarchical Planning -- One Abstract Idea, Many Concrete Realizations (unifying HTN/HGN/hybrid formalisms) | `bercher-alford-holler-hierarchical-planning-survey-ijcai-2019`; `georgievski-aiello-htn-survey-aij-2015` |
 | Context package / topology-aware context transfer (H5) and typed transition semantics (H2), applied to bounding an agent's own execution-history context | Hierarchical state tree with explicit Grow/Compress/Maintain/Revise operations bounding LLM-agent execution-history context and isolating flawed branches | `mage-hierarchical-agent-memory-2026` -- direct H2/H5 collision candidate, terminology-independent |
 | Implementation-availability anchor for hierarchical plan/task decomposition, actively maintained | GTPyhop -- generalization of Pyhop for goal-and-task ("GTN") totally-ordered HTN planning | `gtpyhop-oss` |
+
+## D62 — AI planning
+
+"Continual planning" (interleaved planning/execution/replanning under incomplete knowledge)
+was confirmed as the field's own term for D-System's plan-act-monitor-replan loop at
+`LIT-03-S183`; no source was independently kept for it there (subsumed by the Actor's View and
+Automated Planning and Acting sources below), so it is recorded here as observed vocabulary.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Plan (Implementation & Experience primitive) and its formal machine-readable representation | PDDL / PDDL2.1 -- planning domain/problem definition language, temporal and numeric extension | `pddl21-fox-long-jair-2003` |
+| Runtime-to-knowledge closure (H11): plan, act, monitor and replan treated as one continuous loop | The Actor's View of Automated Planning and Acting; Automated Planning and Acting (canonical integrated textbook model) | `ghallab-nau-traverso-actors-view-position-paper-aij-2013`; `ghallab-nau-traverso-automated-planning-acting-book-2016` |
+| Typed transition semantics as reasoning memory (H2): plan modification triggered by an explicit knowledge update | Integrating Planning, Action Execution, Knowledge Updates and Plan Modifications via Logic Programming | `hayashi-cho-ohsuga-planning-execution-knowledge-updates-2002` -- direct H2 collision candidate, terminology-independent (title is a near-literal restatement of D62's mandated collision query) |
+| "Replanning" as a single D-System mechanism name, against a field that treats it as several incompatible flavors | The Metrics Matter! On the Incompatibility of Different Flavors of Replanning | `metrics-matter-replanning-flavors-taxonomy-2014` |
+| Implementation-availability anchor for classical AI planning/execution, paired with its canonical description paper | Fast Downward -- domain-independent classical PDDL planning system | `fast-downward-planner-oss`; `helmert-fast-downward-planning-system-jair-2006` |
