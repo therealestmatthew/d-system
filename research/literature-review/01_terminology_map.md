@@ -830,3 +830,26 @@ practice, pre-AI, at the project-management level.
 | Citation/evidence discipline against LLM-generated-code hallucination (H3) | Citation discipline in spec-driven development | `citation-discipline-spec-driven-development-2026` |
 | End-to-end lineage from concept through audit-ready delivery (H7) — verified via LIT-03-S065 rather than accepting the source search's characterization uncritically | Agile V: a compliance-ready framework for AI-augmented engineering | `agile-v-compliance-ready-ai-engineering-2026` — flagged collision candidate |
 | Cross-domain recurrence: the datasheet-to-code traceability-link-recovery agent already inventoried under D44 | SpecMap | `specmap-llm-agent-datasheet-code-traceability-2026-d49-recur` (duplicate of `specmap-llm-agent-datasheet-code-traceability-2026`) |
+
+## D50 — Executable specifications
+
+**This domain's canonical papers are historical (1984–1990)**, predating both BDD and the AI-agent
+framing: TRIO, an executable specification language and environment, and static-semantics
+specification all establish "executable specification" as a formal-methods term of art decades
+before D-System's own usage. Adzic's *Specification by Example* (2011) is the separate,
+practice-side origin of "living documentation" — a human-process convention for keeping
+specifications and tests in sync, distinct from the formal-methods executable-specification
+lineage above though the two threads converge on the same D50 vocabulary.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchors: the three historical foundational papers establishing "executable specification" as a formal-methods term | TRIO; executable specification language and environment; executable specification of static semantics | `trio-logic-language-executable-specs-realtime-1990`; `executable-specification-language-environment-1986`; `executable-specification-static-semantics-1984` |
+| Vocabulary-map anchor: controlled-natural-language route toward executable specifications, predating modern spec-driven development | Attempto Controlled English | `attempto-controlled-natural-language-1996` |
+| Vocabulary-map anchor: paywalled canonical taxonomy of what makes a specification executable | Executable Specs: What Makes One, and How Are They Used? | `executable-specs-what-makes-one-sae-ieee-2006` |
+| Vocabulary-map anchor: the separate, practice-side origin of "living documentation" as a human-process convention | Specification by Example | `specification-by-example-adzic-2011-book` |
+| Test-to-requirement traceability inside test-driven practice (H7, H9) | Towards traceable test-driven development | `towards-traceable-test-driven-development-2009` |
+| Model-based generation of acceptance tests (H7, H9) | Enhancing ATDD with model-based test generation | `atdd-model-based-test-generation-2019` |
+| Acceptance-test-to-requirement traceability (H7, H9) | Traceability in acceptance testing | `traceability-acceptance-testing-corriveau-2013` |
+| Executable-specification-driven runtime verification (H11) | Runtime verification based on executable models | `runtime-verification-executable-models-timed-traces-2013` |
+| Agentic evaluation of spec-to-code autoformalization, bridging to D51's Verus | Verus-SpecGym | `verus-specgym-agentic-spec-autoformalization-2026` |
+| Negative evidence: no existing generative system simultaneously achieves full automation and formal traceability (bears on H9) | AI-driven test case generation from NL requirements, survey | `ai-driven-test-case-generation-nl-requirements-survey-2026` |
