@@ -1017,3 +1017,14 @@ instance of the cross-vendor convention below.
 | Context package + governance/delivery flow, version-controlled | memory-bank (OSS) | `dapi-memory-bank-oss` -- direct mechanism-name collision |
 | Context package as a persistent, machine-readable specification maintaining convention-adherence at scale | Codified Context: Infrastructure for AI Agents in a Complex Codebase | `codified-context-agent-infrastructure-2026` |
 | Knowledge graph state evolving under multi-hop reasoning | EvoMemKG: An Evolvable Memory Agent for Multi-hop KG Reasoning | `evomemkg-evolvable-memory-kg-reasoning-2026` |
+
+## D58 — Cross-session coding agents
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchor: Forms/Functions/Dynamics framework for agent memory | Memory in the Age of AI Agents | `memory-in-the-age-of-ai-agents-survey-2025` |
+| Cross-session benchmark vocabulary for persistent memory/reasoning | Momento: Evaluating Persistent Memory and Reasoning with Multi-Session Agentic Conversations | `momento-multi-session-agentic-memory-benchmark-2026` |
+| Phase/session persistence and resumption with a bounded context window (H8) | Reasoner-Executor-Synthesizer: static O(1) context window | `reasoner-executor-synthesizer-o1-context-2026` |
+| Memory-lifecycle transition (consolidation/pruning) between sessions (H2) | Active Context Compression ("Focus Agent") | `active-context-compression-focus-agent-2026` |
+| Cross-session recall of prior reasoning state | Drawing on Memory: Dual-Trace Encoding | `drawing-on-memory-dual-trace-cross-session-2026` |
+| Context carryover from one task/phase into the next, already implemented and patented in conversational assistants a decade-plus before agentic coding | Context carryover in language understanding systems (Microsoft, 2017); Context carryover across tasks for assistant systems (Meta, 2024) | `uspto-9747279-context-carryover-language-understanding-patent`; `uspto-12019685-context-carryover-across-tasks-assistant-patent` -- direct terminology AND mechanism collision, domain-adjacent (conversational assistants, not coding agents) |
