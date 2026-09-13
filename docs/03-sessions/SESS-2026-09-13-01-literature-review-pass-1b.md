@@ -93,7 +93,7 @@ governance exit 0; check_no_private_content exit 0 (0 identifiers checked, see a
 `;`-separated and rows `LIT-02-S225`/`S228` carry a Wiley SICI DOI containing a literal semicolon
 (`10.1002/(sici)1097-4571(198905)40:3<200::aid-asi11>3.0.co;2-u`). A naive split shreds it into two
 fragments that exist nowhere, producing four phantom pair-misses. The DOI is correct and the
-inventory carries it in full; the data was deliberately not rewritten. Recorded as idea `000199`.
+inventory carries it in full; the data was deliberately not rewritten. Recorded as idea `000200`.
 
 ### Coordinator measurements, taken independently of the gate
 
@@ -138,25 +138,31 @@ decision on whether to integrate `agent/lit-campaign` into `dev` at this boundar
 
 ## Unresolved
 
-- **Not marked complete, and not integrated.** Both are the owner's. The branch is 46 commits ahead
-  of `dev` at `920f1d3`, 0 behind, tree clean, governance exit 0, 578 tests passing. The diff is
+- **Not marked complete, and not integrated.** Both are the owner's. The branch is 47 commits ahead
+  of `dev` at `f400737`, 0 behind, tree clean, governance exit 0, 578 tests passing. The diff is
   three files: `git diff dev..agent/lit-campaign` shows 294 ledger rows, 388 inventory rows and 401
   terminology-map lines added, and nothing else.
-- **An idea-id collision consumed and renumbered five ideas.** This session allocated `000156`–
-  `000160` on the unintegrated campaign branch while two peer commits allocated `000156`–`000194` on
-  `dev`. All five collided. `AGENTS.md`'s duplicate-code rule and the procedure set by `1a4dd1b`
-  were followed: the three idea commits were dropped during the rebase rather than hand-edited, and
-  all five were re-appended through the writer as `000195`–`000199`, links recreated, one internal
-  body reference repointed. The annotation this session had placed on `000147` was destroyed with
-  the dropped commits and had to be reconstructed from the transcript — recoverable here, not
-  recoverable in a fresh session. Recorded as a second occurrence on `000158`.
-- **Five instrument gaps recorded as ideas `000195`–`000199`.** A background subagent calling
+- **The idea-id race fired twice in this session, the second time onto the ids that fixed the
+  first.** Occurrence one: this session allocated `000156`–`000160` on the unintegrated campaign
+  branch while two peer commits allocated `000156`–`000194` on `dev`; all five collided. Occurrence
+  two, about eight minutes later: a peer allocated `000195` on `dev` while that renumbering was
+  being committed, so the freshly renumbered `000195` collided immediately. Both were resolved by
+  `1a4dd1b`'s procedure — the idea commits were dropped during the rebase rather than hand-edited,
+  and the set was re-appended through the writer, finally as `000196`–`000200`. **Renumbering is a
+  retry, not a fix, and it loses to a peer that is still allocating.** Each cycle cost a rebase,
+  five re-appends, three re-links, two re-annotations and an edit to every document citing the old
+  ids. The recovery is also lossy: the annotation this session placed on `000147` was destroyed with
+  the dropped commits both times and reconstructed from the transcript, which a fresh session could
+  not have done. Both occurrences are recorded on `000158`, which already held the finding; the peer
+  independently annotated the same idea within minutes, and those two annotations merged cleanly —
+  the same append-only property that would have merged two `created` events for one id silently.
+- **Five instrument gaps recorded as ideas `000196`–`000200`.** A background subagent calling
   `EnterWorktree` hangs silently and forever; the campaign's deliverables disagree on line endings
   (ledger CRLF, inventory and map LF) so the standing CRLF warning is wrong for the file an
   extraction writes; the governance check passes with a stale catalog and `--catalog` prints instead
   of writing; `collision_candidate` is undefined on a duplicate row while `LIT-03 C` ranks the
   top-20 without filtering on `status`; and a `;`-separated `kept` column cannot hold a SICI DOI.
-  `000196`, `000198` and `000199` are linked to `000147`.
+  `000197`, `000199` and `000200` are linked to `000147`.
 - **A cross-phase scoring disagreement stands unresolved and is `phase-lit-03`'s to settle.**
   `structured-belief-state-llm-memory-benchmark-2026` is scored `collision_candidate: no` by
   `phase-lit-01` at D30 and `yes` by this phase at D22, with identical pre-scores (3/2). It is

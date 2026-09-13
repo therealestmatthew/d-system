@@ -7040,11 +7040,24 @@ the next dispatch inventing a fifth convention.
 Found by the coordinator of phase-lit-01. Anchor for the batch of instrument gaps that the
 first real execution of the research protocol (GOV-009) surfaced.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-13T07:30:35-04:00): phase-lit-02 adds two more identifier forms to the ledger's kept column, confirming the gap is structural rather than a phase-lit-01 accident. LIT-02 S1's 96 kept identifiers use arxiv: (63), bare DOI (13), uspto: (1), pmc:PMCNNNNNNN (3), and plain URLs for the rest. pmc: appears nowhere in the inventory's prior 438 rows, and several bioRxiv URLs embed a DOI (biorxiv.org/content/10.1101/...), so the same source is representable in two sanctioned forms and the choice is the writing agent's. Neither was normalised: the gate compares the ledger's kept against the inventory's url_or_doi, so consistency between the pair beats canonical purity, and normalising is what creates the failure it appears to fix (the four semanticscholar.org rows S052/S062/S082/S093 are the standing precedent). The forms were passed forward to the extraction dispatches as addressing instead. That works and is not a fix: it makes every extraction depend on a coordinator transcribing the forms correctly, and in this phase the coordinator's relayed claims were wrong four times while the underlying evidence was sound. A further consequence surfaced at S252, where a truncated researchgate.net URL in kept failed a byte-exact match against the fuller URL the inventory already held, and needed a fix cycle.
+
+</details>
+
 **Links**
 
 - relates_to ← `000148`
 - relates_to ← `000149`
 - relates_to ← `000150`
+- relates_to ← `000197`
+- relates_to ← `000199`
+- relates_to ← `000200`
 
 ---
 
@@ -7413,7 +7426,7 @@ Relates to 000152 (a registry of active worktrees) and 000151 (the claim system'
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-pack-factory (2026-09-13T07:27:13-04:00): THE RACE RECURRED WITHIN THE HOUR, and the second instance is worse than the first.
 
@@ -7426,6 +7439,7 @@ First, the window was not narrow. The peer landed a batch of THIRTY-SIX ideas in
 Second, and more important: THIS COLLISION DID NOT PRODUCE A GIT CONFLICT IN THE IDEA LOG. The first one did, purely because the two appends happened to land on adjacent lines. This time the branch was reset onto dev and the idea re-appended, so the conflict never materialised - but had the two branches merged normally, git would have taken both append-only additions cleanly and fold() would have folded two unrelated created events under one id. That is the silent-corruption path this idea predicted, observed one day later.
 
 The practical consequence is that the frequency estimate in the original text was wrong, and understated. This is not a rare race that "just bit once". It bit twice in under twenty-four hours, in a repository with a handful of concurrent sessions, and the second time it was caught only because a human-directed integration happened to reset the branch rather than merge it.
+- **finding** by agent-lit (2026-09-13T07:30:49-04:00): The race fired twice inside one session, on 2026-09-13, and the second firing landed on the ids allocated to fix the first. Occurrence one: this session allocated 000156-000160 on the unintegrated branch agent/lit-campaign while two peer commits allocated 000156-000194 on dev; all five collided. Resolved per 1a4dd1b's procedure - the three idea commits were dropped during the rebase rather than hand-edited, and all five were re-appended through the writer as 000195-000199. Occurrence two, roughly eight minutes later: a peer allocated 000195 on dev while that renumbering was being committed, so the freshly renumbered 000195 collided immediately and the whole set was dropped and re-appended again as 000196-000200. Three observations the first record could not make. First, renumbering is not a fix but a retry, and it loses to a peer that is still allocating - each cycle costs a rebase, five re-appends, three re-links, two re-annotations and an edit to every document citing the old ids. Second, the recovery is lossy in a way that is easy to miss: an annotation this session had placed on 000147 was destroyed with the dropped commits both times and had to be reconstructed from the transcript, which a fresh session could not have done. Third, both occurrences were caught only because git happened to conflict; the peer and this session also annotated this very idea independently within minutes of each other, and those two annotations merged cleanly precisely because append-only logs are designed to. The same mechanism that makes annotations safe to merge is what would make two created events for one id merge silently. An allocator that reserved against the remote, or a validator rejecting a duplicate created event the way document codes are rejected, prevents all of this; renumbering after the fact does not.
 
 </details>
 
@@ -8978,3 +8992,236 @@ Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (ide
 **Links**
 
 - relates_to → `000158`
+
+---
+
+## 000196 · A background subagent that calls EnterWorktree hangs silently and forever
+
+**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+
+`EnterWorktree` requires a permission prompt. A background subagent has no way to surface one, so
+the call never returns and never errors. The agent blocks on it indefinitely: no output, no
+partial work, no failure message, and nothing in the repository to show it ran.
+
+Observed in phase-lit-02 on 2026-09-12. The `LIT-02 S1` search dispatch was sent at 19:17:31Z. Its
+entire transcript is eight lines:
+
+    19:17:31Z  dispatch received (10 KB)
+    19:17:37Z  ToolSearch      -> 274-byte result
+    19:17:43Z  EnterWorktree   -> no tool_result, ever
+
+It sat there for five hours and was killed. Zero ledger rows, zero commits, clean tree — the
+failure is indistinguishable from "still thinking" without reading the transcript.
+
+Why this is repository-wide rather than one bad dispatch. AGENTS.md requires every session to work
+in a worktree, so nearly every delegation prompt in this repository contains a sentence of the form
+"work in `../d-system-worktrees/<phase-id>`". That phrasing invites an agent to look for a worktree
+tool; `EnterWorktree` is discoverable via ToolSearch; and calling it is the natural next step. The
+`phase-lit-01` dispatches did not hit this, which is luck rather than design.
+
+Contributing factor: no settings file grants `EnterWorktree`, and `permissions.defaultMode` is
+unset, so it falls through to "ask". A denial would have been a usable result. Hanging is not.
+
+Mitigations available now, none of them recorded anywhere an agent would find them:
+
+- Dispatches can forbid `EnterWorktree`/`ExitWorktree` by name and specify `cd <path> && <command>`
+  inside a single Bash call instead (the Bash working directory resets between calls).
+- Dispatches can carry a standing rule to abandon and report any tool call that has not returned in
+  ~60 seconds, so a block becomes a result rather than a stall.
+- Requiring an early first commit turns file mtime into a liveness signal. Better still, the
+  subagent transcript line count distinguishes wedged from working immediately: the hung agent had
+  8 lines and one unanswered tool call; a healthy peer had 72 lines with results returning every few
+  seconds.
+
+Worth deciding: whether the standing dispatch blocks in PROMPT-029 (Block C) and the session-start
+guidance should carry the prohibition, or whether the harness should deny rather than hang. The
+second is the real fix; the first is what stops the next five-hour loss.
+
+---
+
+## 000197 · The literature-review deliverables disagree on line endings, and the standing CRLF warning can corrupt the LF ones
+
+**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+
+The campaign's three working files do not share a line-ending convention:
+
+    00_search_ledger.csv      CRLF throughout   (305 CRLF, 0 bare LF)
+    03_source_inventory.csv   LF               (0 CRLF, 439 bare LF)
+    01_terminology_map.md     LF               (0 CRLF, 340 bare LF)
+
+Nothing records this. The evidence contract (PLAN-023.03) fixes the columns of both CSVs and says
+nothing about line endings, and the only operational note that exists — carried into phase-lit-02's
+dispatches from phase-lit-01's session record — says "the ledger is CRLF-terminated throughout,
+read and write raw bytes".
+
+That note is correct and load-bearing for the ledger: a text-mode round-trip stripped it once in
+phase-lit-01 and cost a repair cycle. But an extraction dispatch writes the *inventory*, not the
+ledger. An agent handed the CRLF warning and told to write both files has been given a fact that is
+true of one and wrong for the other, and the natural generalisation — "the campaign's CSVs are
+CRLF" — corrupts 439 lines of inventory in a way that produces an enormous, uninformative diff.
+
+Caught before it happened in phase-lit-02 only because the coordinator measured both files before
+dispatching `LIT-02 X1`. That is not a control; it is one coordinator being careful once.
+
+Options worth a decision rather than a guess: state the per-file convention in the evidence
+contract so it is contract rather than folklore; or normalise the ledger to LF at a phase boundary
+where no dispatch is mid-flight and drop the special case entirely. The second is cleaner but
+rewrites 305 lines of the campaign's reproducibility record, which is exactly the kind of file that
+should not be rewritten for tidiness.
+
+Relates to 000147: both are gaps where the evidence contract underspecifies a mechanical property
+of a file it otherwise governs completely, and in both cases the gap surfaced as a phase-gate
+failure rather than as a validation error.
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000198 · The governance check passes with a stale catalog, and --catalog prints instead of writing it
+
+**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+
+Two facts combine into a trap that put `dev` red during phase-lit-02's claim on 2026-09-12.
+
+First, `uv run python -m src.governance --catalog` **prints** the generated catalog to stdout. It
+does not write `docs/08-governance/catalog.md`. Its own help string says "Print the generated code
+catalog" (`src/governance/__main__.py:389`) and the implementation is a bare `print(...)` at line
+416. Running the command as documented regenerates nothing.
+
+Second, `uv run python -m src.governance` exits 0 with the catalog stale. It reported
+`Governance OK: 19 systems, 184 documents, 21 memories, 129 backlog phases` while
+`test_committed_catalog_matches_regenerated_output` was failing on the same tree.
+
+AGENTS.md tells an agent to "Regenerate `docs/08-governance/catalog.md` with `--catalog`" and to
+commit that regeneration with the claim, because leaving it undone puts the trunk red. An agent
+that follows both instructions literally — run `--catalog`, then run the governance check to
+confirm — gets a green result and a stale catalog, and commits the claim believing it is complete.
+That is what happened: the claim commit `6096999` carried only `backlog.yaml`, and the failure was
+found afterwards by running the test directly.
+
+The correct invocation is a redirect:
+
+    uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+
+The failure shape is the one this repository keeps re-encountering: a check built to be run quickly,
+producing a clean-looking result, measuring the wrong thing. It is the same shape as 000150 (the
+private-content check printing OK for having compared zero identifiers).
+
+Possible resolutions, for the owner rather than an agent to pick: give the governance check a
+catalog-staleness assertion so exit 0 means what a reader assumes it means; or add a `--write-catalog`
+that writes the file, leaving `--catalog` as the print-only inspection form; or correct AGENTS.md's
+wording to carry the redirect. The first is the only one that closes the trap rather than
+documenting it, but AGENTS.md may not be edited without the owner's explicit per-change approval.
+
+---
+
+## 000199 · The evidence contract does not say how collision_candidate behaves on a duplicate row, and the top-20 list does not filter on status
+
+**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+
+Two under-specifications combine into a measurable distortion of the campaign's headline output.
+
+The evidence contract (PLAN-023.03) defines the source inventory's `collision_candidate` as
+"`yes`/`no` — the top-20 list is the `yes` rows ranked". It says nothing about what the flag means
+on a row whose `status` is `excluded` and whose `dedup_of` points at another row for the same
+source. The delegation pack's `LIT-03 C` then builds the campaign's headline deliverable as "the
+inventory's `collision_candidate: yes` rows ranked by pre-scores" — with **no filter on `status`**.
+
+So a source inventoried twice, once canonically and once as a cross-domain or cross-phase
+recurrence, occupies **two of the twenty slots** if both rows carry `yes`.
+
+Observed in phase-lit-02. `LIT-02 X1` wrote five dedup rows carrying `collision_candidate: yes`,
+reasoning that the flag describes the source's relevance in the domain where it resurfaced.
+`LIT-02 X3`, hitting the same situation later in the same phase, self-corrected to the opposite
+rule — the flag belongs to the canonical row — and set its seven dedup rows to `no`. Both readings
+are defensible against the contract as written, which is the defect: two dispatches in one phase
+applied opposite conventions to the same field, and the inventory carried both until a coordinator
+diff caught it. Four of the five were pure double-counts and were corrected to `no`; the ranking
+would otherwise have been distorted by 20%, in the direction of more apparent prior art, which is
+the direction a campaign working to support H0 is least able to detect.
+
+**The fifth case shows the rule cannot simply be "the flag belongs to the canonical row".**
+`structured-belief-state-llm-memory-benchmark-2026` was scored `collision_candidate: no` by
+phase-lit-01 at D30 and `yes` by phase-lit-02 at D22, with identical pre-scores (3/2). That is a
+genuine cross-phase disagreement about the same evidence, deliberately recorded rather than
+averaged away, and it is the one case where forcing the flag onto the canonical row would silently
+resolve a dispute in favour of whichever phase happened to run first. It is left standing as the
+only excluded row carrying `yes`, which at least makes it findable.
+
+What a fix needs to settle, none of which an agent should decide mid-campaign:
+
+- whether `LIT-03 C`'s top-20 selection filters on `status: candidate`, which would make the whole
+  question moot for ranking while leaving the flag's meaning on a dedup row still undefined;
+- whether a duplicate row may carry a flag at all, or whether recurrence-in-a-new-domain belongs in
+  `domain_ids` on the canonical row instead of in a second row;
+- how a genuine scoring disagreement between two phases is represented, given that the contract
+  requires disagreements to be recorded rather than resolved quietly but provides no field for one
+  at inventory level — `second_review` exists only on the evidence matrix, from Pass 3 onward.
+
+Same family as [[000147]], [[000148]] and [[000149]]: the evidence contract fixes a column's
+vocabulary but not the mechanical rule a downstream gate or deliverable depends on, and the gap
+surfaces as a distorted measurement rather than as a validation error.
+
+**Links**
+
+- relates_to → `000147`
+
+---
+
+## 000200 · The ledger's kept column is semicolon-separated, and DOIs may legally contain a semicolon
+
+**Created 2026-09-13T07:30:16-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) defines the reproducibility ledger's `result_ids` and `kept`
+columns as `;`-separated lists of identifiers. SICI-style Wiley DOIs contain a literal semicolon.
+The two cannot coexist, and the ledger now holds a case where they do not.
+
+`LIT-02-S225` and `LIT-02-S228` (D41, IBIS) both keep Conklin & Begeman's 1989 JASIS paper "gIBIS:
+A tool for all reasons" under its real and complete DOI:
+
+    10.1002/(sici)1097-4571(198905)40:3<200::aid-asi11>3.0.co;2-u
+
+A naive split on `;` — which is exactly what the contract's own wording invites — turns that one
+correct identifier into two fragments, `10.1002/(sici)...3.0.co` and `2-u`, neither of which
+matches anything in the inventory. The phase gate's third measurement, "ledger `kept` entries
+absent from the inventory, gate 0", then reports a failure that does not exist. The inventory
+carries the DOI correctly and in full at `conklin-begeman-gibis-tool-all-reasons-jasis-1989`.
+
+**The data is right; the delimiter is wrong.** This must not be "fixed" by rewriting the DOI. A
+truncated or mangled DOI would be a real defect introduced to satisfy a parser, on the file that is
+the campaign's reproducibility record. Both a worker (`LIT-02 X4`, which hit it while parsing) and
+the coordinator independently reached for the data before catching themselves; the pull toward
+editing the evidence to make a measurement pass is strong and is precisely what the ledger exists
+to resist.
+
+Two consumers are affected and they need different treatment:
+
+- **Gate dispatches** must be told the delimiter is ambiguous, or they will report phantom misses.
+  `phase-lit-01` already demonstrated that a mechanical gate takes the naive reading: its `LIT-01 G`
+  picked the inventory's slug column over `url_or_doi` and reported 435 missing sources against a
+  true figure of 0. A gate that needs a caveat passed to it by hand every time is a gate that will
+  eventually run without the caveat.
+- **`phase-lit-07`'s final stop-condition gate** inherits the same wording, where a spurious miss
+  would reach the research memo.
+
+What a fix has to settle, none of it an agent's call mid-campaign:
+
+- whether `kept` and `result_ids` become a quoted or escaped list, or move to a delimiter no
+  identifier scheme uses (a pipe, a tab, or one identifier per row);
+- whether existing rows are migrated, given that the ledger already holds 500+ rows across two
+  phases and rewriting it is the operation this record most needs to avoid;
+- or whether the contract simply states the exception and every consumer is required to split on
+  `;` only where the following character is not a digit-hyphen-letter SICI tail — a rule that is
+  cheap to state and easy to get wrong.
+
+Same family as [[000147]] (no fixed identifier format), [[000148]] (no `source_type` bucket for a
+patent), [[000149]] (no `strategy_phase` value for verification) and [[000199]] (`collision_candidate`
+undefined on a duplicate row): the contract fixes a column's meaning but not the mechanical rule a
+downstream gate depends on, and the gap surfaces as a false measurement rather than a validation
+error.
+
+**Links**
+
+- relates_to → `000147`
