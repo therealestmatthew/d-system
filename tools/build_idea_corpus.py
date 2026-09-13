@@ -56,6 +56,10 @@ EXCLUSIONS = ROOT / "docs" / "00-working" / "demo-fast-lane-exclusions.yaml"
 #: corpus rather than falling between the two lanes (PROMPT-025 decision 14).
 CONSUMING_DISPOSITIONS = frozenset({"queued", "fixed"})
 
+#: Every disposition the exclusion file is allowed to carry. Anything outside this set is a
+#: typo or a schema drift, and is warned about rather than silently treated as `dropped`.
+KNOWN_DISPOSITIONS = CONSUMING_DISPOSITIONS | {"dropped"}
+
 CORPUS_STATUS = "triaged"
 
 HEADER = """# Idea corpus — {analyst}
@@ -101,16 +105,25 @@ def load_exclusions(path: Path) -> tuple[set[str], set[str]]:
         return set(), set()
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     consumed = data.get("consumed") or {}
-    removed = {
-        str(k)
-        for k, v in consumed.items()
-        if (v or {}).get("disposition") in CONSUMING_DISPOSITIONS
-    }
-    returned = {
-        str(k)
-        for k, v in consumed.items()
-        if (v or {}).get("disposition") not in CONSUMING_DISPOSITIONS
-    }
+    removed: set[str] = set()
+    returned: set[str] = set()
+    for key, value in consumed.items():
+        disposition = (value or {}).get("disposition")
+        if disposition in CONSUMING_DISPOSITIONS:
+            removed.add(str(key))
+            continue
+        returned.add(str(key))
+        if disposition not in KNOWN_DISPOSITIONS:
+            # Warn rather than fail. The direction is safe — an unreadable disposition leaves
+            # the idea IN the corpus, so nothing is silently dropped from the analysis — but a
+            # typo ("QUEUED", a null, a missing key) would otherwise pass with no signal at all
+            # and show up only as an unexpected corpus size. Raised by the GOV-008 stage 5 audit.
+            print(
+                f"build_idea_corpus: WARNING — {key} has unrecognized disposition "
+                f"{disposition!r}; treating it as 'dropped' (kept in the corpus). "
+                f"Known values: {', '.join(sorted(KNOWN_DISPOSITIONS))}.",
+                file=sys.stderr,
+            )
     return removed, returned
 
 

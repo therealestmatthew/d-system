@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-13'
 systems: [sys-governance, sys-backlog, sys-portfolio]
 depends_on: [doc-prompt-idea-batching-delegation-pack, doc-prompt-idea-batching-pre-plan-package, doc-prompt-pack-protocol]
 ---
@@ -83,6 +83,16 @@ Gathered 2026-09-12. These are per-build rulings; they do not generalise to the 
 5. **The descope ladder stands as ratified**, with the flag on `A2`'s placement left standing
    (see `PROMPT-032`'s ladder section). No rung is taken without the owner's explicit direction.
 
+6. **No dual review in this build — a critical issue pauses for the owner directly.** `GOV-008`'s
+   standing contingency sends a critical issue to an adversarial agent that "challenges the finding
+   **and attempts a solution**" before the build may pause. This pack cannot honour the second half:
+   the only charter it ships, `partition-adversary`, is barred from authoring or repairing what it
+   audits, and that bar is what makes it an independent gate rather than a participant. Rather than
+   ship an unexercised prompt for a contingency, this build rules that a critical issue arising
+   outside a gate **stops and goes to the owner**. The cost is small here — the build already stops
+   at three gates, so the owner is never far away. Surfaced by the `GOV-008` stage 5 audit on 2026-09-12 and
+   ratified by the owner on 2026-09-13.
+
 ## Gate schedule
 
 `PROMPT-025` decision 12, binding. The build session **stops** at each of these:
@@ -93,9 +103,9 @@ Gathered 2026-09-12. These are per-build rulings; they do not generalise to the 
 | **GATE 2** | Audit 1 returns | Reads the coverage arithmetic, the convergence check and the order-manipulation finding |
 | **GATE 3** | Audit 2 has checked the merge | **Accepts or corrects the partition, and rules on every decline candidate individually** |
 
-A critical issue arising *outside* a gate gets `GOV-008`'s dual review first — an adversarial
-agent challenges the finding and attempts a solution — and the build pauses for the owner only if
-the issue survives that review unresolved.
+A critical issue arising *outside* a gate **stops and goes to the owner**, per ratified delta 6
+above. `GOV-008`'s dual review does not apply in this build, because the pack ships no agent
+permitted to attempt a solution.
 
 ## Standing prohibitions for this build
 
@@ -126,9 +136,12 @@ in chat is a convenience.
 > never switch the primary checkout's branch. Run the delegation pack's `K` section first: the
 > worktree, then preflight, then `uv run python tools/build_idea_corpus.py`, then read
 > `_working/idea-corpus/manifest.json` for the real corpus size rather than assuming one. Dispatch
-> `R1`–`R4` concurrently to general-purpose sonnet agents, sending each block verbatim and
-> changing nothing — `R4` is a bias control and must never be told that it is one, that findings
-> exist, or that other analysts are running. Stop at GATE 1. Then `A1` to `partition-adversary`,
+> `R1`–`R4` concurrently to general-purpose sonnet agents, sending each block verbatim — with the
+> one exception `PROMPT-032` states: `R2` and `R3` are **not** blocks of their own, they are `R1`'s
+> block with its two filenames substituted, and sending them without that substitution collides all
+> four analysts on one corpus and one report file. Change nothing else. `R4` is a bias control and
+> must never be told that it is one, that findings exist, or that other analysts are running. Stop
+> at GATE 1. Then `A1` to `partition-adversary`,
 > stop at GATE 2, then synthesise in this session under the `S` protocol, then `A2`, then stop at
 > GATE 3 for the owner to accept or correct the partition and rule on every decline candidate.
 > Write nothing to `_data/ideas.jsonl` at any stage, claim no backlog phase, merge nothing onto

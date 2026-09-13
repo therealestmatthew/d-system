@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-13'
 systems: [sys-governance, sys-backlog, sys-portfolio]
 depends_on: [doc-prompt-idea-batching-pre-plan-package, doc-prompt-idea-batching-pack-factory, doc-prompt-pack-protocol]
 ---
@@ -145,9 +145,10 @@ missing; report what already existed.
      GATE 3  when audit 2 has checked the merge — where the owner accepts or corrects the
              partition, and rules on every decline candidate individually
 
-   A critical issue arising outside a gate gets GOV-008's dual review first — an adversarial
-   agent challenges the finding and attempts a solution — and the build pauses for the owner
-   only if the issue survives that review unresolved.
+   A critical issue arising outside a gate STOPS AND GOES TO THE OWNER. GOV-008's dual review
+   does not apply in this build: it requires an adversarial agent that challenges the finding
+   and attempts a solution, and the only charter this pack ships is barred from repairing what
+   it audits. The kick-off record's ratified delta 6 governs this.
 
 6. Analyst reports are written to _working/idea-corpus/report-R1.md .. report-R4.md. The audits
    read them from there.
@@ -505,6 +506,11 @@ missing; report what already existed.
   6. Audit 2 has returned and its blocking findings are addressed or explicitly carried.
   7. uv run python -m src.governance exits 0.
   8. Nothing was written to _data/ideas.jsonl by any agent in this build.
+  9. SPEND POSTURE is reported, per GOV-008's cost protocol: how many dispatches ran, how many
+     were resumed after truncation, how many fix cycles any item took, whether any model was
+     escalated above sonnet (it should not have been), and wall-clock against the runway.
+     PROMPT-025's estimate was roughly 130k tokens of input each for R1-R3, 55k for R4, plus
+     the two audits. Report what it ACTUALLY cost against those figures, not the estimate.
 
 Record real output. A failing check is a result to record, not a step to retry until quiet.
 ```

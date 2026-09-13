@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-13'
 systems: [sys-portfolio, sys-backlog]
 depends_on: [doc-governance-operations]
 ---
