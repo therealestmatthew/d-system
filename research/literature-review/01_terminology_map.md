@@ -1243,3 +1243,25 @@ applied specifically to requirements rather than general knowledge state.
 | Requirements-to-deployment traceability bridging D71 and D72, D-System's own bidirectional traceability claim (H9) | Requirements management in DevOps environments: a multivocal mapping study | `requirements-management-devops-multivocal-mapping-2023` |
 | Empirical grounding for how requirements are actually practiced in agile settings, independent of any single mechanism | Requirements Engineering Practice and Problems in Agile Projects: Results from an International Survey (Naming the Pain in Requirements Engineering initiative) | `wagner-etal-agile-re-practice-international-survey-2017` |
 | "Preventing requirements violations at runtime" framed as a security-adaptation problem, structural parallel to D-System's own runtime requirements-violation/evidence concerns | Engineering topology aware adaptive security | `topology-aware-adaptive-security-requirements-runtime-re2014` |
+
+## D72 — DevOps traceability
+
+Two cross-phase recurrences resolved here rather than re-kept: the field's foundational
+traceability definition (Gotel and Finkelstein 1994, already inventoried under D34) and W3C
+PROV-O (already inventoried under D03, with prior recurrences at D26 and D46) both surfaced
+again under this domain's own searches. SLSA and in-toto, together with PROV-O, form a
+three-way industrial-standard collision cluster for D72's "release evidence" claim; the
+homepage/project-page forms kept here are judged distinct from the already-inventoried pinned
+SLSA v0.1 spec (D53) and in-toto founding paper (D54) respectively, since each pair covers a
+different document (current multi-level framework overview vs. a single pinned predicate
+schema; live project state including the newer Attestation Framework vs. the 2019 founding
+design) rather than the same source in a different URL form.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| D-System's evidence/provenance vocabulary for entities generated/attributed by activities and agents | W3C PROV-O -- Entity/Activity/Agent provenance ontology | `w3c-prov-o-2013-d72-recur` (recurrence of the D03 canonical row `w3c-prov-o-2013`) |
+| "Release evidence" / deployment-traceability vocabulary, D-System's own audit-ready-evidence claim | SLSA (Supply-chain Levels for Software Artifacts) -- signed build/source/dependency attestations over a leveled maturity model | `slsa-framework-homepage-2023` (distinct document from the pinned v0.1 spec at D53, `slsa-spec-v0.1-provenance`) |
+| Attestation-format substrate underlying SLSA, a complementary provenance-recording standard | in-toto -- Statement/Predicate/Subject attestation model, Layout-based verification | `in-toto-project-homepage-2026` (distinct document from the founding paper at D54, `torres-arias-etal-in-toto-farm-to-table-usenix2019`) |
+| The 30-year-old foundational traceability definition D-System's own requirement-to-code lineage claims trace to, rather than anything DevOps-era-specific | "An analysis of the requirements traceability problem" -- forwards/backwards traceability through development, deployment and ongoing refinement | `gotel-finkelstein-traceability-problem-1994-d72-recur` (recurrence of the D34 canonical row `gotel-finkelstein-traceability-problem-1994`) |
+| Direct-title match for requirement traceability specifically inside DevOps pipelines | An Effective Approach for Accuracy of Requirement Traceability in DevOps | `sale-etal-requirement-traceability-accuracy-devops-2021` |
+| Real-world adoption-gap assessment of the SLSA standard, an independent citable account | Analyzing Challenges in Deployment of the SLSA Framework for Software Supply Chain Security | `slsa-deployment-challenges-arxiv-2024` |
