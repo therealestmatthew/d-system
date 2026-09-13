@@ -1056,3 +1056,16 @@ blogs only), so the distinction is recorded here as observed vocabulary rather t
 | Checkpoint/resume cost analysis for autonomous mobile code, pre-LLM | The cost of checkpointing, logging and recovery for the mobile agent systems (PRDC 2002) | `mobile-agent-checkpointing-logging-recovery-cost-2002` |
 | Append-only history + typed transitions supporting resumability, as mature production infrastructure | LangGraph checkpoint library -- thread-scoped state snapshots per superstep, time-travel debugging | `langgraph-checkpoint-library-oss` -- most directly comparable production system to D-System's phase/checkpoint claims (H8) |
 | Vocabulary/history anchors grounding "recovery point" / "resumption" as formally studied concepts predating agentic AI by two-plus decades | A Survey of Rollback-Recovery Protocols in Message-Passing Systems (2002); HPC checkpoint/restart fault-tolerance survey (2013) | `elnozahy-rollback-recovery-survey-2002`; `hpc-checkpoint-restart-fault-tolerance-survey-2013` |
+
+## D61 — Hierarchical task networks
+
+Task-decomposition vocabulary maps to D-System's Implementation & Experience lifecycle
+(Plan -> Phase -> Task), not to the Knowledge Construction primitives; no HTN source found
+challenges the epistemic/provenance side of H1-H11 directly except MAGE below.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Plan / Phase / Task hierarchical decomposition | HTN method decomposition (task decomposed into ordered subtasks via applicable methods) | `shop2-htn-planning-system-jair-2003`; `ghallab-nau-traverso-htn-chapter-theory-practice-2004` |
+| Vocabulary-map anchor and unifying taxonomy for hierarchical-decomposition claims generally | A Survey on Hierarchical Planning -- One Abstract Idea, Many Concrete Realizations (unifying HTN/HGN/hybrid formalisms) | `bercher-alford-holler-hierarchical-planning-survey-ijcai-2019`; `georgievski-aiello-htn-survey-aij-2015` |
+| Context package / topology-aware context transfer (H5) and typed transition semantics (H2), applied to bounding an agent's own execution-history context | Hierarchical state tree with explicit Grow/Compress/Maintain/Revise operations bounding LLM-agent execution-history context and isolating flawed branches | `mage-hierarchical-agent-memory-2026` -- direct H2/H5 collision candidate, terminology-independent |
+| Implementation-availability anchor for hierarchical plan/task decomposition, actively maintained | GTPyhop -- generalization of Pyhop for goal-and-task ("GTN") totally-ordered HTN planning | `gtpyhop-oss` |
