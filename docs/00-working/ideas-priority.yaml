@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-12'
+updated: '2026-09-13'
 # Ideas that jump the queue, in order. Everything else falls back to status then ID
 # (open before triaged; lower ID first within a status). Hand-edited, like backlog.yaml's
 # next_up — reordering is an operational decision, not a fact logged in _data/ideas.jsonl.
@@ -14,7 +14,9 @@ next_up:
 - '000157'
 - '000158'
 - '000195'
-- '000099'
+# 000099 removed 2026-09-13: discarded as verified-resolved by owner ruling during the
+# idea-batching partition. Its PTY failures are fixed and the suite is green; the queue
+# cannot hold a discarded idea, and the governance check enforces that.
 - '000066'
 - '000041'
 - '000038'

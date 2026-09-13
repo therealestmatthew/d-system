@@ -455,8 +455,36 @@ way — `G11` and `G24` conflated programme-level agreement with fine-group agre
 subdivide — and both are corrected above. The remaining four (`G33`, `G48`'s first four members,
 `G49`, `G50`) were verified genuinely unanimous across all four analysts.
 
-## What the owner is being asked to do
+## Owner rulings, 2026-09-13
 
-1. **Accept or correct the partition** — both levels.
-2. **Rule on every decline candidate individually**, across all three tiers.
-3. Note that `000125` is promoted only when this document is **approved**, not when it is written.
+**The partition is accepted as it stands** — both levels, all 62 groups and 12 programmes. Approved
+batches become governed plans in later sessions.
+
+Every decline candidate was ruled on individually. Eight ideas are now `discarded`; eleven were
+explicitly kept, each with the reason recorded on the idea itself so the next reader does not
+re-derive it.
+
+| Ruling | Ideas | Basis |
+|---|---|---|
+| **Discarded — rehearsal artifacts** | `000088`, `000090`, `000103` | Tier 1, the only tier all four analysts agreed on, control included. Self-declared timing placeholders carrying no product content |
+| **Discarded — verified resolved** | `000098`, `000099`, `000129` | Confirmed done and passing on `dev`. These three misled three analysts in this very sweep |
+| **Discarded — delivered** | `000070` | Realized by the live-demo pack; the command-wrapper remainder survives in `000071` |
+| **Discarded — superseded as scoped** | `000063` | Forking half replaced by `000064`'s lineage annotation plus `component_of`; the abstraction question survives inside `G01` |
+| **Kept, rescoped to the need** | `000005` | Tool dead (KuzuDB archived), question alive. Any evaluation starts from a successor |
+| **Kept, rescoped to derivation** | `000097` | Capture shipped as `log-anti-patterns`; derivation is the larger remaining part |
+| **Kept, sequenced behind `000128`** | `000020` | Build the light `_tmpagent/` mechanism first; revisit only if it proves insufficient |
+| **Kept, gate recorded** | `000030`, `000033`, `000034`, `000036` | Gated is not dead — R1's objection upheld against R4's decline-until-evidence. Each now names what unblocks it |
+| **Kept as parked** | `000015`, `000016`, `000017` | Dormancy is not deadness. Wholly isolated in `G58`; a business-priority question, not a technical one |
+
+`000125` stays `triaged` rather than promoted, by ruling: this document is ungoverned by design per
+`ADR-010` and carries no code for `--promoted-to`. It is annotated with the acceptance and promotes
+later, to the real `PLAN` codes the approved batches become.
+
+The two rulings this document flags as its own weakest — `000102`, resolved on a principle rather
+than a checkable fact, and `000081`, placed on a link-graph tie-breaker after audit 2 struck down
+the retrieval move — **stand as ruled**, with the dissent left on record either way.
+
+### Still open
+
+Nothing from this exercise. The remaining work is to turn approved batches into governed plans,
+one pack at a time, which is out of this build's scope by `PROMPT-025` decision 1.

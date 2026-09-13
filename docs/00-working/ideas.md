@@ -38,13 +38,12 @@ Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority
 1. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
 2. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
 3. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
-4. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
-5. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-6. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-7. `000038` — Formalize the requirements-vs-plans process and design
-8. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-9. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-10. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+4. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+5. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+6. `000038` — Formalize the requirements-vs-plans process and design
+7. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+8. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+9. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -298,7 +297,7 @@ whether a graph view of `_data/` and `brain/` would answer questions the project
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-08T23:55:33-04:00): ## Triage finding: 000005 (Graph databases and GitNexus)
 
@@ -321,6 +320,7 @@ The investigation already distinguishes code-structure graphs (for analyzing fun
 
 PROPOSED LINK: 000005 --relates_to--> 000044 (both about graph retrieval; 000005 focuses on code structure via GitNexus/KuzuDB, 000044 on documentation/knowledge databases)
 PROPOSED LINK: 000005 --relates_to--> 000004 (both about knowledge retrieval mechanisms; graph (000005) and vector (000004) approaches are positioned as complementary, not competing)
+- **finding** by agent-idea-batching (2026-09-13T15:52:36-04:00): Kept, rescoped to the need rather than the tool. Owner ruling 2026-09-13 during the idea-batching partition, where R1 and R3 nominated this for decline. GitNexus's embedded graph backend KuzuDB was acquired and archived in October 2025, so the specific tool proposal is dead; the underlying question - graph retrieval over this repository's code structure, as distinct from the documentation graph in 000043/000044/000045 - is not. Any evaluation must start from a successor rather than from GitNexus. Sits in the accepted partition as G27, a one-phase evaluation.
 
 </details>
 
@@ -753,7 +753,7 @@ Unresolved: format/length for X posts, frequency, which aspects to prioritize fo
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-08T23:58:19-04:00): Idea 000015 proposes generating an X/Twitter content series documenting d-system development, pulling from ADRs, completed phases, and project milestones to build in public.
 
@@ -767,6 +767,7 @@ No related plan, requirement, ADR or backlog phase found. Content strategy, publ
 
 PROPOSED LINK: 000015 --relates_to--> 000016 (000016 explicitly extends 000015 to multi-platform presence strategy)
 PROPOSED LINK: 000015 --relates_to--> 000017 (000017 proposes automating the content generation and scheduling that 000015 asks about)
+- **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
 
 </details>
 
@@ -797,13 +798,14 @@ Unresolved: which platforms are worth the effort, whether to build presence firs
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:03:56-04:00): Idea 000016 proposes a multi-platform public presence strategy for the AI space, exploring LinkedIn, Bluesky, GitHub, Mastodon, and other platforms as extensions to a narrower X-focused narrative (000015).
 
 Related idea 000017 (AI-powered content automation pipeline for social media) explicitly references 000016 as the strategy it would execute — the relationship is documented in 000017's body text. No other idea overlaps.
 
 No existing plan, requirement, or ADR governs public presence strategy, content distribution, or audience positioning; this is a new strategic area not yet formalized in the governance system.
+- **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
 
 </details>
 
@@ -835,7 +837,7 @@ Unresolved: which content sources to prioritize, how much human review/approval 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:03:52-04:00): No related plan, ADR or requirement found. The idea proposes a specific implementation strategy — automating multi-platform content generation from d-system activities — but governance documents address only the high-level presence strategy, not the tooling to support it.
 
@@ -845,6 +847,7 @@ The idea's own unresolved questions (content sources, review/approval workflow, 
 
 PROPOSED LINK: 000017 --extends--> 000016 (implements automated content generation as part of the multi-platform presence strategy)
 PROPOSED LINK: 000017 --relates_to--> 000015 (both create content from d-system work; 000017 automates what 000015 currently does manually)
+- **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
 
 </details>
 
@@ -981,7 +984,7 @@ Open questions: how this relates to the existing file-based governance system (r
 - **note** by repository-owner (2026-09-12T11:25:51-04:00): Owner direction, 2026-09-12: when an MCP solution is deployed, evaluate it as a substitute for the phase-claim system specifically, because a service-held claim does not depend on which checkout is primary - the dependency that forces every claim into the shared primary checkout today. Recorded as 000151, which revisits the claim system on its own merits in case MCP does not happen.
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:04:07-04:00): The idea proposes an MCP server for multi-agent coordination with a "Librarian" agent for context curation and semantic search, replacing the current file-based governance system (backlog.yaml lock table, AGENTS.md protocol, worktree coordination per ADR-003).
 
@@ -992,6 +995,7 @@ Related documents:
 The idea's open questions about how the MCP layer relates to existing backlog.yaml/git governance and how Librarian summaries would be audited against source documents are well-framed; the proposed Librarian component builds on but extends PLAN-001's retrieval-focused Librarian design.
 
 PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context curation builds on PLAN-001's memory system architecture)
+- **finding** by agent-idea-batching (2026-09-13T15:55:25-04:00): Kept and sequenced behind 000128; owner ruling 2026-09-13. R4 nominated declining this in favour of 000128 during the idea-batching partition, explicitly not as dead. 000128 addresses the same pain - cross-agent context hand-carried by a coordinator, observed concretely on 2026-09-11 - by extending the existing _tmpagent/ mechanism, with no MCP server, no vector database and no Librarian agent role. Build 000128 (partition group G21) first and revisit this only if the light version proves insufficient at real scale. Its librarian half also overlaps the retrieval programme P6; rescope against whatever lands there rather than duplicating it. Accepted partition: G24.
 
 </details>
 
@@ -1339,7 +1343,7 @@ What's unresolved: everything about priority and sequencing — this is explicit
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:05:25-04:00): Idea 000030 proposes a supervised worker host and watchdog for agent runs—concurrency limits, quiet-hour deferral, heartbeat monitoring, and stale-run flagging for review. It is explicitly the third piece of a designed trilogy (after trigger gateway 000028 and run ledger 000029), with declared dependencies on both predecessors. The body acknowledges this intentional decomposition: "This only makes sense once the trigger gateway and run ledger ideas above exist; on its own it's a scheduling daemon with nothing to schedule."
 
@@ -1349,6 +1353,7 @@ Related ideas 000028 and 000029 are named in the body but have no formal typed l
 
 PROPOSED LINK: 000030 --relates_to--> 000028 (part of supervised agent workflow infrastructure trilogy)
 PROPOSED LINK: 000030 --relates_to--> 000029 (part of supervised agent workflow infrastructure trilogy)
+- **finding** by agent-idea-batching (2026-09-13T15:55:25-04:00): Kept, not declined; owner ruling 2026-09-13. R4 nominated decline-until-evidence during the idea-batching partition and R1 refused to nominate, holding that gated is not dead. What unblocks it: 000028 (trigger gateway) and 000029 (durable run ledger) must exist AND be carrying real work. Its own text calls it the least urgent of the trio. Sits in the accepted partition as part of G24, sequenced 028 then 029 then 030.
 
 </details>
 
@@ -1456,7 +1461,7 @@ What's unresolved: this depends on the idea/plan lifecycle work (PLAN-017, and p
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:06:48-04:00): Idea 000033 proposes a temporal projection explorer — a query layer and UI that exposes deterministic "as of" snapshots and diffs over ideas/plans/portfolio entities. It explicitly depends on PLAN-017 (idea/plan lifecycle architecture) and phase-idea-07's fold work.
 
@@ -1470,6 +1475,7 @@ Cross-checks with other ideas:
 - Ideas 000008 (metrics/analysis), 000040 (deterministic search), and 000042 (ideas HTML dashboard) could potentially consume temporal data once this is built, but no overlap/duplication detected
 
 Status: This is a well-positioned follow-on idea for after phase-idea-07 lands. The architecture is already designed (PLAN-017); this proposal is the first to surface the query interface itself as user-facing work.
+- **finding** by agent-idea-batching (2026-09-13T15:55:25-04:00): Kept, not declined; owner ruling 2026-09-13. R4 nominated decline-until-evidence during the idea-batching partition; R1 refused, holding that gated is not dead. What unblocks it: PLAN-017 / phase-idea-07's fold work, so that more than one idea in the real log carries more than a created event. A CLI-only proof of concept is explicitly sufficient per its own text. Accepted partition: G32.
 
 </details>
 
@@ -1493,7 +1499,7 @@ What's unresolved: this depends on the portfolio-signals system actually existin
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:06:48-04:00): Idea 000034 proposes a portfolio scenario simulator: isolated what-if projections that run signal computation against modified scenarios without touching source data or live databases. The idea explicitly states it depends on portfolio-signals system existing first (per PLAN-002-mini-systems-proposal.md, signal work is still planned, not implemented).
 
@@ -1504,6 +1510,7 @@ Related governed work:
 No other ideas overlap with this scenario-simulation capability. Idea 000033 (temporal projection explorer) explores historical portfolio changes; idea 000034 is about prospective what-if changes. No existing governed document delivers scenario simulation yet.
 
 The idea is well-scoped and distinct from signal definition work — it's a new consumer and interaction layer, waiting on the signal layer to mature first.
+- **finding** by agent-idea-batching (2026-09-13T15:55:25-04:00): Kept, not declined; owner ruling 2026-09-13. R4 nominated decline-until-evidence during the idea-batching partition; R1 refused, holding that gated is not dead. What unblocks it: the portfolio-signals system, which systems.yaml records as mostly planned rather than built, and 000022 - the portfolio holds zero real people and commitments records to simulate against. Accepted partition: G32, gated behind G31.
 
 </details>
 
@@ -1561,7 +1568,7 @@ What's unresolved: this is the most downstream of all the ideas in this batch �
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:07:13-04:00): Idea 000036 proposes building a recommendation calibration system: persisting every recommendation produced (from signals, triage agents, advisory sources) alongside owner decisions (accept/defer/dismiss/revise), observed outcomes, and calibration metrics measuring recommendation effectiveness (precision, deferral rate, false-urgency rate, outcome lag).
 
@@ -1572,6 +1579,7 @@ Potential overlap: Idea 000032 (Evidence-backed provenance graph for memories, r
 No related plan, phase, or requirement document found that covers recommendation outcome tracking or calibration metrics.
 
 PROPOSED LINK: 000036 --relates_to--> 000032 (both build recommendation-aware audit systems; 000032 covers provenance/sources while 000036 covers outcome calibration)
+- **finding** by agent-idea-batching (2026-09-13T15:55:25-04:00): Kept, not declined; owner ruling 2026-09-13. R4 nominated decline-until-evidence during the idea-batching partition; R1 refused, holding that gated is not dead. What unblocks it: recommendations, decisions and outcomes must already exist and accumulate before there is anything to calibrate - it is the most downstream idea in the corpus by its own description. Best treated as a design constraint on future signal-building work. Accepted partition: G32.
 
 </details>
 
@@ -2973,7 +2981,7 @@ No promotion or existing delivery found.
 
 ## 000063 · Two more idea link types: abstraction (atomic to general) and forking (compound to split parts)
 
-**Created 2026-09-09T03:58:13-04:00 · Status: `triaged`**
+**Created 2026-09-09T03:58:13-04:00 · Status: `discarded`**
 
 The owner's proposal (2026-09-09), raised while discussing ARCH-005's classification taxonomy:
 extend the three existing link types (extends/supersedes/relates_to, schemas/idea.schema.json)
@@ -3058,7 +3066,7 @@ and idea 000065 (a decomposition procedure for compound ideas that don't form a 
 emergent whole).
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T06:23:58-04:00): **State of the idea as of 2026-09-09:**
 
@@ -3088,6 +3096,7 @@ No governing plan (PLAN) or requirement (REQ) yet exists for the schema changes 
 
 **Assessment:**
 The forking half of 000063 is effectively superseded by the resolved design captured in 000064 and 000065. The abstraction half remains genuinely open and unresolved. This idea's own assessment annotation serves as the resolution record, making further promotion of 000063 itself premature until the abstraction semantics question is settled (either a new link type or a tightened reading of extends).
+- **finding** by agent-idea-batching (2026-09-13T15:55:38-04:00): Closed as originally scoped; owner ruling 2026-09-13 during the idea-batching partition, where R3 nominated it as a partial decline. The forking half is superseded by 000064's lineage annotation plus a component_of link type, per this idea's own assessment. The surviving abstraction question is not lost: it sits inside the ARCH-005 bundle, partition group G01, and can be recaptured as its own idea if it needs separate tracking.
 
 </details>
 
@@ -3596,7 +3605,7 @@ PROPOSED LINK: 000069 --relates_to--> 000072 (both coordinate around PLAN-020's 
 
 ## 000070 · Build a demo of the idea system for the skills-and-agents training session
 
-**Created 2026-09-10T03:33:13-04:00 · Status: `triaged`**
+**Created 2026-09-10T03:33:13-04:00 · Status: `discarded`**
 
 The owner is facilitating a training session on skills and agents and needs a worked, live example
 rather than slides. This repository's idea system is a good candidate: it is small enough to explain
@@ -3637,10 +3646,11 @@ Raised by the owner on 2026-09-10.
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. Every mechanism the demo needs already exists and works: the orient skill, the idea and idea-triage commands backed by a subagent, the sanctioned writer append_idea.py, and 76 real ideas across 289 events as of today. PROMPT-006 through PROMPT-009 are the reusable path the demo walks, and PLAN-016 delivered the append-only log and schema underneath it. Step 4 depends on 000071, which was raised in the same conversation and proposes the metrics command that does not yet exist. The gap worth knowing before planning: the distinction between a skill, a command, a subagent and a tool — the point the demo exists to land — is implicit in PLAN-020's capability mapping and authority declarations but has no dedicated teaching document anywhere, so the demo would have to write that explanatory material rather than point at it. The idea's own two unresolved questions stand: real data versus a seeded fixture set, and whether to end at a plan or carry through to an executed phase.
 - **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Realized by the live-demo pack recorded 2026-09-10: the live demo requirements (REQ-006), the live demo plan (PLAN-021), the demo terminal decision (ADR-013) and the five phase-demo-* backlog phases now govern the build, queued at the front of next_up. The demo prompt pack (PROMPT-010 through PROMPT-017) drives the factory and build sessions.
+- **finding** by agent-idea-batching (2026-09-13T15:55:38-04:00): Closed as delivered; owner ruling 2026-09-13 during the idea-batching partition, where R2 nominated it. Realized by the live-demo pack - REQ-006, PLAN-021, ADR-013 and phase-demo-01 through -06 - per this idea's own second finding. Discarded as delivered rather than as unwanted. The small remainder, a command wrapper, lives on in 000071 in partition group G03.
 
 </details>
 
@@ -4698,7 +4708,7 @@ The idea's registry requirement is satisfied. The inject/read API, detach/reatta
 
 ## 000088 · Rehearsal idea from dry-run 1
 
-**Created 2026-09-10T14:46:13-04:00 · Status: `triaged`**
+**Created 2026-09-10T14:46:13-04:00 · Status: `discarded`**
 
 Recorded during the 2026-09-10 dry-run 1 rehearsal, phase-demo-05 (demo-validator-code timed
 walkthrough of the live-segment runbook). [Rehearsal entry: this idea is part of the demo record,
@@ -4765,7 +4775,7 @@ PROPOSED LINK: 000089 --relates_to--> 000070 (both serve the live demo session; 
 
 ## 000090 · Rehearsal idea from phase-demo-05 second dry-run
 
-**Created 2026-09-10T14:49:28-04:00 · Status: `triaged`**
+**Created 2026-09-10T14:49:28-04:00 · Status: `discarded`**
 
 Recorded during the 2026-09-10 dry-run rehearsal (demo-validator-code, phase-demo-05 worktree). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.]
 
@@ -5111,7 +5121,7 @@ The open design question is where the capture happens — at session close, at c
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:39:57-04:00): Idea 000097 proposes a system to track session failures and derive anti-patterns that future sessions can apply to prevent similar failures.
 
@@ -5135,6 +5145,7 @@ WHAT THAT COVERS OF 000097. The structured capture this idea describes - what fa
 WHAT REMAINS, AND IT IS THE LARGER PART. (1) The records are prose in four different places, not session-failure records with a common shape a program can read; the skill routes to existing destinations rather than creating a corpus with a schema. (2) Nothing derives anti-pattern rules from those records - a person or an agent still reads and generalises by hand, which is exactly the work 000097 proposed to automate. (3) Nothing surfaces derived rules into future sessions at the point where they would prevent the failure; brain/procedures/ is read when someone chooses to read it. The skill produces the material a derivation system would consume. It is not that system.
 
 Status deliberately unchanged by this annotation. Whether the capture half is enough to promote, or whether derivation is planned as its own work, is the owner's call.
+- **finding** by agent-idea-batching (2026-09-13T15:55:38-04:00): Kept, rescoped to derivation; owner ruling 2026-09-13 during the idea-batching partition, where R2 nominated it. The capture half shipped as the log-anti-patterns skill; what remains is derivation - turning recorded occurrences into rules that surface at the right moment - which its own 2026-09-13 finding calls the larger part. Batched with 000138 as partition group G18, scoped to 000138's fuller description. R4, reading no findings, could not see the delivered half.
 
 </details>
 
@@ -5148,7 +5159,7 @@ Status deliberately unchanged by this annotation. Whether the capture half is en
 
 ## 000098 · Ship the layout-schema test ADR-016 promised
 
-**Created 2026-09-10T22:18:33-04:00 · Status: `triaged`**
+**Created 2026-09-10T22:18:33-04:00 · Status: `discarded`**
 
 ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
 
@@ -5156,7 +5167,7 @@ ADR-016 (workbench layout persistence) states the layout JSON schema is asserted
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:39:45-04:00): Idea 000098 asks to ship the layout JSON schema and validation test that ADR-016 promised.
 
@@ -5171,6 +5182,7 @@ ADR-016 (workbench layout persistence) states the layout JSON schema is asserted
 **Related governed documents:** ADR-016 promises the test (consequence section); REQ-007 W16 specifies its verification method; backlog.yaml phase-wb-02 section records it as surfaced but deferred; PLAN-004 (reliability follow-up) and PLAN-009 (capture-build) establish the principle that schemas precede code.
 
 No existing plan, requirement, decision or other idea fully covers the concrete ask to ship the layout schema and its validation test.
+- **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Verified resolved; discarded by owner ruling 2026-09-13. schemas/workbench-layout.schema.json and test/test_workbench_layout_schema.py exist and assert every invariant this idea asked for plus several more; 21 tests pass. Surfaced during the idea-batching partition, where three of four analysts carried this as open work on a finding predating the fix.
 
 </details>
 
@@ -5178,7 +5190,7 @@ No existing plan, requirement, decision or other idea fully covers the concrete 
 
 ## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
 
-**Created 2026-09-11T00:11:20-04:00 · Status: `triaged`**
+**Created 2026-09-11T00:11:20-04:00 · Status: `discarded`**
 
 `uv run pytest` on dev reports `3 failed, 546 passed` as of 2026-09-11. All three failures are in test/test_demo_terminal.py:
 
@@ -5212,7 +5224,7 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
 - **finding** by agent-idea-triage (2026-09-11T20:42:18-04:00): The three failing PTY tests in test_demo_terminal.py have been thoroughly investigated and documented. 
@@ -5226,6 +5238,7 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 **What remains:** Idea 000099's purpose was complete once the coordinator's finding arrived — it surfaced a red suite and provided a starting point. The action item is now 000129, which owns the solution path (make tests robust, fix host contention, or isolate from shim mechanism) and the done condition (full suite passes with zero expected failures, caveat removed from gates).
 
 PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the parent for environmental anti-patterns like pyenv lock contention)
+- **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Superseded and resolved; discarded by owner ruling 2026-09-13. The coordinator finding root-caused the failure to host-level pyenv contention rather than a code regression, which completed this idea's purpose, and the action item moved to 000129. test/test_demo_terminal.py now passes 46 tests and the full suite is green on dev.
 
 </details>
 
@@ -5328,7 +5341,7 @@ No related ideas found. This suggestion does not overlap with other open ideas o
 
 ## 000103 · Rehearsal pass 2 test entry for the live terminal /idea command
 
-**Created 2026-09-11T04:19:18-04:00 · Status: `triaged`**
+**Created 2026-09-11T04:19:18-04:00 · Status: `discarded`**
 
 Rehearsal entry: this idea is part of the demo record from the phase-wb-07 agent-driven rehearsal pass 2, not a real audience suggestion. It exists to test the live terminal /idea command end to end — confirming that an idea typed into the workbench terminal during a rehearsal flows through tools/append_idea.py, lands in _data/ideas.jsonl with a generated id and timestamp, and appears in the regenerated markdown view. It carries no product content and should be discarded during a later triage pass rather than promoted.
 
@@ -6119,7 +6132,7 @@ Owner direction, 2026-09-11, governing how the next planning session opens. The 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:52:53-04:00): Idea 000125 reframes the upcoming planning session as a holistic triage and categorization exercise before implementation planning. Instead of forcing the accumulated idea batch into a single plan container, the session must first take all open ideas in the batch, categorize them, prioritize them, and determine how they naturally group into multiple distinct plans — only then proceeding to comprehensive development of each plan.
 
@@ -6139,6 +6152,7 @@ Related ideas that connect to different aspects of idea analysis:
 No existing governed document (plan, requirement, or decision) fully specifies or delivers the holistic batch-triage-then-split-into-plans workflow that 000125 directs. This is owner direction governing how the next planning session opens, distinct from the work itself.
 
 PROPOSED LINK: 000125 --relates_to--> 000046 (idea planner agent will take the output of batch triage to draft plans for each grouped category)
+- **finding** by agent-idea-batching (2026-09-13T15:52:36-04:00): Discharged by the accepted batching partition. The owner accepted docs/00-working/idea-batching-partition.md on 2026-09-13: 129 ideas into 62 fine groups and 12 programmes, merged from four independent analyst partitions and corrected against two adversarial audits. That document is the artifact this idea asked for. Owner ruling the same day: it stays triaged rather than promoted, because the document is ungoverned by design per ADR-010 and carries no code for --promoted-to; promotion follows later, to the real PLAN codes the approved batches become. The 23 consultant-demo-kit ideas (000171-000193) are outside that partition by a separate owner ruling, being already governed by REQ-008, PLAN-024 and phase-kit-01 through -08.
 
 </details>
 
@@ -6271,7 +6285,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 
 ## 000129 · Fix the three pre-existing environmental PTY test failures so the suite runs green
 
-**Created 2026-09-11T20:31:54-04:00 · Status: `triaged`**
+**Created 2026-09-11T20:31:54-04:00 · Status: `discarded`**
 
 Owner request, 2026-09-11. The full pytest suite has carried the same three failures through every wb-08/wb-09 verification run: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size and test_two_concurrent_websocket_sessions_are_independent_shells in test/test_demo_terminal.py, all with the pyenv "cannot rehash: couldn't acquire lock" / ".pyenv-shim: cannot overwrite existing file" signature already recorded as environmental in ideas 000097 and 000099. Every gate and audit now has to carry the caveat "3 failed, known environmental" - a standing hole in the evidence that a genuinely new PTY regression could hide inside. Fix them for real: either make the tests robust to the pyenv shim environment (e.g. spawn the PTY shell with a clean environment or an absolute shell path that bypasses shim rehashing), fix the host-level pyenv lock contention, or isolate the tests from the shim mechanism - whichever the investigation supports. Done means the full suite passes with zero expected failures on this machine, and the "known environmental" caveat disappears from gate checklists.
 
@@ -6279,7 +6293,7 @@ Owner request, 2026-09-11. The full pytest suite has carried the same three fail
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:53:18-04:00): ## Finding
 
@@ -6290,6 +6304,7 @@ This idea asks for concrete work to fix three recurring pytest failures in test_
 **Governed documents:** The failures appear extensively in docs/09-backlog/backlog.yaml across phases phase-wb-01 through phase-wb-09, consistently noted with the caveat "known environmental PTY failures" or "3 failed (environmental)" to distinguish them from phase-introduced regressions. PTY adapter design and requirements are covered in ADR-013 (demo-terminal-capability), ADR-014 (workbench-terminal-capability), PLAN-021 (live-demo phase), REQ-006 (live-demo), and REQ-007 (workbench). However, no existing PLAN, phase, or document addresses *fixing* these environmental failures — they are documented as standing defects that every phase must caveat around.
 
 **Assessment:** The idea is currently unstarted work. The existing links to 000097 and 000099 correctly surface the problem statement and environmental diagnosis. No new overlaps or proposed links emerge from the search.
+- **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Verified resolved; discarded by owner ruling 2026-09-13. The three named PTY tests pass and the full suite is 578 passed on dev. Whatever fixed it landed without a status event on this idea, which is the concrete instance behind 000204.
 
 </details>
 
