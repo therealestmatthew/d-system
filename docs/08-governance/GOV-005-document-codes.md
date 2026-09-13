@@ -110,5 +110,8 @@ checkout. Never edit it by hand. CI regenerates it into a temporary file and dif
 catalog is a build failure rather than silent misinformation. Regenerate with:
 
 ```bash
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 ```
+
+The flag writes the file directly — only when the audit is clean — and also prints it, so the
+command above is complete on its own; no redirect is needed.

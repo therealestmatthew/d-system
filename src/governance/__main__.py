@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import tempfile
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -378,6 +379,21 @@ def audit_idea_priority(root: Path, today: date | None = None) -> list[str]:
         return [f"ideas-priority inputs: {exc}"]
 
 
+def write_catalog(root: Path, rendered: str) -> None:
+    """Write the rendered catalog to disk atomically, matching the committed newline convention."""
+    target = public_path(root, "docs/08-governance/catalog.md")
+    content = rendered.rstrip("\n") + "\n"
+    fd, tmp_name = tempfile.mkstemp(dir=target.parent, prefix=".catalog-", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(content)
+        os.replace(tmp_name, target)
+    except BaseException:
+        if os.path.exists(tmp_name):
+            os.remove(tmp_name)
+        raise
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     output = parser.add_mutually_exclusive_group()
@@ -386,7 +402,11 @@ def main() -> int:
         "--backlog", action="store_true", help="Print phases and source plan coverage"
     )
     output.add_argument("--ready", action="store_true", help="Print phases ready for one session")
-    output.add_argument("--catalog", action="store_true", help="Print the generated code catalog")
+    output.add_argument(
+        "--catalog",
+        action="store_true",
+        help="Regenerate docs/08-governance/catalog.md and print it",
+    )
     output.add_argument("--next-code", metavar="KIND", help="Print the next free code for a kind")
     parser.add_argument("--parent", metavar="DOC_ID", help="Allocate a sub-code under this plan")
     args = parser.parse_args()
@@ -413,7 +433,9 @@ def main() -> int:
     elif args.backlog or args.ready:
         print(render_backlog(catalog, result["documents"], ready_only=args.ready))
     elif args.catalog:
-        print(render_catalog(result["register"], result["documents"], catalog["items"]))
+        rendered = render_catalog(result["register"], result["documents"], catalog["items"])
+        write_catalog(ROOT, rendered)
+        print(rendered)
     elif args.inventory:
         print(inventory(result))
     else:

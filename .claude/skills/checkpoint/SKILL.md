@@ -158,7 +158,7 @@ active, however close). Leave every other entry alone.
 ### 7. Regenerate the catalog
 
 ```bash
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 ```
 
 ### 8. Confirm governance is green

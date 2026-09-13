@@ -105,7 +105,7 @@ incomplete is the correct outcome the acceptance conditions were written to allo
 ## 7. Regenerate the catalog and confirm governance is green
 
 ```bash
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 uv run python -m src.governance
 uv run pytest
 ```

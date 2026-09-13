@@ -6,7 +6,7 @@ tags: [agentic-systems, ai-tools, automation]
 source_model: anthropic/claude-fable-5
 project: d-system
 created: 2026-09-12
-updated: 2026-09-12
+updated: 2026-09-13
 confidence: high
 related: [mem-proc-runtime-behavior-needs-runtime-evidence, mem-proc-verify-before-claiming-ignorance]
 scope: global
@@ -34,6 +34,13 @@ check built on the assumed behaviour inherits the assumption and cannot detect t
 
 Verify the mechanism before building a check on it: read the `--help`, or run it and look at what
 changed on disk. One command settles it.
+
+**Note (2026-09-13):** the worked example below is a historical record of what `--catalog`
+did at the time — print only, never write. The tool was fixed the next day so that `--catalog`
+now writes `docs/08-governance/catalog.md` (atomically, only when the audit is clean) in addition
+to printing it. The general lesson — verify the mechanism before building a check on it — is
+unaffected and still applies to the next flag someone assumes about; this note exists only so the
+example below is not mistaken for current tooling behaviour.
 
 ## Worked example (2026-09-12)
 

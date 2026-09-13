@@ -36,7 +36,8 @@ The first command installs the validator dependency. A successful check exits 0 
 3. Assign a unique permanent `doc-*` ID, owner, real dates, kind and systems; remove unused optional fields.
 4. Write the outcome and evidence. For a plan, start at `draft`; specify acceptance criteria before implementation.
 5. Add a registry entry only for a new independent capability. Planned systems may reference their design document; implemented systems need actual implementation paths.
-6. Regenerate the catalog: `uv run python -m src.governance --catalog > docs/08-governance/catalog.md`.
+6. Regenerate the catalog: `uv run python -m src.governance --catalog`. It writes
+   `docs/08-governance/catalog.md` directly (only when the audit is clean) and also prints it.
 7. Run the validator and relevant code tests. Review the diff using the lifecycle rules in the protocol.
 
 For memories, use the existing [memory procedure](../../brain/procedures/add-brain-memory.md) and schema, run governance validation, then rebuild only when deliberately synchronizing source data. This governance task itself requires no repository database rebuild.
@@ -95,7 +96,7 @@ Perform these in order. Do not mark a phase complete before the checks pass.
 # 2. allocate the session code -- its date must equal the record's created date
 uv run python -m src.governance --next-code session
 # 7. regenerate the catalog and verify
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 uv run python -m src.governance && uv run pytest
 ```
 

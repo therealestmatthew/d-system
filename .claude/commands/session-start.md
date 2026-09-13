@@ -75,7 +75,7 @@ lowercase `agent-<name>`. One agent holds at most one active phase.
 Then, before committing:
 
 ```bash
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 uv run python -m src.governance
 ```
 

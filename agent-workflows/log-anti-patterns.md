@@ -134,7 +134,7 @@ Run what your writes actually touched, and keep the real output:
 
 ```bash
 uv run python tools/generate_ideas_md.py            # if you appended to the idea log
-uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance --catalog
 uv run python -m src.governance                     # must exit 0
 uv run pytest
 ```

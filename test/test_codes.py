@@ -199,6 +199,54 @@ def test_catalog_reports_documents_holds_and_phase_rollup(register: dict[str, An
     assert "1 documents — plan: 1." in rendered
 
 
+def test_catalog_flag_writes_committed_file(monkeypatch: pytest.MonkeyPatch, capsys: Any) -> None:
+    """--catalog must write docs/08-governance/catalog.md, not just print it.
+
+    This is the test whose absence let the flag silently print without writing: a
+    test that only checked stdout would have passed throughout that outage.
+    """
+    from src.governance.__main__ import main
+
+    target = ROOT / "docs/08-governance/catalog.md"
+    original = target.read_text(encoding="utf-8")
+    try:
+        target.write_text("CORRUPTED\n", encoding="utf-8")
+        monkeypatch.setattr("sys.argv", ["governance", "--catalog"])
+        exit_code = main()
+        assert exit_code == 0
+        restored = target.read_text(encoding="utf-8")
+        assert restored == original
+        # stdout must still carry the full rendered catalog, byte-identical to the
+        # file, so the `--catalog > catalog.md` and `diff <(--catalog) catalog.md`
+        # forms used elsewhere in the repository keep working.
+        captured = capsys.readouterr()
+        assert captured.out.rstrip("\n") == restored.rstrip("\n")
+    finally:
+        target.write_text(original, encoding="utf-8")
+
+
+def test_catalog_flag_writes_nothing_when_audit_fails(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A failing audit must leave the existing catalog untouched, not truncate it.
+
+    A shell redirect (`--catalog > catalog.md`) truncates its target before the
+    command runs at all, so a failing validator used to destroy the catalog. The
+    tool must refuse to write anything once the audit reports errors.
+    """
+    from src.governance import __main__ as governance_main
+
+    target = ROOT / "docs/08-governance/catalog.md"
+    original = target.read_text(encoding="utf-8")
+    try:
+        target.write_text("CORRUPTED\n", encoding="utf-8")
+        monkeypatch.setattr(governance_main, "audit", lambda root: (["synthetic failure"], [], {}))
+        monkeypatch.setattr("sys.argv", ["governance", "--catalog"])
+        exit_code = governance_main.main()
+        assert exit_code == 1
+        assert target.read_text(encoding="utf-8") == "CORRUPTED\n"
+    finally:
+        target.write_text(original, encoding="utf-8")
+
+
 def coded(code: str, path: str, **changes: Any) -> dict[str, Any]:
     return doc(code, path=path, **changes)
 
