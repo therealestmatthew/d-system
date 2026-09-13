@@ -1213,3 +1213,18 @@ field's separate landmark vision statement that coined the "self-CHOP" vocabular
 | Formal state-machine modeling of the control loop itself | Modeling and Analyzing MAPE-K Feedback Loops for Self-Adaptation | `arcaini-etal-modeling-analyzing-mapek-feedback-loops-seams2015` |
 | Provenance/evidence-as-arbitration-input (H3) inside a MAPE-K-style loop | MAPE-K/MAPE-SAC -- assurance cases built from monitored evidence feeding the shared knowledge base | `mapek-mapesac-security-assurance-cases-interaction-2020` |
 | Implementation-availability anchor for the MAPE-K pattern across languages and domains | GitHub topics/mape-k aggregator -- multi-domain open-source implementation ecosystem | `github-topics-mape-k` |
+
+## D70 — Autonomic computing
+
+Ganek and Corbi's IBM Systems Journal piece is the most citable primary account of Horn's 2001
+founding manifesto, whose own PDF could not be independently re-verified as still live this
+session (`LIT-03-S260`/`S262`); the policy-based-autonomic-computing subfield is the established
+precedent for any goal-to-action policy/directive translation D-System proposes.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| D-System's self-managing knowledge-state vocabulary, historical origin | Autonomic computing -- Horn's 2001 IBM manifesto, recounted in its most citable primary account | `ganek-corbi-dawning-autonomic-computing-era-ibm-sysj-2003` |
+| Established taxonomy for classifying degrees/models of self-management, useful for placing D-System's own adaptation mechanisms on a known scale | A survey of autonomic computing -- degrees, models, and applications | `huebscher-mccann-survey-autonomic-computing-acm-csur-2008` |
+| D-System's directive/policy concepts -- goal-to-action translation | Policy-based autonomic computing -- policy enablement toolkits and policy-centric technique composition | `icac2004-policy-enablement-toolkit-autonomic-computing`; `icac2007-policy-centric-integration-dynamic-composition-autonomic` |
+| Goal/objective-function formalism, a direct precedent for any goal/objective-function element in D-System's own adaptation logic | Utility functions in autonomic systems | `icac2004-utility-functions-autonomic-systems` |
+| Multi-agent/multi-loop coordination, a direct precedent for any multi-agent or multi-loop coordination claim in D-System's architecture | Coordinating Multiple Autonomic Managers to Achieve Specified Power-Performance Tradeoffs | `icac2007-coordinating-multiple-autonomic-managers` |
