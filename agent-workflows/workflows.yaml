@@ -54,7 +54,12 @@ workflows:
     unsupported: []
 - id: log-anti-patterns
   name: log-anti-patterns
-  description: Route a described anti-pattern to the records that should hold it — the concurrency-collision ledger, a brain procedure, an idea, the session record — and write the ones the owner confirms.
+  description: >-
+    Record a mistake, near-miss or collision where it will be found again — routing it to the
+    concurrency-collision ledger, a brain procedure, an idea or the session record, and writing
+    only what the owner confirms. Use when something went wrong and could recur: two agents took
+    the same identifier, a check passed without checking, a rule was rediscovered instead of
+    read, or a slip came from a standing habit rather than the situation.
   authority: agent-invocable
   source: agent-workflows/log-anti-patterns.md
   requires:
