@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-12'
+updated: '2026-09-13'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -6129,7 +6129,28 @@ items:
   deliverables:
   - research/literature-review/00_search_ledger.csv
   - research/literature-review/03_source_inventory.csv
-  next_action: Dispatch delegation-pack section LIT-02 after phase-lit-01 completes.
+  session: doc-session-literature-review-pass-1b
+  completion_evidence:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/01_terminology_map.md
+  - docs/03-sessions/SESS-2026-09-13-01-literature-review-pass-1b.md
+  result: All twelve LIT-02 delegation-pack sections dispatched verbatim in pack order
+    (K, five S/X pairs, G) on agent/lit-campaign. All 20 domains D21-D27 and D33-D45
+    swept. 294 ledger rows LIT-02-S001..S294, contiguous, 562 CRLF and 0 bare LF; 388
+    inventory rows in scope, 358 candidate and 30 excluded with every exclusion carrying
+    a reason; 115 collision_candidate yes in scope; terminology map extended to 741
+    lines. LIT-02 G measured every gate PASS after one fix cycle for a mis-scoped
+    population - 20/20 domains clear the two-distinct-query floor with D43 narrowest
+    at 8, 91/91 mandated variants covered verbatim, 0 excluded rows missing a reason,
+    and 0 kept identifiers absent from the inventory under a SICI-aware split (a naive
+    split reports 2, from one Wiley DOI that legally contains the delimiter). Seven
+    fix cycles issued and closed across K, S1, X1, X2, X4 and G. Governance exits 0
+    and 578 tests pass after the rebase onto dev at 920f1d3.
+  next_action: All twelve work items are complete and every gate passes; nothing is
+    outstanding within the phase. Awaiting the owner's /session-close, which alone may
+    mark it complete, and the owner's decision on integrating agent/lit-campaign into
+    dev at this boundary as they did at phase-lit-01's.
 - id: phase-lit-03
   title: Literature review Pass 1c — broad map of digital-thread, specification and
     agentic-SE domains; close Pass 1
