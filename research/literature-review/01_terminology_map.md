@@ -1,6 +1,44 @@
 # Terminology Map — Literature Review Pass 1
 
-draft — Pass 1 in progress
+finalized — Pass 1 close-out (`LIT-03 C`). All 72 domains (D01–D72) carry a terminology-map
+section below, built across `phase-lit-01` (D01–D20, D28–D32), `phase-lit-02` (D21–D27,
+D33–D45) and `phase-lit-03` (D46–D72). This finalization pass adds nothing to the domain
+sections themselves — they are Pass 1's own record — and instead closes out the deliverable
+by indexing the methodology's mandated §6 table against what those sections already found.
+
+## §6 index — the methodology's seven mandated terms
+
+The review instructions' §6 ("Vocabulary translation requirement") names seven D-System terms
+and tells searchers not to stop at D-System's own vocabulary for them. Every one of the seven
+was matched to an established field term somewhere in Pass 1's domain sections below; this
+table is the consolidated pointer the methodology's §15 deliverable text calls for, not new
+synthesis. Terminology novelty is not mechanism novelty (§2, §6): a match here says which field
+owns the *word*, and takes no position on whether the underlying mechanism collides — that
+question is Pass 2/3's (`phase-lit-04` onward, `05_critical_collisions.md`,
+`06_hypothesis_tests.md`).
+
+| §6 term | Owning field(s) | Established term(s) found | Domains |
+|---|---|---|---|
+| Phase | Agentic software engineering; spec-driven development; classical workflow-engine checkpointing | Specify→plan→tasks→implement pipeline (`github-spec-kit-oss`); deliberate pre-work context preparation, "Mise en Place for Agentic Coding" (`mise-en-place-agentic-coding-2026`); bounded context window / session (`reasoner-executor-synthesizer-o1-context-2026`); checkpoint/interrupt/resume conformance contract (`resume-means-resume-conformance-contract-2026`); classical workflow-recovery checkpointing (`checkpointing-for-workflow-recovery-2000`) | D49, D56, D58, D60 |
+| Epistemic blast radius | Change impact analysis (SE); ontology evolution (KR); truth-maintenance systems (AI) | "Change impact analysis" / ripple effect / dependency analysis (D45 domain name itself); "consistent management and propagation of changes to dependent elements" (`ontology-change-classification-survey-flouris-2008`); ATMS "axiom pinpointing" and "fact garbage collection" (`axiom-pinpointing-atms`, `aaai96-fact-garbage-collection-tms`); upstream/downstream impact analysis over a data-lineage graph (D28) | D08, D28, D32, D37, D38, D45, D63 |
+| Knowledge-to-code lineage | Software/requirements traceability; digital thread | Forward/backward traceability, trace links (`gotel-finkelstein-traceability-problem-1994`); ReqIF (`reqif-omg-spec-1-2`); Eclipse Capra (`eclipse-capra-oss-github`); digital thread (`usaf-digital-thread-twin-origin-2016`) | D34, D43, D44, D47, D55 |
+| Context package | Contextualized/provenance-aware knowledge representation; requirements interchange; coding-agent memory | Contextualized knowledge graph (`provenance-aware-kr-survey-2020`); ReqIF (`reqif-omg-spec-1-2`); AGENTS.md open format (`agentsmd-open-standard`); memory-bank OSS (`dapi-memory-bank-oss`); hierarchical state tree bounding execution-history context (`mage-hierarchical-agent-memory-2026`) | D02, D24, D34, D57, D58, D61 |
+| Convergence | Subjective logic; truth discovery / data fusion; truth-maintenance systems; doxastic logic | Fusion/discount operator family (`multi-source-fusion-operations-subjective-logic`); possibilistic ATMS with data fusion (`possibilistic-atms-data-fusion-2013`); graded distributed belief (`graded-distributed-belief-2025`) | D08, D10, D13, D14, D15 |
+| Transition provenance | W3C PROV / provenance | `prov:wasDerivedFrom` / `prov:wasAttributedTo` / `prov:actedOnBehalfOf` (`w3c-prov-o-2013`); named graphs as statement-level provenance containers (`carroll-etal-named-graphs-provenance-trust-2005`); dynamic/temporal provenance for updates (`dynamic-provenance-sparql-update-2014`, `temporal-provenance-model-2012`) | D02, D03, D04, D06, D26, D30 |
+| Runtime-to-knowledge loop | Self-adaptive systems; MAPE-K; runtime verification; requirements monitoring | MAPE-K (`ibm-architectural-blueprint-autonomic-computing-whitepaper-2006`); models@run.time (`bencomo-gotz-song-models-at-runtime-guided-tour-sosym-2019`); dynamic assurance cases (`calinescu-dynamic-assurance-cases-self-adaptive-tse-2017`); FAME continuous-requirements elicitation (`oriol-etal-fame-continuous-requirements-elicitation-re2018`) | D22, D39, D63, D64, D65, D66, D68, D69, D70, D71 |
+
+**One terminology-currency note, not a field-of-origin claim:** the literal phrase "blast
+radius" (the exact term H10 is named after) has independently become live 2026 industry
+vocabulary for AI-coding-agent change impact. Two genuine arXiv papers use the exact term
+(`blast-radius-agentic-coding-memory-2026`, `beyond-code-generation-agentic-sdlc-2026`), kept as
+evidence of the phrase's currency, but their mechanisms diverge from H10 (context-window
+eviction; an SDLC triage category) rather than colliding with it — recorded in full at D36, and
+not treated here as the term's field of origin. No §6 term returned zero field equivalent.
+
+Beyond the mandated seven, the domain sections below map many further D-System terms the Pass 1
+sweeps surfaced field names for — knowledge state, typed transition, ontological/epistemic/
+lifecycle classification, actor/authority, and others — each recorded in its own domain's table
+with the same "say which field owns each term" discipline.
 
 ## D01 — Knowledge graphs
 
