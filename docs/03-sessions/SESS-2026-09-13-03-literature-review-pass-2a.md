@@ -82,21 +82,30 @@ explanatory reason rather than bare. `evidence_locator` is populated on all 20 r
 than 40 characters.
 
 **Met** — Every CRITICAL_COLLISION flag traces to the scoring rules and backward chaining is logged
-in the ledger for each deep-read source. Checking every row against the contract's flag rules
-(component overlap ≥ 4, or architecture overlap ≥ 4) gives **0 mismatches in either direction**: all
-14 `yes` rows clear a score threshold, and all 6 `no` rows fall below both. All 14 carry
-`second_review: pending`. The ledger holds **20 `strategy_phase: B` rows**, one per deep-read
-source, each with that source's id in `subject_source_id` — measurement 4 of the gate, which
-measured 1 missing on first pass and 0 after fix cycle 1.
+in the ledger for each deep-read source.
+
+The contract's flag rule has **four** triggers, not two: component overlap ≥ 4, architecture overlap
+≥ 4, direct falsification of any of H1–H11, or a span of at least four adjacent stages in the
+Reasoning → … → Knowledge Update pipeline. The coordinator's own check covered only the two numeric
+thresholds and found **0 mismatches in either direction** — all 14 `yes` rows clear a score
+threshold, all 6 `no` rows fall below both. **That check was narrower than the rule**, and the
+independent close review said so; it then tested the other two triggers itself and found no missed
+flag — no `no`-flagged row's text claims it falsifies a hypothesis (the one near hit,
+`assumptions-management-...`, explicitly says "rather than falsifying"), and no `no`-flagged row
+shows four adjacent present-mechanism stages. The condition holds on the full four-part rule, but it
+was the reviewer rather than the coordinator who established that.
+
+All 14 flagged rows carry `second_review: pending`. The ledger holds **20 `strategy_phase: B`
+rows**, one per deep-read source, each with that source's id in `subject_source_id` — measurement 4
+of the gate, which measured 1 missing on first pass and 0 after fix cycle 1.
 
 ## Backlog
 
-`phase-lit-04` — `status: active`, left active deliberately: all work items are complete and
-gate-measured, but only the owner's `/session-close`, after its own independent review, may mark a
-phase `complete`.
+`phase-lit-04` — `status: complete`, set by the owner-invoked `/session-close` after the independent
+review below returned HOLDS on both acceptance conditions with no unresolved discrepancy. Mid-session
+checkpoints left the phase `active`; only this command may complete it.
 
-`next_action`: Phase work is complete and all four `LIT-04 G` gates pass; the phase awaits the
-owner's `/session-close` review. `phase-lit-05` (Pass 2b) is unblocked and continues on
+`next_action`: None outstanding. `phase-lit-05` (Pass 2b) is unblocked and continues on
 `agent/lit-campaign`, numbering its searches from `LIT-05-S001`.
 
 `session`: `doc-session-literature-review-pass-2a`.
@@ -132,6 +141,207 @@ fix cycle.
 - **`LIT-04 G` reported PASS on blank fields having checked 4 of 43** (idea `000214`). The verdict
   held only because the coordinator's independent measurement covered all 43; the LIT-05, LIT-06 and
   LIT-07 gates re-measure the same condition over a larger matrix.
+
+## Review
+
+An independent sub-agent, started cold with no share of this session's context, reviewed the 27
+commits on `agent/lit-campaign` plus the two commits made directly on `dev` (`3414226`, `2ea3080`).
+Its findings, verbatim.
+
+> **Acceptance condition 1 — evidence matrix fully populated with locators to primary material:
+> HOLDS.**
+>
+> Ran a real CSV parser (Python `csv`) over `research/literature-review/04_evidence_matrix.csv`.
+> Header is exactly the contract's 43 fields (`PLAN-023.03-evidence-contract.md`) in order. 20 data
+> rows, every cell of every row non-blank (0 blanks across 860 cells).
+> `NOT_APPLICABLE`/`NOT_DETERMINABLE_FROM_ACCESS` appear only as substring-prefixed values with an
+> attached reason (grep count 212 / 40, matching the record exactly once I accounted for the fact
+> these are prose-prefixed, not bare tokens — my first pass under-counted with an exact-match test).
+> Every `evidence_locator` is a specific section/page/figure citation (sampled all 20; none reads as
+> generic or aggregator-pointing); shortest is 338 characters, none vacuous.
+>
+> **Acceptance condition 2 — CRITICAL_COLLISION flags trace to the rules; backward chaining logged:
+> HOLDS**, with one caveat about how the record described its own check.
+>
+> Checked all 20 rows against the contract's actual four-way flag rule (component ≥4, architecture
+> ≥4, directly falsifies H1–H11, or spans ≥4 adjacent pipeline stages) — not just the two score
+> thresholds the record cites. All 14 `yes`/6 `no` rows match the score-threshold rule exactly. I
+> independently checked the two criteria the record's own write-up omits: grepped for "falsif\*"
+> across the matrix and found no case where a `no`-flagged row's own text states it falsifies a
+> hypothesis (the one relevant hit, `assumptions-management`, explicitly says "rather than
+> falsifying"); traced stage-linkage fields (Decision→…→KnowledgeUpdate) for all 6 `no` rows and
+> found no run of ≥4 adjacent present-mechanism stages. So the flags are correct, but the record's
+> stated method ("component overlap ≥4, or architecture overlap ≥4") silently narrows the contract's
+> four-part rule to two parts — worth noting even though it doesn't change the outcome here.
+>
+> Ledger: 889 lines (header + 888 rows), CRLF throughout, 0 bare LF/CR, every row exactly 15 fields,
+> `LIT-04-` ids contiguous `S001`–`S044` with no gaps/duplicates. Exactly 20 `strategy_phase: B`
+> rows, each `subject_source_id` matching one of the 20 matrix `source_id`s one-for-one (verified by
+> set comparison, not spot check). The five previously-malformed rows (S016/S018/S020/S026/S027) now
+> carry non-blank `duplicate_handling` and `chain_decision`.
+>
+> **Verification entries — my own run vs. the record**
+>
+> 1. `uv run python -m src.governance` → `Governance OK: 20 systems, 193 documents, 22 memories, 133
+>    backlog phases`, exit 0. Matches.
+> 2. `uv run python tools/check_no_private_content.py`, worktree → `OK (550 tracked files, 0
+>    identifiers checked)`. Matches, including the correctly-flagged caveat that 0 is a null result
+>    in a worktree lacking `_private/`. Ran the same tool in the primary checkout (current `dev`
+>    HEAD) and got `OK (548 tracked files, 31 identifiers checked)` — confirms the record's claim
+>    that the real gate ran in the primary checkout with 31 identifiers checked.
+> 3. `LIT-04 G` — reproduced all four gate measurements independently from raw files: 20/20 batch
+>    ids present, 0 blank fields (across all 43 columns, not the 4 the gate script actually checked —
+>    confirmed via idea `000214`'s claim), 0 `critical_collision: yes` rows without `second_review:
+>    pending` (all 14 are `pending`), 0 deep-read sources missing a `strategy_phase: B` row. 4/4
+>    PASS, matching the record.
+>
+> Also ran the full suite myself: `578 passed, 2 warnings` on the campaign branch — matches exactly.
+>
+> **Cross-checks specific to this session's claims**
+>
+> - **Top-20 substitution (ruling 2):** read `02_domain_map.md`'s ranked list (13-way tie at rank 1,
+>   7-of-8 tie at rank 14, `zep-graphiti` named as the dropped rank-21 row). Reconstructed the
+>   expected final 20 by hand (12 rank-1 rows after dropping the ResearchGate `dhar` duplicate, plus
+>   the 7 rank-14 rows, plus `zep-graphiti`) — it matches the matrix's 20 `source_id`s exactly, no
+>   more, no fewer.
+> - **Inventory status:** exactly 20 rows at `status: deep_read`, an exact set match to the matrix's
+>   20 ids. The ResearchGate `dhar` row correctly remains `candidate`.
+> - **`3414226`** touches only the `phase-lit-04` backlog entry's `status`/`agent` lines — nothing
+>   else.
+> - **`2ea3080`** touches only `docs/08-governance/catalog.md` — 4 lines, consistent with the claimed
+>   fix (the rollup counts).
+> - **Full branch diff** (`dev..HEAD`): 8 files — `ideas.jsonl`, `ideas.md`, the session record,
+>   `catalog.md`, `backlog.yaml`, and the three declared `sys-research` deliverables. Nothing outside
+>   scope.
+> - **Distributed authorship:** spot-checked two extraction commits — each touches exactly the three
+>   deliverable files, adding exactly 2 ledger rows + 1 inventory status flip + 1 matrix row, for its
+>   own single source. No commit bulk-writes multiple sources' deliverable content; the `K` commit
+>   creates only the header (0 data rows).
+> - **Pre-score deflation claim:** recomputed component/architecture deltas for the first 13
+>   deep-read sources independently from the inventory and matrix. Result: 11 of 13 down (component),
+>   2 unchanged, 0 up; mean Δcomponent = -1.3077 ≈ -1.31, mean Δarchitecture = -1.4615 ≈ -1.46 — both
+>   match the record to the stated precision. Across the full 20, the same pattern holds (13 down, 7
+>   unchanged, 0 up on both scores), so "systematically deflated... none up" is an accurate
+>   characterization, not cherry-picked.
+> - **Named lineage/quote claims** (de Boer & Jansen-Bosch → Perry & Wolf 1992; Aporia → QOC 1991;
+>   EM-LLM → Event Segmentation Theory/Temporal Context Model; Evidence Graphs → Dung 1995/Toulmin
+>   1958; Zep/TGMS → shared 1999 Snodgrass ancestor with Zep's own reference list silent on it; the
+>   digital-thread ancestor withdrawal; the "recombination" and "novel architectural synthesis"
+>   self-descriptions; the Solozobov misattribution): read the actual `derivative_ancestor`,
+>   `strongest_difference`, `citation`, and `verbatim_notes` field text for each. All check out
+>   verbatim against the record's characterization.
+>
+> **Discrepancies found**
+>
+> One, minor: the record's own description of "the scoring rules" it checked against for acceptance
+> condition 2 mentions only the two numeric thresholds, omitting the contract's other two flag
+> triggers (direct falsification, four-stage span). I checked both independently and found no missed
+> flags, so the acceptance condition still holds — but the record understates what it verified.
+>
+> One observation outside the acceptance conditions: commit trailers are inconsistent. The `K` commit
+> and all seven `X1` commits carry `Co-Authored-By: Claude Fable 5`; every `X2`/`X3` commit (13 of
+> them) carries no co-authorship trailer at all; the coordinator-level commits (session record,
+> checkpoint, idea projection) carry `Claude Opus 5`. None say "Haiku" or "Sonnet," though the
+> record's dispatch table claims `K`/`G` ran on Haiku and `X` on Sonnet. This is a
+> metadata/bookkeeping inconsistency in the trail, not evidence against the substance of the work —
+> the per-commit diffs themselves are correctly scoped regardless of what model label is or isn't
+> attached — but it means the model-tier claims in the dispatch table aren't independently verifiable
+> from git history alone.
+>
+> No other discrepancies found. Every quantitative claim I could independently recompute (blank
+> counts, NA/NDFA counts, ledger shape, contiguity, B-row/source mapping, top-20 substitution,
+> pre/post score deltas, flag correctness) matched the session record exactly.
+
+Both findings were acted on before close: the Acceptance section above now states the full four-part
+flag rule and attributes the fuller check to the reviewer, and the model-verifiability observation is
+recorded as idea `000215`.
+
+## Decisions
+
+**The two owner rulings were taken before any dispatch, not worked around.** Idea `000202` had left
+`phase-lit-04` unable to start without a ruling on deep-read marking, because the evidence contract's
+only deep-read mark is the `status` value the Pass 1 close-out was forbidden to set. Rather than
+invent a column or overload a field, the phase paused and asked. The owner ruled the domain-map list
+authoritative with `status: deep_read` written after the read; that is now measurable, and the gate
+measures it.
+
+**The duplicate in the top-20 was found by verification, not by the brief.** Re-deriving the ranking
+from the inventory before dispatching — a check that existed only to confirm the coordinator's own
+addressing was sound — surfaced that AgenticAKM occupied two of the twenty slots under two identifier
+forms, with `dedup_of: none` on both. Left alone it would have spent a tenth of Pass 2a's reading
+budget on one paper and put two matrix rows behind one mechanism, inflating apparent prior art in the
+direction that flatters H0. The owner ruled the substitution; the coordinator did not edit
+`02_domain_map.md` to make the data fit, and the discrepancy between the published list and what was
+actually read lives here and in idea `000213`.
+
+**The catalog was regenerated and committed on `dev` without asking.** This is the one place the
+session touched the trunk beyond the claim. `AGENTS.md` names the catalog regeneration a claim forces
+as permitted primary-checkout work and requires it committed *with* the claim; the claim had shipped
+without it and `dev` was red. Repairing our own incomplete commit in the place the rule points at is
+not the feature-branch integration that needs the owner's approval, so it was done and reported
+rather than left red pending a question.
+
+**Ledger line endings for a new deliverable were ruled in dispatch addressing.** The evidence contract
+specifies none, and the two existing CSVs disagree (ledger CRLF, inventory LF). The matrix was new
+this phase, so LF was chosen by analogy with the inventory it derives from. That is a data-format
+decision made in prose, which is exactly where a decision cannot be found again — hence idea `000212`
+rather than silence.
+
+## Corrections
+
+**The coordinator verified the catalog by a method that could not fail.** `LIT-04 K` reported
+regenerating the catalog; the coordinator confirmed by running `--catalog` and checking `git status`,
+saw a clean tree, and reported the catalog as current. `--catalog` prints and never writes, so a
+clean tree was the guaranteed outcome of that check whatever the true state. The claim commit
+therefore shipped a stale rollup and `dev` was red on
+`test_committed_catalog_matches_regenerated_output` from `3414226` until the phase boundary. Caught
+by running the full suite after the rebase, diagnosed by deliberately corrupting the row and watching
+`--catalog` leave the corruption in place, fixed in `2ea3080`. Recorded as idea `000208`.
+
+**The coordinator's acceptance check for the collision flags was narrower than the contract's rule.**
+It tested the two numeric thresholds and reported the condition met; the contract has four triggers.
+The independent reviewer caught the gap and tested the other two, finding no missed flag — so the
+verdict stands, but it stood on a check that did not cover the rule. The Acceptance section above was
+rewritten at close to say so.
+
+**`LIT-04 X2` shipped five malformed ledger rows and repaired them itself.** Its append path
+validated CSV shape for the matrix but not the ledger, so `S016`, `S018`, `S020`, `S026` and `S027`
+silently dropped columns. It caught them in its own post-hoc audit and repaired them by byte-level
+surgery; the coordinator and then the independent reviewer both re-verified all 889 rows at 15 fields.
+Recorded as idea `000211`.
+
+**`LIT-04 X3` withdrew one of its own inferences.** Having written that both digital-thread sources
+trace to the 2013 USAF *Global Horizons* report, it read the patent, found it cites the DoD Digital
+Engineering Strategy (2018), and edited the already-committed row. The diff is one field, and it
+retracts a shared-ancestor claim rather than adding one.
+
+**Ideas appended without regenerating their projection.** `tools/append_idea.py` does not write
+`docs/00-working/ideas.md`, so committing `000208`–`000214` left the tree red until
+`tools/generate_ideas_md.py` ran. Same shape as the catalog case and annotated onto `000208`.
+
+## Left undone
+
+**`phase-lit-05` is the whole of the remaining Pass 2 work** and was deliberately not started. The
+campaign stops at phase boundaries; Pass 2b brings the matrix from 20 to the methodology's 20–30 by
+forward chaining and foundational works, and `LIT-05 G` additionally reports which of H1–H11 have
+zero challengers, which is what tells `phase-lit-06` where to dig.
+
+**Seven findings are recorded as ideas and none is resolved**, because none of them is an agent's to
+resolve mid-campaign. Two need the owner specifically: `000208` proposes wording changes to
+`AGENTS.md` and `CLAUDE.md`, which no agent may edit; `000210` asks whether a `source_id` that names
+the wrong author is renamed across four files or frozen with a correction elsewhere. The rest —
+`000209`, `000211`, `000212`, `000213`, `000214`, `000215` — are contract and instrument gaps that
+will recur in `phase-lit-05` through `phase-lit-07` if left, and `000214` in particular bears on
+gates that re-measure blank fields over a larger matrix.
+
+**The inventory was left carrying values the campaign has verified are wrong** — five bibliographic
+disagreements and one misattributed slug. That is correct under the deep-read-marking ruling, which
+confined inventory edits to `status`, and deliberately not fixed here. It becomes a real problem at
+`LIT-07 X3`, which builds the validated bibliography with no rule for which deliverable wins.
+
+**Nothing was integrated into `dev`.** Per `PLAN-023`'s branch model the next owner integration is at
+the pre-synthesis check-in after `phase-lit-06`, and `PROMPT-031`'s check-in section remains empty by
+construction, so `phase-lit-07` stays barred regardless.
 
 ## Preflight
 

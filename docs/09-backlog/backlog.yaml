@@ -6230,7 +6230,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6275,12 +6275,19 @@ items:
     independent re-measurement - 20 of 20 batch ids present, 0 blank required fields
     across all 43 columns, 0 flagged rows lacking second_review pending, 0 deep-read
     sources without a strategy_phase B ledger row. Governance exits 0; 578 tests pass
-    after rebase onto dev.
-  next_action: Phase work is complete and all four LIT-04 G gates pass; the phase
-    awaits the owner's /session-close review. phase-lit-05 (Pass 2b) is unblocked and
-    continues on agent/lit-campaign, numbering its searches from LIT-05-S001. Open for
-    the owner, none blocking - ideas 000208 to 000214, in particular 000208 (the
-    --catalog wording in AGENTS.md and CLAUDE.md, which no agent may change) and
+    after rebase onto dev. Closed after an independent cold-start sub-agent review
+    that recomputed every quantitative claim from the raw files and returned HOLDS on
+    both acceptance conditions with no unresolved discrepancy. The review raised two
+    items, both acted on before close. First, the coordinator's flag check had covered
+    only 2 of the contract's 4 CRITICAL_COLLISION triggers (the reviewer tested the
+    other two and found no missed flag; the session record now states the full rule).
+    Second, commit trailers do not record which model ran which section, so the
+    dispatch table's model tiers are not auditable from git history (idea 000215).
+  next_action: None outstanding. phase-lit-05 (Pass 2b - forward chaining and
+    foundational works, bringing the matrix to the methodology's 20-30) is unblocked
+    and continues on agent/lit-campaign, numbering its searches from LIT-05-S001.
+    Open for the owner, none blocking - ideas 000208 to 000215, in particular 000208
+    (the --catalog wording in AGENTS.md and CLAUDE.md, which no agent may change) and
     000210 (whether the misattributed source_id slug is renamed).
 - id: phase-lit-05
   title: Literature review Pass 2b — deep-read foundational works and complete the
