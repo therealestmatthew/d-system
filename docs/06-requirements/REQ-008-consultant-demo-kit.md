@@ -17,11 +17,15 @@ depends_on: [doc-live-demo-requirements]
 ## Observed problem and scope
 
 The owner presents a live Claude Code demo to Finance Transformation consultants, most of whom have
-minimal coding background and have never opened a terminal. This requirement covers the artefacts
+minimal coding background and have never opened a terminal. This requirement covers the components
 they will be shown: commands, skills, prompts and agents that a consultant would use in their own
 work, with no code, git, debugging or repository content in any of them.
 
-**Scope is 16 artefacts and nothing else:** 6 commands, 2 skills, 6 prompts, 2 agents.
+"Components" is the generic term throughout, matching Anthropic's plugin documentation, which groups
+a plugin's contents as skills, agents, hooks and MCP servers. "Artifacts" is avoided deliberately: it
+names a different Claude feature.
+
+**Scope is 16 components and nothing else:** 6 commands, 2 skills, 6 prompts, 2 agents.
 
 Explicitly out of scope, having been proposed and withdrawn on 2026-09-13: a fictional source
 corpus, sample inputs, a manifest, a facilitator guide, pinned fallback outputs, timed rehearsals,
@@ -37,9 +41,9 @@ originating brief were not treated as binding.
 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
-| K01 | No real client name, engagement, person or figure appears in any artefact. | Run `tools/check_no_private_content.py` with all kit files staged; read each artefact for identifiers. |
+| K01 | No real client name, engagement, person or figure appears in any component. | Run `tools/check_no_private_content.py` with all kit files staged; read each component for identifiers. |
 | K02 | Each command, skill and agent loads without error and appears in its surface: commands as slash commands, skills in the skill listing, agents in the agent listing. | Start a session with the kit present and confirm each entry is listed under its own name; invoke each command once. |
-| K03 | No kit artefact writes any file in this repository. `context-me` outputs the context file's content for the reader to save and never states or implies that it wrote a file. | Read every definition for a write target; invoke `context-me` and confirm nothing is written and nothing claims to have been. |
+| K03 | No kit component writes any file in this repository. `context-me` outputs the context file's content for the reader to save and never states or implies that it wrote a file. | Read every definition for a write target; invoke `context-me` and confirm nothing is written and nothing claims to have been. |
 | K04 | Exactly one capability ships twice — once as a command and once as a skill — and no other capability appears in two invocation models. | Read both definitions and confirm the capability matches; read the remaining entries for a second pair. |
 | K05 | Every skill names itself in the first line of its output when it fires, so the audience can attribute the firing rather than mistaking it for ordinary helpfulness. | Provoke each skill and read the first line of output. |
 | K06 | Each skill's description fires on a cue present in the input, not on an absence, an unobservable event, or a cue broad enough to match any consulting request, and states explicitly when it must not fire. | Read each description; for each skill, run three inputs that should fire it and three related inputs that should not, and record which fired. |
