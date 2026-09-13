@@ -52,3 +52,32 @@ workflows:
       run_commands: shell
       ask_user: structured-user-input
     unsupported: []
+- id: log-anti-patterns
+  name: log-anti-patterns
+  description: Route a described anti-pattern to the records that should hold it — the concurrency-collision ledger, a brain procedure, an idea, the session record — and write the ones the owner confirms.
+  authority: agent-invocable
+  source: agent-workflows/log-anti-patterns.md
+  requires:
+  - read_files
+  - edit_files
+  - run_commands
+  - ask_user
+  targets:
+  - host: claude
+    kind: skill
+    path: .claude/skills/log-anti-patterns/SKILL.md
+    capabilities:
+      read_files: Read
+      edit_files: Edit
+      run_commands: Bash
+      ask_user: AskUserQuestion
+    unsupported: []
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/log-anti-patterns/SKILL.md
+    capabilities:
+      read_files: filesystem
+      edit_files: filesystem
+      run_commands: shell
+      ask_user: structured-user-input
+    unsupported: []

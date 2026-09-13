@@ -1,0 +1,162 @@
+# log-anti-patterns
+
+Takes an anti-pattern someone has just described — a mistake, a near-miss, a collision, a check that
+passed without checking — decides which of this repository's records should hold it, and writes the
+ones the owner confirms.
+
+This workflow records. It is not a reference sheet that explains where things go and leaves the
+writing to whoever invoked it. The output of a run is committed text in the right files, or an
+explicit statement that nothing here needed a durable record.
+
+Read `AGENTS.md` first if you have not already this session. This workflow assumes its concurrency
+and governance rules and does not repeat them.
+
+## What this workflow must never do
+
+- **Never edit `AGENTS.md` or `CLAUDE.md`.** Those two files are changed only by the owner, for one
+  approved change at a time. If the anti-pattern is a gap in their standing rules, the output is a
+  report: quote the passage, propose exact replacement wording, and stop. A gap in the working
+  agreement is not patched in passing, and it is not a reason to write the rule somewhere else
+  instead so that it looks recorded.
+- **Never write without confirming first.** Every destination is proposed, with its reason, and
+  written only after the owner agrees to that specific write. Ask through the host's structured
+  question capability, not in a closing paragraph — a question buried in prose does not get
+  answered. Batch the destinations into one question rather than asking four times.
+- **Never hand-edit `_data/ideas.jsonl`.** `tools/append_idea.py` is the only sanctioned writer. The
+  log is append-only, so a line written any other way is permanent.
+- **Never change an idea's status, and never mark a phase complete.** Recording an anti-pattern
+  against an idea is an annotation. Promoting, discarding or otherwise moving an idea is the owner's
+  judgement, and `status: complete` belongs to `session-close` alone.
+- **Never record a collision that required no choice.** `GOV-003` says most merge conflicts need no
+  entry. A ledger padded with mechanical conflicts stops being readable, and the rows that mattered
+  stop being findable.
+
+## The routing questions
+
+Answer these against the case in front of you, in order. They are not exclusive — one anti-pattern
+often belongs in two destinations, and today's identifier collisions belong in two.
+
+1. **Could it recur?** If the cause was specific to one session's circumstances and nothing about it
+   generalises, there is no durable record to write. Say so. At most it belongs in the session
+   record's `## Corrections`.
+2. **Was it a standing habit or a one-off situation?** A habit — a reflex any agent would reach for
+   under the same conditions — is a `brain/procedures/` entry. A situation that happened to line up
+   badly is not.
+3. **Did resolving it require an actual choice?** Between concurrent agents: which phase yielded,
+   whether a boundary moved, which of two incompatible things was kept. That is a row in `GOV-003`'s
+   Concurrency collisions table. Two agents editing different items of one file is mechanical, and
+   the answer there is no.
+4. **Does fixing it need work, or just a rule?** A missing check, a tool that should warn, a guard
+   that does not exist — that is an idea, because no amount of remembering makes it go away. A rule
+   an agent can follow is a procedure.
+5. **Is the rule itself missing or wrong in `AGENTS.md`?** Then the output is a proposal to the
+   owner. Nothing else.
+
+## The destinations
+
+| Destination | What belongs there | What does not |
+|---|---|---|
+| `docs/08-governance/GOV-003-backlog-decisions.md`, "Concurrency collisions" | A collision between concurrent agents whose resolution required a choice, recorded in the same diff as the resolution | Ordinary merge conflicts resolved by keeping both sides |
+| `brain/procedures/` | A durable, model-agnostic correction for a slip caused by a standing habit | A situational slip; anything phrased as advice to one model |
+| `_data/ideas.jsonl`, via `tools/append_idea.py` | An anti-pattern whose fix is work: a check, a guard, a tool change, a system that should exist | A rule that only needs to be remembered |
+| The session record's `## Corrections` | A mistake made and fixed inside one session, written when the session closes | Anything that outlives the session — that goes in one of the rows above as well |
+| `AGENTS.md`'s "resolve collisions" rules | Nothing an agent writes. Report the gap with proposed wording | Every edit. This file is never edited by an agent |
+
+A single case can produce several of these. The collisions backfilled on 2026-09-13 produced two
+`GOV-003` rows (each resolution chose which session yielded) and one procedure (the yielding rule is
+a habit, not a one-off), and the underlying missing guard was already an idea — `000158` — so no new
+idea was written for it.
+
+## Running it
+
+### 1. Establish what actually happened
+
+Get the case to the level of detail a row or a procedure needs: what was done, what the signal was,
+what the first wrong reading was if there was one, and what the effective fix turned out to be. If
+the invoker's account is second-hand, verify it against the repository before writing anything —
+`git log`, `git show`, the idea log through `fold()` rather than the raw file. A ledger row that
+misstates what happened is worse than an absent one, because the next reader believes it.
+
+If a claim cannot be verified, say which one and record what is verified, not what is plausible.
+
+### 2. Classify
+
+Walk the five routing questions. Write down, for each destination you land on, the one sentence that
+says why it belongs there. If you cannot write that sentence, the destination is wrong.
+
+Check for an existing record first. Grep `brain/procedures/` and the idea log before proposing a new
+entry — an anti-pattern that already has an idea gets an annotation on that idea, not a second one,
+and a procedure that already covers the habit gets extended rather than duplicated.
+
+### 3. Propose, and ask
+
+Present the destinations and their reasons, then ask the owner to confirm which to write, in one
+structured question. Include "none of these" as a real option. If the answer is that nothing should
+be written, that is a complete run of this workflow.
+
+### 4. Write the confirmed destinations
+
+**A `GOV-003` row.** Append to the Concurrency collisions table in its existing column shape —
+Date, Phases, Collision, Resolution. Put the mechanism in the Collision cell and the choice in the
+Resolution cell; a row that says only "renumbered" records the outcome and loses the reason. Where a
+column does not apply, state what is true rather than inventing a value: a collision between two
+unclaimed sessions has no phase ids, and the cell says so. Bump the document's `updated` date.
+
+**A `brain/procedures/` entry.** One file under `brain/procedures/<slug>.md`, with front matter
+matching the entries already there — `id` as `mem-proc-<slug>`, `title`, `type: procedure`, `tags`
+drawn from `_data/tags.json`, `source_model`, `project`, `created`, `updated`, `confidence`,
+`related` naming real `mem-*` ids, and `scope`. Read two existing entries before writing, and follow
+their shape: the rule first, then the worked example with its date, then why the entry is
+model-agnostic. Write the rule so it reaches whichever model works here next; naming one model's
+tools in the rule itself is the defect these entries exist to avoid. Add the entry to
+`brain/index.md` under Procedures.
+
+**An idea.** Write the title and body to a file and pass it with `--file`; a quoted `--body` puts
+prose through the shell, which has corrupted an idea before. Take the id from the writer's own
+output — never guess it, because a guessed id sends a later annotation to a different idea. To
+extend an existing idea instead, use `annotate` with `--kind finding` and an agent `--author`.
+
+```bash
+uv run python tools/append_idea.py add --file /tmp/idea.md
+uv run python tools/append_idea.py annotate 000097 --author agent-<name> --kind finding --text "..."
+uv run python tools/generate_ideas_md.py
+```
+
+Read the record back after writing it and confirm the text landed on the id you meant.
+
+**The session record.** If this session has one, add the case to `## Corrections` — mistakes made
+and fixed within the session. That section is written at close; this workflow adds to it only when
+the record already exists.
+
+### 5. Verify
+
+Run what your writes actually touched, and keep the real output:
+
+```bash
+uv run python tools/generate_ideas_md.py            # if you appended to the idea log
+uv run python -m src.governance --catalog > docs/08-governance/catalog.md
+uv run python -m src.governance                     # must exit 0
+uv run pytest
+```
+
+The generated `docs/00-working/ideas.md` and `docs/08-governance/catalog.md` both have tests that
+fail on any difference from regenerated output, so skipping either regeneration leaves the tree red
+for the next session rather than for this one.
+
+A failing check is a result to record, not a step to retry until it goes quiet.
+
+### 6. Report
+
+Name each destination written and quote the row, the front matter, or the id the writer returned.
+Name each destination considered and rejected, with the routing question that rejected it — a
+destination silently dropped reads the same as one never considered. If the case included a gap in
+`AGENTS.md` or `CLAUDE.md`, end with the proposed wording and the statement that the file was not
+edited.
+
+## Why this asks before every write
+
+Three of the four destinations are permanent or near-permanent. The idea log cannot be edited at
+all. A `GOV-003` row is a governed record that later sessions reason from. A procedure changes what
+every future agent does. The cost of a wrong entry is not the entry — it is that the next reader
+believes it, and believes it precisely because it is written in the place that holds true things.
+Confirming each write is what keeps that place worth trusting.

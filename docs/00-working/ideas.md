@@ -5111,7 +5111,7 @@ The open design question is where the capture happens — at session close, at c
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:39:57-04:00): Idea 000097 proposes a system to track session failures and derive anti-patterns that future sessions can apply to prevent similar failures.
 
@@ -5126,6 +5126,15 @@ Plan 008 (Session opening and closing protocols) covers session lifecycle manage
 No related plan, requirement, or ADR found that proposes the failure-tracking system with anti-pattern derivation that 000097 describes. The brain/ memory system and agent guardrails infrastructure exist, but the explicit workflow for capturing session failures as structured records and deriving rules from them remains unspecified in governed documents.
 
 PROPOSED LINK: 000097 --relates_to--> 000099 (000099 is a concrete example of the session failure pattern 000097 proposes to track and learn from)
+- **finding** by agent-anti-patterns (2026-09-13T09:06:00-04:00): A skill now covers the capture half of this idea. It does not deliver the derivation half, which is most of what 000097 asks for.
+
+WHAT EXISTS AS OF 2026-09-13. The portable workflow log-anti-patterns: agent-workflows/log-anti-patterns.md as the canonical source, generated to .claude/skills/log-anti-patterns/SKILL.md and .agents/skills/log-anti-patterns/SKILL.md through tools/generate_agent_workflows.py. Given a described anti-pattern it verifies the account against the repository, classifies it against five routing questions (could it recur; standing habit or one-off; did resolving it require an actual choice; does fixing it need work or a rule; is the gap in AGENTS.md itself), and writes the destinations the owner confirms: a row in GOV-003's Concurrency collisions table, an entry in brain/procedures/, an idea or an annotation through tools/append_idea.py, and the session record's Corrections section. Every write is confirmed first; AGENTS.md and CLAUDE.md are never edited, only reported on with proposed wording. Its first use was the backfill of the two 2026-09-12 and 2026-09-13 idea-id collisions into GOV-003 plus the renumber procedure at brain/procedures/yield-and-renumber-a-collided-identifier.md.
+
+WHAT THAT COVERS OF 000097. The structured capture this idea describes - what failed, what signal revealed it, the wrong first interpretation if there was one, and the effective fix - now has a route and a destination, and it is written at the moment the failure is noticed rather than reconstructed from memory at session close.
+
+WHAT REMAINS, AND IT IS THE LARGER PART. (1) The records are prose in four different places, not session-failure records with a common shape a program can read; the skill routes to existing destinations rather than creating a corpus with a schema. (2) Nothing derives anti-pattern rules from those records - a person or an agent still reads and generalises by hand, which is exactly the work 000097 proposed to automate. (3) Nothing surfaces derived rules into future sessions at the point where they would prevent the failure; brain/procedures/ is read when someone chooses to read it. The skill produces the material a derivation system would consume. It is not that system.
+
+Status deliberately unchanged by this annotation. Whether the capture half is enough to promote, or whether derivation is planned as its own work, is the owner's call.
 
 </details>
 

@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-12'
+updated: '2026-09-13'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -52,6 +52,8 @@ which phase yielded, whether a system boundary moved, whether a phase was split 
 | Date | Phases | Collision | Resolution |
 |---|---|---|---|
 | 2026-09-06 | `phase-cap-01`, `phase-priv-01` | Both claimed ADR-007. PLAN-006 stated in prose that ADR-007 was allocated to the structure/content boundary, but never reserved it in `codes.yaml`, so `--next-code` issued it to the capture routing decision | The merged document keeps the code, per the rule that the second to integrate renumbers. The boundary ADR became ADR-009; `phase-priv-01`'s deliverable path and PLAN-006's prose were corrected to match. Root cause was the reservation step being skipped, not the allocator |
+| 2026-09-12 | None — neither session held a phase claim | Two sessions allocated idea `000153`: `SESS-2026-09-12-06`'s hand-off idea, created 12:16:28 on an unintegrated branch, and a peer's "The session hand-off protocol is now described in three places and drifts between them", created 14:47:02 and already on `dev`. `tools/append_idea.py` allocates by reading `_data/ideas.jsonl`, and the peer's session read a log that did not yet contain the first idea | The peer's idea keeps `000153`, per the rule that the agent integrating second renumbers — applied to idea ids by analogy with document codes, which is the only written form of the rule. The branch's own events were dropped and the idea re-appended through the writer as `000157`, its finding re-applied to that id and read back to confirm it landed on the right record; `_data/ideas.jsonl` was never hand-edited. The absence of a guard is idea `000158`: a duplicate document code raises a governance error, a duplicate idea id raises nothing |
+| 2026-09-13 | None — neither session held a phase claim, and `_data/ideas.jsonl` is not covered by the lock table at all | The same race, one day later and wider. A peer landed thirty-six ideas as `000159`–`000194` in a single commit on 2026-09-12 at 21:33 — a batch itself already shifted up by two after the collision above — while this session held `000159` on its branch. Two things make it worse than the first instance: exposure scales with batch size, so any id in a thirty-six-wide range was at risk; and the idea log produced **no git conflict**. It was caught only because the branch was reset onto `dev` rather than merged. A normal merge takes both append-only additions cleanly, and `fold()` then folds two unrelated `created` events under one id | Second to integrate yields again: this session's idea was re-appended through the writer as `000195`, and the recurrence was annotated onto `000158` rather than opened as a second idea for the same defect. The renumber rule and its recovery steps are now `brain/procedures/yield-and-renumber-a-collided-identifier.md`, because the rule was being rediscovered per incident rather than read. The silent-merge path itself remains unguarded; `000158` still owns that work |
 
 Append rows in the same diff as the resolution; a commit message is not a governed record. A conflict
 under `src/`, `ts/`, `schemas/` or `sql/` between phases declared disjoint always warrants an entry,
