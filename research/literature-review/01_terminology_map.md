@@ -900,3 +900,28 @@ cross-domain recurrence check.
 | Runtime monitor enforcing formal policy predicates over agent execution traces (H11) — verified via LIT-03-S068 as blocking rather than closing the loop back into knowledge, the strongest difference from H11's own claim | C-Trace: runtime compliance verification for AI agents | `c-trace-runtime-compliance-verification-ai-agents-2026` |
 | Regulation-to-executable-scenario derivation quality (specification representation, requirement derivation) | From Law to Gherkin | `law-to-gherkin-llm-behavioral-specs-food-safety-2025` |
 | BDD specification-representation quality principles — cross-domain recurrence, first surfaced (and excluded) as a D49 lead, independently verified and pulled in here (LIT-03-S069) | Characterising the quality of BDD specifications | `characterising-quality-bdd-specifications-2020` |
+
+
+## D53 — Software provenance
+
+**Two Linux Foundation industry-advocacy reports (SBOM adoption/readiness) were re-typed and
+excluded** rather than accepted as the S3 dispatch's "tech report" characterization: neither
+proposes a provenance mechanism, and the campaign's vendor/foundation-material precedent
+(applied elsewhere to the SLSA spec, Bazel docs, and the OmniBOR spec repo) treats advocacy
+reporting as a lead at most. Godfrey's 2013 canonical software-artifact-provenance paper and
+Moreau et al.'s pre-W3C-PROV Open Provenance Model (OPM) v1.1 are the two strongest field-vocabulary
+anchors; OPM was checked against the existing PROV-O and PASOA rows and is a distinct source, not
+a recurrence. The SLSA specification itself (not a secondary description of it) is kept as a lead
+per the same Phase-A canonical-model instruction that kept Cucumber's own Gherkin reference at D52.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Transition provenance / artifact lineage (H2, H3) — canonical vocabulary anchor for "software provenance" as a field term | Understanding software artifact provenance | `godfrey-understanding-software-artifact-provenance-2013` |
+| Typed transition with provenance (`S_t --[T,P]--> S_t+1`) — pre-W3C-PROV data model, checked against the existing PROV-O/PASOA rows and confirmed distinct | Open Provenance Model (OPM) core specification v1.1 | `moreau-etal-open-provenance-model-v1.1-2010` |
+| Field-vocabulary survey anchor for code-level provenance collection/management/analysis | A Survey on Collecting, Managing, and Analyzing Provenance from Scripts | `pimentel-etal-survey-provenance-scripts-csur-2019` |
+| Artifact identity / component enumeration (bill-of-materials sense, distinct from D-System's transition-provenance sense) | Software Bill of Materials (SBOM); SPDX (ISO/IEC 5962:2021) | `spdx-iso-iec-5962-2021-oxford-chapter`; `ifosslr-spdx-format-update` |
+| Build-step provenance record (builder identity, materials, invocation) as the field's own attestation schema (H3) | SLSA provenance predicate | `slsa-spec-v0.1-provenance` |
+| Decision-to-artifact chain of custody via code signing (H3, H9) | Software signing (traditional vs. next-generation) as provenance establishment | `establishing-provenance-before-coding-software-signing-2024` |
+| Verifiable derivation-to-artifact binding without revealing build inputs (H3) | Zero-knowledge-compiled software-artifact provenance | `verifiable-provenance-zk-compilation-2026` |
+| SBOM-content-sharing verifiability, a distinct-from-attestation lineage-verification approach (H3) | VeriSBOM: zero-knowledge SBOM sharing | `verisbom-zk-sbom-sharing-2026` |
+| Excluded: industry-advocacy/adoption reporting carries no provenance mechanism and is reclassified as a lead despite a DOI | SBOM adoption/readiness reports (Linux Foundation) | `lf-sbom-guide-haddad-2024`; `lf-sbom-state-cybersecurity-readiness-2022` |
