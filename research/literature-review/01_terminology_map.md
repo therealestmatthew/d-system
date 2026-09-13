@@ -790,3 +790,20 @@ domain's variant list intends — recorded as a collision, not folded in as a sy
 | Lifecycle-data integration and authoritative-model-as-source-of-truth precedent, from the older PLM tradition this domain's vocabulary partly descends from | Product lifecycle management (PLM) integration | `plm-integration-framework-2008`; `plm-streamlining-survey-2005`; `digital-twin-survey-plm-framed-2019` |
 | Cross-domain recurrence: MBSE-to-digital-twin bridge already inventoried under D46 | MBSE tied to digital twin | `mbse-digital-twin-bridge-systems-2019-d47-recur` (duplicate of `mbse-digital-twin-bridge-systems-2019`) |
 | Cross-domain recurrence: the requirement-design-runtime provenance chain already inventoried under D46 | Model-Based Digital Threads for Socio-Technical Systems | `model-based-digital-threads-sociotechnical-systems-2022-d47-recur` (duplicate of `model-based-digital-threads-sociotechnical-systems-2022`) |
+
+## D48 — Digital engineering
+
+**DoDI 5000.97 is the governing primary source for this entire domain's vocabulary**: it is the
+document that formally defines "Digital Engineering Ecosystem" and "Authoritative Source of Truth"
+(the latter shared with D47) and mandates model-based acquisition across US defense programs —
+kept in preference to the vendor/consultancy commentary pages that discuss it secondhand.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchor: the primary document defining the domain's own name and its authoritative-source-of-truth concept | Digital Engineering Ecosystem; Authoritative Source of Truth | `dodi-5000-97-digital-engineering-ecosystem` |
+| Transition provenance (`P`) — a foundational provenance-systems architecture, precursor to PROV-O (cross-references D03) | An Architecture for Provenance Systems (PASOA project) | `pasoa-architecture-provenance-systems-2005` — flagged collision candidate |
+| Provenance-model taxonomy transferable to D-System's own provenance model | Big data provenance survey | `big-data-provenance-survey-2015` |
+| Ontology-based knowledge-graph provenance for systems-engineering workflow models (H7) | Model management for SE workflows via ontology-based knowledge graphs | `model-management-ontology-kg-se-workflows-2025` — flagged collision candidate |
+| Architecture overlap: an explicit enterprise-architecture proposal for the domain's own named ecosystem (H7) | Enterprise architecture for a digital systems engineering ecosystem | `enterprise-architecture-digital-se-ecosystem-2022` — flagged collision candidate |
+| Knowledge/decision-provenance chain inside an MBSE/acquisition framing (H7) | Knowledge integration and acquisition methodology for MBSE | `knowledge-integration-acquisition-mbse-methodology-2023` |
+| **Reprint duplicate pair, recorded rather than silently dropped**: an identical book-chapter title reissued across two Springer reference-work editions, neither individually selected as kept by the source search | Digital Twin: Key Enabler and Complement to MBSE | `digital-twin-key-enabler-mbse-2022` (2022 printing, canonical); `digital-twin-key-enabler-mbse-2023-dup` (2023 printing, dedup) |
