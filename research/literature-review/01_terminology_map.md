@@ -1198,3 +1198,18 @@ directly comparable to any runtime-state-synchronization claim D-System makes.
 | Overall field research agenda D-System's own lifecycle and design-space claims should be checked against | Software Engineering for Self-Adaptive Systems: A Research Roadmap / A Second Research Roadmap | `cheng-delemos-etal-self-adaptive-systems-research-roadmap-2009`; `delemos-giese-etal-self-adaptive-systems-second-roadmap-2013` |
 | Runtime-to-knowledge closure (H11) applied specifically to self-adaptive systems | Runtime verification and validation chapter of the Second Roadmap | `self-adaptive-systems-second-roadmap-runtime-vv-chapter-2013` |
 | Learned/adaptive analyze-plan stages, relevant to any ML-augmented adaptation claim in D-System | Applying Machine Learning in Self-adaptive Systems | `applying-ml-self-adaptive-systems-acm-csur-2020` |
+
+## D69 — MAPE-K
+
+The MAPE-K acronym and reference architecture originates in IBM's own technical white paper, not
+a peer-reviewed paper (`LIT-03-S252`); Kephart and Chess's 2003 IEEE Computer paper is the
+field's separate landmark vision statement that coined the "self-CHOP" vocabulary.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| D-System's own monitor/analyze/decide/act control-loop framing over a shared knowledge base | MAPE-K -- Monitor, Analyze, Plan, Execute over a shared Knowledge component | `ibm-architectural-blueprint-autonomic-computing-whitepaper-2006` -- origin document of the acronym and reference architecture, direct H2/H11 collision candidate |
+| Self-configuration/self-healing/self-optimization/self-protection vocabulary underlying any self-managing claim | "Self-CHOP" -- self-configuring, self-healing, self-optimizing, self-protecting | `kephart-chess-vision-autonomic-computing-2003` -- landmark vision paper |
+| Formal specification counterpart to D-System's own typed-transition semantics inside a control loop (H2) | MAPE-K Formal Templates -- rigorous behavior-design templates for MAPE-K loops | `delaiglesia-weyns-mapek-formal-templates-taas-2015` |
+| Formal state-machine modeling of the control loop itself | Modeling and Analyzing MAPE-K Feedback Loops for Self-Adaptation | `arcaini-etal-modeling-analyzing-mapek-feedback-loops-seams2015` |
+| Provenance/evidence-as-arbitration-input (H3) inside a MAPE-K-style loop | MAPE-K/MAPE-SAC -- assurance cases built from monitored evidence feeding the shared knowledge base | `mapek-mapesac-security-assurance-cases-interaction-2020` |
+| Implementation-availability anchor for the MAPE-K pattern across languages and domains | GitHub topics/mape-k aggregator -- multi-domain open-source implementation ecosystem | `github-topics-mape-k` |
