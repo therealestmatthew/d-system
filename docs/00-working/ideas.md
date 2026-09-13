@@ -37,13 +37,14 @@ Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority
 
 1. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
 2. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
-3. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
-4. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-5. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-6. `000038` — Formalize the requirements-vs-plans process and design
-7. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-8. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-9. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+3. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
+4. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+5. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+6. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+7. `000038` — Formalize the requirements-vs-plans process and design
+8. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+9. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+10. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -7399,9 +7400,30 @@ Worth considering, none obviously right: a governance check that fails on any id
 
 Relates to 000152 (a registry of active worktrees) and 000151 (the claim system's dependence on one shared primary checkout) - all three are cases where coordination state lives in a file on a branch rather than somewhere every session can see it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-pack-factory (2026-09-13T07:27:13-04:00): THE RACE RECURRED WITHIN THE HOUR, and the second instance is worse than the first.
+
+This idea was written on 2026-09-12 after two sessions both allocated 000153. On 2026-09-13, while the very commit recording it was waiting to integrate, it happened again: this session allocated 000159 to "check_no_private_content passes without looking whenever it runs outside the primary checkout", and a peer session independently allocated 000159 to "Should an agent read files directly, or only call MCP tools - and what makes the answer enforceable". The peer integrated first, so this session renumbered again, to 000195.
+
+Two details make the second instance more serious than the first.
+
+First, the window was not narrow. The peer landed a batch of THIRTY-SIX ideas in one commit, 000159 through 000194. Any id in that range allocated by any concurrent session would have collided. The first instance could be dismissed as two sessions appending within a few hours of each other; this one shows the exposure scales with batch size, and batch capture is normal here - GOV-006 tells every agent to record asks immediately, so a planning session naturally produces many.
+
+Second, and more important: THIS COLLISION DID NOT PRODUCE A GIT CONFLICT IN THE IDEA LOG. The first one did, purely because the two appends happened to land on adjacent lines. This time the branch was reset onto dev and the idea re-appended, so the conflict never materialised - but had the two branches merged normally, git would have taken both append-only additions cleanly and fold() would have folded two unrelated created events under one id. That is the silent-corruption path this idea predicted, observed one day later.
+
+The practical consequence is that the frequency estimate in the original text was wrong, and understated. This is not a rare race that "just bit once". It bit twice in under twenty-four hours, in a repository with a handful of concurrent sessions, and the second time it was caught only because a human-directed integration happened to reset the branch rather than merge it.
+
+</details>
+
 **Links**
 
 - relates_to → `000157`
+- relates_to ← `000195`
 
 ---
 
@@ -8922,3 +8944,28 @@ all linked.
 - relates_to → `000189`
 - relates_to → `000191`
 - relates_to → `000179`
+
+---
+
+## 000195 · check_no_private_content passes without looking whenever it runs outside the primary checkout
+
+**Created 2026-09-13T07:26:56-04:00 · Status: `open`**
+
+Found 2026-09-12 across SESS-2026-09-12-06. Every single invocation of tools/check_no_private_content.py that session reported success while checking nothing:
+
+    note: _private/portfolio/ not found - content check skipped (path check still ran; this is expected in CI / a fresh clone)
+    check_no_private_content: OK (538 tracked files, 0 identifiers checked)
+
+The path check ran. The content check - the half that reads the owner's real portfolio and greps every staged file for the identifiers in it - did not, because _private/ is gitignored and therefore absent from an agent worktree. The tool says so honestly in its note and still exits 0, and the word OK is what a hurried reader takes away.
+
+WHY THIS IS NOW WORSE THAN IT WAS. The skip was designed for CI and fresh clones, where it is correct - there is nothing to check against. But commits e6b32a3 and 33f931a made worktrees mandatory for every session regardless of what the work touches, withdrawing the documentation-only primary-checkout exception. Agents no longer work where _private/ lives. So the environment in which the content check silently skips has gone from "CI and fresh clones" to "every agent session in the repository", while AGENTS.md still instructs agents to run the check with their changes staged and treats a pass as the gate.
+
+AGENTS.md's own wording is what makes this sharp: "tools/check_no_private_content.py reads git ls-files, so it cannot see a file until that file is staged. Run it with your changes staged, or the gate passes by not looking." The rule anticipated exactly this failure mode for staging and did not anticipate it for the data root. The gate now passes by not looking for a second, structural reason, and the phase-wb-10 session record shows the workaround that was already needed - it symlinked _private into the worktree to get real identifier checking, which is a manual step nothing requires or verifies.
+
+OPTIONS, NONE OBVIOUSLY RIGHT. Exit non-zero when the content check cannot run and the invocation is not CI, which makes the gate honest but fails every agent worktree until the data root is reachable. Report a distinct status - "SKIPPED, not OK" - so the output cannot be misread, without changing exit codes. Teach the tool to find the portfolio through D_SYSTEM_DATA_ROOT or a configured absolute path, so a worktree can check against the real root without symlinking. Or move the check to the integration step, where it runs once in the primary checkout against everything being merged, which matches where the risk actually is.
+
+Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (idea ids colliding across branches): all three are consequences of work moving out of the shared primary checkout faster than the checks that assumed it.
+
+**Links**
+
+- relates_to → `000158`
