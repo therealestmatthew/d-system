@@ -10410,6 +10410,7 @@ Same family as [[000147]], [[000148]], [[000149]] and [[000201]]: an instrument'
 **Links**
 
 - relates_to → `000201`
+- relates_to ← `000216`
 
 ---
 
@@ -10609,3 +10610,28 @@ Raised by the independent reviewer at the close of phase-lit-04 on 2026-09-13, a
 **Links**
 
 - relates_to → `000214`
+
+---
+
+## 000216 · A brain procedure naming the exact failing command did not reach the session that repeated the failure, three days running
+
+**Created 2026-09-13T19:17:22-04:00 · Status: `open`**
+
+brain/procedures/a-check-that-cannot-fail-is-not-a-check.md was written on 2026-09-12 specifically to stop agents building verifications that cannot fail. Its worked example is the governance --catalog flag, named explicitly, with the correct drift check spelled out. SESS-2026-09-13-01 recorded the same trap again from Pass 1b. On 2026-09-13 the phase-lit-04 coordinator ran the identical anti-pattern - ran --catalog, checked git status, saw a clean tree, reported the catalog current - and presented it as a new discovery. Three occurrences in three days, in three different sessions, with a procedure sitting in the repository the whole time that would have prevented all three.
+
+The tooling half is now fixed (the flag writes, agent/catalog-writer), so this particular trap is closed. The retrieval failure it exposes is not, and the fix does not touch it.
+
+What actually went wrong is a routing problem, not a knowledge problem. The repository knew. Nothing in a session's entry path surfaces brain/procedures/ by topic: CLAUDE.md imports GOV-006, AGENTS.md is read in full, the backlog and the phase's own documents are read - and brain/ is mentioned in CLAUDE.md only as the destination for recording a correction, never as something to consult before acting. An agent reaches brain/procedures only if it already suspects the thing the procedure would have told it.
+
+Worth deciding:
+
+- whether brain/procedures entries should be indexed by trigger rather than by title - the procedure that mattered here would have fired on "about to verify that a generated file is current", which is a situation, not a topic an agent would search for;
+- whether the session entry path should surface procedures matching the phase's declared systems or the commands the session is about to run, the way recalled memories surface elsewhere;
+- whether a procedure that has now failed to prevent three recurrences should be treated as evidence that the procedure format itself does not reach agents, rather than as a document to improve;
+- whether the standing rule "record it only if it could recur" needs a companion: a recorded correction that does not change behaviour on the next occurrence has not landed, and the owner's own requirement is that they must not have to correct the same thing twice.
+
+This is the general case behind [[000208]] and is the reason a fourth warning would not have worked. Same family as [[000214]] in one respect: both are cases where the campaign trusted an instrument to do something it was never verified to do.
+
+**Links**
+
+- relates_to → `000208`
