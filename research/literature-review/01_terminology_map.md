@@ -975,3 +975,24 @@ OmniBOR and the in-toto paper already inventoried under D54.
 | Automated SBOM/dependency-graph generation from build artifacts, bridging D53/D55 | Automatic Bill of Materials | `automatic-bill-of-materials-2023` |
 | Downgraded on independent abstract verification (LIT-03-S100/S101): dependency-visibility tooling accuracy, not a novel lineage architecture | Transparent Dependencies (Cofano PhD dissertation) | `cofano-transparent-dependencies-phd-2026` |
 | Distinct research-reproducibility sense of "artifact" (SE-research code/data sharing), not build/pipeline lineage | Understanding and improving artifact sharing in SE research | `artifact-sharing-se-research-emse2021` |
+
+## D56 — Agentic software engineering
+
+**Terminology collision, not mechanism collision**: the search term "agentic software
+engineering" (D-System's H8 domain) collides on name only with the much older (1999-2004)
+Agent-Oriented Software Engineering (AOSE) field, which uses "agent" in the multi-agent-systems
+architecture sense, not the LLM-coding-agent sense. Recorded per methodology Sec.2 as a name
+collision to note, not a reason to rename either field's usage.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchor and founding-era surveys for this domain's own name | Software Engineering for LLM-Empowered Agentic Systems; AI Agentic Programming; From LLMs to LLM-based Agents for SE | `se-llm-agentic-systems-survey-2025`; `ai-agentic-programming-survey-2025`; `llm-based-agents-for-se-survey-2024` |
+| Name collision only (see note above): "agentic software engineering" pre-dates LLM coding agents by two decades under the same name, different mechanism | Agent-Oriented Software Engineering (AOSE) | `jennings-aose-chapter-1999`; `zambonelli-omicini-aose-challenges-2004` |
+| Canonical field benchmark/evaluation vocabulary for "coding agent" capability (issue resolution), not an architecture source itself | SWE-bench: Can Language Models Resolve Real-World GitHub Issues? | `swe-bench-resolve-github-issues-2023` — recurs as D57's own evaluation-vocabulary anchor |
+| Empirical measurement of coding-agent effects on a codebase, contrasted with D-System's own untested claims of quality/traceability benefit | AI IDEs or Autonomous Agents? (velocity gains front-loaded; static-analysis warnings +18%, cognitive complexity +39%) | `ai-ides-or-autonomous-agents-msr2026` |
+| Phase-bounded context construction (H8): deliberate context preparation before agentic work begins | Mise en Place for Agentic Coding | `mise-en-place-agentic-coding-2026` — direct H8 collision candidate |
+| Knowledge-construction primitives (architecture.md Sec. "Knowledge Construction & Management") reframed as an institutional-knowledge object for agentic development | AI Skills as the Institutional Knowledge Primitive (Knowledge Activation) | `knowledge-activation-ai-skills-primitive-2026` |
+| Full development lifecycle (Idea -> ... -> Runtime Observation) applied end-to-end across the SDLC (H8, H9) | Assistance to Autonomy: SLR of Agentic AI across the SDLC | `assistance-to-autonomy-sdlc-slr-2026` |
+| Execution-unit/session model combining planning, memory and tool-use for a coding agent (H8) | HyperAgent: generalist SE agent architecture at scale | `hyperagent-generalist-se-2024` |
+| Architecture decision model spanning D-System's own primitive/component choices | A Taxonomy of Architecture Options for Foundation Model-based Agents | `fm-agent-architecture-taxonomy-2024` |
+| General survey vocabulary anchor for agent harness/system design | Survey on agent system and harness design | `agent-harness-design-survey-2026` |
