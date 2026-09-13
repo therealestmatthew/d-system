@@ -807,3 +807,26 @@ kept in preference to the vendor/consultancy commentary pages that discuss it se
 | Architecture overlap: an explicit enterprise-architecture proposal for the domain's own named ecosystem (H7) | Enterprise architecture for a digital systems engineering ecosystem | `enterprise-architecture-digital-se-ecosystem-2022` — flagged collision candidate |
 | Knowledge/decision-provenance chain inside an MBSE/acquisition framing (H7) | Knowledge integration and acquisition methodology for MBSE | `knowledge-integration-acquisition-mbse-methodology-2023` |
 | **Reprint duplicate pair, recorded rather than silently dropped**: an identical book-chapter title reissued across two Springer reference-work editions, neither individually selected as kept by the source search | Digital Twin: Key Enabler and Complement to MBSE | `digital-twin-key-enabler-mbse-2022` (2022 printing, canonical); `digital-twin-key-enabler-mbse-2023-dup` (2023 printing, dedup) |
+
+## D49 — Specification-driven development
+
+**GitHub's own spec-kit pipeline (specify → plan → tasks → implement) is the field's reference
+implementation**, and its stage sequence maps closely onto D-System's own
+Specification → Plan → Phase → Implementation lifecycle — kept and scored despite being a
+vendor/tool artifact rather than a paper, per campaign precedent for typing such material `lead`
+rather than treating it as peer-reviewed evidence. Two historical encyclopedia/book chapters
+(2002, 2005) anchor the domain's own vocabulary well before the 2020s AI-coding-agent framing;
+a 2009-granted patent shows the same specification-driven-validation idea already reduced to
+practice, pre-AI, at the project-management level.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Vocabulary-map anchors: the two historical encyclopedia/book-chapter sources predating the AI-agent framing | Specification-Driven Verification and Validation; Specification-Driven Tools and Techniques | `specification-driven-verification-validation-2005-chapter`; `specification-driven-tools-techniques-2002-encyclopedia` |
+| Prior reduction to practice of specification-driven project validation, pre-AI (anti-novelty evidence for H7) | System for measuring, controlling, and validating software development projects (US patent) | `uspto-7603653-sdd-project-validation-patent` |
+| Bidirectional artifact/spec derivation (H9) | Spec-Driven Development: from code to contract | `spec-driven-development-code-to-contract-2026` |
+| Phase-bounded, tool-implemented specify→plan→tasks→implement pipeline (H8) — the field's reference implementation | GitHub spec-kit | `github-spec-kit-oss` |
+| "Specifications as source of truth", the field's own named concept, formalized in a maintained community handbook | awesome-spec-driven-development | `github-awesome-spec-driven-development-handbook` |
+| Requirement-level attribution (H3, H9) | 4D-ARE: bridging the attribution gap in LLM agent requirements engineering | `4d-are-llm-agent-requirements-attribution-2026` |
+| Citation/evidence discipline against LLM-generated-code hallucination (H3) | Citation discipline in spec-driven development | `citation-discipline-spec-driven-development-2026` |
+| End-to-end lineage from concept through audit-ready delivery (H7) — verified via LIT-03-S065 rather than accepting the source search's characterization uncritically | Agile V: a compliance-ready framework for AI-augmented engineering | `agile-v-compliance-ready-ai-engineering-2026` — flagged collision candidate |
+| Cross-domain recurrence: the datasheet-to-code traceability-link-recovery agent already inventoried under D44 | SpecMap | `specmap-llm-agent-datasheet-code-traceability-2026-d49-recur` (duplicate of `specmap-llm-agent-datasheet-code-traceability-2026`) |
