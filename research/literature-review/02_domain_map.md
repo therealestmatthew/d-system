@@ -639,3 +639,388 @@ Adjudication is `phase-lit-04` onward's task.
 **Bears on:** H7
 
 *8 inventory rows tagged to this domain.*
+
+### D49 — Specification-driven development
+
+**Tradition.** Specification-driven development, spec-first, contract-first, spec-as-source-of-truth.
+
+**Canonical sources (inventory):**
+- `agile-v-compliance-ready-ai-engineering-2026` (3/4) — Agile V: A Compliance-Ready Framework for AI-Augmented Engineering
+- `specmap-llm-agent-datasheet-code-traceability-2026-d49-recur` (4/3) — SpecMap: Hierarchical LLM Agent for Datasheet-to-Code Traceability Link Recovery in Systems Engineering, arXiv preprint (duplicate of specma
+- `github-spec-kit-oss` (2/3) — spec-kit, GitHub repository (github/spec-kit)
+
+**Bears on:** H3, H7, H8, H9
+
+*12 inventory rows tagged to this domain.*
+
+### D50 — Executable specifications
+
+**Tradition.** Executable specification, living documentation, specification by example, acceptance-test driven.
+
+**Canonical sources (inventory):**
+- `formalising-software-requirements-llms-2025` (3/2) — Formalising Software Requirements with Large Language Models, arXiv preprint
+- `towards-traceable-test-driven-development-2009` (3/2) — Towards traceable test-driven development, IEEE TEFSE workshop, 2009
+- `atdd-model-based-test-generation-2019` (3/2) — Enhancing Acceptance Test-Driven Development with Model-Based Test Generation, IEEE QRS-C, 2019
+
+**Bears on:** H7, H9, H11
+
+*15 inventory rows tagged to this domain.*
+
+### D51 — Formal specification
+
+**Tradition.** Formal specification, formal methods, Z, TLA+, Alloy, refinement.
+
+**Canonical sources (inventory):**
+- `verispecgen-intent-aligned-formal-spec-synthesis-traceable-refinement-2026` (4/3) — Ye, Z. et al. (incl. Microsoft Research authors): Intent-aligned Formal Specification Synthesis via Traceable Refinement (VeriSpecGen), arXi
+- `oo-spec-to-implementation-formal-refinement-dissertation` (3/3) — From Object-Oriented Specification to Implementation: A Formal Refinement Methodology, PhD dissertation
+- `formal-spec-refinement-implementation-path-planning-2016` (3/3) — Formal specification, refinement, and implementation of path planning, IEEE INNOVATIONS, 2016
+
+**Bears on:** H7, H9, H10
+
+*21 inventory rows tagged to this domain.*
+
+### D52 — Behavior-driven development
+
+**Tradition.** BDD, Gherkin, given-when-then, feature files, scenario-based testing.
+
+**Canonical sources (inventory):**
+- `scenario-driven-approach-traceability-icse-2001` (3/2) — A scenario-driven approach to traceability, ICSE 2001
+- `agentic-ai-bdd-testing-llms-2025` (3/2) — Agentic AI for Behavior-Driven Development Testing Using Large Language Models, SCITEPRESS, 2025
+- `law-to-gherkin-llm-behavioral-specs-food-safety-2025` (3/2) — From Law to Gherkin: A Human-Centred Quasi-Experiment on the Quality of LLM-Generated Behavioural Specifications from Food-Safety Regulation
+
+**Bears on:** H7, H9, H11
+
+*12 inventory rows tagged to this domain.*
+
+### D53 — Software provenance
+
+**Tradition.** Software provenance, code provenance, SBOM, supply-chain provenance, SLSA.
+
+**Canonical sources (inventory):**
+- `moreau-etal-open-provenance-model-v1.1-2010` (3/3) — Moreau, L. et al.: The Open Provenance Model core specification (OPM) v1.1, Future Generation Computer Systems, 2010
+- `godfrey-understanding-software-artifact-provenance-2013` (3/2) — Godfrey, M.W.: Understanding software artifact provenance, Science of Computer Programming (invited paper, Paul Klint special issue), submit
+- `slsa-spec-v0.1-provenance` (3/2) — SLSA Provenance Predicate, slsa.dev specification v0.1
+
+**Bears on:** H2, H3, H9
+
+*12 inventory rows tagged to this domain.*
+
+### D54 — Build provenance
+
+**Tradition.** Build provenance, reproducible builds, in-toto, attestation, artifact signing.
+
+**Canonical sources (inventory):**
+- `torres-arias-etal-in-toto-farm-to-table-usenix2019` (4/3) — Torres-Arias, S., Afzali, H., Kuppusamy, T.K., Curtmola, R., Cappos, J.: in-toto: Providing farm-to-table guarantees for bits and bytes, USE
+- `kettle-attested-builds-verifiable-provenance-2026` (4/3) — Asad, A., Arko, A.: Kettle: Attested builds for verifiable software provenance, arXiv preprint, 2026
+- `sok-taxonomy-attacks-oss-supply-chains-sp2023` (3/3) — SoK: Taxonomy of Attacks on Open-Source Software Supply Chains, IEEE S&P 2023
+
+**Bears on:** H2, H3, H4, H9
+
+*6 inventory rows tagged to this domain.*
+
+### D55 — Artifact lineage
+
+**Tradition.** Artifact lineage, artifact graph, derivation chain, pipeline lineage.
+
+**Canonical sources (inventory):**
+- `omnibor-verifiable-artifact-resolution-2024` (4/3) — OmniBOR: A System for Automatic, Verifiable Artifact Resolution across Software Supply Chains, arXiv preprint, 2024
+- `omnibor-spec-repo-github-dedup` (4/3) — OmniBOR project specification repository (Artifact Identifier / Artifact Dependency Graph primary spec)
+- `kettle-attested-builds-verifiable-provenance-2026` (4/3) — Asad, A., Arko, A.: Kettle: Attested builds for verifiable software provenance, arXiv preprint, 2026
+
+**Bears on:** H2, H3, H11
+
+*14 inventory rows tagged to this domain.*
+
+### D56 — Agentic software engineering
+
+**Tradition.** Agentic software engineering, AI software agents, autonomous coding, SWE agents, agent-driven development.
+
+**Canonical sources (inventory):**
+- `mise-en-place-agentic-coding-2026` (3/3) — Mise en Place for Agentic Coding: a deliberate-preparation context-engineering methodology, arXiv preprint
+- `assistance-to-autonomy-sdlc-slr-2026` (3/3) — Assistance to Autonomy: A Systematic Literature Review of Agentic AI across the Software Development Life Cycle, arXiv preprint
+- `hyperagent-generalist-se-2024` (3/3) — HyperAgent: Generalist Software Engineering Agents to Solve Coding Tasks at Scale, arXiv preprint
+
+**Bears on:** H8, H9
+
+*13 inventory rows tagged to this domain.*
+
+### D57 — Coding-agent memory
+
+**Tradition.** Coding agent memory, repository memory, project memory, codebase knowledge persistence.
+
+**Canonical sources (inventory):**
+- `shared-organizational-memory-enterprise-coding-agents-2026` (4/3) — Shared Organizational Memory for Enterprise Coding Agents, arXiv preprint (collection/curation/consumption memory pipeline)
+- `dapi-memory-bank-oss` (4/3) — memory-bank, GitHub repository (dapi/memory-bank)
+- `inside-the-scaffold-coding-agent-taxonomy-2026` (3/3) — Inside the Scaffold: A Source-Code Taxonomy of Coding Agent Architectures, arXiv preprint
+
+**Bears on:** H8
+
+*9 inventory rows tagged to this domain.*
+
+### D58 — Cross-session coding agents
+
+**Tradition.** Cross-session agent, session persistence, context carryover, resumable agents.
+
+**Canonical sources (inventory):**
+- `reasoner-executor-synthesizer-o1-context-2026` (3/3) — Reasoner-Executor-Synthesizer: Scalable Agentic Architecture with Static O(1) Context Window, arXiv preprint
+- `active-context-compression-focus-agent-2026` (3/2) — Active Context Compression: Autonomous Memory Management in LLM Agents, arXiv preprint (the 'Focus Agent' consolidate-and-prune mechanism)
+- `drawing-on-memory-dual-trace-cross-session-2026` (3/2) — Drawing on Memory: Dual-Trace Encoding Improves Cross-Session Recall in LLM Agents, arXiv preprint
+
+**Bears on:** H2, H8
+
+*7 inventory rows tagged to this domain.*
+
+### D59 — Agent handoff
+
+**Tradition.** Agent handoff, task handoff, context transfer, delegation protocol, baton passing.
+
+**Canonical sources (inventory):**
+- `context-lineage-assurance-non-human-identities-2025` (4/3) — Context Lineage Assurance for Non-Human Identities in Critical Multi-Agent Systems, arXiv preprint
+- `a2a-protocol-spec-linux-foundation` (4/3) — Agent2Agent (A2A) Protocol specification, canonical repository (github.com/a2aproject/A2A)
+- `awcp-workspace-delegation-protocol-2026` (3/3) — AWCP: A Workspace Delegation Protocol for Deep-Engagement Collaboration across Remote Agents, arXiv preprint
+
+**Bears on:** H3, H5
+
+*8 inventory rows tagged to this domain.*
+
+### D60 — Agent checkpointing
+
+**Tradition.** Agent checkpointing, state snapshot, resumption, recovery point, workflow checkpoint.
+
+**Canonical sources (inventory):**
+- `langgraph-checkpoint-library-oss` (4/4) — LangGraph checkpoint library (github.com/langchain-ai/langgraph, libs/checkpoint)
+- `reasoning-provenance-beyond-checkpoints-2026` (4/3) — Reasoning Provenance for Autonomous AI Agents: Structured Behavioral Analytics Beyond State Checkpoints and Execution Traces, arXiv preprint
+- `resume-means-resume-conformance-contract-2026` (4/3) — Resume Means Resume: A Machine-Checked Conformance Contract for Checkpoint, Interrupt, and Resume Semantics in Workflow Persistence Layers, 
+
+**Bears on:** H2, H3, H8
+
+*8 inventory rows tagged to this domain.*
+
+### D61 — Hierarchical task networks
+
+**Tradition.** HTN, hierarchical task network, task decomposition, method decomposition.
+
+**Canonical sources (inventory):**
+- `mage-hierarchical-agent-memory-2026` (4/2) — MAGE: Memory as Agent-Guided Exploration, arXiv preprint, 2026
+- `shop2-htn-planning-system-jair-2003` (2/1) — Nau, D. et al.: SHOP2: An HTN Planning System, Journal of Artificial Intelligence Research (JAIR) 20, 2003
+- `georgievski-aiello-htn-survey-aij-2015` (2/1) — Georgievski, I., Aiello, M.: HTN planning: Overview, comparison, and beyond, Artificial Intelligence 222, 2015
+
+**Bears on:** H1, H2, H5, H11
+
+*6 inventory rows tagged to this domain.*
+
+### D62 — AI planning
+
+**Tradition.** AI planning, PDDL, plan representation, plan execution, replanning.
+
+**Canonical sources (inventory):**
+- `ghallab-nau-traverso-actors-view-position-paper-aij-2013` (3/2) — Ghallab, M., Nau, D., Traverso, P.: The Actor's View of Automated Planning and Acting: A Position Paper, Artificial Intelligence 208, 2013 -
+- `ghallab-nau-traverso-automated-planning-acting-book-2016` (3/2) — Ghallab, M., Nau, D., Traverso, P.: Automated Planning and Acting, Cambridge University Press, 2016
+- `hayashi-cho-ohsuga-planning-execution-knowledge-updates-2002` (3/2) — Hayashi, H., Cho, K., Ohsuga, A.: Integrating Planning, Action Execution, Knowledge Updates and Plan Modifications via Logic Programming, LN
+
+**Bears on:** H2, H11
+
+*7 inventory rows tagged to this domain.*
+
+### D63 — Execution monitoring
+
+**Tradition.** Execution monitoring, plan monitoring, discrepancy detection, expectation monitoring.
+
+**Canonical sources (inventory):**
+- `bounded-expectations-discrepancy-detection-gda-workshop` (4/3) — Bounded Expectations for Discrepancy Detection in Goal-Driven Autonomy, AAAI workshop paper (cdn.aaai.org/ocs/ws/ws1245/8829-38107-1-PB.pdf)
+- `execution-monitoring-tbohne-oss` (3/2) — execution_monitoring (github.com/tbohne/execution_monitoring), T. Bohne
+- `simplanner-execution-monitoring-replanning-dynamic-worlds-2001` (3/2) — SimPlanner: An Execution-Monitoring System for Replanning in Dynamic Worlds, LNCS/AI conference proceedings, 2001
+
+**Bears on:** H2, H3, H10, H11
+
+*7 inventory rows tagged to this domain.*
+
+### D64 — Verification and validation
+
+**Tradition.** V&V, verification and validation, test evidence, assurance case, safety case.
+
+**Canonical sources (inventory):**
+- `calinescu-dynamic-assurance-cases-self-adaptive-tse-2017` (4/3) — Calinescu, R. et al.: Engineering Trustworthy Self-Adaptive Software with Dynamic Assurance Cases, IEEE Transactions on Software Engineering
+- `kelly-weaver-goal-structuring-notation-2004` (4/2) — Kelly, T., Weaver, R.: The Goal Structuring Notation - A Safety Argument Notation, DSN Workshop on Assurance Cases, 2004
+- `harmonized-requirement-based-safety-assurance-argumentation-2025` (4/2) — Toward a Harmonized Approach: Requirement-based Structuring of a Safety Assurance Argumentation for Automated Vehicles, arXiv preprint, 2025
+
+**Bears on:** H9, H11
+
+*7 inventory rows tagged to this domain.*
+
+### D65 — Runtime verification
+
+**Tradition.** Runtime verification, monitor synthesis, temporal-logic monitoring, trace checking.
+
+**Canonical sources (inventory):**
+- `runtime-verification-self-adaptive-changing-requirements-2023` (4/3) — Runtime Verification of Self-Adaptive Systems with Changing Requirements, arXiv preprint, 2023
+- `calinescu-self-adaptive-quantitative-verification-runtime-cacm-2012` (4/3) — Calinescu, R. et al.: Self-adaptive software needs quantitative verification at runtime, CACM, 2012
+- `large-scale-trace-checking-mapreduce-2015` (2/1) — Efficient Large-scale Trace Checking Using MapReduce, arXiv preprint, 2015
+
+**Bears on:** H11
+
+*9 inventory rows tagged to this domain.*
+
+### D66 — Requirements monitoring
+
+**Tradition.** Requirements monitoring, requirements at runtime, awareness requirements, requirement reflection.
+
+**Canonical sources (inventory):**
+- `fickas-feather-requirements-monitoring-dynamic-environments-isre-1995` (4/3) — Fickas, S., Feather, M.S.: Requirements monitoring in dynamic environments, RE'95 (IEEE International Symposium on Requirements Engineering)
+- `souza-lapouchnian-robinson-mylopoulos-awareness-requirements-seams-2011` (4/3) — Souza, V.E.S., Lapouchnian, A., Robinson, W.N., Mylopoulos, J.: Awareness Requirements for Adaptive Systems, SEAMS 2011
+- `sawyer-bencomo-whittle-letier-requirements-reflection-icse-2010` (4/3) — Sawyer, P., Bencomo, N., Whittle, J., Letier, E.: Requirements Reflection: Requirements as Runtime Entities, ICSE 2010 NIER track
+
+**Bears on:** H11
+
+*10 inventory rows tagged to this domain.*
+
+### D67 — Observability-driven development
+
+**Tradition.** Observability-driven development, telemetry-informed development, production feedback.
+
+**Canonical sources (inventory):**
+- `event-sourced-observable-software-architectures-experience-report-2022` (4/3) — Event-sourced, observable software architectures: An experience report, Software: Practice and Experience, 2022
+- `johnson-hackystat-software-project-telemetry-ieee-software-2005` (4/2) — Johnson, P.: Improving Software Development Management through Software Project Telemetry, IEEE Software, 2005
+- `mind-the-metrics-telemetry-aware-ide-development-2025` (3/2) — Mind the Metrics: Patterns for Telemetry-Aware In-IDE AI Application Development using MCP, arXiv preprint, 2025
+
+**Bears on:** H11 (no inline H-tag in the terminology-map prose for this domain; inferred from the domain matrix framing and the rows' own content, not from a Pass-1 H-tag)
+
+*8 inventory rows tagged to this domain.*
+
+### D68 — Self-adaptive systems
+
+**Tradition.** Self-adaptive systems, adaptation logic, managed/managing system, models@runtime.
+
+**Canonical sources (inventory):**
+- `weyns-etal-forms-reference-model-taas-2012` (4/3) — Weyns, D. et al.: FORMS: Unifying Reference Model for Formal Specification of Distributed Self-Adaptive Systems, ACM Transactions on Autonom
+- `cheng-delemos-etal-self-adaptive-systems-research-roadmap-2009` (3/3) — Cheng, B.H.C., de Lemos, R. et al.: Software Engineering for Self-Adaptive Systems: A Research Roadmap, Springer LNCS 5525, 2009 (Dagstuhl S
+- `delemos-giese-etal-self-adaptive-systems-second-roadmap-2013` (3/3) — de Lemos, R., Giese, H. et al.: Software Engineering for Self-Adaptive Systems: A Second Research Roadmap, Springer LNCS 7475, 2013 (Dagstuh
+
+**Bears on:** H1, H11
+
+*7 inventory rows tagged to this domain.*
+
+### D69 — MAPE-K
+
+**Tradition.** MAPE-K, monitor-analyze-plan-execute, knowledge base loop, autonomic manager.
+
+**Canonical sources (inventory):**
+- `ibm-architectural-blueprint-autonomic-computing-whitepaper-2006` (4/4) — An Architectural Blueprint for Autonomic Computing, IBM technical white paper, 4th ed., June 2006
+- `delaiglesia-weyns-mapek-formal-templates-taas-2015` (4/3) — De la Iglesia, D.G., Weyns, D.: MAPE-K Formal Templates to Rigorously Design Behaviors for Self-Adaptive Systems, ACM Transactions on Autono
+- `arcaini-etal-modeling-analyzing-mapek-feedback-loops-seams2015` (4/3) — Arcaini, P., Camilli, M., Gargantini, A., Scandurra, P.: Modeling and Analyzing MAPE-K Feedback Loops for Self-Adaptation, SEAMS 2015
+
+**Bears on:** H2, H3, H11
+
+*6 inventory rows tagged to this domain.*
+
+### D70 — Autonomic computing
+
+**Tradition.** Autonomic computing, self-management, self-configuration, self-healing.
+
+**Canonical sources (inventory):**
+- `huebscher-mccann-survey-autonomic-computing-acm-csur-2008` (3/3) — Huebscher, M.C., McCann, J.A.: A survey of autonomic computing
+- `ganek-corbi-dawning-autonomic-computing-era-ibm-sysj-2003` (3/3) — Ganek, A.G., Corbi, T.A.: The dawning of the autonomic computing era, IBM Systems Journal, vol 42(1), 2003
+- `icac2004-policy-enablement-toolkit-autonomic-computing` (3/2) — A toolkit for policy enablement in autonomic computing, ICAC 2004
+
+**Bears on:** H11 (no inline H-tag in the terminology-map prose for this domain; inferred from the domain matrix framing and the rows' own content, not from a Pass-1 H-tag)
+
+*6 inventory rows tagged to this domain.*
+
+### D71 — Continuous requirements engineering
+
+**Tradition.** Continuous RE, just-in-time requirements, agile RE, requirements in DevOps.
+
+**Canonical sources (inventory):**
+- `oriol-etal-fame-continuous-requirements-elicitation-re2018` (4/3) — Oriol, M., Stade, M., Fotrousi, F. et al.: FAME: Supporting Continuous Requirements Elicitation by Combining User Feedback and Monitoring, R
+- `requirements-management-devops-multivocal-mapping-2023` (3/3) — Requirements management in DevOps environments: a multivocal mapping study, Requirements Engineering, Springer, 2023
+- `knauss-etal-acon-contextual-requirements-uncertainty-runtime-2016` (3/2) — Knauss, A., Damian, D., Franch, X. et al.: ACon: A learning-based approach to deal with uncertainty in contextual requirements at runtime, I
+
+**Bears on:** H9, H11
+
+*6 inventory rows tagged to this domain.*
+
+### D72 — DevOps traceability
+
+**Tradition.** DevOps traceability, CI/CD traceability, deployment traceability, release evidence.
+
+**Canonical sources (inventory):**
+- `gotel-finkelstein-traceability-problem-1994-d72-recur` (4/3) — Gotel, O.C.Z., Finkelstein, A.C.W.: An analysis of the requirements traceability problem, ICRE 1994 (duplicate of gotel-finkelstein-traceabi
+- `slsa-framework-homepage-2023` (3/3) — SLSA (Supply-chain Levels for Software Artifacts), slsa.dev
+- `sale-etal-requirement-traceability-accuracy-devops-2021` (3/3) — Sale, V.M., Thigale, S., Melinamath, B.C.: An Effective Approach for Accuracy of Requirement Traceability in DevOps, Springer, 2021
+
+**Bears on:** H7, H9 (no inline H-tag in the terminology-map prose for this domain; inferred from the domain matrix framing and the rows' own content, not from a Pass-1 H-tag)
+
+*6 inventory rows tagged to this domain.*
+
+## Top-20 collision candidate list
+
+**Status filter, decided and applied here.** The section dispatching this task names no
+`status` filter for "the inventory's `collision_candidate: yes` rows ranked by pre-scores."
+The inventory carries exactly one `collision_candidate: yes` row with `status: excluded`
+(`structured-belief-state-llm-memory-benchmark-2026-d22-recur`) — a deliberate, preserved
+cross-phase scoring disagreement (Pass 1a scored the same source `no` at D30 with identical
+pre-scores; Pass 1b scored it `yes` at D22), left unresolved for `phase-lit-04` rather than
+averaged away. Every other `excluded`/duplicate row carries `collision_candidate: no` by
+convention; the flag lives on canonical (`candidate`-status) rows. **Decision: this ranking
+includes only `status: candidate` rows.** Reason: `excluded` is a terminal state — the row has
+already been dropped from further consideration for a documented reason — so promoting an
+excluded row to a "deep-read candidate" list would contradict its own exclusion without
+adjudicating it, which is explicitly Pass 2's job, not this pass's. This also means the
+D22/D30 disagreement itself does not appear in the list below; it remains fully findable in
+the inventory for `phase-lit-04` and is not touched here. Filtering to `candidate` status
+leaves 365 eligible rows out of 366 total `collision_candidate: yes` rows.
+
+**Ranking mechanics.** Rows are ranked by `component_prescore + architecture_prescore`
+(descending), ties broken by `architecture_prescore` (descending), per the evidence contract's
+scoring rubric (`PLAN-023.03`, "Similarity scoring") as read by the coordinator's addressing
+facts. This produces two exact ties within the top 20, honestly reported rather than forced
+into an artificial order:
+
+- **Ranks 1–13** are a 13-way tie: all score `component=5, architecture=4` (sum 9). The two
+  pre-scores are identical across all 13 rows, so no further contract-defined criterion
+  separates them; they are listed in `source_id` alphabetical order, disclosed as a
+  non-evidentiary ordering convenience only.
+- **Ranks 14–20** are 7 of an 8-way tie at `component=4, architecture=4` (sum 8). All 8 rows
+  are equally eligible for rank 14; capping the list at exactly 20 (per this section's own
+  "a list of 20" requirement) forces a cut inside this tied group. The cut is made by
+  `source_id` alphabetical order — again disclosed as arbitrary, not as a scoring difference.
+  The row dropped by this cut is `zep-graphiti-temporal-kg-agent-memory-2025` (D04), which is
+  otherwise tied with ranks 14–20 and would be rank 21 under the same alphabetical convention.
+
+**Deep-read marking outcome — contract/section conflict, reported rather than resolved.** The
+evidence contract's inventory schema (`PLAN-023.03`, "Source inventory format") defines
+`status` with allowed values `candidate` / `deep_read` / `excluded` — the only field in the
+13-column schema that could carry a "this row is a deep-read candidate" mark. But the
+dispatching section is explicit that "status stays `candidate` until LIT-04 actually reads
+them," i.e. this pass may not set `status: deep_read`. The contract's only marking mechanism
+is therefore the one field the section forbids using at this stage, and no second field
+exists to carry the mark instead. Per the coordinator's addressing facts, the inventory is
+**not** edited to invent a new column or overload an existing one. This ranked list is the
+deep-read designation for this pass; `03_source_inventory.csv` is unmodified by `LIT-03 C`.
+
+| Rank | source_id | comp/arch | domain | Reason |
+|---|---|---|---|---|
+| 1 | `de-boer-architectural-knowledge-management-dissertation-2009` | 5/4 | D39 | 2009 dissertation naming "architectural knowledge vaporization" — the failure mode D-System's provenance/typed-transition claims (H2, H9) exist to prevent, described 15+ years earlier. |
+| 1 | `decision-oriented-programming-aporia-2026` | 5/4 | D42 | Aporia (2026): an AI coding agent elicits design decisions as Questions, tracks them in a persistent Decision Bank, encodes each as an executable test suite traceable to code — the strongest single collision found across the whole dispatch against H7/H8/H9 at once, published this same year. |
+| 1 | `dhar-vaidhyanathan-varma-agenticakm-2026` | 5/4 | D39 | AgenticAKM (AGENT'26 @ ICSE 2026): specialized agents for architecture Extraction/Retrieval/Generation/Validation collaborate to generate ADRs from code repositories — a direct H6/H8 collision, an explicitly agentic reframing of AKM postdating D-System's own conception. |
+| 1 | `dhar-vaidhyanathan-varma-agenticakm-2026-arxiv` | 5/4 | D39 | Same AgenticAKM paper via its canonical arXiv identifier, kept per the two-identifier-form rule rather than collapsed into the row above. |
+| 1 | `em-llm-human-inspired-episodic-memory-infinite-context-2024` | 5/4 | D23 | EM-LLM: organizes LLM context into episodic events via Bayesian-surprise plus graph-theoretic boundary refinement, retrieved via similarity-plus-temporal-contiguity modeled on human episodic recall — squarely on H5 (topology-aware context transfer). |
+| 1 | `evidence-graphs-fair-computation-defeasible-reasoning-2021` | 5/4 | D11 | Treats computational provenance itself as a defeasible argument for a result's validity, combining an evidence graph, FAIR provenance and defeasible reasoning over conflicting evidence — close to D-System's provenance-as-conflict-resolution-input hypothesis (H3). |
+| 1 | `graph-native-cognitive-memory-belief-revision-semantics-2026` | 5/4 | D07 | Proposes AGM-style formal belief-revision semantics over a graph-native, versioned, provenance-linked memory architecture for AI agents — directly overlapping D-System's state, transition and provenance models (H1/H2/H3/H5). |
+| 1 | `jansen-bosch-architecture-as-decisions-wicsa-2005` | 5/4 | D38 | The field's foundational 2004/2005 paradigm shift reframing architecture as decisions-plus-rationale rather than structure alone — direct ancestor of current ADR practice, bearing on H7/H9. |
+| 1 | `keim-kaplan-scattered-to-structured-akm-vision-2026` | 5/4 | D39 | An automated pipeline (2026) extracting architectural knowledge from heterogeneous artifacts, linking/reconciling it into a structured knowledge base for change-impact analysis and RAG-based QA — a direct, current H6/H10/H11 collision, publicly proposed the same month this campaign ran. |
+| 1 | `lineagerag-2026` | 5/4 | D24 | LineageRAG induces "Evidence Demands," expands them through graph retrieval while explicitly preserving demand-passage provenance, then grounds supported demands in source text — a near-direct implementation of D-System's evidence/provenance/lineage framing (H3, H5, H9). |
+| 1 | `log-is-the-agent-event-sourced-reactive-graphs-2026` | 5/4 | D06 | The single closest title-and-abstract match to D-System's own architecture found across the entire dispatch — event-sourced, reactive graph, auditable, forkable, agentic — against H1, H2, H6, H7 and H9. |
+| 1 | `procko-provtracer-erau-dissertation-2025` | 5/4 | D35 | ERAU doctoral dissertation building "ProvTracer" on PROV-O and the Basic Formal Ontology — a full doctoral treatment of D-System's own combination of knowledge graph + LLM + provenance + software/requirements traceability. |
+| 1 | `tgms-agent-native-bitemporal-graph-2026` | 5/4 | D05 | TGMS: an agent-native bi-temporal graph management system with validated temporal operators and trace-grounded answer checking — one of the closest single-paper matches to D-System's own bi-temporal, agent-native, evidence/trace-grounded architecture (H1, H2, H5, H6). |
+| 14 | `assumptions-management-software-development-mapping-study-2018` | 4/4 | D45 | The single most directly on-point source found for H10's "assumption" framing specifically (as opposed to change-impact-analysis's usual change/requirement-centric framing) — surfaced by D45's own mandated collision query. |
+| 14 | `ibm-architectural-blueprint-autonomic-computing-whitepaper-2006` | 4/4 | D69 | The actual origin document of the MAPE-K acronym and reference architecture — the primary source against which D-System's own control-loop terminology (H2, H11) must be checked. |
+| 14 | `langgraph-checkpoint-library-oss` | 4/4 | D60 | LangGraph's checkpoint library: thread-scoped state snapshots per superstep with pluggable serialization, human-in-the-loop and time-travel debugging — the most directly comparable production system to D-System's own phase/checkpoint claims (H8). |
+| 14 | `model-based-digital-threads-sociotechnical-systems-2022` | 4/4 | D46 | Spans the requirement-design-runtime chain named in this domain's own mandated collision query, bridging D46/D47 directly — bears on H2/H7. |
+| 14 | `omniscientist-coevolving-ecosystem-human-ai-scientists-2026` | 4/4 | D25 | Proposes a co-evolving ecosystem of human and AI scientists — a direct H6-relevant end-to-end collision candidate for D-System's integrated human-agent knowledge-evolution hypothesis. |
+| 14 | `solozobov-verify-gated-completion-admission-control-2026` | 4/4 | D26 | Introduces a packetized state model with context shaping, memory ownership rules, and decision traces for a governed multi-agent runtime — architecturally close to D-System's own state/transition/provenance framing (H1/H2). |
+| 14 | `us20250165226a1-ai-digital-thread-patent` | 4/4 | D46 | US patent application naming both "digital thread" and "digital engineering" together with an AI-assisted, code-defined thread-generation mechanism — a strong D47/D48/H7 collision. |
+
+*365 `status: candidate` rows carried `collision_candidate: yes` at the time this list was
+built; entries beyond rank 20 do not appear here, per this section's own "a list of 20"
+scope.*
