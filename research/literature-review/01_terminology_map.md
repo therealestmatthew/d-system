@@ -996,3 +996,24 @@ collision to note, not a reason to rename either field's usage.
 | Execution-unit/session model combining planning, memory and tool-use for a coding agent (H8) | HyperAgent: generalist SE agent architecture at scale | `hyperagent-generalist-se-2024` |
 | Architecture decision model spanning D-System's own primitive/component choices | A Taxonomy of Architecture Options for Foundation Model-based Agents | `fm-agent-architecture-taxonomy-2024` |
 | General survey vocabulary anchor for agent harness/system design | Survey on agent system and harness design | `agent-harness-design-survey-2026` |
+
+## D57 — Coding-agent memory
+
+This dispatch's highest cross-phase-overlap domain (H8). Phase A vocabulary discovery
+(`LIT-03-S114`) surfaced a tentative field phrase for D-System's own knowledge-promotion path --
+"local observation -> human review -> durable project rule/skill/ADR" -- but every result at that
+search was a vendor blog (leads only, protocol Sec.7); no source was kept there, so no row cites
+it. The AGENTS.md standard, pursued at `LIT-03-S121`, is the domain's most load-bearing single
+finding: this project's own `AGENTS.md`/`CLAUDE.md` working-agreement files are themselves an
+instance of the cross-vendor convention below.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| Context package / repository-level agent working agreement (this project's own `AGENTS.md`/`CLAUDE.md`) | AGENTS.md open format -- cross-vendor (OpenAI Codex, Amp, Google Jules, Cursor, Factory), Linux-Foundation-stewarded, 60k+ repositories | `agentsmd-open-standard` -- direct terminology AND mechanism collision |
+| Vocabulary-map anchor: source-code-level taxonomy of coding-agent memory/state architectures | Inside the Scaffold | `inside-the-scaffold-coding-agent-taxonomy-2026` |
+| Knowledge-construction pipeline (collect -> curate -> consume) for repository-level memory | Shared Organizational Memory for Enterprise Coding Agents | `shared-organizational-memory-enterprise-coding-agents-2026` -- strongest D57 collision candidate |
+| State model growing/evolving across the agent's working lifetime | Structured Memory (code agent grows alongside developer) | `code-agent-grow-structured-memory-2026` |
+| Knowledge-graph state representation of code/knowledge for retrieval | Codebase-Memory: Tree-Sitter-Based Knowledge Graphs via MCP | `codebase-memory-tree-sitter-kg-mcp-2026` |
+| Context package + governance/delivery flow, version-controlled | memory-bank (OSS) | `dapi-memory-bank-oss` -- direct mechanism-name collision |
+| Context package as a persistent, machine-readable specification maintaining convention-adherence at scale | Codified Context: Infrastructure for AI Agents in a Complex Codebase | `codified-context-agent-infrastructure-2026` |
+| Knowledge graph state evolving under multi-hop reasoning | EvoMemKG: An Evolvable Memory Agent for Multi-hop KG Reasoning | `evomemkg-evolvable-memory-kg-reasoning-2026` |
