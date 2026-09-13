@@ -6416,7 +6416,8 @@ items:
   - client-ready declares its arguments in frontmatter and documents them in a table.
   verification:
   - Invoke each command once in a session and record the result.
-  - Read every command definition for a write target, per REQ-008 K05.
+  - Read every command definition for a write target, per REQ-008 K03.
+  - Confirm each command is general, per REQ-008 K15.
   deliverables:
   - .claude/commands/
   next_action: Create whats-load-bearing, the command that carries the kit's central idea.
@@ -6442,7 +6443,7 @@ items:
   - Each skill's description states both its firing phrasings and its non-firing cases.
   - notes-to-commitments never invents an owner or a date, and flags unowned commitments.
   verification:
-  - Read each SKILL.md against REQ-008 K07 and K08.
+  - Read each SKILL.md against REQ-008 K05, K06 and K15.
   - Confirm each skill appears in the skill listing.
   deliverables:
   - .claude/skills/
@@ -6461,26 +6462,27 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Write five ladder rungs - floor, situation, target, audience, interview - plus the
-    anti-pattern gallery. The obstacle is not its own rung; it arrives inside the
-    interview rung as the answer to a question the model asked.
-  - Run every rung and record its real output in the file, including where the result
-    was worse than predicted. No rung is written from imagination.
-  - Ship the audience rung as a paired run against two audiences.
+  - Write five ladder rungs - floor, situation, objective, audience, interview - plus
+    the anti-pattern gallery. The human constraint is not its own rung; it arrives
+    inside the interview rung as the answer to a question the model asked.
+  - Carry no fixed worked example and no pinned output. Each rung names the ingredient
+    it adds and the change to watch for, so it runs against whatever engagement the
+    reader supplies.
+  - Direct the audience rung as a paired run against two audiences, back to back.
   - Write the anti-pattern gallery with four entries, each naming the failure, showing
     it, stating the fix in one line, and pointing at the rung or component that fixes it.
   acceptance:
   - Each rung names the single ingredient it adds over the previous rung.
-  - No rung before the interview states the human obstacle.
-  - Every rung carries the real output it produced when run.
-  - The audience rung contains two outputs, not one.
+  - No rung before the interview states a human constraint.
+  - No rung contains a fixed example or an output recorded as its own.
+  - The rungs that state an expectation say what to do when it does not hold.
   - The gallery contains no entry whose failure costs only tokens.
   verification:
-  - Read the six files in order against REQ-008 K09, K10, K11 and K12.
+  - Read the six files in order against REQ-008 K09, K10, K11, K12 and K15.
   deliverables:
   - .claude/prompts/
-  next_action: Run the floor rung and record what it actually produced, since every
-    later rung is a comparison against it.
+  next_action: Draft the floor rung, naming the kind of under-specified ask that belongs
+    there and what is wrong with what it produces.
 - id: phase-kit-04
   title: Build the kit's two agents with explicit tool lists
   plan: doc-consultant-demo-kit
@@ -6502,7 +6504,7 @@ items:
   - objection-panel declares its tool posture explicitly rather than leaving it unstated.
   - Each agent's body states what it must never do and when it stops.
   verification:
-  - Read each agent's frontmatter against REQ-008 K09.
+  - Read each agent's frontmatter and body against REQ-008 K07, K08 and K15.
   - Confirm each agent appears in the agent listing.
   deliverables:
   - .claude/agents/

@@ -18,18 +18,23 @@ Builds the 16 components `REQ-008` specifies: 6 commands, 2 skills, 6 prompts, 2
 else. The roster reached this size through a blind adversarial triage of 23 proposed entries,
 recorded on ideas `000171`-`000193`; this plan records what survived, what changed, and why.
 
-## The running scenario
+## No running scenario: every component is general
 
-One fictional company across the whole kit: a mid-size manufacturer that has acquired three
-subsidiaries and now runs three different month-end closes, consolidating onto one calendar and
-cutting the close from twelve days to five. The human obstacle is the controller at the largest
-subsidiary — long-tenured, well respected, reading standardisation as a judgement on their team.
-Their close is the slowest **and** the most accurate, which is what makes the objection real rather
-than an obstacle to be talked around.
+**No component is written against a fictional company, engagement or person.** Each one is a general
+tool a consultant can point at whatever they are actually working on. The owner supplies the real
+material at the moment of use.
 
-The scenario is the setting each component is written against. It is not a deliverable: no corpus,
-sample inputs or fixture documents are built. The owner supplies whatever an entry operates on when
-demonstrating it.
+This reverses the originating brief, which called for one running scenario used across the whole kit,
+and the reversal is the owner's on 2026-09-13. The reason is that a component welded to an invented
+situation is a demo prop rather than a reusable tool: it demonstrates well once and is worthless on
+Monday. A consultant watching a command operate on a fictional manufacturer has to translate it to
+their own work before they can judge it; a consultant watching it operate on *their* engagement does
+not.
+
+Concretely, this means no component names an industry, a company shape, a headcount, a timeline or a
+job title as its subject. Where a component needs something to work on — a draft, a set of notes, a
+recommendation — it takes it as input. Where a teaching file needs to describe a change the reader
+should look for, it describes the *kind* of change, not a specific one.
 
 ## What the triage changed
 
@@ -112,8 +117,8 @@ have; anything not listed is the builder's judgement, and anything contradicting
 - **Separates what it was told from what it inferred**, in two marked sections. Without the split a
   consultant can say it restated the input, and be right.
 - **States what would change its read** — the fact that, if true, flips the assessment.
-- Asks for the **relationship**, not just the role: someone overruled before reads standardisation
-  differently from someone who has not been.
+- Asks for the **relationship**, not just the role: someone who has been overruled before reads a
+  proposed change differently from someone who has not.
 
 **`/capture-this`** — turns what just worked into something reusable.
 
@@ -205,63 +210,66 @@ have; anything not listed is the builder's judgement, and anything contradicting
 Six files: five ladder rungs and the anti-pattern gallery. The obstacle is **not** its own rung — it
 arrives inside the interview rung, because it is no longer the presenter's move to make.
 
-Every rung file carries the **real output that rung produced**, recorded when it was run. These are
-teaching material about what actually happens, so no rung may be written from imagination; the
-builder runs each one and pastes back what came out, including when the result is worse than hoped.
+**No rung carries a fixed example, and none records a pinned output.** Each rung teaches *the
+ingredient*: what it is, why it changes the answer, and what change to look for when it lands. The
+owner supplies a real engagement and runs the ladder against it live. This is what keeps the ladder
+usable by anyone, in any session, instead of only in one rehearsed performance — and it means a rung
+cannot go stale when the model changes.
+
+The discipline the rungs replace pinned outputs with is **stating the expected change in advance**,
+so the owner can tell the room whether it happened, including when it did not.
 
 **Rung 1 — the floor.** A bare, under-specified ask.
 
-- The ask is **one the room would recognise as their own** — something a consultant would genuinely
-  type on a Monday, not a strawman. If nobody sees themselves in it, the whole ladder reads as a
-  setup.
-- **Says what is wrong with the output**, not merely that it is weak: generic advice that would fit
-  any close, any client, any year. Fluent text reads as good text, so the failure has to be named.
-- **Records the actual output.**
+- Characterises the kind of ask that belongs here — the one a consultant would genuinely type on a
+  Monday, not a strawman — so the reader recognises their own habit rather than watching a setup.
+- **Says what is wrong with the output**, not merely that it is weak: advice generic enough to fit any
+  client and any year. Fluent text reads as good text, so the failure has to be named.
 - **Names what a consultant really does next** — gives up on the tool and writes it themselves, which
   is the habit the ladder exists to interrupt.
 
-**Rung 2 — adds situation.** Three subsidiaries, three closes, one company.
+**Rung 2 — adds situation.** Who is involved, what the arrangement is, what constrains it.
 
-- **Situation only**: the twelve-day and five-day figures are held back for rung 3. The split only
-  works if this rung is disciplined about not leaking the objective.
-- **Shows the diff against rung 1**, not just the new output. The ladder teaches by comparison.
+- **Situation only**: no objective, no target figure. The split only works if this rung is disciplined
+  about not leaking the goal.
+- **Names the comparison to make** against rung 1, since the ladder teaches by difference rather than
+  by any single output.
 - **Names what the model still does not know**, which sets up the rungs that follow.
-- **Says honestly if the gain is small.** Triage predicted most of the improvement comes from the
-  target rather than the subsidiary count; if that holds when run, the file says so.
+- **Says the expected gain is modest**, and tells the owner to say so out loud if it is. Situation
+  alone usually moves the answer less than the objective does, and a ladder that oversells its second
+  rung loses the room for its third.
 
-**Rung 3 — adds the target.** Twelve days down to five.
+**Rung 3 — adds the objective.** Current state and target state.
 
-- **The objective only**: current state and target state.
-- **Shows the output becoming specific and decidable** — advice about closes in general becomes
-  advice about a seven-day gap, with tradeoffs a consultant could argue with.
-- **Tests the triage's prediction out loud.** The file states that this rung was expected to
-  outperform rung 2 and reports whether it did. A teaching file that records a prediction and its
-  result teaches more than one that only asserts.
-- **Warns that a target invites false precision**: stating a number makes the model produce confident
-  plans built on it, which is useful and is also the moment to check the number is real.
+- **The objective only.**
+- **Names the change to watch for**: advice in general becomes advice about a specific gap, with
+  tradeoffs a consultant could argue with.
+- **States the expectation that this rung outperforms rung 2**, so the owner can confirm or deny it in
+  front of the room. A teaching file that states a prediction and invites its test teaches more than
+  one that only asserts.
+- **Warns that an objective invites false precision**: stating a number makes the model produce
+  confident plans built on it, which is useful and is also the moment to check the number is real.
 
 **Rung 4 — adds the audience.** Who receives it and what they do with it.
 
-- **Ships as a paired run** — CFO memo and controller working session, same prompt, side by side. A
-  single output cannot demonstrate that audience changes form; without the pair the presenter is
-  asserting it.
+- **Run as a pair** — the same prompt against two audiences, back to back. A single output cannot
+  demonstrate that audience changes form; without the pair the owner is asserting it.
 - **Shows form changing, not only tone**: what gets led with, what is cut, what becomes an appendix.
-- **Names what the audience will do with it.** A memo for approval and a memo for information are
-  different documents, and the decision is what drives the form.
+- **Names what the audience will do with it.** A document for approval and a document for information
+  are different things, and the decision is what drives the form.
 - **Points at `/client-ready`**, so the ladder visibly feeds the component roster rather than sitting
   beside it.
 
-**Rung 5 — the interview, where the obstacle arrives.** The rung the reordering exists for.
+**Rung 5 — the interview, where the constraint arrives.** The rung the reordering exists for.
 
-- **The presenter never types the obstacle first.** The controller enters only as an answer to the
-  model's question. This is where the kit's central claim is demonstrated instead of described.
-- **Records the real question the model asked**, verbatim. If it asked something better than expected,
-  that is the record; if worse, the file says so.
-- **States the fallback** if the model asks about systems or headcount instead of people: what the
-  rung then teaches, which is weaker, and what the presenter says in that case.
-- **Shows the recommendation inverting, not merely improving** — standardise on the leanest close
-  becomes audit why the slow close is accurate and make its owner the design authority. If it only
-  becomes more polite, the file records that instead.
+- **The owner never types the human constraint first.** It enters only as an answer to the model's
+  question. This is where the kit's central claim is demonstrated instead of described.
+- **Tells the owner to hold something back** going in — a known obstacle they have deliberately not
+  stated — so there is something for the model to find. Without that, the rung cannot succeed.
+- **Names the change to watch for**: the recommendation inverting rather than merely softening. A plan
+  that routes around a person becomes a plan that makes them part of it.
+- **States the fallback** for when the model asks about systems or process instead of people: what the
+  rung then teaches, which is weaker, and what the owner says in that case.
 
 **The anti-pattern gallery.** Four entries; politeness padding is cut for costing only tokens.
 
