@@ -115,7 +115,11 @@ fix cycle.
 - **`AGENTS.md` and `CLAUDE.md` both document the catalog regeneration without the redirect that
   makes it write** (idea `000208`). Neither file was edited; that needs the owner's explicit
   approval for the specific change. Note that `.claude/skills/checkpoint/SKILL.md` already carries
-  the correct form, so the repository contradicts itself on this command.
+  the correct form, so the repository contradicts itself on this command. A second instance of the
+  same shape surfaced in this session and is annotated onto `000208`: `tools/append_idea.py` does
+  not regenerate `docs/00-working/ideas.md`, so appending `000208`–`000214` left the tree red until
+  `tools/generate_ideas_md.py` was run. Two sanctioned writers, both exiting 0, both leaving a
+  derived artifact stale, both caught only by the full test suite.
 - **The inventory and the matrix now disagree on bibliographic fact** for at least five sources, and
   the contract names no authority for `LIT-07 X3`'s validated bibliography (idea `000209`).
 - **`solozobov-verify-gated-completion-admission-control-2026` names the wrong author** in a stable

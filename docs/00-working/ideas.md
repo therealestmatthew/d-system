@@ -10395,6 +10395,16 @@ What a fix could be, none of which an agent should decide alone:
 
 Same family as [[000147]], [[000148]], [[000149]] and [[000201]]: an instrument's documented contract and its actual mechanical behaviour differ, and the gap surfaces as a silently wrong artifact rather than an error.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-13T16:55:26-04:00): Second instance in the same session, different tool, same shape. tools/append_idea.py appends to _data/ideas.jsonl but does not regenerate docs/00-working/ideas.md, which is generated output that test_ideas.py::test_the_committed_markdown_matches_regenerated_output diffs in CI. Appending 000208-000214 in phase-lit-04 therefore left the tree red until tools/generate_ideas_md.py was run (commit 79580b0). Neither the idea skill nor the tool's own output mentions the projection; the tool prints "created NNNNNN at <timestamp>" and exits 0, so nothing signals that a second command is owed. That is the same failure shape as the --catalog case this idea records: a sanctioned writer completes successfully while leaving a derived artifact stale, and only the full test suite detects it. Worth considering whether the two fixes are one fix - a writer that regenerates its own projection, or a single pre-commit hook that regenerates every derived file and fails on drift, rather than each tool growing its own follow-up step for callers to remember.
+
+</details>
+
 **Links**
 
 - relates_to → `000201`
