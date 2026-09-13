@@ -1135,3 +1135,25 @@ case paper, a cross-domain recurrence recorded rather than merged into one row.
 | Current canonical field-definition anchor (2018 RV handbook) | Introduction to Runtime Verification | `bartocci-falcone-introduction-runtime-verification-2018` |
 | Runtime-to-knowledge closure (H11): runtime-checked properties directly informing self-adaptation decisions | Self-adaptive software needs quantitative verification at runtime | `calinescu-self-adaptive-quantitative-verification-runtime-cacm-2012` -- shares an author lineage with D64's kept dynamic-assurance-case paper (`10.1109/tse.2017.2738640`); recorded as two distinct papers/rows |
 | Implementation-availability anchor for monitor synthesis, in mature production infrastructure | Linux kernel runtime-verification (rv) subsystem -- LTL/automaton specification compiled to a C monitor skeleton | `linux-kernel-rv-monitor-synthesis-subsystem` |
+
+## D66 — Requirements monitoring
+
+Fickas and Feather's 1995 paper is the field's originating paper for "requirements monitoring";
+its identifier was narratively treated as kept at `LIT-03-S215` (and referenced again as
+"confirmed"/"already kept" at `LIT-03-S219` and `LIT-03-S223`) without ever actually being
+recorded in a `kept` field anywhere in the ledger -- a genuine omission rather than a dedup,
+closed by an integrity-verification lookup logged at `LIT-03-S235` before the row below was
+written.
+
+| D-System term | Field term | Established by |
+|---|---|---|
+| "Requirements monitoring" itself, originating mechanism: monitored variables and reconciliation tactics as a control loop | Requirements monitoring in dynamic environments | `fickas-feather-requirements-monitoring-dynamic-environments-isre-1995` -- foundational paper for this whole domain |
+| "Requirements at runtime" / "awareness requirements" vocabulary, originating mechanism | Awareness Requirements for Adaptive Systems -- requirements that refer to other requirements' success/failure, evaluated at runtime | `souza-lapouchnian-robinson-mylopoulos-awareness-requirements-seams-2011` |
+| Secondary quantitative anchor for "requirements at runtime" as an established sub-field | A Thematic Study of Requirements Modeling and Analysis for Self-Adaptive Systems -- reports roughly 47% of self-adaptive-systems research treats requirements as runtime entities | `yang-cheng-whittle-thematic-study-requirements-self-adaptive-2018` |
+| "Requirements reflection" vocabulary, originating/coining paper | Requirements Reflection: Requirements as Runtime Entities | `sawyer-bencomo-whittle-letier-requirements-reflection-icse-2010` |
+| Implementation-availability anchor at the industrial/patent level for requirement-runtime monitoring | US Patent 10,394,640 -- requirement runtime monitor using temporal logic or a regular expression | `uspto-10394640-requirement-runtime-monitor-patent` |
+| Same research programme's operationalization of the founding 1995 model into an automated monitoring architecture | Automatic monitoring of software requirements | `cohen-feather-narayanaswamy-fickas-automatic-monitoring-requirements-1997` |
+| Field's own consolidating survey/state-of-field anchor | Requirements monitoring frameworks: A systematic review | `yang-ali-ghose-requirements-monitoring-frameworks-systematic-review-2016` |
+| Runtime-to-knowledge closure (H11): a requirement itself revised as a consequence of runtime monitoring outcomes ("requirement revision loop") | (Requirement) evolution requirements for adaptive systems | `requirement-evolution-requirements-adaptive-systems-seams-2012` |
+| Awareness-requirements-to-adaptation link formalized as a feedback controller | From awareness requirements to adaptive systems: A control-theoretic approach | `awareness-requirements-adaptive-systems-control-theoretic-2011` |
+| Implementation-availability anchor, deployed rule-based continuous requirements-monitoring framework | Implementing Rule-Based Monitors within a Framework for Continuous Requirements Monitoring (ReqMon) | `robinson-reqmon-rule-based-continuous-requirements-monitoring-hicss-2005` |
