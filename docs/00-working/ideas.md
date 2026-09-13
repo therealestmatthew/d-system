@@ -6973,7 +6973,7 @@ PROPOSED LINK: 000144 --relates_to--> 000124 (vocabulary work must settle termin
 
 ## 000145 · Capture alternative planning methodologies for work that does not merit a full prompt pack
 
-**Created 2026-09-12T04:23:13-04:00 · Status: `open`**
+**Created 2026-09-12T04:23:13-04:00 · Status: `triaged`**
 
 The prompt-pack protocol (GOV-008) is an eight-stage pipeline with four gates, designed for
 multi-agent code builds spanning several sessions. Two builds proved it: the live demo and the
@@ -6998,11 +6998,33 @@ the light tier to a full pack once it outgrows the smaller one.
 Raised during the idea-batching planning session; related to the prompt-pack protocol (GOV-008)
 and its methodology decision (ADR-017).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:05-04:00): This idea emerged directly from the idea-batching planning session (PROMPT-025, PROMPT-026) on 2026-09-12, when the owner observed that the full prompt-pack protocol (GOV-008) was over-engineered for documents-only analysis work with 3-5 agent dispatches.
+
+The concrete case: idea-batching work used a "light artifact set" (PROMPT-025 decision 13), collapsing GOV-008 stages 6 and 7 into the kick-off record because the build needed no worktrees, ports, browser verification, or schema gates. When that many parts of the protocol become inapplicable, the protocol itself may be the wrong instrument rather than a protocol being bent. The tension is recorded explicitly in PROMPT-026's role scope: "the tension that makes this reasonable is recorded as `000145` (alternative planning methodologies below a full prompt pack); do not attempt to resolve it here."
+
+A second example exists in the research protocol (GOV-009), which adapts GOV-008's 8-stage pipeline and gate structure for research work but replaces the standing rules with research discipline rather than code-build constraints. This suggests that the pattern of "same gates, different standing rules" may be a useful template for lighter methodologies.
+
+The idea asks what distinguishes work that merits a full pack from work that does not (dispatch count, session span, code writing, governed deliverables), which stages survive vs are dropped, whether tiers are variants of one protocol or separate documents, and whether a build can graduate from light to full.
+
+No related plan, phase or document yet exists that settles these questions. GOV-008 is the standard; GOV-009 shows one variant; PROMPT-025 shows one light deviation. The pattern is emerging but ungoverned.
+
+Related documents: GOV-008 (prompt-pack protocol), ADR-017 (methodology decision), GOV-009 (research protocol), PROMPT-025 (idea-batching pre-plan), PROMPT-026 (idea-batching pack factory).
+
+Related ideas: 000038 (formalize requirements-vs-plans process), 000046 (idea planner agent), 000047 (audit plan document quality), 000125 (holistic triage batch) — none directly overlapping but all part of the planning machinery ecosystem.
+
+</details>
+
 ---
 
 ## 000146 · SESS-2026-09-11-01 misstates the literature-review handoff note as requiring an external review before the campaign
 
-**Created 2026-09-12T07:03:03-04:00 · Status: `open`**
+**Created 2026-09-12T07:03:03-04:00 · Status: `triaged`**
 
 The session record that produced the research pack protocol (GOV-009) says, under "Left undone", that its first campaign is "the pending adversarial D-System literature review, for which research/literature-review/HANDOFF.md says external review of the codebase audit must come first". The handoff note says no such thing: its ten numbered instructions cover reading order, the seed-inventory caveat, the null hypothesis, falsifying H1-H11, not modifying the frozen baseline, recording collisions before proposing changes, and not beginning implementation. Nothing in it mentions external review, and nothing makes the codebase audit a precondition.
 
@@ -7012,11 +7034,31 @@ What it would touch: docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.
 
 What is unresolved: whether a session record should be corrected at all once written, or whether the correct treatment of a misstatement in a historical record is an appended note rather than an edit. The repository has no stated convention for amending a closed session record, and that convention question is the more general thing worth settling - this instance is just the occasion for it. The owner was asked about correcting it on 2026-09-12 and did not rule either way, so it is recorded here rather than left in conversation memory.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:06-04:00): SESS-2026-09-11-01 contains a factual error in its "Left undone" section: it states that `research/literature-review/HANDOFF.md` says "external review of the codebase audit must come first", but HANDOFF.md contains no such instruction. The ten numbered instructions cover reading order, treating the seed inventory correctly, the null hypothesis, hypothesis falsification, baseline protection, collision recording, and preventing implementation—not external review as a precondition.
+
+**Existing convention:** PLAN-018-plans-directory-consolidation explicitly names session records as historical documents that should NOT be edited after written ("Not edited — historical records describing what was true when written"). It preserves session records verbatim because they describe what was known or decided at the time, and editing them retroactively corrupts their value as historical accounts.
+
+**Owner decision already made:** The owner ruled 2026-09-12 (while ratifying PROMPT-027) that the stricter paraphrase is an error and that the adversarial codebase review is a frozen input with no precondition. PROMPT-027 records that ruling, so the campaign itself is unblocked and no downstream work depends on this correction. What remains unresolved is only the second-order governance question: what convention should apply to amending closed session records when they contain factual errors about work that follows them?
+
+The session record itself correctly records what was decided at the time. The question is whether a misstatement about an external requirement should be corrected in the historical account, or left unchanged per the existing convention that session records are immutable historical artifacts. No governing document yet addresses this; PLAN-018's rule applies to broader consolidation (document moves, not sentence-level fact-checking), and ADR-007's guidance on corrections applies to portfolio capture records (commitments, decisions, projects), not to session history.
+
+Related governed documents: PLAN-018 (session records as historical, not edited), ADR-007 (corrections edit records and log the correction—but for portfolio capture, not sessions), SESS-2026-09-11-01 (the session record itself), PROMPT-027 (the owner's ruling that the paraphrase was an error).
+
+No related idea overlaps found.
+
+</details>
+
 ---
 
 ## 000147 · Give the literature-review evidence contract a fixed identifier format for the ledger's kept column
 
-**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+**Created 2026-09-12T11:02:59-04:00 · Status: `triaged`**
 
 The evidence contract (PLAN-023.03) defines what the reproducibility ledger's `kept` column
 means but never fixes the *format* of an identifier written into it. In phase-lit-01, the
@@ -7059,9 +7101,41 @@ first real execution of the research protocol (GOV-009) surfaced.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-13T07:30:35-04:00): phase-lit-02 adds two more identifier forms to the ledger's kept column, confirming the gap is structural rather than a phase-lit-01 accident. LIT-02 S1's 96 kept identifiers use arxiv: (63), bare DOI (13), uspto: (1), pmc:PMCNNNNNNN (3), and plain URLs for the rest. pmc: appears nowhere in the inventory's prior 438 rows, and several bioRxiv URLs embed a DOI (biorxiv.org/content/10.1101/...), so the same source is representable in two sanctioned forms and the choice is the writing agent's. Neither was normalised: the gate compares the ledger's kept against the inventory's url_or_doi, so consistency between the pair beats canonical purity, and normalising is what creates the failure it appears to fix (the four semanticscholar.org rows S052/S062/S082/S093 are the standing precedent). The forms were passed forward to the extraction dispatches as addressing instead. That works and is not a fix: it makes every extraction depend on a coordinator transcribing the forms correctly, and in this phase the coordinator's relayed claims were wrong four times while the underlying evidence was sound. A further consequence surfaced at S252, where a truncated researchgate.net URL in kept failed a byte-exact match against the fuller URL the inventory already held, and needed a fix cycle.
+- **finding** by agent-idea-triage (2026-09-13T19:35:27-04:00): Idea 000147 addresses a structural gap in the evidence contract that surfaced during the first two execution sessions of the literature-review campaign (phase-lit-01 and phase-lit-02). The problem: the evidence contract (PLAN-023.03) defines the `kept` column's meaning but not the format of identifiers written into it, creating inconsistency that breaks gate measurements and compromises the campaign's trustworthiness.
+
+**Related Documents:**
+- PLAN-023.03 (evidence contract) — defines the reproducibility ledger format but lacks identifier-format rules for the `kept` and `url_or_doi` columns
+- PROMPT-029 (delegation pack) section "LIT-01 G" — specifies gate measurement 3 as "count of ledger rows whose `kept` names a source absent from the inventory" without naming which inventory column carries identifiers, leading to a measurement defect in phase-lit-01 (compared wrong column, reported 435 missing when actual was 0)
+- SESS-2026-09-12-05 (phase-lit-01 session record) — documents that four dispatches used four different identifier conventions (doi prefix, semanticscholar URL vs scheme, uspto URL vs scheme), creating 32 false gate failures; records the owner's 2026-09-12 ruling to normalize the 32 affected cells before the gate ran, which repaired that instance but did not fix the structural problem
+- SESS-2026-09-13-01 (phase-lit-02 session record) — confirms the gap persists and wider: phase-lit-02 S1 used arxiv: (63 instances), bare DOI (13), uspto: (1), pmc:PMCNNNNNNN (3), and plain URLs for the rest; notes that pmc: appears nowhere in the phase-lit-01 inventory, creating new identifier forms
+
+**Related Ideas:**
+- 000148 (source_type enum lacks patent bucket) — same batch anchor as 000147
+- 000149 (strategy_phase enum incomplete) — same batch anchor as 000147
+- 000150 (private-content check silent in worktrees) — same batch anchor as 000147
+- 000199 (collision_candidate field format not specified) — shares root cause: contract under-specifies data formats
+- 000200 (SICI DOI with semicolon in kept column) — same root cause: identifier format inconsistency creating false gate failures (phase-lit-02 S225/S228 carry a Wiley SICI DOI with a literal semicolon that breaks semicolon-separated parsing)
+- 000203 (OpenAlex mistitled/mis-DOI records) — quality issue in one of the search providers, affecting identifier reliability
+
+**Structured Gap:**
+The evidence contract's three identifier columns (`kept` in the ledger, `url_or_doi` in the inventory, and `source_id` in the matrix) lack a canonical format rule. The contract specifies the columns exist and what they hold, but not:
+1. One canonical scheme-prefixed form per provider (doi:, arxiv:, uspto:, pmc:, https://..., etc.)
+2. Whether identifiers in `kept` must exactly match `url_or_doi` or may use alternative but resolving forms
+3. How to handle providers that use multiple identifier schemes (e.g., arXiv, Zenodo DOIs, SICI DOIs with embedded semicolons)
+
+**Path to Fix:**
+The idea proposes two fixes, not mutually exclusive:
+1. PLAN-023.03 gains an identifier-format rule — one canonical scheme-prefixed form per provider, binding on both the ledger's `kept` and the inventory's `url_or_doi`
+2. Gate measurements are specified to resolve identifiers (detecting semantic equivalence) rather than string-matching
+
+Fix 1 alone is not sufficient: phase-lit-02's note that four semanticscholar.org rows (S052/S062/S082/S093) carry `semanticscholar.org/paper/...` URLs because the inventory carries those sources under the identical URL form shows that rewriting them would create the failure the normalization removed. The contract must accommodate both canonical forms and inventory-matched fallback forms for a given source.
+
+Fix 2 (measurement specification) is essential for the stop-condition gate in phase-lit-07, which computes chaining coverage from `subject_source_id` the same way and inherits the same under-specification.
+
+No related plan, phase or document beyond PLAN-023.03 and its dependent delegation pack (PROMPT-029) has been found.
 
 </details>
 
@@ -7079,7 +7153,7 @@ first real execution of the research protocol (GOV-009) surfaced.
 
 ## 000148 · The literature-review evidence contract's source_type enum has no bucket for a patent
 
-**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+**Created 2026-09-12T11:02:59-04:00 · Status: `triaged`**
 
 The evidence contract (PLAN-023.03) fixes the source inventory's `source_type` to
 standard / peer-reviewed / conference / preprint / OSS / tech report / lead. Phase-lit-01
@@ -7101,6 +7175,22 @@ stay as `tech report` until the contract changes and they are migrated deliberat
 Found by the coordinator of phase-lit-01, the first real execution of the research protocol
 (GOV-009).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:23-04:00): **Related to ongoing literature-review campaign work.** The evidence contract (PLAN-023.03) defines the `source_type` enum used in the source inventory and evidence matrix. Phase-lit-01's execution (SESS-2026-09-12-05) identified three granted patents (USPTO 11544323, 4918621, 11481658) as genuine prior art, but they were filed under "tech report" — the closest available value — because "patent" is not an enum option. The contract's current enum is: standard / peer-reviewed / conference / preprint / OSS / tech report / lead.
+
+The idea correctly identifies that a granted patent has different evidentiary character than a technical report and deserves its own value in the enum. The campaign is building an anti-novelty case, and patents are among the strongest evidence for H0 (that D-System is a recombination of known ideas), because a granted claim is a dated, examined assertion that a mechanism was already known.
+
+**Related idea found:** 000147 (parent issue about contract amendments), 000149 (similar enum gap for `strategy_phase`), 000150 (private-content check defect).
+
+**No promotion candidate.** The fix is identified but not delivered — it requires an amendment to PLAN-023.03, and the idea itself notes that "no agent may edit a ratified contract to make its own data fit," so the amendment is deferred until the contract is intentionally revised. The work is proceeding: phase-lit-04 (deep reading, now active) feeds into the evidence matrix creation, which will need the corrected contract.
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
@@ -7109,7 +7199,7 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 
 ## 000149 · The literature-review ledger's strategy_phase enum has no value for bibliographic verification
 
-**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+**Created 2026-09-12T11:02:59-04:00 · Status: `triaged`**
 
 The evidence contract (PLAN-023.03) fixes the reproducibility ledger's `strategy_phase` to
 A vocabulary / B backward chain / C forward chain / D system search / E collision, mirroring the
@@ -7134,6 +7224,22 @@ deep reading will generate many more verification lookups per source than Pass 1
 Found by the coordinator of phase-lit-01, the first real execution of the research protocol
 (GOV-009).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:34-04:00): The issue is concrete and already surfaced in phase-lit-01's execution (SESS-2026-09-12-05): the evidence contract (PLAN-023.03) defines `strategy_phase` with five values (A vocabulary, B backward chain, C forward chain, D system search, E collision) for search operations that discover new sources. It has no value for verification lookups — operations that confirm details about sources already kept, such as publication year, venue, authorship, or whether a ResearchGate posting is peer-reviewed.
+
+Phase-lit-01 ran 16 verification lookups and logged them under D (system search) as the closest available fit, with the mismatch noted in the session record. This matters for measurement: the ledger's row counts are used to compute "how thoroughly was this domain searched," and verification rows that find nothing new inflate that count, distorting the metric the ledger exists to support.
+
+The idea proposes adding a sixth value (V verification, or similar) and requiring that gate measurements of search breadth exclude verification rows from their row counts. The timing is practical: phase-lit-02 has already been dispatched and is running (SESS-2026-09-13-01); phase-lit-03 is next. But deep reading in phase-lit-04 and beyond will generate many more verification lookups per source than Pass 1, and the enum should be settled before Pass 2 begins.
+
+Related issues are anchored on idea 000147 (the root issue: the evidence contract has no fixed identifier format for the `kept` column, which causes cascading under-specifications in its vocabulary fields). Ideas 000148, 000149, 000150, 000197, 000199, 000200, 000202, and 000203 all relate to gaps in PLAN-023.03's specification that surfaced during phase-lit-01's real execution. No existing plan or requirement addresses updating the contract; the fix belongs in a contract amendment that PLAN-023 should absorb or that a new plan should govern.
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
@@ -7142,7 +7248,7 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 
 ## 000150 · The private-content check silently does nothing in a worktree, because _private is gitignored
 
-**Created 2026-09-12T11:02:59-04:00 · Status: `open`**
+**Created 2026-09-12T11:02:59-04:00 · Status: `triaged`**
 
 `tools/check_no_private_content.py` has two halves: a path check that always runs, and a
 content check that runs only when `_private/portfolio/` exists on disk. `_private/` is
@@ -7185,9 +7291,23 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-12T11:11:09-04:00): Sharpened by peer session d-system-ff on 2026-09-12. The defect is that the tool fails silently rather than loudly: the only signal separating a real run from a vacuous one is the identifier count inside its own OK line, which is easy to read past, and the exit code is 0 either way. A worktree run is the common case rather than the exception, because AGENTS.md requires a worktree whenever any peer holds an active claim. So the fix belongs in the tool rather than in every caller's vigilance - a check that cannot verify should exit non-zero and say so instead of printing OK. Correction to how this finding was first reported: the coordinator of phase-lit-01 told that peer its close review had recorded a worktree run as a passing verification. That was false. SESS-2026-09-12-04 line 47 records 31 identifiers checked from the primary checkout, and the coordinator had already read that line before asserting otherwise.
+- **finding** by agent-idea-triage (2026-09-13T19:35:25-04:00): Verified issue raised during phase-lit-01's first real execution of the research protocol (GOV-009). The content check in `tools/check_no_private_content.py` has two independent checks: a path check (always runs) and a content check (runs only when `_private/portfolio/` exists). Since `_private/` is gitignored, it exists in the primary checkout but never in a worktree.
+
+When run in a worktree, the tool prints "note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)" and exits 0 with "OK (0 identifiers checked)". An agent reading this output could record it as a passing verification when actually the content check—the critical half that catches real identifier leaks—was skipped. The danger scales with long-lived branches (like `agent/lit-campaign`, used across six phases with two integrations to dev): work written in such branches accumulates without full content verification until the first integration.
+
+Related documents:
+- **OPS-009** (Enforce the no-private-content boundary) — operational spec for the tool; lines 39-43 explicitly note the content check runs only where `_private/portfolio/` exists
+- **PLAN-006** (Separate structure from content before the first remote push) — the plan that created the tool in phase-priv-04 as the enforceable half of the content/structure boundary
+- **ADR-009** (The structure/content boundary and where the portfolio lives) — the decision justifying why content check works only on the owner's machine
+- **AGENTS.md** — warns about running the check with changes staged (lines 60-64), not about worktrees
+- **Backlog context** — the lit-campaign integrations show the pattern: "check_no_private_content in the primary checkout reported 31 identifiers checked", confirming the check runs fully only there
+
+The owner ruled on 2026-09-12 to accept the gap for the current campaign and rely on integration-time checking; this idea proposes three durable fixes, none yet implemented: (1) add `--root` or `--identifiers-from` argument to point the tool at the primary checkout's identifier list, (2) make the skipped check non-silent (exit non-zero or print an unforgettable warning), or (3) document in AGENTS.md that worktree runs are not a verification.
+
+Idea 000147 (literature-review evidence contract identifier format) is already linked as relates_to and addresses a separate issue surfaced in the same phase.
 
 </details>
 
@@ -7199,7 +7319,7 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 
 ## 000151 · Revisit the claim system, whose lock table only works because every agent shares one primary checkout
 
-**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+**Created 2026-09-12T11:25:43-04:00 · Status: `triaged`**
 
 The owner directed this on 2026-09-12: "we definitely need to revisit this claim system," and separately, "when we deploy an MCP solution we'll look into using that as a substitution because it will not rely on whatever the main checkout is."
 
@@ -7210,6 +7330,37 @@ Why MCP is the owner's candidate substitute: a service that owns claims does not
 What it would touch: ADR-003 (the accepted worktree-and-lock-table concurrency decision), AGENTS.md's three concurrent-agent sections, `src/governance/backlog.py` (the collision validator that reads the lock table), and GOV-003 where the accepted decisions are recorded. Any replacement has to preserve what the current design gets right: the lock is inspectable by a human with no tooling, it survives a crashed agent because it is a committed file, and its validator already catches system, deliverable-path and dependency-chain overlap.
 
 What is unresolved, and worth settling before any replacement is designed: whether a service-held claim can keep the crash-survivability of a committed file (a process holding a lock in memory is strictly worse than a commit when the process dies — see idea 000025 on abandoned claims); whether the owner still wants to be able to read the lock state from a file without running anything; and whether the primary-checkout dependency is actually the problem or merely where the problem becomes visible, since the deeper constraint is that any lock must be readable by every agent before it starts work, and a shared file is the cheapest thing that satisfies that.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:09-04:00): Finding: Structural tension in the concurrent-agent coordination design
+
+The idea identifies a real tension between two governing decisions:
+
+- ADR-003 mandates worktree isolation: each agent claims a phase, works on `agent/<phase-id>` in its own worktree at `../d-system-worktrees/<phase-id>`, and integrates back to `dev`.
+- GOV-003's 2026-09-12 decision (recorded in its "Every session works in a worktree" section) extends worktree isolation to all sessions, including documentation-only ones, because the risk is branch corruption, not virtualenv conflicts.
+
+The contradiction: the lock mechanism that makes concurrent agents safe is `docs/09-backlog/backlog.yaml` on `dev` in the primary checkout. Claiming a phase requires committing to `dev` there; validating disjoint declarations requires reading the lock table from the primary checkout. Every agent's first and last steps are in the primary checkout, the same shared resource the worktree rule was designed to eliminate.
+
+ADR-003 names this explicitly (Section "Safety rule"): "the claim is serialized through `dev` rather than held on the agent's own branch, [because] two agents cannot both believe they hold the same work." The mechanism is sound, but it depends on every agent being able to reach the same `dev` in the same primary checkout.
+
+Unresolved questions from the idea, worth settling before any replacement is designed:
+
+1. Can a service-held claim (as MCP could provide per 000020) keep the crash-survivability of a committed file? (A process holding a lock in memory is strictly worse than a commit when the process dies — see 000025 on abandoned claims.)
+2. Does the owner still want to be able to read the lock state from a file without running tooling?
+3. Is the primary-checkout dependency actually the root problem, or only where a deeper constraint (every agent must read the lock before starting) becomes visible?
+
+Related ideas already recorded: 000020 (MCP-mediated multi-agent coordination), 000025 (abandoned claims), 000152 (registry of active worktrees), and 000168 (expanded claim and responsibility system). The last two explicitly relate to this one and address complementary angles — worktree discovery and multi-agent queuing — that would need to coexist with any claim-system redesign.
+
+Governing documents touched: ADR-003 (the concurrent-agent decision), AGENTS.md (the concurrent-agent protocol sections), GOV-003 (where the worktree isolation decision was ratified), src/governance/backlog.py (the validator reading the lock table).
+
+No related plan or requirement document found that covers the claim-system revisit on its own. Idea 000020 (MCP) is broader and could absorb this work as part of a larger infrastructure change, but the issue is distinct enough that the owner's ask to revisit it separately is justified.
+
+</details>
 
 **Links**
 
@@ -7222,7 +7373,7 @@ What is unresolved, and worth settling before any replacement is designed: wheth
 
 ## 000152 · A registry of active worktrees that agents must register in before starting work and deregister from when finished
 
-**Created 2026-09-12T11:25:43-04:00 · Status: `open`**
+**Created 2026-09-12T11:25:43-04:00 · Status: `triaged`**
 
 The owner directed this on 2026-09-12, while ratifying the rule that every session works in a worktree except for the claim-system operations that must happen in the primary checkout. The ask, in the owner's framing: "we need to make sure that we have a running list of active worktrees and that agents are required to register their worktrees in that list before beginning any work. That way there's no ambiguity about it, and they would be required to deregister when they finish their work."
 
@@ -7234,6 +7385,40 @@ What it would touch: probably a tracked registry file in the shape of `_tmpagent
 
 What is unresolved: whether the registry is a new file or a field on the existing phase claim, given that a claim already names an agent and a phase and the worktree path is derivable from the phase id by AGENTS.md's own naming convention — in which case the registry may be redundant with the claim for phase work and only genuinely new for sessions that work without claiming one. Also unresolved: what enforces deregistration, since the failure mode this shares with idea 000025 (abandoned claims) is an agent that stops without cleaning up, and a registry with no staleness signal inherits exactly that problem rather than solving it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:32-04:00): The idea proposes a worktree registry to make active worktree status explicitly visible and require agents to register/deregister, addressing ambiguity that cost time on 2026-09-12 when two concurrent sessions could not reliably determine where each other was working.
+
+**Existing related work:**
+
+`ADR-003` (Worktree-isolated concurrent agents) justifies the current worktree design but does not address worktree discovery or registration. `AGENTS.md`'s "Concurrent agents: work in a worktree" section describes the worktree setup procedure (add, branch, venv, rebuild) but not registration before work or deregistration at hand-off. `_tmpagent/AGENTS.md` already establishes a similar `claims.jsonl` ledger for tracking file claims across worktrees using a `(file, kind, ref)` lifecycle (claimed/released), and the idea correctly identifies this as a candidate vehicle for the worktree registry.
+
+**Relationship to linked ideas:**
+
+000151 (Revisit the claim system) covers the structural problem that the lock table depends on a shared primary checkout, and proposes MCP as a candidate replacement. 000152 would be a narrower fix within the current architecture — making worktree presence visible without replacing the claim system. 000025 (No recovery procedure for abandoned claims) names the same failure mode this idea calls out: an agent that stops without cleanup leaves the registry in an ambiguous state, and "a registry with no staleness signal inherits exactly that problem rather than solving it." The idea itself acknowledges this unresolved tension.
+
+**Unresolved constraints the idea names:**
+
+1. Registry shape: new file or extension of the existing phase claim record? The idea notes that `worktree path is derivable from the phase id by AGENTS.md's own naming convention`, raising whether the registry would be redundant with the claim for phase-based work.
+
+2. Staleness detection: what enforces deregistration, and how is an abandoned registration detected? The idea marks this as shared with idea 000025 and unresolved.
+
+3. Scope boundary: should it track only phase-based sessions (those with a claim in `backlog.yaml`) or also unclaimed sessions working on one-off documentation or fixes?
+
+**Existing implementation status:**
+
+No governed plan or backlog phase exists for building this registry. The _tmpagent/claims.jsonl file exists but is currently empty.
+
+**Candidate link:**
+
+000041 (Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work) addresses the same coordination problem from the angle of detecting and preventing collisions during work, while 000152 addresses making agent presence visible and durable. Both were triggered by the same incidents on 2026-09-12. This could be `relates_to` if the owner judges the two approaches as independent refinements to the same underlying problem.
+
+</details>
+
 **Links**
 
 - relates_to → `000151`
@@ -7244,7 +7429,7 @@ What is unresolved: whether the registry is a new file or a field on the existin
 
 ## 000153 · The session hand-off protocol is now described in three places and drifts between them
 
-**Created 2026-09-12T14:47:02-04:00 · Status: `open`**
+**Created 2026-09-12T14:47:02-04:00 · Status: `triaged`**
 
 AGENTS.md's three "Concurrent agents" sections, .claude/commands/session-start.md and
 .claude/commands/session-close.md each describe part of the claim-work-hand-off sequence.
@@ -7267,6 +7452,24 @@ AGENTS.md's, or whether the duplication is accepted with a named owner for recon
 option is obviously right — the commands exist partly because AGENTS.md prose is not an ordered
 procedure a session can execute.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:20-04:00): Idea 000153 names a real drift problem: the session hand-off protocol is described in three places — AGENTS.md's three "Concurrent agents" sections, `.claude/commands/session-start.md` and `.claude/commands/session-close.md` — and past fixes updating one location without the others have created stale inconsistencies. The idea cites commit 0bbcf60 (which resolved two contradictions within AGENTS.md alone) and c80e23e (manual reconciliation between AGENTS.md and the commands) as evidence that this is a recurring failure mode. CLAUDE.md itself names this failure mode: "Duplicating a fact means owning its drift," citing the no-remote rule as an example that sat stale in two files.
+
+The idea proposes three options: (1) have the commands cite AGENTS.md section by section instead of restating the protocol; (2) add a check to assert that ordered steps match AGENTS.md's; or (3) accept the duplication with a named owner for reconciling it.
+
+PLAN-008-session-lifecycle-protocols.md addresses this directly. Its Phase 2 (lines 92–95) proposes the first option: "Keep each one a pointer to the authoritative document rather than a copy of its rules — the same discipline `CLAUDE.md` follows — so the entry points cannot drift from `AGENTS.md` and the governance documents." PLAN-008 is currently draft status with no backlog phases active, but it explicitly contemplates and proposes the same solution this idea surfaces.
+
+Idea 000154 ("A check for unreleased _tmpagent claims, now that the hand-off carries another convention-only rule") is already linked as relates_to->000153 and addresses the hand-off protocol's convention-only rules, which touches one aspect of the problem space.
+
+The duplication is real, the document locations are as named, and the drift is documented in commit history. The owned decision is among the three options the idea lays out.
+
+</details>
+
 **Links**
 
 - relates_to ← `000154`
@@ -7275,7 +7478,7 @@ procedure a session can execute.
 
 ## 000154 · A check for unreleased _tmpagent claims, now that the hand-off carries another convention-only rule
 
-**Created 2026-09-12T14:47:02-04:00 · Status: `open`**
+**Created 2026-09-12T14:47:02-04:00 · Status: `triaged`**
 
 _tmpagent/AGENTS.md states plainly that its contract is "enforced by convention, not by a check" —
 no test reads claims.jsonl and no validator fails on it — and that this is deliberate while the
@@ -7299,6 +7502,26 @@ non-zero, or a report surfaced by --inventory or the orient skill. The contract'
 a check, but making an unreleased claim red would block integration on a ledger no test has ever
 validated, so the first version may want to be a report.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:35:35-04:00): **Overlap with related ideas and governed documents**
+
+Idea 000154 proposes adding a validation check for unreleased _tmpagent claims, motivated by a convention that has now appeared in three places: AGENTS.md, .claude/commands/session-start.md, and the contract in _tmpagent/AGENTS.md itself. The check it describes is derivable from rules already documented, detecting when a claimed branch no longer exists — a permanent blocker on file deletion.
+
+Related to idea 000153 (the session hand-off protocol documentation drift). Idea 000153 flags that the hand-off sequence is now described in AGENTS.md, .claude/commands/session-start.md, and .claude/commands/session-close.md with manual reconciliation needed between them. Idea 000154's proposed check directly addresses the deliverable that makes that reconciliation necessary in the first place: enforcing the convention that agents must release claims before finishing.
+
+Governed context: PLAN-015 (Ephemeral working plans and the working directory) explicitly foresaw this check. The plan states _tmpagent's contract is "enforced by convention, not by a check, which is a deliberate choice at one file and a debt if the directory grows. The failure mode to watch for is a ledger that stops matching reality; the fix then is a check, not a stricter rule." That warning was written before the 2026-09-12 amendment that added the release requirement to AGENTS.md (commit 0bbcf60) and session-start.md (commit c80e23e). The new convention has triggered the exact condition PLAN-015 warned about.
+
+No check currently reads claims.jsonl in src/governance/ or elsewhere. The open question the idea itself raises — whether this becomes a governance failure that exits non-zero, or a report surfaced by --inventory or the orient skill — aligns with PLAN-015's note that "making an unreleased claim red would block integration on a ledger no test has ever validated, so the first version may want to be a report."
+
+PROPOSED LINK: 000154 --relates_to--> 000153 (both address the hand-off protocol; 000153 flags documentation drift, 000154 proposes enforcement that would eliminate the need for drift)
+
+</details>
+
 **Links**
 
 - relates_to → `000153`
@@ -7309,7 +7532,7 @@ validated, so the first version may want to be a report.
 
 ## 000155 · GOV-006 points agents at append_idea.py directly, which leaves the tree red until the generator runs
 
-**Created 2026-09-12T14:54:24-04:00 · Status: `open`**
+**Created 2026-09-12T14:54:24-04:00 · Status: `triaged`**
 
 docs/00-working/ideas.md is generated from _data/ideas.jsonl and committed, and
 test_the_committed_markdown_matches_regenerated_output diffs the two. Appending an idea therefore
@@ -7334,6 +7557,22 @@ so); have GOV-006 name the regeneration alongside the tool; or point GOV-006 at 
 command stay the single sanctioned path, which conflicts with GOV-006 applying to agents in every
 context, including ones with no slash commands.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:37:28-04:00): The idea accurately identifies a gap between the capture rule and its implementation. GOV-006 directs agents to "record it at once through the sanctioned idea writer (tools/append_idea.py)", but calling that tool alone leaves the repository with a red test suite until tools/generate_ideas_md.py runs — test_the_committed_markdown_matches_regenerated_output in test/test_ideas.py will fail because docs/00-working/ideas.md becomes stale.
+
+This became visible on 2026-09-12 when appending 000153 and 000154 left "1 failed, 577 passed" on a branch whose only real change was a memory file. The slash commands (/.claude/commands/idea.md and /idea-triage.md) both contain workarounds on lines 91-92 of each file, running the generator and governance check as part of their procedure — so they stay green. But an agent following GOV-006's instruction literally without invoking /idea hands a red tree to whoever integrates next.
+
+The problem lives at the boundary between three governing documents: ADR-010 (which states writes go through append_idea.py), PLAN-016 (which specifies the writer and generator as separate tools), and GOV-006 (which names only the writer). The idea proposes three options — coupling the generator into the tool itself, naming the regeneration in GOV-006, or pointing GOV-006 at the /idea command instead — none obviously right because each trades one coupling or constraint for another.
+
+This is a governance coordination issue, not a missing feature; no code is undelivered. The remedy is a decision about which layer (tool, guidance document, or slash command) owns ensuring the tree stays green after an append.
+
+</details>
+
 **Links**
 
 - relates_to → `000154`
@@ -7342,7 +7581,7 @@ context, including ones with no slash commands.
 
 ## 000156 · A version-control request queue, with one triage agent owning the primary checkout and dev
 
-**Created 2026-09-12T17:44:21-04:00 · Status: `open`**
+**Created 2026-09-12T17:44:21-04:00 · Status: `triaged`**
 
 When MCP and shared-state logic are in place, no agent should act directly on the primary checkout
 or the dev branch. Instead every agent files a request into a version-control queue, and a single
@@ -7377,6 +7616,24 @@ is invoked per request; what happens to a request whose branch goes stale while 
 the owner's integration approval is requested by the triage agent or still by the agent that did the
 work.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:37:42-04:00): 000156 proposes a serializing version-control request queue with a dedicated triage agent handling all git operations (dev/main writes, PR management, integrations) on behalf of other agents, replacing the current convention-based coordination.
+
+**Related to existing work:** The idea directly addresses the race-condition incidents documented in GOV-003's concurrency-collisions table (2026-09-12 and 2026-09-13), where two distinct agents appended to dev or ideas.jsonl simultaneously without detection, and a peer's integration mid-session blocked a merge attempt with --ff-only. ADR-003 documents the current multi-agent concurrency design, which coordinates through convention-based backlog.yaml locking and _tmpagent/claims.jsonl (enforced by convention with no mechanical check, per _tmpagent/AGENTS.md). PLAN-015 names the current worktree isolation requirement and the primary-checkout boundary.
+
+000156's existing links (relates_to->000154, relates_to->000066) capture related concerns: 000154 proposes a check for unreleased _tmpagent claims (the nearest existing mechanism, per 000156's own text), and 000066 proposes protecting main with PRs from dev, which 000156 describes as either subsumed or sitting in front of a request queue. Ideas 000160 (MCP tool surface: read-only direct access / write through a chokepoint) and 000168 (expand the claim and responsibility system with per-worktree agent queues and orchestrator handoff) are already linked to 000156 and represent overlapping infrastructure concerns.
+
+The idea is well-scoped but leaves five open questions: whether the queue serialises only dev/main writes or every git operation; whether the triage agent runs continuously or per-request; what happens to stale branches while queued; whether integration approval is still requested by the working agent or by the triage agent; and whether MCP implementation is a hard prerequisite (the idea says "When MCP and shared-state logic are in place").
+
+No related plan, requirement, or decision document implements the queue itself — ADR-003 and the current protocol stand; GOV-003 records the incidents that motivate this change, but no governed document proposes or builds the solution yet.
+
+</details>
+
 **Links**
 
 - relates_to → `000154`
@@ -7388,7 +7645,7 @@ work.
 
 ## 000157 · Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
 
-**Created 2026-09-12T20:37:28-04:00 · Status: `open`**
+**Created 2026-09-12T20:37:28-04:00 · Status: `triaged`**
 
 Owner ask, 2026-09-12, at the close of SESS-2026-09-12-06. Written up in full at docs/00-working/handoff-demo-cut-and-batching-pack.md; this idea exists so the queue surfaces it rather than relying on anyone remembering.
 
@@ -7404,7 +7661,7 @@ Everything the owner ruled on is done and merged. What remains is three items, n
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-pack-factory (2026-09-12T20:37:44-04:00): Item 2.4 of the handoff, now CLOSED rather than outstanding. Recorded because the reasoning outlives the fix.
 
@@ -7415,6 +7672,21 @@ Half the pack's reasoning survived and half did not. The analysts R1-R4 and the 
 OWNER RULING, 2026-09-12: read PROMPT-025's "must not carry worktree setup" constraint NARROWLY, as scoping to the dispatches rather than to the session, and amend no ratified decision. The constraint never contemplated the session's own checkout.
 
 Applied in the same session: PROMPT-032's scoping paragraph now reads "no per-dispatch worktree setup" and states why the dispatches need none while the session does; PROMPT-032's K section gains a step 1 creating and entering the worktree, with the remaining steps renumbered; and PROMPT-033's kick-off paragraph carries the same instruction. GOV-008 stage 5 therefore audits a corrected pack rather than rediscovering this.
+- **finding** by agent-idea-triage (2026-09-13T19:37:34-04:00): Three post-build hygiene items following SESS-2026-09-12-06. All documented in the session handoff (docs/00-working/handoff-demo-cut-and-batching-pack.md) and none blocking.
+
+Item 1 (GOV-008 stage 5): The idea-batching prompt pack has been manufactured and independently reviewed against 21 conditions, with one defect found and fixed. Stage 5 — the second adversarial audit specified in GOV-008 — has not yet run. No analyst may be dispatched before that audit and owner approval complete.
+
+Item 2 (private-content check): tools/check_no_private_content.py ran path-only throughout SESS-2026-09-12-06 because _private/portfolio/ does not exist in the agent worktree (it is gitignored). Consequently 0 identifiers were checked. The check needs re-running in an environment where the portfolio exists (primary checkout), per the phase-wb-10 precedent. This connects to a broader structural issue: the tool silently passes by not looking whenever run in a worktree, which is now every agent session after the worktree-everywhere rule landed (000150, 000195). The phase-lit-01 coordinator already encountered and worked around this with a symlink.
+
+Item 3 (worktree cleanup): Remove /code/d-system-worktrees/demo-cut-pack-factory once the branch is merged. It holds 1.7MB of gitignored corpora at _working/idea-corpus/ that regenerate exactly with `uv run python tools/build_idea_corpus.py --seed 20260912`, so nothing needs preservation.
+
+The session also surfaced an idea-id collision (000158): two different ideas were both allocated 000153 during parallel development on unmerged branches, the same race document codes already experience but with no guard against silent merging. The collision was resolved by renumbering; that idea documents the guard gaps.
+
+Related documents: GOV-008 (prompt pack protocol, stages 1-8); OPS-015 (build idea corpus tool); PLAN-006 (confidentiality sweep, which defines the private-content check); REQ-008 (demo kit, which requires the check to pass).
+
+PROPOSED LINK: 000157 --relates_to--> 000150 (both address the private-content check's structural blind spot in worktrees)
+PROPOSED LINK: 000157 --relates_to--> 000195 (both address the private-content check's structural blind spot in worktrees)
+PROPOSED LINK: 000157 --relates_to--> 000158 (discovered together in the same session's integration; 000158 documents the id-collision guard gap)
 
 </details>
 
@@ -7426,7 +7698,7 @@ Applied in the same session: PROMPT-032's scoping paragraph now reads "no per-di
 
 ## 000158 · Idea ids collide across branches exactly like document codes, but nothing catches it
 
-**Created 2026-09-12T20:37:28-04:00 · Status: `open`**
+**Created 2026-09-12T20:37:28-04:00 · Status: `triaged`**
 
 Found 2026-09-12 during the integration of SESS-2026-09-12-06. Two different ideas were both allocated 000153: that session's hand-off idea, created 12:16:28 on an unintegrated branch, and a peer session's "The session hand-off protocol is now described in three places and drifts between them", created 14:47:02 and committed to dev. tools/append_idea.py allocates the next id by reading _data/ideas.jsonl, and the peer's session read a log that did not contain the first idea because it had not been merged yet.
 
@@ -7442,7 +7714,7 @@ Relates to 000152 (a registry of active worktrees) and 000151 (the claim system'
 
 
 <details>
-<summary>3 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-pack-factory (2026-09-13T07:27:13-04:00): THE RACE RECURRED WITHIN THE HOUR, and the second instance is worse than the first.
 
@@ -7457,6 +7729,17 @@ Second, and more important: THIS COLLISION DID NOT PRODUCE A GIT CONFLICT IN THE
 The practical consequence is that the frequency estimate in the original text was wrong, and understated. This is not a rare race that "just bit once". It bit twice in under twenty-four hours, in a repository with a handful of concurrent sessions, and the second time it was caught only because a human-directed integration happened to reset the branch rather than merge it.
 - **finding** by agent-lit (2026-09-13T07:30:49-04:00): The race fired twice inside one session, on 2026-09-13, and the second firing landed on the ids allocated to fix the first. Occurrence one: this session allocated 000156-000160 on the unintegrated branch agent/lit-campaign while two peer commits allocated 000156-000194 on dev; all five collided. Resolved per 1a4dd1b's procedure - the three idea commits were dropped during the rebase rather than hand-edited, and all five were re-appended through the writer as 000195-000199. Occurrence two, roughly eight minutes later: a peer allocated 000195 on dev while that renumbering was being committed, so the freshly renumbered 000195 collided immediately and the whole set was dropped and re-appended again as 000196-000200. Three observations the first record could not make. First, renumbering is not a fix but a retry, and it loses to a peer that is still allocating - each cycle costs a rebase, five re-appends, three re-links, two re-annotations and an edit to every document citing the old ids. Second, the recovery is lossy in a way that is easy to miss: an annotation this session had placed on 000147 was destroyed with the dropped commits both times and had to be reconstructed from the transcript, which a fresh session could not have done. Third, both occurrences were caught only because git happened to conflict; the peer and this session also annotated this very idea independently within minutes of each other, and those two annotations merged cleanly precisely because append-only logs are designed to. The same mechanism that makes annotations safe to merge is what would make two created events for one id merge silently. An allocator that reserved against the remote, or a validator rejecting a duplicate created event the way document codes are rejected, prevents all of this; renumbering after the fact does not.
 - **finding** by agent-idea-batching (2026-09-13T19:30:58-04:00): Fired again on 2026-09-13, during the idea-batching build's integration - and this time it was NOT silent, which contradicts the characterisation in GOV-003's row for the earlier firing that same day. This session appended four ideas and received 000201-000204; the lit-campaign peer appended three to dev in the same window and also received 000201-000203. Unlike the instance recorded as producing no git conflict, this one conflicted loudly in both _data/ideas.jsonl and the generated docs/00-working/ideas.md, and git rebase stopped on it. So detectability is inconsistent across firings: sometimes the append-only log merges cleanly and folds two unrelated created events under one id, sometimes it conflicts and stops the rebase. A guard cannot rely on the conflict surfacing. What decides which happens appears to be whether the two appends touch adjacent trailing lines of the file, which is a function of timing rather than of anything either agent controls. Resolution needed no new judgement: brain/procedures/yield-and-renumber-a-collided-identifier.md already carried the rule, it was followed as written, and it worked - the colliding commit was dropped with git rebase --skip and the four ideas re-appended as 000204-000207 from the writer's own output. Recording the recurrence here rather than as a fourth GOV-003 row, because resolving it required no choice, and no new procedure, because the existing one needed no change.
+- **finding** by agent-idea-triage (2026-09-13T19:37:54-04:00): The race has fired three confirmed times in approximately 48 hours (2026-09-12 through 2026-09-13), and its assessment is now formally captured in three artifacts.
+
+First, the recovery procedure: `brain/procedures/yield-and-renumber-a-collided-identifier.md` documents the rule (agents integrating second yield and renumber) and the concrete recovery steps (never hand-edit the log, drop your own events, re-append through the writer, re-apply annotations, grep for and update every reference, regenerate derived views). The rule itself is drawn by analogy from document codes (which are protected in `AGENTS.md`); idea ids have the same race and no written rule until this procedure was filed.
+
+Second, the governance record: `GOV-003-backlog-decisions.md`'s Concurrency collisions table now carries three rows — 2026-09-12 (000153 collision), 2026-09-13 first occurrence (000159-000194 batch collision), and 2026-09-13 second occurrence (000201-000204 collision) — documenting the pattern, the window expansion (first was hours, second was within one day; exposure scales with batch size), and the detection inconsistency (sometimes git conflicts and stops the rebase, sometimes merges silently). GOV-003's final row explicitly names this idea as owning the guard work: "The silent-merge path itself remains unguarded; `000158` still owns that work."
+
+Third, the deferred decision: `PLAN-010-code-reservation-enforcement.md` addresses document codes, which have a guard (duplicate codes raise a governance error via `tools/check_governance.py`). Idea ids have no equivalent plan. PLAN-010 allocates codes from a reserved register in `codes.yaml`, preventing the race at the source. The idea's own body identifies three candidate approaches for ids: a post-hoc governance check rejecting any id with more than one created event; a reserved-register allocator matching PLAN-010's model; or a content-addressed or event-addressed id removing the sequence race entirely. No selection has been made and no plan drafted.
+
+The practical standing: the yield-and-renumber procedure works and three instances were recovered via its steps. The silent-merge path — where the log takes both append-only additions cleanly and fold() produces one idea with two unrelated created events — remains undetected without a guard. An annotation written against a silently-merged id lands on whichever idea wins the fold, which is the misdirected-write failure that `phase-idea-10` defends against for a different cause (subagent confusion). A collision that produces a git conflict is the lucky case, not the normal one — detection depends on whether the two appends touch adjacent lines.
+
+No related plan, phase or backlog item found proposing a fix. `000158` is currently the sole ownership record for guarding the silent-merge path.
 
 </details>
 
@@ -7469,7 +7752,7 @@ The practical consequence is that the frequency estimate in the original text wa
 
 ## 000159 · Should an agent read files directly, or only call MCP tools — and what makes the answer enforceable
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 The question is whether an agent working in this repository should ever open a file itself, or
 whether every read and write should go through an MCP layer that owns the responsibility. The owner's
@@ -7503,6 +7786,25 @@ checkout, hooks that already block paths regardless of what a tool wants, and th
 Related: 000020 proposes the MCP server itself, and 000014 covers the hooks and settings.json audit.
 The MCP tool surface and the enforcement harness are linked sibling ideas captured alongside this one.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:37:53-04:00): Idea 000159 asks a foundational architectural question about agent tool access: should agents read files directly or only through MCP tools, and what enforcement mechanisms make such a policy stick.
+
+The idea is already correctly linked to the four most directly related ideas: 000020 (MCP server for multi-agent coordination), 000160 (MCP tool surface specification), 000165 (enforcement harness to make violations impossible, not just forbidden), and 000014 (hooks for enforcement).
+
+Two additional ideas merit proposing as links: 000051 (Agent harness and guardrails) is an umbrella for enforcement mechanisms (hooks, settings.json, test gating) and directly addresses the question of "what makes the answer enforceable"; 000031 (Capability and approval broker) proposes narrow capability sets and approval routing for sensitive actions, addressing the enforcement gap at the tool boundary that 000159 identifies.
+
+No related plan, ADR, or backlog phase yet exists that formally decides this question or establishes the policy. AGENTS.md contains many standing rules about agent behavior (claiming phases, worktree isolation, what files agents may edit) but does not yet address whether agents read files directly or must route reads through a service, nor does it establish tool allowlists or capability restrictions. The question remains open for decision despite the related infrastructure (ideas, previous ADRs on governance and concurrency, AGENTS.md's framework) being substantially in place.
+
+PROPOSED LINK: 000159 --relates_to--> 000051 (umbrella for the enforcement mechanisms the question depends on)
+PROPOSED LINK: 000159 --relates_to--> 000031 (approval and capability broker, enforces what agents can do at the tool boundary)
+
+</details>
+
 **Links**
 
 - relates_to → `000160`
@@ -7514,7 +7816,7 @@ The MCP tool surface and the enforcement harness are linked sibling ideas captur
 
 ## 000160 · The MCP tool surface: read-only direct access to files, every write through a mediating chokepoint
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 If agents stop reaching for files directly, something must exist for them to call instead. This idea
 enumerates that surface, distinct from 000020, which proposes the server as a multi-agent
@@ -7547,6 +7849,38 @@ without stating it means the fallback silently becomes the norm.
 Related: 000020 (the server and Librarian context service), 000156 (version-control queue), 000151
 (claim system), 000043 through 000045 (documentation, graph and vector database tooling).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:38:05-04:00): 000160 specifies the MCP tool surface that would support the MCP-mediated coordination architecture described in 000020. The idea enumerates which operations agents would route through the service (document fetch by id/path, search, phase operations, idea fold, backlog query, worktree registry, session-record access) and emphasizes the importance of return-shape contracts that carry provenance and freshness metadata. It also addresses the write-path decision: which writes route through MCP tools vs. which remain git operations.
+
+Related existing and in-progress work:
+
+- **Idea 000159** ("Should an agent read files directly, or only call MCP tools") — the foundational question; that idea's body explicitly names 000160 as a "linked sibling idea" and discusses the enforcement constraints that would make a blended direct-read-plus-MCP model hold.
+
+- **Idea 000165** ("The enforcement harness: make a violation impossible rather than forbid") — describes how deterministic hooks, tool allowlists, and MCP-side authorization would enforce which operations are permitted, complementary to 000160's specification of what operations are available.
+
+- **Idea 000156** ("A version-control request queue") — 000160 mentions this as addressing the write-path decision: which writes route through tools and which remain git operations.
+
+- **Idea 000151** ("Revisit the claim system") — 000160 mentions this in connection with how the write path's decision connects to the claim system redesign MCP would enable.
+
+- **PLAN-001** ("Agent Memory System") — describes The Librarian retrieval router, which is one of the components 000020 proposes and 000160 would provide tools for. Phase-mem-07 and phase-mem-08 are cited in 000160 for the retrieval-hint work on return-shape contracts with provenance and freshness metadata.
+
+- **PLAN-020** ("Portable agent workflows") — establishes workflow authority classification (agent-invocable, owner-invocable, read-only), which shapes what a tool surface must constrain.
+
+- **ADR-003** ("Worktree-isolated concurrent agents") — describes the current multi-agent coordination model that 000160's MCP tool surface would enhance or potentially revise.
+
+- **docs/00-working/gemini-knowledge-retrieval-mcp-design.md** — exploratory document distinguishing retrieval-over-MCP (recommended: read-only server for searching documents and memories) from coordination-over-MCP (not recommended: using MCP instead of file-based locking). 000160's scope is broader than retrieval alone; it encompasses the full agent-facing tool surface.
+
+No related plan, requirement or decision document found that already specifies the MCP tool surface 000160 proposes.
+
+PROPOSED LINK: 000160 --relates_to--> 000159 (foundational question about direct file reads vs. MCP mediation; 000159 explicitly names 000160 as a sibling idea)
+
+</details>
+
 **Links**
 
 - extends → `000020`
@@ -7558,7 +7892,7 @@ Related: 000020 (the server and Librarian context service), 000156 (version-cont
 
 ## 000161 · An ingestion pipeline that takes repository artifacts into the knowledge base
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 What turns the material this repository already holds into retrievable knowledge. PLAN-001 specifies
 the intake half of this for memories — Chronicle extraction, candidate batches, validation,
@@ -7592,6 +7926,27 @@ MCP deployment.
 Related: PLAN-001 (agent memory system), 000043 (documentation database), 000004 (vector and
 semantic retrieval), 000068 (scouting research/ for uncaptured material).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:38:09-04:00): Idea 000161 proposes a general ingestion pipeline for repository artifacts that complements and extends PLAN-001's agent memory system.
+
+Related work found:
+
+PLAN-001 (agent memory system) specifies Chronicle (session extraction), Vault Scribe (intake and validation), and the Librarian (retrieval), with implementation across phase-mem-02 through phase-mem-06. Phase-mem-16 establishes the embedding cache and invalidation contracts using stable identity via content hashes. However, PLAN-001 addresses intake narrowly: Chronicle is task-specific to session transcripts and hands off to Vault Scribe for validation. The idea's ask is distinct and broader—it calls for treatment rules differentiating sources (docs/ ingested wholesale, others summarised or indexed by reference), units and stable identity for knowledge, idempotency, change detection, and explicit relationship to Chronicle rather than replacement. This is a parent-level design that would inform both the memory system and the broader knowledge architecture.
+
+Linked ideas 000162 (append-only event log for knowledge state), 000166 (one-time migration to MCP-held knowledge), and 000043 (documentation database) all touch overlapping ground: 000162 proposes the pattern for recording state changes; 000166 addresses the migration and governance regression the idea separates out; 000043 narrows the scope to documentation front matter only. Ideas 000163 (knowledge classification axes) and 000164 (memory buckets) propose scope and classification schemes that would be shaped by the ingestion pipeline's design. No existing plan or document specifies the full ingestion pipeline for heterogeneous repository artifacts the idea describes.
+
+Governance regression pass and one-time migration are correctly called out as non-negotiable and separate (linked idea 000166), distinct from the pipeline design itself.
+
+PROPOSED LINK: 000161 --relates_to--> 000163 (knowledge classification axes should be informed by ingestion design)
+PROPOSED LINK: 000161 --relates_to--> 000164 (memory bucket precedence rules depend on ingestion scope decisions)
+
+</details>
+
 **Links**
 
 - relates_to → `000162`
@@ -7602,7 +7957,7 @@ semantic retrieval), 000068 (scouting research/ for uncaptured material).
 
 ## 000162 · An append-only event log for knowledge state: creation, transition, deprecation and pruning
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 Knowledge state should be recorded as events and folded into current state, never written as current
 state. This repository already runs the pattern twice — _data/ideas.jsonl and _tmpagent/claims.jsonl
@@ -7634,6 +7989,26 @@ relationships between knowledge states.
 Related: 000018 (tagging and classification for ideas, currently deferred), PLAN-001's pruning gate
 (phase-mem-11 through phase-mem-13), and 000032 (evidence-backed provenance graph).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:38:06-04:00): PLAN-016 (Idea record system) directly implements an append-only event log for ideas with events `created`, `status`, `revisited`, and `amended` — the core infrastructure this idea asks for. PLAN-017.03 details the event contract and amendment semantics. The idea notes the pattern already exists twice in the repository (`_data/ideas.jsonl` and `_tmpagent/claims.jsonl` per PLAN-015), but proposes generalizing it with a broader vocabulary: deprecation, supersession, pruning, and reinstatement as typed events.
+
+PLAN-001's memory system addresses pruning through phases phase-mem-12 and phase-mem-13 (create and apply pruning proposals), but as an approval-gated proposal flow, not as an append-only event. The idea argues that pruning as an event makes deletion reversible and auditable, with approval attached to the event rather than living in a proposal document.
+
+Related idea 000163 covers classification axes and weighting for retrieval across knowledge state — the companion layer that drives what the log's classification signals should carry. The idea's concern about long-horizon relevance in a growing log is exactly the problem 000163 tackles.
+
+PLAN-023 (literature review campaign) lists event sourcing as a research domain (D06), including "event sourced knowledge graph state transition provenance," which overlaps the technical terrain but appears aimed at informing the design rather than delivering it.
+
+The overlap with PLAN-016 is real and material: both are about event logs, but PLAN-016 is ideas-specific and does not address schema evolution, deprecation or broader knowledge state. The idea proposes the vocabulary and mechanics that would generalize the pattern to other knowledge types (memories, decisions, documents) where state changes but immutability and auditability matter. The scope difference is whether this is ideas-only or a reusable architecture.
+
+Related: 000163 (classification axes), 000018 (tagging for ideas, deferred), 000032 (evidence-backed provenance graph).
+
+</details>
+
 **Links**
 
 - relates_to → `000163`
@@ -7645,7 +8020,7 @@ Related: 000018 (tagging and classification for ideas, currently deferred), PLAN
 
 ## 000163 · Knowledge classification axes — ontological, epistemic, temporal — and the weighting that drives retrieval
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 Classification is only worth carrying if it changes what retrieval returns. This idea defines the
 axes and the algorithms that consume them.
@@ -7681,6 +8056,49 @@ sibling idea.
 Related: 000002, 000004, 000005, 000040, 000044, 000018, and PLAN-001's split between classification
 tags and retrieval-hint tags.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:38:14-04:00): ## Triage Finding: 000163
+
+### Summary
+Idea 000163 proposes defining three orthogonal classification axes (ontological, epistemic, temporal) and the weighting algorithms that apply them to drive knowledge retrieval. The axes are intended to be testable: each must demonstrably change retrieval results, or it is decoration.
+
+### Governed Document Overlap
+
+**PLAN-023 (literature review campaign)**: The campaign is actively researching knowledge representation frameworks explicitly covering these exact dimensions. The scope document identifies ontological/epistemic/temporal classification as a core hypothesis (H1: "Multi-dimensional state model — Orthogonal ontological + epistemic + lifecycle classifications for knowledge states"). Phase-lit-01 completed; phases 02-04 are running and will deliver the terminology map and collision analysis that 000167 identifies as a prerequisite blocking 000163's design decisions. This is the "ongoing adversarial literature review" the idea cites as a dependency.
+
+**PLAN-001 (agent memory system)**: Defines the retrieval architecture and Librarian agent that would consume the classification axes and weighting scheme 000163 proposes. It currently implements deterministic and semantic layers but does not yet define the ontological, epistemic, or temporal classification axes that would become first-class filters and ranking signals in the retrieval pipeline.
+
+**REQ-006 or equivalent**: A requirement document formalizing what it means for an axis to "change retrieval" — the testability criterion the idea emphasizes — may exist but was not located.
+
+### Related Ideas
+
+**000061 (classify idea nodes by ontological, epistemic, and lifecycle type)**: Proposes using the same three orthogonal axes — ontological, epistemic, and temporal/execution — to classify idea graph nodes structurally, enabling risk analysis and advanced traversal (e.g., "every Strategic Directive resting on an Assumption rather than an Axiom"). This is a specific application of the same classification framework at the idea-node level, whereas 000163 applies it to broader knowledge representation (decisions, test results, parked ideas). Both explicitly state that axis-based classification enables system intelligence beyond flat tagging. The ideas are not duplicates — 000061 focuses on structural type systems for graph queries; 000163 focuses on weighting and retrieval ranking. However, they are working from the same foundational premise.
+
+**000002 (prioritised search order for agentic knowledge retrieval)**: Already linked as extends. Foundational to the retrieval-ordering idea.
+
+**000004 (vector databases, agentic RAG, and semantic plus deterministic search)**: Already linked as relates_to. Describes the semantic and deterministic layering that 000163 builds on with additional axis-based weighting.
+
+**000167 (knowledge-architecture design depends on the adversarial literature review)**: Already linked as relates_to. Explicitly records that 000163's design decisions wait on PLAN-023's collision scoring, source inventory, and terminology map.
+
+### Findings
+
+- The idea sits at an intersection: PLAN-023 is currently researching the foundational knowledge representation frameworks; PLAN-001 is designing the retrieval architecture that would apply them; 000061 is proposing a parallel application of the same axes to idea-graph nodes. 000163's contribution is to formalize how those axes drive weighting and retrieval ranking.
+
+- The "testability criterion" (each axis must change results, or it is decoration) is well-stated but design-neutral — no plan, requirement, or ADR yet specifies what metric proves an axis is earning its keep. A follow-up phase might include measurement and validation.
+
+- No other plan, document, or phase currently claims to own the definition of the ontological, epistemic, temporal axes themselves. PLAN-023 is researching terminology; 000163 is proposing application to retrieval. Who writes the canonical axis definitions (e.g., what distinguishes an "axiom" from an "assumption" operationally) is unresolved.
+
+- The temporal graph / DAG modeling mentioned (supersession chains, derivation edges, validity intervals) is substantial design work not yet detailed. The relationship to 000005 and 000044's graph-database exploration, and to 000162's append-only knowledge event log, will become clearer once PLAN-023 reports.
+
+PROPOSED LINK: 000163 --relates_to--> 000061 (both propose orthogonal ontological, epistemic, and temporal axes for classifying knowledge, but applied at different scopes: 000163 at retrieval weighting, 000061 at idea-graph node types)
+
+</details>
+
 **Links**
 
 - extends → `000002`
@@ -7693,7 +8111,7 @@ tags and retrieval-hint tags.
 
 ## 000164 · Memory buckets: repo, project, category and global, with precedence and promotion rules
 
-**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:26-04:00 · Status: `triaged`**
 
 PLAN-001 gives every memory a scope of global, project or session. That is one axis and it is not
 enough once knowledge spans several repositories and several subject categories.
@@ -7720,6 +8138,51 @@ Related: PLAN-001 (scope field, Vault Scribe intake, open question four), 000018
 classification), and the knowledge event log and classification-axes ideas captured with this one.
 An adjacent expansion of the agent claim and worktree system is a separate linked idea.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:38:04-04:00): ## Finding: Memory buckets and scope extension
+
+Idea 000164 tackles four specific design questions left open by PLAN-001 (Agent Memory System) — the plan establishes three fixed memory scopes (global, project, session) but explicitly defers "Memory promotion — how does a scope: session memory get promoted to scope: global? Who initiates, and on what cadence?" as open question four. This idea settles that question and extends the scope model to handle additional organizational dimensions (repository-specific and category-tagged knowledge).
+
+### Relationship to governed documents
+
+**PLAN-001 (Agent Memory System)** — Line 509 names "Memory promotion" as an open question the plan leaves unanswered. PLAN-001 specifies scope assignment in Vault Scribe's intake process (lines 61–64) but provides no rules for scope transition or precedence when buckets conflict. This idea is the direct design answer to that gap. The promotion-and-demotion section directly references PLAN-001's open question four.
+
+**ADR-001 (File-based governance)** — Lines 24–25 distinguish "repository-scope `project: d-system`" as a special case within PLAN-001's three-scope model, retaining the existing memory IDs and provenance. This idea extends that distinction by proposing repo and category as independent organizational dimensions, which would require refining how repository-scope memories are stored and merged with other scopes.
+
+### Relationship to other ideas
+
+**000163 (Knowledge classification axes)** — Proposes classification axes (ontological, epistemic, temporal) for memory retrieval ranking. Orthogonal to 000164: classification determines *how well* and *what kind* of memory is retrieved; bucketing (000164) determines *where* it lives and which version wins when buckets conflict. Both are cited in 000164's body ("classification-axes ideas captured with this one"). The two concerns could be implemented together — classify by axis, organize by bucket.
+
+**000162 (Append-only event log for knowledge)** — Proposes recording knowledge state transitions (creation, deprecation, pruning) as events and folding into current state, mirroring the ideas.jsonl and claims.jsonl patterns. Directly supports 000164's proposal that "moving a memory between buckets...should be an event" rather than a file operation (line 24).
+
+**000018 (Tagging and plan-mapping)** — Focused on retroactive tagging of ideas and linking to plans. Cited in 000164's related items but distinct from scope/bucket organization — tagging refines retrieval within a bucket, while bucketing determines precedence across buckets.
+
+**000168 (Expand claim and responsibility system)** — About worktree lifecycle and per-worktree agent queues. Currently linked in 000164 but appears less directly related; the body references "an adjacent expansion of the agent claim and worktree system" as separate.
+
+### Design challenges named
+
+The idea clearly articulates four design choices that PLAN-001 deferred:
+
+1. **Dimension vs. enumeration** — Whether repo and category extend the single scope field (more complex to validate) or become independent metadata dimensions alongside scope (more expressive, clearer semantics).
+2. **Precedence and conflict** — When a repo-level memory contradicts a global one, which wins? Surfacing conflicts buys resolution opportunity but costs retrieval noise.
+3. **Promotion mechanics** — The cadence, initiator, and criteria for promoting session→project→global (or repo-scoped→global).
+4. **Storage layout** — Metadata on flat storage (supports event-based transitions) vs. directory structure (simpler to hand-manage, harder to transition).
+
+No existing governed plan or requirement settles these questions. PLAN-001 acknowledges them; this idea supplies the design.
+
+### Proposed links
+
+The existing links (relates_to->000163, relates_to->000018) capture the complementary ideas. The link to 000168 (worktree expansion) is less clear — the idea body mentions it as "adjacent" but separate. Leaving that link as-is since it may reflect design coupling not yet explained in the body.
+
+No promotion to a governed document is indicated — this is a design idea awaiting a plan, not a delivered feature.
+
+</details>
+
 **Links**
 
 - relates_to → `000163`
@@ -7730,7 +8193,7 @@ An adjacent expansion of the agent claim and worktree system is a separate linke
 
 ## 000165 · The enforcement harness: make a violation impossible rather than forbidden
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 Every rule in AGENTS.md, CLAUDE.md and the governance documents is advisory. An agent follows them
 because it read them and chose to. The owner's requirement is different in kind: for the rules that
@@ -7764,6 +8227,33 @@ is a natural home for the general case.
 Related: 000014 (hooks and settings.json audit), 000031 (capability and approval broker for agent
 actions), 000051 (agent harness and guardrails), 000156 (version-control queue).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:09-04:00): Idea 000165 proposes a coherent design for strengthening enforcement mechanisms across the agent system — moving from "rules the agent remembers" to "capabilities the agent physically cannot bypass."
+
+The idea correctly identifies three control points with different strengths: hooks (deterministic but block even approved actions), per-agent tool allowlist (stronger because it removes capability entirely), and MCP-side authorization (probabilistic but can apply semantic judgment). The evidence from 2026-09-12 showing hooks successfully blocking writes to AGENTS.md and CLAUDE.md, even with owner approval, is concrete and motivating.
+
+The repository already carries partial implementations:
+- PLAN-006 (Separate structure from content, status: complete) uses the confidentiality check approach — "a rule that only lives in `.gitignore` protects against accident, not against `git add -f`. The check is what makes the boundary enforceable." The `tools/check_no_private_content.py` and pre-commit hook are working examples of this enforcement model.
+- `brain/procedures/hook-blocked-writes-hand-off-a-candidate.md` documents the exact sanctioned handoff route the idea proposes for when the owner approves something the harness forbids — a proven workflow from a 2026-09-12 session.
+- ADR-003 (Multi-agent concurrency) explicitly identifies the gap: "no validator can detect [violations of declarations] before the diff exists — it remains a review responsibility," which is exactly what 000165 wants to solve.
+- 000156 (version-control request queue) is already identified in the idea as a natural home for the general case of sanctioned request routes.
+
+Related ideas already linked (000014, 000031, 000051) cover specific mechanisms. Two additional ideas are closely related:
+- 000159 asks the foundational question: "Should an agent read files directly, or only call MCP tools — and what makes the answer enforceable?" This is about the enforcement layer itself.
+- 000160 proposes "The MCP tool surface: read-only direct access to files, every write through a mediating chokepoint" — the implementation of the strongest control point (per-agent tool allowlist) that the idea names.
+
+The idea is a design framework that connects existing partial implementations and proposes how to extend them systematically. It is not yet a plan or requirement, and no single governed document yet says "here is how we enforce rules mechanically across the system."
+
+PROPOSED LINK: 000165 --relates_to--> 000159 (both address enforceability of rules; 000159 asks what makes enforcement possible, 000165 proposes the mechanism)
+PROPOSED LINK: 000165 --relates_to--> 000160 (both about mediating writes through a chokepoint; 000160 is the MCP implementation of the tool allowlist layer 000165 names)
+
+</details>
+
 **Links**
 
 - relates_to → `000014`
@@ -7777,7 +8267,7 @@ actions), 000051 (agent harness and guardrails), 000156 (version-control queue).
 
 ## 000166 · The one-time migration to MCP-held knowledge, with a mandatory governance regression pass
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 When MCP is deployed, existing content has to move, and the owner's position is that this migration
 plan is critical, essential and non-negotiable — without it the cutover produces significant
@@ -7807,6 +8297,36 @@ Related: 000020 (the MCP server), the ingestion pipeline idea captured alongside
 in a worktree — an example of a check that passes by not looking, which is the failure class this
 pass exists to catch).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:23-04:00): Idea 000166 addresses a distinct and critical piece of work: the one-time migration of existing knowledge to MCP-held storage, plus the mandatory governance regression pass that must verify all checks, tests, tools, and commands continue to function correctly under the new arrangement.
+
+**Related ideas:**
+- 000020 (MCP-mediated multi-agent coordination) is the foundational work this migration depends on; the idea properly captures this relationship.
+- 000021 (no backup or disaster-recovery plan) captures a related risk: the migration itself needs cutover and rollback strategy, which this idea explicitly addresses.
+- 000150 (the private-content check silently does nothing in a worktree) is cited in the body as an example of "a check that passes by not looking" — exactly the failure class a governance regression pass exists to catch.
+- 000161 (ingestion pipeline for repository artifacts) explicitly states in its body: "The one-time migration that brings existing content across, and the governance regression pass it requires, are captured as a separate linked idea because the owner rated that work non-negotiable at MCP deployment." This relationship is recorded in the fold (000161 relates_to 000166), but 000166 currently links only to 000020 and 000021.
+
+**Governed documents:**
+No existing plan or phase covers MCP migration or governance regression pass. The work is entirely future-directed: no promoted plan `PLAN-NNN-mcp-migration` or backlog phase exists.
+
+**Governance checks at risk:**
+The idea correctly identifies specific tools and commands that assume files in known locations and will fail or produce silent breakage if inputs move to MCP without re-verification:
+- `src/governance` (the validation command)
+- `tools/generate_catalog.py` (and its drift test)
+- `tools/check_no_private_content.py` (already cited as broken in worktrees per 000150)
+- `tools/generate_ideas_md.py` (referenced in PLAN-016 as generated from ideas.jsonl)
+
+The idea captures a real and necessary constraint: moving content to MCP without this pass risks exactly the kind of silent breakage (checks that pass by not running, tools that skip their checks, missing coverage) that the owner explicitly guards against.
+
+PROPOSED LINK: 000166 --relates_to--> 000161 (ingestion pipeline explicitly calls out this migration as separate critical work at MCP deployment)
+
+</details>
+
 **Links**
 
 - relates_to → `000020`
@@ -7817,7 +8337,7 @@ pass exists to catch).
 
 ## 000167 · The knowledge-architecture design depends on the adversarial literature review now running
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 The weighting, schema and classification decisions in the knowledge-architecture idea set should not
 be settled before the adversarial literature-review campaign reports. This records that dependency
@@ -7848,6 +8368,31 @@ the whole set.
 Related: 000068 (scouting research/ for uncaptured material), the campaign's own phases
 (phase-lit-01 onward) and its prompt pack (PROMPT-029 through PROMPT-031).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:25-04:00): This idea records a critical sequencing constraint within the knowledge-architecture design work: the weighting, schema, and classification decisions must wait for specific deliverables from the adversarial literature-review campaign (PLAN-023) before being settled.
+
+The three specific outputs that feed the design are: (1) the terminology map (capturing vocabulary the knowledge event log needs, extracted against prior art to avoid parallel reinvention); (2) the source inventory and domain map; and (3) the collision scoring against each hypothesis. The terminology map is highlighted as most immediately relevant—the state and transition vocabulary for the knowledge event log is exactly the kind of term the campaign is already systematizing. The idea ties this to H0, the campaign's hypothesis that D-System is primarily a recombination of known ideas: if H0 holds, the right architecture is to adopt prior art deliberately (named, cited, matched to source) rather than invent, which changes not just credit but failure-mode inheritance and known break conditions.
+
+The idea also explicitly carves out what is NOT blocked: the enforcement harness (idea 000165 or related), the MCP tool surface (000160), and the migration and regression pass (000166) are independent and can proceed in parallel.
+
+Related governance:
+- PLAN-023 (Adversarial literature-review campaign — overview) is the campaign itself; the campaign delivers the terminology map as deliverable 01 from phase-lit-03, and collision scoring appears in the evidence matrix from phase-lit-05.
+- 000163 (Knowledge classification axes — ontological, epistemic, temporal — and the weighting that drives retrieval) is the directly dependent idea and already links to 000167 via relates_to.
+- 000162 (An append-only event log for knowledge state) is part of the blocked knowledge-architecture set; the idea explicitly states "the knowledge event log's vocabulary... all wait on the campaign's recorded collisions."
+- 000161 (An ingestion pipeline) and 000164 (Memory buckets) are also part of the knowledge-architecture set and depend on the classification axes and terminology that the campaign will supply.
+- 000068 (Scout research/) is already linked; the idea calls this the campaign's own phases (phase-lit-01 onward) and prompt pack (PROMPT-029 through PROMPT-031, the delegation pack).
+
+The idea is not itself asking for something to be built—it is a dependency note for the planning phase, making explicit a constraint that otherwise might be discovered only after design commitments are made. It is well-integrated into the governance record: PLAN-023 already exists in draft, the phases are queued in the backlog, and the prompts are in place.
+
+PROPOSED LINK: 000162 --relates_to--> 000167 (the knowledge event log's vocabulary and schema depend on the literature review's terminology map)
+
+</details>
+
 **Links**
 
 - relates_to → `000068`
@@ -7857,7 +8402,7 @@ Related: 000068 (scouting research/ for uncaptured material), the campaign's own
 
 ## 000168 · Expand the claim and responsibility system: worktree lifecycle, per-worktree agent queues, orchestrator handoff
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 Today's protocol assumes one agent, one phase, one worktree, held for the life of the work. That
 assumption is already strained — it has no answer for an agent that stalls mid-phase, and none for
@@ -7888,6 +8433,29 @@ registry), 000156 (version-control request queue), 000128 (shared state model fo
 sessions), 000041 (preventing one agent from clobbering another's uncommitted work), ADR-003
 (multi-agent concurrency).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:07-04:00): 000168 identifies the structural limits of the current claim and responsibility system and proposes systematic expansion to handle multiple agents per worktree, fine-grained responsibility tracking, and coordinated queues.
+
+Related governed documents establish the current state:
+- ADR-003 ("Worktree-isolated concurrent agents") defines the accepted concurrency model: one agent per phase, claims serialized via backlog.yaml on dev as a lock table, worktrees at ../d-system-worktrees/<phase-id>
+- PLAN-008 (session lifecycle protocols) acknowledges handoff gaps and discusses mid-phase orchestrator replacement that occurred on 2026-09-11 with improvised rather than defined procedure
+- AGENTS.md carries the concurrent-agent protocol and hand-off sections that this idea would expand
+
+The four linked ideas are not overlaps but decompositions of the problem space 000168 names:
+- 000151: Revisit the claim system's lock-table dependency on shared primary checkout (owner-directed 2026-09-12)
+- 000152: Registry of active worktrees with required register/deregister lifecycle (owner-directed 2026-09-12)
+- 000156: Version-control request queue serializing all primary-checkout and dev operations
+- 000169: Ephemeral purpose-built agents that need per-worktree queues to run disposably
+
+The links are already correct and complete; 000168 is the survey layer that unifies them and calls for the wider queue inventory the final section requests. No related plan or requirement document exists yet — this is the framing phase before implementation planning.
+
+</details>
+
 **Links**
 
 - relates_to → `000151`
@@ -7900,7 +8468,7 @@ sessions), 000041 (preventing one agent from clobbering another's uncommitted wo
 
 ## 000169 · Ephemeral purpose-built agents: crafted for a purpose, disposed at optimal use, rebuilt with fresh context
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 Instead of long-lived general agents that accumulate context until it degrades them, agents are
 built for a specific purpose, used until that purpose is served, disposed of, and replaced by a new
@@ -7930,6 +8498,36 @@ main-session context), 000048 (an idea scribe agent), 000051 (agent harness and 
 (delegation-scoping methodology), and the enforcement-harness and per-worktree-queue ideas captured
 alongside this one.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:35-04:00): **Idea 000169: Ephemeral purpose-built agents**
+
+This idea proposes a lifecycle pattern for agents: craft for a specific purpose, use until that purpose is served, dispose the agent, rebuild a fresh one for what comes next. Context retrieval becomes the enabling mechanism — the Librarian (PLAN-001) reconstructs the next agent with relevant prior learning without inheriting a degraded transcript.
+
+**Related governed documents:**
+
+PLAN-001 (Agent Memory System) supplies the retrieval infrastructure this idea depends on. The Librarian is designed as a universal retrieval router that all agents query to obtain relevant context. When PLAN-001's phased delivery progresses beyond the current design phase, The Librarian will be the mechanism that makes reconstruction possible for ephemeral agents.
+
+ADR-003 (Worktree-isolated concurrent agents) establishes the concurrency and isolation model where agents work independently in separate worktrees. This provides the infrastructure for agent disposal and independent reconstruction.
+
+No existing plan, requirement, or ADR yet covers the ephemeral agent pattern itself — what a purpose specification contains, what disposal does with learned context, what carries forward into a successor, or the measurable criteria for when "optimal use reached" becomes actionable rather than an unmeasurable rule that never fires.
+
+**Related ideas:**
+
+The idea already links to 000127 (subagent for capture), 000128 (shared state for multi-agent sessions), and 000165 (enforcement harness). Those relationships are well-placed and remain current.
+
+000168 (Expand the claim and responsibility system: worktree lifecycle, per-worktree agent queues, orchestrator handoff) covers the other half of the ephemeral pattern — agent disposal, worktree lifecycle management, and handoff mechanics between a finishing agent and its successor. This idea is about construction, purpose, and reconstruction; 000168 is about the operational infrastructure that makes disposal safe and coordinated.
+
+**No related plan, phase or document found that fully covers the ephemeral agent lifecycle pattern.**
+
+PROPOSED LINK: 000169 --relates_to--> 000168 (both address agent lifecycle; 000169 covers ephemeral construction and reconstruction pattern, 000168 covers worktree disposal and orchestrator handoff mechanics)
+
+</details>
+
 **Links**
 
 - relates_to → `000127`
@@ -7941,7 +8539,7 @@ alongside this one.
 
 ## 000170 · A Claude Code teaching kit for Finance Transformation consultants: the fifteen-to-twenty minute live demo
 
-**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
 
 Build a teaching kit for a live 15-20 minute Claude Code demo aimed at Finance Transformation
 consultants, most of whom have minimal coding background. Nothing in the kit is code-focused: no git,
@@ -7995,6 +8593,25 @@ This is the anchor idea; every component idea links to it.
 **Annotations**
 
 - **note** by repository-owner (2026-09-12T21:32:00-04:00): Owner decisions, 2026-09-12, after the blind triage round. (1) PLACEMENT: the kit is built into this repository's live .claude/ directory, against the recommendation of all four blind reviewers, who argued for a separate directory. The owner's call; the consequences the reviewers named still have to be handled rather than accepted - CMD-01 cannot write CLAUDE.md here, .claude/skills/orient enumerates commands from disk and src/api/routes/workbench.py enumerates agents live, so kit entries will appear in surfaces the other demo presents. (2) COMPOSITION: cut on merit rather than holding the brief's 6/6/6/5 targets, and document every cut item so it can be revisited. Cut entries stay at status triaged with a recorded reason - none is discarded. (3) ARGUMENTS: the brief's parameterised-skill requirement is mechanically wrong and resolves by moving client-ready to a command with argument-hint, where arguments actually live; the teaching point survives and becomes accurate. (4) FIXTURES: the Nordhaven corpus is captured as its own idea and built before the entries that consume it.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:19-04:00): 000170 is the anchor idea for the consultant demo kit teaching artefacts (commands, skills, prompts, agents). The idea is governed by REQ-008 (Consultant demo kit requirements, status draft) and PLAN-024 (Consultant demo kit build, status draft), both dated 2026-09-12. REQ-008 and PLAN-024 explicitly reference the blind adversarial triage of the 23 proposed components into the final 16, which were recorded as ideas 000171-000193, all of which extend->000170.
+
+Implementation is backlogged in four phases:
+- phase-kit-01: Build the six commands (queued)
+- phase-kit-02: Build the two self-announcing skills (queued)
+- phase-kit-03: Build the prompt ladder and anti-pattern gallery (queued)
+- phase-kit-04: Build the two agents (queued)
+
+None of the kit components have been built yet. The idea itself remains open and awaits execution of the first phase.
+
+The idea's existing link relates_to->000126 (Thorough audit of the repository's commands, skills, and agents) is appropriate: 000170 will add many new artefacts to .claude/, which 000126's audit will eventually need to cover.
+
+**Status:** The idea is NOT delivered. It is fully governed by REQ-008 and PLAN-024, with work planned but not yet executed in phase-kit-01..04.
+
+</details>
 
 **Links**
 
@@ -8943,7 +9560,7 @@ justify its place in a fifteen-minute run or be cut with the reason recorded.
 
 ## 000194 · The Nordhaven fixture corpus the demo kit's entries need, which nothing currently owns
 
-**Created 2026-09-12T21:31:30-04:00 · Status: `open`**
+**Created 2026-09-12T21:31:30-04:00 · Status: `triaged`**
 
 Three entries in the demo kit cannot be demoed at all without source material that no component idea
 creates. Blind triage found that grep for the scenario name across the whole worktree hits exactly
@@ -8978,6 +9595,30 @@ audience, so no real client name, engagement or figure may appear in it.
 Related: the demo kit anchor idea and the agent, skill and prompt entries that consume the corpus,
 all linked.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:10-04:00): Idea 000194 proposes creating a Nordhaven fixture corpus — a fictional company's month-end close process documents, drafts, meeting notes, and outlines — that the demo kit's entry ideas would depend on. This corpus would serve as input material for the close-process-auditor (000189), evidence-checker (000191), notes-to-commitments (000179), and the prompt ladder against a consistent fictional scenario.
+
+However, this contradicts a documented decision in PLAN-024 (Consultant demo kit build) and REQ-008 (Consultant demo kit requirements), both revised 2026-09-13. The owner explicitly reversed the original brief's "single-running-scenario" instruction and decided that:
+
+1. Every component must be general, not written against a fictional company or scenario
+2. Components take their material as input from the user, not from a pre-built fixture
+3. "Fixture work that would have created a dependency is out of scope" — explicitly stated in PLAN-024's "Build order" section
+4. The owner's reasoning: "a component welded to an invented situation is a demo prop rather than a reusable tool: it demonstrates well once and is worthless on Monday"
+5. REQ-008 K15 verifies this: "No component names an industry, company shape, headcount, timeline or job title as its subject, or depends on a fictional scenario"
+
+The demo kit's four build phases (phase-kit-01 through phase-kit-04) are all marked "depends_on: []" with the explicit note that this is "because the fixture work that would have created a dependency is out of scope."
+
+The demo kit entry ideas (000170, 000189, 000191, 000179) were all shaped by this decision and are designed to work on user-supplied material without a pre-built Nordhaven corpus. Evidence: PLAN-024 explicitly states design changes to the prompts ensure they are general — the interview rung specifically was reordered so the owner supplies real material, not fictional scenario details.
+
+Related documents: PLAN-024 (Consultant demo kit build), REQ-008 (Consultant demo kit requirements).
+
+</details>
+
 **Links**
 
 - relates_to → `000170`
@@ -8989,7 +9630,7 @@ all linked.
 
 ## 000195 · check_no_private_content passes without looking whenever it runs outside the primary checkout
 
-**Created 2026-09-13T07:26:56-04:00 · Status: `open`**
+**Created 2026-09-13T07:26:56-04:00 · Status: `triaged`**
 
 Found 2026-09-12 across SESS-2026-09-12-06. Every single invocation of tools/check_no_private_content.py that session reported success while checking nothing:
 
@@ -9006,6 +9647,40 @@ OPTIONS, NONE OBVIOUSLY RIGHT. Exit non-zero when the content check cannot run a
 
 Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (idea ids colliding across branches): all three are consequences of work moving out of the shared primary checkout faster than the checks that assumed it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:36-04:00): ## Duplicate of 000150 with distinct framing
+
+000150 and 000195 describe the identical problem—the private-content check silently skips its content verification half when run in an agent worktree—found on the same day (2026-09-12) but in different sessions. 000150 (reported by the phase-lit-01 coordinator) is the more complete record, contextualizing the issue within the literature-review campaign and documenting the owner's explicit ruling to accept the gap for the current campaign and rely on the integration-time check. 000195 (found in SESS-2026-09-12-06) emphasizes the structural dimension: commits e6b32a3 and 33f931a made worktrees mandatory for all sessions, withdrawing the documentation-only primary-checkout exception, so the environment where the check silently skips has shifted from "CI and fresh clones" to "every agent session in the repository" while AGENTS.md still instructs agents to treat a worktree pass as the gate succeeding.
+
+Both ideas correctly identify the danger: the tool reports "OK (0 identifiers checked)" when _private/portfolio/ is absent, and the "OK" is the only signal a hurried reader takes away, masking that the content check—the half that catches real identifier leaks—never ran. Both cite the phase-wb-10 precedent, which worked around the issue by manually symlinking _private/ into the worktree, a step nothing requires or verifies.
+
+### Related documents and context
+
+- **PLAN-006** (`Separate structure from content before the first remote push`) created the tool in phase 4 as a gate against accidental identifier exposure. The plan anticipated the "gate passes by not looking" failure mode for unstaged runs (warned in AGENTS.md) but not the data-root failure mode that arises from mandatory worktrees.
+- **AGENTS.md** instructs agents to "run it with your changes staged, or the gate passes by not looking"—correct for staging, but now incomplete for the data root. Agents running the check in a worktree see only the path check run and the tool exit 0, which AGENTS.md teaches them to read as a successful gate.
+- **Session records** (SESS-2026-09-12-05, SESS-2026-09-13-01, SESS-2026-09-13-02, SESS-2026-09-12-06) consistently show the worktree run reporting "OK (X tracked files, 0 identifiers checked)" and note separately that the content check verified nothing.
+
+### Whether promoted
+
+Not promoted. PLAN-006 is complete, but it resolved a pre-worktree threat model. The structural gap exposed by e6b32a3 and 33f931a is a new class of issue—not an unfinished piece of the original plan, but a consequence of architectural decisions made after the plan shipped. This needs its own decision record and fix.
+
+### No other overlapping ideas found
+
+Ideas 000152 (worktree registry) and 000158 (idea ID collisions) are related problems in the same causal family ("consequences of work moving out of the shared primary checkout faster than the checks that assumed it") but describe distinct issues. Neither duplicates the private-content gap.
+
+## Conclusion
+
+000150 is the authoritative record of this issue. 000195 is a duplicate, found independently and adding technical detail about the worktree mandate. The owner should decide whether to close 000195 as a duplicate of 000150 or keep it for the distinct session context it provides.
+
+PROPOSED LINK: 000195 --supersedes--> 000150 (both report the identical issue found 2026-09-12; 000150 has owner's ruling and campaign context; 000195 emphasizes worktree mandate commits and session detail)
+
+</details>
+
 **Links**
 
 - relates_to → `000158`
@@ -9014,7 +9689,7 @@ Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (ide
 
 ## 000196 · A background subagent that calls EnterWorktree hangs silently and forever
 
-**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+**Created 2026-09-13T07:30:03-04:00 · Status: `triaged`**
 
 `EnterWorktree` requires a permission prompt. A background subagent has no way to surface one, so
 the call never returns and never errors. The agent blocks on it indefinitely: no output, no
@@ -9054,11 +9729,42 @@ Worth deciding: whether the standing dispatch blocks in PROMPT-029 (Block C) and
 guidance should carry the prohibition, or whether the harness should deny rather than hang. The
 second is the real fix; the first is what stops the next five-hour loss.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:28-04:00): ## Finding: Background Dispatch Tool Permission Hang
+
+**What I found:** A specific failure mode where background subagent dispatches hang silently and indefinitely when calling `EnterWorktree`. The issue is well-characterized in the idea itself: the tool requires a permission prompt, but background contexts have no way to surface one, so the call never returns and never errors. The hang is indistinguishable from normal operation without reading the transcript — no output, no partial work, no failure message, and nothing in the repository to show the agent ran.
+
+This was observed on 2026-09-12 during phase-lit-02, where the `LIT-02 S1` search dispatch was sent at 19:17:31Z, received an 8-line transcript ending in an unanswered `EnterWorktree` call, and was killed after five hours without completing. The root cause is that `permissions.defaultMode` is unset, so permission requests fall through to "ask" — a usable result in an interactive session, but a fatal stall in a background one.
+
+**Related ideas and documents:** The idea identifies three mitigations available now but not recorded where agents would find them: (1) forbid `EnterWorktree`/`ExitWorktree` by name in dispatch blocks and use `cd <path> && <command>` inside a single Bash call instead; (2) require dispatches to abandon and report tool calls that have not returned in ~60 seconds; (3) require an early first commit to turn file mtime into a liveness signal.
+
+The hanging dispatch ties directly to the agent enforcement framework:
+- **000051** (Agent harness and guardrails) — the umbrella for mechanisms that keep agent behavior inside guardrails, including permission enforcement and settings-driven behavior. This issue shows a gap in how guardrails handle background contexts.
+- **000077** (Handle subagent tool-use truncation: resume to recover, do not re-run) — addresses subagent failure modes and partial work. This issue is a related silent failure in a background context.
+- **000165** (The enforcement harness: make a violation impossible rather than forbidden) — the framework for making violations impossible rather than advisory. This issue demonstrates the alternative: when advisory rules do not work in certain contexts (background dispatch), the system stalls rather than failing cleanly.
+
+The issue also touches on the broader multi-agent coordination concerns in **000082** (Agent engineering: Orchestration) and the claim/recovery system in **000025** (No recovery procedure exists for an abandoned agent claim).
+
+AGENTS.md requires every session to work in a worktree, which makes the `EnterWorktree` tool discoverable and natural to call. PROMPT-029's Block C carries dispatch guidance, but nothing in the prompt, AGENTS.md, or PLAN-021 (which mentions permission allowlists for live-demo) documents the prohibition or the mitigation. The guidance exists only in the idea itself as observations of available workarounds.
+
+**No related plan, phase, or document found** that addresses background dispatch permission handling as a system-level concern. The mitigations are documented here but not recorded anywhere an agent planning a dispatch would encounter them.
+
+PROPOSED LINK: 000196 --relates_to--> 000051 (both address agent enforcement and guardrails; 000196 is a specific failure mode where the guardrail fails in background contexts)
+PROPOSED LINK: 000196 --relates_to--> 000077 (both address subagent failure modes and silent hangs in background execution)
+PROPOSED LINK: 000196 --relates_to--> 000165 (both illuminate the limits of advisory rules when execution context denies surfacing permission prompts)
+
+</details>
+
 ---
 
 ## 000197 · The literature-review deliverables disagree on line endings, and the standing CRLF warning can corrupt the LF ones
 
-**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+**Created 2026-09-13T07:30:03-04:00 · Status: `triaged`**
 
 The campaign's three working files do not share a line-ending convention:
 
@@ -9090,6 +9796,23 @@ Relates to 000147: both are gaps where the evidence contract underspecifies a me
 of a file it otherwise governs completely, and in both cases the gap surfaced as a phase-gate
 failure rather than as a validation error.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:40:41-04:00): Idea 000197 reports a line-ending inconsistency in the literature-review campaign's working files: the search ledger (`00_search_ledger.csv`) uses CRLF (305 lines), while the source inventory (`03_source_inventory.csv`) and terminology map (`01_terminology_map.md`) use LF throughout. The evidence contract (PLAN-023.03) specifies file format and column structure for both CSVs but does not state a line-ending convention for either. An operational note carried forward from phase-lit-01 warns agents to "read and write raw bytes" for the ledger to preserve CRLF — this warning is correct and necessary for the ledger, which corrupted in phase-lit-01 on a text-mode round-trip, but it is wrong for the inventory. An agent dispatched to write both files with the general "CRLF warning" would corrupt the inventory's 439 lines without a measurement error to catch it — the danger was caught in phase-lit-02 only because the coordinator measured both files before dispatch.
+
+This is one of a family of contract-underspecification gaps surfaced during phase-lit-01 and phase-lit-02's execution: ideas 000147 (kept column identifier format), 000148 (source_type enum gaps), 000149 (strategy_phase enum gaps), 000150 (private-content check defect), 000199 (collision_candidate field behavior on duplicates), and 000200 (SICI DOI with literal semicolons breaking kept parsing). All are documented in the phase-lit-02 session record (SESS-2026-09-13-01) and the working ideas document. The linking is correct: 000197 relates_to 000147, anchoring the batch.
+
+No governed plan or requirement yet addresses updating PLAN-023.03 to close these gaps. The session record notes the issue but leaves the decision to the owner: either amend PLAN-023.03 directly to specify per-file line-ending and field-format rules, or create a new plan governing contract amendments across the campaign. The first option is cleaner; the second preserves the campaign's reproducibility record by not rewriting the already-created ledger.
+
+PROPOSED LINK: 000197 --relates_to--> 000199 (both are data-format gaps in the evidence contract surfaced by phase execution)
+PROPOSED LINK: 000197 --relates_to--> 000200 (both are format inconsistencies that threaten the campaign's trustworthiness and agent reliability)
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
@@ -9098,7 +9821,7 @@ failure rather than as a validation error.
 
 ## 000198 · The governance check passes with a stale catalog, and --catalog prints instead of writing it
 
-**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+**Created 2026-09-13T07:30:03-04:00 · Status: `triaged`**
 
 Two facts combine into a trap that put `dev` red during phase-lit-02's claim on 2026-09-12.
 
@@ -9132,11 +9855,49 @@ that writes the file, leaving `--catalog` as the print-only inspection form; or 
 wording to carry the redirect. The first is the only one that closes the trap rather than
 documenting it, but AGENTS.md may not be edited without the owner's explicit per-change approval.
 
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:39-04:00): The issue is confirmed and fully resolved.
+
+## Incident confirmation
+
+The incident described happened on 2026-09-12 during the phase-lit-02 claim commit (commit 1e7a36e). The claim regenerated backlog.yaml and the catalog, but the catalog regeneration failed silently because `uv run python -m src.governance --catalog` only prints to stdout instead of writing the file. The tree showed no changes when `git status` was run, leaving the agent believing the catalog had been regenerated when it had not. This left `dev` red on `test_committed_catalog_matches_regenerated_output`, caught only when the test was run directly (commit 2ea3080, which manually regenerated the catalog the next day, 2026-09-13).
+
+The root cause matches the idea's analysis exactly: AGENTS.md and OPS-001 documented `--catalog` as the catalog regeneration command, but the implementation only printed, requiring an undocumented redirect (`> docs/08-governance/catalog.md`) to actually write the file. An agent following the documented instructions literally would get a green result and a stale catalog — the trap the idea describes.
+
+## Resolution delivered
+
+The issue is fully resolved by commit 803af92 (2026-09-13, "Make --catalog write docs/08-governance/catalog.md, not just print it"). The fix:
+
+1. Changed the `--catalog` flag to write `docs/08-governance/catalog.md` atomically (using a temporary file + `os.replace`) only after the audit reports no errors.
+2. Continues to print the rendered catalog to stdout, so existing redirect forms (`--catalog > catalog.md`) remain byte-identical.
+3. Updated all call sites in OPS-001, GOV-005, session-start, session-close, and checkpoint skills to use the bare form.
+4. Added tests verifying both the write-on-success path and the write-nothing-on-failure path.
+5. Updated the help string to read "Regenerate docs/08-governance/catalog.md and print it" instead of "Print the generated code catalog".
+6. Annotated brain/procedures/a-check-that-cannot-fail-is-not-a-check.md with a note explaining the historical context of the worked example.
+
+This solves the issue more thoroughly than any of the three resolutions the idea proposed: it closes the trap entirely (exit 0 now genuinely means the catalog is written and the audit passed), leaves `--catalog` as both write and print rather than splitting it into separate commands, and requires no correction to AGENTS.md's wording.
+
+## Related ideas
+
+The failure pattern — a check passing without checking what it claims to check — recurs in this repository:
+- 000150: "The private-content check silently does nothing in a worktree, because _private is gitignored" (triaged)
+- 000195: "check_no_private_content passes without looking whenever it runs outside the primary checkout" (triaged, linked to 000158)
+
+These are distinct issues but reflect the same class of failure.
+- **finding** by agent-idea-batching (2026-09-13T19:45:02-04:00): Correction to the triage finding immediately above: the fix is NOT delivered on dev. Commit 803af92 (Make --catalog write docs/08-governance/catalog.md, not just print it) exists only on the unmerged branch agent/catalog-writer. git merge-base --is-ancestor 803af92 dev returns false, and src/governance/__main__.py on dev has no commit after 9e86d17 (an unrelated import sort). Confirmed empirically on 2026-09-13: running uv run python -m src.governance --catalog on dev printed the catalog to stdout and wrote nothing, so this session had to redirect the output to the file by hand. The idea therefore remains open work from dev's point of view until that branch integrates. Recording this because a finding asserting a fix is delivered, when the fix sits on an unmerged branch, is the same defect the idea itself describes - a check or a claim that looks satisfied without being satisfied - and because idea 000204 exists precisely to stop resolved-looking-but-not-resolved state from misleading the next reader. Related: the peer branch agent/lit-campaign independently captured this same defect as its own idea 000208, so 000198 and 000208 are duplicates and the owner should keep one.
+
+</details>
+
 ---
 
 ## 000199 · The evidence contract does not say how collision_candidate behaves on a duplicate row, and the top-20 list does not filter on status
 
-**Created 2026-09-13T07:30:03-04:00 · Status: `open`**
+**Created 2026-09-13T07:30:03-04:00 · Status: `triaged`**
 
 Two under-specifications combine into a measurable distortion of the campaign's headline output.
 
@@ -9185,9 +9946,24 @@ surfaces as a distorted measurement rather than as a validation error.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-13T13:41:30-04:00): phase-lit-03 hit this gap and resolved it explicitly rather than silently: LIT-03 C ranked only status: candidate rows for the top-20, excluding the one deliberate excluded+yes row (structured-belief-state-llm-memory-benchmark-2026-d22-recur, the preserved D22/D30 cross-phase scoring dispute) on the stated ground that promoting an excluded row to deep-read candidacy would pre-empt the Pass 2 adjudication it exists to receive. The decision and reason are recorded in 02_domain_map.md's top-20 preamble. The dispute itself still stands for phase-lit-04.
+- **finding** by agent-idea-triage (2026-09-13T19:42:55-04:00): Found documented evidence of the under-specification identified in 000199.
+
+PLAN-023.03 (the evidence contract) defines collision_candidate on line 68 as `yes`/`no` — the top-20 list is the `yes` rows ranked, but says nothing about what this field means on a row whose `status` is `excluded` and whose `dedup_of` points to another source.
+
+PROMPT-029's LIT-03 C section (lines 634-636) instructs: "Include the **top-20 collision candidate list**: the inventory's `collision_candidate: yes` rows ranked by pre-scores, with a one-line reason each." The instruction applies no filter on `status`, meaning excluded rows with `collision_candidate: yes` could occupy slots in the ranking.
+
+The gap was observed during execution: SESS-2026-09-13-01 (phase-lit-02) documents that `collision_candidate` is undefined on a duplicate row while LIT-03 C ranks the top-20 without filtering on status. The session describes the actual consequence: LIT-02 X1 wrote five dedup rows with `collision_candidate: yes`, reasoning that the flag describes the source's relevance in the domain where it resurfaced. LIT-02 X3, hitting the same situation later, self-corrected to the opposite rule. Four of the five were eventually corrected to `no`, which would have distorted the ranking by 20% in the direction of more apparent prior art—exactly the direction a campaign supporting H0 is least able to detect.
+
+This is part of a documented family: 000147 (identifier format), 000148 (source_type enum), 000149 (strategy_phase enum), 000200 (kept column format), 000201 (PROMPT-029 grammar), 000202 (status value marking) all name gaps where the evidence contract specifies vocabulary but not the mechanical rule a downstream gate or deliverable depends on.
+
+PROPOSED LINK: 000199 --relates_to--> 000148 (source-type enum is similar under-specification)
+PROPOSED LINK: 000199 --relates_to--> 000149 (strategy_phase enum is similar under-specification)
+PROPOSED LINK: 000199 --relates_to--> 000200 (kept column is similar contract under-specification)
+PROPOSED LINK: 000199 --relates_to--> 000201 (PROMPT-029 grammar affects execution of collision_candidate handling)
+PROPOSED LINK: 000199 --relates_to--> 000202 (status field marking is foundational to this issue)
 
 </details>
 
@@ -9201,7 +9977,7 @@ surfaces as a distorted measurement rather than as a validation error.
 
 ## 000200 · The ledger's kept column is semicolon-separated, and DOIs may legally contain a semicolon
 
-**Created 2026-09-13T07:30:16-04:00 · Status: `open`**
+**Created 2026-09-13T07:30:16-04:00 · Status: `triaged`**
 
 The evidence contract (PLAN-023.03) defines the reproducibility ledger's `result_ids` and `kept`
 columns as `;`-separated lists of identifiers. SICI-style Wiley DOIs contain a literal semicolon.
@@ -9251,6 +10027,24 @@ undefined on a duplicate row): the contract fixes a column's meaning but not the
 downstream gate depends on, and the gap surfaces as a false measurement rather than a validation
 error.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:42:55-04:00): Data contract specification gap in PLAN-023.03 (literature-review evidence contract). The contract defines the ledger's `kept` column (line 55) as holding "identifiers added to the inventory/matrix from this search," and earlier the `result_ids` column (line 54) is explicitly marked as "`;`-separated," but the contract never specifies that `kept` itself is semicolon-separated or how to parse identifiers when semicolons appear within identifier schemes. SICI-style Wiley DOIs legally contain semicolons (e.g., `10.1002/(sici)1097-4571(198905)40:3<200::aid-asi11>3.0.co;2-u`), creating ambiguity: a naive split on `;` fragments the DOI into two invalid pieces, and the ledger already holds this case (LIT-02-S225, LIT-02-S228, maintaining Conklin & Begeman's 1989 JASIS paper).
+
+The issue has surfaced in practice during phase-lit-02 execution. The phase gate (LIT-02 G, Measurement 3) discovered the collision: naive split reports 2 missing identifiers; SICI-aware split (understanding that `;` followed by a digit-hyphen-letter is part of a SICI tail, not a separator) reports 0. The gate now applies the SICI-aware logic, but the contract itself never names the rule, leaving it as an informal patch rather than a documented requirement that all downstream consumers must follow.
+
+This is part of a family of six related contract-gap ideas anchored on 000147 (give the contract a fixed identifier format). All six (000148, 000149, 000197, 000199, 000200, 000203) are already linked to 000147 and document specific gaps discovered during actual LIT phase execution that arise from underspecified vocabulary or validation rules in PLAN-023.03. A contract amendment addressing these gaps does not yet have a governing plan; ideas.md notes: "No existing plan or requirement addresses updating the contract; the fix belongs in a contract amendment that PLAN-023 should absorb or that a new plan should govern."
+
+Related documents: PLAN-023.03 (evidence contract, draft status), SESS-2026-09-13-01 (LIT-02 session log, documenting the gate measurement and workaround), backlog.yaml (LIT-02 result records SICI-aware split measurement).
+
+Existing linked ideas: 000147 (parent anchor issue: identifier format for kept column), 000148 (source_type enum missing patent bucket), 000149 (strategy_phase missing verification value), 000197 (line-ending disagreement), 000199 (collision_candidate undefined on duplicates), 000203 (OpenAlex verify-at-source for Pass 2).
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
@@ -9259,9 +10053,25 @@ error.
 
 ## 000201 · Pin PROMPT-029's mandated-variant grammar: a comma-separated item is one variant, slashes preserved
 
-**Created 2026-09-13T13:41:21-04:00 · Status: `open`**
+**Created 2026-09-13T13:41:21-04:00 · Status: `triaged`**
 
 Both possible misreadings of the delegation pack's "variants:" lists have now occurred in the literature-review campaign. In Pass 1b the coordinator relayed 76 variants against a true 91 (under-derivation, caught by the gate re-deriving from the pack). In Pass 1c the gate itself derived 346 by splitting slash compounds like 'prov:Activity/Agent/Entity', 'argument attack/support', 'forward/backward traceability' into fragments, producing a false FAIL with 5 phantom uncovered variants; a fix cycle with the comma-item rule (each comma-separated item is one variant, matched as one literal string) derived 339 and reproduced the independently reviewed 91-variant Pass 1b anchor exactly. The rule lives only in dispatch addressing and session records; LIT-06/LIT-07 gates re-measure variant coverage and will rediscover the ambiguity unless it is written into the instrument (PROMPT-029 or the evidence contract). Recorded during phase-lit-03.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:42:52-04:00): This idea asks to pin a grammar rule for parsing mandated variants in the literature-review delegation pack. The issue is real and documented: Pass 1c (phase-lit-03, SESS-2026-09-13-02) discovered that the gate could over-derive variants by splitting slash-separated compounds like `prov:Activity/Agent/Entity` into three fragments instead of treating the compound as one literal variant. The fix — "each comma-separated item is one variant, matched as one literal string, slashes preserved" — was applied mid-campaign to correct the gate's second run from 346 derived variants (false FAIL) to 339, which reproduced the independently reviewed 91-variant anchor from Pass 1b.
+
+The rule is currently documented only in session records and dispatch addressing (lines 69 in SESS-2026-09-13-02). It has not been written into the instrument itself — either PROMPT-029 (the delegation pack) or PLAN-023.03 (the evidence contract). The idea correctly notes that LIT-06 and LIT-07 gates, which will re-measure variant coverage in Pass 3 and Pass 4, will rediscover the same ambiguity unless the rule is pinned. The evidence contract (PLAN-023.03) does not currently specify how variants in the pack's domain listings should be parsed; PROMPT-029 lists the variants verbatim but contains no normative statement about the grammar.
+
+The related idea 000199 (collision_candidate behavior and top-20 filtering) is already linked, and SESS-2026-09-13-02 records both the variant grammar fix and the status-filter decision (lines 143–148). A sister issue, idea 000202, concerns how deep-read candidacy is marked in the evidence matrix — also a conflict between the pack section and the contract that needs resolution before LIT-04 K can proceed. All three issues (variant grammar, status filtering, deep-read marking) are instrument-pinning tasks for the evidence contract or delegation pack, discovered during Pass 1 execution.
+
+PROPOSED LINK: 000201 --relates_to--> 000202 (sister instrument-pinning issue: deep-read marking conflict between pack and contract, same phase-lit-03 discovery)
+
+</details>
 
 **Links**
 
@@ -9271,9 +10081,27 @@ Both possible misreadings of the delegation pack's "variants:" lists have now oc
 
 ## 000202 · The evidence contract's only deep-read mark is the status value the Pass 1 close-out is forbidden to set
 
-**Created 2026-09-13T13:41:21-04:00 · Status: `open`**
+**Created 2026-09-13T13:41:21-04:00 · Status: `triaged`**
 
 LIT-03 C must "mark the ranked top rows deep_read candidates in the inventory (status stays candidate until LIT-04 actually reads them)" — but the evidence contract's only deep-read mechanism is status: deep_read itself, and the 13-column inventory schema has no other field. Nothing was invented: the inventory is untouched, the ranked top-20 list in 02_domain_map.md serves as the de-facto designation, and the conflict is recorded in that file's preamble. LIT-04 K needs an owner ruling on how deep-read candidacy is marked before Pass 2a starts — options include ruling the domain-map list authoritative, or amending the contract with an explicit field. Recorded during phase-lit-03.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:42:56-04:00): Evidence contract conflict over deep-read marking confirmed and properly documented. The inventory schema's only mechanism for marking deep-read candidates is the `status` field with value `deep_read`, but LIT-03 is explicitly forbidden from setting this (per the specification that "status stays `candidate` until LIT-04 actually reads them"). No alternative field exists in the 13-column inventory schema to carry the mark instead.
+
+This conflict is clearly recorded in the preamble of `02_domain_map.md` under the section "Deep-read marking outcome — contract/section conflict, reported rather than resolved." The description states: "The contract's only marking mechanism is therefore the one field the section forbids using at this stage, and no second field exists to carry the mark instead." The ranked list in that document serves as the de-facto deep-read designation for Pass 1 completion.
+
+The issue is already linked (relates_to->000199), which addresses the related question of how `collision_candidate` behaves with status filtering. The backlog already references this as blocking phase-lit-04: backlog.yaml notes that "phase-lit-04 (Pass 2a, deep reading) is unblocked and continues on the campaign branch; its K needs the owner's ruling on deep_read marking (idea 000202) before Pass 2a starts."
+
+The decision required is straightforward per the options listed in the idea's own body: either rule the domain-map list authoritative (treating the human-readable ranking as the source of truth), or amend the evidence contract with an explicit `deep_read_candidate` field (or overload an existing field). This is blocking LIT-04 K from starting Pass 2a.
+
+No related plan, requirement or document found beyond the evidence contract and the recording already made in 02_domain_map.md.
+
+</details>
 
 **Links**
 
@@ -9283,9 +10111,31 @@ LIT-03 C must "mark the ranked top rows deep_read candidates in the inventory (s
 
 ## 000203 · OpenAlex served mistitled and mis-DOI'd records repeatedly; Pass 2 deep reads must verify identity at the source
 
-**Created 2026-09-13T13:41:22-04:00 · Status: `open`**
+**Created 2026-09-13T13:41:22-04:00 · Status: `triaged`**
 
 During phase-lit-03, OpenAlex served at least three defective bibliographic records: SWE-bench (arxiv:2310.06770) retitled "Persistent memory for AI coding agents...", a GPT-4-report record with mismatched title/DOI at LIT-03-S142, and relevance-ranked searches that failed to surface known-correct targets (the Bercher/Alford/Hoeller survey, the 1972 PLANEX paper) which direct Crossref DOI lookups then resolved. Every Pass 1 keep survived because workers verified identity on the source's own page before writing bibliographic fields. Pass 2's deep reads (phase-lit-04/05) build the evidence matrix from these records and inherit the trap: any LIT-04/LIT-05 dispatch should carry the same verify-at-source addressing, and the validated-bibliography step in phase-lit-07 already requires per-source identity verification. Recorded during phase-lit-03.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:07-04:00): ## Finding
+
+Idea 000203 reports a real problem encountered during phase-lit-03 (literature-review campaign Pass 1c): OpenAlex served at least three defective bibliographic records — SWE-bench (arxiv:2310.06770) retitled incorrectly, a GPT-4-report record at LIT-03-S142 with mismatched title/DOI, and relevance-ranked searches that failed to surface known-correct targets. Every keep from Pass 1 survived verification because workers checked identity at the source before writing bibliographic fields.
+
+The idea proposes that Pass 2 deep reads (phase-lit-04/05) should carry the same verify-at-source instruction. This is already partially addressed: phase-lit-07's validated-bibliography step (documented in PLAN-023.03) mandates per-source identity verification as the first of five promotion steps — "bibliographic identity verified" is the gate before any other validation occurs. However, the concern is that Pass 2's evidence-matrix extraction (phase-lit-04/05) happens earlier and builds from potentially-defective records without an explicit verification gate.
+
+The governed documents are the literature-review campaign plan (PLAN-023), its evidence contract (PLAN-023.03, which already requires identity verification in the synthesis phase), and the session record (SESS-2026-09-13-02) where the OpenAlex defects were documented.
+
+Related governing gaps that surfaced in the same campaign:
+- 000149 (ledger's strategy_phase enum has no value for bibliographic verification) — addresses how verification lookups are tracked in the reproducibility ledger itself, distinct from search strategies
+- 000147, 000199, 000200, 000201, 000202 (other evidence contract and ledger issues) — address identifier normalization, data-quality edge cases, and schema conflicts
+
+000203 relates to 000147 (a link that already exists), not merely as an identifier-format fix but as part of a broader problem where OpenAlex metadata defects expose the need for structured verification at every read stage, not just final synthesis. The identifier-format work (000147) helps gate 5 of phase-lit-03 (0 kept-bearing rows naming a missing source), but does not guard against the scenario where an identifier resolves correctly yet names a source with wrong title/DOI.
+
+</details>
 
 **Links**
 
@@ -9295,7 +10145,7 @@ During phase-lit-03, OpenAlex served at least three defective bibliographic reco
 
 ## 000204 · Resolved work leaves its idea open, so later planning re-plans finished work
 
-**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+**Created 2026-09-13T14:51:01-04:00 · Status: `triaged`**
 
 When a fix lands, nothing gives the idea that reported it a status event. The idea stays
 `triaged` with a finding describing the defect as live, and every later reader — a triage
@@ -9325,11 +10175,51 @@ the nearest existing mechanism to hang this on.
 The cost of leaving it is measured now rather than hypothetical: an entire agent sweep's sizing
 and decline calls for several ideas were built on facts the repository had already overtaken.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:29-04:00): ## Finding: Idea Status Closure Gap
+
+000204 identifies a real, observed problem: when work is resolved, the idea reporting it does not receive a status event, leaving it `triaged` with a stale finding while readers (triage sweeps, planning agents, backlog analysers) treat it as open work and re-plan finished deliverables. The concrete examples from the 2026-09-13 idea-batching build are well-documented: 000098 (layout-schema test), 000099/000129 (PTY tests), and 000171-000193 (demo kit commands) all carried completed work into new plans as open scope, and 000171-000193 compounds it with stale assertions in their bodies ("no requirement, plan or phase exists") now contradicted by REQ-008, PLAN-024, and phase-kit-01 through phase-kit-08.
+
+### Related Governed Documents
+
+**PLAN-017** (the unified idea-plan-lifecycle architecture) and its child **PLAN-017.01** (capture, triage, resolution and promotion) define the full idea status journey, including `promoted` as a terminal state naming governed document codes. That architecture covers the *what* (promotion semantics, target validation, reverse lookups) but does not address the *when* — who and what triggers the transition when work lands. PLAN-017.01's transition table shows owner-controlled movements from `triaged` to `reviewing`, `promoted`, or `discarded`, but no process that fires the promotion automatically when a phase completes.
+
+**PLAN-008** (session lifecycle protocols) covers session opening and closing, including the checkpoint skill and session-close command that record phase completion. Phase 3 and 5 describe what checkpoint and session-close do, but neither mentions validating or updating idea status for ideas in the completed phase's scope.
+
+### Related Ideas
+
+**000027** (no mechanical check that completed phase's actual diff stayed inside declared systems/deliverables) proposes a validation mechanism that diffs a phase's actual output against its declared paths. The idea is about scope containment — did the phase overshoot? That check naturally runs at phase completion and has access to the phase metadata (deliverables, systems, scope declarations). It is the nearest existing mechanism to anchor an idea-status check on, as 000204 notes, but the two concerns are distinct: 000027 validates *what was claimed* versus *what was built*; 000204 requires *updating an idea's status* based on *what was built*. The former is a validation gate; the latter is a state mutation with audit requirements (which status, when, by whom, on what evidence).
+
+### Three Approaches Outlined
+
+000204 proposes three mechanical framings:
+
+1. **Session-close obligation**: a phase that resolves an idea records a status event before it completes
+2. **Mechanical check**: a phase naming an idea in its scope must move that idea (enforced/warned at completion)
+3. **Periodic reconciliation pass**: a separate agent or routine walks the corpus and reconciles idea status against delivered facts
+
+The session-close command (`phase-idea-01` and later phases in PLAN-008) is the natural execution point for (1) or (2). Extending 000027's scope-validation check to also validate idea closure would pair both concerns at phase completion — one session-close review step could verify both that the diff stayed inside declared paths AND that named ideas received status updates. This avoids creating a separate audit or periodic pass if that can be prevented.
+
+### Cost and Clarity
+
+The lack of closure is measured now, not hypothetical: an entire agent sweep's sizing and decline calls were built on facts the repository had already superseded, wasting work and producing false negatives. The problem is real enough that deferral has a documented cost.
+
+The distinction between automatic/mechanical (strongest enforcement) versus owner-judgment (preserves agency) is unresolved, as is the scope of eligible source transitions (open → promoted, triaged → promoted, or others). The existing triage agent (phase-idea-02) already has no authority to promote — it stops at `triaged` — so this decision point fits naturally into the section of PLAN-017.01 that reserves promotion for the owner.
+
+PROPOSED LINK: 000204 --relates_to--> 000027 (both completion-time validation mechanisms; 000027's diff-check could be extended to include idea-status closure)
+
+</details>
+
 ---
 
 ## 000205 · Corpus presentation-order variation changed no substantive answer and can be dropped from future sweeps
 
-**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+**Created 2026-09-13T14:51:01-04:00 · Status: `triaged`**
 
 The idea-batching build (PROMPT-025 decision 5, PROMPT-032) gave three analysts the same
 152-idea corpus in ascending, descending and shuffled order, to control for anchoring. The
@@ -9355,11 +10245,31 @@ variation costs a full extra corpus read per ordering — roughly 143k tokens of
 Scope: applies to any future full-corpus analyst sweep, not only idea batching. Does not
 generalise to the findings/no-findings control, which earned its cost in the same run.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:16-04:00): Related document: PROMPT-026 (idea-batching pack factory), which explicitly required the adversarial audit to report whether the presentation-order variation (decision 5 in PROMPT-025) had any observable effect on the partition outcome. The audit specification in PROMPT-026 states: "The audit must also report whether the presentation-order manipulation did anything at all — did R1, R2 and R3 differ in ways that track their ordering, or did order make no observable difference? [...] If the manipulation has no effect, that is a finding worth having: it means a future sweep can drop the variation and run cheaper."
+
+This idea reports the measured result of exactly that required audit. The finding is data-backed: the presentation-order manipulation (ascending, descending, shuffled) did change observable presentation properties (fine-group granularity varied from 32 to 84 groups, and programme write-up sequence tracked reading order), but did not change the substantive answer (Level-2 programme composition — which ideas batch together — remained highly convergent across all three orderings, with only minor boundary disagreements).
+
+The recommendation to drop the variation from future sweeps is grounded in cost-benefit: the variation costs approximately 143k additional input tokens per ordering at current corpus size, but yields no improvement in the decision the exercise exists to produce. This validates PROMPT-025 decision 16's descope ladder (audit 2 and analyst 3 as lower-priority rungs) after the fact with measured data rather than theory.
+
+Related work: the finding connects to 000125 (the anchor idea for the idea-batching work that prompted this audit), and would inform any future full-corpus analyst sweep (000125 is triaged, awaiting the batching work's completion and owner approval of the partition).
+
+No related plan, requirement, or backlog phase found in the governed document set beyond the prompt pack itself.
+
+PROPOSED LINK: 000205 --relates_to--> 000125 (finding from the batching work that 000125 anchored)
+
+</details>
+
 ---
 
 ## 000206 · Prompt packs cannot instruct a subagent to write its report to a file; the harness refuses it
 
-**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+**Created 2026-09-13T14:51:01-04:00 · Status: `triaged`**
 
 Every dispatch in the idea-batching build named an output path and told the agent to write its
 report there — `_working/idea-corpus/report-R1.md` and siblings, per PROMPT-032. All four
@@ -9383,11 +10293,36 @@ Also worth noting for whoever writes the next pack: the restriction is silent un
 is not visible when the pack is drafted, reviewed at GOV-008 stage 5, or approved — only when an
 agent is already running and has spent its input budget.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:14-04:00): Confirmed during the idea-batching build: the harness refuses subagents' writes to designated report files. Four analyst dispatches in PROMPT-032 each tried to write to `_working/idea-corpus/report-R*.md` (per the delegation pack's kickoff section K, line 154-155), and all four agents rejected the instruction with "Subagents should return findings as text, not write report files." This forced the coordinator to transcribe each report manually into its intended file, adding context cost and introducing transcription fidelity risk.
+
+The restriction is a real constraint on the agent harness itself, not a path-access issue — the coordinating session wrote the same files without trouble, and the analysts read from the same directory without trouble. The harness enforces a capability boundary: subagents return text, coordinators persist.
+
+This will recur in future packs. Two of the three GOV-008 precedents that shaped the standard (PROMPT-018, PROMPT-021) rely on report files as hand-offs between dispatches and the gates that read them — a pattern that breaks under the current restriction. The idea names three possible directions:
+
+1. Dispatches return findings as text and the coordinator persists them (current workaround)
+2. Packs stop routing hand-offs through files agents cannot write (design change)
+3. The restriction is configurable and should be configured (capability change)
+
+The restriction is silent until dispatch time, not visible during pack drafting, GOV-008 stage 5's adversarial review, or approval — only when an agent is already running and has consumed its context budget. Worth surfacing to whoever authors the next pack.
+
+Relates to the MCP chokepoint design (000160) which proposes routing every write through a mediating service, and the enforcement harness (000165) which makes violations impossible rather than forbidden. Whether this particular subagent restriction is the right boundary or whether it should be configurable is a design question for the owner.
+
+PROPOSED LINK: 000206 --relates_to--> 000160 (MCP tool surface governs the write restriction that blocked these dispatches)
+PROPOSED LINK: 000206 --relates_to--> 000165 (enforcement harness asks whether this restriction should be enforceable this way)
+
+</details>
+
 ---
 
 ## 000207 · REQ-008's artifact count does not sum to the roster size it states
 
-**Created 2026-09-13T14:51:01-04:00 · Status: `open`**
+**Created 2026-09-13T14:51:01-04:00 · Status: `triaged`**
 
 Noticed by the adversarial audit during the idea-batching build on 2026-09-13 and flagged as out
 of that build's scope.
@@ -9404,3 +10339,27 @@ against them.
 
 No attempt was made to work out which figure is correct; that needs the triage record the
 sentence cites, and it is the document owner's call rather than a passing auditor's.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-13T19:43:17-04:00): The discrepancy identified in this idea has already been resolved in the current version of REQ-008.
+
+Verification: REQ-008 originally stated "13 artefacts (5 commands plus 1 converted from a skill, 2 skills, 6 prompts, 2 agents)" in an earlier draft, where the enumeration did not sum correctly (5+1+2+6+2 = 16, not 13). The document has since been corrected in commit 22941c4 on 2026-09-13, with the commit message stating: "Also corrects the count: 16 artefacts, not 13. The five ladder rungs were counted as one line."
+
+Current state verification:
+- REQ-008 now states: "**Scope is 16 artefacts and nothing else:** 6 commands, 2 skills, 6 prompts, 2 agents"
+- PLAN-024 confirms: "Builds the 16 components `REQ-008` specifies: 6 commands, 2 skills, 6 prompts, 2 agents"
+- Enumeration now adds correctly: 6 + 2 + 6 + 2 = 16
+- The "6 prompts" consist of 5 ladder rungs (floor, situation, objective, audience, interview) plus 1 anti-pattern gallery
+
+Idea 000170's independent derivation of the artifact count confirms this is correct: "six commands, two skills, prompt ladder plus gallery, two agents" = 6 + 2 + 6 + 2 = 16.
+
+The roster discrepancy that triggered this idea has been resolved. All governing documents (REQ-008 draft, PLAN-024 draft) now consistently state 16 artifacts with accurate enumeration, and the backup phases phase-kit-01 through phase-kit-08 have the correct roster to build against. The idea was effective at catching a real error in a draft document, and that error has been corrected.
+
+No related plan, phase or document found with remaining discrepancies. No overlap with other open ideas detected.
+
+</details>
