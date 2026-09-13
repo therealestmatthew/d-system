@@ -261,6 +261,18 @@ systems:
     that emit chart-ready JSON and consolidated inventories, plus the skill and templates that render
     them into a generated overview page under _public/. Same inputs, same outputs; no model calls in
     the data path. Planned; built by phase-demo-03 and phase-demo-04.
+- id: sys-demo-kit
+  name: Consultant demo kit
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths: []
+  depends_on: []
+  description: Teaching artefacts for the Finance Transformation consultant demo - commands,
+    skills, prompts and agents a consultant would use in their own work, plus a fictional
+    source corpus, a manifest and a facilitator guide. Distinct from sys-demo-stage, which
+    presents this repository to an audience being taught skills and agents. Both claim a
+    fifteen-minute run; REQ-006 R09 governs that one and REQ-008 governs this one.
 - id: sys-backlog
   name: Session phase backlog
   domain: governance

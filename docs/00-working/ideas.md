@@ -168,6 +168,7 @@ The idea is a **design question orthogonal to PLAN-001**, not a duplicate of it:
 **Links**
 
 - extended_by ← `000004`
+- extended_by ← `000163`
 
 ---
 
@@ -267,6 +268,7 @@ PROPOSED LINK: 000004 --relates_to--> 000040 (both address deterministic search 
 - relates_to → `000040`
 - relates_to ← `000005`
 - relates_to ← `000040`
+- relates_to ← `000163`
 
 ---
 
@@ -725,6 +727,8 @@ PROPOSED LINK: 000014 --relates_to--> 000012 (both debate where enforcement shou
 
 - relates_to → `000012`
 - extends → `000051`
+- relates_to ← `000159`
+- relates_to ← `000165`
 
 ---
 
@@ -894,6 +898,8 @@ PROPOSED LINK: 000018 --relates_to--> 000046 (both address idea-plan mapping; 00
 - extended_by ← `000053`
 - relates_to ← `000055`
 - extended_by ← `000061`
+- relates_to ← `000162`
+- relates_to ← `000164`
 
 ---
 
@@ -994,6 +1000,9 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 - relates_to ← `000031`
 - relates_to ← `000128`
 - relates_to ← `000151`
+- relates_to ← `000159`
+- extended_by ← `000160`
+- relates_to ← `000166`
 
 ---
 
@@ -1028,6 +1037,7 @@ No related idea found by title overlap or links. No existing phase or document d
 **Links**
 
 - relates_to ← `000058`
+- relates_to ← `000166`
 
 ---
 
@@ -1379,6 +1389,7 @@ The idea itself explicitly names two related initiatives: 000020 (MCP-mediated m
 
 - relates_to → `000028`
 - relates_to → `000020`
+- relates_to ← `000165`
 
 ---
 
@@ -1422,6 +1433,7 @@ No related idea found.
 - relates_to ← `000036`
 - relates_to ← `000060`
 - relates_to ← `000061`
+- relates_to ← `000162`
 
 ---
 
@@ -1952,6 +1964,7 @@ PROPOSED LINK: 000043 --relates_to--> 000045 (companion ideas both exploring doc
 - relates_to → `000045`
 - relates_to ← `000044`
 - relates_to ← `000056`
+- relates_to ← `000161`
 
 ---
 
@@ -2327,6 +2340,7 @@ No overlapping umbrella ideas or related parent-level concepts found. The specif
 - extended_by ← `000012`
 - extended_by ← `000014`
 - relates_to ← `000079`
+- relates_to ← `000165`
 
 ---
 
@@ -3504,6 +3518,10 @@ The idea identifies a genuine gap: the adversarial review was written to surface
 No overlap with another idea or promotion to an existing plan was found.
 
 </details>
+
+**Links**
+
+- relates_to ← `000167`
 
 ---
 
@@ -6158,6 +6176,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 - relates_to ← `000128`
 - relates_to ← `000136`
 - relates_to ← `000139`
+- relates_to ← `000170`
 
 ---
 
@@ -6190,6 +6209,7 @@ No related plan, phase, or requirement document found that specifically covers t
 **Links**
 
 - relates_to → `000126`
+- relates_to ← `000169`
 
 ---
 
@@ -6235,6 +6255,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 - relates_to → `000020`
 - relates_to → `000023`
 - relates_to ← `000138`
+- relates_to ← `000169`
 
 ---
 
@@ -7156,6 +7177,7 @@ What is unresolved, and worth settling before any replacement is designed: wheth
 - relates_to → `000020`
 - relates_to → `000025`
 - relates_to ← `000152`
+- relates_to ← `000168`
 
 ---
 
@@ -7177,6 +7199,7 @@ What is unresolved: whether the registry is a new file or a field on the existin
 
 - relates_to → `000151`
 - relates_to → `000025`
+- relates_to ← `000168`
 
 ---
 
@@ -7319,6 +7342,8 @@ work.
 
 - relates_to → `000154`
 - relates_to → `000066`
+- relates_to ← `000160`
+- relates_to ← `000168`
 
 ---
 
@@ -7377,3 +7402,1523 @@ Relates to 000152 (a registry of active worktrees) and 000151 (the claim system'
 **Links**
 
 - relates_to → `000157`
+
+---
+
+## 000159 · Should an agent read files directly, or only call MCP tools — and what makes the answer enforceable
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+The question is whether an agent working in this repository should ever open a file itself, or
+whether every read and write should go through an MCP layer that owns the responsibility. The owner's
+position: a blend, not a pole. Direct read, search and grep against the codebase stay available
+because they are fast and already work; everything else routes through the service.
+
+The decisive part is not which policy is chosen but what makes it hold. This is not a suggestion for
+an agent to follow. It must be a capability the agent either has or physically does not have —
+hooks that block commands and paths deterministically, a tool allowlist that omits what the agent
+must not reach, and MCP-side authorization. A blended model raises the enforcement bar rather than
+lowering it: when some direct access is legitimate, only a deterministic harness can distinguish the
+legitimate case from the one that must be impossible. That harness is a linked sibling idea.
+
+Criteria the decision needs, rather than a conclusion asserted up front: what makes a direct read
+legitimate (speed, locality, content the service cannot see), and what makes mediation mandatory
+(anything whose provenance, freshness or authorization matters).
+
+The argument for mediation is auditability. A mediated read is loggable, attributable, cacheable and
+can carry freshness metadata; a raw file read is invisible to everything and leaves no record that
+the agent saw a given version of a document. Every claim about what an agent knew rests on that.
+
+Failure modes already observed in this repository argue the same way: agents reading raw
+_data/ideas.jsonl instead of folding it, whole-file reads spending context on material a query would
+have answered, and stale reads of files a peer changed mid-session in another worktree.
+
+What breaks under an MCP-only rule, and why the blend exists: gitignored content a service cannot
+see (_private/, _working/, per-worktree .venv and data), per-worktree state that differs by
+checkout, hooks that already block paths regardless of what a tool wants, and the bootstrap problem
+— AGENTS.md and CLAUDE.md must be read before any tool surface is known to exist.
+
+Related: 000020 proposes the MCP server itself, and 000014 covers the hooks and settings.json audit.
+The MCP tool surface and the enforcement harness are linked sibling ideas captured alongside this one.
+
+**Links**
+
+- relates_to → `000160`
+- relates_to → `000165`
+- relates_to → `000020`
+- relates_to → `000014`
+
+---
+
+## 000160 · The MCP tool surface: read-only direct access to files, every write through a mediating chokepoint
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+If agents stop reaching for files directly, something must exist for them to call instead. This idea
+enumerates that surface, distinct from 000020, which proposes the server as a multi-agent
+coordination mechanism rather than specifying what it offers.
+
+The owner's target shape: agents keep direct access to the codebase and its files, scoped read-only
+and conditional. Every other read and every write is forced through MCP, which becomes a deliberate
+chokepoint — a place to capture provenance, review and judge requests before they take effect, and
+to add a security layer that mixes strict deterministic controls with semantic and model-based
+components. The chokepoint is the point, not an implementation detail: a single mediated path is
+what makes provenance and review possible at all.
+
+Calls the surface has to carry before file reads can stop being the default: document fetch by id or
+path, search across the corpus, phase and claim operations, idea fold, backlog query, worktree
+registry, and session-record access.
+
+Return-shape contracts matter as much as the call list. Each result needs to say what it is — excerpt
+or whole document — and carry provenance and freshness metadata, because an agent cannot judge
+staleness it cannot see. This is the same reasoning behind the retrieval-hint work in PLAN-001's
+Librarian contract (phase-mem-07 and phase-mem-08).
+
+The write path needs its own decision: which writes route through tools and which remain git
+operations. This connects directly to 000156's version-control request queue and 000151's revisit of
+the claim system, whose lock table only works today because every agent shares one primary checkout.
+
+Bootstrap and degraded mode: what an agent does when the server is absent or down. Either file reads
+are the sanctioned fallback, or a session refuses to start without the service. Choosing the first
+without stating it means the fallback silently becomes the norm.
+
+Related: 000020 (the server and Librarian context service), 000156 (version-control queue), 000151
+(claim system), 000043 through 000045 (documentation, graph and vector database tooling).
+
+**Links**
+
+- extends → `000020`
+- relates_to → `000156`
+- relates_to → `000165`
+- relates_to ← `000159`
+
+---
+
+## 000161 · An ingestion pipeline that takes repository artifacts into the knowledge base
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+What turns the material this repository already holds into retrievable knowledge. PLAN-001 specifies
+the intake half of this for memories — Chronicle extraction, candidate batches, validation,
+authorized application (phase-mem-02 through phase-mem-06) — but not a general pipeline over the
+repository's own artifacts.
+
+Sources to enumerate, each with a stated treatment: ingested wholesale, summarised, or indexed by
+reference only. The candidates are docs/ (plans, requirements, ADRs, governance, sessions), brain/,
+_data/ideas.jsonl, docs/09-backlog/backlog.yaml, source code, and external material such as the
+research/ corpus. Treating them identically is the error to avoid: a session record and a schema
+file do not want the same handling.
+
+Units and stable identity. What a unit of knowledge is — whole document, section, or individual
+claim — and how it keeps an identity across edits. Content hashes and stable ids, the same mechanism
+phase-mem-16 already specifies for embedding invalidation, so a revised document updates rather than
+duplicates.
+
+Idempotency and re-ingestion. Running the pipeline twice must not duplicate or churn. This covers
+change detection, and what happens to derived state when a source document is edited, superseded or
+deleted — the case where derived knowledge outlives its source is the one that produces confident
+wrong answers.
+
+It extends Chronicle rather than replacing it. The relationship to phase-mem-02 through 06 must be
+stated explicitly in any plan that comes from this, or the repository ends up with two intake paths
+whose outputs disagree.
+
+The one-time migration that brings existing content across, and the governance regression pass it
+requires, are captured as a separate linked idea because the owner rated that work non-negotiable at
+MCP deployment.
+
+Related: PLAN-001 (agent memory system), 000043 (documentation database), 000004 (vector and
+semantic retrieval), 000068 (scouting research/ for uncaptured material).
+
+**Links**
+
+- relates_to → `000162`
+- relates_to → `000166`
+- relates_to → `000043`
+
+---
+
+## 000162 · An append-only event log for knowledge state: creation, transition, deprecation and pruning
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+Knowledge state should be recorded as events and folded into current state, never written as current
+state. This repository already runs the pattern twice — _data/ideas.jsonl and _tmpagent/claims.jsonl
+are both append-only, never edited, never reordered, with state derived by replaying them in order —
+and both work for the same reason: the history of how something reached its present state is exactly
+what an audit needs and what a derived-state file discards.
+
+The event vocabulary needs enumerating before anything is built: created, updated, superseded,
+deprecated, pruned, reinstated, and which fields each carries. Every ending gets a name up front,
+because a vocabulary that omits one ending forces that ending to be inferred later from absence.
+
+Pruning becomes reversible and auditable. PLAN-001's pruning gate deletes memory files and writes a
+separate pruning-log.md alongside them. With an event log, a prune is an event: the record is the
+source rather than a note beside it, a wrong prune is recoverable, and the human approval that
+authorised it is attached to the event instead of living in a proposal document that outlives its
+subject.
+
+Schema evolution and updates belong here too. How stored knowledge migrates when its schema changes,
+and whether an update is a new event or an in-place edit — the append-only answer is that it is
+always an event, which makes migration a replay concern rather than a rewrite.
+
+The long-horizon problem this has to survive. The repository will grow substantially in
+documentation scale and scope, and the log's value depends on still being able to identify what is
+relevant inside it. That is the weighting and classification question — deterministic, semantic,
+ontological, epistemic and temporal signals applied in sequence or in batch — captured as a linked
+sibling idea, together with state and transition terminology and the temporal, graph and DAG-shaped
+relationships between knowledge states.
+
+Related: 000018 (tagging and classification for ideas, currently deferred), PLAN-001's pruning gate
+(phase-mem-11 through phase-mem-13), and 000032 (evidence-backed provenance graph).
+
+**Links**
+
+- relates_to → `000163`
+- relates_to → `000018`
+- relates_to → `000032`
+- relates_to ← `000161`
+
+---
+
+## 000163 · Knowledge classification axes — ontological, epistemic, temporal — and the weighting that drives retrieval
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+Classification is only worth carrying if it changes what retrieval returns. This idea defines the
+axes and the algorithms that consume them.
+
+The axes. Ontological: what the knowledge is about — its type and subject, the axis that routes a
+query to the right body of material. Epistemic: how well it is known — provenance, confidence,
+whether it was observed, derived or asserted. Temporal: when it was true, which is a validity window
+and not the same as when it was written. Each needs worked examples from this repository, where a
+decision record, a measured test result and a parked idea sit at very different points on all three.
+
+Each axis has to change retrieval or it is decoration. Epistemic filters and ranks by confidence and
+provenance; temporal filters by validity and recency; ontological routes by type and subject. The
+test for keeping an axis is that removing it changes results.
+
+Weighting, in sequence or in batch. Deterministic, semantic, ontological, epistemic and temporal
+signals can be applied as an ordered cascade — each stage narrowing the last — or scored in parallel
+and blended into one ranking. Both are plausible and they behave differently under scale. This
+extends 000002's prioritised search order from an ordering principle to weighted scoring, and sits
+on top of 000004's deterministic-plus-semantic layering.
+
+The components get built individually. Each signal is developed and measured on its own before any
+combination is attempted, and the combination question — sequential scoping compounded on unit
+weights — is settled against measurements rather than intuition.
+
+Temporal graph and DAG relationships. Supersession chains, derivation edges and validity intervals
+modelled as a directed acyclic graph, so "what did we believe at that time" and "what replaced this"
+are queries instead of archaeology. This is where 000005's and 000044's graph work meets the
+knowledge base rather than the codebase.
+
+This design depends on the ongoing adversarial literature review; that dependency is a linked
+sibling idea.
+
+Related: 000002, 000004, 000005, 000040, 000044, 000018, and PLAN-001's split between classification
+tags and retrieval-hint tags.
+
+**Links**
+
+- extends → `000002`
+- relates_to → `000167`
+- relates_to → `000004`
+- relates_to ← `000162`
+- relates_to ← `000164`
+
+---
+
+## 000164 · Memory buckets: repo, project, category and global, with precedence and promotion rules
+
+**Created 2026-09-12T21:31:26-04:00 · Status: `open`**
+
+PLAN-001 gives every memory a scope of global, project or session. That is one axis and it is not
+enough once knowledge spans several repositories and several subject categories.
+
+Extending the scope field. Whether repo and category are additional values on the existing field or
+independent dimensions alongside it. They behave differently: a memory can be repo-specific and
+category-tagged at once, which a single enumerated field cannot express, so this is likely a
+dimension question disguised as a value question.
+
+Precedence when buckets disagree. Which bucket wins when a repo-level memory contradicts a global
+one, and whether the loser is hidden or returned with the conflict visible. Silently hiding a
+contradiction is how an agent ends up confidently wrong; surfacing it costs a little context and
+buys the chance to resolve it.
+
+Promotion and demotion. How a session memory becomes global, what demotes one, who initiates it and
+on what cadence. PLAN-001 raises this as its own open question four and leaves it unanswered, so
+this idea is the place it gets settled.
+
+Layout versus metadata. Whether buckets are physical directories or metadata on a flat store. The
+choice decides whether moving a memory between buckets is a file operation or an event — and under
+the append-only event log captured alongside this, it should be an event.
+
+Related: PLAN-001 (scope field, Vault Scribe intake, open question four), 000018 (tagging and
+classification), and the knowledge event log and classification-axes ideas captured with this one.
+An adjacent expansion of the agent claim and worktree system is a separate linked idea.
+
+**Links**
+
+- relates_to → `000163`
+- relates_to → `000168`
+- relates_to → `000018`
+
+---
+
+## 000165 · The enforcement harness: make a violation impossible rather than forbidden
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+Every rule in AGENTS.md, CLAUDE.md and the governance documents is advisory. An agent follows them
+because it read them and chose to. The owner's requirement is different in kind: for the rules that
+matter, the agent should not be able to do the thing at all. Not a suggestion to do or not do, but a
+capability it has or physically does not have.
+
+This is the premise the blended direct-read-plus-MCP design rests on. When some direct file access
+stays legitimate, only a deterministic harness can separate the permitted case from the impossible
+one, so a blend needs stronger enforcement than either pole would.
+
+Three control points, with different strengths. Hooks block commands and paths before a tool runs and
+are deterministic. The per-agent tool allowlist removes a capability entirely, which is stronger
+still, because an absent tool cannot be reasoned around. MCP-side authorization can apply semantic
+and model-based judgement that the first two cannot, at the cost of being probabilistic. Any design
+has to say which rules get which treatment; a rule that needs certainty cannot be enforced by the
+third.
+
+Evidence from this repository, on 2026-09-12. Hooks blocked every write path to AGENTS.md and
+CLAUDE.md — Edit denied, Bash denied on any command naming those paths — even with the owner's
+explicit per-change approval in hand. Enforcement held, and it changed the workflow rather than
+stopping it: the session produced a verified candidate file and a prompt for another agent to apply
+it, and the result was checked by diff. That is enforcement working as designed.
+
+The approved-but-blocked path is the part that needs designing. When the owner authorises something
+the harness forbids, there must be a sanctioned route — or agents will reach for ways around the
+guard, and the guard's value depends entirely on that never being possible. The candidate handoff
+used on 2026-09-12 is one such route, recorded in
+brain/procedures/hook-blocked-writes-hand-off-a-candidate.md. 000156's version-control request queue
+is a natural home for the general case.
+
+Related: 000014 (hooks and settings.json audit), 000031 (capability and approval broker for agent
+actions), 000051 (agent harness and guardrails), 000156 (version-control queue).
+
+**Links**
+
+- relates_to → `000014`
+- relates_to → `000031`
+- relates_to → `000051`
+- relates_to ← `000159`
+- relates_to ← `000160`
+- relates_to ← `000169`
+
+---
+
+## 000166 · The one-time migration to MCP-held knowledge, with a mandatory governance regression pass
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+When MCP is deployed, existing content has to move, and the owner's position is that this migration
+plan is critical, essential and non-negotiable — without it the cutover produces significant
+warnings, errors and lost functionality. It is captured separately from the ingestion pipeline
+design because it is a distinct body of work that should become its own plan and phases rather than
+a paragraph inside someone else's.
+
+Every repository, this one first. The migration is a roll-forward re-evaluation of all available
+knowledge across every repository being worked on, starting with this one. It is not an index build
+over existing files; it is a pass that re-examines what the knowledge is and whether it still holds,
+which is why it happens once rather than continuously.
+
+A governance regression pass is the non-negotiable half. Every check, test, tool and command that
+touches a file moving to MCP must be re-verified against the new arrangement. The concrete exposure
+here is specific: the governance validator walks docs/ and brain/, the catalog is regenerated and
+diffed by a test, tools/check_no_private_content.py reads git ls-files, and ideas.md is generated
+from ideas.jsonl and drift-tested. Each of those assumes files on disk in known locations. Moving
+their inputs without re-verifying them produces exactly the silent breakage the owner is guarding
+against.
+
+Cutover and rollback. Whether file-based and MCP paths run in parallel during the transition, what
+evidence proves the migration correct before the file path is retired, and how it is reversed if the
+service proves unready. A migration with no stated rollback is a one-way door.
+
+Related: 000020 (the MCP server), the ingestion pipeline idea captured alongside this one, 000021
+(no backup or disaster-recovery plan), and 000150 (the private-content check silently doing nothing
+in a worktree — an example of a check that passes by not looking, which is the failure class this
+pass exists to catch).
+
+**Links**
+
+- relates_to → `000020`
+- relates_to → `000021`
+- relates_to ← `000161`
+
+---
+
+## 000167 · The knowledge-architecture design depends on the adversarial literature review now running
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+The weighting, schema and classification decisions in the knowledge-architecture idea set should not
+be settled before the adversarial literature-review campaign reports. This records that dependency
+so it is visible when these ideas reach triage, rather than discovered after a design has been
+committed to.
+
+The dependency direction is one-way. Classification axes, retrieval weighting, the knowledge event
+log's vocabulary and the knowledge base's schema all wait on the campaign's recorded collisions.
+The campaign does not wait on them.
+
+The specific outputs that feed the design, not the campaign in the abstract: the collision scoring
+against each hypothesis, the source inventory, and the terminology map. The terminology map matters
+most immediately — the state and transition vocabulary the event log needs is exactly the kind of
+term the campaign is already fixing against prior art, and inventing a second vocabulary in parallel
+would waste both.
+
+H0 shapes the design stance. The campaign works to support H0: that D-System is primarily a
+recombination of known ideas. If H0 holds, the right move for this architecture is to adopt prior
+art deliberately — named, cited and matched to its source — rather than to invent. That changes how
+these ideas get planned, not merely how they get credited, because adopting a known design means
+inheriting its known failure modes and its literature on when it breaks.
+
+What is not blocked. The enforcement harness and the MCP tool surface do not depend on the
+literature at all — they are questions about this repository's own controls and interfaces. The
+migration and regression pass is likewise independent. Saying so keeps the dependency from freezing
+the whole set.
+
+Related: 000068 (scouting research/ for uncaptured material), the campaign's own phases
+(phase-lit-01 onward) and its prompt pack (PROMPT-029 through PROMPT-031).
+
+**Links**
+
+- relates_to → `000068`
+- relates_to ← `000163`
+
+---
+
+## 000168 · Expand the claim and responsibility system: worktree lifecycle, per-worktree agent queues, orchestrator handoff
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+Today's protocol assumes one agent, one phase, one worktree, held for the life of the work. That
+assumption is already strained — it has no answer for an agent that stalls mid-phase, and none for
+work that wants several agents in the same tree.
+
+Multiple agents per worktree. A queue of agents on one worktree, with ordering and explicit handoff
+between them, replacing the one-agent-one-tree assumption. This is the structure that makes the
+short-lived purpose-built agents captured in a linked sibling idea practical, since they need
+somewhere to run that outlives any one of them.
+
+Changing the primary agent on a live worktree. What transfers, what the outgoing agent must leave
+behind, and how peers learn the owner changed. This already happened once: the 2026-09-11 build
+session replaced a stalled orchestrator mid-phase, and the handoff was improvised rather than
+defined.
+
+Responsibility below phase level. Claims today are one phase to one agent, recorded in
+backlog.yaml. When several agents share a tree, responsibility needs to be addressable at a finer
+grain — which agent owns which deliverable, and what a claim means when it is no longer coextensive
+with a worktree.
+
+Other queues and responsibilities. The wider survey: what else in this system is currently
+negotiated by convention and should be an ordered queue with an owner instead. 000156 proposes one
+for version-control operations and 000152 a registry of active worktrees; this asks what the
+complete set is rather than adding them one incident at a time.
+
+Related: 000151 (the claim system's dependency on a shared primary checkout), 000152 (worktree
+registry), 000156 (version-control request queue), 000128 (shared state model for multi-agent
+sessions), 000041 (preventing one agent from clobbering another's uncommitted work), ADR-003
+(multi-agent concurrency).
+
+**Links**
+
+- relates_to → `000151`
+- relates_to → `000152`
+- relates_to → `000156`
+- relates_to → `000169`
+- relates_to ← `000164`
+
+---
+
+## 000169 · Ephemeral purpose-built agents: crafted for a purpose, disposed at optimal use, rebuilt with fresh context
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+Instead of long-lived general agents that accumulate context until it degrades them, agents are
+built for a specific purpose, used until that purpose is served, disposed of, and replaced by a new
+agent assembled for what comes next. The unit of reuse becomes the construction recipe, not the
+running agent.
+
+Craft, use, dispose, rebuild. The lifecycle itself, stated plainly enough to be implementable: what
+a purpose specification contains, what disposal does with anything the agent learned, and what
+carries forward into its successor.
+
+The Librarian supplies the context that makes reconstruction possible. A successor agent is
+assembled with retrieved, relevant context and a scoped toolset rather than inheriting a long
+transcript. This depends on PLAN-001's Librarian and on the retrieval work in the knowledge
+architecture ideas — without good retrieval, disposal just destroys context and reconstruction
+starts from nothing, which is worse than the long-lived agent it replaces.
+
+Disposal criteria in observable terms. What "optimal use reached" actually means: context
+saturation, scope completion, or measurably degraded output. An unmeasurable retirement rule never
+fires, and the agent stays alive past its usefulness by default — which is the present situation.
+
+Minimal scope by construction. Each agent receives only the tools and context its purpose requires.
+That is the enforcement harness applied per agent rather than per repository, and it is what makes a
+short-lived agent safer than a long-lived one rather than merely cheaper.
+
+Related: PLAN-001 (the Librarian), 000127 (idea skill delegating capture to a subagent to protect
+main-session context), 000048 (an idea scribe agent), 000051 (agent harness and guardrails), 000139
+(delegation-scoping methodology), and the enforcement-harness and per-worktree-queue ideas captured
+alongside this one.
+
+**Links**
+
+- relates_to → `000127`
+- relates_to → `000128`
+- relates_to → `000165`
+- relates_to ← `000168`
+
+---
+
+## 000170 · A Claude Code teaching kit for Finance Transformation consultants: the fifteen-to-twenty minute live demo
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `open`**
+
+Build a teaching kit for a live 15-20 minute Claude Code demo aimed at Finance Transformation
+consultants, most of whom have minimal coding background. Nothing in the kit is code-focused: no git,
+no debugging, no repositories. Every entry must be demoable in under 90 seconds and immediately
+useful to someone who has never opened a terminal.
+
+The real curriculum is not skills and agents. It is teaching consultants how to think with an
+agentic partner; the artefacts are the evidence for that lesson, not the lesson itself.
+
+The four teaching beats, and every entry belongs to exactly one:
+1. Context is everything - the context file and the situation you are working in.
+2. Conversation beats command - letting Claude interview you instead of guessing.
+3. Capture what works - turning a good prompt into something reusable.
+4. Delegate and scale - agents and separate context.
+
+The single most important idea in the kit: people under-specify because they cannot see which
+details are load-bearing, and the model often can. At least one entry must embody this directly
+rather than describe it.
+
+The roster must demonstrate, not blur, the distinction between the three invocation models. A
+command is invoked deliberately by the presenter. A skill is invoked by Claude when it recognises
+the need. An agent is delegated to in a separate context. The kit proves this by shipping the same
+capability twice - once as a command and once as a skill - so the audience sees the difference in
+invocation rather than in capability.
+
+Composition: 6 commands, 6 skills, 6 prompts, 5 agents. The prompts are teaching artefacts, not
+executables: a progressive ladder where each rung adds exactly one ingredient and visibly earns its
+place, plus one anti-pattern gallery. Four to five entries are marked headline showpieces - the ones
+to run live given only fifteen minutes.
+
+Running scenario across the whole kit: Nordhaven Industries, a mid-size manufacturer that has acquired three subsidiaries and now runs three different month-end closes. The engagement is to consolidate them onto one close calendar and cut the close from twelve days to five. The human obstacle is the controller at the largest subsidiary - long-tenured, well respected internally, and reading standardisation as a judgement on their team and a loss of autonomy. Their close is the slowest and also the most accurate. Nothing in the kit works without dealing with that person.
+
+Deliverables: demo-kit-manifest.json with stable ids (CMD-01, SKL-01, PRM-01, AGT-01) and dropdown
+labels for the owner's IDE; the command, skill and agent files; the prompt files; a context file
+written in the owner's voice as a consultant rather than a developer; and a facilitator guide with an
+18-minute run of show, a stated 15-minute cut line that never cuts beat 1, the
+command-versus-skill-versus-agent table as the one slide to photograph, pre-run fallbacks for slow
+live calls, and a Monday closer of at most three steps.
+
+Quality bar: every file reads as though written by someone who has run training before. Specific over
+generic. Bans and rules only where they prevent a real failure mode, with the reason stated. No
+filler sections. An entry that cannot justify its place in fifteen minutes is cut, and the reason
+recorded.
+
+Captured as given, per ADR-010's record-as-given rule. The draft was written for a fresh directory,
+not for this repository, which already has a governed root CLAUDE.md and README.md. That conflict is
+deliberately left for the adversarial review step rather than resolved at capture.
+
+This is the anchor idea; every component idea links to it.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:00-04:00): Owner decisions, 2026-09-12, after the blind triage round. (1) PLACEMENT: the kit is built into this repository's live .claude/ directory, against the recommendation of all four blind reviewers, who argued for a separate directory. The owner's call; the consequences the reviewers named still have to be handled rather than accepted - CMD-01 cannot write CLAUDE.md here, .claude/skills/orient enumerates commands from disk and src/api/routes/workbench.py enumerates agents live, so kit entries will appear in surfaces the other demo presents. (2) COMPOSITION: cut on merit rather than holding the brief's 6/6/6/5 targets, and document every cut item so it can be revisited. Cut entries stay at status triaged with a recorded reason - none is discarded. (3) ARGUMENTS: the brief's parameterised-skill requirement is mechanically wrong and resolves by moving client-ready to a command with argument-hint, where arguments actually live; the teaching point survives and becomes accurate. (4) FIXTURES: the Nordhaven corpus is captured as its own idea and built before the entries that consume it.
+
+**Links**
+
+- relates_to → `000126`
+- extended_by ← `000171`
+- extended_by ← `000172`
+- extended_by ← `000173`
+- extended_by ← `000174`
+- extended_by ← `000175`
+- extended_by ← `000176`
+- extended_by ← `000177`
+- extended_by ← `000178`
+- extended_by ← `000179`
+- extended_by ← `000180`
+- extended_by ← `000181`
+- extended_by ← `000182`
+- extended_by ← `000183`
+- extended_by ← `000184`
+- extended_by ← `000185`
+- extended_by ← `000186`
+- extended_by ← `000187`
+- extended_by ← `000188`
+- extended_by ← `000189`
+- extended_by ← `000190`
+- extended_by ← `000191`
+- extended_by ← `000192`
+- extended_by ← `000193`
+- relates_to ← `000194`
+
+---
+
+## 000171 · Demo kit CMD-01: context-me - Interviews the consultant about role, audience, engagement and house style, then writes the context file
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-01
+Slug: context-me
+Type: command - invoked deliberately by the presenter
+Teaching beat: 1
+Headline showpiece: no
+
+Description: Interviews the consultant about role, audience, engagement and house style, then writes the context file.
+
+What it teaches the audience: That the context file is something you own and can build in ninety seconds, not a developer artefact.
+
+Design note: Opens beat 1. The output is the same file used for the on/off comparison in CMD-06, so the two must be demoed in order.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:56-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-01 context-me. KEEP WITH DEFECTS. Its only output is a context file, which in this repository is CLAUDE.md - the one file an agent may not write without per-change owner approval, per both CLAUDE.md and AGENTS.md. Of the six commands this is the one whose core function is prohibited by the repository it would live in. Second defect: it is marked not-headline, yet headline CMD-06 cannot run without its output and beat 1 is never cut, so it is mandatory in practice while labelled optional - and that ordering dependency exists only as prose, with no link between 000171 and 000176, while the weaker CMD-03/CMD-04 pair is linked. Third: four topics of interview plus file generation makes the 90-second claim asserted rather than designed; it needs an explicit two-or-three-question cap. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000172 · Demo kit CMD-02: whats-load-bearing - Takes a request and names which unstated details would most change the answer, ranked, then asks only those
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-02
+Slug: whats-load-bearing
+Type: command - invoked deliberately by the presenter
+Teaching beat: 2
+Headline showpiece: yes
+
+Description: Takes a request and names which unstated details would most change the answer, ranked, then asks only those.
+
+What it teaches the audience: The central idea of the whole kit: people under-specify because they cannot see which details are load-bearing, and the model often can.
+
+Design note: Headline. This is the entry that embodies the kit's most important idea directly. Its twin is SKL-01, the same capability as a skill, and the pair is how the command-versus-skill distinction gets taught.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:56-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-02 whats-load-bearing. SOUND - no problems found. Rated the strongest of the six commands and the only entry that discharges the anchor's stated most-important idea. Genuinely under 90 seconds, genuinely useful with no terminal knowledge, correctly a command. Only quibble, not a defect: it reports before it converses, so beat 1 would fit as well as beat 2. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000177`
+
+---
+
+## 000173 · Demo kit CMD-03: stakeholder-read - Given a situation and a person, produces their likely position, what they are protecting, and what would move them
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-03
+Slug: stakeholder-read
+Type: command - invoked deliberately by the presenter
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Given a situation and a person, produces their likely position, what they are protecting, and what would move them.
+
+What it teaches the audience: That the model is useful on the human obstacle, not only the process problem.
+
+Design note: Runs against the subsidiary controller in the running scenario. Must not produce flattery or armchair psychology; the output is positions and interests, stated as inference with its basis.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:56-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-03 stakeholder-read. KEEP; cut its partner instead. Defect the idea did not name: the scenario is fictional, so the model's inference has no basis beyond the prompt the presenter just typed, and a consultant in the room can fairly say it restated the input. The demo only survives if the presenter withholds a detail and the output surfaces something unstated; that guard is not in the idea. Collides with 000174 and 000190 - three entries producing what the controller thinks. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000174`
+- relates_to ← `000181`
+
+---
+
+## 000174 · Demo kit CMD-04: steelman-the-objection - Argues the opposing case as well as the person holding it would argue it
+
+**Created 2026-09-12T21:31:27-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-04
+Slug: steelman-the-objection
+Type: command - invoked deliberately by the presenter
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Argues the opposing case as well as the person holding it would argue it.
+
+What it teaches the audience: That an agentic partner is more valuable as an adversary than as a cheerleader.
+
+Design note: Pairs with CMD-03. The demo value is that the strongest version of the controller's objection is genuinely strong - the slowest close is also the most accurate.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: teaches the same point as CMD-03 stakeholder-read, and AGT-02 objection-panel teaches it better at beat 4 with three stakeholders instead of one. It is also the most skill-shaped of the commands, creating a second undeclared command/skill ambiguity that blunts the distinction CMD-02 and SKL-01 exist to sharpen.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:56-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-04 steelman-the-objection. CUT from the fifteen-minute run, keep in the kit with the reason recorded. It teaches the same point as CMD-03, and AGT-02 teaches it better at beat 4 with three stakeholders rather than one. It is also the most skill-shaped of the six - fires when the presenter states a position is recognition, not deliberate invocation - creating a second, undeclared command/skill ambiguity that blurs the exact distinction CMD-02 and SKL-01 exist to sharpen. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to → `000173`
+
+---
+
+## 000175 · Demo kit CMD-05: capture-this - Takes what just worked in the conversation and writes it out as a reusable command or skill
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-05
+Slug: capture-this
+Type: command - invoked deliberately by the presenter
+Teaching beat: 3
+Headline showpiece: yes
+
+Description: Takes what just worked in the conversation and writes it out as a reusable command or skill.
+
+What it teaches the audience: Beat 3 in one move: the moment a good prompt stops being disposable.
+
+Design note: Headline. Demoed immediately after a prompt that visibly worked, so the audience sees capture happen on something they just watched succeed rather than on a contrived example.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:56-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-05 capture-this. KEEP AS HEADLINE, two real defects. (1) It cannot run cold: its input is what just worked, so if the preceding step underwhelms the headline has nothing to capture. The anchor mandates pre-run fallbacks and this is the entry that most needs one and has none. (2) Its payoff is a markdown file in a hidden directory; for an audience that has never opened a terminal the demo ends on trust-me-this-exists unless the presenter then invokes the just-created command - the only convincing ending, and it puts the segment well past 90 seconds. Time budget and payoff are in direct conflict. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000176 · Demo kit CMD-06: one-pager - Turns messy notes into a client-ready one-pager in the house style the context file defines
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: CMD-06
+Slug: one-pager
+Type: command - invoked deliberately by the presenter
+Teaching beat: 1
+Headline showpiece: yes
+
+Description: Turns messy notes into a client-ready one-pager in the house style the context file defines.
+
+What it teaches the audience: What a context file is worth, by running the identical prompt with the file on and off.
+
+Design note: Headline. The facilitator note for the context file hangs on this: run it both ways and ask the room which output they would send a client. The comparison is the teaching moment, not the one-pager.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:57-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. CMD-06 one-pager. KEEP AS HEADLINE - best payoff in the kit - with two defects. (1) It forms a second, accidental command/skill twin with SKL-02 house-style, whose stated job is exactly CMD-06's in-the-house-style clause. The anchor's claim is that the kit ships one capability twice deliberately so invocation is the visible variable; an undeclared second pair weakens that lesson. (2) The 90-second constraint is plainly false here: two full generations plus the room comparing both is three to four minutes, and turning the context file off mid-demo means moving a file and restarting the session. The comparison must be half pre-baked and the kit should say so rather than claim a live toggle. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000177 · Demo kit SKL-01: load-bearing-details - Fires when a request for a deliverable arrives under-specified, and asks the two or three questions that would change the output
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-01
+Slug: load-bearing-details
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 2
+Headline showpiece: yes
+
+Description: Fires when a request for a deliverable arrives under-specified, and asks the two or three questions that would change the output.
+
+What it teaches the audience: That a skill is invoked by Claude on recognition, not by the presenter - the same capability as CMD-02, arriving unasked.
+
+Design note: Headline. The description field is the trigger and must be written pushy, with the phrasings that should fire it and an explicit statement of when it should not fire - it must not interrogate someone who has already been specific.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:57-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-01 load-bearing-details. KEEP THE CAPABILITY, fix the mechanics, drop the headline flag. (1) The trigger fires on an absence, and a description cannot match on absent text; it will either fire on nearly every consulting request or never. (2) Fatal for a headline: when it fires, the audience sees Claude ask clarifying questions, which is what Claude does anyway - nothing on screen distinguishes a skill firing from ordinary helpfulness. Its twin CMD-02 is self-evidencing, so the pair teaches the distinction asymmetrically. The fix is cheap and must be required in the idea: the skill must name itself out loud in its first line of output. (3) Two of four-to-five headline slots on one capability is an allocation error; CMD-02 satisfies the anchor's embody-it requirement alone. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to → `000172`
+
+---
+
+## 000178 · Demo kit SKL-02: house-style - Fires on any client-facing writing and applies the voice rules from the context file
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-02
+Slug: house-style
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 1
+Headline showpiece: no
+
+Description: Fires on any client-facing writing and applies the voice rules from the context file.
+
+What it teaches the audience: That standards can be enforced by recognition rather than remembered by the writer.
+
+Design note: Reads its rules from the context file rather than restating them, so the audience sees one source of truth feeding two mechanisms.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: it sabotages CMD-06 one-pager, the kit's best teaching moment. CMD-06 depends on running the identical prompt with the context file on and off; SKL-02 fires on any client-facing writing and applies rules from that file, so it breaks the off run. Its own lesson can only be shown by not showing the context file, which is beat 1's whole subject. The capability survives as a section of CMD-06 rather than as an entry.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:57-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-02 house-style. CUT, or merge into CMD-06. It sabotages CMD-06: that headline's entire value is running the identical prompt with the context file on and off, and SKL-02 fires on any client-facing writing and applies voice rules from that file - so if it fires during the off run, the off run is not off and beat 1's most persuasive moment collapses on stage. Neither idea mentions the other. Its trigger is also the broadest in the set (every prompt in a consulting demo is client-facing), and its own lesson can only be shown by not showing the context file, which is beat 1's whole subject. It is a footnote to CMD-06, not an entry. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000179 · Demo kit SKL-03: notes-to-commitments - Fires when raw meeting notes are pasted, and extracts commitments with owner and date, flagging every one that has no owner
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-03
+Slug: notes-to-commitments
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 3
+Headline showpiece: no
+
+Description: Fires when raw meeting notes are pasted, and extracts commitments with owner and date, flagging every one that has no owner.
+
+What it teaches the audience: That the useful output of a meeting is the set of commitments, and the unowned ones are the finding.
+
+Design note: The unowned-commitment flag is the part that earns the demo. In the running scenario the close consolidation has several.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:57-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-03 notes-to-commitments. SOUND - no problems found. Rated the strongest of the six skills and the only one to keep unconditionally. Its trigger is the only one in the set matching a pattern actually present in the input: a pasted block of bullet fragments with names and dates is lexically recognisable. One paste provokes it, so it is well inside 90 seconds, and pasting notes without asking for anything is precisely the unasked-for-recognition case. Corroboration: this repository's own schemas/commitment.schema.json independently arrived at the same protected -field design - an agent never invents who a promise was made to, and never invents a deadline. Note: its assigned beat 3 does not match its stated lesson. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000194`
+
+---
+
+## 000180 · Demo kit SKL-04: assumption-ledger - Fires when an estimate or target number appears, and records what it depends on
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-04
+Slug: assumption-ledger
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 3
+Headline showpiece: no
+
+Description: Fires when an estimate or target number appears, and records what it depends on.
+
+What it teaches the audience: That an agentic partner can carry the bookkeeping a consultant knows they should do and does not.
+
+Design note: The five-day close target rests on assumptions nobody wrote down. This surfaces them as a ledger the consultant can hand to the client.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: near-total capability overlap with SKL-01 load-bearing-details - both answer what unstated thing this rests on, one forward and one backward, a distinction an audience will not perceive in fifteen minutes. Its trigger also fires throughout a scenario saturated with numbers, and a ledger's value accrues over an engagement rather than in 90 seconds.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:58-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-04 assumption-ledger. CUT, or fold into SKL-01. (1) Fires when an estimate or target number appears - the running scenario is saturated with numbers, so it fires throughout the demo and competes with SKL-02 for the same over-firing failure. (2) Ledger implies persistence, whose value accrues over an engagement; what fits in 90 seconds is one screenful, which is a list, not a ledger. (3) Capability overlap with SKL-01 is near-total - both answer what unstated thing is this resting on, one forward and one backward, a distinction an audience will not perceive in fifteen minutes. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000181 · Demo kit SKL-05: stakeholder-tone-check - Fires before anything addressed to a named stakeholder goes out, and checks it against what is known about that person
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-05
+Slug: stakeholder-tone-check
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Fires before anything addressed to a named stakeholder goes out, and checks it against what is known about that person.
+
+What it teaches the audience: That context about people is context too, and the model will use it if you give it.
+
+Design note: Depends on CMD-03's output existing in the conversation. Must not rewrite the message silently - it reports what would land badly and why, and leaves the decision with the consultant.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: its trigger has no signal - Claude never observes a send, so there is no goes-out event to fire on. It also cannot be provoked standalone, depending on CMD-03's output existing in the conversation, and CMD-03 is a cut candidate at fifteen minutes. Fourth entry covering the same stakeholder. Its no-silent-rewrite constraint is worth preserving wherever the capability lands.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:58-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-05 stakeholder-tone-check. CUT - rated the weakest of the six skills. (1) The trigger has no signal: Claude never observes a send, so there is no goes-out event to fire on, and the only available cue is a person's name in a draft, which the scenario contains constantly. (2) It cannot be provoked standalone - it depends on CMD-03's output existing in the conversation, and CMD-03 is not a headline and is a candidate to drop at fifteen minutes, which silently removes this entry's precondition. An entry that breaks when an unrelated entry is cut has not earned a slot in a run designed around a cut line. (3) Fourth entry covering the same stakeholder. Its no-silent-rewrite constraint is correct and worth preserving wherever the capability lands. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to → `000173`
+
+---
+
+## 000182 · Demo kit SKL-06: client-ready - Fires when a draft is about to go to a client, and adapts it for audience, length and format
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: SKL-06
+Slug: client-ready
+Type: skill - invoked by Claude when it recognises the need
+Teaching beat: 3
+Headline showpiece: no
+
+Description: Fires when a draft is about to go to a client, and adapts it for audience, length and format.
+
+What it teaches the audience: That skills take arguments, and that the same draft has different right answers for different rooms.
+
+Design note: This is the entry that takes arguments and documents them in a table: audience, length, format. Required by the brief so the kit shows at least one parameterised skill.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: cut as a skill and rebuilt as a command, per the owner's arguments decision. Arguments are a command affordance; as a skill this entry could only teach its stated property by contradicting the anchor's definition of a skill.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:58-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. SKL-06 client-ready. CUT AS A SKILL - and the requirement behind it is itself the error, which is an owner decision rather than something to build around. Its stated lesson is that skills take arguments; arguments are a command affordance (argument-hint in .claude/commands/*.md, absent from every SKILL.md in this repository). A skill fires on recognition and reads parameters from whatever the user happened to say, so there is no argument interface to demonstrate - and the only way to show audience, length and format as switchable values on stage is for the presenter to state them explicitly, which is the command model. The entry is defined to teach a property it can only demonstrate by contradicting the anchor's own definition of a skill. It is also a third entry on adapting output for a client, with a trigger indistinguishable from SKL-02's. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000183 · Demo kit PRM-01: rung-1-bare-ask - Help me with month-end close. The floor of the ladder
+
+**Created 2026-09-12T21:31:28-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-01
+Slug: rung-1-bare-ask
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Help me with month-end close. The floor of the ladder.
+
+What it teaches the audience: What under-specification actually costs, shown rather than asserted.
+
+Design note: Rung one. Its output should be plausible and useless, which is the point - the audience must recognise their own prompts here.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:58-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-01 rung-1-bare-ask. SOUND - no problems found. The floor works and plausible-and-useless is the correct target. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000184 · Demo kit PRM-02: rung-2-add-situation - Adds the situation: three subsidiaries, three closes, twelve days, a five-day target
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-02
+Slug: rung-2-add-situation
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Adds the situation: three subsidiaries, three closes, twelve days, a five-day target.
+
+What it teaches the audience: That situation is the first ingredient, and one sentence of it changes the output visibly.
+
+Design note: Rung two adds exactly one ingredient. The discipline of the ladder is that each rung adds one thing and the audience can see which.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:58-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-02 rung-2-add-situation. DEFECTIVE - adds two ingredients, not one. Three subsidiaries and three closes is situation; twelve days against a five-day target is objective. They do different work, and the reviewer's read is that almost all the visible improvement over rung 1 comes from stating the target, not the subsidiary count. The rung's own design note insists each rung adds one thing the audience can see - and this breaks that discipline in the first step after the floor, where the audience is most attentive. Split it, or move the target to its own rung. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000185 · Demo kit PRM-03: rung-3-add-audience - Adds who receives the output and what they will do with it
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-03
+Slug: rung-3-add-audience
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Adds who receives the output and what they will do with it.
+
+What it teaches the audience: That audience changes form, not just tone - a CFO memo and a controller working session are different artefacts.
+
+Design note: Rung three.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:59-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-03 rung-3-add-audience. One ingredient, correct - but the teaching claim is asserted rather than designed. Audience changes form, not just tone cannot be shown by a single output; as specified this rung produces one document and the presenter asserts it would have looked different. It must ship as a paired run - same prompt, two audiences - or the claim is unverifiable on stage. Secondary signal: its design note is the literal string Rung three, the only one of the six with no rationale, which is where an unexamined entry shows up. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000186 · Demo kit PRM-04: rung-4-add-the-obstacle - Adds the human obstacle: the respected controller whose close is slowest and most accurate
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-04
+Slug: rung-4-add-the-obstacle
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: yes
+
+Description: Adds the human obstacle: the respected controller whose close is slowest and most accurate.
+
+What it teaches the audience: That the human constraint is the load-bearing detail, and adding it changes the recommendation rather than decorating it.
+
+Design note: Headline. This is the largest visible jump in the ladder and the rung that proves the kit's central claim about load-bearing details.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:59-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-04 rung-4-add-the-obstacle. The inversion claim is probably right and is unverified, which is the risk. With rungs 1-3 the likely recommendation is standardise on the leanest close; adding that the slowest close is the most accurate and its owner is respected should invert that to auditing why it is accurate and making the controller the design authority. That is a changed recommendation, not changed wording. The adversarial case: rung 3's output will very likely already contain change-management boilerplate, in which case rung 4 reads as the same advice with a name attached - the characteristic ladder failure. It is marked headline on an untested assumption. Rehearse it and pin the outputs before building, and tighten rung 3 to withhold the hedge if it appears. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000187 · Demo kit PRM-05: rung-5-invite-the-interview - Adds the instruction to interview the consultant before answering
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-05
+Slug: rung-5-invite-the-interview
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: no
+
+Description: Adds the instruction to interview the consultant before answering.
+
+What it teaches the audience: Beat 2 stated outright: the best prompt often asks Claude to ask you.
+
+Design note: Rung five closes the ladder by handing specification back to the model, which is where CMD-02 and SKL-01 come from.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:59-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-05 rung-5-invite-the-interview. MIS-ORDERED, and the most important finding of this triage round. (1) It is a category change rather than an added ingredient: rungs 1-4 add content to the prompt, rung 5 changes the mode of the response, so its output is questions and cannot be diffed against rung 4 - the comparison mechanism that makes the ladder legible breaks at the top step, where the audience sees the output get shorter and apparently less useful at the climax. (2) As ordered it teaches the opposite of the anchor's central idea. The anchor says the single most important idea is that people under-specify because they cannot see which details are load-bearing and the model often can, and that an entry must embody it. As sequenced, the presenter reveals the controller at rung 4 - the presenter already knew - and the model never demonstrates the capability. The fix is free: run the interview against rung 2 or 3, before the obstacle is in the prompt, and let the model ask who owns the slowest close. The presenter then supplies the controller because the model asked, and rung 4 becomes rung 5's payoff rather than its predecessor. Alternative preserving the linear build: keep 1-4, then re-run the interview against rung 1 and show it recovers rungs 2-4 in one move. This reordering probably moves the headline mark, which is an owner decision. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000188 · Demo kit PRM-06: anti-pattern-gallery - The failures collected in one place: politeness padding, stacked questions, be-comprehensive, manufactured urgency, and asking for an opinion then arguing with it
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: PRM-06
+Slug: anti-pattern-gallery
+Type: prompt - a teaching artefact, not an executable
+Teaching beat: 2
+Headline showpiece: no
+
+Description: The failures collected in one place: politeness padding, stacked questions, be-comprehensive, manufactured urgency, and asking for an opinion then arguing with it.
+
+What it teaches the audience: That prompting badly is a small set of recognisable habits, not an art.
+
+Design note: Each entry names the failure, shows it, and states the fix in one line. No entry that has not actually been observed.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:59-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. PRM-06 anti-pattern-gallery. MOSTLY REAL, one weak entry, over budget. Stacked questions, be-comprehensive, manufactured urgency and asking-for-an-opinion-then-arguing-with-it are all specific named behaviours with visible consequences - the last is the strongest, because it is the failure that actually destroys value: the model capitulates and the consultant concludes it agrees with them. Politeness padding is the weak one: real behaviour, but it costs tokens and nothing else, so the fix line can only be generic. Cut or replace it. Two further defects: the design note sets the bar that no entry appears that has not been observed, and records no evidence that these five met it; and five entries at name-show-fix inside 90 seconds is about 18 seconds each, feasible only from pre-baked output. Declare it a read-aloud artefact with pinned outputs, or cut it to three. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000189 · Demo kit AGT-01: close-process-auditor - Reads a set of process documents in a separate context and reports gaps against a target close calendar
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: AGT-01
+Slug: close-process-auditor
+Type: agent - delegated to in a separate context
+Teaching beat: 4
+Headline showpiece: no
+
+Description: Reads a set of process documents in a separate context and reports gaps against a target close calendar.
+
+What it teaches the audience: That delegation buys a clean context window, not just parallelism.
+
+Design note: Read-only by construction: no write tools in its frontmatter, and its prompt says so explicitly so the audience sees scoping as a deliberate act.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:31:59-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. AGT-01 close-process-auditor. KEEP ONLY AS A PRE-RUN FALLBACK ARTEFACT, not a live run. (1) The read-only claim is wrong as stated: no write tools in the frontmatter does not produce read-only in this repository, because Bash is a write channel - .claude/agents/idea-triage.md has no write tool and writes to the idea log through it. To make the teaching claim true the file must be tools: Read, Grep, Glob with Bash excluded, and the reason stated. (2) The teaching payload is unobservable: delegation buys a clean context window looks identical on screen to pasting the documents in directly. (3) Multi-document read plus calendar comparison is heavier than the measured ~115s baseline. Measured timing evidence applying to all five agents: docs/00-working/demo-runbook.md:94 records this repository's only subagent round-trip at ~115s for /idea-triage - haiku, three tools, one small input document. Every proposed agent is heavier. All five therefore exceed the anchor's under-90-second rule before any of them is written, and beat 4 has room for two live dispatches, not five. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000194`
+
+---
+
+## 000190 · Demo kit AGT-02: objection-panel - Runs three stakeholders against a recommendation in a separate context and reports how each would react
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: AGT-02
+Slug: objection-panel
+Type: agent - delegated to in a separate context
+Teaching beat: 4
+Headline showpiece: yes
+
+Description: Runs three stakeholders against a recommendation in a separate context and reports how each would react.
+
+What it teaches the audience: What delegation is for: work that would flood the main conversation and is better returned as a summary.
+
+Design note: Headline. The panel includes the subsidiary controller, so it pays off CMD-03 and CMD-04 from earlier in the demo.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:32:00-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. AGT-02 objection-panel. SOUND as the beat-4 headline, and the only one of the kit's three stakeholder entries where delegation is visibly the right mechanism - three personas generated in-thread genuinely would flood the main conversation, and returning a summary is what agents are for. Defects: (1) worst time exposure of the survivors, three personas being the longest generation in the kit after AGT-05. (2) Tool posture unstated while AGT-01 and AGT-03 declare read-only; three agents with three different unexplained tool postures collapses the scoping-is-deliberate lesson. (3) From the audience's seat this is the third pass at stakeholder modelling, so the difference must be visibly one of scale, not merely of invocation. Measured timing evidence applying to all five agents: docs/00-working/demo-runbook.md:94 records this repository's only subagent round-trip at ~115s for /idea-triage - haiku, three tools, one small input document. Every proposed agent is heavier. All five therefore exceed the anchor's under-90-second rule before any of them is written, and beat 4 has room for two live dispatches, not five. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+
+---
+
+## 000191 · Demo kit AGT-03: evidence-checker - Verifies that every number in a draft traces to a stated source, and lists the ones that do not
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: AGT-03
+Slug: evidence-checker
+Type: agent - delegated to in a separate context
+Teaching beat: 4
+Headline showpiece: no
+
+Description: Verifies that every number in a draft traces to a stated source, and lists the ones that do not.
+
+What it teaches the audience: That a separate context is the right place for checking work, because the checker should not have watched it being written.
+
+Design note: Read-only. The teaching point is independence, which is the same reason this repository's own session close uses a non-fork reviewer.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:32:00-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. AGT-03 evidence-checker. SOUNDEST OF THE FIVE - no significant problems found. It is the only one whose teaching claim is exclusively true of agents: a command or skill running in the main context cannot be independent of that context, by construction. Its cited precedent is real and verifiable at .claude/commands/session-close.md:50, which requires a fresh non-fork subagent for exactly this reason. Smallest scope of the five, making it the best 90-second candidate, and read-only is genuinely enforceable here because it needs no Bash at all. Minor defect: subject overlap with SKL-04, which also owns numbers and what they rest on - decide which entry owns numbers. Measured timing evidence applying to all five agents: docs/00-working/demo-runbook.md:94 records this repository's only subagent round-trip at ~115s for /idea-triage - haiku, three tools, one small input document. Every proposed agent is heavier. All five therefore exceed the anchor's under-90-second rule before any of them is written, and beat 4 has room for two live dispatches, not five. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000194`
+
+---
+
+## 000192 · Demo kit AGT-04: deck-outliner - Drafts a deck outline from a brief and returns the outline only
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: AGT-04
+Slug: deck-outliner
+Type: agent - delegated to in a separate context
+Teaching beat: 4
+Headline showpiece: no
+
+Description: Drafts a deck outline from a brief and returns the outline only.
+
+What it teaches the audience: That an agent returning a small artefact from a large amount of thinking is the normal case.
+
+Design note: Returns structure, not slides. Keeps the main conversation free of the intermediate reasoning.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: a command wearing an agent costume - one prompt, one short output, nothing flooding the main context and nothing requiring independence from it. Its stated lesson is unobservable by construction, and rebuilt as a command it duplicates CMD-06.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:32:00-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. AGT-04 deck-outliner. CUT FIRST - a command wearing an agent costume. One prompt, one short output: nothing floods the main context and nothing requires independence from it. Its stated teaching, that an agent returns a small artefact from a large amount of thinking, is unobservable by construction, because the thinking is hidden and the audience sees a brief go in and an outline come out, which is exactly what a command looks like. An agent whose entire lesson is invisible cannot teach that lesson - and rebuilt as a command it duplicates CMD-06. Beat assignment is also wrong: closer to beat 2 than beat 4. Measured timing evidence applying to all five agents: docs/00-working/demo-runbook.md:94 records this repository's only subagent round-trip at ~115s for /idea-triage - haiku, three tools, one small input document. Every proposed agent is heavier. All five therefore exceed the anchor's under-90-second rule before any of them is written, and beat 4 has room for two live dispatches, not five. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to ← `000193`
+
+---
+
+## 000193 · Demo kit AGT-05: long-draft-writer - Takes an approved outline and writes the long-form draft in a separate context
+
+**Created 2026-09-12T21:31:29-04:00 · Status: `triaged`**
+
+Component of the Finance Transformation teaching kit anchor idea, captured as one idea per
+component so each can be triaged, planned or cut on its own merits.
+
+Id: AGT-05
+Slug: long-draft-writer
+Type: agent - delegated to in a separate context
+Teaching beat: 4
+Headline showpiece: no
+
+Description: Takes an approved outline and writes the long-form draft in a separate context.
+
+What it teaches the audience: That the main thread stays a conversation even when the output is long.
+
+Design note: Depends on AGT-04's outline. Together they show a two-stage delegation without the presenter managing either context.
+
+Constraints inherited from the anchor idea: demoable in under 90 seconds, useful to someone
+who has never opened a terminal, no code, git, debugging or repository content, and it must
+justify its place in a fifteen-minute run or be cut with the reason recorded.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-12T21:32:01-04:00): CUT from the build, 2026-09-12, on the owner's merit-over-composition decision. Recorded rather than discarded: this idea stays at status triaged so it can be revisited if the kit is reshaped. Reason: hardest time violation in the set and unable to be scoped down, since shortening the draft destroys the point. It silently needs write access nobody specified, and it depends sequentially on AGT-04, which is cut. Two dispatches at the measured ~115s baseline is roughly four minutes of a fifteen-minute demo for one teaching point.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-demo-kit-triage (2026-09-12T21:32:00-04:00): Blind triage, 2026-09-12. Reviewer saw only the anchor 000170 and its own component ideas, never the originating brief. AGT-05 long-draft-writer. CUT SECOND - three compounding defects. (a) Hardest time violation in the set, and unlike the others it cannot be scoped down, because shortening the draft destroys the point. (b) It silently needs write access: if the draft is returned as a message it is not written and the name is wrong; if it is written to a file the agent needs Write, which the idea never acknowledges - and the one agent that touches the disk is the one whose tool list nobody specified, for an audience that has never opened a terminal. (c) Sequential dependency on AGT-04, which is cut first; two dispatches at the measured baseline is roughly four minutes of a fifteen-minute demo for one teaching point. Its claim, that the main thread stays a conversation, is also the weakest form of beat 4 - output management rather than context independence. Measured timing evidence applying to all five agents: docs/00-working/demo-runbook.md:94 records this repository's only subagent round-trip at ~115s for /idea-triage - haiku, three tools, one small input document. Every proposed agent is heavier. All five therefore exceed the anchor's under-90-second rule before any of them is written, and beat 4 has room for two live dispatches, not five. Repository-wide findings from this triage round, recorded on every component: (1) REQ-006 R09 already defines a governed fifteen-minute demo run for this repository, built by PLAN-021 and phase-demo-01 through 06; the anchor proposes a second fifteen-minute run for a different audience and never acknowledges the first. (2) Placement is unresolved and load-bearing: .claude/commands, .claude/skills and .claude/agents are live working infrastructure, .claude/skills/orient enumerates commands from disk (REQ-006 R09 presents that enumeration), and src/api/routes/workbench.py enumerates .claude/agents/*.md live, so fictional training artefacts dropped into those directories corrupt surfaces the other demo presents. (3) GOV-008 and ADR-017 require a build of this size to go through the prompt-pack pipeline; no requirement, plan or phase exists. (4) The headline count is six against an anchor allowing four to five. (5) No component idea creates the Nordhaven fixture corpus; grep finds the name only in the anchor's own body.
+
+</details>
+
+**Links**
+
+- extends → `000170`
+- relates_to → `000192`
+
+---
+
+## 000194 · The Nordhaven fixture corpus the demo kit's entries need, which nothing currently owns
+
+**Created 2026-09-12T21:31:30-04:00 · Status: `open`**
+
+Three entries in the demo kit cannot be demoed at all without source material that no component idea
+creates. Blind triage found that grep for the scenario name across the whole worktree hits exactly
+one line - the anchor's own body.
+
+What is needed, by the entry that needs it:
+- A set of month-end close process documents, one per subsidiary, differing enough that a gap report
+  against a target close calendar is a real finding rather than a restatement. Needed by the close
+  process auditor agent.
+- A draft containing numbers, some traceable to a stated source and some deliberately not, so the
+  evidence checker has something to find. The untraceable ones are the demo.
+- Raw meeting notes with commitments, several with owners and dates and at least two with neither,
+  so the notes-to-commitments skill's unowned-commitment flag fires on real material.
+- An approved outline, if the two-stage delegation entries survive the cut.
+
+One company, one version. The risk if each entry creates its own fixture is three inconsistent
+versions of the same fictional company appearing in one fifteen-minute demo, which an audience will
+notice faster than any of the teaching points.
+
+The corpus also has to carry the scenario's human obstacle rather than only its process facts: the
+subsidiary controller whose close is the slowest and the most accurate. Several entries depend on
+that tension being visible in the source material, not just in the presenter's narration. The
+stakeholder-read entry has a related requirement from triage - the demo only lands if the presenter
+withholds a detail and the model surfaces something unstated, which is only possible if the fixture
+contains more than the presenter says aloud.
+
+This is a hard dependency and is built before the entries that consume it.
+
+Confidentiality: the corpus is fictional and must stay that way. It is a teaching prop for a live
+audience, so no real client name, engagement or figure may appear in it.
+
+Related: the demo kit anchor idea and the agent, skill and prompt entries that consume the corpus,
+all linked.
+
+**Links**
+
+- relates_to → `000170`
+- relates_to → `000189`
+- relates_to → `000191`
+- relates_to → `000179`

@@ -88,6 +88,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.01 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md |
 | PLAN-023.02 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.02-search-domain-matrix.md |
 | PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
+| PLAN-024 | plan | draft | repository-owner | docs/01-plans/PLAN-024-consultant-demo-kit.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -128,6 +129,7 @@ CI regenerates it and fails on any difference.
 | REQ-005 | requirement | draft | repository-owner | docs/06-requirements/REQ-005-portable-agent-workflows.md |
 | REQ-006 | requirement | draft | repository-owner | docs/06-requirements/REQ-006-live-demo.md |
 | REQ-007 | requirement | draft | repository-owner | docs/06-requirements/REQ-007-workbench.md |
+| REQ-008 | requirement | draft | repository-owner | docs/06-requirements/REQ-008-consultant-demo-kit.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -232,11 +234,12 @@ CI regenerates it and fails on any difference.
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
-| PLAN-022 | doc-workbench | active | 2 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
+| PLAN-022 | doc-workbench | active | 0 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
 | PLAN-023 | doc-lit-campaign | draft | 5 | 1 | 1 | agent-lit |
 | PLAN-023.01 | doc-lit-campaign-scope | draft | 5 | 1 | 1 | agent-lit |
 | PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 5 | 1 | 1 | agent-lit |
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 5 | 1 | 1 | agent-lit |
+| PLAN-024 | doc-consultant-demo-kit | draft | 8 | 0 | 0 | — |
 
 ## Held codes
 
@@ -246,4 +249,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-188 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 37, prompt: 33, requirement: 7, session: 67.
+190 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 38, prompt: 33, requirement: 8, session: 67.
