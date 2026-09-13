@@ -28,11 +28,18 @@ The build is an **analysis**, not a code build. Four analyst agents each partiti
 idea corpus independently, an adversary audits twice, an agent integrates, and the owner rules.
 The deliverable is one ungoverned staging document in `docs/00-working/`.
 
-Because of that, this pack deliberately contains **no worktree setup, no port assignments, no
-browser verification and no schema-drift gates**. Their absence is scoping, not oversight — a
-reader arriving from the code-build precedents (`PROMPT-018`, `PROMPT-021`) should not go looking
-for them. No agent in this build writes a repository file, so no agent needs an isolated
-checkout.
+Because of that, this pack deliberately contains **no per-dispatch worktree setup, no port
+assignments, no browser verification and no schema-drift gates**. Their absence is scoping, not
+oversight — a reader arriving from the code-build precedents (`PROMPT-018`, `PROMPT-021`) should
+not go looking for them. The analysts and the adversary are subagents dispatched inside the build
+session, not sessions of their own, and they write only to the gitignored `_working/idea-corpus/`,
+so none of them needs an isolated checkout.
+
+**That scoping covers the dispatches, not the session.** The build session itself works in a
+worktree like every session, per `AGENTS.md`'s worktree-everywhere rule (2026-09-12) — it writes
+the batching staging document into `docs/00-working/`, which is a tracked file. `K` below carries
+the step. Owner ruling, 2026-09-12: `PROMPT-025`'s "must not carry worktree setup" constraint is
+read narrowly as scoping to the dispatches, and no ratified decision is amended.
 
 ## Section letters
 
@@ -99,7 +106,17 @@ anything.
 Assess the current state of the repository against the deliverables below; do only what is
 missing; report what already existed.
 
-1. Preflight, recording real output:
+1. Work in a worktree. AGENTS.md requires one for every session regardless of what the work
+   touches; this build writes the staging document into docs/00-working/, a tracked file. From
+   the primary checkout on an up-to-date dev:
+
+     git worktree add -b agent/idea-batching ../d-system-worktrees/idea-batching dev
+     cd ../d-system-worktrees/idea-batching
+     uv venv && uv sync --extra dev
+
+   Do not switch the primary checkout's branch, and run everything below in the worktree.
+
+2. Preflight, recording real output:
 
      uv run python -m src.governance --inventory     # must exit 0
      uv run python -m src.governance --ready         # active claims; check max_active numerically
@@ -108,7 +125,7 @@ missing; report what already existed.
 
    A failing check is a result to record, not a step to retry until quiet.
 
-2. Build the corpus and read the manifest:
+3. Build the corpus and read the manifest:
 
      uv run python tools/build_idea_corpus.py
      cat _working/idea-corpus/manifest.json
@@ -117,11 +134,11 @@ missing; report what already existed.
    If the manifest's size disagrees with the kick-off record's pinned figure, that is a fact to
    report to the owner, not a discrepancy to reconcile silently.
 
-3. Dispatch order. R1, R2, R3 and R4 are independent and may run concurrently; none may see
+4. Dispatch order. R1, R2, R3 and R4 are independent and may run concurrently; none may see
    another's output. Then GATE 1. Then A1. Then GATE 2. Then synthesis (S, in the main session).
    Then A2. Then GATE 3.
 
-4. Gate schedule (PROMPT-025 decision 12) — the build stops for owner check-in at each:
+5. Gate schedule (PROMPT-025 decision 12) — the build stops for owner check-in at each:
 
      GATE 1  when the four analyst reports land
      GATE 2  when audit 1 returns
@@ -132,7 +149,7 @@ missing; report what already existed.
    agent challenges the finding and attempts a solution — and the build pauses for the owner
    only if the issue survives that review unresolved.
 
-5. Analyst reports are written to _working/idea-corpus/report-R1.md .. report-R4.md. The audits
+6. Analyst reports are written to _working/idea-corpus/report-R1.md .. report-R4.md. The audits
    read them from there.
 ```
 

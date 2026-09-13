@@ -121,8 +121,10 @@ in chat is a convenience.
 > and then `docs/02-prompts/PROMPT-032-idea-batching-delegation-pack.md`, which holds every prompt
 > you will dispatch. Background, if you need it: `docs/08-governance/GOV-008-prompt-pack-protocol.md`
 > and `docs/02-prompts/PROMPT-025-idea-batching-pre-plan-package.md` (the sixteen ratified
-> decisions — do not re-ask any of them). Run the delegation pack's `K` section first: preflight,
-> then `uv run python tools/build_idea_corpus.py`, then read
+> decisions — do not re-ask any of them). **Work in a worktree** — `AGENTS.md` requires one for
+> every session regardless of what the work touches, and this build writes a tracked file — and
+> never switch the primary checkout's branch. Run the delegation pack's `K` section first: the
+> worktree, then preflight, then `uv run python tools/build_idea_corpus.py`, then read
 > `_working/idea-corpus/manifest.json` for the real corpus size rather than assuming one. Dispatch
 > `R1`–`R4` concurrently to general-purpose sonnet agents, sending each block verbatim and
 > changing nothing — `R4` is a bias control and must never be told that it is one, that findings

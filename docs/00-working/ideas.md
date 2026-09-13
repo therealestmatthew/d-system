@@ -35,13 +35,15 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
-2. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-3. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-4. `000038` — Formalize the requirements-vs-plans process and design
-5. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-6. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-7. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+1. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
+2. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
+3. `000099` — Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
+4. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+5. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+6. `000038` — Formalize the requirements-vs-plans process and design
+7. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+8. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+9. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -7317,3 +7319,61 @@ work.
 
 - relates_to → `000154`
 - relates_to → `000066`
+
+---
+
+## 000157 · Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
+
+**Created 2026-09-12T20:37:28-04:00 · Status: `open`**
+
+Owner ask, 2026-09-12, at the close of SESS-2026-09-12-06. Written up in full at docs/00-working/handoff-demo-cut-and-batching-pack.md; this idea exists so the queue surfaces it rather than relying on anyone remembering.
+
+Everything the owner ruled on is done and merged. What remains is three items, none blocking.
+
+1. GOV-008 STAGE 5. The idea-batching pack (PROMPT-032 delegation pack, partition-adversary charter, tools/build_idea_corpus.py with OPS-015, PROMPT-033 kick-off record) is manufactured and was independently reviewed at session close against 21 conditions, but it has NOT had its stage 5 adversarial audit. No analyst may be dispatched before that audit and the owner's approval. The one defect the close review surfaced - that the pack never told the build session to work in a worktree, written before the worktree-everywhere rule landed - is already fixed under the owner's narrow-reading ruling, so stage 5 starts from a corrected pack.
+
+2. THE PRIVATE-CONTENT CHECK RAN AT HALF STRENGTH ALL SESSION. tools/check_no_private_content.py reported "OK (532 tracked files, 0 identifiers checked)" every time, because _private/portfolio/ is absent from an agent worktree and the content check silently skips - only the path check ran. The phase-wb-10 precedent symlinked _private in to get real coverage. Worth re-running where the portfolio is present, and worth deciding separately whether a check that cannot fail in the environment agents actually work in should report OK at all.
+
+3. REMOVE THE WORKTREE at /code/d-system-worktrees/demo-cut-pack-factory. Its 1.7MB of gitignored corpora under _working/idea-corpus/ are carried by no merge but regenerate exactly with build_idea_corpus.py --seed 20260912, so nothing needs backing up.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-pack-factory (2026-09-12T20:37:44-04:00): Item 2.4 of the handoff, now CLOSED rather than outstanding. Recorded because the reasoning outlives the fix.
+
+The worktree-everywhere rule landed after the pack was written - e6b32a3 (GOV-001, GOV-002, GOV-003) and 33f931a (AGENTS.md, CLAUDE.md) - and the pack told the build session nothing about a worktree. Confirmed by grep rather than by reading the pack's own claims: PROMPT-033 contained no occurrence of "worktree" at all, and PROMPT-032's only mentions were the sentence disclaiming worktree setup plus a bare clean-checkout line in K. The pack's stated ground, that no agent in this build writes a repository file, was false at one point, because the integrator writes the batching staging document into docs/00-working/, which is tracked.
+
+Half the pack's reasoning survived and half did not. The analysts R1-R4 and the adversary A1/A2 genuinely need no worktree - they are subagents dispatched inside the build session rather than sessions of their own, and they write only to the gitignored _working/idea-corpus/. The build session itself does need one.
+
+OWNER RULING, 2026-09-12: read PROMPT-025's "must not carry worktree setup" constraint NARROWLY, as scoping to the dispatches rather than to the session, and amend no ratified decision. The constraint never contemplated the session's own checkout.
+
+Applied in the same session: PROMPT-032's scoping paragraph now reads "no per-dispatch worktree setup" and states why the dispatches need none while the session does; PROMPT-032's K section gains a step 1 creating and entering the worktree, with the remaining steps renumbered; and PROMPT-033's kick-off paragraph carries the same instruction. GOV-008 stage 5 therefore audits a corrected pack rather than rediscovering this.
+
+</details>
+
+**Links**
+
+- relates_to ← `000158`
+
+---
+
+## 000158 · Idea ids collide across branches exactly like document codes, but nothing catches it
+
+**Created 2026-09-12T20:37:28-04:00 · Status: `open`**
+
+Found 2026-09-12 during the integration of SESS-2026-09-12-06. Two different ideas were both allocated 000153: that session's hand-off idea, created 12:16:28 on an unintegrated branch, and a peer session's "The session hand-off protocol is now described in three places and drifts between them", created 14:47:02 and committed to dev. tools/append_idea.py allocates the next id by reading _data/ideas.jsonl, and the peer's session read a log that did not contain the first idea because it had not been merged yet.
+
+This is precisely the race AGENTS.md already documents for document codes - "Codes are free before merge and permanent after, so the agent integrating second renumbers" - reappearing on idea ids. The difference is that document codes have a guard and idea ids do not. A duplicate document code raises a governance error; a duplicate idea id raises nothing. This collision surfaced only as a git conflict during a rebase, and it surfaced at all only because both sides happened to touch adjacent lines of an append-only file. Had the two appends landed further apart in the log, git would have merged both cleanly and fold() would have silently folded two unrelated created events into one idea.
+
+That is the real severity: the failure mode is not a conflict, it is a silent merge. An annotation written against the id would also land on whichever idea won, which is the misdirected-write failure that .claude/agents/idea-triage.md already carries a warning about for a different cause.
+
+Worth considering, none obviously right: a governance check that fails on any id with more than one created event in the folded log, which is cheap and catches the silent case after the fact; allocating ids from a reserved register the way document codes are reserved in codes.yaml, which pushes the race back to the same place codes already handle it; or making the id a function of the content or the event id rather than a sequence, which removes the race entirely at the cost of the readable six-digit handle that GOV-006 leans on when it tells agents to lead with the id.
+
+Relates to 000152 (a registry of active worktrees) and 000151 (the claim system's dependence on one shared primary checkout) - all three are cases where coordination state lives in a file on a branch rather than somewhere every session can see it.
+
+**Links**
+
+- relates_to → `000157`
