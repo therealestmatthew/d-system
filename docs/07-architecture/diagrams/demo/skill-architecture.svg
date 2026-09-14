@@ -35,7 +35,7 @@
   <text class="code mono" x="96" y="244">orient/SKILL.md</text>
   <text class="code mono" x="96" y="268">checkpoint/SKILL.md</text>
   <text class="code mono" x="96" y="292">log-anti-patterns/SKILL.md</text>
-  <text class="small" x="56" y="312">One folder per skill. Supporting files are optional.</text>
+  <text class="small" x="56" y="318">One folder per skill. Supporting files are optional.</text>
 
   <!-- SKILL.md anatomy -->
   <rect class="panel" x="490" y="80" width="498" height="382" rx="12"/>
