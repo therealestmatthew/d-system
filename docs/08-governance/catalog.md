@@ -89,6 +89,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.02 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.02-search-domain-matrix.md |
 | PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
 | PLAN-024 | plan | draft | repository-owner | docs/01-plans/PLAN-024-consultant-demo-kit.md |
+| PLAN-025 | plan | draft | repository-owner | docs/01-plans/PLAN-025-repeatable-idea-partition.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -130,6 +131,7 @@ CI regenerates it and fails on any difference.
 | REQ-006 | requirement | draft | repository-owner | docs/06-requirements/REQ-006-live-demo.md |
 | REQ-007 | requirement | draft | repository-owner | docs/06-requirements/REQ-007-workbench.md |
 | REQ-008 | requirement | draft | repository-owner | docs/06-requirements/REQ-008-consultant-demo-kit.md |
+| REQ-009 | requirement | draft | repository-owner | docs/06-requirements/REQ-009-repeatable-idea-partition.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -244,6 +246,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 4 | 1 | 2 | agent-lit |
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 4 | 1 | 2 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 4 | 0 | 0 | — |
+| PLAN-025 | doc-repeatable-idea-partition | draft | 3 | 0 | 0 | — |
 
 ## Held codes
 
@@ -252,5 +255,6 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
+| PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-194 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 38, prompt: 33, requirement: 8, session: 71.
+196 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 39, prompt: 33, requirement: 9, session: 71.

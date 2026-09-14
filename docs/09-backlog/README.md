@@ -21,6 +21,7 @@
 | `phase-plc-*` | Retiring root `plans/` as a governed concept and consolidating it into `docs/01-plans/` | [Plans directory consolidation](../01-plans/PLAN-018-plans-directory-consolidation.md) |
 | `phase-demo-*` | Live-demo stage backend and frontend, deterministic overview tools, overview generation and demo readiness | [Live demo plan](../01-plans/PLAN-021-live-demo.md) |
 | `phase-wb-*` | Workbench — the stage becomes the chartered management UI: backend API, layout engine and notes strip, terminal rework and shells, HTML Viewer, explorers, rehearsal refresh | [Workbench plan](../01-plans/PLAN-022-workbench.md) |
+| `phase-part-*` | Repeating an idea-partition sweep: the reusable prompt pack, a selectable corpus status, and the `/partition-ideas` workflow | [Repeatable idea partition](../01-plans/PLAN-025-repeatable-idea-partition.md) and [requirements](../06-requirements/REQ-009-repeatable-idea-partition.md) |
 
 ```bash
 uv run python -m src.governance --ready

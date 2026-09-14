@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-13'
+updated: '2026-09-14'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -6524,3 +6524,149 @@ items:
   - .claude/agents/
   next_action: Create demo-agent-evidence-checker, whose read-only posture is genuinely
     enforceable because it needs no Bash.
+- id: phase-part-01
+  title: Write the reusable partition pack
+  plan: doc-repeatable-idea-partition
+  sources:
+  - doc-repeatable-idea-partition-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Create PROMPT-034 carrying six blocks and no per-build state - the analyst brief,
+    the control brief, audit 1, audit 2, the synthesis protocol and the gate.
+  - Carry the partition criterion, the two levels, the six-field batch record, the
+    completeness arithmetic, the unbatched section, the decline tiers and the three
+    synthesis prohibitions across from PROMPT-032 unchanged in substance.
+  - Rewrite for a four-dispatch sweep - section letters R1, R4, A1, A2, S and G;
+    audit 1's convergence check, which was written for a 3-1 split; and the descope
+    ladder, whose first two rungs surrendered analysts the sweep no longer runs.
+  - Decide and write what audit 1 does with a one-reader-one-control disagreement,
+    which has no majority to read and two indistinguishable explanations.
+  - Leave PROMPT-032 active and unedited as the record of the first sweep.
+  acceptance:
+  - PROMPT-034 contains all six blocks, each independently dispatchable and opening
+    with the idempotency sentence.
+  - No pinned corpus size, per-build owner ruling or kick-off delta appears anywhere
+    in it.
+  - The control brief mentions findings, other analysts and differing input nowhere.
+  - The dispatch table states that the corpus-ordering variation is dropped, and cites
+    000205 as the measurement that dropped it.
+  - PROMPT-032 is unchanged by this phase.
+  verification:
+  - Read PROMPT-034 for a pinned number or a per-build ruling; each occurrence is a
+    defect to fix before the phase closes.
+  - Diff the control brief against the analyst brief and confirm the only differences
+    are the removals REQ-009 R08 requires.
+  - git diff dev -- docs/02-prompts/PROMPT-032-idea-batching-delegation-pack.md is empty.
+  - uv run python -m src.governance exits 0 with PROMPT-034 present and the catalog
+    regenerated.
+  deliverables:
+  - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
+  next_action: Draft audit 1's convergence brief first. It is the block that cannot be
+    copied across, because a 1-1 disagreement is not the 3-1 split the original was
+    written to read.
+- id: phase-part-02
+  title: Make the corpus status selectable and test the corpus builder
+  plan: doc-repeatable-idea-partition
+  sources:
+  - doc-repeatable-idea-partition-requirements
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add --status to tools/build_idea_corpus.py, accepting one status or a comma-separated
+    list and defaulting to triaged, and stop using CORPUS_STATUS as the filter.
+  - Reject an unrecognized status with a message naming the valid set, taken from the
+    idea record system rather than a second hard-coded list.
+  - Record the selected statuses in manifest.json.
+  - Create test/test_build_idea_corpus.py. The tool currently has no tests at all, so
+    the default-behaviour guarantee has nothing holding it.
+  - Update OPS-015's narrative for the flag and regenerate its tool-reference block
+    with tools/generate_tool_docs.py.
+  acceptance:
+  - build_idea_corpus.py --stats with no status argument is byte-identical to its output
+    before this change.
+  - A non-default status selects exactly the ids a direct fold() query returns for that
+    status.
+  - An unrecognized status exits non-zero and names the valid set.
+  - manifest.json records the selected statuses on a default run as well as a
+    non-default one.
+  - No module-level constant is used as the status filter.
+  verification:
+  - Capture uv run python tools/build_idea_corpus.py --stats on dev, then on the branch,
+    and diff the two files.
+  - uv run pytest test/test_build_idea_corpus.py
+  - uv run python tools/build_idea_corpus.py --status open --stats and compare against
+    a fold() query for open ideas.
+  - uv run python tools/build_idea_corpus.py --status nonsense; confirm a non-zero exit
+    and a message naming the valid set.
+  - uv run ruff check tools/ test/ and uv run pytest
+  deliverables:
+  - tools/build_idea_corpus.py
+  - test/test_build_idea_corpus.py
+  - docs/08-governance/OPS-015-build-idea-corpus.md
+  next_action: Capture the --stats baseline from dev before touching the tool. It is the
+    only evidence that the default behaviour did not move, and it cannot be reconstructed
+    afterwards.
+- id: phase-part-03
+  title: Build the partition-ideas workflow
+  plan: doc-repeatable-idea-partition
+  sources:
+  - doc-repeatable-idea-partition-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-part-01
+  - phase-part-02
+  scope:
+  - Create .claude/skills/partition-ideas/SKILL.md as a runner whose every dispatch is
+    a verbatim PROMPT-034 section and which authors no brief of its own.
+  - Step 1 is the open-set gate - count open ideas through fold(), print every id, and
+    stop for the owner when the count is not zero.
+  - Order the run - preflight and worktree, open-set gate, corpus build and manifest
+    read, R1 and R4 concurrently, GATE 1, A1, GATE 2, synthesis, A2, the gate checklist,
+    GATE 3.
+  - State that the coordinator writes every analyst and audit report, because subagents
+    cannot write report files, and that corpus and report paths resolve in the primary
+    checkout because subagents inherit it regardless of the coordinator's worktree.
+  - Write the output to docs/00-working/idea-partition-<YYYY-MM-DD>.md, recording the
+    corpus size, the status filter and the manifest seed, and never edit an earlier
+    partition document.
+  - Make each step check for its own output before dispatching, and resume a truncated
+    agent rather than re-running it.
+  - Close with the spend posture - dispatches run, dispatches resumed, any escalation
+    above sonnet, wall-clock against the estimate.
+  acceptance:
+  - The skill is listed as a skill and runs to GATE 1 against the live corpus.
+  - With at least one open idea, it prints the ids and halts before the first dispatch.
+  - Every dispatch it makes matches its PROMPT-034 section character for character.
+  - One analyst report exists at _working/idea-corpus/ and was written by the
+    coordinator, not the subagent.
+  - It moves no idea status, marks no phase complete, and stops at all three gates.
+  - _data/ideas.jsonl is unchanged by the dry run.
+  verification:
+  - Invoke /partition-ideas and stop at GATE 1; record the open-set output, the manifest
+    corpus size and the persisted report path.
+  - Hash _data/ideas.jsonl before and after the dry run and confirm it is unchanged.
+  - Read the skill body for any brief it quotes rather than dispatches.
+  - Re-invoke after abandoning at GATE 1 and confirm it reports the existing reports
+    and dispatches nothing already done.
+  - uv run python -m src.governance exits 0.
+  deliverables:
+  - .claude/skills/partition-ideas/
+  next_action: Write the open-set gate first and run it against the live log - there are
+    14 open ideas today, 000208 to 000221, so the non-empty path is the one that can
+    actually be exercised.
