@@ -67,7 +67,14 @@ class WindowsConPtyAdapter(TerminalAdapter):
 
     def close(self) -> None:
         if self._process is not None and self._process.isalive():
-            self._process.terminate(force=True)
+            # The shell can exit between isalive() and terminate(); winpty then calls
+            # os.kill() on a pid whose handle is gone and Windows answers with
+            # ERROR_ACCESS_DENIED (WinError 5). The process is already closed, so
+            # there is nothing left to clean up.
+            try:
+                self._process.terminate(force=True)
+            except OSError:
+                pass
 
     @property
     def alive(self) -> bool:
