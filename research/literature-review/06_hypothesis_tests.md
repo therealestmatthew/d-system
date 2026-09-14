@@ -54,15 +54,21 @@ not "is the mechanism known" but "has this campaign looked hard enough to say."
 saturation may not be claimed at this stage (pre-synthesis check-in, ruling 8). `LIT-06 G` measured
 a campaign-wide duplicate rate of 20.0% (44/220 raw result identifiers; 36/208 = 17.3% on a
 distinct-identifier basis). This phase's own three dedicated collision searches measure lower
-still: resolving every `LIT-08-*` row's `result_ids` in `00_search_ledger.csv` against
-`03_source_inventory.csv` as it stood immediately before this phase started (commit `83fb42b^`,
-the parent of the first `LIT-08` search) gives 58/387 = 15.0% raw, 37/347 = 10.7% distinct — a
-falling duplicate rate, i.e. a *rising* share of genuinely new material, the opposite of the signal
-saturation would produce. That is a trend against saturation, not toward it, and it holds even
-domain-by-domain: H1's own searches ran the highest of the three at 39/156 = 25.0%, H4's the lowest
-at 4/66 = 6.1%, H11's at 15/165 = 9.1% — every one of them far short of anything resembling "mostly
-yield duplicates," the methodology's own stop-condition language (§18). Route one stays closed for
-all three hypotheses uniformly, regardless of these differences between them.
+still. Population: all 82 `LIT-08-*` rows in `00_search_ledger.csv` (24 tagged `domain_id: H1`, 32
+`H4`, 26 `H11`), every semicolon-separated identifier in each row's `result_ids` field, checked for
+membership in `03_source_inventory.csv` as it stood immediately before this phase started (commit
+`83fb42b^`, the parent of the first `LIT-08` search, i.e. before any `LIT-08` row could itself add
+an entry to the inventory it is being checked against) on either that snapshot's `source_id` or
+`url_or_doi` column — the same either-column method `LIT-06 G` used and confirmed identical.
+Result: 58/387 = 15.0% raw duplicates, 37/347 = 10.7% on a distinct-identifier basis (347 unique
+identifiers across the 387 raw mentions) — a falling duplicate rate, i.e. a *rising* share of
+genuinely new material, the opposite of the signal saturation would produce. That is a trend
+against saturation, not toward it, and it holds even domain-by-domain, computed the same way but
+restricted to each domain's own rows: H1's own searches ran the highest of the three at
+39/156 = 25.0%, H4's the lowest at 4/66 = 6.1%, H11's at 15/165 = 9.1% — every one of them far
+short of anything resembling "mostly yield duplicates," the methodology's own stop-condition
+language (§18). Route one stays closed for all three hypotheses uniformly, regardless of these
+differences between them.
 
 *Route two — a dedicated collision search that still returns nothing better — is what this phase
 exists to test, and it needs a sharper statement than this file previously gave it.* The prior text
@@ -489,7 +495,18 @@ assessment: >
   but for a sharper reason: not "the search was thin" (it was not, this phase), but "the field this
   specific search mapped is thin," which is a fact about the literature this dispatch's search
   established, not about search effort.
-status: KNOWN_COMPONENT_NEW_INTEGRATION (review-instructions general phrasing); INSUFFICIENT_EVIDENCE (frozen-register graph-topological phrasing)
+  `status` below is a single permitted token, as the file's own vocabulary constraint requires; it
+  cannot carry both readings at once, so it records the review-instructions general phrasing's
+  verdict — `KNOWN_COMPONENT_NEW_INTEGRATION` — as primary. That follows this file's own
+  front-matter rule ("the review-instructions text ... is primary; a frozen-register nuance is
+  noted wherever it changes the assessment, never blended into a merged phrasing"), which is the
+  same rule H8's block already applies: H8's bare `status` likewise carries only its
+  review-instructions verdict, with the frozen register's stricter reading argued in full above
+  rather than folded into the token. The frozen-register graph-topological reading's verdict —
+  `INSUFFICIENT_EVIDENCE` — is not demoted by this choice; it is fully argued immediately above,
+  and the summary table below states both against their respective phrasings, matching the
+  convention H8's table row already uses.
+status: KNOWN_COMPONENT_NEW_INTEGRATION
 ```
 
 ---
