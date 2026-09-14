@@ -200,6 +200,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-13-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-13-01-literature-review-pass-1b.md |
 | SESS-2026-09-13-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-13-02-literature-review-pass-1c.md |
 | SESS-2026-09-13-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-13-03-literature-review-pass-2a.md |
+| SESS-2026-09-13-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-13-04-literature-review-pass-2b.md |
 
 ## Plans and their phases
 
@@ -252,4 +253,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-193 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 38, prompt: 33, requirement: 8, session: 70.
+194 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 38, prompt: 33, requirement: 8, session: 71.

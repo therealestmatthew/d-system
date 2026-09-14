@@ -10635,3 +10635,92 @@ This is the general case behind [[000208]] and is the reason a fourth warning wo
 **Links**
 
 - relates_to → `000208`
+
+---
+
+## 000217 · The literature-review branch model and the claim protocol collide, and it will recur at every phase
+
+**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+
+PLAN-023 has every campaign phase commit to one long-lived branch, agent/lit-campaign, which the owner integrates into dev only twice. AGENTS.md has each phase claimed on dev, where backlog.yaml is the lock table, and src/governance/backlog.py:67 rejects an agent holding two active phases.
+
+These two rules are incompatible whenever a phase closes without integration. The close commit lives only on the campaign branch, so dev's lock table still shows the previous phase active under the same agent id, and the next phase's claim fails with "backlog: agent agent-lit holds 2 active phases; claim only one".
+
+This fired on 2026-09-13 at phase-lit-05's claim. phase-lit-04 had been closed by the owner's /session-close in commit e9b32ab on the campaign branch, while dev still read it active. The delegation pack's LIT-05 K section says "Claim phase-lit-05 per AGENTS.md", which could not be done. The owner ruled: integrate agent/lit-campaign into dev early, then claim normally. That worked, but it took an unscheduled integration that PLAN-023 does not schedule, and it spent owner attention on a structural problem rather than on the research.
+
+It will recur at phase-lit-06's claim and again at phase-lit-07's, because the same conditions hold: the campaign branch accumulates closes that dev cannot see.
+
+Worth deciding deliberately rather than re-deriving each session. Options a future planning session might weigh: claim the phase on the campaign branch only and reconcile at the scheduled integration; let the campaign hold one standing claim across all seven phases rather than one per phase; or accept an integration at every phase boundary and amend PLAN-023's branch model to say so. This is the owner's call, not an agent's.
+
+Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+---
+
+## 000218 · LIT-05's item order makes its own gate measurement 3 structurally unsatisfiable
+
+**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+
+The delegation pack gives phase-lit-05 the item order S1 to X1 to X2 to G. S1 runs forward chaining over every evidence-matrix row scoring 3 or higher. X1 and X2 then deep-read new sources into the matrix, and some of those new rows also score 3 or higher.
+
+LIT-05 G measurement 3 requires every row scoring 3 or higher to carry both a strategy_phase B and a strategy_phase C ledger row. Rows created by X1 and X2 get their B row from their own deep read, but they cannot have a C row, because forward chaining already ran before they existed.
+
+The gate therefore fails by construction, not because any worker erred. On 2026-09-13 it measured B coverage 24/24 and C coverage 17/24, with the seven missing rows being exactly the ones X1 and X2 had added: w3c-prov-o-2013, snodgrass-developing-time-oriented-database-applications-sql-1999, agm-partial-meet-contraction-revision-1985, zimmermann-et-al-managing-architectural-decision-models-2009, burns-groth-agentic-ontological-notebook-memory-2026, burckhardt-et-al-durable-functions-stateful-serverless-2021, levinson-et-al-fairscape-fair-reproducible-biomedical-analytics-2021.
+
+It was resolved by routing a fix cycle back to S1, which is what Block G prescribes, and the re-measure passed at 24/24 on both. So the gate works and the fix path works. The defect is that the phase spends a fix cycle every time on a failure its own item order guarantees.
+
+Candidate corrections, for the owner to choose between rather than an agent to pick: reorder the phase to X1, X2, S1, G so chaining runs last over the final matrix; or split S1 into a pre-pass and a post-pass; or scope measurement 3 to rows that existed when chaining ran, which is weaker because it stops measuring what it is for.
+
+Note this is a defect in PROMPT-029, a governed prompt. No agent may author or edit a prompt mid-campaign.
+
+Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+**Links**
+
+- relates_to ← `000219`
+- relates_to ← `000220`
+
+---
+
+## 000219 · A gate that silently drops tokens it did not expect cannot tell contract-correct data from a typo
+
+**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+
+LIT-05 G's measurement 4 tallies hypotheses_challenged across H1 to H11. The field is semicolon-separated and may carry the contract's NOT_DETERMINABLE_FROM_ACCESS where access was too limited to assess any hypothesis.
+
+On its first run the gate parsed the field, counted the H-tokens, and silently discarded the one NOT_DETERMINABLE_FROM_ACCESS value on capilla-et-al-web-based-tool-architectural-design-decisions-2006. Its dispatch had explicitly told it to name any token appearing in a form it did not expect; it did not. The coordinator found the token by re-measuring independently, and the gate reported it only when asked again.
+
+The data was correct: that row is abstract_only, so the value is exactly what the evidence contract requires. Nothing was wrong with the matrix. What is wrong is that the gate's parse cannot distinguish that case from a genuine defect. A typo, a stray hypothesis id such as H12, or a field written with the wrong separator would all vanish the same silent way, and measurement 4 would report a clean distribution over data it had partly thrown away.
+
+Block G already says a gate that narrows its own scope silently reports PASS on the part it skipped, and that no fix cycle is ever opened for a false PASS. This is that failure in the parsing step rather than the field-selection step, so the existing wording does not quite reach it.
+
+Worth considering whether Block G should require every gate that parses a multi-valued field to report the complete token inventory it found, with counts, including tokens outside the expected set, rather than only the tally it was asked for.
+
+Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+**Links**
+
+- relates_to → `000218`
+
+---
+
+## 000220 · Counting mentions as inheritance manufactures shared ancestors, and every error it makes flatters H0
+
+**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+
+During phase-lit-05, the LIT-05 K kickoff was asked to rank foundational works by how many evidence-matrix rows inherit from each, so the deep read could start with the strongest shared lineages. It counted how many rows MENTION a work's name in the derivative_ancestor field, which is not the same thing, and the difference is not neutral.
+
+The proof is mechanical. Both "Digital Engineering Strategy" and "Global Horizons" are mentioned in matrix rows 16 and 19. Both cannot be shared ancestors of both rows. Row 16's text is a correction written by phase-lit-04's X3 after it read the patent, and it states the two sources cite "two different, both DoD-adjacent, named documents for the same term, not one shared ancestor". K read a sentence withdrawing a shared-ancestor claim and scored it as a shared ancestor, ranking DAU/DoD 2018 as the matrix's strongest shared lineage.
+
+Why this matters beyond one bad rank: the campaign works to support H0, that D-System is primarily a recombination of known ideas. A shared ancestor is evidence for H0. A method that turns mentions into inheritance therefore produces errors that all point the same way, and it produces them in the place the campaign is least able to notice, because the result looks like exactly what the thesis predicts. This specific claim had already been withdrawn once, by an agent that read the primary source; it re-entered through the ranking of a later phase.
+
+The inverse error appeared in the same output. K merged Kruchten 1995, the 4+1 View Model, with Kruchten 2004, the design-decision ontology, into one candidate because the surname matched. The campaign already has a rule that a shared name is not a shared mechanism; a shared surname is not a shared work is the same rule one level down.
+
+Both were caught because the coordinator re-derived the counts from the file rather than relaying them. Two fix cycles were spent and the arithmetic still did not fully close.
+
+Possible durable fix, for the owner to weigh: state in the evidence contract or the delegation pack that derivative_ancestor is prose which may name works a row does NOT descend from, including withdrawn claims and explicit contrasts, so any count over it must read each row's text rather than match strings. A structured ancestor field would remove the ambiguity entirely but is a contract change, not an agent's call.
+
+Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+**Links**
+
+- relates_to → `000218`
