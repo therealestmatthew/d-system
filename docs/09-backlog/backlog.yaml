@@ -7,7 +7,6 @@ next_up:
 - phase-prog-01
 - phase-port-02
 - phase-ses-01
-- phase-prog-03
 - phase-prog-02
 - phase-prog-04
 - phase-prog-05
@@ -7373,3 +7372,527 @@ items:
   - docs/06-requirements/
   next_action: Rule on G63 first. Three ideas, zero product content, and the strongest
     decline signal in the partition - it is the cheapest decision in the bucket.
+- id: phase-arch-01
+  title: Settle the workbench vocabulary and rule on identifier migration
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-brain
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add brain/concepts/terms-workbench-ui.md defining slot, panel, region, layout, assignment,
+    visible panel, session, panel type, template family, generated page and overview, and
+    regenerate docs/08-governance/GLOSSARY.md from it.
+  - State explicitly which of slot and panel is the container, settling the question 000135
+    and 000141 both defer to.
+  - Rule, per identifier class, whether existing names are renamed or aliased - layout slot_id
+    values, CSS class names, REQ-007 row wording, localStorage keys, panel registry ids and
+    test fixtures.
+  - Create no second glossary document; the generated glossary is the only rendered view.
+  acceptance:
+  - REQ-011 R01 holds - all eleven terms appear in the regenerated glossary and the drift test
+    passes.
+  - REQ-011 R02 holds - one sentence names the container explicitly.
+  - REQ-011 R04 holds - each of the six identifier classes carries a rename-or-alias
+    disposition with a reason.
+  verification:
+  - uv run python tools/generate_glossary.py
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - brain/concepts/terms-workbench-ui.md
+  - docs/08-governance/GLOSSARY.md
+  next_action: Write the container-versus-content ruling first. Six ideas wait on that one
+    sentence, and every other term in the file is phrased against it.
+- id: phase-arch-02
+  title: Execute the workbench identifier migration
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  scope:
+  - Apply phase-arch-01's ruling to every identifier class it dispositioned, renaming or
+    aliasing as ruled.
+  - Replace the slot_id value "terminal" in both shipped layouts with a geometry-or-role name,
+    since it is named for the panel that first occupied it.
+  - Keep stored browser state safe across the change - read through an alias or discard to
+    layout defaults, never surface an error.
+  acceptance:
+  - REQ-011 R03 holds - no slot_id in _data/workbench/layouts names a panel type.
+  - REQ-011 R05 holds - pre-migration localStorage loads layout-1 defaults without an error.
+  - ADR-016 decision 3's discard behavior still holds after the rename.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - _data/workbench/layouts/
+  - ts/src/stage/
+  next_action: Grep for every occurrence of each old identifier before changing one, so the
+    rename is one atomic diff rather than a chase through tests.
+- id: phase-arch-03
+  title: Duplication audit across the workbench and API
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  scope:
+  - Audit ts/src and src for logic, components and patterns implemented more than once, naming
+    each with file references.
+  - Judge for each duplication whether generalizing pays for itself, and propose the shared
+    abstraction where it does.
+  - Cover the multi-panel wrapper, header and switcher machinery explicitly - it is the owner's
+    motivating example and was touched by both phase-wb-08 and idea 000101.
+  acceptance:
+  - REQ-011 R06 holds - every finding carries file references and a pay-for-itself judgment.
+  - Slot.tsx and its CSS chain appear as a named finding.
+  - The audit is written where phase-arch-04 can cross-reference it.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Start from Slot.tsx and its CSS chain. It is the one duplication the owner
+    named, and the abstraction it wants is the same one phase-arch-07 would build.
+- id: phase-arch-04
+  title: Code structure and file-size audit with target structures
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  - phase-arch-03
+  scope:
+  - Measure lines of code per file across ts/src and src and record the measurement command so
+    the table can be regenerated.
+  - For every file judged to need refactoring, propose the target structure - the split, the
+    new module boundaries, what moves where - not only the size.
+  - Cross-reference phase-arch-03 in both directions where an abstraction it extracted is the
+    refactor proposed here.
+  acceptance:
+  - REQ-011 R07 holds - every flagged file carries a proposed structure, not only a size.
+  - REQ-011 R08 holds - the two audits reference each other, both ways.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Run the measurement before forming any view. A file-size audit that starts from
+    an opinion about which files are too big measures the opinion.
+- id: phase-arch-05
+  title: Per-panel content-fit contracts and their mechanised checks
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  scope:
+  - Define a content-fit contract per panel type - what overflows, what scrolls, what
+    truncates, what reflows.
+  - Generalize the existing Playwright fill and scroll checks so each contract is asserted
+    mechanically rather than by inspection.
+  - Make a panel added without a declared fit behavior fail a check rather than ship unchecked.
+  - Ground the contracts in the five known instances - the phase-wb-08 height collapse, the
+    File Browser clip, the rotator tooltip cutoff, the popup height floor and the 98px chrome
+    offset that defeats naive fill checks.
+  acceptance:
+  - REQ-011 R09 holds - one contract per shipped panel type, and the suite fails when a panel
+    is given content violating its own contract.
+  - REQ-011 R10 holds - an undeclared panel fails a check and is named by it.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - docs/06-requirements/
+  - test/
+  next_action: Write the contract for the File Browser first. Its clip is recorded as W18, so
+    the assertion can be checked against a known failure rather than an invented one.
+- id: phase-arch-06
+  title: Decide the slot configuration-schema model, superseding ADR-016
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  - phase-arch-05
+  scope:
+  - Write an ADR recording the slot configuration-schema model - each slot either a single slot
+    for one element-type panel, or a nested structure of sub-slots that admit declared element
+    types, with eligibility decided by structural match.
+  - Carry supersedes [doc-workbench-layout-decision] and mark ADR-016 superseded in the same
+    change.
+  - State what is kept from ADR-016 - layouts are repository data, the browser stores
+    selections only - so the supersede reads as a change to the structural model, not to the
+    persistence posture.
+  - Allocate the ADR code with the governance allocator; never pick a number by reading the
+    directory.
+  acceptance:
+  - REQ-011 R11 holds - the new ADR names its supersedes target and ADR-016 reads superseded.
+  - The governance check exits 0, which rejects a supersedes target not marked superseded.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/04-decisions/
+  next_action: Read ADR-016 decision by decision and state, for each of its four, whether the
+    new model keeps it or replaces it. That table is the ADR's spine.
+- id: phase-arch-07
+  title: Implement schema-owned slots and sub-slots with structural eligibility
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-06
+  scope:
+  - Give each slot a configuration schema with sub-slots that declare the element types they
+    admit.
+  - Replace REQ-007 W16's per-panel eligibility lists with structural matching as the
+    eligibility authority, and amend the W16 row rather than leaving two specifications in
+    force.
+  - Make the slot schema own the top bar, so a hosted panel cannot render a second one.
+  acceptance:
+  - REQ-011 R12 holds - no per-panel allow-list remains as the eligibility authority.
+  - REQ-011 R13 holds - assigning every panel type into every slot in both layouts yields
+    exactly one header per slot.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  - docs/06-requirements/
+  next_action: Assert the one-header count as a test before changing the rendering, so idea
+    000101's defect is reproduced by the check first.
+- id: phase-arch-08
+  title: Multi-instance panel identity across layout, storage, registry and sessions
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-07
+  scope:
+  - Replace singleton panel identity by panel_id with an instance identity, in all four places
+    idea 000135 names - layout data, the storage shape, the panel registry and session
+    ownership.
+  - Support multiple instances of one panel type across slots, and within a slot where the
+    schema admits it.
+  acceptance:
+  - REQ-011 R14 holds - two instances of one panel type mount in two slots with independent
+    state.
+  - Stored selections written against singleton ids are discarded to defaults rather than
+    surfacing an error, per ADR-016 decision 3 as the superseding ADR carries it forward.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  - _data/workbench/layouts/
+  next_action: Start at session ownership. A second terminal instance is the case where a bare
+    panel_id is not merely untidy but wrong, so it sizes the change honestly.
+- id: phase-arch-09
+  title: Reconfigurable slot geometry with per-role content constraints
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-05
+  - phase-arch-07
+  scope:
+  - Revisit the slot-geometry customization ADR-016 deliberately excluded, on the schema model
+    phase-arch-07 ships.
+  - State each slot role's content constraints - a shell's rows and cols reflow, an iframe's
+    scaling, an explorer tree's visible depth - per role, never per current occupant.
+  - Keep the zero-scroll obligation satisfiable at all four required window sizes, as REQ-006
+    R02 requires.
+  acceptance:
+  - REQ-011 R15 holds - every slot role states a constraint, and resizing through its stated
+    range reflows the content within it rather than clipping.
+  - The zero-scroll checks still pass at all four window sizes in both layouts.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  - _data/workbench/layouts/
+  next_action: Write the per-role constraint table before touching geometry. Idea 000133's
+    stated requirement is the constraints, and the resizing is only what tests them.
+- id: phase-arch-10
+  title: Define the sub-app package contract
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-06
+  - phase-arch-07
+  scope:
+  - Specify what a sub-app package is - its boundary, its API surface toward the workbench, how
+    it registers as a panel type, and how it receives its data.
+  - Write it so a future sub-app can be integrated from the document alone, without reading an
+    existing sub-app's source.
+  acceptance:
+  - REQ-011 R16 holds - all four elements are specified.
+  - The contract uses the vocabulary phase-arch-01 settled, with no container-versus-content
+    ambiguity left in it.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/06-requirements/
+  next_action: Specify the registration path first. It is the only half of the contract that
+    phase-arch-13 can falsify by trying to use it.
+- id: phase-arch-11
+  title: 'Ports and system processes: lifecycle exploration'
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Explore the lifecycle of ports and system processes, when and how a process is killed, and
+    how both should be managed.
+  - Ground it in this repository's own incidents - the port-8000 conflict during the workbench
+    builds, the orphaned dev servers left by cut-off agents, and the PTY child reaping the
+    000099 and 000129 investigations turned on.
+  acceptance:
+  - REQ-011 R17 holds - lifecycle, kill conditions and management are all covered, and all
+    three repository incidents are cited.
+  - The exploration proposes no application; phase-arch-12 builds it against what this phase
+    establishes.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Reconstruct the port-8000 conflict from the session records that hit it. A real
+    trace beats a general treatment of what a port is.
+- id: phase-arch-12
+  title: Build the port and process management application
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-api
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-11
+  scope:
+  - Report what is listening on which port and which processes are running with their state.
+  - Offer management actions - killing a process, freeing a port.
+  - Resolve the tension with ADR-015's read-only API posture in this phase's own ADR; do not
+    widen ADR-015 in passing.
+  acceptance:
+  - REQ-011 R18 holds - against a deliberately occupied port the tool names the listener, and
+    after freeing it the port is bindable.
+  - An ADR records the write-capability decision and its boundary.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  - src/api/routes/
+  - test/
+  next_action: Settle the ADR-015 tension before writing a route. A kill action is the first
+    write the workbench API would ever expose.
+- id: phase-arch-13
+  title: Package the port/process app as a workbench sub-app
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-10
+  - phase-arch-12
+  scope:
+  - Integrate the port and process application as a workbench sub-app using only the
+    registration path phase-arch-10 documented.
+  - Record every place the contract proved insufficient, and fix the contract rather than
+    hand-wiring around it.
+  acceptance:
+  - REQ-011 R19 holds - the integration uses the documented path only, and the sub-app is
+    assignable into a slot whose sub-slots admit its element configuration.
+  - Any contract gap found is fixed in phase-arch-10's document, not worked around here.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  - docs/06-requirements/
+  next_action: Integrate from the contract document with the app's source closed. That is the
+    only way this phase tests what it is for.
+- id: phase-arch-14
+  title: Measure workbench performance before designing any cache
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Measure page load, panel mount and switch times, the enumeration, filesystem and explorer
+    API round-trips, HTML Viewer file serving, and overview generation.
+  - Record a figure and a method for each, so the caching design is built against numbers.
+  - Propose no cache in this phase.
+  acceptance:
+  - REQ-011 R20 holds - all six carry a figure and a stated method.
+  - The report contains no caching proposal; that is phase-arch-15's work.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Measure the enumeration and search routes first. Idea 000121 names them as the
+    ones a bad cache would break, so their baseline is the one that matters most.
+- id: phase-arch-15
+  title: Design and ship caching with mtime-keyed invalidation
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-api
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-14
+  scope:
+  - Design each cache against phase-arch-14's measurements, not against assumption.
+  - Give every cache an invalidation story keyed on file mtime or explicitly busted by the
+    writer; ship no bare TTL.
+  - Keep a regenerated overview page immediately visible to the viewer's own picker, which is
+    the dated failure idea 000121 records.
+  acceptance:
+  - REQ-011 R21 holds - no cache uses a TTL as its only invalidation.
+  - REQ-011 R22 holds - after tools/generate_overview.py runs, both the workbench search route
+    and the stage overview-location route reflect the new file with no restart and no wait.
+  verification:
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance
+  deliverables:
+  - src/api/routes/
+  - test/
+  next_action: Write the regenerate-then-read test before adding the first cache. It is the
+    check that would have caught 000121's failure, and it must fail for the right reason first.
+- id: phase-arch-16
+  title: Terminal persistence and performance audit across three shells
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Audit session survival for bash, CMD and PowerShell across layout switch, visible-panel
+    switch, re-assignment, collapse/drop/restore and page reload, judging for each whether the
+    outcome is intended and whether it is communicated.
+  - Measure connect latency, echo latency, resize behavior, scrollback handling and behavior at
+    the six-session cap.
+  - Name which measurements are owner-machine checks that agent evidence on Linux cannot
+    supply, rather than asserting them.
+  - Build on idea 000107's corrected diagnosis - a stored visible-panel choice differing between
+    layouts silently kills the hidden shell's session.
+  acceptance:
+  - REQ-011 R23 holds - a three-shell by five-event matrix with survival, intent and
+    communication filled in every cell.
+  - REQ-011 R24 holds - the five measurements are reported and the owner-machine checks are
+    listed explicitly.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Fill the bash column completely on Linux first, then mark exactly which CMD and
+    PowerShell cells the owner must run. A matrix with guessed cells is worse than a short one.
