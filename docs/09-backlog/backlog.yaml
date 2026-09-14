@@ -4988,22 +4988,28 @@ items:
   - docs/07-architecture/diagrams/demo
   - docs/07-architecture/README.md
   session: doc-session-demo-glossary-diagrams
-  next_action: 'Built, rebased onto dev and re-verified on agent/phase-demo-07; ready for the owner''s
-    review, not yet integrated. All three acceptance conditions hold. The session-code collision
-    is resolved - SESS-2026-09-10-09 was taken on dev by the workbench-planning record while
-    this branch sat unmerged, so this branch''s record renumbered to SESS-2026-09-10-14 per
-    AGENTS.md''s integrate-second-renumbers rule. Post-rebase gates are green - governance OK,
-    580 passed, both glossary generations byte-identical with no drift from the committed files,
-    test/test_glossary.py 6 passed. The private-content check was run for real against 31
-    derived identifiers over 591 tracked files with 0 violations; run plainly in a worktree it
-    reports 0 identifiers checked, which is not a pass. The 1024x768 legibility condition is now
-    independently corroborated rather than self-reported - a demo-validator-web dispatch was
-    blocked by the shared Playwright browser profile a peer holds, so the six SVGs and
-    index.html were re-rendered with headless Chrome on a private profile and inspected, all six
-    clean with no overlap, clipping or contrast problem. Left active because the owner decided
-    on 2026-09-14 that this phase does not take GOV-003''s demo-track exception and requires the
-    full /session-close review, which is owner-only. Integration is the owner''s call and has
-    not been asked for.'
+  next_action: 'NOT COMPLETE - /session-close was invoked 2026-09-14 and completion was withheld. The
+    independent demo-adversary review found the concept memory misstates three counts it claims
+    to take from .claude/, which is the scope''s central requirement that terms be defined
+    against what this repository actually contains. brain/concepts/terms-skills-and-agents-
+    demo.md:103 says three skills (actual four, missing log-anti-patterns), :86 says eleven
+    agents (actual twelve, missing partition-adversary), :119 says four commands (actual six,
+    missing /session-start and /resume-lit-review). skill-architecture.svg and command-skill-
+    tool.svg bake the same wrong counts into rendered text. The entries were CORRECT when
+    authored - at the branch''s original base 86a4f68 the tree genuinely held 3/11/4 - and were
+    falsified by the 484 commits that landed while the branch sat unmerged; the 2026-09-14
+    rebase should have caught it and did not. To finish - fix the three counts naming the
+    missing items, regenerate both glossaries, update the two diagrams and re-render them at
+    1024x768 to confirm the added text does not break layout, then re-run the verification list.
+    Optionally align the aria-label strings in llm-vs-agent.svg and command-skill-tool.svg with
+    their visible titles. Note that all three acceptance conditions PASS as written even in this
+    state - condition 2 tests the SVGs against the glossary and nothing tests the glossary
+    against reality, so a count check belongs in test_glossary.py or in the acceptance list.
+    Everything else is verified and green on dev - governance OK, 580 passed, both glossary
+    generations byte-identical with no drift, check_no_private_content OK with 31 identifiers
+    checked, six SVGs independently confirmed legible at 1024x768 with no external dependency,
+    and the diff touches only declared deliverables plus backlog.yaml and catalog.md. The work
+    is merged into dev; the branch and worktree are removed.'
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
   next_action: 'None — phase complete: all items validated, the W01-A blocker fixed

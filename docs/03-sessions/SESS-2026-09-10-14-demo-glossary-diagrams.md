@@ -225,6 +225,129 @@ the fixed state was observable here.
 - **Both generations are byte-identical on a second run and `test_glossary.py` passes.** Met; output
   above, and both files also show no drift from their committed state.
 
+**All three conditions are Met, and the phase still does not close.** The independent review raised
+an unresolved discrepancy against the phase's *scope* — the entries misstate the counts they claim
+to take from `.claude/` — and `/session-close` requires both a clean acceptance pass *and* a review
+that corroborates it with nothing unresolved. The second half does not hold. That the acceptance
+list can pass over a glossary which misstates the repository is itself the finding: condition 2
+tests the SVGs against the glossary, and nothing tests the glossary against reality.
+
+## Review
+
+Independent completion-gate review by a fresh `demo-adversary` sub-agent on 2026-09-14, given the
+scope, acceptance and verification lists, the range `fa60fc4..7786daa`, and eight named claims from
+this record to attack. It shared none of the closing session's context. Its findings, recorded as
+delivered:
+
+**Acceptance condition 1 — Met.** "Counted directly (not via the tool's mislabeled output):
+`docs/00-working/demo-glossary.md` has 18 `### ` headings — the 17 scope terms verified present by
+exact string match … plus the 'Advanced topics' group, which itself names all four out-of-scope
+topics. Confirmed with a script diff against the scope list — zero missing."
+
+**Acceptance condition 2 — Met, narrowly.** "All six declare `width="1024" height="768"
+viewBox="0 0 1024 768"`, no `http(s)://`, no `xlink:href`, no `@import`, no external `url()` (only
+internal `url(#arrow)` marker refs), and only generic/websafe font stacks … Labels in the SVGs do
+match the glossary's terminology word-for-word — **but only because both are wrong in the same way**
+… The condition as literally worded (SVG-to-glossary consistency) passes; it does not test
+SVG/glossary-to-reality accuracy, which is where this phase actually fails."
+
+**Acceptance condition 3 — Met.** Both generations byte-identical on reruns, `test_glossary.py`
+6 passed, full suite 580 passed.
+
+**BLOCKER, as the reviewer stated it.** "The glossary's and diagrams' core claim ('defined against
+this repository's actual .claude/ and .mcp.json conventions') is false in three places":
+
+- `brain/concepts/terms-skills-and-agents-demo.md:103` says "This repository has three under
+  `.claude/skills/` — `orient`, `checkpoint` and `d-system-overview`." Actual: **four**, missing
+  `log-anti-patterns`.
+- `:86` says "`.claude/agents/` holds eleven definitions." Actual: **twelve**, missing
+  `partition-adversary.md`.
+- `:119` says "`/backlog`, `/idea`, `/idea-triage` and `/session-close` are the four here." Actual:
+  **six**, missing `/session-start` and `/resume-lit-review`. The reviewer's note on why this one
+  matters most: "`/session-start` is arguably the single most load-bearing command in the repository
+  … and it is entirely absent from a glossary whose stated purpose is to teach exactly this
+  vocabulary to a live audience by pointing at real files."
+- `skill-architecture.svg` and `command-skill-tool.svg` bake the same wrong counts into their
+  rendered text.
+- "A presenter who opens `.claude/commands/` on stage during this demo (the exact scenario the
+  design is built around) will count six files against a slide/glossary claiming four."
+
+**Minor.** `aria-label` differs from visible title text in two diagrams: `llm-vs-agent.svg`
+("LLM versus agent" vs "LLM vs agent") and `command-skill-tool.svg` ("Command, skill and tool" vs
+"Command, skill, tool"). Screen-reader only; invisible in the rendered image.
+
+**No discrepancy found** on claims (a), (d), (f), (g) and (h), on the `_data/tags.json` addition, or
+on scope containment — the diff touches only declared deliverables plus `backlog.yaml` and
+`catalog.md`, and `b5b91b1` disturbs no deliverable.
+
+### One correction to the review
+
+The reviewer wrote that the counts were "false from the moment this phase started, not from later
+drift." That is wrong, and the distinction matters for where the process failed. At `86a4f68`, the
+branch's original base on 2026-09-10, the tree genuinely held **3 skills, 11 agents and 4 commands** —
+exactly what the entries claim. The four additions landed on `dev` afterwards:
+`/session-start` (`82b1abd`, 09-12), `/resume-lit-review` (`33a2972`, 09-12),
+`partition-adversary.md` (`3b548a6`, 09-12), `log-anti-patterns` (`93802e7`, 09-13).
+
+The entries were accurate when written and were falsified by the 484 commits that landed while the
+branch sat unmerged. Everything else the reviewer found is confirmed.
+
+## Decisions
+
+- **The phase does not take `GOV-003`'s demo-track completion exception.** Owner decision,
+  2026-09-14. That exception names `phase-demo-01` through `phase-demo-06`; this phase is not on the
+  list, so the full `/session-close` review applies. This was the open question that left the phase
+  active on 2026-09-10.
+- **The session-code collision was resolved by renumbering this record, not dev's.** `AGENTS.md`
+  gives the rule: whoever integrates second renumbers. `--next-code session` is the wrong tool for
+  it — it returns today's date, and `src/governance/codes.py` requires the code's date to equal
+  `created`.
+- **`_public/skills-and-agents-lexicon.html` was left untouched.** Owner decision, 2026-09-14. It
+  carries a frozen base64 copy of these diagrams and will go stale silently, but editing it would
+  widen this phase's declared deliverables.
+- **The `backlog.yaml` rebase conflict was resolved by keeping dev verbatim and proving it.** The
+  ~2,200-line conflict block was edit-distance noise. Resolution was verified by diffing the result
+  against `dev`: all 148 phase ids present, the only content change this phase's own two fields.
+  A peer session had independently warned that a prior commit silently reverted four phases through
+  this file; its regression check was run and came back clean.
+- **The private-content gate was run for real rather than deferred.** A worktree run reports
+  `0 identifiers checked` and is not a pass. The identifier list was derived from the primary
+  checkout and held in memory only.
+- **The phase was not marked complete.** See below.
+
+## Corrections
+
+- **The brief this session started from asserted that the glossary entries "were fact-checked
+  against the real `.claude/` and `.mcp.json` counts and match."** That was true on 2026-09-10 and
+  false by the time of the rebase. It was carried forward without re-checking, and the rebase — the
+  one step whose whole purpose is reconciling the branch with four days of `dev` — did not re-verify
+  the facts the entries assert about `dev`. The independent review caught it. This is the substantive
+  failure of the session.
+- **"Seventeen `###` headings" was an imprecise count** repeated from the brief. There are eighteen:
+  seventeen terms plus the advanced-topics group. Corrected in `## Verification`.
+- **The `demo-validator-web` dispatch was reported as producing a verdict it did not produce.** It
+  returned blocked — the shared Playwright profile was held by a peer — and took no screenshot. The
+  visual review was redone with headless Chrome on a private profile instead.
+
+## Left undone
+
+The phase stays `active`. Three things remain, and none is large:
+
+1. **Fix the three stale counts** in `brain/concepts/terms-skills-and-agents-demo.md` — four skills,
+   twelve agents, six commands — naming `log-anti-patterns`, `partition-adversary`, `/session-start`
+   and `/resume-lit-review`. Then regenerate both glossaries.
+2. **Update the two diagrams that bake the counts in**, `skill-architecture.svg` and
+   `command-skill-tool.svg`, and re-render both at 1024×768 to confirm the added text does not break
+   the layout.
+3. **Optionally align the two `aria-label` strings** with their visible titles.
+
+A fourth item is governance, not this phase: **the acceptance conditions do not test what the scope
+requires.** All three conditions pass on a glossary that misstates the repository, because condition
+2 tests SVG-against-glossary consistency and nothing tests glossary-against-reality. A phase whose
+stated purpose is "defined against what this repository actually contains" needs an acceptance
+condition that reruns those counts. Worth an idea or a check in `test_glossary.py`; recording it here
+so it is not lost with this session.
+
 ## Not done, and why
 
 `status: complete` was not set, and this session did not set it either. `GOV-003`'s "demo track
@@ -238,13 +361,16 @@ for yet as of this checkpoint.
 
 ## Backlog
 
-- `status: active` — unchanged, and not this session's to change.
+- `status: active` — **not** advanced to `complete`. The owner invoked `/session-close`, its step 6
+  was reached, and completion was withheld because the independent review raised an unresolved
+  discrepancy. This is the outcome that step is written to allow, not a failure to finish.
 - `session: doc-session-demo-glossary-diagrams` — unchanged; the id is permanent and survived the
   renumber.
-- `next_action` — rewritten this run to record the rebase, the renumber, the real private-content
-  gate and the independent visual review, and to replace the stale GOV-003 uncertainty with the
-  owner's decision.
-- `next_up` — not pruned. Nothing became `complete` this run.
+- `completion_evidence` / `result` — not written. The work is merged into `dev` but is not correct
+  yet, and evidence fields asserting otherwise would be false.
+- `next_action` — rewritten at close to name the three stale counts, the two diagrams that bake them
+  in, and the acceptance-vs-scope gap.
+- `next_up` — not pruned. `phase-demo-07` is not on it, and nothing became `complete` this run.
 
 ## Unresolved
 
