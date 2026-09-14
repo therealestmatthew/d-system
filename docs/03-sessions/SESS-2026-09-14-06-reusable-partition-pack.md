@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-reusable-partition-pack
-code: SESS-2026-09-14-04
+code: SESS-2026-09-14-06
 title: Write the reusable partition pack (PROMPT-034)
 kind: session
 status: active

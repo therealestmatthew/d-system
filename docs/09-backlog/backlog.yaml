@@ -6862,7 +6862,7 @@ items:
   session: doc-session-reusable-partition-pack
   completion_evidence:
   - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
-  - docs/03-sessions/SESS-2026-09-14-04-reusable-partition-pack.md
+  - docs/03-sessions/SESS-2026-09-14-06-reusable-partition-pack.md
   result: PROMPT-034 written, 456 lines, six blocks in order. Acceptance 2-5 met; 1 is
     unmet as written because it demands an idempotency sentence and dispatchability of S,
     which is by definition not a dispatch and which PROMPT-032 marks the same way. Branch

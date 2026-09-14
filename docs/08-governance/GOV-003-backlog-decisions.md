@@ -385,6 +385,6 @@ wording passed literally — was considered and rejected on the precedent above.
 **Why this is recorded rather than quietly edited.** Amending an acceptance condition after seeing
 the deliverable is exactly the move that makes an acceptance list worthless if it goes unrecorded,
 because nothing distinguishes "the condition was wrong" from "the work missed the bar and the bar
-moved." The checkpoint recorded the condition as **unmet** first, in `SESS-2026-09-14-04`, and the
+moved." The checkpoint recorded the condition as **unmet** first, in `SESS-2026-09-14-06`, and the
 amendment came afterwards as a separate owner ruling. Anyone auditing the phase can see both states
 and judge the change for themselves.
