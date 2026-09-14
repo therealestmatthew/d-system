@@ -33,7 +33,7 @@ independent second review of every critical collision.
 `uv run python -m src.governance`
 
 ```text
-Governance OK: 20 systems, 194 documents, 22 memories, 133 backlog phases
+Governance OK: 20 systems, 195 documents, 22 memories, 133 backlog phases
 exit 0
 ```
 
@@ -42,7 +42,7 @@ exit 0
 ```text
 note: _private/portfolio/ not found — content check skipped (path check still ran; this is
 expected in CI / a fresh clone)
-check_no_private_content: OK (555 tracked files, 0 identifiers checked)
+check_no_private_content: OK (556 tracked files, 0 identifiers checked)
 exit 0
 ```
 
@@ -117,11 +117,15 @@ not that. A saturation claim at `LIT-07`'s final gate is not supportable from th
 ## Acceptance
 
 - **`06_hypothesis_tests.md` gives every H1–H11 a strongest challenger, evidence, assessment and
-  a status from the permitted vocabulary, each traceable to evidence-matrix rows** — **Met at the
-  time of writing, now qualified.** Gate measurement 1 confirms all eleven blocks with permitted
-  statuses and non-empty challengers. But the second reviews that ran afterwards materially
-  undercut two of those challengers (H11's and H1's), and no dispatch in this phase owns `06`.
-  See *Unresolved*.
+  a status from the permitted vocabulary, each traceable to evidence-matrix rows** — **Met, after
+  the close review failed it once and the reconciliation ran.** The first close review judged it
+  Not met: H11's and H1's named challengers rested on descriptions the second reviews showed to
+  misread the source, with no in-document flag. The owner directed the fix be made here rather
+  than deferred, `LIT-07 X1`'s item-0 text was dispatched early as the work, and an independent
+  re-review confirmed the condition now holds — verifying `burns-groth`'s §2 and §6 against the
+  primary PDF itself rather than against `05`'s account of it. Eleven blocks, five keys each,
+  every status permitted, all thirteen cited `source_id`s present in the matrix, and a dated
+  reconciliation note at the head of the file. See `## Review`.
 - **Every CRITICAL_COLLISION in `05_critical_collisions.md` carries a recorded independent second
   review; disagreements are recorded, not averaged away** — **Met.** 19 sections, 19 dated review
   subsections, 0 pending, each recording the first assessment's position and the reviewer's
@@ -256,7 +260,7 @@ produced the row or `05`/`06`. **6 confirmed, 13 disputed. All 19 answered "no" 
 source materially subsumes a hypothesis — no `GOV-009` escalation.**
 
 **`X2` (Sonnet), one fix cycle.** 19 verdicts into `second_review` and 19 dated subsections in
-`05`, plus 42 factual corrections across 16 rows. Changed no score, no `critical_collision` and
+`05`, plus 42 factual corrections across 15 rows. Changed no score, no `critical_collision` and
 no `hypotheses_challenged` — verified by field-level diff. Fix cycle 1: `X1`'s preamble claimed
 `X2` folds reviewer findings into `06_hypothesis_tests.md`, which is both untrue and the
 writer-gap stated as though resolved.
@@ -274,6 +278,171 @@ but the split inverts the phase's central finding.
 - **Opus escalation**: none spent, in this session or the campaign.
 - **Descope rung**: none taken.
 - **Runway**: 6 of 7 sessions used, against an owner-accepted range of six to eight.
+
+## Review
+
+An independent sub-agent reviewed the range `dev..HEAD` (20 commits) at close, starting with no
+context from this session. Its findings, condition by condition.
+
+### Acceptance 1 — **Not Met**
+
+> Formally this holds: all 11 `## H1`–`## H11` blocks exist in
+> `research/literature-review/06_hypothesis_tests.md`, each with `strongest_challenger`,
+> `evidence`, `assessment`, and a `status` from the permitted vocabulary (verified statuses match
+> the gate table exactly: H1/H3/H5/H6/H10 `KNOWN_COMPONENT_NEW_INTEGRATION`, H2/H7/H8/H9
+> `LIKELY_ALREADY_KNOWN`, H4/H11 `INSUFFICIENT_EVIDENCE`). No `NOVEL`, no "no prior work exists"
+> anywhere in the three deliverables.
+>
+> But I read the H1 and H11 blocks against their named challengers' second-review subsections in
+> `05_critical_collisions.md` myself (lines 662–719 and 19–72 of `06`, against lines 1046–1105 and
+> 921–989 of `05`), and the defect is not a disputed score threshold — it is a documented
+> misreading of the source:
+>
+> - **H11**'s strongest challenger, `burns-groth-agentic-ontological-notebook-memory-2026`, is
+>   presented in `06` as "a named, working, demonstrated closed loop... with a public benchmark."
+>   The independent reviewer, reading the same paper end to end, found its own §6 states plainly:
+>   *"Our future work focuses on developing the virtuous cycle..."* — the mechanism `06` calls
+>   demonstrated is the paper's own future work.
+> - **H1**'s strongest challenger, `eywa-provenance-grounded-memory-joshi-2026`, is presented in
+>   `06` as independently tracking "three orthogonal dimensions." The independent reviewer read all
+>   29 pages and found each of the five object types carries a deterministic one-to-one mapping to
+>   tier and lifecycle — one axis restated, not three independent ones — and that the word
+>   "orthogonal" never appears in the paper.
+>
+> `05`'s preamble states plainly that `06` was not updated by this phase; `06` itself carries no
+> such disclaimer anywhere in its own text. A reader of `06` alone — the artifact this acceptance
+> condition evaluates — has no way to know two of its eleven verdicts rest on evidence the
+> campaign's own adversarial control has already shown to be inaccurate. Nine of eleven hold up
+> cleanly; two do not, in substance rather than form. I judge the condition **Not Met** as
+> written, though I note the countervailing case: the owner was informed of exactly this gap and
+> ruled to defer the fix to `LIT-07 X1` item 0 rather than block on it — a reasonable process
+> call, but a different question from whether the acceptance text is satisfied today.
+
+### Acceptance 2 — **Met**
+
+> Confirmed directly: 19 `##` sections, 19 dated `### Review — 2026-09-14` subsections,
+> `second_review` populated on all 19 `critical_collision: yes` matrix rows (0 pending; 13
+> `disputed`, 6 `confirmed`). Sampled sections (aporia, burns-groth, eywa) show a consistent,
+> honest pattern — "First assessment position" and "Independent reviewer position" stated
+> separately, then a "Resolution" that explicitly states the score/flag/`hypotheses_challenged`
+> value is "left exactly as scored" when disputed, never silently adjusted.
+
+### Gate measurements — all independently reproduced
+
+All four reproduced. On measurement 4 the reviewer added a caution worth keeping:
+
+> a strict exact-string match of the 220 `LIT-06-*` `result_ids` against the pre-phase
+> (`a00623f`) inventory's `url_or_doi` column gives **43/220**, one short. The 44th requires
+> recognizing `plato.stanford.edu/entries/reasoning-defeasible` (no trailing slash […]) as the
+> same source as `plato.stanford.edu/entries/reasoning-defeasible/` (with slash […]) — a
+> normalization the ledger row's own annotation confirms is correct […]. With that one legitimate
+> match, I reproduce **44/220 exactly**. I agree with the number; the method is sound in intent
+> but mechanically fragile — a pure string-equality check under-reports by one without
+> manual/semantic attention, and nothing in the pipeline normalizes URL forms across searches.
+
+File integrity, the frozen baseline, the backlog restore and the governed-document amendments all
+verified clean. On the restore:
+
+> Result: `phase-lit-03/04/05/06` in `b319b7a` are byte-identical (as parsed structures) to their
+> `7ff3421` state. Every other phase present in both `b319b7a` and current `dev` matches exactly,
+> kit phases included. […] This is a clean, surgical restore exactly as claimed.
+
+### Discrepancies it found
+
+1. **The correction count was wrong in this record.** "42 factual corrections across 16 rows" —
+   the cell count is right, the row count is **15**. Verified independently by the coordinator
+   after the review and corrected above.
+2. **Stale counts in the verification block** (194 documents / 555 tracked files), because those
+   commands ran before this session's final commit added a document. Corrected above.
+3. **The supplementary distinct-identifier figure** — the record gives 36/208 = 17.3%; the
+   reviewer got 36/207 under stricter normalization. The coordinator re-ran it and reproduces
+   36/208 with trailing-slash normalization, so this is a normalization difference rather than an
+   error, and it illustrates the same fragility the reviewer flagged on the primary figure. Left
+   as written, with the fragility recorded.
+
+> No other discrepancies found — the backlog restore, the frozen-baseline check, the
+> governed-document amendments, the file-integrity checks, and the four gate measurements' primary
+> values all reproduced exactly against my own independent derivation.
+
+### Its completion verdict
+
+> If `/session-close` requires acceptance 1 to hold in substance, it does not yet — `06` needs the
+> `LIT-07 X1` item-0 reconciliation (already written into `PROMPT-029`) before this phase's
+> central deliverable can be called accurate. If the owner's standard is the literal text of the
+> acceptance condition (challenger/evidence/assessment/status present and citing a real matrix
+> row), it is satisfied today and the reconciliation is correctly a `LIT-07` concern. That is the
+> owner's call to make, not mine to resolve on their behalf — but I would not represent acceptance
+> 1 as unqualifiedly Met without naming this gap explicitly at the point of close.
+
+### The reconciliation, and the re-review that cleared it
+
+On the owner's direction the fix ran here rather than at `LIT-07`. The item-0 text already
+written into `PROMPT-029` was dispatched verbatim as the work, so this executed a governed prompt
+early rather than authoring one — the distinction the pack's no-mid-campaign-authoring rule
+exists to protect.
+
+**First pass (`0d44f51`)** dropped `burns-groth` as H11's challenger and `eywa`/`burns-groth` as
+H1's, dropped `log-is-the-agent` from H5 per its reviewer's finding that the paper's own §8
+rejects the memory-retrieval category, added caveats to H9, and moved **H1 and H11 to
+`POTENTIALLY_DISTINCT`** — taking the campaign from zero surviving distinctions to two.
+
+**The coordinator sent it back (fix cycle 1 of 2).** Not for the direction, which moved against
+the campaign's own thesis and was well argued, but for consistency: H1, H4 and H11 were in
+materially the same evidential position — every candidate found had been inspected and none
+demonstrated the mechanism at full scope — yet carried two different statuses. H11's new
+strongest challenger scored component overlap **1** and was not a critical collision. And the
+pass's own sentence, that both verdicts were "open to reversal by a further, more targeted search
+this reconciliation did not perform", describes insufficient evidence. The dispatch was told to
+state its rule and apply it uniformly, and not told which way to resolve.
+
+**Second pass (`9329436`)** stated the rule — `POTENTIALLY_DISTINCT` requires not only that found
+candidates fail but that the search behind that finding approaches saturation — and **converged
+downward**: H1 and H11 back to `INSUFFICIENT_EVIDENCE`, H4 unchanged with a stated reason. Its
+argument for converging that way rather than elevating H4: `bara` genuinely instantiates H4's
+mechanism, formally and in closed form, merely at narrower scope, which is a stronger match than
+anything left standing for H1 or H11; H11's remaining candidate was never the target of dedicated
+search and H1 has had none in six phases.
+
+Final distribution: **4 `LIKELY_ALREADY_KNOWN`, 4 `KNOWN_COMPONENT_NEW_INTEGRATION`, 3
+`INSUFFICIENT_EVIDENCE`, 0 `POTENTIALLY_DISTINCT`.** The campaign returns to zero surviving
+distinctions — but now by a stated, checkable rule rather than by default, and with three
+hypotheses honestly parked rather than two carrying verdicts their evidence did not support.
+
+### Independent re-review of acceptance 1 — **Met**
+
+A second fresh reviewer checked only the failed condition. It verified the primary source itself:
+
+> I fetched the actual `burns-groth` PDF (CAIS '26, Burns & Groth) and read it in full. Section 2
+> says exactly: *"We are developing a feedback loop for iterative refinement… This closes the loop
+> between curation experience and ontological design"* (present-progressive), and Section 6
+> states: *"Our future work focuses on developing the virtuous cycle…"* Section 4 (Demonstration:
+> job-hunt, tech-recon, DisMech) contains no instance of this loop running. This is exactly what
+> `06`'s H11 block and `05`'s source-16 review now say — the original review's objection is
+> accurately corrected, not just asserted.
+
+On the question the coordinator flagged for it — whether a rule pushing hypotheses away from
+distinctness is a thumb on the scale for H0:
+
+> it only demands search-saturation evidence for a *negative/absence* claim ("the mechanism
+> doesn't exist elsewhere"). It does not retroactively question `LIKELY_ALREADY_KNOWN` or
+> `KNOWN_COMPONENT_NEW_INTEGRATION` verdicts, which rest on *positive* claims […] That asymmetry
+> is a standard, correct epistemological distinction, not a selectively-applied escape hatch — and
+> note that of the two possible directions this rule could have moved things, it moved H1/H11
+> *away* from a status hostile to H0 (`POTENTIALLY_DISTINCT`) toward a genuinely neutral hedge
+> (`INSUFFICIENT_EVIDENCE`), not toward a status that affirmatively supports H0. […] Declaring
+> distinctness on a two-candidate, non-saturated search would have been the actual overclaim;
+> walking it back to "we don't know yet" is the more conservative, defensible call.
+
+It confirmed eleven blocks with five keys each, every status permitted, `NOVEL` and "no prior work
+exists" only in the file's own rule prose, all thirteen cited `source_id`s present in the matrix,
+the dated reconciliation note present, and both fix commits touching `06` alone. **"No
+discrepancies found that block acceptance."**
+
+One rough edge it recorded, not blocking: the rule's illustrative phrase at
+`06_hypothesis_tests.md:36-38` holds up H4's single Pass 3 collision search as the example of a
+search that would satisfy saturation, while the H4 block then says that same search is "thinner,
+not thicker" and insufficient. The enforced bar is consistent; the abstract statement of it is
+looser than the bar. Worth tightening in `phase-lit-07`, not a defect in the verdicts.
 
 ## The pre-synthesis check-in
 
@@ -310,6 +479,105 @@ contract and the dispatches read the pack. That was itself ruling 7.
 8. **`phase-lit-07` must not claim saturation.** `LIT-06 G` measured 20.0% (44/220), recomputed
    independently and reproduced exactly; four results in five were new. `LIT-07 G` reports the
    trend and must not assert the stop condition holds.
+
+## Decisions
+
+**The coordinator drew a line the pack does not draw, and the owner kept it.** When nineteen
+reviews returned and six said a flag should not stand, nothing in `PROMPT-029` said whether `X2`
+could act on that. The line taken was: `X2` writes `second_review`, corrects factual errors, and
+touches no score, no `critical_collision` and no `hypotheses_challenged`, because a score is a
+judgment and the pack gave no dispatch authority over one. `X2` was told to say if that line was
+wrong and said it was right — that the clean separation made nineteen rows tractable without
+guessing whether a given correction was "factual enough". The owner then ruled the same way at the
+check-in. The result is that thirteen disputes sit recorded and unapplied, which looks like
+inaction and is not: the disagreement is the evidence, and resolving it inside a worker dispatch
+would have destroyed the record of it.
+
+**The owner overrode the coordinator's recommendation once, and was right to.** Asked what should
+happen to the six flags, the recommendation was to drop five and let the patent follow the
+patent-scoring ruling. The owner kept all nineteen. That is the better answer: dropping five would
+have changed the population `LIT-06 G` had already measured, forcing a gate re-run, in exchange
+for a count that `LIT-07` will revisit anyway.
+
+**The patent rule the coordinator invented was wrong, and the check-in reversed it.** "Score the
+claims, not the specification" went into a review dispatch as addressing. It is the test for
+infringement and validity; for prior art, a published application's whole disclosure is public
+knowledge regardless of what was claimed. The reviewer working under that rule re-derived
+`us20250165226a1`'s architecture overlap from 4 to 3 and concluded its flag should fall. Under the
+owner's ruling that re-derivation is rejected as applying the wrong standard, and the rule now
+lives in `PLAN-023.03` where the next person to score a patent will read it.
+
+**Rulings went into the governing documents, not only the kickoff record.** `PROMPT-031` wins by
+precedence, but `LIT-07 G` reads the evidence contract and dispatches read the pack — a ruling
+recorded only in the kickoff record would never reach them. So `PLAN-023.03` gained the patent
+rule and the contiguous definition of "adjacent", and `PROMPT-029` gained Block D's
+read-disclosure requirement and `LIT-07 X1`'s item 0. Amending a pack mid-campaign is normally
+forbidden; these are owner rulings, attributed as such in each passage.
+
+**The backlog regression was reported, not worked around.** Finding four phases reverted by a peer
+commit, the session stopped and asked rather than restoring on its own judgment, because
+`AGENTS.md` forbids resolving a `backlog.yaml` collision by taking one side wholesale and three of
+the four had reached `complete` through the owner's own `/session-close`. The owner directed the
+full restore.
+
+## Corrections
+
+**A worker claim was relayed without being fully checked, and the close review caught it.** `X2`
+reported "42 factual corrections across 16 rows". The cell count was verified; the row count was
+not. It is 15 rows. This is the exact failure mode this session spent the day guarding against in
+others — the standing rule was to verify every worker claim against the file, and on this one
+number it was relayed instead. Corrected in `## What was dispatched`, and named here rather than
+quietly fixed.
+
+**Two stale numbers in the verification block.** Governance and tracked-file counts were captured
+before the session's last commit added a document, so they read 194/555 against a true 195/556.
+Corrected.
+
+**A gate reported a breakdown that inverted the phase's central finding.** `LIT-06 G` gave
+measurement 2 as 10 confirmed / 9 disputed against a true 6 / 13. Its PASS was correct — the gate
+tests `0 pending` — but the split would have told a reader the second reviews broadly upheld the
+first assessment when they broadly did not. Caught by re-measuring rather than by reading, and
+fixed in one cycle.
+
+**`X1` asserted a process that does not exist.** Its preamble in `05` said `LIT-06 X2` folds
+reviewer findings into `06_hypothesis_tests.md`. Nothing does. That sentence stated the writer gap
+as though it were resolved, and would have told `LIT-07` that `06` already reflected the reviews.
+Corrected in a fix cycle; `05` now says the opposite explicitly.
+
+**`S1` wrote prose into two enum-valued fields.** One row carried a sentence in
+`hypotheses_challenged` whose content was that the source challenges neither H3 nor H4 — but
+`LIT-07 G` computes challenger counts from that field, so a consumer would have extracted "H3" and
+"H4" from it and credited both, inflating the campaign's thinnest hypothesis in the direction that
+flatters H0. Caught before it could propagate.
+
+## Left undone
+
+**The rule's own worked example is looser than the bar it enforces.**
+`06_hypothesis_tests.md:36-38` offers H4's single Pass 3 collision search as the example of a
+search that would satisfy saturation, while H4's own block then says that same search is "thinner,
+not thicker" and insufficient. The verdicts are applied consistently; only the abstract statement
+drifts. Left for `phase-lit-07` rather than spending this work item's second fix cycle on wording.
+
+**`LIT-07 X1`'s item 0 is now redundant in practice and was deliberately left in the pack.** Every
+pack section is idempotent by design — output that already exists is verified against its contract
+and extended from the first missing item, never re-created — so on re-dispatch it verifies a
+reconciliation that has already happened. Removing it would have been the more fragile choice.
+
+**Six flags stand that six reviewers say should not.** Recorded as disputes, unapplied, by ruling.
+`LIT-07 X1` weighs them when building the anti-novelty case, and `LIT-07 G` counts a population of
+19 rather than 13.
+
+**The campaign is not saturated and the next phase cannot fix that.** 20.0% duplicate rate, four
+results in five new. `phase-lit-07` is synthesis, not search, so the number will not improve;
+ruling 8 forbids claiming otherwise. If saturation matters for the memo's standing, that is an
+eighth session, not a paragraph.
+
+**Three findings outlive this phase.** `000221` — the contract still names `LIT-06 X2` as
+`second_review`'s sole writer while the flagging dispatch writes `pending`. `000148` — the
+`source_type` enum has no bucket for a patent, dissertation, whitepaper or software library, all
+of which are in the matrix. `000224` — the backlog regression is repaired on this branch, but a
+phase silently dropping from `complete` to `queued` still fails no check, and the only reason this
+one was found is that a session happened to rebase and notice its own claim missing.
 
 ## Resume state
 

@@ -128,6 +128,18 @@ into the document that gate or dispatch actually reads, as noted.
 4. **`LIT-07 X1` reconciles `06_hypothesis_tests.md` against the corrected matrix before writing
    anything else**, as its item 0. Written into `PROMPT-029`. H11's and H1's named challengers
    are known to need it. Idea `000225`.
+
+   **Superseded at `phase-lit-06`'s close, same day.** The independent close review judged the
+   phase's first acceptance condition **Not Met** on exactly this gap — `06` presented two of
+   eleven verdicts on evidence the campaign's own adversarial control had shown to misread the
+   source, with no in-document flag. The owner then directed that the reconciliation run inside
+   `phase-lit-06` rather than wait for `LIT-07`, so the phase could close on an accurate
+   deliverable. The item-0 text was dispatched early, verbatim, as the work.
+
+   `LIT-07 X1` item 0 **remains in the pack and is not removed**. Every pack section is
+   idempotent by design — output that already exists is verified against its contract and
+   extended from the first missing item, never re-created — so on re-dispatch it verifies a
+   reconciliation that has already happened. That is the intended behaviour, not a redundancy.
 5. **No row is re-read.** The 42 factual corrections already landed and the scores stand under
    ruling 1. Instead `Block D` now requires a deep-extraction dispatch to declare what it
    actually read and what it could have read but did not. Written into `PROMPT-029`. Idea
