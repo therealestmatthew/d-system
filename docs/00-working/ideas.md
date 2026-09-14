@@ -10904,6 +10904,10 @@ X2's writer clause should extend to 06, or that a new item between X2 and G shou
 06 is deliberately a snapshot of the first assessment and LIT-07 is where reconciliation happens —
 in which case 06 should say so in its own text. This is the same shape as 000221.
 
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: LIT-07 X1 reconciles 06_hypothesis_tests.md against the corrected evidence matrix as its item 0, before writing 07_anti_novelty_case.md. It reads each block's strongest_challenger against that row's current matrix values and its dated review subsection in 05, says so in the block where a review undercuts the challenger, and re-derives the status from the evidence that stands. H11 and H1 are known to need it and are named in the pack; the dispatch is told not to assume they are the only two. Written into PROMPT-029 as LIT-07 X1 item 0. This closes the writer gap for 06 but not the general shape - 000221 remains open on second_review's stated sole writer.
+
 **Links**
 
 - relates_to → `000221`
@@ -10969,6 +10973,10 @@ What needs deciding is whether any row should be re-read before synthesis, and w
 should require a deep-extraction dispatch to state what it actually read, so a locator that stops
 at page 4 is visible at write time rather than at second review. Recorded from phase-lit-06.
 
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:12-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: NO ROW IS RE-READ. The 42 factual corrections from the second reviews already landed, and the scores stand under the ruling that keeps the nineteen flags. The defect is addressed by prevention instead: Block D now requires a deep-extraction dispatch to establish what access the source really permits before scoring, to record in evidence_locator the range it read AND anything available it did not read with the reason, and never to code a field NOT_DETERMINABLE_FROM_ACCESS when reachable material answers it. access_limitation describes what the source permits, never how far the read got - recording abstract_only when full text was freely reachable is a false statement about the source. Written into PROMPT-029's Block D.
+
 **Links**
 
 - relates_to → `000203`
@@ -11012,6 +11020,10 @@ basis recorded per row; and whether the same treatment extends to other artifact
 contract's rubric was not written for — standards, dissertations, whitepapers and live software
 libraries all appeared in this campaign's matrix. Two of those (langgraph-checkpoint-library-oss
 and the patent) are among the nineteen critical collisions, so this is not an edge case.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: a patent's WHOLE PUBLISHED DISCLOSURE is prior art - specification and claims together - and both overlap scores derive from all of it. A published application discloses its contents regardless of what was ultimately claimed, and this campaign measures what is already known, not what is legally protected. This REJECTS the claims-only re-derivation applied to us20250165226a1-ai-digital-thread-patent during phase-lit-06 as using the wrong standard: that rule is the test for infringement and validity. The row's architecture overlap of 4 and its critical_collision: yes both stand. Where claims are materially narrower than the specification, record the difference in strongest_difference rather than adjusting a score. Written into PLAN-023.03. The source_type enum still has no patent bucket; 000148 remains open.
 
 **Links**
 
@@ -11057,6 +11069,10 @@ middle.
 Recorded as an open contract question in 05_critical_collisions.md during phase-lit-06. The
 contract was not edited. Resolving it is the owner's call, and it should be resolved before
 LIT-07's final gate recounts collisions.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: 'adjacent' in PLAN-023.03's fourth CRITICAL_COLLISION trigger means CONTIGUOUS - four consecutive stages with no gap. A source covering Reasoning, Artifact, Verification and Knowledge Update does not fire it; Artifact to Verification to Deployment to Runtime Evidence does. The strict reading is chosen because the loose one inflates the collision count in the direction that flatters H0, which is the campaign's known exposure. Written into PLAN-023.03 with the phase-lit-06 evidence that surfaced it.
 
 **Links**
 
@@ -11104,6 +11120,10 @@ disputing their flags: log-is-the-agent (H2;H3;H5;H7;H9 -> H2;H9), langgraph (dr
 (drop H9), burns-groth (drop H3), tgms (drop H3;H5). Those recommendations are recorded in
 05_critical_collisions.md and likewise unapplied.
 
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: the nineteen critical-collision flags STAND. The six disputes in which a reviewer re-derived a score one level lower and found no trigger fires are recorded in second_review and in 05_critical_collisions.md, and are not applied. No score, no critical_collision value and no hypotheses_challenged value changes. LIT-06 G's measurement 2 therefore needs no re-run and the population LIT-07 G inherits stays at 19. The five recommended narrowings of hypotheses_challenged are likewise recorded, not applied. LIT-07 X1 weighs all of it when it reconciles 06_hypothesis_tests.md. Recorded in PROMPT-031's check-in entry, ruling 1 and ruling 6.
+
 **Links**
 
 - relates_to → `000230`
@@ -11147,6 +11167,10 @@ seven-session runway with an accepted range of six to eight.
 
 Separately and not part of the check-in: a backlog regression on dev clobbered four of this
 campaign's phases and no check caught it. [[000224]]
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-14T09:09:22-04:00): CHECK-IN HELD, 2026-09-14, ruling: proceed. All five rulings this anchor was created to collect are now made and recorded in PROMPT-031's check-in entry, with each behaviour-changing ruling also written into the document that governs it - PLAN-023.03 for the patent rule and the contiguous definition, PROMPT-029 for Block D's read-disclosure requirement and LIT-07 X1's reconcile-first step. Three further rulings were taken at the same sitting: the nineteen flags stand and the five recommended narrowings are recorded not applied; rulings go into the governing documents rather than the kickoff record alone; and phase-lit-07 must NOT claim saturation, because LIT-06 G measured a 20.0 percent duplicate rate (44/220, recomputed independently and reproduced exactly) and four results in five were new. phase-lit-07 is unblocked and was deliberately not started in the same session.
 
 **Links**
 
