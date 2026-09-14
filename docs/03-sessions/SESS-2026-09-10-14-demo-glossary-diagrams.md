@@ -292,6 +292,36 @@ exactly what the entries claim. The four additions landed on `dev` afterwards:
 The entries were accurate when written and were falsified by the 484 commits that landed while the
 branch sat unmerged. Everything else the reviewer found is confirmed.
 
+## Review — round 2, after the fix
+
+The first review's blocker was fixed on `agent/phase-demo-07` (`b20ae12`) and a second
+`demo-adversary` sub-agent re-reviewed that commit with no shared context.
+
+**It confirmed the fix.** Ground truth counted independently — 4 skills, 12 agents, 6 commands, one
+MCP server (`playwright`) — and all three counts and every named item now match, in all three copies.
+It swept the whole concept memory for other stale claims, which the first review never did, checking
+`demo-adversary`'s tool list, `.claude/settings.json`'s deny list, the `demo-orch-*`/`demo-creator-*`
+/`demo-validator-*` names and the MCP entry against `.mcp.json`: **no other stale claim found.**
+Regression clean — governance OK, 580 passed, both glossaries byte-identical with no drift, all six
+SVGs well-formed at 1024×768 with no external reference, and the commit inside declared deliverables.
+
+**It raised one blocker, which did not reproduce.** It reported the new seventh tree row in
+`skill-architecture.svg` colliding with the caption beneath it — "descenders … run into the
+ascenders", "effectively no gap". Rendered at 4× device scale and inspected directly, there is a
+visible gap: the row's descenders clear the caption's ascenders. The geometry agrees — a 17px row at
+`y=292` has descenders to roughly 296, and a 16px caption at `y=312` has ascenders from roughly 300.
+The collision as described is not there.
+
+**The underlying concern was fair and was acted on anyway** (`e1438d1`). The spacing was genuinely
+tighter than the rest of the panel, and the six-item command column sat 4px off its panel floor.
+Both were loosened rather than argued about: the caption moved to `y=318` (≈6px clearance above the
+panel floor at 328), and the `HERE` block lifted 6px in all three columns so `/resume-lit-review`
+clears the floor by 10px. Re-rendered at 1024×768 and at 4×: clear separation in both, nothing
+clipped, every row inside its panel.
+
+Recording it this way because "the reviewer was wrong" and "the reviewer was pointing at something
+real" are both true here, and collapsing that into either one alone would misreport it.
+
 ## Decisions
 
 - **The phase does not take `GOV-003`'s demo-track completion exception.** Owner decision,
@@ -331,46 +361,50 @@ branch sat unmerged. Everything else the reviewer found is confirmed.
 
 ## Left undone
 
-The phase stays `active`. Three things remain, and none is large:
+The three items recorded here at the first close — the stale counts, the two diagrams baking them
+in, and the `aria-label` mismatches — were all fixed afterwards on the owner's instruction
+(`b20ae12`, `e1438d1`). What remains is one governance item, which is not this phase's to fix:
 
-1. **Fix the three stale counts** in `brain/concepts/terms-skills-and-agents-demo.md` — four skills,
-   twelve agents, six commands — naming `log-anti-patterns`, `partition-adversary`, `/session-start`
-   and `/resume-lit-review`. Then regenerate both glossaries.
-2. **Update the two diagrams that bake the counts in**, `skill-architecture.svg` and
-   `command-skill-tool.svg`, and re-render both at 1024×768 to confirm the added text does not break
-   the layout.
-3. **Optionally align the two `aria-label` strings** with their visible titles.
+**The acceptance conditions do not test what the scope requires.** All three conditions passed over
+a glossary that misstated the repository, because condition 2 tests the SVGs against the glossary
+and nothing tests the glossary against reality. A phase whose stated purpose is "defined against
+what this repository actually contains" needs an acceptance condition that reruns those counts, or a
+check in `test_glossary.py` that compares the stated counts to the real directory listings. The
+owner's decision on 2026-09-14 was to record it here rather than build it now or open an idea; it is
+written down so it is not lost with this session.
 
-A fourth item is governance, not this phase: **the acceptance conditions do not test what the scope
-requires.** All three conditions pass on a glossary that misstates the repository, because condition
-2 tests SVG-against-glossary consistency and nothing tests glossary-against-reality. A phase whose
-stated purpose is "defined against what this repository actually contains" needs an acceptance
-condition that reruns those counts. Worth an idea or a check in `test_glossary.py`; recording it here
-so it is not lost with this session.
+Worth noting for whoever picks that up: this is the second time the same shape of problem has
+appeared today. A peer session found that `uv run python -m src.governance` exits 0 while a
+`complete` phase silently reverts to `queued`, and queued `phase-gov-05` to add the missing guard.
+Both are checks that pass by not looking.
 
 ## Not done, and why
 
-`status: complete` was not set, and this session did not set it either. `GOV-003`'s "demo track
-completes through its testing gate" section names five `phase-demo-*` phases plus `phase-demo-06` by
-explicit owner decision; `phase-demo-07` is not on that list. **The owner resolved this on
-2026-09-14: `phase-demo-07` does not take the demo-track exception and requires the full
-`/session-close` review.** That is owner-only, so the phase stays `active`.
+`status: complete` is not set. `/session-close` was invoked on 2026-09-14 and reached step 6 twice.
 
-The branch is not integrated. Per `AGENTS.md` that is the owner's call, and it has not been asked
-for yet as of this checkpoint.
+The first time, completion was withheld: all three acceptance conditions passed, but the independent
+review raised an unresolved discrepancy against the phase's scope, and step 6 requires both. That is
+the outcome the step exists to allow.
+
+The second time, after the fix and the re-review, the blocking discrepancy is resolved and no other
+survives. Completion is now a decision the owner takes, not one this session takes for them — and
+there is a specific reason to put it in front of them rather than assume it. The round-2 reviewer
+raised a blocker that this session judged unreproducible and then partly acted on anyway. An agent
+overruling its own reviewer is exactly the move this gate exists to catch, so the judgement is
+recorded in full above and handed over rather than exercised quietly.
+
+The branch is also unmerged, so completion and integration are one approval, not two.
 
 ## Backlog
 
-- `status: active` — **not** advanced to `complete`. The owner invoked `/session-close`, its step 6
-  was reached, and completion was withheld because the independent review raised an unresolved
-  discrepancy. This is the outcome that step is written to allow, not a failure to finish.
+- `status: active` — still not advanced to `complete`; see above.
 - `session: doc-session-demo-glossary-diagrams` — unchanged; the id is permanent and survived the
   renumber.
-- `completion_evidence` / `result` — not written. The work is merged into `dev` but is not correct
-  yet, and evidence fields asserting otherwise would be false.
-- `next_action` — rewritten at close to name the three stale counts, the two diagrams that bake them
-  in, and the acceptance-vs-scope gap.
-- `next_up` — not pruned. `phase-demo-07` is not on it, and nothing became `complete` this run.
+- `completion_evidence` / `result` — still not written. They would be true now, but writing them on
+  an `active` phase ahead of the owner's decision would assert a closure that has not happened.
+- `next_action` — rewritten to record the fix, both review rounds, and that the phase is ready for
+  the owner's completion-and-integration decision.
+- `next_up` — not pruned. `phase-demo-07` is not on it.
 
 ## Unresolved
 

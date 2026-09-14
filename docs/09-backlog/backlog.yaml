@@ -4988,28 +4988,25 @@ items:
   - docs/07-architecture/diagrams/demo
   - docs/07-architecture/README.md
   session: doc-session-demo-glossary-diagrams
-  next_action: 'NOT COMPLETE - /session-close was invoked 2026-09-14 and completion was withheld. The
-    independent demo-adversary review found the concept memory misstates three counts it claims
-    to take from .claude/, which is the scope''s central requirement that terms be defined
-    against what this repository actually contains. brain/concepts/terms-skills-and-agents-
-    demo.md:103 says three skills (actual four, missing log-anti-patterns), :86 says eleven
-    agents (actual twelve, missing partition-adversary), :119 says four commands (actual six,
-    missing /session-start and /resume-lit-review). skill-architecture.svg and command-skill-
-    tool.svg bake the same wrong counts into rendered text. The entries were CORRECT when
-    authored - at the branch''s original base 86a4f68 the tree genuinely held 3/11/4 - and were
-    falsified by the 484 commits that landed while the branch sat unmerged; the 2026-09-14
-    rebase should have caught it and did not. To finish - fix the three counts naming the
-    missing items, regenerate both glossaries, update the two diagrams and re-render them at
-    1024x768 to confirm the added text does not break layout, then re-run the verification list.
-    Optionally align the aria-label strings in llm-vs-agent.svg and command-skill-tool.svg with
-    their visible titles. Note that all three acceptance conditions PASS as written even in this
-    state - condition 2 tests the SVGs against the glossary and nothing tests the glossary
-    against reality, so a count check belongs in test_glossary.py or in the acceptance list.
-    Everything else is verified and green on dev - governance OK, 580 passed, both glossary
-    generations byte-identical with no drift, check_no_private_content OK with 31 identifiers
-    checked, six SVGs independently confirmed legible at 1024x768 with no external dependency,
-    and the diff touches only declared deliverables plus backlog.yaml and catalog.md. The work
-    is merged into dev; the branch and worktree are removed.'
+  next_action: 'READY for the owner''s completion-and-integration decision; branch agent/phase-demo-07 is
+    unmerged with two commits. The blocker that withheld the first close is fixed - b20ae12
+    corrects the three stale .claude/ counts (four skills naming log-anti-patterns, twelve
+    agents, six commands naming /session-start and /resume-lit-review) in the concept memory and
+    in the two diagrams that rendered them, and aligns two aria-labels with their visible
+    titles. A second independent demo-adversary review confirmed the corrections against ground
+    truth it counted itself, swept the whole concept memory for other stale claims and found
+    none, and reported regression clean. It raised one blocker - a descender collision in skill-
+    architecture.svg - which did NOT reproduce at 4x device scale; the descenders visibly clear
+    the caption and the geometry agrees. The spacing was genuinely tight though, so e1438d1
+    loosened it anyway along with the six-item command column, both re-rendered and re-
+    inspected. Flagging explicitly that this session judged its own reviewer wrong on that point
+    - the full reasoning is in the session record under Review round 2, and it is the one thing
+    worth a second opinion before completing. Verification green on the branch - governance OK,
+    580 passed, both glossary generations byte-identical with no drift, 18 headings, all six
+    SVGs well-formed at 1024x768 with no external reference. One governance item is recorded as
+    left undone and is NOT this phase''s to fix - nothing tests the glossary''s stated counts
+    against the real .claude/ directories, which is why the wrong counts reached a merge with
+    all three acceptance conditions passing.'
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
   next_action: 'None — phase complete: all items validated, the W01-A blocker fixed
