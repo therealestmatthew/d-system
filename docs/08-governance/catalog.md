@@ -221,7 +221,11 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-14-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-01-literature-review-pass-3.md |
 | SESS-2026-09-14-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-02-demo-launch-docs.md |
 | SESS-2026-09-14-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-03-partition-generalization-and-programme-plans.md |
+<<<<<<< HEAD
 | SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-lit-06-followups.md |
+=======
+| SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-phase-kit-02-demo-kit-skills.md |
+>>>>>>> dbb6536 (Record the phase-kit-02 session)
 
 ## Plans and their phases
 
@@ -289,4 +293,8 @@ CI regenerates it and fails on any difference.
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 | PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
+<<<<<<< HEAD
 215 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 33, requirement: 10, session: 76.
+=======
+213 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 76.
+>>>>>>> dbb6536 (Record the phase-kit-02 session)
