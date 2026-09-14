@@ -21,9 +21,14 @@ depends_on: []
 
 ## Summary
 
-Programme `P10` of the twelve, third in the owner's delivery order. Audits and architecture of the
-workbench itself, as against `P11`'s discrete features — the same product, a different kind of
+Programme `P10` of the twelve, **second in the owner's delivery order**. Audits and architecture of
+the workbench itself, as against `P11`'s discrete features — the same product, a different kind of
 work.
+
+It was moved ahead of `P11` on 2026-09-14, on the owner's ruling. `G40`'s container-vs-content
+vocabulary is cited as a prerequisite by six ideas, four of them in `P11`, so planning the features
+first would have meant naming things twice. The plan codes were already permanent by then, which is
+why `PLAN-028` sits after `PLAN-027` while running before it; `next_up` is the authority on order.
 
 **13 ideas across 8 fine groups**, from the accepted partition of 2026-09-13. Sizing at partition
 time was 12–15 phases, with `G43` alone approaching a full architecture revision.
@@ -58,8 +63,8 @@ this programme: requirement, design, real phases under a registered prefix, and 
 
 - **`G40` comes first and is cited as a prerequisite by six ideas** — `000115`, `000116`, `000133`,
   `000135`, `000141` and `000144`. It is a documentation deliverable completable alone, in about one
-  phase. This programme being third in the order does not make `G40` third; see the tension noted
-  in `PLAN-027`.
+  phase. It is the reason this programme was moved ahead of `P11`, so it should be the first
+  implementation phase this plan produces, not a later one.
 - **`G40` gates `G43` and `G44`** by those ideas' own text, not by an inference drawn here.
 - **`G46` measures before it changes anything** — `000114` is the measurement, `000121` the
   refinement, and they are not separable.

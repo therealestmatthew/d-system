@@ -21,10 +21,15 @@ depends_on: []
 
 ## Summary
 
-Programme `P11` of the twelve, second in the owner's delivery order. Discrete, mostly small,
+Programme `P11` of the twelve, **third in the owner's delivery order**. Discrete, mostly small,
 user-facing features and bugs in the shipped workbench. The programme is an administrative rollup
 rather than a single design: each group touches a different panel or route and is independently
 shippable.
+
+It was moved behind `P10` on 2026-09-14, on the owner's ruling, so that `G40`'s vocabulary is
+settled before any of this programme's work renames anything. The plan codes were already permanent
+by then, which is why `PLAN-027` sits before `PLAN-028` while running after it; `next_up` is the
+authority on order.
 
 **16 ideas across 9 fine groups**, from the accepted partition of 2026-09-13. Sizing at partition
 time was 8–10 phases excluding `G56`, which is already done.
@@ -65,7 +70,8 @@ this programme: requirement, design, real phases under a registered prefix, and 
   defect fix. One analyst lost this idea entirely, so its evidence is thinner than the rest.
 - **`000102` was placed here by content, not provenance.** Check the owner's ruling in the
   partition before assuming it belongs to the HTML Viewer group.
-- **Ordering tension worth the owner's attention:** `G40` (vocabulary) sits in `P10`, which is
-  sequenced *after* this programme, yet the partition names it a prerequisite wherever `P11` work
-  renames anything. Either settle `G40` first or confine early `P11` phases to work that renames
-  nothing.
+- **`G40` is settled before this programme runs, and that is deliberate.** The vocabulary decision
+  lives in `P10`'s `G40`, and `P10` was moved ahead of this programme on 2026-09-14 for exactly that
+  reason. Two consequences for the finalize session: use `G40`'s vocabulary rather than inventing
+  names, and sequence any phase here that renames a container or a panel behind `G40`'s completion
+  in `depends_on` rather than trusting queue order to hold.

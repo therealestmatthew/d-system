@@ -8,8 +8,8 @@ next_up:
 - phase-ses-01
 - phase-part-01
 - phase-prog-01
-- phase-prog-02
 - phase-prog-03
+- phase-prog-02
 - phase-prog-04
 - phase-prog-05
 - phase-prog-06
@@ -6840,8 +6840,8 @@ items:
   depends_on: []
   scope:
   - Write the requirement for P11 with observable statements and verification methods.
-  - Settle the design questions PLAN-027 lists as open, including the G40 ordering
-    tension it records against P10.
+  - Settle the design questions PLAN-027 lists as open, using G40's vocabulary, which
+    P10 settles first, and sequencing any renaming phase behind it in depends_on.
   - Replace PLAN-027's placeholder sections with the real plan and add session-sized
     implementation phases under a new prefix registered in the backlog README.
   acceptance:
@@ -6871,14 +6871,14 @@ items:
   depends_on: []
   scope:
   - Write the requirement for P10 with observable statements and verification methods.
-  - Settle the design questions PLAN-028 lists as open, and decide whether G40 is pulled
-    ahead of P11 work that renames anything.
+  - Settle the design questions PLAN-028 lists as open, and make G40 the first
+    implementation phase - it is why this programme was moved ahead of P11.
   - Replace PLAN-028's placeholder sections with the real plan and add session-sized
     implementation phases under a new prefix registered in the backlog README.
   acceptance:
   - PLAN-028 carries no placeholder banner and states a chosen design.
   - A requirement document exists for P10 and every row maps to at least one phase.
-  - G40's position relative to P11 is stated explicitly rather than left implied.
+  - G40 is the first implementation phase, and P11's dependency on it is stated.
   - phase-prog-03 is removed from next_up in the same change that completes it.
   verification:
   - uv run python -m src.governance exits 0.
