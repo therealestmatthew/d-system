@@ -7196,6 +7196,7 @@ The idea correctly identifies that a granted patent has different evidentiary ch
 **Links**
 
 - relates_to → `000147`
+- relates_to ← `000227`
 
 ---
 
@@ -10147,6 +10148,7 @@ Related governing gaps that surfaced in the same campaign:
 - relates_to → `000147`
 - relates_to ← `000209`
 - relates_to ← `000210`
+- relates_to ← `000226`
 
 ---
 
@@ -10447,6 +10449,7 @@ Same family as [[000199]]: the contract fixes a column's vocabulary but not the 
 **Links**
 
 - relates_to → `000203`
+- relates_to ← `000226`
 
 ---
 
@@ -10743,6 +10746,10 @@ Resolving it is a contract change and therefore the owner's call, not an agent's
 
 Raised by the coordinator at phase-lit-05's close. See SESS-2026-09-13-04.
 
+**Links**
+
+- relates_to ← `000225`
+
 ---
 
 ## 000222 · Demo kit skills roster, owner-authored: the six the kit actually ships
@@ -10818,3 +10825,333 @@ how to create one is open.
 **Links**
 
 - relates_to → `000222`
+
+---
+
+## 000224 · A whole-file backlog write silently reverted four completed phases, and governance exits 0 either way
+
+**Created 2026-09-14T00:55:05-04:00 · Status: `open`**
+
+Commit 5ecb203 on dev ("Adopt the owner's command and skill rosters") rewrote
+docs/09-backlog/backlog.yaml from a stale copy. Its intended change was correct — scope,
+acceptance and verification on phase-kit-01, phase-kit-02 and phase-kit-04. The same write also
+rolled four phase-lit-* entries back to their state before Pass 1c closed:
+
+  phase-lit-03  complete -> active,  session/completion_evidence/result deleted
+  phase-lit-04  complete -> queued,  same, agent cleared
+  phase-lit-05  complete -> queued,  same, agent cleared
+  phase-lit-06  active   -> queued,  agent cleared (a live claim)
+
+The tell is phase-lit-03's restored next_action, "Dispatch delegation-pack section LIT-03 after
+phase-lit-02 completes", last true three phases earlier. next_up was unchanged and no phase was
+added or removed, so this was collateral from a whole-file write rather than a decision.
+
+What makes it worth recording is not the slip but the detection gap. The governance check exits 0
+on both sides of the regression: it validates claim conflicts, max_active and dependency chains,
+and a complete phase silently becoming queued breaks none of them. Three phases' completion
+evidence and one live claim vanished from the lock table with no check failing anywhere.
+
+It surfaced only because phase-lit-06's session rebased onto dev at its phase boundary and noticed
+its own claim missing. That is luck, not a control. A session that did not rebase, or that
+rebased without looking, would have inherited the regression and integrated it.
+
+Restored in b319b7a from 7ff3421 on the owner's explicit direction, after the finding was reported
+rather than worked around — AGENTS.md forbids resolving a backlog.yaml collision by taking one
+side wholesale, and three of the four phases reached complete through the owner's own
+/session-close.
+
+What would prevent a recurrence is a check the validator does not currently have: a phase that has
+ever been complete, or that carries session/completion_evidence/result, should not silently regress
+to queued or active without the change saying so. A monotonicity assertion over phase status
+across commits would have failed this commit at the point it was made.
+
+---
+
+## 000225 · No dispatch owns 06_hypothesis_tests.md after the second reviews land, so it ships stale by construction
+
+**Created 2026-09-14T00:55:05-04:00 · Status: `open`**
+
+The delegation pack (PROMPT-029) gives LIT-06 X1 the job of writing 06_hypothesis_tests.md, and
+gives LIT-06 X2 the matrix second_review field and a dated subsection of 05_critical_collisions.md.
+Nothing updates 06 after the independent reviews return.
+
+In phase-lit-06 this stopped being theoretical. X1 wrote eleven verdicts naming a strongest
+challenger each. Nineteen independent reviews then ran, and thirteen came back disputed — two of
+them undercutting exactly the challengers 06 names as strongest:
+
+  H11's challenger, burns-groth-agentic-ontological-notebook-memory-2026, describes a feedback
+  mechanism the paper's own Section 6 calls future work; the row quoted the mechanism while
+  dropping the preceding sentence "We are developing a feedback loop for iterative refinement".
+
+  H1's challenger, eywa-provenance-grounded-memory-joshi-2026, rests on Table 2 encoding three
+  orthogonal classification dimensions; a reviewer reading all 29 pages found one axis restated
+  three times, with the word "orthogonal" appearing nowhere.
+
+So 06 now cites challengers whose standing the campaign's own control has questioned, and no
+dispatch is assigned to revisit it. X1's own preamble in 05 compounded this by asserting that X2
+folds reviewer findings into 06 — untrue, and the writer gap stated as though it were resolved.
+That sentence was corrected in a fix cycle, and 05 now says plainly that 06 was not updated by
+this phase and does not reflect these reviews.
+
+The blast radius is contained but not zero. LIT-07 X1 builds the anti-novelty case from the
+evidence matrix, which X2 did correct, so the staleness does not propagate into synthesis. But
+LIT-07 G measures "every H1-H11 has at least one serious challenger" — and if the disputed
+challengers do not hold, H11 in particular may be back at or near zero, which is where H4 sat
+before phase-lit-06.
+
+Resolving this is a pack change and therefore the owner's call. The plausible readings are that
+X2's writer clause should extend to 06, or that a new item between X2 and G should own it, or that
+06 is deliberately a snapshot of the first assessment and LIT-07 is where reconciliation happens —
+in which case 06 should say so in its own text. This is the same shape as 000221.
+
+**Links**
+
+- relates_to → `000221`
+- relates_to → `000230`
+
+---
+
+## 000226 · Pass 2's deep reads overstated collisions in one direction, and seven of nineteen rows scored high on material their own locators never reached
+
+**Created 2026-09-14T00:55:42-04:00 · Status: `open`**
+
+phase-lit-06 dispatched an independent second review for every critical collision — nineteen of
+them, each reviewer receiving only the source and that row's 43 matrix fields, never the first
+assessment's rationale. Thirteen came back disputed. Not one reviewer found a row that
+UNDERSTATED its collision.
+
+That one-directional result is the finding. The campaign works to support H0, that D-System is
+primarily a recombination of known ideas, so every over-read points the same way: toward finding
+prior art that flatters the thesis. The coordinator prompt warns that a campaign built to support
+H0 is most exposed where the evidence looks most favourable to it, and this is what that exposure
+looks like when measured.
+
+Seven rows scored at or near the rubric's ceiling on material their own evidence_locator never
+reached:
+
+  memtx-transactional-belief-commit-2026 recorded access_limitation: abstract_only and scored
+  component overlap 4 from the abstract. The arXiv page offered PDF, HTML and TeX Source; the
+  reviewer read the HTML twice. Full text resolved the ambiguity in the narrower direction.
+
+  decision-oriented-programming-aporia-2026 capped its locators at page 4, so actor_model reads
+  "a single coding agent" where Section 3.3 states the system orchestrates three.
+
+  em-llm-human-inspired-episodic-memory-...-2024 never cited Section 3.4, the retrieval section,
+  which is the only section bearing on the H5 claim the row was flagged for.
+
+  graph-native-cognitive-memory-...-2026 read pages 1-3 and left six fields
+  NOT_DETERMINABLE_FROM_ACCESS that the same free HTML answered.
+
+  jansen-bosch-architecture-as-decisions-wicsa-2005 scored the ceiling while its own notes
+  admitted the case-study and related-work sections were unread.
+
+Plus three rows with a single field miscoded NOT_DETERMINABLE_FROM_ACCESS where the full text
+answered it (agenticakm, evidence-graphs-fair, tgms).
+
+Two cases are not depth at all and are worse:
+
+  tgms-agent-native-bitemporal-graph-2026 reported "100% detection" citing four mutation classes
+  at 250/250, 250/250, 100/100, 100/100. Table 5 has eight classes. The two omitted run at 36%
+  and 0%, and the paper itself states "Dropped entity-set members are invisible to trace grounding
+  by construction". The row erased a limitation the source discloses.
+
+  evidence-graphs-fair-computation-...-2021 attributed a 2005 Cayrol and Lagasquie-Schiex paper to
+  the source's Methods section. It appears nowhere in that source's 73-item bibliography; the
+  actual citations are the 2009, 2010 and 2013 papers. A real paper conflated into a citation the
+  source never made.
+
+Against that, five rows showed genuine full-document engagement (langgraph, zep-graphiti, bara,
+the patent, log-is-the-agent), and two disclosed their skipped page ranges honestly — reviewers
+re-read those ranges and found nothing that moved a score. So this is not universal and not a
+defect in the method; every instance was caught by the control built to catch it.
+
+What needs deciding is whether any row should be re-read before synthesis, and whether Block D
+should require a deep-extraction dispatch to state what it actually read, so a locator that stops
+at page 4 is visible at write time rather than at second review. Recorded from phase-lit-06.
+
+**Links**
+
+- relates_to → `000203`
+- relates_to → `000209`
+- relates_to → `000230`
+
+---
+
+## 000227 · The evidence contract has no rule for scoring a patent, and a coordinator invented one mid-campaign
+
+**Created 2026-09-14T00:55:42-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) says nothing about how to assess a patent. Its source_type
+enum has no patent bucket either, which is already recorded as 000148 — granted patents were filed
+as "tech report". What 000148 does not cover is the scoring question, which turns out to matter
+more.
+
+A patent's specification routinely describes far more than its claims cover, and only the claims
+are legally the invention. Scoring the specification and scoring the claims give different
+answers, and for us20250165226a1-ai-digital-thread-patent they give materially different answers:
+the row carries architecture overlap 4 with component overlap only 3, so the architecture score
+alone triggers its critical_collision flag, and that score was derived from specification
+background paragraphs [0030]-[0032] and an unclaimed figure discussion. Read from the claims
+alone, the reviewer re-derived architecture 3, no trigger fires, and the flag does not stand.
+
+The problem is where that rule came from. No governed document states it. The coordinator running
+phase-lit-06 put "score the claims, not the specification's aspirational language" into the review
+dispatch as addressing, and the reviewer reached its verdict on that basis — then flagged the
+provenance itself, noting that counting spec-background toward the stage-span trigger is "a
+defensible policy choice for someone else to make explicitly".
+
+So a verdict that would flip a critical_collision from yes to no rests on a sentence a coordinator
+wrote, not on the contract. The pack is explicit that nothing is authored mid-campaign and that a
+missing prompt is a blocking finding rather than something to improvise; the same principle should
+cover a missing scoring rule. It was recorded in 05_critical_collisions.md with the provenance
+caveat stated and was deliberately not folded in as settled, and the contract was not edited to
+fit.
+
+What needs deciding: whether patents are scored on claims, on specification, or on both with the
+basis recorded per row; and whether the same treatment extends to other artifact kinds the
+contract's rubric was not written for — standards, dissertations, whitepapers and live software
+libraries all appeared in this campaign's matrix. Two of those (langgraph-checkpoint-library-oss
+and the patent) are among the nineteen critical collisions, so this is not an edge case.
+
+**Links**
+
+- relates_to → `000148`
+- relates_to → `000230`
+
+---
+
+## 000228 · "Spans at least four adjacent stages" does not say whether adjacent means contiguous, and the two readings flip the trigger
+
+**Created 2026-09-14T00:56:14-04:00 · Status: `open`**
+
+PLAN-023.03's CRITICAL_COLLISION flag rules list four triggers. The fourth reads: flag a source
+yes if "it spans at least four adjacent stages in: Reasoning -> Decision -> Requirement ->
+Specification -> Plan -> Execution -> Artifact -> Verification -> Deployment -> Runtime Evidence ->
+Knowledge Update".
+
+"Adjacent" is undefined. Two readings are available and they do not agree:
+
+  STRICT: four CONSECUTIVE stages with no gap, so a source covering Reasoning, Artifact,
+  Verification and Knowledge Update does not qualify.
+
+  LOOSE: any four stages from the ordered list, contiguity not required.
+
+Two reviewers in phase-lit-06 hit this independently and reported both answers rather than pick
+one. On evidence-graphs-fair-computation-defeasible-reasoning-2021 the readings disagree: strict
+gives 3 (Execution partial -> Artifact -> Verification indirect, broken by Deployment), loose gives
+5 (Reasoning, Execution, Artifact, Verification, Knowledge Update). The trigger fires under one
+reading and not the other. It did not change that row's outcome because the component-overlap
+trigger already fired, but it will change a row where the stage-span trigger is the only one.
+
+Exactly one row in the phase fires this trigger cleanly under BOTH readings:
+model-based-digital-threads-sociotechnical-systems-2022, whose Figure 2.18 threads Artifact ->
+Verification -> Deployment -> Runtime Evidence as four genuine consecutive stages. Every other row
+that touched the trigger needed the reading specified to get an answer.
+
+This matters beyond bookkeeping. The stage-span trigger is the one that catches an end-to-end
+system without either overlap score reaching 4 — precisely the H6 and H7 subsumption candidates
+the campaign most needs to find. A loose reading inflates the collision count in the direction
+that flatters H0; a strict reading may miss a genuinely spanning system with one weak stage in the
+middle.
+
+Recorded as an open contract question in 05_critical_collisions.md during phase-lit-06. The
+contract was not edited. Resolving it is the owner's call, and it should be resolved before
+LIT-07's final gate recounts collisions.
+
+**Links**
+
+- relates_to → `000230`
+
+---
+
+## 000229 · Six critical-collision flags survive only because no dispatch was authorised to drop them
+
+**Created 2026-09-14T00:56:14-04:00 · Status: `open`**
+
+phase-lit-06's nineteen independent second reviews returned six verdicts in which the reviewer,
+re-deriving both overlap scores from the contract's own rubric, found that NO trigger fires at
+all — not component >= 4, not architecture >= 4, not direct falsification, not the four-adjacent-
+stages test:
+
+  em-llm-human-inspired-episodic-memory-infinite-context-2024   component 4 -> 3
+  tgms-agent-native-bitemporal-graph-2026                       component 4 -> 3
+  memtx-transactional-belief-commit-2026                        component 4 -> 3
+  burns-groth-agentic-ontological-notebook-memory-2026          component 4 -> 3, architecture 3 -> 2
+  eywa-provenance-grounded-memory-joshi-2026                    component 4 -> 3, architecture 3 -> 2
+  us20250165226a1-ai-digital-thread-patent                      architecture 4 -> 3
+
+In each case the row's sole trigger was a score the reviewer re-derived one level lower. In
+several the row's own prose already argued for the lower score — memtx's strongest_difference
+describes a mechanism "scoped to a single shared memory store's internal derived-records... not
+D-System's cross-lifecycle propagation", which is a level-3 description sitting beside a level-4
+score.
+
+The pack gives LIT-06 X2 authority over the second_review field and over factual corrections. It
+gives no dispatch authority over a score or over critical_collision. So X2 recorded all six as
+disputes and changed nothing; a field-level diff across all 34 matrix rows confirms zero changes
+to component_overlap_score, architecture_overlap_score, critical_collision or
+hypotheses_challenged. The coordinator drew that line explicitly and the owner ruled to leave the
+count at 19 pending the pre-synthesis check-in.
+
+The consequence to decide: accepting all six drops critical collisions from 19 to 13, and changes
+the population LIT-06 G's measurement 2 ranged over, so that gate would need re-measuring. It also
+changes what LIT-07's final gate counts. Two of the six are H1's and H11's named strongest
+challengers, so accepting them would leave H11 at or near zero serious challengers — the position
+H4 occupied before phase-lit-06, and a condition LIT-07 G measures directly.
+
+Separately, reviewers recommended narrowing hypotheses_challenged on five further rows without
+disputing their flags: log-is-the-agent (H2;H3;H5;H7;H9 -> H2;H9), langgraph (drop H9), zep-graphiti
+(drop H9), burns-groth (drop H3), tgms (drop H3;H5). Those recommendations are recorded in
+05_critical_collisions.md and likewise unapplied.
+
+**Links**
+
+- relates_to → `000230`
+
+---
+
+## 000230 · Anchor: the five rulings the literature campaign's pre-synthesis check-in has to produce
+
+**Created 2026-09-14T00:56:45-04:00 · Status: `open`**
+
+phase-lit-06 closed its gate on 2026-09-14 and the campaign stopped for the owner's one scheduled
+pause (PROMPT-031 ratified decision 1), which is also the first of the two owner integrations of
+agent/lit-campaign into dev. phase-lit-07 cannot start until PROMPT-031 carries a dated
+"pre-synthesis check-in held, ruling proceed" entry.
+
+Five decisions surfaced during phase-lit-06 and are queued behind that check-in. They are linked
+to this anchor so they surface together rather than one at a time:
+
+  1. Whether the six disputed critical-collision flags are dropped, 19 -> 13. Changes the
+     population LIT-06 G measured and what LIT-07 G counts. [[000229]]
+
+  2. How a patent is scored — claims, specification, or both with the basis recorded. No governed
+     document says, and a coordinator improvised a rule mid-campaign. [[000227]]
+
+  3. Whether "adjacent" in PLAN-023.03's fourth flag trigger means contiguous. The two readings
+     flip the trigger on real rows. [[000228]]
+
+  4. What updates 06_hypothesis_tests.md now that the second reviews have undercut two of the
+     challengers it names, given no dispatch owns it. [[000225]]
+
+  5. Whether the Pass 2 depth defect warrants re-reading any row before synthesis. Seven of
+     nineteen rows scored high on material their own locators never reached, and every error ran
+     one way — toward finding collisions. [[000226]]
+
+A sixth item is not a ruling but belongs with them, because it is what a check-in is for:
+the duplicate rate LIT-06 G measured is 44/220 = 20.0%, recomputed independently and reproduced
+exactly. Four results in five were new. The methodology's stop condition is that additional
+searches "mostly yield duplicates or clearly adjacent work"; 20% is not that. A saturation claim
+at LIT-07's final gate is not supportable from this number, and the campaign has used six of a
+seven-session runway with an accepted range of six to eight.
+
+Separately and not part of the check-in: a backlog regression on dev clobbered four of this
+campaign's phases and no check caught it. [[000224]]
+
+**Links**
+
+- relates_to ← `000225`
+- relates_to ← `000226`
+- relates_to ← `000227`
+- relates_to ← `000228`
+- relates_to ← `000229`
