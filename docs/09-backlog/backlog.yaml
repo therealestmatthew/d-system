@@ -5,7 +5,6 @@ max_active: 3
 next_up:
 - phase-port-02
 - phase-ses-01
-- phase-part-01
 - phase-prog-01
 - phase-prog-03
 - phase-prog-02
@@ -6820,7 +6819,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-partition
   priority: 1
   session_budget: 1
@@ -6863,13 +6862,17 @@ items:
   completion_evidence:
   - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
   - docs/03-sessions/SESS-2026-09-14-06-reusable-partition-pack.md
-  result: PROMPT-034 written, 456 lines, six blocks in order. Acceptance 2-5 met; 1 is
-    unmet as written because it demands an idempotency sentence and dispatchability of S,
-    which is by definition not a dispatch and which PROMPT-032 marks the same way. Branch
-    agent/phase-part-01 at b503db5, pushed, unmerged.
-  next_action: Ready for /session-close. All five acceptance conditions met - condition 1
-    against the wording amended 2026-09-14 per GOV-003, with the deliverable unchanged.
-    Closing this releases sys-governance, which nine ready phases currently conflict with.
+  result: PROMPT-034 written, 456 lines, six blocks in order, integrated into dev at
+    7ebf55a. All five acceptance conditions met - condition 1 against the wording amended
+    2026-09-14 per GOV-003, with the deliverable unchanged. Governance OK (20 systems, 218
+    documents, 24 memories, 150 phases), 580 passed, 31 identifiers checked in the primary
+    checkout, catalog in sync. An independent sub-agent review confirmed all five
+    conditions, judged the condition-1 amendment a sound correction rather than a lowered
+    bar after checking PROMPT-032's precedent itself, and found one defect - this result
+    field was stale, which this text fixes.
+  next_action: Complete. Closing this released sys-governance, unblocking phase-port-02,
+    phase-ses-01, phase-prog-01, phase-prog-12, phase-gov-01, phase-gov-04, phase-gov-05,
+    phase-idea-05 and phase-tool-02. phase-part-02 is next in this plan.
 - id: phase-part-02
   title: Make the corpus status selectable and test the corpus builder
   plan: doc-repeatable-idea-partition
