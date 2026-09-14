@@ -222,10 +222,14 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-14-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-02-demo-launch-docs.md |
 | SESS-2026-09-14-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-03-partition-generalization-and-programme-plans.md |
 <<<<<<< HEAD
+<<<<<<< HEAD
 | SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-lit-06-followups.md |
 =======
 | SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-phase-kit-02-demo-kit-skills.md |
 >>>>>>> dbb6536 (Record the phase-kit-02 session)
+=======
+| SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-consultant-demo-kit.md |
+>>>>>>> 57fc611 (Record the consultant demo kit session across all four kit phases)
 
 ## Plans and their phases
 
