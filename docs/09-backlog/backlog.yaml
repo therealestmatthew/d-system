@@ -6693,8 +6693,23 @@ items:
   - Confirm each skill appears in the skill listing.
   deliverables:
   - .claude/skills/
-  next_action: Build demo-skill-ask-me first, since three other skills call it and its
-    parameter contract has to exist before they can.
+  session: doc-session-2026-09-14-01-phase-kit-02
+  completion_evidence:
+  - .claude/skills/demo-skill-ask-me/SKILL.md
+  - .claude/skills/demo-skill-flowchart/SKILL.md
+  - .claude/skills/demo-skill-brainstorm/SKILL.md
+  - .claude/skills/demo-skill-meeting-notes/SKILL.md
+  - .claude/skills/demo-skill-scorecard/SKILL.md
+  - .claude/skills/demo-skill-make-it-a-skill/SKILL.md
+  - docs/03-sessions/SESS-2026-09-14-01-phase-kit-02-demo-kit-skills.md
+  result: Six skills built, demo-skill-ask-me first. Governance exits 0 and 580 tests
+    pass in the worktree. The standalone flowchart and scorecard HTML rendered from
+    ~/demo-kit-output/ over file:// with no server and no external reference. Four
+    acceptance conditions verified outright; two more rest on definitions whose firing
+    was not observed this session.
+  next_action: Fire each of the six skills in a fresh session to observe the
+    self-announcing first line, the meeting-notes missing-field behaviour and the skill
+    listing, then run tools/check_no_private_content.py on dev where _private/ exists.
 - id: phase-kit-03
   title: Build the reordered prompt ladder and the anti-pattern gallery
   plan: doc-consultant-demo-kit
