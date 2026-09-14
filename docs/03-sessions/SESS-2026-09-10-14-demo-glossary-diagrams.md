@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-14'
 systems: [sys-brain, sys-portfolio]
 depends_on: [doc-live-demo, doc-live-demo-requirements, doc-prompt-demo-glossary-diagram-audit]
 ---
@@ -123,102 +123,152 @@ depth (Hooks, Agent permissions, Observability, Agent SDK).
 
 ## Verification
 
-Every command in the phase's `verification` list, run in the worktree.
+Every command in the phase's `verification` list, re-run in the worktree on 2026-09-14 after
+rebasing onto `dev`. These figures supersede the 2026-09-10 run: `dev` moved 484 commits in between,
+so the governance totals and the tracked-file count both changed.
 
 ```
 $ uv run python -m src.governance
-Governance OK: 18 systems, 136 documents, 16 memories, 112 backlog phases
+Governance OK: 20 systems, 212 documents, 24 memories, 148 backlog phases
 
 $ uv run python tools/generate_glossary.py            # twice
 wrote .../docs/08-governance/GLOSSARY.md — 9 term(s)
 wrote .../docs/08-governance/GLOSSARY.md — 9 term(s)
-diff empty: byte-identical
+diff empty: byte-identical; git diff against the committed file also empty
 
 $ uv run python tools/generate_glossary.py --tag demo-glossary \
     --out docs/00-working/demo-glossary.md            # twice
 wrote docs/00-working/demo-glossary.md — 9 term(s)
 wrote docs/00-working/demo-glossary.md — 9 term(s)
-diff empty: byte-identical
+diff empty: byte-identical; git diff against the committed file also empty
 
 $ uv run pytest test/test_glossary.py
-6 passed, 2 warnings in 0.17s
+6 passed, 2 warnings
 
-$ uv run python tools/check_no_private_content.py     # with the changes staged
-check_no_private_content: OK (437 tracked files, 31 identifiers checked)
+$ uv run pytest                                        # full suite, post-rebase
+580 passed, 2 warnings
 ```
 
-The filtered glossary renders all seventeen `###` term headings plus the advanced-topics group.
+The filtered glossary renders seventeen `###` term headings plus an eighteenth heading for the
+advanced-topics group — eighteen `###` in total. Recorded precisely because "seventeen headings" and
+"eighteen headings" are both true of different things and the earlier phrasing invited the wrong count.
 
-**A note on the private-content check.** Run plainly inside the worktree it reports
-`0 identifiers checked`, because `_private/portfolio/` is gitignored and so does not exist in a
-worktree — the content half of the gate silently does not run, exactly the "passes by not looking"
-failure `AGENTS.md` warns about. The run recorded above was taken with a temporary symlink from the
-worktree's `_private/portfolio` to the primary checkout's, which is untracked; the symlink was
-removed immediately afterwards and the worktree has no `_private/` directory now. Worth knowing for
-any future worktree phase: the number to check is the identifier count, not the OK.
+**The tool's "9 term(s)" is a mislabel, not a term count.** `tools/generate_glossary.py:119` prints
+`len(entries)`, the number of concept-memory files loaded, and the tag filter is applied afterwards
+inside `render()`. So the line reads `9 term(s)` identically for the unfiltered glossary (61 `###`)
+and the filtered one (18 `###`). Cosmetic, in a tool this phase did not author, but it makes the
+tool's own output useless as evidence for the term-count acceptance condition — the headings were
+counted directly instead.
 
-### Visual review
+**The private-content check.** Run plainly inside a worktree it reports `0 identifiers checked`,
+because `_private/portfolio/` is gitignored and so does not exist there — the content half of the
+gate silently does not run, exactly the "passes by not looking" failure `AGENTS.md` warns about. It
+is visible in this session's own commit hook output: `OK (583 tracked files, 0 identifiers checked)`.
+That is not a pass.
 
-The phase requires a browser review of each SVG at 1024×768. The Playwright MCP server was
-unavailable — a peer agent on `phase-demo-06` holds its browser profile — so the review was done
-with headless Chrome against `file://` URLs at `--window-size=1024,768`, one PNG per diagram,
-inspected directly. The first pass found real defects, all since fixed:
+A real run was taken instead, deriving the identifier list from the primary checkout's
+`_private/portfolio/` and scanning the branch's tracked files by path, with the identifiers held in
+memory and never written anywhere:
 
-- `agentic-loop`: four edge labels sat on their arrow lines. The layout was rebuilt with wider gaps
-  and the labels moved clear.
-- `skill-architecture`: the directory tree lost its indentation, because SVG `<text>` collapses
-  leading whitespace. Each line now carries its own `x` offset. The "front matter" and "body"
-  callouts were struck through by their own arrows and were moved above them; the
-  progressive-disclosure caption overflowed into the box beside it and the boxes were narrowed.
-- `sub-agents-context-isolation`: the blocked-output marker pointed at the "Model call" box, reading
-  as though the model call were blocked. It now leaves the loop's edge at the level of the
-  accumulated tool results.
-- `llm-vs-agent`: the return-path label was pinched against the panel border, and the exit path
-  started two pixels inside the loop container.
-- `mcp-architecture`: the `.mcp.json` snippet was centred line by line, which destroyed its
-  indentation; it is left-aligned as a block.
+```
+identifiers derived: 31
+branch tracked files: 591
+files content-scanned: 577
+VIOLATIONS: 0
+```
 
-All six were re-rendered and re-inspected after the fixes. `index.html` was rendered from `file://`
-and loads all six thumbnails with no network access.
+The scan refuses to report a pass if the derived identifier list is empty, so a vacuous run fails
+rather than looking green. The number to trust is the identifier count, never the `OK`.
 
-Each SVG was also parsed with an XML parser and checked for external references: all six parse,
-carry `width="1024" height="768"` with a matching `viewBox`, and reference no URI other than the SVG
-namespace.
+### Visual review — independently repeated
+
+The phase requires a browser review of each SVG at 1024×768. The 2026-09-10 review was the original
+author's own, and its five fixes were self-reported. This session repeated it independently.
+
+A `demo-validator-web` sub-agent was dispatched first and returned **blocked, not verified**: the
+Playwright MCP server binds one shared Chrome profile
+(`~/.cache/ms-playwright-mcp/mcp-chrome-27f151d`), held by a live peer process, and every browser
+call failed with "Browser is already in use … use `--isolated`". It took no screenshot and reached no
+verdict. Killing a peer's browser was not an acceptable way to obtain one.
+
+The review was then done directly with headless Chrome against `file://` URLs, using a throwaway
+`--user-data-dir` in a scratch directory so the peer's profile was untouched. All six SVGs and
+`index.html` were rendered at `--window-size=1024,768` and each image was inspected:
+
+- `llm-vs-agent` — clean. No overlap, nothing clipped, the rotated "result appended" label clears
+  the loop border.
+- `skill-architecture` — clean. The directory tree keeps its indentation and the "front matter" and
+  "body" callouts sit clear of their arrows.
+- `agentic-loop` — clean. All four edge labels sit clear of their arrow lines.
+- `sub-agents-context-isolation` — clean. The blocked-output marker meets the loop edge at the
+  accumulated-results level, not the model call.
+- `mcp-architecture` — clean. The `.mcp.json` snippet is left-aligned and keeps its indentation.
+- `command-skill-tool` — clean. Three columns, no text clipped at the column edges.
+
+No text overlap, no clipping at the viewBox boundary, and adequate contrast in all six. `index.html`
+was additionally rendered at full page height: all six diagrams render as live frames with their
+captions, none blank or broken, and the page is readable at 1024 wide.
+
+This corroborates the earlier self-report on the outcome. It does not independently confirm the five
+defects listed above ever existed — that history is still the original author's account, and only
+the fixed state was observable here.
 
 ## Acceptance
 
-- **Every listed term has an entry and the filtered glossary lists them.** Met. Seventeen `###`
-  headings, covering the owner's eight and all nine additions, plus the advanced-topics group.
-- **Each SVG opens standalone at 1024×768 with labels matching the glossary.** Met, with the
-  substitution noted above: headless Chrome from `file://` rather than the Playwright MCP server.
-  Two label mismatches found in the consistency pass were fixed — the `Command` entry now names
-  "slash command", the phrase the command/skill/tool diagram uses, and the sub-agent diagram's
-  context window says `CLAUDE.md` rather than `AGENTS.md`, matching what the `Context` entry states
-  is loaded automatically.
+- **Every listed term has an entry and the filtered glossary lists them.** Met. Seventeen `###` term
+  headings covering the owner's eight and all nine audit additions, plus the advanced-topics group;
+  counted directly from the file, not from the tool's mislabelled output.
+- **Each SVG opens standalone at 1024×768 with labels matching the glossary.** Met, and now
+  independently corroborated rather than self-reported — see the repeated visual review above. The
+  substitution stands: headless Chrome from `file://` rather than the Playwright MCP server, which a
+  peer holds. Diagram labels were checked against the glossary's heading list and match.
 - **Both generations are byte-identical on a second run and `test_glossary.py` passes.** Met; output
-  above.
+  above, and both files also show no drift from their committed state.
 
 ## Not done, and why
 
-`status: complete` was not set. `GOV-003`'s "demo track completes through its testing gate" section
-names five `phase-demo-*` phases plus `phase-demo-06` by explicit owner decision. `phase-demo-07` is
-not on that list and no extension of it was found, so the ordinary rule stands: `/session-close` is
-the only path to `complete`. The phase is left `active` with an honest `next_action`.
+`status: complete` was not set, and this session did not set it either. `GOV-003`'s "demo track
+completes through its testing gate" section names five `phase-demo-*` phases plus `phase-demo-06` by
+explicit owner decision; `phase-demo-07` is not on that list. **The owner resolved this on
+2026-09-14: `phase-demo-07` does not take the demo-track exception and requires the full
+`/session-close` review.** That is owner-only, so the phase stays `active`.
 
-The branch is not integrated. Per `AGENTS.md` that is the owner's call.
+The branch is not integrated. Per `AGENTS.md` that is the owner's call, and it has not been asked
+for yet as of this checkpoint.
+
+## Backlog
+
+- `status: active` — unchanged, and not this session's to change.
+- `session: doc-session-demo-glossary-diagrams` — unchanged; the id is permanent and survived the
+  renumber.
+- `next_action` — rewritten this run to record the rebase, the renumber, the real private-content
+  gate and the independent visual review, and to replace the stale GOV-003 uncertainty with the
+  owner's decision.
+- `next_up` — not pruned. Nothing became `complete` this run.
 
 ## Unresolved
 
+- **A session-code collision was resolved by renumbering this record.** `SESS-2026-09-10-09` was
+  taken on `dev` by `SESS-2026-09-10-09-workbench-planning.md` while this branch sat unmerged for
+  four days. Per `AGENTS.md`, the agent integrating second renumbers, so this record moved to
+  `SESS-2026-09-10-14` — `-01` through `-13` are all held for that date. `created` stays
+  `2026-09-10` because `src/governance/codes.py` requires the code's date to equal `created`, and
+  the date is honest. The `id` is unchanged. `--next-code session` is the wrong tool here: it
+  returns today's date, which that same rule would then reject.
+- **`_public/skills-and-agents-lexicon.html` embeds a frozen copy of these diagrams.** It landed on
+  `dev` in `b9433d3`, built from this phase's content but never named in this phase's scope, and it
+  carries the diagrams as base64. If the SVGs change it goes stale silently and no test catches it.
+  The owner's decision on 2026-09-14 was to leave it alone and record the risk: editing it would
+  widen this phase's declared deliverables. Flagged, not fixed.
 - **`AGENTS.md` contradicts itself about pushing, and both halves are load-bearing.** The
   *Confidentiality and publishing* section says "Pushing your own branch to `origin` needs no
-  approval"; *Concurrent agents: claim a phase* says "**ask the owner before pushing** (see
-  *Confidentiality and publishing*)" — citing, as its authority, the section that says the opposite.
-  `CLAUDE.md` agrees with the first. This agent followed the first and pushed `dev` and its own
-  branch. No agent may edit `AGENTS.md`, so this is reported rather than fixed. Proposed replacement
-  for the second passage: "A remote now exists, so `git fetch`, `git pull` and `git push` all work.
-  Pushing your own branch needs no approval; integrating onto `dev` does (see *Confidentiality and
-  publishing*)."
-- **The Playwright MCP server cannot be shared between concurrent agents.** It fails with
-  "Browser is already in use … use `--isolated` to run multiple instances". Any phase whose
-  verification depends on it is serialised behind whichever agent claimed the browser first. Worth
-  an idea if browser-verified phases are going to run concurrently again.
+  approval"; *Concurrent agents: claim a phase* cites that same section as authority for asking
+  first. `CLAUDE.md` agrees with the first. No agent may edit `AGENTS.md`, so this is reported
+  rather than fixed. Proposed replacement for the second passage: "A remote now exists, so
+  `git fetch`, `git pull` and `git push` all work. Pushing your own branch needs no approval;
+  integrating onto `dev` does (see *Confidentiality and publishing*)."
+- **The Playwright MCP server cannot be shared between concurrent agents.** It fails with "Browser
+  is already in use … use `--isolated`", and it blocked a validator dispatch again this session.
+  Any phase whose verification depends on it is serialised behind whichever agent claimed the
+  browser first. The workaround that worked both times is headless Chrome with a private
+  `--user-data-dir`.
