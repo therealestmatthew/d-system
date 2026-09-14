@@ -3,9 +3,10 @@ updated: '2026-09-14'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-part-02
+- phase-prog-01
 - phase-port-02
 - phase-ses-01
-- phase-prog-01
 - phase-prog-03
 - phase-prog-02
 - phase-prog-04
