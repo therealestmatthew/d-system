@@ -159,3 +159,164 @@ Makinson (1985) as its own "central formal contribution" ancestor.
 second_review: pending
 
 ---
+
+## 6. jansen-bosch-architecture-as-decisions-wicsa-2005
+
+Jansen, A., Bosch, J.: *Software Architecture as a Set of Architectural Design Decisions*,
+WICSA 2005 (read via the open-access republication as Ch.4 of Jansen's 2008 dissertation; the
+WICSA proceedings version is paywalled on IEEE Xplore).
+
+**Overlap.** component_overlap=5, architecture_overlap=4 — tied for the matrix's ceiling
+component score. The field's foundational reframing of software architecture as a first-class
+set of accumulated design decisions ("a software archictecture = dd1 + dd2 + ... + ddn," p.86),
+with decisions explicitly capable of generating new requirements and explicitly required to have
+a bilateral relationship with the system's actual realization — a near-literal 2005 precursor to
+H7 (decisions deriving requirements) and H9 (decision-to-architecture traceability), and the
+direct ancestor of the ADR-template mechanism dhar-vaidhyanathan-varma-agenticakm-2026-arxiv
+(section 2, above) automates with agents.
+
+**What it would falsify.** At full strength this would falsify H7 and H9's core claims for the
+decision/requirement segment of the lifecycle — the paper states the requirement-generation
+direction and the bilateral traceability requirement explicitly, twenty years before D-System.
+It would not falsify H1 (no epistemic/ontological classification), H2 as D-System's fuller
+typed-transition claim (no formal typed-transition schema comparable to Kumiho's AGM-grounded
+graph), H3/H4 (no multi-actor authority or conflict-arbitration model), or H5/H6/H8/H10/H11 (no
+knowledge-construction system upstream, no artifact/test/deployment/runtime linkage beyond a
+named-but-undetailed bilateral goal, human-only, pre-agentic, 2005). Archium is evaluated on a
+trivial illustrative example, not benchmarked or deployed. Its own reference list names Kruchten
+(2004) as an immediate one-year predecessor and shares Perry & Wolf (1992) as an ultimate
+ancestor with de-boer-architectural-knowledge-management-dissertation-2009 — confirming this is
+one lineage, not an independent invention.
+
+second_review: pending
+
+---
+
+## 7. log-is-the-agent-event-sourced-reactive-graphs-2026
+
+Nakajima, Y.: *The Log is the Agent: Event-Sourced Reactive Graphs for Auditable, Forkable
+Agentic Systems*, arXiv:2605.21997, submitted 21 May 2026. Open source (Apache-2.0):
+github.com/yoheinakajima/activegraph.
+
+**Overlap.** component_overlap=4, architecture_overlap=4. An event-sourced, append-only log as
+the sole source of truth with graph state as a deterministic, replayable projection of it —
+matching D-System's H2 transition-semantics claim at the mechanism level, combined with a total,
+worked-example-verified provenance chain from goal to individual model call (H9's backward
+direction) using D-System's own System-A vocabulary (claim, evidence, question) linked by typed
+relations (supports, addresses, derived_from). Real, installable (pip-installable, quickstart
+reproduces byte-identical output counts). Self-described by its own author as "recombination" of
+event sourcing, CQRS, reactive dataflow, and 1980s Blackboard-era coordination.
+
+**What it would falsify.** At full strength this would falsify H2 (transition semantics), H3's
+provenance half (actor+lineage present), H5 (context reconstructable from the log), H7, and H9
+simultaneously — it is the single broadest-spanning collision in the matrix by hypothesis count
+(H2;H3;H5;H7;H9). It would not falsify H1 (no orthogonal ontological+epistemic+lifecycle state
+classification), the authority half of H3 (no authority-weighted or trust-arbitrated multi-actor
+provenance), H4 (no independence-aware convergence/corroboration scoring), H6/H8/H10/H11 (no
+requirement/plan/specification objects or a development lifecycle at all — the worked domain is
+investment diligence, not software development; no bitemporal/versioned time model, only
+log-order sequencing). The paper explicitly reports "no large-scale empirical evaluation of task
+performance" and names its own architectural ancestors directly: Nii's Blackboard Model (1986)
+and the same author's own prior BabyAGI (2023) — "less a new idea than a vindication of an old
+one" (Sec.8).
+
+second_review: pending
+
+---
+
+## 8. tgms-agent-native-bitemporal-graph-2026
+
+Zhang, X.: *TGMS: An Agent-Native Bi-Temporal Graph Management System*, arXiv:2607.10265, v2
+24 Jul 2026. Open source (Apache-2.0): github.com/zxf-work/tgms.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. A formally specified, empirically
+validated bi-temporal transition model — assert/retract/correct distinguishing "the world
+changed" from "we were wrong" while preserving both, with a tested bi-temporal-immutability
+invariant — close to H2's transition-semantics claim, and a rigorously validated claim-
+verification mechanism (100% detection of eight injected-error classes, zero false positives)
+directly relevant to H3/H9. Evaluated across two storage backends and six model configurations —
+one of the most thoroughly engineered implementations in this campaign.
+
+**What it would falsify.** At full strength this would falsify H2's transition-semantics claim
+for a general-purpose graph substrate, and would provide direct evidentiary support against the
+naive form of H3 and H9 (claim-verification gated on evidence completeness). It would not
+falsify H1 (no epistemic/ontological classification), the authority half of H3 (provenance
+fields reserved but explicitly unused — "write-back... disabled pending provenance and
+authorization policies," Sec.8), H4 (absent), or H5/H6/H7/H8/H10/H11 (no decision/requirement/
+specification/plan/artifact/test/deployment concept anywhere; domain is temporal-graph question
+answering over communication-network data, not software development; no human role in the
+evaluated pipeline). The paper explicitly and specifically differentiates itself from Zep/
+Graphiti and TOKI while sharing their bi-temporal foundation, naming Snodgrass (1999) as the
+classical ancestor of all three — independent convergence on a shared 1999 mechanism, not three
+independent inventions, exactly the pattern this campaign's independence rule is built to
+detect. The paper's own Limitations section states "TGMS does not yet solve general temporal
+graph question answering."
+
+second_review: pending
+
+---
+
+## 9. langgraph-checkpoint-library-oss
+
+LangChain AI: LangGraph checkpoint library (`langgraph-checkpoint`), github.com/langchain-ai/
+langgraph/tree/main/libs/checkpoint.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. A production-grade, widely deployed
+(41,574 GitHub stars on the parent repo, PyPI v4.2.0, MIT-licensed) instance of exactly the
+resumable, forkable, timestamped execution-checkpoint mechanism H8 (phase-bounded context)
+gestures toward: per-step snapshots, parent-chain lineage enabling backward walk and "time
+travel" replay, and an explicit `source={"input","loop","update","fork"}` classification of how
+each snapshot was produced. Comparison against the implemented system sharpens this: D-System's
+own checkpoint mechanism (`.claude/skills/checkpoint/SKILL.md`) currently rewrites/overwrites
+summary sections in place rather than retaining a parent-linked chain (adversarial codebase
+review, `04_state_transition_audit.md`, E42) — on H8/H9, this OSS library's shipped behavior
+exceeds D-System's own current implementation, not only its conceptual architecture.
+
+**What it would falsify.** At full strength this would falsify H8 as the review-instructions
+phrasing states it ("equivalent task/session/context lifecycle in agentic development systems")
+and contribute to H9's backward-traceability claim for execution state specifically. It would
+not falsify H8 under the frozen register's fuller phrasing, since `channel_values` is opaque
+application state, not a typed knowledge object — no epistemic/ontological state classification
+(H1), no actor/authority/provenance beyond run_id and parent linkage (H3 largely absent), no
+independence-aware convergence (H4), and no requirement/specification/artifact/test/deployment
+linkage anywhere (H7/H9's non-code portions absent). This is a narrow, single-purpose execution-
+state persistence layer for one graph run, not a knowledge-management or development-provenance
+system. Its Pregel-based execution model traces directly to Malewicz et al. (SIGMOD 2010) and
+its checkpoint-and-resume pattern to Chandy & Lamport's distributed-snapshot algorithm (1985) —
+recorded as ancestors per campaign discipline, not credited as novel.
+
+second_review: pending
+
+---
+
+## 10. model-based-digital-threads-sociotechnical-systems-2022
+
+Pessoa, Pires, Moreira, Wu: *Model-Based Digital Threads for Socio-Technical Systems*, in
+*Machine Learning for Smart Environments/Cities*, Springer ISRL vol.121, 2022.
+
+**Overlap.** component_overlap=4, architecture_overlap=4. Fig.2.18 ("MBSE and the digital
+thread") is a materially close structural analogue to H7/H9: a typed, directional (trace/
+refine/realize) graph linking Requirement -> Use-Case/Specification -> Block-Definition/Internal-
+Block-Diagram -> Detailed Models -> Implemented System -> Test Case -> Field Performance,
+explicitly built "to compare expected behavior (requirements) and actual system performance" —
+spanning five of the methodology's flagged adjacent stages (Requirement, Specification,
+Artifact, Verification, Deployment/Runtime Evidence).
+
+**What it would falsify.** At full strength this would falsify H7 and H9 for the requirement-
+through-runtime segment of the lifecycle — an explicit, named design goal in a peer-reviewed
+2022 chapter. It would not falsify H1 (no epistemic/ontological state classification), H3 (no
+provenance actor/authority on any traceability link — explicitly named by the paper itself as an
+unsolved "challenging problem," Sec.2.3.2), H4 (absent), or H11 (only gestured at as future
+work). It has no upstream Idea/Reasoning/Decision/Evidence layer — the thread begins at
+Requirement, so H7's full idea-to-requirement span is not addressed — and the case study covers
+only two of the methodology's six defined lifecycle phases, in a systems-engineering (not
+software-development) domain. Two corrections are recorded on this row during this campaign:
+its own Sec.2.2.1 traces the term "digital thread" to a 2013 USAF report, while
+us20250165226a1-ai-digital-thread-patent (section 13, below) traces the same term to a different,
+2018 DAU/DoD document — two independently cited coinages for the same term, not one shared
+ancestor as an earlier pass of this campaign mistakenly recorded (now withdrawn on this row). The
+chapter's own methodology is itself an explicit refinement of Bickford et al. (2020, ref.[5]).
+
+second_review: pending
+
+---
