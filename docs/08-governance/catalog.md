@@ -102,6 +102,7 @@ CI regenerates it and fails on any difference.
 | PLAN-035 | plan | draft | repository-owner | docs/01-plans/PLAN-035-schema-consistency-testing.md |
 | PLAN-036 | plan | draft | repository-owner | docs/01-plans/PLAN-036-html-generation-design-system.md |
 | PLAN-037 | plan | draft | repository-owner | docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md |
+| PLAN-038 | plan | draft | repository-owner | docs/01-plans/PLAN-038-backlog-status-regression-guard.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -144,6 +145,7 @@ CI regenerates it and fails on any difference.
 | REQ-007 | requirement | draft | repository-owner | docs/06-requirements/REQ-007-workbench.md |
 | REQ-008 | requirement | draft | repository-owner | docs/06-requirements/REQ-008-consultant-demo-kit.md |
 | REQ-009 | requirement | draft | repository-owner | docs/06-requirements/REQ-009-repeatable-idea-partition.md |
+| REQ-010 | requirement | draft | repository-owner | docs/06-requirements/REQ-010-backlog-status-regression-guard.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -257,10 +259,10 @@ CI regenerates it and fails on any difference.
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 1 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
-| PLAN-023 | doc-lit-campaign | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.01 | doc-lit-campaign-scope | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 0 | 6 | agent-lit |
+| PLAN-023 | doc-lit-campaign | draft | 2 | 0 | 6 | agent-lit |
+| PLAN-023.01 | doc-lit-campaign-scope | draft | 2 | 0 | 6 | agent-lit |
+| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 2 | 0 | 6 | agent-lit |
+| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 2 | 0 | 6 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 3 | 1 | 0 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 1 | 0 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
@@ -275,6 +277,7 @@ CI regenerates it and fails on any difference.
 | PLAN-035 | doc-schema-consistency-testing | draft | 1 | 0 | 0 | — |
 | PLAN-036 | doc-html-generation-design-system | draft | 1 | 0 | 0 | — |
 | PLAN-037 | doc-standalone-explorations-housekeeping | draft | 1 | 0 | 0 | — |
+| PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
 
 ## Held codes
 
@@ -285,4 +288,4 @@ CI regenerates it and fails on any difference.
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 | PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-212 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 75.
+214 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 33, requirement: 10, session: 75.

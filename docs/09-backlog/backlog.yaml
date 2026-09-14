@@ -6435,6 +6435,114 @@ items:
     it enforces, worth tightening. Still open - 000221 (second_review's stated sole writer),
     000148 (no source_type bucket for a patent, dissertation, whitepaper or library) and
     000224 (a phase regressing from complete to queued fails no check).
+- id: phase-lit-08
+  title: Literature review Pass 3b — targeted collision search for H1, H4 and H11
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign-scope
+  - doc-lit-campaign-domain-matrix
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  - doc-prompt-literature-review-kickoff
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-06
+  scope:
+  - Numbered 08 but runs BEFORE phase-lit-07, which depends on it. Phase ids are allocated in
+    creation order; execution order is the depends_on chain, not the number.
+  - 'Why this phase exists (owner direction, 2026-09-14): phase-lit-06 left H1, H4 and H11 at
+    INSUFFICIENT_EVIDENCE under an explicit rule that distinctness requires search saturation,
+    and LIT-06 G measured a 20.0 percent duplicate rate (44/220) that does not show it. H1 has
+    never had a dedicated collision search across six phases; H4 had one Pass 3 search; H11
+    lost its only challenger when burns-groth was found to describe its own future work.
+    Synthesis cannot honestly characterise what remains while those three rest on searches
+    that never targeted them.'
+  - Run dedicated strategy Phase E collision searches for H1, H4 and H11 using the
+    search-domain matrix's pre-crafted queries for the domains bearing on each, plus
+    gap-driven variants built from the specific mechanism each hypothesis claims. Ledger rows
+    carry the hypothesis id as domain_id and pass 3. Construct queries meant to FIND systems
+    that already do what the hypothesis claims; the campaign supports H0 and this phase does
+    not defend the hypotheses.
+  - Deep-extract any genuinely new strong candidate into the evidence matrix as a full
+    43-field contract row, and dispatch an independent R second review for any that flags
+    critical_collision yes, per the LIT-06 R section.
+  - Re-derive each of H1, H4 and H11's status in 06_hypothesis_tests.md under the saturation
+    rule that file already states, and report this phase's duplicate rate against
+    phase-lit-06's 20.0 percent as the saturation trend.
+  acceptance:
+  - Each of H1, H4 and H11 has at least two further distinct-query ledger rows carrying its
+    hypothesis id as domain_id, beyond the counts phase-lit-06 left (H1 3, H4 15, H11 4).
+  - Every new evidence-matrix row is a full 43-field contract row with zero blank cells, and
+    every one flagged critical_collision yes carries a recorded independent second review.
+  - 06_hypothesis_tests.md states, for each of H1, H4 and H11, whether the further search
+    changes its status under the file's own saturation rule, and says so explicitly where it
+    does not.
+  - This phase's duplicate rate is measured and reported against phase-lit-06's 44/220 as a
+    trend, never asserted as saturation.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Ledger integrity - CRLF on every line, 15 fields on every row, every new row carrying pass
+    3 and a contiguous LIT-08-S sequence; matrix and inventory LF-only with 43 and 13 fields
+    and zero blank cells
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/06_hypothesis_tests.md
+  next_action: Dispatch dedicated Phase E collision searches for H1, H4 and H11 on the
+    campaign branch agent/lit-campaign. Read SESS-2026-09-14-01 first - it records why these
+    three are thin and what their retracted challengers were.
+- id: phase-gov-05
+  title: Fail the governance check when a phase silently leaves complete
+  plan: doc-backlog-status-regression-guard-plan
+  sources:
+  - doc-backlog-status-regression-guard
+  - doc-adr-multi-agent-concurrency
+  - doc-backlog-decisions
+  systems:
+  - sys-backlog
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add one check to src/governance that compares the working copy of backlog.yaml against
+    git show HEAD version and fails when a phase leaves status complete, or keeps complete
+    while losing session, completion_evidence or result.
+  - Permit the transition when the same change adds an entry naming that phase id to
+    GOV-003-backlog-decisions.md, so a legitimate reopen is recorded rather than blocked.
+  - Treat an unreadable prior state (mid-rebase, shallow clone, initial commit) as no
+    comparison possible and pass with a one-line note; a guard that hard-fails when it cannot
+    read history would block every rebase in the repository.
+  - Failure output names each affected phase id, its from to transition, and which of session,
+    completion_evidence and result were lost.
+  acceptance:
+  - A seeded complete to queued transition makes uv run python -m src.governance exit
+    non-zero and name the phase.
+  - A phase left at complete with completion_evidence removed makes the check exit non-zero.
+  - The same transition accompanied by a GOV-003 entry naming that phase exits 0; an entry
+    naming a different phase does not.
+  - An unreadable prior state exits 0 with a note rather than failing.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest test/ -k regression
+  - uv run ruff check src/ test/ and uv run mypy src/
+  deliverables:
+  - src/governance/
+  - test/
+  next_action: Implement per PLAN-038. The owner still has one open question recorded in
+    REQ-010 - whether the prior state is HEAD (narrow, catches a bad working-copy edit) or
+    dev-relative (catches a regression arriving by merge, but fires on every agent branch
+    that legitimately completes a phase). The plan proceeds on HEAD; re-parameterize this
+    phase's acceptance if the owner rules otherwise.
 - id: phase-lit-07
   title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
     bibliography
@@ -6452,6 +6560,7 @@ items:
   session_budget: 1
   depends_on:
   - phase-lit-06
+  - phase-lit-08
   scope:
   - 'Entry condition (ratified decision 3, PROMPT-027): the owner''s one campaign
     check-in happens before this phase starts - it does not begin, even if ready,
