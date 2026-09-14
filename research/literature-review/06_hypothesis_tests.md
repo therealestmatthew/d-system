@@ -249,7 +249,14 @@ strongest_challenger: >
   graph-native-cognitive-memory-belief-revision-semantics-2026 (component_overlap=5,
   architecture_overlap=4, preprint_version) and jansen-bosch-architecture-as-decisions-wicsa-2005
   (component_overlap=5, architecture_overlap=4, full_text) — the two highest component-overlap
-  scores in the entire evidence matrix. 13 rows challenge H2 in total.
+  scores in the entire evidence matrix. Both scores are disputed on independent second review
+  (`05_critical_collisions.md`): the reviewer re-derives Kumiho to component_overlap=4/
+  architecture_overlap=3 (the flag surviving on the component trigger alone, not two independent
+  triggers) and Jansen & Bosch to component_overlap=3/architecture_overlap=2 (the flag surviving
+  only via the directly-falsifies trigger — idea-level anticipation of H2 — not mechanism-level
+  equivalence, since no tool existed at publication). Per the owner's ruling that disputes are
+  recorded, not applied, the matrix's original 5/4 scores stand undisputed-unapplied, and this
+  file's citations continue to use them. 13 rows challenge H2 in total.
 evidence:
   - >
     graph-native-cognitive-memory (Kumiho), Sec.7 (per Abstract/Sec.1 summary): a formal
@@ -288,8 +295,10 @@ assessment: >
   & Bosch 2005, formally extended by Zimmermann et al. 2009), a W3C provenance standard (PROV-O,
   2013), and multiple production 2025-2026 agent-memory systems (Zep/Graphiti, Kumiho) — one of
   which (Kumiho) has a published, if partially unreproduced, formal correspondence proof to the
-  AGM postulates specifically. Thirteen of the matrix's 34 rows challenge H2; two reach the
-  matrix's ceiling component-overlap score of 5. This is not a thin or contested finding.
+  AGM postulates specifically. Thirteen of the matrix's 49 rows challenge H2; two reach the
+  matrix's ceiling component-overlap score of 5 (disputed on review to 4 and 3 respectively — see
+  `strongest_challenger` above; the flags survive regardless). This is not a thin or contested
+  finding.
   Qualification: none of these sources combine transition-preservation with D-System's full
   proposed epistemic+ontological+lifecycle state model (H1) simultaneously, and Kumiho's own
   formal correspondence is explicitly scoped to "a deliberately simple propositional logic over
@@ -312,7 +321,12 @@ hypothesis: >
 strongest_challenger: >
   log-is-the-agent-event-sourced-reactive-graphs-2026 (component_overlap=4, architecture_overlap=4,
   full_text) and omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (component_overlap=4,
-  architecture_overlap=4, full_text). 9 rows challenge H3 in total.
+  architecture_overlap=4, full_text). 11 rows challenge H3 in total, including two added by
+  `phase-lit-08`'s H4-targeted search that this file had not previously discussed:
+  extending-nanopublications-knowledge-provenance (component_overlap=3, architecture_overlap=2,
+  full_text) and provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE,
+  component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second
+  review: confirmed).
 evidence:
   - >
     log-is-the-agent, Sec.6/Sec.8: a total, worked-example-verified provenance/lineage chain
@@ -339,26 +353,56 @@ evidence:
     conflict-resolution rule (epistemic entrenchment) exists — but it is source-agnostic; AGM's
     only recorded property of a belief is a scalar entrenchment rank, with no actor, evidence,
     method, or delegation dimension at all.
+  - >
+    extending-nanopublications-knowledge-provenance (full 15-page paper, retrieved via curl): a
+    real, automated conflict-resolution rule deployed at scale (197,511 published facts, CoreKB) —
+    a two-stage sufficiency/consistency threshold test (Sec.4) classifying each Proposition as
+    ReliableFact or UnreliableFact (InsufficientEvidence/ContrastingEvidence) from its
+    supporting-vs-conflicting evidence counts, with no human arbitration in the deployed pipeline.
+    But on full-text read the ontology's own actor-trust classes (InfoCreatorTrust,
+    PropositionTrust) play no role in the threshold test itself: the classification runs entirely
+    on evidence-probability counts, the same source-agnostic shape AGM's entrenchment rule already
+    exhibits, not an authority- or delegation-weighted arbitration. A second, independent instance
+    of "automated resolution exists, but not wired to the rich provenance dimensions," not a
+    counter-example to it.
+  - >
+    provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE; full 6-page
+    paper, retrieved via curl): a real, implemented, demonstrated conflict/sensitivity mechanism —
+    TMS-environment refutation (Sec.3.2) that propagates disabling a source or operation class
+    through every dependent element, letting an operator counter-factually inspect the analysis
+    without a given contribution. But this is explicitly manual and user-triggered, not automated
+    arbitration; DIVE's three confidence-propagation policies (minimum/maximum/average) compute
+    over evidence diversity without weighting by actor identity or authority.
 assessment: >
   The two halves of H3 are individually well established but no found source combines them.
   Rich, typed, multi-actor provenance representation is thoroughly known (PROV-O, EVI, log-is-
-  the-agent, omniscientist, burns-groth all score component_overlap=3-4 on exactly this).
-  Automated conflict resolution driven by a belief-revision rule is also thoroughly known (AGM,
-  1985, and its 2026 descendants). Given both ingredients are independently mature, wiring
-  provenance fields into an entrenchment-style automated arbitration rule is an unglamorous
-  combination of two already-solved pieces, not a research gap — exactly the "known component,
-  new integration" pattern the campaign's anti-novelty case is built to detect.
-  Qualification: it is notable, and worth recording rather than explaining away, that the
-  field's most rigorous, most deployed provenance systems repeatedly and explicitly decline to
-  automate this step. EVI's authors state directly that challenge resolution "ultimately
-  require[s] human judgment"; TGMS explicitly disables provenance-based write-back "pending
-  policies." That two separate, careful, 2021-2026 engineering teams built the provenance
-  machinery and then deliberately stopped short of automating arbitration on top of it is some
-  evidence that the combination carries a correctness or liability risk its builders did not
-  want to accept — not proof that it is hard, but a reason the absence may not be mere neglect.
-  This tempers confidence without changing the verdict: the components needed are known: no
-  source demonstrates a materially equivalent working arbitration mechanism, so this stops short
-  of LIKELY_ALREADY_KNOWN, but the ingredients are too mature to call the combination distinct.
+  the-agent, omniscientist, burns-groth, extending-nanopublications, DIVE all score
+  component_overlap=3-4 on exactly this). Automated conflict resolution driven by a
+  belief-revision-style rule is also known: AGM's axiomatically-constrained entrenchment rule
+  (1985), and, deployed at real scale, extending-nanopublications' sufficiency/consistency
+  threshold test (197,511 facts) — but both are source-agnostic, resolving disagreement from
+  evidence quantity alone, never drawing on the actor-identity/domain-authority/delegation
+  dimensions that make provenance "rich" in the first place. Given both ingredients are
+  independently mature, wiring rich, multi-actor provenance into an authority-weighted automated
+  arbitration rule is an unglamorous combination of two already-solved pieces, not a research
+  gap — exactly the "known component, new integration" pattern the campaign's anti-novelty case
+  is built to detect.
+  Qualification: it is notable, and worth recording rather than explaining away, that of the
+  provenance systems in this matrix rich enough to plausibly support authority-weighted
+  arbitration, most explicitly decline to automate the step at all. EVI's authors state directly
+  that challenge resolution "ultimately require[s] human judgment"; TGMS explicitly disables
+  provenance-based write-back "pending policies"; DIVE's refutation mechanism is manual and
+  user-triggered. The one exception, extending-nanopublications, does automate arbitration — but
+  only over evidence-sufficiency counts, never over the actor-trust relationships its own
+  ontology defines. That three separate, careful, 2020-2026 engineering teams built rich
+  provenance machinery and either declined to automate arbitration on top of it or automated it
+  without drawing on that same rich machinery is some evidence that authority-weighted automated
+  arbitration carries a correctness or liability risk its builders did not want to accept — not
+  proof that it is hard, but a reason the absence may not be mere neglect. This tempers confidence
+  without changing the verdict: the components needed are known: no source demonstrates a
+  materially equivalent working arbitration mechanism that draws on the rich provenance dimensions,
+  so this stops short of LIKELY_ALREADY_KNOWN, but the ingredients are too mature to call the
+  combination distinct.
 status: KNOWN_COMPONENT_NEW_INTEGRATION
 ```
 
@@ -521,13 +565,17 @@ hypothesis: >
 strongest_challenger: >
   solozobov-verify-gated-completion-admission-control-2026 (component_overlap=4,
   architecture_overlap=4, full_text) and zep-graphiti-temporal-kg-agent-memory-2025
-  (component_overlap=4, architecture_overlap=3, full_text). `04_evidence_matrix.csv` lists 8 rows
+  (component_overlap=4, architecture_overlap=3, full_text). `04_evidence_matrix.csv` lists 9 rows
   as challenging H5, including log-is-the-agent-event-sourced-reactive-graphs-2026 (the first
   assessment's other strongest_challenger) — but independent review (`05_critical_collisions.md`,
   source 7) found log-is-the-agent's own Sec.8 explicitly positions the paper as *rejecting* the
   memory/retrieval category rather than instantiating it: a shared word ("topology") over a
   different mechanism (a replayable event log, not context selection). It is dropped as a
-  challenger here; solozobov and zep-graphiti carry the hypothesis instead.
+  challenger here; solozobov and zep-graphiti carry the hypothesis instead. One of the 9 rows,
+  provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE), is also tagged H5
+  but not separately discussed below: its three confidence-propagation policies (minimum/maximum/
+  average, per H4's evidence above) select over evidence diversity, not the dissent/authority/
+  convergence dimensions H5 lists, so it does not change the qualification's conclusion.
 evidence:
   - >
     solozobov, Sec.6, Table 9, Sec.6.1-6.2: an explicit context compiler distinguishing canonical/
@@ -649,7 +697,11 @@ hypothesis: >
 strongest_challenger: >
   graph-native-cognitive-memory-belief-revision-semantics-2026 (component_overlap=5,
   architecture_overlap=4) and jansen-bosch-architecture-as-decisions-wicsa-2005
-  (component_overlap=5, architecture_overlap=4) — the matrix's ceiling scores, tied. 10 rows
+  (component_overlap=5, architecture_overlap=4) — the matrix's ceiling scores, tied. Both are
+  disputed on independent second review (`05_critical_collisions.md`): Kumiho re-derived to 4/3,
+  Jansen & Bosch to 3/2 (the latter's flag surviving only via idea-level anticipation, not
+  mechanism-level equivalence — no tool existed at publication). Per the owner's ruling, disputes
+  are recorded, not applied; the matrix's original 5/4 scores stand and are cited as-is. 10 rows
   challenge H7 in total.
 evidence:
   - >
@@ -690,8 +742,9 @@ assessment: >
   by Zimmermann et al. 2009), model-based systems engineering's "digital thread" (2022), a
   granted US patent commercially operated as a digital-engineering platform (priority 2023,
   granted 2025), and a 2026 agentic-coding tool (Aporia) explicitly self-described as an
-  application of 1991-era design-rationale notation. Ten of 34 matrix rows challenge H7, two at
-  the matrix's ceiling overlap score.
+  application of 1991-era design-rationale notation. Ten of the matrix's 49 rows challenge H7,
+  two at the matrix's ceiling overlap score (disputed on review to 4 and 3 respectively — see
+  `strongest_challenger` above).
   Qualification: most of these chains start at Decision or Requirement, not at Idea/Reasoning/
   Evidence as D-System's fuller lifecycle proposes, and none combines the chain with an
   append-only, typed-transition data model carrying the epistemic apparatus H1-H4 describe. But
@@ -791,8 +844,12 @@ hypothesis: >
 strongest_challenger: >
   graph-native-cognitive-memory-belief-revision-semantics-2026 (component_overlap=5,
   architecture_overlap=4) and jansen-bosch-architecture-as-decisions-wicsa-2005
-  (component_overlap=5, architecture_overlap=4). 18 of the matrix's 34 rows challenge H9 — the
-  single most heavily challenged hypothesis in the review.
+  (component_overlap=5, architecture_overlap=4). Both are disputed on independent second review
+  (`05_critical_collisions.md`): Kumiho re-derived to 4/3, Jansen & Bosch to 3/2 (the latter's
+  flag surviving only via idea-level anticipation, not mechanism-level equivalence — no tool
+  existed at publication). Per the owner's ruling, disputes are recorded, not applied; the
+  matrix's original 5/4 scores stand and are cited as-is. 18 of the matrix's 49 rows challenge
+  H9 — the single most heavily challenged hypothesis in the review.
 evidence:
   - >
     graph-native-cognitive-memory (Kumiho): agent outputs "automatically versioned, addressable,
@@ -838,15 +895,17 @@ assessment: >
   rationale, digital-thread, and provenance-ontology literatures combined, and this campaign
   found it independently demonstrated across three decades and at least seven distinct
   technical traditions, several at production scale (Zep/Graphiti, LangGraph, Kumiho, the
-  granted Istari patent). Eighteen of 34 matrix rows — over half — challenge this hypothesis,
-  more than any other. By raw density of independent corroboration, this is the review's
-  clearest case.
+  granted Istari patent). Eighteen of the matrix's 49 rows challenge this hypothesis — more than
+  any other. By raw density of independent corroboration, this is the review's clearest case.
   Qualification: no single source combines all of D-System's proposed traceability directions
   (idea -> decision -> requirement -> specification -> plan -> phase -> implementation ->
   verification -> deployment -> runtime -> revised knowledge) into one continuous chain across
   that many stages simultaneously — most sources cover a contiguous subset. But the mechanism
   class itself, and multiple examples spanning most individual stage-to-stage links, are
-  established beyond reasonable dispute.
+  established more thoroughly than any other hypothesis in this review — bounded, like every
+  claim in this file, by the coverage caveat that 340 of 387 collision candidates surfaced by
+  this campaign were never deep-read (`07_anti_novelty_case.md`'s coverage caveat), not a claim
+  that no unread source could sharpen or contest the picture.
 status: LIKELY_ALREADY_KNOWN
 ```
 
@@ -865,11 +924,11 @@ hypothesis: >
   by the same evidence a fortiori.
 strongest_challenger: >
   memtx-transactional-belief-commit-2026 (component_overlap=4, architecture_overlap=2,
-  abstract_only). 4 rows challenge H10 in total; H10 has exactly one source with
-  component_overlap above 2.
+  full_text). 4 rows challenge H10 in total; H10 has exactly one source with component_overlap
+  above 2.
 evidence:
   - >
-    memtx, arXiv abstract: "retracting a belief triggers typed cascading repair of its derived
+    memtx, Sec.3.4/3.5 (full HTML text, arxiv.org/html/2607.23929v2, read twice): "retracting a belief triggers typed cascading repair of its derived
     records and tool side effects. Two invariants, action-safety gating and cascade-repair
     completeness, are machine-checked by property-based testing and bounded exhaustive
     enumeration of 5.5 million protocol states, with zero violations." Retraction of a belief —
@@ -1072,9 +1131,9 @@ status: INSUFFICIENT_EVIDENCE
 |---|---|---|---|
 | H1 | INSUFFICIENT_EVIDENCE | mythologiq-agent-memory-oss / subit-wiki-epistemic-hmm-oss (closest new candidates, both mechanism-mismatched — see block) | 6 |
 | H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 13 |
-| H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 9 |
+| H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 11 |
 | H4 | KNOWN_COMPONENT_NEW_INTEGRATION (review-instructions general phrasing); INSUFFICIENT_EVIDENCE (frozen-register graph-topological phrasing) | goldman-experts-which-ones-should-you-trust-2001 (general) / epistemic-sybil-resistance-bara-2026 (graph-topological) | 6 |
-| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 8 |
+| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 9 |
 | H6 | KNOWN_COMPONENT_NEW_INTEGRATION | omniscientist-coevolving-ecosystem-human-ai-scientists-2026 | 3 |
 | H7 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 10 |
 | H8 | LIKELY_ALREADY_KNOWN (review-instructions phrasing); KNOWN_COMPONENT_NEW_INTEGRATION (frozen-register phrasing) | langgraph-checkpoint-library-oss (review-instructions) / solozobov-verify-gated-completion-admission-control-2026 (frozen-register, assembly half only) | 4 |
