@@ -6,6 +6,53 @@ A personal system for tracking people, projects, commitments, and tasks — redu
 
 ---
 
+## 🖥️ Running the demo app
+
+The demo stage and workbench UI need `D_SYSTEM_DEMO_TERMINAL=1` on **both** processes, and the
+frontend additionally needs `VITE_API_TARGET` pointed at the backend's port. Setting the flag on
+the backend alone is the common failure — see below.
+
+```bash
+# backend — terminal 1
+env D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010
+
+# frontend — terminal 2
+cd ts && env D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 \
+  npm run dev -- --port 5180 --strictPort
+```
+
+Then open http://localhost:5180.
+
+**Verify the proxy before using the UI.** This must print `200`, not `404`:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5180/api/v1/workbench/injection-sources
+```
+
+### If the terminal reports "availability is unknown" and the dropdowns are empty
+
+Both symptoms have one cause: the **frontend** process is missing the two variables.
+
+- Without `VITE_API_TARGET`, `ts/vite.config.ts` proxies `/api` to its default `:8000`. If anything
+  else is listening there, every API call returns 404 — which reads as "backend down" rather than
+  "wrong backend", including the stage's "Terminal availability is unknown — the stage backend is
+  not reachable" message and empty Commands/Skills/Prompts/Agents dropdowns.
+- Without `D_SYSTEM_DEMO_TERMINAL=1`, the `serveRepositoryFiles` plugin is not registered, so
+  `/workbench-file/*` does not exist and the HTML Viewer cannot load pages.
+
+Check what the running frontend process actually has, rather than what the command was meant to set:
+
+```bash
+tr '\0' '\n' < /proc/$(pgrep -f 'node.*vite --port 5180')/environ | grep -E 'D_SYSTEM|VITE_API'
+```
+
+Both lines must appear. Empty output means the environment prefix was dropped — recalling the
+launch command from shell history is the usual way that happens, since the prefix is easy to lose
+from a recalled line. Restart with the `env ...` form above, which keeps the variables attached to
+the whole invocation.
+
+---
+
 ## 📋 Working Agreement
 
 **[AGENTS.md](AGENTS.md) governs all work in this repository** — read it before changing anything.
