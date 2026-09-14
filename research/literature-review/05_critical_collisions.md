@@ -1015,7 +1015,30 @@ Given this hypothesis's thin evidence count (one challenger), this section recor
 without treating it as settled in either direction — that judgment belongs to
 `06_hypothesis_tests.md`'s `INSUFFICIENT_EVIDENCE` verdict, not to this collision analysis.
 
-second_review: pending
+second_review: confirmed; a serious challenger to H4's narrow core but only adjacent to H4's full
+scope, exactly as the row's own fields already state. No factual corrections.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2. The provenance-DAG-
+based discount of corroboration from reports sharing an evidentiary root is the single closest
+primary-source match found in this campaign to H4's claim — both the DAG structure and the
+discounting arithmetic are explicit and formal. Found only in this phase's Pass 3 collision search,
+after five prior phases at zero challengers for H4.
+
+**Independent reviewer position.** Confirms both scores exactly via full-text read
+(arxiv.org/html/2609.01873) with independent identity corroboration and word-for-word verification
+of several verbatim_notes quotes. Confirms this is a serious challenger to the narrow core of H4
+(graph/lineage-based discounting of derivative agreement, Sec.6 provenance DAG plus Sec.5.2
+Corollary 2's closed-form kappa_m = 1/(1+rho(m-1))) but only adjacent to H4 as fully scoped, because
+the paper is explicitly AI-agent-only (a single LLM extractor class replicated, literal Sybils
+rather than heterogeneous independent reasoning paths) and explicitly outside the "mixed human-agent"
+scope H4's own falsification condition names, and because the general topology-weighted treatment is
+defined (Sec.6) but not delivered in closed form (Sec.9 leaves this an open problem). The row's own
+`strongest_difference` and `human_agent_scope` fields already state this gap accurately. No factual
+corrections found — every checked field matched the source exactly.
+
+**Resolution.** No matrix changes needed. No score, flag, or hypotheses_challenged value is changed.
 
 ---
 
@@ -1044,7 +1067,39 @@ lifecycle). No prior mechanism is credited by the paper for the ontological/epis
 classification or the evidence-first provenance design; it positions itself against contemporary
 LLM-agent memory benchmarks (LoCoMo/LongMemEval/BEAM) rather than a named earlier system.
 
-second_review: pending
+second_review: disputed -- THE FLAG DOES NOT SURVIVE per re-derived scores; left unchanged. No
+factual corrections to the citation.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3. Independently tracking
+ontological type, epistemic status/tier, and lifecycle state on the same memory object (Table 2,
+Sec.4.3) is the closest primary-source, real-implemented match found in this campaign to H1's
+orthogonal claim. Real, implemented, evaluated system.
+
+**Independent reviewer position.** Re-derives component_overlap to 3 and architecture_overlap to 2
+(both down one point); none of the four triggers fire under re-derivation. Reads the full 29-page
+PDF end to end and finds the row's central premise — that Table 2 encodes "three
+independently-tracked classification dimensions" — is not supported by the primary text: the five
+object types (Evidence, Signals, Candidates, Beliefs, Links) each carry a deterministic one-to-one
+Mutability value (Evidence is *always* Immutable, Beliefs are *always* Revisable — no case of
+cross-product variation), so the "epistemic tier" is likewise fixed by object type. Knowing an
+object's type fully determines both its tier and lifecycle value — restatements of one axis, not
+independent ones. The word "orthogonal" never appears in all 29 pages, and the row's own
+`state_model` field already hedges this ("frames it as a memory-object taxonomy... rather than
+naming three orthogonal axes") while the score did not follow. Separately and dispositively: a
+single-author arXiv preprint three and a half months old, with no indication of peer review or
+institutional adoption, is not an "established framework" within H1's falsification bar regardless
+of mechanism similarity. H5 similarly does not survive its bar (retrieval covers current state and
+evidence but no dissent/authority/unresolved-uncertainty signal, and convergence is explicitly
+disclaimed). No factual corrections to the citation — all verbatim quotes checked accurate and
+correctly located; `interpretation_confidence: high` is earned for factual transcription but not for
+the scoring judgment.
+
+**Resolution.** No matrix field changes needed. The score and flag disagreement is recorded here as
+a judgment dispute per the coordinator's addressing; `component_overlap_score`,
+`architecture_overlap_score`, and `critical_collision` are left exactly as scored. Had the
+reviewer's re-derivation been authorized, this row's flag would be dropped.
 
 ---
 
@@ -1074,4 +1129,41 @@ unspecified prior agent-memory systems that "treat every accepted write as immed
 actionable truth" (its stated gap). A full-text read (currently abstract-only) is recorded as an
 open item for whichever pass next revisits this row, not resolved here.
 
-second_review: pending
+second_review: disputed: reviewer re-derives component_overlap to 3 (not 4); no trigger fires under
+re-derivation, left unchanged. Fuller access was available and had not been taken; five factual
+corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2. The strongest
+primary-source match found in this campaign for H10's epistemic-blast-radius claim, proven for one
+memory system's dependency graph. Read from the abstract only; access_limitation=abstract_only, with
+several fields NOT_DETERMINABLE_FROM_ACCESS.
+
+**Independent reviewer position.** ***Headline finding: fuller access was available and was not
+taken.*** The abstract page itself lists three full-text routes (PDF, HTML, TeX); the reviewer read
+the HTML rendering twice, extracting section-numbered content the original pass never accessed.
+Confirms architecture_overlap=2 but re-derives component_overlap to 3: the cascade explicitly
+dispatches on only three types (beliefs, memory-store derivatives, tool actions), and a full-text
+keyword search for "requirement," "specification," "plan," "decision record," and "artifact"
+returned zero hits — same-store dependency-graph cascade, structurally narrower than D-System's
+cross-lifecycle blast-radius shape that a level-4 score requires. Notes the row's own
+`strongest_difference` already said as much ("scoped to a single shared memory store's internal
+derived-records... not D-System's cross-lifecycle propagation") while the score did not follow.
+With no trigger firing under re-derivation, reads `critical_collision` as not standing as scored.
+H10 splits cleanly: the "epistemic, not artifact" half is confirmed — the cascade's entry point is
+"transaction abort and revocation of a committed record" (Sec.3.4), a genuine, formally verified
+instance (5.5M-state bounded enumeration, zero violations); the cross-SE-lifecycle half is not
+present, per the zero-hit keyword search. Five factual corrections found, all traceable to the
+access gap: `access_limitation` should be `full_text`, not `abstract_only`; `implementation_availability`
+undersold a publicly released, live-verified code repository; `state_model` omits an explicit 8-state
+lifecycle (raw -> tentative -> validated -> committed -> action-safe, plus quarantined/superseded/
+revoked branches, Sec.3.1-3.2); `derivative_ancestor` said "none identified" when the full text names
+several prior systems in a Table 1 comparison; `evidence_locator` had no section-level citations
+though they were available.
+
+**Resolution.** `access_limitation`, `implementation_availability`, `state_model`,
+`derivative_ancestor`, and `evidence_locator` corrected in `04_evidence_matrix.csv`. The
+component-score and flag disagreement is recorded here as a judgment dispute per the coordinator's
+addressing; `component_overlap_score` and `critical_collision` are left exactly as scored. Had the
+reviewer's re-derivation been authorized, this row's flag would be dropped.
