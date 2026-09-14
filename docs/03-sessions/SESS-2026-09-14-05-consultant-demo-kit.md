@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-consultant-demo-kit
-code: SESS-2026-09-14-04
+code: SESS-2026-09-14-05
 title: Building the consultant demo kit — all twenty components
 kind: session
 status: active

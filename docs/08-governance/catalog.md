@@ -221,15 +221,8 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-14-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-01-literature-review-pass-3.md |
 | SESS-2026-09-14-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-02-demo-launch-docs.md |
 | SESS-2026-09-14-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-03-partition-generalization-and-programme-plans.md |
-<<<<<<< HEAD
-<<<<<<< HEAD
 | SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-lit-06-followups.md |
-=======
-| SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-phase-kit-02-demo-kit-skills.md |
->>>>>>> dbb6536 (Record the phase-kit-02 session)
-=======
-| SESS-2026-09-14-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-04-consultant-demo-kit.md |
->>>>>>> 57fc611 (Record the consultant demo kit session across all four kit phases)
+| SESS-2026-09-14-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-05-consultant-demo-kit.md |
 
 ## Plans and their phases
 
@@ -268,19 +261,11 @@ CI regenerates it and fails on any difference.
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 1 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
-<<<<<<< HEAD
 | PLAN-023 | doc-lit-campaign | draft | 2 | 0 | 6 | agent-lit |
 | PLAN-023.01 | doc-lit-campaign-scope | draft | 2 | 0 | 6 | agent-lit |
 | PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 2 | 0 | 6 | agent-lit |
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 2 | 0 | 6 | agent-lit |
-| PLAN-024 | doc-consultant-demo-kit | draft | 3 | 1 | 0 | agent-kit |
-=======
-| PLAN-023 | doc-lit-campaign | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.01 | doc-lit-campaign-scope | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 1 | 0 | 6 | agent-lit |
-| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 0 | 6 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
->>>>>>> 5e5d7c8 (Close phase-kit-01, -02, -03 and -04: the consultant demo kit)
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 1 | 0 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
 | PLAN-027 | doc-workbench-features-defects | draft | 1 | 0 | 0 | — |
@@ -305,8 +290,4 @@ CI regenerates it and fails on any difference.
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 | PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-<<<<<<< HEAD
-215 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 33, requirement: 10, session: 76.
-=======
-213 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 76.
->>>>>>> dbb6536 (Record the phase-kit-02 session)
+216 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 33, requirement: 10, session: 77.
