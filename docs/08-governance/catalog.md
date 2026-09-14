@@ -90,6 +90,18 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
 | PLAN-024 | plan | draft | repository-owner | docs/01-plans/PLAN-024-consultant-demo-kit.md |
 | PLAN-025 | plan | draft | repository-owner | docs/01-plans/PLAN-025-repeatable-idea-partition.md |
+| PLAN-026 | plan | draft | repository-owner | docs/01-plans/PLAN-026-concurrency-git-safety.md |
+| PLAN-027 | plan | draft | repository-owner | docs/01-plans/PLAN-027-workbench-features-defects.md |
+| PLAN-028 | plan | draft | repository-owner | docs/01-plans/PLAN-028-workbench-architecture-quality.md |
+| PLAN-029 | plan | draft | repository-owner | docs/01-plans/PLAN-029-idea-graph-lifecycle.md |
+| PLAN-030 | plan | draft | repository-owner | docs/01-plans/PLAN-030-document-backlog-governance.md |
+| PLAN-031 | plan | draft | repository-owner | docs/01-plans/PLAN-031-agent-engineering-delegation.md |
+| PLAN-032 | plan | draft | repository-owner | docs/01-plans/PLAN-032-autonomous-agent-operations.md |
+| PLAN-033 | plan | draft | repository-owner | docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md |
+| PLAN-034 | plan | draft | repository-owner | docs/01-plans/PLAN-034-blocked-downstream-projections.md |
+| PLAN-035 | plan | draft | repository-owner | docs/01-plans/PLAN-035-schema-consistency-testing.md |
+| PLAN-036 | plan | draft | repository-owner | docs/01-plans/PLAN-036-html-generation-design-system.md |
+| PLAN-037 | plan | draft | repository-owner | docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -248,6 +260,18 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 0 | 6 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 3 | 1 | 0 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 3 | 0 | 0 | — |
+| PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
+| PLAN-027 | doc-workbench-features-defects | draft | 1 | 0 | 0 | — |
+| PLAN-028 | doc-workbench-architecture-quality | draft | 1 | 0 | 0 | — |
+| PLAN-029 | doc-idea-graph-lifecycle | draft | 1 | 0 | 0 | — |
+| PLAN-030 | doc-document-backlog-governance | draft | 1 | 0 | 0 | — |
+| PLAN-031 | doc-agent-engineering-delegation | draft | 1 | 0 | 0 | — |
+| PLAN-032 | doc-autonomous-agent-operations | draft | 1 | 0 | 0 | — |
+| PLAN-033 | doc-retrieval-knowledge-infrastructure | draft | 1 | 0 | 0 | — |
+| PLAN-034 | doc-blocked-downstream-projections | draft | 1 | 0 | 0 | — |
+| PLAN-035 | doc-schema-consistency-testing | draft | 1 | 0 | 0 | — |
+| PLAN-036 | doc-html-generation-design-system | draft | 1 | 0 | 0 | — |
+| PLAN-037 | doc-standalone-explorations-housekeeping | draft | 1 | 0 | 0 | — |
 
 ## Held codes
 
@@ -258,4 +282,4 @@ CI regenerates it and fails on any difference.
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 | PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-197 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 39, prompt: 33, requirement: 9, session: 72.
+209 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 72.

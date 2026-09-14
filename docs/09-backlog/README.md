@@ -22,6 +22,7 @@
 | `phase-demo-*` | Live-demo stage backend and frontend, deterministic overview tools, overview generation and demo readiness | [Live demo plan](../01-plans/PLAN-021-live-demo.md) |
 | `phase-wb-*` | Workbench — the stage becomes the chartered management UI: backend API, layout engine and notes strip, terminal rework and shells, HTML Viewer, explorers, rehearsal refresh | [Workbench plan](../01-plans/PLAN-022-workbench.md) |
 | `phase-part-*` | Repeating an idea-partition sweep: the reusable prompt pack, a selectable corpus status, and the `/partition-ideas` workflow | [Repeatable idea partition](../01-plans/PLAN-025-repeatable-idea-partition.md) and [requirements](../06-requirements/REQ-009-repeatable-idea-partition.md) |
+| `phase-prog-*` | One phase per programme from the accepted idea partition. Each finalizes that programme's placeholder plan into a real requirement, design and implementation phases — it builds nothing itself. Twelve phases for `PLAN-026`–`PLAN-037`, queued in the owner's delivery order: `P3`, `P11`, `P10`, then `P1`, `P2`, `P4`–`P9`, `P12` | [The partition](../00-working/idea-batching-partition.md); each placeholder plan links its own source material |
 
 ```bash
 uv run python -m src.governance --ready

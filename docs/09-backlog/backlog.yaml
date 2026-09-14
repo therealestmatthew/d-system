@@ -6,6 +6,19 @@ next_up:
 - phase-wb-07
 - phase-port-02
 - phase-ses-01
+- phase-part-01
+- phase-prog-01
+- phase-prog-02
+- phase-prog-03
+- phase-prog-04
+- phase-prog-05
+- phase-prog-06
+- phase-prog-07
+- phase-prog-08
+- phase-prog-09
+- phase-prog-10
+- phase-prog-11
+- phase-prog-12
 items:
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
@@ -6783,3 +6796,376 @@ items:
     had a non-empty open set every time it has been checked since the first sweep, so the
     non-empty path is the one that can actually be exercised. Read the count from fold()
     rather than from this line.
+- id: phase-prog-01
+  title: Finalize the concurrency, git safety and enforcement plan (P3)
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P3 with observable statements and verification methods.
+  - Settle the design questions PLAN-026 lists as open, and record any that need an ADR.
+  - Replace PLAN-026's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-026 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P3 and every row maps to at least one phase.
+  - The implementation phases are session-sized with acceptance and verification each.
+  - phase-prog-01 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-026-concurrency-git-safety.md
+  - docs/06-requirements/
+  next_action: Scope G10 first. It is no longer blocked, it is the largest group at 3-4
+    phases, and G09 is sequenced behind its document rewrite.
+- id: phase-prog-02
+  title: Finalize the workbench features and defects plan (P11)
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P11 with observable statements and verification methods.
+  - Settle the design questions PLAN-027 lists as open, including the G40 ordering
+    tension it records against P10.
+  - Replace PLAN-027's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-027 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P11 and every row maps to at least one phase.
+  - G56 is recorded as already delivered and gets no implementation phase.
+  - phase-prog-02 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-027-workbench-features-defects.md
+  - docs/06-requirements/
+  next_action: Rule on 000119's render location first. G48 is the largest group and
+    000109 and 000110 conflict with each other until that decision exists.
+- id: phase-prog-03
+  title: Finalize the workbench architecture and quality plan (P10)
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P10 with observable statements and verification methods.
+  - Settle the design questions PLAN-028 lists as open, and decide whether G40 is pulled
+    ahead of P11 work that renames anything.
+  - Replace PLAN-028's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-028 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P10 and every row maps to at least one phase.
+  - G40's position relative to P11 is stated explicitly rather than left implied.
+  - phase-prog-03 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-028-workbench-architecture-quality.md
+  - docs/06-requirements/
+  next_action: Scope G40 first. Six ideas cite it as a prerequisite and it is a
+    documentation deliverable completable alone.
+- id: phase-prog-04
+  title: Finalize the idea graph and lifecycle plan (P1)
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P1 with observable statements and verification methods.
+  - Settle the design questions PLAN-029 lists as open, including what G01 needs as its
+    governing requirement given ARCH-005 already bundles its seven ideas.
+  - Replace PLAN-029's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-029 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P1 and every row maps to at least one phase.
+  - What is already delivered in G03 is verified in code before any phase is sized.
+  - phase-prog-04 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-029-idea-graph-lifecycle.md
+  - docs/06-requirements/
+  next_action: Verify what G03 already ships before sizing anything - 000071 is
+    prototyped and 000070 largely delivered, so the group is smaller than it reads.
+- id: phase-prog-05
+  title: Finalize the document and backlog governance plan (P2)
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance
+  systems:
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P2 with observable statements and verification methods.
+  - Settle the design questions PLAN-030 lists as open, including 000056's unresolved
+    overlap with 000047.
+  - Replace PLAN-030's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-030 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P2 and every row maps to at least one phase.
+  - Overlap with the already-queued phase-gov-01 is checked and stated.
+  - phase-prog-05 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-030-document-backlog-governance.md
+  - docs/06-requirements/
+  next_action: Settle the 000056-to-000047 overlap first. It is the scope question that
+    decides whether G05 is two phases or one.
+- id: phase-prog-06
+  title: Finalize the agent engineering and delegation plan (P4)
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Run the scoping pass the partition requires for this programme before any phase
+    count is committed, resolving its internal near-duplication.
+  - Write the requirement for P4 with observable statements and verification methods.
+  - Replace PLAN-031's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-031 carries no placeholder banner and states a chosen design.
+  - The 000072-to-000046 duplication is ruled on explicitly.
+  - G18's delivered capture half and G22's possible existing procedure are both verified
+    in the repository before either is sized.
+  - phase-prog-06 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-031-agent-engineering-delegation.md
+  - docs/06-requirements/
+  next_action: Do the scoping pass before anything else. This is the largest programme
+    and the partition says its phase count is meaningless until the duplication is cut.
+- id: phase-prog-07
+  title: Finalize the autonomous agent operations plan (P5)
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P5 with observable statements and verification methods.
+  - Rule on 000020, which the control analyst nominated for decline in favour of 000128.
+  - Replace PLAN-032's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-032 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P5 and every row maps to at least one phase.
+  - The 000031 gate is stated as a precondition for anything running unsupervised.
+  - phase-prog-07 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-032-autonomous-agent-operations.md
+  - docs/06-requirements/
+  next_action: Rule on 000020 first. Its librarian half overlaps P6 and a lighter
+    mechanism in P4, so the programme's shape depends on the ruling.
+- id: phase-prog-08
+  title: Finalize the retrieval and knowledge infrastructure plan (P6)
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P6 with observable statements and verification methods.
+  - Decide how G25 collects the recorded retrieval failure the whole programme is gated
+    on, since nothing collects it today.
+  - Replace PLAN-033's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-033 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P6 and every row maps to at least one phase.
+  - G28 is kept whole, with the reason audit 2 gave for restoring it recorded.
+  - phase-prog-08 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md
+  - docs/06-requirements/
+  next_action: Design G25's failure collection first. It gates the programme and would
+    unblock phase-mem-15, -16, -18 and -19 outside it.
+- id: phase-prog-09
+  title: Finalize the blocked downstream projections plan (P7)
+  plan: doc-blocked-downstream-projections
+  sources:
+  - doc-blocked-downstream-projections
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Resolve G31 with the owner - whether two core entities holding zero records is
+    tooling friction or no current need - measured against the correct data root.
+  - Rule on the control analyst's nomination to decline all three of G32.
+  - Replace PLAN-034's placeholder sections with the real plan, which may legitimately
+    give phases to G31 only and leave G32 dormant.
+  acceptance:
+  - PLAN-034 carries no placeholder banner and states a chosen design.
+  - G31 is resolved, or the plan states exactly what the owner must answer.
+  - G32's decline nomination is ruled on rather than carried forward silently.
+  - phase-prog-09 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-034-blocked-downstream-projections.md
+  - docs/06-requirements/
+  next_action: Answer G31 before writing any requirement. It is a question for the owner
+    and it determines whether G32 has any subject matter at all.
+- id: phase-prog-10
+  title: Finalize the schema consistency and testing plan (P8)
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing
+  systems:
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P8 with observable statements and verification methods.
+  - Decide whether G33 commits to 000024's concrete drift fix or 000035's general
+    contract compiler, before sizing either.
+  - Replace PLAN-035's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-035 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P8 and every row maps to at least one phase.
+  - G36 is recorded as already delivered and gets no implementation phase.
+  - phase-prog-10 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-035-schema-consistency-testing.md
+  - docs/06-requirements/
+  next_action: Choose between 000024 and 000035 first. They are very different amounts
+    of work for the same symptom and the sizing is meaningless until one is picked.
+- id: phase-prog-11
+  title: Finalize the HTML generation and design system plan (P9)
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the requirement for P9 with observable statements and verification methods.
+  - Sequence G39 ahead of G37's detailed scoping, since G39 produces that scope.
+  - Replace PLAN-036's placeholder sections with the real plan and add session-sized
+    implementation phases under a new prefix registered in the backlog README.
+  acceptance:
+  - PLAN-036 carries no placeholder banner and states a chosen design.
+  - A requirement document exists for P9 and every row maps to at least one phase.
+  - The boundary against PLAN-029's G03 reporting work is stated explicitly.
+  - phase-prog-11 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows the new phases.
+  deliverables:
+  - docs/01-plans/PLAN-036-html-generation-design-system.md
+  - docs/06-requirements/
+  next_action: Scope G39 first. It is one phase of independent research and it produces
+    the scope the rest of the programme would otherwise guess at.
+- id: phase-prog-12
+  title: Finalize or disperse the standalone explorations bucket (P12)
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Rule on each of the seven groups separately. This bucket is a readability device,
+    not a design, so finalizing may produce several small plans, none, or dispersal into
+    other programmes.
+  - Rule on G63, which all four analysts nominated for decline.
+  - Run the scoping pass G57 needs, given no sys-observability exists and the work spans
+    three systems.
+  - Replace PLAN-037's placeholder sections with whatever the rulings produce.
+  acceptance:
+  - PLAN-037 carries no placeholder banner and states what happened to each of the seven
+    groups.
+  - G63 is ruled on rather than carried forward.
+  - Any member moved to another programme is recorded in that programme's plan too.
+  - phase-prog-12 is removed from next_up in the same change that completes it.
+  verification:
+  - uv run python -m src.governance exits 0.
+  - uv run python -m src.governance --ready shows whatever phases the rulings produced.
+  deliverables:
+  - docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md
+  - docs/06-requirements/
+  next_action: Rule on G63 first. Three ideas, zero product content, and the strongest
+    decline signal in the partition - it is the cheapest decision in the bucket.
