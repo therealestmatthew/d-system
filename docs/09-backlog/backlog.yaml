@@ -6843,8 +6843,15 @@ items:
   - research/literature-review/11_open_research_questions.md
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
-  next_action: Hold the pre-synthesis owner check-in (ratified decision 3), then dispatch
-    delegation-pack section LIT-07.
+  session: doc-session-literature-review-pass-4
+  next_action: Owner /session-close. All six items dispatched and verified; all seven synthesis
+    deliverables exist; acceptance 1 met. Acceptance 2 not met in its stop-conditions half,
+    recorded rather than asserted away - gate measurement 2 fails (15 of 39 strong collisions,
+    all added in phase-lit-06/08 after the chaining passes, have no forward-chaining rows and 5
+    no backward rows), saturation is not demonstrated (duplicate rate fell 20.0% to 15.0%;
+    ruling 8 forbids claiming it), and the 20-30 deep-read condition is met by count (49 rows)
+    not coverage (20 of 32 top-band candidates never read). Whether any of the three warrants
+    a ninth session is the owner's call; the campaign has no further phases.
 - id: phase-kit-01
   title: Build the kit's six commands
   plan: doc-consultant-demo-kit
