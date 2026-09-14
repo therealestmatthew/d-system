@@ -1384,3 +1384,60 @@ corner is touched).
 
 **Resolution.** No matrix changes needed. No score, flag, or `hypotheses_challenged` value is
 changed; no factual corrections were found.
+
+---
+
+## 23. provenance-based-interpretation-multi-agent-information-analysis-2020
+
+Friedman, S., Rye, J., LaVergne, D., Thomsen, D. (SIFT, LLC), Allen, M., Tunis, K. (Raytheon BBN
+Technologies). "Provenance-Based Interpretation of Multi-Agent Information Analysis." Proceedings
+of TaPP 2020 (12th USENIX Workshop on the Theory and Practice of Provenance). arXiv:2011.04016.
+
+**Overlap.** component_overlap=4, architecture_overlap=3. A real, implemented, live system combining
+PROV-O provenance with a purpose-built DIVE ontology (Appraisal/Evidence/Preference/Nexus) and TMS
+environments, demonstrating genuine mixed human-machine appraisal and confidence propagation over
+multi-path corroborating evidence (three independent derivation paths for one assertion, Fig.2) —
+directly on point for H4's general convergence claim and, uniquely among this dispatch's sources, at
+a demonstrated (not just stated) mixed human-agent scope. Also closely matches H5's "context
+selection... reasoning lineage... convergence" via a topology-driven context-isolation mechanism.
+
+**What it would falsify.** At full strength this would falsify H4's general-convergence half and
+contribute to H5. It would not falsify H4's specific independence-discount mechanism: the three
+implemented confidence-propagation policies (minimum, maximum, average) are not topology-aware and
+do not discount for shared lineage — the specific mechanism is named only as future work (Sec.3.3),
+citing Kuter & Golbeck 2007 ("SUNNY"), which this dispatch's own backward chain (LIT-08-S054)
+confirms does not itself supply a shared-lineage discount or corroboration-boost mechanism on a full
+read (a single trust/confidence estimate for one source-sink pair via Bayesian-network path
+elimination, no corroboration-boost or lineage-discount claim anywhere). No quantitative evaluation
+of any kind is reported (Sec.5, explicitly future work). It says nothing bearing on H1, H2, H6-H11:
+no multi-dimensional (O,E,L) state model, no decision/requirement/spec/plan/execution/artifact/
+deployment/runtime linkage (all confirmed `NOT_APPLICABLE`).
+
+second_review: confirmed; scores, flag and hypotheses_challenged all reproduced exactly, with the
+row's central citation claim independently verified against the cited paper's full text. No factual
+corrections.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on the
+component trigger alone (H3;H4;H5 challenged). A real, demonstrated, mixed human-machine system;
+the shared-lineage discount H4 needs is deferred to a citation the row flags as possibly not
+delivering it.
+
+**Independent reviewer position.** Independently re-derives both scores exactly (4/3) from the
+primary source read three ways (PDF, HTML, and the abstract page), confirmed 6 pages via `pdfinfo`.
+Spot-checked and confirmed against primary text: both verbatim quotes (field 42), author list and
+institutional affiliations, the DIVE four-class structure and JanusGraph/TinkerPop implementation,
+the refutation walkthrough, the absence of any linked code repository, the absence of quantitative
+evaluation, and the venue string. **Independently verified the row's most load-bearing claim** — by
+retrieving and fully reading cited ref [9] (Kuter & Golbeck, "SUNNY," AAAI-07,
+`cdn.aaai.org/AAAI/2007/AAAI07-218.pdf`) rather than trusting the row's characterization of it: SUNNY
+computes a single trust/confidence estimate for one source-to-sink pair via Bayesian-network mapping
+and probabilistic logic sampling, and its `GENERATEBN` procedure aggressively eliminates redundant
+and cyclic paths rather than reasoning about shared ancestry between converging paths — no
+corroboration-boost or lineage-discount claim appears anywhere in its text, abstract, or conclusions.
+The citation does not discharge the claim it is attached to, confirming field 38
+(`derivative_ancestor`) and the `LIT-08-S054` finding it cites.
+
+**Resolution.** No matrix changes needed. No score, flag, or `hypotheses_challenged` value is
+changed; no factual corrections were found.
