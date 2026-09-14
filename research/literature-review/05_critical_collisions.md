@@ -759,7 +759,35 @@ model-based-digital-threads-sociotechnical-systems-2022's 2013 USAF citation (se
 this campaign's earlier assumption that both sources shared one 2013 ancestor is wrong and is
 withdrawn on that row.
 
-second_review: pending
+second_review: disputed, with an explicit provenance caveat on the scoring rule itself. One factual
+correction applied regardless of that dispute.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=3, architecture_overlap=4. At full strength —
+reading background/preferred-embodiment material — this would contribute stage-spanning evidence
+against H7/H9; read strictly against the granted claims, the falsification is much narrower.
+
+**Independent reviewer position.** ***Coordinator-note on the scoring rule's provenance***: the
+"score the claims, not the specification" instruction the reviewer applied came from the
+coordinator's addressing, not from any governed document — the evidence contract and methodology
+are silent on how to score a patent, and the contract's `source_type` enum has no patent bucket
+(idea 000148). The reviewer itself flagged this as "a defensible policy choice for someone else to
+make explicitly." Under that rule, re-derives `architecture_overlap` to 3 (not 4): claims cover
+Execution and Artifact solidly, but Requirement, Decision, Specification-of-the-software-system,
+Deployment, and Runtime-Evidence-in-production are absent from every claim — that material lives
+only in unclaimed specification background. Under claims-only scoring, no trigger fires and the flag
+should not stand as scored. Verified the granted claims (US12461717B2) are textually identical to
+the published application's claims. Found one factual error unrelated to the scoring-rule dispute:
+`change_impact_mechanism` was coded NOT_APPLICABLE, but claim 18 claims to "predict a change in one
+or more items... based on a change in one of the items" and claim 19 restates this for the reverse
+direction — a real, narrow, pairwise change-propagation primitive the row missed entirely.
+
+**Resolution.** `change_impact_mechanism` corrected in `04_evidence_matrix.csv` — this correction
+stands independent of the scoring-rule dispute. The architecture-score/flag dispute is recorded here
+as conditional on a rule the owner has not ruled on and is **not folded in as settled**;
+`architecture_overlap_score` and `critical_collision` are left exactly as scored, and
+`PLAN-023.03`'s evidence contract is not edited to add a patent-scoring rule.
 
 ---
 
@@ -792,7 +820,32 @@ tgms-agent-native-bitemporal-graph-2026 (section 8, above) names explicitly and 
 paper's 28-entry reference list does not cite — one shared 1999 ancestor and two derivative
 LLM-era applications, not two independent inventions of bi-temporal novelty.
 
-second_review: pending
+second_review: confirmed; reviewer's one push-back is that H9's inclusion should carry the same
+domain-absence caveat given to H7/H8/H11. No factual corrections needed.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3. Graphiti's bi-temporal
+edge model with LLM-mediated contradiction detection directly matches H2; its retrieval pipeline
+matches H5; bidirectional episode-to-fact indices are a direct H9 primitive. Falsifies H2, H5, and
+H9 together at full strength.
+
+**Independent reviewer position.** Confirms both scores exactly via a complete 12-page read
+(including the full 28-entry reference list, which the reviewer checked in full and confirmed does
+not cite Snodgrass or temporal-database theory — the paper frames its "novel advancement" only
+relative to prior LLM/RAG memory systems). Confirms H2 and H5 are genuinely challenged, though H2
+meets only the state-transition half of its bar and not the provenance half (no actor/method/
+evidence field on the transition, only four bitemporal timestamps). Pushes back specifically on H9:
+the row's own cited mechanism (bidirectional episode<->entity indices, Sec.2.1) is explicitly "not
+directly examined in this paper's experiments," and Zep has zero decision/requirement/artifact/
+verification/deployment concepts — structurally the same "not applicable by domain" situation the
+row already gives H7/H8/H11, which it oddly omits H9 from. Recommends H9 not be counted as seriously
+challenged by this source. No factual corrections found — every checked field matched the source
+exactly, and the locator spans the full document, not a page-4 cap.
+
+**Resolution.** The H9-inclusion push-back is recorded here as a judgment dispute per the
+coordinator's addressing; `hypotheses_challenged` is left exactly as scored (H2;H5;H9). Had the
+reviewer's recommendation been authorized, this row's hypotheses_challenged would narrow to H2;H5.
 
 ---
 
@@ -825,7 +878,42 @@ independent confirmation; its own novel contribution is the integrity-constraint
 formalization and the outcome-status/changedBy fields that go beyond Jansen & Bosch's original
 model.
 
-second_review: pending
+second_review: disputed: flag and both scores independently reproduced and confirmed, but the row's
+own narrative overstates implementation maturity. Flag rests on a single trigger, not convergent
+evidence. Four factual corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3. The most formally
+complete decision-representation mechanism found in the campaign: an explicit outcome-status
+lifecycle, a formally proved typed-transition mechanism, per-outcome actor provenance, and
+requirement-to-decision linkage. Falsifies H2 and H7 for the decision/requirement segment. Working
+tool evaluated on 389 real decision issues.
+
+**Independent reviewer position.** Independently reproduces both scores exactly via a full 36-page
+read (identity separately verified at Crossref). Confirms the flag fires correctly by the single
+component trigger, but finds the row's narrative reads as a stronger case than the single-trigger
+reality — worth recording explicitly. The load-bearing finding: the paper's own words (Sec.6.3,
+p.33) state "the integrity constraint checks, heuristics for balanced architectural decision models,
+and production rules are implemented in an advanced prototype that is not yet publicly available."
+The publicly deployed tool (the Architectural Decision Knowledge Wiki, 200+ users, 600+ downloads)
+implements only the basic CRUD metamodel — not the triggers/integrity-constraint engine the
+component score actually rests on. That engine exists (not aspirational future work) but lives in a
+non-public prototype, separate from both the industrially validated content and the widely used
+wiki — the row's `implementation_availability` is technically true but elides this split. Confirms
+H2 and H7 both survive, with H2 not fully equivalent (ADOutcome's status mutates in place, no
+versioned history of prior states preserved as distinct entities). Finds four locator/precision
+corrections: the outcome-status definition quote is cited to "p.16, Sec.4" but is actually at
+Definition 14, PDF p.22 (a 6-page discrepancy); two Sec.3 quotes cited to p.4-5/p.5 are actually on
+PDF p.6; `evidence_locator`'s claim that this PDF's pagination "matches" the published JSS pagination
+is false (it carries its own internal 1-36 numbering; DOI/Crossref identity is unaffected);
+`temporal_model` omits a `validUntil: Timestamp` attribute visible in Fig.1 (p.5), though it is never
+elaborated further and the substantive NOT_APPLICABLE conclusion holds.
+
+**Resolution.** `verbatim_notes`, `evidence_locator`, and `temporal_model` corrected in
+`04_evidence_matrix.csv`. The implementation-maturity overstatement is a narrative concern the
+reviewer raises against the row's framing, not a scored field; no score, flag, or
+hypotheses_challenged value is changed.
 
 ---
 
@@ -857,7 +945,44 @@ itself in its own Related Work as architecturally distinct from every memory sys
 domain-thing/ICE split draws on the established Information Artifact Ontology (Ceusters 2013),
 a vocabulary borrowing, not a mechanism inheritance from a single ancestor.
 
-second_review: pending
+second_review: disputed -- THE FLAG DOES NOT SURVIVE per re-derived scores; left unchanged.
+Recommends dropping H3 as a challenger and downgrading H11. Three factual corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3. A genuine ontological-
+vs-epistemic-vs-derivational state distinction close in spirit to H1; explicit per-note actor
+attribution and full backward provenance (H3); a named, working closed loop from curation failures
+back into schema design (H11) — the strongest H11 match found in this campaign, "a working,
+demonstrated mechanism... not merely proposed."
+
+**Independent reviewer position.** Re-derives component_overlap to 3 and architecture_overlap to 2
+(both down one point); no trigger fires under either adjacency reading (longest contiguous run is 2:
+Reasoning and Knowledge Update, separated by an unbroken run of absent stages). The state model is a
+type *hierarchy* (ICE subtypes exist only under Information Content Entities), not orthogonal axes
+applied uniformly. Recommends dropping H3 entirely as a challenger: the provenance chain has zero
+conflict/trust use, and H3's operative clause is that provenance *influences conflict resolution* —
+`conflict_trust_mechanism` is confirmed NOT_APPLICABLE by direct read, so the chain illustrates the
+gap H3 claims to fill rather than closing it. Most significantly, finds the row's central H11 claim
+unsupported by the primary text: field 27 quotes Sec.2's mechanism description verbatim but drops
+the immediately preceding sentence, "We are developing a feedback loop for iterative refinement"
+(present-progressive, not completed), and the schema-deficit-to-GitHub-issue loop never appears in
+Section 4 (the paper's own Demonstration section) — no example, instance, or evaluation anywhere.
+Section 6 (Conclusion & Future Work), which the row's evidence_locator never cites, states plainly:
+"Our future work focuses on developing the virtuous cycle of using experience of the systems' use
+curation work to improve schema + code design as an automated agentic loop." Recommends downgrading
+this source from "strongest H11 match found" to a background/adjacent data point, and downgrading
+`interpretation_confidence` from high to medium, since a high-confidence read should not have missed
+the source's own future-work framing of its central claim.
+
+**Resolution.** `evidence_locator`, `feedback_to_knowledge_mechanism`, `strongest_dsystem_overlap`,
+and `interpretation_confidence` corrected in `04_evidence_matrix.csv` to state the loop as
+in-progress rather than demonstrated and to extend the locator to the sections that establish this.
+The score, flag, and hypotheses_challenged disagreements are recorded here as judgment disputes per
+the coordinator's addressing; `component_overlap_score`, `architecture_overlap_score`,
+`critical_collision`, and `hypotheses_challenged` (H1;H3;H11) are left exactly as scored. Had the
+reviewer's re-derivation been authorized, this row's flag would be dropped and H3 removed from
+hypotheses_challenged.
 
 ---
 
