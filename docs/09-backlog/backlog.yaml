@@ -4995,7 +4995,7 @@ items:
     than complete because GOV-003's demo-track completion exception names phase-demo-01
     through phase-demo-06 and not this phase, so /session-close remains the only path to
     complete. Visual review used headless Chrome from file:// rather than the Playwright
-    MCP server, whose browser profile a peer agent holds; see SESS-2026-09-10-09. The
+    MCP server, whose browser profile a peer agent holds; see SESS-2026-09-10-14. The
     branch is not integrated — that is the owner's call.
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry

@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-demo-glossary-diagrams
-code: SESS-2026-09-10-09
+code: SESS-2026-09-10-14
 title: Skills-and-agents glossary and diagram library — audit and build (phase-demo-07)
 kind: session
 status: active
