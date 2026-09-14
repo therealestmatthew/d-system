@@ -6667,6 +6667,7 @@ items:
   - uv run python -m src.governance exits 0.
   deliverables:
   - .claude/skills/partition-ideas/
-  next_action: Write the open-set gate first and run it against the live log - there are
-    14 open ideas today, 000208 to 000221, so the non-empty path is the one that can
-    actually be exercised.
+  next_action: Write the open-set gate first and run it against the live log, which has
+    had a non-empty open set every time it has been checked since the first sweep, so the
+    non-empty path is the one that can actually be exercised. Read the count from fold()
+    rather than from this line.
