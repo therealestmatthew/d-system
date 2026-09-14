@@ -14,7 +14,7 @@ depends_on: [doc-consultant-demo-kit-requirements]
 
 # Consultant demo kit build
 
-Builds the 16 components `REQ-008` specifies: 6 commands, 2 skills, 6 prompts, 2 agents. Nothing
+Builds the 20 components `REQ-008` specifies: 6 commands, 6 skills, 6 prompts, 2 agents. Nothing
 else. The roster reached this size through a blind adversarial triage of 23 proposed entries,
 recorded on ideas `000171`-`000193`; this plan records what survived, what changed, and why.
 
@@ -38,7 +38,15 @@ should look for, it describes the *kind* of change, not a specific one.
 
 ## What the triage changed
 
-Seven entries are cut, each recorded on its idea with the reason, none discarded:
+The blind triage cut seven entries from the roster that was proposed during the design round. On
+2026-09-13 the owner replaced that roster's commands and skills wholesale with their own
+(ideas `000222` and `000223`), so most of these components no longer exist in any form. The table is
+kept because the *reasons* outlived the components: they are the failure modes any replacement has to
+avoid, and three of them shaped the current roster directly — arguments belong to commands, a skill
+firing on an unobservable event cannot work, and a component whose lesson is invisible teaches
+nothing.
+
+Each cut is recorded on its own idea, and none was discarded:
 
 | Cut | Reason |
 |---|---|
@@ -64,18 +72,22 @@ spawning, but a skill firing on recognition looks exactly like Claude being help
 names itself in its first output line, or the skills third of the roster teaches nothing the audience
 can attribute.
 
-**`context-me` writes nothing.** Its subject is the context file, which in this repository is
-`CLAUDE.md` — a file no agent may write. The resolution is not a stand-in file narrated as though it
-were the real one; that would be a prop pretending to be the thing the entry exists to teach. The
-command drafts the content to the screen and the consultant saves it themselves, which is both honest
-and the better demonstration: the audience watches the file become theirs.
+**Nothing drafts a stand-in context file.** The earlier roster had a command whose subject was
+the context file, which in this repository is `CLAUDE.md` — a file no agent may write. Resolving that
+with a stand-in narrated as though it were the real one would have been a prop pretending to be the
+thing the component existed to teach. The owner's roster settles it differently and better:
+`demo-cmd-context-check` reports what Claude knows and what is missing, and never authors the file at
+all. Noticing the gap is the lesson; filling it is the consultant's.
 
 ## Constraints this build works under
 
 The kit is built into this repository's live `.claude/` directory, which the blind reviewers argued
 against and the owner decided.
 
-- **No kit component writes any file here.** This covers `context-me` and every other entry.
+- **No kit component writes a repository file.** Components that produce an output file —
+  `demo-skill-flowchart` and `demo-skill-scorecard`, which emit HTML — write only to their stated
+  output location. Nothing writes into `docs/`, `.claude/`, `_data/` or any governed path, and
+  nothing writes `CLAUDE.md`.
 - **Kit entries will appear in `orient`'s command enumeration and the workbench agent picker** during
   ordinary D-System work. No parking mechanism is in scope. `REQ-008` records this as an accepted
   consequence, not an open defect.
@@ -89,101 +101,139 @@ have; anything not listed is the builder's judgement, and anything contradicting
 
 ### Commands
 
-**`/context-me`** — interviews the consultant and produces their context file.
+Six commands, owner-authored on 2026-09-13 (idea `000223`), replacing the set proposed during the
+design round. Names carry the `demo-cmd-` prefix.
 
-- A hard cap of **three questions**, chosen by what would most change the output. The command that
-  opens the demo models the load-bearing idea rather than only describing it.
-- Covers **three fields**: who you are, who you write for, current engagement. House style is
-  deliberately absent — `/one-pager` demonstrates voice better than a declared rule states it.
-- Ends by **naming the file and where it goes**, stating plainly that it has written nothing and the
-  saving is the consultant's.
-- Emitting one complete paste-ready block was offered and not selected; the format of the content is
-  the builder's judgement.
+**`demo-cmd-teach-me`** — takes any topic and produces a tiered explanation with a hands-on exercise.
 
-**`/whats-load-bearing`** — the kit's central idea, made executable.
+- **Tiered**: the same topic at increasing depth, so the reader stops where they are satisfied rather
+  than reading to the end to find their level.
+- **Ends in an exercise**, not a summary. The hands-on step is what separates this from an article.
+- **Any topic**: it names no domain of its own and carries no worked example.
 
-- **Ranks** the missing details rather than listing them. The ranking carries the judgement; a flat
-  list of everything absent is a checklist.
-- Asks only the **top two or three** after ranking.
-- Says **why** each detail is load-bearing — what the answer would change to, depending on the reply.
-  Without this the audience sees questions and cannot tell they are the right ones.
-- **Names what it will assume** for anything left unanswered, so declining is a choice rather than a
-  dead end.
+**`demo-cmd-askme`** — forces Claude to interview the consultant before acting. The flagship
+do-not-guess demonstration, and the command half of the kit's one duplicated capability.
 
-**`/stakeholder-read`** — a person's likely position and what would move them.
+- **Interviews first, acts second.** It does not answer and then check; it asks and waits.
+- **Asks only what would change the output**, and says why each question matters, so the reader can
+  tell these are the right questions rather than a form to fill in.
+- **Names what it will assume** for anything left unanswered.
+- Pairs with `demo-skill-ask-me`. Identical stems, differing only by type prefix: the pairing is
+  deliberate and the prefix is the only thing that says how each is invoked.
 
-- **Positions and interests, never personality.** What they are protecting and what they would trade;
-  no temperament, no motive-guessing.
-- **Separates what it was told from what it inferred**, in two marked sections. Without the split a
-  consultant can say it restated the input, and be right.
-- **States what would change its read** — the fact that, if true, flips the assessment.
-- Asks for the **relationship**, not just the role: someone who has been overruled before reads a
-  proposed change differently from someone who has not.
+**`demo-cmd-explain-this`** — points at anything the consultant has in front of them and explains it
+in plain business English.
 
-**`/capture-this`** — turns what just worked into something reusable.
+- **Any artifact**: a document, a spreadsheet, a system message, an error, a file. Broadened from
+  files, folders and errors so the command is not a developer tool wearing a business label, and so
+  it satisfies the kit's no-code rule rather than forcing an exception to it.
+- **No jargon in the output**, including no jargon it invents to explain jargon.
+- **Says when it is unsure** what something is, instead of producing a confident wrong reading.
 
-- **Decides command or skill and says why** in one line — deliberate use means a command, recognition
-  means a skill. It teaches the distinction at the moment it matters.
-- **Names what it generalised and what it dropped.** A good prompt is specific and a reusable one is
-  not; which specifics became parameters is the craft being taught.
-- Takes an **optional argument** for what to capture, defaulting to the recent context, and
-  **recommends the capture topic** from that context rather than guessing silently.
-- **Clarifies through `AskUserQuestion`**, iterating over what kind of component it should become,
-  what to call it, where it goes, and how it will be used later — every question carrying a
-  recommendation, and multi-select unless a single choice is the correct display.
-- **Shows the file content and writes nothing**, consistent with `/context-me` and `REQ-008` K03.
+**`demo-cmd-context-check`** — shows what Claude currently knows about the project and what is
+missing. Makes the invisible visible.
 
-**`/one-pager`** — messy notes into a client-ready page.
+- **Two lists: known and missing.** The missing list is the useful half.
+- **Ranks the gaps** by what they would change, so the reader knows which to close first.
+- **Does not author the context file.** The kit deliberately teaches noticing the gap rather than
+  filling it; showing what is missing implies what to write.
 
-- **States which context it used**, in a short line. This is what makes the context-file-on/off
-  comparison legible: with the file absent, that line says so and the audience sees the difference
-  instead of being told about it.
-- **Fixed structure, stated up front**: situation, recommendation, what it costs, what happens next.
-  A predictable shape is what lets the two comparison runs differ in substance rather than layout.
-- **Flags what it had to invent** — anything filled in that the notes did not contain, so nobody
-  sends a document containing a fabricated figure.
-- Takes notes as `$ARGUMENTS` or from the conversation.
+**`demo-cmd-rubber-duck`** — asks probing questions about a half-formed idea and offers no solutions
+until invited.
 
-**`/client-ready`** — adapts a draft for an audience. The component that carries arguments.
+- **Withholds solutions by default.** This is the rule that makes the command work, and the one a
+  model will break without an explicit instruction not to.
+- **Questions probe, not clarify** — what the idea assumes, what it would take to be wrong, what it
+  rules out.
+- **Offers to switch modes** once, rather than drifting into advice unasked.
 
-- **Three arguments documented in a table**: audience, length, format, declared in `argument-hint`.
-  This is why it is a command and not a skill.
-- **Shows what changed and why** after the adapted draft — what moved, what was cut, what was
-  softened, and which argument drove each. Otherwise the audience sees a second draft and cannot tell
-  what the arguments did.
-- **Refuses to change substance.** It adapts form, length and emphasis and never alters a number, a
-  commitment or a recommendation. Stated as a rule with its reason: a consultant must be able to
-  trust that adapting for an audience did not quietly change the advice.
-- **Defaults every argument**, so a live run cannot fail on a typo and the arguments can be added one
-  at a time to show their effect.
+**`demo-cmd-second-opinion`** — re-examines Claude's own previous answer adversarially and reports
+what it would change.
+
+- **Argues against its own prior output**, not a summary of it.
+- **Reports what it would change and what it would keep.** An adversarial pass that overturns
+  everything is as useless as one that overturns nothing.
+- **States what evidence would settle it** where it is genuinely unsure.
 
 ### Skills
 
-**`load-bearing-details`** — the recognition-fired twin of `/whats-load-bearing`.
+Six skills, owner-authored on 2026-09-13 (idea `000222`), replacing the set proposed during the
+design round. Names carry the `demo-skill-` prefix. Every skill names itself in its first output line
+so the audience can attribute the firing, and every description states both its firing cues and the
+cases where it must not fire.
 
-- **Names itself in its first output line.** Without this the firing is indistinguishable from
-  Claude being ordinarily helpful, and half the command-versus-skill lesson is invisible.
-- Its **description lists both firing and non-firing phrasings.** The trigger is an absence, which a
-  description cannot match directly; naming the request shapes that should fire it — and the
-  already-specific ones that must not — is the workaround.
-- Asks **at most two** questions, against the command's three. It arrives uninvited, so it costs
-  less than the one you chose to run, and the asymmetry gives the presenter something concrete to
-  point at.
-- **Defers when work is already underway**, noting the gap in a line rather than interrupting.
+**`demo-skill-flowchart`** — turns a described process into a rendered diagram. The kit's best visual
+payoff.
 
-**`notes-to-commitments`** — fires on pasted meeting notes.
+- **Fires when a process is described in sequence** — steps, hand-offs, conditions — which is a cue
+  present in the text.
+- **Produces two outputs**: a standalone self-contained HTML file that opens in any browser, which is
+  what keeps the component general and portable, and a repository-specific path that publishes into
+  the HTML viewer. The standalone file is the component; the viewer path is this repository's
+  convenience.
+- **Reflects the process as described**, including where it is incoherent. A diagram that silently
+  fixes a gap hides the finding the consultant most needs.
 
-- **Never invents an owner or a date.** Missing ones are reported missing. This repository's own
-  `schemas/commitment.schema.json` independently arrived at the same protected-field rule.
-- **Unowned commitments are the headline output**, presented first rather than buried in a table.
-  That list is the finding a consultant recognises from their own meetings.
-- **Names itself in its first output line.**
-- **Separates commitments from discussion**, saying which it treated as which, so the consultant can
-  correct it rather than trusting a filtered list they cannot audit.
+**`demo-skill-brainstorm`** — structured divergent-then-convergent ideation with explicit option
+scoring.
+
+- **Diverges before it converges**, and says which phase it is in, so the consultant does not read
+  early options as recommendations.
+- **Scores explicitly** against stated criteria rather than ranking by feel.
+- **Calls `demo-skill-ask-me`** to establish the criteria rather than assuming them.
+
+**`demo-skill-ask-me`** — the elicitation engine, and the skill half of the kit's one duplicated
+capability.
+
+- **Parameterised** by question count, single versus multi-select, and whether to include
+  recommendations. Parameters are read from how it is asked and **documented in a table in its body**
+  — skills carry no `argument-hint`, which is the command affordance, so the parameters are prose and
+  the table is the documentation.
+- **Recommends by default.** Include-or-exclude recommendations is one of its parameters and the
+  default is to include: a question offered with no recommendation moves the analysis back onto the
+  person answering.
+- **Other skills genuinely call it.** `flowchart`, `brainstorm` and `scorecard` invoke it to gather
+  what they need instead of each writing its own questioning. This makes the kit compose, and makes
+  this the most load-bearing component in it — a change here reaches three other skills.
+- Pairs with `demo-cmd-askme`.
+
+**`demo-skill-meeting-notes`** — raw notes in, structured summary with decisions, owners and risks
+out. The most immediately relatable component in the kit.
+
+- **Fires on pasted raw notes** — bullet fragments, names, dates — the most lexically recognisable
+  cue in the set.
+- **Never invents an owner and never invents a date.** Missing ones are reported missing. This rule
+  is inherited deliberately from the component this one replaced, and this repository's own
+  `schemas/commitment.schema.json` independently arrived at the same protected-field design.
+- **Separates decisions, owners and risks**, and says what it treated as discussion rather than
+  silently discarding it.
+
+**`demo-skill-scorecard`** — a weighted comparison matrix for any decision: vendor, approach, tool.
+
+- **Weights are explicit and stated before scoring**, so the conclusion is traceable to the weights
+  rather than asserted.
+- **Produces two outputs**, as `flowchart` does: a standalone HTML table and a repository-specific
+  publish into the HTML viewer.
+- **Calls `demo-skill-ask-me`** for the options and the criteria.
+- **Names what the weights are doing** — which option wins under different weightings, so the
+  consultant sees the decision's sensitivity rather than a single verdict.
+
+**`demo-skill-make-it-a-skill`** — watches what was just done manually and drafts a reusable skill
+from it. The moment that makes skills self-propagating, and the replacement for the capture-this
+command.
+
+- **Fires on a repeated or manual sequence** the consultant has just worked through by hand.
+- **Names what it generalised and what it dropped.** A good sequence is specific and a reusable one
+  is not; which specifics became parameters is the craft being taught.
+- **Shows the draft and writes nothing.** The consultant saves it, which is both honest and the
+  better demonstration.
+- **Says why it is a skill rather than a command** — recognition versus deliberate invocation —
+  teaching the distinction at the moment it is being decided.
+
 
 ### Agents
 
-**`objection-panel`** — three stakeholders against a recommendation, in a separate context.
+**`demo-agent-objection-panel`** — three stakeholders against a recommendation, in a separate context.
 
 - **Three named roles, one of them sympathetic.** If everyone objects the output is a wall of
   resistance; the disagreement between panellists is what teaches sequencing.
@@ -194,7 +244,7 @@ have; anything not listed is the builder's judgement, and anything contradicting
 - **Declares its tool posture explicitly.** It needs no write access, and saying so keeps the
   scoping-is-deliberate lesson consistent across both agents.
 
-**`evidence-checker`** — traces every number in a draft to a source.
+**`demo-agent-evidence-checker`** — traces every number in a draft to a source.
 
 - **Tools: `Read`, `Grep`, `Glob` — no `Bash`.** Bash is a write channel here, so excluding it is
   what makes the read-only claim true rather than decorative.
@@ -257,8 +307,9 @@ so the owner can tell the room whether it happened, including when it did not.
 - **Shows form changing, not only tone**: what gets led with, what is cut, what becomes an appendix.
 - **Names what the audience will do with it.** A document for approval and a document for information
   are different things, and the decision is what drives the form.
-- **Points at `/client-ready`**, so the ladder visibly feeds the component roster rather than sitting
-  beside it.
+- **Names the comparison to make** between the two runs. The earlier roster had a command that
+  automated this and the owner's roster does not, so the rung stands on its own rather than pointing
+  at a component.
 
 **Rung 5 — the interview, where the constraint arrives.** The rung the reordering exists for.
 
@@ -289,10 +340,12 @@ so the owner can tell the room whether it happened, including when it did not.
 Four independent phases, one per component type. Nothing depends on anything else, because the
 fixture work that would have created a dependency is out of scope.
 
-1. **Commands** — `context-me`, `whats-load-bearing`, `stakeholder-read`, `capture-this`,
-   `one-pager`, `client-ready`.
-2. **Skills** — `load-bearing-details`, `notes-to-commitments`, both self-announcing.
+1. **Commands** — `teach-me`, `askme`, `explain-this`, `context-check`, `rubber-duck`,
+   `second-opinion`, all `demo-cmd-` prefixed.
+2. **Skills** — `flowchart`, `brainstorm`, `ask-me`, `meeting-notes`, `scorecard`,
+   `make-it-a-skill`, all `demo-skill-` prefixed and all self-announcing. Build `ask-me` first:
+   three of the others call it.
 3. **Prompts** — the reordered ladder and the anti-pattern gallery.
-4. **Agents** — `objection-panel`, `evidence-checker`, tool lists explicit.
+4. **Agents** — `demo-agent-objection-panel`, `demo-agent-evidence-checker`, tool lists explicit.
 
 Testing and demonstration are the owner's, and are not phases here.

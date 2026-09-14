@@ -10742,3 +10742,79 @@ This was found by the independent review at phase-lit-05's close, which flagged 
 Resolving it is a contract change and therefore the owner's call, not an agent's. The plausible readings are that second_review's writer clause should say the flagging dispatch sets pending and LIT-06 X2 sets the outcome; or that the field should be split into a request and a result; or that the clause is right and the flag rules should not imply a write. An agent should not pick among these mid-campaign, and PROMPT-029 and PLAN-023.03 are both governed documents.
 
 Raised by the coordinator at phase-lit-05's close. See SESS-2026-09-13-04.
+
+---
+
+## 000222 · Demo kit skills roster, owner-authored: the six the kit actually ships
+
+**Created 2026-09-13T23:29:29-04:00 · Status: `open`**
+
+The consultant demo kit's six skills, given by the owner on 2026-09-13 and replacing the skill roster
+proposed during the earlier design round. These are the ones the owner aligned with.
+
+demo-skill-flowchart - turns a described process into a rendered diagram. The kit's best visual
+payoff.
+demo-skill-brainstorm - structured divergent-then-convergent ideation with explicit option scoring.
+demo-skill-ask-me - the elicitation engine, parameterised by question count, single versus
+multi-select, and whether to include recommendations. Other skills call it rather than each writing
+its own questioning, which makes the kit compose and makes this the most load-bearing component in
+it.
+demo-skill-meeting-notes - raw notes in, structured summary with decisions, owners and risks out.
+Instantly relatable to consultants. It inherits the protected-field rule from the skill it replaces:
+never invent an owner, never invent a date.
+demo-skill-scorecard - a weighted comparison matrix for any decision - vendor, approach, tool.
+demo-skill-make-it-a-skill - watches what was just done manually and drafts a reusable skill from it.
+The moment that makes skills self-propagating, and it replaces the capture-this command.
+
+Two consequences recorded with the roster. Commands drop to five, since make-it-a-skill takes over
+capture-this's job as a skill rather than a command. And the command-and-skill pair that teaches
+invocation as the only variable becomes demo-cmd-whats-load-bearing with demo-skill-ask-me: both
+elicit what the model needs, one invoked and one fired on recognition and reusable by other skills.
+
+Visual output is built twice: a standalone self-contained HTML file that opens in any browser, which
+keeps the component general, and a repository-specific path that publishes into the HTML viewer.
+
+Naming: demo-skill-, demo-cmd-, demo-agent-. This accepts that demo- names two different things
+among the agents in this repository, since the stage build already owns demo-adversary, demo-orch-
+and demo-creator-.
+
+**Links**
+
+- relates_to ← `000223`
+
+---
+
+## 000223 · Demo kit commands roster, owner-authored: the six the kit actually ships
+
+**Created 2026-09-13T23:29:29-04:00 · Status: `open`**
+
+The consultant demo kit's six commands, given by the owner on 2026-09-13 and replacing the command
+roster proposed during the earlier design round, exactly as the skills roster was replaced.
+
+demo-cmd-teach-me - takes any topic and produces a tiered explanation with a hands-on exercise. A
+generalized form of a teach-me-git command the owner had previously.
+demo-cmd-askme - forces Claude to interview the consultant before acting. The flagship do-not-guess,
+ask demonstration.
+demo-cmd-explain-this - points at any file, folder or error and explains it in plain business
+English, no jargon.
+demo-cmd-context-check - shows what Claude currently knows about the project and what is missing,
+making the invisible visible.
+demo-cmd-rubber-duck - asks probing questions about a half-formed idea and offers no solutions until
+invited.
+demo-cmd-second-opinion - re-examines Claude's own previous answer adversarially and reports what it
+would change.
+
+Replaced from the earlier roster: context-me, whats-load-bearing, stakeholder-read, one-pager and
+client-ready. capture-this was already replaced by the make-it-a-skill skill.
+
+Consequences to resolve, recorded here rather than assumed: demo-cmd-askme and demo-skill-ask-me are
+one capability in two invocation models, which is the pair that teaches invocation as the only
+variable - and their names differ by one hyphen, which needs deciding. demo-cmd-explain-this points
+at files, folders and errors, which is developer territory and sits against the kit's own rule that
+no component carries code, git, debugging or repository content. demo-cmd-context-check covers what
+Claude knows, where the replaced context-me built the context file; whether the kit still teaches
+how to create one is open.
+
+**Links**
+
+- relates_to → `000222`
