@@ -264,10 +264,10 @@ CI regenerates it and fails on any difference.
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 0 | 0 | 10 | agent-demo-data, agent-demo-stage, agent-fable |
-| PLAN-023 | doc-lit-campaign | draft | 1 | 0 | 7 | agent-lit |
-| PLAN-023.01 | doc-lit-campaign-scope | draft | 1 | 0 | 7 | agent-lit |
-| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 1 | 0 | 7 | agent-lit |
-| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 0 | 7 | agent-lit |
+| PLAN-023 | doc-lit-campaign | draft | 0 | 1 | 7 | agent-lit |
+| PLAN-023.01 | doc-lit-campaign-scope | draft | 0 | 1 | 7 | agent-lit |
+| PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 0 | 1 | 7 | agent-lit |
+| PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 0 | 1 | 7 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 0 | 1 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
