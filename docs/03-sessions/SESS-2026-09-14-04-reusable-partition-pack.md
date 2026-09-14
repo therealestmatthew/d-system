@@ -92,15 +92,28 @@ Per-block structure, computed from the document:
 
 ## Acceptance
 
-**1. All six blocks present, each independently dispatchable and opening with the idempotency
-sentence — NOT MET as written.** All six blocks exist in order. Five carry the idempotency sentence.
-`S` does not, and is not dispatchable, because it is not a dispatch: it is the protocol the
-coordinating session runs itself, and `PROMPT-032` marks its own `S` the same way — "**Not a
-dispatch.**", with no idempotency sentence. The document follows the established convention
-correctly; the condition as drafted demands dispatchability of a block that is defined as not being
-one. This is a defect in the acceptance condition rather than in the deliverable, and it is recorded
-as unmet rather than silently reinterpreted. Resolving it is an owner decision at close: amend the
-condition to exempt `S`, or require an idempotency sentence on `S` against the precedent.
+**1. All six blocks present; the four dispatchable blocks open with the idempotency sentence; `S`
+present and marked as not a dispatch — Met, against the condition as amended on 2026-09-14.**
+
+This condition was **recorded unmet first**, and the sequence matters enough to keep in the record.
+As originally drafted it required all six blocks to be "independently dispatchable and opening with
+the idempotency sentence." All six blocks exist in order, and `R1`, `R4`, `A1`, `A2` and `G` each
+carry the sentence — but `S` carries neither, because `S` is not a dispatch: it is the protocol the
+coordinating session runs itself after the audits return, and `PROMPT-032` marks its own `S` as
+"**Not a dispatch.**" with no idempotency sentence either. The deliverable followed the precedent;
+the condition demanded dispatchability of a block defined as not being one.
+
+The owner ratified the amendment on 2026-09-14: require the sentence of the dispatchable blocks, and
+require `S` to be present and explicitly marked as not a dispatch. The rejected alternative was
+adding the sentence to `S` so the original wording passed literally. The decision and its reasoning
+are recorded in [GOV-003](../08-governance/GOV-003-backlog-decisions.md) under "A non-dispatch block
+carries no idempotency sentence", including why it is recorded rather than quietly edited — an
+acceptance list that can be amended silently after seeing the deliverable is worth nothing, because
+nothing then distinguishes a wrong condition from a moved bar.
+
+Against the amended condition: all six blocks present; `R1`, `R4`, `A1`, `A2` each open with the
+idempotency sentence; `S` is headed "synthesis protocol" and marked `**Not a dispatch.**` in the
+document. **Met.**
 
 **2. No pinned corpus size, per-build owner ruling or kick-off delta anywhere — Met.** The grep in
 verification 1 returns nothing.
@@ -122,36 +135,41 @@ but not the answer, and cites `000205` as the record of that result.
 
 ## Backlog
 
-`phase-part-01` stays **`status: active`** with `agent: agent-partition`. Acceptance condition 1 is
-unmet, so this phase is not a candidate for closure in its current state regardless of anything
-else.
+`phase-part-01` stays **`status: active`** with `agent: agent-partition`. All five acceptance
+conditions are now met, condition 1 against its amended wording. The phase is **ready for closure**
+but is not closed here: `status: complete` is `/session-close`'s alone to write, after its own
+independent review, and an agent must never reach for it.
 
-`next_action`: Rule on acceptance condition 1, which demands an idempotency sentence and
-dispatchability of `S` — a block that is by definition not a dispatch, and that `PROMPT-032`
-marks the same way. Either exempt `S` in the condition or require the sentence against precedent.
-The deliverable itself needs no change for conditions 2 through 5.
+`next_action`: Ready for `/session-close`. All five acceptance conditions met; condition 1 amended
+2026-09-14 per GOV-003 and the deliverable unchanged. Branch integrated into dev.
 
-`deliverables` was widened on `dev` to include `docs/08-governance/codes.yaml`, because
-`src/governance/codes.py:205` requires a code's reservation to be removed in the same change that
-spends it, and this repository has had repeated code races, so the lock belongs where peers can see
-it.
+`deliverables` was widened twice. `docs/08-governance/codes.yaml` was added on `dev` in its own
+commit, because `src/governance/codes.py:205` requires a code's reservation to be removed in the
+same change that spends it, and this repository has had repeated code races, so the lock belongs
+where peers can see it. `docs/08-governance/GOV-003-backlog-decisions.md` was added later, on the
+branch rather than on `dev`, to carry the acceptance amendment. That is a deviation from
+`AGENTS.md`'s "update the declarations on `dev`" instruction, taken because integration followed
+within minutes and no peer held `sys-governance` at the time — recorded here rather than left
+implicit.
 
 `next_up` was **not** pruned. `phase-part-01` is still listed and is still `active`; nothing reached
 `complete` this run.
 
 ## Unresolved
 
-- **Acceptance condition 1's wording**, as above — the one thing blocking this phase.
-- **The branch is unmerged.** `agent/phase-part-01` carries `b503db5` and is pushed; integration
-  needs the owner's approval and a primary-checkout gate run.
-- **`phase-part-02` and `phase-part-03` remain blocked.** `phase-part-02` declares `sys-portfolio`,
-  which the active `phase-demo-07` locks, and `phase-part-03` depends on `phase-part-02`. So the
-  `/partition-ideas` skill cannot be built until that lock clears. The owner ruled on 2026-09-14 to
-  leave the declaration as-is and defer both rather than narrow it.
-- **`max_active` is 3 of 3** with this claim, so no further phase can be claimed until one
-  completes.
-- **The idea-triage sweep is deferred** for the same `sys-portfolio` lock. 23 ideas are open,
-  `000208`–`000223` plus later arrivals.
+- **Nothing blocks this phase.** Condition 1's wording was resolved by owner ruling on 2026-09-14
+  and recorded in `GOV-003`; the branch is integrated. Only `/session-close` remains, which is the
+  owner's to run.
+- **`phase-part-02` is now unblocked.** `phase-demo-07` reached `complete` later on 2026-09-14,
+  releasing `sys-portfolio`, so `phase-part-02` shows no conflict and is ready to claim.
+  `phase-part-03` — the `/partition-ideas` skill — still waits on `phase-part-02` by `depends_on`,
+  and additionally needs `sys-governance` free, so it follows this phase's closure.
+- **This phase's claim is now the queue's bottleneck.** It holds `sys-governance`, which conflicts
+  with nine ready phases — `phase-port-02`, `phase-ses-01`, `phase-prog-01` (P3), `phase-prog-12`,
+  `phase-gov-01`, `phase-gov-04`, `phase-gov-05`, `phase-idea-05` and `phase-tool-02`. Closing it
+  releases all nine. `max_active` is 1 of 3 since two peers closed.
+- **The idea-triage sweep is no longer blocked** — `sys-portfolio` is free. 24 ideas are open,
+  `000208` onward, and the set has grown every time it was checked this session.
 - **`tools/build_idea_corpus.py` still emits `corpus-R2.md` and `corpus-R3.md`** unconditionally.
   `PROMPT-034` documents only the files it reads, which is correct for the pack, but the tool
   produces two corpora a four-dispatch sweep never opens. Tidying that belongs to `phase-part-02`,

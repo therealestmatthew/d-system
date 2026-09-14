@@ -6838,8 +6838,9 @@ items:
     which has no majority to read and two indistinguishable explanations.
   - Leave PROMPT-032 active and unedited as the record of the first sweep.
   acceptance:
-  - PROMPT-034 contains all six blocks, each independently dispatchable and opening
-    with the idempotency sentence.
+  - PROMPT-034 contains all six blocks. The four dispatchable blocks (R1, R4, A1, A2)
+    each open with the idempotency sentence; S is present and explicitly marked as not
+    a dispatch, per PROMPT-032's precedent. Amended 2026-09-14 - see GOV-003.
   - No pinned corpus size, per-build owner ruling or kick-off delta appears anywhere
     in it.
   - The control brief mentions findings, other analysts and differing input nowhere.
@@ -6857,6 +6858,7 @@ items:
   deliverables:
   - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
   - docs/08-governance/codes.yaml
+  - docs/08-governance/GOV-003-backlog-decisions.md
   session: doc-session-reusable-partition-pack
   completion_evidence:
   - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
@@ -6865,11 +6867,9 @@ items:
     unmet as written because it demands an idempotency sentence and dispatchability of S,
     which is by definition not a dispatch and which PROMPT-032 marks the same way. Branch
     agent/phase-part-01 at b503db5, pushed, unmerged.
-  next_action: Rule on acceptance condition 1, which demands an idempotency sentence and
-    dispatchability of S - a block that is by definition not a dispatch, and that
-    PROMPT-032 marks the same way. Either exempt S in the condition or require the
-    sentence against precedent. Conditions 2-5 are met and the deliverable needs no
-    change for them.
+  next_action: Ready for /session-close. All five acceptance conditions met - condition 1
+    against the wording amended 2026-09-14 per GOV-003, with the deliverable unchanged.
+    Closing this releases sys-governance, which nine ready phases currently conflict with.
 - id: phase-part-02
   title: Make the corpus status selectable and test the corpus builder
   plan: doc-repeatable-idea-partition

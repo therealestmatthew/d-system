@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-13'
+updated: '2026-09-14'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -358,3 +358,33 @@ tension with this rule by construction; an MCP-held claim is the candidate subst
 does not depend on which checkout is primary — see `000020`) and `000152` (a registry of active
 worktrees that agents must register in before starting work and deregister from when finished, so
 where each agent is working is a fact to read rather than an inference to draw).
+
+## A non-dispatch block carries no idempotency sentence
+
+`phase-part-01`'s first acceptance condition required that `PROMPT-034` "contains all six blocks,
+each independently dispatchable and opening with the idempotency sentence." The finished pack failed
+it on one block, and the failure was in the condition rather than in the document.
+
+Four of the six blocks — the analyst brief `R1`, the control `R4`, and the two adversarial audits
+`A1` and `A2` — are dispatched to subagents, and each opens with the sentence that makes a dispatch
+safe to re-send: *"Assess the current state of the repository against the deliverables below; do
+only what is missing; report what already existed."* The gate `G` carries it too, because a
+coordinator may re-run the gate checklist.
+
+`S` is different. It is the synthesis protocol, and it is what the coordinating session does itself
+after the audits return. Nothing dispatches it. `PROMPT-032` had already settled this for the first
+sweep: its own `S` section is headed "**Not a dispatch.**" and carries no idempotency sentence.
+Requiring one of `S` would put a dispatch preamble on a block nothing sends, and would make the
+reusable pack diverge from the precedent it was extracted from.
+
+**The decision, ratified by the owner on 2026-09-14:** the condition is amended to require the
+idempotency sentence of the *dispatchable* blocks, and to require that `S` be present and
+explicitly marked as not a dispatch. The alternative — adding the sentence to `S` so the original
+wording passed literally — was considered and rejected on the precedent above.
+
+**Why this is recorded rather than quietly edited.** Amending an acceptance condition after seeing
+the deliverable is exactly the move that makes an acceptance list worthless if it goes unrecorded,
+because nothing distinguishes "the condition was wrong" from "the work missed the bar and the bar
+moved." The checkpoint recorded the condition as **unmet** first, in `SESS-2026-09-14-04`, and the
+amendment came afterwards as a separate owner ruling. Anyone auditing the phase can see both states
+and judge the change for themselves.
