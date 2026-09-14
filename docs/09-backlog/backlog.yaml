@@ -6518,9 +6518,26 @@ items:
   - research/literature-review/03_source_inventory.csv
   - research/literature-review/04_evidence_matrix.csv
   - research/literature-review/06_hypothesis_tests.md
-  next_action: Dispatch dedicated Phase E collision searches for H1, H4 and H11 on the
-    campaign branch agent/lit-campaign. Read SESS-2026-09-14-01 first - it records why these
-    three are thin and what their retracted challengers were.
+  session: doc-session-literature-review-pass-3b
+  completion_evidence:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/06_hypothesis_tests.md
+  - research/literature-review/05_critical_collisions.md
+  result: 'All four acceptance conditions met and all eight LIT-08 G gate measurements pass.
+    Ledger 997 to 1079 rows (LIT-08-S001 to S082, contiguous, all pass 3); H1 3 to 27, H4 15
+    to 47, H11 4 to 30, every row a distinct query. Matrix 34 to 49 rows, 43 fields, zero
+    blanks. Five new critical_collision yes rows, all five independently second-reviewed,
+    all five confirmed, zero pending. H1 and H11 re-examined and explicitly unchanged at
+    INSUFFICIENT_EVIDENCE; H4 moves to KNOWN_COMPONENT_NEW_INTEGRATION on a positive match
+    (goldman-2001), not on an absence. Still zero POTENTIALLY_DISTINCT and zero NOVEL.
+    Duplicate rate fell 20.0 to 15.0 percent, reported as a trend only per ruling 8.'
+  next_action: None outstanding for this phase's scope - awaiting the owner's /session-close.
+    Two items are recorded for that review, not for further work here - H4's status rests on
+    a dispatch framing the X5 worker flagged as steering, and 21 of 33 top-band collision
+    candidates remain unread, which phase-lit-07 inherits and cannot close as a synthesis
+    phase. See SESS-2026-09-14-07.
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan

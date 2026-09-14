@@ -74,7 +74,7 @@ exit 0
 `uv run pytest`, after the rebase
 
 ```text
-580 passed, 2 warnings in 36.82s
+580 passed, 2 warnings
 ```
 
 `uv run python tools/check_no_private_content.py`, with changes staged
@@ -89,6 +89,21 @@ exit 0
 **This is not a passing verification.** `_private/` is gitignored and absent from a worktree, so the
 tool builds an empty identifier list and reports `0 identifiers checked`. Idea `000150` records
 this. The real check runs in the primary checkout.
+
+**Ledger, matrix and inventory integrity** — the phase's third verification entry, written in prose
+rather than as a command. Measured by the coordinator directly against the files, and independently
+by `LIT-08 G`:
+
+```text
+00_search_ledger.csv:    1080 lines, 1080 CRLF, 0 LF-only; 1079 data rows; 15 fields on every row
+                         LIT-08-S001..S082 contiguous, no gaps; every LIT-08 row pass=3
+04_evidence_matrix.csv:  50 lines, 0 CRLF; 49 data rows; 43 fields on every row; 0 blank cells
+03_source_inventory.csv: 1124 lines, 0 CRLF; 1123 data rows; 13 fields on every row; 0 blank cells
+```
+
+The ledger carries 2 blank cells on one pre-existing Pass 1b row (`LIT-02-S045`, fields `kept` and
+`inclusion_rationale`), present since before this phase and **not** a contract violation — see
+Corrections.
 
 ### Delegation-pack section `LIT-08 G` — the phase gate
 
@@ -148,6 +163,46 @@ contiguous with no gaps; every `LIT-08` row carries `pass: 3`.
   explicitly unchanged with stated reasons; H4 moved. See below.
 - **This phase's duplicate rate is measured and reported against 44/220 as a trend, never asserted
   as saturation** — **Met.** 58/387 = 15.0%, reported as a falling trend, no saturation claimed.
+
+## Backlog
+
+`phase-lit-08` — `status: active`, `agent: agent-lit`. Left active deliberately: only the owner's
+`/session-close` moves a phase to `complete`, and an agent never marks one itself.
+
+`next_action`: None outstanding for the phase's own scope — all four acceptance conditions are met
+and all eight gate measurements pass. Awaiting the owner's `/session-close`. Two items are recorded
+for that review rather than for further work here: H4's status rests on a dispatch framing the
+worker flagged as steering (see Corrections), and 21 of 33 top-band collision candidates remain
+unread (see below), which is `phase-lit-07`'s inherited problem rather than this phase's.
+
+`completion_evidence` (files that exist now):
+
+- `research/literature-review/00_search_ledger.csv`
+- `research/literature-review/03_source_inventory.csv`
+- `research/literature-review/04_evidence_matrix.csv`
+- `research/literature-review/06_hypothesis_tests.md`
+- `research/literature-review/05_critical_collisions.md`
+
+`next_up`: unchanged. `phase-lit-08` was never in it, and nothing else became `complete` this
+session, so there was nothing to prune.
+
+## Unresolved
+
+- **H4's status may be contaminated by a coordinator dispatch framing**, which `X5` flagged
+  unprompted. H1 and H11 are unaffected. A re-derivation by an agent that never saw the framing is
+  the owner's call at `/session-close`. See Corrections.
+- **21 of 33 top-band collision candidates have never been deep-read** — 63.6% of the strongest
+  band, and three of this phase's strongest finds came from that unread set. `phase-lit-07` is
+  synthesis, not search, so it cannot close this itself.
+- **The campaign is further from saturation than it looked.** The duplicate rate fell 20.0% → 15.0%
+  when searches were aimed at neglected ground.
+- **Three fetch-tool fabrications and one uncritically-inherited self-reported metric** were caught
+  this phase, all by workers re-reading primary text. No governed rule currently requires that
+  re-verification; Block C's "summaries are leads" is the nearest thing and it is advisory.
+- **Carried from earlier phases**: `000221` (contract names `LIT-06 X2` as `second_review`'s sole
+  writer while the flagging dispatch writes `pending`), `000148` (the `source_type` enum, now
+  demonstrably short a bucket for live repositories), `000224` (a phase silently regressing from
+  `complete` still fails no check; `phase-gov-05` is queued for it).
 
 ## What the evidence phase found
 
