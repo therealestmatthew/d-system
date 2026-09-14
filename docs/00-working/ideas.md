@@ -11179,3 +11179,38 @@ campaign's phases and no check caught it. [[000224]]
 - relates_to ← `000227`
 - relates_to ← `000228`
 - relates_to ← `000229`
+
+---
+
+## 000231 · generate_glossary.py reports the unfiltered term count for a filtered glossary, so the number is useless as evidence
+
+**Created 2026-09-14T13:10:55-04:00 · Status: `open`**
+
+`tools/generate_glossary.py` builds `entries = load_concepts()` at line 102, then `render()` applies
+the tag and system filters internally into a local `filtered` list (lines 68-73). The success line
+at line 119 prints `len(entries)` — the count before filtering:
+
+    print(f"wrote {target} — {len(entries)} term(s)")
+
+So a filtered run and an unfiltered run report the same number. Reported by the phase-demo-07
+session on 2026-09-14, which hit it while trying to use the count as evidence: it printed
+"9 term(s)" identically for an unfiltered glossary rendering 61 headings and a filtered one
+rendering 18. Verified independently from the source afterwards.
+
+The output is harmless to the generated file — `render()` filters correctly and the glossary itself
+is right. The defect is in what the tool tells you it did.
+
+Why it is worth fixing rather than ignoring. A tool's success line is the thing a session pastes
+into a record as proof the step ran, and a phase's `verification` list can name a count. A number
+that is right for one invocation and silently wrong for another is worse than no number, because
+it reads as evidence. This is the same shape as the gate defects `phase-lit-06` hit twice — a
+measurement reported against the wrong population, passing every check because nothing compares it
+to anything.
+
+The fix is one line: report the length of the rendered set rather than the loaded set. Whether the
+unfiltered total is also worth printing alongside it (e.g. "18 of 61 term(s)") is a judgment for
+whoever picks it up; naming both would make a filtered run self-evidently filtered.
+
+Also worth checking at the same time whether any other tool under `tools/` prints a count taken
+before a filter, since this pattern would not be visible in any test that only asserts the
+generated file's content.
