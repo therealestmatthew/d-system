@@ -327,7 +327,35 @@ trivial illustrative example, not benchmarked or deployed. Its own reference lis
 ancestor with de-boer-architectural-knowledge-management-dissertation-2009 — confirming this is
 one lineage, not an independent invention.
 
-second_review: pending
+second_review: disputed: reviewer confirms component_overlap at 3 (not 4) and architecture_overlap
+at 2 (agreed); flag left unchanged. Two factual corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=5, architecture_overlap=4 — tied for the matrix's
+ceiling. The field's foundational 2005 reframing of architecture as accumulated decisions, a
+near-literal precursor to H7/H9, twenty years before D-System. Falsifies H7/H9's core claims for the
+decision/requirement segment; not evaluated or deployed at publication.
+
+**Independent reviewer position.** Re-derives component_overlap to 3 ("multiple relevant
+primitives") and architecture_overlap to 2, and finds the flag survives only through the
+directly-falsifies trigger (genuine idea-level precursors), not mechanism-level equivalence, since
+no typed provenance/actor schema, automation, or tool existed at publication — the paper's own
+conclusion states "Ongoing and future work on Archium includes the development of tool support"
+(Sec.4.8, p.99). The Athena case study is illustrated entirely with hand-drawn diagrams, never a
+real system trace. Read pp.79-100 in full, including Sec.4.6/4.7 which the row's own
+evidence_locator flagged as unread, and found no multi-actor model or retrieval mechanism anywhere
+in those sections either — contrary to the row's NOT_DETERMINABLE_FROM_ACCESS coding for
+`actor_model` and `retrieval_context_model`. The row's `implementation_availability` field
+understated the gap by focusing on whether Archium "survives" today rather than stating plainly that
+no tool existed at the time.
+
+**Resolution.** `implementation_availability`, `actor_model`, and `retrieval_context_model`
+corrected in `04_evidence_matrix.csv`. Component and architecture score disagreements are recorded
+here as judgment disputes per the coordinator's addressing; `component_overlap_score`,
+`architecture_overlap_score`, `critical_collision`, and `hypotheses_challenged` are left exactly as
+scored. Had the reviewer's re-derivation been authorized, the correct basis for the flag would be
+idea-level anticipation alone, not the mechanism-equivalence framing the row's narrative implies.
 
 ---
 
@@ -359,7 +387,41 @@ performance" and names its own architectural ancestors directly: Nii's Blackboar
 and the same author's own prior BabyAGI (2023) — "less a new idea than a vindication of an old
 one" (Sec.8).
 
-second_review: pending
+second_review: disputed: reviewer confirms component_overlap at 4 but re-derives architecture_overlap
+to 3 (not 4); of the five challenged hypotheses only H2 and H9 survive per the reviewer. Four minor
+locator/quote corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=4. An event-sourced,
+append-only log as sole source of truth, matching H2 at the mechanism level, with a
+worked-example-verified provenance chain (H9's backward direction). The single broadest-spanning
+collision in the matrix by hypothesis count (H2;H3;H5;H7;H9). Self-described by its own author as
+"recombination."
+
+**Independent reviewer position.** Confirms component_overlap=4 (a genuine mechanism-level match to
+H2, not naming coincidence) but re-derives architecture_overlap to 3, not 4 — coverage concentrates
+in one subsystem (the log/replay/lineage substrate) with zero presence for Requirement,
+Specification, Artifact-as-code, Verification, Deployment, and Runtime Evidence, confirmed by the
+row's own fields. Of the five listed hypotheses, only two survive their own falsification bars: H2
+and H9 (the strongest — demonstrated bidirectionally, Sec.6). H3 should drop (actor+lineage
+provenance exists but zero arbitration logic — checked the GitHub README to confirm the row's own
+NOT_DETERMINABLE flag resolves to "absent," and the row's own strongest_difference already concedes
+this). H5 should drop (Sec.8 explicitly positions the paper as *rejecting* the memory/retrieval
+category rather than instantiating it — shared word "topology," different mechanism). H7 should
+drop, the largest overreach — H7's bar names a specific SDLC stage list, and the row's own
+strongest_difference already states the worked domain (investment diligence) has "essentially no
+analog" to software development. Four minor locator/quote corrections found: a Sec.3-vs-Sec.2
+citation, a p.10-vs-p.11 page citation, an unsupported inference that a forking evaluator is
+specified as human (Sec.7 never says so), and a dropped "patches" item from a budget-cap list.
+
+**Resolution.** All four locator/quote corrections applied to `04_evidence_matrix.csv`
+(`retrieval_context_model`, `verbatim_notes`, `human_agent_scope`, `execution_unit_session_model`).
+The architecture-score disagreement and the recommendation to drop H3/H5/H7 from
+`hypotheses_challenged` are recorded here as judgment disputes per the coordinator's addressing;
+`architecture_overlap_score` and `hypotheses_challenged` are left exactly as scored. Had the
+reviewer's re-derivation been authorized, this row's hypotheses_challenged would narrow from
+H2;H3;H5;H7;H9 to H2;H9.
 
 ---
 
@@ -391,7 +453,40 @@ independent inventions, exactly the pattern this campaign's independence rule is
 detect. The paper's own Limitations section states "TGMS does not yet solve general temporal
 graph question answering."
 
-second_review: pending
+second_review: disputed: reviewer re-derives component_overlap to 3 (not 4); with architecture_overlap
+at 2 (agreed) and no other trigger met, reads critical_collision as NO. Left unchanged. Corrections
+applied to a miscoded field and cherry-picked verifier statistics.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2. A formally specified,
+empirically validated bi-temporal transition model close to H2, and a rigorously validated
+claim-verification mechanism (100% detection of eight injected-error classes, zero false positives)
+relevant to H3/H9. One of the most thoroughly engineered implementations in this campaign.
+
+**Independent reviewer position.** Re-derives component_overlap to 3: the paper combines three
+separately-known primitives for a narrow domain — the bi-temporal correction pattern, which the
+paper itself calls "classical [24]" (Snodgrass 1999) and positions against Zep/Graphiti and TOKI as
+sharing "the bi-temporal foundation"; typed tool-contract APIs in a cited lineage (Toolformer,
+ToolGate, PAL); and evidence-cited claim verification in a cited lineage (RARR, FActScore,
+Chain-of-Verification) — substantially the primitive itself applied to a new but generic domain, not
+strong overlap with D-System's specific claims. With architecture_overlap at 2 (agreed) and no other
+trigger met (H3's bar requires actor/authority arbitration, explicitly reserved-but-unused per
+Sec.8: "write-back is schema-ready but disabled pending provenance and authorization policies"), the
+reviewer reads `critical_collision` as NO on this row and flags it as a genuine judgment call for the
+owner. Separately found the "100% detection" claim cherry-picked: Table 5 has eight mutation
+classes, and two are materially worse — wrong-step citation detected in only 36/100 (36%) and entity
+member dropped in 0/100 (0%), a gap the paper itself discloses (Sec.5.4: "invisible to trace
+grounding by construction"). Also found `feedback_to_knowledge_mechanism` miscoded
+NOT_DETERMINABLE_FROM_ACCESS when the full text (Sec.4.1) fully specifies the mechanism's design —
+what is undetermined is its empirical performance, not its existence.
+
+**Resolution.** `feedback_to_knowledge_mechanism`, `test_verification_linkage`,
+`backward_traceability`, and `strongest_dsystem_overlap` corrected in `04_evidence_matrix.csv` to
+remove the miscoding and the cherry-picked statistic. The score and flag disagreement is recorded
+here as a judgment dispute per the coordinator's addressing; `component_overlap_score` and
+`critical_collision` are left exactly as scored. Had the reviewer's re-derivation been authorized,
+this row's flag would be dropped entirely.
 
 ---
 
@@ -424,7 +519,38 @@ system. Its Pregel-based execution model traces directly to Malewicz et al. (SIG
 its checkpoint-and-resume pattern to Chandy & Lamport's distributed-snapshot algorithm (1985) —
 recorded as ancestors per campaign discipline, not credited as novel.
 
-second_review: pending
+second_review: disputed: scores, flag and factual fields hold, but reviewer disputes the
+hypotheses_challenged framing for H8's consolidation half and H9. One completeness correction
+applied to evidence_locator.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2. A production-grade,
+widely deployed (41,574 GitHub stars, PyPI v4.2.0) checkpoint mechanism gesturing toward H8:
+per-step snapshots, parent-chain lineage, explicit `source` classification. D-System's own
+checkpoint skill currently rewrites/overwrites in place rather than retaining a parent-linked chain
+— on H8/H9, this OSS library's shipped behavior exceeds D-System's own current implementation.
+
+**Independent reviewer position.** Confirms component_overlap=4 and architecture_overlap=2 exactly,
+verified directly against the code (Checkpoint/CheckpointMetadata/BaseCheckpointSaver,
+`channel_values: dict[str, Any]` confirmed opaque at both the checkpoint layer and the long-term
+store layer). Disputes not the scores or flag but the `hypotheses_challenged` framing: the row's own
+fields already document that `planning_model`, `decision_representation`, `requirement_derivation`,
+and `specification_representation` are all NOT_APPLICABLE, and that `provenance_model` is
+"mechanical... not epistemic" — yet `hypotheses_challenged` lists H8 and H9 as genuinely challenged
+without that qualification. H8's assembly half is genuinely implemented (parent-chain lineage
+walk); its consolidation half is not (every checkpoint is the same opaque state, just a new
+version). H9 is the more overstated of the two: it requires bidirectional traceability tying
+functionality to reasoning, evidence, assumptions, and decisions, and the parent chain ties
+checkpoint-to-checkpoint mechanically, never to a decision, requirement, or evidence object — those
+types do not exist in the interface. One completeness correction to `evidence_locator`: additional
+DeltaChannel-beta functions (`delete_for_runs`, `prune`, `get_delta_channel_history`) are present in
+the exact file read but uncited, and `copy_thread`'s line range needed correcting.
+
+**Resolution.** `evidence_locator` corrected in `04_evidence_matrix.csv`. The
+`hypotheses_challenged` framing dispute is recorded here per the coordinator's addressing;
+`hypotheses_challenged` is left exactly as scored (H8;H9). Had the reviewer's framing been
+authorized, H8 would carry an explicit assembly-only qualifier and H9 would be dropped.
 
 ---
 
@@ -456,7 +582,30 @@ us20250165226a1-ai-digital-thread-patent (section 13, below) traces the same ter
 ancestor as an earlier pass of this campaign mistakenly recorded (now withdrawn on this row). The
 chapter's own methodology is itself an explicit refinement of Bickford et al. (2020, ref.[5]).
 
-second_review: pending
+second_review: confirmed, reached via a different (green open-access) route. One factual correction
+(source_type conference -> book-chapter).
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=4. Fig.2.18 is a
+materially close structural analogue to H7/H9, spanning five of the methodology's flagged adjacent
+stages (Requirement, Specification, Artifact, Verification, Deployment/Runtime Evidence). Falsifies
+H7/H9 for the requirement-through-runtime segment; no upstream Idea/Reasoning/Decision/Evidence
+layer.
+
+**Independent reviewer position.** Confirms both scores exactly, reached through a legitimate green
+open-access copy (University of Twente institutional repository) after the Springer paywall could
+not be passed — read all 26 pages end to end, with pagination, section numbers, all 18 figures, and
+every checked quote matching the row verbatim. Confirms this is the one row in the phase where the
+four-adjacent-stages trigger fires cleanly under both a strict-contiguous reading (Artifact ->
+Verification -> Deployment -> Runtime Evidence, four consecutive stages) and a loose reading (six
+stages in pipeline order). Confirms H7 and H9 both survive their bars exactly as the row states.
+Finds one factual error: `source_type` is listed as `conference`, but Crossref's authoritative
+record for the DOI types it `book-chapter` (Intelligent Systems Reference Library, an edited
+monograph series) — it was never presented at a conference.
+
+**Resolution.** `source_type` corrected to `book-chapter` in `04_evidence_matrix.csv`. No score,
+flag, or hypotheses_challenged value is changed.
 
 ---
 
@@ -489,7 +638,29 @@ specialization of the classical nanopublication (Groth, Gibson & Velterop, 2010)
 provenance traditions, not a novel provenance primitive; OSP's communication layer is explicitly
 built atop MCP, A2A, and SCP rather than invented from scratch (Sec.4.1).
 
-second_review: pending
+second_review: confirmed; one minor factual correction (evaluation_method's QA-accuracy figure
+attribution).
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=4. The ContributionLedger
+is one of the closest matches in the campaign to combined H2+H3+H9; the Unified Participant Model is
+a direct, quantified H6 challenger. Falsifies H6's "may be distinct" claim within the scientific-
+research domain; does not falsify H1 or H4.
+
+**Independent reviewer position.** Confirms both scores exactly via a complete 40-page read, and
+confirms three of the flag's four trigger types independently justify it (component, architecture,
+and four-adjacent-stages via Plan->Execution->Artifact->Verification). Confirms H6 is one of the
+strongest H6 challengers in the campaign, weakened but not falsified — no O,E,L typing, no
+independence-aware trust/convergence, no domain-authority weighting (all Participants are
+protocol-symmetric by design). Direction is "NEITHER" overstated nor understated. Finds one minor
+factual error: `evaluation_method` states the QA retrieval-accuracy figure (0.70->0.88) as if it
+came from the same n=1000 metadata sample as the completeness/correctness metrics; the source
+distinguishes these — metadata quality is measured at n=1000, but the QA-accuracy figure came from a
+separate 100-QA-pair benchmark.
+
+**Resolution.** `evaluation_method` corrected in `04_evidence_matrix.csv`. No score, flag, or
+hypotheses_challenged value is changed.
 
 ---
 
@@ -524,7 +695,36 @@ directly: continuous-delivery quality gates (Humble & Farley 2010; Forsgren, Hum
 and IT-governance decision-rights models (Weill & Ross 2004) — an explicit inheritance, not an
 independent invention. No public repository accompanies the internal reference implementation.
 
-second_review: pending
+second_review: disputed: reviewer confirms component_overlap at 4 but re-derives architecture_overlap
+to 3 (not 4); flag stands via component-overlap plus the stage-span trigger firing independently, not
+via architecture-overlap. Two factual corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=4. A five-plane
+architecture with a formally specified acceptance predicate, packet-lineage provenance, a
+three-class memory-ownership taxonomy, and risk-tiered execution-unit boundaries — one of the
+closest structural matches in the campaign to combined H2, H5, H8, and H9.
+
+**Independent reviewer position.** Confirms component_overlap=4 (independently verified the
+fail-closed acceptance predicate and the three-class memory taxonomy against the text) but
+re-derives architecture_overlap to 3: the row's own fields mark `requirement_derivation`,
+`specification_representation`, and `planning_model` all NOT_APPLICABLE — the entire front half of
+D-System's pipeline has no real analog, so "near end-to-end" overstates roughly half the pipeline
+being untouched by mechanism. The four-adjacent-stages trigger fires independently regardless
+(Execution->Artifact->Verification->Deployment carries real mechanism), so `critical_collision: yes`
+is correct but rests on component-overlap plus stage-span, not architecture-overlap as the row's
+narrative implies. Confirms all four listed hypotheses (H2;H5;H8;H9) survive their bars, with H8
+splitting cleanly (assembly half strongly challenged, consolidation half largely intact per the
+paper's own "Scaffold" self-rating). Finds two factual errors: `memory_model`'s "98.58% rule
+agreement (n=2044)" conflates two different denominators — 98.58% (1,526/1,548) applies only to the
+finalized-outcome subset, while n=2044 is the total shadow-evaluation pool. `derivative_ancestor`
+omits a third self-cited ancestor: DAPPER (Google's distributed-tracing paper, ref.[20]), cited for
+the causal-stitching event-logging mechanism (Sec.8.1).
+
+**Resolution.** `memory_model` and `derivative_ancestor` corrected in `04_evidence_matrix.csv`. The
+architecture-score disagreement is recorded here as a judgment dispute per the coordinator's
+addressing; `architecture_overlap_score` is left exactly as scored.
 
 ---
 
