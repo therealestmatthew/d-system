@@ -1,6 +1,6 @@
 # Critical collisions
 
-One section per `critical_collision: yes` row in `04_evidence_matrix.csv` — 19 rows, derived
+One section per `critical_collision: yes` row in `04_evidence_matrix.csv` — 24 rows, derived
 directly from that file (`component_overlap_score >= 4` and/or `architecture_overlap_score >= 4`
 and/or a direct H1-H11 falsification claim and/or spanning four-plus adjacent stages of the
 Reasoning→Knowledge-Update chain, per `research/literature-review/CLAUDE.md` §11). Each section
@@ -8,7 +8,9 @@ records the overlap and what the source would falsify if the overlap held at ful
 followed by a dated independent-review subsection carrying that reviewer's verdict. Review outcomes
 are recorded in two places: the matrix row's `second_review` field and the dated subsection here.
 `06_hypothesis_tests.md` was not updated by this phase and does not reflect these reviews. Sections
-follow the order the coordinator cross-checked the 19-row derivation against.
+1-19 follow the order the coordinator cross-checked the original 19-row derivation against; sections
+20-24 were appended by `LIT-08 X4` for the five rows dispatched to it as a second-review batch, in
+the order given in that dispatch.
 
 ---
 
@@ -1168,3 +1170,85 @@ though they were available.
 component-score and flag disagreement is recorded here as a judgment dispute per the coordinator's
 addressing; `component_overlap_score` and `critical_collision` are left exactly as scored. Had the
 reviewer's re-derivation been authorized, this row's flag would be dropped.
+
+---
+
+## 20. mythologiq-agent-memory-oss
+
+MythologIQ-Labs-LLC: *agent-memory* — governed reference architecture for agentic memory, GitHub
+repository (README, PAMA governance doctrine, 58 JSON Schemas, SHA256-chained Meta Ledger).
+https://github.com/MythologIQ-Labs-LLC/agent-memory
+
+**Overlap.** component_overlap=4, architecture_overlap=3. The memory-unit schema's `type`
+(ontological content-category, 18 values) and `state` (lifecycle stage, 15 values) are two clean,
+independently-varying enum axes on one record — a genuine structural match to two of D-System's
+three `S=(O,E,L,...)` axes, confirmed by reading `schemas/memory-unit.schema.json` directly.
+Combined with a SHA256-chained decision ledger providing verifiable transition provenance and a
+real, implemented (not stub) decision -> execution -> runtime-evidence -> knowledge-update chain
+(`decision-receipt` -> `execution-witness` -> `runtime-trace-correlation` -> `maintenance-run-
+evidence`), this is the strongest primitive-level and partial-architecture-level collision found
+across this dispatch's five sources.
+
+**What it would falsify.** At full strength this would contribute to falsifying H1 (the
+ontological/lifecycle pairing is real and independently varying). It would not falsify H1 outright,
+because the axis D-System calls epistemic classification is not a single field here — it is
+distributed across `evidence[]`, `signals[]`, `saturation`, and `certification.status`, arguably
+more expressive but not a materially-equivalent 3-tuple. It does not falsify H4 (no independence-
+aware convergence/discounting mechanism), H3 beyond a bare hash chain (no authority/delegation
+arbitration), or H6/H7/H9/H10/H11 (no Requirement, Specification, Plan, or Deployment schema among
+the 58 listed — under the contract's strict contiguous-stage reading the four covered stages are
+not adjacent, so the four-stage trigger does not fire; the flag here rests entirely on the
+component-overlap trigger). The `type` enum's content-category taxonomy is traced in the
+repository's own bibliography to named cognitive-science literature (Baddeley 2000, Squire & Zola
+1998, Cavaco et al. 2004, McDaniel et al. 1999) — a direct application of an established taxonomy,
+not an original classification scheme; the lifecycle-state enum and the governance/SHA256-ledger
+layer were not traced to a named external ancestor.
+
+second_review: confirmed; scores, flag and hypotheses_challenged all reproduced exactly. Three
+factual corrections applied to supporting fields — a self-reported "359+ merged PRs" figure
+corrected to the independently checked 223 merged / 239 total, a "Code Reality Graph" claim
+corrected to reflect the repository's own "declared... not built" status, and single-author/
+no-external-review context made explicit.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on the
+component trigger alone (H1 challenged). A single-organization-owned GitHub repository presented
+with substantial doctrine (42 docs, 36 ADRs, 58 schemas) and governance ledger (SHA256-chained,
+"748 commits / 359+ merged PRs") as supporting evidence of a mature, real implementation.
+
+**Independent reviewer position.** Independently re-derives both scores exactly (4/3) and confirms
+the flag rests entirely and correctly on the component-overlap trigger. Verified directly against
+`schemas/memory-unit.schema.json` (the 18-value `type` enum and 15-value `state` enum, and the
+`required` array proving both are mandatory, independent axes), `docs/META_LEDGER.md`'s SHA256 hash
+chain (`chain_hash = SHA256(content_hash + previous_hash)`, multiple entries with real hex digests),
+and — going beyond the original pass — the actual implementing code and test files for all four
+schemas in the decision->execution->runtime-evidence->knowledge-update chain (`core/receipts.py`,
+324 lines; `memory/enforcement_evidence.py`; `memory/runtime_trace_correlation.py`; dedicated
+maintenance-run modules), confirming this is not a set of dormant schema stubs. Two factual errors
+found in supporting fields: (1) "359+ merged PRs" — the commit count (748) is correct, but the PR
+figure is wrong; `gh api search/issues` gives 223 merged / 239 total, both confirmed by the
+`pulls?state=all` pagination header. The "359+" figure is self-reported in the repository's own
+internal governance ledger, authored by an internal "Governor" role describing the repo as "an
+existing mature repository" at project genesis — not an external source, and copied into the row
+uncritically rather than checked against GitHub's actual PR data, where it overstates the true count
+by well over 100 PRs. (2) The row's `artifact_code_linkage` field states the CRG modules exist
+"implementing a 'Code Reality Graph' (CRG)" — the repository's own maturity document
+(`docs/43-substrate-inventory-and-maturity.md`, Sec.4) states CRG status is "declared... no module
+has been built yet," and `code_graph_qualification.py`'s own docstring says it "cannot grant Agent
+Memory authority" — the file does real normalization work but is not the CRG itself. Separately (not
+a factual error, but a maturity-context omission): this is a single-author repository — 745 of 748
+commits by one person (`gh api .../contributors`), with only 2 dependabot and 1 github-actions bot
+commits from anyone else — zero external contributors, zero independent review, created 2026-07-06,
+about ten weeks before this read. The row's institutional-weight framing (commit/PR counts, "42
+doctrine docs, 36 ADRs, 58 schemas") reads as more institutionally credentialed than one person's
+self-governed, self-reviewed output actually is.
+
+**Resolution.** No score, flag, or `hypotheses_challenged` value changed. Three corrections applied
+to `04_evidence_matrix.csv`: `memory_model`, `implementation_availability`, and `verbatim_notes`
+corrected for the PR-count figure; `artifact_code_linkage` corrected for the CRG-implementation
+overstatement; `implementation_availability` extended with the single-author/no-external-review
+context. **Process note:** the inherited "359+ merged PRs" figure is the same class of error as this
+phase's fetch-tool fabrication incidents but a different variant — not an invented claim, an
+uncritically inherited self-reported one from the source's own internal governance document, and it
+ran in the direction of crediting the collision rather than discrediting it.
