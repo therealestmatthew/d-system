@@ -13,6 +13,16 @@
 > should treat its verdicts as post-dating and superseding the pre-review reading of the same
 > sources in `05`'s un-reviewed first-assessment prose.
 
+> **Further reconciled against `phase-lit-08`'s dedicated collision searches, 2026-09-14
+> (`LIT-08 X5`).** `phase-lit-08` ran the first search purpose-built for each of H1, H4 and H11 —
+> the three hypotheses this file's own decision rule (below) had flagged as never having had one —
+> and deep-read fifteen new sources across them, five newly flagged `critical_collision: yes` and
+> all five independently second-reviewed as `confirmed`. This pass re-derives only the H1, H4 and
+> H11 blocks and the decision rule itself against that new evidence; the other eight blocks are
+> untouched. Per the same owner ruling that shaped the prior reconciliation,
+> `04_evidence_matrix.csv` and `05_critical_collisions.md` are not edited here — this file's
+> `strongest_challenger` entries cite the matrix's already-recorded scores directly.
+
 Verdicts follow `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`.
 Per that record, the review-instructions text (`research/literature-review/CLAUDE.md`, §4) is
 primary; a frozen-register (`research/pre-literature-hypotheses.yaml`) nuance is noted wherever
@@ -33,22 +43,76 @@ demonstrates the claimed mechanism at full scope — so the two are easy to conf
 between them is not what the found candidates show; it is what the *search* supports concluding
 about what has not been found. `POTENTIALLY_DISTINCT` requires the absence of a match to be
 attributable to the mechanism genuinely not existing elsewhere, which in turn requires the search
-that failed to find it to have plausibly covered the relevant ground — approaching saturation (a
-falling duplicate-discovery rate), or backed by a dedicated collision search of the kind H4's Pass
-3 ran, that still returned nothing better. `INSUFFICIENT_EVIDENCE` is the status whenever that
-saturation condition is not met, regardless of how well or poorly the individual candidates read on
-inspection — because the open question in that case is not "is the mechanism known" but "has this
-campaign looked hard enough to say." Per `LIT-06 G`'s own gate measurement, the campaign-wide
-duplicate-discovery rate stands at 20.0% — four results in five surfaced by this phase's searches
-were new, not repeats of prior finds. That is a non-saturated search space by the campaign's own
-instrumentation, and it is a fact about every hypothesis's search history, not only the ones a
-dispatch happens to flag. Under this rule a hypothesis whose found candidates fail to demonstrate
-the claimed mechanism does not, on that failure alone, qualify for `POTENTIALLY_DISTINCT` — it
-qualifies only once the search itself, not just the candidates it turned up, can be said to have
-looked hard enough that an unfound match is implausible. H1, H4, and H11 are assessed against this
-rule below, applied uniformly; none of their search histories meet the saturation bar, and all
-three carry `INSUFFICIENT_EVIDENCE` as a result — a status that reflects the search's current
-state, not a judgment that the mechanisms are, or are not, already known.
+that failed to find it to have plausibly covered the relevant ground — either of two routes:
+approaching saturation (a falling duplicate-discovery rate across the campaign as a whole), or a
+dedicated collision search for that specific hypothesis that still returned nothing better.
+`INSUFFICIENT_EVIDENCE` is the status whenever neither route is satisfied, regardless of how well
+or poorly the individual candidates read on inspection — because the open question in that case is
+not "is the mechanism known" but "has this campaign looked hard enough to say."
+
+*Route one — saturation — is closed to every hypothesis right now.* The owner has ruled that
+saturation may not be claimed at this stage (pre-synthesis check-in, ruling 8). `LIT-06 G` measured
+a campaign-wide duplicate rate of 20.0% (44/220 raw result identifiers; 36/208 = 17.3% on a
+distinct-identifier basis). This phase's own three dedicated collision searches measure lower
+still: resolving every `LIT-08-*` row's `result_ids` in `00_search_ledger.csv` against
+`03_source_inventory.csv` as it stood immediately before this phase started (commit `83fb42b^`,
+the parent of the first `LIT-08` search) gives 58/387 = 15.0% raw, 37/347 = 10.7% distinct — a
+falling duplicate rate, i.e. a *rising* share of genuinely new material, the opposite of the signal
+saturation would produce. That is a trend against saturation, not toward it, and it holds even
+domain-by-domain: H1's own searches ran the highest of the three at 39/156 = 25.0%, H4's the lowest
+at 4/66 = 6.1%, H11's at 15/165 = 9.1% — every one of them far short of anything resembling "mostly
+yield duplicates," the methodology's own stop-condition language (§18). Route one stays closed for
+all three hypotheses uniformly, regardless of these differences between them.
+
+*Route two — a dedicated collision search that still returns nothing better — is what this phase
+exists to test, and it needs a sharper statement than this file previously gave it.* The prior text
+held up "H4's Pass 3" as the worked example of a search that would satisfy the bar, while H4's own
+block then called that same search "thinner, not thicker" and insufficient — an inconsistency
+between the rule's stated example and the rule's applied bar, flagged and left open at
+`SESS-2026-09-14-01`. Resolved here: a dedicated collision search satisfies route two only when it
+clears two conditions together, not one —
+
+1. **Search depth.** It runs multiple independent strategies against the hypothesis specifically —
+   vocabulary/terminology-translation discovery, backward citation chaining to the mechanism's
+   likely theoretical ancestors, and direct collision-style queries — and it deep-reads the primary
+   text of the candidates it surfaces rather than resting on an abstract or a generated summary,
+   verifying any claimed match against that primary text before crediting it (the exact failure
+   this file's own H1 and H11 blocks below record catching, in `burns-groth`).
+2. **Comparator quality.** The closest candidates the search turns up, taken together, constitute a
+   genuinely mature, on-topic comparator family — established, multi-source, ideally multi-year —
+   not a single very-recent, single-author, unreviewed item; *and* at least the closest member of
+   that family instantiates the same mechanism the hypothesis claims, even if narrower in scope,
+   rather than a structurally different mechanism that merely sits in the same neighborhood.
+
+Condition 1 alone is not enough: a thorough, well-run search of a field that turns out to be thin
+or immature has shown that corner of the field is thin, not that the mechanism is absent from the
+wider literature — the search covered its own ground well without covering enough of the *right*
+ground to license a conclusion either way. Condition 2's second half exists because a mature but
+mechanism-mismatched comparator family is a false friend: finding that an adjacent, well-studied
+tradition solves a related-but-different problem is not evidence about whether the claimed
+mechanism exists elsewhere — it means the search struck the wrong neighborhood, however well-studied
+that neighborhood is. Only when both conditions hold — a well-run search finds a mature family, and
+the family's best member is a genuine (if partial) instance of the claimed mechanism rather than a
+different one — does a negative or partial-only result license `POTENTIALLY_DISTINCT`; short of
+that, a hypothesis stays at `INSUFFICIENT_EVIDENCE` regardless of how many queries were run, because
+what is missing is not effort but *the right kind of finding*, a fact about the field, not about how
+hard this campaign looked.
+
+H1, H4, and H11 are assessed against this two-condition rule below, applied uniformly. All three had
+a dedicated collision search run against them this phase for the first time, satisfying condition 1
+for all three alike. Where they differ is condition 2, and each difference is argued explicitly in
+its own block rather than merely asserted: H1's comparator family fails on maturity (four
+candidates, the most-implemented eleven weeks old and single-author, one proving a formally
+different triple entirely); H11's comparator family is mature (a 2010–2023 peer-reviewed lineage,
+plus two 2026 preprints) but its best-implemented member is a different mechanism shape — a
+closed, hand-authored control-loop reaction, not a narrower instance of H11's evidence-revises-
+knowledge claim; H4, uniquely, splits by phrasing — its general (review-instructions) reading now
+has a genuine, mature, same-mechanism comparator (Goldman 2001, backward-chained this phase from
+Mayo-Wilson 2014), while its frozen-register graph-topological reading fails on maturity in the
+same shape as H1's. None of the three clears both conditions for `POTENTIALLY_DISTINCT`. H4's
+general reading does clear the bar for treating its mechanism as established rather than merely
+searched-for, which moves that one reading's status to `KNOWN_COMPONENT_NEW_INTEGRATION` — the
+only status change among the three. `NOVEL` remains unavailable to all of them.
 
 ---
 
@@ -64,77 +128,105 @@ hypothesis: >
 strongest_challenger: >
   eywa-provenance-grounded-memory-joshi-2026 (component_overlap=4, architecture_overlap=3,
   full_text) and burns-groth-agentic-ontological-notebook-memory-2026 (component_overlap=4,
-  architecture_overlap=3, preprint_version) remain the only two matrix rows listing H1 in
-  `hypotheses_challenged` — no other row does. Independent review of both (`05_critical_collisions.md`,
+  architecture_overlap=3, preprint_version) were the only two matrix rows listing H1 in
+  `hypotheses_challenged` before this phase; independent review of both (`05_critical_collisions.md`,
   sources 18 and 16) found the specific claim each was credited with — a genuinely orthogonal
-  three-axis classification — does not survive a full-text read of either. Both are retained below
-  as the closest available candidates, now read for what they actually show rather than what the
-  first assessment credited them with.
+  three-axis classification — does not survive a full-text read of either. `phase-lit-08` ran H1's
+  first dedicated collision search (`00_search_ledger.csv`, LIT-08-S001 through S024: vocabulary
+  discovery, backward citation chaining, and direct collision queries) and deep-read four new
+  candidates: mythologiq-agent-memory-oss (component_overlap=4, architecture_overlap=3, full_text,
+  `critical_collision: yes`, second review: confirmed) and subit-wiki-epistemic-hmm-oss
+  (component_overlap=4, architecture_overlap=2, full_text, `critical_collision: yes`, second
+  review: confirmed) are now the closest partial matches found for H1 across the whole campaign;
+  toki-bitemporal-operator-algebra-contradiction-2026 (component_overlap=3,
+  architecture_overlap=2, full_text) and symbolic-memory-prolog-oss (component_overlap=2,
+  architecture_overlap=1, full_text) are weaker but read in full below for completeness.
 evidence:
   - >
-    eywa, Table 2 / Sec.4.3: a memory-object model (Evidence/Signal/Candidate/Belief/Link) that
-    tracks ontological type, epistemic status/tier, and lifecycle state on the same object, in a
-    real, implemented, evaluated agent-memory system (per-question artifacts published at
-    eywa.to/research, Sec.1 Abstract).
+    (Unchanged from the prior reconciliation.) eywa, Table 2 / Sec.4.3, and burns-groth, Sec.3.2-3.3:
+    both credited at first assessment with a genuinely orthogonal three-axis classification. Full-text
+    review found eywa's five object types carry a deterministic one-to-one mapping to Mutability and
+    epistemic tier — one axis restated, not three independent ones, and the word "orthogonal" appears
+    nowhere in the paper — and Burns & Groth's ICE split is a type *hierarchy* (Artifact/Fragment/Note
+    nested under Information Content Entities), not orthogonal axes applied uniformly. eywa also fails
+    H1's own falsification bar on procedural grounds: a three-and-a-half-month-old, single-author,
+    non-peer-reviewed preprint is not "a materially equivalent established framework."
   - >
-    Independent review (`05`, source 18), full 29-page read: the row's premise that Table 2 encodes
-    "three independently-tracked classification dimensions" is not supported by the primary text.
-    The five object types each carry a deterministic one-to-one mapping to Mutability and epistemic
-    tier — Evidence is always Immutable and Tier-0, Beliefs always Revisable and Tier-1, with no case
-    of cross-product variation — so knowing an object's type fully determines the other two fields.
-    One axis restated, not three independent ones; the word "orthogonal" appears nowhere in the
-    paper's 29 pages. Separately and dispositively per the reviewer: a single-author arXiv preprint
-    roughly three and a half months old, with no indication of peer review or institutional adoption,
-    does not meet H1's own falsification bar ("a materially equivalent established framework") on
-    procedural grounds, independent of the mechanism finding.
+    toki-bitemporal-operator-algebra-contradiction-2026 (full HTML text, arxiv.org/html/2606.06240v1,
+    read across two extraction passes): a formally PROVEN three-orthogonal-axis system — four
+    soundness theorems over a semiring-based provenance algebra — the strongest primary-source
+    precedent found in this campaign for orthogonality *proven* rather than merely asserted. But the
+    three axes it proves orthogonal are isolation/schema/provenance (Sec.2.2, 3.1, 3.3), write-time
+    concurrency-control dimensions of a bitemporal fact store, not D-System's
+    ontological/epistemic/lifecycle triple on a knowledge state — a different triple by content, with
+    no ontological-type axis and no lifecycle axis anywhere in the paper, confirmed on full-text read.
   - >
-    burns-groth, Sec.3.2-3.3: a domain-thing vs. Artifact/Fragment/Note (ICE) hierarchy, drawing
-    on the W3C-adjacent Information Artifact Ontology (Ceusters 2013), with per-note actor
-    attribution and full backward provenance to source.
+    mythologiq-agent-memory-oss (README, five JSON Schemas, META_LEDGER.md, all read in full;
+    github.com/MythologIQ-Labs-LLC/agent-memory): the closest structural match found in the whole
+    campaign — `type` (an 18-value ontological content-category enum) and `state` (a 15-value
+    lifecycle-stage enum) are two genuinely independent enum axes on one memory-unit record, confirmed
+    by reading the JSON Schema directly rather than the README's prose. Second review re-derived the
+    score independently and confirmed both the 4/3 overlap and the critical-collision flag. But the
+    third axis — D-System's epistemic classification — is not a single field here: it is distributed
+    across `evidence[]`, `signals[]`, `saturation`, and `certification.status`, which the matrix row's
+    own `strongest_difference` records as "arguably more expressive... but not the same structure."
+    Procedurally thin on the falsification bar: a single-author Apache-2.0 repository, 748 commits but
+    12 stars, no published evaluation, ten weeks old as of this phase's search.
   - >
-    Independent review (`05`, source 16), full-text read: the ICE split is a type *hierarchy* —
-    Artifact/Fragment/Note subtypes exist only nested under Information Content Entities — not
-    orthogonal axes applied uniformly; the reviewer found no case of independent cross-product
-    variation here either. This is the same defect found in eywa: a multi-valued classification
-    that is not, on inspection, an orthogonal one.
+    subit-wiki-epistemic-hmm-oss (README, full schema, decoder source, all read in full;
+    github.com/sciganec/subit-wiki): a real, working implementation of three independent 2-valued
+    axes combined into a 64-state code, decoded via a genuine log-space Viterbi HMM — the same
+    combinatorial-state-space-plus-probabilistic-transition shape as D-System's H1 and H2 claims
+    combined. Second review confirmed the 4/2 score and flag. But the three axes (WHO/WHERE/WHEN)
+    encode discourse/rhetorical stance — perspective, argumentative move, maturity phase — not
+    D-System's type/epistemic-status/lifecycle content, confirmed by direct schema reading.
+    Procedurally thinner still: the repository's LICENSE file is a 3-byte stub, not license text
+    (GitHub's own API classifies it `license: other, NOASSERTION`), and the self-evolving ontology
+    loop the source was nominated for fails 2 of its own 9 tests.
+  - >
+    symbolic-memory-prolog-oss (README, IMPLEMENTATION-STATUS.md, source, four open issues, all read
+    in full; github.com/lost-rob0t/symbolic-memory): Kind and Lifecycle exist as separate fields on
+    every memory record in the implemented code, but neither carries an enforced enum, and every
+    H1/H2/H4-relevant primitive beyond those bare fields exists only as open-issue design prose,
+    confirmed absent from the shipped code by a zero-hit search for the design issues' own named
+    predicates.
 assessment: >
   The best case that D-System's orthogonal ontological+epistemic+lifecycle state model is already
-  known rests on two independently authored 2026 agent-memory systems that, at first read, appeared
-  to track a comparable three-dimensional classification on the same memory object: eywa's
-  ontological-type/epistemic-tier/lifecycle-state triple, and Burns & Groth's ontological/epistemic/
-  derivational (ICE) split drawn from an established upper ontology. If either held up as genuinely
-  orthogonal, it would go a long way toward falsifying H1's "uncommon" framing, since agent-memory
-  research would then already contain the specific structural pattern D-System proposes, and two
-  independent 2026 teams converging on it without a shared ancestor would be additional evidence
-  the idea's time has come.
-  Independent review of both sources against their primary text found this does not hold. In eywa,
-  the classification is not three independent axes but one: object type fully and deterministically
-  determines both epistemic tier and lifecycle state, and the paper never itself claims
-  orthogonality. In Burns & Groth, the ICE split is a type hierarchy, not orthogonal axes — an
-  object's Note/Fragment/Artifact type constrains which ontological/epistemic/derivational values
-  are even possible, rather than the three dimensions varying independently the way D-System's
-  (O,E,L) triple proposes. Neither source demonstrates the specific mechanism H1 asks about, and
-  eywa additionally fails H1's falsification bar on procedural grounds regardless of mechanism — a
-  three-and-a-half-month-old, single-author, non-peer-reviewed preprint is not "a materially
-  equivalent established framework." No other row in `04_evidence_matrix.csv` lists H1 among its
-  challenged hypotheses, so these two sources, now undercut on the one dimension the hypothesis
-  turns on, are the whole of the found prior art.
-  Under the decision rule stated at the top of this file, that finding is not enough on its own to
-  call the claim distinct. Two candidates were found and both, on close reading, fail to
-  demonstrate orthogonal classification — but the search that produced only two candidates for H1
-  across six phases has not been shown to approach saturation: no dedicated collision search
-  targeted H1 the way H4's Pass 3 did, and the campaign's own duplicate-discovery rate
-  (`LIT-06 G`, 20.0%) shows the search space generally is still yielding new material four times in
-  five. A frontier this open could still contain a source combining the two candidates' partial
-  matches, or an orthogonal classification neither eywa nor Burns & Groth's search terms
-  surfaced. The frozen register's narrower "not commonly integrated" phrasing does not change this:
-  what both systems actually show is type-determined, non-orthogonal multi-field metadata, which is
-  a materially different mechanism from an orthogonal triple, not a looser instance of the same
-  one — treating it as such would be exactly the terminology-for-mechanism substitution this
-  review's discipline forbids in the other direction — but that mechanism-mismatch finding answers
-  "what do these two sources show," not "has the field been searched enough to rule out a source
-  that does." The honest status is that this campaign has not searched enough to say either way,
-  not that it has searched enough to say the claim survives.
+  known now draws on six sources rather than two, and the strongest of the new four come closer
+  than eywa or Burns & Groth ever did. mythologiq-agent-memory-oss genuinely has two of D-System's
+  three axes as independent enums on one record, confirmed against its JSON Schema rather than its
+  README; subit-wiki-epistemic-hmm-oss is a real, working three-axis-to-combinatorial-state
+  implementation with a probabilistic typed-transition decoder, the same shape H1 and H2 propose
+  together; toki proves three axes orthogonal with a rigor (four soundness theorems) nothing else in
+  this review's H1 evidence approaches. If any one of these combined the right three axes with that
+  level of rigor and maturity, H1's "uncommon" framing would be in real trouble.
+  None of them does. toki's proven triple is the wrong one — isolation/schema/provenance, not
+  ontological/epistemic/lifecycle — a different formalism entirely, not a looser version of
+  D-System's. mythologiq has the right two axes (type, lifecycle stage) but distributes the third
+  across four separate fields rather than tracking it as one independently-varying value. subit-wiki
+  has three genuinely independent axes but of the wrong content (discourse stance, not D-System's
+  ontological/epistemic/lifecycle triple). eywa and Burns & Groth, as already established, turn out
+  on close reading not to be orthogonal at all. Six candidates, six different ways of missing the
+  specific claim, and not one candidate that gets the axis *content* and the *independence* and the
+  *maturity* right together.
+  Checked against this file's two-condition rule for route two of `POTENTIALLY_DISTINCT`: this
+  phase's search satisfies condition 1 in full — vocabulary discovery, backward chaining, and direct
+  collision queries were all run specifically for H1, for the first time in this campaign, and every
+  candidate was deep-read from primary text rather than credited from a summary (the same discipline
+  that caught eywa and burns-groth's overclaims in the first place). Condition 2 is where it fails.
+  The four new candidates are not a mature, established comparator family: the most implemented
+  (mythologiq) is ten weeks old, single-author, 12 stars, unreviewed; subit-wiki is a smaller hobby
+  project with 2 of 9 tests failing; symbolic-memory implements almost none of what it was nominated
+  for; only toki carries formal weight, and it proves an unrelated triple. H1's own falsification
+  bar asks for "a materially equivalent *established* framework" — a thorough search of this
+  specific, thin, very-recent corner of GitHub and arXiv does not establish that no such framework
+  exists elsewhere; it establishes that this corner doesn't have one. That is a genuine, re-examined
+  finding, not a restatement of the prior assessment, and it leaves the verdict exactly where it was:
+  this campaign has not searched enough of the *right* ground to say the claim is absent, only enough
+  of this ground to say these six candidates are not it. The frozen register's narrower "not
+  commonly integrated" phrasing does not change this — mythologiq's distributed epistemic axis and
+  subit-wiki's wrong-content triple remain materially different mechanisms from an orthogonal
+  (O,E,L) triple, not looser instances of the same one, under either phrasing.
 status: INSUFFICIENT_EVIDENCE
 ```
 
@@ -278,72 +370,126 @@ hypothesis: >
   same evidence bears on each; the frozen phrasing's topological language is, if anything, the
   closer match to what was found.
 strongest_challenger: >
-  epistemic-sybil-resistance-bara-2026 (component_overlap=4, architecture_overlap=2, full_text)
-  — the sole challenger. This is a thin-evidence hypothesis by count (1 challenger, after five
-  prior phases at zero) and is assessed as such, per the coordinator's guidance: neither
-  inflated into a falsification nor waved away as absent.
+  Against the frozen register's graph-topological reading: epistemic-sybil-resistance-bara-2026
+  (component_overlap=4, architecture_overlap=2, full_text) remains the closest match, unmoved by
+  this phase's search. Against the review-instructions' general reading:
+  goldman-experts-which-ones-should-you-trust-2001 (component_overlap=4, architecture_overlap=1,
+  full_text) is the new strongest challenger, backward-chained this phase
+  (`00_search_ledger.csv`, LIT-08-S055/S056) from reliability-testimonial-norms-scientific-
+  communities-synthese (component_overlap=3, architecture_overlap=2, preprint_version), itself
+  found via a dedicated collision search that also deep-read
+  barakat-corroboration-provenance-patterns-tapp2017 (component_overlap=4, architecture_overlap=3,
+  full_text, `critical_collision: yes`, second review: confirmed),
+  extending-nanopublications-knowledge-provenance (component_overlap=3, architecture_overlap=2,
+  full_text), and provenance-based-interpretation-multi-agent-information-analysis-2020
+  (component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second
+  review: confirmed) — 32 new ledger rows in total (LIT-08-S025 through S056), the first dedicated
+  collision search this campaign has run for H4 since the single Pass 3 search of `phase-lit-06`.
 evidence:
   - >
-    bara-2026, Sec.6: a provenance DAG G=(V,E_G) "whose nodes can represent primitive
-    observations, datasets, documents, transformations, retrieval operations, models, agents,
-    and reports, and whose edges u->v record that information from u was available in generating
-    v" — a graph-topological structure, formally defined.
+    (Unchanged.) bara-2026, Sec.6, a provenance DAG G=(V,E_G) with a closed-form discount
+    kappa_m = 1/(1+rho(m-1)) (Sec.5.2, Corollary 2) for corroborating reports sharing an
+    evidentiary root — a graph-topological structure with matching mathematics for the frozen
+    register's "graph-topological ... discounted based on shared lineage" phrasing. Scoped
+    AI-agent-only (human_agent_scope field), with the practical protocol left as an open problem
+    (Sec.9) and no deployed aggregator.
   - >
-    bara-2026, Sec.5.2, Corollary 2: a closed-form discount kappa_m = 1/(1+rho(m-1)), "exactly
-    m_eff/m" — corroborating reports sharing an evidentiary root are discounted rather than
-    counted as independent confirmations, the precise mechanism H4 (and the frozen register's
-    topological phrasing) describes.
+    barakat-corroboration-provenance-patterns-tapp2017 (full 7-page paper, retrieved via curl after
+    a 403 on WebFetch): a PROV-graph corroboration methodology explicitly scoped to "computational
+    or human" sources (Abstract) — broader actor scope than bara-2026 — computing a graph-derived
+    reliability score. But Sec.5 states plainly the built methodology "assumed independence among
+    witnesses"; the paper's only treatment of shared-dependency discounting is Eq.8, a sketched,
+    never-implemented rewrite citing an external analogy (Townend et al. 2005's channel weighting,
+    backward-chained this phase to Eckhardt & Lee 1985's N-version-programming reliability theory),
+    with no worked example and no reappearance anywhere else in the paper.
   - >
-    bara-2026, Sec.3.1: "common ancestry does not imply that one report is redundant conditional
-    on the other, since different reports can extract different aspects" — a nuance beyond naive
-    discounting.
+    extending-nanopublications-knowledge-provenance (full 15-page paper, retrieved via curl): a
+    real, deployed (197K+ facts) provenance/trust ontology (PROV-K) linking claims to multiple
+    supporting/conflicting sources with a certainty degree — but searched specifically for an
+    independence/shared-lineage discount and found to have none. Reliability rests on naive
+    sufficiency/consistency counting over supporting-vs-conflicting sentences, with no treatment of
+    whether two supporting sentences might share a dependent origin.
   - >
-    bara-2026, human_agent_scope field: AI-agent-only; no human witnesses or mixed human-agent
-    evidence modeled or evaluated — explicitly outside H4's "mixed human-agent knowledge" scope.
+    provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE; full 6-page paper,
+    retrieved via curl, superseding an earlier abstract-only read): a real, implemented, live system
+    with a demonstrated (not merely stated) mixed human-machine appraisal scope — Sec.2.1's
+    Appraisal class is "a human or machine agent's judgment," and the one worked example shows a
+    named human user co-participating with multiple machine agents in the same provenance graph.
+    But its three implemented confidence-propagation policies (minimum/maximum/average) are not
+    topology-aware and do not discount for shared lineage; the specific H4 mechanism is named only
+    as future work (Sec.3.3), citing Kuter & Golbeck 2007, which this phase's own backward chain
+    (LIT-08-S054) confirms does not supply it either on a full read (general Bayesian trust
+    propagation, no corroboration-boost-from-diversity term).
   - >
-    bara-2026, Sec.9: the paper's own stated open problems include practical provenance
-    authentication and estimating I(Theta;Z|R) from raw reports — design guidance, not a
-    runnable, deployed aggregator.
+    reliability-testimonial-norms-scientific-communities-synthese (Mayo-Wilson 2014; full 30-page
+    author preprint): eight proven theorems and 4,500-network simulations on how communication
+    topology affects testimony reliability among human scientists — network-structure-sensitive, but
+    its formal machinery evaluates whole belief-update *strategies*, not a per-claim discount
+    function for a specific dependent witness. Its own footnote 1 names the source this dispatch
+    backward-chained to next: "Goldman [2001] argues that, because experts' judgments might be
+    highly correlated due to common information, agreement cannot always provide greater evidence
+    of a hypothesis."
   - >
-    Negative result, dong-berti-equille-srivastava-truth-discovery-copying-detection-2009
-    (component_overlap=3, hypotheses_challenged=NOT_APPLICABLE): deep-read specifically as the
-    closest named prior-art family for H4 (HMM-detected copier/independent classification
-    feeding a Bayesian truth-decision model). Recorded verdict: "does not challenge H3 or H4 ...
-    it neither models transition provenance with actor/authority/evidence/method/lineage/
-    delegation (H3) nor a provenance/topology-aware graph over reasoning/evidence paths in mixed
-    human-agent knowledge (H4)." The mechanism is correlation-based copier detection over a
-    fixed, closed set of structured web sources, not a derivation-graph topology.
+    goldman-experts-which-ones-should-you-trust-2001 (full 26-page peer-reviewed paper, retrieved
+    via an open PDF mirror): a general, agent-model-agnostic, closed-form Bayesian proof (Sec.4,
+    Eqs.1-6) that a "blind follower" of another witness adds *zero* extra evidential weight beyond
+    the original witness — "no larger revision is warranted in the two-concurring-believers case
+    than in the single-believer case" (p.100-101) — while genuinely independent witnesses do add
+    weight. Materially the general-reading mechanism H4 describes: independent paths strengthen
+    weight, derivative (non-independent) agreement is discounted, here to zero in the limiting
+    case. 25 years old, peer-reviewed, foundational to an entire expert-testimony sub-literature
+    (Mayo-Wilson 2014 formally extends it). Independence is stipulated via hypothetical causal-route
+    scenarios (blind follower, non-discriminating reflector, partly-autonomous reasoner), not
+    computed from a provenance graph or topology — no PROV-O-style structure, no graph traversal,
+    anywhere in the paper.
+  - >
+    (Unchanged.) Negative result, dong-berti-equille-srivastava-truth-discovery-copying-detection-2009:
+    the closest named prior-art family for H4 by mechanism shape (HMM-detected copier/independent
+    classification feeding a Bayesian truth-decision model), deep-read specifically for this
+    hypothesis and recorded as not challenging it — correlation-based copier detection over a fixed,
+    closed set of structured web sources, not a derivation-graph topology.
 assessment: >
-  A closed-form, formally derived discount for corroboration sharing an evidentiary root,
-  published on a provenance DAG whose node/edge semantics are essentially the same shape as
-  D-System's own reasoning-lineage graph, already exists (bara-2026) — not as loose analogy but
-  as matching mathematics: a topology-aware discount factor for shared-ancestry agreement is
-  exactly what H4, and especially the frozen register's "graph-topological ... discounted based
-  on shared lineage" phrasing, describes. Treated uncharitably, H4 is simply an unformalized
-  restatement of a result that already has a closed-form proof.
-  Qualification: this is one preprint, found late (Pass 3 of this phase, after five prior phases
-  found nothing), scoped to AI-agent report multiplicity with no human actor and no deployed
-  aggregator — its own author leaves the practical protocol as an open problem. That the field's
-  most likely candidate ancestor family (truth discovery / copying detection, dong 2009) was
-  searched specifically for this hypothesis and came back a deliberate non-match, rather than a
-  weak match, is itself informative: it suggests the graph-topological formalization is recent
-  and narrow rather than an established, decades-deep tradition like H2's. One close but
-  narrowly-scoped, unimplemented formal result is not "an established framework" in the sense
-  the falsification criterion asks for, but it is also too close, too formal, and too directly
-  on-point to say the hypothesis stands untested. Per the coordinator's framing: thin evidence
-  cuts both ways, and INSUFFICIENT_EVIDENCE is the honest status for exactly this shape of
-  result, not a discomfort to be resolved by picking a side.
-  Checked against the decision rule stated at the top of this file: bara-2026 is, if anything, a
-  stronger partial match than either of H1's or H11's remaining candidates — it genuinely
-  instantiates the claimed mechanism (a formal, closed-form, graph-topological discount), just at
-  narrower scope (AI-agent-only, not mixed human-agent) — yet the search behind it is thinner, not
-  thicker: one challenger, found only on a Pass 3 collision search after five prior phases at
-  zero, against a campaign-wide duplicate-discovery rate of 20.0% (`LIT-06 G`) that shows the
-  search space is nowhere near saturated. Under the rule, a stronger mechanism match does not
-  outweigh a search this far from saturated, so the status stays INSUFFICIENT_EVIDENCE rather than
-  moving up to KNOWN_COMPONENT_NEW_INTEGRATION or down to POTENTIALLY_DISTINCT — it was already
-  the rule-consistent verdict, unchanged by this reconciliation.
-status: INSUFFICIENT_EVIDENCE
+  The two phrasings genuinely diverge here, and the scope record is explicit that they must not be
+  blended, so the best case is argued separately for each.
+  Under the review-instructions' general phrasing — independent paths strengthen epistemic weight,
+  derivative agreement is discounted — the case that this is already known is now strong. Goldman
+  (2001) is a mature, peer-reviewed, closed-form Bayesian proof of exactly this: dependent
+  ("blind follower") agreement adds no weight, independent agreement does, and the result has stood
+  for 25 years as the foundation of an entire expert-testimony sub-literature that Mayo-Wilson
+  (2014) formally extends with network-topology sensitivity. Combined with the campaign's own
+  earlier finding (H3) that rich, typed, multi-actor provenance representation is thoroughly known,
+  this is the textbook shape of "known component, new integration": the discount-for-dependence
+  principle is old and proven (Goldman), explicit provenance/derivation-graph representation is
+  separately old and proven (PROV-O, evidence graphs, this file's H3 block), and wiring the first
+  onto the second — computing the discount from the graph rather than stipulating it narratively —
+  is what remains unshown as one working system, not a mechanism nobody knows how to build.
+  Under the frozen register's sharper graph-topological phrasing, the case is much weaker. Nothing
+  found combines broad scope, graph-topological computation, and maturity: bara-2026 is
+  graph-topological and formally closed-form but AI-agent-only and left as an open protocol
+  problem; barakat is broader in scope (human-and-computational) and graph-based but its own Eq.8
+  discount term is an unimplemented sketch that never reappears in the paper; extending-nanopublications
+  and DIVE are real deployed provenance/appraisal systems with no independence-discount mechanism at
+  all. Treated uncharitably under this reading, H4 is still close to an unformalized restatement of
+  bara-2026's closed-form proof, narrowly scoped — the same reading the prior assessment gave, now
+  reinforced rather than displaced by a much larger, dedicated search that consistently found the
+  graph-topological formalization specifically to be recent and narrow.
+  Checked against this file's two-condition rule: this phase's search satisfies condition 1 for both
+  phrasings — 32 queries across vocabulary discovery, backward chaining (to Townend/Eckhardt-Lee and
+  to Goldman/Mayo-Wilson), and direct collision queries, every candidate deep-read from primary text.
+  Condition 2 splits by phrasing. For the general reading, it is satisfied: Goldman and Mayo-Wilson
+  are a genuinely mature, peer-reviewed, decades-spanning comparator family, and Goldman's blind-
+  follower proof is a real, if narrative rather than graph-computed, instance of the same discount
+  mechanism — this is a positive finding, not an absence, so the route-two saturation question does
+  not even need to be reached for this reading; the mechanism is established, and the status moves to
+  `KNOWN_COMPONENT_NEW_INTEGRATION`. For the graph-topological reading, condition 2 fails on
+  maturity in the same shape it fails for H1: the found family (bara-2026, barakat's Eq.8 sketch) is
+  one narrow 2026 preprint and one unimplemented citation-sketch from a 2017 workshop paper, not an
+  established tradition — so a negative result here does not license `POTENTIALLY_DISTINCT`, and the
+  graph-topological reading stays `INSUFFICIENT_EVIDENCE`, unchanged from the prior reconciliation
+  but for a sharper reason: not "the search was thin" (it was not, this phase), but "the field this
+  specific search mapped is thin," which is a fact about the literature this dispatch's search
+  established, not about search effort.
+status: KNOWN_COMPONENT_NEW_INTEGRATION (review-instructions general phrasing); INSUFFICIENT_EVIDENCE (frozen-register graph-topological phrasing)
 ```
 
 ---
@@ -765,76 +911,139 @@ hypothesis: >
   no material frozen-register divergence flagged for H11.)
 strongest_challenger: >
   ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (component_overlap=1,
-  architecture_overlap=1, secondary_coverage) is now the sole standing challenger. The first
-  assessment's other challenger, burns-groth-agentic-ontological-notebook-memory-2026
-  (component_overlap=4, architecture_overlap=3, preprint_version, matrix values unchanged), was
-  independently reviewed (`05_critical_collisions.md`, source 16) and found not to demonstrate the
-  loop it was credited with — see below. 2 rows challenge H11 in `04_evidence_matrix.csv`; both
-  are addressed here, one now on very different terms than the first assessment gave it.
+  architecture_overlap=1, secondary_coverage) and burns-groth-agentic-ontological-notebook-memory-2026
+  (component_overlap=4, architecture_overlap=3, preprint_version, matrix values unchanged, found not
+  to demonstrate the loop it was credited with — see below) were the only two matrix rows listing
+  H11 before this phase. `phase-lit-08` ran H11's first dedicated collision search
+  (`00_search_ledger.csv`, LIT-08-S057 through S082: vocabulary discovery, backward citation
+  chaining through the awareness-requirements lineage, and direct collision queries) and deep-read
+  six new candidates. requirement-evolution-requirements-adaptive-systems-seams-2012 (EvoReqs;
+  component_overlap=3, architecture_overlap=2, full_text) is now the closest *implemented* candidate
+  found for H11 in the whole campaign; souza-lapouchnian-robinson-mylopoulos-awareness-requirements-
+  seams-2011 (component_overlap=3, architecture_overlap=2, full_text) and
+  runtime-verification-self-adaptive-changing-requirements-2023 (component_overlap=3,
+  architecture_overlap=2, full_text) are the family's other implemented members;
+  sawyer-bencomo-whittle-letier-requirements-reflection-icse-2010 (component_overlap=2,
+  architecture_overlap=1, full_text) is the family's founding, unimplemented vision paper;
+  krentsel-agarwal-cemri-reality-final-verifier-two-gaps-agentic-se-2026 (component_overlap=2,
+  architecture_overlap=1, full_text) and bajaj-ai-augmented-closed-loop-quality-engineering-2026
+  (component_overlap=2, architecture_overlap=1, full_text) are two brand-new 2026 papers outside that
+  lineage, read in full below.
 evidence:
   - >
-    Independent review (`05`, source 16), full-text read: the first assessment's citation of
-    burns-groth (Sec.2: "Agent-generated notes and extraction failures serve as loss signals ...
-    this closes the loop between curation experience and ontological design") quoted past the
-    immediately preceding sentence — "We are developing a feedback loop for iterative refinement"
-    (present-progressive, not completed). The claimed closure — curation failure to note to GitHub
-    issue to schema change — appears nowhere in Section 4, the paper's own Demonstration section:
-    no example, instance, or evaluation. Section 6 (Conclusion & Future Work), which the first
-    assessment's locator never cited, states plainly: "Our future work focuses on developing the
-    virtuous cycle of using experience of the systems' use curation work to improve schema + code
-    design as an automated agentic loop." The mechanism H11 needs from this source is the paper's
-    own stated future work, not a demonstrated result — the reviewer recommends dropping it as an
-    H11 challenger, or at minimum downgrading it from "strongest H11 match found."
+    (Unchanged.) Independent review (`05`, source 16) found burns-groth's claimed closed loop —
+    "curation failure to note to GitHub issue to schema change" — is the paper's own stated future
+    work ("We are developing a feedback loop for iterative refinement"), not a demonstrated result;
+    nothing in its Demonstration section or Conclusion shows it closing.
   - >
-    Even granting the loop as intended future work, the reviewer notes it would close onto
-    ontology/schema refinement specifically — curator-tool dogfooding — not onto the decisions and
-    requirements that produced the observed code in the first place, a narrower loop than
-    D-System's proposed "same knowledge structure that generated implementation intent" even if it
-    is eventually built.
+    (Unchanged.) ibm-architectural-blueprint-autonomic-computing-whitepaper-2006: MAPE-K, the
+    foundational Monitor-Analyze-Plan-Execute-over-Knowledge control loop, is the widely cited
+    ancestor of "close the loop from runtime observation back into a knowledge structure that also
+    drives action," but its "Knowledge" is short-lived, single-control-loop operational state, not
+    an append-only, provenance-bearing, cross-session history, and the architecture is explicitly
+    oriented toward reducing human involvement, unlike D-System's collaborative framing.
   - >
-    ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (component_overlap=1,
-    secondary_coverage via Muller, O'Brien, Klein & Wood, CMU/SEI-2006-TN-006): the MAPE-K
-    control loop — Monitor-Analyze-Plan-Execute over shared Knowledge — is the foundational,
-    extremely widely cited ancestor of "close the loop from runtime observation back into a
-    knowledge structure that also drives action," and is itself already named in D-System's own
-    CLAUDE.md (§5, domain #69-70) as a search domain and vocabulary-translation target
-    ("Runtime-to-knowledge loop -> runtime verification, feedback control, requirements
-    monitoring, MAPE-K").
+    sawyer-bencomo-whittle-letier-requirements-reflection-icse-2010 (complete 4-page paper, author
+    copy): the family's founding statement — requirements as introspectable, runtime-mutable
+    objects, synchronized bidirectionally with architecture — is the closest verbal match in the
+    ranked H11 sources to a knowledge structure being revised at runtime, and also the least
+    realized: "We know of no approach that fully supports requirements reflection" (Abstract); every
+    mechanism is stated as a named "Challenge" (Sec.3), zero implementation of any kind.
   - >
-    ibm-autonomic-computing, strongest_difference field: MAPE-K's "Knowledge" is short-lived,
-    single-control-loop operational state, not an append-only, provenance-bearing, cross-session
-    history, and the architecture is explicitly oriented toward reducing human involvement,
-    unlike D-System's collaborative human-agent framing.
+    souza-lapouchnian-robinson-mylopoulos-awareness-requirements-seams-2011 (complete paper): AwReqs
+    are first-class, runtime-monitorable requirement objects with an explicit satisfaction lifecycle
+    (Undecided->Succeeded/Failed/Canceled) and an append-only PropertyEvent evaluation repository —
+    the closest of the family to D-System's state-plus-evidence-at-runtime idea. But the authors name
+    the loop closing runtime evidence back into requirement revision as explicitly future work ("is
+    at the core of our future work," Sec.7); AwReqs themselves are elicited manually at design time,
+    not derived from evidence, and carry no provenance model (actor, authority, evidence, method,
+    lineage, delegation).
+  - >
+    requirement-evolution-requirements-adaptive-systems-seams-2012 (EvoReqs; complete paper): the
+    strongest *built* analog in this dispatch's payload — ECA-triggered, code-executing mutation of
+    the live requirements/goal model in direct response to a runtime AwReq failure, implemented
+    (OSGi, open-source, github.com/vitorsouza/Zanshin) and evaluated on a case study grounded in a
+    real historical incident. But the set of possible mutations is closed and hand-authored in
+    advance by an analyst — the system selects among anticipated responses, it does not derive a
+    novel requirement change from arbitrary runtime evidence — and no provenance model records why or
+    by what authority a mutation fired. This is a rule-triggered control-loop reaction over a
+    pre-specified vocabulary, the same MAPE-K-family shape this block already distinguishes from
+    D-System's claim above, not a narrower instance of "runtime evidence becomes provenance-bearing
+    evidence updating a knowledge structure."
+  - >
+    runtime-verification-self-adaptive-changing-requirements-2023 (complete paper, arXiv HTML):
+    persistent observer state functioning as knowledge preserved across change, explicitly framed as
+    "co-evolution of runtime verification and requirements" (Sec.I) — but requirement changes are
+    externally/human-supplied by design: "we believe that fully automating the requirements
+    manager...is challenging and also possibly not desired" (Sec.III-B). No provenance model; the
+    mechanism never reaches Decision, Specification, Plan, Artifact, or Deployment stages.
+  - >
+    krentsel-agarwal-cemri-reality-final-verifier-two-gaps-agentic-se-2026 (complete paper, arXiv
+    HTML): the single closest terminological match to H11 found anywhere in this campaign — an
+    "outer assurance-revision loop that uses deployment evidence to revise the requirements, model,
+    or evaluator" (Abstract), with a proposed "versioned assurance argument" linking claims to
+    evidence, assumptions, scope, and owners, the closest any ranked source comes to gesturing at a
+    provenance model for this exact loop. But Sec.1 itself frames the loop as part of "a research
+    agenda," motivated by third-party incident reports, never built or evaluated by the authors — a
+    direct instance of the same failure mode already caught in burns-groth, here correctly not scored
+    as a critical collision.
+  - >
+    bajaj-ai-augmented-closed-loop-quality-engineering-2026 (complete paper, arXiv HTML): the only
+    ranked H11 source that both implements a runtime-evidence-to-upstream-artifact feedback formula
+    and reports quantitative results — production defect-severity and incident-impact signals
+    measurably change a requirement-linked risk score used in later release decisions (Sec.3.5-3.6).
+    But the "knowledge structure" being revised is a single derived numeric feature attached to a
+    requirement for test-prioritization, not the requirement's content, its specification, or any
+    decision/rationale artifact — materially narrower than H11's claim — and the evaluation dataset
+    is semi-synthetic, not collected from a deployed system.
 assessment: >
-  The best case that runtime-to-knowledge closure is already known rests on two sources: MAPE-K,
-  a foundational, forty-plus-year-lineage pattern establishing that closing some loop from
-  operation back into a knowledge store is old and well understood in the abstract, and, until
-  this reconciliation, a concrete 2026 agentic system (Burns & Groth) said to implement a narrower
-  working instance of it. If Burns & Groth's loop held as demonstrated, MAPE-K's age plus a
-  concrete 2026 agentic instance would together make a reasonably strong case that closing this
-  loop at all is neither underexplored nor unprecedented.
-  Independent review found the second, concrete source does not hold up: the loop it was credited
-  with is the paper's own stated future work, not a demonstrated result — a quotation the first
-  assessment used had dropped the sentence immediately before it announcing the loop as
-  in-progress, and the paper's own Demonstration section and Conclusion confirm nothing closes
-  yet. What remains is MAPE-K alone: a foundational conceptual ancestor at the matrix's lowest
-  overlap score, whose own knowledge model differs from H11's claim in kind, not merely in degree
-  (short-lived operational state, not persistent, provenance-bearing, human-legible history), and
-  whose architecture is explicitly oriented toward reducing human involvement rather than
-  D-System's collaborative framing.
-  This leaves H11 with less supporting evidence than the first assessment recorded, not more: the
-  one source that looked like a working instance of the specific mechanism turns out, on the
-  primary text, not to be one. Under the decision rule stated at the top of this file, that is not
-  by itself grounds to call the mechanism distinct. No dispatch in this campaign has run a search
-  purpose-built for H11 the way H4's Pass 3 collision search did, and the sole remaining
-  challenger sits at the matrix's lowest possible overlap score, found only as secondary coverage
-  of a 2006 whitepaper rather than through search aimed at this hypothesis — that is a search that
-  has barely started on H11's specific terms, not one approaching saturation. Against a
-  campaign-wide duplicate-discovery rate of 20.0% (`LIT-06 G`), the case for concluding "the
-  mechanism has been looked for and is not there" is weaker here than for almost any other
-  hypothesis in this review, not stronger. The honest status is that this campaign has not
-  searched enough to say either way — not that the search was thorough enough to call the
-  specific closed loop H11 proposes absent from the field.
+  The best case that runtime-to-knowledge closure is already known now draws on a genuine academic
+  tradition rather than one disputed source. The "awareness requirements" family spans 2010-2023,
+  peer-reviewed at ICSE and SEAMS, and its most-implemented member (EvoReqs, 2012) is a real, working,
+  evaluated system where a runtime evidence event — an AwReq failure — automatically triggers a
+  mutation of the live requirements model. Two brand-new 2026 papers extend the picture: krentsel
+  states H11's own mechanism in language that maps almost one-to-one onto it, and bajaj reports actual
+  quantitative before/after results from a deployed feedback formula. If either the family's most
+  mature member or either of the 2026 papers held up as a working instance of the specific claim, H11
+  would be in real trouble: a fourteen-year academic tradition converging on this exact idea,
+  reinforced by working 2026 tooling, would be a strong falsification case.
+  None of them holds up as that instance, but not for a uniform reason, and the reason matters for
+  what this finding is worth. Three of the six — sawyer-bencomo (2010), souza-lapouchnian (2011), and
+  krentsel (2026) — name the loop and explicitly state it as future work, a challenge, or a research
+  agenda, never built. runtime-verification-self-adaptive-changing-requirements-2023 keeps a human
+  deciding what changed and how, by explicit design choice, not merely as an unfilled gap. bajaj builds and evaluates a real feedback
+  loop, but onto a single derived risk number, not the decision/rationale content H11 actually asks
+  about. EvoReqs is the one member that is both implemented and closes a loop from runtime evidence
+  back into an actual requirements-model mutation — but on inspection that loop is a rule-triggered
+  control-loop reaction over a closed, analyst-authored vocabulary of anticipated responses, the same
+  MAPE-K-family shape this block already treats as distinct from D-System's provenance-bearing,
+  evidence-driven claim, not a scoped-down version of it.
+  Checked against this file's two-condition rule: this phase's search satisfies condition 1 in
+  full — 26 queries across vocabulary discovery, a genuine multi-paper backward citation chain
+  through the awareness-requirements lineage (each paper's own reference list read in full), and
+  direct collision queries, with every candidate deep-read from primary text and verified against it
+  before being credited (catching krentsel's "we propose" framing exactly the way burns-groth's was
+  caught previously). Condition 2 is where H11 differs from H1 rather than resembling it: the
+  comparator family found here is genuinely mature — a fourteen-year, multi-venue, peer-reviewed
+  lineage, not a scattering of unreviewed hobby repositories — so the first half of condition 2 is
+  satisfied where H1's was not. But the second half fails: the family's best-implemented member
+  (EvoReqs) is a structurally different mechanism — closed-vocabulary rule triggering, not evidence
+  weighed into a provenance-bearing knowledge revision — not a narrower instance of the same one, and
+  every member that *is* aimed at the same mechanism (sawyer-bencomo, souza-lapouchnian, krentsel)
+  states it as unbuilt. A mature field that keeps naming the same gap across sixteen years without
+  building the thing itself is suggestive, but under this file's rule it is not the same as a mature
+  field producing even a narrow positive instance of the actual claimed mechanism the way Goldman does
+  for H4's general reading — it is closer to a mature field solving an adjacent problem well
+  (rule-triggered adaptive control) while repeatedly declining to solve this one, which the rule
+  treats as a false-friend match, not a same-mechanism one. That keeps H11 short of
+  `POTENTIALLY_DISTINCT` for the same structural reason H1 falls short, even though the two fail
+  different halves of the same test — and it is a genuinely closer call than H1's, worth recording as
+  such rather than flattening into an identical verdict for an identical reason. The status is
+  unchanged from the prior reconciliation, re-examined rather than reasserted: this campaign has
+  found, for the first time, a mature field that has spent over a decade naming this exact gap, and
+  still has not searched up a working instance of it — which is evidence worth weighing in synthesis,
+  but is not, by this file's own rule, sufficient on its own to call the mechanism absent from the
+  wider field.
 status: INSUFFICIENT_EVIDENCE
 ```
 
@@ -844,38 +1053,54 @@ status: INSUFFICIENT_EVIDENCE
 
 | Hyp. | Status | Strongest challenger (source_id) | Challenger count |
 |---|---|---|---|
-| H1 | INSUFFICIENT_EVIDENCE | eywa-provenance-grounded-memory-joshi-2026 / burns-groth-agentic-ontological-notebook-memory-2026 (both undercut on orthogonality — see block) | 2 |
+| H1 | INSUFFICIENT_EVIDENCE | mythologiq-agent-memory-oss / subit-wiki-epistemic-hmm-oss (closest new candidates, both mechanism-mismatched — see block) | 6 |
 | H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 13 |
 | H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 9 |
-| H4 | INSUFFICIENT_EVIDENCE | epistemic-sybil-resistance-bara-2026 | 1 |
+| H4 | KNOWN_COMPONENT_NEW_INTEGRATION (review-instructions general phrasing); INSUFFICIENT_EVIDENCE (frozen-register graph-topological phrasing) | goldman-experts-which-ones-should-you-trust-2001 (general) / epistemic-sybil-resistance-bara-2026 (graph-topological) | 6 |
 | H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 8 |
 | H6 | KNOWN_COMPONENT_NEW_INTEGRATION | omniscientist-coevolving-ecosystem-human-ai-scientists-2026 | 3 |
 | H7 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 10 |
 | H8 | LIKELY_ALREADY_KNOWN (review-instructions phrasing); KNOWN_COMPONENT_NEW_INTEGRATION (frozen-register phrasing) | langgraph-checkpoint-library-oss (review-instructions) / solozobov-verify-gated-completion-admission-control-2026 (frozen-register, assembly half only) | 4 |
 | H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied; zep-graphiti/langgraph's contribution to this row is weaker than the raw count implies — see block) | 18 |
 | H10 | KNOWN_COMPONENT_NEW_INTEGRATION | memtx-transactional-belief-commit-2026 | 4 |
-| H11 | INSUFFICIENT_EVIDENCE | ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (burns-groth dropped on review — see block) | 2 |
+| H11 | INSUFFICIENT_EVIDENCE | requirement-evolution-requirements-adaptive-systems-seams-2012 (closest built candidate, different mechanism shape — see block) | 8 |
 
-H1 and H11 both moved off a stronger-sounding first-assessed status once independent review of
-their named challengers' primary text found the challenger did not demonstrate the specific
-mechanism it was credited with (eywa/burns-groth's claimed orthogonality for H1; burns-groth's
-claimed demonstrated loop for H11). Neither lands on `POTENTIALLY_DISTINCT`, though a first pass
-at this reconciliation put them there: applying the decision rule stated at the top of this file,
-a challenger failing to demonstrate its claimed mechanism only earns `POTENTIALLY_DISTINCT` if the
-search behind that finding approaches saturation, and neither does — H1 has had no dedicated
-collision search of the kind H4's Pass 3 ran, and H11's sole remaining challenger
-(`ibm-architectural-blueprint-autonomic-computing-whitepaper-2006`, component_overlap=1, not
-itself a critical collision) was found as secondary coverage, not through search aimed at this
-hypothesis. Against the campaign-wide 20.0% duplicate-discovery rate (`LIT-06 G`), treating either
-gap as settled distinctiveness would outrun what the search record supports. `H4` was checked
-against the same rule and stays `INSUFFICIENT_EVIDENCE` for the same reason, despite having, if
-anything, a mechanistically closer (if narrowly scoped) match than either H1 or H11 — the rule is
-applied uniformly across all three rather than case by case. `NOVEL` remains unavailable to any of
-the three; all three are open to revision by a further, more targeted search this reconciliation
-did not perform, and that openness is exactly why none is called distinct yet. Every other
-remaining gap in the table above is a gap in what any single found system's *scope* combines
-(cross-lifecycle span for H6/H10; knowledge-bearing consolidation for H8's frozen phrasing) — not a
-gap in whether the field knows how to build the underlying mechanisms, and not a search-saturation
-question the way H1/H4/H11 are. That distinction is what separates `KNOWN_COMPONENT_NEW_
-INTEGRATION` from `INSUFFICIENT_EVIDENCE` in this review's vocabulary, and no hypothesis in this
-pass meets the bar this file now states for `POTENTIALLY_DISTINCT`.
+`phase-lit-08` ran the first dedicated collision search this campaign has aimed at H1, H4, and H11
+specifically, and the result is not uniform, though it was checked for uniformity deliberately —
+the same mistake `phase-lit-06`'s first pass made (moving H1 and H11 toward `POTENTIALLY_DISTINCT`
+while leaving H4 behind, for hypotheses in materially the same evidential position) is exactly what
+this reconciliation set out not to repeat. Applying the two-condition rule stated at the top of this
+file uniformly: all three hypotheses satisfy condition 1 (a genuinely dedicated, multi-strategy,
+primary-text-verified search ran for each, for the first time). Condition 2 — a mature, on-topic
+comparator family whose closest member instantiates the *same* mechanism, even narrowly — is where
+they separate. H1's comparator family (mythologiq-agent-memory-oss, subit-wiki-epistemic-hmm-oss,
+toki, symbolic-memory) fails on maturity: the closest candidates are weeks-old, single-author,
+unreviewed repositories, or (toki) a rigorous proof of an unrelated triple. H11's comparator family
+(the 2010-2023 awareness-requirements lineage, plus krentsel and bajaj) is genuinely mature but
+fails on mechanism match: its best-implemented member, EvoReqs, closes a loop over a closed,
+hand-authored rule vocabulary — a control-loop reaction, not a narrower instance of
+evidence-becomes-provenance-bearing-knowledge. Both stay `INSUFFICIENT_EVIDENCE`, re-examined and
+confirmed unchanged, for related but distinct reasons that are argued in full in their own blocks
+rather than asserted here. H4 is the one hypothesis where condition 2 is satisfied — for its
+review-instructions general phrasing only: Goldman (2001), backward-chained this phase from
+Mayo-Wilson (2014), is a mature, peer-reviewed, closed-form demonstration of the general discount
+mechanism H4 describes, moving that phrasing's status to `KNOWN_COMPONENT_NEW_INTEGRATION`. H4's
+frozen-register graph-topological phrasing fails condition 2 on maturity in the same shape H1's
+does — the graph-topological formalization this phase's search found (bara-2026, barakat's Eq.8
+sketch) is one narrow, largely unimplemented corner, not an established tradition — and stays
+`INSUFFICIENT_EVIDENCE`.
+This phase's own duplicate-discovery rate (58/387 = 15.0% raw, 37/347 = 10.7% distinct, computed
+against the pre-phase inventory snapshot) is lower than `LIT-06 G`'s campaign-wide 20.0%/17.3% — a
+falling duplicate rate, i.e. more new material found, not less, which argues against approaching
+saturation rather than for it. Per the owner's ruling, saturation is not claimed for any hypothesis
+on that basis; route one of the decision rule stays closed for all three uniformly, and every
+status change or non-change above rests on route two — search depth and comparator quality — argued
+explicitly, hypothesis by hypothesis, rather than on the duplicate-rate trend. `NOVEL` remains
+unavailable to all three; none meets the bar this file states for `POTENTIALLY_DISTINCT`, and all
+three (H4's graph-topological reading included) remain open to revision by a further, more targeted
+search this reconciliation did not perform. Every other remaining gap in the table above is a gap
+in what any single found system's *scope* combines (cross-lifecycle span for H6/H10;
+knowledge-bearing consolidation for H8's frozen phrasing) — not a gap in whether the field knows how
+to build the underlying mechanisms, and not a search-quality question the way H1/H4/H11 are. That
+distinction is what separates `KNOWN_COMPONENT_NEW_INTEGRATION` from `INSUFFICIENT_EVIDENCE` in this
+review's vocabulary.
