@@ -6693,6 +6693,7 @@ items:
     regenerated.
   deliverables:
   - docs/02-prompts/PROMPT-034-reusable-partition-pack.md
+  - docs/08-governance/codes.yaml
   next_action: Draft audit 1's convergence brief first. It is the block that cannot be
     copied across, because a 1-1 disagreement is not the 3-1 split the original was
     written to read.
