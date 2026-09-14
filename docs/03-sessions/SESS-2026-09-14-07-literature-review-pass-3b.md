@@ -1,0 +1,408 @@
+---
+schema_version: 1
+id: doc-session-literature-review-pass-3b
+code: SESS-2026-09-14-07
+title: Literature review Pass 3b — targeted collision search for H1, H4 and H11, and the dispatch mapping the pack did not carry
+kind: session
+status: active
+owner: repository-owner
+created: '2026-09-14'
+updated: '2026-09-14'
+systems:
+- sys-research
+- sys-backlog
+depends_on:
+- doc-lit-campaign
+- doc-prompt-literature-review-delegation-pack
+- doc-prompt-literature-review-coordinator
+- doc-prompt-literature-review-kickoff
+---
+
+# Literature review Pass 3b — targeted collision search for H1, H4 and H11
+
+The campaign's seventh execution session. Claimed by `agent-lit`, working in
+`../d-system-worktrees/lit-campaign` on `agent/lit-campaign`.
+
+## Phase
+
+`phase-lit-08` — Literature review Pass 3b: targeted collision search for H1, H4 and H11.
+Numbered 08 but runs **before** `phase-lit-07`, which depends on it.
+
+## The blocking finding this session opened with
+
+**`PROMPT-029` has no `LIT-08` section, and no ruling mapped the phase onto existing ones.**
+Verified rather than assumed: `grep -rn "LIT-08" docs/ research/` returns exactly one hit, and it
+is not a prompt — it is the phase's own verification line naming a `LIT-08-S` ledger prefix
+(`backlog.yaml:6513`). The pack runs `LIT-01` through `LIT-07` and stops.
+
+`PROMPT-031`'s pre-synthesis check-in carries eight rulings and **none maps this phase**, which it
+could not have: the check-in was held in [SESS-2026-09-14-01](SESS-2026-09-14-01-literature-review-pass-3.md),
+and `phase-lit-08` was created afterwards in [SESS-2026-09-14-04](SESS-2026-09-14-04-lit-06-followups.md).
+
+Per the pack's own rule the coordinator stopped and asked. **The owner ruled the mapping**, which is
+now recorded as its own dated section in `PROMPT-031` — deliberately not folded into the
+pre-synthesis check-in section, so a reader looking for what that check-in decided does not find a
+later, unrelated ruling mixed into it.
+
+Every item dispatched was existing pack text with a narrowed payload. **No section was authored.**
+
+| Item | Model | Section dispatched | Narrowing |
+|---|---|---|---|
+| `K` | Haiku | `LIT-06 K` | claims `phase-lit-08` |
+| `S1`/`S2`/`S3` | Sonnet | `LIT-06 S1` (Block C + S) | one dispatch per hypothesis; search and log only |
+| `X1`/`X2`/`X3` | Sonnet | Block C + **Block D** | deep-extract what the paired `S` nominated |
+| `R` ×5 | Sonnet | `LIT-06 R` verbatim | one per new `critical_collision: yes` row |
+| `X4` | Sonnet | `LIT-06 X2` | folds the five new verdicts |
+| `X5` | Sonnet | `LIT-06 X1` | **H1, H4, H11 blocks only**; `05` half skipped |
+| `G` | Haiku | Block G | measures this phase's four acceptance conditions |
+
+The owner's three mapping choices and their reasons are in `PROMPT-031`. The substantive one:
+extraction is a **separate Block D dispatch** rather than inline in `S`, because an `S` dispatch
+assembles Block C + Block S and never receives Block D — so the read-disclosure requirement added by
+check-in ruling 5 would not have reached the agent doing the extraction. A searcher scoring its own
+finds is the configuration that produced Pass 2's one-directional depth defect.
+
+## Verification
+
+`uv run python -m src.governance`, after rebasing onto `dev`
+
+```text
+Governance OK: 20 systems, 218 documents, 24 memories, 150 backlog phases
+exit 0
+```
+
+`uv run pytest`, after the rebase
+
+```text
+580 passed, 2 warnings in 36.82s
+```
+
+`uv run python tools/check_no_private_content.py`, with changes staged
+
+```text
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is
+expected in CI / a fresh clone)
+check_no_private_content: OK (607 tracked files, 0 identifiers checked)
+exit 0
+```
+
+**This is not a passing verification.** `_private/` is gitignored and absent from a worktree, so the
+tool builds an empty identifier list and reports `0 identifiers checked`. Idea `000150` records
+this. The real check runs in the primary checkout.
+
+### Delegation-pack section `LIT-08 G` — the phase gate
+
+Run on Haiku. **All eight measurements PASS.** Every figure below was independently reproduced by
+the coordinator against the files before being recorded here.
+
+**Measurement 1 — per-hypothesis ledger coverage. Gate: ≥2 more distinct-query rows than
+`phase-lit-06` left. PASS.** Population: ledger rows matching `domain_id` **exactly** (a substring
+match on `H1` also catches `H10` and `H11`, and would be wrong).
+
+| | before | after | added | distinct queries |
+|---|---|---|---|---|
+| H1 | 3 | **27** | +24 | 27 |
+| H4 | 15 | **47** | +32 | 47 |
+| H11 | 4 | **30** | +26 | 30 |
+
+Every row is a distinct query; no hypothesis reaches its floor by logging one query twice.
+
+**Measurement 2 — evidence-matrix integrity. PASS.** 43 fields × 49 rows = 2,107 cells, **0 blank**.
+
+**Measurement 3 — second reviews. Gate: 0 pending. PASS.** 24 `critical_collision: yes` rows, 0
+pending; 11 `confirmed`, 13 `disputed`.
+
+**Measurement 4 — statuses. Gate: 11 of 11 permitted, no `NOVEL`. PASS.** 4
+`LIKELY_ALREADY_KNOWN`, 5 `KNOWN_COMPONENT_NEW_INTEGRATION`, 2 `INSUFFICIENT_EVIDENCE`, **0
+`POTENTIALLY_DISTINCT`, 0 `NOVEL`.**
+
+**Measurement 5 — this phase's duplicate rate, the saturation signal. 15.0%.** Numerator 58,
+denominator 387: `result_ids` of all 82 `LIT-08-*` rows resolved against the pre-phase inventory at
+`83fb42b^`, matching on `source_id` **or** `url_or_doi`. Distinct-identifier basis: 37/347 = 10.7%.
+
+**The rate FELL, from `phase-lit-06`'s 44/220 = 20.0%.** Reported as a trend only, per ruling 8. No
+saturation is claimed and none is demonstrable. The honest reading is stronger than "unproven": a
+targeted search into three neglected hypotheses surfaced *more* new material than the broad sweep
+before it, which is evidence the campaign's coverage was **uneven rather than near-complete**.
+
+**Measurement 6 — line endings. PASS.** Ledger 1080 lines, 1080 CRLF. Matrix 50 lines, 0 CRLF.
+Inventory 1124 lines, 0 CRLF.
+
+**Measurement 7 — ledger structure. PASS.** 15 fields on all 1,079 rows; `LIT-08-S001`–`S082`
+contiguous with no gaps; every `LIT-08` row carries `pass: 3`.
+
+**Measurement 8 — `05_critical_collisions.md`. PASS.** 24 sections against 24
+`critical_collision: yes` rows; every flagged row has one.
+
+## Acceptance
+
+- **Each of H1, H4 and H11 has ≥2 further distinct-query ledger rows beyond `phase-lit-06`'s
+  counts** — **Met.** +24, +32 and +26 against a floor of +2, all distinct queries. Verified by the
+  coordinator against the ledger, not relayed.
+- **Every new matrix row is a full 43-field row with zero blanks, and every one flagged
+  `critical_collision: yes` carries a recorded independent second review** — **Met.** 15 new rows,
+  43 fields each, 0 blanks across 2,107 cells; 5 flagged `yes`, all 5 independently reviewed, 0
+  pending.
+- **`06_hypothesis_tests.md` states for each of H1, H4 and H11 whether the further search changes
+  its status, and says so explicitly where it does not** — **Met.** H1 and H11 re-examined and
+  explicitly unchanged with stated reasons; H4 moved. See below.
+- **This phase's duplicate rate is measured and reported against 44/220 as a trend, never asserted
+  as saturation** — **Met.** 58/387 = 15.0%, reported as a falling trend, no saturation claimed.
+
+## What the evidence phase found
+
+**The campaign gained no surviving distinction. It still holds zero `POTENTIALLY_DISTINCT` and zero
+`NOVEL`.** One hypothesis moved, and it moved *toward* H0.
+
+- **H1 — `INSUFFICIENT_EVIDENCE`, unchanged, explicitly re-examined.** Its four new candidates are
+  weeks-old, single-author, unreviewed repositories, or — for `toki` — a rigorous proof of an
+  unrelated triple.
+- **H4 — `INSUFFICIENT_EVIDENCE` → `KNOWN_COMPONENT_NEW_INTEGRATION`.** Not because the search
+  failed to find anything, but because it found `goldman-experts-which-ones-should-you-trust-2001`:
+  a peer-reviewed, closed-form Bayesian proof that a blind follower adds zero evidential weight,
+  agent-model-agnostic, 25 years before `bara-2026`. A positive match, not an absence. The status
+  carries the **review-instructions general phrasing**; the frozen register's graph-topological
+  phrasing remains `INSUFFICIENT_EVIDENCE` and that argument is preserved in full inside
+  `assessment`, per the file's own primacy rule and the H8 precedent.
+- **H11 — `INSUFFICIENT_EVIDENCE`, unchanged, explicitly re-examined.** Uniquely among the three it
+  found a genuinely mature comparator family — the 2010–2023 awareness-requirements lineage — but
+  its best-implemented member (`EvoReqs`) closes a loop over a hand-authored rule vocabulary with no
+  provenance. Every candidate aimed at H11's actual mechanism states it as unbuilt.
+
+**`toki` was in the inventory for four phases and was never opened.** `LIT-08 S1` surfaced it only
+because a dedicated H1 search went looking. The deep read then settled it as a different mechanism —
+isolation/schema/provenance, write-time concurrency control, no ontological-type or lifecycle axis.
+
+## The finding that outgrows this phase
+
+**63.6% of the campaign's top-band collision candidates have never been deep-read.** Measured by the
+coordinator across the whole inventory:
+
+| prescore | candidates | deep-read | share |
+|---|---|---|---|
+| 5 | 33 | 12 | **36.4%** |
+| 4 | 198 | 17 | 8.6% |
+| 3 | 149 | 5 | 3.4% |
+
+346 of 382 `collision_candidate: yes` rows have no matrix row. Triage was directionally sound — the
+read rate rises with prescore — but **21 of 33 top-band candidates were never opened.**
+
+This is not an abstract risk. **Three of this phase's strongest finds came from that unread set**:
+`toki` (H1), `barakat` at prescore 5/3 (H4), and the entire awareness-requirements family at 4/3
+(H11) — eight sources whose own inventory rationale, in one case, names H11 by id.
+
+The methodology's stop condition is "the strongest 20–30 sources deeply compared". At 49 matrix rows
+that is satisfied **by count**. It is not satisfied by **coverage of the strongest band**, and
+nothing in the campaign measures the difference. `phase-lit-07` needs this before it characterises
+what remains.
+
+## What was dispatched
+
+Item order `K → S1 → X1 → S2 → X2 → S3 → X3 → R×5 → X4 → X5 → G`, per the owner's ruling. Checked
+before dispatching for the shape `000218` describes: every row the reviews and the gate must cover
+exists before either runs.
+
+**`K` (Haiku).** Claimed `phase-lit-08` on `dev` in `f8e817b` with the catalog regeneration the
+claim forces, in the primary checkout — the only work `AGENTS.md` permits there. Verified prior
+evidence rather than recreating it. Its report omitted a confirmation it had been asked for, which
+is how the peer-file question below came to be checked.
+
+**`S1` (Sonnet), H1.** 20 rows, `LIT-08-S001`–`S020`, all distinct queries. Took H1 from 3 to 24
+rows. Surfaced `toki` from the inventory.
+
+**`X1` (Sonnet), H1.** 4 matrix rows; 2 flagged. Deviated from the commit-per-source rule, batching
+all four into one commit, and disclosed it. Not sent back: the resumability that rule protects is
+moot once a run has completed, and rewriting the commits buys nothing.
+
+**`S2` (Sonnet), H4.** 22 rows, `S025`–`S046`. Surfaced `barakat` from the inventory.
+
+**`X2` (Sonnet), H4.** 5 matrix rows — four from the payload plus `goldman`, found by chasing a
+footnote. 3 flagged. Committed per source.
+
+**`S3` (Sonnet), H11.** 20 rows, `S057`–`S076`.
+
+**`X3` (Sonnet), H11.** 6 matrix rows, **all `critical_collision: no`**. Self-caught a 14-field
+ledger row on write and fixed it in its own commit (`52dc19d`) — the on-write validation rule
+working as designed.
+
+**`R` (Sonnet ×5).** One dispatch per new flagged row, each freshly spawned, each receiving exactly
+two inputs: the source, and a file containing that row's 43 fields and nothing else, with `05` and
+`06` explicitly off-limits. **5 confirmed, 0 disputed.** Every reviewer re-derived both scores
+independently and matched; every flag stood on the component-overlap trigger alone.
+
+**`X4` (Sonnet).** Five verdicts into `second_review`, five dated sections into `05` (19 → 24), and
+the factual corrections below. **Changed no score, no `critical_collision`, no
+`hypotheses_challenged`** — verified by a coordinator-run field-level diff across all 49 rows.
+
+**`X5` (Sonnet), one fix cycle.** Re-derived H1, H4 and H11. Fix cycle 1: H4's `status` carried a
+compound string naming two permitted tokens, violating its own section's explicit four-value
+constraint and risking both this gate's classification and `LIT-07 G`'s downstream counts. Sent back
+for conformance to the file's own H8 precedent — a bare token in `status`, the split preserved in
+`assessment` — and **not** told which reading to make primary. The other eight blocks verified
+byte-identical before and after.
+
+**`G` (Haiku).** All eight measurements passed, no fix cycle. It exceeded a mechanical gate's brief
+once, by interpreting the ledger's blank cells against the contract rather than only reporting them
+— and was right to; see Corrections.
+
+## Spend posture
+
+- **Searches**: 82 this phase (`LIT-08-S001`–`S082`); ledger now 1,079 rows.
+- **Sources deep-read**: 15 new matrix rows; matrix now 49 rows × 43 fields, 0 blanks.
+- **Independent reviews**: 5, each a full source re-read; one executed the source's test suite.
+- **Fix cycles**: 1, against `X5`, well inside the cap of two.
+- **Opus escalation**: none spent, in this session or the campaign.
+- **Descope rung**: none taken.
+- **Runway**: 7 of 7 estimated sessions used, against an owner-accepted range of six to eight.
+  `phase-lit-07` is the eighth and would sit at the top of that range.
+
+## Corrections
+
+**The coordinator got two numbers wrong, and both were caught by cross-checking rather than by
+trusting.** Recorded here because the standing rule is to verify every claim against the file, and
+these are the cases where the coordinator's own output needed the same treatment.
+
+1. **H11's ledger count was reported as 4 → 24 (+20). It is 4 → 30 (+26).** The figure was measured
+   immediately after `S3` committed and not re-measured after `X3` appended six backward-chaining
+   rows (`LIT-08-S077`–`S082`, all `domain_id: H11`). It reached the `X5` dispatch in that state.
+   `X5` caught it. **`X5`'s stated reason was itself wrong** and was not adopted: it attributed the
+   gap to embedded newlines defeating a naive parse, but the ledger has **0 rows with an embedded
+   newline in any field** and the original count came from a real CSV parse. The cause was
+   staleness. A false account of why a number was wrong is worse than the wrong number, because the
+   next person applies the wrong remedy.
+2. **The coordinator's independent duplicate-rate figure (59/389) was wrong; `X5`'s and `G`'s
+   agreeing 58/387 is right.** The coordinator split `result_ids` on commas as well as semicolons,
+   fragmenting two identifiers that contain parenthetical commas (`…(paywalled, 303 redirect…)` and
+   `…(open mirror, 26pp)`) into four tokens and inventing one spurious duplicate. The delimiter is
+   the semicolon alone.
+
+**The coordinator called two ledger blank cells a defect. They are not a contract violation.** The
+"blank is not permitted" rule at `PLAN-023.03:75` governs the **evidence matrix**, not the ledger,
+and line 194 explicitly contemplates the case: "a failed collision search is a ledger row with its
+queries and empty `kept`." `LIT-08 G` read the contract and got this right where the coordinator had
+not. What survives is smaller: `LIT-02-S045` is the **only** row of 1,079 leaving `kept` empty while
+**412 rows write the literal token `none`** — a lone convention deviation that makes the row
+invisible to any consumer testing for the token. A consistency note, not a defect.
+
+**A dispatch framing may have steered `X5`'s H4 verdict, and `X5` said so.** The dispatch's context
+section stated that Goldman "satisfies a general reading and fails the register's graph-topological
+reading" — a relay of what `X2` had already reported, but a substantive conclusion placed into a
+dispatch whose job was to reach conclusions about that evidence. `X5` flagged it unprompted: it
+introduced the general/topological split "since the dispatch text explicitly named Goldman as
+satisfying the general reading." H1 and H11 are unaffected, and `X5` declined to extend an analogous
+move to H11 despite a real implemented system sitting there, which is evidence of independent
+judgment rather than compliance. **The H4 split should not be treated as uncontaminated**, and a
+re-derivation by an agent that never saw the framing is the owner's call at `/session-close`.
+
+## Findings raised
+
+**Three fetch-tool fabrications, caught by three different dispatches.** Each was found only because
+a worker re-fetched and read primary text instead of trusting a summary:
+
+- `X2` — a WebFetch summary produced a **verbatim quote attributed to Kuter & Golbeck 2007 that
+  appears nowhere in that paper**. Logged at `LIT-08-S054`.
+- `X3` — a WebFetch summary **invented a "Taiga tool" and a "meeting room management system" case
+  study** for Souza et al. 2011; the real implementation is EEAT with an Ambulance Dispatch System.
+  Not used in any scored field.
+- `S3` — a suspected fabricated claim attributed to an MDPI paper, excluded rather than credited.
+
+A fourth, separate tool artifact: WebFetch reported the SEAMS 2012 PDF as "corrupted/unreadable"
+when it was not — `curl` plus local `pdftotext` read it in full. A fetch failure message is not
+evidence that a source is unreachable.
+
+**A new variant of the same class: a source's self-reported metric adopted without check.** The
+`mythologiq` row recorded "359+ merged PRs", taken from the repository's **own internal governance
+ledger**, authored by an internal project role, describing itself as "an existing mature
+repository". GitHub's API gives **223 merged / 239 total** — roughly 60% inflation. The row also
+credited a "Code Reality Graph" as implemented, which the repository's own maturity document marks
+`declared… no module has been built yet`, and framed a **single-author** project (745 of 748 commits
+by one person, zero external contributors, ten weeks old) with language implying institutional
+weight. Scores unaffected; the maturity narrative corrected by `X4`.
+
+**Block D's read-disclosure requirement caught a contradiction it was built to catch.** The
+`subit-wiki` row claimed a file was "read in full" while the row's own `evidence_locator` disclosed
+only "first ~60 lines" — and the claim built on that partial read (that the source omits
+attribution) was false; the file cites Rabiner 1989 and Forney 1973 in its references. **Owner ruling
+5 is what made this visible.**
+
+**One reviewer executed the source's test suite**, establishing something neither a read nor a score
+could: `subit-wiki`'s Viterbi decoder is provably correct (9/9, including a brute-force
+cross-check), while its self-evolving feedback mechanism **fails 2 of its own 9 tests**. Specified
+and coded, imperfectly demonstrated.
+
+**The `source_type` enum gap widened** (`000148`). It has no bucket for a live software repository;
+three were filed under `OSS`, which now conflates a mature released library with an
+actively-developed governance system and a single-commit abandoned dump.
+
+**The one-directional error pattern persists, but has shrunk and is being caught by controls rather
+than by luck.** All three errors the reviews found ran the same way `phase-lit-06`'s did — toward
+crediting a collision — in a campaign whose null hypothesis is that collisions exist. But the
+profile inverted: **5 confirmed / 0 disputed** here against 6 confirmed / 13 disputed there. The
+likely reason is that these rows were written *after* Block D's read-disclosure requirement landed,
+by dispatches holding it.
+
+## Decisions
+
+**The coordinator stopped on the missing prompt rather than improvising one.** `phase-lit-08`'s
+`scope` gestures at reuse — "per the `LIT-06 R` section", "strategy Phase E collision searches" —
+and it would have been easy to read that as a mapping and proceed. It is not one: choosing which
+sections to reuse, how to narrow their payloads, and what the gate measures *is* authoring a
+dispatch mapping. The owner ruled it instead, and every item dispatched is existing pack text.
+
+**The `X2` charter line was held exactly where `phase-lit-06` drew it.** `X4` writes review outcomes
+and factual corrections and touches no score, no flag, no `hypotheses_challenged` — even where a
+correction made a row's maturity picture look materially weaker. Asked whether the line sits in the
+right place, `X4` said it does, and named the one borderline case: whether "make the single-author
+context explicit" is a descriptive correction or a reframing. It affected no protected field either
+way.
+
+**The `X5` fix cycle was opened for conformance, not for direction.** H4's compound status violated
+an explicit constraint of its own section text. The dispatch back said so, cited the file's own H8
+precedent, and stated plainly that which reading is primary remained `X5`'s call. This is the same
+shape as `phase-lit-06`'s fix cycle, which was sent back for inconsistency rather than for the
+direction it had chosen.
+
+## Left undone
+
+**`phase-lit-07` inherits a coverage problem this phase could only measure, not fix.** 21 of 33
+top-band collision candidates remain unread. Reading them is not a paragraph in the synthesis phase;
+it is search-and-extraction work, and `phase-lit-07` is neither.
+
+**The H4 split rests on a dispatch framing the worker flagged as steering.** See Corrections.
+
+**The campaign is further from saturation than it looked, not closer.** The duplicate rate fell
+20.0% → 15.0% when searches were aimed at neglected ground. `phase-lit-07` is synthesis, not search,
+so the number will not improve there; ruling 8 continues to forbid claiming otherwise.
+
+**Findings that outlive this phase**: `000221` (the contract still names `LIT-06 X2` as
+`second_review`'s sole writer while the flagging dispatch writes `pending`), `000148` (the
+`source_type` enum, now demonstrably short a bucket for live repositories), `000224` (a phase
+silently regressing from `complete` still fails no check; `phase-gov-05` is queued for it).
+
+## Resume state
+
+**Current phase**: `phase-lit-08`, `active`, gate-measured and passing on all eight measurements,
+left active for the owner's `/session-close`. An agent never marks a phase complete.
+
+**Next**: `phase-lit-07` — Pass 4, synthesis. Its `depends_on` names `phase-lit-08`, so it unblocks
+when this phase closes. `PROMPT-031` already carries the dated pre-synthesis check-in entry
+`LIT-07 K` requires. `LIT-07`'s item order is `K → X1 → X2 → X3 → A → G`, and `X1`'s item 0
+verifies the `06` reconciliation rather than redoing it — that reconciliation ran in `phase-lit-06`
+and this phase rewrote three of its blocks on new evidence.
+
+**A fresh session must read**: `AGENTS.md`, `GOV-006`, `PROMPT-031` — including both its
+pre-synthesis check-in rulings and the `phase-lit-08` dispatch-mapping section — then `PROMPT-030`,
+then [SESS-2026-09-14-01](SESS-2026-09-14-01-literature-review-pass-3.md) for the campaign's state,
+then this record.
+
+**Three things `phase-lit-07` must not do**: claim saturation (ruling 8, and the trend now runs
+against it); represent the matrix's 49 rows as covering the strongest candidates without naming the
+63.6% unread top band; or treat H4's status as settled without noting the dispatch-framing caveat.
+
+**Branch**: `agent/lit-campaign`, rebased onto `dev` at this boundary, clean, governance exit 0, 580
+tests passing, 28 commits ahead. **Not integrated** — the second of the two owner integrations
+`PLAN-023` schedules falls at campaign close, and this is not it. Review with
+`git diff dev..agent/lit-campaign`.
+
+**The `lit-campaign` worktree must be retained.** `phase-lit-07` commits to this same branch, and
+removing the worktree destroys its gitignored `.venv` and `data/`, which no merge carries.
