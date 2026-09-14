@@ -28,7 +28,9 @@ mechanism as an open question would misstate the evidence.
 
 **Status:** `LIKELY_ALREADY_KNOWN`. Thirteen matrix rows challenge H2, two at the matrix's ceiling
 component-overlap score of 5 (`graph-native-cognitive-memory-belief-revision-semantics-2026`,
-`jansen-bosch-architecture-as-decisions-wicsa-2005`). The claim traces through AGM belief-revision
+`jansen-bosch-architecture-as-decisions-wicsa-2005`) — both disputed on independent second review
+to 4/3 and 3/2 respectively, disputes recorded but not applied per the owner's ruling
+(`06_hypothesis_tests.md`'s H2 block). The claim traces through AGM belief-revision
 logic (1985), Snodgrass's transaction-time tables (1999), the ADR tradition (Jansen & Bosch 2005,
 formally extended by Zimmermann et al. 2009), W3C PROV-O (2013), and multiple 2025-2026 production
 agent-memory systems (Zep/Graphiti, Kumiho) — see `07_anti_novelty_case.md` §§2-4. Per
@@ -68,8 +70,9 @@ PROV-O-extended evidence graphs, and multiple 2025-2026 production systems (see
 `07_anti_novelty_case.md` §§2, 8-11). Per `06_hypothesis_tests.md`'s qualification, no single source
 combines all of D-System's proposed traceability directions into one continuous chain across every
 stage simultaneously — most sources cover a contiguous subset — but the mechanism class itself, and
-multiple examples spanning most individual stage-to-stage links, are established beyond reasonable
-dispute.
+multiple examples spanning most individual stage-to-stage links, are established more thoroughly
+than any other hypothesis in this review, bounded by the same coverage caveat stated at the top of
+this file.
 
 ---
 
@@ -83,14 +86,20 @@ successful recombination finding, not a research gap.
 ### H3 — Provenance as conflict-resolution input
 
 **Status:** `KNOWN_COMPONENT_NEW_INTEGRATION`. Rich, typed, multi-actor provenance representation is
-thoroughly known (PROV-O, EVI, log-is-the-agent — `07_anti_novelty_case.md` §2). Automated,
-axiomatically-constrained conflict resolution is also thoroughly known (AGM, 1985 — §4). No source
-combines them: EVI's authors state directly that challenge resolution "ultimately require[s] human
-judgment"; TGMS explicitly disables provenance-based write-back "pending policies." Per
-`06_hypothesis_tests.md`, this is worth recording as more than incidental — two separate, careful,
-2021-2026 engineering teams built the provenance machinery and then deliberately stopped short of
-automating arbitration on top of it, which is some evidence the combination carries a correctness or
-liability risk its builders did not want to accept, not proof the combination is hard to build.
+thoroughly known (PROV-O, EVI, log-is-the-agent, extending-nanopublications, DIVE — see
+`06_hypothesis_tests.md`'s H3 block and `07_anti_novelty_case.md` §2). Automated conflict
+resolution is also known: AGM's axiomatically-constrained entrenchment rule (1985 — §4) and, at
+real deployed scale, extending-nanopublications' sufficiency/consistency threshold test — but both
+resolve disagreement from evidence quantity alone, never drawing on the actor-identity/authority
+dimensions that make provenance "rich." No source combines rich, authority-bearing provenance with
+an arbitration rule that actually uses that authority: EVI's authors state directly that challenge
+resolution "ultimately require[s] human judgment"; TGMS explicitly disables provenance-based
+write-back "pending policies"; DIVE's refutation mechanism is manual and user-triggered. Per
+`06_hypothesis_tests.md`, this is worth recording as more than incidental — of the three
+2020-2026 teams that declined to automate, and the one (nanopublications) that did automate but
+without engaging its own actor-trust machinery, the pattern is some evidence that
+authority-weighted automated arbitration carries a correctness or liability risk builders did not
+want to accept, not proof the combination is hard to build.
 
 ### H4 — Independence-aware convergence (review-instructions phrasing)
 
