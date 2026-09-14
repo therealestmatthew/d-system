@@ -3,7 +3,6 @@ updated: '2026-09-14'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-wb-07
 - phase-port-02
 - phase-ses-01
 - phase-part-01
@@ -5624,23 +5623,36 @@ items:
   - ts/src
 - id: phase-wb-07
   title: Rehearsal refresh — runbook, Windows checks, owner-driven timing
-  next_action: 'Unblocked 2026-09-14 - the resume condition is met. phase-wb-10 is complete and the runbook
-    was refreshed against the post-fix workbench UI (93bb924, updated again in 676b257), and all
-    seven dependencies (phase-wb-01 through phase-wb-06 and phase-wb-10) are complete.
-    Acceptance condition 1 re-verified on dev 2026-09-14: the runbook is workbench-UI-only with
-    a per-step command and a named fallback for every step, and its timeboxes sum to 15m
-    (1+2+2+3+4+3), inside REQ-007 W13. No agent-executable work remains. Conditions 2 and 3 are
-    owner-machine only and cannot be advanced by any agent - the REQ-006 R06 terminal smoke
-    check, the CMD and PowerShell round-trips (REQ-007 W12), and both owner-driven timed dry-
-    runs closing REQ-006 R09. The runbook''s two dry-run tables still carry unfilled
-    __DATE_TIME__, __ACTUAL_1__ through __ACTUAL_6__, __TOTAL__ and __RECORDING_PATH__
-    placeholders; those are stopwatch readings from the owner driving the real UI on the
-    presentation machine. Left queued rather than active: it needs no max_active slot while no
-    agent can advance it, and an idle claim on sys-demo-stage is what blocked phase-wb-08 last
-    time. The prior result field was dropped because the validator rejects it on a released
-    phase; that history is preserved in the session record doc-session-rehearsal-refresh, which
-    the session field still points at. The stale agent/phase-wb-07 branch and worktree were
-    removed 2026-09-14, fully merged at 0 commits ahead of dev.'
+  next_action: 'None - phase complete. Closed 2026-09-14 by owner instruction; condition 1 verified by
+    independent review, conditions 2 and 3 closed on the owner''''s attestation with results
+    held on the presentation machine.'
+  result: 'Closed 2026-09-14 on the owner''''s explicit instruction under /session-close. Acceptance
+    condition 1 is VERIFIED: a fresh demo-adversary review against current dev confirmed both
+    Dry-Run tables carry identical timeboxes summing to 15m (1+2+2+3+4+3) with matching stated
+    totals, every step names a fallback, every quoted command resolves against the real
+    repository - it ran the curl proxy check live and got the documented 200, confirmed
+    tools/demo_reset.py exposes exactly the prepare/restore subcommands the runbook claims (19
+    passed on its own suite), and matched every UI control the presenter is told to click
+    against real strings in ts/src/. No broken command found, no leftover superseded-stage UI.
+    Gates green: governance OK, check_no_private_content OK with 31 identifiers checked in the
+    primary checkout. Acceptance conditions 2 and 3 are ATTESTED, not verified here: the owner
+    confirmed on 2026-09-14 that the REQ-006 R06 smoke check, the CMD and PowerShell round-trips
+    (REQ-007 W12) and both timed dry-runs were performed on the Windows presentation machine and
+    that the results are held there. They are not transcribed into any tracked file - the
+    runbook still carries 17 unfilled __ACTUAL__/__DATE_TIME__/__TOTAL__/__RECORDING_PATH__
+    placeholders and demo-windows-setup.md is 0 of 37 boxes ticked with three further
+    placeholders unfilled - so this session recorded the owner''''s attestation as the basis
+    rather than claiming verification it did not perform. Anyone needing the per-step times must
+    get them from the presentation machine; transcribing them into the runbook tables would make
+    this record self-contained. Correcting an earlier imprecise claim in this entry: the stale
+    branch cleanup on 2026-09-14 removed the LOCAL agent/phase-wb-07 branch and its worktree,
+    which were 0 commits ahead of dev; origin/agent/phase-wb-07 still exists with 9 commits not
+    in dev, verified to be superseded older variants of the two deliverables with dev a strict
+    superset.'
+  completion_evidence:
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  - docs/03-sessions/SESS-2026-09-11-05-rehearsal-refresh.md
   session: doc-session-rehearsal-refresh
   plan: doc-workbench
   sources:
@@ -5648,10 +5660,7 @@ items:
   systems:
   - sys-demo-stage
   owner: repository-owner
-  status: queued
-  resume_when: 'The owner is at the Windows presentation machine and able to run and record the R06 smoke
-    check, the W12/W17 shell round-trips, the W15 fill confirmations and both R09 timed dry-
-    runs. All repository-side prerequisites are already met.'
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:

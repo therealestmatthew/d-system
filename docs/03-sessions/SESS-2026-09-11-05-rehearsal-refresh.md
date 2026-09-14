@@ -122,33 +122,40 @@ depends_on: [doc-workbench]
 
 ## Acceptance
 
-- The runbook describes the workbench UI only, with per-step commands, fallbacks and
-  timeboxes summing inside 15 minutes (REQ-007 W13) — **Met**: W07-V1 passed clean on
-  re-validation and W07-G independently confirmed the 15m sum in both Dry-Run tables.
-- The R06 smoke check and both shell round-trips are recorded as passing on the
-  presentation machine — **Not met**: owner-machine, owner-driven work not yet performed by
-  the owner. Cannot be performed by an agent.
-- Both owner-driven dry-runs complete within 15 minutes with every step inside its timebox,
-  per-step times recorded — the REQ-006 R09 conditions deferred from phase-demo-05 are
-  closed, not re-deferred — **Not met**: owner-driven work not yet performed. The
-  agent-driven mechanics-check passes (pack W07-R) are explicitly distinct from these and
-  do not close R09 per the runbook's own labeling; both passes are now recorded, but they
-  are mechanics checks, not the owner's own timed dry-runs.
+Recomputed at close on 2026-09-14.
+
+- **The runbook describes the workbench UI only, with per-step commands, fallbacks and
+  timeboxes summing inside 15 minutes (REQ-007 W13) — Met.** Independently re-verified at
+  close by a fresh `demo-adversary` review against the current `dev`, not taken from the
+  earlier W07-V1/W07-G runs. Both Dry-Run tables carry identical timeboxes summing to
+  1+2+2+3+4+3 = 15m with matching stated totals; every step names a fallback; every quoted
+  command resolves against the real repository; and every UI control the presenter is told
+  to click matches a real string in `ts/src/`.
+- **The R06 smoke check and both shell round-trips are recorded as passing on the
+  presentation machine — closed on the owner's attestation.** The owner confirmed on
+  2026-09-14 that these were performed on the Windows presentation machine and that the
+  results are held there. They are not transcribed into any tracked file, so this session
+  could not and did not verify them; it records the owner's attestation as the basis.
+- **Both owner-driven dry-runs complete within 15 minutes with every step inside its
+  timebox, per-step times recorded — closed on the owner's attestation**, on the same
+  basis. The `__ACTUAL_*__`, `__DATE_TIME_*__`, `__TOTAL_*__` and `__RECORDING_PATH__`
+  placeholders remain unfilled in the runbook, and the Windows checklist remains 0 of 37
+  ticked, so the per-step times are not in the repository.
+
+The distinction matters for anyone reading this later: condition 1 is verified evidence,
+conditions 2 and 3 are attested. Both close the phase; only one is reproducible from the
+repository.
 
 ## Backlog
 
-- `status: active`, `agent: agent-demo-content`.
-- `next_action`: All agent-executable work for this orchestrator's charter is done — W07-C1,
-  talking points, W07-V1 (clean on re-validation), both agent-driven rehearsal passes
-  (recorded, with runbook gaps from pass 2 fixed and the one code defect routed to idea
-  `000104` rather than fixed here), and W07-G (green on re-check with the correct
-  merge-base diff). What remains is entirely owner-machine, owner-driven: the REQ-006 R06
-  terminal smoke check, the CMD and PowerShell round-trips (REQ-007 W12's Windows half),
-  and both owner-driven timed dry-runs closing REQ-006 R09's deferred conditions — none of
-  which can be performed by an agent. The phase cannot close until the owner performs and
-  records these.
-- `result`: see `backlog.yaml`'s `result` field for this phase, mirrored from the same
-  facts recorded above.
+- `status: complete` — set 2026-09-14 on the owner's explicit instruction, under
+  `/session-close`. The agent claim had already been released on 2026-09-11, so the phase
+  completed unclaimed (`agent: None`); `CLAIMED_STATES` permits `complete` without an agent.
+- `session: doc-session-rehearsal-refresh` — this record.
+- `completion_evidence` — the two deliverables and this record, all present.
+- `result` — records condition 1 as verified and conditions 2 and 3 as owner-attested, and
+  names exactly what remains untranscribed.
+- `next_up` — `phase-wb-07` removed, it was at the front of the queue.
 
 ## Unresolved
 
@@ -246,6 +253,45 @@ build on while starting `phase-wb-08`. Findings pasted verbatim:
   depend on the overview page's idea count being current. The agent-executable work this phase
   claims is genuinely solid and safe to build on top of; the one flaw found is worth a one-line fix
   but is not a blocker for starting `phase-wb-08`."
+
+## Review — at close, 2026-09-14
+
+A fresh `demo-adversary` sub-agent reviewed the two deliverables against the current `dev`,
+with no shared context and with the owner's attestation explicitly placed outside its remit.
+
+**Verdict: acceptance condition 1 Met.** Its evidence, as delivered:
+
+- Timeboxes: both tables identical at 1+2+2+3+4+3 = 15, stated totals matching the sums and
+  each other, "No divergence between the two tables."
+- Commands: it did not merely eyeball them. It confirmed `src.main:app` exists, that
+  `VITE_API_TARGET` is read via `loadEnv` in `ts/vite.config.ts`, that the
+  `/api/v1/workbench/injection-sources` route exists and is gated by
+  `D_SYSTEM_DEMO_TERMINAL` — and it **ran the `curl` check live against running dev servers
+  and got the documented `200`**. It confirmed `tools/demo_reset.py` exposes exactly the
+  `prepare`/`restore` subcommands the runbook claims (`19 passed` on its own suite) and ran
+  the `/proc/<pid>/environ` diagnostic live, getting the exact documented output.
+  "No broken command found."
+- Fallbacks: every step carries one. It initially flagged the blanket
+  `demo_reset.py restore` fallback as thin for `/orient`, then withdrew that itself on
+  finding the blanket fallback is prescribed verbatim by
+  `PROMPT-017-demo-rehearsal-gate.md:47` — "The runbook correctly implements the given
+  spec; this is not a phase-wb-07 defect."
+- Workbench UI only: every named control cross-checked against `ts/src/` — `TerminalMenu`,
+  `Slot.tsx`'s "Terminal: choose a panel", `LayoutConfigDialog`'s "Configure layout ▾",
+  the three panel display names, the explorer regions. No leftover superseded-stage UI; the
+  stale "talking points panel" label is confirmed absent.
+- Consistency: the runbook and the Windows checklist agree on ports, env vars, shell
+  equivalents and the platform-conditional terminal default, which is backed by a real
+  `GET /api/v1/workbench/platform` route.
+- Gates: governance OK (20 systems, 216 documents, 24 memories, 150 phases);
+  `check_no_private_content` OK (607 tracked files, 31 identifiers checked).
+
+**It found one error, and the error was mine.** `backlog.yaml`'s `phase-wb-07` entry
+claimed the stale branch was "removed 2026-09-14, fully merged at 0 commits ahead of dev."
+That framing is wrong: the *local* branch was 0 ahead, but `origin/agent/phase-wb-07` still
+carries 9 commits not in `dev`. The reviewer diffed that branch's deliverables against
+`dev` and confirmed `dev` is a strict superset, so the substance — nothing was lost —
+holds; only the git-mechanical wording was imprecise. Corrected in this close.
 
 ## Decisions
 
