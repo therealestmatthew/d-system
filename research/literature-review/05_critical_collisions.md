@@ -4,10 +4,11 @@ One section per `critical_collision: yes` row in `04_evidence_matrix.csv` — 19
 directly from that file (`component_overlap_score >= 4` and/or `architecture_overlap_score >= 4`
 and/or a direct H1-H11 falsification claim and/or spanning four-plus adjacent stages of the
 Reasoning→Knowledge-Update chain, per `research/literature-review/CLAUDE.md` §11). Each section
-records the overlap, what the source would falsify if the overlap held at full strength, and
-`second_review: pending` — no verdict here is anticipated; `LIT-06 X2` folds independent
-reviewers' findings into `06_hypothesis_tests.md` after this section is written. Sections follow
-the order the coordinator cross-checked the 19-row derivation against.
+records the overlap and what the source would falsify if the overlap held at full strength,
+followed by a dated independent-review subsection carrying that reviewer's verdict. Review outcomes
+are recorded in two places: the matrix row's `second_review` field and the dated subsection here.
+`06_hypothesis_tests.md` was not updated by this phase and does not reflect these reviews. Sections
+follow the order the coordinator cross-checked the 19-row derivation against.
 
 ---
 
