@@ -6469,7 +6469,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6532,12 +6532,18 @@ items:
     all five confirmed, zero pending. H1 and H11 re-examined and explicitly unchanged at
     INSUFFICIENT_EVIDENCE; H4 moves to KNOWN_COMPONENT_NEW_INTEGRATION on a positive match
     (goldman-2001), not on an absence. Still zero POTENTIALLY_DISTINCT and zero NOVEL.
-    Duplicate rate fell 20.0 to 15.0 percent, reported as a trend only per ruling 8.'
-  next_action: None outstanding for this phase's scope - awaiting the owner's /session-close.
-    Two items are recorded for that review, not for further work here - H4's status rests on
-    a dispatch framing the X5 worker flagged as steering, and 21 of 33 top-band collision
-    candidates remain unread, which phase-lit-07 inherits and cannot close as a synthesis
-    phase. See SESS-2026-09-14-07.
+    Duplicate rate fell 20.0 to 15.0 percent, reported as a trend only per ruling 8.
+    An independent close review reran every verification and confirmed all four conditions,
+    reproducing the duplicate rate exactly and the protected-field diff independently. It
+    refuted one narrative figure - the top-band coverage count - which was recomputed and
+    corrected at close to 340 of 387 unread, 20 of 32 in the top band. It judged the H4
+    dispatch-framing risk real and contestable; that caveat travels to phase-lit-07.'
+  next_action: None. Phase closed by the owner's /session-close on 2026-09-14 after an
+    independent review confirmed all four acceptance conditions against its own reruns. Two
+    items pass to phase-lit-07 rather than remaining open here - H4's status rests on a
+    dispatch framing the X5 worker flagged as steering and the close review judged a real,
+    contestable risk; and 20 of 32 top-band collision candidates remain unread, which a
+    synthesis phase cannot close. See SESS-2026-09-14-07.
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan

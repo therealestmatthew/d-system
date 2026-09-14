@@ -166,14 +166,14 @@ contiguous with no gaps; every `LIT-08` row carries `pass: 3`.
 
 ## Backlog
 
-`phase-lit-08` — `status: active`, `agent: agent-lit`. Left active deliberately: only the owner's
-`/session-close` moves a phase to `complete`, and an agent never marks one itself.
+`phase-lit-08` — `status: complete`, `agent: agent-lit`. Closed by the owner's `/session-close` on
+2026-09-14, after an independent review confirmed all four acceptance conditions against its own
+reruns.
 
-`next_action`: None outstanding for the phase's own scope — all four acceptance conditions are met
-and all eight gate measurements pass. Awaiting the owner's `/session-close`. Two items are recorded
-for that review rather than for further work here: H4's status rests on a dispatch framing the
-worker flagged as steering (see Corrections), and 21 of 33 top-band collision candidates remain
-unread (see below), which is `phase-lit-07`'s inherited problem rather than this phase's.
+`next_action`: None. Two items pass to `phase-lit-07` rather than remaining open here: H4's status
+rests on a dispatch framing the worker flagged as steering and the close review judged a real,
+contestable risk (see Review and Corrections); and 20 of 32 top-band collision candidates remain
+unread (see below), which a synthesis phase cannot close.
 
 `completion_evidence` (files that exist now):
 
@@ -191,9 +191,14 @@ session, so there was nothing to prune.
 - **H4's status may be contaminated by a coordinator dispatch framing**, which `X5` flagged
   unprompted. H1 and H11 are unaffected. A re-derivation by an agent that never saw the framing is
   the owner's call at `/session-close`. See Corrections.
-- **21 of 33 top-band collision candidates have never been deep-read** — 63.6% of the strongest
+- **20 of 32 top-band collision candidates have never been deep-read** — 62.5% of the strongest
   band, and three of this phase's strongest finds came from that unread set. `phase-lit-07` is
-  synthesis, not search, so it cannot close this itself.
+  synthesis, not search, so it cannot close this itself. (Figures corrected at close after the
+  independent review refuted the first ones; see Corrections item 3.)
+- **Two duplicate `source_id` rows in the inventory**, pre-dating this phase, found by the close
+  review: `memtx-transactional-belief-commit-2026` and
+  `semantically-seeded-graph-propagated-impact-analysis-vision-2026`. No acceptance condition is
+  affected, but the inventory's row count is not a distinct-source count.
 - **The campaign is further from saturation than it looked.** The duplicate rate fell 20.0% → 15.0%
   when searches were aimed at neglected ground.
 - **Three fetch-tool fabrications and one uncritically-inherited self-reported metric** were caught
@@ -230,17 +235,26 @@ isolation/schema/provenance, write-time concurrency control, no ontological-type
 
 ## The finding that outgrows this phase
 
-**63.6% of the campaign's top-band collision candidates have never been deep-read.** Measured by the
-coordinator across the whole inventory:
+**62.5% of the campaign's top-band collision candidates have never been deep-read.** Measured across
+the whole inventory at close. "Read" means the `source_id` has a row in `04_evidence_matrix.csv`;
+the band is `max(component_prescore, architecture_prescore)`:
 
 | prescore | candidates | deep-read | share |
 |---|---|---|---|
-| 5 | 33 | 12 | **36.4%** |
-| 4 | 198 | 17 | 8.6% |
-| 3 | 149 | 5 | 3.4% |
+| 5 | 32 | 12 | **37.5%** |
+| 4 | 200 | 24 | 12.0% |
+| 3 | 152 | 8 | 5.3% |
+| 2 | 3 | 3 | 100% |
 
-346 of 382 `collision_candidate: yes` rows have no matrix row. Triage was directionally sound — the
-read rate rises with prescore — but **21 of 33 top-band candidates were never opened.**
+**340 of 387** `collision_candidate: yes` rows have no matrix row. Triage was directionally sound —
+the read rate rises with prescore — but **20 of 32 top-band candidates were never opened.**
+
+*(These figures were corrected at close. The independent review refuted the coordinator's first
+numbers, which were measured after `X1` but before `X2` and `X3` added nine inventory rows and
+eleven matrix rows, and whose table silently omitted the prescore-2 band — so its columns summed to
+380 against a headline of 382. Banding by `component_prescore` alone rather than the max gives
+32/197/153 candidates and the identical totals, so the choice of band definition does not affect the
+finding. See Corrections.)*
 
 This is not an abstract risk. **Three of this phase's strongest finds came from that unread set**:
 `toki` (H1), `barakat` at prescore 5/3 (H4), and the entire awareness-requirements family at 4/3
@@ -250,6 +264,11 @@ The methodology's stop condition is "the strongest 20–30 sources deeply compar
 that is satisfied **by count**. It is not satisfied by **coverage of the strongest band**, and
 nothing in the campaign measures the difference. `phase-lit-07` needs this before it characterises
 what remains.
+
+Two duplicate `source_id` rows exist in the inventory — `memtx-transactional-belief-commit-2026` and
+`semantically-seeded-graph-propagated-impact-analysis-vision-2026` — found by the close review. Both
+pre-date this phase and affect no acceptance condition, but they mean the inventory's row count is
+not a distinct-source count, and whoever acts on the coverage finding should dedupe first.
 
 ## What was dispatched
 
@@ -331,6 +350,22 @@ these are the cases where the coordinator's own output needed the same treatment
    `…(open mirror, 26pp)`) into four tokens and inventing one spurious duplicate. The delimiter is
    the semicolon alone.
 
+3. **The coverage finding's numbers were stale and its table was internally inconsistent. Caught by
+   the close review, not by the coordinator.** Recorded as 346 of 382 unread with a 36.4% top-band
+   read rate; correct at close is **340 of 387 unread with a 37.5% top-band read rate, 20 of 32
+   never opened**. The figures were measured after `X1` but before `X2` and `X3` added nine
+   inventory rows and eleven matrix rows. The table also silently omitted the prescore-2 band, so
+   its columns summed to 380 against a headline of 382 — the reviewer spotted that arithmetic gap
+   from the record alone. The qualitative finding is unchanged and marginally worse than recorded.
+
+**All three coordinator errors this session share one root cause: a figure measured mid-phase and
+not re-measured at close.** H11's ledger count, and twice over in the coverage finding. The
+duplicate-rate error was different in kind (a tokenizer bug), but the pattern in the other two is a
+habit worth naming — a number taken while dispatches are still writing to the files it counts is a
+number with a shelf life, and nothing in the campaign's process forces a re-measure before it is
+written down. The gate re-measures the gate's own quantities; nothing re-measures the coordinator's
+narrative ones.
+
 **The coordinator called two ledger blank cells a defect. They are not a contract violation.** The
 "blank is not permitted" rule at `PLAN-023.03:75` governs the **evidence matrix**, not the ledger,
 and line 194 explicitly contemplates the case: "a failed collision search is a ledger row with its
@@ -395,6 +430,100 @@ crediting a collision — in a campaign whose null hypothesis is that collisions
 profile inverted: **5 confirmed / 0 disputed** here against 6 confirmed / 13 disputed there. The
 likely reason is that these rows were written *after* Block D's read-disclosure requirement landed,
 by dispatches holding it.
+
+## Review
+
+An independent sub-agent reviewed `dev...agent/lit-campaign` (30 commits) at close, starting with no
+context from this session, and ran every verification command itself. Its findings, verbatim.
+
+### The four acceptance conditions
+
+> **1. ≥2 further distinct-query ledger rows per hypothesis — Met.** Exact `domain_id` match (not
+> substring) gives H1 3→27 (+24), H4 15→47 (+32), H11 4→30 (+26). All 82 `LIT-08-S001`–`S082` rows
+> carry `pass: 3`, contiguous, no gaps. Reproduced myself with a script, not taken from the record.
+>
+> **2. Full 43-field matrix rows, second reviews for all `critical_collision: yes` — Met.** Matrix:
+> 49 rows × 43 fields, 0 blank cells across 2,107 cells (verified by direct cell scan). 24 rows
+> flagged `critical_collision: yes`, 0 pending, 11 confirmed / 13 disputed — exact match to the
+> record. The five new reviews from this phase are all `confirmed`, 0 disputed.
+>
+> **3. `06_hypothesis_tests.md` states whether status changed, explicitly — Met.** 11 `status:`
+> lines, values restricted to the four permitted tokens […]; `NOVEL` appears only in rule prose.
+> H1/H11 = `INSUFFICIENT_EVIDENCE`, H4 = `KNOWN_COMPONENT_NEW_INTEGRATION`. All three blocks are
+> substantive re-derivations, not pro forma.
+>
+> **4. Duplicate rate reported as trend only, never saturation — Met.** I reproduced 58/387 = 15.0%
+> and 37/347 = 10.7% independently […] No saturation assertion found anywhere in the deliverables.
+
+### On the protected-field claim, and the duplicate rate
+
+> **Five new second reviews changed no score** — confirmed by my own field-level diff of the matrix
+> between the commit before `X4`'s first commit and `X4`'s last commit: `component_overlap_score`,
+> `architecture_overlap_score`, `critical_collision`, `hypotheses_challenged` are unchanged across
+> all 49 rows.
+
+> **Duplicate rate 58/387=15.0%, 37/347=10.7%** — **independently reproduced exactly** […] This is
+> the strongest positive confirmation in the whole review — my number-for-number match on first
+> attempt corroborates both the number and the documented comma-splitting pitfall.
+
+> **Eight non-H1/H4/H11 blocks byte-identical to `dev`** — confirmed. Extracted H2, H3, H5–H10 from
+> both versions; identical line-for-line.
+
+> **No fabricated material in any committed deliverable** — confirmed. Searched for "Taiga tool,"
+> "meeting room management system" (neither appears anywhere), and the Kuter & Golbeck material
+> (appears only in `05_critical_collisions.md` and the ledger as documentation of the fabrication
+> being caught and discarded, never credited as fact). The MDPI incident is also present exactly as
+> described, at `LIT-08-S065`, explicitly flagged as an unverified tool-generated claim "not to be
+> mistaken for a confirmed finding."
+
+### The one claim it refuted
+
+> **Coverage finding (346/382, 21/33 top-band unread, 36.4%)** — **not reproduced.** My own
+> computation from the current committed files gives different numbers by every method I tried […]
+> Neither method reproduces the record's 346/382 or its per-band breakdown, though both land in the
+> same neighborhood and support the same qualitative conclusion (severe undercoverage of the top
+> band). Note also that the record's own table is internally inconsistent — the three band totals in
+> its text sum to 380, not the 382 asserted in the headline sentence […] This looks like arithmetic
+> drift in the record's own count, not a fabrication — the direction and rough magnitude of the
+> finding hold up — but the specific numbers should not be trusted at face value.
+
+**Acted on.** The coordinator recomputed at close, confirmed the reviewer, and corrected the figures
+and the method statement above. See Corrections item 3.
+
+### Its judgement on the two substantive questions
+
+> **Is acceptance 3 genuinely satisfied in substance?** Yes. I read the full H1 and H11 blocks. Both
+> name the specific searches run, list every new candidate with its overlap scores and why it falls
+> short, and explicitly apply the file's own two-condition saturation-adjacent rule […] A reader
+> would genuinely learn that the search was re-run in earnest and found nothing sufficient, not just
+> that a status line stayed the same.
+
+> **Does H4's verdict stand on the evidence, or on the dispatch framing?** Mixed, genuinely
+> contestable. The evidentiary content is real: Goldman (2001) is a peer-reviewed, 25-year-old,
+> closed-form proof that dependent ("blind follower") agreement adds no evidential weight while
+> independent agreement does — a substantive match to H4's general phrasing regardless of how it was
+> described to the worker. The two-phrasing split itself also isn't invented for H4; it follows an
+> existing documented convention already used for H8 earlier in the same file. But the coordinator's
+> dispatch text told the worker, before it reached its own conclusion, that Goldman "satisfies a
+> general reading and fails the register's graph-topological reading" — handing the worker the exact
+> two-way split and exactly how to characterize the key source. `X5` disclosed this unprompted,
+> which is a point in favor of process integrity, but disclosure doesn't remove the risk: I cannot
+> rule out that a neutrally-framed dispatch would have produced a more conservative single verdict
+> (e.g., treating the ambiguity as reason to stay `INSUFFICIENT_EVIDENCE` overall) rather than
+> actively promoting one reading to the primary status token. The session record's own flag on this
+> is fair and should not be waved off at `/session-close`.
+
+### Its bottom line
+
+> All four acceptance conditions hold under my own reruns. Eight of the nine specific claims I
+> checked reproduce exactly or are directly confirmed by the diff. The ninth — the
+> coverage/undercoverage finding — does not reproduce under any matching method I tried, though the
+> qualitative conclusion […] is directionally correct […] The H4-framing risk the record itself
+> raises is real and warrants the owner's attention at close, not dismissal.
+
+It also noted governance reporting 219 documents against the record's 218 — background drift on
+`dev` since that run, not this phase's doing — and the two duplicate inventory `source_id`s recorded
+above.
 
 ## Decisions
 
