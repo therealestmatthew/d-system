@@ -197,6 +197,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-10-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-11-workbench-backend-api.md |
 | SESS-2026-09-10-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-12-workbench-layout-notes-strip.md |
 | SESS-2026-09-10-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-13-workbench-terminal-panel-rework.md |
+| SESS-2026-09-10-14 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-10-14-demo-glossary-diagrams.md |
 | SESS-2026-09-11-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-01-research-pack-protocol.md |
 | SESS-2026-09-11-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-02-workbench-html-viewer-panel.md |
 | SESS-2026-09-11-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-11-03-file-browser-panel.md |
@@ -284,4 +285,4 @@ CI regenerates it and fails on any difference.
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 | PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-211 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 74.
+212 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 51, prompt: 33, requirement: 9, session: 75.
