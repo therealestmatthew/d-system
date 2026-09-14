@@ -261,7 +261,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 1 | 0 | 6 | agent-lit |
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 0 | 6 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 3 | 1 | 0 | agent-kit |
-| PLAN-025 | doc-repeatable-idea-partition | draft | 3 | 0 | 0 | — |
+| PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 1 | 0 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
 | PLAN-027 | doc-workbench-features-defects | draft | 1 | 0 | 0 | — |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 1 | 0 | 0 | — |

@@ -6657,7 +6657,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-partition
   priority: 1
   session_budget: 1
   depends_on: []
