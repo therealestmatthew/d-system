@@ -6169,7 +6169,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6202,7 +6202,23 @@ items:
   - research/literature-review/03_source_inventory.csv
   - research/literature-review/01_terminology_map.md
   - research/literature-review/02_domain_map.md
-  next_action: Dispatch delegation-pack section LIT-03 after phase-lit-02 completes.
+  session: doc-session-literature-review-pass-1c
+  completion_evidence:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/01_terminology_map.md
+  - research/literature-review/02_domain_map.md
+  - docs/03-sessions/SESS-2026-09-13-02-literature-review-pass-1c.md
+  result: All 17 pack sections dispatched and gate-measured. LIT-03 G (after one fix
+    cycle correcting its own variant derivation) - all 72 domains >=2 distinct-query
+    rows; 339/339 mandated variants covered; 1,038 candidate inventory rows (floor 75);
+    domain map complete with all 72 entries and a ranked top-20; 0 excluded rows without
+    reason; 0 kept identifiers unresolved. 283 ledger rows LIT-03-S001..S283. Three
+    coordinator fix cycles (S3, S4, G), all closed first-cycle. No Opus escalation, no
+    descope rung.
+  next_action: None outstanding. phase-lit-04 (Pass 2a, deep reading) is unblocked and
+    continues on the campaign branch; its K needs the owner's ruling on deep_read marking
+    (idea 000202) before Pass 2a starts.
 - id: phase-lit-04
   title: Literature review Pass 2a — deep-read the top collision candidates
   plan: doc-lit-campaign
@@ -6214,7 +6230,8 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: queued
+  status: complete
+  agent: agent-lit
   priority: 3
   session_budget: 1
   depends_on:
@@ -6244,7 +6261,34 @@ items:
     second_review pending, a backward-chaining ledger row for every deep-read source
   deliverables:
   - research/literature-review/04_evidence_matrix.csv
-  next_action: Dispatch delegation-pack section LIT-04 after phase-lit-03 completes.
+  session: doc-session-literature-review-pass-2a
+  completion_evidence:
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/00_search_ledger.csv
+  - docs/03-sessions/SESS-2026-09-13-03-literature-review-pass-2a.md
+  result: Pass 2a executed - LIT-04 K, X1, X2 (one fix cycle), X3 and G dispatched
+    verbatim from PROMPT-029. 20 sources deeply compared into a new 43-field evidence
+    matrix; 44 ledger rows LIT-04-S001 to S044 (24 bibliographic-verification rows
+    under strategy_phase D, 20 backward-chaining rows under strategy_phase B); 14
+    rows flagged critical_collision yes, all carrying second_review pending. All four
+    LIT-04 G gates PASS on both the gate's own measurement and the coordinator's
+    independent re-measurement - 20 of 20 batch ids present, 0 blank required fields
+    across all 43 columns, 0 flagged rows lacking second_review pending, 0 deep-read
+    sources without a strategy_phase B ledger row. Governance exits 0; 578 tests pass
+    after rebase onto dev. Closed after an independent cold-start sub-agent review
+    that recomputed every quantitative claim from the raw files and returned HOLDS on
+    both acceptance conditions with no unresolved discrepancy. The review raised two
+    items, both acted on before close. First, the coordinator's flag check had covered
+    only 2 of the contract's 4 CRITICAL_COLLISION triggers (the reviewer tested the
+    other two and found no missed flag; the session record now states the full rule).
+    Second, commit trailers do not record which model ran which section, so the
+    dispatch table's model tiers are not auditable from git history (idea 000215).
+  next_action: None outstanding. phase-lit-05 (Pass 2b - forward chaining and
+    foundational works, bringing the matrix to the methodology's 20-30) is unblocked
+    and continues on agent/lit-campaign, numbering its searches from LIT-05-S001.
+    Open for the owner, none blocking - ideas 000208 to 000215, in particular 000208
+    (the --catalog wording in AGENTS.md and CLAUDE.md, which no agent may change) and
+    000210 (whether the misattributed source_id slug is renamed).
 - id: phase-lit-05
   title: Literature review Pass 2b — deep-read foundational works and complete the
     evidence matrix
@@ -6257,7 +6301,8 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: queued
+  status: complete
+  agent: agent-lit
   priority: 3
   session_budget: 1
   depends_on:
@@ -6286,7 +6331,36 @@ items:
     hypotheses still lacking a challenger
   deliverables:
   - research/literature-review/04_evidence_matrix.csv
-  next_action: Dispatch delegation-pack section LIT-05 after phase-lit-04 completes.
+  session: doc-session-literature-review-pass-2b
+  completion_evidence:
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - docs/03-sessions/SESS-2026-09-13-04-literature-review-pass-2b.md
+  result: All five LIT-05 work items (K, S1, X1, X2, G) dispatched and verified. The
+    evidence matrix reached 30 rows - the methodology's 20-30 ceiling - closing Pass
+    2, with 0 blank cells across 43 fields x 30 rows and 16 rows carrying critical_collision
+    yes and second_review pending. The ledger holds 967 rows (LIT-05-S001 to S079,
+    contiguous, all 15 fields, CRLF throughout); the inventory holds 1108. All five
+    LIT-05 G gates pass after one fix cycle on S1, which closed a measurement-3 failure
+    caused by the phase's own item order rather than by any worker (idea 000218).
+    LIT-05 G measurement 4 reports H4 with zero challengers, H1 with one and H11 with
+    two.
+  next_action: None outstanding. Closed by the owner's /session-close after an independent
+    sub-agent review, which confirmed both acceptance conditions MET on its own re-measurement
+    and raised six discrepancies - all resolved before close. The one real data defect
+    (18 ledger rows carrying pass 3 inside a Pass-2b phase) went back to LIT-05 X2 as
+    a fix cycle and is corrected in commit a940c19; every phase's pass column is now
+    internally consistent. agent/lit-campaign was integrated into dev on the owner's
+    direction, and the branch and worktree are deliberately retained because PLAN-023
+    has every campaign phase commit to that one branch. phase-lit-06 (Pass 3 - adversarial
+    hypothesis testing H1-H11 and the 16 pending collision second reviews) is unblocked
+    and continues on it, numbering its searches from LIT-06-S001. LIT-06 S1 must dig
+    where LIT-05 G measured thin - H4 has zero challengers, H1 has one, H11 has two.
+    Open for the owner, none blocking - ideas 000217 to 000221, in particular 000218
+    (LIT-05's item order defeats its own gate measurement 3 and will cost phase-lit-06
+    a fix cycle the same way) and 000221 (the contract names LIT-06 X2 as second_review's
+    only writer while LIT-04 and LIT-05 both write it).
 - id: phase-lit-06
   title: Literature review Pass 3 — adversarial hypothesis testing and collision second
     reviews
@@ -6299,7 +6373,8 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-lit
   priority: 3
   session_budget: 1
   depends_on:
