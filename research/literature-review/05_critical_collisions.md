@@ -1441,3 +1441,60 @@ The citation does not discharge the claim it is attached to, confirming field 38
 
 **Resolution.** No matrix changes needed. No score, flag, or `hypotheses_challenged` value is
 changed; no factual corrections were found.
+
+---
+
+## 24. goldman-experts-which-ones-should-you-trust-2001
+
+Goldman, Alvin I. "Experts: Which Ones Should You Trust?" Philosophy and Phenomenological Research
+63, no. 1 (2001): 85-110. https://doi.org/10.1111/j.1933-1592.2001.tb00093.x
+
+**Overlap.** component_overlap=4, architecture_overlap=1. A general, agent-model-agnostic,
+closed-form Bayesian proof that concurring testimony from a non-independent (or only-partially-
+independent) witness adds little or no extra evidential weight, and that full weight requires
+genuine conditional independence between witnesses' causal routes to belief — found via backward
+chaining from a footnote in a different dispatch's source rather than nominated directly.
+
+**What it would falsify.** At full strength this would contribute to falsifying H4's general shape.
+It does not satisfy H4's "graph-topological" framing: independence is characterized narratively via
+two "causal route" types (routes that "entirely bypass" each other vs. routes that go "partly
+through" another witness's reasoning) — informal philosophical categories, not an explicit graph/
+lineage data structure, with no traversal algorithm and no worked graph example; the paper provides
+no algorithm or worked procedure for a novice to actually *determine* whether two witnesses are
+independent in practice. Architecture overlap is minimal (1): no O/E/L state triple, no typed
+transition model, no provenance graph/ontology, no persistent memory/retrieval, and no decision/
+requirement/spec/plan/execution/artifact/test/deployment/runtime linkage — the only architectural
+contact point is the shared broad objective.
+
+second_review: confirmed, with one correction: a verbatim_notes page locator was off by one (p.101
+-> p.102). Scores, flag and hypotheses_challenged all reproduced exactly.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=1, flag fires on the
+component trigger alone (H4 challenged). A rigorous algebraic proof, at wider scope (any epistemic
+agents, not AI-agent-only) than other H4 challengers in this campaign, but characterized narratively
+rather than graph-topologically.
+
+**Independent reviewer position.** Independently re-derives both scores exactly (4/1) from Sec.4's
+full Bayesian derivation (pp.97-104), read directly page by page from the same third-party mirror
+the row cites, confirmed as a 26-page PDF matching the paper's stated pp.85-110 pagination. Confirms
+the attributed formal result is real (Eqs.1-6', not a fabrication or embellishment): if Y is a
+"blind follower" of X, (3) reduces exactly to (1) — zero extra evidential weight; a "non-
+discriminating reflector" (equal conditional likelihoods) also collapses to zero weight; the
+N-witness generalization is stated in prose. Confirms independence is characterized narratively
+(p.102), not via an explicit graph/lineage data structure — correctly the basis for capping
+component overlap at 4 rather than 5, and for the row's `strongest_difference` field. One factual
+correction, page-citation only: `verbatim_notes` cites the "non-discriminating reflectors... add no
+further weight" quote at p.101; a page-by-page reading places it at p.102 — the quote text itself is
+verbatim-accurate, only the locator was off by one. All other verbatim quotes, section-header page
+numbers, and citation/DOI/masthead details check out exactly. One prose-precision note, not a
+scoring change: Goldman rigorously proves only the boundary cases (blind follower / non-
+discriminating reflector collapsing to exactly zero extra weight); the graded/continuous case is
+argued only qualitatively ("if the members are more reliable and more conditionally independent...
+that might imply..."), with no continuous discount formula derived — so the row's framing of this as
+"materially the same discount shape" as a closed-form comparator elsewhere in the campaign is exact
+at the zero-weight boundary and only qualitative in between. This does not move either score.
+
+**Resolution.** One correction applied to `04_evidence_matrix.csv`: `verbatim_notes`'s page locator
+(p.101 -> p.102). No score, flag, or `hypotheses_challenged` value changed.
