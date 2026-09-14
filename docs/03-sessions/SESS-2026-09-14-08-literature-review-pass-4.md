@@ -152,13 +152,17 @@ than fixed — no dispatch in this phase owns the inventory.
 `phase-lit-07` — `status: active`, `agent: agent-lit`. Left active for the owner's
 `/session-close`; an agent never marks a phase complete.
 
-`next_action`: as written to `backlog.yaml` this run — the owner's `/session-close`, with three
-campaign-level facts the close must weigh: the gate's measurement 2 fails (15 late-added strong
+`next_action`: as written to `backlog.yaml` this run — the owner's scoping decision.
+`/session-close` ran on 2026-09-14: the independent close review corroborated acceptance 1 Met
+and acceptance 2 Not met with zero discrepancies, so the phase stays `active` — completion
+requires every condition met, and the second condition's stop-conditions half does not hold. The
+three campaign-level facts behind it: the gate's measurement 2 fails (15 late-added strong
 collisions never chained, a search gap no synthesis dispatch can close); saturation is not
 demonstrated and ruling 8 forbids claiming it (duplicate rate fell 20.0% → 15.0%); the "strongest
 20–30 deeply compared" condition is met by count, not by coverage (20 of 32 top-band candidates
-never deep-read). Whether any of the three warrants a ninth session is the owner's call — the
-runway estimate of seven sessions is already exceeded by one, inside the accepted range's top end.
+never deep-read). The owner decides between a ninth search session and ruling on how the phase
+closes against an acceptance half that ruling 8 makes unclaimable as written — the runway
+estimate of seven sessions is already exceeded by one, at the accepted range's top end.
 
 `completion_evidence` (files that exist now): the fourteen files of
 `research/literature-review/` — ledger, inventory, matrix, terminology and domain maps,
@@ -190,6 +194,82 @@ runway estimate of seven sessions is already exceeded by one, inside the accepte
 - **Carried from earlier phases**: `000221` (the evidence contract still names `LIT-06 X2` as
   `second_review`'s sole writer), `000148` (the `source_type` enum gaps), `000224` (a phase
   silently leaving `complete` fails no check; `phase-gov-05` is queued for it).
+
+## Review
+
+An independent sub-agent reviewed `dev...agent/lit-campaign` (11 commits) at close, starting with
+no context from this session, and ran every verification command itself. Its report, verbatim.
+
+> ### Verification commands (run myself)
+>
+> - `uv run python -m src.governance` — `Governance OK: 20 systems, 220 documents, 24 memories,
+>   150 backlog phases`, exit 0.
+> - `uv run python tools/check_no_private_content.py` — `OK (618 tracked files, 0 identifiers
+>   checked)`. **Not a meaningful pass**: `_private/portfolio/` is absent from the worktree by
+>   construction, so the tool checks an empty identifier list. The record itself flags this
+>   correctly.
+> - `uv run pytest` — `580 passed, 2 warnings`. Matches the record exactly.
+> - `git log`/`git diff --stat` — 11 commits, matches the record's manifest of touched files
+>   exactly. `research/sources/` (the historical seed ledger) shows zero diff — genuinely
+>   untouched.
+> - Branch state: working tree clean, `dev` is an ancestor of `agent/lit-campaign` (rebased), 11
+>   commits ahead — matches the resume-state claim.
+>
+> ### Acceptance condition 1
+>
+> **Holds.** Independently confirmed: all seven files exist and are substantial; 45 of the
+> matrix's 49 `source_id`s are cited by the synthesis files; I verified the claimed 4 unused are
+> genuinely absent by both slug and author-name search, and confirmed two other apparent misses
+> (`levinson-et-al-fairscape...`, `krentsel-agarwal-cemri...`) are in fact cited by author name —
+> matching the record's stated cross-check method precisely. `08`'s eleven hypothesis placements
+> match `06`'s eleven statuses one-for-one (4 `LIKELY_ALREADY_KNOWN`, 5
+> `KNOWN_COMPONENT_NEW_INTEGRATION`, 2 `INSUFFICIENT_EVIDENCE`, 0 `NOVEL`, 0
+> `POTENTIALLY_DISTINCT`), and H3's rework (from 9 to 11 challenger rows, with the two
+> `phase-lit-08` additions argued rather than asserted) reads as genuine, sourced reasoning, not a
+> rubber-stamped fix. Across the entire branch diff, zero `status:` tokens changed in
+> `06_hypothesis_tests.md`. The stale "34 rows" → "49 rows" denominator correction in commit
+> `c24a8ee` is real.
+>
+> ### Acceptance condition 2
+>
+> **Holds as recorded: Not met, in its stop-conditions half.** I re-ran the gate measurements
+> independently: measurement 2 reproduced **exactly** — 39 matrix rows with either overlap score
+> ≥3, of which 15 lack forward-chaining rows, 5 of those also lacking backward rows; my computed
+> source-id lists match the record's verbatim. Measurement 4: 2,107 cells, 0 blank; row count 49
+> above the 20–30 band — confirmed as a count-not-coverage distinction. Measurement 6: 24 flagged,
+> 0 pending, 11 confirmed / 13 disputed — exact. Measurement 3: all 11 statuses permitted.
+> Measurement 1 spot-check (D18): 17 rows, and the domain-id distribution confirms 72 D-domains
+> (D48 minimum at 6) plus 11 H-domains. Measurement 7: 14 files. Ledger: 1,095 data rows, 15
+> fields uniform, all CRLF-terminated (verified byte-level); `LIT-07-S001`–`S016` present, all
+> `strategy_phase: D`. No deliverable anywhere claims saturation or represents the 49 rows as the
+> strongest available — every mention of saturation explicitly disclaims it. The lit-06→lit-08
+> comparator (20.0%→15.0%, falling) is not a deviation from the pack's literal lit-05 comparator
+> text — `PROMPT-031`'s later `phase-lit-08` dispatch-mapping ruling explicitly directs reporting
+> against `phase-lit-06`'s 44/220, superseding the pack's stale text. Correctly followed, not a
+> hidden interpretation. The 340/387 coverage figure: 387 rows flagged `collision_candidate: yes`
+> (386 distinct ids, one duplicate), exactly 4 non-duplicate rows labeled `status: candidate`
+> despite having matrix rows — matching the record's hygiene-gap claim precisely; the record's own
+> "naive recount gives 341" acknowledgment is internally consistent with this, not an unexplained
+> discrepancy. Fix-cycle commits `c24a8ee`/`0a15400`/`e7e2828` confirmed, zero `status:` changes,
+> the specific content fixes verified in the diffs.
+>
+> ### Discrepancies found
+>
+> None. Every specific, checkable number in the session record reproduced exactly under my own
+> independent computation — the ledger, matrix, inventory, and hypothesis-status figures all
+> matched, including the more convoluted ones. I found no instance where the record's claim outran
+> what the files support, and no instance of a hidden or unstated interpretation beyond the two
+> the record itself already discloses.
+>
+> ### Bottom line
+>
+> I corroborate both of the record's verdicts: **acceptance 1 Met, acceptance 2 Not met** (in its
+> stop-conditions half). The synthesis deliverables are real, traceable, and internally
+> consistent; the campaign's three open evidentiary gaps (measurement 2's chaining gap,
+> undemonstrated saturation, and the 340/387 top-band coverage gap) are genuine, independently
+> reproduced, and honestly reported rather than argued away. Nothing I found blocks an honest
+> close on the terms the record states — the open questions are properly the owner's scoping call
+> (whether a ninth session is warranted), not defects in this phase's execution or reporting.
 
 ## What was dispatched
 
@@ -255,7 +335,7 @@ measurements 1 and 4 with the corrected method and corrected a misattribution in
 measurement-8 note. Final: measurements 1, 3, 5-as-trend, 6, 7, 8 pass; measurement 2 fails;
 measurement 4 splits (blanks pass, count above band with the caveat carried).
 
-## Coordinator decisions
+## Decisions
 
 **Two gate failures were not sent back and one was.** `phase-lit-01` produced one real gate
 failure and one artifact of the gate's own method, needing different responses; this gate
@@ -299,6 +379,29 @@ the idea-triage agent — no existing plan, phase or document covers it — and 
 `docs/01-plans/PLAN-039-literature-review-source-archival.md`) written with one queued
 requirements-and-design phase, `phase-arc-01` (`aedcd9b`). Governance exits 0 on that branch.
 Promotion of `000232` onto `PLAN-039` and integration of the branch are the owner's.
+
+## Left undone
+
+**The phase closes honestly incomplete, and that is the campaign's result, not a defect in the
+work.** Acceptance 2's second half asks the final gate to show the stop conditions met; three do
+not hold, and one of them — saturation — is unclaimable by construction while ruling 8 stands and
+the duplicate trend falls. The synthesis itself is finished: nothing in items `K` through `G`
+remains undispatched, unfixed or unverified. What remains is evidence work no synthesis phase can
+perform:
+
+- **Forward chaining on the 15 late-added strong collisions** (5 also need backward chaining) —
+  one bounded search phase, if the owner wants measurement 2 closed.
+- **The top-band coverage gap** — 20 of 32 prescore-5 candidates never deep-read; reading them is
+  Pass 2-shaped work.
+- **Saturation** — only further searching can move the trend, and the trend currently moves away.
+
+Whether any of this is worth a ninth session, or whether the campaign's memo stands on the
+recorded caveats, is the scoping decision this record hands to the owner. The deliverables are
+written so that either answer leaves them accurate.
+
+**Also left, on the side branch**: promotion of `000232` to the source-archival plan
+(`PLAN-039`) and integration of `agent/source-archival` — owner-directed work from this session,
+complete on its branch, awaiting the owner's integration decision.
 
 ## Spend posture
 

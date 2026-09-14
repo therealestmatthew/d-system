@@ -6844,14 +6844,17 @@ items:
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
   session: doc-session-literature-review-pass-4
-  next_action: Owner /session-close. All six items dispatched and verified; all seven synthesis
-    deliverables exist; acceptance 1 met. Acceptance 2 not met in its stop-conditions half,
-    recorded rather than asserted away - gate measurement 2 fails (15 of 39 strong collisions,
-    all added in phase-lit-06/08 after the chaining passes, have no forward-chaining rows and 5
-    no backward rows), saturation is not demonstrated (duplicate rate fell 20.0% to 15.0%;
-    ruling 8 forbids claiming it), and the 20-30 deep-read condition is met by count (49 rows)
-    not coverage (20 of 32 top-band candidates never read). Whether any of the three warrants
-    a ninth session is the owner's call; the campaign has no further phases.
+  next_action: 'Owner scoping decision. /session-close ran 2026-09-14: the independent close
+    review corroborated acceptance 1 Met and acceptance 2 Not met in its stop-conditions half
+    with zero discrepancies, so the phase stays active - completion requires every condition
+    met. The synthesis work is finished; what fails is the campaign-level evidence, recorded
+    rather than asserted away: gate measurement 2 (15 of 39 strong collisions, all added in
+    phase-lit-06/08 after the chaining passes, have no forward-chaining rows and 5 no backward
+    rows), saturation (duplicate rate fell 20.0% to 15.0%; ruling 8 forbids claiming it), and
+    the 20-30 deep-read condition met by count (49 rows) not coverage (20 of 32 top-band
+    candidates never read). The owner decides: direct a ninth search session to close the gaps,
+    or rule on how the phase closes against an acceptance half that ruling 8 makes unclaimable
+    as written. The campaign has no further phases.'
 - id: phase-kit-01
   title: Build the kit's six commands
   plan: doc-consultant-demo-kit
