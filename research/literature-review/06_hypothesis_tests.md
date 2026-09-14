@@ -1,5 +1,18 @@
 # Hypothesis tests — H1 through H11
 
+> **Reconciled against the second reviews, 2026-09-14.** `phase-lit-06` ran nineteen independent
+> second reviews of the `critical_collision: yes` rows in `04_evidence_matrix.csv` (6 confirmed, 13
+> disputed; verdicts recorded in `05_critical_collisions.md`, one dated `### Review — 2026-09-14`
+> subsection per row) but did not itself update this file. This pass folds those reviews' findings
+> into the blocks below. Per the owner's ruling, the matrix's scores and `critical_collision` flags
+> were left exactly as first assessed even where a review disputed them — a dispute is a recorded
+> judgment call, not an applied correction — so this file's `strongest_challenger` overlap scores
+> still cite those first-assessed values. What changed here is which sources are credited as
+> challenging which hypothesis, and in two cases (H1, H11) the resulting status, based on what the
+> reviews established the sources' own primary text actually says. A reader of this file alone
+> should treat its verdicts as post-dating and superseding the pre-review reading of the same
+> sources in `05`'s un-reviewed first-assessment prose.
+
 Verdicts follow `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`.
 Per that record, the review-instructions text (`research/literature-review/CLAUDE.md`, §4) is
 primary; a frozen-register (`research/pre-literature-hypotheses.yaml`) nuance is noted wherever
@@ -27,45 +40,73 @@ hypothesis: >
   addresses explicitly below, per the scope record's flagged H1 divergence.
 strongest_challenger: >
   eywa-provenance-grounded-memory-joshi-2026 (component_overlap=4, architecture_overlap=3,
-  full_text); secondary: burns-groth-agentic-ontological-notebook-memory-2026 (component_overlap=4,
-  architecture_overlap=3, preprint_version)
+  full_text) and burns-groth-agentic-ontological-notebook-memory-2026 (component_overlap=4,
+  architecture_overlap=3, preprint_version) remain the only two matrix rows listing H1 in
+  `hypotheses_challenged` — no other row does. Independent review of both (`05_critical_collisions.md`,
+  sources 18 and 16) found the specific claim each was credited with — a genuinely orthogonal
+  three-axis classification — does not survive a full-text read of either. Both are retained below
+  as the closest available candidates, now read for what they actually show rather than what the
+  first assessment credited them with.
 evidence:
   - >
     eywa, Table 2 / Sec.4.3: a memory-object model (Evidence/Signal/Candidate/Belief/Link) that
-    independently tracks ontological type, epistemic status/tier, and lifecycle state on the same
-    object, in a real, implemented, evaluated agent-memory system (per-question artifacts
-    published at eywa.to/research, Sec.1 Abstract).
+    tracks ontological type, epistemic status/tier, and lifecycle state on the same object, in a
+    real, implemented, evaluated agent-memory system (per-question artifacts published at
+    eywa.to/research, Sec.1 Abstract).
   - >
-    eywa, Sec.4.1, Eq.1: "a belief is valid only to the extent that it is supported by one or
-    more evidence records" — the epistemic axis is load-bearing, not decorative.
+    Independent review (`05`, source 18), full 29-page read: the row's premise that Table 2 encodes
+    "three independently-tracked classification dimensions" is not supported by the primary text.
+    The five object types each carry a deterministic one-to-one mapping to Mutability and epistemic
+    tier — Evidence is always Immutable and Tier-0, Beliefs always Revisable and Tier-1, with no case
+    of cross-product variation — so knowing an object's type fully determines the other two fields.
+    One axis restated, not three independent ones; the word "orthogonal" appears nowhere in the
+    paper's 29 pages. Separately and dispositively per the reviewer: a single-author arXiv preprint
+    roughly three and a half months old, with no indication of peer review or institutional adoption,
+    does not meet H1's own falsification bar ("a materially equivalent established framework") on
+    procedural grounds, independent of the mechanism finding.
   - >
     burns-groth, Sec.3.2-3.3: a domain-thing vs. Artifact/Fragment/Note (ICE) hierarchy, drawing
     on the W3C-adjacent Information Artifact Ontology (Ceusters 2013), with per-note actor
-    attribution and full backward provenance to source — an independently-arrived-at ontological/
-    epistemic/derivational split in a second, separately-authored 2026 system.
+    attribution and full backward provenance to source.
+  - >
+    Independent review (`05`, source 16), full-text read: the ICE split is a type *hierarchy* —
+    Artifact/Fragment/Note subtypes exist only nested under Information Content Entities — not
+    orthogonal axes applied uniformly; the reviewer found no case of independent cross-product
+    variation here either. This is the same defect found in eywa: a multi-valued classification
+    that is not, on inspection, an orthogonal one.
 assessment: >
-  Two independently authored 2026 agent-memory systems have already landed on a roughly
-  three-axis classification for knowledge objects — eywa's ontological-type/epistemic-tier/
-  lifecycle-state triple tracked on the same memory object, and Burns & Groth's ontological/
-  epistemic/derivational (ICE) split drawn from an established upper ontology. That two teams,
-  working independently in the same 2026 window, converged on the same general shape without
-  citing each other or a common ancestor for the classification itself, is evidence that
-  orthogonal state classification is an idea whose time has come as agent-memory systems mature,
-  not a distinctively D-System insight. Against the review-instructions phrasing ("may be
-  uncommon in agent-memory systems") eywa alone is close to sufficient to falsify "uncommon": it
-  is exactly an agent-memory system, and it already does this.
-  Qualification: neither system applies the classification uniformly across a full
-  idea-to-runtime lifecycle. Eywa's three dimensions are described by its own authors as "a
-  memory-object taxonomy and a two-tier capture/validation pipeline," confined to conversational
-  memory, not a formally orthogonal (O,E,L) triple applied system-wide; Burns & Groth's
-  classification is per-skill and domain-specific. Against the frozen register's added
-  "idea/action" lifecycle-dimension nuance specifically, neither source's lifecycle field
-  extends to idea or action states — that piece of the frozen claim is untested by this
-  evidence, not falsified and not confirmed. The frozen register's narrower domain claim ("not
-  commonly integrated in existing agent-memory systems") is, if anything, more directly
-  undercut than the review-instructions text, since the strongest match is itself exactly such
-  a system.
-status: KNOWN_COMPONENT_NEW_INTEGRATION
+  The best case that D-System's orthogonal ontological+epistemic+lifecycle state model is already
+  known rests on two independently authored 2026 agent-memory systems that, at first read, appeared
+  to track a comparable three-dimensional classification on the same memory object: eywa's
+  ontological-type/epistemic-tier/lifecycle-state triple, and Burns & Groth's ontological/epistemic/
+  derivational (ICE) split drawn from an established upper ontology. If either held up as genuinely
+  orthogonal, it would go a long way toward falsifying H1's "uncommon" framing, since agent-memory
+  research would then already contain the specific structural pattern D-System proposes, and two
+  independent 2026 teams converging on it without a shared ancestor would be additional evidence
+  the idea's time has come.
+  Independent review of both sources against their primary text found this does not hold. In eywa,
+  the classification is not three independent axes but one: object type fully and deterministically
+  determines both epistemic tier and lifecycle state, and the paper never itself claims
+  orthogonality. In Burns & Groth, the ICE split is a type hierarchy, not orthogonal axes — an
+  object's Note/Fragment/Artifact type constrains which ontological/epistemic/derivational values
+  are even possible, rather than the three dimensions varying independently the way D-System's
+  (O,E,L) triple proposes. Neither source demonstrates the specific mechanism H1 asks about, and
+  eywa additionally fails H1's falsification bar on procedural grounds regardless of mechanism — a
+  three-and-a-half-month-old, single-author, non-peer-reviewed preprint is not "a materially
+  equivalent established framework." No other row in `04_evidence_matrix.csv` lists H1 among its
+  challenged hypotheses, so these two sources, now undercut on the one dimension the hypothesis
+  turns on, are the whole of the found prior art.
+  This is a stronger result than a thin or unsearched hypothesis, and stronger than the first
+  assessment's conclusion in the opposite direction: this campaign identified the two clearest
+  available candidates across six phases of search and read both past their abstracts, and neither,
+  on inspection, implements orthogonal state classification — only a correlated or hierarchical
+  substitute for it. The frozen register's narrower "not commonly integrated" phrasing fares no
+  better under this reading: what both systems actually show is type-determined, non-orthogonal
+  multi-field metadata, which is a materially different mechanism from an orthogonal triple, not a
+  looser instance of the same one — and treating it as such would be exactly the terminology-for-
+  mechanism substitution this review's discipline forbids in the other direction. Absent a better
+  candidate, D-System's specific orthogonality claim has not been shown to already exist elsewhere.
+status: POTENTIALLY_DISTINCT
 ```
 
 ---
@@ -276,9 +317,15 @@ hypothesis: >
   authority, convergence, and unresolved uncertainty. (Review-instructions text; no material
   frozen-register divergence flagged for H5.)
 strongest_challenger: >
-  log-is-the-agent-event-sourced-reactive-graphs-2026 (component_overlap=4, architecture_overlap=4,
-  full_text) and solozobov-verify-gated-completion-admission-control-2026 (component_overlap=4,
-  architecture_overlap=4, full_text). 8 rows challenge H5 in total.
+  solozobov-verify-gated-completion-admission-control-2026 (component_overlap=4,
+  architecture_overlap=4, full_text) and zep-graphiti-temporal-kg-agent-memory-2025
+  (component_overlap=4, architecture_overlap=3, full_text). `04_evidence_matrix.csv` lists 8 rows
+  as challenging H5, including log-is-the-agent-event-sourced-reactive-graphs-2026 (the first
+  assessment's other strongest_challenger) — but independent review (`05_critical_collisions.md`,
+  source 7) found log-is-the-agent's own Sec.8 explicitly positions the paper as *rejecting* the
+  memory/retrieval category rather than instantiating it: a shared word ("topology") over a
+  different mechanism (a replayable event log, not context selection). It is dropped as a
+  challenger here; solozobov and zep-graphiti carry the hypothesis instead.
 evidence:
   - >
     solozobov, Sec.6, Table 9, Sec.6.1-6.2: an explicit context compiler distinguishing canonical/
@@ -309,9 +356,9 @@ assessment: >
   Retrieval that goes beyond plain semantic similarity — incorporating graph topology, temporal
   recency, reasoning lineage, and evidence provenance — is thoroughly established across
   2024-2026 agent-memory and agentic-runtime systems: Zep/Graphiti's traversal-plus-recency
-  pipeline, EM-LLM's peer-reviewed episodic-segmentation retrieval, solozobov's explicit
-  memory-tier context compiler, and log-is-the-agent's total provenance-chain lineage are all
-  real, working instances of "select context using more than semantic similarity." If H5 were
+  pipeline, EM-LLM's peer-reviewed episodic-segmentation retrieval, and solozobov's explicit
+  memory-tier context compiler are all real, working instances of "select context using more
+  than semantic similarity." If H5 were
   read as "context selection beyond naive similarity is uncommon," the evidence flatly falsifies
   that reading.
   Qualification: H5 as worded lists seven specific dimensions (state, lineage, evidence, dissent,
@@ -572,6 +619,17 @@ evidence:
     all independently score component_overlap=4 for a bidirectional traceability mechanism
     within their own domain (see per-row `strongest_dsystem_overlap` fields in the evidence
     matrix).
+  - >
+    Two items in that list are weaker H9 evidence than the lumped bullet above implies, per
+    independent review. zep-graphiti's own text states its bidirectional episode<->entity
+    indices were "not directly examined in this paper's experiments" (Sec.2.1) — the mechanism is
+    specified but not run in the reported evaluation (`05`, source 14). langgraph-checkpoint's
+    parent-chain lineage ties checkpoint-to-checkpoint mechanically; the reviewer found it never
+    ties to a decision, requirement, or evidence object, since none of those types exist in the
+    interface (`channel_values` is opaque application state) — of the two hypotheses the row
+    lists, the reviewer called H9 "the more overstated" (`05`, source 9). Neither point changes
+    the verdict below, given the remaining six-plus independently-scored traditions, but both are
+    recorded so the density claim is not overstated by two of its weaker members.
 assessment: >
   Bidirectional traceability — forward from intent to artifact, backward from artifact to
   rationale — is essentially the organizing promise of the requirements-traceability, design-
@@ -667,21 +725,33 @@ hypothesis: >
   the same knowledge structure that generated implementation intent. (Review-instructions text;
   no material frozen-register divergence flagged for H11.)
 strongest_challenger: >
-  burns-groth-agentic-ontological-notebook-memory-2026 (component_overlap=4,
-  architecture_overlap=3, preprint_version). 2 rows challenge H11 in total — treated as a
-  near-gap, not as covered, per the same thin-evidence caution applied to H4.
+  ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (component_overlap=1,
+  architecture_overlap=1, secondary_coverage) is now the sole standing challenger. The first
+  assessment's other challenger, burns-groth-agentic-ontological-notebook-memory-2026
+  (component_overlap=4, architecture_overlap=3, preprint_version, matrix values unchanged), was
+  independently reviewed (`05_critical_collisions.md`, source 16) and found not to demonstrate the
+  loop it was credited with — see below. 2 rows challenge H11 in `04_evidence_matrix.csv`; both
+  are addressed here, one now on very different terms than the first assessment gave it.
 evidence:
   - >
-    burns-groth, Sec.2: "Agent-generated notes and extraction failures serve as loss signals ...
-    the agent records the deficit/error as a note in its memory, and subsequently treats it as a
-    github issue to be addressed under normal coding agent practices. This closes the loop
-    between curation experience and ontological design" — a named, working, demonstrated closed
-    loop, with a public benchmark repo (github.com/sciknow-io/alhazen-skill-dismech).
+    Independent review (`05`, source 16), full-text read: the first assessment's citation of
+    burns-groth (Sec.2: "Agent-generated notes and extraction failures serve as loss signals ...
+    this closes the loop between curation experience and ontological design") quoted past the
+    immediately preceding sentence — "We are developing a feedback loop for iterative refinement"
+    (present-progressive, not completed). The claimed closure — curation failure to note to GitHub
+    issue to schema change — appears nowhere in Section 4, the paper's own Demonstration section:
+    no example, instance, or evaluation. Section 6 (Conclusion & Future Work), which the first
+    assessment's locator never cited, states plainly: "Our future work focuses on developing the
+    virtuous cycle of using experience of the systems' use curation work to improve schema + code
+    design as an automated agentic loop." The mechanism H11 needs from this source is the paper's
+    own stated future work, not a demonstrated result — the reviewer recommends dropping it as an
+    H11 challenger, or at minimum downgrading it from "strongest H11 match found."
   - >
-    burns-groth, strongest_difference field: the feedback loop closes onto ONTOLOGY/SCHEMA
-    refinement specifically, not onto the broader idea -> decision -> requirement -> code ->
-    runtime lineage H7/H9/H10 target — a narrower loop than D-System's proposed "same knowledge
-    structure that generated implementation intent."
+    Even granting the loop as intended future work, the reviewer notes it would close onto
+    ontology/schema refinement specifically — curator-tool dogfooding — not onto the decisions and
+    requirements that produced the observed code in the first place, a narrower loop than
+    D-System's proposed "same knowledge structure that generated implementation intent" even if it
+    is eventually built.
   - >
     ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (component_overlap=1,
     secondary_coverage via Muller, O'Brien, Klein & Wood, CMU/SEI-2006-TN-006): the MAPE-K
@@ -697,24 +767,30 @@ evidence:
     history, and the architecture is explicitly oriented toward reducing human involvement,
     unlike D-System's collaborative human-agent framing.
 assessment: >
-  The general pattern H11 describes — runtime observation closing a loop back into the knowledge
-  that drove the observed behavior — is one of the most foundational, most widely cited patterns
-  in all of systems engineering: MAPE-K, named directly by D-System's own architecture notes as
-  an ancestor to search for. A concrete, running, agentic instance of the loop closing onto
-  memory specifically already exists (Burns & Groth, 2026): curation failures during runtime
-  become notes, which become GitHub issues, which drive schema changes — evidence flowing back
-  from operation into structure, demonstrated and benchmarked. Taken together, closing this loop
-  at all is neither underexplored nor unprecedented.
-  Qualification: neither found source demonstrates the specific loop H11 proposes. MAPE-K's
-  knowledge is deliberately narrow, short-lived, and not human-legible or decision-relevant
-  across sessions; Burns & Groth's loop closes specifically onto ontology/schema refinement, not
-  onto the decisions and requirements that produced the observed code in the first place — the
-  "same knowledge structure that generated implementation intent" is not what either source
-  updates. With only two challengers, one purely conceptual/foundational and one real but
-  narrowly scoped, and no deep search in this campaign having targeted H11 specifically the way
-  H4's Pass 3 collision search did, this is thin evidence in both directions: too little to
-  claim prior art defeats it, too little to claim it survives.
-status: INSUFFICIENT_EVIDENCE
+  The best case that runtime-to-knowledge closure is already known rests on two sources: MAPE-K,
+  a foundational, forty-plus-year-lineage pattern establishing that closing some loop from
+  operation back into a knowledge store is old and well understood in the abstract, and, until
+  this reconciliation, a concrete 2026 agentic system (Burns & Groth) said to implement a narrower
+  working instance of it. If Burns & Groth's loop held as demonstrated, MAPE-K's age plus a
+  concrete 2026 agentic instance would together make a reasonably strong case that closing this
+  loop at all is neither underexplored nor unprecedented.
+  Independent review found the second, concrete source does not hold up: the loop it was credited
+  with is the paper's own stated future work, not a demonstrated result — a quotation the first
+  assessment used had dropped the sentence immediately before it announcing the loop as
+  in-progress, and the paper's own Demonstration section and Conclusion confirm nothing closes
+  yet. What remains is MAPE-K alone: a foundational conceptual ancestor at the matrix's lowest
+  overlap score, whose own knowledge model differs from H11's claim in kind, not merely in degree
+  (short-lived operational state, not persistent, provenance-bearing, human-legible history), and
+  whose architecture is explicitly oriented toward reducing human involvement rather than
+  D-System's collaborative framing.
+  This leaves H11 with less supporting evidence than the first assessment recorded, not more: the
+  one source that looked like a working instance of the specific mechanism turns out, on the
+  primary text, not to be one. No dispatch in this campaign has run a search purpose-built for
+  H11 the way H4's Pass 3 collision search did, so a further dedicated search could still turn up
+  a genuine instance. But on the evidence actually in hand, the honest status is not "too little
+  evidence to call it either way" — it is that the specific closed loop H11 proposes has not been
+  shown to already exist in any source this campaign found and closely read.
+status: POTENTIALLY_DISTINCT
 ```
 
 ---
@@ -723,23 +799,30 @@ status: INSUFFICIENT_EVIDENCE
 
 | Hyp. | Status | Strongest challenger (source_id) | Challenger count |
 |---|---|---|---|
-| H1 | KNOWN_COMPONENT_NEW_INTEGRATION | eywa-provenance-grounded-memory-joshi-2026 | 2 |
+| H1 | POTENTIALLY_DISTINCT | eywa-provenance-grounded-memory-joshi-2026 / burns-groth-agentic-ontological-notebook-memory-2026 (both undercut on orthogonality — see block) | 2 |
 | H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 13 |
 | H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 9 |
 | H4 | INSUFFICIENT_EVIDENCE | epistemic-sybil-resistance-bara-2026 | 1 |
-| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / solozobov-verify-gated-completion-admission-control-2026 (tied) | 8 |
+| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 8 |
 | H6 | KNOWN_COMPONENT_NEW_INTEGRATION | omniscientist-coevolving-ecosystem-human-ai-scientists-2026 | 3 |
 | H7 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 10 |
 | H8 | LIKELY_ALREADY_KNOWN (review-instructions phrasing); KNOWN_COMPONENT_NEW_INTEGRATION (frozen-register phrasing) | langgraph-checkpoint-library-oss (review-instructions) / solozobov-verify-gated-completion-admission-control-2026 (frozen-register, assembly half only) | 4 |
-| H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 18 |
+| H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied; zep-graphiti/langgraph's contribution to this row is weaker than the raw count implies — see block) | 18 |
 | H10 | KNOWN_COMPONENT_NEW_INTEGRATION | memtx-transactional-belief-commit-2026 | 4 |
-| H11 | INSUFFICIENT_EVIDENCE | burns-groth-agentic-ontological-notebook-memory-2026 | 2 |
+| H11 | POTENTIALLY_DISTINCT | ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (burns-groth dropped on review — see block) | 2 |
 
-No hypothesis reaches `POTENTIALLY_DISTINCT` on this pass. Per the methodology
-(`research/literature-review/CLAUDE.md`, §14 and §19): "If nothing remains, say so. That is a
-successful research result." Every gap identified above is a gap in what any single found
-system's *scope* combines (mixed human-agent + graph topology for H4; ontology-refinement scope
-vs. full development lineage for H11; cross-lifecycle span for H6/H10; knowledge-bearing
-consolidation for H8's frozen phrasing) — not a gap in whether the field knows how to build the
-underlying mechanisms. That distinction is exactly what separates `KNOWN_COMPONENT_NEW_
-INTEGRATION` and `INSUFFICIENT_EVIDENCE` from `POTENTIALLY_DISTINCT` in this review's vocabulary.
+Two hypotheses, H1 and H11, reach `POTENTIALLY_DISTINCT` after this reconciliation — both moved
+there from a stronger-sounding first-assessed status once independent review of their named
+challengers' primary text found the challenger did not demonstrate the specific mechanism it was
+credited with (eywa/burns-groth's claimed orthogonality for H1; burns-groth's claimed demonstrated
+loop for H11). Per the methodology (`research/literature-review/CLAUDE.md`, §14 and §19): "If
+nothing remains, say so. That is a successful research result" — applied here in reverse: where a
+review shows a credited "known component" was not actually shown to be known, the honest status
+moves toward distinctiveness, not away from it, regardless of which direction is more convenient
+for the campaign's H0 mandate. `NOVEL` remains unavailable to either verdict; both are open to
+reversal by a further, more targeted search this reconciliation did not perform. Every other
+remaining gap is a gap in what any single found system's *scope* combines (mixed human-agent +
+graph topology for H4; cross-lifecycle span for H6/H10; knowledge-bearing consolidation for H8's
+frozen phrasing) — not a gap in whether the field knows how to build the underlying mechanisms.
+That distinction is exactly what separates `KNOWN_COMPONENT_NEW_INTEGRATION` and
+`INSUFFICIENT_EVIDENCE` from `POTENTIALLY_DISTINCT` in this review's vocabulary.
