@@ -158,6 +158,53 @@ Not a ruling, recorded because it bears on the runway: the campaign has used six
 seven-session estimate, against an owner-accepted range of six to eight. `phase-lit-07` is the
 seventh.
 
+## The `phase-lit-08` dispatch mapping (owner ruling, 2026-09-14)
+
+A separate, later ruling — **not part of the pre-synthesis check-in above**, which was held
+before `phase-lit-08` existed. It is recorded in its own section so a reader looking for what
+the check-in decided does not find an unrelated ruling mixed into it.
+
+`phase-lit-08` (Pass 3b, the targeted collision search for H1, H4 and H11) was created after the
+check-in, in [SESS-2026-09-14-04](../03-sessions/SESS-2026-09-14-04-lit-06-followups.md). The
+delegation pack ([`PROMPT-029`](PROMPT-029-literature-review-delegation-pack.md)) has no
+`LIT-08` section, and the pack's own rule makes a missing prompt a blocking finding for the
+owner rather than something a coordinator improvises. The coordinator stopped on that finding
+and the owner ruled the mapping below rather than have a new section authored mid-campaign.
+
+**Every item is existing pack text with a narrowed payload. No section was authored.**
+
+| Item | Model | Pack section dispatched | Payload narrowing |
+|---|---|---|---|
+| `K` | Haiku | `LIT-06 K` | Claims `phase-lit-08`; item order as below |
+| `S1`, `S2`, `S3` | Sonnet | `LIT-06 S1` (Block C + Block S) | **One dispatch per hypothesis** — `S1`=H1, `S2`=H4, `S3`=H11. Search and log only |
+| `X1`, `X2`, `X3` | Sonnet | Block C + **Block D** + the source ids its paired `S` nominated | Deep-extraction of genuinely new strong candidates only |
+| `R` ×n | Sonnet | `LIT-06 R`, verbatim | One per **new** `critical_collision: yes` row; none if none flags |
+| `X4` | Sonnet | `LIT-06 X2` | Folds the new `R` verdicts only; runs only if `R` ran |
+| `X5` | Sonnet | `LIT-06 X1` | **Restricted to the H1, H4 and H11 blocks** of `06_hypothesis_tests.md`; the other eight are untouched, and the `05_critical_collisions.md` drafting half is skipped because `05` already exists and is fully reviewed |
+| `G` | Haiku | Block G | Measurements are `phase-lit-08`'s four acceptance conditions |
+
+Item order: `K → S1 → X1 → S2 → X2 → S3 → X3 → R×n → X4 → X5 → G`.
+
+The three choices the owner made, and why each was a choice rather than a default:
+
+1. **`X5` is `LIT-06 X1`, not `LIT-06 X2`.** `X1` authored `06_hypothesis_tests.md` and knows its
+   block format and its saturation rule. `X2`'s charter was deliberately kept narrow at
+   `phase-lit-06` — it writes review outcomes and nothing else — and re-deriving a hypothesis
+   status is a judgment, not a review outcome. Widening `X2` would undo the separation that made
+   nineteen rows tractable.
+2. **Three `S` dispatches, one per hypothesis, not one across all three.** `LIT-06 S1` dispatched
+   once across all eleven hypotheses and produced 30 rows — two or three per hypothesis. That
+   dilution is the reason this phase exists, so reproducing its shape would reproduce its result.
+3. **Extraction is a separate Block D dispatch, not inline in `S`.** `LIT-06 S1`'s own text folds
+   extraction into the search dispatch, but an `S` dispatch assembles Block C + Block S and never
+   receives Block D — so the read-disclosure requirement added by check-in ruling 5 would not
+   reach the agent doing the extraction. A searcher scoring its own finds is the configuration
+   that produced Pass 2's one-directional depth defect.
+
+Check-in rulings 1, 2, 3, 5 and 8 bind this phase unchanged. Ruling 8 in particular: this phase
+**reports its duplicate rate against `phase-lit-06`'s 44/220 (20.0%) as a trend and may not
+assert saturation**, whatever the number comes out at.
+
 ---
 
 ## The kick-off paragraph
