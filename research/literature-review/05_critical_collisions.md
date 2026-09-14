@@ -320,3 +320,172 @@ chapter's own methodology is itself an explicit refinement of Bickford et al. (2
 second_review: pending
 
 ---
+
+## 11. omniscientist-coevolving-ecosystem-human-ai-scientists-2026
+
+Shao et al. (Tsinghua / Zhongguancun Academy): *OmniScientist: Toward a Co-evolving Ecosystem
+of Human and AI Scientists*, arXiv:2511.16931, v2 14 Dec 2025.
+
+**Overlap.** component_overlap=4, architecture_overlap=4. The Omni Scientific Protocol's
+ContributionLedger — an immutable, chronological, per-object record of typed actions (create/
+refine/propose/approve), each carrying actor identity and timestamp, explicitly designed to move
+"from Data Provenance to Contribution Provenance" — is one of the closest matches in the
+campaign to combined H2+H3+H9. Its Unified Participant Model, empirically evaluated in an HLE
+case study (Human-AI Collaboration Mode: 0.22 accuracy vs. 0.10 Human Solo vs. 0.00 AI Solo), is
+a direct, quantified H6 challenger — among the most direct empirical H6 evidence found in this
+campaign.
+
+**What it would falsify.** At full strength this would falsify H6's claim that the full human-
+agent collective-knowledge-evolution synthesis "may be distinct even if primitives are known" —
+a working, evaluated ecosystem already exists, in the scientific-research domain. It would
+falsify H9's backward-traceability claim within that domain ("the final scientific result...
+can always be transparently traced back to all contributors") and contribute typed-transition
+evidence to H2/H3. It would not falsify H1 (ScholarlyObjects are typed only by kind, not by an
+O,E,L triple), H4 (REQUEST_DECISION escalates disagreement to human fiat rather than computing
+evidential weight — no independence-aware convergence), or domain-authority weighting under H3
+(all Participants hold symmetric protocol status). H7's later stages and H11's production-
+runtime loop are not applicable by domain (scientific-paper production, not software
+development), not falsified. The ContributionLedger is structurally a scientific-credit
+specialization of the classical nanopublication (Groth, Gibson & Velterop, 2010) and PAV/PROV-O
+provenance traditions, not a novel provenance primitive; OSP's communication layer is explicitly
+built atop MCP, A2A, and SCP rather than invented from scratch (Sec.4.1).
+
+second_review: pending
+
+---
+
+## 12. solozobov-verify-gated-completion-admission-control-2026
+
+Nguyen, H.-D., Tran, X.-T.: *Verify-Gated Completion as Admission Control in a Governed
+Multi-Agent Runtime*, arXiv:2605.17998, v2 21 May 2026. (Inventory naming note: the source_id
+slug names "Solozobov," but the paper's own title page lists only Nguyen and Tran — recorded as
+a bibliographic identity mismatch, not corrected silently.)
+
+**Overlap.** component_overlap=4, architecture_overlap=4. A five-plane architecture with a
+formally specified task-state tuple, a fail-closed acceptance predicate gating every completion
+claim, a packet-lineage provenance chain (common-ground -> claim -> evidence -> verify outcome),
+a three-class memory-ownership taxonomy (canonical/archive-only/prompt-injectable) with an
+explicit context compiler, and risk-tiered execution-unit boundaries — together one of the
+closest structural matches in the campaign to combined H2, H5, H8, and H9. Its context compiler
+is a more developed, explicitly-named version of exactly the context-selection discipline H5
+proposes but, per the adversarial codebase review, does not yet fully implement.
+
+**What it would falsify.** At full strength this would falsify H2 (packet-lineage typed
+transitions), H5 (the context compiler's memory-tier discipline), H8 (risk-tiered execution-unit
+boundaries as an explicit context boundary), and H9 (packet lineage as backward traceability)
+together — the widest simultaneous four-hypothesis span found among the 19 collisions alongside
+log-is-the-agent (section 7). It would not falsify H1 (the task-state tuple's dimensions are
+governance/operational, not an O,E,L triple), H4 (its PGV redundant advisory check is not
+corroboration across independent paths), or H7's early stages (success criteria are asserted at
+task-ingest, not derived from upstream reasoning/evidence) or H10's full cross-artifact scope
+(only single-claim recovery ownership). The paper is explicit that its released empirical slice
+is "synthetic-heavy and concentrated" (1,784/1,801 non-production rows), so its quantitative
+claims validate inspectability, not effectiveness. Its own Sec.2 names its architectural lineage
+directly: continuous-delivery quality gates (Humble & Farley 2010; Forsgren, Humble & Kim 2018)
+and IT-governance decision-rights models (Weill & Ross 2004) — an explicit inheritance, not an
+independent invention. No public repository accompanies the internal reference implementation.
+
+second_review: pending
+
+---
+
+## 13. us20250165226a1-ai-digital-thread-patent
+
+Roper et al. (Istari Digital, Inc.): *Software-Code-Defined Digital Threads in Digital
+Engineering Systems with Artificial Intelligence (AI) Assistance*, US Patent Application
+US20250165226A1 (published 2025-05-22; since GRANTED as US12461717B2, confirmed via the
+patent's own legal-status metadata).
+
+**Overlap.** component_overlap=3, architecture_overlap=4. The specification describes digital
+threads "linked across different stages... from concept, design, testing, to production," with
+physical-prototype sensor data "compared with the DTw's simulations to confirm the product's
+performance and verify its design" — a genuine multi-stage span structurally relevant to H7/H9.
+The specifically claimed invention (Claims 1, 2, 3, 25) is narrower: an intent input generates a
+stored code artifact (the digital thread), and feedback on that artifact retrains the generating
+model — concretely matching D-System's artifact-linkage and feedback-to-knowledge primitives.
+
+**What it would falsify.** At full strength — reading the background/preferred-embodiment
+material rather than only the granted claims — this would contribute stage-spanning evidence
+against H7 and H9. Read strictly against the claims actually granted, the falsification is much
+narrower: no requirement/decision/specification stage between intent and generated script (H7's
+early stages absent from the claims themselves), no actor/authority/provenance model beyond
+training-triplet lineage (H3 largely absent), no ontological/epistemic state classification
+(H1), and no independence-aware convergence (H4). The domain is engineering-model integration
+scripting (CAD/simulation tool interoperability), not general software or knowledge-management
+provenance. The patent's own cited-references list traces the claimed intent-to-code mechanism to
+established machine-programming/text-to-code lineages (Intel, Microsoft, IBM prior patents,
+2020-2024), not a sui generis invention. Its own "digital thread" definition cites the DAU/DoD
+Digital Engineering Strategy (2018) — a different named source than
+model-based-digital-threads-sociotechnical-systems-2022's 2013 USAF citation (section 10, above);
+this campaign's earlier assumption that both sources shared one 2013 ancestor is wrong and is
+withdrawn on that row.
+
+second_review: pending
+
+---
+
+## 14. zep-graphiti-temporal-kg-agent-memory-2025
+
+Rasmussen, Paliychuk, Beauvais, Ryan, Chalef (Zep AI): *Zep: A Temporal Knowledge Graph
+Architecture for Agent Memory*, arXiv:2501.13956, v1 20 Jan 2025.
+
+**Overlap.** component_overlap=4, architecture_overlap=3. Graphiti's bi-temporal edge model
+(four timestamps: t_created/t_expired transactional, t_valid/t_invalid world-time) with
+LLM-mediated contradiction detection and recency-prioritized edge invalidation is a direct
+match to H2's typed-transition claim; its three-stage Search-Rerank-Constructor retrieval
+pipeline (including breadth-first traversal to incorporate "recently mentioned entities and
+relationships") directly matches H5's topology-aware context-transfer claim; its bidirectional
+episode-to-fact indices are a direct H9 primitive. Commercial, production-deployed (getzep.com),
+built on the open-source Graphiti component.
+
+**What it would falsify.** At full strength this would falsify H2 (bi-temporal typed
+transitions), H5 (topology/recency-aware retrieval), and H9 (bidirectional indices, though "not
+directly examined in this paper's experiments" per its own Sec.2.1) together. It would not
+falsify H1 beyond the episodic/semantic/community subgraph-membership distinction (only
+partially present), H3 (edge invalidation is purely recency-based — "Graphiti consistently
+prioritizes new information" — not evidence- or authority-weighted), H4 (absent), or H6-H8/H10-
+H11 (no decision/requirement/specification/plan/artifact/verification/deployment concept
+anywhere — scoped entirely to D-System's Knowledge-Construction side, with humans present only
+as message-author data, not a distinguished participant class). Its bi-temporal model is
+presented as "a novel advancement... in LLM-based knowledge graph construction" but silently
+inherits the classical valid-time/transaction-time distinction (Snodgrass 1999) that
+tgms-agent-native-bitemporal-graph-2026 (section 8, above) names explicitly and that this Zep
+paper's 28-entry reference list does not cite — one shared 1999 ancestor and two derivative
+LLM-era applications, not two independent inventions of bi-temporal novelty.
+
+second_review: pending
+
+---
+
+## 15. zimmermann-et-al-managing-architectural-decision-models-2009
+
+Zimmermann, Koehler, Leymann, Polley, Schuster: *Managing Architectural Decision Models with
+Dependency Relations, Integrity Constraints, and Production Rules*, Journal of Systems and
+Software 82(8), 1249-1267 (2009).
+
+**Overlap.** component_overlap=4, architecture_overlap=3. The most formally complete decision-
+representation and constraint-production-rule mechanism found in the campaign: an explicit
+outcome-status lifecycle field (open/implied/resolved), a formally proved typed-transition
+mechanism (triggers, governed by 8 integrity constraints), per-outcome actor provenance
+(changedBy), and requirement-to-decision linkage (decisionDrivers/justification) — strong,
+multi-primitive overlap with H2 and H7. Working tool: the Architectural Decision Knowledge Wiki,
+publicly available since March 2008, evaluated on 389 real decision issues.
+
+**What it would falsify.** At full strength this would falsify H2 (a formally proved typed-
+transition mechanism with actor provenance) and H7 (requirement-to-decision linkage,
+requirements as first-class dependency-graph nodes) for the decision/requirement segment. It
+would not falsify H1 (no epistemic/ontological classification alongside the lifecycle status),
+H3/H4 (no independence-aware convergence, and the decision graph's own logical consistency is
+the only thing checked — not evidence or authority weighting), or H5/H6/H8-H11 (the mechanism
+never leaves the decision-and-requirement layer: no specification, plan, execution, artifact,
+test, deployment, or runtime-evidence linkage; work-breakdown-structure and health-checking ideas
+are explicitly named future work, Sec.7). The paper states directly (Sec.3, p.5) "Our metamodel
+extends that from [1] and [5]" — [5] is jansen-bosch-architecture-as-decisions-wicsa-2005
+(section 6, above) — a direct formal extension of an already-matrixed collision, not an
+independent confirmation; its own novel contribution is the integrity-constraint/production-rule
+formalization and the outcome-status/changedBy fields that go beyond Jansen & Bosch's original
+model.
+
+second_review: pending
+
+---
