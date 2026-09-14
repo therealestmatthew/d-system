@@ -29,27 +29,36 @@ Then open http://localhost:5180.
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5180/api/v1/workbench/injection-sources
 ```
 
-### If the terminal reports "availability is unknown" and the dropdowns are empty
+### If the terminal reports "availability is unknown" and the dropdowns are greyed out
 
 Both symptoms have one cause: the **frontend** process is missing the two variables.
 
 - Without `VITE_API_TARGET`, `ts/vite.config.ts` proxies `/api` to its default `:8000`. If anything
   else is listening there, every API call returns 404 — which reads as "backend down" rather than
-  "wrong backend", including the stage's "Terminal availability is unknown — the stage backend is
-  not reachable" message and empty Commands/Skills/Prompts/Agents dropdowns.
+  "wrong backend". The stage shows "Terminal availability is unknown — the stage backend is not
+  reachable", and all four injection dropdowns render as disabled buttons labelled
+  "(terminal absent)" — they cannot be opened at all. Note that Commands goes dark for a different
+  reason than the other three: it is fed by the static `/demo-commands.json`, never by the proxy,
+  and is disabled only because the terminal is not enabled.
 - Without `D_SYSTEM_DEMO_TERMINAL=1`, the `serveRepositoryFiles` plugin is not registered, so
-  `/workbench-file/*` does not exist and the HTML Viewer cannot load pages.
+  `/workbench-file/*` is never routed. The request does not 404 — the dev server's history fallback
+  answers it with the app shell at HTTP 200, so the HTML Viewer goes silently blank with no error
+  anywhere.
 
-Check what the running frontend process actually has, rather than what the command was meant to set:
+**Do not trust the in-app message.** If the dropdowns are reachable in some other failure, their
+404 state tells you to start the backend with `D_SYSTEM_DEMO_TERMINAL=1` — advice that is wrong in
+exactly this case, because the backend already has it. The frontend is the process to check:
 
 ```bash
-tr '\0' '\n' < /proc/$(pgrep -f 'node.*vite --port 5180')/environ | grep -E 'D_SYSTEM|VITE_API'
+tr '\0' '\n' < "/proc/$(pgrep -f 'node.*vite --port 5180' | head -1)/environ" | grep -E 'D_SYSTEM|VITE_API'
 ```
 
-Both lines must appear. Empty output means the environment prefix was dropped — recalling the
-launch command from shell history is the usual way that happens, since the prefix is easy to lose
-from a recalled line. Restart with the `env ...` form above, which keeps the variables attached to
-the whole invocation.
+Both `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010` must appear. If they do
+not, the environment prefix was dropped — recalling the launch command from shell history is the
+usual way that happens, since the prefix is easy to lose from a recalled line. Restart with the
+`env ...` form above, which keeps the variables attached to the whole invocation. (`head -1` matters:
+without it, `pgrep` run from inside a `bash -c` wrapper also matches the wrapper's own command line
+and the redirect fails with "ambiguous redirect".)
 
 ---
 
@@ -110,6 +119,9 @@ cd ts && npm install             # frontend first-time setup
 uv run uvicorn src.main:app --reload   # Backend API on :8000
 cd ts && npm run dev                   # Frontend UI on :5173 (proxies /api → :8000)
 ```
+
+This is the ordinary app. For the demo stage and workbench UI — different ports, and two required
+environment variables — see [Running the demo app](#-running-the-demo-app) above.
 
 ### Data Management
 ```bash
