@@ -378,33 +378,34 @@ appeared today. A peer session found that `uv run python -m src.governance` exit
 `complete` phase silently reverts to `queued`, and queued `phase-gov-05` to add the missing guard.
 Both are checks that pass by not looking.
 
-## Not done, and why
+## Closure
 
-`status: complete` is not set. `/session-close` was invoked on 2026-09-14 and reached step 6 twice.
+`/session-close` was invoked on 2026-09-14 and reached step 6 twice.
 
-The first time, completion was withheld: all three acceptance conditions passed, but the independent
-review raised an unresolved discrepancy against the phase's scope, and step 6 requires both. That is
-the outcome the step exists to allow.
+The first time, completion was **withheld**. All three acceptance conditions passed, but the
+independent review raised an unresolved discrepancy against the phase's scope, and step 6 requires
+both. That is the outcome the step exists to allow, and it is the one that caught this.
 
-The second time, after the fix and the re-review, the blocking discrepancy is resolved and no other
-survives. Completion is now a decision the owner takes, not one this session takes for them — and
-there is a specific reason to put it in front of them rather than assume it. The round-2 reviewer
-raised a blocker that this session judged unreproducible and then partly acted on anyway. An agent
-overruling its own reviewer is exactly the move this gate exists to catch, so the judgement is
-recorded in full above and handed over rather than exercised quietly.
+The second time, after the fix and the re-review, the blocking discrepancy was resolved and no other
+survived. One judgement was put to the owner rather than taken quietly: this session overruled its
+own round-2 reviewer on the descender collision, having failed to reproduce it at 4× device scale,
+and then loosened the spacing anyway. An agent overruling its reviewer is what this gate exists to
+catch, so it was surfaced explicitly with the option of a third review. **The owner accepted the
+call on 2026-09-14** — the dispute was moot in practice once the spacing was loosened — and
+authorised completion and integration together.
 
-The branch is also unmerged, so completion and integration are one approval, not two.
+`status: complete` was set, with `completion_evidence` naming seven files that exist and a `result`
+recording both review rounds. The branch was integrated into `dev` fast-forward.
 
 ## Backlog
 
-- `status: active` — still not advanced to `complete`; see above.
+- `status: complete` — set at close, on the owner's authorisation, after two independent reviews.
 - `session: doc-session-demo-glossary-diagrams` — unchanged; the id is permanent and survived the
-  renumber.
-- `completion_evidence` / `result` — still not written. They would be true now, but writing them on
-  an `active` phase ahead of the owner's decision would assert a closure that has not happened.
-- `next_action` — rewritten to record the fix, both review rounds, and that the phase is ready for
-  the owner's completion-and-integration decision.
-- `next_up` — not pruned. `phase-demo-07` is not on it.
+  `SESS-2026-09-10-09` → `SESS-2026-09-10-14` renumber.
+- `completion_evidence` — seven files, all present.
+- `result` — records the actual verification output and both review rounds, including the blocker
+  that did not reproduce.
+- `next_up` — not pruned; `phase-demo-07` was never on it.
 
 ## Unresolved
 

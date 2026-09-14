@@ -4932,7 +4932,7 @@ items:
   - sys-brain
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-demo-glossary
   priority: 1
   session_budget: 1
@@ -4988,25 +4988,35 @@ items:
   - docs/07-architecture/diagrams/demo
   - docs/07-architecture/README.md
   session: doc-session-demo-glossary-diagrams
-  next_action: 'READY for the owner''s completion-and-integration decision; branch agent/phase-demo-07 is
-    unmerged with two commits. The blocker that withheld the first close is fixed - b20ae12
-    corrects the three stale .claude/ counts (four skills naming log-anti-patterns, twelve
-    agents, six commands naming /session-start and /resume-lit-review) in the concept memory and
-    in the two diagrams that rendered them, and aligns two aria-labels with their visible
-    titles. A second independent demo-adversary review confirmed the corrections against ground
-    truth it counted itself, swept the whole concept memory for other stale claims and found
-    none, and reported regression clean. It raised one blocker - a descender collision in skill-
-    architecture.svg - which did NOT reproduce at 4x device scale; the descenders visibly clear
-    the caption and the geometry agrees. The spacing was genuinely tight though, so e1438d1
-    loosened it anyway along with the six-item command column, both re-rendered and re-
-    inspected. Flagging explicitly that this session judged its own reviewer wrong on that point
-    - the full reasoning is in the session record under Review round 2, and it is the one thing
-    worth a second opinion before completing. Verification green on the branch - governance OK,
-    580 passed, both glossary generations byte-identical with no drift, 18 headings, all six
-    SVGs well-formed at 1024x768 with no external reference. One governance item is recorded as
-    left undone and is NOT this phase''s to fix - nothing tests the glossary''s stated counts
-    against the real .claude/ directories, which is why the wrong counts reached a merge with
-    all three acceptance conditions passing.'
+  next_action: 'None - phase complete. Closed 2026-09-14 via /session-close after two independent review
+    rounds; the branch was integrated into dev fast-forward.'
+  result: 'Complete after two independent review rounds. Seventeen terms plus the advanced-topics group
+    (18 headings) in the filtered glossary, six standalone SVGs legible at 1024x768 with no
+    external URL, font or image, and both glossary generations byte-identical with no drift.
+    Round 1 withheld completion: the concept memory stated three counts taken from .claude/ that
+    were true at the branch''s original base 86a4f68 (3 skills, 11 agents, 4 commands) and
+    falsified by commits that landed while the branch sat unmerged four days. Fixed in b20ae12
+    to four skills naming log-anti-patterns, twelve agents, and six commands naming /session-
+    start and /resume-lit-review, in the concept memory and in the two diagrams that rendered
+    them. Round 2 confirmed the fix against ground truth it counted itself, swept the whole
+    concept memory for other stale claims and found none, and reported regression clean; its one
+    blocker, a descender collision in skill-architecture.svg, did not reproduce at 4x device
+    scale, and the spacing was loosened anyway in e1438d1 along with the six-item command
+    column. Final verification on the rebased branch: governance OK, 580 passed,
+    test/test_glossary.py 6 passed, check_no_private_content OK with 31 identifiers checked in
+    the primary checkout. Visual review was done with headless Chrome on a private profile
+    because the Playwright MCP browser profile is held by a peer; a demo-validator-web dispatch
+    returned blocked, not verified. Recorded as left undone and not this phase''s to fix:
+    nothing tests the glossary''s stated counts against the real .claude/ directories, which is
+    why wrong counts reached a merge with all three acceptance conditions passing.'
+  completion_evidence:
+  - brain/concepts/terms-skills-and-agents-demo.md
+  - _data/tags.json
+  - docs/08-governance/GLOSSARY.md
+  - docs/00-working/demo-glossary.md
+  - docs/07-architecture/diagrams/demo/index.html
+  - docs/07-architecture/README.md
+  - docs/03-sessions/SESS-2026-09-10-14-demo-glossary-diagrams.md
 - id: phase-wb-01
   title: Workbench backend API — enumeration, filesystem, explorers, reveal, session registry
   next_action: 'None — phase complete: all items validated, the W01-A blocker fixed
