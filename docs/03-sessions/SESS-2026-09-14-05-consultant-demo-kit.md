@@ -330,6 +330,12 @@ phases sharing `sys-demo-kit` validate cleanly where four active ones could not.
 
 ## Unresolved
 
+- **Observed after the merge: the kit loads.** All six `demo-skill-` skills and all six `demo-cmd-`
+  commands appeared in this session's own skill and command listing immediately after integration,
+  each under its own name with its description intact. That is K02's listing half, observed rather
+  than inferred, for 12 of the 20 components — and it settles `phase-kit-01`'s "each command loads
+  and is listed as a slash command under its demo-cmd- name" outright. The two agents' listing was
+  not separately observed.
 - **Nothing in the kit has been invoked (K02).** No command was run, no skill fired, no agent
   dispatched. Every acceptance condition about observed behaviour is recorded as accepted rather
   than met. `REQ-008` records testing and demonstration as the owner's, and this is the largest

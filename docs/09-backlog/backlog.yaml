@@ -6641,7 +6641,7 @@ items:
   - .claude/commands/demo-cmd-rubber-duck.md
   - .claude/commands/demo-cmd-second-opinion.md
   - docs/03-sessions/SESS-2026-09-14-05-consultant-demo-kit.md
-  result: 'Six demo-cmd- commands built, each with frontmatter and a $ARGUMENTS body. Every CLAUDE.md and AGENTS.md mention across them sits inside a prohibition. An independent review confirmed K03, K15, K16 and K19 hold. The two acceptance conditions about observed output were accepted by the owner without a runtime run.'
+  result: 'Six demo-cmd- commands built, each with frontmatter and a $ARGUMENTS body. Every CLAUDE.md and AGENTS.md mention across them sits inside a prohibition. An independent review confirmed K03, K15, K16 and K19 hold. All six commands were observed listed under their own demo-cmd- names after the merge, settling the listing condition. The jargon-free-output condition was accepted by the owner without a runtime run.'
   priority: 1
   session_budget: 1
   depends_on: []
