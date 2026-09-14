@@ -123,11 +123,35 @@ regression exits non-zero.
   audit history, and it would not have caught `5ecb203` after the fact — it would have caught it
   at the moment it was made, which is the point.
 
-## Open question for the owner
+## R6 — A `dev`-relative comparison warns, and never fails the run
 
-**What is the prior state compared against, in a worktree that has not fetched?** The natural
-answer is `HEAD`, which catches a bad working-copy edit. It does not catch a regression that
-arrives through a rebase or merge from another branch, because by then it is already committed on
-the other side. A `dev`-relative comparison would catch more and would also fire on every agent
-branch that legitimately completes a phase. `HEAD` is the narrower, quieter choice and is what
-the plan assumes unless the owner says otherwise.
+**Statement.** In addition to R1–R5 against `HEAD`, the check performs the same two comparisons
+against `dev` and reports any finding as a **warning**. A `dev`-relative finding alone never
+changes the exit code.
+
+**Why both** (owner ruling, 2026-09-14). The two comparisons catch different failures and neither
+subsumes the other:
+
+- **`HEAD`** catches a bad edit *before it is committed*, in the tree that makes it. That is
+  exactly how `5ecb203` happened, and it is the case worth failing on.
+- **`dev`** also catches a regression arriving by rebase or merge from another branch, which
+  `HEAD` structurally cannot — by then the prior state on this branch already contains it.
+
+**Why `dev` warns rather than fails.** It fires on correct work. Every agent branch that
+legitimately completes a phase differs from `dev` by exactly the transition this guard looks for,
+so failing on it would make the guard fire on the normal case. A check that cries wolf on correct
+work is one agents learn to skip, which would cost more than the regressions it catches. As a
+warning it costs nothing to be wrong, and it still puts the fact in front of the person merging.
+
+**Verification.** A test asserting a `dev`-relative-only finding produces warning output and exit
+0, and that a `HEAD`-relative finding still exits non-zero with the warning present.
+
+**Degradation.** `dev` may be unreachable — a detached worktree, a clone without that ref. Treat
+it exactly as R-unreadable prior state is treated: skip the comparison, note it in one line, do
+not fail.
+
+## Resolved: what the prior state is compared against
+
+**Both, as two checks with different severities** — owner ruling, 2026-09-14. `HEAD` is the hard
+failure (R1–R5); `dev` is the warning (R6). This supersedes `PLAN-038`'s original position that a
+`dev`-relative comparison would be a separate phase; it is in scope for `phase-gov-05`.

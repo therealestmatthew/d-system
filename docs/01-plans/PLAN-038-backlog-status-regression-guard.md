@@ -36,13 +36,24 @@ own tool. It touches no existing validation rule and changes no schema.
 genuinely new thing in the design. The prior state is `git show HEAD:docs/09-backlog/backlog.yaml`
 — the committed version in the working tree's own branch.
 
-`HEAD` is chosen over a `dev`-relative comparison deliberately. A `dev` comparison catches more —
-including a regression arriving through a merge — but fires on every agent branch that
-legitimately completes a phase, which is the normal case, and a check that cries wolf on correct
-work is a check agents learn to ignore. `HEAD` catches the case that actually occurred: a bad
-working-copy edit, before it is committed. `REQ-010` records this as an open question; the plan
-proceeds on `HEAD` and the phase's acceptance can be re-parameterized if the owner rules
-otherwise.
+**Two bases, two severities** (owner ruling, 2026-09-14, `REQ-010` R6). The same two comparisons
+run against both `HEAD` and `dev`:
+
+| base | catches | severity |
+|---|---|---|
+| `HEAD` | a bad edit before it is committed, in the tree that makes it — how `5ecb203` happened | **error**, exit non-zero |
+| `dev` | a regression arriving by rebase or merge, which `HEAD` structurally cannot see | **warning**, exit unchanged |
+
+The asymmetry is the whole design. `dev` cannot be a hard failure because it fires on correct
+work: every agent branch that legitimately completes a phase differs from `dev` by exactly the
+transition the guard looks for. Failing there would make the guard fire on the normal case, and a
+check that cries wolf on correct work is one agents learn to skip — costing more than the
+regressions it catches. As a warning it costs nothing to be wrong while still putting the fact in
+front of whoever is merging.
+
+An earlier draft of this plan proposed `HEAD` alone and said a `dev` comparison would be a second
+phase. The owner ruled for both in one phase; that position is superseded and `phase-gov-05`'s
+scope carries the ruling.
 
 **Three comparisons, one per requirement.** For every phase id present in both states:
 
@@ -73,11 +84,17 @@ than the one it prevents.
 to be written down. `GOV-003` already exists for this and is already where `AGENTS.md` sends a
 collision resolution.
 
-**It would not have caught `5ecb203` at merge time.** Stated plainly because it matters: this
-guard fires at the moment the bad edit is made, in the tree that makes it. Once the regression is
-committed on another branch and arrives by merge, the prior state on *this* branch already
-contains it. Catching that case needs the `dev`-relative comparison the plan declined. If the
-owner wants both, that is a second phase, not a widening of this one.
+**The merge-time case is covered, but only as a warning.** The `HEAD` check fires at the moment
+the bad edit is made, in the tree that makes it; once a regression is committed on another branch
+and arrives by merge, the prior state on *this* branch already contains it and `HEAD` sees
+nothing. That is what the `dev` comparison is for. Be clear about what it buys: a warning on a
+merge that brings a regression in, not a block. Someone still has to read it. The guard makes the
+regression visible at the moment it crosses onto the branch — which is more than existed when
+`5ecb203` went unnoticed for hours — and does not pretend to prevent it.
+
+**`dev` may be unreachable** — a detached worktree, a clone without the ref. Treated exactly as an
+unreadable `HEAD`: skip that comparison, print one line, do not fail. The `HEAD` check is
+unaffected and still runs.
 
 ## Phases
 

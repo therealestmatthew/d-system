@@ -6530,6 +6530,12 @@ items:
     read history would block every rebase in the repository.
   - Failure output names each affected phase id, its from to transition, and which of session,
     completion_evidence and result were lost.
+  - 'Owner ruling 2026-09-14 (REQ-010 R6): run the same two comparisons against dev as well,
+    and report those findings as WARNINGS that never change the exit code. dev catches a
+    regression arriving by rebase or merge, which HEAD structurally cannot see; it cannot be a
+    hard failure because every agent branch that legitimately completes a phase differs from
+    dev by exactly the transition the guard looks for. Treat an unreachable dev ref the same
+    way as an unreadable HEAD - skip it, note it in one line, do not fail.'
   acceptance:
   - A seeded complete to queued transition makes uv run python -m src.governance exit
     non-zero and name the phase.
@@ -6537,6 +6543,9 @@ items:
   - The same transition accompanied by a GOV-003 entry naming that phase exits 0; an entry
     naming a different phase does not.
   - An unreadable prior state exits 0 with a note rather than failing.
+  - A dev-relative-only finding produces warning output and exits 0; a HEAD-relative finding
+    still exits non-zero with the warning present. An unreachable dev ref exits 0 with a note
+    and does not suppress the HEAD check.
   verification:
   - uv run python -m src.governance
   - uv run pytest test/ -k regression
@@ -6544,11 +6553,11 @@ items:
   deliverables:
   - src/governance/
   - test/
-  next_action: Implement per PLAN-038. The owner still has one open question recorded in
-    REQ-010 - whether the prior state is HEAD (narrow, catches a bad working-copy edit) or
-    dev-relative (catches a regression arriving by merge, but fires on every agent branch
-    that legitimately completes a phase). The plan proceeds on HEAD; re-parameterize this
-    phase's acceptance if the owner rules otherwise.
+  next_action: 'Implement per PLAN-038. The owner''s open question is RESOLVED (2026-09-14) -
+    both bases, two severities. HEAD is the hard failure, dev is a warning. REQ-010 R6 and
+    PLAN-038''s "Two bases, two severities" table carry the reasoning; the plan''s earlier
+    position that dev-relative comparison would be a separate phase is superseded and in
+    scope here.'
 - id: phase-lit-07
   title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
     bibliography
