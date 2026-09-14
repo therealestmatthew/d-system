@@ -1326,3 +1326,61 @@ but does not reliably produce its own intended learning behavior.
 read-disclosure requirement) recorded the true, smaller read extent ("first ~60 lines") sitting next
 to the field that overclaimed it — the contradiction was visible without needing to re-fetch
 anything. This is exactly the failure mode the disclosure requirement exists to surface.
+
+---
+
+## 22. barakat-corroboration-provenance-patterns-tapp2017
+
+Barakat, L., Taylor, P., Griffiths, N., Miles, S. "Corroboration via Provenance Patterns."
+Proceedings of the 9th USENIX Workshop on the Theory and Practice of Provenance (TaPP 2017),
+Seattle, WA, June 22-23, 2017.
+https://www.usenix.org/system/files/conference/tapp2017/tapp17_paper_barakat.pdf
+
+**Overlap.** component_overlap=4, architecture_overlap=3. A PROV-graph-based corroboration
+methodology, explicitly scoped to human-and-computational sources, that discovers independent
+confirming witnesses for a claim and computes a graph-derived reliability score (Eq.1) — a formally
+specified, multi-stage pipeline (claim decomposition, three abstraction operators with an
+information-loss uncertainty measure, witness/confirmation pattern derivation via a formally
+defined graph-projection satisfaction relation, and an uncertainty-weighted aggregate reliability
+score) directly on-point for H4's general convergence claim.
+
+**What it would falsify.** At full strength this would falsify H4's general-convergence half —
+"independent paths... strengthen epistemic weight." It does not reach outright falsification of
+H4's other half, because the paper's own mechanism for discounting *derivative* (non-independent)
+agreement is never built: Sec.5 states plainly that Eq.1 "assumed independence among witnesses,"
+and Eq.8's unweighted-to-weighted rewrite is a bare algebraic sketch with no method given for
+computing `weight(s)`, no worked example, and no reappearance anywhere else in the paper — attributed
+by citation to a different-domain, twelve-years-earlier mechanism (Townend et al. 2005) rather than
+derived or evaluated by this paper itself. It says nothing that would falsify H1, H2, H5, or H6-H11:
+the paper covers only the convergence/corroboration corner of D-System's architecture, with no
+counterpart for state/transition typing, actor authority/delegation beyond `actedOnBehalfOf`,
+memory, decision representation, or the requirement->plan->execution->artifact->verification->
+deployment->runtime chain.
+
+second_review: confirmed; scores, flag and hypotheses_challenged all reproduced exactly against the
+complete primary text. No factual corrections.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on the
+component trigger alone (H4 challenged). Eq.1's built convergence mechanism is strong; Eq.8's
+discount-for-derivative-agreement mechanism is an unimplemented sketch, correctly distinguishing
+"built general mechanism" from "unimplemented specific mechanism."
+
+**Independent reviewer position.** Independently re-derives both scores exactly (4/3) from the
+complete 7-page paper, retrieved and read directly (not summarized) via `curl` and
+`pdftotext -layout`. Confirms every checked verbatim claim matches primary text exactly: the
+abstract's "(computational or human)" scoping language; Sec.5's "we have assumed independence among
+witnesses"; the shared-dependency example; the Eq.8 formula and its confirmed non-reappearance after
+Sec.5; `human_agent_scope`'s claim that no mechanism differentiates human vs. computational
+witnesses (the word "human" occurs exactly once in the entire 7-page paper, in the abstract); the
+section-structure/page-assignment locators; and the `derivative_ancestor` field's citation match to
+Barakat's own Townend et al. 2005 reference-list entry (did not independently re-verify the further
+backward chain to Townend 2005 or Eckhardt & Lee 1985 beyond confirming Barakat's own citation, which
+belongs to a separate dispatch). Confirms none of the four collision triggers besides component
+overlap fires: architecture overlap (3, not 4); direct falsification (the discount-for-derivative-
+agreement half is left unimplemented, not falsified); four contiguous stages (only the convergence
+corner is touched).
+
+**Resolution.** No matrix changes needed. No score, flag, or `hypotheses_challenged` value is
+changed; no factual corrections were found.
