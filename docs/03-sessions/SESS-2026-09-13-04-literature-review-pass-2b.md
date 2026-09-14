@@ -72,20 +72,25 @@ re-measured by the coordinator against the files before being accepted:
   for the strongest collision candidates."** — **Met.** Gate measurements 1 and 2 show 30 rows with
   0 blanks across 1,290 cells; measurement 3 shows B 24/24 and C 24/24 over the 24 qualifying rows.
 - **"Derivative-ancestry lineage is recorded wherever multiple sources inherit one mechanism."** —
-  **Met.** Gate measurement 5 shows `derivative_ancestor` filled on all 30 rows, 0 blank and 0
-  literal `none`. Shared lineages are recorded as one ancestor plus derivatives: PROV-O 2013 across
-  three rows, Perry & Wolf 1992 and Snodgrass 1999 across two each.
+  **Met.** Gate measurement 5 shows `derivative_ancestor` filled on all 30 rows, 0 blank. Shared
+  lineages are recorded as one ancestor plus derivatives: PROV-O 2013 across three rows,
+  Perry & Wolf 1992 and Snodgrass 1999 across two each. Two rows record explicit *independence*
+  rather than an ancestor — `perry-wolf-…-1992` ("none — this is itself a near-origin paper") and
+  `burns-groth-…-2026` ("none — explicitly positioned in its own Related Work section") — which
+  contract field 38 permits where a source genuinely has no ancestor. The condition is met because
+  lineage is recorded wherever it exists, not because all 30 rows name an ancestor.
 
 ## Backlog
 
-- `status`: **`active`** — unchanged. Only the owner's `/session-close` may move it to `complete`.
-- `next_action`: All five `phase-lit-05` work items are complete and gate-measured, with all five
-  `LIT-05 G` gates passing after one fix cycle on `S1`. Awaiting the owner's `/session-close` and
-  its independent review. `phase-lit-06` (Pass 3 — adversarial hypothesis testing and the 16
-  pending collision second reviews) continues on `agent/lit-campaign`, numbering from
-  `LIT-06-S001`. `LIT-05 G` measurement 4 reports **H4 with zero challengers**, H1 with one and H11
-  with two — that is where `LIT-06 S1` must dig. Open for the owner, none blocking: ideas
-  `000217`–`000220`.
+- `status`: **`complete`** — set by the owner's `/session-close`, after the independent sub-agent
+  review recorded below and after every discrepancy it raised was resolved. The phase was left
+  `active` through the session and by the mid-session checkpoint; this is the only step that moved
+  it.
+- `next_action`: None outstanding. `phase-lit-06` (Pass 3 — adversarial hypothesis testing H1–H11
+  and the 16 pending collision second reviews) is unblocked and continues on `agent/lit-campaign`,
+  numbering from `LIT-06-S001`. `LIT-05 G` measurement 4 reports **H4 with zero challengers**, H1
+  with one and H11 with two — that is where `LIT-06 S1` must dig. Open for the owner, none
+  blocking: ideas `000217`–`000221`.
 - `session`: `doc-session-literature-review-pass-2b`.
 - `completion_evidence`: `research/literature-review/04_evidence_matrix.csv` (30 rows),
   `research/literature-review/00_search_ledger.csv` (967 rows, `LIT-05-S001`–`S079`),
@@ -98,15 +103,144 @@ re-measured by the coordinator against the files before being accepted:
 - **`LIT-05 K`'s candidate arithmetic never closed.** Both fix cycles were spent; 35 candidates were
   expected against 34 listed, one unaccounted. Reported rather than looped on, per the pack's
   two-cycle limit. It does not affect the matrix, which reached its ceiling from the ranked tier.
-- **Four findings are open for the owner**, none blocking `phase-lit-06`: ideas `000217`
-  (branch-model/claim-protocol collision, which will recur at `phase-lit-06`'s claim), `000218`
-  (`LIT-05`'s item order defeats its own gate measurement 3), `000219` (a gate silently dropping
-  unexpected tokens), `000220` (mention-counting producing H0-flattering false shared ancestors).
-  `000218`–`000220` are linked `relates_to` `000218` as one campaign-instrument batch.
+- **Five findings are open for the owner**, none blocking `phase-lit-06`: ideas `000217`
+  (branch-model/claim-protocol collision), `000218` (`LIT-05`'s item order defeats its own gate
+  measurement 3), `000219` (a gate silently dropping unexpected tokens), `000220` (mention-counting
+  producing H0-flattering false shared ancestors), `000221` (the contract names `LIT-06 X2` as
+  `second_review`'s only writer while `LIT-04` and `LIT-05` both write it). `000219` and `000220`
+  are linked `relates_to` `000218` as one campaign-instrument batch.
 - **`phase-lit-07` remains barred.** `PROMPT-031`'s pre-synthesis check-in section is still empty by
   construction.
-- **The branch is not integrated.** `agent/lit-campaign` is 39 commits ahead of `dev`; integration
-  is the owner's call.
+- **`000217` no longer bites at the next claim, but is not resolved.** The owner's early integration
+  put `phase-lit-04`'s `complete` onto `dev`, so `agent-lit` holds one active phase and
+  `phase-lit-06`'s claim will validate normally. The structural collision recurs at any future
+  un-integrated close.
+
+## Review
+
+An independent sub-agent (fresh context, not a fork) reviewed the range `9d5c792..baa198c` — 41
+commits, 8 files — against the phase's `scope`, `acceptance` and `verification`, re-running the
+verification commands and re-parsing all three CSVs itself. Its findings, verbatim:
+
+> ## Verification commands (my own reruns, primary checkout, `dev` @ `baa198c`)
+>
+> ```
+> $ uv run python -m src.governance
+> Governance OK: 20 systems, 194 documents, 22 memories, 133 backlog phases
+> EXIT=0
+>
+> $ uv run python tools/check_no_private_content.py
+> check_no_private_content: OK (551 tracked files, 31 identifiers checked)
+> EXIT=0
+> ```
+>
+> Both pass. The record labels its own worktree run of the second command "vacuous" (0 identifiers,
+> `_private/` absent) and cites a real 550-file/31-identifier run at integration; my 551/31 differs
+> by exactly the session record added afterward. That is honest and consistent.
+>
+> ## Acceptance condition 1 — MET
+>
+> - Evidence matrix: **30 data rows**, **43 fields**, every row exactly 43 fields.
+> - Blanks: **0 blanks across 43 fields × 30 rows = 1,290 cells.**
+> - Qualifying rows (`component_overlap_score >= 3` OR `architecture_overlap_score >= 3`): **24 of 30.**
+> - **B coverage 24/24, none missing. C coverage 24/24, none missing.** Every qualifying `source_id`
+>   appears as `subject_source_id` on at least one `strategy_phase: B` row and at least one
+>   `strategy_phase: C` row.
+> - Header matches the evidence contract's 43 numbered fields exactly, in order.
+>
+> ## Acceptance condition 2 — MET
+>
+> - `derivative_ancestor` blank on **0 of 30** rows.
+> - Shared lineage genuinely recorded across rows: PROV-O named in 3 rows besides its own, Snodgrass
+>   1999 in 2 besides its own, Perry & Wolf 1992 in 2 (de-boer, jansen-bosch). Matches the record.
+>
+> ## Discrepancies found
+>
+> **1. The spend-posture strategy split is wrong.** Record: "45 forward-chaining (`C`), 5
+> backward-chaining (`B`), 29 under `D`". Files: **C = 45, B = 11, D = 23.** Total 79 is right; the
+> split is not. Six backward-chain rows written by `X2` — `LIT-05-S052`, `S054`, `S057`, `S064`,
+> `S067`, `S068`, all `strategy_phase: B` — were tallied as `D`.
+>
+> **2. 18 `LIT-05` ledger rows carry `pass: 3` inside a Pass-2b phase, and the record does not
+> mention it.** `LIT-05-S051`–`S068`, all written by `X2`. Every other row in the campaign matches
+> its phase's pass: LIT-01/02/03 all `pass: 1`, LIT-04 all `pass: 2`, and LIT-05's `S001`–`S050` and
+> `S069`–`S079` all `pass: 2`. The record itself asserts "Pass 2 is complete" at this phase, and the
+> contract defines `pass` as the campaign pass the search served. So this is a mislabel, and it is
+> internally inconsistent — `X1` labelled its rows 2 and `X2` labelled equivalent work 3.
+> `phase-lit-06` *is* Pass 3; its rows will be indistinguishable from these 18 by that column, which
+> is the column that makes "which pass did this search serve" computable from the ledger.
+>
+> **3. The Semantic Scholar tally is understated.** Record: "429 on 9 of 13 attempts, 200 on 3, 404
+> on 1." Over `S1`'s range the ledger has **14** Semantic Scholar rows: **429 on 10**, 200 on 3, 404
+> on 1. (Phase-wide, 15 rows: 429×10, 200×3, 404×2.)
+>
+> **4. "0 literal `none`" overstates what the data shows.** Two rows record explicit independence:
+> `perry-wolf-…-1992` and `burns-groth-…-2026`. Neither cell is the bare token `none`, so the gate's
+> statement is literally true, but the record's acceptance framing reads as though all 30 rows carry
+> an ancestor. Contract field 38 explicitly permits `none` when independent, so the data is correct
+> — the framing is not.
+>
+> **5. Three pre-existing inventory rows were silently re-quoted.** They parse to byte-identical
+> field values — a CSV-writer requoting artifact from rewriting the file. Harmless, but it means the
+> inventory was rewritten wholesale rather than appended to, which the narrative does not say.
+>
+> **6. Minor contract note, unmentioned.** Contract field 43 says `second_review` is "filled only by
+> `LIT-06 X2`". `LIT-05 X2` wrote `pending` on the two new critical-collision rows. Blank is
+> forbidden and `phase-lit-04` set the existing 14 the same way, so this is established convention
+> rather than a new deviation — but it is a literal departure from the field's stated writer.
+>
+> ## Claims I tested that held exactly
+>
+> - Matrix 30 rows / 0 blanks / 1,290 cells — confirmed.
+> - Ledger **967 data rows**, every row exactly **15 fields**, **968 CRLF, 0 bare LF, 0 lone CR**;
+>   `LIT-05-S001`–`S079` present, **79 unique, contiguous, no gaps, no duplicates**.
+> - Inventory 1,108 rows, 13 fields, LF. Matrix LF (0 CRLF).
+> - `hypotheses_challenged`: H9 18, H2 13, H7 10, H3 9, H5 7, H8 4, H6 3, H10 3, H11 2, H1 1,
+>   **H4 0** — 70 records total. **H4 is the only hypothesis with zero challengers.** Exactly one
+>   non-H token, `NOT_DETERMINABLE_FROM_ACCESS`, on `capilla-…-2006`.
+> - **16 `critical_collision: yes` and 16 `second_review: pending`, agreeing row-for-row** — zero
+>   yes-without-pending, zero pending-without-yes.
+> - The 7 rows the first gate run flagged as missing `C` are exactly the 7 named, and are exactly the
+>   post-`S1` rows that qualify.
+> - All five named inventory corrections applied with **slugs unchanged**. No inventory row removed
+>   or renamed; 17 added.
+> - **No matrix `source_id` was renamed.** The prior 20 rows are a byte-identical prefix of the new
+>   file (matrix diff is +10 / −0).
+> - `X1` and `X2` score tables match the matrix on all 10 rows. Matrix grew 20 → 25 → 30.
+> - Ideas `000217`–`000220` created; `000219` and `000220` linked `relates_to` `000218`.
+>
+> ## Scope — nothing out of bounds
+>
+> - **Only 8 files touched across all 41 commits** (checked per-commit, not just the endpoint diff).
+>   Nothing in `src/`, `ts/`, `_data/` proper, or any other system's documents.
+> - **The backlog diff modifies `phase-lit-05` and no other phase.** Status correctly left `active`,
+>   not `complete`.
+> - **The frozen baselines were never touched at any commit in the range.**
+> - `catalog.md` is a mechanical regeneration consistent with the claim.
+>
+> ## Bottom line
+>
+> Both acceptance conditions hold on my own measurements. The five discrepancies are all in the
+> session record's prose, not in the deliverables — except **finding 2**, the 18 ledger rows
+> mislabelled `pass: 3`, which is a real data defect in a committed file that will mislead
+> `phase-lit-06`'s own pass accounting, and **finding 1**, a wrong B/D split that misstates how much
+> backward chaining this phase actually did (11 rows, not 5). Neither blocks acceptance; both should
+> be corrected before `phase-lit-06` numbers from them.
+
+### Coordinator's response to the review
+
+Every finding was re-verified against the files before being acted on; all six hold.
+
+- **Finding 2** was a real defect in a committed deliverable, so it went back to `LIT-05 X2` as fix
+  cycle 1 of 2 rather than being repaired by the coordinator. Fixed and re-verified; see
+  `## Corrections`.
+- **Findings 1, 3 and 4** were errors in this record's prose, written by the coordinator, and were
+  corrected in place with the correction marked rather than silently overwritten.
+- **Finding 5** is a CSV-writer requoting artifact with byte-identical parsed values; recorded, no
+  action.
+- **Finding 6** is a real literal departure from the contract's stated writer for `second_review`,
+  but it matches what `phase-lit-04` established for the existing 14 rows. Changing it is a contract
+  question, not an agent's call — raised as idea `000221` rather than resolved here.
 
 ## The claim required an unscheduled integration, on the owner's ruling
 
@@ -176,9 +310,13 @@ indexed by no citation provider and needed a Crossref bibliographic proxy. All 3
 `strategy_phase: C`, `pass: 2`, no blank `subject_source_id`, `chain_decision` or
 `duplicate_handling`.
 
-Provider behaviour, logged as real zero-yield rows rather than omitted: Semantic Scholar 429 on 9
-of 13 attempts, 200 on 3, 404 on 1. Several of the strongest collisions have zero confirmed
-citations because they are 2026 preprints too recent to have any.
+Provider behaviour, logged as real zero-yield rows rather than omitted: across `S1`'s range the
+ledger carries 14 Semantic Scholar rows — **429 on 10, 200 on 3, 404 on 1**; phase-wide, 15 rows
+with a second 404 from `X2`. Several of the strongest collisions have zero confirmed citations
+because they are 2026 preprints too recent to have any. *(Corrected at close: this record first
+reported 9 of 13, understating the rate limiting. The worker's own summary was low and it was
+relayed without checking it against the ledger — the one claim this session did not verify against
+the file.)*
 
 Eleven inventory rows added, two flagged low-confidence because the *citation link itself* was
 unverified — `proper-…-2014` (OpenAlex misattributing unrelated same-repository dissertations as
@@ -341,9 +479,12 @@ checkpoint mechanism and so with H8. Its chain produced two further leads (`neth
 
 ## Spend posture
 
-- **Searches this phase**: 79 ledger rows, `LIT-05-S001`–`S079` — 45 forward-chaining (`C`), 5
-  backward-chaining (`B`), 29 under `D` (bibliographic verification and source access, the enum
-  having no verification value, per idea `000149`).
+- **Searches this phase**: 79 ledger rows, `LIT-05-S001`–`S079` — **45 forward-chaining (`C`), 11
+  backward-chaining (`B`), 23 under `D`** (bibliographic verification and source access, the enum
+  having no verification value, per idea `000149`). *(Corrected at close: this record first stated
+  B 5 / D 29, having missed six `B` rows written by `X2` — `S052`, `S054`, `S057`, `S064`, `S067`,
+  `S068` — and counted them as `D`. The independent close review caught it; the file always said
+  B 11 / D 23.)*
 - **Sources deep-read**: 10. Campaign matrix total **30 of the methodology's 20–30** — the ceiling,
   reached exactly. Pass 2 is complete.
 - **Opus escalation**: none spent, in this phase or the campaign to date. The kick-off record's
@@ -371,7 +512,92 @@ checkpoint mechanism and so with H8. Its chain produced two further leads (`neth
   wins over the coordinator prompt), `PROMPT-030` in full, and this record.
 - **`phase-lit-07` remains barred.** `PROMPT-031`'s pre-synthesis check-in section is still empty by
   construction. A kick-off paragraph describing the planned pause is not a held check-in.
-- **Open for the owner**, none blocking `phase-lit-06`: ideas `000217`–`000220`.
-- **Integration**: `agent/lit-campaign` was integrated into `dev` at the *start* of this session on
-  the owner's ruling, to free the claim slot. It is now 38 commits ahead again and **not**
-  integrated. The diff is `git diff dev..agent/lit-campaign`.
+- **Open for the owner**, none blocking `phase-lit-06`: ideas `000217`–`000221`.
+- **Integration**: `agent/lit-campaign` was integrated into `dev` **twice** this session on the
+  owner's direction — once at the start, to free the claim slot, and once at close. The branch and
+  worktree are deliberately retained; `PLAN-023` has `phase-lit-06` continue on them.
+
+## Decisions
+
+**Integrate early rather than work around the stale lock.** Preflight hit a conflict the campaign's
+own design produces: `dev` said `phase-lit-04` was active, the campaign branch said complete, and
+`LIT-05 K`'s instruction to claim the phase could not be carried out because the validator rejects
+an agent holding two active phases. The coordinator's recommendation was to claim on the branch only
+and reconcile at the scheduled integration, preserving `PLAN-023`'s two-integration schedule. **The
+owner overrode that and directed an immediate integration**, which was the better call: it put
+`phase-lit-04`'s completion where peers can see it, made the claim validate normally, and removed
+the problem from `phase-lit-06`'s path rather than deferring it. The structural defect is recorded
+as idea `000217` regardless, because the override fixed this instance and not the cause.
+
+**Split the ten remaining matrix slots 5/5 between `X1` and `X2`.** The matrix sat at the floor of
+the methodology's 20–30 band with two extraction dispatches to run and a hard ceiling of 30. Capping
+`X1` at 25 reserved `X2`'s share; without the cap, `X1` would have consumed the whole budget on
+foundational works and the forward-chaining finds would never have been read. The 30-row ceiling was
+reached exactly.
+
+**Rank `X1`'s batch by how many matrix rows descend from each work, not by recency or citation
+count.** A work several rows inherit from is a shared lineage, and shared lineage is the specific
+evidence H0 predicts. That ranking criterion is also what exposed `K`'s method error — the ranking
+only makes sense if inheritance is counted correctly, so getting a wrong answer was visible.
+
+**Send measurement 3's failure back to `S1` rather than accepting a red gate at the boundary.** The
+rules say a failing gate is a result to record, not a retry loop; they do not forbid the fix cycle
+Block G explicitly provides. Re-running the gate hoping for a different number would have been the
+prohibited move. Routing the failure to the section responsible for forward chaining, then
+re-measuring, is the sanctioned one.
+
+**Raise the `second_review` contract mismatch as an idea instead of resolving it.** The independent
+review found the contract names `LIT-06 X2` as that field's only writer while `LIT-04` and `LIT-05`
+both write it. Both readings have consequences for the campaign's remaining phases, and
+`PLAN-023.03` and `PROMPT-029` are governed documents no agent may edit mid-campaign. Idea `000221`.
+
+## Corrections
+
+**The `pass` column was wrong on 18 committed ledger rows, and the coordinator did not catch it.**
+`LIT-05 X2` wrote `pass: 3` on `LIT-05-S051`–`S068` inside a Pass-2b phase. The independent close
+review found it; this session's own verification did not, because the coordinator checked field
+counts, line endings, id contiguity, `strategy_phase`, `subject_source_id`, `chain_decision` and
+`duplicate_handling` on every append — but never checked `pass` against the phase. It mattered:
+`phase-lit-06` *is* Pass 3, and its rows would have been indistinguishable from these 18 by the one
+column that makes pass attribution computable from the ledger. Routed to `X2` as fix cycle 1 of 2;
+`X2` did not dispute it, corrected exactly the `pass` column on exactly those 18 rows, and
+re-verified the ledger intact (967 rows, 15 fields each, 968 CRLF, 0 bare LF, ids contiguous). Every
+phase now reads consistently. Commit `a940c19`.
+
+**This record misstated its own spend posture.** It reported 5 backward-chaining rows and 29 `D`
+rows; the file says 11 and 23. Six `B` rows written by `X2` were counted as `D`. Corrected in place
+with the correction marked.
+
+**This record understated the Semantic Scholar rate limiting**, reporting 429 on 9 of 13 attempts
+where the ledger shows 10 of 14 in `S1`'s range. The cause is worth naming: it was relayed from the
+worker's own summary without being checked against the file — the one claim this session took on
+trust, and the one that was wrong. Every other worker claim was re-derived from the files and held.
+
+**`LIT-05 K` produced a ranking built on a withdrawn claim**, corrected across two fix cycles and
+still not fully closed; see the `What was dispatched` section and idea `000220`.
+
+**`X1` and `S1` each caught and corrected a fabrication of their own before it reached disk** — a
+WebFetch summary inventing a five-tuple for Perry & Wolf 1992, and an invented author list on the
+Plataniotis row killed by its own Crossref verification.
+
+## Left undone
+
+**`LIT-05 K`'s candidate arithmetic never closed.** Both fix cycles were spent and 35 expected
+candidates were reported as 34 listed. It is left as-is deliberately: the pack caps fix cycles at
+two precisely so a work item cannot absorb unlimited attention, and the unaccounted candidate sits
+in the count-1 tier that `X1` never reached, because the matrix hit its ceiling from the ranked
+tier above it. Nothing downstream depends on it.
+
+**Three forward-chaining leads are in the inventory but not the matrix**, because the matrix is at
+its 30-row ceiling: `plataniotis-…-decision-design-graphs-2013`, `burckhardt-…-netherite-2022` and
+`qi-liu-jin-halfmoon-…-2023`, plus the confirmed `proper-…-2014`. They are `phase-lit-06`'s to use
+as leads. The Liu Springer CCIS chapter remains genuinely unobtainable after five providers.
+
+**Five campaign-instrument findings await the owner** — ideas `000217`–`000221`. None blocks
+`phase-lit-06`, but `000218` will cost that phase a fix cycle the same way it cost this one if the
+item order is not changed first, and `000217` will recur at any future un-integrated close.
+
+**The three below-threshold matrix rows were never forward-chained**, correctly: `keim-kaplan`
+(2/2), `assumptions-management` (2/1) and `ibm-blueprint` (1/1) fall outside the ≥3 population the
+section defines. If `phase-lit-06` finds that a hypothesis with thin coverage depends on one of
+them, that is a reason to revisit the threshold, not a gap in this phase.

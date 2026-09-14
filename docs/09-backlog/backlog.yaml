@@ -6301,7 +6301,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6346,16 +6346,21 @@ items:
     caused by the phase's own item order rather than by any worker (idea 000218).
     LIT-05 G measurement 4 reports H4 with zero challengers, H1 with one and H11 with
     two.
-  next_action: All five work items are complete and gate-measured, with all five LIT-05
-    G gates passing. Awaiting the owner's /session-close and its independent review;
-    the phase stays active until then. phase-lit-06 (Pass 3 - adversarial hypothesis
-    testing H1-H11 and the 16 pending collision second reviews) is unblocked once this
-    phase completes and continues on agent/lit-campaign, numbering its searches from
-    LIT-06-S001. LIT-06 S1 must dig where LIT-05 G measured thin - H4 has zero challengers,
-    H1 has one, H11 has two. Open for the owner, none blocking - ideas 000217 to 000220,
-    in particular 000217 (the branch-model/claim-protocol collision, which will recur
-    at phase-lit-06's claim) and 000218 (LIT-05's item order defeats its own gate).
-    agent/lit-campaign is not integrated; that is the owner's call.
+  next_action: None outstanding. Closed by the owner's /session-close after an independent
+    sub-agent review, which confirmed both acceptance conditions MET on its own re-measurement
+    and raised six discrepancies - all resolved before close. The one real data defect
+    (18 ledger rows carrying pass 3 inside a Pass-2b phase) went back to LIT-05 X2 as
+    a fix cycle and is corrected in commit a940c19; every phase's pass column is now
+    internally consistent. agent/lit-campaign was integrated into dev on the owner's
+    direction, and the branch and worktree are deliberately retained because PLAN-023
+    has every campaign phase commit to that one branch. phase-lit-06 (Pass 3 - adversarial
+    hypothesis testing H1-H11 and the 16 pending collision second reviews) is unblocked
+    and continues on it, numbering its searches from LIT-06-S001. LIT-06 S1 must dig
+    where LIT-05 G measured thin - H4 has zero challengers, H1 has one, H11 has two.
+    Open for the owner, none blocking - ideas 000217 to 000221, in particular 000218
+    (LIT-05's item order defeats its own gate measurement 3 and will cost phase-lit-06
+    a fix cycle the same way) and 000221 (the contract names LIT-06 X2 as second_review's
+    only writer while LIT-04 and LIT-05 both write it).
 - id: phase-lit-06
   title: Literature review Pass 3 — adversarial hypothesis testing and collision second
     reviews

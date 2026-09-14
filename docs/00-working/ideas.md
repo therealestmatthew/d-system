@@ -10724,3 +10724,21 @@ Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
 **Links**
 
 - relates_to → `000218`
+
+---
+
+## 000221 · The evidence contract names LIT-06 X2 as second_review's only writer, but LIT-04 and LIT-05 both write it
+
+**Created 2026-09-13T22:44:40-04:00 · Status: `open`**
+
+PLAN-023.03's evidence-matrix schema says field 43, second_review, is "filled only by LIT-06 X2". In practice every phase that sets critical_collision to yes has also written second_review at the same time, because the contract separately forbids a blank cell and the flag rules say a yes sets second_review to pending.
+
+phase-lit-04 established this for the first 14 critical collisions. phase-lit-05's X2 followed it for the two it added. The matrix now holds 16 rows with critical_collision yes and 16 with second_review pending, agreeing row for row, and an independent close review confirmed there are no yes-without-pending or pending-without-yes cases. So the data is coherent and the convention is consistent across two phases.
+
+What is not coherent is the contract. As written, a field with a named sole writer is being written by two other dispatches, and following the contract literally would require leaving the cell blank until LIT-06 runs, which the same contract forbids.
+
+This was found by the independent review at phase-lit-05's close, which flagged it as a literal departure from the field's stated writer rather than a defect in the data.
+
+Resolving it is a contract change and therefore the owner's call, not an agent's. The plausible readings are that second_review's writer clause should say the flagging dispatch sets pending and LIT-06 X2 sets the outcome; or that the field should be split into a request and a result; or that the clause is right and the flag rules should not imply a write. An agent should not pick among these mid-campaign, and PROMPT-029 and PLAN-023.03 are both governed documents.
+
+Raised by the coordinator at phase-lit-05's close. See SESS-2026-09-13-04.
