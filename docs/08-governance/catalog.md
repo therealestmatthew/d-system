@@ -136,6 +136,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-031 | prompt | active | repository-owner | docs/02-prompts/PROMPT-031-literature-review-kickoff.md |
 | PROMPT-032 | prompt | active | repository-owner | docs/02-prompts/PROMPT-032-idea-batching-delegation-pack.md |
 | PROMPT-033 | prompt | active | repository-owner | docs/02-prompts/PROMPT-033-idea-batching-kickoff.md |
+| PROMPT-034 | prompt | active | repository-owner | docs/02-prompts/PROMPT-034-reusable-partition-pack.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -288,6 +289,5 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
-| PROMPT-034 | reserved | Reusable partition pack; deliverable of phase-part-01. |
 
-216 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 33, requirement: 10, session: 77.
+217 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 10, session: 77.
