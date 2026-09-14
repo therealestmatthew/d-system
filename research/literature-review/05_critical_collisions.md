@@ -36,7 +36,34 @@ multi-actor provenance/authority/conflict model). It says nothing about H1, H5, 
 there is no upstream knowledge-construction system, no requirement/plan/deployment/runtime
 stage, and Aporia is single-agent, single-goal, not a multi-actor or cross-session architecture.
 
-second_review: pending
+second_review: disputed: both scores and the flag confirmed correct, but actor_model and
+temporal_model were factually wrong and are corrected in the matrix.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on the
+component trigger alone. H9 is the strongest of the three challenged hypotheses (H7;H8;H9); H7 is
+not falsified because Aporia edits/revokes decisions destructively in place rather than
+append-only; H8 is the weakest, correctly hedged.
+
+**Independent reviewer position.** Re-derives the identical scores (component 4, architecture 3)
+and concurs the flag rests entirely and correctly on the component trigger — the four-adjacent-
+stages trigger does not fire (longest consecutive run is Execution->Artifact->Verification = 3,
+broken by real gaps at Requirement and Plan). Concurs H9 is strongest and H7 is not falsified for
+the same append-only-vs-destructive-edit reason. Diverges on two factual fields: `actor_model`
+stated "a single coding agent" and "no multi-agent... actor model," but Sec.3.3 (p.4) — a section
+the row's own evidence_locator never cites — describes Aporia internally orchestrating three
+specialized agents (questioner, planner, implementer), each a separate Claude Code instance under
+the Agent Client Protocol; the user-facing count of two actors is correct, but the system itself is
+internally multi-agent. `temporal_model` was coded NOT_DETERMINABLE_FROM_ACCESS when Sec.6.3
+directly states Aporia lacks a navigable history — a citable absence, not an unread gap. Also
+identifies two citation-location errors (a misnumbered Pail reference, and the "application of QOC"
+quote misattributed to Sec.2 rather than Sec.3.2).
+
+**Resolution.** The reviewer's own bottom line is that neither hypothesis reading (over- or
+understated) needs adjusting on this row — direction is "NEITHER." `actor_model` and
+`temporal_model` are corrected in `04_evidence_matrix.csv`, along with the `verbatim_notes` and
+`evidence_locator` citation errors. No score, flag, or hypotheses_challenged value is changed.
 
 ---
 
@@ -65,7 +92,29 @@ nothing about H1, H5, H8, H10, or H11 — the system recovers existing architect
 snapshot; it does not model the upstream idea/evidence/reasoning construction that produced it,
 nor a persistent cross-session knowledge structure.
 
-second_review: pending
+second_review: confirmed, with one factual correction (temporal_model). Reviewer would score H2 as
+a stronger challenger than the row's "challenged" framing suggests.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on the
+component trigger alone (with directly-falsifies for H6 arguably a second route). Falsifies H6's
+"the full synthesis may be distinct" framing by being a working multi-agent AKM pipeline already
+spanning generation, retrieval, and validation; does not falsify H2, H4, or H7 as D-System frames
+it.
+
+**Independent reviewer position.** Confirms both scores exactly and confirms the H6/H9
+non-falsification conclusions via full-text read including a direct visual inspection of Figure 1
+(needed because the diagram's box labels are not extractable by text-only PDF/HTML converters — one
+of two independent extraction attempts on this source failed for exactly this reason). Finds one
+factual error: `temporal_model` was coded NOT_DETERMINABLE_FROM_ACCESS, but the complete 4-page
+preprint is the paper's entire content and was read in full — no temporal/versioning model exists
+anywhere in it, so the correct code is NOT_APPLICABLE, per the evidence contract's own guidance that
+absence is recorded only after reading a source's full scope.
+
+**Resolution.** `temporal_model` corrected to NOT_APPLICABLE in `04_evidence_matrix.csv`. Direction
+is "NEITHER" overstated nor understated on the row's own terms; no score, flag, or
+hypotheses_challenged value is changed.
 
 ---
 
@@ -94,7 +143,35 @@ instantiation of a 2002-2017 cognitive-science lineage (Zacks & Swallow's Event 
 Theory, Baldassano et al., Howard & Kahana's Temporal Context Model) — a derivative application,
 not an independent invention, per this campaign's independence-discipline rule.
 
-second_review: pending
+second_review: disputed: reviewer re-derives component_overlap to 3 (not 4) and argues the flag
+should not stand; score and flag left unchanged as a recorded judgment dispute, not a factual
+correction.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2, flag fires on the
+component trigger. A peer-reviewed, scaled (10M-token), publicly released mechanism directly
+relevant to H5, falsifying only the narrow reading that "context selection beyond plain semantic
+similarity is uncommon" — not H5's fuller epistemic-lineage/dissent/authority/convergence claim. No
+other hypothesis touched.
+
+**Independent reviewer position.** Confirms architecture_overlap=2 and the H5 non-falsification
+conclusion via a full 39-page read including the specific retrieval mechanism section (Sec.3.4,
+p.7) that the row's own evidence_locator never cites — its locator spans only pp.1-4 (abstract
+through Sec.3.1/Fig.1), a span from which the row's substantive description is fully derivable
+without needing the method section it is nominally about. On this basis the reviewer re-derives
+component_overlap to 3: EM-LLM contributes three genuine primitives (surprise-based segmentation,
+graph-modularity boundary refinement, similarity-plus-contiguity retrieval), clearing "multiple
+relevant primitives" but not "strong mechanism overlap," because the actual selection criteria do
+not substantially match D-System's mechanism — the row's own prose (retrieval_context_model,
+strongest_difference) already states H5's epistemic dimensions are "entirely outside its scope" yet
+assigns a component score that contradicts that same prose. Under the reviewer's re-derivation, the
+sole trigger (component>=4) fails and critical_collision should read NO.
+
+**Resolution.** This is a scoring judgment, not a factual error in the payload's terms —
+recorded here as disputed per the coordinator's addressing; `component_overlap_score` and
+`critical_collision` are left exactly as they stand in `04_evidence_matrix.csv`. Had the reviewer's
+re-derivation been authorized, this row's flag would be dropped.
 
 ---
 
@@ -126,7 +203,39 @@ split), and no AI-agentic actors are modeled. Its argumentation-theoretic suppor
 relations trace directly to Dung (1995), Cayrol & Lagasquie-Schiex (2005), and Toulmin (1958) —
 a 2021 OWL-formalized instantiation of a 1958-2005 lineage, not an independent invention.
 
-second_review: pending
+second_review: confirmed, with two factual corrections (derivative_ancestor, temporal_model).
+Reviewer would score H2 as a STRONG rather than marginal challenger. Surfaces an open contract
+question (see the "adjacent stages" note below).
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=3; flag fires on the
+component trigger, with directly-falsifies arguably a second independent route for H2. Structurally
+the closest single match in its batch to H2 and H3; does not falsify H3's arbitration half (the
+paper is explicit that resolving a flagged conflict "ultimately require[s] human judgment").
+
+**Independent reviewer position.** Confirms both scores exactly and confirms the H2/H3/H9 mapping
+via a complete bioRxiv v3 read (all 14 pages plus the full 73-item reference list). Goes further
+than the row on H2: `directlySupports` is a first-class subproperty layered on but distinct from
+base PROV `used`/`generatedBy`, deployed at 17,996-node production scale — the reviewer judges this
+plausibly meets H2's own falsification bar ("equivalent... provenance architecture") and recommends
+06 weigh it as a strong, not marginal, challenger. Finds two factual errors: `derivative_ancestor`
+cited "Cayrol & Lagasquie-Schiex, On the Acceptability of Arguments in Bipolar Argumentation
+Frameworks, 2005" — no such reference exists in this paper's 73-item bibliography; the paper's
+actual cited works (Methods Sec.2, p.4, "as developed by Cayrol and others [31, 37, 38]") are three
+different Cayrol & Lagasquie-Schiex papers (2009, 2010, 2013). `temporal_model` was coded
+NOT_DETERMINABLE_FROM_ACCESS though the full text was read end to end and never addresses
+versioning. Separately flags a contract-level ambiguity: under a strict-contiguous reading of
+"adjacent stages" the four-adjacent-stages trigger does not fire (longest run is
+Execution(partial)->Artifact->Verification(indirect) = 3); under a looser "any four, not necessarily
+contiguous" reading it would fire (5 stages touched). `PLAN-023.03` does not specify which reading
+applies. This does not change this row's outcome (the component trigger already fires) but will
+elsewhere in the batch.
+
+**Resolution.** `derivative_ancestor` and `temporal_model` corrected in `04_evidence_matrix.csv`.
+The "adjacent stages" ambiguity is recorded here as an open contract question per the coordinator's
+addressing — not resolved, and `PLAN-023.03` is not edited. No score, flag, or
+hypotheses_challenged value is changed.
 
 ---
 
@@ -156,7 +265,37 @@ architectural synthesis," self-identifying as a synthesis of concurrent 2025 sys
 Mem0, A-MEM) rather than a component-level invention, and naming Alchourron, Gardenfors &
 Makinson (1985) as its own "central formal contribution" ancestor.
 
-second_review: pending
+second_review: disputed: reviewer re-derives component_overlap to 4 (not 5) and architecture_overlap
+to 3 (not 4); flag survives on the component trigger alone. Six factual corrections applied.
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=5, architecture_overlap=4 (the matrix's ceiling
+component score). A graph-native memory architecture combining immutable versioned revisions, typed
+dependency/provenance edges, and formal AGM/Hansson belief-revision correspondence proofs; the
+closest single match in the campaign to H2. Falsifies H2 outright per the row; weakens but does not
+fully falsify H7/H9. The paper self-identifies as "architectural synthesis," not component
+invention.
+
+**Independent reviewer position.** Both overlap scores overstated by one point each — component 4
+not 5, architecture 3 not 4 — though the flag stands on the component trigger alone.
+`Component`: the proof is scoped to "a deliberately simple propositional logic over ground triples"
+with Recovery rejected and K*7/K*8 left open; no actor-authority arbitration or convergence/
+independence weighting exists (confirmed absent, not merely unread); conflict handling is
+last-write-wins supersession, which the paper itself contrasts with Letta's reconciliation.
+`Architecture`: Requirement/Specification/Plan/Verification/Deployment/Runtime Evidence are
+confirmed genuinely absent from the full text; Decision has no schema; Execution is TTL session
+namespacing only — one deep subsystem (Artifact) plus one partial (Knowledge Update), not
+"near end-to-end." Six fields were also miscoded NOT_DETERMINABLE_FROM_ACCESS or otherwise wrong
+though the same freely available full text (arxiv.org/html/2603.17244) resolves them:
+`conflict_trust_mechanism` and `change_impact_mechanism` are both specified (Sec.2.1, Sec.6.5);
+`convergence_independence_mechanism` and `decision_representation` are confirmed absent, not merely
+unread; `execution_unit_session_model` is TTL-scoped session keys only; `implementation_availability`
+undersells a free self-hostable "Kumiho CE" tier alongside the paid cloud service.
+
+**Resolution.** All six factually miscoded fields corrected in `04_evidence_matrix.csv`. No score,
+flag, or hypotheses_challenged value is changed — the reviewer's score disagreement is recorded here
+as a judgment dispute per the coordinator's addressing.
 
 ---
 
