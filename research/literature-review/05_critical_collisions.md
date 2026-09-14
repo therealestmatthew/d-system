@@ -489,3 +489,125 @@ model.
 second_review: pending
 
 ---
+
+## 16. burns-groth-agentic-ontological-notebook-memory-2026
+
+Burns, G.A., Groth, P.: *Complex Knowledge Curation using Agentic Ontological Notebook Memory*,
+CAIS '26 (ACM, 5 pages). Open source: github.com/sciknow-io/skillful-alhazen.
+
+**Overlap.** component_overlap=4, architecture_overlap=3. A genuine, empirically evaluated
+ontological-vs-epistemic-vs-derivational state distinction (domain things vs. Artifact/Fragment/
+Note ICE hierarchy) close in spirit to H1's O+E+L triple; explicit per-note actor attribution and
+a full backward provenance chain to source (H3); and a named, working closed loop from
+operational curation failures back into schema/ontological design (H11) — the strongest H11
+match found in this campaign. All three are working, demonstrated mechanisms with a public
+benchmark (github.com/sciknow-io/alhazen-skill-dismech), not merely proposed.
+
+**What it would falsify.** At full strength this would falsify H1's "uncommon in agent-memory
+systems" framing (a working system already does something close), contribute actor-attribution
+evidence to H3, and falsify H11's claim that runtime-to-knowledge closure is unexplored — the
+loop from curation failure to GitHub issue to schema change is real and benchmarked. It would
+not falsify H2 (no typed transition-with-provenance primitive linking states the way D-System's
+S_t--[T,P]-->S_t+1 does), H4 (no conflict/trust or independence/convergence mechanism at all), or
+H5-H10 (no decision/requirement/specification/plan representation beyond one skill's narrow
+success-criteria entities; the O/E/L-like classification is per-skill and domain-specific, not
+universal; H11's feedback loop closes onto ontology/schema refinement specifically, not the
+broader idea->decision->requirement->code->runtime lineage H7/H9/H10 target). The paper positions
+itself in its own Related Work as architecturally distinct from every memory system it cites
+(MemGPT/Letta, LangGraph, Zep/Graphiti, Mem0, Cognee) rather than an extension of any one — its
+domain-thing/ICE split draws on the established Information Artifact Ontology (Ceusters 2013),
+a vocabulary borrowing, not a mechanism inheritance from a single ancestor.
+
+second_review: pending
+
+---
+
+## 17. epistemic-sybil-resistance-bara-2026
+
+Bara, M.: *Epistemic Sybil Resistance: Multiplying AI Agents Without Multiplying Evidence*,
+arXiv:2609.01873, 1 Sep 2026.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. The provenance-DAG-based discount of
+corroboration from reports sharing an evidentiary root is the single closest primary-source
+match found in this campaign to H4's claim — both the DAG structure and the discounting
+arithmetic (kappa_m = 1/(1+rho(m-1)), Sec.5.2 Corollary 2) are explicit and formal, not
+analogical. Found only in this phase's Pass 3 collision search, after five prior phases at zero
+challengers for H4.
+
+**What it would falsify.** At full strength this would falsify H4 — a closed-form,
+graph-topological discount for shared-ancestry corroboration is exactly what H4, and especially
+the frozen register's "graph-topological... discounted based on shared lineage" phrasing,
+describes. It would not fully falsify H4 as D-System frames it, because the paper is explicitly
+scoped to AI-agent report multiplicity only — no human witnesses, no mixed human-agent
+corroboration are modeled or evaluated, which is explicitly outside H4's "mixed human-agent
+knowledge" scope — and the "topology" is a flat root-sharing DAG used solely to test conditional
+independence of reports, not a general reasoning-lineage/transition graph carrying decision,
+requirement, or artifact nodes as D-System's own lineage graph would. The paper's own Sec.9
+leaves practical provenance authentication and information-theoretic estimation from raw reports
+as open problems — design guidance, not a deployed aggregator. No prior mechanism is named as an
+ancestor; the formalization is presented as this paper's own original contribution, situated
+against classical Sybil-resistance and jury/testimony epistemology as conceptual framing only.
+Given this hypothesis's thin evidence count (one challenger), this section records the overlap
+without treating it as settled in either direction — that judgment belongs to
+`06_hypothesis_tests.md`'s `INSUFFICIENT_EVIDENCE` verdict, not to this collision analysis.
+
+second_review: pending
+
+---
+
+## 18. eywa-provenance-grounded-memory-joshi-2026
+
+Joshi, R.: *Eywa: Provenance-Grounded Long-Term Memory for AI Agents*, arXiv:2605.30771, May
+2026.
+
+**Overlap.** component_overlap=4, architecture_overlap=3. Independently tracking ontological
+type, epistemic status/tier, and lifecycle state on the same memory object (Table 2, Sec.4.3) is
+the closest primary-source, real-implemented match found in this campaign to H1's orthogonal
+ontological+epistemic+lifecycle claim, combined with an explicit, auditable provenance link from
+every derived belief back to its immutable source evidence. Real, implemented, evaluated system;
+per-question artifacts published at eywa.to/research.
+
+**What it would falsify.** At full strength this would falsify H1's "uncommon in agent-memory
+systems" framing directly — this is exactly such a system, exactly doing that. It would
+contribute evidence toward H5 (retrieval combining evidence provenance with query-type weighting,
+Sec.4.5). It would not falsify H1 under a strict reading requiring a formally orthogonal (O,E,L)
+triple applied uniformly system-wide (the three dimensions here are a memory-object taxonomy and
+a two-tier capture/validation pipeline, per the paper's own framing), nor H3 (no authority/
+delegation provenance), H4 (no independence-aware convergence discounting), or H7/H9/H10/H11 (no
+reach beyond conversational memory into decisions, requirements, code, tests, deployment, or
+runtime evidence — confined to the Reasoning/Knowledge-Update ends of D-System's proposed
+lifecycle). No prior mechanism is credited by the paper for the ontological/epistemic/lifecycle
+classification or the evidence-first provenance design; it positions itself against contemporary
+LLM-agent memory benchmarks (LoCoMo/LongMemEval/BEAM) rather than a named earlier system.
+
+second_review: pending
+
+---
+
+## 19. memtx-transactional-belief-commit-2026
+
+Li, Wang, Lu, Chen, Li, Song, Zheng, Cai: *MemTX: Transactional Belief Commit for Stateful
+Agent Memory*, arXiv:2607.23929, v2 28 Jul 2026.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. Retraction -> typed cascading repair
+of derived records and tool side effects, machine-verified for completeness, is the strongest
+primary-source match found in this campaign for H10's epistemic-blast-radius claim — proven, not
+just claimed, for one memory system's dependency graph (5.5 million enumerated protocol states,
+zero violations). Read from the abstract only in this pass; access_limitation=abstract_only, so
+several fields remain NOT_DETERMINABLE_FROM_ACCESS.
+
+**What it would falsify.** At full strength this would falsify H10's core mechanism claim —
+retracting/falsifying a claim triggers verified, cascading reassessment of everything downstream
+— for the scope of one memory store's internal state. It would not falsify H10 as D-System's
+fuller cross-lifecycle claim states it, since the cascade is scoped to a single shared memory
+store's internal derived records and tool-call side effects, not D-System's proposed propagation
+into requirements, plans, specifications, artifacts, and tests. It would not falsify H4 (no
+independence-aware convergence/discounting mechanism confirmed) or H1 (no ontological/epistemic/
+lifecycle state triple confirmed) — both NOT_DETERMINABLE_FROM_ACCESS pending a full-text read
+this dispatch did not perform. Multi-AI-agent only; no human actor or authority model. No
+ancestor is named for the cascading-repair mechanism itself; the paper situates itself against
+unspecified prior agent-memory systems that "treat every accepted write as immediately
+actionable truth" (its stated gap). A full-text read (currently abstract-only) is recorded as an
+open item for whichever pass next revisits this row, not resolved here.
+
+second_review: pending
