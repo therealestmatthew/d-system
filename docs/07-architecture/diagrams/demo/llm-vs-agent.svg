@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="LLM versus agent">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="LLM vs agent">
   <title>LLM vs agent</title>
   <desc>An LLM is one stateless call from text in to text out. An agent is the same model in a loop with tools.</desc>
   <defs>

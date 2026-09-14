@@ -28,12 +28,13 @@
   <!-- Directory structure -->
   <rect class="panel" x="36" y="80" width="424" height="248" rx="12"/>
   <text class="head" x="56" y="116">Where a skill lives</text>
-  <text class="code mono" x="56" y="152">.claude/</text>
-  <text class="code mono" x="76" y="178">skills/</text>
-  <text class="code mono" x="96" y="204">d-system-overview/</text>
-  <text class="code mono" x="116" y="230">SKILL.md</text>
-  <text class="code mono" x="96" y="256">orient/SKILL.md</text>
-  <text class="code mono" x="96" y="282">checkpoint/SKILL.md</text>
+  <text class="code mono" x="56" y="148">.claude/</text>
+  <text class="code mono" x="76" y="172">skills/</text>
+  <text class="code mono" x="96" y="196">d-system-overview/</text>
+  <text class="code mono" x="116" y="220">SKILL.md</text>
+  <text class="code mono" x="96" y="244">orient/SKILL.md</text>
+  <text class="code mono" x="96" y="268">checkpoint/SKILL.md</text>
+  <text class="code mono" x="96" y="292">log-anti-patterns/SKILL.md</text>
   <text class="small" x="56" y="312">One folder per skill. Supporting files are optional.</text>
 
   <!-- SKILL.md anatomy -->

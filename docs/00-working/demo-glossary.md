@@ -84,7 +84,7 @@ can recover from a failed command: the failure is just another result to read.
 A second agent started by the first, with its own context window, its own tool set and its own loop,
 which reports one result back to the caller. The point is context isolation: the sub-agent's
 intermediate tool output never enters the caller's context, only its final report does. In this
-repository `.claude/agents/` holds eleven definitions — a Markdown file whose front matter sets
+repository `.claude/agents/` holds twelve definitions — a Markdown file whose front matter sets
 `name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
 instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
 
@@ -101,8 +101,9 @@ every sub-agent starting without the caller's context.
 
 A folder of instructions the model loads when a task calls for it: `SKILL.md` with YAML front matter
 giving a `name` and a `description`, a Markdown body containing the procedure, and optionally
-supporting files the body points to. This repository has three under `.claude/skills/` — `orient`,
-`checkpoint` and `d-system-overview`. A skill is instructions, not code: `d-system-overview` tells
+supporting files the body points to. This repository has four under `.claude/skills/` — `orient`,
+`checkpoint`, `d-system-overview` and `log-anti-patterns`. A skill is instructions, not code:
+`d-system-overview` tells
 the agent to run `tools/generate_overview.py` and report what it printed; the determinism lives in
 the tool, not in the skill.
 
@@ -118,7 +119,8 @@ use the skill rather than to summarise it.
 A named prompt the user triggers by typing `/<name>` — a **slash command** — defined in this
 repository as a Markdown file
 under `.claude/commands/` with `description` and `argument-hint` front matter. `/backlog`, `/idea`,
-`/idea-triage` and `/session-close` are the four here. A command is invoked by the person; a skill is
+`/idea-triage`, `/session-start`, `/session-close` and `/resume-lit-review` are the six here.
+A command is invoked by the person; a skill is
 loaded by the model when it judges the task matches; a tool is called by the model as a step. That is
 the whole distinction between the three — who initiates.
 

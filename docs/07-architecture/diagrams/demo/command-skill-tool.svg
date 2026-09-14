@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="Command, skill and tool — who initiates">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768" role="img" aria-label="Command, skill, tool — who initiates">
   <title>Command, skill, tool — who initiates</title>
   <desc>A command is invoked by the person, a skill is loaded by the model when the task matches, a tool is called by the model as a step.</desc>
   <defs>
@@ -24,7 +24,7 @@
   <text class="title" x="512" y="52" text-anchor="middle">Command, skill, tool — who initiates</text>
 
   <!-- Command -->
-  <rect class="panel" x="40" y="86" width="304" height="536" rx="12"/>
+  <rect class="panel" x="40" y="86" width="304" height="552" rx="12"/>
   <rect class="cmd" x="40" y="86" width="304" height="58" rx="12"/>
   <text class="colhead" x="192" y="126" text-anchor="middle">Command</text>
 
@@ -41,14 +41,16 @@
   <text class="mono" x="64" y="436">.claude/commands/</text>
   <text class="mono" x="64" y="458">  &lt;name&gt;.md</text>
 
-  <text class="cap" x="64" y="510">HERE</text>
-  <text class="mono" x="64" y="540">/backlog</text>
-  <text class="mono" x="64" y="564">/idea</text>
-  <text class="mono" x="64" y="588">/idea-triage</text>
-  <text class="mono" x="64" y="612">/session-close</text>
+  <text class="cap" x="64" y="488">HERE</text>
+  <text class="mono" x="64" y="514">/backlog</text>
+  <text class="mono" x="64" y="538">/idea</text>
+  <text class="mono" x="64" y="562">/idea-triage</text>
+  <text class="mono" x="64" y="586">/session-start</text>
+  <text class="mono" x="64" y="610">/session-close</text>
+  <text class="mono" x="64" y="634">/resume-lit-review</text>
 
   <!-- Skill -->
-  <rect class="panel" x="360" y="86" width="304" height="536" rx="12"/>
+  <rect class="panel" x="360" y="86" width="304" height="552" rx="12"/>
   <rect class="skl" x="360" y="86" width="304" height="58" rx="12"/>
   <text class="colhead" x="512" y="126" text-anchor="middle">Skill</text>
 
@@ -65,13 +67,14 @@
   <text class="mono" x="384" y="436">.claude/skills/&lt;name&gt;/</text>
   <text class="mono" x="384" y="458">  SKILL.md</text>
 
-  <text class="cap" x="384" y="510">HERE</text>
-  <text class="mono" x="384" y="540">orient</text>
-  <text class="mono" x="384" y="564">checkpoint</text>
-  <text class="mono" x="384" y="588">d-system-overview</text>
+  <text class="cap" x="384" y="488">HERE</text>
+  <text class="mono" x="384" y="514">orient</text>
+  <text class="mono" x="384" y="538">checkpoint</text>
+  <text class="mono" x="384" y="562">d-system-overview</text>
+  <text class="mono" x="384" y="586">log-anti-patterns</text>
 
   <!-- Tool -->
-  <rect class="panel" x="680" y="86" width="304" height="536" rx="12"/>
+  <rect class="panel" x="680" y="86" width="304" height="552" rx="12"/>
   <rect class="tl" x="680" y="86" width="304" height="58" rx="12"/>
   <text class="colhead" x="832" y="126" text-anchor="middle">Tool</text>
 
@@ -88,9 +91,9 @@
   <text class="body" x="704" y="436">the application itself, or</text>
   <text class="body" x="704" y="458">an MCP server</text>
 
-  <text class="cap" x="704" y="510">HERE</text>
-  <text class="mono" x="704" y="540">Read · Bash · Edit</text>
-  <text class="mono" x="704" y="564">mcp__playwright__*</text>
+  <text class="cap" x="704" y="488">HERE</text>
+  <text class="mono" x="704" y="514">Read · Bash · Edit</text>
+  <text class="mono" x="704" y="538">mcp__playwright__*</text>
 
   <rect class="band" x="40" y="648" width="944" height="88" rx="12"/>
   <text class="foot" x="512" y="684" text-anchor="middle">All three arrive as text in the same context. What differs is who decides to bring them in.</text>
