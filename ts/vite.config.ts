@@ -268,7 +268,7 @@ function serveRepositoryFiles(): Plugin {
 // upgrade (`/api/v1/demo/terminal/ws`) alongside ordinary HTTP `/api` calls — stay unchanged.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiTarget = env.VITE_API_TARGET || 'http://localhost:8000'
+  const apiTarget = env.VITE_API_TARGET || 'http://127.0.0.1:8000'
 
   return {
     plugins: [
