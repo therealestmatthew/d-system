@@ -52,6 +52,7 @@ brain/
 - [Scope Dispatches to the Turn Budget](procedures/scope-dispatches-to-the-turn-budget.md)
 - [A Question You Want Answered Belongs in the Tool, Not in Your Closing Paragraph](procedures/ask-through-the-tool.md)
 - [When You and a Peer Take the Same Identifier, the One Integrating Second Renumbers](procedures/yield-and-renumber-a-collided-identifier.md)
+- [Document the Symptom You Observed, Not the One You Inferred](procedures/document-the-symptom-you-observed.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
