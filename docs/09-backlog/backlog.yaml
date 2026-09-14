@@ -6407,7 +6407,28 @@ items:
   deliverables:
   - research/literature-review/05_critical_collisions.md
   - research/literature-review/06_hypothesis_tests.md
-  next_action: Dispatch delegation-pack section LIT-06 after phase-lit-05 completes.
+  session: doc-session-literature-review-pass-3
+  completion_evidence:
+  - research/literature-review/05_critical_collisions.md
+  - research/literature-review/06_hypothesis_tests.md
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/00_search_ledger.csv
+  - docs/03-sessions/SESS-2026-09-14-01-literature-review-pass-3.md
+  result: All six work items dispatched and gate-measured. LIT-06 G (after one fix cycle
+    correcting its own measurement-2 breakdown) - 11/11 hypotheses with a challenger block
+    and a permitted status, 0 POTENTIALLY_DISTINCT; 0 pending second reviews across 19
+    critical_collision rows; every hypothesis at or above 2 distinct-query ledger rows,
+    where before this phase only H4 had any; duplicate rate 44/220 = 20.0%, which does not
+    demonstrate saturation. 30 ledger rows LIT-06-S001..S030, all pass 3. Matrix 30 -> 34
+    rows, 0 blanks. 19 independent second reviews - 6 confirmed, 13 disputed, all 19
+    answering no to scope falsification. Four fix cycles (S1, X2, G, and the backlog
+    restore), none exceeding the cap. No Opus escalation, no descope rung.
+  next_action: Hold the pre-synthesis check-in and append the dated "pre-synthesis check-in
+    held, ruling proceed" entry to PROMPT-031; LIT-07 K refuses to dispatch without it. Five
+    rulings are queued behind it - whether the six disputed flags are dropped (19 -> 13),
+    how a patent is scored, whether "adjacent" in PLAN-023.03's fourth trigger means
+    contiguous, what updates 06_hypothesis_tests.md now that no dispatch owns it, and
+    whether the Pass 2 depth defect warrants re-reading any row before synthesis.
 - id: phase-lit-07
   title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
     bibliography
