@@ -27,6 +27,29 @@ exactly `LIKELY_ALREADY_KNOWN`, `KNOWN_COMPONENT_NEW_INTEGRATION`, `POTENTIALLY_
 Each `assessment` states the best case that D-System is not distinct on that hypothesis before
 any counter-argument, per the campaign's method.
 
+**Decision rule: `POTENTIALLY_DISTINCT` vs `INSUFFICIENT_EVIDENCE`.** Both statuses can describe
+the same surface pattern — every candidate found for a hypothesis has been read closely and none
+demonstrates the claimed mechanism at full scope — so the two are easy to conflate. The line
+between them is not what the found candidates show; it is what the *search* supports concluding
+about what has not been found. `POTENTIALLY_DISTINCT` requires the absence of a match to be
+attributable to the mechanism genuinely not existing elsewhere, which in turn requires the search
+that failed to find it to have plausibly covered the relevant ground — approaching saturation (a
+falling duplicate-discovery rate), or backed by a dedicated collision search of the kind H4's Pass
+3 ran, that still returned nothing better. `INSUFFICIENT_EVIDENCE` is the status whenever that
+saturation condition is not met, regardless of how well or poorly the individual candidates read on
+inspection — because the open question in that case is not "is the mechanism known" but "has this
+campaign looked hard enough to say." Per `LIT-06 G`'s own gate measurement, the campaign-wide
+duplicate-discovery rate stands at 20.0% — four results in five surfaced by this phase's searches
+were new, not repeats of prior finds. That is a non-saturated search space by the campaign's own
+instrumentation, and it is a fact about every hypothesis's search history, not only the ones a
+dispatch happens to flag. Under this rule a hypothesis whose found candidates fail to demonstrate
+the claimed mechanism does not, on that failure alone, qualify for `POTENTIALLY_DISTINCT` — it
+qualifies only once the search itself, not just the candidates it turned up, can be said to have
+looked hard enough that an unfound match is implausible. H1, H4, and H11 are assessed against this
+rule below, applied uniformly; none of their search histories meet the saturation bar, and all
+three carry `INSUFFICIENT_EVIDENCE` as a result — a status that reflects the search's current
+state, not a judgment that the mechanisms are, or are not, already known.
+
 ---
 
 ## H1 — Multi-dimensional state model
@@ -96,17 +119,23 @@ assessment: >
   equivalent established framework." No other row in `04_evidence_matrix.csv` lists H1 among its
   challenged hypotheses, so these two sources, now undercut on the one dimension the hypothesis
   turns on, are the whole of the found prior art.
-  This is a stronger result than a thin or unsearched hypothesis, and stronger than the first
-  assessment's conclusion in the opposite direction: this campaign identified the two clearest
-  available candidates across six phases of search and read both past their abstracts, and neither,
-  on inspection, implements orthogonal state classification — only a correlated or hierarchical
-  substitute for it. The frozen register's narrower "not commonly integrated" phrasing fares no
-  better under this reading: what both systems actually show is type-determined, non-orthogonal
-  multi-field metadata, which is a materially different mechanism from an orthogonal triple, not a
-  looser instance of the same one — and treating it as such would be exactly the terminology-for-
-  mechanism substitution this review's discipline forbids in the other direction. Absent a better
-  candidate, D-System's specific orthogonality claim has not been shown to already exist elsewhere.
-status: POTENTIALLY_DISTINCT
+  Under the decision rule stated at the top of this file, that finding is not enough on its own to
+  call the claim distinct. Two candidates were found and both, on close reading, fail to
+  demonstrate orthogonal classification — but the search that produced only two candidates for H1
+  across six phases has not been shown to approach saturation: no dedicated collision search
+  targeted H1 the way H4's Pass 3 did, and the campaign's own duplicate-discovery rate
+  (`LIT-06 G`, 20.0%) shows the search space generally is still yielding new material four times in
+  five. A frontier this open could still contain a source combining the two candidates' partial
+  matches, or an orthogonal classification neither eywa nor Burns & Groth's search terms
+  surfaced. The frozen register's narrower "not commonly integrated" phrasing does not change this:
+  what both systems actually show is type-determined, non-orthogonal multi-field metadata, which is
+  a materially different mechanism from an orthogonal triple, not a looser instance of the same
+  one — treating it as such would be exactly the terminology-for-mechanism substitution this
+  review's discipline forbids in the other direction — but that mechanism-mismatch finding answers
+  "what do these two sources show," not "has the field been searched enough to rule out a source
+  that does." The honest status is that this campaign has not searched enough to say either way,
+  not that it has searched enough to say the claim survives.
+status: INSUFFICIENT_EVIDENCE
 ```
 
 ---
@@ -304,6 +333,16 @@ assessment: >
   on-point to say the hypothesis stands untested. Per the coordinator's framing: thin evidence
   cuts both ways, and INSUFFICIENT_EVIDENCE is the honest status for exactly this shape of
   result, not a discomfort to be resolved by picking a side.
+  Checked against the decision rule stated at the top of this file: bara-2026 is, if anything, a
+  stronger partial match than either of H1's or H11's remaining candidates — it genuinely
+  instantiates the claimed mechanism (a formal, closed-form, graph-topological discount), just at
+  narrower scope (AI-agent-only, not mixed human-agent) — yet the search behind it is thinner, not
+  thicker: one challenger, found only on a Pass 3 collision search after five prior phases at
+  zero, against a campaign-wide duplicate-discovery rate of 20.0% (`LIT-06 G`) that shows the
+  search space is nowhere near saturated. Under the rule, a stronger mechanism match does not
+  outweigh a search this far from saturated, so the status stays INSUFFICIENT_EVIDENCE rather than
+  moving up to KNOWN_COMPONENT_NEW_INTEGRATION or down to POTENTIALLY_DISTINCT — it was already
+  the rule-consistent verdict, unchanged by this reconciliation.
 status: INSUFFICIENT_EVIDENCE
 ```
 
@@ -785,12 +824,18 @@ assessment: >
   D-System's collaborative framing.
   This leaves H11 with less supporting evidence than the first assessment recorded, not more: the
   one source that looked like a working instance of the specific mechanism turns out, on the
-  primary text, not to be one. No dispatch in this campaign has run a search purpose-built for
-  H11 the way H4's Pass 3 collision search did, so a further dedicated search could still turn up
-  a genuine instance. But on the evidence actually in hand, the honest status is not "too little
-  evidence to call it either way" — it is that the specific closed loop H11 proposes has not been
-  shown to already exist in any source this campaign found and closely read.
-status: POTENTIALLY_DISTINCT
+  primary text, not to be one. Under the decision rule stated at the top of this file, that is not
+  by itself grounds to call the mechanism distinct. No dispatch in this campaign has run a search
+  purpose-built for H11 the way H4's Pass 3 collision search did, and the sole remaining
+  challenger sits at the matrix's lowest possible overlap score, found only as secondary coverage
+  of a 2006 whitepaper rather than through search aimed at this hypothesis — that is a search that
+  has barely started on H11's specific terms, not one approaching saturation. Against a
+  campaign-wide duplicate-discovery rate of 20.0% (`LIT-06 G`), the case for concluding "the
+  mechanism has been looked for and is not there" is weaker here than for almost any other
+  hypothesis in this review, not stronger. The honest status is that this campaign has not
+  searched enough to say either way — not that the search was thorough enough to call the
+  specific closed loop H11 proposes absent from the field.
+status: INSUFFICIENT_EVIDENCE
 ```
 
 ---
@@ -799,7 +844,7 @@ status: POTENTIALLY_DISTINCT
 
 | Hyp. | Status | Strongest challenger (source_id) | Challenger count |
 |---|---|---|---|
-| H1 | POTENTIALLY_DISTINCT | eywa-provenance-grounded-memory-joshi-2026 / burns-groth-agentic-ontological-notebook-memory-2026 (both undercut on orthogonality — see block) | 2 |
+| H1 | INSUFFICIENT_EVIDENCE | eywa-provenance-grounded-memory-joshi-2026 / burns-groth-agentic-ontological-notebook-memory-2026 (both undercut on orthogonality — see block) | 2 |
 | H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 13 |
 | H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 9 |
 | H4 | INSUFFICIENT_EVIDENCE | epistemic-sybil-resistance-bara-2026 | 1 |
@@ -809,20 +854,28 @@ status: POTENTIALLY_DISTINCT
 | H8 | LIKELY_ALREADY_KNOWN (review-instructions phrasing); KNOWN_COMPONENT_NEW_INTEGRATION (frozen-register phrasing) | langgraph-checkpoint-library-oss (review-instructions) / solozobov-verify-gated-completion-admission-control-2026 (frozen-register, assembly half only) | 4 |
 | H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied; zep-graphiti/langgraph's contribution to this row is weaker than the raw count implies — see block) | 18 |
 | H10 | KNOWN_COMPONENT_NEW_INTEGRATION | memtx-transactional-belief-commit-2026 | 4 |
-| H11 | POTENTIALLY_DISTINCT | ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (burns-groth dropped on review — see block) | 2 |
+| H11 | INSUFFICIENT_EVIDENCE | ibm-architectural-blueprint-autonomic-computing-whitepaper-2006 (burns-groth dropped on review — see block) | 2 |
 
-Two hypotheses, H1 and H11, reach `POTENTIALLY_DISTINCT` after this reconciliation — both moved
-there from a stronger-sounding first-assessed status once independent review of their named
-challengers' primary text found the challenger did not demonstrate the specific mechanism it was
-credited with (eywa/burns-groth's claimed orthogonality for H1; burns-groth's claimed demonstrated
-loop for H11). Per the methodology (`research/literature-review/CLAUDE.md`, §14 and §19): "If
-nothing remains, say so. That is a successful research result" — applied here in reverse: where a
-review shows a credited "known component" was not actually shown to be known, the honest status
-moves toward distinctiveness, not away from it, regardless of which direction is more convenient
-for the campaign's H0 mandate. `NOVEL` remains unavailable to either verdict; both are open to
-reversal by a further, more targeted search this reconciliation did not perform. Every other
-remaining gap is a gap in what any single found system's *scope* combines (mixed human-agent +
-graph topology for H4; cross-lifecycle span for H6/H10; knowledge-bearing consolidation for H8's
-frozen phrasing) — not a gap in whether the field knows how to build the underlying mechanisms.
-That distinction is exactly what separates `KNOWN_COMPONENT_NEW_INTEGRATION` and
-`INSUFFICIENT_EVIDENCE` from `POTENTIALLY_DISTINCT` in this review's vocabulary.
+H1 and H11 both moved off a stronger-sounding first-assessed status once independent review of
+their named challengers' primary text found the challenger did not demonstrate the specific
+mechanism it was credited with (eywa/burns-groth's claimed orthogonality for H1; burns-groth's
+claimed demonstrated loop for H11). Neither lands on `POTENTIALLY_DISTINCT`, though a first pass
+at this reconciliation put them there: applying the decision rule stated at the top of this file,
+a challenger failing to demonstrate its claimed mechanism only earns `POTENTIALLY_DISTINCT` if the
+search behind that finding approaches saturation, and neither does — H1 has had no dedicated
+collision search of the kind H4's Pass 3 ran, and H11's sole remaining challenger
+(`ibm-architectural-blueprint-autonomic-computing-whitepaper-2006`, component_overlap=1, not
+itself a critical collision) was found as secondary coverage, not through search aimed at this
+hypothesis. Against the campaign-wide 20.0% duplicate-discovery rate (`LIT-06 G`), treating either
+gap as settled distinctiveness would outrun what the search record supports. `H4` was checked
+against the same rule and stays `INSUFFICIENT_EVIDENCE` for the same reason, despite having, if
+anything, a mechanistically closer (if narrowly scoped) match than either H1 or H11 — the rule is
+applied uniformly across all three rather than case by case. `NOVEL` remains unavailable to any of
+the three; all three are open to revision by a further, more targeted search this reconciliation
+did not perform, and that openness is exactly why none is called distinct yet. Every other
+remaining gap in the table above is a gap in what any single found system's *scope* combines
+(cross-lifecycle span for H6/H10; knowledge-bearing consolidation for H8's frozen phrasing) — not a
+gap in whether the field knows how to build the underlying mechanisms, and not a search-saturation
+question the way H1/H4/H11 are. That distinction is what separates `KNOWN_COMPONENT_NEW_
+INTEGRATION` from `INSUFFICIENT_EVIDENCE` in this review's vocabulary, and no hypothesis in this
+pass meets the bar this file now states for `POTENTIALLY_DISTINCT`.
