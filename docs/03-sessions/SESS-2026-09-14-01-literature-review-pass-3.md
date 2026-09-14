@@ -133,10 +133,9 @@ not that. A saturation claim at `LIT-07`'s final gate is not supportable from th
 owner's `/session-close` moves a phase to `complete`, and the campaign's one scheduled pause
 falls immediately after this gate.
 
-`next_action`: Hold the pre-synthesis check-in and append the dated
-`pre-synthesis check-in held: <date>, ruling: proceed` entry to `PROMPT-031`. `LIT-07 K` refuses
-to dispatch without it. Two rulings are queued behind that check-in: whether the six disputed
-flags are dropped, and how patents are scored.
+`next_action`: None outstanding for this phase. The pre-synthesis check-in was held later in this
+same session and `PROMPT-031` now carries the dated entry, so `phase-lit-07` is unblocked; it was
+deliberately not started. `phase-lit-06` awaits the owner's `/session-close`.
 
 `completion_evidence` (files that exist now):
 
@@ -146,6 +145,10 @@ flags are dropped, and how patents are scored.
 - `research/literature-review/00_search_ledger.csv`
 
 ## Unresolved
+
+**Five of the seven items below were ruled on at the pre-synthesis check-in, held by the owner
+later in this same session — see *The pre-synthesis check-in* at the end of this record. They are
+left here as written, with the ruling noted, so the finding and its resolution stay together.**
 
 - **`06_hypothesis_tests.md` is stale against the matrix it cites, and no dispatch owns it.** The
   pack gives `X2` the matrix `second_review` field and `05`; nothing updates `06` after the
@@ -272,28 +275,65 @@ but the split inverts the phase's central finding.
 - **Descope rung**: none taken.
 - **Runway**: 6 of 7 sessions used, against an owner-accepted range of six to eight.
 
+## The pre-synthesis check-in
+
+**Held by the owner on 2026-09-14, ruling: proceed**, after `phase-lit-06`'s gate and within this
+same session. `PROMPT-031` now carries the dated entry `LIT-07 K` requires. Eight rulings,
+anchored on idea `000230`, each recorded on the idea that raised it.
+
+Where a ruling changes how a gate or a dispatch behaves it was written into the document that
+gate or dispatch actually reads, not only into the kickoff record — `LIT-07 G` reads the evidence
+contract and the dispatches read the pack. That was itself ruling 7.
+
+1. **The nineteen flags stand.** The six disputes where a reviewer re-derived a score one level
+   lower and found no trigger fires are recorded, not applied. No score, `critical_collision` or
+   `hypotheses_challenged` value changed, so `LIT-06 G`'s measurement 2 needs no re-run and
+   `LIT-07` inherits a population of 19. (`000229`)
+2. **A patent's whole published disclosure is prior art**, specification and claims together.
+   Written into `PLAN-023.03`. This rejects the claims-only re-derivation applied to the patent
+   row during this phase as using the wrong standard — claims-only is the test for infringement
+   and validity, not for prior-art disclosure — so `us20250165226a1`'s architecture overlap of 4
+   and its flag both stand. The rule the coordinator improvised was wrong, and saying so is the
+   point of recording it. (`000227`)
+3. **"Adjacent" means contiguous** — four consecutive stages, no gap. Written into
+   `PLAN-023.03`. The loose reading inflates the collision count toward H0. (`000228`)
+4. **`LIT-07 X1` reconciles `06_hypothesis_tests.md` as its item 0**, before writing 07. Written
+   into `PROMPT-029`, naming H11 and H1 as known cases and telling the dispatch not to assume
+   they are the only two. (`000225`)
+5. **No row is re-read.** `Block D` instead gains a read-disclosure requirement: declare the
+   range read and anything available but unread, and never code
+   `NOT_DETERMINABLE_FROM_ACCESS` when reachable material answers the field. Written into
+   `PROMPT-029`. (`000226`)
+6. **The five recommended narrowings of `hypotheses_challenged` are recorded, not applied**,
+   consistent with ruling 1.
+7. **Behaviour-changing rulings go into the governing documents**, not the kickoff record alone.
+8. **`phase-lit-07` must not claim saturation.** `LIT-06 G` measured 20.0% (44/220), recomputed
+   independently and reproduced exactly; four results in five were new. `LIT-07 G` reports the
+   trend and must not assert the stop condition holds.
+
 ## Resume state
 
 **Current phase**: `phase-lit-06`, `active`, gate-measured and passing, left active for the
-owner's `/session-close`.
+owner's `/session-close`. An agent never marks a phase complete.
 
-**Next**: not `phase-lit-07`. The campaign stops here for the pre-synthesis check-in — ratified
-decision 1 in `PROMPT-031` — which is also the first of the two owner integrations of
-`agent/lit-campaign` into `dev`. `phase-lit-07` may not start until `PROMPT-031` carries a dated
-`pre-synthesis check-in held: <date>, ruling: proceed` entry. That section is empty by
-construction and nothing in this session wrote to it.
+**Next**: `phase-lit-07` — Pass 4, synthesis. It is **unblocked**: `PROMPT-031` carries the dated
+check-in entry `LIT-07 K` refuses to dispatch without. It was deliberately not started in this
+session; the owner directed that the check-in be resolved, not that synthesis begin.
 
-**A fresh session must read**: `AGENTS.md`, `GOV-006`, `PROMPT-031`, `PROMPT-030`, then this
-record. Then it must confirm the check-in entry exists before dispatching anything.
+**A fresh session must read**: `AGENTS.md`, `GOV-006`, `PROMPT-031` — including its check-in
+entry and the eight rulings — then `PROMPT-030`, then this record. `LIT-07`'s item order is
+`K → X1 → X2 → X3 → A → G`, and `X1` now begins by reconciling `06` rather than by writing 07.
 
-**Rulings the check-in needs to produce**, in the order they bite:
+**Still open, and not resolved by the check-in**:
 
-1. Whether the six disputed flags are dropped (`19 → 13`), which changes the population
-   `LIT-07 G` measures.
-2. How a patent is scored — claims or specification — since no governed document says.
-3. Whether "adjacent" in `PLAN-023.03`'s fourth trigger means contiguous.
-4. What updates `06_hypothesis_tests.md`, given no dispatch owns it.
-5. Whether the Pass 2 depth defect warrants re-reading any row before synthesis.
+- `000221` — the evidence contract still names `LIT-06 X2` as `second_review`'s sole writer while
+  the flagging dispatch writes `pending`. Ruling 4 closed the writer gap for `06`, not this one.
+- `000148` — the `source_type` enum still has no bucket for a patent, a dissertation, a
+  whitepaper or a live software library, all of which appear in the matrix.
+- `000224` — the backlog regression was restored on this branch, but nothing prevents a
+  recurrence: a phase silently regressing from `complete` to `queued` fails no check.
 
 **Branch**: `agent/lit-campaign`, rebased onto `dev` at this boundary, clean, governance 0, 580
-tests passing. Not integrated — that is the owner's call at the check-in.
+tests passing. Not integrated — the first of the two owner integrations `PLAN-023` schedules
+falls at this check-in and remains the owner's to make. Review with
+`git diff dev..agent/lit-campaign`.

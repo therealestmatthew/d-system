@@ -6423,12 +6423,14 @@ items:
     rows, 0 blanks. 19 independent second reviews - 6 confirmed, 13 disputed, all 19
     answering no to scope falsification. Four fix cycles (S1, X2, G, and the backlog
     restore), none exceeding the cap. No Opus escalation, no descope rung.
-  next_action: Hold the pre-synthesis check-in and append the dated "pre-synthesis check-in
-    held, ruling proceed" entry to PROMPT-031; LIT-07 K refuses to dispatch without it. Five
-    rulings are queued behind it - whether the six disputed flags are dropped (19 -> 13),
-    how a patent is scored, whether "adjacent" in PLAN-023.03's fourth trigger means
-    contiguous, what updates 06_hypothesis_tests.md now that no dispatch owns it, and
-    whether the Pass 2 depth defect warrants re-reading any row before synthesis.
+  next_action: None outstanding. The pre-synthesis check-in was held on 2026-09-14, ruling
+    proceed; PROMPT-031 carries the dated entry and its eight rulings, so phase-lit-07 is
+    unblocked and was deliberately not started. The rulings that change behaviour were written
+    into the documents that govern it - PLAN-023.03 for the patent rule and the contiguous
+    definition of "adjacent", PROMPT-029 for Block D's read-disclosure requirement and LIT-07
+    X1's new item 0 reconciling 06_hypothesis_tests.md. The nineteen critical-collision flags
+    stand; thirteen disputes and five recommended narrowings are recorded, not applied. This
+    phase awaits the owner's /session-close.
 - id: phase-lit-07
   title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
     bibliography
