@@ -17,6 +17,10 @@ wrong.
 
 Call `demo-skill-ask-me` for the options and the criteria. Do not write questioning of your own.
 
+**Say that you are calling it**, in the line after your own announcement — `calling demo-skill-ask-me
+for the options and the criteria`. One component visibly using another is the thing being
+demonstrated, and it is invisible unless the hand-off is stated.
+
 Typically undetermined: which criteria genuinely matter here, how they weigh against one another,
 which are hard constraints that disqualify rather than deduct, and who has to accept the decision.
 

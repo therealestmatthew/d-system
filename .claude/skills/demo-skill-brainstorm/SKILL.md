@@ -14,6 +14,10 @@ is a reader treating the third option generated during divergence as a recommend
 
 ## What it needs, and how it gets it
 
+**Say that you are calling it**, in the line after your own announcement — `calling demo-skill-ask-me
+to establish the criteria`. One component visibly using another is the thing being demonstrated, and
+it is invisible unless the hand-off is stated.
+
 Call `demo-skill-ask-me` to establish the criteria. Do not write questioning of your own, and do not
 assume the criteria — assumed criteria produce a ranking the person cannot argue with because they
 never agreed to what it optimises for.

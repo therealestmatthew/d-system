@@ -16,6 +16,10 @@ that prose hides — an unassigned step, a branch with no rejoin, a loop nobody 
 
 Call `demo-skill-ask-me` for anything undetermined. Do not write questioning of your own.
 
+**Say that you are calling it**, in the line after your own announcement — `calling demo-skill-ask-me
+to gather what I need`. One component visibly using another is the thing being demonstrated, and it
+is invisible unless the hand-off is stated.
+
 Typically undetermined: where the process starts and ends, who owns the steps that were described
 without an owner, what happens on the failure side of a branch that only stated the success side,
 and whether a step named twice is one step or two.

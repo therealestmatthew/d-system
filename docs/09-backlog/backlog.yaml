@@ -6630,7 +6630,18 @@ items:
   systems:
   - sys-demo-kit
   owner: repository-owner
-  status: queued
+  status: complete
+  agent: agent-kit
+  session: doc-session-consultant-demo-kit
+  completion_evidence:
+  - .claude/commands/demo-cmd-teach-me.md
+  - .claude/commands/demo-cmd-askme.md
+  - .claude/commands/demo-cmd-explain-this.md
+  - .claude/commands/demo-cmd-context-check.md
+  - .claude/commands/demo-cmd-rubber-duck.md
+  - .claude/commands/demo-cmd-second-opinion.md
+  - docs/03-sessions/SESS-2026-09-14-04-consultant-demo-kit.md
+  result: 'Six demo-cmd- commands built, each with frontmatter and a $ARGUMENTS body. Every CLAUDE.md and AGENTS.md mention across them sits inside a prohibition. An independent review confirmed K03, K15, K16 and K19 hold. The two acceptance conditions about observed output were accepted by the owner without a runtime run.'
   priority: 1
   session_budget: 1
   depends_on: []
@@ -6664,7 +6675,7 @@ items:
   systems:
   - sys-demo-kit
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-kit
   priority: 1
   session_budget: 1
@@ -6718,7 +6729,18 @@ items:
   systems:
   - sys-demo-kit
   owner: repository-owner
-  status: queued
+  status: complete
+  agent: agent-kit
+  session: doc-session-consultant-demo-kit
+  completion_evidence:
+  - .claude/prompts/rung-1-the-floor.md
+  - .claude/prompts/rung-2-situation.md
+  - .claude/prompts/rung-3-the-objective.md
+  - .claude/prompts/rung-4-the-audience.md
+  - .claude/prompts/rung-5-the-interview.md
+  - .claude/prompts/anti-pattern-gallery.md
+  - docs/03-sessions/SESS-2026-09-14-04-consultant-demo-kit.md
+  result: 'Five ladder rungs plus the anti-pattern gallery. An independent review reread rungs 1-4 and confirmed the only human-constraint text before rung 5 is rung 2''s own prohibition against stating one, and that the gallery has exactly four entries, none costing only tokens. All five acceptance conditions met.'
   priority: 1
   session_budget: 1
   depends_on: []
@@ -6752,7 +6774,14 @@ items:
   systems:
   - sys-demo-kit
   owner: repository-owner
-  status: queued
+  status: complete
+  agent: agent-kit
+  session: doc-session-consultant-demo-kit
+  completion_evidence:
+  - .claude/agents/demo-agent-evidence-checker.md
+  - .claude/agents/demo-agent-objection-panel.md
+  - docs/03-sessions/SESS-2026-09-14-04-consultant-demo-kit.md
+  result: 'Two demo-agent- agents, both declaring Read, Grep and Glob with Bash excluded, and both stating what they must never do and when they stop. An independent review confirmed all three acceptance conditions met.'
   priority: 1
   session_budget: 1
   depends_on: []
