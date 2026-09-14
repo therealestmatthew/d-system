@@ -53,7 +53,11 @@ on top of it, is thoroughly established across the matrix's agent-memory and pro
 
 Graph-native, typed-node/typed-edge memory for agents is a mature, multi-implementation, partly
 commercial pattern as of 2025-2026. Nothing about using a graph as the underlying data structure is
-contested anywhere in this matrix.
+contested anywhere in this matrix. (Zep/Graphiti and TGMS also share one uncredited 1999 ancestor —
+Snodgrass's valid-time/transaction-time distinction — for their bi-temporal *substrate*
+specifically, per TGMS's own Sec.7 and this matrix's `derivative_ancestor` fields; that shared
+ancestry bears on the bi-temporal mechanism, not on the graph-structure claim made here, so it is
+noted rather than treated as double-counting this component.)
 
 ---
 
@@ -81,7 +85,9 @@ standard:
 
 A typed, multi-actor, standards-grounded provenance vocabulary — the raw material H3 needs — is a
 2013 W3C Recommendation with a decade of extensions (EVI, 2021) and direct 2025-2026 application to
-both agent memory and software-development rationale capture. This is not contested ground.
+both agent memory and software-development rationale capture. Nothing in the sources this campaign
+read disputes that the vocabulary itself is established — a claim bounded, like every claim in this
+document, by the coverage caveat above (340 of 387 candidates never deep-read).
 
 ---
 
@@ -226,8 +232,9 @@ component leaves, carried forward below.
 D-System's H7/H9 decision-provenance claims are close to a direct restatement of the
 design-rationale tradition founded by Jansen & Bosch (2005):
 
-- **jansen-bosch-architecture-as-decisions-wicsa-2005**: "software architicture = dd1+dd2+...+ddn"
-  (p.86) — architecture as an accumulated, non-overwritten set of decision objects, with decisions
+- **jansen-bosch-architecture-as-decisions-wicsa-2005**: "a software archictecture = dd1 + dd2 +
+  ... + ddn" (p.86; [sic], the paper's own typo, preserved per the matrix's `verbatim_notes`) —
+  architecture as an accumulated, non-overwritten set of decision objects, with decisions
   explicitly capable of generating new requirements and an explicit bilateral-traceability
   requirement, 2005. component_overlap=5 in the first assessment (re-derived on review to 3;
   disputed and unapplied per the owner's ruling).
