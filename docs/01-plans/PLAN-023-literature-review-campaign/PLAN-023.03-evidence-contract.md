@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-14'
 systems:
 - sys-research
 depends_on: []
@@ -155,6 +155,38 @@ Flag a source `critical_collision: yes` if any of:
 Every critical collision receives a second independent review (delegation pack `R` sections):
 a different agent, receiving the source and the evidence row, never the first assessment's
 rationale. Disagreements are recorded in `05_critical_collisions.md`, not averaged away.
+
+### "Adjacent" means contiguous (owner ruling, pre-synthesis check-in 2026-09-14)
+
+The fourth trigger requires **four consecutive stages with no gap**, not any four stages drawn
+from the ordered chain. A source covering Reasoning, Artifact, Verification and Knowledge Update
+does not fire it; a source covering Artifact → Verification → Deployment → Runtime Evidence does.
+
+The word was undefined until `phase-lit-06`, where two reviewers reached different stage counts
+under the two readings and reported both rather than choose. On
+`evidence-graphs-fair-computation-defeasible-reasoning-2021` the readings disagree — 3 contiguous
+against 5 scattered — and the trigger fires under one and not the other. The strict reading is
+chosen because the loose one inflates the collision count in the direction that flatters H0,
+which is the campaign's known exposure.
+
+### Scoring a patent (owner ruling, pre-synthesis check-in 2026-09-14)
+
+**A patent's whole published disclosure is prior art — specification and claims together — and
+both overlap scores are derived from all of it.** A published application discloses its contents
+to the public regardless of what was ultimately claimed, and this campaign measures what is
+already known, not what is legally protected.
+
+This settles a gap that produced a defective review in `phase-lit-06`: the contract said nothing
+about patents, and a coordinator improvised a "score the claims, not the specification" rule into
+a review dispatch. That is the test for infringement and validity, not for prior-art disclosure.
+The review conducted under it re-derived `us20250165226a1-ai-digital-thread-patent`'s
+architecture overlap from 4 to 3 by excluding specification paragraphs [0030]–[0032] and an
+unclaimed figure. **Under this ruling that re-derivation is rejected as applying the wrong
+standard**, and the row's architecture overlap of 4 and its `critical_collision: yes` both stand.
+
+Where a patent's claims are materially narrower than its specification, record the difference in
+`strongest_difference` rather than adjusting a score for it. The `source_type` enum still has no
+patent bucket; granted patents continue to be filed as `tech report` (idea `000148`).
 
 ## Negative evidence and verdicts
 

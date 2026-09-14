@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-14'
 systems:
 - sys-research
 - sys-backlog
@@ -101,13 +101,50 @@ keep consistent, which is the failure `GOV-009`'s precedence rule exists to cont
 
 ## Pre-synthesis check-in
 
-*Empty by construction.* The coordinator appends the dated ruling here when the check-in is
-held, and `LIT-07 K` reads this section to decide whether synthesis may start. A description of
-the planned pause is not a held check-in.
+The coordinator appends the dated ruling here when the check-in is held, and `LIT-07 K` reads
+this section to decide whether synthesis may start. A description of the planned pause is not a
+held check-in.
 
 ```text
-(no entry yet)
+pre-synthesis check-in held: 2026-09-14, ruling: proceed
 ```
+
+Held after `phase-lit-06`'s gate, by the owner, in the session recorded as
+[SESS-2026-09-14-01](../03-sessions/SESS-2026-09-14-01-literature-review-pass-3.md). Eight
+rulings, anchored on idea `000230`. They are recorded here because this record wins over the
+coordinator prompt; where a ruling changes how a gate or a dispatch behaves it was also written
+into the document that gate or dispatch actually reads, as noted.
+
+1. **The nineteen critical-collision flags stand.** Six reviewers re-derived a score one level
+   lower and concluded no trigger fires; those are recorded as `disputed` in `second_review` and
+   in `05_critical_collisions.md`, and no score, `critical_collision` or `hypotheses_challenged`
+   value was changed. `LIT-06 G`'s measurement 2 therefore needs no re-run. Idea `000229`.
+2. **A patent's whole published disclosure is prior art** — specification and claims together.
+   Written into `PLAN-023.03`. This rejects the claims-only re-derivation applied to
+   `us20250165226a1-ai-digital-thread-patent` during `phase-lit-06` as using the wrong standard;
+   that row's architecture overlap of 4 and its flag both stand. Idea `000227`.
+3. **"Adjacent" in the fourth flag trigger means contiguous** — four consecutive stages, no gap.
+   Written into `PLAN-023.03`. Idea `000228`.
+4. **`LIT-07 X1` reconciles `06_hypothesis_tests.md` against the corrected matrix before writing
+   anything else**, as its item 0. Written into `PROMPT-029`. H11's and H1's named challengers
+   are known to need it. Idea `000225`.
+5. **No row is re-read.** The 42 factual corrections already landed and the scores stand under
+   ruling 1. Instead `Block D` now requires a deep-extraction dispatch to declare what it
+   actually read and what it could have read but did not. Written into `PROMPT-029`. Idea
+   `000226`.
+6. **The five recommended narrowings of `hypotheses_challenged` are recorded, not applied** —
+   consistent with ruling 1. `LIT-07 X1` weighs them when it reconciles 06.
+7. **Rulings that change behaviour are written into the documents that govern it**, not only
+   here, because `LIT-07 G` reads the evidence contract and the dispatches read the pack.
+8. **Saturation is not demonstrated and `phase-lit-07` must not claim it.** `LIT-06 G` measured
+   a 20.0% duplicate rate (44/220), recomputed independently and reproduced exactly. Four
+   results in five were new. The methodology's stop condition is that additional searches
+   "mostly yield duplicates or clearly adjacent work"; 20% is not that. `LIT-07 G`'s saturation
+   measurement reports the trend and must not assert the condition holds.
+
+Not a ruling, recorded because it bears on the runway: the campaign has used six sessions of a
+seven-session estimate, against an owner-accepted range of six to eight. `phase-lit-07` is the
+seventh.
 
 ---
 

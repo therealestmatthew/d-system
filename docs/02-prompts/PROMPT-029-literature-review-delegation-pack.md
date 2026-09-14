@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-14'
 systems:
 - sys-research
 depends_on:
@@ -138,6 +138,23 @@ Dispatch rules:
 > Absence claims require reading the source's scope; from `abstract_only` access, absence
 > claims cap `interpretation_confidence` at `medium`. Commit after each source, so a
 > truncated run resumes at the first missing row.
+>
+> **Declare what you actually read.** Before scoring, establish what access the source really
+> permits — for an arXiv item that means checking the abstract page for PDF, HTML and source
+> links, not stopping at the abstract; for a paywalled item it means looking for an author copy,
+> a green open-access repository deposit or a preprint. Then record in `evidence_locator` the
+> page or section range you read **and** anything available you did not read, with the reason.
+> `access_limitation` describes what the source permits, never how far you got: recording
+> `abstract_only` when full text was freely reachable is a false statement about the source.
+> Never code a field `NOT_DETERMINABLE_FROM_ACCESS` when material you could have reached
+> answers it — that code means the access genuinely withholds the answer, not that the read
+> stopped early.
+>
+> *(Added by the owner's pre-synthesis check-in ruling, 2026-09-14. `phase-lit-06`'s second
+> reviews found seven of nineteen rows scored at or near the rubric's ceiling on material their
+> own locators never reached — including one row that recorded `abstract_only` while PDF, HTML
+> and TeX Source all sat on the same arXiv page. Every error ran one way, toward finding
+> collisions, in a campaign whose null hypothesis is that collisions exist. Idea `000226`.)*
 
 ## Block G — gate procedure (in every G dispatch)
 
@@ -860,6 +877,20 @@ here.*
 
 > Write, in this order:
 >
+> 0. **Reconcile `research/literature-review/06_hypothesis_tests.md` against the evidence
+>    matrix before writing anything else.** `phase-lit-06` wrote 06 from the first assessment,
+>    then ran nineteen independent second reviews that corrected 42 matrix fields and disputed
+>    thirteen rows — and no dispatch in that phase owned 06, so it still cites the first
+>    assessment's challengers. Read each block's `strongest_challenger` against that row's
+>    current matrix values and its dated review subsection in `05_critical_collisions.md`.
+>    Where a review undercuts the challenger, say so in the block and re-derive the `status`
+>    from the evidence that stands — the permitted vocabulary is unchanged and `NOVEL` remains
+>    unavailable. Two blocks are known to need this: **H11**, whose challenger
+>    `burns-groth-agentic-ontological-notebook-memory-2026` was found to describe a mechanism
+>    the paper's own §6 calls future work, and **H1**, whose challenger
+>    `eywa-provenance-grounded-memory-joshi-2026` rests on three orthogonal classification
+>    dimensions a reviewer reading all 29 pages found to be one axis restated. Do not assume
+>    those are the only two. Commit 06 before starting 07.
 > 1. `research/literature-review/07_anti_novelty_case.md` — the strongest coherent argument
 >    that D-System requires no new mechanism: the methodology's §14 decomposition (Knowledge
 >    Graph + PROV-O + Event Sourcing + Belief Revision + Argumentation + Truth Discovery +
@@ -874,6 +905,11 @@ here.*
 >
 > Every claim traces to a matrix row or a ledger-logged source; a claim that cannot be
 > traced is removed, not softened. Commit after each file.
+
+*(Item 0 added by the owner's pre-synthesis check-in ruling, 2026-09-14, resolving the writer
+gap idea `000225` records: the pack gave 06 a writer in `LIT-06 X1` and gave review outcomes to
+`LIT-06 X2`, and assigned nobody to reconcile the two. `LIT-07 G`'s measurement 3 counts
+challengers, so 06 must be current before that gate runs.)*
 
 ### LIT-07 X2 — implications, questions, experiments (Sonnet)
 
