@@ -1252,3 +1252,77 @@ context. **Process note:** the inherited "359+ merged PRs" figure is the same cl
 phase's fetch-tool fabrication incidents but a different variant — not an invented claim, an
 uncritically inherited self-reported one from the source's own internal governance document, and it
 ran in the direction of crediting the collision rather than discrediting it.
+
+---
+
+## 21. subit-wiki-epistemic-hmm-oss
+
+sciganec: *subit-wiki* — SUBIT: Epistemic State Machine with Self-Evolving Ontology, GitHub
+repository. https://github.com/sciganec/subit-wiki
+
+**Overlap.** component_overlap=4, architecture_overlap=2. A genuine, working implementation of
+three independent 2-valued classification axes combined into a single 64-state code on one
+knowledge unit, decoded via a real log-space Viterbi HMM over a learned transition matrix —
+structurally the same "N orthogonal axes -> combinatorial state space + probabilistic typed
+transition" shape as D-System's H1 (state) and H2 (transition) claims combined.
+
+**What it would falsify.** At full strength this would contribute to falsifying H1's structural
+shape. It would not falsify H1 on content: none of the WHO/WHERE/WHEN axes is D-System's
+ontological-classification axis (what kind of thing this is) — the content is a discourse/
+rhetorical-stance scheme (perspective x argumentative-move x maturity-phase), confirmed by direct
+reading of `schema/subit-schema.md`. No provenance, actor-authority, conflict-resolution,
+convergence, or SE-lifecycle content was found in the files read — fields 16-28 (decision through
+change-impact) are all `NOT_APPLICABLE`, ruling out an architecture-overlap trigger. The
+implementation is single-commit and five months stale as of this read, with (per the original pass)
+no confirmed evidence the test suite had ever been executed.
+
+second_review: confirmed; scores, flag and hypotheses_challenged all reproduced exactly. Five
+factual corrections applied, including a false "read in full... no attribution" claim, two fields
+wrongly marked NOT_DETERMINABLE_FROM_ACCESS, an MIT-license overstatement, and new executed-test-
+suite evidence (9/9 Viterbi pass, 7/9 decoder pass with 2 named failures).
+
+### Review — 2026-09-14
+
+**First assessment position.** component_overlap=4, architecture_overlap=2, flag fires on the
+component trigger alone (H1 challenged). A real, working Viterbi/HMM decoder over a three-axis
+combinatorial state code, but single-commit, un-iterated, and of undetermined test status.
+
+**Independent reviewer position.** Independently re-derives both scores exactly (4/2) via direct
+read of `schema/subit-schema.md` and `scripts/core/sigma_decoder.py`. Additionally tests the
+directly-falsifies-H1 trigger explicitly (the original row leaves it implicit): SUBIT's three axes
+are WHO (discourse perspective), WHERE (rhetorical/argumentative direction), WHEN (maturity phase) —
+none is an ontological-type axis, none is a dedicated epistemic-status axis, so this is a structural
+resemblance, not a content/mechanism identity, and the trigger correctly does not fire (moot, since
+the component trigger already does). Five factual corrections found: (1) `derivative_ancestor`
+states neither Viterbi (1967) nor Rabiner (1989) is "cited by name in `docs/theory/hmm_viterbi.md`
+(read in full: the file states the algorithm without attribution)" — false. The complete 169-line
+file was retrieved and read for this review; the original pass's own `evidence_locator` discloses
+only the first ~60 lines were read, contradicting the "read in full" parenthetical. The file's
+References section (lines 165-169) reads "1. Rabiner, L. R. (1989)... 2. Forney, G. D. (1973). The
+Viterbi algorithm..." — the repository does cite its ancestor lineage by name, plus a further real
+citation (Forney 1973) the row never mentions; the row's backward-chaining conclusion about the
+ancestor lineage itself stays correct and useful. (2)-(3) `provenance_model` and `human_agent_scope`
+were marked `NOT_DETERMINABLE_FROM_ACCESS` though both are determinable from `schema/AGENTS.md`,
+which the row's own `evidence_locator` lists as unopened — it specifies a page-level `sources:`
+citation convention and an explicit human-supplies-`raw/`/LLM-agent-performs-ingest split. (4)
+`implementation_availability` states "MIT-licensed"; the actual `LICENSE` file is a 3-byte stub
+containing only the string `MIT`, not license text, and GitHub's own license API classifies the
+repo as `license: {key: "other", name: "Other", spdx_id: "NOASSERTION"}`. (5) New empirical evidence
+rather than a correction: the test suite was retrieved and executed locally.
+`tests/unit/test_viterbi.py`: 9/9 pass, including a brute-force-vs-Viterbi correctness check — the
+core decoding math is genuinely, empirically correct, not merely specified.
+`tests/unit/test_decoder.py`: 7/9 pass, 2 fail (`test_anomaly_detection`,
+`test_update_transition_matrix` — the EMA update with the shipped default `ema_alpha=0.7` does not
+converge as the test itself expects; `trans[0,1]` comes out to 0.191, not >0.5). This resolves the
+demonstrates-vs-specifies question with more precision than either verdict alone: the decoding
+mechanism is demonstrated and correct; the self-evolving/feedback mechanism is real code that runs
+but does not reliably produce its own intended learning behavior.
+
+**Resolution.** No score, flag, or `hypotheses_challenged` value changed. Six fields corrected in
+`04_evidence_matrix.csv`: `derivative_ancestor`, `provenance_model`, `human_agent_scope`,
+`implementation_availability`, `test_verification_linkage`, and `feedback_to_knowledge_mechanism`.
+**Process note — the read-disclosure control worked.** The false "read in full" claim in
+`derivative_ancestor` was caught precisely because the row's own `evidence_locator` field (Block D's
+read-disclosure requirement) recorded the true, smaller read extent ("first ~60 lines") sitting next
+to the field that overclaimed it — the contradiction was visible without needing to re-fetch
+anything. This is exactly the failure mode the disclosure requirement exists to surface.
