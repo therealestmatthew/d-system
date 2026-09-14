@@ -112,7 +112,7 @@ check_no_private_content: OK (562 tracked files, 0 identifiers checked)
 ## Backlog
 
 - `status: active` — unchanged. Marking the phase complete belongs to `/session-close`.
-- `session: doc-session-2026-09-14-01-phase-kit-02`
+- `session: doc-session-phase-kit-02`
 - `completion_evidence:` the six `SKILL.md` files under `.claude/skills/demo-skill-*/` and this
   record.
 - `result:` Six skills built, `demo-skill-ask-me` first. Governance exits 0 and 580 tests pass in
