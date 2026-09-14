@@ -258,7 +258,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 0 | 1 | 6 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
+| PLAN-021 | doc-live-demo | draft | 0 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 1 | 0 | 9 | agent-demo-data, agent-demo-stage, agent-fable |
 | PLAN-023 | doc-lit-campaign | draft | 2 | 0 | 6 | agent-lit |
 | PLAN-023.01 | doc-lit-campaign-scope | draft | 2 | 0 | 6 | agent-lit |
