@@ -6424,14 +6424,15 @@ items:
   next_action: Create demo-cmd-askme, the flagship do-not-guess command and the half of the
     kit's one duplicated capability that is invoked deliberately.
 - id: phase-kit-02
-  title: Build the kit's two self-announcing skills
+  title: Build the kit's six self-announcing skills
   plan: doc-consultant-demo-kit
   sources:
   - doc-consultant-demo-kit-requirements
   systems:
   - sys-demo-kit
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-kit
   priority: 1
   session_budget: 1
   depends_on: []

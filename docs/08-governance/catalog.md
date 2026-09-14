@@ -245,7 +245,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.01 | doc-lit-campaign-scope | draft | 4 | 1 | 2 | agent-lit |
 | PLAN-023.02 | doc-lit-campaign-domain-matrix | draft | 4 | 1 | 2 | agent-lit |
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 4 | 1 | 2 | agent-lit |
-| PLAN-024 | doc-consultant-demo-kit | draft | 4 | 0 | 0 | — |
+| PLAN-024 | doc-consultant-demo-kit | draft | 3 | 1 | 0 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 3 | 0 | 0 | — |
 
 ## Held codes
