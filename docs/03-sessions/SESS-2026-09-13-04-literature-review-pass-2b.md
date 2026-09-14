@@ -26,6 +26,88 @@ compared sources. Claimed by `agent-lit`, the fifth execution session of the cam
 
 The phase is left `active`. Only the owner's `/session-close` moves a phase to `complete`.
 
+## Verification
+
+The phase's three `verification` entries, run in this worktree after the final rebase onto `dev`.
+
+`uv run python -m src.governance`:
+
+```text
+Governance OK: 20 systems, 194 documents, 22 memories, 133 backlog phases
+exit 0
+```
+
+`uv run python tools/check_no_private_content.py` with the changes staged:
+
+```text
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
+check_no_private_content: OK (551 tracked files, 0 identifiers checked)
+exit 0
+```
+
+**This worktree run is vacuous and is not recorded as a passing verification.** `_private/` is
+gitignored and absent here, so the tool builds an empty identifier list (idea `000150`). The real
+check ran in the primary checkout at this session's integration, with the live identifier list:
+`check_no_private_content: OK (550 tracked files, 31 identifiers checked)`.
+
+Third entry — run delegation-pack section `LIT-05 G` and record real output. Run twice (the first
+run failed measurement 3; a fix cycle to `S1` closed it). Final measurements, each independently
+re-measured by the coordinator against the files before being accepted:
+
+```text
+1. Matrix rows .................. 30 data rows                         PASS (gate 20-30)
+2. Blank required fields ........ 0 across 43 fields x 30 rows = 1,290 cells   PASS (gate 0)
+3. B+C ledger coverage .......... 24 qualifying rows of 30;
+                                  B coverage 24/24, C coverage 24/24   PASS (gate 0 missing)
+4. hypotheses_challenged ........ H9:18 H2:13 H7:10 H3:9 H5:7 H8:4
+                                  H6:3 H10:3 H11:2 H1:1 H4:0
+                                  zero challengers: H4
+                                  non-hypothesis tokens: NOT_DETERMINABLE_FROM_ACCESS x1
+5. derivative_ancestor filled ... 0 blank across 30 rows               PASS (gate 0 blank)
+```
+
+## Acceptance
+
+- **"The evidence matrix holds 20–30 fully populated rows and both chaining directions are logged
+  for the strongest collision candidates."** — **Met.** Gate measurements 1 and 2 show 30 rows with
+  0 blanks across 1,290 cells; measurement 3 shows B 24/24 and C 24/24 over the 24 qualifying rows.
+- **"Derivative-ancestry lineage is recorded wherever multiple sources inherit one mechanism."** —
+  **Met.** Gate measurement 5 shows `derivative_ancestor` filled on all 30 rows, 0 blank and 0
+  literal `none`. Shared lineages are recorded as one ancestor plus derivatives: PROV-O 2013 across
+  three rows, Perry & Wolf 1992 and Snodgrass 1999 across two each.
+
+## Backlog
+
+- `status`: **`active`** — unchanged. Only the owner's `/session-close` may move it to `complete`.
+- `next_action`: All five `phase-lit-05` work items are complete and gate-measured, with all five
+  `LIT-05 G` gates passing after one fix cycle on `S1`. Awaiting the owner's `/session-close` and
+  its independent review. `phase-lit-06` (Pass 3 — adversarial hypothesis testing and the 16
+  pending collision second reviews) continues on `agent/lit-campaign`, numbering from
+  `LIT-06-S001`. `LIT-05 G` measurement 4 reports **H4 with zero challengers**, H1 with one and H11
+  with two — that is where `LIT-06 S1` must dig. Open for the owner, none blocking: ideas
+  `000217`–`000220`.
+- `session`: `doc-session-literature-review-pass-2b`.
+- `completion_evidence`: `research/literature-review/04_evidence_matrix.csv` (30 rows),
+  `research/literature-review/00_search_ledger.csv` (967 rows, `LIT-05-S001`–`S079`),
+  `research/literature-review/03_source_inventory.csv` (1,108 rows), and this record.
+- `next_up`: not pruned — `phase-lit-05` is not in `next_up`, and nothing in it became complete this
+  session.
+
+## Unresolved
+
+- **`LIT-05 K`'s candidate arithmetic never closed.** Both fix cycles were spent; 35 candidates were
+  expected against 34 listed, one unaccounted. Reported rather than looped on, per the pack's
+  two-cycle limit. It does not affect the matrix, which reached its ceiling from the ranked tier.
+- **Four findings are open for the owner**, none blocking `phase-lit-06`: ideas `000217`
+  (branch-model/claim-protocol collision, which will recur at `phase-lit-06`'s claim), `000218`
+  (`LIT-05`'s item order defeats its own gate measurement 3), `000219` (a gate silently dropping
+  unexpected tokens), `000220` (mention-counting producing H0-flattering false shared ancestors).
+  `000218`–`000220` are linked `relates_to` `000218` as one campaign-instrument batch.
+- **`phase-lit-07` remains barred.** `PROMPT-031`'s pre-synthesis check-in section is still empty by
+  construction.
+- **The branch is not integrated.** `agent/lit-campaign` is 39 commits ahead of `dev`; integration
+  is the owner's call.
+
 ## The claim required an unscheduled integration, on the owner's ruling
 
 Preflight found the two lock tables disagreeing. On `dev`, `phase-lit-04` still read
@@ -153,30 +235,6 @@ outcomes written back to the inventory's `exclusion_reason`.
 
 The Liu Springer CCIS chapter was genuinely unobtainable after five providers returned paywall,
 bot-wall, 404 and quota errors. Recorded honestly and correctly did not consume a matrix slot.
-
-## Verification
-
-The phase's three `verification` entries, run in the worktree after the final rebase onto `dev`.
-
-`uv run python -m src.governance`:
-
-```text
-Governance OK: 20 systems, 193 documents, 22 memories, 133 backlog phases
-exit 0
-```
-
-`uv run python tools/check_no_private_content.py` with changes staged:
-
-```text
-note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
-check_no_private_content: OK (550 tracked files, 0 identifiers checked)
-exit 0
-```
-
-**This worktree run is vacuous and is not recorded as a passing verification.** `_private/` is
-gitignored and absent here, so the tool builds an empty identifier list (idea `000150`). The real
-check ran in the primary checkout at this session's integration: `OK (550 tracked files, 31
-identifiers checked)`.
 
 ## `LIT-05 G` — the phase gate
 
