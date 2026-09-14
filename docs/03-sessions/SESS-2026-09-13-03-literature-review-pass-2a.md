@@ -339,11 +339,31 @@ immediately afterwards, and those rulings are recorded as annotations on the ide
 - `000214` — **approved and applied**: Block G in `PROMPT-029` now requires every gate to report the
   population it measured, to name every trigger it tested where a rule has more than one, and to
   derive a field list from its contract rather than choosing a subset.
-- `000208` — **fix the tool, not the documentation.** Dispatched as owner-directed work on
-  `agent/catalog-writer`, outside this campaign's branch and without a backlog phase.
+- `000208` — **fix the tool, not the documentation.** Done as owner-directed work on
+  `agent/catalog-writer`, outside this campaign's branch and without a backlog phase. `--catalog`
+  now regenerates `docs/08-governance/catalog.md` atomically and still prints to stdout, so the
+  dozen existing `--catalog > catalog.md` and `diff <(--catalog) catalog.md` call sites keep working
+  byte-for-byte; it writes only after a clean audit, which also removes the truncate-on-failure
+  hazard the redirect form carried. Two tests were added, including the one whose absence let this
+  through — a stdout-only test passed throughout. **Neither `AGENTS.md` nor `CLAUDE.md` needed
+  changing**: `AGENTS.md:155` simply becomes true as written, and `CLAUDE.md` never referenced the
+  flag. Integrated into `dev` at `0bee788` on the owner's approval; branch and worktree removed.
 
-`000211`, `000212`, `000213` and `000215` remain open. They are contract and instrument gaps that
-will recur through `phase-lit-07` if left, none of them blocking.
+A ninth idea, `000216`, was raised after close and is the general case behind `000208`: the brain
+procedure naming this exact flag as its worked example existed the whole time and reached none of
+the three sessions that repeated the failure. The tooling fix closes the trap; the routing gap it
+exposes is untouched by it.
+
+`000211`, `000212`, `000213`, `000215` and `000216` remain open. They are contract, instrument and
+knowledge-routing gaps that will recur through `phase-lit-07` if left, none of them blocking.
+
+**A concurrency collision was resolved during the post-close rebase.** A peer's `idea-triage` run
+(`f050ff5`) and this session both appended to `_data/ideas.jsonl`, producing a rebase conflict of 82
+peer lines against 14 of this session's. Resolved by keeping **both** sides — the append-only log
+admits no other answer, and `--ours`/`--theirs` on this file silently destroys one agent's work.
+Verified afterwards by folding the log: 216 ideas, all nine of this session's present, and the
+peer's annotations on `000147` and `000158` intact. The generated projection
+`docs/00-working/ideas.md` was regenerated rather than merged.
 
 **A correction to this record's own account of `000208`.** It is written above as a discovery. It was
 a rediscovery: `brain/procedures/a-check-that-cannot-fail-is-not-a-check.md`, dated 2026-09-12, names
