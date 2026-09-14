@@ -15,9 +15,17 @@ and the triage sweep that followed it. Everything below is merged to `dev` and p
    and decline candidates in three tiers.
 3. **Every decline candidate was ruled on individually.** Eight discarded, eleven explicitly kept
    with the reason recorded on the idea itself.
-4. **All 40 open ideas were triaged** through the `idea-triage` agent in four waves of ten. Every
-   annotation was verified against the folded log before its status moved; 40/40 landed correctly.
-   **Nothing is `open`.** Current state: 190 `triaged`, 7 `promoted`, 10 `discarded`.
+4. **All 40 ideas that were open were triaged** through the `idea-triage` agent in four waves of
+   ten. Every annotation was verified against the folded log before its status moved; 40/40 landed
+   correctly.
+
+**The open set was empty for about twenty minutes.** `agent/lit-campaign` then merged
+`phase-lit-05` into `dev`, bringing **14 new open ideas, `000208`–`000221`**. State now: 221 ideas
+— 190 `triaged`, 7 `promoted`, 10 `discarded`, **14 `open`**.
+
+That is worth stating rather than hiding, because it is the whole problem in miniature: a triage
+sweep is a snapshot, the log is written by concurrent sessions, and "everything is triaged" decays
+the moment a peer integrates. The next sweep should triage `000208`–`000221` and expect the same.
 
 **The partition is a map, not a plan.** Each approved programme still needs its own requirement and
 plan before any code. That is the next body of work.
@@ -106,9 +114,10 @@ variation changed presentation but not the answer — so the next sweep is **4 d
   `git worktree remove` would destroy it.
 - **Ideas captured this session:** `000204` (resolved work leaves its idea open — the systemic one),
   `000205`, `000206`, `000207`.
-- **Unmerged peer branches:** `agent/lit-campaign` (ideas through `000216`, `phase-lit-04` closed),
-  `agent/catalog-writer` (`803af92`, the `--catalog` fix), `kit-skills-six`, `phase-demo-07`,
-  `phase-wb-07`.
+- **Peer branches:** `agent/lit-campaign` is now **fully merged** into `dev` through
+  `phase-lit-05`. Still unmerged: `agent/catalog-writer` (`803af92`, the `--catalog` fix — until it
+  lands, `--catalog` prints and does not write, so redirect it by hand), `kit-skills-six`,
+  `phase-demo-07`, `phase-wb-07`.
 - **Two harness constraints worth knowing.** Subagents **cannot write report files** (`000206`) —
   they return text and the coordinator persists it. Subagents also inherit the **primary checkout**
   as their working directory regardless of the coordinator's worktree, which is why the triage
