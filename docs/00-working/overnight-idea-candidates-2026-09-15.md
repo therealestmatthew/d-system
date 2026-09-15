@@ -5,8 +5,27 @@ Staged during the unattended run of 2026-09-15, per that run's instruction **not
 code, no front matter.
 
 Each heading is one candidate, recorded as given per `ADR-010`'s record-as-given rule, with the phase
-and the moment that raised it. **None of these has been written to the idea log.** The owner decides
-which enter it.
+and the moment that raised it.
+
+**All seven were written to the idea log on 2026-09-15, on the owner's direction after reviewing each
+one.** This file is now the staging record rather than a pending queue; the ideas themselves are the
+live copies.
+
+| Candidate | Idea | Links asserted |
+|---|---|---|
+| The `backlog.yaml` single-line rule vs. what `phase-prog-*` phases do | `000239` | → `000242` |
+| `yaml.safe_dump` writes anchors, and the second append breaks the file | `000240` | → `000242` |
+| Review agents dispatched with write tools they are told not to use | `000241` | — |
+| A scope naming a file its `deliverables` omit | `000242` | — |
+| The partition's programme sizings contradict its group tables | `000243` | → `000244` |
+| The partition carries factual errors that finalize phases inherit | `000244` | — |
+| `deliverables` means "locked" before a phase, "produced" after | `000245` | → `000242` |
+
+`000242` is the hub, because three of the seven are different views of the same gap: a declaration
+that does not match the work. One edge is weaker than the others and is left standing rather than
+retracted — `000240` → `000242` connects the YAML-writer trap to the declaration gap on the ground
+that both are `backlog.yaml` mechanics found in the same run, which is a looser relation than the
+other three.
 
 ---
 
