@@ -167,12 +167,17 @@ There is no critical path worth naming: the deepest chain is two.
 
 Every row of `REQ-019` maps to at least one phase, and every phase carries at least one row.
 
+`R04` is carried by `phase-proj-03` and `-04` only. `000033`'s disposition still satisfies the
+requirement — it was kept rather than declined — but `phase-proj-02` carries no `resume_when` to
+check, because decision 2 found its gate already met. A phase cannot assert a gate it deliberately
+does not have, so the row is covered by the two phases that do.
+
 | Requirement | Phases |
 |---|---|
 | R01 The question and the exact command | `phase-proj-01` |
 | R02 `000022`'s figures corrected, with the reason | `phase-proj-01` |
 | R03 The answer routes to a stated consequence | `phase-proj-01` |
-| R04 Each `G32` idea carries a gate, not a decline | `phase-proj-02`, `phase-proj-03`, `phase-proj-04` |
+| R04 Each `G32` idea carries a gate, not a decline | `phase-proj-03`, `phase-proj-04` |
 | R05 `000033`'s gate checked against the repository | `phase-proj-02` |
 | R06 As-of snapshots and diffs with supporting events | `phase-proj-02` |
 | R07 Scenario simulation never writes to source | `phase-proj-03` |

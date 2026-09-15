@@ -89,9 +89,78 @@ This run's prompt does not direct it. **No part of `_private/` was read.**
 
 ## Backlog
 
-`phase-prog-09` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-09` is `status: complete`, `agent: agent-night`,
+`session: doc-session-blocked-downstream-projections-plan`. Completion evidence is `PLAN-034`,
+`REQ-019`, `docs/09-backlog/README.md` and this record. Written under the owner's advance authority
+for this batch, after the read-only independent review below confirmed all four conditions.
 
 Four phases added under `phase-proj-*`: two `queued`, two `deferred` with gates. None claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-09`, and was told
+`_private/` was off-limits to it as well. Its runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 241 documents, 25 memories, 242 backlog phases
+EXIT: 0
+
+$ uv run pytest
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** Confirmed by diffing `dev`'s
+copy: the banner and its "Do not build from this document" line are gone, `status: draft` → `active`.
+
+**Condition 2 — `G31` resolved, or the plan states exactly what the owner must answer — Met on the
+second branch. The reviewer was asked to judge whether that was an evasion, and ruled it was not.**
+
+> "`AGENTS.md:111` reads verbatim: '`_private/` is gitignored. Never read or write files there unless
+> the user directs you to.' That is an absolute rule requiring explicit direction, not implication.
+> The scope's phrase 'measured against the correct data root' names which root is authoritative; it
+> does not instruct a read of it. It is naming, not granting access — a defensible reading, not a
+> rules-lawyered one, and the session record's own 'Unresolved' section states this ambiguity plainly
+> rather than hiding it."
+
+It also checked the command actually works, which this phase had not verified to that depth:
+`tools/rebuild_db.py` and `source_validation.py`'s `data_root()` confirm `D_SYSTEM_DATA_ROOT` support
+exists, added by `phase-priv-03`, "whose own acceptance required 'the owner's real records still
+rebuild when the data root points at `_private/portfolio/`' — so the mirrored subdirectory structure
+the count loop assumes is a documented guarantee, not a guess." And it caught a detail this phase got
+right by habit rather than by design: "Plain `ls` (no `-a`) excludes `.gitkeep`, so a placeholder-only
+directory correctly counts as 0, avoiding the exact trap that made `000022`'s original reading
+ambiguous."
+
+**The privacy boundary was verified independently, not taken on trust.**
+
+```
+$ git ls-tree -r agent/phase-prog-09 --name-only | grep '^_private'   → no match (exit 1)
+$ git diff --name-only dev...agent/phase-prog-09                      → only the 6 deliverable files
+$ uv run python tools/check_no_private_content.py                     → OK (645 tracked files)
+```
+
+**Condition 3 — `G32`'s decline nomination ruled on — Met.** The reviewer quoted the owner's ruling
+verbatim from the partition and confirmed the implementation: both deferred phases carry
+`resume_when` and `blocked_reason`, matching `phase-mem-15`'s shape and the fields
+`src/governance/backlog.py` requires for `deferred`. It also caught a distinction worth having: the
+ruling's fourth idea, `000030`, "is a different idea in a different programme… PLAN-034 correctly
+leaves it alone."
+
+**Condition 4 — removed from `next_up` in the same change — Met**, and the reviewer established
+something useful about the whole batch: it checked all eight prior `phase-prog-*` phases and found the
+removal always lands in the finalize commit, never in the later close commit, because "only
+`/session-close` can set `status: complete`, [so] an agent commit literally cannot satisfy a stricter
+reading of 'the same change'."
+
+**Both staleness claims were checked byte-for-byte** through `fold()` and live counts, and both
+matched. `phase-idea-07` complete and `fold()` at `src/db/ideas.py:230` both confirmed — "If either
+were false, `phase-proj-02` would be wrongly queued — it isn't."
+
+**One minor finding, fixed.** *`PLAN-034`'s coverage table overclaims `phase-proj-02` for `R04`.* That
+phase's acceptance cites `R05` and `R06` only, and deliberately carries no gate, so it cannot assert
+one. **Fixed**: the table now credits `R04` to `phase-proj-03` and `-04`, with a note explaining that
+`000033`'s disposition still satisfies the requirement while the phase has no `resume_when` to check.
 
 ## Decisions
 
