@@ -17,6 +17,7 @@ next_up:
 - phase-prog-10
 - phase-prog-11
 - phase-prog-12
+- phase-lit-09
 items:
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
@@ -6543,6 +6544,74 @@ items:
     dispatch framing the X5 worker flagged as steering and the close review judged a real,
     contestable risk; and 20 of 32 top-band collision candidates remain unread, which a
     synthesis phase cannot close. See SESS-2026-09-14-07.
+- id: phase-lit-09
+  title: Literature review Pass 3c — chaining completion, top-band deep reads and the
+    clean-room H4 re-derivation
+  plan: doc-lit-campaign
+  sources:
+  - doc-lit-campaign
+  - doc-lit-campaign-evidence-contract
+  - doc-prompt-literature-review-delegation-pack
+  - doc-prompt-literature-review-kickoff
+  systems:
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-lit-08
+  scope:
+  - 'Owner-approved ninth campaign session (2026-09-14, after phase-lit-07''s close
+    review): close the three evidence gaps phase-lit-07''s final gate measured -
+    forward and backward chaining on the strong-collision rows added after the
+    chaining passes (15 lacking phase-C rows, 5 of those lacking phase-B, at last
+    measure), deep reads of the never-opened top-prescore-band candidates (20 at
+    last measure), and the duplicate-rate trend re-measure - plus the clean-room H4
+    re-derivation resolving the phase-lit-08 dispatch-framing caveat.'
+  - Dispatch per the phase-lit-09 mapping recorded in PROMPT-031 (owner ruling,
+    2026-09-14) - every item existing PROMPT-029 text with a narrowed payload,
+    nothing authored. Item order K, C1, B1, X1, X2, X3, R per new flag, X4, X5,
+    H4R, G. Payload lists are derived from the files at dispatch, not from the
+    counts above.
+  - Work on agent/lit-campaign in the retained lit-campaign worktree. phase-lit-07
+    stays active under agent-lit and untouched by this phase; claim this phase
+    under a distinct agent id, since one agent holds at most one active phase.
+  acceptance:
+  - Every matrix row with either overlap score >= 3, including rows added this
+    phase, has at least one strategy_phase B and one strategy_phase C ledger row
+    carrying its id in subject_source_id - 0 missing.
+  - Every top-band candidate (collision_candidate yes, max of the two prescores =
+    5, no matrix row, deduplicated) has a full 43-field matrix row with 0 blanks;
+    every new critical_collision yes row carries a recorded independent second
+    review, 0 pending.
+  - H4's status is re-derived by an agent with no exposure to any prior H4 framing,
+    from the evidence alone, with reasoning recorded in the block; the caveat is
+    resolved either way and propagated into 08_surviving_distinctions.md where it
+    changes anything.
+  - This phase's duplicate rate is measured against the pre-phase inventory and
+    reported against phase-lit-08's 58/387 = 15.0% as a trend, with no saturation
+    assertion regardless of the number, per check-in ruling 8's standing form.
+  - LIT-07 G measurements 2, 4 and 5 are re-measured against the updated files and
+    recorded in the session record, for the owner's revisit of phase-lit-07's
+    close.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Run the phase gate per the PROMPT-031 phase-lit-09 mapping and record real
+    output - every acceptance measurement with its population named, the
+    duplicate-rate trend reported without any saturation assertion, and the three
+    LIT-07 G re-measures
+  deliverables:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/05_critical_collisions.md
+  - research/literature-review/06_hypothesis_tests.md
+  next_action: Run /resume-lit-review in a fresh session (or paste PROMPT-031's
+    kick-off paragraph). The backlog queue and the PROMPT-031 phase-lit-09 mapping
+    carry everything a fresh coordinator needs; SESS-2026-09-14-08 records where
+    the evidence stands.
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan

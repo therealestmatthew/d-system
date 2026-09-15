@@ -205,6 +205,43 @@ Check-in rulings 1, 2, 3, 5 and 8 bind this phase unchanged. Ruling 8 in particu
 **reports its duplicate rate against `phase-lit-06`'s 44/220 (20.0%) as a trend and may not
 assert saturation**, whatever the number comes out at.
 
+## The `phase-lit-09` dispatch mapping (owner ruling, 2026-09-14)
+
+A third, still later ruling, separate from both sections above. Made at the close of
+`phase-lit-07` (the session recorded as
+[SESS-2026-09-14-08](../03-sessions/SESS-2026-09-14-08-literature-review-pass-4.md)), when the
+owner approved a ninth session — one past the seven-session estimate, at the top of the accepted
+six-to-eight range — to close the three evidence gaps that session's final gate measured, plus
+the clean-room H4 re-derivation the owner elected to include. `phase-lit-09` carries the scope
+and acceptance; this section carries the dispatch mapping, because the pack has no `LIT-09`
+section and nothing is authored mid-campaign.
+
+**Every item is existing pack text with a narrowed payload. No section was authored.**
+
+| Item | Model | Pack section dispatched | Payload narrowing |
+|---|---|---|---|
+| `K` | Haiku | `LIT-06 K` | Claims `phase-lit-09` under a distinct agent id (`agent-lit` still holds `phase-lit-07`); verifies prior evidence; item order as below |
+| `C1` | Sonnet | `LIT-05 S1` (forward chaining) | Payload = every matrix row with either overlap score ≥ 3 lacking a `strategy_phase: C` row carrying its id in `subject_source_id`, derived from the files at dispatch (15 at ruling time) |
+| `B1` | Sonnet | Block C + Block D | Payload = the ids lacking `strategy_phase: B` rows (5 at ruling time). Idempotent re-dispatch: the matrix rows exist and are verified; the work extends from the first missing item — the backward-chaining rows. No re-scoring |
+| `X1`/`X2`/`X3` | Sonnet | Block C + Block D (as `LIT-04 X1`–`X3`) | Payload = the unread top-band candidates in rank order — `collision_candidate: yes`, max of the two prescores = 5, no matrix row, deduplicated (20 at ruling time), split roughly evenly. Commit per source |
+| `R` ×n | Sonnet | `LIT-06 R`, verbatim | One per **new** `critical_collision: yes` row; none if none flags |
+| `X4` | Sonnet | `LIT-06 X2` | Folds the new verdicts only; runs only if `R` ran |
+| `X5` | Sonnet | `LIT-06 X1` | Restricted to hypothesis blocks the new evidence bears on; explicit statement where a status does not change; other blocks byte-identical |
+| `H4R` | Sonnet | `LIT-06 X1` | Restricted to the **H4 block only**, dispatched to a fresh agent. **The dispatch carries no coordinator characterization of any source** — nothing about any specific challenger, nothing about a general/topological split: Block C, the section text and file paths, nothing else. Resolves the `phase-lit-08` framing caveat in whichever direction the evidence supports |
+| `G` | Haiku | Block G | Measurements are `phase-lit-09`'s five acceptance conditions plus ledger/matrix integrity re-measures, populations named |
+
+Item order: `K → C1 → B1 → X1 → X2 → X3 → R×n → X4 → X5 → H4R → G`.
+
+Operational facts that bind, carried from the session records rather than re-derived: the
+ledger's `result_ids` delimiter is the semicolon alone; ledger rows are CRLF-terminated and this
+phase's `search_id`s are `LIT-09-S001` onward, numbered per phase; the inventory carries two
+known duplicate `source_id` rows and four rows still `status: candidate` despite having matrix
+rows — payload derivations dedupe, and nobody "fixes" the inventory. Check-in rulings 1, 2, 3, 5
+and 8 bind unchanged. Ruling 8 in particular: this phase **reports its duplicate rate against
+`phase-lit-08`'s 58/387 (15.0%) as a trend and may not assert saturation**, whatever the number
+comes out at. `phase-lit-07` remains `active` under `agent-lit` throughout and is revisited by
+the owner after this phase's gate re-measures `LIT-07 G`'s measurements 2, 4 and 5.
+
 ---
 
 ## The kick-off paragraph
