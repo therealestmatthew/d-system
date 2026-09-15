@@ -90,7 +90,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | plan | draft | repository-owner | docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md |
 | PLAN-024 | plan | draft | repository-owner | docs/01-plans/PLAN-024-consultant-demo-kit.md |
 | PLAN-025 | plan | draft | repository-owner | docs/01-plans/PLAN-025-repeatable-idea-partition.md |
-| PLAN-026 | plan | draft | repository-owner | docs/01-plans/PLAN-026-concurrency-git-safety.md |
+| PLAN-026 | plan | active | repository-owner | docs/01-plans/PLAN-026-concurrency-git-safety.md |
 | PLAN-027 | plan | draft | repository-owner | docs/01-plans/PLAN-027-workbench-features-defects.md |
 | PLAN-028 | plan | draft | repository-owner | docs/01-plans/PLAN-028-workbench-architecture-quality.md |
 | PLAN-029 | plan | draft | repository-owner | docs/01-plans/PLAN-029-idea-graph-lifecycle.md |
@@ -149,6 +149,7 @@ CI regenerates it and fails on any difference.
 | REQ-010 | requirement | draft | repository-owner | docs/06-requirements/REQ-010-backlog-status-regression-guard.md |
 | REQ-011 | requirement | draft | repository-owner | docs/06-requirements/REQ-011-workbench-architecture-quality.md |
 | REQ-012 | requirement | draft | repository-owner | docs/06-requirements/REQ-012-workbench-features-defects.md |
+| REQ-013 | requirement | draft | repository-owner | docs/06-requirements/REQ-013-concurrency-git-safety.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -278,7 +279,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 1 | 7 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 0 | 1 | agent-partition |
-| PLAN-026 | doc-concurrency-git-safety | draft | 0 | 1 | 0 | agent-night |
+| PLAN-026 | doc-concurrency-git-safety | active | 9 | 1 | 0 | agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | draft | 1 | 0 | 0 | — |
@@ -300,4 +301,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-227 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 12, session: 85.
+228 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 13, session: 85.
