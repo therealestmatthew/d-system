@@ -7569,7 +7569,8 @@ items:
   - sys-brain
   - sys-wb-layout
   owner: repository-owner
-  status: queued
+  agent: agent-arch-vocab
+  status: active
   priority: 1
   session_budget: 1
   depends_on: []
