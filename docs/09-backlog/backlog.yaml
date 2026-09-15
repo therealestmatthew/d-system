@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-07
 - phase-prog-08
 - phase-prog-09
 - phase-prog-10
@@ -10200,3 +10199,216 @@ items:
   - .claude/agents/
   next_action: The weakest-evidenced placement in the partition - 000009 carries no recorded links and
     was filed here by subject. It depends on nothing, so moving it costs nothing if the placement is wrong.
+- id: phase-auto-01
+  title: Design the autonomous-operations architecture and rule what to build
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Design the architecture across the four components, evaluating each alone as the partition's decomposition
+    intended.
+  - Rule what to build now and what to defer. This phase may conclude that 000028, 000029 or 000030 should
+    not be built yet and say so - 000030's own body calls it a scheduling daemon with nothing to schedule
+    until the other two exist.
+  - 'Write the ADR recording the broker-first inversion: 000031 is built ahead of the gateway, ledger
+    and worker, against the partition''s stated ordering.'
+  - State that nothing in the programme becomes a second authority over phase claims.
+  acceptance:
+  - 'REQ-017 R01 holds on its design half: the broker-first ordering is recorded as a decision with its
+    reason, not stated as a precedence note.'
+  - 'REQ-017 R16 holds: the design names backlog.yaml as the lock table and the governance validator as
+    the lock check, and no component proposed here replaces either.'
+  - Any component deferred is returned with the reasoning attached rather than dropped silently.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  - docs/07-architecture/
+  next_action: This is the most speculative programme in the partition and four of its five ideas came
+    from a research pass rather than an incident. Recommending less is a legitimate outcome.
+- id: phase-auto-02
+  title: Build the capability and approval broker, enforced at the tool boundary
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-auto-01
+  scope:
+  - Give every agent run an explicit, narrow capability set of named actions - repository read, source
+    mutation, external network, publication - rather than a role.
+  - Enforce denied capabilities at the tool boundary. A denial described in a prompt an agent could misread
+    is what 000031 exists to replace.
+  - Route anything sensitive through an approval request carrying scope, reason, expiry and an immutable
+    decision record.
+  - This is built first, ahead of the gateway, ledger and worker. A gate constructed after the things
+    it gates has never gated anything.
+  acceptance:
+  - 'REQ-017 R02 holds: a run''s capability set names specific actions, not a role.'
+  - 'REQ-017 R03 holds: an agent prompted to use a denied capability is stopped at the boundary, not trusted
+    to decline.'
+  - 'REQ-017 R04 holds: an approval carries all four fields, its decision cannot be edited afterwards,
+    and an expired approval is not honoured.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - schemas/
+  - test/
+  next_action: Build this before anything else in the programme. It will look like over-engineering while
+    nothing runs unattended, which is the correct shape for a safety gate.
+- id: phase-auto-03
+  title: Build the external trigger gateway with deduplicated events
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-auto-01
+  - phase-auto-02
+  scope:
+  - Accept filesystem, scheduled, webhook and CLI events and normalise each into one event shape carrying
+    source, payload hash, received time and requested workflow.
+  - Deduplicate by payload hash, so the same trigger delivered twice produces one run.
+  - Keep it provider-neutral and separate from the execution layer, per 000028's own framing.
+  acceptance:
+  - 'REQ-017 R05 holds: one of each of the four source types produces an event with all four fields.'
+  - 'REQ-017 R06 holds: a duplicate payload produces one run. A gateway that runs work twice on a retried
+    webhook is worse than no gateway.'
+  - 'REQ-017 R07 holds: the interface hard-codes no model or tool name.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/api/routes/
+  - schemas/
+  - test/
+  next_action: Siblings with phase-auto-04, not sequenced before it - the partition chains 028 to 029
+    but neither actually depends on the other. Both can run at once.
+- id: phase-auto-04
+  title: Build the durable run ledger with resumable steps
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-auto-01
+  - phase-auto-02
+  scope:
+  - Persist every run with a correlation id, the triggering payload's hash, model and tool versions, a
+    context-pack hash, budget, timeout, retry count, checkpoints, produced artifacts and final disposition.
+    These eleven are 000029's list, not a summary of it.
+  - Make an interrupted run resumable without repeating completed side effects. Re-running from the start
+    is not resumption.
+  - Keep the execution adapter provider-neutral, so the run schema does not encode one model's shape.
+  acceptance:
+  - 'REQ-017 R08 holds: a completed run''s record carries all eleven fields.'
+  - 'REQ-017 R09 holds: a run interrupted mid-way and resumed produces each completed step''s side effects
+    exactly once.'
+  - 'REQ-017 R10 holds: a second provider could be added without changing the run schema.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - sql/
+  - schemas/
+  - test/
+  next_action: Read phase-agx-01 and phase-agx-05 first if they have landed - truncation handling and
+    the delegation methodology both bear on what a run must record.
+- id: phase-auto-05
+  title: Build the supervised worker, watchdog and abandoned-run review
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-auto-03
+  - phase-auto-04
+  scope:
+  - Add a supervised worker that drains queued runs and enforces concurrency limits and quiet hours.
+  - Heartbeat progress, and mark a run abandoned for review when a heartbeat goes stale rather than silently
+    retrying work whose side effects may be half-applied.
+  - Provide a review surface where an abandoned run can be found and resolved.
+  acceptance:
+  - 'REQ-017 R11 holds: work queued beyond the limit waits, and work queued inside quiet hours does not
+    start.'
+  - 'REQ-017 R12 and R13 hold: killing a worker mid-run marks that run abandoned rather than retrying
+    it, and restarting resumes queued work.'
+  - 'REQ-017 R14 holds: an abandoned run appears on the review surface and can be resolved from it.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - test/
+  next_action: Needs both the gateway and the ledger. 000030's own body calls this a scheduling daemon
+    with nothing to schedule otherwise.
+- id: phase-auto-06
+  title: Revisit 000020 against the delivered _tmpagent mechanism
+  plan: doc-autonomous-agent-operations
+  sources:
+  - doc-autonomous-agent-operations-requirements
+  - doc-autonomous-agent-operations
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-agx-07
+  scope:
+  - Revisit 000020 only after phase-agx-07's _tmpagent extension has shipped and been used in anger.
+  - Record whether the light mechanism proved insufficient, naming actual cases where it fell short -
+    or record that it did not.
+  - 'Do not re-argue the decision. The owner ruled on 2026-09-13: kept, sequenced behind 000128, revisit
+    only if the light version proves insufficient.'
+  - Confirm nothing proposed would become a second authority over documents, phase claims or worktrees.
+  acceptance:
+  - 'REQ-017 R15 holds: the revisit names actual cases where the _tmpagent mechanism fell short, or states
+    plainly that it did not. A revisit re-arguing the decision without evidence has not honoured the ruling.'
+  - 'REQ-017 R16 holds: no proposal replaces backlog.yaml as the lock table or the governance validator
+    as the lock check.'
+  - Concluding that 000020 is still not needed satisfies this phase fully and is the expected outcome.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  next_action: Depends on a phase in P4, not in this programme. Confirm phase-agx-07 has shipped and been
+    used before starting - a revisit against an unused mechanism has no evidence to weigh.
