@@ -7089,8 +7089,13 @@ items:
   deliverables:
   - docs/01-plans/PLAN-028-workbench-architecture-quality.md
   - docs/06-requirements/
-  next_action: Scope G40 first. Six ideas cite it as a prerequisite and it is a
-    documentation deliverable completable alone.
+  next_action: All four acceptance conditions verified met at close. Awaiting the
+    owner's session-close review; nothing remains to build.
+  session: doc-session-workbench-architecture-quality-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-028-workbench-architecture-quality.md
+  - docs/06-requirements/REQ-011-workbench-architecture-quality.md
+  - docs/09-backlog/README.md
 - id: phase-prog-04
   title: Finalize the idea graph and lifecycle plan (P1)
   plan: doc-idea-graph-lifecycle
