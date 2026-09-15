@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-04
 - phase-prog-05
 - phase-prog-06
 - phase-prog-07
@@ -8755,7 +8754,7 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
-  systems: &id001
+  systems:
   - sys-governance
   owner: repository-owner
   status: queued
@@ -8792,7 +8791,8 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
-  systems: *id001
+  systems:
+  - sys-governance
   owner: repository-owner
   status: queued
   priority: 1
@@ -8900,7 +8900,8 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
-  systems: *id001
+  systems:
+  - sys-governance
   owner: repository-owner
   status: queued
   priority: 2
@@ -8969,7 +8970,8 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
-  systems: *id001
+  systems:
+  - sys-governance
   owner: repository-owner
   status: queued
   priority: 2
@@ -8996,3 +8998,408 @@ items:
   - docs/03-sessions/
   next_action: Owner action, not agent work. An agent picking this up should confirm the hunks are already
     applied and verify R16, or report that the phase is waiting on the owner and stop.
+- id: phase-idg-01
+  title: Ship the idea schema bundle and record the scope-fork decision
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add the three ARCH-005 classification axes as distinct schema fields, the component_of link type,
+    the lineage annotation kind, and document-code link targets - in one change, because all four touch
+    schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py together.
+  - 'Write the ADR recording the scope-fork ruling: fields on the idea schema rather than a separate typed-node
+    graph layer, with the migration cost stated.'
+  - Move ARCH-005 from draft to accepted in the same change, now that its governing requirement exists.
+  - Restrict lineage to the owner's voice, as note and assessment already are.
+  acceptance:
+  - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
+    without parsing, component_of and lineage present, and one commit touching all three files.'
+  - 'REQ-014 R07 holds: every pre-change idea folds to identical derived state and _data/ideas.jsonl''s
+    existing lines are byte-identical.'
+  - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/idea.schema.json
+  - src/db/ideas.py
+  - tools/append_idea.py
+  - docs/04-decisions/
+  - docs/07-architecture/ARCH-005-idea-node-classification.md
+  next_action: Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
+    fields before recording why they are fields inverts the reasoning.
+- id: phase-idg-02
+  title: Build the pure classification agent
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - Build an agent that assigns values on the three axes for one idea at a time, reading that idea in
+    isolation.
+  - 'It writes neither tags nor links - 000018 owns tagging and 000055 owns relationships. The isolation
+    is the point: a classification biased by an idea''s neighbours reflects the graph rather than the
+    idea.'
+  - Require it to record why it left an axis blank, so an unset axis is distinguishable from an unprocessed
+    idea.
+  acceptance:
+  - 'REQ-014 R08 holds: run against one idea, the events written contain no tag or link, and the agent
+    did not read the idea''s neighbours.'
+  - 'REQ-014 R02 holds on its agent half: a blank axis carries a recorded reason.'
+  - The agent writes only through tools/append_idea.py and never edits _data/ideas.jsonl.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - docs/08-governance/
+  next_action: Read ARCH-005's three axes before designing the prompt. The agent classifies against that
+    vocabulary and must not invent axis values of its own.
+- id: phase-idg-03
+  title: Backfill classification across the corpus and report coverage
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-02
+  scope:
+  - Backfill the existing corpus by appending classification events - never by rewriting existing lines.
+  - Report per-axis coverage as a number, before and after.
+  - List the ideas the agent declined to classify, with reasons, rather than skipping them silently.
+  acceptance:
+  - 'REQ-014 R09 holds: coverage is reported before and after, and declined ideas are listed with reasons.'
+  - 'REQ-014 R03 holds: per-axis coverage is a number the metrics tool emits, not an impression.'
+  - 'REQ-014 R07 holds: git diff shows _data/ideas.jsonl grew by appended lines only, with no existing
+    line modified.'
+  verification:
+  - uv run pytest
+  - uv run python tools/overview_metrics.py
+  deliverables:
+  - _data/ideas.jsonl
+  - tools/overview_metrics.py
+  next_action: Run the coverage figure before starting, so the after number has something to be measured
+    against. A backfill with no baseline cannot show it worked.
+- id: phase-idg-04
+  title: Build the tagging registry and retroactive tag assignment
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - Add a tag registry with a controlled vocabulary, in the shape _data/tags.json already uses for projects.
+  - Allow tags to be assigned retroactively through the sanctioned writer.
+  - Make tags queryable, and reject an unregistered tag rather than accepting free text.
+  acceptance:
+  - 'REQ-014 R10 holds: a tag added to an existing idea is queryable, the vocabulary is a registry file,
+    and an unregistered tag is rejected.'
+  - Tag assignment goes through tools/append_idea.py; no path writes _data/ideas.jsonl directly.
+  - PLAN-017's deferral condition is recorded as discharged - the corpus passed 60 ideas long ago.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/idea.schema.json
+  - tools/append_idea.py
+  - _data/
+  next_action: Check how _data/tags.json models its vocabulary before inventing a second shape. Two tag
+    registries with different rules is the outcome to avoid.
+- id: phase-idg-05
+  title: Write the decomposition procedure for compound ideas
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-02
+  scope:
+  - Write the procedure for pulling apart a compound idea that turns out to be a disjoint brainstorm dump
+    rather than a cohesive whole.
+  - Require each fragment to be checked against the existing corpus before a new idea is written - a fragment
+    may already exist, in which case it is linked, not duplicated.
+  - Leave the original idea intact, with component_of links to its parts.
+  acceptance:
+  - 'REQ-014 R12 holds: run against a compound idea, the original survives with component_of links, and
+    an existing matching fragment was linked rather than duplicated.'
+  - The procedure names who may run it and what flags a candidate, rather than assuming the owner spots
+    them.
+  - It is tested against a real candidate, not a constructed one.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - _data/ideas.jsonl
+  next_action: Test against 000004. ARCH-005 names it as already reading like a live compound idea, which
+    makes it the honest test case rather than one built to pass.
+- id: phase-idg-06
+  title: Move /idea capture into a subagent
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Change the idea skill so capture runs in a subagent that returns only the created ids, keeping drafting
+    and file churn out of the main session's context.
+  - 'The subagent still obeys the idea-system rules: it writes through tools/append_idea.py and never
+    edits _data/ideas.jsonl.'
+  - Record 000127's general principle - any skill whose work is mechanical and self-contained should run
+    in a subagent by default - as a finding for the commands-and-skills audit rather than building it
+    here.
+  acceptance:
+  - 'REQ-014 R15 holds: capturing an idea leaves the main session with the ids and not the writer''s output
+    or file churn.'
+  - The subagent never guesses an id - it takes it from the writer's own output, per the standing rule.
+  - 000048 and 000127 are both closed by this phase; it is one ask recorded twice.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - .claude/commands/idea.md
+  - .claude/agents/
+  next_action: 000048 and 000127 are the same request six days apart. Read both before starting so the
+    phase closes both rather than leaving one looking unaddressed.
+- id: phase-idg-07
+  title: Build the connection-builder agent across all idea statuses
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-04
+  scope:
+  - Build an agent that maintains typed links and tag assignments across ideas of every status, including
+    revisiting ideas already past open.
+  - Give it the surfacing role 000055 describes - flagging ideas that relate to newly captured ones.
+  - Keep it distinct from the triage agent, which is scoped to open ideas and never revisits them.
+  acceptance:
+  - 'REQ-014 R11 holds: the agent writes at least one link to a triaged or promoted idea, which is what
+    distinguishes it from idea-triage.'
+  - It owns component_of maintenance as well as the three original link types.
+  - It never classifies - that is phase-idg-02's agent, and the separation is deliberate.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - docs/08-governance/
+  next_action: Depends on tagging as well as the schema. Sizing it before phase-idg-04 lands means designing
+    tag maintenance against a registry that does not exist.
+- id: phase-idg-08
+  title: Wrap idea metrics as a command and rule on the generated page
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a command that reports the metric set tools/overview_metrics.py already computes. The tool is
+    delivered and verified; the command wrapper is what 000071 is still missing.
+  - 'Rule on 000042: whether a generated ideas-and-backlog HTML page is still wanted now that IdeaExplorerRegion
+    and BacklogExplorerRegion both ship in the workbench.'
+  - Record 000008 and 000050 as closed - the metrics are delivered and the umbrella gets no phase of its
+    own.
+  acceptance:
+  - 'REQ-014 R13 holds: the command runs and reports the tool''s metric set.'
+  - 'REQ-014 R14 holds: the ruling states what a generated page would add over the two explorers, and
+    either sizes it or declines it.'
+  - No change is made to tools/overview_metrics.py's output shape - this phase wraps it, it does not revise
+    it.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/overview_metrics.py
+  deliverables:
+  - .claude/commands/
+  - docs/08-governance/
+  next_action: Run the tool first and read what it already emits. The command's job is to surface those
+    numbers, not to compute a second set beside them.
+- id: phase-idg-09
+  title: Capture an idea with no session open
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-06
+  scope:
+  - 'Make it possible to record an idea without a session running. 000010 names this the part that changes
+    behaviour most: today an idea is recorded only if a session happens to be open, which silently filters
+    for ideas that occur at a keyboard.'
+  - Choose the mechanism deliberately - a dashboard input, a watched directory, a phone shortcut - and
+    state why, since the requirement fixes the behaviour and not the surface.
+  - Whatever the surface, the write still goes through tools/append_idea.py.
+  acceptance:
+  - 'REQ-014 R16 holds: an idea captured with no session open lands in the log with a valid id.'
+  - The id comes from the writer's own output rather than being guessed or pre-allocated.
+  - The chosen mechanism is recorded with its reason, and the alternatives considered are named.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/
+  - docs/08-governance/
+  next_action: Decide the surface before building anything. This is the one phase in the programme whose
+    value depends entirely on whether the owner will actually reach for it.
+- id: phase-idg-10
+  title: Audit the plan corpus and write the plan-quality standard
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Audit docs/01-plans/ and name concretely what distinguishes the dense plans from the thin ones - which
+    sections earn their place, which are cargo-culted, what tone works.
+  - Cite real plans on both sides of every judgement. A standard citing no actual plan has not used the
+    corpus it was meant to audit.
+  - Write the result as a standard a later plan can be checked against, not as an essay.
+  acceptance:
+  - 'REQ-014 R17 holds: every judgement names plans from the corpus on both sides.'
+  - The standard is checkable - it states sections and properties rather than describing good taste.
+  - It is written so phase-idg-12 can measure a draft against it, which is what R20 requires of it.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  next_action: PLAN-016 and PLAN-017 are named in 000047 as the dense end of the corpus. Start there and
+    find the thin end honestly rather than picking a weak plan to make the point.
+- id: phase-idg-11
+  title: Define where a promoted plan lives before it earns a code
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Define what happens between the owner deciding an idea should become a plan and the coded document
+    existing in docs/01-plans/.
+  - State what happens if the draft is abandoned. ADR-010 covers staging and stops at promotion; PLAN-015's
+    _working/ is deleted rather than rewritten, which is the wrong shape for a document meant to become
+    permanent.
+  - Make the definition reachable from ADR-010, or from its successor.
+  acceptance:
+  - 'REQ-014 R18 holds: the location is defined, the abandoned-draft case is stated, and ADR-010 or its
+    successor points at it.'
+  - The definition does not require a code to be allocated before the draft exists, which would waste
+    codes on drafts that never land.
+  - It is consistent with GOV-005's rule that a code is permanent once it reaches the trunk.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  - docs/08-governance/
+  next_action: This blocks 000046's design, which is why it is sized ahead of the planner agent rather
+    than discovered during it.
+- id: phase-idg-12
+  title: Build the idea planner agent and check it against the standard
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-idg-10
+  - phase-idg-11
+  scope:
+  - Build an agent that drafts a governed plan - and where the idea implies observable behaviour, the
+    paired requirement - from a promoted idea.
+  - 'It drafts and does not decide: it allocates no code and marks nothing promoted, mirroring the triage
+    agent''s boundary.'
+  - It pulls in what triage already found - related plans, phases, overlapping ideas - so the draft does
+    not duplicate coverage triage already established.
+  acceptance:
+  - 'REQ-014 R19 holds: run against a promoted idea carrying findings and links, the draft cites them,
+    and the agent allocated no code and marked nothing promoted.'
+  - 'REQ-014 R20 holds: the draft is checked against phase-idg-10''s standard and conforms to its named
+    sections.'
+  - The draft lands where phase-idg-11 defined, not straight into docs/01-plans/.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - docs/08-governance/
+  next_action: 000072's planner bullet in P4 duplicates this. phase-prog-06 owns that ruling - confirm
+    it was struck before building, or this gets built twice.

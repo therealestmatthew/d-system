@@ -93,7 +93,7 @@ CI regenerates it and fails on any difference.
 | PLAN-026 | plan | active | repository-owner | docs/01-plans/PLAN-026-concurrency-git-safety.md |
 | PLAN-027 | plan | draft | repository-owner | docs/01-plans/PLAN-027-workbench-features-defects.md |
 | PLAN-028 | plan | draft | repository-owner | docs/01-plans/PLAN-028-workbench-architecture-quality.md |
-| PLAN-029 | plan | draft | repository-owner | docs/01-plans/PLAN-029-idea-graph-lifecycle.md |
+| PLAN-029 | plan | active | repository-owner | docs/01-plans/PLAN-029-idea-graph-lifecycle.md |
 | PLAN-030 | plan | draft | repository-owner | docs/01-plans/PLAN-030-document-backlog-governance.md |
 | PLAN-031 | plan | draft | repository-owner | docs/01-plans/PLAN-031-agent-engineering-delegation.md |
 | PLAN-032 | plan | draft | repository-owner | docs/01-plans/PLAN-032-autonomous-agent-operations.md |
@@ -150,6 +150,7 @@ CI regenerates it and fails on any difference.
 | REQ-011 | requirement | draft | repository-owner | docs/06-requirements/REQ-011-workbench-architecture-quality.md |
 | REQ-012 | requirement | draft | repository-owner | docs/06-requirements/REQ-012-workbench-features-defects.md |
 | REQ-013 | requirement | draft | repository-owner | docs/06-requirements/REQ-013-concurrency-git-safety.md |
+| REQ-014 | requirement | draft | repository-owner | docs/06-requirements/REQ-014-idea-graph-lifecycle.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -283,7 +284,7 @@ CI regenerates it and fails on any difference.
 | PLAN-026 | doc-concurrency-git-safety | active | 9 | 0 | 1 | agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
-| PLAN-029 | doc-idea-graph-lifecycle | draft | 0 | 1 | 0 | agent-night |
+| PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 1 | 0 | agent-night |
 | PLAN-030 | doc-document-backlog-governance | draft | 1 | 0 | 0 | — |
 | PLAN-031 | doc-agent-engineering-delegation | draft | 1 | 0 | 0 | — |
 | PLAN-032 | doc-autonomous-agent-operations | draft | 1 | 0 | 0 | — |
@@ -302,4 +303,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-229 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 13, session: 86.
+230 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 14, session: 86.
