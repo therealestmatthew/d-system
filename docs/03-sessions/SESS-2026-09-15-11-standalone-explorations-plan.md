@@ -88,9 +88,71 @@ No such system exists, as the partition states.
 
 ## Backlog
 
-`phase-prog-12` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-12` is `status: complete`, `agent: agent-night`,
+`session: doc-session-standalone-explorations-plan`. Completion evidence is `PLAN-037`,
+`docs/09-backlog/README.md` and this record — **no requirement document**, per the ruling above.
+Written under the owner's advance authority for this batch, after the read-only independent review
+below confirmed all four conditions.
 
 Seven phases added under `phase-expl-*`, all `status: queued`, none claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-12`, told the batch's
+history — stale premises found in ideas and the partition, and one fabricated verification result —
+and pointed directly at the no-requirement ruling's premise as the thing most likely to break.
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 246 documents, 25 memories, 261 backlog phases
+EXIT: 0
+
+$ uv run pytest -q              →  580 passed, 2 warnings
+$ uv run pytest test/test_ideas.py -q  →  62 passed
+```
+
+It ran `phase-expl-03`'s declared verification command as well as this phase's, confirming the
+command a future claimant will use is real and green.
+
+**All four conditions Met.**
+
+- *Condition 1* — all seven groups get a named ruling "in both the summary table and a prose
+  subsection", and the reviewer checked that the two surviving instances of the word "placeholder" are
+  legitimate content, namely `G63`'s own title.
+- *Condition 2* — verified through `fold()` rather than raw JSONL, with the owner's ruling located at
+  `idea-batching-partition.md:469` and quoted verbatim. The reviewer noted this "directly contradicts
+  the batch's flagged prior failure mode… this check used a tool that distinguishes idea state
+  precisely."
+- *Condition 3* — "Nothing was moved, and the plan states that explicitly… rather than leaving the
+  condition silently satisfied." It cross-checked every `G57`–`G62` idea against the partition and
+  confirmed none appears under another programme.
+- *Condition 4* — confirmed by parsed-YAML diff: `next_up` "drops `phase-prog-12` and nothing else".
+
+**The premise it was sent to break held, because it had already been corrected.**
+
+> "I expected this to be an unchecked overstatement in `PLAN-037`. It is not: the plan already states
+> this precisely… The plan's self-correction matches my independent check exactly, including the
+> 'first draft of this section overstated it' admission. This is the strongest part of the diff — it
+> names its own earlier overstatement and fixes the reasoning rather than just the count."
+
+It independently confirmed `REQ-016` and `REQ-019` exist and carry those codes.
+
+**Integrity.** Parsed item-by-item against `dev`: "**zero** pre-existing phases differ; only the seven
+`phase-expl-*` items are new. No YAML anchors." All seven carry `priority` ≤ 4, consistent with the
+corrections narrative. The prefix is registered once, "phrased as 'an index, not a track.'"
+
+**One minor observation, not fixed here.**
+
+> "`phase-prog-12`'s own `deliverables` field (pre-existing, unmodified by this diff) still lists
+> `docs/06-requirements/`, even though the phase's central ruling is that no requirement document
+> gets written."
+
+Correct, and left as found. The field was set at phase-creation time and declares a **lock** — during
+the phase, peers were correctly excluded from `docs/06-requirements/`, because at claim time it was
+not yet known whether one would be written. Narrowing it retroactively would rewrite a lock that
+already did its job. The reviewer judged it "worth a line in a future backlog-hygiene pass; not worth
+blocking on", and it is staged as an idea candidate, because the general point is real: a
+`deliverables` entry means *locked* before a phase and reads as *produced* after it.
 
 ## Decisions
 

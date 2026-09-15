@@ -114,6 +114,31 @@ may be worse than none.
 
 ---
 
+## A `deliverables` entry means "locked" before a phase and reads as "produced" after it
+
+**Raised by:** `phase-prog-12`'s review, on the last phase of the run.
+
+`phase-prog-12` declares `docs/06-requirements/` in its `deliverables`. Its central ruling was that
+**no requirement document should be written** — so after close, the field reads as a claim about
+output that is false.
+
+It was not wrong to declare it. At claim time nobody knew whether a requirement would be written, and
+the declaration correctly locked peers out of `docs/06-requirements/` for the duration. The field did
+its job. But the same field is read two ways at two times: before and during a phase it is a **lock**,
+and after completion it reads as a **manifest**.
+
+This is why the run's other `deliverables` finding felt slippery too — every `phase-prog-*` phase
+rewrites `backlog.yaml` without declaring it, which is a lock that does not cover the work; and here
+is the inverse, a lock covering work that never happened.
+
+Worth deciding: whether a completed phase should carry `completion_evidence` as its manifest and have
+`deliverables` read purely as the historical lock — which is roughly how they are used already, but is
+nowhere stated — or whether the two fields should be reconciled at close. Unresolved: whether
+retroactively narrowing a `deliverables` entry is ever right, given it would rewrite a lock that
+peers relied on while the phase was live.
+
+---
+
 ## The partition carries factual errors that finalize phases inherit
 
 **Raised by:** `phase-prog-08`, after drafting an entire plan on a premise that turned out to be false.

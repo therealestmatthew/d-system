@@ -7778,7 +7778,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7806,6 +7806,32 @@ items:
   - docs/09-backlog/README.md
   next_action: Rule on G63 first. Three ideas, zero product content, and the strongest
     decline signal in the partition - it is the cheapest decision in the bucket.
+  session: doc-session-standalone-explorations-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-11-standalone-explorations-plan.md
+  result: >-
+    Finalized P12, the bucket the partition itself describes as "Why together: nothing." Ruled on each
+    of the seven groups separately and produced phases only where earned: G57 one scoping pass, G58 one
+    owner-decision phase, G59 one capture pass, G60 two phases, G61 one document, G62 one deep dive,
+    G63 none. Confirmed G63 rather than re-ruling it - all three rehearsal placeholders already carry
+    status discarded from the owner's 2026-09-13 ruling. Moved nothing to another programme and said so
+    under its own heading, since a conditional acceptance left silent is indistinguishable from one
+    overlooked; 000054 was the nearest candidate for P5 and stays, with the overlap handled as a stated
+    boundary against phase-auto-04's run ledger and phase-agx-06's retrospective, both created earlier
+    in this same batch. Wrote no requirement document, deliberately: a requirement states observable
+    behaviour for a coherent body of work, and this is the one programme where the missing acceptance
+    condition and the missing coherence coincide. Registered seven phases under phase-expl-*, declared
+    an index rather than a track because a prefix per group would recreate at the prefix level the
+    unreadability the bucket exists to prevent. Verification green - governance exits 0 at 246
+    documents and 261 phases, --ready shows six of seven with only the G60 pair sequenced, and 580
+    tests pass. Two corrections: three phases written with priority 5 against a schema cap of 4, caught
+    by the gate; and a false premise in the no-requirement ruling, which claimed this phase's
+    acceptance was uniquely missing the requirement condition when three of ten omit it and two of
+    those got requirements anyway - caught by checking my own premise, and the review confirmed the
+    correction matched its independent check exactly.
+
 - id: phase-arch-01
   title: Settle the workbench vocabulary and rule on identifier migration
   plan: doc-workbench-architecture-quality
