@@ -7057,8 +7057,14 @@ items:
   deliverables:
   - docs/01-plans/PLAN-027-workbench-features-defects.md
   - docs/06-requirements/
-  next_action: Rule on 000119's render location first. G48 is the largest group and
-    000109 and 000110 conflict with each other until that decision exists.
+  next_action: Start by recording what shipped on 2026-09-14, before planning anything.
+    G48 is no longer the largest group. 000119's render location was ruled and implemented
+    route-side, and 000232, 000110 and 000118 all shipped with it - COMPATIBLE_EXTENSIONS
+    in ts/src/stage/HtmlViewerRegion.tsx now holds .html, .htm, .svg, .md and the six image
+    formats. Only 000109 (double-click opens a new tab) and 000102 (freshness badge) remain
+    open in G48. Record the delivered ideas the way acceptance already requires for G56 -
+    as delivered, with no implementation phase - and verify each against the code rather
+    than against this note.
 - id: phase-prog-03
   title: Finalize the workbench architecture and quality plan (P10)
   plan: doc-workbench-architecture-quality
