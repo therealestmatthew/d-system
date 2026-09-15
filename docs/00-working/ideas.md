@@ -11366,3 +11366,23 @@ Also worth covering: a checkpoint invoked from the primary checkout while a peer
 **Links**
 
 - relates_to → `000235`
+
+---
+
+## 000238 · HTML Viewer steps through a directory's files instead of scrolling one long page
+
+**Created 2026-09-15T00:28:19-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised during the demo-night viewer work and motivated by demoability. The owner does not want to present the agent lexicon page (_public/skills-and-agents-lexicon.html) by scrolling through it. They want the viewer to iterate through the individual files - stepping from one diagram to the next in the panel - so each is shown on its own, fitted and centred, while they talk.
+
+The owner put the request on hold the same night, saying the HTML Viewer would be used to rotate images instead. Recorded anyway so the ask survives the session; it was not captured at the time because tools/append_idea.py, run from a worktree branched off dev, allocated an id that was already live in uncommitted work sitting in the primary checkout. That collision is now resolved.
+
+Distinct from phase-wbf-06 (rotator variants), which is the NOTES STRIP rotator - long entries scrolling horizontally, image entries sourced from a directory, sized inside the small panel. This request is the HTML Viewer panel, which is a different surface with a different sizing problem. Idea 000132 sits behind phase-wbf-06 and should not be conflated with this.
+
+What the feature would need, all already present: HtmlViewerRegion holds `files` (the recursive compatible-file list for the active tab's directory), `filteredFiles` (that list narrowed by the tab's search text), and per-tab `selectedFile`. Stepping is moving selectedFile along that array. No new route and no backend change.
+
+The open question that decides what gets built: manual stepping - previous/next controls the presenter drives, with a position indicator - or automatic rotation on a timer. The manual reading lets a presenter control pace and go back when asked a question; the automatic reading overlaps phase-wbf-06's mechanism and would want a pause control to be usable live.
+
+Constraints: REQ-006 R02 zero page scroll and REQ-007 W15's fill assertions at 1280x720, 1366x768, 1920x1080 and 1024x768 in both layouts, all verified green with an image displayed as of SESS-2026-09-14-09. REQ-007 W08 keeps header controls shared across tabs while directory, search and page stay per-tab, so a stepping control belongs in the shared header acting on the active tab.
+
+Context already shipped that makes this cheap: COMPATIBLE_EXTENSIONS now admits six image formats plus .md and .htm; served images are wrapped route-side in a fitted, centred document; and the six canonical diagrams are tracked at _public/images/, which is the obvious directory to point the viewer at and step through.
