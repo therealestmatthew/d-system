@@ -6731,7 +6731,7 @@ items:
   - research/literature-review/06_hypothesis_tests.md
   next_action: Run /resume-lit-review in a fresh session (or paste PROMPT-031's
     kick-off paragraph). The backlog queue and the PROMPT-031 phase-lit-09 mapping
-    carry everything a fresh coordinator needs; SESS-2026-09-14-08 records where
+    carry everything a fresh coordinator needs; SESS-2026-09-14-10 records where
     the evidence stands.
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
