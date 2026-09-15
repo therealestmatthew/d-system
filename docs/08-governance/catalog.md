@@ -95,7 +95,7 @@ CI regenerates it and fails on any difference.
 | PLAN-028 | plan | draft | repository-owner | docs/01-plans/PLAN-028-workbench-architecture-quality.md |
 | PLAN-029 | plan | active | repository-owner | docs/01-plans/PLAN-029-idea-graph-lifecycle.md |
 | PLAN-030 | plan | active | repository-owner | docs/01-plans/PLAN-030-document-backlog-governance.md |
-| PLAN-031 | plan | draft | repository-owner | docs/01-plans/PLAN-031-agent-engineering-delegation.md |
+| PLAN-031 | plan | active | repository-owner | docs/01-plans/PLAN-031-agent-engineering-delegation.md |
 | PLAN-032 | plan | draft | repository-owner | docs/01-plans/PLAN-032-autonomous-agent-operations.md |
 | PLAN-033 | plan | draft | repository-owner | docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md |
 | PLAN-034 | plan | draft | repository-owner | docs/01-plans/PLAN-034-blocked-downstream-projections.md |
@@ -152,6 +152,7 @@ CI regenerates it and fails on any difference.
 | REQ-013 | requirement | draft | repository-owner | docs/06-requirements/REQ-013-concurrency-git-safety.md |
 | REQ-014 | requirement | draft | repository-owner | docs/06-requirements/REQ-014-idea-graph-lifecycle.md |
 | REQ-015 | requirement | draft | repository-owner | docs/06-requirements/REQ-015-document-backlog-governance.md |
+| REQ-016 | requirement | draft | repository-owner | docs/06-requirements/REQ-016-agent-engineering-delegation.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -240,6 +241,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-15-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-02-concurrency-git-safety-plan.md |
 | SESS-2026-09-15-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-03-idea-graph-lifecycle-plan.md |
 | SESS-2026-09-15-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-04-document-backlog-governance-plan.md |
+| SESS-2026-09-15-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-05-agent-engineering-delegation-plan.md |
 
 ## Plans and their phases
 
@@ -289,7 +291,7 @@ CI regenerates it and fails on any difference.
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 0 | 1 | agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 7 | 0 | 1 | agent-night |
-| PLAN-031 | doc-agent-engineering-delegation | draft | 0 | 1 | 0 | agent-night |
+| PLAN-031 | doc-agent-engineering-delegation | active | 13 | 1 | 0 | agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | draft | 1 | 0 | 0 | — |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | draft | 1 | 0 | 0 | — |
 | PLAN-034 | doc-blocked-downstream-projections | draft | 1 | 0 | 0 | — |
@@ -306,4 +308,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-233 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 15, session: 88.
+235 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 16, session: 89.

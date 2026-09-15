@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-06
 - phase-prog-07
 - phase-prog-08
 - phase-prog-09
@@ -9701,3 +9700,473 @@ items:
   - docs/08-governance/systems.yaml
   next_action: Well under one session. Do not plan a sitting around it - take it alongside whichever adjacent
     governance phase you claim next.
+- id: phase-agx-01
+  title: Document the truncation cap and make truncation detectable
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Document the tool-use cap that truncates a subagent, with its actual observed value, and the standing
+    rule that a truncated agent is resumed rather than re-run.
+  - Establish what the harness exposes to a caller that distinguishes a truncated dispatch from a completed
+    one, and report what is actually available rather than assuming a signal exists.
+  - If no signal is available, record that finding and fall back to GOV-008's existing resume convention.
+  acceptance:
+  - 'REQ-016 R01 holds: the guidance states a number, not that a cap exists, and states the cost of re-running
+    - the whole context paid twice.'
+  - REQ-016 R02 holds, either by a working signal or by a recorded finding that the harness exposes none.
+    A guess about the harness satisfies neither.
+  - 'The 2026-09-10 evidence is cited concretely: two of six scouts at exactly 30 tool calls, the four
+    that completed at 14 to 19.'
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-008-prompt-pack-protocol.md
+  - brain/procedures/
+  next_action: Ships first because every other phase in this programme dispatches agents and this failure
+    is live. Do not block on R02 - documenting the cap is valuable even if the signal turns out to be
+    unavailable.
+- id: phase-agx-02
+  title: Audit every command, skill and agent, and rule on the Claude Code dependency
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Audit every item under .claude/ and every shipped agent definition, judging each on scope, tooling,
+    model assignment and context cost against its job.
+  - 'Produce a verdict per item: keep, redesign, retire, or missing-and-needed. The missing-and-needed
+    output answers 000013, which gets no phase of its own.'
+  - 'Rule on 000069: whether this repository needs Claude Code specifically or an agent runner, given
+    PLAN-020 makes .claude/ generated output. Write an ADR if the answer is anything other than Claude
+    Code stays.'
+  - Note which items make good on-stage demo material and which need hardening first, per 000126's second
+    purpose.
+  acceptance:
+  - 'REQ-016 R03 holds: one row per item, and the row count matches the actual file count under .claude/
+    plus the shipped agent definitions.'
+  - 'REQ-016 R04 holds: five rows chosen at random each cite all four dimensions rather than a general
+    impression.'
+  - 'REQ-016 R05 holds: the Claude Code question is decided, not deferred, and states what would change
+    the answer.'
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/
+  - .claude/
+  - docs/04-decisions/
+  next_action: Six phases depend on this one. 000013's candidate list is partly shipped already - /session-close
+    and /backlog both exist - so check before calling anything missing.
+- id: phase-agx-03
+  title: Build the anti-pattern store with recurrence detection, populated from what exists
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the store behind the delivered log-anti-patterns skill, so a recurrence is detected mechanically
+    rather than by someone remembering.
+  - Populate it at first run from brain/procedures/ and the 2026-09-11 starter catalog, and report the
+    count.
+  - Do not rebuild capture. .claude/skills/log-anti-patterns/SKILL.md already routes and writes; this
+    phase adds the store behind it.
+  acceptance:
+  - 'REQ-016 R06 holds: an anti-pattern already in the catalog, recorded a second time, is identified
+    as a recurrence. A store accepting silent duplicates fails this.'
+  - 'REQ-016 R07 holds: the brain/procedures/ entries and the starter catalog are present at first run,
+    counted.'
+  - git diff shows no change to the log-anti-patterns skill's capture behaviour.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - brain/
+  - tools/
+  - docs/08-governance/
+  next_action: Read the log-anti-patterns skill before writing anything. Capture is delivered; a phase
+    that re-ships it has spent a session on work already done.
+- id: phase-agx-04
+  title: Derive authoring rules from accumulated anti-patterns, traceably
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-agx-03
+  scope:
+  - Derive rules from the accumulated store - the half 000097 was rescoped to after capture shipped.
+  - Make the path from originating incidents to the dispatch text a rule changed traceable in both directions.
+  - Feed the derived rules into how future work is authored rather than into a document that joins the
+    pile.
+  acceptance:
+  - 'REQ-016 R08 holds: one rule can be followed from its originating incidents to the authored prompt
+    text it changed.'
+  - A derivation producing a document nothing reads does not satisfy the row, and the phase states which
+    authoring surface each rule reached.
+  - At least one rule is derived from incidents recorded before this phase started, not from incidents
+    it created.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - brain/
+  next_action: The traceability is the deliverable, not the rules. Rules without a path back to their
+    evidence are indistinguishable from opinions.
+- id: phase-agx-05
+  title: Write the delegation-scoping methodology, including the runtime-evidence convention
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-agx-01
+  - phase-agx-02
+  scope:
+  - 'Write the methodology for scoping delegated work as a procedure with inputs: task size against the
+    turn budget, model choice, context selection, the verification instrument named up front, and the
+    escalation and resume path.'
+  - Consolidate PROMPT-012's model policy, PROMPT-021 and -024's dispatch conventions and GOV-008's cost
+    protocols rather than adding a fourth partial version.
+  - 'Include 000136''s convention: every work item whose requirement is runtime behaviour carries a named
+    runtime instrument and a live check inside its loop, not only at the phase gate.'
+  - Do not restate brain/procedures/runtime-behavior-needs-runtime-evidence.md, which already records
+    the lesson. Build the convention that makes an authored item carry the instrument by construction.
+  acceptance:
+  - 'REQ-016 R09 holds: applied to three dispatches of genuinely different size, the methodology yields
+    a defensible answer for each.'
+  - 'REQ-016 R10 holds: a frontend work item authored without a named instrument and an in-loop check
+    fails review.'
+  - The three existing partial versions are consolidated, not supplemented - after this phase there is
+    one place to look.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/GOV-008-prompt-pack-protocol.md
+  - docs/02-prompts/
+  next_action: Read the runtime-evidence procedure first and build the convention it implies. The knowledge
+    exists; what is missing is the authoring mechanism.
+- id: phase-agx-06
+  title: Measure the methodology against outcomes and change at least one rule
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-05
+  - phase-agx-04
+  scope:
+  - 'Run the retrospective the methodology requires: dispatch counts, truncations, fix cycles against
+    the cap of two, escalations above the standard model.'
+  - Change at least one rule as a result, so the continual-improvement half of 000139 is demonstrated
+    rather than asserted.
+  - Use real dispatch data, including this programme's own.
+  acceptance:
+  - 'REQ-016 R11 holds: the retrospective reports the four measures and at least one rule changed as a
+    result.'
+  - A retrospective changing nothing has not demonstrated the loop, and is recorded as a failed run rather
+    than a clean one.
+  - The measures come from recorded dispatches rather than from recollection.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  next_action: Needs real data. Do not claim this phase before enough dispatches exist to measure - the
+    retrospective on three dispatches is theatre.
+- id: phase-agx-07
+  title: Extend _tmpagent into a shared state model without a second lock table
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-agx-02
+  scope:
+  - Extend _tmpagent/ so facts established mid-session - environment quirks, corrected diagnoses, decisions
+    taken, batch membership - reach every dispatched agent without a coordinator re-pasting them.
+  - State what may be written to the shared state, by whom, and when it is released.
+  - Do not duplicate backlog.yaml's claim semantics. _tmpagent/ already carries a claims ledger; two lock
+    tables that can disagree is worse than one with gaps.
+  acceptance:
+  - 'REQ-016 R12 holds: a fact is established, two agents are dispatched, and both reach it without it
+    appearing in either prompt.'
+  - 'REQ-016 R13 holds: the contract names what, who and when, and adds no second claim mechanism.'
+  - The existing _tmpagent/AGENTS.md contract is extended rather than replaced, and its claim-activate-release
+    semantics still hold.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _tmpagent/
+  - docs/08-governance/
+  next_action: 000128 names the light alternative to 000020 in P5, which the control analyst nominated
+    for decline in its favour. phase-prog-07 owns that ruling - check it before starting.
+- id: phase-agx-08
+  title: 'Agent engineering: guides, grounded in this repository''s incidents'
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-02
+  scope:
+  - 'Write the guides concern of the agent-engineering framework: system prompts, AGENTS.md files, constraint
+    documents - what an agent is told.'
+  - Ground every claim in an incident recorded in this repository rather than in general principle. AGENTS.md's
+    drift - five documents asserting there was no remote for a day after there was one - and the agent
+    edit that rewrote its own governing rules are the available material.
+  - This is the first of the framework phases and it runs after the audit deliberately, so the framework
+    is derived from what recurred rather than illustrated with what the author remembered.
+  acceptance:
+  - 'REQ-016 R14 holds for the guides concern: every claim carries a citation to a recorded incident.'
+  - A concern citing no repository evidence has not used the material available and fails the row.
+  - The document is written against the audit's findings, which is why it depends on phase-agx-02.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/07-architecture/
+  - docs/08-governance/
+  next_action: Do not write this before the audit lands. A framework written first is four essays; written
+    after, it is a summary of what actually broke.
+- id: phase-agx-09
+  title: 'Agent engineering: orchestration, with the sensors and context-pipeline boundaries'
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-02
+  - phase-agx-08
+  scope:
+  - 'Write the orchestration concern: routing, multi-agent coordination and recovery paths, grounded in
+    the claim protocol that already works and the collisions it answered.'
+  - 'State the boundaries for the two thinner concerns rather than giving each a phase: sensors'' live-monitoring
+    half belongs to phase-agx-01 and -05, and context pipelines is a cross-reference to P6''s G25, whose
+    deliverable is a query contract where 000081''s is a selection framework.'
+  - State the boundary against P3's concurrency mechanics rather than restating them - 000082 is an open
+    survey, G09 is two diagnosed incidents.
+  acceptance:
+  - 'REQ-016 R14 holds for the orchestration concern: every claim carries a citation to a recorded incident.'
+  - 'REQ-016 R15 holds: explicit cross-references to P6 on context pipelines and P3 on orchestration,
+    with no duplicated content on either side.'
+  - Sensors and context pipelines are covered by stated boundaries rather than by silence - a reader can
+    tell where each was handled.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/07-architecture/
+  - docs/08-governance/
+  next_action: The boundary statements are the point of this phase, not an afterthought. Two of the four
+    framework concerns are handled here by pointing elsewhere, and pointing badly means writing them twice
+    later.
+- id: phase-agx-10
+  title: Build the lifecycle agent roster, without a planner role
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-02
+  - phase-agx-08
+  scope:
+  - Build out the agent roster so each stage of the lifecycle has an agent with a bounded remit, mirroring
+    how idea-triage is deliberately incapable of closing an idea.
+  - Include no planner role. 000072's planner bullet is struck - phase-idg-12 in P1 is the planner, and
+    it has a quality standard to draft against and a defined location to draft into, neither of which
+    the bullet has.
+  - 'Keep the deliberation trio out, on 000072''s own instruction: a different family, planned alongside
+    but not merged.'
+  acceptance:
+  - 'REQ-016 R16 holds: each role states what it may not do, and no role can reach the decision the role
+    above it owns.'
+  - 'REQ-016 R17 holds: no roster role duplicates phase-idg-12. A roster reinstating the planner builds
+    the same agent twice.'
+  - The roster is gated on PLAN-020, per the partition - confirm its state before building Claude-specific
+    definitions.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - docs/08-governance/
+  next_action: Confirm phase-idg-12 exists and owns the planner before starting. If P1 has not run, this
+    phase's central ruling has nothing to point at.
+- id: phase-agx-11
+  title: Build the expander and the minimalist, and prove they disagree
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-10
+  scope:
+  - Build the just-one-more agent, whose remit is breadth and which is judged on what it surfaces that
+    nobody had thought of, not on whether the suggestions are practical.
+  - Build the minimalist agent, whose remit is necessity and which argues its case rather than listing.
+    The defends-it-vigorously part is the design point - an agent that produces a ranked list and shrugs
+    adds nothing over sorting.
+  - Run both against one real decision and record the disagreement.
+  acceptance:
+  - 'REQ-016 R18 holds: run against the same input, the two produce genuinely opposed recommendations.
+    Two agents agreeing on everything are one agent with two prompts.'
+  - Neither agent decides anything - both produce arguments for the arbiter, which phase-agx-12 builds.
+  - The real decision they are tested against is one the repository actually faced, not a constructed
+    example.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  next_action: Build them as a pair and test them together. Either alone is unfalsifiable - the disagreement
+    is the only evidence that the remits differ.
+- id: phase-agx-12
+  title: Rule the arbiter's authority boundary, then build it
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-11
+  scope:
+  - 'Rule where the arbiter''s authority stops, and write the ADR. Deciding scope is close to the owner''s
+    own role, and this repository has drawn that line twice already: idea-triage scouts but never promotes,
+    and /session-close is typed by a person so an agent cannot reach completion.'
+  - Build the product-owner agent that weighs the expander's and the minimalist's arguments and issues
+    a ruling with reasons.
+  - Make the ruling advisory wherever scope is the owner's.
+  acceptance:
+  - 'REQ-016 R19 holds: the boundary is stated, is at least as tight as /session-close''s, and the arbiter
+    cannot reach a decision reserved to the owner.'
+  - An ADR records the boundary, because it is a standing constraint on how close an agent may come to
+    an owner decision rather than one phase's design.
+  - The arbiter's ruling cites both arguments rather than restating one of them.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - docs/04-decisions/
+  next_action: The boundary is the phase; the agent is the easy half. 000075 calls this the most dangerous
+    of the three and it is right.
+- id: phase-agx-13
+  title: Independent transcript review against the participant's record
+  plan: doc-agent-engineering-delegation
+  sources:
+  - doc-agent-engineering-delegation-requirements
+  - doc-agent-engineering-delegation
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build deterministic transcript extraction, and an agent that reads the transcript directly as an independent
+    third party and writes its own session documentation.
+  - Run an adversarial review between that record and the one the working agent produced - two independent
+    accounts of the same session, compared.
+  - The reviewer must read the raw transcript, never the participant's summary, because inheriting the
+    participant's framing is the failure this exists to avoid.
+  acceptance:
+  - 'REQ-016 R20 holds: both records exist and the diff between them is produced.'
+  - The reviewer demonstrably read the transcript rather than the summary - its record contains at least
+    one fact the participant's record omits.
+  - 'Extraction is deterministic: two runs over the same transcript produce byte-identical output.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/
+  - .claude/agents/
+  next_action: The weakest-evidenced placement in the partition - 000009 carries no recorded links and
+    was filed here by subject. It depends on nothing, so moving it costs nothing if the placement is wrong.
