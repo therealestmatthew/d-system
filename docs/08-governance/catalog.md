@@ -98,7 +98,7 @@ CI regenerates it and fails on any difference.
 | PLAN-031 | plan | active | repository-owner | docs/01-plans/PLAN-031-agent-engineering-delegation.md |
 | PLAN-032 | plan | active | repository-owner | docs/01-plans/PLAN-032-autonomous-agent-operations.md |
 | PLAN-033 | plan | active | repository-owner | docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md |
-| PLAN-034 | plan | draft | repository-owner | docs/01-plans/PLAN-034-blocked-downstream-projections.md |
+| PLAN-034 | plan | active | repository-owner | docs/01-plans/PLAN-034-blocked-downstream-projections.md |
 | PLAN-035 | plan | draft | repository-owner | docs/01-plans/PLAN-035-schema-consistency-testing.md |
 | PLAN-036 | plan | draft | repository-owner | docs/01-plans/PLAN-036-html-generation-design-system.md |
 | PLAN-037 | plan | draft | repository-owner | docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md |
@@ -155,6 +155,7 @@ CI regenerates it and fails on any difference.
 | REQ-016 | requirement | draft | repository-owner | docs/06-requirements/REQ-016-agent-engineering-delegation.md |
 | REQ-017 | requirement | draft | repository-owner | docs/06-requirements/REQ-017-autonomous-agent-operations.md |
 | REQ-018 | requirement | draft | repository-owner | docs/06-requirements/REQ-018-retrieval-knowledge-infrastructure.md |
+| REQ-019 | requirement | draft | repository-owner | docs/06-requirements/REQ-019-blocked-downstream-projections.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -246,6 +247,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-15-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-05-agent-engineering-delegation-plan.md |
 | SESS-2026-09-15-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-06-autonomous-agent-operations-plan.md |
 | SESS-2026-09-15-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-07-retrieval-knowledge-infrastructure-plan.md |
+| SESS-2026-09-15-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-08-blocked-downstream-projections-plan.md |
 
 ## Plans and their phases
 
@@ -298,7 +300,7 @@ CI regenerates it and fails on any difference.
 | PLAN-031 | doc-agent-engineering-delegation | active | 13 | 0 | 1 | agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | active | 6 | 0 | 1 | agent-night |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
-| PLAN-034 | doc-blocked-downstream-projections | draft | 0 | 1 | 0 | agent-night |
+| PLAN-034 | doc-blocked-downstream-projections | active | 2 | 1 | 0 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | draft | 1 | 0 | 0 | — |
 | PLAN-036 | doc-html-generation-design-system | draft | 1 | 0 | 0 | — |
 | PLAN-037 | doc-standalone-explorations-housekeeping | draft | 1 | 0 | 0 | — |
@@ -312,4 +314,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-239 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 18, session: 91.
+241 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 19, session: 92.

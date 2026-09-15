@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-09
 - phase-prog-10
 - phase-prog-11
 - phase-prog-12
@@ -10823,3 +10822,149 @@ items:
   - src/
   next_action: This is 000029's trust layer over 000060's lifecycle. Sized after phase-ret-09 because
     confidence needs something to attach to.
+- id: phase-proj-01
+  title: Answer the portfolio data question against the real root
+  plan: doc-blocked-downstream-projections
+  sources:
+  - doc-blocked-downstream-projections-requirements
+  - doc-blocked-downstream-projections
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Put one question to the owner: do people and commitments hold records in the real portfolio, and
+    if not, is that tooling friction or no current need?'
+  - Supply the exact command that produces the evidence, against D_SYSTEM_DATA_ROOT=_private/portfolio.
+    Counting _data/ answers a different question - that root is the fictional example set since phase-priv-03.
+  - 'Correct 000022''s figures on the record and state why they went stale: ADR-009 moved the real records,
+    so the location the idea measured no longer means what it meant.'
+  - Record the consequence of each answer. Friction routes to capture ergonomics; no current need means
+    CLAUDE.md's statement of purpose describes an aspiration rather than a use.
+  - Write an ADR only if the answer is no current need, since that reshapes what the system claims to
+    be for.
+  acceptance:
+  - 'REQ-019 R01 holds: one question and one runnable command, and the command names D_SYSTEM_DATA_ROOT
+    rather than counting _data/.'
+  - 'REQ-019 R02 holds: 000022''s cited counts are compared against today''s and the relocation is named
+    as the reason they diverged.'
+  - 'REQ-019 R03 holds: both answers route to a stated consequence.'
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  - docs/08-governance/
+  next_action: An agent cannot resolve this. _private/ is gitignored, absent from every worktree, and
+    AGENTS.md forbids reading it without the owner's direction. Put the question; do not go looking.
+- id: phase-proj-02
+  title: Deterministic as-of snapshots and two-point diffs
+  plan: doc-blocked-downstream-projections
+  sources:
+  - doc-blocked-downstream-projections-requirements
+  - doc-blocked-downstream-projections
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Expose deterministic as-of snapshots and two-point diffs over ideas and plans: which status, annotation,
+    relationship, promotion or plan-phase fact changed, when it became known, and which source event supports
+    it.'
+  - 000033's stated prerequisite is already met - phase-idea-07 is complete and fold() ships in src/db/ideas.py
+    - so this is sizeable now rather than dormant, despite the partition filing all of G32 as dormant.
+  - 'Keep it deterministic: two runs over unchanged history produce identical output.'
+  acceptance:
+  - 'REQ-019 R06 holds: a snapshot at a past date and a diff between two dates both resolve, and each
+    changed fact names its supporting event.'
+  - 'REQ-019 R05 holds: the gate was checked against the repository rather than assumed, and the finding
+    is recorded.'
+  - Two runs over unchanged history produce byte-identical output.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - tools/
+  - test/
+  next_action: The partition files this as dormant and it is not. Confirm phase-idea-07 is still complete,
+    then build - nothing else gates it.
+- id: phase-proj-03
+  title: Portfolio scenario simulation that never writes to source
+  plan: doc-blocked-downstream-projections
+  sources:
+  - doc-blocked-downstream-projections-requirements
+  - doc-blocked-downstream-projections
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-proj-01
+  scope:
+  - 'Add isolated what-if scenarios over the derived portfolio projection: defer a project, change capacity,
+    move a deadline, close a commitment, reallocate tasks, then recompute signals and compare against
+    the real baseline.'
+  - Never write to source JSON, the live database, or the idea log. That is 000034's own constraint and
+    the property that makes what-if safe.
+  - Depends on portfolio signals from PLAN-002's phase-sig line, which is outside this programme.
+  acceptance:
+  - 'REQ-019 R07 holds: after a scenario run, source JSON, the database and the idea log are byte-identical.'
+  - 'REQ-019 R04 holds: this phase carries a gate naming what unblocks it rather than a decline.'
+  - A scenario comparison against the real baseline is produced, not just a recomputed projection.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - test/
+  next_action: Do not start before phase-proj-01 is answered. Simulating a portfolio that holds no people
+    or commitments simulates the example set.
+  resume_when: phase-proj-01 records the owner's answer on the portfolio data gap, and portfolio signals
+    exist from PLAN-002's phase-sig line.
+  blocked_reason: Needs a portfolio projection with real content and the signals to recompute; neither
+    exists today.
+- id: phase-proj-04
+  title: Recommendation calibration against observed outcomes
+  plan: doc-blocked-downstream-projections
+  sources:
+  - doc-blocked-downstream-projections-requirements
+  - doc-blocked-downstream-projections
+  systems:
+  - sys-projection
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Persist every recommendation the system produces with its supporting evidence, the owner's actual
+    decision - accept, defer, dismiss or revise - and the later observed outcome.
+  - 'Produce calibration reports: which recommendations were useful, which created false urgency, which
+    kept being deferred, and how long outcomes lagged.'
+  - Keep the four decision values distinct rather than collapsing them; which advice created false urgency
+    is the question calibration exists to answer.
+  acceptance:
+  - 'REQ-019 R08 holds: one record carries evidence, the owner''s decision and the observed outcome, with
+    the four decision values distinct.'
+  - 'REQ-019 R04 holds: this phase carries a gate naming what unblocks it rather than a decline.'
+  - The calibration report is computed from recorded outcomes rather than from recommendation counts alone.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - schemas/
+  - test/
+  next_action: The most downstream idea in the corpus, by the control analyst's own description, and that
+    is the gate rather than a reason to discard it. The owner ruled it kept on 2026-09-13.
+  resume_when: Recommendations and their outcomes have accumulated in enough volume to calibrate against;
+    nothing produces them today.
+  blocked_reason: Calibration needs recommendations and observed outcomes to exist first.
