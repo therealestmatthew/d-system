@@ -7316,7 +7316,8 @@ items:
   systems:
   - sys-portfolio
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7337,6 +7338,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-029-idea-graph-lifecycle.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Verify what G03 already ships before sizing anything - 000071 is
     prototyped and 000070 largely delivered, so the group is smaller than it reads.
 - id: phase-prog-05
