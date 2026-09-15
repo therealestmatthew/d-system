@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-12
 - phase-lit-09
 items:
 - id: phase-wbf-11
@@ -11476,3 +11475,231 @@ items:
   - templates/styles/
   next_action: Last in the programme by dependency, not by priority. It populates libraries that must
     exist first, and its output is checkable only against a convention the earlier phases fix.
+- id: phase-expl-01
+  title: Scope observability and telemetry, with its boundaries against P4 and P5
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Run the scoping pass 000054 needs: what to instrument first - API request latency, agent run duration
+    and outcome, DB rebuild timing - where telemetry data lives, and how it differs from the governance
+    check''s own reporting.'
+  - Decide whether a new system id is warranted. No sys-observability exists today and the work spans
+    sys-api, sys-projection and sys-html.
+  - State the boundary against phase-auto-04's run ledger, which persists per-run duration, disposition,
+    retries and checkpoints, and against phase-agx-06's retrospective, which measures dispatch counts,
+    truncations and escalations. Both are agent-run telemetry with different consumers.
+  - Do not instrument anything in this phase. The output is a scope, and the work it scopes is sized afterwards.
+  acceptance:
+  - The pass names what to instrument first, where telemetry lives, and whether a new system id is warranted
+    - each with a reason rather than a preference.
+  - The boundaries against phase-auto-04 and phase-agx-06 are stated explicitly, so no later phase instruments
+    agent runs twice.
+  - No instrumentation ships in this phase; the diff adds no logging, metric or trace call.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  - docs/08-governance/systems.yaml
+  next_action: Read phase-auto-04 and phase-agx-06 before scoping. Both were created on 2026-09-15 and
+    the partition's independence argument for 000054 predates them.
+- id: phase-expl-02
+  title: Put the content-strategy question to the owner and record the answer
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Frame the business-priority question 000015, 000016 and 000017 form as one expanding chain: one platform,
+    then multi-platform, then automation.'
+  - State the options and what each commits to, and put the question. The owner ruled these kept as parked
+    on 2026-09-13 - dormancy is not deadness, a business-priority question, not a technical one - so the
+    decision is theirs.
+  - Record the answer and what follows from it. Do not decide on the owner's behalf whether to build in
+    public.
+  - If the answer is yes to any rung, size that rung and leave the rest parked.
+  acceptance:
+  - One question is put with its options and their commitments, in the shape phase-proj-01 uses for the
+    portfolio data gap.
+  - The owner's answer is recorded, and each rung of the chain has a disposition rather than being left
+    collectively parked.
+  - No content is produced and no platform account is created by this phase.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  - docs/04-decisions/
+  next_action: An agent frames this; it does not answer it. Whether the owner wants to build in public
+    is not a fact in the repository.
+- id: phase-expl-03
+  title: Scout research/ for uncaptured ideas
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Scout research/ - roughly 10,700 lines across about 90 files - for application ideas and enhancements
+    not yet captured as ideas.
+  - Mine the twelve adversarial codebase-review reports in particular. Their findings were deliberately
+    never executed, and 12_recommendations.md ends by saying to stop rather than start.
+  - Record what is found through tools/append_idea.py, one idea per distinct finding, taking each id from
+    the writer's own output.
+  - Edit no file under research/. This phase reads that corpus and writes ideas; it does not revise the
+    research.
+  acceptance:
+  - Ideas are recorded through the sanctioned writer, and git diff shows no change to any file under research/.
+  - The adversarial review reports are covered specifically, not just the architecture documents.
+  - Each recorded idea names the research file and section it came from, so a reader can trace it back.
+  verification:
+  - uv run pytest test/test_ideas.py
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/
+  next_action: 'The boundary is what bounds the phase: read research/, write ideas, change no research
+    file. Without it this is open-ended.'
+- id: phase-expl-04
+  title: Build the tracked repository list
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Build a tracked list of the owner''s repositories: those they created and those they starred or marked
+    for future reference.'
+  - Ship the list as useful on its own. The awareness agent is phase-expl-05 and may never be built; this
+    phase must deliver value without it.
+  - Tie in autoclaude-api, which the owner names specifically - it scouts repositories for Claude skills
+    and is an existing external dependency rather than something to rebuild.
+  acceptance:
+  - The list exists and is queryable, and is useful without any agent reading it.
+  - autoclaude-api is represented rather than duplicated, with its relationship to this list stated.
+  - The list's schema states what a tracked repository record holds, so phase-expl-05 has a contract to
+    read.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/
+  - schemas/
+  next_action: Confirm what autoclaude-api already does before designing around it. The owner names it
+    as something to tie into, not to replace.
+- id: phase-expl-05
+  title: Build the cross-repo awareness agent
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-expl-04
+  scope:
+  - 'Build the agent whose purpose is connecting the dots across the tracked repositories: knowing what
+    exists where, and pointing someone at the right existing repo so nothing gets rebuilt that already
+    exists.'
+  - Read the list phase-expl-04 ships rather than maintaining a second inventory.
+  - 000086 may split further on contact, per the partition. If it does, split it rather than building
+    a larger phase.
+  acceptance:
+  - Asked about a capability, the agent names an existing repository that provides it, or states plainly
+    that none does.
+  - It reads phase-expl-04's list and maintains no second inventory.
+  - It recommends rather than acts - it creates no repository and modifies none.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  next_action: Worthless without the list. Confirm phase-expl-04 shipped and read its schema before designing
+    the agent's queries.
+- id: phase-expl-06
+  title: Evaluate languages and platforms for a non-web rebuild
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Evaluate Rust, Go and C# - the candidates the owner named - for a desktop-class rebuild of the application
+    as an IDE-style customizable workspace: panels, terminals, file viewers, explorers, notes, agent triggering.'
+  - Weigh what each offers for that shape of application, and what each costs against the current web
+    stack.
+  - Produce a document. Do not propose a migration, and do not start one. 000122 is recorded as deliberately
+    standalone and future-only.
+  acceptance:
+  - Each named candidate carries an assessment against the IDE-style workspace shape, not a general language
+    comparison.
+  - The document states what would have to be true for a rebuild to be worth starting, without recommending
+    that it start.
+  - No application code is changed by this phase.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Future-only by the owner's own framing. A recommendation to migrate would exceed the idea
+    rather than fulfil it.
+- id: phase-expl-07
+  title: Websockets deep dive grounded in this repository's terminal stack
+  plan: doc-standalone-explorations-housekeeping
+  sources:
+  - doc-standalone-explorations-housekeeping
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Produce an owner-education deep dive on how websockets actually work, using the D-System terminal
+    stack as the study material because it exercises the full lifecycle end to end.
+  - 'Ground it in this repository''s real incidents: the lifecycle traces from the 2026-09-11 gate work,
+    000137''s 403-versus-close-frame distinction, FastAPI and uvicorn''s accept and close semantics, and
+    the PTY reaping the terminal work turned on.'
+  - Ship no product code. 000140 is explicitly not a build item.
+  acceptance:
+  - Every section is grounded in a named incident or file from this repository rather than in generic
+    material.
+  - The HTTP upgrade handshake, close codes, and what a pre-accept rejection looks like on the wire are
+    all covered, since 000140 names them.
+  - git diff shows no change to src/ or ts/.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: The worked examples are the phase. A generic websockets tutorial would fulfil none of what
+    000140 asks for.
