@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-08
 - phase-prog-09
 - phase-prog-10
 - phase-prog-11
@@ -10441,3 +10440,351 @@ items:
   - docs/08-governance/
   next_action: Depends on a phase in P4, not in this programme. Confirm phase-agx-07 has shipped and been
     used before starting - a revisit against an unused mechanism has no evidence to weigh.
+- id: phase-ret-01
+  title: Build retrieval-failure collection and seed it from the session corpus
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Build a defined way to record a retrieval failure: what was sought, where it was looked for, and
+    whether it existed. The third field is what separates a retrieval failure from a question with no
+    answer.'
+  - Do not instrument tools/load_context.py as the collection mechanism. It queries only the memories
+    table, so it measures the one route that already works and misses grep, which is how retrieval actually
+    happens here.
+  - Sweep existing session records for retrieval failures already described in prose and seed the collection
+    from them, reporting a count.
+  acceptance:
+  - 'REQ-018 R01 holds: a recorded failure reads back with all three fields, including whether the thing
+    existed.'
+  - 'REQ-018 R02 holds: the sweep ran and produced a count. A collection starting empty leaves the gate
+    unreachable for as long as it takes to accumulate.'
+  - The mechanism is voluntary and cheap, in the manner of the log-anti-patterns skill, rather than automatic
+    instrumentation of a path that covers one table.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/
+  - docs/08-governance/
+  - brain/
+  next_action: Claim this first. It unblocks phase-ret-02, which releases four deferred phases in PLAN-001,
+    and it produces the corpus R14 measures the eventual mechanism against.
+- id: phase-ret-02
+  title: Re-specify the gate with a threshold and expiry, and re-rule the deferred phases
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-ret-01
+  scope:
+  - Restate the gate on phase-mem-15, -16, -18 and -19 with a number and a review date, replacing the
+    recorded retrieval failures, which has no threshold and therefore cannot be met.
+  - 'State what happens in both outcomes: threshold met, or review date passed with fewer. Wait longer
+    is not a ruling.'
+  - Write the ADR. This changes the release condition on four phases belonging to PLAN-001, and a reader
+    finding them move needs to know the gate was deliberately restated rather than quietly dropped.
+  - Act on G26 here rather than creating phases beside the phase-mem line - 000004 enumerates those four
+    phases by id in its own body.
+  acceptance:
+  - 'REQ-018 R03 holds: the restated gate carries a number and a date, and all four phases'' next_action
+    fields cite it.'
+  - 'REQ-018 R04 holds: both outcomes are ruled, including what happens if the failures do not materialise.'
+  - No new phase duplicates phase-mem-15, -16, -18 or -19.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/09-backlog/backlog.yaml
+  - docs/04-decisions/
+  next_action: The threshold is a guess made before the data exists. That is fine; the expiry is what
+    stops a wrong guess parking the work a second time.
+- id: phase-ret-03
+  title: State the prioritised search order and its conflict rule
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - State the order of places to look, naming for each source what it is authoritative for - code for
+    what exists, plans for intent that may never have been built, ADRs for why a choice was made and what
+    was rejected, session records for contemporaneous narrative, the ideas log for what is explicitly
+    not yet decided, brain/ memories, and the generated catalog.
+  - State what to do when two sources disagree. 000002's observation is that they disagree in predictable
+    ways; an order that ranks without resolving has not used it.
+  acceptance:
+  - 'REQ-018 R05 holds: one entry per source, each saying what that source is true about rather than only
+    where it ranks.'
+  - 'REQ-018 R06 holds: a conflict rule exists and is applied to at least one real disagreement in the
+    corpus.'
+  - The order is written so an agent can follow it without further judgement about which source wins.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  next_action: Better after P1 lands. The order must rank the ideas log among its sources, and P1 gives
+    that log the classification to rank by.
+- id: phase-ret-04
+  title: Design deterministic search across the surfaces
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ret-03
+  scope:
+  - Design a family of deterministic search algorithms across _data/ideas.jsonl, docs/09-backlog/backlog.yaml,
+    docs/05-memories/, the governed document corpus and session records.
+  - Keep it deterministic. 000040 states in its own text that it is not semantic or vector search, and
+    a design that reaches for embeddings when exact matching gets hard has become G26's work under G25's
+    name.
+  - Build on phase-ret-03's stated order rather than inventing a second ranking.
+  acceptance:
+  - 'REQ-018 R07 holds: the design names its method and contains no vector or embedding mechanism.'
+  - The design consumes the prioritised search order rather than restating or contradicting it.
+  - It is tested against real queries from the collected failures, not against queries written to suit
+    it.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - tools/
+  - test/
+  next_action: Read 000040's own text first. The deterministic boundary is the whole point of the idea
+    and is the easiest thing to erode mid-design.
+- id: phase-ret-05
+  title: Revisit ADR-001 on a queryable document projection
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Revisit ADR-001's decision that governance metadata needs no DuckDB table, DDL migration or API model
+    - explicitly the exception to the entity schema to DDL to model workflow.
+  - Engage its stated reason, that governance metadata is development tooling rather than a business entity,
+    instead of routing around it.
+  - Either reaffirm it, which is a complete outcome, or supersede it and mark ADR-001 superseded in the
+    same change.
+  acceptance:
+  - 'REQ-018 R08 holds: the revisit engages ADR-001''s stated reason, and if superseded, ADR-001 is marked
+    so in the same change.'
+  - Reaffirming ADR-001 closes this phase fully - 000043 then proceeds without a projection, or does not
+    proceed.
+  - Governance exits 0, which rejects a supersedes target not marked superseded.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/04-decisions/ADR-001-file-based-governance.md
+  - docs/04-decisions/
+  next_action: Sized ahead of the surveys deliberately. Surveying documentation-database tooling while
+    the governing decision still forbids the projection surveys something that cannot be built.
+- id: phase-ret-06
+  title: Survey structured, graph and vector retrieval for the documentation corpus
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ret-05
+  scope:
+  - 'Run all three surveys for the documentation corpus: structured front matter (000043), graph tooling
+    (000044) and vector tooling (000045).'
+  - For each, name a candidate mechanism, what it would cost, and what questions it would and would not
+    answer for this corpus specifically.
+  - Do not decide here. The decision is phase-ret-07's and must come from all three together.
+  acceptance:
+  - 'REQ-018 R09 holds: three surveys exist, each naming a candidate mechanism with its cost and its coverage.'
+  - No survey concludes with a recommendation that pre-empts phase-ret-07's decision.
+  - The graph survey addresses the documentation corpus, not code structure, which is phase-ret-08's.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  - docs/07-architecture/
+  next_action: Three surveys is the work of this phase and not more. Keeping them separate from the decision
+    is what keeps G28 whole.
+- id: phase-ret-07
+  title: Decide the documentation-retrieval mechanism from all three surveys
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ret-06
+  scope:
+  - Make one decision for the documentation corpus, citing all three surveys. 000045's own body records
+    that the three were deliberately split so one decision could be made from all of them together.
+  - Write the ADR. Choosing structured, graph or vector for this corpus is a standing architectural commitment
+    and either supersedes ADR-001 or is constrained by it.
+  - Measure the chosen mechanism against the failures collected in phase-ret-01, not against constructed
+    queries.
+  acceptance:
+  - 'REQ-018 R10 holds: the decision cites all three surveys. A decision citing one has not used the companion
+    set.'
+  - 'REQ-018 R14 holds: the mechanism is evaluated against the recorded failure corpus and the number
+    it now answers is reported.'
+  - An ADR records the decision and its relationship to ADR-001.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/04-decisions/
+  - docs/07-architecture/
+  next_action: Audit 2 caught a silent split of this set once already. Claiming this phase on fewer than
+    three surveys repeats that error with a different mechanism.
+- id: phase-ret-08
+  title: Evaluate a code-graph tool against this repository's code
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Evaluate a code-graph retrieval tool against this repository's actual code - functions, classes and
+    imports - and record what it answered.
+  - 'Start from a successor rather than the tool 000005 names. The owner''s ruling of 2026-09-13 kept
+    the idea and rescoped it: tool dead, KuzuDB archived, question alive.'
+  - 'Keep the corpus distinct from phase-ret-06''s: this is code structure, that is documentation.'
+  acceptance:
+  - 'REQ-018 R11 holds: the tool ran over this repository''s code and what it answered is recorded.'
+  - The evaluation names questions it answered that grep and the deterministic design could not, or states
+    plainly that it found none.
+  - The corpus is code, not documentation, which is what distinguishes this from the G28 surveys.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Confirm the successor tool exists and is maintained before planning around it. 000005's
+    named tool is archived and the ruling that kept the idea says any evaluation starts from a successor.
+- id: phase-ret-09
+  title: Detect memory staleness and contradiction, and track confidence
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Detect staleness and contradiction across memory content, and track confidence in a memory over time.
+  - Make confidence change on evidence rather than being set once at write time.
+  - Cover docs/05-memories/ and brain/, which are the two memory surfaces this repository actually writes
+    to.
+  acceptance:
+  - 'REQ-018 R12 holds: a memory contradicting an existing one is surfaced, and a confidence value exists
+    and moves on evidence.'
+  - Staleness is detected against what a memory describes rather than against its age, consistent with
+    the same ruling in phase-dgov-02.
+  - Existing memories are not rewritten by the detection pass - findings are recorded, not applied.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - brain/
+  - docs/05-memories/
+  - src/
+  next_action: 000060 is the content lifecycle and is deliberately distinct from the retrieval-mechanism
+    cluster. Do not fold it into how search works.
+- id: phase-ret-10
+  title: Record provenance behind every memory, report and recommendation
+  plan: doc-retrieval-knowledge-infrastructure
+  sources:
+  - doc-retrieval-knowledge-infrastructure-requirements
+  - doc-retrieval-knowledge-infrastructure
+  systems:
+  - sys-retrieval
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-ret-09
+  scope:
+  - 'Record the sources behind every memory, generated report, recommendation, context pack and dashboard
+    metric: the source file or event and its anchor, the query or prompt that produced it, the model and
+    tool versions involved, and any human decision made about it.'
+  - 000032 unifies what two source agents proposed separately as a provenance manifest and a claim registry;
+    keep them one capability rather than re-splitting them.
+  - Make the human-decision field distinguish an agent's inference from an owner's ruling.
+  acceptance:
+  - 'REQ-018 R13 holds: a memory, a report and a recommendation each read back with all four provenance
+    elements.'
+  - The human-decision field distinguishes an inference from a ruling, which is what makes the record
+    a trust layer rather than a log.
+  - Provenance is recorded at write time rather than reconstructed afterwards.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - brain/
+  - schemas/
+  - src/
+  next_action: This is 000029's trust layer over 000060's lifecycle. Sized after phase-ret-09 because
+    confidence needs something to attach to.
