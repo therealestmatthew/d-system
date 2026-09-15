@@ -8050,7 +8050,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  agent: agent-arch
+  status: active
   priority: 1
   session_budget: 1
   depends_on: []
