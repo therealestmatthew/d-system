@@ -26,8 +26,8 @@ settling the names would have meant naming them twice.
 
 **13 ideas across 8 fine groups**, from the accepted partition of 2026-09-13, **plus `000233`**
 (panel maximize), raised on 2026-09-14 and ruled into `G43` below. This plan turns them into **17
-phases** under the `phase-arch-*` prefix, plus `phase-arch-00`, which is owner-directed enabling work
-rather than an idea of the partition's — **18 in total**, governed by
+phases** under the `phase-arch-*` prefix, plus `phase-arch-00` and `phase-arch-18`, which are
+owner-directed enabling work rather than ideas of the partition's — **19 in total**, governed by
 [REQ-011](../06-requirements/REQ-011-workbench-architecture-quality.md).
 
 | Group | Ideas | What it covers | Phases |
@@ -57,15 +57,22 @@ teaches the next reader something false.
 
 ## The chosen design
 
-Five decisions shape the eighteen phases. Four were open in the placeholder; the fifth rules on an
+Five decisions shape the nineteen phases. Four were open in the placeholder; the fifth rules on an
 idea raised after it.
 
-`phase-arch-00` sits outside all five. It is not an idea from the partition and belongs to no group:
+`phase-arch-00` and `phase-arch-18` sit outside all five. It is not an idea from the partition and belongs to no group:
 the owner directed on 2026-09-14 that `sys-ui` be decomposed alongside the start of the track,
 because `sys-ui` is declared by 14 of the 17 and the validator treats a shared system as a collision,
 so the track would otherwise execute almost entirely serially. It gates nothing and runs concurrently
 with `phase-arch-01`. Measured rather than assumed — see *Execution order* below. Recorded as
 `000234`.
+
+The two were split on 2026-09-14 after measuring what retiring `sys-ui` actually costs: **33 governed
+documents and 28 backlog phases** declare it, 13 of them `complete` and one of them an active peer's
+claim. `phase-arch-00` therefore only *adds* the narrower ids and redeclares the queued
+`phase-arch-*` phases, which is what lifts the ceiling; `phase-arch-18` retires the coarse id once no
+peer holds it. Retiring it inside one session would have required editing an active claim, which
+`AGENTS.md` forbids.
 
 ### 1. The vocabulary ships as concept memories, not as a new document
 
@@ -154,7 +161,7 @@ work under the programme that would ship it sooner.
 
 ## Implementation phases
 
-Eighteen phases under `phase-arch-*`, registered in
+Nineteen phases under `phase-arch-*`, registered in
 [the backlog index](../09-backlog/README.md).
 
 **Two phases are first, and neither waits on the other.** `phase-arch-00` and `phase-arch-01` both
@@ -183,6 +190,7 @@ execution.
 | `phase-arch-15` | Design and ship caching with mtime-keyed invalidation | `G46` | `14` |
 | `phase-arch-16` | Terminal persistence and performance audit across three shells | `G47` | — |
 | `phase-arch-17` | Panel maximize and collapse on the slot model | `G43` | `07`, `09` |
+| `phase-arch-18` | Retire `sys-ui` across the document and phase corpus | — | `00` |
 
 ### Sizing against the partition
 
@@ -268,7 +276,7 @@ Every row of `REQ-011` maps to at least one phase, and every phase carries at le
 | R26 Zero scroll and fill assertions hold maximized and collapsed | `phase-arch-17` |
 | R27 Maximize is transient and never persisted | `phase-arch-17` |
 | R28 A maximized shell keeps its PTY session | `phase-arch-17` |
-| R29 The frontend lock table admits two independent phases | `phase-arch-00` |
+| R29 The frontend lock table admits two independent phases | `phase-arch-00` (seams), `phase-arch-18` (retirement) |
 
 ## What P11 depends on
 

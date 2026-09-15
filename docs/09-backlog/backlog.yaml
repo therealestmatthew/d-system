@@ -7973,25 +7973,66 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Split sys-ui in docs/08-governance/systems.yaml along seams observed in the code, not
-    along wished-for boundaries. Candidate seams are the layout and slot engine, the panel
-    implementations under ts/src/stage, the notes strip and rotator, and the explorer panels.
-  - Redeclare every phase-arch-* phase's systems against the narrower ids, and retire the
-    coarse sys-ui id rather than leaving it as a third alias.
+  - Add narrower system ids to docs/08-governance/systems.yaml along seams observed in the
+    code, not along wished-for boundaries. Candidate seams are the layout and slot engine, the
+    panel implementations under ts/src/stage, the notes strip and rotator, and the explorer
+    panels.
+  - Redeclare the systems of the queued phase-arch-* phases only, against the narrower ids.
+    Leave sys-ui in place as a valid id; retiring it is phase-arch-18's work and cannot happen
+    while any peer holds a claim declaring it.
   - Narrow the deliverable paths that collide phases for no real reason - docs/00-working/
     collides phase-arch-11, 14 and 16 with each other, and ts/src/stage/ collides phase-arch-08
     with 09 and phase-arch-13 with 17.
   - Record the counter-consideration in the change - a finer lock table admits more genuine
     conflicts that the coarse lock was accidentally preventing.
+  - Touch no phase outside phase-arch-*, and no phase that is active or complete.
   acceptance:
-  - REQ-011 R29 holds - running src.governance.backlog.collisions() over the phase-arch-* set
-    shows a concurrency ceiling above 2.
+  - REQ-011 R29's first half holds - running src.governance.backlog.collisions() over the
+    phase-arch-* set shows a concurrency ceiling above 2.
   - Every new system id names a surface that exists in the tree today.
-  - The governance check exits 0 with sys-ui retired and every phase redeclared.
+  - The governance check exits 0 with the new ids registered and the queued phase-arch-* phases
+    redeclared.
+  - No phase outside phase-arch-* is modified, and no active or complete phase is modified.
   verification:
   - uv run python -m src.governance
   - uv run pytest
   deliverables:
   - docs/08-governance/systems.yaml
-  next_action: Measure the current ceiling first with collisions() over all seventeen phases,
-    so the split is argued against a number rather than an impression.
+  - docs/09-backlog/backlog.yaml
+  next_action: Measure the current ceiling first with collisions() over the seventeen
+    idea-derived phases, so the split is argued against a number rather than an impression.
+- id: phase-arch-18
+  title: Retire sys-ui across the document and phase corpus
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-arch-00
+  scope:
+  - Replace sys-ui with the narrower ids phase-arch-00 introduced, everywhere it is still
+    declared - 33 governed documents and 28 backlog phases as measured on 2026-09-14 - then
+    retire sys-ui so it cannot be declared again.
+  - Leave complete phases' declarations alone unless the governance check rejects them; a
+    historical phase's systems record what it locked at the time, and rewriting it rewrites
+    the record.
+  - Run only when no active claim declares sys-ui. A peer holding it makes this phase
+    unrunnable, not merely awkward.
+  acceptance:
+  - REQ-011 R29's retirement clause holds - sys-ui is retired and is not left as a third alias.
+  - The governance check exits 0 with no document or phase declaring a system id that no longer
+    exists.
+  - No active phase's declarations were edited.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/systems.yaml
+  - docs/09-backlog/backlog.yaml
+  next_action: Enumerate every declaration site first with a grep over docs/ and brain/ plus a
+    pass over backlog.yaml, and check the active-claims table before touching anything.
