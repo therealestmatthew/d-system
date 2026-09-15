@@ -41,11 +41,22 @@ $ grep -in "interaction\|decision\|waiting\|development_event" tools/rebuild_db.
 209: for path in _glob(entities / "interactions", "*.json"):
 ```
 
-All four tables exist, and `tools/rebuild_db.py` loads all four. The data directories exist and are
-empty, which `source_validation.py` explicitly permits: *"A directory that does not exist yet is not
-an error; the capture pipeline creates them as records appear."*
+All four tables exist, and `tools/rebuild_db.py` loads all four — so the schema-validated-with-no-
+table-behind-it drift is gone.
 
-**What remains of `000024` is documentation drift in `CLAUDE.md`, and it is wider than the idea
+The data directories, by contrast, **still do not exist**, and that is designed rather than drifted:
+
+```
+$ ls _data/
+commitments  ideas.jsonl  people  projects  tags.json  tasks  workbench
+```
+
+`source_validation.py:170` is `if not source.is_dir(): continue`, and the comment above
+`ENTITY_DIRECTORIES` states the intent: *"A directory that does not exist yet is not an error; the
+capture pipeline creates them as records appear."* A missing directory and an empty one are handled
+identically, so this half of `000024` needs no fix.
+
+**What remains as a real gap is documentation drift in `CLAUDE.md`, and it is wider than the idea
 states.** `CLAUDE.md` names four schema files and seven DDL tables. `schemas/` holds twenty
 definitions and `sql/001_schema.sql` creates sixteen tables. So the file under-describes the schema
 layer by more than the four entities `000024` counted.
@@ -81,7 +92,7 @@ is, and `P8` governs code and contract hygiene.
 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
-| R01 | `000024`'s current state is recorded against the repository: which of its three claims still hold and which closed. | Read the record against `sql/001_schema.sql`, `tools/rebuild_db.py` and `_data/`. Confirm it states that the DDL and loader gaps closed, rather than repeating the idea's original framing. |
+| R01 | `000024`'s current state is recorded against the repository: which of its three claims still hold and which closed, each verified by a command whose output distinguishes the cases. | Read the record against `sql/001_schema.sql`, `tools/rebuild_db.py` and `_data/`. Confirm the DDL and loader claims are recorded as closed, and the data-directory claim as still true but not a defect. Confirm the directory check distinguishes *absent* from *empty* — `ls _data/x 2>/dev/null \| wc -l` returns `0` for both and settles neither. |
 | R02 | The `CLAUDE.md` correction is written out as proposed text for the owner, and not applied by an agent. | Confirm the phase's diff contains no `CLAUDE.md` edit. `AGENTS.md` and `CLAUDE.md` are owner-only; the deliverable is exact replacement wording. |
 | R03 | A check fails when `CLAUDE.md`'s stated tables or schema files diverge from `sql/001_schema.sql` and `schemas/`. | Add a table to the DDL without updating `CLAUDE.md` and confirm the check fails and names the divergence. Confirm it passes once the text matches. This is the mechanism `000024`'s drift went unnoticed for want of. |
 | R04 | `000035`'s contract compiler is decided against recorded drift evidence, not against its own proposal. | Read the decision for the drift instances it weighs. Confirm it counts what `R03`'s check has actually caught since shipping. A decision to build made with zero recorded recurrences has not used evidence. |

@@ -7664,7 +7664,7 @@ items:
   systems:
   - sys-contracts
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7689,6 +7689,32 @@ items:
   - docs/09-backlog/README.md
   next_action: Choose between 000024 and 000035 first. They are very different amounts
     of work for the same symptom and the sizing is meaningless until one is picked.
+  session: doc-session-schema-consistency-testing-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-035-schema-consistency-testing.md
+  - docs/06-requirements/REQ-020-schema-consistency-testing.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-09-schema-consistency-testing-plan.md
+  result: >-
+    Finalized P8. Ruled the scope's central question toward 000024 rather than 000035's contract
+    compiler: the compiler's stated motivation was the drift 000024 found, and that drift closed
+    through ordinary work - all four DDL tables and rebuild_db loaders now exist. Building it now
+    would be a machine to prevent a defect class whose only recorded instance already healed, so
+    phase-sch-01 ships a cheap check instead and phase-sch-02 decides the compiler later against what
+    that check catches, with R04 forbidding a decision made from the proposal's own persuasiveness.
+    What survives of 000024 is CLAUDE.md drift, wider than the idea counted - four schema files named
+    against twenty present, seven tables against sixteen created - and CLAUDE.md is owner-only, so the
+    phase proposes replacement text and stops, with R02 making the absence of a CLAUDE.md edit
+    checkable. Verified G36 delivered before recording it so: schema present, 21 substantive tests
+    passing, idea already discarded, and no phase sizes it. Wrote REQ-020 with twelve rows and
+    registered six phases under phase-sch-*, five queued and one deferred. Verification green -
+    governance exits 0 at 243 documents and 248 phases, --ready shows three, and 580 tests pass. The
+    independent review confirmed all four conditions and caught a real error: the plan and requirement
+    asserted the four entity directories exist and are empty when they do not exist at all, from a
+    check whose output could not distinguish absent from empty. Corrected in the plan, the
+    requirement, R01, phase-sch-01's scope and this record, and recorded as the
+    a-check-that-cannot-fail-is-not-a-check anti-pattern.
+
 - id: phase-prog-11
   title: Finalize the HTML generation and design system plan (P9)
   plan: doc-html-generation-design-system
@@ -11009,9 +11035,12 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - 'Record what remains of 000024 against the repository: the DDL tables and rebuild_db loaders for interactions,
-    decisions, waiting_on and development_events all exist now, and empty entity directories are permitted
-    by source_validation.py''s own comment. Only the CLAUDE.md gap survives.'
+  - 'Record what remains of 000024 against the repository, verifying each of its three claims with a
+    command whose output distinguishes the cases. The DDL tables and rebuild_db loaders for
+    interactions, decisions, waiting_on and development_events all exist now. The four _data/
+    directories still do not exist, which source_validation.py line 170 treats identically to empty
+    and its own comment permits - so that claim is true but is not a defect. Only the CLAUDE.md gap
+    needs fixing.'
   - 'Write the CLAUDE.md correction as proposed replacement text for the owner and stop. No agent edits
     CLAUDE.md for any reason - the drift is wider than 000024 counted: four schema files named against
     twenty present, seven tables named against sixteen created.'

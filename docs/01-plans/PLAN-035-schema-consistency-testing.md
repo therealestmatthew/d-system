@@ -50,7 +50,7 @@ having misled three analysts in the partition sweep itself.
 **`G36` gets no implementation phase**, and the reason is recorded with the evidence above rather than
 asserted.
 
-### `G33`'s concrete drift is mostly closed, which reshapes the group
+### `G33`'s drift is closed; two other halves of `000024` survive
 
 `000024` reports four entities mapped in `ENTITY_DIRECTORIES` with "no DDL table, no data directory,
 and no CLAUDE.md mention". Checked, claim by claim:
@@ -65,16 +65,29 @@ $ grep -in "interaction\|decision\|waiting\|development_event" tools/rebuild_db.
 209: for path in _glob(entities / "interactions", "*.json"):
 ```
 
-- **No DDL table — now false.** All four exist.
-- **No data directory — now false, and never an error.** All four exist and are empty, which
-  `source_validation.py` explicitly permits: *"A directory that does not exist yet is not an error;
-  the capture pipeline creates them as records appear."*
+- **No DDL table — now false.** All four exist, and `tools/rebuild_db.py` loads all four.
+- **No data directory — still true, and deliberately not a defect.** None of `_data/interactions`,
+  `_data/decisions`, `_data/waiting-on` or `_data/development-events` exists:
+
+  ```
+  $ ls _data/
+  commitments  ideas.jsonl  people  projects  tags.json  tasks  workbench
+  ```
+
+  `source_validation.py:170` reads `if not source.is_dir(): continue`, and the comment above
+  `ENTITY_DIRECTORIES` states the intent: *"A directory that does not exist yet is not an error; the
+  capture pipeline creates them as records appear."* A missing directory and an empty one are
+  treated identically, so this half of `000024` describes designed behaviour rather than drift.
 - **No `CLAUDE.md` mention — still true, and wider than stated.** `CLAUDE.md` names four schema files
   and seven DDL tables. `schemas/` holds twenty definitions; `sql/001_schema.sql` creates sixteen
   tables.
 
-So the drift `000024` identified closed through ordinary work, and what survives is documentation
-drift — in a file no agent may edit.
+**So one of `000024`'s three claims closed, one is designed behaviour, and one is a real remaining
+gap.** The claim that closed is the one `000035`'s compiler was proposed to prevent.
+
+So the *drift* `000024` identified — schema validated with no table behind it — closed through
+ordinary work. What survives is one benign absence and one real documentation gap, the latter in a
+file no agent may edit.
 
 ## The chosen design
 
@@ -188,7 +201,7 @@ Group ranges were `G33` 2–3, `G34` 2, `G35` `<1`, `G36` 0 — 4–5 total. Thi
 at 2, `G34` at **3**, `G35` at 1, `G36` at 0.
 
 `G34`'s extra phase is decision 3 — `000001` gets its own `deferred` phase rather than being folded or
-dropped. `G33` lands at the bottom of its range because half of `000024` turned out to be done.
+dropped. `G33` lands at the bottom of its range because the drift half of `000024` turned out to be done.
 `G36` at zero is the acceptance condition, and is the only group in this programme whose partition
 sizing was already correct.
 
@@ -236,8 +249,10 @@ Every row of `REQ-020` maps to at least one phase, and every phase carries at le
   from scratch and do not size it.
 - **`000024`'s DDL and loader gaps are closed.** All four tables exist and `rebuild_db.py` loads them.
   Only the `CLAUDE.md` half survives.
-- **Empty entity directories are not a defect.** `source_validation.py` says so in a comment at the
-  point it would otherwise be one.
+- **The four entity directories do not exist, and that is not a defect.** `source_validation.py:170`
+  skips a directory that is not there, and the comment above `ENTITY_DIRECTORIES` says so explicitly.
+  Do not "fix" this by creating empty directories; the capture pipeline creates them as records
+  appear.
 - **`CLAUDE.md` under-describes the schema layer by more than `000024` counted** — four schema files
   named against twenty present, seven tables named against sixteen created.
 - **The overview has determinism tests but no drift test.** They are different assertions; do not read

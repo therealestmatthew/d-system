@@ -61,7 +61,7 @@ $ uv run pytest test/test_workbench_layout_schema.py -q
 21 passed, 2 warnings
 ```
 
-**`G33`'s concrete drift — mostly closed.**
+**`G33`'s drift — closed. Its other two claims — not.**
 
 ```
 $ grep -in "create table" sql/001_schema.sql
@@ -75,10 +75,24 @@ $ ls schemas/ | wc -l          →  20
 $ grep -c "^CREATE TABLE" sql/001_schema.sql  →  16
 ```
 
-`000024` claims no DDL table, no data directory, and no `CLAUDE.md` mention for four entities. The
-first two are now false; the four directories exist and are empty, which `source_validation.py`
-explicitly permits. The third is true and wider than stated — `CLAUDE.md` names four schema files
-against twenty present, and seven tables against sixteen created.
+```
+$ ls _data/
+commitments  ideas.jsonl  people  projects  tags.json  tasks  workbench
+```
+
+`000024` claims no DDL table, no data directory, and no `CLAUDE.md` mention for four entities.
+
+- **DDL table — now false.** All four tables exist and `rebuild_db.py` loads all four. This is the
+  claim that closed, and it is the one `000035`'s compiler was proposed to prevent.
+- **Data directory — still true, and not a defect.** None of the four exists, as the `ls` above
+  shows. `source_validation.py:170` is `if not source.is_dir(): continue`, and its comment permits
+  exactly this: *"A directory that does not exist yet is not an error."* Missing and empty are
+  handled identically.
+- **`CLAUDE.md` mention — still true, and wider than stated.** Four schema files named against twenty
+  present; seven tables against sixteen created.
+
+The first version of this record said the directories "exist and are empty". They do not exist. See
+`## Corrections` — the check I ran could not tell the two apart.
 
 **`G34`'s gap — confirmed open.**
 
@@ -110,9 +124,71 @@ lacks.
 
 ## Backlog
 
-`phase-prog-10` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-10` is `status: complete`, `agent: agent-night`,
+`session: doc-session-schema-consistency-testing-plan`. Completion evidence is `PLAN-035`, `REQ-020`,
+`docs/09-backlog/README.md` and this record. Written under the owner's advance authority for this
+batch, after the read-only independent review below confirmed all four conditions.
 
 Six phases added under `phase-sch-*`: five `queued`, one `deferred` with a gate. None claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-10`, told explicitly
+that earlier phases in this batch had found stale premises and that its highest-value job was
+checking whether *this* phase's "already fixed" findings were right **in both directions** — because
+work wrongly declared done would be dropped. That framing found the error below.
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 243 documents, 25 memories, 248 backlog phases
+EXIT:0
+
+$ uv run pytest          →  580 passed
+$ ruff check             →  all checks passed
+$ mypy src/              →  no issues
+$ --catalog vs committed →  zero diff, exit 0
+```
+
+**All four conditions Met.** Coverage checked in both directions against `backlog.yaml` and `REQ-020`
+directly. `G36` re-verified by running the tests: "The 21 tests are substantive (schema validation,
+W06 eligibility invariants, malformed-input rejection), not vacuous." `000098` confirmed `discarded`
+through `fold()`. The `next_up` diff: "exactly one removed line… and one region of pure additions. No
+pre-existing phase was touched." And the explicitly requested check: `git diff` for `CLAUDE.md` and
+`AGENTS.md` is empty.
+
+**One major finding, and it was mine.**
+
+> "`PLAN-035:69` and `REQ-020:44-45` both assert, in the section whose entire purpose is 'checked
+> against the repository, not restated from the idea': *'No data directory — now false, and never an
+> error. All four exist and are empty'*… None of `_data/interactions`, `_data/decisions`,
+> `_data/waiting-on`, `_data/development-events` exist on disk — not 'exist and are empty,' they are
+> simply absent. This is exactly idea `000024`'s original claim, which the plan and requirement both
+> declare 'now false.' It is not false; it is still literally true today."
+
+And the part that matters most:
+
+> "Neither the session record nor the diff shows a command that actually verified this claim… unlike
+> the DDL-table and loader claims, which were genuinely checked and are correct… it is a fabricated
+> verification result sitting in a governance-tracked requirement document whose stated authority is
+> 'checked, not assumed'."
+
+It also spotted that `R01` was positioned to let the error propagate: the row "only mentions the
+DDL/loader half — it never asks `phase-sch-01` to re-verify the data-directory claim". **All of it
+corrected** — see `## Corrections`, including `R01`'s widening and the command shape that caused it.
+
+The reviewer judged the functional impact near-zero, since `source_validation.py` treats missing and
+empty identically, and confirmed the `G33` ruling survives: "defensible on the evidence, not pretext
+— the DDL/loader drift genuinely closed without the compiler, `phase-sch-02` is explicitly gated…
+rather than skipped, and `R04`/`R05` set an evidentiary bar for the eventual decision rather than
+presupposing 'decline.'"
+
+**Everything else held**, each checked rather than accepted: the four counts (20 schema files, 16
+tables, against `CLAUDE.md`'s 4 and 7), `000026`'s CI gap, `000106`'s determinism-versus-drift
+distinction — "real, not a quibble" — the `source_validation.py` comment verbatim, all six phases
+carrying acceptance and verification, `phase-sch-06`'s `resume_when` and `blocked_reason`, README
+registration, and `backlog.yaml` parsing at 248 items with no anchors. It also confirmed
+`000035`, `000052`, `000001`, `000026`, `000057` and `000106` all remain `triaged` — "none were
+incorrectly treated as resolved.
 
 ## Decisions
 
@@ -143,6 +219,40 @@ one shape for "committed artifact matches a regeneration"; a second shape for th
 maintenance cost with no benefit.
 
 ## Corrections
+
+**I asserted a verification result I never produced, in a document whose stated authority is that
+its claims are checked.** `PLAN-035` and `REQ-020` both said the four entity directories "exist and
+are empty". They do not exist at all:
+
+```
+$ ls _data/
+commitments  ideas.jsonl  people  projects  tags.json  tasks  workbench
+```
+
+The cause is that my check could not fail. I ran:
+
+```
+for d in interactions decisions waiting-on development-events; do
+  printf "%-20s %s\n" "$d" "$(ls _data/$d 2>/dev/null | wc -l || echo MISSING)"
+done
+```
+
+Every line printed `0`, and I read that as "exists, empty". But `ls` wrote its error to `/dev/null`
+and `wc -l` counted zero lines of empty input, so `0` means *absent or empty* and distinguishes
+neither. The `|| echo MISSING` never fired because `wc` succeeded. This is the anti-pattern this
+repository already has a procedure for by name —
+`brain/procedures/a-check-that-cannot-fail-is-not-a-check.md` — and I wrote the claim into a governed
+requirement anyway.
+
+Found by the independent review, not by me. Corrected in three places: `PLAN-035`'s claim-by-claim
+breakdown now records the directories as absent and explains why that is designed rather than
+drifted; `REQ-020`'s narrative says the same; and `R01` now requires the directory check to
+*distinguish absent from empty*, naming the exact command shape that fails to. `phase-sch-01`'s
+scope carries the correction too, so the error cannot propagate into its record.
+
+The ruling this sat under is unaffected. `G33`'s commitment to `000024` rests on the DDL and loader
+drift having closed, which was genuinely checked and is correct. What changed is the count: one of
+`000024`'s three claims closed, one is designed behaviour, one is a real gap — not "half done".
 
 **I miscounted the schema files before measuring them.** The requirement first said `schemas/` holds
 nineteen definitions; `ls schemas/ | wc -l` returns twenty. Corrected before the plan was written.
