@@ -12,10 +12,14 @@ const SEARCH_URL = '/api/v1/workbench/search'
 // (`src/api/routes/workbench.py`, `phase-wb-01`) report paths only, never content (ADR-015), so
 // this is what actually fetches the bytes an iframe can render.
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
-// REQ-007 W07: "the compatible files (.html and .svg)". Exported so the File Browser's
-// right-click context menu (`FileBrowserRegion.tsx`, REQ-007 W09) can hide "Open in HTML Viewer"
-// on an incompatible entry using this same list rather than a second, hand-kept copy of it.
-export const COMPATIBLE_EXTENSIONS = ['.html', '.svg']
+// The compatible files: `.html`/`.svg`, which this panel renders directly, plus the six raster/
+// vector image formats `serveRepositoryFiles` (`ts/vite.config.ts`'s `CONTENT_TYPE_BY_EXTENSION`)
+// already serves with correct image MIME types — an image needs no render step in the iframe, so
+// widening this list to include them was the only change idea 000232 required (no backend or
+// vite.config change). Exported so the File Browser's right-click context menu
+// (`FileBrowserRegion.tsx`, REQ-007 W09) can hide "Open in HTML Viewer" on an incompatible entry
+// using this same list rather than a second, hand-kept copy of it.
+export const COMPATIBLE_EXTENSIONS = ['.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico']
 
 // REQ-007 W08: "tabs exactly like the terminal's session tabs" — mirrors `TerminalRegion`'s own
 // `MAX_SESSIONS`/`FIRST_SESSION_ID` constants and cap, one tab bar per panel instance.
@@ -125,9 +129,10 @@ function loadInitialTabs(schemaVersion: number | null): { tabs: ViewerTab[]; act
  * - Refresh: re-fetches the active tab's displayed page (a cache-busting query param on the
  *   iframe `src`, since a cached response would defeat the point of a manual refresh) and
  *   re-checks it still exists.
- * - The searchable file dropdown: every `.html`/`.svg` file found recursively under the active
- *   tab's searched directory (`GET /api/v1/workbench/search`), filtered client-side by the active
- *   tab's search text as the user types.
+ * - The searchable file dropdown: every compatible file (`COMPATIBLE_EXTENSIONS` above — `.html`,
+ *   `.svg`, and the six served image formats) found recursively under the active tab's searched
+ *   directory (`GET /api/v1/workbench/search`), filtered client-side by the active tab's search
+ *   text as the user types.
  * - The directory-change button: opens `DirectoryPickerDialog`, an in-app dialog fed by the
  *   one-level listing route (`GET /api/v1/workbench/list`) — repository-relative paths only —
  *   changing the active tab's directory.
@@ -471,14 +476,17 @@ export default function HtmlViewerRegion() {
             // `sandbox=""` (no tokens, i.e. every restriction applied — no scripts, no
             // same-origin access, no top navigation, no forms/popups): unlike
             // `OverviewRegion`'s iframe, which always embeds one fixed repo-generated page, this
-            // panel embeds whatever `.html`/`.svg` the workbench search/listing routes turn up
-            // anywhere non-ignored in the repository (REQ-007 W07) — a script inside any of
-            // those, served same-origin via `/workbench-file/...`, would otherwise run with the
-            // app's own privileges: read/write its `localStorage` (the ADR-016 selections key),
-            // reach `window.parent`, or make same-origin fetches to workbench routes including
-            // `POST /api/v1/workbench/reveal` (which spawns the OS opener). The generated
-            // overview page this panel also renders (W04-W) has no `<script>` tags, so it
-            // renders unaffected by `sandbox` blocking script execution.
+            // panel embeds whatever compatible file (`COMPATIBLE_EXTENSIONS` above) the workbench
+            // search/listing routes turn up anywhere non-ignored in the repository — a script
+            // inside an `.html` or `.svg` among those, served same-origin via
+            // `/workbench-file/...`, would otherwise run with the app's own privileges: read/write
+            // its `localStorage` (the ADR-016 selections key), reach `window.parent`, or make
+            // same-origin fetches to workbench routes including `POST /api/v1/workbench/reveal`
+            // (which spawns the OS opener). The generated overview page this panel also renders
+            // (W04-W) has no `<script>` tags, so it renders unaffected by `sandbox` blocking
+            // script execution — and the six image formats in the list carry no script capability
+            // at all, so `sandbox` has nothing to neutralize there; it stays applied uniformly
+            // regardless of which compatible type is on screen.
             <iframe
               className="stage-overview__iframe"
               src={embedSrc ?? undefined}
