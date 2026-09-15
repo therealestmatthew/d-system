@@ -116,7 +116,8 @@ assignments naming slots that no longer exist.
 
 ## Verification
 
-All three of the phase's commands, run in the worktree after the rebase onto `dev`.
+All three of the phase's commands, run in the worktree after the final rebase onto `dev` — the run
+that decides whether the branch may integrate.
 
 `uv run python tools/generate_glossary.py`
 
@@ -127,31 +128,63 @@ wrote /code/d-system-worktrees/phase-arch-01/docs/08-governance/GLOSSARY.md — 
 `uv run pytest`
 
 ```
-580 passed, 2 warnings in 57.10s
+580 passed, 2 warnings in 41.69s
 ```
 
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 225 documents, 25 memories, 181 backlog phases
+Governance OK: 27 systems, 227 documents, 25 memories, 181 backlog phases
 ```
 
-The memory count moves 24 → 25; the document count is unchanged, which is the check that no second
-glossary document was created.
+The memory count moves 24 → 25. The document count reaching 227 is `dev`'s two session records plus
+this one, not a second glossary document — `GLOSSARY.md` is generated and uncatalogued, which is the
+check that `PLAN-028` design decision 1 was honoured.
 
-**The committed glossary was not stale.** The phase's verification note treats a dirty tree after
-regeneration as a result to report. Regenerating produced `231 insertions, 0 deletions` against the
-committed file — purely this session's new section, with nothing else drifting.
-
-The drift test's own gate, run directly:
-
-```
-/code/d-system-worktrees/phase-arch-01/docs/08-governance/GLOSSARY.md is current
-```
+`git status --porcelain` is empty after the regeneration above, so the committed glossary is not
+stale.
 
 All eleven terms grepped in the rendered glossary, lowest-frequency first: `template family` 2,
 `visible panel` 3, `generated page` 3, `region` 10, `panel type` 10, `assignment` 12, `overview` 16,
 `session` 30, `layout` 32, `slot` 52, `panel` 56. No term is absent.
+
+### The first post-rebase run failed, and what it found
+
+The green run above is the third. The first rebase produced `3 failed, 577 passed`, from two
+unrelated causes, both recorded here rather than retried until quiet.
+
+**Two were this session's error.** `test_committed_catalog_matches_regenerated_output` and
+`test_catalog_flag_writes_committed_file` failed because the session record is a governed document
+and the catalog was not regenerated when it was committed:
+
+```
+E  assert '# Documentat... session: 83.' == '# Documentat... session: 84.'
+E  - | SESS-2026-09-15-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-01-settle-workbench-vocabulary.md |
+```
+
+Fixed by regenerating the catalog in its own commit. The lesson is narrow and already encoded in the
+protocol: the catalog regeneration is forced by *any* governed document, not only by the claim.
+
+**One was inherited from `dev`.** `test_the_committed_markdown_matches_regenerated_output` failed on
+`dev` itself, independent of this branch: commit `2d861ca` added idea `000237` to
+`_data/ideas.jsonl` without regenerating `docs/00-working/ideas.md`.
+
+```
+E  AssertionError: docs/00-working/ideas.md is generated. Regenerate it with
+   tools/generate_ideas_md.py; do not edit it by hand.
+E  - - relates_to ← `000237`
+```
+
+Confirmed as `dev`'s rather than this branch's by reading `dev` directly — `git show
+dev:_data/ideas.jsonl` carried `000237` while `git show dev:docs/00-working/ideas.md` did not. It
+was not fixed here, on the owner's ruling: regenerating a peer's generated file inside this phase's
+diff would have hidden that `dev` was red when the peer integrated. It was fixed on `dev` by its
+owner (`2d9290f`), and this branch was rebased again onto the result.
+
+**The second rebase conflicted on `docs/08-governance/catalog.md`**, because `dev` had meanwhile
+added `SESS-2026-09-14-12` to the same generated file. Resolved by regenerating rather than by
+choosing a side — `--ours`/`--theirs` on a generated file silently drops whichever record it does
+not pick. Both session records are present in the committed catalog, and the document count is 227.
 
 ## Found wrong in the source material
 
