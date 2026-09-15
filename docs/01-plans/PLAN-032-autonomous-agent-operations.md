@@ -77,6 +77,22 @@ The cost accepted: the broker is the least immediately useful of the four, becau
 running unattended there is nothing to authorise. It will look like over-engineering for as long as
 the rest of the programme is unbuilt. That is the correct shape for a safety gate.
 
+**But the ordering does not force the broker's full policy up front, and that distinction matters.**
+Building it first means designing a capability taxonomy against zero real capability requests — the
+gateway and ledger are what would generate the requirements it authorises. So `phase-auto-01`'s
+design decides which of two shapes ships:
+
+- **A full policy broker** — the capability set, the approval path and the decision record all
+  specified up front, if the design can name the capabilities from what already exists.
+- **An enforcement point with a permissive default** — the tool-boundary mechanism and the refusal
+  path built and wired, with a policy that denies nothing until real requests exist to write it
+  against.
+
+Either satisfies `R01`, because both put a working refusal path ahead of every unattended component.
+The second is the honest choice if the design finds it is guessing at the taxonomy, and it preserves
+the gate without paying for a policy nobody has requirements for. The ruling is *broker first*, not
+*complete broker first*.
+
 ### 2. `000020` is not built, and this plan carries the owner's ruling rather than re-making it
 
 The phase's scope asks for a ruling on `000020`, which the control analyst nominated for decline in

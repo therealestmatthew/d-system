@@ -66,7 +66,7 @@ it something to read.
 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
-| R01 | The capability broker exists and denies a capability *before* any trigger, ledger or worker can start unattended work. | Attempt an unattended run before the broker is in place and confirm it is refused. This is the `000031` gate, and the ordering is the requirement: a gate built after the things it gates has never gated anything. |
+| R01 | The capability broker exists and denies a capability *before* any trigger, ledger or worker can start unattended work. | Attempt an unattended run before the broker is in place and confirm it is refused. This is the `000031` gate, and the ordering is the requirement: a gate built after the things it gates has never gated anything. The row is satisfied by a working refusal path, whether the broker ships full policy or an enforcement point with a permissive default — see `PLAN-032` decision 1. |
 | R02 | Every agent run carries an explicit, narrow capability set — named actions, not a role. | Read a run's capability set for specific named actions such as repository read, source mutation, external network, publication. A set naming a role rather than actions does not satisfy this. |
 | R03 | A denied capability is enforced at the tool boundary, and an agent that attempts it is stopped rather than trusted not to try. | Give an agent a prompt instructing it to use a denied capability and confirm the attempt fails at the boundary. A denial enforced only in prompt text fails this row — that is the distinction `000031` exists to draw. |
 | R04 | Anything sensitive routes through an approval request carrying scope, reason, expiry and an immutable decision record. | Request one and read the record for all four. Confirm the decision cannot be edited after the fact. Confirm an expired approval is not honoured. |
@@ -88,6 +88,12 @@ it something to read.
 **R01 is an ordering requirement, not a feature.** It is satisfiable only by building the broker
 first. Every other row in this requirement describes a component; this one describes a sequence, and
 it is the one the phase's acceptance names.
+
+**R01 does not require a complete policy.** An enforcement point that refuses at the tool boundary
+and denies nothing by default satisfies it, because the gate is the refusal path rather than the
+rules it carries. `R02` and `R04` are what require real capability sets and approvals, and a design
+that ships the permissive shape leaves those two open until there are real requests to write them
+against — which must then be recorded as open rather than claimed.
 
 **R03 is the whole of `000031`'s value.** A capability model that describes denials in a prompt is a
 longer prompt. The row asks for enforcement at the tool boundary because that is the only version an

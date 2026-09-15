@@ -105,9 +105,20 @@ compiler now would be building a machine to prevent a class of defect whose only
 has already healed.
 
 So `phase-sch-01` fixes what remains of `000024` — the documentation half — and adds the small
-mechanism whose absence let the drift go unnoticed: a check comparing `CLAUDE.md`'s stated schema
-files and tables against `schemas/` and `sql/001_schema.sql`. `phase-sch-02` then decides `000035`
-against what that check has actually caught.
+mechanism whose absence let the drift go unnoticed: a check comparing the schema layer's consumers
+against `schemas/`.
+
+**That check has to span the boundaries `000035` targets, or the deferral is circular.** A check
+covering only `CLAUDE.md`, `schemas/` and the DDL would report clean indefinitely while drift between
+schemas and Pydantic models, or schemas and TypeScript types, went unmeasured — and `phase-sch-02`
+would then read "zero recurrences" from a check that never looked. So `R03` spans `CLAUDE.md`, the
+DDL **and** `src/models/`, and `R04` requires the decision to state which boundaries its evidence
+covers.
+
+This is the correction to the first draft of this ruling, which specified the narrow check. "The
+drift closed on its own" is also weaker than it first sounds: it closed because someone noticed and
+fixed it, which is exactly the manual vigilance `000035` proposes to replace. The deferral is
+defensible only if what replaces the compiler is actually measuring the right thing.
 
 `R04` forbids deciding from the proposal's own persuasiveness, and `R05` requires a named trigger.
 Building `000035` remains a legitimate outcome — the row asks for evidence, not for a particular
@@ -255,6 +266,9 @@ Every row of `REQ-020` maps to at least one phase, and every phase carries at le
   appear.
 - **`CLAUDE.md` under-describes the schema layer by more than `000024` counted** — four schema files
   named against twenty present, seven tables named against sixteen created.
+- **`phase-sch-02`'s evidence is only as good as `phase-sch-01`'s span.** If the check ships covering
+  `CLAUDE.md` alone, a zero count means nothing was looking rather than nothing drifted. `R03` names
+  the model boundary for that reason.
 - **The overview has determinism tests but no drift test.** They are different assertions; do not read
   `test_two_generations_..._byte_identical_output` as covering `000106`.
 - **`CLAUDE.md` is owner-only.** `phase-sch-01` proposes text and stops, exactly as `phase-conc-09`

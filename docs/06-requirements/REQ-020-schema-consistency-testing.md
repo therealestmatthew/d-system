@@ -94,8 +94,8 @@ is, and `P8` governs code and contract hygiene.
 |---|---|---|
 | R01 | `000024`'s current state is recorded against the repository: which of its three claims still hold and which closed, each verified by a command whose output distinguishes the cases. | Read the record against `sql/001_schema.sql`, `tools/rebuild_db.py` and `_data/`. Confirm the DDL and loader claims are recorded as closed, and the data-directory claim as still true but not a defect. Confirm the directory check distinguishes *absent* from *empty* — `ls _data/x 2>/dev/null \| wc -l` returns `0` for both and settles neither. |
 | R02 | The `CLAUDE.md` correction is written out as proposed text for the owner, and not applied by an agent. | Confirm the phase's diff contains no `CLAUDE.md` edit. `AGENTS.md` and `CLAUDE.md` are owner-only; the deliverable is exact replacement wording. |
-| R03 | A check fails when `CLAUDE.md`'s stated tables or schema files diverge from `sql/001_schema.sql` and `schemas/`. | Add a table to the DDL without updating `CLAUDE.md` and confirm the check fails and names the divergence. Confirm it passes once the text matches. This is the mechanism `000024`'s drift went unnoticed for want of. |
-| R04 | `000035`'s contract compiler is decided against recorded drift evidence, not against its own proposal. | Read the decision for the drift instances it weighs. Confirm it counts what `R03`'s check has actually caught since shipping. A decision to build made with zero recorded recurrences has not used evidence. |
+| R03 | A check fails when the schema layer's consumers diverge from `schemas/` — covering at least `CLAUDE.md`'s stated tables and schema files, `sql/001_schema.sql`'s tables, and the Pydantic models under `src/models/`. | Add a table to the DDL without updating `CLAUDE.md` and confirm the check fails and names the divergence. Add a schema with no matching model and confirm the same. Confirm it passes once each is reconciled. The check must span the boundaries `000035` targets, not only the one `000024` happened to find. |
+| R04 | `000035`'s contract compiler is decided against recorded drift evidence, not against its own proposal. | Read the decision for the drift instances it weighs, and confirm `R03`'s check actually spans the boundaries being decided about. A count of zero from a check that never looked at the model or type boundary is not evidence of no drift; the decision must state which boundaries its evidence covers. |
 | R05 | The decision states what would change it, in terms a later reader can evaluate. | Read for a named trigger — a count of drift instances, a new entity type, a second consumer of the schemas. "Revisit later" is not a trigger. |
 | R06 | CI runs a linter over `ts/` and fails the build on a lint error. | Introduce a lint violation and confirm CI fails naming it. Confirm a clean tree passes. |
 | R07 | CI runs a frontend test suite and fails the build on a failing test. | Add a deliberately failing test and confirm CI fails. Confirm the runner is configured in `ts/package.json` rather than invoked ad hoc. |
@@ -110,9 +110,15 @@ is, and `P8` governs code and contract hygiene.
 **R02 is not a `CLAUDE.md` edit.** No agent may make one, for any reason. The deliverable is proposed
 wording the owner applies, in the same shape `phase-conc-09` uses for `AGENTS.md`.
 
-**R03 is the small mechanism that replaces a large one.** A check comparing three files is cheap and
-catches recurrence at the moment it happens. It is not a contract compiler and does not pretend to
-generate anything.
+**R03 is the small mechanism that measures whether a large one is needed.** It is cheap, catches
+recurrence at the moment it happens, and generates nothing — it is not a contract compiler.
+
+**Its span is the point, and the first draft got it wrong.** A check comparing only `CLAUDE.md`,
+`schemas/` and the DDL would have reported clean indefinitely while drift between schemas and
+Pydantic models, or schemas and TypeScript types, went unmeasured — so `R04`'s evidence would have
+been about the wrong thing, and "zero recurrences" would have meant "nothing was looking". The row
+now spans the model boundary, and `R05`'s trigger should be widened again if a second consumer of the
+schemas appears.
 
 **R04 does not presume the answer.** Building `000035` is a legitimate outcome if the evidence
 supports it. What the row forbids is deciding from the proposal's own persuasiveness, which is the
