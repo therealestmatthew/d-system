@@ -7433,7 +7433,8 @@ items:
   systems:
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7455,6 +7456,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-031-agent-engineering-delegation.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Do the scoping pass before anything else. This is the largest programme
     and the partition says its phase count is meaningless until the duplication is cut.
 - id: phase-prog-07
