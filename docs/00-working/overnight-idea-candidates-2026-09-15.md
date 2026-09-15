@@ -114,6 +114,40 @@ may be worse than none.
 
 ---
 
+## The partition carries factual errors that finalize phases inherit
+
+**Raised by:** `phase-prog-08`, after drafting an entire plan on a premise that turned out to be false.
+
+`docs/00-working/idea-batching-partition.md` is the source every `phase-prog-*` phase works from, and
+its scope lines are copied into the backlog phases verbatim. Three errors have surfaced in one night
+of using it:
+
+1. **`P6`'s gate.** The partition says the programme is "gated on a recorded retrieval failure that
+   nothing currently collects", and `phase-prog-08`'s scope repeats it. False. The gate lives in
+   `resume_when`, names `phase-mem-10`, and that phase is `status: queued` — ready, blocked by
+   nothing, simply never claimed. The partition also omits `phase-mem-17`, which is gated identically.
+   The plan was fully drafted before this was checked.
+
+2. **`P2`'s sizing.** The programme header says 4–5 phases; its own group table sums to 5–6 plus two
+   fragments. Recorded separately below.
+
+3. **`P4`'s `000072`/`000046` duplication** was caught by only one of four analysts, and the partition
+   records that fact itself — so this one is a known limit rather than an error, but it is the same
+   shape: a claim in the partition that a finalize phase must verify rather than trust.
+
+The pattern is that the partition is a **secondary source** being used as a primary one. It was
+written by synthesising four analyst reports, and audit 2 already found it making "unlisted or
+overstated convergence claims" — its own words. Where it describes repository state, `backlog.yaml`,
+the idea log and the code are the authorities, and they were available the whole time.
+
+Worth deciding: whether the remaining `phase-prog-*` scope lines should be re-verified against the
+repository before those phases are claimed, and whether the partition should carry a standing note
+that its state claims are as-of-2026-09-13 and must be re-checked. Unresolved: how many more such
+errors remain — three surfaced in six phases, and the six that ran tonight were not chosen for
+error-proneness.
+
+---
+
 ## The partition's programme-level sizings contradict its own group tables
 
 **Raised by:** `phase-prog-05`, while sizing `P2`.
