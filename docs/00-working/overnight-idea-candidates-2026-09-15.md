@@ -114,6 +114,26 @@ may be worse than none.
 
 ---
 
+## The partition's programme-level sizings contradict its own group tables
+
+**Raised by:** `phase-prog-05`, while sizing `P2`.
+
+`docs/00-working/idea-batching-partition.md` gives each programme a size in its prose header and then
+gives each of its groups a size in the table below. For `P2` the header says **4–5 phases**; the group
+table says `G05` 2, `G06` 1 each × 3, `G07` `<1`, `G08` trivial — which sums to 5–6 phases plus two
+fragments. The two cannot both be right. The plan followed the group table and landed at seven.
+
+This matters beyond `P2`, because the programme-level figures are what a reader uses to estimate the
+whole backlog. If they are systematically low relative to their own group tables, remaining work is
+being under-estimated across twelve programmes.
+
+Worth deciding: whether to re-derive each programme's headline from its group table, or to record
+that the headline is a deliberate compression and the group table governs. Unresolved whether the
+discrepancy is systematic — this run has only checked `P2` closely. `P3` landed at 9 against a 6–8
+header and `P1` at 12 inside a 10–13 header, so the pattern is not yet clear.
+
+---
+
 ## `ARCH-005` sat in `draft` for six days as the gate on six ideas
 
 **Raised by:** `phase-prog-04`, while ruling on what `G01` needs as its governing requirement.

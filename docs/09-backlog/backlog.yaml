@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-05
 - phase-prog-06
 - phase-prog-07
 - phase-prog-08
@@ -9433,3 +9432,244 @@ items:
   - docs/08-governance/
   next_action: 000072's planner bullet in P4 duplicates this. phase-prog-06 owns that ruling - confirm
     it was struck before building, or this gets built twice.
+- id: phase-dgov-01
+  title: Rule when a requirement is mandatory, classify the corpus, enforce forward
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the rule that decides when a requirement document is mandatory and when a plan's own acceptance
+    section suffices, in terms a second reader applies to the same answer. Non-trivial is not a gate.
+  - Classify the existing corpus against the rule and list every plan that would need a requirement and
+    lacks one.
+  - Enforce the rule on new plans only, grandfathering that list, so the trunk does not go red on 14-plus
+    plans written before the rule existed.
+  acceptance:
+  - 'REQ-015 R01 holds: the rule applied to five plans chosen without regard to outcome yields the same
+    answer for a second reader.'
+  - 'REQ-015 R02 holds: the count of unpaired plans is stated as a number, not as several.'
+  - 'REQ-015 R03 holds: a fixture plan meeting the mandatory condition with no requirement fails governance
+    and is named; every grandfathered plan still passes.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-001-protocol.md
+  - src/governance/
+  - test/
+  next_action: Write the rule before classifying. Deriving it from the corpus produces a rule shaped to
+    excuse whatever the corpus already does.
+- id: phase-dgov-02
+  title: Define document staleness and the retirement path
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-10
+  scope:
+  - Define staleness against what a document describes, never against its age - a named file that no longer
+    exists, a command whose flags changed, a system whose responsibilities moved in systems.yaml.
+  - Define the path to retirement or supersession when the thing a document describes changes.
+  - State the boundary against plan-quality assessment, and consume phase-idg-10's standard for plans
+    rather than defining a second one.
+  acceptance:
+  - 'REQ-015 R04 holds: the mechanism distinguishes a document that is wrong from one that is merely old.
+    A date-based rule flags ADR-003, which is old and correct, and fails this condition.'
+  - 'REQ-015 R05 holds: both documents state what each owns, and the staleness mechanism consumes the
+    plan-quality standard rather than restating it.'
+  - The mechanism is demonstrated against a real stale document, not a constructed one.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/
+  next_action: Depends on phase-idg-10 in P1, which is a different programme. Confirm that standard exists
+    before starting, or this phase writes the second standard R05 forbids.
+- id: phase-dgov-03
+  title: Audit every index width against a stated horizon and widen what is short
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Audit every index against a stated horizon: document codes per series, sub-codes, dated session sequences,
+    phase numbers within a track, and identifiers under _data/.'
+  - Record each index's current pattern, its ceiling, current usage and the horizon judged against.
+  - Widen any index judged too narrow, without renumbering a single issued code - GOV-005 forbids reuse,
+    so the cost of being wrong is asymmetric.
+  acceptance:
+  - 'REQ-015 R06 holds: one row per index, each carrying pattern, ceiling, usage and horizon. An index
+    with no stated horizon has not been audited.'
+  - 'REQ-015 R07 holds: any widened pattern accepts both old and new forms, and no existing document''s
+    code changed.'
+  - The three-digit document code ceiling and the 99-sessions-per-day dated code limit are both addressed
+    explicitly, since 000006 names them.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/document.schema.json
+  - docs/08-governance/GOV-005-document-codes.md
+  next_action: Do this early in the programme. Widening now is a schema edit; widening after a series
+    fills is a migration GOV-005 will not permit.
+- id: phase-dgov-04
+  title: Split completed phases into a backlog archive, and measure the saving
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Move complete and cancelled phases into docs/09-backlog/backlog-archive.yaml, leaving only non-terminal
+    phases in backlog.yaml.
+  - Preserve every id and every piece of completion evidence exactly - this is a location change, not
+    a deletion, so GOV-002's preservation rule still binds.
+  - Report the working file's size and phase count before and after.
+  acceptance:
+  - 'REQ-015 R08 holds: a completed phase''s record is byte-identical across the move, and --ready and
+    --backlog report unchanged totals across both files.'
+  - 'REQ-015 R09 holds: the size and phase-count saving is stated as a measurement. A split leaving the
+    working file the same size has moved the problem, not solved it.'
+  - Every tool and test that reads backlog.yaml reads both files where it needs the full history.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - docs/09-backlog/backlog.yaml
+  - src/governance/
+  - test/test_backlog.py
+  next_action: Find every reader of backlog.yaml before moving anything. A split that leaves one reader
+    seeing half the corpus is worse than no split.
+- id: phase-dgov-05
+  title: Write the backlog review and re-prioritisation procedure
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Write the procedure: what triggers a review beyond an empty ready set, how next_up is rebuilt and
+    by whom, and whether deferred phases are reconsidered on a schedule or only on evidence.'
+  - Answer what un-defers a phase whose gate cannot be met by waiting. phase-mem-15 through -19 gate on
+    recorded retrieval failures that nothing currently records, which is the case that proves the procedure
+    is needed.
+  - Decide whether this is a session type under phase-ses-01 or a command, and make it reachable that
+    way.
+  acceptance:
+  - 'REQ-015 R10 holds: the procedure names its triggers, how next_up is rebuilt, by whom, and what un-defers
+    a gate-blocked phase.'
+  - 'REQ-015 R11 holds: it is invocable as whatever it claims to be, and running it produces a result.
+    Prose in a governance document is not reachable.'
+  - The phase-mem-15 to -19 case is worked through concretely rather than named as an example.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - .claude/commands/
+  next_action: 000011 says defining this before it is needed is building ahead of demand, and the backlog
+    is not close to empty. Confirm with the owner that the need is now real before building the command
+    half.
+- id: phase-dgov-06
+  title: Diff a completed phase's change set against its declared paths
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-gov-01
+  scope:
+  - Build the check that diffs a completed phase's actual change set against its declared systems and
+    deliverables, naming files outside the declaration.
+  - Make it report rather than block, and distinguish a declaration that was too narrow from work that
+    genuinely strayed - only a person can tell those apart.
+  - Write nothing to backlog.yaml and reopen no completed phase.
+  acceptance:
+  - 'REQ-015 R12 holds: run against a phase with a known undeclared path, the check names the phase and
+    the file. Run against the repository as it stands, the result is recorded - zero findings across 70-plus
+    completed phases indicates a broken check, not a clean corpus.'
+  - 'REQ-015 R13 holds: the output distinguishes a too-narrow declaration from genuine strays, and nothing
+    in the check writes to backlog.yaml.'
+  - The known phase-prog-* case - every one rewrites backlog.yaml without declaring it - appears in the
+    first run's findings.
+  verification:
+  - uv run pytest test/test_backlog.py
+  - uv run python -m src.governance
+  deliverables:
+  - src/governance/backlog.py
+  - test/test_backlog.py
+  next_action: Collides with phase-gov-01 on both deliverables. That phase is ready and small; take it
+    first rather than queueing a claim the validator will reject.
+- id: phase-dgov-07
+  title: Register _tmpagent in the systems maturity registry
+  plan: doc-document-backlog-governance
+  sources:
+  - doc-document-backlog-governance-requirements
+  - doc-document-backlog-governance
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add an entry for _tmpagent's claim protocol to docs/08-governance/systems.yaml, with a maturity justified
+    by what the mechanism does.
+  - Confirm --inventory reports it alongside sys-backlog, sys-portfolio and the rest.
+  acceptance:
+  - 'REQ-015 R14 holds: --inventory reports the entry with a maturity level.'
+  - The maturity is justified against the mechanism's actual state - claimed, activated and released in
+    daily use - rather than asserted.
+  - AGENTS.md's existing _tmpagent section and _tmpagent/AGENTS.md are both reachable from the entry.
+  verification:
+  - uv run python -m src.governance --inventory
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/systems.yaml
+  next_action: Well under one session. Do not plan a sitting around it - take it alongside whichever adjacent
+    governance phase you claim next.
