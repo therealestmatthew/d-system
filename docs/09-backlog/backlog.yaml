@@ -10326,12 +10326,12 @@ items:
   scope:
   - Persist every run with a correlation id, the triggering payload's hash, model and tool versions, a
     context-pack hash, budget, timeout, retry count, checkpoints, produced artifacts and final disposition.
-    These eleven are 000029's list, not a summary of it.
+    These are 000029's own list, reproduced rather than summarised.
   - Make an interrupted run resumable without repeating completed side effects. Re-running from the start
     is not resumption.
   - Keep the execution adapter provider-neutral, so the run schema does not encode one model's shape.
   acceptance:
-  - 'REQ-017 R08 holds: a completed run''s record carries all eleven fields.'
+  - 'REQ-017 R08 holds: a completed run''s record carries every field 000029 names.'
   - 'REQ-017 R09 holds: a run interrupted mid-way and resumed produces each completed step''s side effects
     exactly once.'
   - 'REQ-017 R10 holds: a second provider could be added without changing the run schema.'

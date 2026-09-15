@@ -187,7 +187,7 @@ Every row of `REQ-017` maps to at least one phase, and every phase carries at le
 | R05 Four trigger sources normalised to one event shape | `phase-auto-03` |
 | R06 A duplicate trigger produces one run | `phase-auto-03` |
 | R07 The gateway is provider-neutral | `phase-auto-03` |
-| R08 Eleven fields persisted per run | `phase-auto-04` |
+| R08 Every field `000029` names, persisted per run | `phase-auto-04` |
 | R09 An interrupted run resumes without repeating side effects | `phase-auto-04` |
 | R10 The execution adapter is provider-neutral | `phase-auto-04` |
 | R11 Concurrency limits and quiet hours enforced | `phase-auto-05` |
@@ -213,7 +213,9 @@ Every row of `REQ-017` maps to at least one phase, and every phase carries at le
   calls it "a scheduling daemon with nothing to schedule" otherwise.
 - **`000028` and `000029` do not actually depend on each other**, despite the partition's chain. Each
   is testable alone; only `000030` needs both.
-- **`000029`'s eleven persisted fields are a list, not a summary.** `R08` reproduces them exactly.
+- **`000029`'s persisted fields are a list, not a summary.** `R08` reproduces them exactly: ten
+  fields as the idea writes them, with model and tool versions as the single comma-separated item it
+  names rather than split into two.
 - **This is the most speculative programme in the partition**, by the partition's own assessment.
   Four of its five ideas came from a research pass rather than an incident, and the plan says so
   rather than implying an evidence base it lacks.
