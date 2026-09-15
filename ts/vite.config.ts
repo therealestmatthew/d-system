@@ -158,10 +158,29 @@ function isGitIgnored(repoRelativePath: string): boolean {
 // to Vite's normal middleware chain and 404s (or, under the dev server's history fallback,
 // serves `index.html` like any other unknown route) — it does not exist, the same "unset means
 // absent" property the backend route enjoys.
+// Query param that selects the raw-bytes response for a wrapped raster image (see the
+// `RASTER_IMAGE_EXTENSIONS` wrapper branch below) — read from the query string only, never from
+// the path, so it cannot be spoofed by a path segment and never influences which file on disk
+// gets resolved.
+const RAW_IMAGE_QUERY_PARAM = 'raw'
+
+// The six raster formats a bare `<img>` document renders top-left-anchored at natural size,
+// un-scaled, in Chromium (browser-measured: a 900x560 image inside HtmlViewerRegion's ~739x262
+// iframe showed only its top-left corner, roughly 47% of its height, with scrollbars inside the
+// iframe) — wrapped in a small fitting/centring HTML document instead of served as bare bytes.
+// `.svg` is deliberately excluded: it already scales to its container natively and that behaviour
+// is browser-verified, so it is left untouched.
+const RASTER_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'])
+
 function serveRepositoryFiles(): Plugin {
   const attach = (middlewares: Connect.Server) => {
     middlewares.use(WORKBENCH_FILE_PREFIX, (req, res) => {
-      const requestedPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+      // Split the query string off before decoding the path — `decodeURIComponent` must never see
+      // (and so never be influenced by) the query, and the query itself is parsed separately below
+      // so the `raw` flag can be read from it without ever touching path resolution.
+      const [pathOnly, queryString] = (req.url ?? '').split('?')
+      const requestedPath = decodeURIComponent(pathOnly ?? '')
+      const query = new URLSearchParams(queryString ?? '')
       const relative = requestedPath.replace(/^\/+/, '')
       if (!relative) {
         res.statusCode = 400
@@ -243,6 +262,56 @@ function serveRepositoryFiles(): Plugin {
       // iframe's `sandbox=""`. Applies to every response from this route, not just the fallback
       // path, since the same URL is reachable either way.
       res.setHeader('Content-Security-Policy', 'sandbox')
+      // A bare raster image response renders as Chromium's built-in image document: top-left
+      // anchored, at the image's natural size, never scaled to the iframe — the browser-measured
+      // finding above. Wrapping it in a minimal HTML document with a single `<img>` fixes that
+      // without touching `HtmlViewerRegion.tsx`: the component asks for the same path either way
+      // and gets back something that fits. `?raw=1` (checked via `query`, never the path) is what
+      // that wrapper's own `<img src>` points back at to fetch the actual bytes, one level down —
+      // without it, wrapping would recurse into wrapping the wrapper.
+      const extensionLower = extname(realResolved).toLowerCase()
+      if (RASTER_IMAGE_EXTENSIONS.has(extensionLower) && !query.has(RAW_IMAGE_QUERY_PARAM)) {
+        const title = basename(realResolved)
+        // Relative, not absolute: this document's own URL already carries whatever query
+        // `HtmlViewerRegion`'s iframe added (its cache-busting `?v=<n>`), so a relative
+        // `<basename>?raw=1` resolves against that same URL to
+        // `/workbench-file/<dir>/<name>.png?raw=1` — the sibling request for the same file's raw
+        // bytes — without this route needing to know its own full request path.
+        // `encodeURIComponent` keeps a name containing a space or `#` correctly resolvable as a
+        // URL.
+        const imgSrc = `${encodeURIComponent(title)}?${RAW_IMAGE_QUERY_PARAM}=1`
+        const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${title}</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #111;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  img {
+    max-width: 100%;
+    max-height: 100vh;
+    object-fit: contain;
+  }
+</style>
+</head>
+<body>
+<img src="${imgSrc}" alt="${title}">
+</body>
+</html>
+`
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.end(html)
+        return
+      }
       // Markdown renders route-side, to HTML, rather than serving raw source (idea 000110, sited
       // here rather than in the frontend or a new backend route per idea 000119's ruling: both
       // `HtmlViewerRegion`'s sandboxed iframe and idea 000109's double-click-to-new-tab fetch this
