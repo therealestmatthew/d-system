@@ -304,7 +304,7 @@ CI regenerates it and fails on any difference.
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
-| PLAN-036 | doc-html-generation-design-system | draft | 1 | 0 | 0 | — |
+| PLAN-036 | doc-html-generation-design-system | draft | 0 | 1 | 0 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | draft | 1 | 0 | 0 | — |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
 

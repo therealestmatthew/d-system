@@ -7723,7 +7723,8 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7743,6 +7744,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-036-html-generation-design-system.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Scope G39 first. It is one phase of independent research and it produces
     the scope the rest of the programme would otherwise guess at.
 - id: phase-prog-12
