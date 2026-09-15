@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-10
 - phase-prog-11
 - phase-prog-12
 - phase-lit-09
@@ -10996,3 +10995,206 @@ items:
   resume_when: Recommendations and their outcomes have accumulated in enough volume to calibrate against;
     nothing produces them today.
   blocked_reason: Calibration needs recommendations and observed outcomes to exist first.
+- id: phase-sch-01
+  title: Record 000024's real state, propose the CLAUDE.md text, and add the drift check
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Record what remains of 000024 against the repository: the DDL tables and rebuild_db loaders for interactions,
+    decisions, waiting_on and development_events all exist now, and empty entity directories are permitted
+    by source_validation.py''s own comment. Only the CLAUDE.md gap survives.'
+  - 'Write the CLAUDE.md correction as proposed replacement text for the owner and stop. No agent edits
+    CLAUDE.md for any reason - the drift is wider than 000024 counted: four schema files named against
+    twenty present, seven tables named against sixteen created.'
+  - Add a check that fails when CLAUDE.md's stated schema files or tables diverge from schemas/ and sql/001_schema.sql.
+    This is the mechanism whose absence let the drift sit unnoticed.
+  - Record G36 as delivered with its evidence - schemas/workbench-layout.schema.json and 21 passing tests
+    in test_workbench_layout_schema.py - and give it no phase.
+  acceptance:
+  - 'REQ-020 R01 holds: the record states which of 000024''s three claims closed and which survives, checked
+    against the files rather than restated from the idea.'
+  - 'REQ-020 R02 and R03 hold: the diff contains no CLAUDE.md edit, and adding a table to the DDL without
+    updating CLAUDE.md makes the check fail and name the divergence.'
+  - 'REQ-020 R12 holds: G36 has no phase and the record cites the schema file and the passing test count.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - test/
+  - tools/
+  - docs/08-governance/
+  next_action: Half of 000024 is already fixed. Read sql/001_schema.sql and tools/rebuild_db.py before
+    writing anything, or this phase re-reports a closed gap.
+- id: phase-sch-02
+  title: Decide 000035's contract compiler against recorded drift evidence
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-sch-01
+  scope:
+  - Decide whether to build 000035's contract compiler - JSON Schema as the single executable source for
+    Python models, TypeScript types, OpenAPI fragments and fixture factories - or to rely on phase-sch-01's
+    check.
+  - Weigh the drift instances the check has actually caught since shipping, not the proposal's own persuasiveness.
+    Its stated motivation was 000024's drift, which closed without a compiler.
+  - 'Name what would change the decision: a count of drift instances, a new entity type, a second consumer
+    of the schemas.'
+  - Write the ADR whichever way it goes. Building commits every future schema change to a generation pipeline;
+    declining commits the repository to hand-maintained consistency with a check.
+  acceptance:
+  - 'REQ-020 R04 holds: the decision names the drift instances it weighed, and a decision to build made
+    with zero recorded recurrences is recorded as unevidenced.'
+  - 'REQ-020 R05 holds: a named, evaluable trigger exists rather than revisit later.'
+  - An ADR records the decision and its evidence.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  next_action: Do not claim this until the check from phase-sch-01 has run for long enough to have caught
+    something or demonstrably nothing. Deciding on day one has the same evidence as deciding today.
+- id: phase-sch-03
+  title: Add a lint and test gate for ts/ to CI
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add an eslint configuration under ts/ and a test runner in ts/package.json, and wire both into .github/workflows/ci.yaml's
+    frontend job, which today runs npm ci and npm run build and nothing else.
+  - Fail the build on a lint error and on a failing test.
+  - Keep the runner configured in package.json rather than invoked ad hoc in the workflow.
+  acceptance:
+  - 'REQ-020 R06 holds: a lint violation fails CI and is named; a clean tree passes.'
+  - 'REQ-020 R07 holds: a deliberately failing frontend test fails CI.'
+  - The existing build step still runs and still passes.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - .github/workflows/ci.yaml
+  - ts/package.json
+  - ts/
+  next_action: 'Confirmed open: ci.yaml lines 40-41 are npm ci and npm run build with nothing after them.
+    This touches ts/, so it cannot run while a demo is live.'
+- id: phase-sch-04
+  title: Write the per-layer testing standard
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-sch-03
+  scope:
+  - 'State what tested means per layer: backend routes, frontend components, generation scripts, and agent-facing
+    tools such as tools/append_idea.py.'
+  - Derive it from what the repository already does, citing real test files, and name where current coverage
+    falls short of the standard's own rule.
+  - Say for each layer what is deliberately not covered, so a gap is a decision rather than an omission.
+  acceptance:
+  - 'REQ-020 R09 holds: one entry per layer, each naming what is covered and what is deliberately not.'
+  - 'REQ-020 R10 holds: the standard cites existing test files on both sides and names at least one shortfall.
+    A standard finding the current state already conformant has not been applied.'
+  - The frontend layer's entry reflects what phase-sch-03 actually shipped rather than what it proposed.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  next_action: Sequenced after the ts/ gate so the frontend layer has something real to describe. Writing
+    it first would describe an intention.
+- id: phase-sch-05
+  title: Add the committed-output drift test for the overview page
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a test asserting the committed _public/overview/index.html matches a fresh regeneration from tools/generate_overview.py.
+  - Mirror test_ideas.py's test_the_committed_markdown_matches_regenerated_output rather than inventing
+    a second shape for the same assertion.
+  - Do not mistake the existing determinism tests for this. test_generate_overview.py proves two runs
+    agree with each other; this proves the committed artifact agrees with a run.
+  acceptance:
+  - 'REQ-020 R08 holds: editing the committed page by hand makes the test fail.'
+  - The test mirrors the existing ideas.md pattern, so the repository has one shape for this assertion
+    rather than two.
+  - The full suite still passes.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - test/
+  next_action: The cheapest phase in the batch - one test modelled on an existing one. 000106 records
+    the real drift that shipped for want of it.
+- id: phase-sch-06
+  title: Design HTML-generation fixtures
+  plan: doc-schema-consistency-testing
+  sources:
+  - doc-schema-consistency-testing-requirements
+  - doc-schema-consistency-testing
+  systems:
+  - sys-contracts
+  - sys-delivery
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Decide where HTML-generation fixtures live, whether they are generated from _data/ or hand-authored,
+    and whether a fixture is a governed artifact or a test asset.
+  - 000001 names these as the decisions usually discovered late; the phase exists to make them early.
+  - Generated fixtures cannot drift from the source shapes; hand-authored ones cover cases real data does
+    not. Rule on the trade rather than picking one silently.
+  acceptance:
+  - 'REQ-020 R11 holds: all three decisions are stated with reasons.'
+  - The ruling is consistent with whatever phase-sch-04's testing standard says about generation scripts.
+  - test/ is not scanned by the governance audit, which the ruling must account for when deciding whether
+    a fixture is governed.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - test/
+  - docs/08-governance/
+  next_action: Dormant until PLAN-003 builds the HTML generation system. Designing fixtures for templates
+    that do not exist would be guessing at their shapes.
+  resume_when: PLAN-003's HTML generation system exists far enough that template and data shapes are fixed;
+    fixtures cannot be designed against templates that do not exist.
+  blocked_reason: The system these fixtures would stand in for has not been built.
