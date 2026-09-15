@@ -7179,6 +7179,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-026-concurrency-git-safety.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Scope G10 first. It is no longer blocked, it is the largest group at 3-4
     phases, and G09 is sequenced behind its document rewrite.
 - id: phase-prog-02
