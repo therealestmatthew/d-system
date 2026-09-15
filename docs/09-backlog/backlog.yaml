@@ -6,7 +6,6 @@ next_up:
 - phase-part-02
 - phase-port-02
 - phase-ses-01
-- phase-prog-11
 - phase-prog-12
 - phase-lit-09
 items:
@@ -11229,3 +11228,224 @@ items:
   resume_when: PLAN-003's HTML generation system exists far enough that template and data shapes are fixed;
     fixtures cannot be designed against templates that do not exist.
   blocked_reason: The system these fixtures would stand in for has not been built.
+- id: phase-des-01
+  title: Audit the pre-build HTML plans and disposition every phase-html-* phase
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Audit PLAN-003's six child plans and their requirements against what the live demo and the workbench
+    actually built. Disposition each requirement as accomplished, open, superseded or retired.
+  - Disposition all ten phase-html-* phases, which are queued today and none complete, and change the
+    backlog for any judged superseded or retired. A disposition written in a document while the phase
+    stays queued has changed nothing --ready shows.
+  - Where a disposition says accomplished, name the demo or workbench work that accomplished it. Covered
+    by the workbench without a reference is an assertion.
+  - Write an ADR only if the audit concludes PLAN-003 is substantially superseded; retiring an approved
+    plan with six children and ten phases is a commitment a reader must be able to trace.
+  - Do not build or decide on any report page - phase-idg-08 in P1 rules on whether the ideas-and-backlog
+    page is wanted.
+  acceptance:
+  - 'REQ-021 R01 holds: every requirement across PLAN-003''s child plans carries a disposition.'
+  - 'REQ-021 R02 holds: --ready after the audit offers no phase the audit judged obsolete, and REQ-021
+    R03 holds: each accomplished item names what accomplished it.'
+  - 'REQ-021 R12 holds: this phase builds no report page and makes no ruling reserved to phase-idg-08.'
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/01-plans/PLAN-003-dynamic-html-generation/
+  - docs/09-backlog/backlog.yaml
+  - docs/00-working/
+  next_action: Claim this before any asset-library phase. It produces their scope, and it is the only
+    phase that can tell a coordinator which of the ten queued phase-html-* phases are still real work.
+- id: phase-des-02
+  title: Build the governance atlas page in the atlas family
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Build a standalone page covering the governance system in the atlas template family: the document-code
+    series and allocator, the backlog protocol and claim model, the GOV document series, the idea lifecycle
+    and sanctioned writer, and how the pieces reference each other.'
+  - Use templates/html/atlas-page.html and templates/styles/atlas.css rather than starting a new family.
+    _public/prompt-pack-protocol.html is the working companion this page broadens.
+  - The owner deferred this on 2026-09-10 for sequencing - protocol plus case studies first - not for
+    a missing prerequisite. The family exists.
+  acceptance:
+  - 'REQ-021 R13 holds: all four subjects appear on the page and it is built from the existing atlas family.'
+  - 'REQ-021 R12 holds: the page covers governance, not idea or backlog reporting, so it does not pre-empt
+    phase-idg-08''s ruling.'
+  - The page renders without a generator change, since the atlas family already ships.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - _public/
+  - templates/html/
+  - templates/styles/
+  next_action: The only phase in this programme that ships reader-facing content rather than machinery,
+    and it is claimable today - it depends on nothing.
+- id: phase-des-03
+  title: Make the template layer a growing library with declared population methods
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-des-01
+  scope:
+  - Turn templates/html/ and templates/styles/ from the fixed set the two shipped families needed into
+    a library that accumulates, where adding a template needs no generation-code change.
+  - Give each template a machine-readable declaration of its population method - deterministic slot-filling,
+    AI adaptation, or both - so a generator can dispatch on it rather than the caller having to know.
+  - Keep the existing atlas and overview families rendering byte-identically.
+  - Scope this against phase-des-01's audit findings rather than against PLAN-003 directly.
+  acceptance:
+  - 'REQ-021 R05 holds: a template added without touching a generator renders, and both existing families
+    still render byte-identically.'
+  - 'REQ-021 R06 holds: the population method is machine-readable and a generator dispatches on it.'
+  - 'REQ-021 R04 holds: the phase cites the audit''s findings for its scope.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - templates/html/
+  - templates/styles/
+  - tools/
+  next_action: Two families already exist and must keep rendering identically. Treat them as the regression
+    surface, not as examples to rewrite.
+- id: phase-des-04
+  title: Build the HTML component library
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-des-01
+  scope:
+  - 'Build reusable components so page generation assembles from known-good blocks instead of emitting
+    bespoke markup: menu bars, hover dialogs, toolbars, tooltips, in-page search, an embedded terminal.'
+  - Have each component that needs script behaviour declare it, so a page built only from script-free
+    components ships no script element. The pages in _public/ are the precedent for staying static where
+    possible.
+  - Where a component 000084 names is not worth building, defer it explicitly with a reason rather than
+    omitting it silently.
+  - Scope this against phase-des-01's audit findings.
+  acceptance:
+  - 'REQ-021 R07 holds: a page assembled from components only renders, and every component 000084 names
+    either exists or is explicitly deferred with a reason.'
+  - 'REQ-021 R08 holds: a page built from script-free components contains no script element.'
+  - 'REQ-021 R04 holds: the phase cites the audit''s findings for its scope.'
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  deliverables:
+  - templates/html/
+  - templates/styles/
+  - tools/
+  next_action: The embedded terminal component overlaps the workbench's terminal panel. Check what phase-wb-03
+    shipped before building a second one.
+- id: phase-des-05
+  title: Build the colour palette library
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-des-01
+  scope:
+  - Build a library of pre-vetted colour combinations selectable per page or per template family, as data
+    rather than a code branch.
+  - Decide and state the role set - background, surface, accent, text, at minimum - and whether palettes
+    carry light and dark variants. 000085 leaves both open.
+  - Apply a palette without hard-coding colours into a template, so the same template renders coherently
+    under two different palettes.
+  - Scope this against phase-des-01's audit findings.
+  acceptance:
+  - 'REQ-021 R09 holds: the same template renders coherently under two palettes, and the palette is data
+    rather than a code branch.'
+  - 'REQ-021 R10 holds: each palette states its role set and its variant coverage.'
+  - 'REQ-021 R04 holds: the phase cites the audit''s findings for its scope.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - templates/styles/
+  - tools/
+  next_action: The role set and the light/dark question are the phase, not preliminaries to it. 000085
+    records both as unresolved and neither has been decided since.
+- id: phase-des-06
+  title: Build the HTML Designer agent
+  plan: doc-html-generation-design-system
+  sources:
+  - doc-html-generation-design-system-requirements
+  - doc-html-generation-design-system
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-des-03
+  - phase-des-04
+  - phase-des-05
+  scope:
+  - Build an agent that scans a shipped page and extracts its token set, type scale, component patterns
+    and interaction shell into a named template family.
+  - 'Follow the existing family convention: header comment with provenance and usage, a token contract,
+    canonical component markup. atlas and overview both demonstrate it.'
+  - Test it against one of the five pages already in _public/ rather than a constructed example.
+  - 'It depends on all three asset phases: without a template contract there is nowhere to write a family,
+    without a component vocabulary nothing to name the patterns, without a palette format no shape for
+    the token set.'
+  acceptance:
+  - 'REQ-021 R11 holds: run against a real _public/ page, the output family matches atlas''s structure
+    on all three elements.'
+  - The agent writes a family rather than a one-off page, so a second page can be generated from what
+    it extracted.
+  - It does not modify the page it scanned.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - .claude/agents/
+  - templates/html/
+  - templates/styles/
+  next_action: Last in the programme by dependency, not by priority. It populates libraries that must
+    exist first, and its output is checkable only against a convention the earlier phases fix.
