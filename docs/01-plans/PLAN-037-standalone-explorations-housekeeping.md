@@ -42,12 +42,28 @@ total is not a meaningful number" — and that assessment is correct and worth p
 
 ### 1. No requirement document, deliberately
 
-Every other programme this batch finalized produced a paired requirement. **This one does not**, and
-the phase's acceptance does not ask for one — unlike its nine siblings, whose acceptance names "a
-requirement document exists for P*n*".
+Every other programme this batch finalized produced a paired requirement. **This one does not.**
 
-That asymmetry is correct. A requirement document states observable behaviour for a coherent body of
-work. These seven groups share no system, no consumer and no file; a single requirement over them
+The phase's acceptance does not ask for one — but that alone settles nothing, and the first draft of
+this section overstated it. Checked:
+
+```
+phase-prog-01  REQUIRES a requirement doc     phase-prog-07  REQUIRES a requirement doc
+phase-prog-04  REQUIRES a requirement doc     phase-prog-08  REQUIRES a requirement doc
+phase-prog-05  REQUIRES a requirement doc     phase-prog-10  REQUIRES a requirement doc
+phase-prog-06  -- no requirement-doc condition --   phase-prog-11  REQUIRES a requirement doc
+phase-prog-09  -- no requirement-doc condition --   phase-prog-12  -- no requirement-doc condition --
+```
+
+**Three** of the ten omit the condition, not one — and `phase-prog-06` (`P4`) and `phase-prog-09`
+(`P7`) both got requirements anyway, as `REQ-016` and `REQ-019`. So the absence of the condition is
+permission, never instruction.
+
+The real reason is substantive, and the comparison sharpens it rather than supporting it. A
+requirement document states observable behaviour for a coherent body of work. `P4` and `P7` are
+coherent — agent engineering, and downstream projections — so a requirement served them even
+unrequired. `P12` is the one programme where the absence of the condition and the absence of
+coherence coincide. These seven groups share no system, no consumer and no file; a single requirement over them
 would be a list of unrelated observables in one table, which is a document manufactured to match a
 pattern rather than to serve a reader. `AGENTS.md` records the cost of that habit directly: four
 documents were manufactured on 2026-09-06 for want of somewhere to put an idea.

@@ -95,11 +95,16 @@ Seven phases added under `phase-expl-*`, all `status: queued`, none claimed.
 ## Decisions
 
 **No requirement document was written, and that is the phase's most consequential ruling.** Every
-other programme in this batch produced one. This phase's acceptance is the only one of the ten that
-does *not* name a requirement document — its siblings all say "a requirement document exists for
-P*n*" — and the asymmetry is correct rather than an oversight in the phase definition.
+other programme in this batch produced one.
 
-A requirement states observable behaviour for a coherent body of work. These seven groups share no
+The ruling stands, but the argument I first gave for it was wrong on its facts — see
+`## Corrections`. Three of the ten phases omit the requirement-document condition, not one, and two
+of those three got requirements anyway. So the absence of the condition is permission, never
+instruction, and the reason has to be substantive.
+
+It is. A requirement states observable behaviour for a coherent body of work. `P4` and `P7` are
+coherent bodies of work and were served by one even unrequired; `P12` is the single programme where
+the absence of the condition and the absence of coherence coincide. These seven groups share no
 system, no consumer and no file; the partition's own words are *"Why together: nothing."* A single
 requirement over them would be unrelated observables in one table — a document manufactured to match a
 pattern. `AGENTS.md` records what that habit costs: four documents were manufactured on 2026-09-06 for
@@ -133,6 +138,27 @@ a technical one", and whether they want to build in public is not a fact in the 
 a comparison document and may not propose a migration — `000122` is recorded as future-only.
 
 ## Corrections
+
+**I claimed this phase's acceptance was the only one of the ten omitting a requirement-document
+condition. It is one of three.** Checked, after writing it:
+
+```
+phase-prog-06  -- no requirement-doc condition --
+phase-prog-09  -- no requirement-doc condition --
+phase-prog-12  -- no requirement-doc condition --
+```
+
+And the inconsistency runs further than the miscount: I wrote `REQ-016` for `phase-prog-06` and
+`REQ-019` for `phase-prog-09` despite neither requiring one. So the pattern I offered as corroboration
+was both wrong and contradicted by my own work earlier tonight.
+
+Caught by verifying my own premise against `backlog.yaml` while the review ran, rather than by the
+review. The ruling itself survives and is now argued on the substantive ground it always rested on:
+`P4` and `P7` are coherent programmes a requirement genuinely serves; `P12` is the one where the
+missing condition and the missing coherence coincide. Corrected in `PLAN-037` and above.
+
+The habit that caught it came from `phase-prog-10`, where an unverified premise reached a governed
+document and the review found it. This is the same class of claim, checked before it could.
 
 **Three phases were written with `priority: 5`, which the schema caps at 4.** Governance went red
 immediately:
