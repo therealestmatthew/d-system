@@ -29,8 +29,15 @@ rehearsal begins.
 
 ### Frontend Dependencies
 
-- [ ] Run `npm install` in the repository root to ensure frontend dependencies are current.
+- [ ] Run `npm install` in `ts/` to ensure frontend dependencies are current. There is no
+      `package.json` at the repository root; `ts/package.json` is the only one.
 - [ ] Confirm no errors in the npm output.
+- [ ] This step is one-time per checkout, not something to repeat before every launch: `ts/node_modules/`
+      is gitignored, so a checkout with a `node_modules/` left over from before `marked` was added as a
+      devDependency (in `ts/package.json`, for markdown rendering in the workbench file server) does not
+      have it. On such a checkout, `npm run dev` (run from `ts/`) fails while loading `ts/vite.config.ts`
+      because it cannot resolve `marked`, and the frontend never starts. Re-run `npm install` from `ts/`
+      after a fresh clone, a fresh worktree, or any change to `ts/package.json`.
 
 ### Environment Variables for Terminal Route and Frontend API Target
 

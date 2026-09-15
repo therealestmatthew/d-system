@@ -264,6 +264,11 @@ Backend launch:
 env D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010
 ```
 
+**One-time-per-checkout prerequisite:** run `npm install` in `ts/` before the first frontend launch on a given checkout, and again any time `ts/package.json` changes. `ts/vite.config.ts` now imports `marked` (added as a devDependency for markdown rendering in the workbench file server). A checkout with a `ts/node_modules/` left over from before that change does not have `marked`: the dev server exits while loading `ts/vite.config.ts` because it cannot resolve the import, and the frontend never starts. `ts/node_modules/` is gitignored and per-checkout, so this is not a one-time step for the machine — it is a one-time step for each checkout, and it does not need to run before every launch, only after a fresh clone/worktree or a `package.json` change.
+```
+npm install
+```
+
 Frontend launch (in `ts/` directory):
 ```
 env D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 npm run dev -- --port 5180 --strictPort
