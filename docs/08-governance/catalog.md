@@ -22,11 +22,13 @@ CI regenerates it and fails on any difference.
 | ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
 | ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
+| ADR-018 | adr | draft | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
 | ARCH-004 | architecture | active | repository-owner | docs/07-architecture/ARCH-004-architecture-overview.md |
 | ARCH-005 | architecture | draft | repository-owner | docs/07-architecture/ARCH-005-idea-node-classification.md |
+| ARCH-006 | architecture | draft | repository-owner | docs/07-architecture/ARCH-006-idea-realization-system.md |
 | GOV-001 | governance | active | repository-owner | docs/08-governance/GOV-001-protocol.md |
 | GOV-002 | governance | active | repository-owner | docs/08-governance/GOV-002-backlog-protocol.md |
 | GOV-003 | governance | active | repository-owner | docs/08-governance/GOV-003-backlog-decisions.md |
@@ -103,6 +105,7 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | plan | active | repository-owner | docs/01-plans/PLAN-036-html-generation-design-system.md |
 | PLAN-037 | plan | active | repository-owner | docs/01-plans/PLAN-037-standalone-explorations-housekeeping.md |
 | PLAN-038 | plan | draft | repository-owner | docs/01-plans/PLAN-038-backlog-status-regression-guard.md |
+| PLAN-039 | plan | draft | repository-owner | docs/01-plans/PLAN-039-idea-realization-system.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -158,6 +161,7 @@ CI regenerates it and fails on any difference.
 | REQ-019 | requirement | draft | repository-owner | docs/06-requirements/REQ-019-blocked-downstream-projections.md |
 | REQ-020 | requirement | draft | repository-owner | docs/06-requirements/REQ-020-schema-consistency-testing.md |
 | REQ-021 | requirement | draft | repository-owner | docs/06-requirements/REQ-021-html-generation-design-system.md |
+| REQ-022 | requirement | draft | repository-owner | docs/06-requirements/REQ-022-idea-realization-system.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -254,6 +258,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-15-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-10-html-generation-design-system-plan.md |
 | SESS-2026-09-15-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-11-standalone-explorations-plan.md |
 | SESS-2026-09-15-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-12-panel-maximize-reexamination.md |
+| SESS-2026-09-15-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-13-idea-realization-system-architecture.md |
 
 ## Plans and their phases
 
@@ -311,6 +316,7 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 13 | 0 | 0 | — |
 
 ## Held codes
 
@@ -320,4 +326,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-247 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 21, session: 96.
+252 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 53, prompt: 34, requirement: 22, session: 97.

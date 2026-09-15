@@ -435,3 +435,22 @@ systems:
     write only the thirteen campaign deliverables, the evidence matrix, the source inventory and
     the reproducibility ledger, all under research/literature-review/ and the locations the
     evidence contract (PLAN-023.03) fixes.
+- id: sys-realization
+  name: Idea realization pipeline
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/07-architecture/ARCH-006-idea-realization-system.md
+  - docs/06-requirements/REQ-022-idea-realization-system.md
+  - docs/01-plans/PLAN-039-idea-realization-system.md
+  - docs/04-decisions/ADR-018-langgraph-orchestration.md
+  depends_on:
+  - sys-portfolio
+  - sys-backlog
+  - sys-governance
+  description: The end-to-end pipeline from idea capture to a verified delivered capability, per
+    ARCH-006 - nine stages, five owner gate categories, a LangGraph orchestrator over Claude Agent
+    SDK agents (ADR-018), and the glue phases PLAN-039 holds around the P1, P4, P5 and PLAN-025
+    sub-programmes. Planned only - no orchestrator code exists yet; the paths listed are the
+    governing documents, and implementation phases will widen them as components land.

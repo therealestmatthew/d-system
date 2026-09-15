@@ -11739,3 +11739,422 @@ items:
   - docs/00-working/
   next_action: The worked examples are the phase. A generic websockets tutorial would fulfil none of what
     000140 asks for.
+- id: phase-irs-01
+  title: Stopgap triage dispatch on append, with the reconciling sweep
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Dispatch one triage agent per idea automatically when tools/append_idea.py records an add event,
+    without changing the writer's event contract or the log format.
+  - Build the reconciling sweep that finds ideas still open after a failed or missed dispatch and
+    re-dispatches them, so the stopgap degrades to batch and never to loss.
+  - Mark the mechanism interim in its own operations document, naming the phase-auto-01 ruling as
+    what decides migration to the trigger gateway or permanence.
+  acceptance:
+  - 'REQ-022 R06 holds: a test idea appended to the log is triaged with no human action.'
+  - 'REQ-022 R07 holds: a dispatch killed mid-run leaves the idea open and the sweep brings it to
+    triaged.'
+  - The interim status and its deciding ruling are stated in the tool's operations document.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/
+  - docs/08-governance/
+  next_action: Decide the dispatch mechanism (post-write hook in the writer versus a watcher) against
+    the constraint that the writer stays usable with no orchestrator running at all.
+- id: phase-irs-02
+  title: Consolidate PLAN-025's check-ins into Gate 2 and record the amendment
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-part-03
+  scope:
+  - Amend PLAN-025 and its prompt pack so the partition workflow's three owner check-ins consolidate
+    into one Gate 2 sitting where the material allows, per the owner's 2026-09-15 ruling on 000247.
+  - Record the amendment and its reason in GOV-003 in the same diff.
+  - Surface PLAN-025's draft status for acceptance alongside the amendment.
+  acceptance:
+  - The amended workflow reaches the owner once per partition run unless a critical issue escalates
+    earlier, and the escalation path is stated.
+  - GOV-003 carries the amendment with its date and the ruling it applies.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/01-plans/
+  - docs/02-prompts/
+  - docs/08-governance/
+  next_action: Read PLAN-025's three gates against a real partition transcript and identify which
+    check-ins carry decisions the others cannot batch.
+- id: phase-irs-03
+  title: Write the pipeline role contracts
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - One written contract per pipeline role from ARCH-006's stage table - inputs received, outputs
+    required, and the binding never-do column - covering triage, partition, planner, adversary,
+    phase-fit, mapper, developer, validator and realization roles.
+  - Encode the owner-reserved list from ARCH-006's authority model verbatim, so no contract grants
+    what the model reserves.
+  - State the evidence rule for validators - executed tests and repository checks, never persona
+    assertions.
+  acceptance:
+  - 'REQ-022 R03 holds: every owner-reserved action appears in no agent contract.'
+  - Each contract names its consuming and producing artifacts from ARCH-006's hand-off table.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - .claude/agents/
+  next_action: Start from the existing demo-validator and idea-triage agent definitions, which
+    already embody the pattern, and generalize their contract form.
+- id: phase-irs-04
+  title: LangGraph orchestrator skeleton with interrupt gates and the thin-state rule
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-03
+  scope:
+  - Implement the nine-stage graph with stub nodes, the checkpointer under gitignored data/, interrupt
+    nodes for gates G2 through G5, and ledger entries per transition.
+  - Enforce ADR-018's thin-state rule - state carries run identity, stage and references only, and on
+    disagreement the repository wins and the run re-derives.
+  - Consume claim-protocol recovery from phase-agx-09's deliverables where they exist; define none
+    here, per the PLAN-039 boundary table.
+  acceptance:
+  - 'REQ-022 R16, R17 and R18 hold: corrupted checkpoint re-derives, a killed run resumes at its gate,
+    and one run is reconstructible from ledger entries alone.'
+  - 'REQ-022 R19 holds: the orchestrator package contains no claim-recovery logic of its own.'
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  - docs/04-decisions/ADR-018-langgraph-orchestration.md
+  next_action: Pin the LangGraph dependency and confine its import surface to one orchestrator package
+    before writing the first node.
+- id: phase-irs-05
+  title: Phase-fit procedure and agent
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-10
+  scope:
+  - Write the procedure for judging whether a backlog phase fits one session and for splitting one
+    that does not, deliberately distinct from phase-idg-05's idea decomposition per the PLAN-039
+    boundary table.
+  - Build the agent that applies it, returning split phases into the three-altitude review at the
+    phase altitude.
+  acceptance:
+  - 'REQ-022 R11 holds: a deliberately oversized phase is split and each part re-enters review.'
+  - The procedure cites the plan-quality standard for what a one-session phase contains.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - .claude/agents/
+  next_action: Derive the fit test from the session_budget field's actual meaning in completed phases
+    rather than inventing a size heuristic.
+- id: phase-irs-06
+  title: Three-altitude review procedure with the interim adversarial engine
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-10
+  scope:
+  - Write the review procedure at its three altitudes - the plan as a whole, each phase in isolation,
+    each later-added phase against the standing plan - with findings and dispositions recorded.
+  - Run it with a single-adversary engine now, defining the adoption seam for phase-agx-11/12's trio
+    so the engine swaps without the procedure changing.
+  - Include the planner conformance check from REQ-022 R09 as the review's entry condition.
+  acceptance:
+  - 'REQ-022 R10 holds: the procedure exists in writing and one review produces a findings record
+    with dispositions.'
+  - A non-conformant draft is returned before adversarial time is spent on it.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - docs/02-prompts/
+  next_action: Generalize the prompt used for the 2026-09-15 pass on ARCH-006's draft, which already
+    exercised the top altitude.
+- id: phase-irs-07
+  title: Dependency-mapping agent and the Gate 3 ratification flow
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-12
+  scope:
+  - Build the agent that writes depends_on and systems locks for an approved plan's phases,
+    validator-checked, and proposes a next_up ordering it never writes itself.
+  - Build the Gate 3 ratification flow where the owner ratifies, amends or rejects the proposal, with
+    the decision recorded.
+  - Twice-rejected mappings escalate to Gate 3 with the validator output attached.
+  acceptance:
+  - 'REQ-022 R05 holds: one plan traces from proposal to ratified ordering with the owner decision
+    recorded.'
+  - The agent has no write path to next_up.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - .claude/agents/
+  next_action: Define the proposal artifact the owner ratifies - it must read as a decision-ready
+    ordering with reasons, not a diff.
+- id: phase-irs-08
+  title: Execution loop harness for developer and validator dispatch
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  - phase-auto-02
+  scope:
+  - Dispatch developer agents into worktrees under the unchanged ADR-003 claim protocol and validator
+    agents against their diffs, with validators seeing the requirement and never the rationale.
+  - Park a twice-rejected unit as blocked with its finding attached, surfaced in the Gate 5 queue.
+  - Run the staged confidentiality check mechanically before any push; a failure blocks the push.
+  - If phase-auto-01 descopes the supervised worker, fall back to plain Agent SDK dispatch per the
+    PLAN-039 boundary table.
+  acceptance:
+  - 'REQ-022 R13, R14 and R22 hold, each demonstrated in a test run.'
+  - The ADR-003 claim protocol is unchanged; the harness dispatches into it rather than around it.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  next_action: Read phase-auto-02's broker contract when it lands; the harness authorizes merges
+    through it, never around it.
+- id: phase-irs-09
+  title: Terminal delivered status and the realization check
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - Add the terminal delivered status to the idea status machine as append-only events, coordinated
+    with the phase-idg-01 schema bundle rather than forked from it.
+  - Build the realization agent that verifies a delivered capability against the originating idea's
+    text, records evidence annotations, and proposes delivered for Gate 5 sign-off.
+  - An unverifiable capability is recorded as a finding on the idea and surfaced at Gate 5, never
+    silently closed.
+  acceptance:
+  - 'REQ-022 R15 holds: one idea traces from merge to delivered with evidence, through an owner
+    Gate 5 decision.'
+  - The status change lands as append-only events; git diff shows no rewritten line in _data/ideas.jsonl.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - schemas/
+  - tools/
+  - .claude/agents/
+  next_action: Confirm against phase-idg-01's landed schema whether delivered is a new status or an
+    annotation pattern on the existing terminal states.
+- id: phase-irs-10
+  title: Wire the learning loop into the anti-pattern store
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-agx-03
+  - phase-irs-09
+  scope:
+  - Route validator rejections, recurring adversarial findings and realization-check outcomes into
+    the anti-pattern store phase-agx-03 builds.
+  - Define how the plan-quality standard cites the store when revised, closing the loop from pipeline
+    failures to better plans.
+  acceptance:
+  - 'REQ-022 R25 holds: one recorded rejection traces into the store, and a standard revision cites
+    it.'
+  - The store's own recording contract is used unchanged; no second store or parallel format exists.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - docs/08-governance/
+  next_action: Adopt the store's own recording contract; this phase adds sources to it, not a second
+    store.
+- id: phase-irs-11
+  title: Run budgets, hard caps and the kill switch
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  scope:
+  - Give every run a token budget with a hard cap that parks the run rather than exceeding it.
+  - Build the owner-operable kill switch that halts all pipeline dispatch before the next agent
+    dispatch.
+  acceptance:
+  - 'REQ-022 R20 and R21 hold: a low-cap test run parks, and the switch trips a multi-stage run.'
+  - A parked run resumes cleanly after the cap is raised or the switch is cleared, with its ledger intact.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  next_action: Decide where the switch lives so it works when the orchestrator itself is wedged - a
+    file the dispatch path checks is the candidate.
+- id: phase-irs-12
+  title: End-to-end trace, forced-failure drill and metrics baselines
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-irs-05
+  - phase-irs-06
+  - phase-irs-07
+  - phase-irs-08
+  scope:
+  - Trace one real idea end to end through the assembled pipeline, recording every transition and
+    every gate decision.
+  - Force one failure per stage class and confirm each stage's written failure path engages, per
+    REQ-022 R12.
+  - Compute automation rate, cycle time and rework rate deterministically from the ledger and log,
+    and record the baselines before any target is set.
+  acceptance:
+  - 'REQ-022 R12 and R24 hold: no stage wedges silently, and the metrics tool is deterministic with a
+    recorded baseline.'
+  - The trace and drill results are recorded with real output, including every failure engaged on purpose.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/
+  - docs/08-governance/
+  next_action: Pick the traced idea from the log's open queue with the owner at Gate 1, so the drill
+    is real work rather than a synthetic fixture.
+- id: phase-irs-13
+  title: Gate queue and decision-ready presentation with batched completion review
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  scope:
+  - Build the queue where gate items wait, each decision-ready - the proposal, the adversarial
+    findings and the evidence, pre-digested, never a raw transcript.
+  - Make Gate 5 batchable so the owner clears finished phases in one sitting, each still individually
+    closed through the owner-invoked session-close review.
+  acceptance:
+  - 'REQ-022 R02 and R04 hold: a two-phase batch closes in one sitting, and one queued item per gate
+    category passes owner inspection as decision-ready.'
+  - Each batched phase is still individually closed through the owner-invoked session-close review.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - src/
+  - ts/
+  next_action: Decide the queue's surface with the owner - the workbench is the natural host but not
+    a settled one.

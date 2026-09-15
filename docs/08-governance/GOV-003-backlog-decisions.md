@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-14'
+updated: '2026-09-15'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -388,3 +388,29 @@ because nothing distinguishes "the condition was wrong" from "the work missed th
 moved." The checkpoint recorded the condition as **unmet** first, in `SESS-2026-09-14-06`, and the
 amendment came afterwards as a separate owner ruling. Anyone auditing the phase can see both states
 and judge the change for themselves.
+
+## The idea realization system re-frames four programmes as sub-programmes
+
+Idea `000247` asked for the informal idea-to-delivery process to be formalized into one automated
+pipeline. On 2026-09-15 the owner ruled, via recorded findings on that idea, that the result is a
+**superseding master plan** — [PLAN-039](../01-plans/PLAN-039-idea-realization-system.md), with
+[ARCH-006](../07-architecture/ARCH-006-idea-realization-system.md) as its architecture and
+[REQ-022](../06-requirements/REQ-022-idea-realization-system.md) as its requirements — under which
+the idea graph and lifecycle programme (`PLAN-029`, P1), agent engineering and delegation
+(`PLAN-031`, P4), autonomous agent operations (`PLAN-032`, P5) and the repeatable idea partition
+(`PLAN-025`) become sub-programmes of the pipeline.
+
+**What this changes and what it does not.** The re-framing changes no sub-programme phase: codes,
+scopes, orderings and the accepted partition of 2026-09-13 all stand. `PLAN-039` adds thirteen
+`phase-irs-*` glue phases, none in `next_up`, with dependency edges *into* the sub-programmes.
+It is recorded here because the 2026-09-13 partition was an accepted decision, and a master plan
+sitting above its programmes is a change to that decision's framing that a future reader must be
+able to find deliberately rather than discover by inference.
+
+**Two consequential rulings travel with it.** First, the five-gate model: the owner's four gate
+categories plus a batched completion-review gate, under which `PLAN-025`'s three partition
+check-ins consolidate into one Gate 2 sitting — an amendment to `PLAN-025` that `phase-irs-02`
+executes and records here when it lands. Until then `PLAN-025`'s three check-ins stand as written.
+Second, no standing owner-only rule is delegated: `/session-close` remains owner-invoked per
+phase, batched but never automated, and `next_up` ranking remains the owner's, with the mapping
+agent proposing and never writing.
