@@ -11318,6 +11318,7 @@ Distinct from the idea-partition pack (PLAN-025, PROMPT-034), which partitions i
 **Links**
 
 - relates_to → `000234`
+- relates_to ← `000237`
 
 ---
 
@@ -11347,3 +11348,21 @@ Belongs to P1 (idea graph and lifecycle, PLAN-029) by subject matter; recorded h
 - relates_to → `000119`
 - relates_to → `000232`
 - relates_to → `000129`
+
+---
+
+## 000237 · Amend the checkpoint and session-close skills to cover a session with no claimed phase
+
+**Created 2026-09-14T23:52:45-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised after a long planning session that produced two coordinator prompts, a phase split, four session prompts and several integrations - and could not be recorded by either skill, because both assume a claimed phase.
+
+The gap, precisely. The checkpoint skill's step 1 says "If no phase is active for this session, say so and stop. There is nothing to record." That is wrong for owner-directed work: AGENTS.md explicitly provides for a session with no backlog phase ("a one-off document, a fix asked for directly - has nothing to claim... name the branch and worktree after the work"), and AGENTS.md's hand-off step 2 still requires such a session to write a kind: session record. So the repository simultaneously requires a record and tells the skill there is nothing to record. session-close inherits the same gap through its step 1, which runs the checkpoint procedure in full, and its steps 3, 4 and 6 (sub-agent review, acceptance verdicts, status: complete) have nothing to operate on when no phase was claimed.
+
+What the amendment should settle rather than assume: whether an unclaimed session's record uses the same six-section contract with Phase stating "none, unclaimed" (what was done by hand on 2026-09-14, see SESS-2026-09-14-12), or a narrower shape that drops Verification and Acceptance since neither has a declared list to run against; whether session-close should be invocable at all with no phase, or whether a third entry point owns this case; and what, if anything, replaces the independent sub-agent review as the honesty gate when there are no acceptance conditions to review against. Note the review is the load-bearing step - it caught three real errors in phase-prog-03 the same day - so dropping it for unclaimed sessions removes the check exactly where the work is least constrained.
+
+Also worth covering: a checkpoint invoked from the primary checkout while a peer's session record sits uncommitted there. The skill says never touch a phase you are not working, which is correct, but says nothing about how to report a peer's dirty state, which is what actually happened.
+
+**Links**
+
+- relates_to → `000235`
