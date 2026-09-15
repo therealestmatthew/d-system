@@ -269,8 +269,34 @@ function serveRepositoryFiles(): Plugin {
       // and gets back something that fits. `?raw=1` (checked via `query`, never the path) is what
       // that wrapper's own `<img src>` points back at to fetch the actual bytes, one level down —
       // without it, wrapping would recurse into wrapping the wrapper.
+      // The wrapper above is a presentation choice for a *top-level* view of an image (the HTML
+      // Viewer's iframe, or a direct browser navigation) — it must never intercept an `<img>` that
+      // is itself fetching this same URL for its bytes, which is exactly what a relative
+      // `<img src="foo.png">` inside a rendered markdown file or a served `.html` page does (both
+      // resolve against this same `/workbench-file/` prefix). Without this discriminator, every
+      // raster URL always answers with the wrapper unless the caller happens to already know to
+      // add `?raw=1`, which an ordinary `<img src>` written by a markdown or HTML author never
+      // does — that `<img>` would render broken. `Sec-Fetch-Dest` is what browsers attach to every
+      // fetch on a potentially-trustworthy origin (localhost qualifies) to say what kind of
+      // request this is; `image` means "an `<img>`/`<picture>` etc. asked for this," so that case
+      // always gets raw bytes. Node lowercases incoming header *names* itself, so
+      // `req.headers['sec-fetch-dest']` already finds the header regardless of the casing it
+      // arrived in; the value is lowercased here too for the same reason, even though the fetch
+      // spec itself always sends it lowercase. A missing header (an older browser, curl, or any
+      // client that omits it) is deliberately treated as "not an image sub-resource" — i.e. still
+      // wrapped — so the demo path (an iframe/direct-navigation client that does send the header)
+      // is never the case put at risk by a client that doesn't; `?raw=1` remains the explicit
+      // escape hatch for exactly that gap, and is what the wrapper's own `<img>` relies on.
+      // Do not "simplify" this away by dropping the header check: doing so reintroduces the
+      // defect this branch exists to fix.
+      const secFetchDest = (req.headers['sec-fetch-dest'] ?? '').toString().toLowerCase()
+      const isImageSubResourceRequest = secFetchDest === 'image'
       const extensionLower = extname(realResolved).toLowerCase()
-      if (RASTER_IMAGE_EXTENSIONS.has(extensionLower) && !query.has(RAW_IMAGE_QUERY_PARAM)) {
+      if (
+        RASTER_IMAGE_EXTENSIONS.has(extensionLower) &&
+        !query.has(RAW_IMAGE_QUERY_PARAM) &&
+        !isImageSubResourceRequest
+      ) {
         const title = basename(realResolved)
         // Relative, not absolute: this document's own URL already carries whatever query
         // `HtmlViewerRegion`'s iframe added (its cache-busting `?v=<n>`), so a relative
