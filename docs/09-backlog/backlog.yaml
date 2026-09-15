@@ -7607,7 +7607,8 @@ items:
   systems:
   - sys-projection
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7628,6 +7629,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-034-blocked-downstream-projections.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Answer G31 before writing any requirement. It is a question for the owner
     and it determines whether G32 has any subject matter at all.
 - id: phase-prog-10

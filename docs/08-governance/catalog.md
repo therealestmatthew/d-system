@@ -298,7 +298,7 @@ CI regenerates it and fails on any difference.
 | PLAN-031 | doc-agent-engineering-delegation | active | 13 | 0 | 1 | agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | active | 6 | 0 | 1 | agent-night |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
-| PLAN-034 | doc-blocked-downstream-projections | draft | 1 | 0 | 0 | — |
+| PLAN-034 | doc-blocked-downstream-projections | draft | 0 | 1 | 0 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | draft | 1 | 0 | 0 | — |
 | PLAN-036 | doc-html-generation-design-system | draft | 1 | 0 | 0 | — |
 | PLAN-037 | doc-standalone-explorations-housekeeping | draft | 1 | 0 | 0 | — |
