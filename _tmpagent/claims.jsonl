@@ -10,3 +10,5 @@
 {"file":"viewer-render-location-ruling.md","event":"claimed","at":"2026-09-14T20:43:00-04:00","by":"agent-demo-a","branch":"agent/demo-viewer-tonight","kind":"branch","ref":"agent/demo-viewer-tonight"}
 {"file":"viewer-render-location-ruling.md","event":"released","at":"2026-09-14T22:31:00-04:00","by":"agent-demo-a","branch":"agent/demo-viewer-tonight","kind":"branch","ref":"agent/demo-viewer-tonight"}
 {"file":"demo-track-coordinator.md","event":"released","at":"2026-09-14T22:31:00-04:00","by":"agent-demo-a","branch":"agent/demo-viewer-tonight","kind":"branch","ref":"agent/demo-viewer-tonight"}
+{"event": "claimed", "file": "p10-track-coordinator-v2.md", "kind": "branch", "ref": "agent/phase-arch-01", "at": "2026-09-14T23:58:07-04:00", "agent": "agent-arch-vocab", "branch": "agent/phase-arch-01"}
+{"event": "released", "file": "p10-track-coordinator-v2.md", "kind": "branch", "ref": "agent/phase-arch-01", "at": "2026-09-15T00:03:11-04:00", "agent": "agent-arch-vocab", "branch": "agent/phase-arch-01"}
