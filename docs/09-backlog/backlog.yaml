@@ -7490,7 +7490,7 @@ items:
   systems:
   - sys-api
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7514,6 +7514,33 @@ items:
   - docs/09-backlog/README.md
   next_action: Rule on 000020 first. Its librarian half overlaps P6 and a lighter
     mechanism in P4, so the programme's shape depends on the ruling.
+  session: doc-session-autonomous-agent-operations-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-032-autonomous-agent-operations.md
+  - docs/06-requirements/REQ-017-autonomous-agent-operations.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-06-autonomous-agent-operations-plan.md
+  result: >-
+    Finalized P5, the most speculative programme in the partition. Acted on the owner's existing
+    000020 ruling rather than re-deciding it: the control analyst nominated decline, the owner ruled
+    on 2026-09-13 to keep it sequenced behind 000128, so phase-auto-06 is a revisit with a
+    precondition on phase-agx-07 and R15 requires it to name cases where the light mechanism actually
+    fell short. Inverted the partition's ordering so 000031's broker is built first, ahead of the
+    gateway, ledger and worker - read as a precedence note the gate is satisfiable by building the
+    other three and adding the broker before switching them on, leaving a window where unattended work
+    runs with nothing authorising it. The review confirmed the inversion is mechanically enforced, not
+    merely asserted: src/governance/backlog.py refuses to let phase-auto-03, -04 or -05 reach active
+    or complete while the broker is incomplete. Stated the programme's evidence problem plainly rather
+    than implying an evidence base it lacks - four of five ideas came from a research pass, and the
+    one real data point is this unattended run, which used none of this infrastructure and was bounded
+    instead by written advance authority an agent chose to honour, which is exactly the enforcement
+    000031 calls insufficient. The review independently corroborated that evidence against the owner's
+    own authority grant committed before the batch ran. Wrote REQ-017 with sixteen rows and registered
+    six phases under phase-auto-*. Verification green - governance exits 0 at 237 documents and 228
+    phases, --ready shows phase-auto-01 alone as the programme's shape requires, and 580 tests pass.
+    All four conditions confirmed; two minor findings, one already fixed before review and one fixed
+    at close.
+
 - id: phase-prog-08
   title: Finalize the retrieval and knowledge infrastructure plan (P6)
   plan: doc-retrieval-knowledge-infrastructure

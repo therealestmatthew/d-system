@@ -25,10 +25,12 @@ Fifth phase of the unattended overnight batch run by `agent-night`.
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 236 documents, 25 memories, 228 backlog phases
+Governance OK: 27 systems, 237 documents, 25 memories, 228 backlog phases
 ```
 
-Exit 0. Documents 235 → 236 for `REQ-017`; phases 222 → 228 for the six `phase-auto-*` phases.
+Exit 0. Documents 235 → 237: `REQ-017`, and this record. Phases 222 → 228 for the six
+`phase-auto-*` phases. An earlier run during the session reported `236 documents`, correctly — this
+record did not exist yet. The final figure is the one recorded here.
 
 `uv run python -m src.governance --ready`
 
@@ -61,9 +63,75 @@ everything except the `000020` revisit, and that revisit waits on `phase-agx-07`
 
 ## Backlog
 
-`phase-prog-07` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-07` is `status: complete`, `agent: agent-night`,
+`session: doc-session-autonomous-agent-operations-plan`. Completion evidence is `PLAN-032`,
+`REQ-017`, `docs/09-backlog/README.md` and this record. Written under the owner's advance authority
+for this batch, after the read-only independent review below confirmed all four conditions.
 
 Six phases added under `phase-auto-*`, all `status: queued`, none claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-07`. Its own runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 237 documents, 25 memories, 228 backlog phases
+EXIT=0
+
+$ uv run pytest -q
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`status: draft` → `active`;
+four numbered design decisions plus an 'evidence problem' section replace the old banner."
+
+**Condition 2 — requirement exists, every row maps to a phase — Met.** "Checked coverage directly
+against `backlog.yaml`, not PLAN-032's own table: all 16 IDs appear in the `phase-auto-01..06`
+acceptance text, and every phase's acceptance cites at least one row."
+
+**Condition 3 — the `000031` gate is a precondition for anything unsupervised — Met, and verified two
+ways, not just in prose.** The reviewer went further than the data shape and found the enforcement:
+
+> "Mechanical enforcement, not just data shape: `src/governance/backlog.py:134-136` — `if
+> item["status"] == "active"/"complete" and items[dependency]["status"] != "complete":
+> errors.append("prerequisite ... is not complete")`. … The ordering is a real, checked gate, not a
+> note that a later builder could satisfy by prose alone."
+
+That is a stronger result than this phase claimed. The plan argued the ordering makes the gate real;
+the reviewer established that the governance check actively refuses to let `phase-auto-03`, `-04` or
+`-05` reach `active` or `complete` while the broker is not complete.
+
+**Condition 4 — removed from `next_up` in the same change — Met**, verified by `git show`.
+
+**The `000020` ruling was checked against the source, not the claim.** "Confirmed real, not
+re-decided… `docs/00-working/idea-batching-partition.md` line 458, 'Owner rulings, 2026-09-13,' row:
+`Kept, sequenced behind 000128 | 000020 | Build the light _tmpagent/ mechanism first; revisit only if
+it proves insufficient.` PLAN-032 and REQ-017 restate this without contradiction." It also confirmed
+`phase-agx-07` exists and the dependency is real rather than fabricated.
+
+**The self-citation was corroborated independently**, which this phase could not do for itself. The
+reviewer checked whether citing this run as evidence was self-serving and found the owner's own
+authority grant committed before the batch ran:
+
+> "`docs/00-working/overnight-run-prompt-2026-09-15.md` (committed on `dev` at `c4e0e759`, **authored
+> by the owner**, before the batch ran, not part of this diff) records the exact authority grant and
+> guardrails PLAN-032 cites… This is real, independently-dated corroboration — not the same agent
+> inventing its own evidence after the fact. … I judge this legitimate, appropriately caveated
+> evidence, not a self-serving overclaim."
+
+**`backlog.yaml` integrity.** "Exactly 6 new items, **zero** pre-existing items changed, no YAML
+anchors/aliases introduced. `next_up` differs only by the removal of `phase-prog-07`."
+
+**Two minor findings, both already addressed.**
+
+- *R08's "eleven fields" overstates fidelity to `000029`'s text* — the idea names ten
+  comma-separated items, and eleven is reachable only by splitting "the model/tool versions used" in
+  two. The reviewer is right, and this was **already corrected in commit `c74360b`**, which landed
+  after the snapshot it reviewed: both documents now cite the idea's list without imposing a count.
+  Independently reaching the same conclusion from the idea body is corroboration of the fix.
+- *The session record's pasted governance output was stale* — `236 documents` against 237, because
+  this record was not yet in the catalog when the command ran. **Fixed**, with the reason stated.
 
 ## Decisions
 
