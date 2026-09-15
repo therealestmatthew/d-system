@@ -11282,6 +11282,28 @@ Constraints it must not break, all already specified and verified:
 
 Related: 000133 revisits panel geometry on the G43 model and is the nearest existing home if this lands in P10.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-maximize-review (2026-09-15T16:47:07-04:00): Read-only investigation, 2026-09-15, of PLAN-028 design decision 5 against the shipped code, at the owner's request. The ruling stands on the owner's decision: phase-arch-17 keeps depends_on [phase-arch-07, phase-arch-09] and its queue position. Recorded so the mechanism is not re-derived.
+
+The slot-level mechanism already exists and was built for this problem class. StagePage.tsx:129 keeps panelHosts: one persistent div per panel type, created once, never replaced, carrying display:contents and dataset.panelHost. StagePage.tsx:155-188 is a layout effect that appends each visible panel's host into its slot's registered body and moves it by DOM appendChild on a re-assignment - a DOM move, invisible to React, so nothing unmounts. It exists because changing a React portal's container remounts the subtree and closed the terminal's websocket (the W09 fix cycle 1 defect, documented at StagePage.tsx:36-54).
+
+Maximize is that same operation in a different target geometry, and the cheapest form does not reparent at all: StagePage writes host.dataset.maximized and one CSS rule does the rest - [data-panel-host][data-maximized] > .stage-region { position: fixed; inset: 0; z-index: N }. That escapes the overflow:hidden chain because StagePage.css sets no transform, filter, contain or will-change anywhere (grepped, zero hits), so nothing establishes a containing block that would trap a fixed-position element. Popover.tsx already escapes the same chain by portalling to document.body. Not reparenting also avoids the iframe reload that reinserting an iframe element causes, which matters because the HTML Viewer is the motivating panel.
+
+Three of the four REQ-011 rows then come out free. R28 (a maximized shell keeps its PTY): no remount, and TerminalRegion.tsx:273-276 observes the session's own mount div with a ResizeObserver whose guarded attemptFit refits xterm and sends the backend a resize frame, so the shell reflows to full screen with no new code. R27 (transient, never persisted): storage.ts has one named writer per persisted field, so adding no writer satisfies the row by construction. R25 (available to every panel type, no panel implements its own): the control sits in the slot chrome, which Slot.tsx renders unconditionally, exactly once per slot. Estimated cost: 25-40 lines across StagePage.tsx, Slot.tsx and StagePage.css, plus a maximized-elsewhere placeholder for the vacated slot body, since Slot.tsx's two existing placeholders cover only isEmpty and showsNothing.
+
+On the dependency edges: REQ-011 R25-R28 as written require neither sub-slots (R12, phase-arch-07) nor reconfigurable geometry (R15, phase-arch-09). The edges 17 to 07 and 09 come from G43 group membership, not from the requirement text. What 07 genuinely changes is the control's home - R13 makes the slot top bar schema-owned, so the button relocates into it. What 09 genuinely changes is whether maximize is expressed as a point in a geometry range rather than a fixed overlay; that is the one real coupling and the honest argument for waiting.
+
+Scale check on the motivation: in layout-1 the HTML Viewer's main slot is column 2 of [1.4fr, 1fr] and row 2 of [0.25fr, 1.3fr, 1.15fr] - about 20 percent of the grid, roughly 785x478px at 1920x1080. In layout-2 it is about 13 percent. Maximizing is a 5x and 8x area gain. The projector complaint is quantitatively correct.
+
+Two further notes for whoever executes this. There is no automated fill or zero-scroll check in the repository - test/ holds 22 files, none browser-driven, and grepping test/, tools/ and js/ for W15, scrollHeight or 1366 returns nothing - so R26 is a demo-validator-web Playwright run at four window sizes by two layouts by two states, and it is the largest line item in the phase. And available today at zero cost: the viewer's existing embed/open-in-tab toggle (HtmlViewerRegion.tsx:510-519) opens the selected page full-screen in a browser tab, served with a CSP sandbox header - not maximize-and-collapse, but a full-screen generated page on a projector at one click.
+
+</details>
+
 **Links**
 
 - relates_to → `000133`
@@ -11364,6 +11386,24 @@ The gap, precisely. The checkpoint skill's step 1 says "If no phase is active fo
 What the amendment should settle rather than assume: whether an unclaimed session's record uses the same six-section contract with Phase stating "none, unclaimed" (what was done by hand on 2026-09-14, see SESS-2026-09-14-12), or a narrower shape that drops Verification and Acceptance since neither has a declared list to run against; whether session-close should be invocable at all with no phase, or whether a third entry point owns this case; and what, if anything, replaces the independent sub-agent review as the honesty gate when there are no acceptance conditions to review against. Note the review is the load-bearing step - it caught three real errors in phase-prog-03 the same day - so dropping it for unclaimed sessions removes the check exactly where the work is least constrained.
 
 Also worth covering: a checkpoint invoked from the primary checkout while a peer's session record sits uncommitted there. The skill says never touch a phase you are not working, which is correct, but says nothing about how to report a peer's dirty state, which is what actually happened.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-maximize-review (2026-09-15T16:47:22-04:00): Second occurrence, 2026-09-15. The owner invoked /session-close on a read-only investigation session that claimed no phase, and the command hit exactly the gap this idea describes. Recorded because the first occurrence (SESS-2026-09-14-12) was a long planning session and this one is the opposite shape - a single short investigation - which shows the gap is not specific to large owner-directed sittings.
+
+What happened in practice, step by step, as evidence for the amendment. Step 1 had no phase to name: no claim commit exists for the session, and the only active phase was phase-lit-07, held by a peer in the lit-campaign worktree, which AGENTS.md forbids touching. Steps 2 through 6 had nothing to operate on, so no sub-agent review was launched - there were no acceptance conditions to review against. Nothing reached status: complete, correctly.
+
+Two steps did work unchanged and should survive the amendment. Step 7's gates are phase-independent and were run (governance OK; 579 passed after a fix). Step 8's commit instruction applied cleanly: the session had produced a real repository change (an idea capture) sitting uncommitted in the primary checkout, and step 8 is what caught it. An amendment that makes the whole command conditional on a claimed phase would lose that, which is the one thing a phaseless session most needs, since it has no branch and no integration procedure to catch stray work.
+
+One datum for the open question this idea raises about what replaces the independent review as the honesty gate. Here there was nothing for a reviewer to verify against a declared list, but there was something verifiable: a drift test caught the session's own error. Appending the idea without regenerating docs/00-working/ideas.md turned test_ideas.py::test_the_committed_markdown_matches_regenerated_output red, which the step 7 gates surfaced. For a phaseless session whose output is data writes rather than code, the existing drift tests may already be the proportionate gate, and the sub-agent review may be the wrong instrument rather than a missing one. That is a candidate answer to the question, not a settled one.
+
+The record shape question this idea leaves open was resolved by following the 2026-09-14 precedent: SESS-2026-09-15-12 uses the same six-section contract with Phase stating none/unclaimed, and an Unresolved section in place of Review since no review ran. That is now two hand-written instances of the same shape, which is the argument for making it the contract rather than re-deciding it a third time.
+
+</details>
 
 **Links**
 
