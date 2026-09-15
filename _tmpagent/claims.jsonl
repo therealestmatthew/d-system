@@ -4,3 +4,5 @@
 {"file":"p10-track-coordinator.md","event":"created","at":"2026-09-14T20:12:35-04:00","by":"agent-prog","branch":"dev","purpose":"Track B coordinator prompt for P10 phase-arch-* execution after the demo; replaces nothing"}
 {"file":"demo-track-coordinator.md","event":"activated","at":"2026-09-14T20:12:35-04:00","by":"agent-prog","branch":"dev"}
 {"file":"p10-track-coordinator.md","event":"activated","at":"2026-09-14T20:12:35-04:00","by":"agent-prog","branch":"dev"}
+{"file":"p10-track-coordinator-v2.md","event":"created","at":"2026-09-14T20:33:48-04:00","by":"agent-prog","branch":"dev","purpose":"Track B coordinator prompt, corrected wave-1 ceiling from 2 to 3; replaces p10-track-coordinator.md which stated a measurement that omitted phase-arch-00"}
+{"file":"p10-track-coordinator-v2.md","event":"activated","at":"2026-09-14T20:33:48-04:00","by":"agent-prog","branch":"dev"}
