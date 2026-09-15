@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-14'
+updated: '2026-09-15'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -7158,7 +7158,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
