@@ -26,7 +26,8 @@ settling the names would have meant naming them twice.
 
 **13 ideas across 8 fine groups**, from the accepted partition of 2026-09-13, **plus `000233`**
 (panel maximize), raised on 2026-09-14 and ruled into `G43` below. This plan turns them into **17
-phases** under the `phase-arch-*` prefix, governed by
+phases** under the `phase-arch-*` prefix, plus `phase-arch-00`, which is owner-directed enabling work
+rather than an idea of the partition's — **18 in total**, governed by
 [REQ-011](../06-requirements/REQ-011-workbench-architecture-quality.md).
 
 | Group | Ideas | What it covers | Phases |
@@ -56,8 +57,14 @@ teaches the next reader something false.
 
 ## The chosen design
 
-Five decisions shape the seventeen phases. Four were open in the placeholder; the fifth rules on an
+Five decisions shape the eighteen phases. Four were open in the placeholder; the fifth rules on an
 idea raised after it.
+
+`phase-arch-00` sits outside all five. It is not an idea from the partition and belongs to no group:
+the owner directed on 2026-09-14 that `sys-ui` be decomposed before the rest of the track runs,
+because `sys-ui` is declared by 14 of the 17 and the validator treats a shared system as a collision,
+so the track would otherwise execute almost entirely serially. Measured rather than assumed — see
+*Execution order* below. Recorded as `000234`.
 
 ### 1. The vocabulary ships as concept memories, not as a new document
 
@@ -146,11 +153,12 @@ work under the programme that would ship it sooner.
 
 ## Implementation phases
 
-Seventeen phases under `phase-arch-*`, registered in
+Eighteen phases under `phase-arch-*`, registered in
 [the backlog index](../09-backlog/README.md). `phase-arch-01` is first and has no prerequisites.
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
+| `phase-arch-00` | Decompose `sys-ui` so frontend phases stop serializing on one lock | — | — |
 | `phase-arch-01` | Settle the workbench vocabulary and rule on identifier migration | `G40` | — |
 | `phase-arch-02` | Execute the workbench identifier migration | `G40` | `01` |
 | `phase-arch-03` | Duplication audit across the workbench and API | `G41` | `01` |
@@ -184,6 +192,34 @@ against 14, and the delta is three stated choices rather than scope growth:
 
 `G41`, `G44`, `G45`, `G46` and `G47` each land inside their partition-time range. `G43` lands at five
 against a 4–5 range, and the fifth is `000233`, which the range never covered.
+
+## Execution order and real concurrency
+
+Measured on 2026-09-14 by running `src.governance.backlog.collisions()` over the whole
+`phase-arch-*` set, not read off the dependency graph. `depends_on` gives the waves; the lock table
+decides how much of each wave can actually run at once.
+
+| Wave | Ready together | Actually concurrent | What blocks the rest |
+|---|---|---|---|
+| 1 | `01`, `11`, `14`, `16` | **2** — `01`+`11`, or `01`+`16` | `01`/`14` share `sys-ui`; `11`, `14`, `16` all share the `docs/00-working/` deliverable |
+| 2 | `02`, `03`, `05`, `12`, `15` | **2** — `02`+`12` only | `sys-ui` pairwise across `02`, `03`, `05`, `15`; `sys-api` across `03`, `12`, `15`; `test/` across `05`, `12`, `15` |
+| 3 | `04`, `06` | **1** | share `sys-ui` |
+| 4 | `07` | 1 | nothing ready beside it |
+| 5 | `08`, `09`, `10` | **1** | all three share `sys-ui`; `08`/`09` also share `ts/src/stage/` and `_data/workbench/layouts/` |
+| 6 | `13`, `17` | **1** | share `sys-ui` and `ts/src/stage/` |
+
+**The ceiling is 2, not `max_active`'s 3, and it is 1 from wave 3 onward.** `sys-ui` is declared by
+14 of the 17 idea-derived phases, and a shared system is a collision, so adding agents past two buys
+nothing. The critical path is six deep: `01` → `05` → `06` → `07` → `09` → `17`.
+
+This is what `phase-arch-00` exists to change, and why the owner directed it first. Until it lands,
+a coordinator should claim the permitted pairs above and run everything else serially rather than
+queue claims the validator will reject.
+
+Two of the collisions are artifacts rather than real contention. `docs/00-working/` is a staging
+directory, not a contended surface — three audit phases collide there only because each declares the
+whole directory. `ts/src/stage/` is one path covering every panel. Both narrow naturally when
+`phase-arch-00` splits the lock table.
 
 ## Requirement coverage
 
@@ -219,6 +255,7 @@ Every row of `REQ-011` maps to at least one phase, and every phase carries at le
 | R26 Zero scroll and fill assertions hold maximized and collapsed | `phase-arch-17` |
 | R27 Maximize is transient and never persisted | `phase-arch-17` |
 | R28 A maximized shell keeps its PTY session | `phase-arch-17` |
+| R29 The frontend lock table admits two independent phases | `phase-arch-00` |
 
 ## What P11 depends on
 

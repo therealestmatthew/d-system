@@ -7938,3 +7938,38 @@ items:
   - test/
   next_action: Assert R28 first with a failing test - set a shell variable, maximize, collapse,
     read it back. Session loss on remount is the one constraint that cannot be retrofitted.
+- id: phase-arch-00
+  title: Decompose sys-ui so frontend phases stop serializing on one lock
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Split sys-ui in docs/08-governance/systems.yaml along seams observed in the code, not
+    along wished-for boundaries. Candidate seams are the layout and slot engine, the panel
+    implementations under ts/src/stage, the notes strip and rotator, and the explorer panels.
+  - Redeclare every phase-arch-* phase's systems against the narrower ids, and retire the
+    coarse sys-ui id rather than leaving it as a third alias.
+  - Narrow the deliverable paths that collide phases for no real reason - docs/00-working/
+    collides phase-arch-11, 14 and 16 with each other, and ts/src/stage/ collides phase-arch-08
+    with 09 and phase-arch-13 with 17.
+  - Record the counter-consideration in the change - a finer lock table admits more genuine
+    conflicts that the coarse lock was accidentally preventing.
+  acceptance:
+  - REQ-011 R29 holds - running src.governance.backlog.collisions() over the phase-arch-* set
+    shows a concurrency ceiling above 2.
+  - Every new system id names a surface that exists in the tree today.
+  - The governance check exits 0 with sys-ui retired and every phase redeclared.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/systems.yaml
+  next_action: Measure the current ceiling first with collisions() over all seventeen phases,
+    so the split is argued against a number rather than an impression.
