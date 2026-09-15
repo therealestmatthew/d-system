@@ -176,7 +176,7 @@ Ten phases under `phase-ret-*`, registered in [the backlog index](../09-backlog/
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
 | `phase-ret-01` | Build retrieval-failure collection and seed it from the session corpus | `G25` | — |
-| `phase-ret-02` | Re-specify the gate with a threshold and expiry, and re-rule the deferred phases | `G25`, `G26` | `01` |
+| `phase-ret-02` | Correct the gate's record and add a review date | `G25`, `G26` | `01` |
 | `phase-ret-03` | State the prioritised search order and its conflict rule | `G25` | — |
 | `phase-ret-04` | Design deterministic search across the surfaces | `G25` | `03` |
 | `phase-ret-05` | Revisit `ADR-001` on a queryable document projection | `G28` | — |
@@ -218,8 +218,8 @@ Every row of `REQ-018` maps to at least one phase, and every phase carries at le
 |---|---|
 | R01 A retrieval failure can be recorded, with existence stated | `phase-ret-01` |
 | R02 The collection is seeded from existing session records | `phase-ret-01` |
-| R03 The gate restated with a threshold and a review date | `phase-ret-02` |
-| R04 The deferred phases re-ruled in either outcome | `phase-ret-02` |
+| R03 The gate's real shape recorded, with a review date added | `phase-ret-02` |
+| R04 The waiting phases re-ruled when the date passes | `phase-ret-02` |
 | R05 A prioritised search order naming each source's authority | `phase-ret-03` |
 | R06 A conflict rule for disagreeing sources | `phase-ret-03` |
 | R07 Deterministic search, with no vector mechanism | `phase-ret-04` |
@@ -241,8 +241,11 @@ Every row of `REQ-018` maps to at least one phase, and every phase carries at le
 
 ## Known facts not to rediscover
 
-- **The gate is unmeetable as written.** Four phases are deferred behind "the recorded retrieval
-  failures" and nothing collects them. That is a deadlock, not a high bar.
+- **The gate names a collector, and the collector is unclaimed.** Four phases — `phase-mem-15`,
+  `-16`, `-17`, `-18` — carry `resume_when: phase-mem-10 records concrete unmet retrieval needs`.
+  `phase-mem-10` is `status: queued` and its deliverables do not exist. The partition's claim that
+  nothing collects this evidence is wrong, and `phase-mem-17` is missing from its account. Read
+  `backlog.yaml`, not the partition.
 - **`tools/load_context.py` reads only the `memories` table** (`FROM memories`, line 94). It is not a
   proxy for retrieval in this repository, and instrumenting it would measure the wrong path.
 - **`G28` is whole on the ideas' own self-description**, not on a synthesis judgement. `000045`'s body

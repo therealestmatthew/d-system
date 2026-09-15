@@ -163,7 +163,7 @@ records carry "Found wrong in the source material" and "Unresolved" sections, an
 there is a retrieval failure — some are defects found, not things sought and missed. **Proceeded on
 the assumption that the sweep will need a judgement pass**, and wrote `R01`'s third field (whether the
 thing existed) partly so the sweep has a criterion to apply. If the distinction proves unworkable,
-the seed count will be small and the threshold should account for that.
+the seed count will be small, and `phase-ret-02`'s review date should account for that.
 
 **Whether `phase-ret-08`'s successor tool exists.** `000005` names GitNexus, and the owner's ruling of
 2026-09-13 records the tool as dead — KuzuDB archived — with the question alive and any evaluation

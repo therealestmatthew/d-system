@@ -10483,7 +10483,7 @@ items:
   next_action: Claim phase-mem-10 first or confirm it is claimed - it is queued, ready, blocked by nothing,
     and four phases wait behind it. This phase records real misses; that one builds the synthetic set.
 - id: phase-ret-02
-  title: Re-specify the gate with a threshold and expiry, and re-rule the deferred phases
+  title: Correct the gate's record and add a review date
   plan: doc-retrieval-knowledge-infrastructure
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
