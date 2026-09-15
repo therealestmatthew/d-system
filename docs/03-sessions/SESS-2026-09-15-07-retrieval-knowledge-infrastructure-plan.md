@@ -35,14 +35,15 @@ exist yet.
 `uv run python -m src.governance --ready`
 
 ```
-| phase-ret-01 | Build retrieval-failure collection and seed it from the session corpus | — | 1 | ready | — | phase-prog-08 |
 | phase-ret-03 | State the prioritised search order and its conflict rule | — | 2 | ready | — | phase-prog-08 |
 | phase-ret-05 | Revisit ADR-001 on a queryable document projection | — | 2 | ready | — | phase-prog-08 |
 | phase-ret-08 | Evaluate a code-graph tool against this repository's code | — | 3 | ready | — | phase-prog-08 |
 | phase-ret-09 | Detect memory staleness and contradiction, and track confidence | — | 3 | ready | — | phase-prog-08 |
 ```
 
-Five of ten are `ready` — exactly the five declaring `depends_on: []`.
+Four of ten are `ready` — the four declaring `depends_on: []`. `phase-ret-01` is **not** among them,
+which is the correction described below working: it now depends on `phase-mem-10`, the collector the
+gate actually names. An earlier run in this session showed five, before that dependency was added.
 
 `uv run pytest`
 
@@ -53,7 +54,8 @@ Five of ten are `ready` — exactly the five declaring `depends_on: []`.
 ## Acceptance
 
 - **`PLAN-033` carries no placeholder banner and states a chosen design.** Met. Banner removed,
-  `status` `draft` → `active`, six numbered rulings plus a section on the gate deadlock.
+  `status` `draft` → `active`, six numbered rulings plus a section correcting the partition's account
+  of the gate.
 - **A requirement document exists for P6 and every row maps to at least one phase.** Met. `REQ-018`
   carries fourteen rows; the mapping is total in both directions, checked against the backlog.
 - **`G28` is kept whole, with the reason audit 2 gave for restoring it recorded.** Met. `PLAN-033`
@@ -72,11 +74,37 @@ Ten phases added under `phase-ret-*`, all `status: queued`, none claimed.
 
 ## Decisions
 
-**The gate is a deadlock, and re-specifying it is the programme's first job.** `phase-mem-15`, `-16`,
-`-18` and `-19` are all `deferred`, each citing "the recorded retrieval failures", and nothing records
-one. The evidence that would release the work can only come from using a retrieval system nobody may
-build until the evidence exists. Four phases have sat behind a condition with no threshold — no
-number, no date, nothing that could be satisfied or expire.
+**The partition's premise about the gate is wrong, and checking it changed this plan.** The partition
+says the programme "is gated on a recorded retrieval failure that nothing currently collects", and the
+phase's own scope repeats it. Both are mistaken in the same way, and I drafted the whole plan on that
+premise before verifying it.
+
+The gate lives in `resume_when`, not `next_action`, and it names a collector:
+
+```
+phases gated on phase-mem-10: ['phase-mem-15', 'phase-mem-16', 'phase-mem-17', 'phase-mem-18']
+phase-mem-10 status: ['queued']
+```
+
+Three corrections follow. **`phase-mem-10` exists and is `queued`** — ready, blocked by nothing,
+dependent on nothing, simply never claimed; its deliverables `tools/evaluate_retrieval.py` and
+`test/fixtures/retrieval_cases.json` are absent from disk. **`phase-mem-17` is gated too**, which the
+partition's account omits. And **`phase-mem-10`'s acceptance already carries the both-outcomes ruling**
+I had thought I was inventing: "identifies concrete unmet retrieval needs **or explicitly records that
+current retrieval is sufficient**."
+
+So the cheapest unblocking move in this programme is not to design anything. It is to claim a ready
+phase. That is now `phase-ret-01`'s `next_action`.
+
+**`phase-ret-01` was rewritten to complement `phase-mem-10` rather than replace it.** The distinction
+that survives is the corpus: `phase-mem-10` builds a *synthetic* evaluation set, synthetic by its own
+acceptance, which measures prepared queries; `phase-ret-01` records *actual* misses hit during real
+work. `R14` is why both are wanted — a retrieval system evaluated only on queries its designer wrote
+is evaluated on the wrong corpus. It now declares `depends_on: [phase-mem-10]`.
+
+**`phase-ret-02` was narrowed from re-specifying the gate to correcting the record of it**, then adding
+the one thing genuinely missing: a review date, so the waiting phases have a point at which they are
+re-ruled rather than waiting longer.
 
 **Collection is voluntary and seeded, not instrumented.** The obvious move is to instrument
 `tools/load_context.py`; ruled against, because it reads only the `memories` table —
@@ -86,11 +114,9 @@ and misses grep, which is how retrieval actually happens and which leaves no tra
 failure is indistinguishable from a question with no answer. `R02` seeds the collection from existing
 session records, which already describe such cases in prose.
 
-**The gate gets a threshold and an expiry, and both outcomes are ruled.** This is the half that
-matters. A condition that can expire converts four indefinitely parked phases into phases scheduled
-for a decision. If the failures never materialise, that is itself an answer — retrieval was not the
-problem it was assumed to be. The threshold is a guess made before the data exists; the expiry is
-what stops a wrong guess parking the work a second time.
+**The gate gets a review date, which is the gap that survived the correction.** A condition that can
+expire converts four waiting phases into phases scheduled for a decision. What it does *not* need is
+the threshold I first drafted: `phase-mem-10`'s acceptance already rules both outcomes.
 
 **`G26` gets no phase at all.** `000004` enumerates `phase-mem-15`, `-16`, `-18` and `-19` by id in
 its own body. Creating phases beside them would duplicate an existing line, so `phase-ret-02` acts on
@@ -109,17 +135,28 @@ absence of any vector mechanism.
 
 ## Corrections
 
+**The plan's central premise was wrong, and I wrote the whole first draft on it.** I inherited the
+partition's claim that nothing collects the retrieval evidence and did not check it until the plan,
+the requirement and ten phases were already drafted. `phase-mem-10` is the collector, it is `queued`,
+and `phase-mem-17` is gated on it too. Corrected in `PLAN-033`, `REQ-018` R03/R04 and the two affected
+phases before this phase was reviewed. The lesson is the ordinary one and I did not apply it: the
+partition is a secondary source, and `backlog.yaml` was the authority available the whole time.
+
 **`REQ-018`'s `depends_on` named a document id that does not exist.** I wrote `doc-agent-memory-system`
 for `PLAN-001`; its actual id is `doc-agent-memory`. Caught by reading the file's front matter before
 running governance rather than after. Corrected in both the requirement and the plan.
 
+**A correction was almost made with a whole-file rewrite.** Applying the phase edits by re-dumping
+`backlog.yaml` through the YAML writer reflowed every entry — 6,264 lines changed, 2,803 insertions
+against 3,461 deletions — which is unreviewable and is exactly the silent-mutation risk every review
+this run has checked for. Reverted and redone as a surgical replacement of the two blocks: 61 lines,
+and a parsed-item diff against `HEAD` confirms only `phase-ret-01` and `phase-ret-02` changed.
+
 ## Unresolved
 
-**What the threshold and review date should actually be.** `R03` requires a number and a date;
-`phase-ret-02` picks them. Options: fix them here, or leave them to the phase with the collection in
-hand. **Left them to the phase**, because choosing a threshold before `phase-ret-01`'s seeding sweep
-reports how many cases the corpus already contains would be guessing at a number that will be
-knowable in one session's time.
+**What the review date should be.** `R03` requires one; `phase-ret-02` picks it. Options: fix it
+here, or leave it to the phase. **Left it to the phase**, because the sensible date depends on whether
+`phase-mem-10` gets claimed in the meantime, which is not knowable now.
 
 **Whether the seeding sweep can distinguish a retrieval failure from an ordinary correction.** Session
 records carry "Found wrong in the source material" and "Unresolved" sections, and not every entry

@@ -10453,23 +10453,26 @@ items:
   status: queued
   priority: 1
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-mem-10
   scope:
-  - 'Build a defined way to record a retrieval failure: what was sought, where it was looked for, and
-    whether it existed. The third field is what separates a retrieval failure from a question with no
-    answer.'
+  - 'Build a defined way to record a retrieval failure met during real work: what was sought, where it
+    was looked for, and whether it existed. The third field is what separates a retrieval failure from
+    a question with no answer.'
+  - Complement phase-mem-10 rather than duplicating it. That phase builds a synthetic query-to-memory
+    evaluation set, synthetic by its own acceptance; this one records actual misses. Do not build a second
+    evaluation harness.
   - Do not instrument tools/load_context.py as the collection mechanism. It queries only the memories
-    table, so it measures the one route that already works and misses grep, which is how retrieval actually
-    happens here.
+    table (load_context.py line 94 is FROM memories), so it measures the one route that already works
+    and misses grep, which is how retrieval actually happens here.
   - Sweep existing session records for retrieval failures already described in prose and seed the collection
     from them, reporting a count.
   acceptance:
   - 'REQ-018 R01 holds: a recorded failure reads back with all three fields, including whether the thing
     existed.'
-  - 'REQ-018 R02 holds: the sweep ran and produced a count. A collection starting empty leaves the gate
-    unreachable for as long as it takes to accumulate.'
-  - The mechanism is voluntary and cheap, in the manner of the log-anti-patterns skill, rather than automatic
-    instrumentation of a path that covers one table.
+  - 'REQ-018 R02 holds: the sweep ran and produced a count.'
+  - The complement to phase-mem-10 is stated in the deliverable itself, so a later reader does not build
+    a parallel evaluation harness.
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -10477,8 +10480,8 @@ items:
   - tools/
   - docs/08-governance/
   - brain/
-  next_action: Claim this first. It unblocks phase-ret-02, which releases four deferred phases in PLAN-001,
-    and it produces the corpus R14 measures the eventual mechanism against.
+  next_action: Claim phase-mem-10 first or confirm it is claimed - it is queued, ready, blocked by nothing,
+    and four phases wait behind it. This phase records real misses; that one builds the synthetic set.
 - id: phase-ret-02
   title: Re-specify the gate with a threshold and expiry, and re-rule the deferred phases
   plan: doc-retrieval-knowledge-infrastructure
@@ -10495,27 +10498,31 @@ items:
   depends_on:
   - phase-ret-01
   scope:
-  - Restate the gate on phase-mem-15, -16, -18 and -19 with a number and a review date, replacing the
-    recorded retrieval failures, which has no threshold and therefore cannot be met.
-  - 'State what happens in both outcomes: threshold met, or review date passed with fewer. Wait longer
-    is not a ruling.'
-  - Write the ADR. This changes the release condition on four phases belonging to PLAN-001, and a reader
-    finding them move needs to know the gate was deliberately restated rather than quietly dropped.
-  - Act on G26 here rather than creating phases beside the phase-mem line - 000004 enumerates those four
-    phases by id in its own body.
+  - Correct the record of the gate before changing it. It lives in resume_when, not next_action; it names
+    phase-mem-10; and it covers phase-mem-15, -16, -17 and -18 - phase-mem-17 is absent from the partition's
+    account of it.
+  - 'Add a review date, which is the gate''s genuine gap. phase-mem-10''s acceptance already carries the
+    both-outcomes ruling: identify concrete unmet retrieval needs, or explicitly record that current retrieval
+    is sufficient.'
+  - State what happens on that date whether or not phase-mem-10 has been claimed. Wait longer is not a
+    ruling.
+  - Write the ADR - this edits the release condition on phases belonging to PLAN-001.
+  - Act on G26 here rather than creating phases beside the phase-mem line; 000004 enumerates those phases
+    by id in its own body.
   acceptance:
-  - 'REQ-018 R03 holds: the restated gate carries a number and a date, and all four phases'' next_action
-    fields cite it.'
-  - 'REQ-018 R04 holds: both outcomes are ruled, including what happens if the failures do not materialise.'
-  - No new phase duplicates phase-mem-15, -16, -18 or -19.
+  - 'REQ-018 R03 holds: the gate''s real shape is recorded against backlog.yaml''s fields, phase-mem-17
+    is included, and a review date exists.'
+  - 'REQ-018 R04 holds: the date''s outcome is ruled whether or not the collector has been claimed by
+    then.'
+  - No new phase duplicates phase-mem-15, -16, -17, -18 or -19.
   verification:
   - uv run python -m src.governance
   - uv run pytest
   deliverables:
   - docs/09-backlog/backlog.yaml
   - docs/04-decisions/
-  next_action: The threshold is a guess made before the data exists. That is fine; the expiry is what
-    stops a wrong guess parking the work a second time.
+  next_action: Read phase-mem-10's entry first. The partition says nothing collects this evidence; the
+    backlog says otherwise, and the backlog is the authority.
 - id: phase-ret-03
   title: State the prioritised search order and its conflict rule
   plan: doc-retrieval-knowledge-infrastructure

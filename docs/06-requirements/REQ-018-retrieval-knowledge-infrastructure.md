@@ -23,12 +23,13 @@ describe intent that may never have been built, and the ideas log is explicitly 
 
 Five gaps, and one of them is blocking the other four.
 
-1. **The programme is gated on evidence nothing collects.** `phase-mem-15`, `-16`, `-18` and `-19`
-   are all `deferred`, and each waits on "the recorded retrieval failures". Nothing in this
-   repository records a retrieval failure. The gate is therefore unreachable by waiting: the evidence
-   that would unblock the work can only come from a system nobody is allowed to build until the
-   evidence exists. Four phases have sat deferred behind a condition with no collection mechanism and
-   no threshold.
+1. **Four phases wait behind a collector nobody has claimed.** `phase-mem-15`, `-16`, `-17` and
+   `-18` each carry `resume_when: phase-mem-10 records concrete unmet retrieval needs`.
+   `phase-mem-10` is `status: queued` — ready, blocked by nothing, dependent on nothing — and its
+   deliverables (`tools/evaluate_retrieval.py`, `test/fixtures/retrieval_cases.json`) do not exist.
+   The commonly repeated claim that nothing collects this evidence is wrong; the collector is
+   specified and unclaimed. What the gate genuinely lacks is a **review date**, so the four waiting
+   phases have no point at which they are re-ruled rather than waiting longer.
 
 2. **There is no stated search order.** `000002` names the candidate sources — developed code, plan
    documentation, ADRs, session records, the ideas list, `brain/` memories — and observes that what is
@@ -43,8 +44,10 @@ Five gaps, and one of them is blocking the other four.
    one (`000043`, `000044`).
 
 4. **The one retrieval path that is instrumented covers almost nothing.** `tools/load_context.py`
-   queries the `memories` table and nothing else. Grep is how retrieval actually happens, and grep
-   leaves no record of having failed.
+   queries the `memories` table and nothing else (`load_context.py:94` is `FROM memories`). Grep is
+   how retrieval actually happens, and grep leaves no record of having failed. `phase-mem-10`'s
+   evaluation set is synthetic by its own acceptance, so it measures prepared queries rather than
+   real misses — the two are complementary evidence, not duplicates.
 
 5. **Nothing tracks whether what is found can be trusted.** No staleness detection, no contradiction
    handling, no confidence tracking over memory content, and no record of the sources behind a
@@ -62,8 +65,8 @@ sharing its deliverable.
 |---|---|---|
 | R01 | A retrieval failure can be recorded when it happens, through a defined mechanism, and the record states what was sought, where it was looked for, and whether it existed. | Record one and read it back for all three. A record that does not say whether the thing existed cannot distinguish a retrieval failure from an absent answer, which is the distinction the whole gate rests on. |
 | R02 | Existing session records are swept for retrieval failures already described in prose, and the recovered cases seed the collection. | Run the sweep and report a count. A collection starting empty measures only the future and leaves the gate unreachable for as long as it takes to accumulate; the corpus already contains cases. |
-| R03 | The gate on `phase-mem-15`, `-16`, `-18` and `-19` is restated with a threshold and a review date, replacing "the recorded retrieval failures". | Read the restated gate for a number and a date. Confirm the four phases' `next_action` fields cite it. A gate with no threshold cannot be met, which is why those four have been deferred rather than progressing. |
-| R04 | When the threshold is met, or the review date passes with fewer, the four deferred phases are re-ruled rather than left deferred. | Confirm the restated gate names what happens in both cases. "Wait longer" is not a ruling. |
+| R03 | The gate's actual shape is recorded correctly — that it lives in `resume_when`, names `phase-mem-10`, and covers `phase-mem-15`, `-16`, `-17` and `-18` — and a review date is added to it. | Read the record against `backlog.yaml`'s real fields. Confirm `phase-mem-17` is included, which the partition's account omits. Confirm a date exists; `phase-mem-10`'s acceptance already supplies the both-outcomes ruling, so the date is the genuine gap. |
+| R04 | When the review date passes, the four waiting phases are re-ruled rather than left waiting. | Confirm the gate names what happens on that date whether or not `phase-mem-10` has been claimed. "Wait longer" is not a ruling. |
 | R05 | A prioritised search order exists, naming each source and what it is authoritative for. | Read the order for one entry per source. Confirm each says what that source is true about — code for what exists, ADRs for why a choice was made, the ideas log for what is explicitly not yet decided — rather than only ranking them. |
 | R06 | The search order states what to do when two sources disagree. | Read for a conflict rule. `000002`'s point is that the sources "disagree with each other in predictable ways"; an order that ranks without resolving has not used that observation. |
 | R07 | Deterministic search across ideas, backlog, memories, decisions and session records is designed, and the design is explicitly not semantic search. | Read the design for its method. Confirm no vector or embedding mechanism appears — `000040` is the deterministic layer by definition, and `000004` is the vector work. |
@@ -82,9 +85,11 @@ the right one. What it must not be is automatic instrumentation of `tools/load_c
 that path queries the `memories` table and nothing else, so instrumenting it measures the one route
 already working and misses grep, which is how retrieval actually happens.
 
-**R03 is the phase's central act.** The existing gate is not a high bar, it is an unmeetable one. A
-threshold and a review date convert it into a condition that can be satisfied or can expire, which is
-what lets the four deferred phases move in either direction.
+**R03 is a correction before it is an addition.** The existing gate is not unmeetable — it names a
+collector that is ready and unclaimed. The record of it is what is wrong, in two ways the partition
+repeats: it is described as absent, and `phase-mem-17` is omitted from the phases it covers. Adding a
+review date is the smaller, real gap, and it is what lets the waiting phases move in either
+direction.
 
 **R08 is not a licence to reverse `ADR-001`.** Reaffirming it is a complete outcome. `000043`
 proposes something that decision explicitly ruled out, so the decision gets revisited on its own

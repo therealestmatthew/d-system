@@ -31,50 +31,74 @@ over it.
 Partition-time sizing was 9–13 phases across the groups, "mostly design, not code". This plan lands
 **ten**.
 
-## The gate is a deadlock, and breaking it is this programme's first job
+## The gate, and what the partition got wrong about it
 
 The partition states that "the whole programme is gated on a recorded retrieval failure that nothing
-currently collects — `G25` is what would supply it." The finalize phase's scope asks how `G25`
-collects it. The answer has two halves, and the second matters more than the first.
+currently collects — `G25` is what would supply it", and the finalize phase's scope repeats it. **That
+premise is wrong, and checking it changed this plan.**
 
-**`phase-mem-15`, `-16`, `-18` and `-19` are all `deferred`, and each one's `next_action` cites "the
-recorded retrieval failures".** Nothing records one. So the gate cannot be met by waiting: the
-evidence that would release the work can only be produced by using a retrieval system nobody is
-permitted to build until the evidence exists. Four phases have sat behind that condition, and the
-condition has no threshold — no number, no date, nothing that could ever be satisfied or expire.
+The gate is real, but it is not in `next_action` and it does not lack a collector. It lives in
+`resume_when`, and it names one:
 
-### 1. Collection is voluntary and seeded, not instrumented
+```
+$ python3 -c "...resume_when.startswith('phase-mem-10 records')"
+phases gated on phase-mem-10: ['phase-mem-15', 'phase-mem-16', 'phase-mem-17', 'phase-mem-18']
+phase-mem-10 status: ['queued']
+```
 
-The obvious mechanism is to instrument `tools/load_context.py`. **Ruled against.** That tool queries
-the `memories` table and nothing else — `load_context.py:94` is `FROM memories`. Instrumenting it
-measures the one retrieval route that already works and misses grep, which is how retrieval actually
-happens in this repository and which leaves no trace when it fails.
+Four phases — not the three usually cited, and including `phase-mem-17`, which the partition does not
+mention — carry `resume_when: phase-mem-10 records concrete unmet retrieval needs; review that
+evidence before releasing this phase.` (`phase-mem-19` is gated differently, on `phase-mem-18`.)
 
-So collection is a voluntary record with a defined shape, in the manner of the `log-anti-patterns`
-skill that already works for its own subject: an agent that looked for something, did not find it,
-and later learned it existed records that. `R01` fixes what the record must contain — what was
-sought, where it was looked for, and **whether it existed** — because without the third field a
-retrieval failure is indistinguishable from a question with no answer.
+**`phase-mem-10` is `status: queued`.** Not deferred, not blocked, dependent on nothing. It has simply
+never been claimed. Its scope is to "create a small public/synthetic query-to-relevant-memory
+evaluation set and a repeatable evaluation command" and "record misses, relevance/coverage and latency
+before considering embeddings". Its deliverables — `tools/evaluate_retrieval.py`,
+`test/fixtures/retrieval_cases.json` — do not exist on disk.
 
-**And the collection is seeded from the corpus rather than started empty.** `R02` requires a sweep of
-existing session records for failures already described in prose. This repository writes "Found wrong
-in the source material" and "Unresolved" sections as a matter of course; the cases are already
-written down, just not as data. Starting empty would leave the gate unreachable for however long it
-takes to accumulate, which is the state the programme is already in.
+And its acceptance already carries the both-outcomes ruling that a gate needs: *"The report identifies
+concrete unmet retrieval needs **or explicitly records that current retrieval is sufficient**."*
 
-### 2. The gate is re-specified with a threshold and an expiry
+So the accurate statement is not that nothing collects the evidence. It is that **the collector is
+ready, unclaimed, and four phases have waited behind it.** The cheapest unblocking move in this
+programme is not to design anything; it is to claim `phase-mem-10`.
 
-This is the more important half. `R03` requires the gate to be restated with **a number and a review
-date**, and `R04` requires a ruling in both directions: threshold met, or date passed with fewer.
+### 1. `phase-ret-01` complements `phase-mem-10` rather than replacing it
 
-"Wait for recorded retrieval failures" is not a high bar, it is an unmeetable one, and the four
-deferred phases are the evidence. A condition that can expire converts them from indefinitely parked
-into scheduled for a decision. If the failures do not materialise, that is itself the answer —
-retrieval is not the problem it was assumed to be, and the vector line should be re-ruled rather than
-waiting longer.
+Having found the collector, the question becomes whether a second one is justified. **It is, and the
+distinction is the corpus.**
 
-The cost accepted: a threshold picked before the data exists is a guess. It is a better guess than no
-threshold, and `R04`'s expiry is what stops a wrong guess from parking the work a second time.
+`phase-mem-10` builds a *synthetic* evaluation set — deliberately so, since its own acceptance
+requires it to run "without transmitting memories or requiring an embedding provider". That measures
+retrieval against queries someone wrote in advance.
+
+`phase-ret-01` records *actual* failures: an agent looked for something during real work, did not find
+it, and later learned it existed. `REQ-018` `R14` is why both are needed — a retrieval system
+evaluated only on queries its designer wrote is evaluated on the wrong corpus.
+
+`phase-ret-01` therefore declares `depends_on: [phase-mem-10]` and states the complement explicitly,
+so nobody builds a parallel evaluation harness.
+
+The mechanism ruling stands: collection is a voluntary record, not instrumentation of
+`tools/load_context.py`, which queries the `memories` table and nothing else (`load_context.py:94` is
+`FROM memories`) and so would measure the one route that already works while missing grep. `R01`
+requires the record to say **whether the thing existed**, because without that a retrieval failure is
+indistinguishable from a question with no answer. `R02` seeds it from session records, which already
+describe such cases in prose.
+
+### 2. The gate is corrected before it is re-specified
+
+`phase-ret-02`'s first job is no longer to invent a threshold. It is to **fix the record**: the gate
+names `phase-mem-10`, that phase is claimable today, and `phase-mem-17` is gated the same way but is
+absent from the partition's account.
+
+Only then does the re-specification earn its place, and it is narrower than first drafted. What
+`phase-mem-10`'s acceptance does not carry is a **review date** — a point at which, if nobody has
+claimed it, the four waiting phases are re-ruled rather than waiting indefinitely. That is the gap
+worth closing, and it is a smaller gap than "the gate has no collector".
+
+The cost accepted: adding a date to another plan's phases is an edit across a plan boundary, which is
+why `R03` keeps the ADR requirement.
 
 ## The chosen design
 
