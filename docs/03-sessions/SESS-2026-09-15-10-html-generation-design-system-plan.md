@@ -84,18 +84,88 @@ scan. `000093`'s page has a working companion in `_public/prompt-pack-protocol.h
   carries thirteen rows; the mapping is total in both directions, checked by grep against the backlog
   rather than by reading the plan's own table.
 - **The boundary against `PLAN-029`'s `G03` reporting work is stated explicitly.** Met. `PLAN-036`
-  carries a dedicated section, and `R12` makes it checkable: no phase here may carry a deliverable
-  that builds a report page whose existence `phase-idg-08` is ruling on. The boundary is stated as
-  one-way — `P9` supplies assets, `G03` decides whether a given report exists — and two phases cite
-  `R12` so the rule has somewhere to fail.
+  carries a dedicated section, and `R12` gives it somewhere to fail: no phase here may carry a
+  deliverable that builds a report page whose existence `phase-idg-08` is ruling on. The boundary is
+  stated as one-way — `P9` supplies assets, `G03` decides whether a given report exists — and two
+  phases cite `R12`. It is settled by a reviewer reading the `deliverables` field; nothing in
+  `src/governance` enforces it, and the requirement now says so.
 - **`phase-prog-11` is removed from `next_up` in the same change that completes it.** Met, in the
   same commit that registers the track.
 
 ## Backlog
 
-`phase-prog-11` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-11` is `status: complete`, `agent: agent-night`,
+`session: doc-session-html-generation-design-system-plan`. Completion evidence is `PLAN-036`,
+`REQ-021`, `docs/09-backlog/README.md` and this record. Written under the owner's advance authority
+for this batch, after the read-only independent review below confirmed all four conditions.
 
 Six phases added under `phase-des-*`, all `status: queued`, none claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-11`, told that
+earlier phases in this batch had found stale premises and one fabricated verification result, and
+asked to check every factual claim with a command that distinguishes the cases — in both directions.
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 245 documents, 25 memories, 254 backlog phases
+EXIT: 0
+
+$ uv run pytest  →  580 passed, 2 warnings
+```
+
+**All four conditions Met.** Coverage verified programmatically "not by reading the plan's own table".
+The `next_up` check: "the *only* line removed anywhere in `backlog.yaml` across the whole diff is
+`- phase-prog-11`". Catalog regenerated and diffed byte-for-byte against the committed file —
+identical.
+
+**Every factual claim was re-checked and held**, including ones this phase asserted from a directory
+listing: the ten `queued` `phase-html-*` phases (`Counter({'queued': 10})`), `PLAN-003`'s `approved`
+status and six child plans, the two template families, and `_public/`'s five pages — where the
+reviewer was more precise than this phase had been: it counted with `find _public -name "*.html"`,
+noting "the `.zip` and `images/` in the raw `ls` are correctly not counted as pages".
+
+It also read `atlas-page.html`, `atlas.css` and `atlas-components.html` directly to confirm the
+convention `R11` checks against is real: "all three convention elements the plan claims are real —
+header comment with provenance/usage…, a token contract…, and canonical component markup with a
+documented class contract."
+
+**The boundary held under attack, and the reviewer found corroboration this phase had not.** It
+grepped all six phases and traced the only two matches, then went further:
+
+> "I traced this to idea `000093`'s own body and an existing 2026-09-11 triage annotation that
+> pre-dates this phase and explicitly separates it from `000042`: *'000042 … about HTML page
+> generation from governed data, but for a different topic (idea/backlog prioritization rather than
+> governance system documentation).'* The boundary is grounded in prior evidence, not invented here."
+
+That annotation is now cited in `PLAN-036`.
+
+**One minor finding, and it was a fair hit on my wording.**
+
+> "R12's verification method … is a manual/judgment check, not anything wired into `src.governance` —
+> 'R12 makes it checkable' overstates what's mechanically enforced (nothing greps this automatically
+> today)."
+
+Correct. **Fixed** in `REQ-021`, `PLAN-036` and the backlog README: all three now say the boundary is
+settled by a reviewer reading the `deliverables` field, and state plainly that nothing in
+`src/governance` enforces it. The reviewer noted this is house style for most rows in the document;
+the fix is to stop claiming more than that.
+
+**The gating override was judged sound, with a better argument than the one I gave.**
+
+> "`PLAN-003` describes a FastAPI/React 'dynamic' generation pipeline…, while the two template
+> families that actually exist and ship five pages today are static HTML/CSS/vanilla-JS, built
+> through a different mechanism entirely. Gating new library work on a plan describing an
+> apparently-unbuilt, possibly-superseded pipeline would either stall the work indefinitely or gate
+> it on something irrelevant to what actually exists."
+
+I verified that before adopting it — four of `PLAN-003`'s six child plans reference FastAPI, React or
+npm — and added it to design decision 1. It is a stronger reason than "the audit may retire it",
+because it holds even if the audit finds `PLAN-003` entirely intact.
+
+**The second minor finding**, `phase-des-04`'s possible terminal duplication, the reviewer noted was
+"already surfaced by the phase, not a gap I'm introducing".
 
 ## Decisions
 
@@ -126,7 +196,16 @@ prerequisite.
 
 ## Corrections
 
-None this phase. The two habits that produced corrections earlier tonight were applied up front
+**`R12` claimed more enforcement than exists.** The requirement said the boundary was "checkable",
+which reads as mechanically enforced; nothing in `src/governance` greps for it, and it is settled by
+a reviewer reading one field. Found by the review. Corrected in all three places the claim appeared.
+
+The self-test that preceded it is worth recording too: running `R12`'s own check as first written
+returned `phase-des-01`, whose scope says *"Do not build or decide on any report page"* — the rule
+quoting itself. A check that cannot tell a prohibition from a violation reports a breach on the one
+phase restating the boundary. `R12` now inspects `deliverables`, where a violation would appear. That
+is the same defect shape as `phase-prog-10`'s directory check, caught this time before review because
+that phase taught the habit of running my own checks against my own work. The two habits that produced corrections earlier tonight were applied up front
 instead: every factual claim was checked with a command whose output distinguishes the cases, and
 requirement coverage was verified by grep rather than by reading.
 

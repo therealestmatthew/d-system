@@ -72,8 +72,14 @@ both ship in the workbench."
 it rules the page is not wanted, `P9` is unaffected, because its assets already serve five pages.
 
 The failure this prevents is concrete: `P9` sizing a phase to build an ideas-and-backlog page while
-`phase-idg-08` separately decides whether that page should exist. `R12` makes it checkable by
-forbidding any phase here to carry such a deliverable.
+`phase-idg-08` separately decides whether that page should exist. `R12` forbids any phase here to
+carry such a deliverable — checked by a reviewer reading the `deliverables` field, not by anything
+running in `src/governance`.
+
+The boundary is not this plan's invention. A triage annotation on `000093` from 2026-09-11 already
+separates the two: `000042` is "about HTML page generation from governed data, but for a different
+topic (idea/backlog prioritization rather than governance system documentation)." This plan states
+what was already found rather than drawing a new line.
 
 ## The chosen design
 
@@ -86,6 +92,13 @@ The partition gates `G37` on `PLAN-003`. But `PLAN-003` is exactly what `G39` au
 may find parts of it accomplished, superseded or retired. Gating the asset libraries on a plan whose
 current standing is the thing under audit would hold them behind a document that might not survive
 the audit intact.
+
+There is a sharper reason, surfaced by this phase's review. **`PLAN-003` and the shipped families
+describe different technologies.** Its six child plans are a FastAPI/React pipeline — build tooling,
+backend endpoints, frontend components. The two families that actually exist and serve five pages
+today are static HTML, CSS and vanilla JavaScript, produced by a different mechanism. So gating
+static-asset work on an unbuilt dynamic pipeline gates it on something largely irrelevant to what
+exists, as well as on something the audit may retire.
 
 So `phase-des-03`, `-04` and `-05` depend on `phase-des-01`, not on `PLAN-003`. `R04` makes the asset
 phases cite the audit's findings, so the sequencing is a real dependency rather than an ordering

@@ -7722,7 +7722,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7746,6 +7746,31 @@ items:
   - docs/09-backlog/README.md
   next_action: Scope G39 first. It is one phase of independent research and it produces
     the scope the rest of the programme would otherwise guess at.
+  session: doc-session-html-generation-design-system-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-036-html-generation-design-system.md
+  - docs/06-requirements/REQ-021-html-generation-design-system.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-10-html-generation-design-system-plan.md
+  result: >-
+    Finalized P9. Stated the G03 boundary the acceptance requires and gave it somewhere to fail: P9
+    supplies the families, components and palettes any generated page is assembled from, and P1's
+    phase-idg-08 decides whether a given report page exists, with R12 forbidding any phase here to
+    carry such a deliverable. The review found corroboration the phase had not - a 2026-09-11 triage
+    annotation on 000093 already separates it from 000042 - now cited in the plan. Changed what G37
+    is gated on, from PLAN-003 to the audit of PLAN-003, because that plan's standing is the thing
+    under examination; the review supplied a stronger reason, that PLAN-003's six child plans
+    describe a FastAPI/React pipeline while the two families actually shipping five pages are static
+    HTML and CSS, which was verified before adopting. Checked before sizing: ten phase-html-* phases
+    queued and none complete, PLAN-003 approved with six children, two template families not one,
+    five shipped pages. R02 makes the audit change the backlog rather than describe it, since --ready
+    offers those ten phases today, and R03 guards the opposite error to the one this batch kept
+    finding by requiring an accomplished disposition to name what accomplished it. Wrote REQ-021 with
+    thirteen rows and registered six phases under phase-des-*. Verification green - governance exits 0
+    at 245 documents and 254 phases, --ready shows two, and 580 tests pass. All four conditions
+    confirmed; one minor finding, that R12 claimed more enforcement than exists, fixed in three
+    places.
+
 - id: phase-prog-12
   title: Finalize or disperse the standalone explorations bucket (P12)
   plan: doc-standalone-explorations-housekeeping

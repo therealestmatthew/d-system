@@ -102,8 +102,12 @@ bespoke markup — which is `000084`'s composability point applied to a real con
 page is not wanted, `P9` is unaffected, because its assets serve the five pages that already exist.
 
 The failure this boundary prevents: `P9` sizing a phase to build an ideas-and-backlog page, and
-`phase-idg-08` separately ruling on whether that page should exist. `R12` makes the boundary
-checkable.
+`phase-idg-08` separately ruling on whether that page should exist.
+
+`R12` gives the boundary somewhere to fail. It is **not mechanically enforced** — nothing in
+`src/governance` greps for it, and like most rows in this document it is checked by a reviewer
+reading the `deliverables` field. Calling it "checkable" means a reviewer can settle it by looking at
+one field, not that a check runs.
 
 ## Observable requirements and verification
 
