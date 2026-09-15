@@ -7315,7 +7315,7 @@ items:
   systems:
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7340,6 +7340,33 @@ items:
   - docs/09-backlog/README.md
   next_action: Verify what G03 already ships before sizing anything - 000071 is
     prototyped and 000070 largely delivered, so the group is smaller than it reads.
+  session: doc-session-idea-graph-lifecycle-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-029-idea-graph-lifecycle.md
+  - docs/06-requirements/REQ-014-idea-graph-lifecycle.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-03-idea-graph-lifecycle-plan.md
+  result: >-
+    Finalized P1. Verified G03's delivery in code before sizing anything, which the acceptance
+    required: tools/overview_metrics.py implements 000071's delivered metric set and was executed,
+    IdeaExplorerRegion.tsx and BacklogExplorerRegion.tsx both ship against four implemented workbench
+    routes, and the orient skill answers 000071's second half. The partition called G03 most
+    shovel-ready at six ideas; it is two phases, and the reviewer confirmed all four artifacts are
+    untouched by this branch rather than built and credited here. Wrote REQ-014 with twenty rows and
+    replaced PLAN-029's placeholder with six design rulings. Settled the scope fork ARCH-005 left open
+    - three fields on schemas/idea.schema.json rather than a separate typed-node graph layer - because
+    the layer needs 000060 and 000032 in P6, neither started, and blocking six G01 ideas behind an
+    unbuilt substrate costs more than the migration it avoids; the cost is stated. Axes are optional
+    but a blank axis must carry a reason, or coverage is unmeasurable. Backfill appends and never
+    edits. 000048 and 000127 are one phase because they are one ask. Registered twelve phases under
+    phase-idg-*. Verification green - governance exits 0 at 231 documents and 202 phases, --ready
+    shows five ready with four genuinely non-colliding, and 580 tests pass. Governance went red
+    mid-phase on a duplicate YAML anchor from yaml.safe_dump sharing list objects; fixed by expanding
+    the anchors phase-prog-01 had left latent in the phase-conc-* block and re-dumping alias-free,
+    with every pre-existing phase verified dict-identical against dev afterwards. A read-only
+    independent review confirmed all four conditions and raised three non-blocking weaknesses, all
+    fixed before close.
+
 - id: phase-prog-05
   title: Finalize the document and backlog governance plan (P2)
   plan: doc-document-backlog-governance
@@ -9326,7 +9353,8 @@ items:
   - Write the result as a standard a later plan can be checked against, not as an essay.
   acceptance:
   - 'REQ-014 R17 holds: every judgement names plans from the corpus on both sides.'
-  - The standard is checkable - it states sections and properties rather than describing good taste.
+  - The standard names a section list a later plan can be checked against mechanically - phase-idg-12
+    can grep a draft for each named section and report which are absent.
   - It is written so phase-idg-12 can measure a draft against it, which is what R20 requires of it.
   verification:
   - uv run python -m src.governance

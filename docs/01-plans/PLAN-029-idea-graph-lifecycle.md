@@ -38,12 +38,15 @@ Partition-time sizing was 10–13 phases if built in full. This plan lands **twe
 The phase's acceptance requires this before any phase is sized, so it was done first and is recorded
 here rather than left in the session record.
 
-- **`tools/overview_metrics.py` implements `000071`'s metric set.** It emits funnel counts and rates
+- **`tools/overview_metrics.py` implements `000071`'s delivered metric set.** It emits funnel counts and rates
   by status, cycle time between statuses, annotation coverage, link-type distribution and orphan
   count, throughput by day, age of open ideas, and backlog phase counts. It reads through
   `load_events()` and `fold()` rather than parsing `_data/ideas.jsonl` by hand, and is deterministic
   by construction — no wall clock, sorted keys, byte-identical across runs. Executed during this
   phase and produced real output. **`000008` is delivered by this tool.**
+  One metric from `000071`'s candidate list is deliberately absent: *amendment rate as a proxy for
+  rework*. `phase-demo-03` scoped it out and annotated the idea saying so. The tool implements what
+  was accepted, not the full candidate list, and `phase-idg-08` should not silently reinstate it.
 - **Both explorers ship in the workbench.** `ts/src/stage/IdeaExplorerRegion.tsx` and
   `BacklogExplorerRegion.tsx` render the two queues against `/api/v1/workbench/ideas`,
   `/ideas/queue`, `/backlog` and `/backlog/queue`, each with a standard/priority-queue toggle.

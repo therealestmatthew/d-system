@@ -51,7 +51,7 @@ Four gaps, each observable today.
    each new plan is written by pattern-matching whichever existing one the author had open.
 
 **`G03` is largely delivered and was verified in code before this requirement was written**, per the
-phase's acceptance condition. `tools/overview_metrics.py` implements `000071`'s metric set — funnel
+phase's acceptance condition. `tools/overview_metrics.py` implements `000071`'s delivered metric set — funnel
 counts and rates, cycle time between statuses, annotation coverage, link-type distribution and
 orphan count, throughput, age of open ideas, and backlog phase counts — reading through `load_events()`
 and `fold()` rather than parsing the log by hand. `ts/src/stage/IdeaExplorerRegion.tsx` and

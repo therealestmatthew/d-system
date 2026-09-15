@@ -100,11 +100,73 @@ against a group that reads as six ideas.
 
 ## Backlog
 
-`phase-prog-04` is `status: active`, `agent: agent-night`, pending the independent review below. All
-four conditions read Met against the verification above, which makes the phase a candidate for
-closure rather than closed.
+`phase-prog-04` is `status: complete`, `agent: agent-night`,
+`session: doc-session-idea-graph-lifecycle-plan`. Completion evidence is `PLAN-029`, `REQ-014`,
+`docs/09-backlog/README.md` and this record.
+
+Written under the owner's advance authority for this batch, and only after the read-only independent
+review below confirmed all four conditions. Removed from `next_up` in commit `3da1295`.
 
 Twelve phases added under `phase-idg-*`, all `status: queued`, none claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools (`Read`, `Grep`, `Glob`, `Bash` — no `Edit`, no
+`Write`) reviewed `dev...agent/phase-prog-04`. Read-only by construction this time, following
+`phase-prog-01`, where the review agent held write tools it was merely instructed not to use. Its own
+runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 231 documents, 25 memories, 202 backlog phases
+EXIT: 0
+
+$ uv run pytest
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`status: active`, banner gone,
+and carries six numbered design rulings each naming the alternative refused and the cost accepted…
+`grep -in "placeholder|TBD|TODO"` on the branch file returns nothing."
+
+**Condition 2 — requirement exists, every row maps to a phase — Met, verified independently.** "Read
+`REQ-014` (20 rows, R01–R20) and `backlog.yaml`'s `phase-idg-*` acceptance text directly, not
+`PLAN-029`'s own coverage table. Every row R01–R20 is cited by name in at least one phase's
+`acceptance:`, and every one of the 12 `phase-idg-*` items cites at least one row. Both directions
+hold."
+
+**Condition 3 — `G03`'s delivery verified in code before sizing — Met, and re-verified
+independently.** The reviewer ran the tool itself, confirmed the four API routes the explorer panels
+call are implemented in `src/api/routes/workbench.py`, and confirmed `.claude/skills/orient/SKILL.md`
+exists. Its sharpest check: "All four artifacts (tool, both region files, orient skill) are
+**untouched by this branch**… the phase verified pre-existing delivery rather than building it and
+then claiming credit." On the sizing: "The two-phases-against-six-ideas sizing is defensible on the
+evidence found."
+
+**Condition 4 — removed from `next_up` in the same change — Met, verified with `git show`.**
+"`git show 3da1295 -- docs/09-backlog/backlog.yaml` shows `next_up` losing `phase-prog-04` in the
+identical commit that adds the 12 `phase-idg-*` items and registers the prefix."
+
+**`backlog.yaml` integrity, attacked directly.** The reviewer was asked specifically to check that the
+anchor repair had not silently altered the peer `phase-conc-*` track. "Parsed every `phase-conc-*`
+item on `dev` against the branch: **all nine are dict-identical** — the anchor→literal expansion
+changed only YAML syntax, not content… the only changes are 12 new `phase-idg-*` items and the
+`next_up` removal. No silent mutation of any other phase." No anchors or aliases remain.
+
+**Three weaknesses reported, none blocking. All three fixed before close.**
+
+- *"`backlog.yaml` is modified substantially but is not a declared deliverable of `phase-prog-04`
+  itself"* — 417 lines rewritten under a declaration naming only the plan, the requirements directory
+  and the README. The reviewer noted this is wider than this run's own staged idea candidate had
+  said, which named only `README.md`. **Fixed** by widening that candidate; not fixed by changing the
+  declaration, for the reason recorded in it.
+- *"`implements 000071's metric set` slightly overclaims"* — `000071`'s body names *amendment rate as
+  a proxy for rework*, which the tool does not emit; `phase-demo-03` scoped it out and annotated the
+  idea saying so. **Fixed**: both documents now read "delivered metric set", and `PLAN-029` states the
+  omission explicitly so `phase-idg-08` does not silently reinstate it.
+- *"`phase-idg-10`'s second acceptance bullet is close to restating its own scope line"* — both
+  asserted "checkable, not prose" with no independent verification. **Fixed**: the bullet now requires
+  a named section list that `phase-idg-12` can grep a draft against.
 
 ## Decisions
 

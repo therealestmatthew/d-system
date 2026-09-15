@@ -84,19 +84,29 @@ disqualification of that review, which is how this run treated it, or something 
 
 ---
 
-## `phase-prog-*` phases omit `docs/09-backlog/README.md` from their deliverables
+## `phase-prog-*` phases declare neither `docs/09-backlog/README.md` nor `backlog.yaml` itself
 
-**Raised by:** `phase-prog-01`, at the point the work needed to register a new prefix.
+**Raised by:** `phase-prog-01`, at the point the work needed to register a new prefix. **Widened by**
+the `phase-prog-04` reviewer, which found the gap is larger than the first version of this candidate
+said.
 
 Every `phase-prog-*` phase's `scope` requires registering a new prefix in the backlog index, but only
 `phase-prog-03` declares `docs/09-backlog/README.md` as a deliverable. `phase-prog-01`, `-02` and the
 nine that follow did not. `phase-prog-02` wrote the file anyway and listed it as completion evidence,
 which means the write happened outside the declared lock and nothing noticed.
 
-This run widened the declaration on `dev` before starting each phase, so the nine remaining are being
-fixed as they are claimed. The candidate is the general one: a phase whose `scope` names a file its
-`deliverables` omits is a lock that does not cover the work, and nothing currently checks the two
-against each other.
+**The wider gap: no `phase-prog-*` phase declares `docs/09-backlog/backlog.yaml` at all**, yet adding
+a dozen backlog items is the phase's central deliverable. `phase-prog-04`'s diff rewrites 417 lines of
+that file under a declaration naming only the plan, the requirements directory and the README. The
+reviewer checked for actual harm and found none — every pre-existing phase parsed dict-identical
+against `dev` — but the declared lock does not cover the work being done under it, across the whole
+track.
+
+This run widened the README declaration on `dev` before starting each phase. It did **not** add
+`backlog.yaml`, because by the time the reviewer surfaced it two phases had already merged under the
+narrower declaration and changing the shape mid-run would make the ten phases inconsistent with each
+other. The candidate is the general one: a phase whose `scope` names a file its `deliverables` omits
+is a lock that does not cover the work, and nothing currently checks the two against each other.
 
 Worth deciding: whether the governance check should flag a phase whose scope text names a path absent
 from its deliverables. Unresolved: scope is prose, so the check would be a heuristic, and a noisy one
