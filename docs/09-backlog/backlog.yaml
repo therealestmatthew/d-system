@@ -7896,3 +7896,45 @@ items:
   - docs/00-working/
   next_action: Fill the bash column completely on Linux first, then mark exactly which CMD and
     PowerShell cells the owner must run. A matrix with guessed cells is worse than a short one.
+- id: phase-arch-17
+  title: Panel maximize and collapse on the slot model
+  plan: doc-workbench-architecture-quality
+  sources:
+  - doc-workbench-architecture-quality-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-07
+  - phase-arch-09
+  scope:
+  - Add maximize and collapse to the slot model, so every panel type gets it and no panel
+    implements its own geometry path. Idea 000233 asked for it on the HTML Viewer; PLAN-028
+    design decision 5 rules it slot-level.
+  - Keep maximize transient - collapsing restores the panel to its assigned slot, and no
+    maximize state is written into the ADR-016 selections store.
+  - Preserve a maximized shell panel's PTY session; a remount that kills it is a regression
+    against REQ-007 W16's survival obligation.
+  - Hold the zero-scroll obligation and the fill assertions in both states, at all four window
+    sizes, in both layouts.
+  acceptance:
+  - REQ-011 R25 holds - every panel type maximizes and collapses in both layouts, and no panel
+    source carries a geometry path of its own.
+  - REQ-011 R26 holds - REQ-006 R02 and REQ-007 W15 pass at 1280x720, 1366x768, 1920x1080 and
+    1024x768, in both layouts, maximized and collapsed.
+  - REQ-011 R27 holds - no maximize state appears in the ADR-016 storage key, and a reload
+    renders the panel in its assigned slot.
+  - REQ-011 R28 holds - a shell variable set before maximizing survives collapse, with an
+    unchanged session id.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  - test/
+  next_action: Assert R28 first with a failing test - set a shell variable, maximize, collapse,
+    read it back. Session loss on remount is the one constraint that cannot be retrofitted.

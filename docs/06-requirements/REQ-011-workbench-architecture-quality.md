@@ -52,7 +52,8 @@ in the repository as it stands today:
 This requirement covers the architecture and quality programme (`P10`) over the workbench: its
 vocabulary, its code-shape audits, its content-fit methodology, the slot/panel structural model, the
 sub-app packaging contract, the ports/processes exploration and app, the performance and cache-
-invalidation work, and the terminal persistence audit. It does **not** cover the workbench's
+invalidation work, the panel maximize capability, and the terminal persistence audit. It does
+**not** cover the workbench's
 discrete features and defects — that is `P11` ([PLAN-027](../01-plans/PLAN-027-workbench-features-defects.md)),
 which consumes `R01`'s vocabulary and is sequenced behind it wherever it renames anything.
 
@@ -84,6 +85,10 @@ which consumes `R01`'s vocabulary and is sequenced behind it wherever it renames
 | R22 | Regenerating the overview page makes the new page visible immediately to `GET /api/v1/workbench/search` and to `GET /api/v1/demo/stage/overview-location`. | Run `tools/generate_overview.py`, then call both routes and confirm each reflects the regenerated file without a restart or a wait. This is `000121`'s dated failure asserted as a check. |
 | R23 | The terminal persistence audit covers bash, CMD and PowerShell equally, and for each of layout switch, visible-panel switch, re-assignment, collapse/drop/restore and page reload it states whether the session survives, whether that is intended, and whether it is communicated to the user. | Read the audit for a three-shell by five-event matrix with all three columns filled. A cell with a survival result but no intent judgment is a defect. |
 | R24 | The audit reports connect latency, echo latency, resize behavior, scrollback handling and behavior at the six-session cap, and states plainly which measurements are owner-machine checks that agent evidence cannot supply. | Read the audit for the five measurements and for an explicit list of owner-machine checks. CMD and PowerShell coverage that claims Linux-gathered evidence is a defect. |
+| R25 | Any panel can be maximized to fill the viewport and collapsed back to the slot it was assigned to. The capability belongs to the slot model and is available to every panel type; no panel implements its own. | Maximize and collapse each panel type in turn, in both layouts, and confirm each returns to its assigned slot. Grep the panel sources for a geometry path of their own; a maximize implemented inside `HtmlViewerRegion` or any single panel is a defect. |
+| R26 | Maximizing breaks neither the zero-scroll obligation nor the fill assertions: the page does not scroll, and the maximized panel fills the viewport at 1280x720, 1366x768, 1920x1080 and 1024x768, in both layouts, maximized and collapsed. | Run the `REQ-006` R02 and `REQ-007` W15 checks at all four sizes in both layouts, in both states. Any scroll, or any unfilled region, is a defect. |
+| R27 | Maximize is transient view state and is never written to the layout selections store. A browser closed while a panel is maximized reopens with that panel in its assigned slot. | Maximize a panel, read the `ADR-016` namespaced localStorage key, and confirm no maximize state appears in it. Reload and confirm the panel renders in its assigned slot, unmaximized. |
+| R28 | A maximized shell panel keeps its PTY session. Maximizing and collapsing do not remount it or kill the session. | Start a shell, set a shell variable, maximize, collapse, and confirm the variable survives and the session id is unchanged. A remount that kills the PTY is a regression against `REQ-007` W16's survival obligation. |
 
 ## Boundaries and unresolved compatibility
 
@@ -105,6 +110,13 @@ Windows machine. The audit is required to name those checks rather than assert t
 **`R12` changes a shipped contract.** `REQ-007` W16 specifies per-panel eligibility lists, and W16
 is implemented. `R12` replaces the eligibility authority, so the phase delivering it amends W16's
 row rather than leaving two contradictory specifications in force.
+
+**`R25`–`R28` were asked for on one panel and are specified for all of them.** The owner raised
+maximize on the HTML Viewer (`000233`), for a projector at the back of a room. The rows here are
+slot-level deliberately: the mechanism is geometry, the geometry belongs to the slot, and a maximize
+built inside `HtmlViewerRegion` would be a second geometry path outside the model `R12` and `R15`
+establish. `R25`'s grep for a panel-owned geometry path is what makes that observable rather than
+merely intended.
 
 **`R18`'s management actions are destructive.** Killing a process is not a read-only operation, and
 `ADR-015` fixed a read-only posture for the workbench API. The phase delivering `R18` resolves that

@@ -35,10 +35,10 @@ instruction, not a read of the queue, and `next_up` was not reordered to make th
 - **[PLAN-028](../01-plans/PLAN-028-workbench-architecture-quality.md)** — placeholder banner
   removed, four design decisions stated, 16 implementation phases, a requirement-coverage table and
   the stated `P11` dependency edge.
-- **16 phases under `phase-arch-*`**, registered in [the backlog index](../09-backlog/README.md).
+- **17 phases under `phase-arch-*`**, registered in [the backlog index](../09-backlog/README.md).
 - **`phase-prog-03` removed from `next_up`** in the same change.
 
-## The four design decisions
+## The five design decisions
 
 1. **The vocabulary ships as a `brain/concepts/` memory, not a new document.**
    `tools/generate_glossary.py` already renders `brain/concepts/` into
@@ -55,6 +55,42 @@ instruction, not a read of the queue, and `next_up` was not reordered to make th
 4. **`G44`'s two halves are sequenced apart, around `G45`.** The general contract needs `G40` and
    `G43`; the concrete packaging needs `G45`'s app to exist. `phase-arch-13` is the proof the
    contract works on something real.
+5. **Panel maximize (`000233`) belongs to `P10`'s `G43`, not `P11`'s `G48`** — ruled mid-session
+   after the owner raised the idea. See below.
+
+## The 000233 ruling: P10 owns panel maximize
+
+`000233` was raised on 2026-09-14, after this phase's brief was written, and read with the idea
+system's `fold()`. The owner asked for maximize on the HTML Viewer, motivated by reading a generated
+page from the back of a room on a projector.
+
+**Ruled into `P10`'s `G43`, as `phase-arch-17`.** `P11` does not carry it and `PLAN-027` must not add
+it. The reasoning is the boundary between the two programmes: `P11` is discrete features on one
+panel, `P10` is the model all panels share, and maximize is geometry — the same geometry `000133`
+revisits and `000141` restructures. Built inside `HtmlViewerRegion` it would be a second geometry
+path outside the slot model, rebuilt the first time a shell or an explorer wanted it. `REQ-011` `R25`
+makes that observable: a maximize implemented inside any single panel fails the row.
+
+The three constraints recorded on the idea are carried into `R26`–`R28` rather than restated as
+prose — zero scroll and the W15 fill assertions in both states at all four sizes, maximize as
+transient state never written to the `ADR-016` store, and PTY survival across maximize and collapse.
+
+**The cost is stated in the plan rather than hidden.** `phase-arch-17` depends on `07` and `09`, so
+it sits at the end of the longest chain, `01` → `06` → `07` → `09` → `17`. The idea's motivation is
+demoability and this is the slowest route to it. The faster route — a viewer-only maximize in one
+`P11` phase — is rejected on purpose, because `G43` would throw it away. That trade-off is the
+owner's to overrule with information; it is not a reason to file the work under whichever programme
+would ship it sooner.
+
+**`000232` is not affected.** Its sibling — the six already-served image formats in the HTML Viewer
+— is `P11`/`G48` work, needs nothing from `P10`, and by its own text does not inherit `000118`'s
+dependency on markdown rendering. `PLAN-028` names it only so the `000233` ruling is not read as
+claiming its sibling too.
+
+**Where the ideas live.** `000233` and `000232` were appended to `_data/ideas.jsonl` in the primary
+checkout and were uncommitted at the time of this session, which is why they resolve through
+`fold()` there and not in this worktree. This phase references them by id and writes nothing to the
+idea log.
 
 ## The defect in PLAN-028, resolved
 

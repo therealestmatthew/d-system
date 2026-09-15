@@ -24,8 +24,9 @@ It was moved ahead of `P11` on 2026-09-14, on the owner's ruling. `G40`'s contai
 vocabulary is cited as a prerequisite by six ideas, so planning any work that renames things before
 settling the names would have meant naming them twice.
 
-**13 ideas across 8 fine groups**, from the accepted partition of 2026-09-13. This plan turns them
-into **16 phases** under the `phase-arch-*` prefix, governed by
+**13 ideas across 8 fine groups**, from the accepted partition of 2026-09-13, **plus `000233`**
+(panel maximize), raised on 2026-09-14 and ruled into `G43` below. This plan turns them into **17
+phases** under the `phase-arch-*` prefix, governed by
 [REQ-011](../06-requirements/REQ-011-workbench-architecture-quality.md).
 
 | Group | Ideas | What it covers | Phases |
@@ -33,7 +34,7 @@ into **16 phases** under the `phase-arch-*` prefix, governed by
 | `G40` Vocabulary | `000124` | Settles container-vs-content naming before more work names things wrong | `phase-arch-01`, `phase-arch-02` |
 | `G41` Duplication and structure audits | `000115`, `000116` | Two-way cross-reference: an abstraction extracted in one is often the refactor proposed in the other | `phase-arch-03`, `phase-arch-04` |
 | `G42` Content-fit methodology | `000134` | Per-panel visibility contracts and mechanised checks | `phase-arch-05` |
-| `G43` Slot/panel architecture | `000133`, `000135`, `000141` | `000141` generalises `000135` structurally and would prevent the double-header defect by construction; `000133` revisits geometry on the same model | `phase-arch-06` … `phase-arch-09` |
+| `G43` Slot/panel architecture | `000133`, `000135`, `000141`, `000233` | `000141` generalises `000135` structurally and would prevent the double-header defect by construction; `000133` revisits geometry on the same model, and `000233`'s maximize is that same geometry in a second state | `phase-arch-06` … `phase-arch-09`, `phase-arch-17` |
 | `G44` Sub-app packaging | `000144` | How a sub-app plugs into a slot | `phase-arch-10`, `phase-arch-13` |
 | `G45` Ports/process app | `000142`, `000143` | Explore the lifecycle, then build the tool — raised together against the same port-conflict incidents | `phase-arch-11`, `phase-arch-12` |
 | `G46` Performance and cache invalidation | `000114`, `000121` | `000121` sharpens `000114`'s invalidation requirement with a dated failure: a stale overview page during demo prep | `phase-arch-14`, `phase-arch-15` |
@@ -55,7 +56,8 @@ teaches the next reader something false.
 
 ## The chosen design
 
-Four decisions shape the sixteen phases. Each was open in the placeholder; each is settled here.
+Five decisions shape the seventeen phases. Four were open in the placeholder; the fifth rules on an
+idea raised after it.
 
 ### 1. The vocabulary ships as concept memories, not as a new document
 
@@ -106,9 +108,45 @@ app `G45` builds to exist. They cannot be one phase without one half waiting on 
 run `G45` independently of both. `phase-arch-13` packages the app through the contract, and is the
 proof the contract works on something real rather than only on paper.
 
+### 5. Panel maximize (`000233`) belongs to `P10`'s `G43`, not `P11`'s `G48`
+
+**The ruling: `P10` owns it.** `000233` joins `G43` and gets `phase-arch-17`. `P11` does not carry
+it, and `PLAN-027` should not add it.
+
+The owner asked for maximize on the HTML Viewer, for reading a generated page from the back of a
+room. Read as a feature request that is `G48` work. Read as a mechanism it is not, and the mechanism
+is what decides the boundary between these two programmes: `P11` is discrete features on one panel,
+`P10` is the model all panels share.
+
+Maximize is geometry. It changes which region of the viewport a panel occupies and then restores it
+— the same thing `000133` revisits and the same model `000141` restructures. Built inside
+`HtmlViewerRegion` it would be a second geometry path sitting outside the slot model, which is
+precisely the divergence `G43` exists to remove, and it would be rebuilt the first time a shell or an
+explorer wanted the same behavior. `REQ-011` `R25` makes that observable rather than merely intended:
+a maximize implemented inside any single panel fails the row.
+
+Three constraints ride with it, all already specified and verified elsewhere, and all carried into
+`R25`–`R28`:
+
+- **Zero scroll and the fill assertions hold in both states.** `REQ-006` R02 and `REQ-007` W15, at
+  1280x720, 1366x768, 1920x1080 and 1024x768, in both layouts, maximized and collapsed.
+- **Maximize is transient view state, not a `W16` re-assignment.** Collapsing restores the panel to
+  its assigned slot, and maximize is never written into the `ADR-016` selections store — a browser
+  left maximized would otherwise reopen wrong.
+- **A maximized shell keeps its PTY session.** `W16` already obliges live sessions to survive
+  re-assignment where feasible; a remount that kills the PTY is a regression, not a new gap.
+
+**The cost of this ruling, stated plainly.** `phase-arch-17` depends on `phase-arch-07` and
+`phase-arch-09`, so it sits at the end of the programme's longest chain —
+`01` → `06` → `07` → `09` → `17`. The idea's stated motivation is demoability, and this ruling is the
+slowest route to it. The faster route exists and is rejected here on purpose: a viewer-only maximize
+would ship in one `P11` phase and be thrown away when `G43` lands. If the demo need is urgent enough
+to buy a throwaway, that is the owner's call to make against this trade-off, not a reason to file the
+work under the programme that would ship it sooner.
+
 ## Implementation phases
 
-Sixteen phases under `phase-arch-*`, registered in
+Seventeen phases under `phase-arch-*`, registered in
 [the backlog index](../09-backlog/README.md). `phase-arch-01` is first and has no prerequisites.
 
 | Phase | Title | Group | Depends on |
@@ -129,11 +167,14 @@ Sixteen phases under `phase-arch-*`, registered in
 | `phase-arch-14` | Measure workbench performance before designing any cache | `G46` | — |
 | `phase-arch-15` | Design and ship caching with mtime-keyed invalidation | `G46` | `14` |
 | `phase-arch-16` | Terminal persistence and performance audit across three shells | `G47` | — |
+| `phase-arch-17` | Panel maximize and collapse on the slot model | `G43` | `07`, `09` |
 
 ### Sizing against the partition
 
-Partition-time sizing for `P10` was **12–15 phases**. This plan lands **16**, and the delta is two
-deliberate choices stated above rather than scope growth:
+Partition-time sizing for `P10` was **12–15 phases**, against 13 ideas. This plan lands **17**
+against 14, and the delta is three stated choices rather than scope growth:
+
+- `000233` did not exist at partition time. It adds `phase-arch-17` under design decision 5.
 
 - `G40` was sized at one phase because its deliverable is documentation. It is two here, because the
   migration is execution work and must not gate the six ideas waiting on the documentation (design
@@ -141,7 +182,8 @@ deliberate choices stated above rather than scope growth:
 - `G42` was sized at 1–2 and is one here: a content-fit contract with no mechanised assertion is a
   contract nothing checks, so `000134`'s two halves ship together.
 
-`G41`, `G43`, `G44`, `G45`, `G46` and `G47` each land inside their partition-time range.
+`G41`, `G44`, `G45`, `G46` and `G47` each land inside their partition-time range. `G43` lands at five
+against a 4–5 range, and the fifth is `000233`, which the range never covered.
 
 ## Requirement coverage
 
@@ -173,6 +215,10 @@ Every row of `REQ-011` maps to at least one phase, and every phase carries at le
 | R22 A regenerated overview is immediately visible | `phase-arch-15` |
 | R23 Three-shell persistence matrix with intent judgments | `phase-arch-16` |
 | R24 Latency measurements and named owner-machine checks | `phase-arch-16` |
+| R25 Slot-level maximize and collapse, available to every panel | `phase-arch-17` |
+| R26 Zero scroll and fill assertions hold maximized and collapsed | `phase-arch-17` |
+| R27 Maximize is transient and never persisted | `phase-arch-17` |
+| R28 A maximized shell keeps its PTY session | `phase-arch-17` |
 
 ## What P11 depends on
 
@@ -187,6 +233,21 @@ disjointness.
 
 `P11`'s own finalize phase (`phase-prog-02`) sets those edges when it creates its phases. This plan
 states the rule; it does not write into `PLAN-027`.
+
+### Two ideas raised on 2026-09-14, split between the programmes
+
+Both are anchored on `000119` and were raised after the partition was accepted. They are recorded
+here together because they arrived together and look like one batch, and are not one batch.
+
+- **`000233` (panel maximize) is `P10`'s.** Ruled into `G43` by design decision 5 above, and built
+  as `phase-arch-17`. `PLAN-027` should not give it a phase. A `G48` phase that adds maximize to the
+  HTML Viewer would duplicate `phase-arch-17` and create the second geometry path the ruling exists
+  to prevent.
+- **`000232` (the six already-served image formats) is `P11`'s**, and `P10` takes nothing from it.
+  It is one `COMPATIBLE_EXTENSIONS` array in `ts/src/stage/HtmlViewerRegion.tsx`, needs no rendering
+  step, and by the idea's own text does **not** inherit `000118`'s dependency on markdown rendering
+  landing first. It is named here only so the `000233` ruling is not read as claiming its sibling
+  too.
 
 ## Key references
 
