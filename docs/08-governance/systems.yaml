@@ -134,7 +134,129 @@ systems:
   description: The chartered management UI. Becomes the workbench (PLAN-022, REQ-007) — a
     configurable surface of panels, named layouts and injection controls built on the demo
     stage, per the owner's 2026-09-10 decision (PROMPT-020). Scaffold today; built by
-    phase-wb-01 through phase-wb-07.
+    phase-wb-01 through phase-wb-07. The workbench surfaces it names are now also registered
+    individually as sys-wb-layout, sys-wb-styles, sys-wb-shared, sys-wb-terminal,
+    sys-wb-notes, sys-wb-explorers and sys-wb-viewer (phase-arch-00). This id stays valid and
+    stays declared by the phases and documents that already carry it; phase-arch-18 retires it
+    once no peer holds a claim on it.
+- id: sys-wb-layout
+  name: Workbench layout and slot engine
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/workbench
+  - ts/src/stage/StagePage.tsx
+  - _data/workbench/layouts
+  depends_on:
+  - sys-api
+  - sys-wb-styles
+  description: The engine that turns a layout file into a rendered grid of slots — Slot.tsx,
+    the layout types, the browser-side selection store, useWorkbenchLayouts, the panel type
+    registry and the layout-configuration dialog, with StagePage.tsx as the host that keeps a
+    panel's component instance (and so a live PTY session) alive across a reassignment, and
+    _data/workbench/layouts as the repository-owned geometry ADR-016 fixed. Every panel below
+    is mounted by this engine and named by its registry, so a change here is felt by all of
+    them; a change inside one panel is not.
+- id: sys-wb-styles
+  name: Workbench stylesheet
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/StagePage.css
+  depends_on: []
+  description: The single stylesheet the stage root imports, carrying the class names every
+    slot and panel renders against and the min-height/overflow chain that REQ-006 R02's
+    zero-scroll obligation rests on. Registered separately because it is one file that two
+    different kinds of work act on — identifier migration renames its classes, content-fit
+    contracts assert against them — and folding it into the engine would make every
+    CSS-touching phase collide with every engine phase for no reason beyond the import.
+- id: sys-wb-shared
+  name: Workbench cross-panel primitives
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/Popover.tsx
+  - ts/src/stage/Tooltip.tsx
+  - ts/src/stage/panelBridge.ts
+  depends_on:
+  - sys-wb-layout
+  description: The primitives panels share rather than own — the popover and tooltip used by
+    several panel headers and menus, and panelBridge's module-level registration slots, which
+    are how the File Browser's context menu reaches the live HTML Viewer or terminal instance
+    across slots the engine deliberately keeps independent. This is the surface a duplication
+    audit is most likely to grow, which is why it is not filed under any one panel.
+- id: sys-wb-terminal
+  name: Workbench terminal panel
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/TerminalMenu.tsx
+  - ts/src/stage/InjectionDropdowns.tsx
+  - ts/src/stage/CommandPanel.tsx
+  - _data/workbench/injection-overrides.json
+  depends_on:
+  - sys-wb-layout
+  - sys-wb-shared
+  description: The xterm.js shell panel and the controls that drive it — the bash/CMD/PowerShell
+    variants, the terminal menu, the injection dropdowns and the command panel, plus the
+    injection override data they read. The panel that owns live session state, which is why
+    persistence and survival questions land here rather than on the engine. The PTY backend it
+    talks to is sys-demo-stage's (src/demo, src/api/routes/demo_terminal.py), not this id's.
+- id: sys-wb-notes
+  name: Workbench notes strip
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/NotesStripRegion.tsx
+  depends_on:
+  - sys-wb-layout
+  description: The notes strip and its talking-points rotator — one panel, one file, a header
+    that carries no title per REQ-007 W01. Registered on its own because it is the one panel
+    whose fit behavior differs in kind from the others (a fixed-height strip rather than a
+    filled region), and it is a named seam in phase-arch-00's own scope.
+- id: sys-wb-explorers
+  name: Workbench explorer panels
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/explorer
+  - ts/src/stage/IdeaExplorerRegion.tsx
+  - ts/src/stage/BacklogExplorerRegion.tsx
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/FileTreeContextMenu.tsx
+  - ts/src/stage/DirectoryPickerDialog.tsx
+  depends_on:
+  - sys-wb-layout
+  - sys-wb-shared
+  - sys-api
+  description: The table-and-tree panels over repository state (REQ-007 W09/W10/W11) — the
+    shared ExplorerRegion that owns all sort, filter and queue-toggle behavior, the idea and
+    backlog explorers that parameterize it, and the File Browser with its context menu and
+    directory picker. Grouped as one id because they are one configuration surface with three
+    data sources, not three independent panels.
+- id: sys-wb-viewer
+  name: Workbench HTML viewer and overview panels
+  domain: application
+  status: implemented
+  owner: repository-owner
+  paths:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/OverviewRegion.tsx
+  depends_on:
+  - sys-wb-layout
+  - sys-wb-shared
+  - sys-api
+  description: The panels that render generated HTML — the HTML Viewer with its file dropdown
+    and tabs, which generalized and replaced the overview panel as layout 1's main-slot
+    default, and OverviewRegion, still registered and still layout 2's. Kept as one id because
+    the viewer's staleness and caching behavior is the overview panel's behavior too.
 - id: sys-html
   name: Dynamic HTML generation
   domain: application

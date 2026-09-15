@@ -7567,7 +7567,7 @@ items:
   - doc-workbench-architecture-quality-requirements
   systems:
   - sys-brain
-  - sys-ui
+  - sys-wb-layout
   owner: repository-owner
   status: queued
   priority: 1
@@ -7604,7 +7604,13 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
+  - sys-wb-shared
+  - sys-wb-terminal
+  - sys-wb-notes
+  - sys-wb-explorers
+  - sys-wb-viewer
   owner: repository-owner
   status: queued
   priority: 2
@@ -7628,6 +7634,7 @@ items:
   - uv run python -m src.governance
   deliverables:
   - _data/workbench/layouts/
+  - ts/src/workbench/
   - ts/src/stage/
   next_action: Grep for every occurrence of each old identifier before changing one, so the
     rename is one atomic diff rather than a chase through tests.
@@ -7637,7 +7644,13 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
+  - sys-wb-shared
+  - sys-wb-terminal
+  - sys-wb-notes
+  - sys-wb-explorers
+  - sys-wb-viewer
   - sys-api
   owner: repository-owner
   status: queued
@@ -7659,7 +7672,7 @@ items:
   verification:
   - uv run python -m src.governance
   deliverables:
-  - docs/00-working/
+  - docs/00-working/workbench-duplication-audit.md
   next_action: Start from Slot.tsx and its CSS chain. It is the one duplication the owner
     named, and the abstraction it wants is the same one phase-arch-07 would build.
 - id: phase-arch-04
@@ -7668,7 +7681,13 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
+  - sys-wb-shared
+  - sys-wb-terminal
+  - sys-wb-notes
+  - sys-wb-explorers
+  - sys-wb-viewer
   - sys-api
   owner: repository-owner
   status: queued
@@ -7690,7 +7709,7 @@ items:
   verification:
   - uv run python -m src.governance
   deliverables:
-  - docs/00-working/
+  - docs/00-working/workbench-structure-audit.md
   next_action: Run the measurement before forming any view. A file-size audit that starts from
     an opinion about which files are too big measures the opinion.
 - id: phase-arch-05
@@ -7699,7 +7718,13 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
+  - sys-wb-shared
+  - sys-wb-terminal
+  - sys-wb-notes
+  - sys-wb-explorers
+  - sys-wb-viewer
   owner: repository-owner
   status: queued
   priority: 2
@@ -7725,7 +7750,7 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/06-requirements/
-  - test/
+  - test/test_workbench_fit_contracts.py
   next_action: Write the contract for the File Browser first. Its clip is recorded as W18, so
     the assertion can be checked against a known failure rather than an invented one.
 - id: phase-arch-06
@@ -7734,7 +7759,7 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
   owner: repository-owner
   status: queued
   priority: 2
@@ -7769,7 +7794,8 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
   owner: repository-owner
   status: queued
   priority: 2
@@ -7792,7 +7818,8 @@ items:
   - cd ts && npm run build
   - uv run python -m src.governance
   deliverables:
-  - ts/src/stage/
+  - ts/src/workbench/
+  - ts/src/stage/StagePage.css
   - docs/06-requirements/
   next_action: Assert the one-header count as a test before changing the rendering, so idea
     000101's defect is reproduced by the check first.
@@ -7802,7 +7829,8 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-terminal
   - sys-api
   owner: repository-owner
   status: queued
@@ -7826,7 +7854,8 @@ items:
   - cd ts && npm run build
   - uv run python -m src.governance
   deliverables:
-  - ts/src/stage/
+  - ts/src/workbench/
+  - ts/src/stage/TerminalRegion.tsx
   - _data/workbench/layouts/
   next_action: Start at session ownership. A second terminal instance is the case where a bare
     panel_id is not merely untidy but wrong, so it sizes the change honestly.
@@ -7836,7 +7865,8 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
   owner: repository-owner
   status: queued
   priority: 2
@@ -7860,7 +7890,8 @@ items:
   - cd ts && npm run build
   - uv run python -m src.governance
   deliverables:
-  - ts/src/stage/
+  - ts/src/workbench/
+  - ts/src/stage/StagePage.css
   - _data/workbench/layouts/
   next_action: Write the per-role constraint table before touching geometry. Idea 000133's
     stated requirement is the constraints, and the resizing is only what tests them.
@@ -7870,7 +7901,7 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
   owner: repository-owner
   status: queued
   priority: 2
@@ -7919,7 +7950,7 @@ items:
   verification:
   - uv run python -m src.governance
   deliverables:
-  - docs/00-working/
+  - docs/00-working/ports-and-processes-lifecycle.md
   next_action: Reconstruct the port-8000 conflict from the session records that hit it. A real
     trace beats a general treatment of what a port is.
 - id: phase-arch-12
@@ -7953,7 +7984,7 @@ items:
   deliverables:
   - docs/04-decisions/
   - src/api/routes/
-  - test/
+  - test/test_ports_api.py
   next_action: Settle the ADR-015 tension before writing a route. A kill action is the first
     write the workbench API would ever expose.
 - id: phase-arch-13
@@ -7962,7 +7993,7 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
   owner: repository-owner
   status: queued
   priority: 2
@@ -7984,6 +8015,7 @@ items:
   - cd ts && npm run build
   - uv run python -m src.governance
   deliverables:
+  - ts/src/workbench/panelRegistry.tsx
   - ts/src/stage/
   - docs/06-requirements/
   next_action: Integrate from the contract document with the app's source closed. That is the
@@ -7994,7 +8026,9 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-explorers
+  - sys-wb-viewer
   - sys-api
   owner: repository-owner
   status: queued
@@ -8013,7 +8047,7 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - docs/00-working/
+  - docs/00-working/workbench-performance-baseline.md
   next_action: Measure the enumeration and search routes first. Idea 000121 names them as the
     ones a bad cache would break, so their baseline is the one that matters most.
 - id: phase-arch-15
@@ -8023,7 +8057,7 @@ items:
   - doc-workbench-architecture-quality-requirements
   systems:
   - sys-api
-  - sys-ui
+  - sys-wb-viewer
   owner: repository-owner
   status: queued
   priority: 2
@@ -8047,7 +8081,7 @@ items:
   - uv run python -m src.governance
   deliverables:
   - src/api/routes/
-  - test/
+  - test/test_workbench_cache.py
   next_action: Write the regenerate-then-read test before adding the first cache. It is the
     check that would have caught 000121's failure, and it must fail for the right reason first.
 - id: phase-arch-16
@@ -8056,6 +8090,7 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
+  - sys-wb-terminal
   - sys-demo-stage
   owner: repository-owner
   status: queued
@@ -8081,7 +8116,7 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - docs/00-working/
+  - docs/00-working/terminal-persistence-audit.md
   next_action: Fill the bash column completely on Linux first, then mark exactly which CMD and
     PowerShell cells the owner must run. A matrix with guessed cells is worse than a short one.
 - id: phase-arch-17
@@ -8090,7 +8125,9 @@ items:
   sources:
   - doc-workbench-architecture-quality-requirements
   systems:
-  - sys-ui
+  - sys-wb-layout
+  - sys-wb-styles
+  - sys-wb-terminal
   owner: repository-owner
   status: queued
   priority: 2
@@ -8122,8 +8159,9 @@ items:
   - cd ts && npm run build
   - uv run python -m src.governance
   deliverables:
-  - ts/src/stage/
-  - test/
+  - ts/src/workbench/
+  - ts/src/stage/StagePage.css
+  - test/test_workbench_maximize.py
   next_action: Assert R28 first with a failing test - set a shell variable, maximize, collapse,
     read it back. Session loss on remount is the one constraint that cannot be retrofitted.
 - id: phase-arch-00
