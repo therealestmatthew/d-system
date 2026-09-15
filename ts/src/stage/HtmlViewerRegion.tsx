@@ -12,14 +12,28 @@ const SEARCH_URL = '/api/v1/workbench/search'
 // (`src/api/routes/workbench.py`, `phase-wb-01`) report paths only, never content (ADR-015), so
 // this is what actually fetches the bytes an iframe can render.
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
-// The compatible files: `.html`/`.svg`, which this panel renders directly, plus the six raster/
-// vector image formats `serveRepositoryFiles` (`ts/vite.config.ts`'s `CONTENT_TYPE_BY_EXTENSION`)
-// already serves with correct image MIME types — an image needs no render step in the iframe, so
-// widening this list to include them was the only change idea 000232 required (no backend or
-// vite.config change). Exported so the File Browser's right-click context menu
+// The compatible files: `.html`/`.htm`/`.svg`, which this panel renders directly; `.md`, which
+// `serveRepositoryFiles` (`ts/vite.config.ts`) now renders route-side to HTML before this panel
+// ever sees it (idea 000110, idea 000119's ruling) — the block idea 000118 put on `.md` here was
+// only ever "until rendering lands," and it lands in the same change that adds `.md` to this
+// list; and the six raster/vector image formats that same route already serves with correct image
+// MIME types (`CONTENT_TYPE_BY_EXTENSION`) — an image needs no render step in the iframe, so
+// widening this list to include them (idea 000232) was a one-line addition, no backend or
+// vite.config change. Exported so the File Browser's right-click context menu
 // (`FileBrowserRegion.tsx`, REQ-007 W09) can hide "Open in HTML Viewer" on an incompatible entry
 // using this same list rather than a second, hand-kept copy of it.
-export const COMPATIBLE_EXTENSIONS = ['.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico']
+export const COMPATIBLE_EXTENSIONS = [
+  '.html',
+  '.htm',
+  '.svg',
+  '.md',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.ico',
+]
 
 // REQ-007 W08: "tabs exactly like the terminal's session tabs" — mirrors `TerminalRegion`'s own
 // `MAX_SESSIONS`/`FIRST_SESSION_ID` constants and cap, one tab bar per panel instance.

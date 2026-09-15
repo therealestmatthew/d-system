@@ -1,8 +1,9 @@
 import { spawnSync } from 'node:child_process'
-import { createReadStream, existsSync, realpathSync, statSync } from 'node:fs'
-import { extname, join, normalize, resolve, sep } from 'node:path'
+import { createReadStream, existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
+import { basename, extname, join, normalize, resolve, sep } from 'node:path'
 import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { marked } from 'marked'
 
 // The repo root, one directory above `ts/` (this file's own directory) — where `_public/` (the
 // generated overview page's home, `phase-demo-04`) and `_data/` (repository data, including the
@@ -103,14 +104,17 @@ function serveWorkbenchLayouts(): Plugin {
   }
 }
 
-// The extensions the HTML Viewer's served pages are ever expected to reference: the compatible
-// documents themselves (`.html`/`.svg`, REQ-007 W07) plus the ordinary assets a static page can
-// link to relatively (stylesheets, scripts, images, fonts) — a `.html` page's own relative links
-// resolve against this same prefix, so they need to be servable too, not just the page itself.
-// Anything outside this map falls back to `application/octet-stream`.
+// The content types this route ever answers with: the compatible documents themselves
+// (`.html`/`.htm`/`.svg`, plus `.md` — served as `text/html`, since `serveRepositoryFiles` below
+// renders markdown to HTML route-side rather than serving its raw source, idea 000119's ruling)
+// and the ordinary assets a static page can link to relatively (stylesheets, scripts, images,
+// fonts) — a `.html` page's own relative links resolve against this same prefix, so they need to
+// be servable too, not just the page itself. Anything outside this map falls back to
+// `application/octet-stream`.
 const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.htm': 'text/html; charset=utf-8',
+  '.md': 'text/html; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -239,6 +243,94 @@ function serveRepositoryFiles(): Plugin {
       // iframe's `sandbox=""`. Applies to every response from this route, not just the fallback
       // path, since the same URL is reachable either way.
       res.setHeader('Content-Security-Policy', 'sandbox')
+      // Markdown renders route-side, to HTML, rather than serving raw source (idea 000110, sited
+      // here rather than in the frontend or a new backend route per idea 000119's ruling: both
+      // `HtmlViewerRegion`'s sandboxed iframe and idea 000109's double-click-to-new-tab fetch this
+      // same `/workbench-file/` URL, so rendering once at the route means there is one path to
+      // keep correct, not two; ADR-015 scopes the FastAPI workbench API to reporting paths, never
+      // content, so a backend route was never the right place). No client-side sanitizer
+      // (DOMPurify or similar) is layered on top of `marked`'s output — the
+      // `Content-Security-Policy: sandbox` header set just above already gives this response an
+      // opaque origin and blocks script execution for both the iframe and the new-tab case, which
+      // is what a sanitizer would otherwise exist to backstop.
+      if (extname(realResolved).toLowerCase() === '.md') {
+        try {
+          const source = readFileSync(realResolved, 'utf-8')
+          // `{ async: false }` pins the synchronous overload — `marked.parse` is typed to return
+          // `string | Promise<string>` because an async extension can make it asynchronous, but
+          // none is registered here, so this is always the synchronous, string-returning path;
+          // asserting the type keeps that guarantee visible without making this middleware (or
+          // its surrounding `Connect` handler signature) `async`.
+          const rendered = marked.parse(source, { async: false }) as string
+          const title = basename(realResolved)
+          const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${title}</title>
+<style>
+  body {
+    max-width: 48rem;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem 4rem;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 20px;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    margin: 1.6em 0 0.6em;
+    font-weight: 600;
+  }
+  h1 { font-size: 2.2em; border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
+  h2 { font-size: 1.7em; border-bottom: 1px solid #eee; padding-bottom: 0.25em; }
+  h3 { font-size: 1.35em; }
+  p, ul, ol, blockquote, pre, table { margin: 0.9em 0; }
+  ul, ol { padding-left: 1.6em; }
+  li { margin: 0.3em 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.9em;
+    background: #f2f2f2;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: #1e1e1e;
+    color: #f2f2f2;
+    padding: 1em 1.25em;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  blockquote {
+    border-left: 4px solid #ccc;
+    margin-left: 0;
+    padding: 0.2em 1.2em;
+    color: #555;
+    font-style: italic;
+  }
+  a { color: #0b5fff; text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 0.5em 0.8em; text-align: left; }
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+${rendered}
+</body>
+</html>
+`
+          res.end(html)
+        } catch {
+          res.statusCode = 500
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+          res.end(`Failed to render markdown: ${relative}`)
+        }
+        return
+      }
       // Stream from the already-`realpathSync`-resolved path, not the textually-normalized
       // `resolved` re-opened here: re-deriving bytes from `resolved` after the symlink-boundary
       // check above passed would reopen the original (possibly symlinked) path, leaving a
