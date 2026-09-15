@@ -7548,7 +7548,7 @@ items:
   systems:
   - sys-retrieval
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7573,6 +7573,32 @@ items:
   - docs/09-backlog/README.md
   next_action: Design G25's failure collection first. It gates the programme and would
     unblock phase-mem-15, -16, -18 and -19 outside it.
+  session: doc-session-retrieval-knowledge-infrastructure-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md
+  - docs/06-requirements/REQ-018-retrieval-knowledge-infrastructure.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-07-retrieval-knowledge-infrastructure-plan.md
+  result: >-
+    Finalized P6, and corrected the premise the scope itself asserts. The partition and this phase's
+    own scope both say the programme is gated on a retrieval failure that nothing collects; that is
+    false. The gate lives in resume_when, names phase-mem-10, and covers phase-mem-15, -16, -17 and
+    -18 - phase-mem-17 being absent from the partition's account. phase-mem-10 is status queued,
+    ready, blocked by nothing and never claimed, its three deliverables absent from disk, and its
+    acceptance already carries the both-outcomes ruling this plan first thought it was adding. The
+    whole plan was drafted on the false premise before it was checked; the correction is recorded in
+    the session record rather than smoothed over. So the cheapest unblocking move in this programme is
+    to claim a ready phase, not to design anything. phase-ret-01 now complements phase-mem-10 -
+    synthetic evaluation set there, real recorded misses here - and depends on it; phase-ret-02
+    narrows to correcting the gate's record and adding the one real gap, a review date. Kept G28 whole
+    and recorded audit 2's reason. G26 gets no phase, since 000004 enumerates the existing phase-mem
+    line by id. Wrote REQ-018 with fourteen rows and registered ten phases under phase-ret-*.
+    Verification green - governance exits 0 at 239 documents and 238 phases, --ready shows four, and
+    580 tests pass. Two reviews: the first was stopped mid-flight because the correction superseded
+    the document it was auditing; the second, told to attack the correction itself, confirmed all four
+    conditions and verified every load-bearing claim independently, including a parsed-dict diff
+    showing zero pre-existing phases changed after a whole-file reformat was reverted.
+
 - id: phase-prog-09
   title: Finalize the blocked downstream projections plan (P7)
   plan: doc-blocked-downstream-projections

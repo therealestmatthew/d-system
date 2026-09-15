@@ -68,9 +68,90 @@ gate actually names. An earlier run in this session showed five, before that dep
 
 ## Backlog
 
-`phase-prog-08` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-08` is `status: complete`, `agent: agent-night`,
+`session: doc-session-retrieval-knowledge-infrastructure-plan`. Completion evidence is `PLAN-033`,
+`REQ-018`, `docs/09-backlog/README.md` and this record. Written under the owner's advance authority
+for this batch, after the read-only independent review below confirmed all four conditions.
 
 Ten phases added under `phase-ret-*`, all `status: queued`, none claimed.
+
+## Review
+
+**Two reviews were dispatched for this phase, and the first was stopped mid-flight.** It was auditing
+the plan as originally drafted, and the premise correction above rewrote that plan's central section
+while it ran. A verdict on a superseded document cannot close a phase, so it was killed rather than
+left to finish. That is spend attributable to not verifying the premise before drafting, and it is
+recorded as such rather than as a review-process cost.
+
+The second review is the one this closure rests on: a fresh non-fork sub-agent with read-only tools,
+told explicitly that the plan had been corrected mid-phase and that checking whether the correction
+was *itself* right and complete was its most valuable job. Its runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 239 documents, 25 memories, 238 backlog phases
+EXIT: 0
+
+$ uv run pytest
+580 passed, 2 warnings
+```
+
+It also checked the arithmetic rather than the assertion: "Independently confirmed `dev` has 228
+phases … so 228→238 for the ten new `phase-ret-*` phases checks out arithmetically, not just by
+assertion."
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`status: draft` → `active`…
+`grep -i placeholder|TODO|TBD` on the file returns nothing; the file states six numbered design
+rulings plus the correction narrative."
+
+**Condition 2 — requirement exists, every row maps to a phase — Met.** "Programmatically mapped all 14
+`REQ-018` rows against every `phase-ret-*` entry's scope/acceptance text — every row hits at least one
+phase… Reverse direction… also holds."
+
+**Condition 3 — `G28` kept whole with audit 2's reason recorded — Met.** The reviewer checked the
+quotation against the partition and pulled `000045` through `fold()` itself, confirming the idea does
+self-describe as a companion to the other two, and that `R10` makes wholeness checkable.
+
+**Condition 4 — removed from `next_up` in the same change — Met.** "the exact same commit that adds
+the ten `phase-ret-*` phases and registers the track — not a separate cleanup commit."
+
+**The correction was attacked hardest, and holds.** Every load-bearing claim was verified
+independently rather than accepted:
+
+- *The gated set.* "Independently parsed `backlog.yaml` and confirmed exactly `['phase-mem-15',
+  'phase-mem-16', 'phase-mem-17', 'phase-mem-18']` carry it, `phase-mem-10` is `status: queued`.
+  `phase-mem-19` is correctly excluded."
+- *The both-outcomes quote* from `phase-mem-10`'s acceptance — "verbatim".
+- *The absent deliverables* — all three genuinely missing from disk, including one this phase had not
+  named (`docs/03-sessions/2026-09-05-retrieval-baseline.md`).
+- *`load_context.py`* — "line 94 is literally `FROM memories`; it is the *only* `SELECT`/`FROM` in the
+  file… so 'queries nothing else' is accurate, not rhetorical."
+- *The complement is genuine, not redundant.* "`phase-mem-10`'s own acceptance requires it to run
+  'without transmitting memories or requiring an embedding provider' — i.e. a synthetic, pre-written
+  query set — while `phase-ret-01`'s scope is real misses hit during actual work, with a third field
+  … that the synthetic harness has no reason to carry."
+- *`phase-mem-17`'s omission corroborated from a second source.* "Idea `000004`'s body … enumerates
+  `phase-mem-15`, `-16`, `-18`, `-19` by id and explicitly omits `-17`."
+- *Completeness of the correction.* "every occurrence of 'nothing collects' is inside a sentence that
+  labels it wrong/false… 'deadlock' appears zero times in the final diff… 'threshold' appears twice,
+  both explicitly rejecting it."
+
+**`backlog.yaml` integrity, checked with extra care** after the reverted whole-file rewrite: no
+anchors or aliases, and "parsed-dict diff against `dev`: **zero** pre-existing items differ… the final
+state is the surgical 61-line replacement it says it is, not a residual of the bad rewrite."
+
+**Two weak points, neither blocking.**
+
+- *The `phase-prog-*` family under-declares its deliverables* — `backlog.yaml` is rewritten by every
+  one of them and declared by none. The reviewer checked precedent and confirmed it is a standing gap
+  across all eight, "not something `phase-prog-08` introduced". Already staged as an idea candidate;
+  not fixed here.
+- *A paraphrase was presented as a quotation.* `PLAN-033` rendered `000045`'s self-description as
+  "companion ideas recorded alongside this one" in quote marks; the idea's actual opening is
+  *"Companion to the ideas recorded alongside this one about reviewing documentation front matter…"*.
+  The reviewer noted this is inherited from the partition, which makes the identical
+  paraphrase-as-quote. **Fixed**: the plan now quotes the idea's real text and notes that the
+  partition's rendering is a paraphrase.
 
 ## Decisions
 

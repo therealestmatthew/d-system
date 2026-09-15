@@ -110,9 +110,14 @@ The phase's acceptance requires this, and requires audit 2's reason for restorin
 with no entry in the disagreement table — a silent reassignment against the ideas' own
 self-description."* The fix applied was *"Reunited as `G28`; `G26` is `000004` alone."*
 
-The checkable fact is `000045`'s own body, which opens by naming the other two as "companion ideas
-recorded alongside this one", deliberately split so one design decision — structured front matter,
-graph, or vector for the documentation corpus — can be made from all three surveys together.
+The checkable fact is `000045`'s own body, which opens: *"Companion to the ideas recorded alongside
+this one about reviewing documentation front matter for a documentation database, and about graph
+database tooling for that same documentation/knowledge corpus."* It names the other two and positions
+itself as the third survey — structured, graph and semantic — of one corpus.
+
+Note that the partition renders this as the phrase "companion ideas recorded alongside this one" in
+quotation marks, which is a paraphrase rather than the idea's wording. The substance is unaffected,
+but the quotation above is the idea's actual text.
 Synthesis had pulled `000045` in with `000004` on vector-mechanism grounds and had not recorded the
 change; audit 2 caught it.
 
