@@ -7491,7 +7491,8 @@ items:
   systems:
   - sys-api
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7511,6 +7512,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-032-autonomous-agent-operations.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Rule on 000020 first. Its librarian half overlaps P6 and a lighter
     mechanism in P4, so the programme's shape depends on the ruling.
 - id: phase-prog-08
