@@ -7665,7 +7665,8 @@ items:
   systems:
   - sys-contracts
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7686,6 +7687,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-035-schema-consistency-testing.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Choose between 000024 and 000035 first. They are very different amounts
     of work for the same symptom and the sizing is meaningless until one is picked.
 - id: phase-prog-11
