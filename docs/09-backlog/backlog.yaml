@@ -7549,7 +7549,8 @@ items:
   systems:
   - sys-retrieval
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7570,6 +7571,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-033-retrieval-knowledge-infrastructure.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Design G25's failure collection first. It gates the programme and would
     unblock phase-mem-15, -16, -18 and -19 outside it.
 - id: phase-prog-09
