@@ -7375,7 +7375,8 @@ items:
   systems:
   - sys-backlog
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-night
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7396,6 +7397,7 @@ items:
   deliverables:
   - docs/01-plans/PLAN-030-document-backlog-governance.md
   - docs/06-requirements/
+  - docs/09-backlog/README.md
   next_action: Settle the 000056-to-000047 overlap first. It is the scope question that
     decides whether G05 is two phases or one.
 - id: phase-prog-06
