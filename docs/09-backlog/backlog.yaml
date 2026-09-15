@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-part-02
-- phase-prog-01
 - phase-port-02
 - phase-ses-01
 - phase-prog-04
@@ -8650,3 +8649,320 @@ items:
   next_action: TerminalRegion.tsx already probes terminal-enabled at line 405. Reuse that result
     rather than adding a second probe - InjectionDropdowns.tsx renders unconditionally today,
     which is the whole defect.
+- id: phase-conc-01
+  title: Define the stale-claim signal and report it in --ready
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Define what makes a claim stale in terms a check can evaluate without judgement - branch commit recency,
+    worktree presence - and write down what the signal does not prove.
+  - Report stale claims in --ready and --backlog as a distinct state that names which signal fired, beside
+    the existing active-claims table.
+  - Add no code path that releases a claim. The report is an input to a human decision.
+  acceptance:
+  - 'REQ-013 R01 holds: a phase set active with no branch activity past the threshold is reported as stale
+    and names the signal; a live claim in the same run is not flagged.'
+  - 'REQ-013 R02 holds: the definition uses only evaluable inputs and states explicitly that staleness
+    is evidence for the owner, not proof the agent is dead.'
+  - 'REQ-013 R03 holds on its negative half: grep over src/governance/ finds no code writing status queued
+    over a peer''s claim.'
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest test/test_backlog.py
+  deliverables:
+  - src/governance/backlog.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - test/test_backlog.py
+  next_action: Pick the threshold from the repository's own history before writing any code - measure
+    how long real claims have actually stayed open, rather than choosing a round number.
+- id: phase-conc-02
+  title: Refuse integration over a dirty primary checkout
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the guard that refuses an integration into dev while the primary checkout holds uncommitted
+    changes, naming the dirty paths in the refusal.
+  - Make the refusal unsatisfiable by git stash - a guard that stashing clears teaches the behaviour that
+    caused the 000041 incident.
+  - Decide and record where the guard runs, using phase-conc-08's placement rule if it has landed, or
+    stating the placement and its reason if it has not.
+  acceptance:
+  - 'REQ-013 R04 holds: with an unrelated modified file in the primary checkout, the integration is refused
+    and the dirty paths are named.'
+  - The refusal survives a git stash - stashing the peer's work does not let the integration proceed.
+  - A clean primary checkout is not refused, so the guard does not block ordinary work.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/git-hooks/
+  - docs/08-governance/OPS-001-operations.md
+  next_action: Read the 000041 incident report before designing the guard. The session-code half of that
+    incident is phase-conc-03, not this phase - do not fold them together.
+- id: phase-conc-03
+  title: Make document-code allocation collision-proof across concurrent sessions
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems: &id001
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Change --next-code so two allocations of the same kind in flight from different worktrees cannot return
+    the same code.
+  - Make the reservation visible to the second caller before the first has merged. An allocator that reads
+    only committed state is the defect SESS-2026-09-08-07 demonstrates.
+  - Retire or restate the AGENTS.md workaround of reserving the code in codes.yaml alongside the backlog
+    claim, which exists only because the mechanism is unsafe.
+  acceptance:
+  - 'REQ-013 R05 holds: the same kind allocated from two worktrees before either commits yields two different
+    codes.'
+  - The reservation is observable to the second caller pre-merge, demonstrated by a test rather than by
+    inspection.
+  - GOV-005 describes the mechanism actually in force, with no surviving instruction to work around it
+    by hand.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest test/test_codes.py
+  deliverables:
+  - src/governance/
+  - docs/08-governance/GOV-005-document-codes.md
+  - docs/08-governance/codes.yaml
+  - test/test_codes.py
+  next_action: Establish first whether codes.yaml on dev can serve as the reservation point, or whether
+    a pre-merge reservation needs somewhere else to live. That choice decides the whole phase.
+- id: phase-conc-04
+  title: Write the claim-recovery procedure and record it in GOV-003
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems: *id001
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-conc-01
+  scope:
+  - 'Write the procedure for recovering an abandoned claim: who may release it, what must be confirmed
+    before releasing, and what happens to the orphaned branch and worktree.'
+  - Record the accepted decision in GOV-003 alongside the incidents that motivated it.
+  - State the recovery path for gitignored content in the orphaned worktree, which a merge never carries
+    and git worktree remove destroys.
+  acceptance:
+  - 'REQ-013 R03 holds on its positive half: the procedure names who may release, what is confirmed first,
+    and the disposition of the branch and worktree.'
+  - The procedure consumes phase-conc-01's signal as evidence rather than re-deriving staleness, and says
+    so.
+  - GOV-003 carries the decision and its reason, not only a pointer to this plan.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  next_action: Do not start before phase-conc-01 lands. The procedure's first step is reading the stale-claim
+    report, and writing it against an imagined report shape is how it ends up unusable.
+- id: phase-conc-05
+  title: Decide and apply branch protection on main, with the settings record
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems:
+  - sys-delivery
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Decide, per setting, whether to require a pull request, review approval, passing status checks, linear
+    history, force-push protection, and whether the owner's account is exempt.
+  - Apply the settings to the remote and record each one as load-bearing today or ceremony kept for later,
+    with the reason.
+  - Make tools/check_no_private_content.py a required check, and fix its silent pass when _private/portfolio/
+    is absent.
+  acceptance:
+  - 'REQ-013 R06 holds: a direct push to main is rejected by the remote, and a pull request from dev with
+    a failing required check cannot merge. Both observed against the remote, not read from a document.'
+  - 'REQ-013 R07 holds: every enabled setting carries a stated judgement; a setting enabled with no reason
+    is a defect.'
+  - 'REQ-013 R08 holds: the private-content check is required on the gate, and it fails or warns rather
+    than reporting OK with 0 identifiers checked.'
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py
+  deliverables:
+  - docs/04-decisions/
+  - tools/check_no_private_content.py
+  - .github/workflows/ci.yaml
+  next_action: The 0-identifiers-checked failure is the half of this phase that is verifiable locally.
+    Fix it first, then apply the remote settings, so the required check is worth requiring.
+- id: phase-conc-06
+  title: Rewrite the multi-agent protocol for the pull-request gate and reconcile the corpus
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems:
+  - sys-governance
+  - sys-backlog
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-conc-05
+  scope:
+  - 'State what a claim means under the gate: when it is released relative to merge, and how an agent
+    determines whether its work has landed.'
+  - Reconcile every governed document that describes the branch model against the model actually in force,
+    covering the passages commit 0c82996 rewrote.
+  - Propose, but do not apply, any AGENTS.md change the reconciliation requires. That file is owner-executed
+    - see phase-conc-09.
+  acceptance:
+  - 'REQ-013 R09 holds: the protocol answers all three questions and states the reason for the agent-integrates-to-dev
+    choice rather than asserting it.'
+  - 'REQ-013 R10 holds: a grep of the document corpus for branch-model claims finds none that contradicts
+    the remote''s settings.'
+  - No AGENTS.md or CLAUDE.md edit was made by this phase; any required change is written out as proposed
+    text for the owner.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/08-governance/OPS-001-operations.md
+  - docs/04-decisions/ADR-003-multi-agent-concurrency.md
+  next_action: Read commit 0c82996 before touching anything. It rewrote 31 references and also shipped
+    post-push policy corrections; a naive revert undoes both.
+- id: phase-conc-07
+  title: Decide the backup posture for non-git state and verify it by restoring
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems: *id001
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Decide the backup posture for state git cannot hold, addressing _private/portfolio/ explicitly: an
+    encrypted off-machine copy, a second local disk, or a recorded acceptance of the risk.'
+  - Record what the posture covers, what it does not, and at what cadence.
+  - If a mechanism is chosen, verify it by restoring into a scratch location and diffing against the source.
+  acceptance:
+  - 'REQ-013 R11 holds: the decision names a mechanism and a cadence, or accepts the risk and states what
+    is lost with the disk. To be decided is not a posture.'
+  - 'REQ-013 R12 holds, or is recorded as not applicable because the risk was accepted: a chosen mechanism
+    is verified by a restore-and-diff, never by the backup command''s exit code.'
+  - The record states that _private/ is permanently gitignored by ADR-009 and that no remote will cover
+    it, so the posture is not mistaken for something git provides.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  next_action: This is a question for the owner before it is work. Put the three options with their costs,
+    and do not choose a mechanism on their behalf - accepting the risk is a legitimate answer and the
+    cheapest one.
+- id: phase-conc-08
+  title: Write the enforcement-placement rule, apply it, and audit .claude/ settings
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems:
+  - sys-governance
+  - sys-delivery
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the rule that decides, for a standing rule, whether it belongs in a hook, a test, or prose -
+    with stated inputs rather than a judgement call.
+  - 'Apply it to the rules already in force: the governance check, catalog staleness, the private-content
+    gate, and _private/ reads.'
+  - Audit .claude/settings.json and .claude/settings.local.json permission by permission, recording where
+    each belongs and naming any broader than the work requires.
+  - Record 000012's disposition - unblocked but not worth implementing at the current suite runtime -
+    rather than sizing it.
+  acceptance:
+  - 'REQ-013 R13 holds: the rule has a decision procedure with stated inputs, and all four named rules
+    land somewhere with a reason.'
+  - 'REQ-013 R14 holds: one row per permission present, naming which settings file it belongs in, with
+    the Edit(AGENTS.md) deny reconciled against 000091.'
+  - 'REQ-013 R15 holds: each hook''s record states its equivalent for an agent not running under Claude
+    Code.'
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/08-governance/
+  - .claude/settings.json
+  next_action: Write the rule before looking at any specific case. Deriving it from four placements chosen
+    first produces a rule that only fits those four.
+- id: phase-conc-09
+  title: 'Owner-executed: apply the approved AGENTS.md push-rule rewrite'
+  plan: doc-concurrency-git-safety
+  sources:
+  - doc-concurrency-git-safety-requirements
+  - doc-concurrency-git-safety
+  systems: *id001
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-conc-06
+  scope:
+  - The owner applies the two approved hunks to AGENTS.md by hand, or lifts the .claude/settings.json
+    deny for the duration and restores it after.
+  - An agent may verify the result and may not produce it. No agent edits AGENTS.md under any circumstance
+    - see that file's own standing rule.
+  - The verbatim replacement text is recorded in a finding annotation on idea 000091; take it from there
+    rather than from the plan file outside the repository.
+  acceptance:
+  - 'REQ-013 R16 holds: both passages read as one general rule plus one named exception, and the cross-reference
+    points at a passage that agrees with it.'
+  - CLAUDE.md's parenthetical duplicate of the exception is still accurate under the rewrite, or is flagged
+    to the owner if it is not.
+  - No agent-authored edit to AGENTS.md appears in the phase's diff.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - docs/03-sessions/
+  next_action: Owner action, not agent work. An agent picking this up should confirm the hunks are already
+    applied and verify R16, or report that the phase is waiting on the owner and stop.
