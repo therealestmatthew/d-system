@@ -277,9 +277,59 @@ to `_data/ideas.jsonl`** per your instruction:
 
 ---
 
+## Morning review, 2026-09-15
+
+The owner reviewed the run on waking and directed three things. Recorded here because the run summary
+above is the account a future reader will open, and two of the rulings it describes were amended
+within hours of being written.
+
+**Two rulings were amended; one was held.** The owner flagged `P5`, `P8` and `P12` as the ones to
+revisit. I argued each, named the strongest case against it, and recommended a middle path on two and
+holding the third. That was approved.
+
+- **`P5` — "broker first, not *complete* broker first."** The ordering stands, but building the
+  broker ahead of the gateway and ledger means designing a capability taxonomy against zero real
+  capability requests. `phase-auto-01` now decides which shape ships: full policy, or an enforcement
+  point with a permissive default that denies nothing until real requests exist. Both satisfy `R01`,
+  because the gate is the refusal path rather than the rules it carries. If the permissive shape is
+  chosen, `R02` and `R04` are recorded **open** rather than claimed.
+- **`P8` — the check was narrower than the drift class it was meant to measure.** This was a real
+  defect in the original ruling, not a refinement. As first written, `phase-sch-01`'s check compared
+  only `CLAUDE.md`, `schemas/` and the DDL — so schema-to-model and schema-to-type drift would never
+  have registered, and `phase-sch-02` would have read "zero recurrences" from a check that never
+  looked. `R03` now spans `src/models/`, and `R04` requires the decision to state which boundaries
+  its evidence covers. `PLAN-035` also records the weakness in the original argument: *"the drift
+  closed on its own"* closed because someone noticed and fixed it, which is the manual vigilance
+  `000035` proposes to replace.
+- **`P12` — no requirement document — held unchanged.**
+
+Only `phase-auto-01`, `phase-sch-01` and `phase-sch-02` differ; nothing added or removed.
+
+**All seven idea candidates were written to the log**, on the owner's direction after reviewing each:
+`000239`–`000245`. Four `relates_to` edges, with `000242` as the hub — three of the seven turned out
+to be views of one gap, a declaration that does not match the work. The staging file now records the
+ids rather than presenting a pending queue.
+
+**One question was answered and one reframed.** The portfolio data gap (`phase-proj-01`) drew a
+clarifying question rather than an answer — the owner reads `people` and `commitments` as required
+tracking items that stay gitignored, which rules out *no current need* but leaves *records exist*
+versus *friction* open. The distinction was explained and the phase still holds the question.
+
+**A separate thread was opened and deliberately not pursued here.** The owner asked whether panel
+maximize was ever built. It was not: `000233` is `open`, `phase-arch-17` is `queued`, and there are
+no hits for maximize or fullscreen anywhere in `ts/src/`. It is five deep on `PLAN-028`'s critical
+path by a deliberate ruling that maximize is slot-level rather than viewer-level — which sits awkwardly
+against the owner's stated reason for wanting it, which was demoability. A paste-in paragraph to
+explore that in a fresh session is staged at `_working/explore-000233-panel-maximize.md`.
+
+**Both pieces of morning work ran unclaimed**, as owner-directed work with no backlog phase, on
+branches named after the work. No phase reached `status: complete` in the morning review; all ten had
+closed during the run itself.
+
 ## State of `dev`
 
-Green, unpushed, 41 commits ahead of where the run began.
+Green, unpushed. 41 commits from the run itself, plus the morning review's amendments and idea
+capture.
 
 ```
 Governance OK: 27 systems, 246 documents, 25 memories, 261 backlog phases
