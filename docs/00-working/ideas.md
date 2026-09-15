@@ -5732,6 +5732,7 @@ The workbench plan phases (wb-08 and wb-09) deliver features and include mechani
 
 - relates_to → `000107`
 - relates_to ← `000114`
+- relates_to ← `000246`
 
 ---
 
@@ -6679,6 +6680,7 @@ PROPOSED LINK: 000137 --relates_to--> 000140 (000140 explicitly uses 000137's cl
 
 - relates_to → `000140`
 - relates_to ← `000140`
+- relates_to ← `000246`
 
 ---
 
@@ -11545,3 +11547,50 @@ Unresolved: whether retroactively narrowing a deliverables entry is ever right, 
 **Links**
 
 - relates_to → `000242`
+
+---
+
+## 000246 · Terminal panel drops its connection and restarts unprovoked, and it cost a live demo
+
+**Created 2026-09-15T16:35:34-04:00 · Status: `open`**
+
+Owner report, 2026-09-15. While testing ahead of a live demo, the workbench terminal panel was
+observed randomly dropping its connection and restarting on its own — no layout switch, no
+visible-panel switch, no re-assignment, no collapse/drop/restore and no page reload provoked it.
+The owner judged the workbench too unstable to present and ran the demo out of Claude Code
+directly instead, so the application built for the demo went unused. That is the cost this idea
+records: not a cosmetic defect, but the reason the tool was not trusted in front of an audience.
+
+Investigate the stability of the terminal: what actually closes the socket, whether the restart is
+the frontend reconnecting or a second session being opened, and whether the PTY on the backend
+survives or is reaped. The observation is a symptom with no diagnosis yet, and the diagnosis is the
+deliverable — a fix proposed before the cause is known would be a guess.
+
+Places to start, all in this repository:
+- src/api/routes/demo_terminal.py — the websocket route, the session registry and the six-session
+  global cap. A cap eviction, a TOCTOU window (000095) or a pre-accept close (000137) would each
+  present to the browser as a drop.
+- ts/src/stage/TerminalRegion.tsx — the socket lifecycle. Its cleanup already defers closing a
+  CONNECTING socket to dodge a React 18 StrictMode double-mount warning, which means a remount
+  path exists that closes and reopens a socket; whether any of those paths can fire without a
+  user action is exactly the open question.
+- The PTY child reaping that 000099 and 000129 turned on, and any idle or read timeout on the
+  backend side.
+- Whether the drop correlates with the dev server, with an agent's cut-off session leaving an
+  orphaned process (000142's material), or with the six-session cap being reached silently.
+
+Boundary against 000113, which does NOT cover this. 000113 is an audit, and its own text says
+"not a bug fix": it enumerates the provoked transitions (layout switch, visible-panel switch,
+re-assignment, collapse/drop/restore, page reload) and measures latency, scrollback and cap
+behavior. Every transition it covers is one a user causes. This idea is the unprovoked case — the
+session dying while nobody touched it — which no row of that audit would catch. The two are
+related and should be sequenced together if convenient, since both instrument the same stack, but
+this one is a defect investigation and does not belong inside that audit's scope.
+
+Reported on Linux, in the bash panel. Whether CMD and PowerShell on the owner's Windows machine
+show the same behavior is unknown and is an owner-machine check.
+
+**Links**
+
+- relates_to → `000113`
+- relates_to → `000137`
