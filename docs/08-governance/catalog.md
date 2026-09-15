@@ -274,7 +274,7 @@ CI regenerates it and fails on any difference.
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 0 | 1 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
 | PLAN-027 | doc-workbench-features-defects | draft | 1 | 0 | 0 | — |
-| PLAN-028 | doc-workbench-architecture-quality | draft | 18 | 1 | 0 | agent-prog |
+| PLAN-028 | doc-workbench-architecture-quality | draft | 18 | 0 | 1 | agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | draft | 1 | 0 | 0 | — |
 | PLAN-030 | doc-document-backlog-governance | draft | 1 | 0 | 0 | — |
 | PLAN-031 | doc-agent-engineering-delegation | draft | 1 | 0 | 0 | — |
