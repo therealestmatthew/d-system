@@ -7432,7 +7432,7 @@ items:
   systems:
   - sys-delivery
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7458,6 +7458,31 @@ items:
   - docs/09-backlog/README.md
   next_action: Do the scoping pass before anything else. This is the largest programme
     and the partition says its phase count is meaningless until the duplication is cut.
+  session: doc-session-agent-engineering-delegation-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-031-agent-engineering-delegation.md
+  - docs/06-requirements/REQ-016-agent-engineering-delegation.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-05-agent-engineering-delegation-plan.md
+  result: >-
+    Finalized P4, the largest programme. Ran the scoping pass the partition requires before committing
+    any count; it cut six phases from a face-value reading. Ruled the 000072-to-000046 duplication the
+    acceptance names: the planner bullet is struck and phase-idg-12 in P1 is the planner, because P1's
+    version has a quality standard to draft against and a defined location to draft into and the
+    bullet has neither; REQ-016 R17 makes it checkable rather than a note. Verified both repository
+    claims in full before sizing - log-anti-patterns ships a complete capture workflow so G18 keeps
+    only recurrence detection and derivation, and brain/procedures/runtime-behavior-needs-runtime-
+    evidence.md carries G22's rule at high confidence with the phase-wb-09 incident, so G22 gets no
+    phase and its missing authoring convention becomes a section of G19. Also folded 000013 and 000069
+    into the audit, and both thin G14 concerns into boundary sections. Sequenced the framework after
+    the audit deliberately, since naming recurring concerns is worth something only if it comes from
+    what actually recurred. Wrote REQ-016 with twenty rows and registered thirteen phases under
+    phase-agx-*. Verification green - governance exits 0 at 235 documents and 222 phases, --ready
+    shows the four phases declaring no prerequisites, and 580 tests pass. A read-only independent
+    review confirmed all four conditions and found one real error - the sizing arithmetic contradicted
+    the plan's own phase table, undercounting the G14 cut by one - which was corrected along with two
+    minor findings.
+
 - id: phase-prog-07
   title: Finalize the autonomous agent operations plan (P5)
   plan: doc-autonomous-agent-operations
@@ -9773,8 +9798,11 @@ items:
   - docs/08-governance/
   - .claude/
   - docs/04-decisions/
-  next_action: Six phases depend on this one. 000013's candidate list is partly shipped already - /session-close
-    and /backlog both exist - so check before calling anything missing.
+  next_action: Six phases depend on this one, and it is the one phase here where a single session is a real
+    stretch - roughly 37 files under .claude/ on four dimensions each, plus the 000069 ruling. Judge
+    at claim time whether to split the audit from the ruling. 000013's candidate list is partly
+    shipped already - /session-close and /backlog both exist - so check before calling anything
+    missing.
 - id: phase-agx-03
   title: Build the anti-pattern store with recurrence detection, populated from what exists
   plan: doc-agent-engineering-delegation

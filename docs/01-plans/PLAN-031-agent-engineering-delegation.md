@@ -22,7 +22,7 @@ this; `P5` runs it without a person present.
 
 The partition flags this programme specifically: it "carries the most internal near-duplication and
 deserves a scoping pass before any phase count is committed", and the finalize phase's scope requires
-that pass to run before anything is sized. [It ran first](#the-scoping-pass), and it cut five phases
+that pass to run before anything is sized. [It ran first](#the-scoping-pass), and it cut six phases
 from a naive reading.
 
 | Group | Ideas | What it covers |
@@ -59,7 +59,7 @@ So `G22` is not a phase; it is a section of `G19`'s methodology.
 
 ## The scoping pass
 
-Five phases removed relative to sizing each idea or group at face value. Each cut is a ruling, not a
+Six phases removed relative to sizing each idea or group at face value. Each cut is a ruling, not a
 deferral.
 
 **1. `000072`'s planner bullet is struck — the acceptance condition's explicit subject.** `000072`
@@ -89,7 +89,8 @@ recorded, the convention is not, and a convention for authoring dispatches belon
 that governs authoring dispatches. A standalone phase would produce a second document `G19` then has
 to reconcile with.
 
-**5. `G14` is three phases, not four or five, and it runs late.** Two cuts here. Sensors and context
+**5. `G14` is two phases, not four or five, and it runs late.** Two cuts here, which is why the six
+above come from five numbered rulings. Sensors and context
 pipelines do not each earn a phase: `000080`'s live-monitoring half is `G15` and `G19`'s work, and
 `000081` is explicitly a cross-reference to `P6`'s `G25` rather than a merge, so what remains of both
 is a boundary statement — one phase, not two.
@@ -191,11 +192,12 @@ Thirteen phases under `phase-agx-*`, registered in [the backlog index](../09-bac
 
 Partition-time sizing was **12–15 phases** against 19 ideas, with the explicit caveat that the count
 was meaningless until the duplication was cut. This plan lands **thirteen**, inside the range but
-reached from the other direction: the scoping pass removed five phases a face-value reading would
+reached from the other direction: the scoping pass removed six phases a face-value reading would
 have produced — `000046`'s duplicate planner, `000013`'s own phase, `000069`'s own phase, `000136`'s
-own phase, and one of `G14`'s four.
+own phase, and two of `G14`'s four, since `000080` and `000081` were both folded into boundary
+sections of `phase-agx-09` rather than given phases.
 
-Two groups land below their partition range as a result. `G14` is 3 against 4–5, and `G16` is 1
+Two groups land below their partition range as a result. `G14` is 2 against 4–5, and `G16` is 1
 against 2–3 because `000069` moved into the audit and the planner bullet was struck. `G19` is 2
 against "2–3; scope down first", which is that instruction followed. Every other group lands inside
 its range.

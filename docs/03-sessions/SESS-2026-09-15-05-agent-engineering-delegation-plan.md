@@ -26,10 +26,12 @@ partition, and the one whose finalize phase requires a scoping pass before any c
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 234 documents, 25 memories, 222 backlog phases
+Governance OK: 27 systems, 235 documents, 25 memories, 222 backlog phases
 ```
 
-Exit 0. Documents 233 → 234 for `REQ-016`; phases 209 → 222 for the thirteen `phase-agx-*` phases.
+Exit 0. Documents 233 → 235: `REQ-016`, and this record. Phases 209 → 222 for the thirteen
+`phase-agx-*` phases. An earlier run during the session reported `234 documents`, correctly — this
+record did not exist yet. The final figure is the one recorded here.
 
 `uv run python -m src.governance --ready`
 
@@ -102,18 +104,89 @@ methodology, and `phase-agx-05` carries it.
 
 ## Backlog
 
-`phase-prog-06` is `status: active`, `agent: agent-night`, pending the independent review below.
+`phase-prog-06` is `status: complete`, `agent: agent-night`,
+`session: doc-session-agent-engineering-delegation-plan`. Completion evidence is `PLAN-031`,
+`REQ-016`, `docs/09-backlog/README.md` and this record. Written under the owner's advance authority
+for this batch, after the read-only independent review below confirmed all four conditions.
 
 Thirteen phases added under `phase-agx-*`, all `status: queued`, none claimed.
 
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-06`. Its own runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 235 documents, 25 memories, 222 backlog phases
+EXIT=0
+
+$ uv run pytest -q
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`dev`'s copy opens with
+`> **Placeholder. Not a finalized plan.**`; the branch copy has no such banner, `status: draft` →
+`active`… and a 'The chosen design' section with five numbered decisions plus a five-ruling scoping
+pass."
+
+**Condition 2 — the `000072`-to-`000046` duplication ruled on — Met, and independently verified.**
+The reviewer read the ideas through `fold()` rather than taking the claim: "`000072` does contain the
+planner bullet ('A **planner** that turns a triaged idea into a requirement, plan and phases');
+`000046` is the separately-filed idea-planner-agent idea. `phase-idg-12` … exists in
+`backlog.yaml:9426`, depends on `phase-idg-10` … and `phase-idg-11` … — exactly the 'quality standard
+to draft against and a defined location to draft into' the plan claims, and this text predates the
+branch." It also confirmed `R17` exists, is cited by `phase-agx-10`, and that no roster role is a
+planner under another name.
+
+**Condition 3 — `G18`'s capture half and `G22`'s procedure verified in the repository before sizing —
+Met.** "`.claude/skills/log-anti-patterns/SKILL.md` exists (10.5KB) and is a real, complete
+routing/capture workflow… the plan's characterization holds.
+`brain/procedures/runtime-behavior-needs-runtime-evidence.md` exists at `confidence: high`, documents
+the `phase-wb-09` incident verbatim as claimed, and does *not* contain a pack-authoring convention —
+also as claimed. Sizing genuinely follows."
+
+**Condition 4 — removed from `next_up` in the same change — Met, verified by `git show`.** It also
+noted correctly that the phase was still `active` at review time, "correct, since marking a phase
+complete is owner-only."
+
+**Integrity and coverage.** All 20 rows cited in exactly the phases claimed, checked against the
+backlog rather than the plan's table; all thirteen phases carry acceptance, verification and
+`session_budget: 1`; all 19 ideas accounted for, read through `fold()` and cross-checked against the
+partition's `P4` table; `backlog.yaml` parses at 222 items with no anchors, and "diffed every
+pre-existing phase's parsed dict between `dev` and the branch — zero changed, zero removed."
+
+**One major finding, and it was a real error of mine.**
+
+> "the plan's own 'Sizing against the partition' arithmetic doesn't match its own implementation
+> table… the implementation table directly above tags only **two** phases with `G14`… Both `000080`
+> (sensors) and `000081` (context pipelines) were folded out of standalone phases, not just one — the
+> scoping-pass narrative undercounts its own cut by one."
+
+Correct. `G14` is two phases, not three, and the pass therefore cut six phases, not five. **Fixed** in
+`PLAN-031` and in this record: the headline, the scoping-pass heading, ruling 5, the sizing paragraph
+and the `G14` figure all now read two and six. The reviewer's own diagnosis — that both thin concerns
+were folded, not one — is what makes the corrected number six rather than five.
+
+**Two minor findings, both fixed.**
+
+- *The session record's pasted governance output was stale* — `234 documents` against an actual 235,
+  because the record was not yet in the catalog when the command ran. Corrected, with the reason
+  stated.
+- *`phase-agx-02`'s remit is large for one session* — roughly 37 files under `.claude/` on four
+  dimensions each, plus the `000069` ruling, while also being the bottleneck six phases wait on.
+  **Not resized**, because the plan is explicit that the bottleneck is deliberate; instead its
+  `next_action` now tells whoever claims it to judge at claim time whether to split the audit from the
+  ruling.
+
 ## Decisions
 
-**The scoping pass cut five phases, and each cut is a ruling rather than a deferral.** The planner
+**The scoping pass cut six phases, and each cut is a ruling rather than a deferral.** The planner
 bullet struck (ruling 1); `000013` folded into the audit, since the partition already observes that
 `000126`'s missing-and-needed output *is* `000013`'s question; `000069` folded into the audit, because
 the question is about `.claude/` and the audit is the work that reads every file in `.claude/`;
 `000136` folded into `G19`, because a convention for authoring dispatches belongs in the document
-governing authoring dispatches; and one of `G14`'s four sub-topic phases removed.
+governing authoring dispatches; and two of `G14`'s four sub-topic phases removed, since `000080` and
+`000081` both became boundary sections of `phase-agx-09` rather than phases.
 
 **The framework is derived from evidence rather than written before it, which is the most consequential
 ruling here.** `G14` is `P4`'s headline group and the obvious thing to schedule first. It runs late
