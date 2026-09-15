@@ -181,13 +181,18 @@ systems:
   - ts/src/stage/Popover.tsx
   - ts/src/stage/Tooltip.tsx
   - ts/src/stage/panelBridge.ts
+  - ts/src/stage/DirectoryPickerDialog.tsx
   depends_on:
   - sys-wb-layout
   description: The primitives panels share rather than own — the popover and tooltip used by
-    several panel headers and menus, and panelBridge's module-level registration slots, which
-    are how the File Browser's context menu reaches the live HTML Viewer or terminal instance
-    across slots the engine deliberately keeps independent. This is the surface a duplication
-    audit is most likely to grow, which is why it is not filed under any one panel.
+    several panel headers and menus, the directory picker dialog that both the File Browser and
+    the HTML Viewer open, and panelBridge's module-level registration slots, which are how the
+    File Browser's context menu reaches the live HTML Viewer or terminal instance across slots
+    the engine deliberately keeps independent. This is the surface a duplication audit is most
+    likely to grow, which is why it is not filed under any one panel. DirectoryPickerDialog sits
+    here rather than under sys-wb-explorers for the same reason the popover does — two panels in
+    two different ids import it, so filing it under either would leave the other able to edit it
+    without holding a lock on it.
 - id: sys-wb-terminal
   name: Workbench terminal panel
   domain: application
@@ -231,15 +236,19 @@ systems:
   - ts/src/stage/BacklogExplorerRegion.tsx
   - ts/src/stage/FileBrowserRegion.tsx
   - ts/src/stage/FileTreeContextMenu.tsx
-  - ts/src/stage/DirectoryPickerDialog.tsx
   depends_on:
   - sys-wb-layout
   - sys-wb-shared
+  - sys-wb-viewer
   - sys-api
   description: The table-and-tree panels over repository state (REQ-007 W09/W10/W11) — the
     shared ExplorerRegion that owns all sort, filter and queue-toggle behavior, the idea and
-    backlog explorers that parameterize it, and the File Browser with its context menu and
-    directory picker. Grouped as one id because they are one configuration surface with three
+    backlog explorers that parameterize it, and the File Browser with its context menu. The
+    directory picker both this id and sys-wb-viewer open is sys-wb-shared's. One code-level
+    leak crosses this boundary and is not yet fixed — FileBrowserRegion imports
+    COMPATIBLE_EXTENSIONS from HtmlViewerRegion, so this id depends on sys-wb-viewer rather
+    than being independent of it. Grouped as one id because they are one configuration surface
+    with three
     data sources, not three independent panels.
 - id: sys-wb-viewer
   name: Workbench HTML viewer and overview panels

@@ -8174,7 +8174,7 @@ items:
   - sys-governance
   owner: repository-owner
   agent: agent-arch
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on: []
@@ -8205,8 +8205,35 @@ items:
   deliverables:
   - docs/08-governance/systems.yaml
   - docs/09-backlog/backlog.yaml
-  next_action: Measure the current ceiling first with collisions() over the seventeen
-    idea-derived phases, so the split is argued against a number rather than an impression.
+  next_action: Complete. Seven sys-wb-* ids are registered and the seventeen queued phase-arch-*
+    phases are redeclared against them. sys-ui is untouched and still declared by 22 other
+    phases; phase-arch-18 retires it.
+  session: doc-session-decompose-sys-ui-lock
+  completion_evidence:
+  - docs/08-governance/systems.yaml
+  - docs/09-backlog/backlog.yaml
+  - docs/03-sessions/SESS-2026-09-14-11-decompose-sys-ui-lock.md
+  result: 'Added sys-wb-layout, sys-wb-styles, sys-wb-shared, sys-wb-terminal, sys-wb-notes,
+    sys-wb-explorers and sys-wb-viewer, each naming files that exist in the tree, and redeclared
+    the seventeen queued phase-arch-* phases against them. Measured with collisions() before and
+    after, taking each dependency wave''s largest pairwise-disjoint subset: among the seventeen
+    idea-derived phases the ceiling rises 2 to 3 (wave 1 now admits phase-arch-01, -11 and -16);
+    across all nineteen with this phase complete, 3 to 4, above max_active of 3. Waves 2 through
+    6 did not move, and that is reported rather than engineered away - phase-arch-02 genuinely
+    touches all seven ids, the two audits read every file under ts/src and src, and waves 4 to 6
+    are G43''s own chain on the layout engine. Deliverable paths narrowed where they collided for
+    no reason: docs/00-working/ to a named file per audit, test/ to a named module per phase,
+    ts/src/stage/ to the specific panel or stylesheet, which removes the docs/00-working/
+    three-way collision entirely. Governance exits 0 at 27 systems and 181 phases; 580 tests
+    pass. Independent sub-agent review found all four acceptance conditions met on its own
+    evidence and raised three discrepancies, all resolved before completion: the Backlog section
+    asserted a complete state before the review had run, the record misdescribed phase-arch-13''s
+    deliverables, and DirectoryPickerDialog was filed under sys-wb-explorers although the HTML
+    Viewer imports it too - it moved to sys-wb-shared, and sys-wb-explorers now declares its
+    dependency on sys-wb-viewer and names the COMPATIBLE_EXTENSIONS import that forces it. Left
+    stale on the owner''s ruling, both outside this phase''s deliverables: PLAN-028''s concurrency
+    table, and REQ-011 R29''s third verification clause, which asks to confirm sys-ui is retired
+    and is the negation of this phase''s scope.'
 - id: phase-arch-18
   title: Retire sys-ui across the document and phase corpus
   plan: doc-workbench-architecture-quality
