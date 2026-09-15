@@ -5607,13 +5607,14 @@ Owner request, 2026-09-11, for the next workbench prompt pack (post-PROMPT-024 b
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:46:17-04:00): Related ideas and overlap: Two sibling ideas already capture the dependencies of this feature. Idea 000118 (Grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) and idea 000119 (Decide where markdown-to-HTML rendering happens, or new-tab open shows raw source) both link directly to 000110 and address the implementation follow-on: extending file-type support and selecting the markdown-to-HTML conversion location (serving route vs frontend). These links are already recorded.
 
 Governed documents: The HTML Viewer is specified in REQ-007 (Workbench requirements), requirement W07, which currently scopes supported files to ".html and .svg" found recursively in a selected directory. PLAN-022 (Workbench plan) describes phase-wb-04, which delivered the HTML Viewer panel with that scope; the phase is complete (per backlog.yaml status). Rendering markdown files is a planned extension beyond the current workbench specification, explicitly positioned by the idea body as post-PROMPT-024 work (after the current fixpack for terminal and layout issues). REQ-007 W07 would require amendment to include markdown rendering when this feature ships, and COMPATIBLE_EXTENSIONS in ts/src/stage/HtmlViewerRegion.tsx is the code choke point 000118 identifies.
 
 Status: This is a new feature request, not yet integrated into any plan phase. No promotion to a governed document is warranted; the idea is properly situated as a candidate for the next workbench prompt pack after the current PROMPT-024 cycle closes (phase-wb-08 and phase-wb-09).
+- **finding** by agent-prog (2026-09-14T23:03:59-04:00): Delivered 2026-09-14, verified against the code during phase-prog-02 (P11 finalization). Markdown renders route-side via marked in ts/vite.config.ts serveRepositoryFiles (commit 593597e), following the 000119 ruling rather than the frontend-only option this idea left open. The marked dependency creates an npm install prerequisite, recorded in the runbook (commit bdd1aa0). .md is present in COMPATIBLE_EXTENSIONS at ts/src/stage/HtmlViewerRegion.tsx:29. Status deliberately left at triaged, not moved: promoted is false (no governed document was produced) and discarded is false (the work was built, not rejected). Recorded in place per the owner ruling of 2026-09-14; see 000236 for the missing resolved status this is waiting on, and PLAN-027 for the standing note to return here.
 
 </details>
 
@@ -5623,6 +5624,7 @@ Status: This is a new feature request, not yet integrated into any plan phase. N
 - relates_to ← `000118`
 - relates_to ← `000119`
 - relates_to ← `000232`
+- relates_to ← `000236`
 
 ---
 
@@ -5890,7 +5892,7 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:48:55-04:00): Idea 000118 correctly identifies a code choke point that needs updating when markdown rendering ships. The HtmlViewerRegion.tsx file exports `COMPATIBLE_EXTENSIONS = ['.html', '.svg']` (line 18, ts/src/stage/HtmlViewerRegion.tsx), which is the single authoritative list both the viewer component and the File Browser's right-click context menu read to decide whether "Open in HTML Viewer" should appear on a file. Currently governed by REQ-007 W07 ("the compatible files (.html and .svg)"). 
 
@@ -5901,6 +5903,7 @@ The existing relates_to links (000110 and 000112) are appropriate — both are n
 No existing plan, phase, or requirement currently covers markdown rendering in the HTML Viewer. The workbench phases (phase-wb-*) focus on the existing .html/.svg capability.
 
 PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdown rendering into the HTML Viewer workflow)
+- **finding** by agent-prog (2026-09-14T23:03:59-04:00): Delivered 2026-09-14, verified against the code during phase-prog-02 (P11 finalization). The extension list grew once markdown rendering landed, exactly as this idea sequenced it. COMPATIBLE_EXTENSIONS at ts/src/stage/HtmlViewerRegion.tsx:25-36 now holds .html, .htm, .svg, .md and the six image formats. The single-list property this idea turned on holds: FileBrowserRegion.tsx:4 imports the same constant and reads it at line 500 to decide viewerCompatible, so the right-click Open in HTML Viewer action followed for free with no second hand-kept copy. The Documentation preset defect this idea named — docs/ with typeFilter .md unable to open its own files — is resolved by the same change. Status deliberately left at triaged, not moved: promoted is false (no governed document was produced) and discarded is false (the work was built, not rejected). Recorded in place per the owner ruling of 2026-09-14; see 000236 and PLAN-027.
 
 </details>
 
@@ -5910,6 +5913,7 @@ PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdow
 - relates_to → `000112`
 - relates_to → `000119`
 - relates_to ← `000232`
+- relates_to ← `000236`
 
 ---
 
@@ -5923,7 +5927,7 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:50:35-04:00): Idea 000119 identifies a decision point already made explicit in the agent scout's framing: when ideas 000109 (new-tab open) and 000110 (markdown rendering) both land in the same workbench batch, they create a collision unless the render location is chosen first. The issue is precise and real — if markdown rendering is implemented only in the frontend component (HtmlViewerRegion), then 000109's double-click behavior, which loads raw /workbench-file/ bytes directly, bypasses that rendering entirely and shows unrendered markdown source to the user.
 
@@ -5939,6 +5943,7 @@ No related plan, requirement or ADR found that reserves or predetermines the ren
 000232 is deliberately NOT gated by this ruling. The ruling settles where markdown rendering happens; .png needs no rendering step, is already served as image/png by ts/vite.config.ts, and therefore does not inherit 000118's deferral of COMPATIBLE_EXTENSIONS growth until 000110 lands.
 
 000233 may not belong to P11 at all — maximize is a slot-level mechanism, so G43 (PLAN-028/P10) is the plausible owner. That scope question is recorded on the idea itself and must be settled before either programme plans it.
+- **finding** by agent-prog (2026-09-14T23:03:59-04:00): Delivered 2026-09-14, verified against the code during phase-prog-02 (P11 finalization). The render-location ruling recorded in _tmpagent/viewer-render-location-ruling.md was consumed and implemented route-side: ts/vite.config.ts imports marked and renders markdown in the serveRepositoryFiles plugin at the /workbench-file/ route (commit 593597e), so both the in-panel iframe and 000109 double-click new-tab open resolve to the same rendered output. The collision this idea existed to prevent cannot now occur. Content-Security-Policy: sandbox is set on the response (ts/vite.config.ts:264). Status deliberately left at triaged rather than moved: promoted is false (no governed document was produced) and discarded is false (the work was built, not rejected). Recorded in place per the owner ruling of 2026-09-14; see 000236 for the missing resolved status this is waiting on, and PLAN-027 for the standing note to return here.
 
 </details>
 
@@ -5948,6 +5953,7 @@ No related plan, requirement or ADR found that reserves or predetermines the ren
 - relates_to → `000110`
 - relates_to ← `000109`
 - relates_to ← `000118`
+- relates_to ← `000236`
 
 ---
 
@@ -6319,6 +6325,7 @@ This idea asks for concrete work to fix three recurring pytest failures in test_
 
 - relates_to → `000097`
 - relates_to → `000099`
+- relates_to ← `000236`
 
 ---
 
@@ -11240,10 +11247,21 @@ Consequence for sequencing: 000118 defers growing COMPATIBLE_EXTENSIONS until ma
 
 Open question for the planning session: whether the iframe's bare-image presentation is acceptable (browser default centering, background, zoom behavior) or whether an image needs wrapping in a minimal HTML document for consistent presentation with the other file types. The answer should be the same for all six.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-prog (2026-09-14T23:04:00-04:00): Delivered 2026-09-14, verified against the code during phase-prog-02 (P11 finalization). All six formats are present in COMPATIBLE_EXTENSIONS at ts/src/stage/HtmlViewerRegion.tsx:30-35 (commit 6896efc). This idea shipped independently of the markdown work, as its own text required, and did not inherit 000118 dependency on 000110. Its one open question — whether bare-image iframe presentation is acceptable or an image needs wrapping for consistency — was answered in the build rather than deferred to this planning session: images are wrapped in a fitted, centred HTML document (commit 2e35ae7), with a follow-up serving image bytes to sub-resource requests rather than the wrapper (commit 71cc841), the ?raw=1 discriminator at ts/vite.config.ts:278. The answer is the same for all six, as the idea required. No question remains for P11 to settle. Status deliberately left at open, not moved: promoted is false (no governed document was produced) and discarded is false (the work was built, not rejected). Recorded in place per the owner ruling of 2026-09-14; see 000236 and PLAN-027.
+
+</details>
+
 **Links**
 
 - relates_to → `000118`
 - relates_to → `000110`
+- relates_to ← `000236`
 
 ---
 
@@ -11300,3 +11318,32 @@ Distinct from the idea-partition pack (PLAN-025, PROMPT-034), which partitions i
 **Links**
 
 - relates_to → `000234`
+
+---
+
+## 000236 · Add a terminal "resolved" idea status, distinct from promoted and discarded
+
+**Created 2026-09-14T23:03:26-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised during phase-prog-02 (P11 finalization) when four ideas that had shipped that same evening had no honest status to move to.
+
+The problem. schemas/idea.schema.json's status enum is open | triaged | reviewing | promoted | discarded. Both terminal states misdescribe an idea whose work is simply done:
+
+- promoted means "became a plan, requirement or phase" and the schema requires promoted_to naming the governed documents it produced. An idea delivered directly as code, with no phase and no document, has nothing to name. Writing a plan code there to satisfy the constraint would be a false record.
+- discarded means "rejected". An idea that was built is the opposite of rejected. The G56 precedent (000099, 000129) used discarded anyway, with a finding annotation reading "Verified resolved; discarded by owner ruling 2026-09-13" doing the work the status could not. That annotation is the evidence the status is wrong: the record has to contradict its own status field in prose.
+
+What resolved would mean: the idea's substance exists in the product, verified against the code, without having produced a governed document. Terminal, like the other two.
+
+Four ideas are waiting on this right now and were deliberately left in place rather than mis-stated. 000110 (markdown rendering), 000118 (extension list growth) and 000119 (render location) are triaged; 000232 (six image formats) is open. All four shipped to dev on 2026-09-14 in commits 593597e, 6896efc, 2e35ae7 and 71cc841 and are recorded as delivered in PLAN-027, which carries the standing note to return here. The owner's instruction was explicit: use a resolved status if one exists, and if not, record in place and hold until we can get back to them.
+
+What it would touch. schemas/idea.schema.json: the status enum, the transition table (open, triaged and reviewing should each reach resolved; resolved is never a from), and whether revisited may reopen it as it does discarded. src/db/ideas.py: legal_transitions() reads the schema, so fold() follows, but any status-precedence ordering — such as the queue view in src/api/routes/workbench.py, which orders open before triaged — needs a position for the new state. The workbench Idea Explorer and generate_ideas_md.py render status and would need the new value. Whether the two G56 ideas and the four above are then amended from discarded to resolved, or left as the historical record with an annotation, is a migration question the work must settle rather than assume.
+
+Belongs to P1 (idea graph and lifecycle, PLAN-029) by subject matter; recorded here rather than folded into P11, which builds none of it.
+
+**Links**
+
+- relates_to → `000110`
+- relates_to → `000118`
+- relates_to → `000119`
+- relates_to → `000232`
+- relates_to → `000129`

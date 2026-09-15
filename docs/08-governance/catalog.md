@@ -148,6 +148,7 @@ CI regenerates it and fails on any difference.
 | REQ-009 | requirement | draft | repository-owner | docs/06-requirements/REQ-009-repeatable-idea-partition.md |
 | REQ-010 | requirement | draft | repository-owner | docs/06-requirements/REQ-010-backlog-status-regression-guard.md |
 | REQ-011 | requirement | draft | repository-owner | docs/06-requirements/REQ-011-workbench-architecture-quality.md |
+| REQ-012 | requirement | draft | repository-owner | docs/06-requirements/REQ-012-workbench-features-defects.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -274,7 +275,7 @@ CI regenerates it and fails on any difference.
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 0 | 1 | agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | draft | 1 | 0 | 0 | — |
-| PLAN-027 | doc-workbench-features-defects | draft | 0 | 1 | 0 | agent-prog |
+| PLAN-027 | doc-workbench-features-defects | draft | 10 | 1 | 0 | agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 19 | 0 | 1 | agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | draft | 1 | 0 | 0 | — |
 | PLAN-030 | doc-document-backlog-governance | draft | 1 | 0 | 0 | — |
@@ -295,4 +296,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-222 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 11, session: 81.
+223 documents — adr: 15, architecture: 5, governance: 9, operation: 15, plan: 52, prompt: 34, requirement: 12, session: 81.

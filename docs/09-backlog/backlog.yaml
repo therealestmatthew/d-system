@@ -7,7 +7,6 @@ next_up:
 - phase-prog-01
 - phase-port-02
 - phase-ses-01
-- phase-prog-02
 - phase-prog-04
 - phase-prog-05
 - phase-prog-06
@@ -8106,3 +8105,361 @@ items:
   - docs/09-backlog/backlog.yaml
   next_action: Enumerate every declaration site first with a grep over docs/ and brain/ plus a
     pass over backlog.yaml, and check the active-claims table before touching anything.
+- id: phase-wbf-01
+  title: Open a viewer tab's file in a new browser tab on double-click
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Double-clicking a file tab in the HTML Viewer opens that file in a new browser tab, as a
+    full page outside the workbench iframe.
+  - The new tab shows the same rendered output the panel shows - rendered markdown for .md and
+    the wrapper document for an image, not raw source. 000119's route-side rendering already
+    makes this true; the phase must confirm it rather than add a second render path.
+  - Confine the change to ts/src/stage/HtmlViewerRegion.tsx and its tab strip. Rename no slot,
+    panel, region or layout identifier.
+  acceptance:
+  - REQ-012 R01 holds - double-clicking a tab holding .html, .md and an image each opens a new
+    browser tab whose content matches the panel's.
+  - REQ-012 R02 holds - the response carries Content-Security-Policy - sandbox, and no code path
+    reaches the file outside serveRepositoryFiles.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  next_action: Confirm first that the new-tab URL already renders markdown. 000119 was ruled and
+    implemented route-side in ts/vite.config.ts on 2026-09-14, so the raw-source defect this idea
+    was paired against should already be gone - verify it before writing any rendering code.
+- id: phase-wbf-02
+  title: Show a last-modified badge on the HTML Viewer header
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Show, in the HTML Viewer's header, when the displayed file was last modified, readable
+    without opening dev tools.
+  - The badge tracks what is displayed - switching tabs updates it, and re-selecting a file that
+    changed on disk shows the newer time.
+  - Surface the file's mtime through the existing workbench filesystem route rather than adding a
+    new one, if the route already carries it.
+  acceptance:
+  - REQ-012 R03 holds - the badge matches the file's mtime on disk, not page-load time.
+  - REQ-012 R04 holds - the badge changes on a tab switch between files with different mtimes,
+    and advances after the overview page is regenerated and re-selected.
+  verification:
+  - uv run pytest test/test_workbench.py
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  next_action: Check whether GET /api/v1/workbench/list already returns an mtime per entry before
+    designing anything. If it does, this is a frontend-only change and sys-api can be dropped
+    from the phase's declared systems.
+- id: phase-wbf-03
+  title: Decide the bookmark category storage, reference and batch-bridge model
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  scope:
+  - Write an ADR deciding the bookmark-category model - the storage shape (a tracked _data/
+    entity versus browser storage), the reference model by which a category is named elsewhere,
+    and how file paths stay valid as the repository moves.
+  - Argue the storage choice against its alternative rather than asserting it. 000111 names both
+    candidates and states only a leaning.
+  - State how a category is consumed as a set by more than one surface, naming the surfaces, and
+    state the consequence for the panel bridge that phase-wbf-04 implements.
+  - Cover both 000111 and 000120 in one ADR. They are the same decision surface asked from two
+    directions, and two ADRs would have to agree with each other.
+  - Build nothing. The decision is owner-reviewed before creators build panels against it, by the
+    idea's own requirement.
+  acceptance:
+  - REQ-012 R05 holds - storage shape, reference model and path validity each carry a decision,
+    and the storage choice carries an argument against the alternative.
+  - REQ-012 R06 holds - the ADR names the consuming surfaces and states the batch requirement
+    explicitly.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  next_action: Allocate the ADR code with uv run python -m src.governance --next-code adr, then
+    settle storage first - the reference model and the path-validity rule are both phrased
+    against it.
+- id: phase-wbf-04
+  title: Extend the panel bridge to batch, multi-target actions
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  - phase-wbf-03
+  scope:
+  - Extend ts/src/stage/panelBridge.ts so one invocation delivers N files to one or more
+    registered targets, per the contract phase-wbf-03's ADR states.
+  - Introduce no second, parallel bridging mechanism. A file-passing path that does not go
+    through panelBridge.ts is the duplication 000115's audit exists to catch.
+  - Preserve the existing degradation contract - an action with nothing registered reads null and
+    disables, never throws and never queues.
+  acceptance:
+  - REQ-012 R07 holds - a batch action with N files delivers all N, and no parallel file-passing
+    path exists in ts/src/stage/.
+  - REQ-012 R08 holds - a batch action with no target registered is disabled rather than raising,
+    and the partial-target behavior matches what the ADR chose.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/panelBridge.ts
+  next_action: Read the existing BridgeSlot contract before changing it. The single-handle,
+    single-action shape is deliberate, and the extension has to widen it without losing the
+    never-throws-never-queues property that shape was chosen for.
+- id: phase-wbf-05
+  title: Build the bookmark category surface and its consumers
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  - sys-api
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  - phase-wbf-03
+  - phase-wbf-04
+  scope:
+  - Build the grouping surface - create, rename and delete named categories, add and remove files
+    within one, and list a category's files.
+  - Reference a category to pull up its files as a set, through phase-wbf-04's batch action.
+  - Make a category naming a moved or deleted file degrade legibly - the category still opens,
+    the missing entry is identified by path, nothing raises.
+  acceptance:
+  - REQ-012 R09 holds - all six operations work and the stored representation changes as the ADR
+    specifies.
+  - REQ-012 R10 holds - referencing a category of at least three files opens all three, not the
+    first only.
+  - REQ-012 R11 holds - a category with a deleted file opens its remaining files and names the
+    missing one.
+  verification:
+  - uv run pytest
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/
+  next_action: Build the storage and the six operations before any consuming surface. Opening a
+    category as a set is the feature, but it has nothing to open until categories can be created
+    and populated.
+- id: phase-wbf-06
+  title: 'Rotator variants: horizontally scrolling text and image entries'
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-arch-01
+  scope:
+  - Make a notes-strip entry too long for the panel scroll horizontally right to left rather than
+    truncating or overflowing, with a stated pause interaction.
+  - State and implement the interaction between rotating between entries and scrolling within
+    one.
+  - Let the rotator rotate image entries as well as text, with a stated sizing rule inside the
+    small panel and a stated ruling on whether text and image entries may mix.
+  - Source images from a directory. Do not couple this phase to the bookmark categories of G49 -
+    a category becomes an additional source later if the bookmark model makes it cheap.
+  acceptance:
+  - REQ-012 R12 holds - a long entry scrolls rather than clipping, the pause works, and REQ-006
+    R02's zero page scroll still holds.
+  - REQ-012 R13 holds - an explicit rule exists in the implementation and the observed behavior
+    through a full rotation cycle matches it.
+  - REQ-012 R14 holds - images are sized per the stated rule rather than overflowing, and the
+    mixing question carries a ruling either way.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/NotesStripRegion.tsx
+  next_action: Design the entry model first, as one union of text and image entries. Both
+    variants change the same component, and designing the model twice is what splitting this
+    phase would have cost.
+- id: phase-wbf-07
+  title: Decide the external terminal interaction API
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write an ADR covering the external terminal interaction API before any of it is built -
+    gating (its own flag or the existing one), loopback binding, session identity, authentication
+    if any, output buffering depth, and whether sessions outlive their websocket.
+  - State the relationship to ADR-014, which already absorbed 000087's session-registry half, and
+    scope this ADR to the remaining inject/read surface rather than re-deciding what ADR-014
+    settled.
+  - Follow ADR-013's precedent that a shell capability beyond the demo stage starts from its own
+    decision record.
+  - Build nothing.
+  acceptance:
+  - REQ-012 R15 holds - each of the six questions carries a decision.
+  - REQ-012 R16 holds - the ADR states explicitly what ADR-014 already owns, so no second session
+    registry is proposed.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/04-decisions/
+  next_action: Read idea 000087's own text through the idea system's fold() rather than the
+    partition's summary of it - one analyst lost the idea entirely, so the partition's evidence
+    on it is thinner than the rest. Then read ADR-014 to establish what is already settled.
+- id: phase-wbf-08
+  title: Build the flag-gated terminal inject and read API
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-api
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-wbf-07
+  scope:
+  - Build a flag-gated HTTP endpoint that injects input into a named live shell session, refusing
+    an unknown session id with a structured error rather than creating one.
+  - Build a flag-gated HTTP endpoint that reads buffered output from a named session without
+    stealing bytes from the websocket pump. Adapter reads are destructive, so a broadcast buffer
+    sits between them.
+  - With the flag unset, the routes are absent - no partial exposure, no session-registry side
+    effect on a flag-off request.
+  - The adapter contract in src/demo/adapter.py needs no change; write() is already the injection
+    primitive.
+  acceptance:
+  - REQ-012 R17 holds - an injected command executes in the named session, and an unknown session
+    id is refused.
+  - REQ-012 R18 holds - a browser attached to the same session loses no output while an HTTP
+    reader is reading it.
+  - REQ-012 R19 holds - every route returns 404 with the flag unset, with no side effect.
+  verification:
+  - uv run pytest test/test_demo_terminal.py
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/api/routes/
+  - test/
+  next_action: Build the broadcast output buffer before either endpoint. Both depend on it, and a
+    read endpoint written against the destructive adapter read is the one defect this phase most
+    needs to avoid shipping.
+- id: phase-wbf-09
+  title: 'Terminal route defects: cap race, shell override, close reason'
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-api
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Reserve the session registry slot before await websocket.accept() and release it on failure,
+    closing the TOCTOU window between the cap check and the insertion.
+  - Accept first, then close with a structured frame, so a global-cap refusal reaches the browser
+    as a quotable reason rather than CloseEvent 1006 - the pattern _refuse_shell_request already
+    uses for unavailable shells. Make the panel quote the real reason.
+  - Either document the D_SYSTEM_DEMO_SHELL override's interaction with per-session shell
+    selection in the demo terminal OPS document, or make the override apply only when no explicit
+    shell is requested. State the choice and its reason.
+  acceptance:
+  - REQ-012 R20 holds - the reservation precedes the accept in src/api/routes/demo_terminal.py.
+    The race was never reproduced under the asyncio scheduler, so the code reading is the
+    verification, not a connect storm.
+  - REQ-012 R21 holds - a refused connection delivers the structured code and reason to the
+    browser, and the panel displays that reason.
+  - REQ-012 R22 holds - the observed override behavior matches what the OPS document says
+    happens, whichever behavior was chosen.
+  verification:
+  - uv run pytest test/test_demo_terminal.py
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  next_action: Read lines 287 to 313 of src/api/routes/demo_terminal.py first. The cap check, the
+    pre-accept close and the accept sit within twenty-six lines of each other, and the two code
+    fixes are two edits to that one control flow - which is why they share a phase.
+- id: phase-wbf-10
+  title: Silence the flag-off workbench probes
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - With D_SYSTEM_DEMO_TERMINAL unset, stop the frontend fetching /api/v1/workbench/
+    injection-sources and /list on load. Probe the existing /api/v1/demo/stage/terminal-enabled
+    route first and skip the workbench fetches when it reports false.
+  - Change nothing about the existing degradation - disabled dropdowns, the absent-terminal
+    message, and no uncaught exceptions all stay as they are.
+  acceptance:
+  - REQ-012 R23 holds on its count - zero 404 console entries on load with the flag unset,
+    against the four measured in phase-wb-03.
+  - REQ-012 R23 holds on its degradation half - disabled dropdowns, the absent-terminal message
+    and no uncaught exceptions all still hold, so silencing the probes did not silence the
+    feature.
+  verification:
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/InjectionDropdowns.tsx
+  next_action: TerminalRegion.tsx already probes terminal-enabled at line 405. Reuse that result
+    rather than adding a second probe - InjectionDropdowns.tsx renders unconditionally today,
+    which is the whole defect.
