@@ -11022,7 +11022,7 @@ items:
   acceptance:
   - 'REQ-020 R01 holds: the record states which of 000024''s three claims closed and which survives, checked
     against the files rather than restated from the idea.'
-  - 'REQ-020 R02 and R03 hold: the diff contains no CLAUDE.md edit, and adding a table to the DDL without
+  - 'REQ-020 R02 holds and REQ-020 R03 holds: the diff contains no CLAUDE.md edit, and adding a table to the DDL without
     updating CLAUDE.md makes the check fail and name the divergence.'
   - 'REQ-020 R12 holds: G36 has no phase and the record cites the schema file and the passing test count.'
   verification:
