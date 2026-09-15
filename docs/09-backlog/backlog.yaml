@@ -7105,7 +7105,7 @@ items:
   - sys-ui
   owner: repository-owner
   agent: agent-prog
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7126,11 +7126,27 @@ items:
   deliverables:
   - docs/01-plans/PLAN-027-workbench-features-defects.md
   - docs/06-requirements/
-  next_action: All four acceptance conditions are Met and verified - PLAN-027 carries no
-    placeholder banner and six design decisions, REQ-012 carries 23 rows all mapped to
-    phase-wbf-* phases, G56 is recorded delivered with no phase, and phase-prog-02 is out of
-    next_up in commit 5680d2a. Awaiting session-close's independent review before status moves
-    to complete.
+  next_action: Complete. P11 is finalized; phase-wbf-07 and phase-wbf-09 are the two entry
+    points that collide with nothing while P10 holds sys-ui.
+  session: doc-session-workbench-features-defects-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-027-workbench-features-defects.md
+  - docs/06-requirements/REQ-012-workbench-features-defects.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-14-10-workbench-features-defects-plan.md
+  result: 'All four acceptance conditions met and corroborated by an independent sub-agent
+    review that ran the verification itself. PLAN-027 carries no placeholder banner and six
+    argued design decisions; REQ-012 carries 23 observable rows, each mapped to at least one of
+    the ten phase-wbf-* phases, and each phase carries at least one row; G56 and the four G48
+    ideas delivered on 2026-09-14 are recorded as delivered with no implementation phase,
+    verified against the code rather than the note; phase-prog-02 left next_up in commit 8ee29dd,
+    the same commit that finalized the plan. 000233 gets no P11 phase, per PLAN-028 design
+    decision 5. Four phases declare depends_on: [phase-arch-01]; none references phase-arch-02.
+    Governance exits 0 (20 systems, 224 documents, 180 phases); uv run pytest is 580 passed. The
+    review found one defect - a commit hash orphaned by the rebase - which is fixed. The four
+    delivered ideas keep their status deliberately: the lifecycle has no resolved state, tracked
+    as 000236.'
+
 - id: phase-prog-03
   title: Finalize the workbench architecture and quality plan (P10)
   plan: doc-workbench-architecture-quality

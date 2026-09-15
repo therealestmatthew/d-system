@@ -93,7 +93,7 @@ FAILED test/test_codes.py::test_catalog_flag_writes_committed_file
    `[DELIVERED]`. In `backlog.yaml` they appear only in historical `phase-wb-*` result text and in
    `phase-arch-17`'s source note; no `phase-wbf-*` phase mentions either, and none implements G56.
 4. **phase-prog-02 is removed from next_up in the same change that completes it — Met.** `next_up`
-   no longer lists it; the removal is in commit `5680d2a`, the same commit that finalized the plan,
+   no longer lists it; the removal is in commit `8ee29dd`, the same commit that finalized the plan,
    the requirement and the ten phases.
 
 ## Backlog
@@ -250,3 +250,195 @@ No `_tmpagent/` claims were opened. `_tmpagent/viewer-render-location-ruling.md`
 
 A peer committed to `dev` during orientation (`7e506d0`, splitting `phase-arch-00` and adding
 `phase-arch-18`). The claim commit was made on top of it and disturbed nothing.
+
+## Review
+
+An independent sub-agent, given no context from this session beyond the phase's `scope`,
+`acceptance` and `verification` lists, the commit range `dev..HEAD` and the owner's binding
+constraints, reviewed the diff and ran the verification commands itself. Its findings, condition by
+condition:
+
+**1. PLAN-027 carries no placeholder banner and states a chosen design — HOLDS.**
+
+> `grep -niE "placeholder|TBD|TODO|to be written|skeleton"` over the file returns nothing (exit 1).
+> `git show dev:...` confirms the old file opened with `> **Placeholder. Not a finalized plan.** …
+> **Do not build from this document.**`; that block is gone. The file now has a
+> `## The chosen design` section with six numbered decisions, each argued (not asserted), plus a
+> `## Sequencing against P10` and a sizing account.
+
+**2. A requirement document exists for P11 and every row maps to at least one phase — HOLDS.**
+
+> I did the mapping by hand. `REQ-012` carries exactly 23 R-rows, R01–R23, no gaps or duplicates.
+> PLAN-027's *Requirement coverage* table carries 23 entries, R01–R23, each naming at least one
+> phase. Reverse mapping: wbf-01←R01,R02; -02←R03,R04; -03←R05,R06; -04←R07,R08; -05←R09,R10,R11;
+> -06←R12,R13,R14; -07←R15,R16; -08←R17,R18,R19; -09←R20,R21,R22; -10←R23. All ten phases carry at
+> least one row; no row maps to nothing. All ten ids resolve to defined phases in `backlog.yaml`
+> (`grep -c "^- id: phase-wbf-"` = 10), and all ten appear in `--ready`/`--waiting` output from
+> governance, so the ids are real.
+
+**3. G56 is recorded as already delivered and gets no implementation phase — HOLDS.**
+
+> `000099`/`000129` appear in REQ-012's "Already delivered" table and in PLAN-027's group table
+> marked `[DELIVERED] … no phase`. Grepping the `phase-wbf-*` region of `backlog.yaml` for
+> `000099|000129` returns nothing; the only backlog occurrences are in historical `phase-wb-*`
+> result text and a `phase-arch-17` source note, all pre-existing.
+
+**4. phase-prog-02 removed from next_up in the same change that completes it — HOLDS.**
+
+> The `next_up` diff removes the line, and `git show 8ee29dd -- docs/09-backlog/backlog.yaml` shows
+> the removal is in the same commit that adds REQ-012, rewrites PLAN-027, registers the prefix and
+> adds the ten phases.
+
+### The reviewer's own runs
+
+```
+$ uv run python -m src.governance
+Governance OK: 20 systems, 224 documents, 24 memories, 180 backlog phases
+=== EXIT: 0 ===
+
+$ uv run pytest
+580 passed, 2 warnings in 41.95s
+=== EXIT: 0 ===
+
+$ uv run pytest test/test_codes.py
+48 passed, 2 warnings in 1.82s
+```
+
+### Constraint findings
+
+- **(a) No application code — HOLDS.** Eight files in the diffstat; nothing under `ts/` or `src/`.
+- **(b) `AGENTS.md` / `CLAUDE.md` untouched — HOLDS.**
+- **(c) No code collisions — HOLDS.** REQ-012 and SESS-2026-09-14-10 each unique; `test_codes.py`
+  passes. Apparent PLAN-003/006/017/023 duplicates are pre-existing multi-file plan directories and
+  a quoted example in `GOV-001`, untouched here.
+- **(d) `000233` not in P11 — HOLDS.** No `phase-wbf-*` phase mentions maximize or `000233`; REQ-012
+  names it only twice, both to exclude it.
+- **(e) `phase-arch-01` edges — HOLDS, with one borderline note.** Four phases carry the edge and no
+  phase anywhere references `phase-arch-02`. The reviewer's note is worth keeping verbatim:
+
+  > The borderline: PLAN-028's rule reads "…or that writes new requirement rows using those nouns
+  > [slot, panel, region, layout]". REQ-012 R02 ("the same sandbox posture as the panel") belongs to
+  > wbf-01, and R21 ("the panel displays that reason") belongs to wbf-09 — both phases carry no
+  > edge. Under a maximally literal reading those two would need it. I judge the omission defensible
+  > rather than a violation: both uses are ordinary prose for the on-screen thing, neither phase
+  > renames an identifier, and applying the literal reading would make the edge near-universal and
+  > block the whole programme behind one unclaimed phase — which PLAN-027 design decision 6
+  > explicitly reasons about. Worth the owner's awareness, not a blocker.
+
+- **(f) Six delivered ideas recorded, no phases — HOLDS.** The only references are two in
+  `phase-wbf-01` telling the implementer to *confirm* `000119`'s route-side rendering already holds
+  rather than rebuild it, "which is the right handling."
+- **(g) `resolved` status — HOLDS; the session's handling is correct.** The reviewer read
+  `schemas/idea.schema.json` itself and confirmed the enum is
+  `["open", "triaged", "reviewing", "promoted", "discarded"]`, with no `resolved`. The diff shows
+  only `annotated` and `linked` events on the four held ideas — no `status` events.
+
+### Ground-truth re-verification
+
+All five factual claims about unmodified code were re-checked independently and are true, with exact
+line numbers: `COMPATIBLE_EXTENSIONS` at `HtmlViewerRegion.tsx:25-36` (ten entries); the single-list
+import at `FileBrowserRegion.tsx:4` read at line 500, with no second copy; `marked` imported at
+`vite.config.ts:6` and `marked.parse` called at line 359 inside the `/workbench-file/` plugin;
+`search_files`'s `ext` parameter at `workbench.py:439`; and `demo_terminal.py` lines 287, 288 and 313
+— with the reviewer adding that "the pre-accept close is genuinely still there — the defect R20/R21
+describe is live, not already fixed."
+
+### The one discrepancy it found
+
+> **The commit hash `5680d2a` is wrong.** … `git branch --contains 5680d2a` returns nothing — the
+> object exists but is dangling, a pre-rebase hash orphaned by the `1f85b56` rebase onto dev. The
+> actual commit is `8ee29dd`. The substance of the claim is correct (I verified the removal and the
+> finalization are in one commit); only the citation is stale. Since the `next_action` text is
+> committed to `backlog.yaml`, a future reader following that hash will find nothing.
+
+Verified and fixed before close — see *Corrections*.
+
+> **Recommendation: all four acceptance conditions hold.** The only thing I would fix before close is
+> the stale `5680d2a` hash in the committed `next_action` and in the session record's condition 4.
+
+No other defects were found. The reviewer listed what it looked for and did not find: a requirement
+row with no phase, a phase with no row, a coverage-table id that does not exist, a duplicate or
+unreserved code, a `status` event on the four held ideas, a `phase-arch-02` edge, and an open
+`_tmpagent/` claim.
+
+## Decisions
+
+**The owner made four rulings in this session**, and one of them overrode the shape the work would
+otherwise have taken.
+
+**`000102` keeps its place in `G48` and gets its own phase.** This one was genuinely open. The
+partition had flagged its own ruling as the weakest in its table — placed by content rather than
+provenance, "ruled on a principle, not a repository check" — and explicitly invited the owner to
+reverse it. The idea's body still carries the marker that it is a rehearsal artifact, and its three
+`G63` siblings were nominated for decline by all four analysts. The owner affirmed the placement.
+They also declined folding it into `phase-wbf-01`, which was the recommendation's cheaper
+alternative: the two surviving `G48` ideas share only the panel, and a phase carrying both would have
+two unrelated acceptance halves. That ruling is why `G48` still costs two phases after losing four
+ideas, and it is the single largest input to this plan landing at 10 rather than 8.
+
+**The prefix is `phase-wbf-*`**, chosen over `phase-feat-*` (too generic to leave room for a future
+non-workbench feature programme) and `phase-wbd-*` (understates the feature half).
+
+**The delivered ideas are recorded in place rather than given a status.** The recommendation was to
+follow the `G56` precedent and discard them. The owner overrode it with a better question: *is there
+a `resolved` status, and if so use that.* There is not — and asking the question is what surfaced
+that the `G56` precedent had been papering over a real gap in the lifecycle, with an annotation
+reading "Verified resolved; discarded by owner ruling" doing work the status field could not. The
+override produced a more honest record than the recommendation would have, and produced `000236`.
+
+**Phases declare `sys-ui` as it exists today**, with no edge to `phase-arch-00` and no accompanying
+revisit note. The owner declined the third option, which would have added an explicit instruction to
+re-declare systems once the decomposition lands. The consequence is that seven of the ten phases
+serialise against each other until `phase-arch-00` runs, and they widen silently rather than by
+instruction when it does.
+
+**Two decisions were mine, not the owner's, and are argued in `PLAN-027` rather than here.**
+Consolidating `G52`/`G53`/`G55` into one phase came from measuring their distance in the source: the
+cap check, the pre-accept close and the accept sit at lines 287, 288 and 313 of one file, so two of
+the three fixes are edits to the same control flow and separate sessions would have the second
+rebasing onto the first's rewrite. Keeping `G50`'s two variants together came from the observation
+that a text entry and an image entry are one union type in the rotator's entry model, so splitting
+them means designing that model twice.
+
+## Corrections
+
+**The commit hash `5680d2a` was stale, and the independent review caught it.** I cited it in the
+session record's acceptance condition 4 and in the phase's committed `next_action`. It was the
+pre-rebase hash for the finalization commit; rebasing onto `dev` orphaned it, and `git branch
+--contains 5680d2a` returns nothing. The real commit is `8ee29dd`. Both citations are corrected. The
+substance was never wrong — the `next_up` removal and the finalization are in one commit, which the
+reviewer confirmed independently — but a future reader following the hash would have found nothing.
+
+The lesson is narrow and worth stating: **a commit hash written into a tracked file before a rebase
+is a hash that will not survive it.** Cite hashes after the rebase, or cite the commit by its subject
+line instead.
+
+Two test failures were found and fixed mid-session rather than retried into silence — the stale
+`ideas.md` after appending idea events, and the stale catalog after the rebase brought in a peer's
+phase. Both are recorded with their real output in `## Verification`.
+
+## Left undone
+
+**The four delivered ideas still have no honest terminal status.** `000110`, `000118` and `000119`
+are `triaged`; `000232` is `open`. This is the deliberate outcome of the owner's ruling, not an
+oversight, and it is unresolved in the idea lifecycle rather than in this phase — the phase's
+acceptance never required a status move. Whoever implements `000236` should return to all four, and
+should also decide whether `000099` and `000129` are amended from `discarded` or left as the
+historical record of how the gap was worked around.
+
+**The `phase-arch-01` edge has a borderline reading nobody has ruled on.** The reviewer found that
+`REQ-012` R02 and R21 use the word *panel* in ordinary prose, in phases (`phase-wbf-01`,
+`phase-wbf-09`) that carry no edge. I judged, and the reviewer agreed, that this is not a violation:
+neither phase renames an identifier, and the literal reading would make the edge near-universal and
+block the programme behind an unclaimed phase. But `PLAN-028`'s rule is worded loosely enough to
+admit both readings, and if the owner wants the strict one, four more phases gain edges. Flagged
+rather than decided, because tightening it is `PLAN-028`'s call, not this plan's.
+
+**`phase-arch-02` may rename `HtmlViewerRegion.tsx`**, which `phase-wbf-01` and `phase-wbf-02` edit.
+No edge encodes this, deliberately — it is a file-level sequencing question for a coordinator, and
+blocking two small viewer features behind the largest rename in the sibling programme would be the
+wrong trade. Whoever coordinates the two programmes needs to know it.
+
+**Nothing in this programme has been built.** All ten `phase-wbf-*` phases are `queued`;
+`phase-wbf-07` and `phase-wbf-09` are the two to start with, because they collide with nothing while
+`P10` holds `sys-ui`.
