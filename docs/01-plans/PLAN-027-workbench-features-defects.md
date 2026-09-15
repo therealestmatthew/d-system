@@ -217,7 +217,15 @@ block two small viewer features behind the largest rename in the sibling program
 
 ## Implementation phases
 
-Ten phases under `phase-wbf-*`, registered in [the backlog index](../09-backlog/README.md).
+Ten implementation phases under `phase-wbf-*`, registered in
+[the backlog index](../09-backlog/README.md).
+
+An eleventh id, `phase-wbf-11`, is **not** one of them. It was backfilled on 2026-09-14 by the
+session that shipped `000232`, `000110`, `000118` and `000119`, as a completed record of work that
+was already done — `status: complete`, owned by `agent-demo-a`, carrying that session's own
+verification. It implements nothing outstanding and carries no `REQ-012` row, by design: the
+delivered ideas get no implementation phase, and a backfill is a record of history rather than a
+claim on the future. A coordinator counting work to do should count the ten below.
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
@@ -259,7 +267,8 @@ expect `phase-wbf-01`, `-02` and `-10` to be short sessions rather than expect f
 ## Requirement coverage
 
 Every row of [`REQ-012`](../06-requirements/REQ-012-workbench-features-defects.md) maps to at least
-one phase, and every phase carries at least one row.
+one phase, and every one of the ten implementation phases carries at least one row. `phase-wbf-11`
+is outside this property for the reason given above.
 
 | Requirement | Phases |
 |---|---|
