@@ -11634,3 +11634,65 @@ show the same behavior is unknown and is an owner-machine check.
 
 - relates_to → `000113`
 - relates_to → `000137`
+
+---
+
+## 000247 · Formalize the idea realization system into an automated multi-agent pipeline
+
+**Created 2026-09-15T17:32:21-04:00 · Status: `triaged`**
+
+The owner wants the informal process used so far — "the idea realization system" — formalized into a well-oiled machine with proper division of labor across agents, then planned in detail. The pipeline as the owner describes it: (1) ideas are generated in conversation with Claude, approved by the owner, and recorded in the immutable append-only idea event log; (2) idea triage agents should triage ideas immediately when they are added to the log; (3) when enough new ideas accumulate, an idea partition system splits them into tracks by relatedness, and the partition agent proposes whether each track becomes a new plan or an amendment to an existing plan; (4) plan agents plan each track and decompose plans into the smallest possible units of work (minimum scope); (5) adversarial agents review each plan, each individual phase, and any new phase against the larger plan for alignment; (6) a decomposition-check agent looks at phases and identifies whether they need further splitting into smaller units; (7) dependency mapping orders the units of work; (8) task developer agents deliver the units and validator agents check the work for correctness. The build should use LangChain and Python with the Claude Agent SDK to automate as much as possible, keeping the human in the loop at the critical points where the owner's judgment is essential (idea approval and other key gates). Goal: streamline the process, ensure proper division of labor and optimal functionality across the agents, and accelerate the rate of development work on the owner's visions. Next step per the owner: triage this idea immediately, then develop the framework/architecture for the system, which will ultimately form into a much more detailed plan.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-15T17:34:05-04:00): Idea 000247 proposes formalizing the idea realization system into an automated multi-agent pipeline. The repository already has substantial work underway on individual components of this pipeline, though they are not yet formalized as a single coordinated system.
+
+**Existing related plans and phases:**
+
+PLAN-016 (idea-record-system) builds the append-only event log and write tooling; idea 000007 (An agent for triaging parked ideas) has already been promoted to this plan, and phase-idea-02 implements the triage agent.
+
+PLAN-017 (idea-plan-lifecycle) documents the broader lifecycle from idea capture through promotion to planning, with subplans covering event contracts (PLAN-017.03), annotations and relationships (PLAN-017.04), and plan lifecycle (PLAN-017.02).
+
+PLAN-025 (repeatable-idea-partition) builds the idea partition system mentioned explicitly in idea 000247, including the reusable prompt pack (PROMPT-034) and corpus filtering.
+
+PLAN-020 (portable-agent-workflows) formalizes agent workflow capture as governed documents with host adapters, ensuring portability across Claude, Codex, and other platforms.
+
+PLAN-031 (agent-engineering-delegation, P4, active) is a nineteen-idea programme covering agent instruction, coordination, and review — including orchestration (idea 000082), deliberation agents (ideas 000073-074), and truncation handling (idea 000077).
+
+PLAN-032 (autonomous-agent-operations, P5, active) covers unsupervised multi-agent execution: gateway, ledger, worker host, and capability broker (ideas 000028-031).
+
+**Architecture decision:**
+
+ADR-003 (multi-agent-concurrency) establishes the worktree protocol for concurrent agents and the claim-lock model over the backlog.
+
+**Related ideas (all triaged, none yet promoted):**
+
+000046 (An idea planner agent that turns a promoted idea into a governed plan) — directly addresses step 4 of idea 000247's pipeline.
+
+000072 (Agents covering the full lifecycle from idea to working product) — names the exact problem idea 000247 solves, and references adversarial review and validators.
+
+000078 (Agent engineering as a discipline with its own framework) — the umbrella for building agents deliberately rather than ad-hoc; idea 000082 covers orchestration specifically.
+
+000009 (Independent transcript analysis with adversarial session review) — addresses the adversarial review agents mentioned in step 5 of idea 000247's pipeline.
+
+**What is already built vs. what remains:**
+
+The infrastructure exists: triage (phase-idea-02 shipped), partition (PLAN-025), planner agent (phase-idg-12 in PLAN-029), adversarial review (established in the architecture), and the multi-agent orchestration framework (PLAN-031 active). What does not yet exist is a single master plan that synthesizes these pieces into one coordinated pipeline, documents their dependencies and sequencing explicitly, and names the remaining gaps (validator agents, decomposition-check agents, dependency mapping automation).
+
+Idea 000247 asks for a unifying formalization that would take the piecemeal work across PLAN-016, PLAN-017, PLAN-020, PLAN-025, PLAN-031, and PLAN-032 and bind it into one executable architecture with clear division of labor, explicit hand-off points, and human gates at judgment calls (owner approval, promotion decisions). This is not a duplicate; it is a meta-level synthesis of work already underway.
+
+**Proposed next step:**
+
+This idea's own request — "develop the framework/architecture for the system, which will ultimately form into a much more detailed plan" — aligns with what remains to be done: taking the implemented pieces and formalizing them into one coherent, documented pipeline architecture suitable for execution by the system itself.
+
+PROPOSED LINK: 000247 --relates_to--> 000046 (both address agent-based plan generation from ideas)
+PROPOSED LINK: 000247 --relates_to--> 000072 (both name the full lifecycle pipeline from idea to shipped product)
+PROPOSED LINK: 000247 --relates_to--> 000078 (both address formalizing agent engineering as a discipline)
+PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central component of the pipeline)
+- **finding** by agent-fable (2026-09-15T17:41:15-04:00): Owner rulings recorded 2026-09-15, taken in conversation via AskUserQuestion at architecture time: (1) Orchestration stack is LangGraph plus the Claude Agent SDK — LangGraph for the pipeline state machine (checkpointing, branching, human-interrupt nodes), the Agent SDK for agent execution; plain LangChain is not the target. (2) Scope is a superseding master plan: one umbrella plan that re-frames PLAN-029 (P1), PLAN-031 (P4), PLAN-032 (P5) and PLAN-025 as sub-programmes of the idea realization system; existing phases are not invalidated, the master plan sits above them. (3) Human-in-the-loop gates are all four proposed: idea approval, partition/track acceptance, plan approval (post-adversarial-review), and integration into dev. Everything between gates is a candidate for full automation with audit-trail oversight. (4) Sequencing: write the architecture and master plan now so P1/P4 phases are shaped with the pipeline in mind; implementation phases gate on the P1 and P4 foundations they orchestrate.
+
+</details>
