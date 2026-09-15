@@ -18,6 +18,90 @@ next_up:
 - phase-prog-12
 - phase-lit-09
 items:
+- id: phase-wbf-11
+  title: HTML Viewer image formats, markdown rendering and image presentation (backfill)
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  systems:
+  - sys-ui
+  - sys-demo-stage
+  owner: repository-owner
+  status: complete
+  agent: agent-demo-a
+  session: doc-session-demo-viewer-image-and-markdown
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add the already-served image formats (.png, .jpg, .jpeg, .gif, .webp, .ico) to the HTML Viewer's compatible
+    file list, so they are selectable in the panel and in the File Browser's "Open in HTML Viewer" action
+    (idea 000232).
+  - Render markdown route-side inside serveRepositoryFiles per the owner's ruling on idea 000119, and make
+    .md and .htm selectable (ideas 000110 and 000118, plus the ruling's .htm consequence).
+  - Present images legibly in the panel rather than as bare browser image documents anchored top-left at
+    natural size.
+  acceptance:
+  - All six image formats are selectable and display in the panel, and the File Browser's context action
+    offers them without keeping a second extension list.
+  - A markdown file renders as formatted HTML - headings, lists, code blocks, tables and links - rather
+    than raw source, and the rendering happens in the serving route rather than the frontend component.
+  - An image is centred and fitted in the panel, and a relative <img> reference still receives image bytes
+    rather than the wrapper document.
+  - REQ-006 R02 zero page scroll and REQ-007 W15's fill assertions still hold at 1280x720, 1366x768, 1920x1080
+    and 1024x768 in both layouts, with an image displayed and with markdown displayed.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - cd ts && npm run lint && npm run build
+  - Playwright browser verification (demo-validator-web) covering the image types, markdown rendering, the
+    File Browser context action, and the zero-scroll and fill assertions in both layouts at all four window
+    sizes
+  - Adversarial review (demo-adversary) of the merged range against the route's existing boundary checks
+  deliverables:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/vite.config.ts
+  - ts/package.json
+  - _public/images/agentic-loop.svg
+  completion_evidence:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/vite.config.ts
+  - ts/package.json
+  - _public/images/agentic-loop.svg
+  - _public/skills-and-agents-lexicon.html
+  - docs/00-working/demo-runbook.md
+  - docs/00-working/demo-windows-setup.md
+  result: 'Complete, and backfilled: this phase was written after the work shipped and merged, not before
+    it, and was not used to decide what to build. The session ran unclaimed under AGENTS.md''s provision
+    for owner-directed work with no backlog phase, because P11 was still unplanned at the time - phase-prog-02
+    finalized it later the same night, after this work was already on dev. The phase exists so SESS-2026-09-14-09
+    has something to point at. It was never queued or active and was never in next_up. Shipped, in order:
+    the six image formats in COMPATIBLE_EXTENSIONS (000232, no backend or vite.config change needed - confirmed
+    by curl before writing code); route-side markdown rendering with marked per the owner''s 000119 ruling,
+    plus .md and .htm made selectable (000110, 000118, ruling consequence 3); an image wrapper after a browser
+    measurement showed bare image documents render top-left at natural size, so a 900x560 image showed roughly
+    47% of its height in the panel with its label below the fold; and a Sec-Fetch-Dest discriminator fixing
+    a defect the wrapper introduced, where every relative <img> in rendered markdown or a served .html page
+    would have loaded a document instead of bytes. Also tracked the six canonical diagrams under _public/images
+    and re-embedded the three stale copies in the lexicon page after the owner ruled the files canonical.
+    Verification on dev after merge: 580 passed, governance OK, check_no_private_content OK with 31 real
+    identifiers checked in the primary checkout, npm run lint and npm run build clean, and the bundle unchanged
+    at 539.75 kB across the marked commit - the evidence it does not ship to the browser. Browser verification
+    (demo-validator-web, finished by hand after four turn-limit truncations): all six image types display,
+    the File Browser context action widened from the shared constant, markdown renders formatted at 20px
+    and ~15.7:1 contrast, and REQ-006 R02 zero page scroll with REQ-007 W15 fill held at 16 of 16 combinations
+    - four window sizes in both layouts, once with an image displayed and once with markdown, every one measuring
+    fillDelta 0. An independent demo-adversary review of 85ec053..5e59b8a returned twelve of twelve conditions
+    holding, with path traversal, encoded traversal, .git and gitignored paths blocked in every combination
+    of ?raw=1 and Sec-Fetch-Dest, no request shape serving image bytes without the sandbox CSP, a 60MB markdown
+    file caught by the route''s own try/catch rather than killing the process, and marked.parse confirmed
+    synchronous as used. Known gaps recorded rather than rounded away: the eight markdown fill combinations
+    were measured before the Sec-Fetch-Dest commit, and REQ-007 W07 still describes two compatible types
+    while the code ships eight. Ideas 000109 and 000102 were cut from the night and are now phase-wbf-01
+    and phase-wbf-02.'
+  next_action: 'None - phase complete. Backfilled after the work shipped and merged; see the first sentence
+    of result.'
 - id: phase-rel-01
   title: Restore the baseline Python lint gate
   plan: doc-reliability-follow-up

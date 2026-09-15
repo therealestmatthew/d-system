@@ -21,15 +21,27 @@ depends_on:
 
 ## Phase
 
-None. This session ran as owner-directed work with no backlog phase, under `AGENTS.md`'s provision
-for it: no claim commit, branch and worktree named after the work (`agent/demo-viewer-tonight`,
-`../d-system-worktrees/demo-viewer-tonight`), and the absence of a lock stated in the session's first
-report so peers knew nothing was held against them.
+`phase-wbf-11` — HTML Viewer image formats, markdown rendering and image presentation, under the
+workbench features and defects plan ([PLAN-027](../01-plans/PLAN-027-workbench-features-defects.md)).
 
-There was no phase to claim because P11 is not planned yet and its finalize phase `phase-prog-02` is
-blocked behind `phase-prog-03`, which was active and unmerged for the whole session. No phase was
-manufactured to have something to claim, and nothing is marked complete — `status: complete` needs a
-phase, and there is none.
+**The phase is a backfill.** The session ran without one. It worked as owner-directed work with no
+backlog phase, under `AGENTS.md`'s provision for exactly that: no claim commit, branch and worktree
+named after the work (`agent/demo-viewer-tonight`, `../d-system-worktrees/demo-viewer-tonight`), and
+the absence of a lock stated in the session's first report so peers knew nothing was held against
+them.
+
+There was nothing to claim at the time because P11 was unplanned and its finalize phase
+`phase-prog-02` was blocked behind `phase-prog-03`. No phase was manufactured during the work to have
+something to claim. `phase-wbf-11` was added afterwards, at the owner's direction, so this record has
+something to point at — it was not used to decide what to build, and the sections below were written
+before it existed.
+
+P11 was finalized later the same night, after this work was already merged. Its ten `phase-wbf-*`
+phases are the real continuation of this surface, and two of them are the items this session cut:
+`phase-wbf-01` is idea `000109` and `phase-wbf-02` is idea `000102`. `phase-wbf-06` covers the
+rotator variants that overlap the file-stepping request. A separate plan was drafted for this
+backfill and then discarded once P11 landed, because two plans describing the HTML Viewer's features
+is worse than one.
 
 The work came from the Track A coordinator prompt (`_tmpagent/demo-track-coordinator.md`), itself
 recorded as idea `000235`.
@@ -104,7 +116,25 @@ Browser assertions, driven by `demo-validator-web` and finished by hand:
 
 ## Acceptance
 
-No phase, so no `acceptance` list. Judged against what the coordinator prompt asked for:
+`phase-wbf-11`'s `acceptance` list was written from what had already shipped, so it cannot be
+evidence on its own — a backfilled condition can always be made to match its own outcome. What makes
+these verdicts worth anything is that the evidence in `## Verification` and the independent review in
+`## Review` were both produced before the phase existed.
+
+- All six image formats selectable and displaying, with the File Browser's context action offering
+  them from the same constant — **Met**. Verified in a browser; the shared-constant behaviour was
+  confirmed by reading `FileBrowserRegion.tsx`, not assumed.
+- Markdown rendering as formatted HTML, in the serving route rather than the frontend component —
+  **Met**. The render sits inside `serveRepositoryFiles`, after every boundary check, reading the
+  validated realpath.
+- An image centred and fitted, and a relative `<img>` still receiving bytes — **Met**. Measured at
+  580.2x361 in a 781x361 viewport, and the sub-resource path returns `image/png` under
+  `Sec-Fetch-Dest: image`.
+- Zero page scroll and fill assertions holding at four window sizes in both layouts, with an image
+  and with markdown — **Met**, 16 of 16 combinations at `fillDelta 0`.
+
+Also judged against what the coordinator prompt asked for, which is what the work was actually built
+against:
 
 - Six image formats selectable and displaying — **Met**. Verified in a browser, and the File Browser
   context action widened from the shared constant with no second list, as predicted but confirmed
@@ -120,8 +150,15 @@ No phase, so no `acceptance` list. Judged against what the coordinator prompt as
 
 ## Backlog
 
-No backlog line was touched. No phase was claimed, no `status` changed, and `next_up` was not
-pruned — none of those have a subject in an unclaimed session.
+No backlog line was touched *during* the work: nothing was claimed, no `status` changed, and
+`next_up` was not pruned, because an unclaimed session gives none of those a subject.
+
+Afterwards, at the owner's direction, `phase-wbf-11` was added to `docs/09-backlog/backlog.yaml` at
+`status: complete`, under `plan: doc-workbench-features-defects`, with
+`session: doc-session-demo-viewer-image-and-markdown`, real `completion_evidence`, and a `result`
+whose first sentence says it is a backfill. It was never `queued` or `active` — it did not exist
+until the work it describes was merged — and it was never added to `next_up`. No other phase's lines
+were touched, including the ten `phase-wbf-*` phases `phase-prog-02` created the same night.
 
 ## Unresolved
 
