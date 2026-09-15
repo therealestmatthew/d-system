@@ -7570,7 +7570,7 @@ items:
   - sys-wb-layout
   owner: repository-owner
   agent: agent-arch-vocab
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on: []
@@ -7599,6 +7599,27 @@ items:
   - docs/08-governance/GLOSSARY.md
   next_action: Write the container-versus-content ruling first. Six ideas wait on that one
     sentence, and every other term in the file is phrased against it.
+  session: doc-session-settle-workbench-vocabulary
+  completion_evidence:
+  - brain/concepts/terms-workbench-ui.md
+  - docs/08-governance/GLOSSARY.md
+  - docs/03-sessions/SESS-2026-09-15-01-settle-workbench-vocabulary.md
+  result: >-
+    Ruled that a slot is the container and a panel is its content - a slot is a named region of a
+    layout's grid, a panel is a unit of content assigned into exactly one slot at a time - settling
+    the question 000135 left open and that 000141 and 000144 presuppose. Resolved 000135's doubt
+    rather than overriding it: the containment it noticed is real one tier down, so element was
+    added as the tier a panel contains. Defined the eleven terms in brain/concepts/terms-workbench-
+    ui.md and regenerated the glossary through the existing generator; no second glossary document.
+    Session and region are qualified headings because both nouns already carry other senses in the
+    same rendered file. Ruled all six identifier classes: layout slot_id values, localStorage field
+    names and test fixtures renamed; CSS class names, REQ-007 row wording and panel registry ids
+    aliased. Executed no rename - phase-arch-02 owns that. Slot ids become
+    primary/secondary/strip/explorer under a rule that a slot id names its role and may never equal
+    a panel id, which also discharges a collision REQ-011 R03 does not record: terminal and notes-
+    strip are each simultaneously a slot_id and a panel_id in both shipped layouts. Verification
+    green (580 passed, governance OK, glossary regeneration leaves no drift) and an independent sub-
+    agent review of 2d9290f..e76a385 found all three conditions met with no discrepancies.
 - id: phase-arch-02
   title: Execute the workbench identifier migration
   plan: doc-workbench-architecture-quality

@@ -128,7 +128,7 @@ wrote /code/d-system-worktrees/phase-arch-01/docs/08-governance/GLOSSARY.md — 
 `uv run pytest`
 
 ```
-580 passed, 2 warnings in 41.69s
+580 passed, 2 warnings
 ```
 
 `uv run python -m src.governance`
@@ -186,6 +186,36 @@ added `SESS-2026-09-14-12` to the same generated file. Resolved by regenerating 
 choosing a side — `--ours`/`--theirs` on a generated file silently drops whichever record it does
 not pick. Both session records are present in the committed catalog, and the document count is 227.
 
+## Acceptance
+
+One line per condition, against what `## Verification` above actually shows.
+
+- **`REQ-011` R01 — all eleven terms appear in the regenerated glossary and the drift test passes.**
+  Met. All eleven grep present in the rendered glossary, each as a real `###` entry rather than an
+  incidental mention; `test/test_glossary.py` passes inside the 580. `GLOSSARY.md` is absent from
+  `catalog.md`, which is the check that it stayed generated and that no second glossary document was
+  created.
+- **`REQ-011` R02 — one sentence names the container explicitly.** Met. One sentence, and only one:
+  `grep -n "is the container"` over the concept memory returns a single hit. It states the answer —
+  a slot is the container — rather than describing the ambiguity, which R02's verification column
+  makes a defect.
+- **`REQ-011` R04 — each of the six identifier classes carries a rename-or-alias disposition with a
+  reason.** Met. Six `### N.` headings, three RENAME and three ALIAS, each with a reason specific to
+  that class rather than a restatement of the disposition.
+
+The phase's other obligation is negative and also holds: **no rename was executed.**
+`git diff --name-only 2d9290f..e76a385` returns five files — the concept memory, the glossary, this
+record, the catalog and the `_tmpagent` ledger. No layout JSON, no CSS, no test, no registry, no
+TypeScript. `phase-arch-02` still owns the migration.
+
+## Backlog
+
+`phase-arch-01` is `status: complete`, `agent: agent-arch-vocab`,
+`session: doc-session-settle-workbench-vocabulary`. Completion evidence is
+`brain/concepts/terms-workbench-ui.md` and `docs/08-governance/GLOSSARY.md`. The `result` records the
+container ruling, the eleven terms plus `element`, and the six dispositions with the migration
+deliberately unexecuted. The phase was not in `next_up`, so nothing was pruned.
+
 ## Found wrong in the source material
 
 Four things, none of them in this phase's declared systems, so none were edited.
@@ -236,3 +266,144 @@ session's.
 - **`REQ-007` W16's prose will describe slot ids that no longer exist** once `phase-arch-02` lands.
   The ruling accepts this deliberately, because the prose names roles rather than ids, but it is a
   gap a reader could mistake for staleness.
+
+## Review
+
+An independent sub-agent reviewed commit range `2d9290f..e76a385` with no context from this session,
+ran the three verification commands itself, and was asked to judge the acceptance conditions from the
+diff rather than from this record's claims. Its findings, condition by condition.
+
+Its own runs:
+
+```
+$ uv run python tools/generate_glossary.py
+wrote /code/d-system/docs/08-governance/GLOSSARY.md — 10 term(s)
+$ git status --porcelain
+(empty)
+
+$ uv run pytest -q
+580 passed, 2 warnings
+
+$ uv run python -m src.governance
+Governance OK: 27 systems, 227 documents, 25 memories, 181 backlog phases   [exit 0]
+```
+
+**Condition 1 — R01 — Met.** "All eleven terms exist as real definitional entries, not incidental
+prose. … I read the bodies: each opens with a genus-and-differentia definition and a contrast clause
+… and each is anchored to a file or field that exists. … These are definitions, not grep hits."
+On the two qualified headings: "I judge these legitimate, not evasion. R01 asks that the vocabulary
+*define* the terms; both entries do, and the qualifier is forced by genuine pre-existing overload
+inside the same rendered file. `### Session` already exists at GLOSSARY.md:548 … an unqualified
+`### Session` would have been a duplicate heading in one document." On `Region (workbench)`: "the
+entry is the more useful for it: it records that `region` means *panel* in code identifiers …, which
+is a substantive fact a bare heading would have hidden."
+
+**Condition 2 — R02 — Met.** "Exactly one sentence. `grep -n \"is the container\"` … returns a
+single hit, line 21. … It states the answer; it does not describe the ambiguity. R02's
+verification-column defect condition is not triggered. The paragraph that follows *discusses*
+`000135`'s doubt, but it does so to resolve it … an answer, not a survey."
+
+**Condition 3 — R04 — Met.** "All six classes carry both a disposition and a reason. … No class is
+missing either half. Each reason is specific rather than a restatement of the disposition."
+
+**Scope check — no renames executed — confirmed.** "No layout JSON, no CSS, no test, no registry, no
+`.ts`/`.tsx` … `git diff -M --summary` shows only two file creations, no git-detected renames. The
+phase executed none of the migration, as it said it would not."
+
+**Discrepancies between this record and what the reviewer found: none.** "Every claim I tested held."
+Specifically corroborated:
+
+- The committed glossary was not stale — regeneration left the tree empty.
+- The `R03` severity claim: "True, and if anything understated by the requirement rather than
+  overstated by the record. … I confirmed this by parsing both files and intersecting the id sets:
+  `overlap: ['notes-strip', 'terminal']` in each."
+- `phase-wbf-01` declares the wrong system: "True. … `HtmlViewerRegion.tsx` is not among them; it
+  belongs to `sys-wb-viewer`. The lock does not cover the work."
+- `panelRegistry.tsx` cites a non-existent field: "True. … `grep -c admits` on both layout files
+  returns 0. `admits` exists only on the resolved in-memory `LayoutSlotDefinition`."
+- The private-content figures and the memory and catalog counts all reconcile.
+
+The reviewer could not reproduce the worktree-side private-content figure, because the worktree had
+already been merged away by the time it ran: "the mechanism described … is consistent with the tool's
+output shape." That is a limit on the corroboration, not a contradiction of the claim.
+
+## Decisions
+
+**The container ruling was the owner's to make, and was put to them before any file was written.**
+The phase's `next_action` directs the agent to state the answer, and `R02` makes describing the
+ambiguity a defect — but `000135` records the owner as explicitly unsure and directing that nothing
+terminology-related change until it was settled. Settling it by agent judgement alone would have
+answered a question the owner had reserved. It was put as a choice between the two readings with the
+cost of each stated, alongside the slot-naming scheme and the heading-collision handling. The owner
+took the recommendation in all three cases.
+
+**`element` was added beyond the eleven terms `R01` requires.** Not scope creep: without a word for
+what a panel contains, the container ruling reads as contradicting the owner's own observation in
+`000135` rather than resolving it. The term is what makes "your instinct was right, one tier down" a
+statement about the system instead of a concession.
+
+**`primary`/`secondary` over geometry names.** The same slot is a different shape in each layout, and
+assignments are stored per `layout_id` per `panel_id`, so geometry-derived ids would differ per layout
+and break the moment `phase-arch-09` moves a slot.
+
+**The inherited `dev` breakage was not fixed on this branch.** `test_the_committed_markdown_matches_
+regenerated_output` was failing on `dev` itself, from a peer's commit. Regenerating `ideas.md` here
+would have turned this branch green while hiding that `dev` was red when the peer integrated. The
+owner ruled it fixed on `dev` instead, and this branch was rebased onto that fix.
+
+**A peer's uncommitted work in the primary checkout was left untouched.** The claim commit was made
+with explicit pathspecs rather than `git add -A`, so `_data/ideas.jsonl`, `systems.yaml` and a peer's
+session record stayed exactly as found.
+
+## Corrections
+
+**The session record was missing `## Acceptance` and `## Backlog`.** Both are required by the session
+record contract in `.claude/skills/checkpoint/SKILL.md`, and the first draft went straight from
+`## Verification` to `## Found wrong in the source material`. Caught while running the checkpoint
+procedure at close and added. The lesson is that writing a record from the shape of the work rather
+than from the contract loses the sections that make records comparable to each other.
+
+**The catalog was not regenerated when the session record was committed.** This turned the first
+post-rebase run red — `test_committed_catalog_matches_regenerated_output` and
+`test_catalog_flag_writes_committed_file`, two of the three failures. Any governed document forces
+the regeneration, not only the claim. Fixed in its own commit.
+
+**A cross-reference in the concept memory pointed at a heading that does not exist.** The first draft
+cited `### Region` under *Skills and agents*; only `### Session` is there. Corrected before the file
+was first committed.
+
+**Wall-clock timings were left in the recorded command output.** The record contract requires them
+stripped so that a rerun against unchanged state produces a byte-identical record. Removed at close.
+
+## Left undone
+
+**The migration itself**, deliberately and by design. `phase-arch-02` executes all six classes.
+`PLAN-028` design decision 2 separates them precisely so the six ideas waiting on the vocabulary are
+not held behind a rename touching layout data, CSS, requirement prose, stored state, the registry and
+the tests.
+
+**One constraint `phase-arch-02` inherits with nothing mechanical to enforce it**: the
+`schema_version` bump and the slot id rename must land in the same change, or live browsers are
+stranded on stored assignments naming slots that no longer exist. It is stated in the ruling and here;
+a check for it would belong to that phase.
+
+**The four source-material defects were reported, not fixed.** Each sits outside this phase's declared
+systems, and three of them belong to phases that have not run yet:
+
+- `phase-wbf-01` declares `sys-ui`, which no longer covers `HtmlViewerRegion.tsx`. Editing another
+  phase's declarations is not this phase's to do, and the mis-declaration means the validator would
+  not stop a peer editing that file concurrently. Worth fixing before that phase is claimed.
+- `panelRegistry.tsx`'s doc comment cites an `admits` field that does not exist in the layout JSON.
+  It is `ts/src/workbench`, inside `sys-wb-layout` which this phase holds — but it is a code comment,
+  and `phase-arch-03`/`-04` are about to audit those files.
+- `REQ-011` R03 records only half its own failing case, omitting the `slot_id`/`panel_id` collision.
+  Amending a requirement row mid-programme was out of scope here; the naming rule covers both halves.
+- The private-content check runs weaker in a worktree (`0 identifiers checked`) than in the primary
+  checkout (`31`), because `_private/portfolio/` is absent there. The full check ran against the
+  merged result. A worktree-only run is not the check it appears to be, which is worth knowing for
+  every worktree session, not just this one.
+
+**The `overview` panel type is left registered and unruled on** — whether `OverviewRegion` still earns
+its place now that the HTML Viewer serves the same page is a duplication question for
+`phase-arch-03`, not a naming one.
+
