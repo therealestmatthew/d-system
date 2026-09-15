@@ -7374,7 +7374,7 @@ items:
   systems:
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7399,6 +7399,32 @@ items:
   - docs/09-backlog/README.md
   next_action: Settle the 000056-to-000047 overlap first. It is the scope question that
     decides whether G05 is two phases or one.
+  session: doc-session-document-backlog-governance-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-030-document-backlog-governance.md
+  - docs/06-requirements/REQ-015-document-backlog-governance.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-04-document-backlog-governance-plan.md
+  result: >-
+    Finalized P2. Wrote REQ-015 with fourteen rows and replaced PLAN-030's placeholder with seven
+    design rulings. Settled the design question the scope named - 000056 does not merge with 000047,
+    because they fail differently: 000047 asks whether a document is well written and 000056 whether
+    it is still true, and a well-structured plan describing a refactored system passes the first and
+    is exactly what the second exists to catch. The shared surface is handled by making the staleness
+    mechanism consume the plan-quality standard rather than write a second one, which creates a
+    cross-programme dependency on phase-idg-10 in P1, recorded in depends_on rather than prose.
+    Checked the phase-gov-01 overlap the acceptance requires: distinct in function - that phase
+    checks declarations before work starts, this one diffs actual change sets afterwards - but
+    colliding on identical deliverables, so phase-dgov-06 declares depends_on rather than merging a
+    ready phase out of PLAN-010. Ruled staleness against what a document describes and never its age,
+    since a date rule flags ADR-003, which is old and correct. Registered seven phases under
+    phase-dgov-*, against a partition header of 4-5 that contradicts its own group table summing to
+    5-6 plus two fragments. Verification green - governance exits 0 at 233 documents and 209 phases,
+    --ready shows five ready with both cross-programme dependencies correctly withholding the other
+    two, and 580 tests pass. A read-only independent review confirmed all four conditions and raised
+    three non-blocking findings; two were fixed, and the third is the known track-wide deliverables
+    gap already staged as an idea candidate.
+
 - id: phase-prog-06
   title: Finalize the agent engineering and delegation plan (P4)
   plan: doc-agent-engineering-delegation

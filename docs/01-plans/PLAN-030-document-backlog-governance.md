@@ -172,6 +172,21 @@ All seven declare `sys-governance` and five declare `sys-backlog`, so the progra
 is **one agent at a time**. As with `P3`, this is not a defect to engineer around: the subject matter
 *is* the governance corpus, and the corpus is one surface.
 
+**Three phases contend on `src/governance/` and `test/test_backlog.py`, not two.** Decision 6 audits
+the `phase-dgov-06`/`phase-gov-01` pair because their deliverables are identical, but
+`phase-dgov-04`'s `src/governance/` and `test/test_backlog.py` collide with both — `src/governance/`
+is a prefix of `src/governance/backlog.py`, and the repository's own `path_conflict()` returns true
+for that pair. Measured, not inferred.
+
+No `depends_on` edge is added for it. The edge on `phase-dgov-06` exists because that phase is
+*functionally* sequenced behind `phase-gov-01` — it extends the same check — whereas `phase-dgov-04`
+merely touches the same files and has no ordering requirement against either. The collision is
+therefore real but inert: the programme is already serialised by `sys-governance`, and
+`concurrency_errors` rejects a bad concurrent claim regardless of whether this plan predicted it.
+Recorded here because decision 6 established the methodology of auditing file-level collisions and
+stating them, and applying that to one pair and not the other would leave the next reader assuming
+`phase-dgov-04` is safe to run beside `phase-gov-01`.
+
 Two dependencies reach outside the programme, which matters more than the internal ordering:
 
 - `phase-dgov-02` waits on `phase-idg-10` in `P1`. **`P1` should therefore run before `P2`**, even

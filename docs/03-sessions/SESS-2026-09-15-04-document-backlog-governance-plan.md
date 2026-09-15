@@ -25,10 +25,12 @@ Third phase of the unattended overnight batch run by `agent-night`.
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 232 documents, 25 memories, 209 backlog phases
+Governance OK: 27 systems, 233 documents, 25 memories, 209 backlog phases
 ```
 
-Exit 0. Documents 231 → 232 for `REQ-015`; phases 202 → 209 for the seven `phase-dgov-*` phases.
+Exit 0. Documents 231 → 233: `REQ-015`, and this record. Phases 202 → 209 for the seven
+`phase-dgov-*` phases. An earlier run during the session reported `232 documents`, correctly — this
+record did not exist yet. The final figure is the one recorded here.
 
 `uv run python -m src.governance --ready`
 
@@ -80,10 +82,71 @@ above confirms the tool agrees — `phase-dgov-06` does not appear as ready.
 
 ## Backlog
 
-`phase-prog-05` is `status: active`, `agent: agent-night`, pending the independent review below. All
-four conditions read Met against the verification above.
+`phase-prog-05` is `status: complete`, `agent: agent-night`,
+`session: doc-session-document-backlog-governance-plan`. Completion evidence is `PLAN-030`,
+`REQ-015`, `docs/09-backlog/README.md` and this record.
+
+Written under the owner's advance authority for this batch, and only after the read-only independent
+review below confirmed all four conditions.
 
 Seven phases added under `phase-dgov-*`, all `status: queued`, none claimed.
+
+## Review
+
+A fresh non-fork sub-agent with read-only tools reviewed `dev...agent/phase-prog-05`. Its own runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 233 documents, 25 memories, 209 backlog phases
+EXIT=0
+
+$ uv run pytest
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`grep -ni
+"placeholder\|TBD\|TODO\|XXX"` … returned nothing. `status: draft` → `status: active`… Seven numbered
+'chosen design' rulings are present…, each naming the rejected alternative and its cost."
+
+**Condition 2 — requirement exists, every row maps to a phase — Met.** "Checked directly against
+`docs/09-backlog/backlog.yaml`, not against PLAN-030's own coverage table… every row's id appears
+verbatim in exactly one `phase-dgov-*` entry's `acceptance` block… Coverage is total in both
+directions."
+
+**Condition 3 — the `phase-gov-01` overlap is checked and stated — Met.** The reviewer read that
+phase's real entry and tested both halves of the claim: "its job is rejecting a *declared* deliverable
+whose filename carries an unreserved code — pre-hoc… `phase-dgov-06`'s deliverables … are the
+identical two paths, but its job is diffing a *completed phase's actual git diff* against its declared
+paths — post-hoc… **Functions verified distinct; files verified identical (both halves of the claim
+hold).**"
+
+**Condition 4 — removed from `next_up` in the same change — Met.** "`- phase-prog-05` removed from
+`next_up` in the same (and only) commit `744d4c8` that adds the seven `phase-dgov-*` phases. No
+separate commit does this."
+
+**The cross-programme dependency was verified against the data, not the prose.** "`phase-idg-10` … is
+confirmed present on `dev` before this branch… `phase-dgov-02` declares `depends_on: [phase-idg-10]`
+in `backlog.yaml`. All asserted, all real."
+
+**`backlog.yaml` integrity.** "Parses cleanly (209 items); no actual YAML anchor/alias syntax
+anywhere… Diffed every pre-existing item's parsed dict between `dev` and the branch: **0 changed, 0
+missing** — only the 7 new ids were added, and `next_up` lost exactly one entry."
+
+**Three findings, none blocking.**
+
+- *`phase-prog-05`'s own deliverables do not cover `backlog.yaml`, which the diff rewrites by 242
+  lines.* The reviewer noted the phase "instantiates the pattern it flags for the future containment
+  check." **Not fixed** — it is the known track-wide gap, already staged as an idea candidate and
+  already predicted by `R12`. Changing the declaration shape mid-run would make the ten phases
+  inconsistent with each other.
+- *`phase-dgov-04` collides with `phase-gov-01` and `phase-dgov-06` on `src/governance/` and
+  `test/test_backlog.py`, undeclared*, while decision 6 devotes a whole ruling to the identical-file
+  collision between the other two. The reviewer ran the repository's own `path_conflict()` to
+  establish it. The inconsistency is real: the plan applied its own methodology to one pair and not
+  the other. **Fixed** — the concurrency section now states the three-way contention, and says why no
+  `depends_on` edge follows from it.
+- *The session record's document count was off by one* (232 against 233, this record being the
+  233rd). **Fixed.**
 
 ## Decisions
 
