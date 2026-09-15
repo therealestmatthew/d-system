@@ -5622,6 +5622,7 @@ Status: This is a new feature request, not yet integrated into any plan phase. N
 - relates_to → `000108`
 - relates_to ← `000118`
 - relates_to ← `000119`
+- relates_to ← `000232`
 
 ---
 
@@ -5908,6 +5909,7 @@ PROPOSED LINK: 000118 --relates_to--> 000119 (both required to integrate markdow
 - relates_to → `000110`
 - relates_to → `000112`
 - relates_to → `000119`
+- relates_to ← `000232`
 
 ---
 
@@ -5921,7 +5923,7 @@ Agent-scouted 2026-09-11 (owner-approved for the next-pack batch), connecting id
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:50:35-04:00): Idea 000119 identifies a decision point already made explicit in the agent scout's framing: when ideas 000109 (new-tab open) and 000110 (markdown rendering) both land in the same workbench batch, they create a collision unless the render location is chosen first. The issue is precise and real — if markdown rendering is implemented only in the frontend component (HtmlViewerRegion), then 000109's double-click behavior, which loads raw /workbench-file/ bytes directly, bypasses that rendering entirely and shows unrendered markdown source to the user.
 
@@ -5932,6 +5934,11 @@ The decision itself — whether markdown-to-HTML conversion happens route-side (
 Related ideas are already recorded: 000109 (double-click new-tab) and 000110 (markdown rendering) are both linked. Idea 000118 (grow COMPATIBLE_EXTENSIONS past .html/.svg when markdown rendering lands) depends on this decision as well — it will be the task to update the compatible-files list after the render location is chosen and 000110 ships.
 
 No related plan, requirement or ADR found that reserves or predetermines the render location. PLAN-022-workbench.md and REQ-007-workbench.md cover the HTML Viewer's current scope (W07–W08: .html and .svg files with refresh, directory dialog, tabs, and tab persistence), but neither mentions markdown rendering or render-location choice. The decision belongs in the planning session for whichever phase undertakes 000110.
+- **finding** by agent-viewer (2026-09-14T19:50:47-04:00): Two further owner asks joined the HTML Viewer batch on 2026-09-14, after the render-location ruling was recorded: 000232 (.png support) and 000233 (panel maximize/minimize, raised on the viewer). They belong with G48's existing five ideas for one future planning session.
+
+000232 is deliberately NOT gated by this ruling. The ruling settles where markdown rendering happens; .png needs no rendering step, is already served as image/png by ts/vite.config.ts, and therefore does not inherit 000118's deferral of COMPATIBLE_EXTENSIONS growth until 000110 lands.
+
+000233 may not belong to P11 at all — maximize is a slot-level mechanism, so G43 (PLAN-028/P10) is the plausible owner. That scope question is recorded on the idea itself and must be settled before either programme plans it.
 
 </details>
 
@@ -6459,6 +6466,7 @@ No related plan, requirement or backlog phase found for geometry customization b
 - relates_to → `000124`
 - relates_to → `000134`
 - relates_to ← `000124`
+- relates_to ← `000233`
 
 ---
 
@@ -6866,6 +6874,7 @@ PROPOSED LINK: 000141 --relates_to--> 000135 (generalizes multi-instance modular
 - relates_to → `000124`
 - relates_to → `000135`
 - relates_to ← `000144`
+- relates_to ← `000233`
 
 ---
 
@@ -11214,3 +11223,80 @@ whoever picks it up; naming both would make a filtered run self-evidently filter
 Also worth checking at the same time whether any other tool under `tools/` prints a count taken
 before a filter, since this pattern would not be visible in any test that only asserts the
 generated file's content.
+
+---
+
+## 000232 · HTML Viewer supports the already-served image formats (.png, .jpg, .jpeg, .gif, .webp, .ico)
+
+**Created 2026-09-14T19:49:56-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, for the workbench viewer batch (G48, PLAN-027/P11). Add the already-served image formats to the HTML Viewer's selectable file types so images display in the panel the same way .html and .svg already do. Raised as ".png" and widened by the owner the same day to every image type ts/vite.config.ts already serves: .png, .jpg, .jpeg, .gif, .webp and .ico.
+
+Unlike markdown (000110), this needs no rendering step at all. CONTENT_TYPE_BY_EXTENSION in ts/vite.config.ts already maps all six to correct image MIME types, so serveRepositoryFiles serves the bytes correctly today; an image loaded into the viewer's sandboxed iframe renders as the browser's own image view. The change is COMPATIBLE_EXTENSIONS in ts/src/stage/HtmlViewerRegion.tsx:18 — one array entry per type — which also widens the File Browser's "Open in HTML Viewer" context action for free, because FileBrowserRegion.tsx imports that same constant rather than keeping its own copy.
+
+Taking all six together rather than .png alone was the owner's explicit choice: the marginal cost of each additional type is one array entry and one browser assertion, against returning for the same change five more times.
+
+Consequence for sequencing: 000118 defers growing COMPATIBLE_EXTENSIONS until markdown rendering lands, because .md without a render step shows raw source. That reasoning does NOT apply to any of these image types — they are already correctly served and displayable. This idea must therefore not inherit 000118's dependency on 000110, and can ship independently of the markdown work. The render-location ruling recorded in _tmpagent/viewer-render-location-ruling.md is scoped to where markdown rendering happens and does not constrain this idea; the owner declined a successor ruling on 2026-09-14 on the grounds that this idea carries the distinction itself.
+
+Open question for the planning session: whether the iframe's bare-image presentation is acceptable (browser default centering, background, zoom behavior) or whether an image needs wrapping in a minimal HTML document for consistent presentation with the other file types. The answer should be the same for all six.
+
+**Links**
+
+- relates_to → `000118`
+- relates_to → `000110`
+
+---
+
+## 000233 · Panels maximize to full screen and collapse back to their slot
+
+**Created 2026-09-14T19:50:11-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised for the HTML Viewer specifically and motivated by demoability: expand the viewer to fill the screen, then collapse it back to the position it came from. On a projector the viewer's slot is too small to read generated pages from the back of a room, and switching layouts to get more room loses the arrangement.
+
+Scope question the planning session must settle first, because it decides which programme owns this: is maximize a HTML Viewer feature (G48, PLAN-027/P11) or a general panel capability every panel gets (G43 slot/panel architecture, PLAN-028/P10)? The owner asked for it on the viewer, but the mechanism is slot-level, not viewer-level, and a viewer-only implementation would have to be redone when a shell panel or an explorer wants the same thing. G43 already covers the slot/panel model and idea 000141 generalises it structurally; building maximize inside HtmlViewerRegion would add a second geometry path outside that model, which is the kind of divergence G43 exists to remove.
+
+Constraints it must not break, all already specified and verified:
+- REQ-006 R02 zero page scroll, and REQ-007 W15's fill assertions at 1280x720, 1366x768, 1920x1080 and 1024x768 in both layouts.
+- W16's assignment model: maximize is a transient view state, not a re-assignment. Collapsing must restore the panel to its assigned slot, and maximize state should not be written into the ADR-016 layout selections store, or a browser left maximized reopens wrong.
+- Shell panels must not lose their session when maximized. W16 already requires that live sessions survive re-assignment where feasible; the same obligation applies here, and a remount that kills a PTY would be a regression.
+
+Related: 000133 revisits panel geometry on the G43 model and is the nearest existing home if this lands in P10.
+
+**Links**
+
+- relates_to → `000133`
+- relates_to → `000141`
+- relates_to ← `000234`
+
+---
+
+## 000234 · Decompose sys-ui, which serializes almost every frontend phase under the concurrency validator
+
+**Created 2026-09-14T20:07:22-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised while planning parallel execution of P10 (PLAN-028). sys-ui is declared by 14 of the 17 phase-arch-* phases, and the concurrency validator treats a shared system as a collision, so at most one sys-ui phase can ever be active. Measured against the finalized P10 plan by running src.governance.backlog.collisions() over all 17 phases: the real concurrency ceiling is 2, reached only in the first two dependency waves, and waves 3 through 6 are strictly serial regardless of how many agents are available. max_active is 3 and is never reachable. The critical path is six sessions deep (phase-arch-01, 05, 06, 07, 09, 17).
+
+The ask: split sys-ui in docs/08-governance/systems.yaml into components that can be locked independently - candidate seams observed in the tree are the layout/slot engine, the panel implementations under ts/src/stage, the notes strip and rotator, and the explorer panels - so that two frontend phases touching different surfaces stop colliding on a single system id. Deliverable paths would need the same treatment: docs/00-working/ is currently a shared deliverable that collides phase-arch-11, 14 and 16 with each other for no real reason, and ts/src/stage/ collides phase-arch-08 with 09 and phase-arch-13 with 17.
+
+The owner directed on 2026-09-14 that this runs BEFORE the rest of the P10 track, because every phase-arch-* phase would otherwise have to redeclare its systems afterward. Note the counter-consideration recorded at the time: a finer lock table admits more concurrency but also admits more genuine conflicts that the coarse lock was accidentally preventing, so the split should be argued from observed seams in the code rather than from a wish for more parallelism.
+
+**Links**
+
+- relates_to → `000233`
+- relates_to ← `000235`
+
+---
+
+## 000235 · Two-track coordinator prompt pack: a demo-mandatory track and a programme-execution track
+
+**Created 2026-09-14T20:07:34-04:00 · Status: `open`**
+
+Owner request, 2026-09-14, raised the night before the 2026-09-15 demo. The owner asked for a master prompt instructing a coordinator model to run parallel agent sessions, and on being shown that P10 admits at most two concurrent sessions and delivers nothing to a demo tomorrow, ruled for two separate tracks: a demo-mandatory track run first, and a programme-execution track run with whatever time remains.
+
+The general capability worth keeping past tomorrow night: a reusable pack that turns a set of backlog phases into a coordinator prompt, computed from the backlog rather than written by hand. The inputs it needs are already mechanical - depends_on gives the waves, src.governance.backlog.collisions() gives which phases inside a wave may be claimed together, and max_active bounds the rest. Today that analysis was run ad hoc in a session and pasted into prose; a second run would redo it from scratch.
+
+Distinct from the idea-partition pack (PLAN-025, PROMPT-034), which partitions ideas into programmes. This one sequences already-planned phases into dispatchable waves and would consume the partition's output rather than duplicate it. Related to 000234: the coordinator's usefulness is bounded by how coarse the lock table is, so a pack that reports "your ceiling is 2, here is why" is more honest than one that assumes agents can always be added.
+
+**Links**
+
+- relates_to → `000234`
