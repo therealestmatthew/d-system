@@ -125,16 +125,19 @@ by diff review, and this change moves more weight onto it.
 
 ## Verification
 
+Both run after the rebase onto `dev`, which is the run that decides whether the branch may
+integrate.
+
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 224 documents, 24 memories, 180 backlog phases
+Governance OK: 27 systems, 225 documents, 24 memories, 181 backlog phases
 ```
 
 `uv run pytest`
 
 ```
-580 passed, 2 warnings in 53.95s
+580 passed, 2 warnings in 42.10s
 ```
 
 Acceptance condition 4 was checked mechanically rather than by reading the diff — parsing both
@@ -164,4 +167,5 @@ top-level keys changed: []
 - **A peer merged `phase-prog-02` into `dev` between this session's preflight and its claim**,
   taking the backlog from 170 to 180 phases and releasing `sys-ui`. The claim was re-validated
   against the merged state. The ten new phases are `phase-wbf-*`; the `phase-arch-*` set is
-  unchanged at nineteen.
+  unchanged at nineteen. A further peer commit (`phase-wbf-11`, backfilled) landed during the
+  session and was picked up by the rebase; the `phase-arch-*` set is still nineteen.
