@@ -72,7 +72,7 @@ terminal functionality on Windows.
    $env:VITE_API_TARGET="http://localhost:8010"
    npm run dev -- --port 5180 --strictPort
    ```
-   Without `VITE_API_TARGET`, the dev proxy silently targets `http://localhost:8000` instead of
+   Without `VITE_API_TARGET`, the dev proxy silently targets `http://127.0.0.1:8000` instead of
    the demo backend on `8010`, and every stage route 404s if anything else holds port 8000.
    The `--strictPort` flag ensures the frontend fails rather than silently falling back to
    another port.
