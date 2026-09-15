@@ -19,14 +19,99 @@ depends_on:
 
 ## Phase
 
-`phase-prog-02` — finalize the workbench features and defects plan (`P11`), the placeholder
-[PLAN-027](../01-plans/PLAN-027-workbench-features-defects.md) that carried no design and no
+`phase-prog-02` — Finalize the workbench features and defects plan (P11): turn the placeholder
+[PLAN-027](../01-plans/PLAN-027-workbench-features-defects.md) into a real requirement, design and
 implementation phases.
 
-**This phase was taken out of `next_up` order on the owner's explicit ruling, not on a queue read.**
-`next_up` read `phase-part-02`, `phase-prog-01`, `phase-port-02`, `phase-ses-01`, `phase-prog-02`;
-the first four were deliberately jumped on the owner's instruction, and the queue was not reordered
-to make the jump look routine.
+**Taken out of `next_up` order on the owner's explicit ruling, not on a queue read.** `next_up` read
+`phase-part-02`, `phase-prog-01`, `phase-port-02`, `phase-ses-01`, `phase-prog-02`; the first four
+were deliberately jumped on the owner's instruction, and the queue was not reordered to make the jump
+look routine.
+
+## Verification
+
+Both entries in the phase's `verification` list, run in the worktree at close, after the rebase onto
+`dev`.
+
+`uv run python -m src.governance` — must exit 0:
+
+```
+Governance OK: 20 systems, 224 documents, 24 memories, 180 backlog phases
+EXIT=0
+```
+
+`uv run python -m src.governance --ready` — must show the new phases:
+
+```
+180 phases; every phase has a one-session budget.
+active: 2, complete: 69, deferred: 5, ready: 35, waiting: 69
+| phase-wbf-01 | Open a viewer tab's file in a new browser tab on double-click | — | 2 | ready | — | phase-prog-02 |
+| phase-wbf-07 | Decide the external terminal interaction API | — | 2 | ready | — | — |
+| phase-wbf-09 | Terminal route defects: cap race, shell override, close reason | — | 2 | ready | — | — |
+| phase-wbf-02 | Show a last-modified badge on the HTML Viewer header | — | 3 | ready | — | phase-prog-02 |
+| phase-wbf-10 | Silence the flag-off workbench probes | — | 4 | ready | — | phase-prog-02 |
+```
+
+Five of the ten are `ready`; `phase-wbf-03` through `-06` and `-08` are `waiting` on `phase-arch-01`
+or on their own group's ADR, which is the intended shape. Phase count moved 169 → 180 (ten from this
+session, one from a peer merged during it).
+
+Not in the phase's list, but run because the work touches governed documents and the idea log:
+
+```
+$ uv run pytest
+580 passed, 2 warnings
+```
+
+It failed twice before reaching that, and both are recorded rather than retried into silence:
+
+```
+FAILED test/test_ideas.py::test_the_committed_markdown_matches_regenerated_output
+1 failed, 579 passed, 2 warnings
+```
+— appending idea events left `docs/00-working/ideas.md` stale; `tools/generate_ideas_md.py` fixed it.
+
+```
+FAILED test/test_codes.py::test_committed_catalog_matches_regenerated_output
+FAILED test/test_codes.py::test_catalog_flag_writes_committed_file
+2 failed, 578 passed, 2 warnings
+```
+— a peer's phase merged during the session, so the rebase left the committed catalog stale;
+`--catalog` fixed it.
+
+## Acceptance
+
+1. **PLAN-027 carries no placeholder banner and states a chosen design — Met.** Zero matches for the
+   banner text or "Do not build from this document" in the file; one `## The chosen design` section,
+   carrying six numbered decisions.
+2. **A requirement document exists for P11 and every row maps to at least one phase — Met.**
+   `REQ-012` carries 23 `R`-numbered rows; `PLAN-027`'s coverage table carries 23 rows naming
+   phases, and all ten `phase-wbf-*` ids it names resolve to a defined phase in `backlog.yaml`.
+   Every phase carries at least one row.
+3. **G56 is recorded as already delivered and gets no implementation phase — Met.** `000099` and
+   `000129` appear in `REQ-012`'s delivered table and in `PLAN-027`'s group table marked
+   `[DELIVERED]`. In `backlog.yaml` they appear only in historical `phase-wb-*` result text and in
+   `phase-arch-17`'s source note; no `phase-wbf-*` phase mentions either, and none implements G56.
+4. **phase-prog-02 is removed from next_up in the same change that completes it — Met.** `next_up`
+   no longer lists it; the removal is in commit `5680d2a`, the same commit that finalized the plan,
+   the requirement and the ten phases.
+
+## Backlog
+
+`phase-prog-02` — status at checkpoint time: `active`. All four acceptance conditions `Met`, which
+is what makes this record eligible for `session-close`'s review; the checkpoint itself never writes
+`complete`.
+
+`next_up` pruned of `phase-prog-02`. Ten `phase-wbf-*` phases added, all `queued`; none was added to
+`next_up`, matching how `PLAN-028`'s `phase-arch-*` phases were registered.
+
+## Unresolved
+
+**The four delivered ideas have no honest terminal status, and are held in place rather than
+mis-stated.** `000110`, `000118` and `000119` remain `triaged`; `000232` remains `open`. This is the
+one piece of the session's work that is deliberately not finished, and it is unresolved in the
+lifecycle, not in this phase — the phase's acceptance does not require a status move. Tracked as
+`000236` and by the standing note in `PLAN-027`. See *The idea-status gap* below.
 
 ## What was produced
 
@@ -119,35 +204,6 @@ back; `G49` and `G51` landing at the top of their ranges because their ADRs are 
 **The delivery shrank the work without shrinking the phase count.** A coordinator should expect
 `phase-wbf-01`, `-02` and `-10` to be short sessions, not expect fewer of them.
 
-## Verification
-
-Both commands from the phase's `verification` list, run in the worktree after the work:
-
-```
-$ uv run python -m src.governance
-Governance OK: 20 systems, 223 documents, 24 memories, 179 backlog phases
-EXIT=0
-```
-
-```
-$ uv run python -m src.governance --ready
-179 phases; every phase has a one-session budget.
-active: 2, complete: 69, deferred: 5, ready: 34, waiting: 69
-...
-| phase-wbf-01 | Open a viewer tab's file in a new browser tab on double-click | — | 2 | ready | — | phase-prog-02 |
-| phase-wbf-07 | Decide the external terminal interaction API | — | 2 | ready | — | — |
-| phase-wbf-09 | Terminal route defects: cap race, shell override, close reason | — | 2 | ready | — | — |
-| phase-wbf-02 | Show a last-modified badge on the HTML Viewer header | — | 3 | ready | — | phase-prog-02 |
-| phase-wbf-10 | Silence the flag-off workbench probes | — | 4 | ready | — | phase-prog-02 |
-```
-
-Five of the ten are `ready`; the other five are `waiting` on `phase-arch-01` or on their own
-group's ADR, which is the intended shape. The phase count moved 169 → 179.
-
-`uv run pytest` — **580 passed**. It failed once first, on
-`test_ideas.py::test_the_committed_markdown_matches_regenerated_output`: appending idea events left
-`docs/00-working/ideas.md` stale. Regenerating it with `tools/generate_ideas_md.py` fixed it. Recorded
-because the failure was real, not because it survived.
 
 ## What was found wrong in the source material
 
