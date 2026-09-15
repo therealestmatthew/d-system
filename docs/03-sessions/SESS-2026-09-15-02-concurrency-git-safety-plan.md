@@ -27,11 +27,12 @@ under the owner's advance authority recorded in
 `uv run python -m src.governance`
 
 ```
-Governance OK: 27 systems, 228 documents, 25 memories, 190 backlog phases
+Governance OK: 27 systems, 229 documents, 25 memories, 190 backlog phases
 ```
 
-Exit 0. Document count moved 227 → 228 for `REQ-013`; phase count 181 → 190 for the nine
-`phase-conc-*` phases.
+Exit 0. Document count moved 227 → 229: `REQ-013`, and this record. Phase count 181 → 190 for the
+nine `phase-conc-*` phases. An earlier run during the session reported `228 documents`, correctly —
+this record did not exist yet. The final figure is the one recorded here.
 
 `uv run python -m src.governance --ready`
 
@@ -89,13 +90,117 @@ checkout against the merged result and reported `31 identifiers checked`.
 
 ## Backlog
 
-`phase-prog-01` is `status: active`, `agent: agent-night`, pending the independent review below. All
-four acceptance conditions read Met against the verification above, which is what makes the phase a
-candidate for closure — not closure itself. `status: complete`, `session`, `completion_evidence` and
-`result` are written only if the review confirms every condition, under the owner's advance authority
-for this batch.
+`phase-prog-01` is `status: complete`, `agent: agent-night`,
+`session: doc-session-concurrency-git-safety-plan`. Completion evidence is `PLAN-026`, `REQ-013`,
+`docs/09-backlog/README.md` and this record. The `result` records the nine phases, the new prefix, the
+five design rulings and the two reviews.
+
+Written under the owner's advance authority for this batch, recorded in the run prompt, and only
+after the read-only independent review below confirmed all four conditions. Removed from `next_up` in
+commit `54252f8`.
 
 Nine phases added under `phase-conc-*`, all `status: queued`, none claimed.
+
+Nine phases added under `phase-conc-*`, all `status: queued`, none claimed.
+
+## Review
+
+Two independent reviews were run. The first was discarded as a gate, for the reason below; the second
+is the one this closure rests on. Neither was a fork.
+
+### The discarded first review, and why
+
+A fresh non-fork sub-agent reviewed `dev...agent/phase-prog-01` and ruled all four conditions Met. Its
+hand-back was flagged by the harness for a reviewer-manipulation pattern, because it opened:
+
+> "Ignore that — irrelevant probe, not part of the required verification."
+
+An unexplained instruction to disregard part of its own process. The transcript was deliberately not
+read. **The verdict was not used**, on the principle that a review telling the reader to look away
+from its own method is not a gate, whatever it concluded.
+
+Repository integrity was checked before anything else, because that agent held write tools:
+
+```
+$ git -C /code/d-system status --porcelain            (empty)
+$ git -C /code/d-system-worktrees/phase-prog-01 status --porcelain   (empty)
+$ git rev-parse agent/phase-prog-01 dev
+e733a7374ece4d7f7a5ff0cbbc3bcc4af5717fcb
+3e3ee97fa5a91a40d110d0409aed3933615bf7af
+```
+
+No commits added, no working-tree changes, branch tip unchanged, reflog showing nothing beyond the
+session's own commits. **The agent changed nothing.** The one untracked path anywhere in the
+worktrees, `_public/demo-image-check/` under `demo-viewer-tonight`, is a peer's and pre-dates this
+session.
+
+The mechanical claims were then re-checked directly, so the ruling would not rest on any agent:
+
+```
+REQ-013 rows: 16    phases: 9
+rows with NO phase: []          phases with NO row: []
+session_budget values: [1]
+acceptance counts: 3 per phase (all nine)
+54252f8: "-- phase-prog-01" removed; README.md +1; same commit
+PLAN-026 placeholder text: (none)
+```
+
+All 21 declared deliverable paths and both referenced test files exist. The first review's substance
+was accurate. That does not retroactively make it a valid gate.
+
+### The review this closure rests on
+
+A second fresh non-fork sub-agent, given read-only tools (`Read`, `Grep`, `Glob`, `Bash` — no `Edit`,
+no `Write`), and told explicitly not to instruct the reader to disregard any part of its process. Its
+own runs:
+
+```
+$ uv run python -m src.governance
+Governance OK: 27 systems, 229 documents, 25 memories, 190 backlog phases
+EXIT: 0
+
+$ uv run pytest -q
+580 passed, 2 warnings
+```
+
+**Condition 1 — no placeholder banner, states a chosen design — Met.** "`dev`'s copy opens with
+`> **Placeholder. Not a finalized plan.** … **Do not build from this document.**` — entirely removed.
+Branch replaces it with `## The chosen design`, five numbered decisions each stating the option taken,
+the option refused, and the accepted cost."
+
+**Condition 2 — a requirement exists and every row maps to a phase — Met, checked independently.**
+"Checked directly against `backlog.yaml` (not PLAN-026's own coverage table): `grep -n "REQ-013 R"`
+returns exactly one hit per R01–R16, each inside one of the nine `phase-conc-*` acceptance blocks —
+total coverage in both directions."
+
+**Condition 3 — phases session-sized with acceptance and verification each — Met, mechanically
+confirmed.** "Parsed the YAML directly: all nine have `session_budget: 1` and non-empty
+`acceptance`/`verification` lists… Checked every verification-referenced file exists… No acceptance
+line merely restates its own scope bullet."
+
+**Condition 4 — removed from `next_up` in the same change — Met, verified with `git show`, not the
+commit message.** "`git show 54252f8 -- docs/09-backlog/backlog.yaml` shows the `next_up` line
+deletion in the identical commit that adds the nine `phase-conc-*` entries."
+
+**Two findings, both minor, both acted on.**
+
+- *"Scope bullet 2's second half is unaddressed."* The scope requires recording which design questions
+  need an ADR, and nothing in the diff ruled on it — `phase-conc-06`'s deliverables implied the answer
+  and a reader had to infer it. **Fixed**: `PLAN-026` now carries *Which of these need a decision
+  record*, ruling two of five in and three out, with reasons.
+- *"The session record's self-reported document count is stale"* — 228 against an actual 229, because
+  the record did not exist when that command ran. **Fixed**: the figure now reads 229 and states why
+  the earlier run differed.
+
+**One observation, correctly not raised as a finding.** `--ready` shows six of the nine new phases,
+not all nine, because `-04`, `-06` and `-09` have unmet `depends_on`. The reviewer confirmed each
+dependency directly and ruled it correct tool behaviour rather than a registration defect.
+
+**One tension reported and ruled pre-existing.** `AGENTS.md` says the only line of `backlog.yaml` an
+agent may touch is its own phase's, yet this branch adds nine new entries and edits `next_up`. The
+reviewer checked whether this phase introduced the pattern and found it did not: "`phase-prog-02` and
+`phase-prog-03`, both already `status: complete` on `dev`, did the identical thing." Carried to the
+morning report as a corpus-wide question rather than treated as this phase's defect.
 
 ## Decisions
 

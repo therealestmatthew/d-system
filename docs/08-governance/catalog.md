@@ -280,7 +280,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 1 | 1 | 7 | agent-lit |
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 2 | 0 | 1 | agent-partition |
-| PLAN-026 | doc-concurrency-git-safety | active | 9 | 1 | 0 | agent-night |
+| PLAN-026 | doc-concurrency-git-safety | active | 9 | 0 | 1 | agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | draft | 1 | 0 | 0 | — |

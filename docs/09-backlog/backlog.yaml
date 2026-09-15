@@ -7157,7 +7157,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-night
   priority: 1
   session_budget: 1
@@ -7181,6 +7181,34 @@ items:
   - docs/09-backlog/README.md
   next_action: Scope G10 first. It is no longer blocked, it is the largest group at 3-4
     phases, and G09 is sequenced behind its document rewrite.
+  session: doc-session-concurrency-git-safety-plan
+  completion_evidence:
+  - docs/01-plans/PLAN-026-concurrency-git-safety.md
+  - docs/06-requirements/REQ-013-concurrency-git-safety.md
+  - docs/09-backlog/README.md
+  - docs/03-sessions/SESS-2026-09-15-02-concurrency-git-safety-plan.md
+  result: >-
+    Finalized P3. Wrote REQ-013 with sixteen observable rows grounded in four failures recorded in
+    the repository - the abandoned claim with no recovery path (000025), the git stash that destroyed
+    a peer's uncommitted work and the session code allocated twice (000041), the absent branch
+    protection on main (000066), and enforcement living in prose that agents skip (000012, 000014,
+    000051). Replaced PLAN-026's placeholder with five design decisions, each stating the option
+    refused and the cost accepted: staleness is reported by a check and released only by a human,
+    because the evidence a check gathers is about artifacts and never about the agent; the clobber
+    guard sits at integration rather than on git stash, because git has no stash hook and stashing
+    your own work is ordinary; only dev-to-main is gated, because a pull request per agent branch
+    would hold claims open across sessions; the backup obligation is a recorded posture and accepting
+    the risk counts; and the enforcement question is answered once as a placement rule then applied.
+    Ruled which decisions need a decision record - two of five, both already assigned to phases.
+    Registered nine phases under phase-conc-*, sized against a partition estimate of 6-8 with both
+    deltas explained. phase-conc-09 is owner-executed: no agent may make 000091's AGENTS.md change.
+    Verification green - governance exits 0 at 229 documents and 190 phases, --ready shows six of the
+    nine new phases with -04, -06 and -09 correctly waiting on prerequisites, and 580 tests pass. Two
+    independent non-fork reviews ran. The first was discarded as a gate after its hand-back was
+    flagged for a reviewer-manipulation pattern; repository integrity was verified unchanged and its
+    mechanical claims re-checked by hand. The second, given read-only tools, confirmed all four
+    conditions with two minor findings, both fixed before close.
+
 - id: phase-prog-02
   title: Finalize the workbench features and defects plan (P11)
   plan: doc-workbench-features-defects

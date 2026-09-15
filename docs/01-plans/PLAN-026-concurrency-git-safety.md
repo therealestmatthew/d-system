@@ -142,6 +142,27 @@ is a function of suite runtime, and the suite runs 580 tests in about a minute. 
 disposition in the placement rule's phase and no implementation phase of its own. Building a
 provenance check to save sixty seconds is work the programme cannot justify today.
 
+### Which of these need a decision record
+
+The phase's scope requires ruling on this rather than leaving it to be inferred. **Two of the five
+decisions need a governed decision record; three do not, and neither ruling creates a new document in
+this phase.**
+
+- **Decision 3 (branch topology) amends `ADR-003` rather than superseding it.** `ADR-003` decided
+  worktree-isolated agents over a disjoint backlog, and its claim model is what decision 3 reasons
+  from. Adding a gate on `dev`-to-`main` does not overturn that model; it bounds where the trunk
+  ends. `phase-conc-06` declares `ADR-003` among its deliverables and carries the amendment. A new
+  ADR would leave two live documents describing one branch model, which is `R10`'s defect.
+- **Decision 4 (the backup posture) needs a new ADR**, because there is no existing decision record
+  about durability of non-git state, and `ADR-009` addresses only where the portfolio lives.
+  `phase-conc-07` declares `docs/04-decisions/` for exactly this.
+- **Decisions 1, 2 and 5 need none.** Each is a design choice whose reasoning belongs with the
+  mechanism it governs, and each has a phase that records it where a reader will meet it:
+  `phase-conc-04` writes the recovery decision into `GOV-003` alongside the incidents that motivated
+  it, `phase-conc-02` records the guard's placement in `OPS-001`, and `phase-conc-08`'s placement
+  rule is itself the record. Minting an ADR for a choice already written into the governing document
+  adds a second place for it to drift.
+
 ### The `G13` exception: one phase no agent may execute
 
 `000091`'s replacement text for `AGENTS.md` is already approved and recorded verbatim on the idea. The
