@@ -120,7 +120,7 @@ checkable.
 | R09 | A palette library exists where each palette is a named, pre-vetted set of roles, selectable per page or per family. | Apply two different palettes to the same template and confirm both render coherently. Confirm the palette is data, not a code branch. |
 | R10 | Each palette states its role set and whether it carries light and dark variants. | Read a palette definition for its roles — background, surface, accent, text, at minimum — and its variant coverage. `000085` leaves both open; this row closes them. |
 | R11 | A designer agent extracts a shipped page's token set, type scale, component patterns and interaction shell into a named family following the existing convention. | Run it against one of the five pages in `_public/` and compare the output family against `atlas`'s structure — header comment with provenance and usage, token contract, canonical component markup. |
-| R12 | No phase in this programme builds a report page whose existence `phase-idg-08` is ruling on. | Grep this programme's phases for an ideas-and-backlog page deliverable. Finding one means the boundary was crossed; the page is `P1`'s to decide and `P9`'s only to supply assets for. |
+| R12 | No phase in this programme builds a report page whose existence `phase-idg-08` is ruling on. | Inspect each phase's `deliverables` field, not its prose. A violation appears as a deliverable; the prohibition itself appears in `scope`, so a whole-entry grep flags the rule stating itself and settles nothing. Finding such a deliverable means the boundary was crossed; the page is `P1`'s to decide and `P9`'s only to supply assets for. |
 | R13 | A governance atlas page ships in the atlas family, covering the document-code series and allocator, the backlog protocol and claim model, the `GOV` series, and the idea lifecycle and sanctioned writer. | Open the page and confirm all four subjects appear. Confirm it uses `templates/html/atlas-page.html` and `templates/styles/atlas.css` rather than a new family. |
 
 ## What each requirement is not
@@ -135,6 +135,11 @@ state the audit establishes.
 
 **R12 is a boundary, not a prohibition on report pages.** `P9` may build page *assets* freely. What it
 may not do is decide whether a particular report exists, which is `phase-idg-08`'s ruling.
+
+**R12 is checked against `deliverables`, deliberately.** Running the obvious whole-entry grep over
+this programme returns `phase-des-01`, whose scope says *"Do not build or decide on any report page"*
+— the rule quoting itself. A check that cannot tell a prohibition from a violation would report a
+breach on the one phase that restates the boundary.
 
 **R13 is content, not automation.** The atlas family exists and works; this row asks for a page built
 from it, which is why `000093` is one phase and independent of the rest.
