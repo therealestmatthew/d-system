@@ -180,8 +180,8 @@ Thirteen phases under `phase-agx-*`, registered in [the backlog index](../09-bac
 | `phase-agx-05` | Write the delegation-scoping methodology, including the runtime-evidence convention | `G19`, `G22` | `01`, `02` |
 | `phase-agx-06` | Measure the methodology against outcomes and change at least one rule | `G19` | `05`, `04` |
 | `phase-agx-07` | Extend `_tmpagent` into a shared state model without a second lock table | `G21` | `02` |
-| `phase-agx-08` | Agent engineering: guides, grounded in this repository's incidents | `G14` | `02` |
-| `phase-agx-09` | Agent engineering: orchestration, with the sensors and context-pipeline boundaries | `G14` | `02`, `08` |
+| `phase-agx-08` | Agent engineering: guides (`000079`), grounded in this repository's incidents | `G14` | `02` |
+| `phase-agx-09` | Agent engineering: orchestration (`000082`), with the `000080`/`000081` boundaries | `G14` | `02`, `08` |
 | `phase-agx-10` | Build the lifecycle agent roster, without a planner role | `G16` | `02`, `08` |
 | `phase-agx-11` | Build the expander and the minimalist, and prove they disagree | `G17` | `10` |
 | `phase-agx-12` | Rule the arbiter's authority boundary, then build it | `G17` | `11` |

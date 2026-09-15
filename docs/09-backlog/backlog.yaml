@@ -9972,7 +9972,7 @@ items:
   depends_on:
   - phase-agx-02
   scope:
-  - 'Write the guides concern of the agent-engineering framework: system prompts, AGENTS.md files, constraint
+  - 'Write the guides concern of the agent-engineering framework, idea 000079 - system prompts, AGENTS.md files, constraint
     documents - what an agent is told.'
   - Ground every claim in an incident recorded in this repository rather than in general principle. AGENTS.md's
     drift - five documents asserting there was no remote for a day after there was one - and the agent
@@ -10007,7 +10007,7 @@ items:
   - phase-agx-02
   - phase-agx-08
   scope:
-  - 'Write the orchestration concern: routing, multi-agent coordination and recovery paths, grounded in
+  - 'Write the orchestration concern, idea 000082 - routing, multi-agent coordination and recovery paths, grounded in
     the claim protocol that already works and the collisions it answered.'
   - 'State the boundaries for the two thinner concerns rather than giving each a phase: sensors'' live-monitoring
     half belongs to phase-agx-01 and -05, and context pipelines is a cross-reference to P6''s G25, whose
