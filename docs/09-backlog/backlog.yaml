@@ -11745,6 +11745,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   - sys-portfolio
@@ -11752,7 +11753,8 @@ items:
   status: queued
   priority: 2
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-irs-04
   scope:
   - Dispatch one triage agent per idea automatically when tools/append_idea.py records an add event,
     without changing the writer's event contract or the log format.
@@ -11838,8 +11840,9 @@ items:
     already embody the pattern, and generalize their contract form.
 - id: phase-irs-04
   title: LangGraph orchestrator skeleton with interrupt gates and the thin-state rule
-  plan: doc-idea-realization-system-plan
+  plan: doc-irs-orchestrator-design
   sources:
+  - doc-irs-orchestrator-design
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
   systems:
