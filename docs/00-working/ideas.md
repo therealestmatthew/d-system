@@ -1282,6 +1282,7 @@ PROPOSED LINK: 000028 --relates_to--> 000020 (MCP/Librarian coordination is comp
 - relates_to ← `000029`
 - relates_to ← `000030`
 - relates_to ← `000031`
+- relates_to ← `000249`
 
 ---
 
@@ -11698,3 +11699,35 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 - **finding** by agent-fable (2026-09-15T22:37:05-04:00): Owner ruling, round 3 (2026-09-15, via AskUserQuestion at PLAN-039.01 design time): (9) Begin with deeper design - the orchestrator child plan PLAN-039.01 is written before any phase-irs build phase is claimed. (10) Process model: daemon + watcher - a persistent orchestrator process that reacts to events (idea appends, gate decisions, thresholds) rather than a per-invocation CLI runner or a FastAPI-embedded service. Chosen with the stated overlap against P5's supervised worker and trigger gateway in view; PLAN-039.01 must draw that boundary explicitly: the daemon watches repo-internal events only, external triggers remain phase-auto-03's, and the supervised worker, if built, hosts execution agents rather than the graph.
 
 </details>
+
+**Links**
+
+- extended_by ← `000248`
+- relates_to ← `000249`
+
+---
+
+## 000248 · Expand the orchestrator daemon into a host for other always-on agents
+
+**Created 2026-09-15T23:15:55-04:00 · Status: `open`**
+
+The PLAN-039.01 daemon's skeleton - single-instance lock, watcher registry, tick loop, ledger, kill switch, and the budget/dispatch adapter with role-contract binding - is generic always-on infrastructure, not idea-pipeline-specific. The owner wants to explore, in more detail, expanding it to host other always-on agents beyond the idea realization pipeline. No specific agent is in mind yet; the exploration is the point. The design's seam is already there: a new always-on behavior arrives as either a new watcher (another repo-internal event source that wakes the tick) or a new run kind (another graph beside intake/batch/unit/realization with its own start condition, gates and re-derivation row), and every addition inherits the kill switch, budgets, repo-wins recovery, audit ledger and manual-tick degraded mode. Constraint the exploration must respect: expansions land as new watchers or run kinds through the normal plan-and-phase path, not by the daemon quietly accreting jobs, and the daemon schedules rather than becoming a general process supervisor (phase-auto-05's territory if built).
+
+**Links**
+
+- extends → `000247`
+- relates_to ← `000249`
+
+---
+
+## 000249 · Watch for external events beyond the repository as pipeline triggers
+
+**Created 2026-09-15T23:16:02-04:00 · Status: `open`**
+
+The owner wants the orchestrator's event surface explored beyond repo-internal watchers: reacting to things that do not fall within the repository - external events arriving from the outside world. PLAN-039.01 deliberately scopes the daemon's watchers to repo-internal events only and names phase-auto-03's trigger gateway (idea 000028, PLAN-032/P5) as the sole door to the outside, conditional on the phase-auto-01 design ruling. This idea asks for the detail of that outside half in the daemon's context: what external event sources matter (webhooks, schedules, mail, other systems), and how they compose with the daemon - the stated clean composition being that the gateway injects events by writing where the daemon's watchers already look, so the daemon hosts always-on behavior while the gateway remains the only external door. Exploratory; no specific external source is chosen yet.
+
+**Links**
+
+- relates_to → `000247`
+- relates_to → `000028`
+- relates_to → `000248`
