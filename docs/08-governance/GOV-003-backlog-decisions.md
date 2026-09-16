@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-15'
+updated: '2026-09-16'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -414,3 +414,25 @@ executes and records here when it lands. Until then `PLAN-025`'s three check-ins
 Second, no standing owner-only rule is delegated: `/session-close` remains owner-invoked per
 phase, batched but never automated, and `next_up` ranking remains the owner's, with the mapping
 agent proposing and never writing.
+
+## The queued-phase review session may edit unclaimed phases' backlog lines
+
+`AGENTS.md`'s standing rule is that a session touches only its own phase's line in
+`backlog.yaml`. The phase-review session that [PROMPT-035](../02-prompts/PROMPT-035-queued-phase-review-pack.md)
+kicks off exists to critique and enhance the whole idea-realization build queue — roughly 23
+queued phases the session has not claimed — and so needs exactly the permission the rule
+withholds.
+
+**The decision, made by the owner on 2026-09-16 in approving the revised pack:** the exception
+is **pre-authorized in the pack itself** rather than gated at runtime. Its bounds travel with
+it: the grant covers only the in-scope phases' lines, the top-level `updated` date and the
+forced catalog regeneration; before every enhancement dispatch the session re-checks
+`--ready` and skips, untouched, any phase a peer has claimed since the scope froze, reporting
+the skips; `next_up`, status fields, `agent` fields and every other document stay out of
+reach, and integration into `dev` still waits on the owner's explicit yes with the diff in
+front of them.
+
+**Why recorded here:** an agent reading `AGENTS.md` during that session would correctly
+conclude the edits are forbidden. This entry is the authority it should find when it goes
+looking, and the alternatives — a runtime owner gate before each run, or patch-file-only
+enhancement — were offered and declined in the same ruling.
