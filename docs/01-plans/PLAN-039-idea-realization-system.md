@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-16'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-idea-graph-lifecycle, doc-agent-engineering-delegation, doc-autonomous-agent-operations, doc-repeatable-idea-partition]
 ---
@@ -54,8 +54,9 @@ phases to them.
 
 ## Implementation phases
 
-Thirteen phases under `phase-irs-*`, registered in the backlog. None enters `next_up`; per the
-owner's ruling this track does not jump the queue, and its ordering ratification is itself a G3
+Fifteen phases under `phase-irs-*`, registered in the backlog (two — the batch and realization
+graphs — added by the 2026-09-16 audit revision of `PLAN-039.01`, which found them unowned). None
+enters `next_up`; per the owner's ruling this track does not jump the queue, and its ordering ratification is itself a G3
 decision when the time comes.
 
 | Phase | Title | Depends on | Requirements |
@@ -63,7 +64,7 @@ decision when the time comes.
 | `phase-irs-01` | Stopgap triage dispatch on append, with the reconciling sweep | — | R06, R07 |
 | `phase-irs-02` | Consolidate `PLAN-025`'s check-ins into Gate 2 and record the amendment | `phase-part-03` | R01, R08 |
 | `phase-irs-03` | Write the pipeline role contracts | — | R03, R13, R23 |
-| `phase-irs-04` | LangGraph orchestrator skeleton: graph, checkpointer, interrupt gates, thin-state rule | `phase-irs-03` | R16–R19, R08 |
+| `phase-irs-04` | LangGraph orchestrator skeleton: four run kinds, tick and lock, interrupt gates, thin-state rule, tracked ledger and decision inbox | `phase-irs-03`, `phase-auto-02` | R16–R19 |
 | `phase-irs-05` | Phase-fit procedure and agent | `phase-idg-10` | R11 |
 | `phase-irs-06` | Three-altitude review procedure with the interim adversarial engine | `phase-idg-10` | R09, R10 |
 | `phase-irs-07` | Dependency-mapping agent and the G3 ratification flow | `phase-idg-12` | R05 |
@@ -71,7 +72,9 @@ decision when the time comes.
 | `phase-irs-09` | Terminal `delivered` status and the realization check | `phase-idg-01` | R15 |
 | `phase-irs-10` | Learning loop: wire rejections, findings and realization outcomes into the anti-pattern store | `phase-agx-03`, `phase-irs-09` | R25 |
 | `phase-irs-11` | Run budgets, hard caps and the kill switch | `phase-irs-04` | R20, R21 |
-| `phase-irs-12` | End-to-end trace, forced-failure drill and metrics baselines | `phase-irs-05`–`08` | R12, R24 |
+| `phase-irs-12` | End-to-end trace, forced-failure drill and metrics baselines | `phase-irs-05`–`08`, `-14`, `-15` | R12, R24 |
+| `phase-irs-14` | Batch graph: per-track fan-out, per-plan G3 interrupts, amend-as-re-key, the plan→ideas trace | `phase-irs-04` | R05, R08 |
+| `phase-irs-15` | Realization graph against the delivered-state ruling | `phase-irs-04`, `phase-irs-09` | R15 |
 | `phase-irs-13` | Gate queue and decision-ready presentation, including batched completion review | `phase-irs-04` | R02, R04 |
 
 Requirement coverage: every `REQ-022` row maps to a phase above except R09's planner half
@@ -82,7 +85,9 @@ half (owned by `PLAN-025`, amended by `phase-irs-02`). Every phase carries at le
 
 The genuinely parallel front at the start is `phase-irs-01` and `phase-irs-03` — neither
 depends on anything, and the stopgap is the owner-ruled immediate build. The critical path runs
-`03 → 04 → 08 → 12`, with `04` unblocking three phases (`08`, `11`, `13`). Everything else
+`03 → 04 → 08 → 12`, with `04` unblocking five phases (`08`, `11`, `13`, `14`, `15`) — and `04`
+itself now gates on the capability broker (`phase-auto-02`), per the owner's strict broker-first
+ruling of 2026-09-16: the orchestrator dispatches nothing unattended before the broker exists. Everything else
 gates on the sub-programmes: `05`/`06` on the plan-quality standard, `07` on the planner, `09`
 on the schema bundle, `10` on the anti-pattern store, `08` on the broker — the broker-first
 inversion `PLAN-032` itself made. If `phase-auto-01` descopes a P5 component, the named

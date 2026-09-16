@@ -444,6 +444,7 @@ systems:
   - docs/07-architecture/ARCH-006-idea-realization-system.md
   - docs/06-requirements/REQ-022-idea-realization-system.md
   - docs/01-plans/PLAN-039-idea-realization-system.md
+  - docs/01-plans/PLAN-039.01-orchestrator-design.md
   - docs/04-decisions/ADR-018-langgraph-orchestration.md
   depends_on:
   - sys-portfolio

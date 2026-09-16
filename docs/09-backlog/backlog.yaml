@@ -11753,15 +11753,17 @@ items:
   status: queued
   priority: 2
   session_budget: 1
-  depends_on:
-  - phase-irs-04
+  depends_on: []
   scope:
-  - Dispatch one triage agent per idea automatically when tools/append_idea.py records an add event,
-    without changing the writer's event contract or the log format.
-  - Build the reconciling sweep that finds ideas still open after a failed or missed dispatch and
-    re-dispatches them, so the stopgap degrades to batch and never to loss.
-  - Mark the mechanism interim in its own operations document, naming the phase-auto-01 ruling as
-    what decides migration to the trigger gateway or permanence.
+  - Ship a self-contained tool under tools/ - a post-append dispatch hook plus a sweep command - that
+    dispatches one triage agent per idea when the log records a created event, without changing the
+    writer's event contract or the log format, and with no orchestrator dependency in either direction.
+  - Bound dispatch by a creation watermark (ideas appended after the tool's install; the 41 pre-existing
+    open ideas stay with the batch /idea-triage path) and a per-dispatch budget ceiling.
+  - Build the reconciling sweep that finds post-watermark ideas still open after a failed or missed
+    dispatch and re-dispatches them, so the stopgap degrades to batch and never to loss.
+  - Mark the tool interim in its own operations document - phase-irs-04's daemon absorbs its duty and
+    retires it, and the phase-auto-01 ruling decides the external-gateway question separately.
   acceptance:
   - 'REQ-022 R06 holds: a test idea appended to the log is triaged with no human action.'
   - 'REQ-022 R07 holds: a dispatch killed mid-run leaves the idea open and the sweep brings it to
@@ -11773,8 +11775,9 @@ items:
   deliverables:
   - tools/
   - docs/08-governance/
-  next_action: Decide the dispatch mechanism (post-write hook in the writer versus a watcher) against
-    the constraint that the writer stays usable with no orchestrator running at all.
+  next_action: 'The mechanism is ruled in PLAN-039.01 SS10: a standalone post-append hook plus sweep
+    under tools/, watermark-bounded and budget-capped. Start from the hook''s failure mode - the writer
+    must succeed even when dispatch fails.'
 - id: phase-irs-02
   title: Consolidate PLAN-025's check-ins into Gate 2 and record the amendment
   plan: doc-idea-realization-system-plan
@@ -11853,26 +11856,39 @@ items:
   session_budget: 1
   depends_on:
   - phase-irs-03
+  - phase-auto-02
   scope:
-  - Implement the nine-stage graph with stub nodes, the checkpointer under gitignored data/, interrupt
-    nodes for gates G2 through G5, and ledger entries per transition.
-  - Enforce ADR-018's thin-state rule - state carries run identity, stage and references only, and on
-    disagreement the repository wins and the run re-derives.
+  - Implement the four-run-kind skeleton per PLAN-039.01 - the intake graph, the tick (reconcile with
+    watermark and idempotent natural-key starts, start, advance), the flock lock shared by daemon and
+    manual tick, the three-field thin state with per-kind re-derivation by thread re-keying, gate nodes
+    that contain only their interrupt, and the CLI verbs start/stop/status/tick/gate/halt/resume-dispatch.
+  - Ship the tracked run ledger and decision inbox with the idea-log discipline - schemas/run.schema.json
+    and schemas/decision.schema.json, sanctioned writers under tools/ with their OPS documents, dedup
+    keys as designed.
+  - Attended-only operation - no unattended dispatch; every dispatch batch requires an owner-initiated
+    tick with an explicit flag, per the strict broker-first ruling. The daemon refuses to start in a
+    linked worktree and runs in the primary checkout only.
   - Consume claim-protocol recovery from phase-agx-09's deliverables where they exist; define none
     here, per the PLAN-039 boundary table.
   acceptance:
-  - 'REQ-022 R16, R17 and R18 hold: corrupted checkpoint re-derives, a killed run resumes at its gate,
-    and one run is reconstructible from ledger entries alone.'
+  - 'REQ-022 R16 (as amended), R17 and R18 hold: deleting or corrupting the checkpoint store yields
+    re-keyed threads at the re-derived position, a killed run resumes at its gate, and one run is
+    reconstructible from ledger entries alone.'
   - 'REQ-022 R19 holds: the orchestrator package contains no claim-recovery logic of its own.'
+  - A manual tick against a live daemon waits or exits on the lock; it never runs concurrently.
+  - No agent dispatch occurs without the owner-initiated dispatch flag.
   verification:
   - uv run python -m src.governance
   - uv run pytest
   deliverables:
   - src/
   - test/
+  - schemas/
+  - tools/
+  - docs/08-governance/
   - docs/04-decisions/ADR-018-langgraph-orchestration.md
-  next_action: Pin the LangGraph dependency and confine its import surface to one orchestrator package
-    before writing the first node.
+  next_action: Pin the LangGraph dependency and confine its import surface to src/orchestrator/ (graphs/,
+    tick, state, gates) before writing the first node.
 - id: phase-irs-05
   title: Phase-fit procedure and agent
   plan: doc-idea-realization-system-plan
@@ -12093,8 +12109,9 @@ items:
   deliverables:
   - src/
   - test/
-  next_action: Decide where the switch lives so it works when the orchestrator itself is wedged - a
-    file the dispatch path checks is the candidate.
+  next_action: 'The switch location is ruled in PLAN-039.01 SS9: _working/orchestrator-halt, outside
+    regenerable data/, checked by the dispatch path immediately before every dispatch. Build the
+    enforcement and its tests; the halt and resume-dispatch verbs ship with phase-irs-04.'
 - id: phase-irs-12
   title: End-to-end trace, forced-failure drill and metrics baselines
   plan: doc-idea-realization-system-plan
@@ -12112,6 +12129,8 @@ items:
   - phase-irs-06
   - phase-irs-07
   - phase-irs-08
+  - phase-irs-14
+  - phase-irs-15
   scope:
   - Trace one real idea end to end through the assembled pipeline, recording every transition and
     every gate decision.
@@ -12161,3 +12180,73 @@ items:
   - ts/
   next_action: Decide the queue's surface with the owner - the workbench is the natural host but not
     a settled one.
+- id: phase-irs-14
+  title: Batch graph with per-track fan-out and the amend-as-re-key flow
+  plan: doc-irs-orchestrator-design
+  sources:
+  - doc-irs-orchestrator-design
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  scope:
+  - Implement the batch graph covering stages 3 through 7 with LangGraph Send fan-out to one branch
+    per accepted track, a G2 interrupt for the partition and one G3 interrupt per track's plan, so a
+    slow track never blocks a fast one.
+  - Implement the three decision verbs at G2/G3, with amend as re-keying - the owner's amendment is
+    applied to the repository artifact, the branch's thread is abandoned, and reconcile reopens at the
+    position the amended records prove.
+  - Write the plan-to-contributing-ideas trace entry to the run ledger at phase-registration time, per
+    PLAN-039.01 SS8.
+  acceptance:
+  - 'REQ-022 R05 and R08 hold in a test run: a partition proposal reaches G2, each track''s plan reaches
+    its own G3, and an amended G3 resumes from the amended artifact.'
+  - A rejected track ends its branch without disturbing sibling tracks.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  next_action: Build the fan-out against a fixture partition of two tracks with deliberately different
+    speeds, since the independent-branch property is the phase's point.
+- id: phase-irs-15
+  title: Realization graph against the delivered-state ruling
+  plan: doc-irs-orchestrator-design
+  sources:
+  - doc-irs-orchestrator-design
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  - phase-irs-09
+  scope:
+  - Implement the realization graph for stage 9 - started from the ledger's plan-to-ideas trace when a
+    unit run under the plan completes, ending at the terminal delivered state in whichever form
+    phase-irs-09's ruling landed, or at a recorded shortfall finding surfaced at G5.
+  - Cover ideas that entered work without promotion events by reading the registration-time trace
+    entry rather than inferring lineage after the fact.
+  acceptance:
+  - 'REQ-022 R15 holds in a test run: one idea traces from an integrated unit run to its terminal
+    delivered state through a G5 decision.'
+  - An unverifiable capability produces a recorded finding on the idea and no terminal state.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  next_action: Read phase-irs-09's landed ruling first - the graph's terminal write differs between the
+    new-status and annotation-pattern forms.

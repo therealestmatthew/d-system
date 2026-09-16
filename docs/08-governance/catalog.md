@@ -261,6 +261,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-15-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-12-panel-maximize-reexamination.md |
 | SESS-2026-09-15-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-13-idea-realization-system-architecture.md |
 | SESS-2026-09-15-14 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-14-orchestrator-design.md |
+| SESS-2026-09-16-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-01-orchestrator-design-audit-revision.md |
 
 ## Plans and their phases
 
@@ -319,7 +320,7 @@ CI regenerates it and fails on any difference.
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 0 | — |
-| PLAN-039.01 | doc-irs-orchestrator-design | draft | 2 | 0 | 0 | — |
+| PLAN-039.01 | doc-irs-orchestrator-design | draft | 4 | 0 | 0 | — |
 
 ## Held codes
 
@@ -329,4 +330,4 @@ CI regenerates it and fails on any difference.
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-254 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 54, prompt: 34, requirement: 22, session: 98.
+255 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 54, prompt: 34, requirement: 22, session: 99.

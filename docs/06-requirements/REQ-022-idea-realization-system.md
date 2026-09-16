@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-16'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-realization-system]
 ---
@@ -48,7 +48,7 @@ least one phase.
 
 | # | Requirement | Verification |
 |---|---|---|
-| R16 | Graph state is thin: run identity, current stage, and references into durable records; on disagreement the repository wins and the run re-derives | Corrupt a checkpoint's cached field in a test run; confirm re-derivation |
+| R16 | Graph state is thin: run identity, current stage, and references into durable records; on disagreement the repository wins and the run re-derives by abandoning the thread and re-keying a new one at the re-derived position | Delete or corrupt the checkpoint store in a test run; confirm threads are re-keyed at the position the records prove |
 | R17 | A run interrupted at a gate parks durably and resumes in a later process without loss | Kill the orchestrator at a gate; resume; compare state |
 | R18 | Every automated transition writes a ledger entry sufficient to reconstruct the run after the fact | Reconstruct one completed run from the ledger alone |
 | R19 | The orchestrator consumes claim-protocol recovery procedures from `phase-agx-09`'s deliverables and defines none of its own | Grep the orchestrator for claim-recovery logic; audit against the boundary table in `PLAN-039` |
