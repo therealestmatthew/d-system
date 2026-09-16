@@ -1283,6 +1283,7 @@ PROPOSED LINK: 000028 --relates_to--> 000020 (MCP/Librarian coordination is comp
 - relates_to ← `000030`
 - relates_to ← `000031`
 - relates_to ← `000249`
+- relates_to ← `000250`
 
 ---
 
@@ -11648,7 +11649,7 @@ The owner wants the informal process used so far — "the idea realization syste
 
 
 <details>
-<summary>4 finding(s)</summary>
+<summary>5 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-15T17:34:05-04:00): Idea 000247 proposes formalizing the idea realization system into an automated multi-agent pipeline. The repository already has substantial work underway on individual components of this pipeline, though they are not yet formalized as a single coordinated system.
 
@@ -11697,6 +11698,7 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 - **finding** by agent-fable (2026-09-15T17:41:15-04:00): Owner rulings recorded 2026-09-15, taken in conversation via AskUserQuestion at architecture time: (1) Orchestration stack is LangGraph plus the Claude Agent SDK — LangGraph for the pipeline state machine (checkpointing, branching, human-interrupt nodes), the Agent SDK for agent execution; plain LangChain is not the target. (2) Scope is a superseding master plan: one umbrella plan that re-frames PLAN-029 (P1), PLAN-031 (P4), PLAN-032 (P5) and PLAN-025 as sub-programmes of the idea realization system; existing phases are not invalidated, the master plan sits above them. (3) Human-in-the-loop gates are all four proposed: idea approval, partition/track acceptance, plan approval (post-adversarial-review), and integration into dev. Everything between gates is a candidate for full automation with audit-trail oversight. (4) Sequencing: write the architecture and master plan now so P1/P4 phases are shaped with the pipeline in mind; implementation phases gate on the P1 and P4 foundations they orchestrate.
 - **finding** by agent-fable (2026-09-15T19:19:04-04:00): Owner rulings, round 2 (2026-09-15, taken via AskUserQuestion after an adversarial pass on the draft architecture): (5) Gate model: the four gates are decision categories, not literal stops. PLAN-025's three partition check-ins are to be amended/collapsed into one Gate-2 session where the material allows, and a standing fifth gate is added: batched phase-completion review, where the owner runs /session-close over a queue of finished phases in one sitting. No standing owner-only rule is automated away. (6) Trigger path: build a repo-native stopgap now — a minimal dispatch hook on the sanctioned idea writer (append dispatches a triage agent), explicitly interim, migrating to P5's trigger gateway only if phase-auto-01 rules that gateway should exist. (7) Ordering authority: the dependency-mapping agent writes depends_on and systems locks and proposes a next_up ordering; ratifying or reordering is folded into Gate 3 plan approval, and cross-track priority stays the owner's permanently. (8) End state: a stage 9 realization check is added — after integration an agent verifies the delivered capability against the originating idea's text, records evidence, and the idea reaches a terminal delivered status with batched owner sign-off; this stage also feeds the learning loop (anti-pattern store, plan-quality standard). Adversarial findings driving these: PLAN-025 gate collision, per-phase session-close scaling, stage-5 trio mischaracterization, stage-6 misapplication of phase-idg-05 (idea vs phase decomposition), orchestrator overlap with phase-agx-09, P5 gateway dependency with no interim, next_up authority, missing stage 7/8 failure paths, PLAN-025 still draft.
 - **finding** by agent-fable (2026-09-15T22:37:05-04:00): Owner ruling, round 3 (2026-09-15, via AskUserQuestion at PLAN-039.01 design time): (9) Begin with deeper design - the orchestrator child plan PLAN-039.01 is written before any phase-irs build phase is claimed. (10) Process model: daemon + watcher - a persistent orchestrator process that reacts to events (idea appends, gate decisions, thresholds) rather than a per-invocation CLI runner or a FastAPI-embedded service. Chosen with the stated overlap against P5's supervised worker and trigger gateway in view; PLAN-039.01 must draw that boundary explicitly: the daemon watches repo-internal events only, external triggers remain phase-auto-03's, and the supervised worker, if built, hosts execution agents rather than the graph.
+- **finding** by agent-fable (2026-09-16T01:20:51-04:00): Owner rulings, round 4 (2026-09-16, via AskUserQuestion after the Opus audit of PLAN-039.01 - 11 blockers, 17 majors, 10 minors, accepted): (11) Strict broker-first - phase-irs-04 gains depends_on phase-auto-02; until the broker lands the orchestrator runs attended-only, every dispatch owner-initiated via manual ticks. (12) Ledger home: a tracked append-only ledger (_data/runs.jsonl with schema and sanctioned writer, the idea-log pattern) now; future state is a remote location mediated by an MCP server, captured as 000250. (13) The phase-irs-01 stopgap dependency inversion is undone: depends_on returns to empty and the stopgap ships standalone under tools/, absorbed by the daemon at phase-irs-04. (14) dev write authority: the daemon proposes and a human commits (claims and parks appear as queue items naming the exact edit); the future MCP/remote server (000250) later mediates this along with other details.
 
 </details>
 
@@ -11704,6 +11706,7 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 
 - extended_by ← `000248`
 - relates_to ← `000249`
+- relates_to ← `000250`
 
 ---
 
@@ -11712,6 +11715,16 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 **Created 2026-09-15T23:15:55-04:00 · Status: `open`**
 
 The PLAN-039.01 daemon's skeleton - single-instance lock, watcher registry, tick loop, ledger, kill switch, and the budget/dispatch adapter with role-contract binding - is generic always-on infrastructure, not idea-pipeline-specific. The owner wants to explore, in more detail, expanding it to host other always-on agents beyond the idea realization pipeline. No specific agent is in mind yet; the exploration is the point. The design's seam is already there: a new always-on behavior arrives as either a new watcher (another repo-internal event source that wakes the tick) or a new run kind (another graph beside intake/batch/unit/realization with its own start condition, gates and re-derivation row), and every addition inherits the kill switch, budgets, repo-wins recovery, audit ledger and manual-tick degraded mode. Constraint the exploration must respect: expansions land as new watchers or run kinds through the normal plan-and-phase path, not by the daemon quietly accreting jobs, and the daemon schedules rather than becoming a general process supervisor (phase-auto-05's territory if built).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-fable (2026-09-16T01:20:51-04:00): Audit finding M16 (2026-09-16 Opus audit of PLAN-039.01): the generic-host seam this idea depends on is asserted, not designed - the written design has three hardcoded watchers and pipeline-specific start conditions and re-derivation inline in tick.py and state.py, with no watcher registry, run-kind protocol or plug-in point. The seam must be created (a registration interface for watchers and run kinds) before this idea is actionable; the PLAN-039.01 revision records it as future work rather than claiming it exists.
+
+</details>
 
 **Links**
 
@@ -11726,8 +11739,31 @@ The PLAN-039.01 daemon's skeleton - single-instance lock, watcher registry, tick
 
 The owner wants the orchestrator's event surface explored beyond repo-internal watchers: reacting to things that do not fall within the repository - external events arriving from the outside world. PLAN-039.01 deliberately scopes the daemon's watchers to repo-internal events only and names phase-auto-03's trigger gateway (idea 000028, PLAN-032/P5) as the sole door to the outside, conditional on the phase-auto-01 design ruling. This idea asks for the detail of that outside half in the daemon's context: what external event sources matter (webhooks, schedules, mail, other systems), and how they compose with the daemon - the stated clean composition being that the gateway injects events by writing where the daemon's watchers already look, so the daemon hosts always-on behavior while the gateway remains the only external door. Exploratory; no specific external source is chosen yet.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-fable (2026-09-16T01:20:51-04:00): Audit finding M17 (2026-09-16 Opus audit of PLAN-039.01): the stated composition - the gateway injects events by writing where the watchers already look - is blocked by the sanctioned-writer rule: _data/ideas.jsonl has a sole sanctioned writer (tools/append_idea.py, OPS-005) and the decisions inbox is owner-decision plumbing, not general ingress. An external gateway needs a third, neutral inbox with its own schema and writer discipline; 000250's MCP-mediated service is a candidate home for it.
+
+</details>
+
 **Links**
 
 - relates_to → `000247`
 - relates_to → `000028`
 - relates_to → `000248`
+
+---
+
+## 000250 · Mediate orchestrator state and dev writes through a remote MCP server
+
+**Created 2026-09-16T01:20:31-04:00 · Status: `open`**
+
+Future direction named by the owner on 2026-09-16 while ruling on the PLAN-039.01 audit: the orchestrator's durable concerns should eventually move behind a remote service mediated by an MCP server, aligned with the future direction of the repository. Two concerns were named explicitly, with "other details" to follow: (1) the run ledger's future home - for now it is a tracked append-only log (_data/runs.jsonl with schema and sanctioned writer, per the round-4 ruling), with the remote MCP-mediated location as the future state; (2) mediation of the daemon's writes to dev - for now the daemon proposes and a human commits (claims, parks), with the MCP/remote server later mediating that authority along with other details. Exploratory: the idea is to design what such a server owns (ledger storage, decision inbox, write brokering), how it relates to P5's capability broker (phase-auto-02) and trigger gateway (phase-auto-03), and what stays in-repo as the source of truth.
+
+**Links**
+
+- relates_to → `000247`
+- relates_to → `000028`
