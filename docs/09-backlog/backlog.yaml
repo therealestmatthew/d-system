@@ -11971,7 +11971,7 @@ items:
     keys as designed.
   - Attended-only operation - no unattended dispatch; every dispatch batch requires an owner-initiated
     tick with an explicit flag, per the strict broker-first ruling.
-  - Consume claim-protocol recovery from phase-agx-09's deliverables where they exist; define none
+  - Consume claim-protocol recovery from phase-conc-04's deliverables where they exist; define none
     here, per the PLAN-039 boundary table.
   - Flip ADR-018's status from draft to accepted once the intake graph runs end-to-end, per its own
     acceptance clause.

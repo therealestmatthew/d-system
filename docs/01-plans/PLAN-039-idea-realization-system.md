@@ -76,7 +76,7 @@ decision when the time comes.
 | `phase-irs-12` | End-to-end trace, forced-failure drill and metrics baselines | `phase-irs-05`–`08`, `-10`, `-14`, `-15`, `phase-part-03` | R12, R24 |
 | `phase-irs-14` | Batch graph: per-track fan-out, per-plan G3 interrupts, amend-as-re-key, the plan→ideas trace | `phase-irs-04`, `phase-part-03` | R05, R08 |
 | `phase-irs-15` | Realization graph against the delivered-state ruling | `phase-irs-04`, `phase-irs-09`, `phase-irs-14` | R15 |
-| `phase-irs-16` | Daemon process model: lock, signal handling and start/stop/status | `phase-irs-04` | — |
+| `phase-irs-16` | Daemon process model: lock, signal handling and start/stop/status | `phase-irs-04` | R17 |
 | `phase-irs-13` | Gate queue and decision-ready presentation, including batched completion review | `phase-irs-04`, `phase-irs-11`, `phase-irs-06`, `phase-irs-07` | R02, R04 |
 
 Requirement coverage: every `REQ-022` row maps to a phase above except R09's planner half
