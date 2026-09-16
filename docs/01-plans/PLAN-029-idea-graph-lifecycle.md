@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-15'
+updated: '2026-09-16'
 systems: [sys-portfolio, sys-projection, sys-governance]
 depends_on: [doc-idea-graph-lifecycle-requirements, doc-idea-node-classification]
 ---
@@ -189,11 +189,17 @@ range, and the internal distribution is where the interest is.
 `phase-idg-01` is a genuine bottleneck: five phases depend on it directly or transitively, and it is
 the only phase touching `schemas/idea.schema.json`. Nothing in `G01` can start beside it.
 
-Three phases declare `depends_on: []` and do not collide with each other — `phase-idg-06`
-(`.claude/` and the agent roster), `phase-idg-08` (a command and a ruling), `phase-idg-10` (an audit
-document). **Those three plus `phase-idg-01` and `phase-idg-11` are the widest genuinely parallel
-front in this programme, and it is reached at the start rather than in the middle.** A coordinator
-should open with `phase-idg-01` and as many of `-06`, `-08`, `-10`, `-11` as `max_active` allows.
+Five phases declare `depends_on: []`, but not all five clear each other. `phase-idg-08`,
+`phase-idg-10` and `phase-idg-11` all declare `sys-gov-docs` and collide with each other on that
+shared system; `phase-idg-08`'s bare `.claude/commands/` deliverable also collides with
+`phase-idg-06`'s `.claude/commands/idea.md`; and `phase-idg-01`'s bare `docs/04-decisions/`
+deliverable collides with `phase-idg-11`'s `docs/04-decisions/ADR-019-promoted-plan-staging.md`. The
+one mutually disjoint set among the five is `phase-idg-01`, `phase-idg-06` and `phase-idg-10` —
+**that trio is the widest genuinely parallel front in this programme, reached at the start rather
+than in the middle.** `phase-idg-08` clears only `phase-idg-01` of the other four, and
+`phase-idg-11` clears only `phase-idg-06`; neither can join the trio as a fourth. A coordinator
+should open with `phase-idg-01`, `phase-idg-06` and `phase-idg-10` together; `phase-idg-08` can run
+only in place of `phase-idg-06`, and `phase-idg-11` only in place of `phase-idg-01`.
 
 After `phase-idg-01` lands, `G01` serialises hard: `-02` before `-03`, `-02` before `-05`, and `-04`
 before `-07`. The critical path is four deep: `01` → `02` → `03`, with `01` → `04` → `07` the same

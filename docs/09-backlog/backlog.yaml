@@ -32,6 +32,7 @@ next_up:
 - phase-irs-10
 - phase-irs-02
 - phase-irs-12
+- phase-irs-17
 items:
 - id: phase-wbf-11
   title: HTML Viewer image formats, markdown rendering and image presentation (backfill)
@@ -7136,9 +7137,11 @@ items:
   - State that the coordinator writes every analyst and audit report, because subagents
     cannot write report files, and that corpus and report paths resolve in the primary
     checkout because subagents inherit it regardless of the coordinator's worktree.
-  - Write the output to docs/00-working/idea-partition-<YYYY-MM-DD>.md, recording the
-    corpus size, the status filter and the manifest seed, and never edit an earlier
-    partition document.
+  - Write the output to docs/00-working/idea-partition-<YYYY-MM-DD>.md, where the date is
+    the corpus's build date, recording the corpus size, the status filter and the
+    manifest seed; never edit an earlier partition document, and refuse or suffix the
+    filename rather than overwrite when a second run's corpus build date lands on the
+    same calendar day as an existing one.
   - Alongside the markdown, emit a structured partition record - a
     docs/00-working/idea-partition-<YYYY-MM-DD>.json validated against
     schemas/idea-partition-record.schema.json - carrying the same tracks, ids and
@@ -7162,6 +7165,8 @@ items:
   - The dry run's structured partition record validates against
     schemas/idea-partition-record.schema.json and its tracks and ids agree with the
     markdown output from the same run.
+  - Re-invoking on the same calendar day as an existing partition document's corpus
+    build date refuses or suffixes rather than overwriting the earlier file.
   verification:
   - Invoke /partition-ideas and stop at GATE 1; record the open-set output, the manifest
     corpus size and the persisted report path.
@@ -9535,7 +9540,7 @@ items:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
   systems:
-  - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -9559,7 +9564,7 @@ items:
   - uv run python tools/overview_metrics.py
   deliverables:
   - .claude/commands/
-  - docs/08-governance/
+  - docs/08-governance/GOV-012-idea-metrics-command.md
   next_action: Run the tool first and read what it already emits. The command's job is to surface those
     numbers, not to compute a second set beside them.
 - id: phase-idg-09
@@ -9613,12 +9618,19 @@ items:
     sections earn their place, which are cargo-culted, what tone works.
   - Cite real plans on both sides of every judgement. A standard citing no actual plan has not used the
     corpus it was meant to audit.
-  - Write the result as a standard a later plan can be checked against, not as an essay.
+  - Also name what a good requirement document looks like, since phase-idg-12 drafts a paired requirement
+    alongside the plan and needs a standard to check that draft against too.
+  - Write the result as a standard a later plan or requirement can be checked against, not as an essay.
+  - State it explicitly as standing beside templates/governance/document.md, cross-referenced from and to
+    it - this standard does not rewrite or supersede that generic template.
   acceptance:
   - 'REQ-014 R17 holds: every judgement names plans from the corpus on both sides.'
   - The standard names a section list a later plan can be checked against mechanically - phase-idg-12
     can grep a draft for each named section and report which are absent.
   - It is written so phase-idg-12 can measure a draft against it, which is what R20 requires of it.
+  - The two bullets above ("every judgement names plans from the corpus on both sides" and "the standard
+    names a section list a later plan can be checked against mechanically") are judged by the session-close
+    independent review, not by a mechanical command.
   verification:
   - uv run python -m src.governance
   deliverables:
@@ -9640,7 +9652,8 @@ items:
   depends_on: []
   scope:
   - Define what happens between the owner deciding an idea should become a plan and the coded document
-    existing in docs/01-plans/.
+    existing in docs/01-plans/, building on GOV-005's existing reservation mechanism rather than a second
+    one - this phase defines only the physical draft location and the abandoned-draft case on top of it.
   - State what happens if the draft is abandoned. ADR-010 covers staging and stops at promotion; PLAN-015's
     _working/ is deleted rather than rewritten, which is the wrong shape for a document meant to become
     permanent.
@@ -9648,8 +9661,9 @@ items:
   acceptance:
   - 'REQ-014 R18 holds: the location is defined, the abandoned-draft case is stated, and ADR-010 or its
     successor points at it.'
-  - The definition does not require a code to be allocated before the draft exists, which would waste
-    codes on drafts that never land.
+  - The definition builds on GOV-005's reservation mechanism (reserve now, remove if the draft is
+    abandoned) rather than inventing a second one - GOV-005 already solves early allocation waste, so
+    this phase does not need to avoid allocating a code before the draft exists.
   - It is consistent with GOV-005's rule that a code is permanent once it reaches the trunk.
   verification:
   - uv run python -m src.governance
@@ -10037,19 +10051,29 @@ items:
   scope:
   - Build the store behind the delivered log-anti-patterns skill, so a recurrence is detected mechanically
     rather than by someone remembering.
-  - Populate it at first run from brain/procedures/ and the 2026-09-11 starter catalog, and report the
-    count.
+  - Populate it at first run from the qualifying brain/procedures/ entries - only
+    runtime-behavior-needs-runtime-evidence.md and scope-dispatches-to-the-turn-budget.md, since a
+    how-to guide such as add-new-project.md is not a recurrence risk and does not qualify - and the
+    2026-09-11 starter catalog, and report the count.
+  - Write up the three starter-catalog anti-patterns that exist only as prose in idea 000138, so all
+    five starter-catalog anti-patterns are recorded and counted, not just the two already filed under
+    brain/procedures/.
   - Do not rebuild capture. .claude/skills/log-anti-patterns/SKILL.md already routes and writes; this
     phase adds the store behind it.
   - Name and document the store's own recording contract - the interface a caller uses to write an
     anti-pattern and to check one against existing entries - under docs/08-governance/, so a
     downstream consumer (phase-irs-10) can adopt it unchanged instead of reverse-engineering the
     store's shape from code.
+  - Recurrence detection indexes all four log-anti-patterns capture destinations - brain/procedures/,
+    the GOV-003 concurrency-collision ledger, _data/ideas.jsonl and session records - not
+    brain/procedures/ alone.
   acceptance:
   - 'REQ-016 R06 holds: an anti-pattern already in the catalog, recorded a second time, is identified
     as a recurrence. A store accepting silent duplicates fails this.'
   - 'REQ-016 R07 holds: the brain/procedures/ entries and the starter catalog are present at first run,
     counted.'
+  - All five starter-catalog anti-patterns - the two named in brain/procedures/ and the three written
+    up from idea 000138 - are present in the store at first run and counted.
   - git diff shows no change to the log-anti-patterns skill's capture behaviour.
   - The recording contract is named and documented in one place under docs/08-governance/, stating
     both the write interface and the recurrence-check interface a caller uses.
@@ -11840,11 +11864,16 @@ items:
     dispatch and re-dispatches them, so the stopgap degrades to batch and never to loss.
   - Mark the tool interim in its own operations document - phase-irs-04's daemon absorbs its duty and
     retires it, and the phase-auto-01 ruling decides the external-gateway question separately.
+  - Check the _working/orchestrator-halt flag file before each dispatch - a stat-only check with no
+    dependency on daemon code - so the kill switch's "halts all pipeline dispatch" claim is literally
+    true while this stopgap tool is the one doing the dispatching.
   acceptance:
   - 'REQ-022 R06 holds: a test idea appended to the log is triaged with no human action.'
   - 'REQ-022 R07 holds: a dispatch killed mid-run leaves the idea open and the sweep brings it to
     triaged.'
   - The interim status and its deciding ruling are stated in the tool's operations document.
+  - With _working/orchestrator-halt present, the tool dispatches nothing; removing the file restores
+    dispatch with no other state change.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -12012,8 +12041,9 @@ items:
   - Write the procedure for judging whether a backlog phase fits one session and for splitting one
     that does not, deliberately distinct from phase-idg-05's idea decomposition per the PLAN-039
     boundary table.
-  - Build the agent that applies it, returning split phases into the three-altitude review at the
-    phase altitude.
+  - Build the agent that applies it. "Returning split phases into review" is a status-marking action
+    on the split phases themselves - it is not an end-to-end call into phase-irs-06's three-altitude
+    review procedure, and adds no depends_on edge onto it.
   acceptance:
   - 'REQ-022 R11 holds: a deliberately oversized phase is split and each part re-enters review.'
   - The fit heuristic is derived from historical session-length data across completed phases, not
@@ -12044,8 +12074,9 @@ items:
   scope:
   - Write the review procedure at its three altitudes - the plan as a whole, each phase in isolation,
     each later-added phase against the standing plan - with findings and dispositions recorded.
-  - Run it with a single-adversary engine now, defining the adoption seam for phase-agx-11/12's trio
-    so the engine swaps without the procedure changing.
+  - Run it with a single-adversary engine now. This phase commits only to that single-adversary run;
+    designing the adoption seam for the trio's swap is deferred to whichever of phase-agx-11/phase-agx-12
+    lands second, as that phase's own integration duty.
   - Include the planner conformance check from REQ-022 R09 as the review's entry condition.
   acceptance:
   - 'REQ-022 R10 holds: the procedure exists in writing and one review produces a findings record
@@ -12116,9 +12147,14 @@ items:
   - Run the staged confidentiality check mechanically before any push; a failure blocks the push.
   - If phase-auto-01 descopes the supervised worker, fall back to plain Agent SDK dispatch per the
     PLAN-039 boundary table.
+  - End every unit run with the hand-off PLAN-039.01 SS6 requires - a session record written, every
+    _tmpagent/ claim released, git rebase dev, a green governance check and uv run pytest - with the
+    Gate 4 review presenting that output.
   acceptance:
   - 'REQ-022 R13, R14 and R22 hold, each demonstrated in a test run.'
   - The ADR-003 claim protocol is unchanged; the harness dispatches into it rather than around it.
+  - A test run's unit ends with a session record, no outstanding _tmpagent/ claim, a rebase onto dev,
+    and a green governance check and pytest run, and Gate 4's review presents that output.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -12232,7 +12268,7 @@ items:
     regenerable data/, checked by the dispatch path immediately before every dispatch. Build the
     enforcement and its tests; the halt and resume-dispatch verbs ship with phase-irs-04.'
 - id: phase-irs-12
-  title: End-to-end trace, forced-failure drill and metrics baselines
+  title: End-to-end trace and metrics baselines
   plan: doc-idea-realization-system-plan
   sources:
   - doc-idea-realization-system-requirements
@@ -12253,27 +12289,65 @@ items:
   - phase-part-03
   - phase-irs-10
   scope:
-  - Trace one real idea end to end through the assembled pipeline, recording every transition and
-    every gate decision.
-  - Force one failure per stage class and confirm each stage's written failure path engages, per
-    REQ-022 R12.
+  - Trace one real idea end to end through the assembled nine-stage pipeline, recording every
+    transition and every gate decision.
   - Compute automation rate, cycle time and rework rate deterministically from the ledger and log,
     and record the baselines before any target is set.
   acceptance:
-  - 'REQ-022 R12 and R24 hold: no stage wedges silently, and the metrics tool is deterministic with a
-    recorded baseline.'
-  - The trace and drill results are recorded with real output, including every failure engaged on purpose.
+  - 'REQ-022 R24 holds: the metrics tool is deterministic and a baseline is recorded before any
+    target is set.'
+  - The trace is recorded with real output, including every gate decision reached along the way.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - Run the metrics tool twice against the same ledger slice and confirm byte-identical output.
+  deliverables:
+  - tools/
+  - docs/08-governance/
+  next_action: Pick the traced idea from the log's open queue with the owner at Gate 1, so the metrics
+    baseline is computed from real output rather than a synthetic fixture.
+- id: phase-irs-17
+  title: Forced-failure drill across the assembled pipeline
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-irs-05
+  - phase-irs-06
+  - phase-irs-07
+  - phase-irs-08
+  - phase-irs-14
+  - phase-irs-15
+  - phase-part-03
+  - phase-irs-10
+  - phase-irs-12
+  scope:
+  - Force one failure per stage class across the nine-stage pipeline traced by phase-irs-12 - nine
+    forced failures - and confirm each stage's written failure path engages, per REQ-022 R12.
+  - Record each forced failure and the failure path it exercised, so no stage's failure leaves a run
+    wedged silently.
+  acceptance:
+  - 'REQ-022 R12 holds: every stage''s written failure path is confirmed to engage; no stage leaves a
+    run wedged silently.'
+  - The drill results are recorded with real output, including every failure engaged on purpose.
   verification:
   - uv run python -m src.governance
   - uv run pytest
   - Force one failure per stage class in the traced run and confirm each stage's written failure path
     engages.
-  - Run the metrics tool twice against the same ledger slice and confirm byte-identical output.
   deliverables:
-  - tools/
+  - test/
   - docs/08-governance/
-  next_action: Pick the traced idea from the log's open queue with the owner at Gate 1, so the drill
-    is real work rather than a synthetic fixture.
+  next_action: Run the drill against the run phase-irs-12 traced, in the order the pipeline stages
+    execute, so each forced failure is diagnosed against real prior state rather than a synthetic
+    fixture.
 - id: phase-irs-13
   title: Gate queue and decision-ready presentation with batched completion review
   plan: doc-idea-realization-system-plan
@@ -12312,7 +12386,9 @@ items:
   - src/
   - ts/
   next_action: Decide the queue's surface with the owner - the workbench is the natural host but not
-    a settled one.
+    a settled one. Once the host is chosen, add the relevant sys-wb-* id to this phase's systems
+    list so the governance conflicts check can detect a collision with a concurrent workbench
+    session; no id is invented or registered here.
 - id: phase-irs-14
   title: Batch graph with per-track fan-out and the amend-as-re-key flow
   plan: doc-irs-orchestrator-design
@@ -12364,6 +12440,7 @@ items:
   - doc-idea-realization-system
   systems:
   - sys-realization
+  - sys-portfolio
   owner: repository-owner
   status: queued
   priority: 3

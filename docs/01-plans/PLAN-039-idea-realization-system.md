@@ -73,7 +73,8 @@ decision when the time comes.
 | `phase-irs-09` | Terminal `delivered` status and the realization check | `phase-idg-01`, `phase-irs-03` | R15 |
 | `phase-irs-10` | Learning loop: wire rejections, findings and realization outcomes into the anti-pattern store | `phase-agx-03`, `phase-idg-10`, `phase-irs-06`, `phase-irs-08`, `phase-irs-09` | R25 |
 | `phase-irs-11` | Run budgets, hard caps and the kill switch | `phase-irs-04` | R20, R21 |
-| `phase-irs-12` | End-to-end trace, forced-failure drill and metrics baselines | `phase-irs-05`–`08`, `-10`, `-14`, `-15`, `phase-part-03` | R12, R24 |
+| `phase-irs-12` | End-to-end trace and metrics baselines | `phase-irs-05`–`08`, `-10`, `-14`, `-15`, `phase-part-03` | R24 |
+| `phase-irs-17` | Forced-failure drill across the assembled pipeline | `phase-irs-05`–`08`, `-10`, `-12`, `-14`, `-15`, `phase-part-03` | R12 |
 | `phase-irs-14` | Batch graph: per-track fan-out, per-plan G3 interrupts, amend-as-re-key, the plan→ideas trace | `phase-irs-04`, `phase-part-03` | R05, R08 |
 | `phase-irs-15` | Realization graph against the delivered-state ruling | `phase-irs-04`, `phase-irs-09`, `phase-irs-14` | R15 |
 | `phase-irs-16` | Daemon process model: lock, signal handling and start/stop/status | `phase-irs-04` | R17 |

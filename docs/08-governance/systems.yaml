@@ -36,6 +36,7 @@ systems:
   - _data/ideas.jsonl
   - tools/append_idea.py
   - tools/generate_ideas_md.py
+  - src/db/ideas.py
   depends_on:
   - sys-contracts
   description: Projects, tags, people, commitments and tasks are populated. Per ADR-009, the tracked
