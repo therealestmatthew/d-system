@@ -7149,11 +7149,19 @@ items:
     coordinator, not the subagent.
   - It moves no idea status, marks no phase complete, and stops at all three gates.
   - _data/ideas.jsonl is unchanged by the dry run.
+  - R06, R11, R13, R05's empty-open-set branch and R14's GATE 2/GATE 3 halting are not
+    exercised by this phase's dry run; they are verified for the first time by the first
+    real sweep's session record.
   verification:
   - Invoke /partition-ideas and stop at GATE 1; record the open-set output, the manifest
     corpus size and the persisted report path.
   - Hash _data/ideas.jsonl before and after the dry run and confirm it is unchanged.
   - Read the skill body for any brief it quotes rather than dispatches.
+  - Capture the R1 prompt actually dispatched during the dry run and diff it against
+    PROMPT-034-reusable-partition-pack.md:112-182; confirm the diff is empty.
+  - Read the skill body and confirm it names both R1 (PROMPT-034:112) and R4
+    (PROMPT-034:183) as dispatches ahead of GATE 1, even though the dry run exercises
+    only one of them for cost.
   - Re-invoke after abandoning at GATE 1 and confirm it reports the existing reports
     and dispatches nothing already done.
   - uv run python -m src.governance exits 0.
@@ -9301,7 +9309,13 @@ items:
   - docs/04-decisions/
   - docs/07-architecture/ARCH-005-idea-node-classification.md
   next_action: Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
-    fields before recording why they are fields inverts the reasoning.
+    fields before recording why they are fields inverts the reasoning. Name the three fields and
+    their enum values in lowercase snake_case, one token per ARCH-005 type (e.g. concept, artifact,
+    process, event / axiom, hypothesis, anti_pattern / generative_seed, strategic_directive,
+    operational_task, retrospective_insight), matching the convention status and link type already
+    use on this schema. Reuse or extract the document registry src/governance/__main__.py:158 builds,
+    rather than re-scanning docs/ independently inside tools/append_idea.py - a second, independent
+    scanner drifts from the governance check's own source of truth for what documents exist.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle
@@ -9648,6 +9662,7 @@ items:
   depends_on:
   - phase-idg-10
   - phase-idg-11
+  - phase-dgov-01
   scope:
   - Build an agent that drafts a governed plan - and where the idea implies observable behaviour, the
     paired requirement - from a promoted idea.
@@ -9997,6 +10012,7 @@ items:
   systems:
   - sys-delivery
   - sys-governance
+  - sys-brain
   owner: repository-owner
   status: queued
   priority: 2
@@ -10022,6 +10038,7 @@ items:
   - brain/
   - tools/
   - docs/08-governance/
+  - test/test_anti_pattern_store.py
   next_action: Read the log-anti-patterns skill before writing anything. Capture is delivered; a phase
     that re-ships it has spent a session on work already done.
 - id: phase-agx-04
@@ -10417,6 +10434,9 @@ items:
   - 'REQ-017 R16 holds: the design names backlog.yaml as the lock table and the governance validator as
     the lock check, and no component proposed here replaces either.'
   - Any component deferred is returned with the reasoning attached rather than dropped silently.
+  - The ADR states explicitly which broker shape ships - full policy or an enforcement point with a
+    permissive default - and, if the permissive-default shape is chosen, explicitly records REQ-017
+    R02 and R04 as open rather than claimed, per REQ-017's own qualification.
   verification:
   - uv run python -m src.governance
   deliverables:
@@ -10440,20 +10460,27 @@ items:
   depends_on:
   - phase-auto-01
   scope:
-  - Give every agent run an explicit, narrow capability set of named actions - repository read, source
-    mutation, external network, publication - rather than a role.
+  - If phase-auto-01's design ships the full-policy shape, give every agent run an explicit, narrow
+    capability set of named actions - repository read, source mutation, external network, publication
+    - rather than a role. If it ships the enforcement-point-with-permissive-default shape, build the
+    enforcement mechanism and refusal path only.
   - Enforce denied capabilities at the tool boundary. A denial described in a prompt an agent could misread
     is what 000031 exists to replace.
   - Route anything sensitive through an approval request carrying scope, reason, expiry and an immutable
     decision record.
+  - Provide a surface (a CLI command or an API route) to list pending approval requests and record a
+    decision against one - nothing else in this programme does.
   - This is built first, ahead of the gateway, ledger and worker. A gate constructed after the things
     it gates has never gated anything.
   acceptance:
-  - 'REQ-017 R02 holds: a run''s capability set names specific actions, not a role.'
+  - 'REQ-017 R02 holds if phase-auto-01 chose the full-policy shape: a run''s capability set names specific
+    actions, not a role. Otherwise this row is recorded open per REQ-017 lines 92-96, not claimed by
+    this phase.'
   - 'REQ-017 R03 holds: an agent prompted to use a denied capability is stopped at the boundary, not trusted
     to decline.'
-  - 'REQ-017 R04 holds: an approval carries all four fields, its decision cannot be edited afterwards,
-    and an expired approval is not honoured.'
+  - 'REQ-017 R04 holds if phase-auto-01 chose the full-policy shape: an approval carries all four fields,
+    its decision cannot be edited afterwards, and an expired approval is not honoured. Otherwise this
+    row is recorded open per REQ-017 lines 92-96, not claimed by this phase.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -11798,6 +11825,7 @@ items:
   deliverables:
   - tools/
   - docs/08-governance/
+  - test/
   next_action: 'The mechanism is ruled in PLAN-039.01 SS10: a standalone post-append hook plus sweep
     under tools/, watermark-bounded and budget-capped. Start from the hook''s failure mode - the writer
     must succeed even when dispatch fails.'
@@ -11827,6 +11855,8 @@ items:
   - GOV-003 carries the amendment with its date and the ruling it applies.
   verification:
   - uv run python -m src.governance
+  - Read the amended PLAN-025 Gate 2 section and the new GOV-003 entry for the escalation sentence
+    and the ruling citation.
   deliverables:
   - docs/01-plans/
   - docs/02-prompts/
@@ -11839,6 +11869,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   owner: repository-owner
@@ -11854,9 +11885,15 @@ items:
     what the model reserves.
   - State the evidence rule for validators - executed tests and repository checks, never persona
     assertions.
+  - State the per-dispatch token-budget ceiling PLAN-039.01 SS8 requires each role contract to
+    carry, so phase-irs-11's enforcement has a source to read.
   acceptance:
   - 'REQ-022 R03 holds: every owner-reserved action appears in no agent contract.'
   - Each contract names its consuming and producing artifacts from ARCH-006's hand-off table.
+  - 'REQ-022 R13 holds: the validator contract states it receives the requirement and the diff, and
+    never the developer''s rationale.'
+  - 'REQ-022 R23 holds: the validator contract grounds evidence in executed tests and repository
+    checks, not persona assertions, and states the owner''s G5 spot-audit sampling rule.'
   verification:
   - uv run python -m src.governance
   deliverables:
@@ -11893,6 +11930,8 @@ items:
     linked worktree and runs in the primary checkout only.
   - Consume claim-protocol recovery from phase-agx-09's deliverables where they exist; define none
     here, per the PLAN-039 boundary table.
+  - Flip ADR-018's status from draft to accepted once the intake graph runs end-to-end, per its own
+    acceptance clause.
   acceptance:
   - 'REQ-022 R16 (as amended), R17 and R18 hold: deleting or corrupting the checkpoint store yields
     re-keyed threads at the re-derived position, a killed run resumes at its gate, and one run is
@@ -11903,6 +11942,7 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
+  - grep -rn "claim" src/orchestrator/ tools/append_run.py tools/append_decision.py
   deliverables:
   - src/
   - test/
@@ -11937,9 +11977,11 @@ items:
   - The procedure cites the plan-quality standard for what a one-session phase contains.
   verification:
   - uv run python -m src.governance
+  - uv run pytest
   deliverables:
   - docs/08-governance/
   - .claude/agents/
+  - test/
   next_action: Derive the fit test from the session_budget field's actual meaning in completed phases
     rather than inventing a size heuristic.
 - id: phase-irs-06
@@ -11968,6 +12010,7 @@ items:
   - A non-conformant draft is returned before adversarial time is spent on it.
   verification:
   - uv run python -m src.governance
+  - uv run pytest
   deliverables:
   - docs/08-governance/
   - docs/02-prompts/
@@ -11979,6 +12022,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   - sys-backlog
@@ -12012,6 +12056,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   owner: repository-owner
@@ -12057,8 +12102,9 @@ items:
   scope:
   - Add the terminal delivered status to the idea status machine as append-only events, coordinated
     with the phase-idg-01 schema bundle rather than forked from it.
-  - Build the realization agent that verifies a delivered capability against the originating idea's
-    text, records evidence annotations, and proposes delivered for Gate 5 sign-off.
+  - Build the realization agent that verifies a delivered capability (the integrated branch, its
+    verification output, and the completion-reviewed phase) against the originating idea's text,
+    records evidence annotations, and proposes delivered for Gate 5 sign-off.
   - An unverifiable capability is recorded as a finding on the idea and surfaced at Gate 5, never
     silently closed.
   acceptance:
@@ -12088,7 +12134,10 @@ items:
   session_budget: 1
   depends_on:
   - phase-agx-03
+  - phase-irs-06
+  - phase-irs-08
   - phase-irs-09
+  - phase-idg-10
   scope:
   - Route validator rejections, recurring adversarial findings and realization-check outcomes into
     the anti-pattern store phase-agx-03 builds.
@@ -12100,8 +12149,10 @@ items:
   - The store's own recording contract is used unchanged; no second store or parallel format exists.
   verification:
   - uv run python -m src.governance
+  - uv run pytest
   deliverables:
   - src/
+  - test/
   - docs/08-governance/
   next_action: Adopt the store's own recording contract; this phase adds sources to it, not a second
     store.
@@ -12111,6 +12162,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   owner: repository-owner
@@ -12154,6 +12206,8 @@ items:
   - phase-irs-08
   - phase-irs-14
   - phase-irs-15
+  - phase-part-03
+  - phase-irs-10
   scope:
   - Trace one real idea end to end through the assembled pipeline, recording every transition and
     every gate decision.
@@ -12168,6 +12222,9 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
+  - Force one failure per stage class in the traced run and confirm each stage's written failure path
+    engages.
+  - Run the metrics tool twice against the same ledger slice and confirm byte-identical output.
   deliverables:
   - tools/
   - docs/08-governance/
@@ -12179,6 +12236,7 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  - doc-irs-orchestrator-design
   systems:
   - sys-realization
   owner: repository-owner
@@ -12198,6 +12256,8 @@ items:
   - Each batched phase is still individually closed through the owner-invoked session-close review.
   verification:
   - uv run python -m src.governance
+  - uv run pytest
+  - cd ts && npm run build
   deliverables:
   - src/
   - ts/
@@ -12231,6 +12291,8 @@ items:
   - 'REQ-022 R05 and R08 hold in a test run: a partition proposal reaches G2, each track''s plan reaches
     its own G3, and an amended G3 resumes from the amended artifact.'
   - A rejected track ends its branch without disturbing sibling tracks.
+  - A fast track's plan reaches its own G3 while a slower sibling track is still in an earlier stage,
+    and neither track's progress gates on the other.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -12255,6 +12317,7 @@ items:
   depends_on:
   - phase-irs-04
   - phase-irs-09
+  - phase-irs-14
   scope:
   - Implement the realization graph for stage 9 - started from the ledger's plan-to-ideas trace when a
     unit run under the plan completes, ending at the terminal delivered state in whichever form
