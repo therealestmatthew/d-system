@@ -204,8 +204,8 @@ G5 in `realization`. Two implementation rules from the audit:
   checkpointed before the gate node begins. Resume re-executes an empty wrapper, costing
   nothing and duplicating nothing. One interrupt per node, always.
 - **The decision inbox gets the idea log's discipline, scaled down.** It moves to
-  **`_data/decisions.jsonl`** — tracked for the same reason the ledger is — with a schema
-  (`schemas/decision.schema.json`), the `gate` subcommand as its sole sanctioned writer, and a
+  **`_data/gate-decisions.jsonl`** — tracked for the same reason the ledger is — with a schema
+  (`schemas/gate-decision.schema.json`), the `gate` subcommand as its sole sanctioned writer, and a
   dedup key `(run_id, gate, decision_seq)`. A second decision for an already-resumed gate is
   refused by the writer, not absorbed by the reader. The durable truth of a decision remains
   the repository artifact it produces; the inbox is how the resumption is requested.

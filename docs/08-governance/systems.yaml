@@ -435,6 +435,48 @@ systems:
     write only the thirteen campaign deliverables, the evidence matrix, the source inventory and
     the reproducibility ledger, all under research/literature-review/ and the locations the
     evidence contract (PLAN-023.03) fixes.
+- id: sys-gov-docs
+  name: Governance-document authoring
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths:
+  - docs/08-governance/
+  depends_on:
+  - sys-governance
+  description: The governance prose authored under docs/08-governance/ - GOV-* protocol pages,
+    OPS-* runbooks and similar working-agreement documents - as distinct from sys-governance, which
+    is the validation engine (src/governance, the document/systems/codes schemas, systems.yaml,
+    codes.yaml, tools/generate_tool_docs.py) that checks this prose's structure rather than writing
+    it. Split out per the owner's 2026-09-16 ruling, because phases that write new documents in
+    this directory were tagged sys-governance despite never touching the engine's own paths.
+- id: sys-auto-gateway
+  name: Autonomous-operations trigger gateway
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-032-autonomous-agent-operations.md
+  depends_on:
+  - sys-api
+  description: The external trigger gateway (idea 000028) that normalises filesystem, scheduled,
+    webhook and CLI events into one shape and deduplicates by payload hash before handing a run to
+    the ledger. Planned only; no code exists yet. Registered separately from sys-auto-ledger so
+    phase-auto-03 and phase-auto-04 can be worked and locked independently, per PLAN-032's stated
+    concurrency intent - sharing sys-api made that impossible under collisions().
+- id: sys-auto-ledger
+  name: Autonomous-operations run ledger
+  domain: application
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-032-autonomous-agent-operations.md
+  depends_on:
+  - sys-api
+  description: The durable run ledger (idea 000029) that persists every run's correlation id,
+    triggering payload hash, model and tool versions, context-pack hash, budget, checkpoints and
+    disposition, and resumes an interrupted run without repeating completed side effects. Planned
+    only; no code exists yet. Registered separately from sys-auto-gateway for the same reason.
 - id: sys-realization
   name: Idea realization pipeline
   domain: governance

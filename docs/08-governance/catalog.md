@@ -265,6 +265,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-16-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-01-orchestrator-design-audit-revision.md |
 | SESS-2026-09-16-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-02-queued-phase-review-pack.md |
 | SESS-2026-09-16-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-03-prompt-035-adversarial-revision.md |
+| SESS-2026-09-16-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-04-queued-phase-review-run.md |
 
 ## Plans and their phases
 
@@ -322,8 +323,8 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
-| PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 0 | — |
-| PLAN-039.01 | doc-irs-orchestrator-design | draft | 4 | 0 | 0 | — |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 13 | 0 | 0 | — |
+| PLAN-039.01 | doc-irs-orchestrator-design | draft | 10 | 0 | 0 | — |
 
 ## Held codes
 
@@ -331,6 +332,9 @@ CI regenerates it and fails on any difference.
 |---|---|---|
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
+| ADR-019 | reserved | Promoted-plan staging decision; deliverable of phase-idg-11. |
+| GOV-010 | reserved | Plan-quality standard; deliverable of phase-idg-10. |
+| GOV-011 | reserved | Promoted-plan staging protocol; deliverable of phase-idg-11. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-258 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 54, prompt: 35, requirement: 22, session: 101.
+259 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 54, prompt: 35, requirement: 22, session: 102.

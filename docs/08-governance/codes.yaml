@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-10'
+updated: '2026-09-16'
 # Series definitions are the only source of truth for prefix, numbering and location.
 # The register holds nothing derivable from documents: no titles, statuses or owners.
 series:
@@ -63,6 +63,12 @@ reserved:
   reason: Membership authority decision; deliverable of phase-rel-04.
 - code: ADR-005
   reason: Projection publication decision; deliverable of phase-rel-05.
+- code: GOV-010
+  reason: Plan-quality standard; deliverable of phase-idg-10.
+- code: ADR-019
+  reason: Promoted-plan staging decision; deliverable of phase-idg-11.
+- code: GOV-011
+  reason: Promoted-plan staging protocol; deliverable of phase-idg-11.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011

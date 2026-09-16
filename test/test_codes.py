@@ -82,9 +82,9 @@ def test_malformed_codes_are_rejected(value: str) -> None:
 
 
 def test_counter_allocation_skips_reserved_codes(register: dict[str, Any]) -> None:
-    # ADR-004 and ADR-005 are held for backlog phases that have not been written yet.
-    assert next_code("adr", register, {}) == "ADR-006"
-    assert next_code("adr", register, {"doc-a": doc("ADR-006", kind="adr")}) == "ADR-007"
+    # ADR-004, ADR-005 and ADR-019 are held for backlog phases that have not been written yet.
+    assert next_code("adr", register, {}) == "ADR-020"
+    assert next_code("adr", register, {"doc-a": doc("ADR-020", kind="adr")}) == "ADR-021"
 
 
 def test_counter_allocation_skips_retired_codes(register: dict[str, Any]) -> None:

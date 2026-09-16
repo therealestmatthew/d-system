@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-15'
+updated: '2026-09-16'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -12,22 +12,24 @@ next_up:
 - phase-auto-01
 - phase-auto-02
 - phase-irs-04
+- phase-irs-16
+- phase-part-03
 - phase-irs-14
 - phase-irs-11
-- phase-irs-13
 - phase-idg-01
 - phase-idg-10
 - phase-idg-11
+- phase-dgov-01
 - phase-idg-12
 - phase-irs-05
 - phase-irs-06
 - phase-irs-07
+- phase-irs-13
 - phase-irs-08
 - phase-irs-09
 - phase-irs-15
 - phase-agx-03
 - phase-irs-10
-- phase-part-03
 - phase-irs-02
 - phase-irs-12
 items:
@@ -7137,6 +7139,11 @@ items:
   - Write the output to docs/00-working/idea-partition-<YYYY-MM-DD>.md, recording the
     corpus size, the status filter and the manifest seed, and never edit an earlier
     partition document.
+  - Alongside the markdown, emit a structured partition record - a
+    docs/00-working/idea-partition-<YYYY-MM-DD>.json validated against
+    schemas/idea-partition-record.schema.json - carrying the same tracks, ids and
+    manifest seed, so a downstream consumer (phase-irs-14's G2 gate and amend-as-re-key
+    flow) reads a machine-readable record instead of parsing the markdown.
   - Make each step check for its own output before dispatching, and resume a truncated
     agent rather than re-running it.
   - Close with the spend posture - dispatches run, dispatches resumed, any escalation
@@ -7152,6 +7159,9 @@ items:
   - R06, R11, R13, R05's empty-open-set branch and R14's GATE 2/GATE 3 halting are not
     exercised by this phase's dry run; they are verified for the first time by the first
     real sweep's session record.
+  - The dry run's structured partition record validates against
+    schemas/idea-partition-record.schema.json and its tracks and ids agree with the
+    markdown output from the same run.
   verification:
   - Invoke /partition-ideas and stop at GATE 1; record the open-set output, the manifest
     corpus size and the persisted report path.
@@ -7167,6 +7177,7 @@ items:
   - uv run python -m src.governance exits 0.
   deliverables:
   - .claude/skills/partition-ideas/
+  - schemas/idea-partition-record.schema.json
   next_action: Write the open-set gate first and run it against the live log, which has
     had a non-empty open set every time it has been checked since the first sweep, so the
     non-empty path is the one that can actually be exercised. Read the count from fold()
@@ -9591,7 +9602,7 @@ items:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
   systems:
-  - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -9611,7 +9622,7 @@ items:
   verification:
   - uv run python -m src.governance
   deliverables:
-  - docs/08-governance/
+  - docs/08-governance/GOV-010-plan-quality-standard.md
   next_action: PLAN-016 and PLAN-017 are named in 000047 as the dense end of the corpus. Start there and
     find the thin end honestly rather than picking a weak plan to make the point.
 - id: phase-idg-11
@@ -9621,7 +9632,7 @@ items:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
   systems:
-  - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -9643,8 +9654,8 @@ items:
   verification:
   - uv run python -m src.governance
   deliverables:
-  - docs/04-decisions/
-  - docs/08-governance/
+  - docs/04-decisions/ADR-019-promoted-plan-staging.md
+  - docs/08-governance/GOV-011-promoted-plan-staging.md
   next_action: This blocks 000046's design, which is why it is sized ahead of the planner agent rather
     than discovered during it.
 - id: phase-idg-12
@@ -9663,6 +9674,7 @@ items:
   - phase-idg-10
   - phase-idg-11
   - phase-dgov-01
+  - phase-irs-03
   scope:
   - Build an agent that drafts a governed plan - and where the idea implies observable behaviour, the
     paired requirement - from a promoted idea.
@@ -9670,12 +9682,16 @@ items:
     agent''s boundary.'
   - It pulls in what triage already found - related plans, phases, overlapping ideas - so the draft does
     not duplicate coverage triage already established.
+  - Per ARCH-006's stage 4 minimum-scope duty, the draft's phases are already decomposed to minimum
+    scope - one session each - not left as a descriptive phase table for a later phase to split.
   acceptance:
   - 'REQ-014 R19 holds: run against a promoted idea carrying findings and links, the draft cites them,
     and the agent allocated no code and marked nothing promoted.'
   - 'REQ-014 R20 holds: the draft is checked against phase-idg-10''s standard and conforms to its named
     sections.'
   - The draft lands where phase-idg-11 defined, not straight into docs/01-plans/.
+  - 'REQ-022 R09 holds: the draft''s phases are already split to minimum scope; a deliberately
+    non-conformant draft is returned to the planner.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -10025,12 +10041,18 @@ items:
     count.
   - Do not rebuild capture. .claude/skills/log-anti-patterns/SKILL.md already routes and writes; this
     phase adds the store behind it.
+  - Name and document the store's own recording contract - the interface a caller uses to write an
+    anti-pattern and to check one against existing entries - under docs/08-governance/, so a
+    downstream consumer (phase-irs-10) can adopt it unchanged instead of reverse-engineering the
+    store's shape from code.
   acceptance:
   - 'REQ-016 R06 holds: an anti-pattern already in the catalog, recorded a second time, is identified
     as a recurrence. A store accepting silent duplicates fails this.'
   - 'REQ-016 R07 holds: the brain/procedures/ entries and the starter catalog are present at first run,
     counted.'
   - git diff shows no change to the log-anti-patterns skill's capture behaviour.
+  - The recording contract is named and documented in one place under docs/08-governance/, stating
+    both the write interface and the recurrence-check interface a caller uses.
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -10497,7 +10519,7 @@ items:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
   systems:
-  - sys-api
+  - sys-auto-gateway
   owner: repository-owner
   status: queued
   priority: 3
@@ -10520,10 +10542,12 @@ items:
   - uv run python -m src.governance
   deliverables:
   - src/api/routes/
-  - schemas/
-  - test/
+  - src/triggers/
+  - schemas/trigger-event.schema.json
+  - test/test_trigger_gateway.py
   next_action: Siblings with phase-auto-04, not sequenced before it - the partition chains 028 to 029
-    but neither actually depends on the other. Both can run at once.
+    but neither actually depends on the other. Both can run at once, now that sys-auto-gateway and
+    sys-auto-ledger replace the shared sys-api tag and the deliverables no longer overlap.
 - id: phase-auto-04
   title: Build the durable run ledger with resumable steps
   plan: doc-autonomous-agent-operations
@@ -10531,7 +10555,7 @@ items:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
   systems:
-  - sys-api
+  - sys-auto-ledger
   owner: repository-owner
   status: queued
   priority: 3
@@ -10539,6 +10563,8 @@ items:
   depends_on:
   - phase-auto-01
   - phase-auto-02
+  - phase-agx-01
+  - phase-agx-05
   scope:
   - Persist every run with a correlation id, the triggering payload's hash, model and tool versions, a
     context-pack hash, budget, timeout, retry count, checkpoints, produced artifacts and final disposition.
@@ -10555,12 +10581,12 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - src/
+  - src/ledger/
   - sql/
-  - schemas/
-  - test/
-  next_action: Read phase-agx-01 and phase-agx-05 first if they have landed - truncation handling and
-    the delegation methodology both bear on what a run must record.
+  - schemas/run-record.schema.json
+  - test/test_run_ledger.py
+  next_action: Read phase-agx-01 and phase-agx-05 first - both now hard depends_on edges, not a
+    hedge - truncation handling and the delegation methodology both bear on what a run must record.
 - id: phase-auto-05
   title: Build the supervised worker, watchdog and abandoned-run review
   plan: doc-autonomous-agent-operations
@@ -11845,14 +11871,25 @@ items:
   depends_on:
   - phase-part-03
   scope:
-  - Amend PLAN-025 and its prompt pack so the partition workflow's three owner check-ins consolidate
-    into one Gate 2 sitting where the material allows, per the owner's 2026-09-15 ruling on 000247.
+  - Amend PLAN-025 itself to structurally reduce its gate count from three (GATE 1, GATE 2, GATE 3)
+    to one - replacing the mechanism, not scheduling the three existing check-ins to land at one
+    sitting while all three still formally exist - per the owner's 2026-09-15 ruling on 000247 and
+    the owner's follow-up ruling that the change is structural, not presentational.
+  - Amend REQ-009 in the same diff so its requirements state the reduced gate count rather than the
+    original three - the structural change is not real until the requirement it satisfies agrees.
+  - Update .claude/skills/partition-ideas/SKILL.md's own gate logic (phase-part-03's build) to match
+    the amended count in the same diff, so the prose amendment and the skill's actual gate-checking
+    code cannot drift apart.
   - Record the amendment and its reason in GOV-003 in the same diff.
   - Surface PLAN-025's draft status for acceptance alongside the amendment.
   acceptance:
   - The amended workflow reaches the owner once per partition run unless a critical issue escalates
     earlier, and the escalation path is stated.
   - GOV-003 carries the amendment with its date and the ruling it applies.
+  - PLAN-025's own gate count, read from the amended document, is one rather than three, and REQ-009
+    is amended to state the same reduced count - the change is observable in both documents, not
+    only asserted in GOV-003.
+  - .claude/skills/partition-ideas/SKILL.md's gate logic matches the amended count exactly.
   verification:
   - uv run python -m src.governance
   - Read the amended PLAN-025 Gate 2 section and the new GOV-003 entry for the escalation sentence
@@ -11860,9 +11897,12 @@ items:
   deliverables:
   - docs/01-plans/
   - docs/02-prompts/
+  - docs/06-requirements/
   - docs/08-governance/
+  - .claude/skills/partition-ideas/SKILL.md
   next_action: Read PLAN-025's three gates against a real partition transcript and identify which
-    check-ins carry decisions the others cannot batch.
+    check-ins carry decisions the others cannot batch, then reduce the mechanism itself rather than
+    just their scheduling.
 - id: phase-irs-03
   title: Write the pipeline role contracts
   plan: doc-idea-realization-system-plan
@@ -11887,6 +11927,9 @@ items:
     assertions.
   - State the per-dispatch token-budget ceiling PLAN-039.01 SS8 requires each role contract to
     carry, so phase-irs-11's enforcement has a source to read.
+  - Write prose contracts only, filed under docs/08-governance/, updating the existing
+    .claude/agents/*.md files where a role's agent definition already exists, and creating no new
+    stub agent-definition files for roles that do not yet have one.
   acceptance:
   - 'REQ-022 R03 holds: every owner-reserved action appears in no agent contract.'
   - Each contract names its consuming and producing artifacts from ARCH-006's hand-off table.
@@ -11918,16 +11961,16 @@ items:
   - phase-irs-03
   - phase-auto-02
   scope:
-  - Implement the four-run-kind skeleton per PLAN-039.01 - the intake graph, the tick (reconcile with
-    watermark and idempotent natural-key starts, start, advance), the flock lock shared by daemon and
-    manual tick, the three-field thin state with per-kind re-derivation by thread re-keying, gate nodes
-    that contain only their interrupt, and the CLI verbs start/stop/status/tick/gate/halt/resume-dispatch.
+  - Implement the four-run-kind graph skeleton per PLAN-039.01 - the intake graph, the tick (reconcile
+    with watermark and idempotent natural-key starts, start, advance), the three-field thin state with
+    per-kind re-derivation by thread re-keying, gate nodes that contain only their interrupt, and the
+    CLI verbs tick/gate/halt/resume-dispatch. The daemon's own process management - start/stop/status
+    and the flock lock - is phase-irs-16's, not this phase's.
   - Ship the tracked run ledger and decision inbox with the idea-log discipline - schemas/run.schema.json
-    and schemas/decision.schema.json, sanctioned writers under tools/ with their OPS documents, dedup
+    and schemas/gate-decision.schema.json, sanctioned writers under tools/ with their OPS documents, dedup
     keys as designed.
   - Attended-only operation - no unattended dispatch; every dispatch batch requires an owner-initiated
-    tick with an explicit flag, per the strict broker-first ruling. The daemon refuses to start in a
-    linked worktree and runs in the primary checkout only.
+    tick with an explicit flag, per the strict broker-first ruling.
   - Consume claim-protocol recovery from phase-agx-09's deliverables where they exist; define none
     here, per the PLAN-039 boundary table.
   - Flip ADR-018's status from draft to accepted once the intake graph runs end-to-end, per its own
@@ -11937,7 +11980,6 @@ items:
     re-keyed threads at the re-derived position, a killed run resumes at its gate, and one run is
     reconstructible from ledger entries alone.'
   - 'REQ-022 R19 holds: the orchestrator package contains no claim-recovery logic of its own.'
-  - A manual tick against a live daemon waits or exits on the lock; it never runs concurrently.
   - No agent dispatch occurs without the owner-initiated dispatch flag.
   verification:
   - uv run python -m src.governance
@@ -11965,7 +12007,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
-  - phase-idg-10
+  - phase-irs-03
   scope:
   - Write the procedure for judging whether a backlog phase fits one session and for splitting one
     that does not, deliberately distinct from phase-idg-05's idea decomposition per the PLAN-039
@@ -11974,7 +12016,8 @@ items:
     phase altitude.
   acceptance:
   - 'REQ-022 R11 holds: a deliberately oversized phase is split and each part re-enters review.'
-  - The procedure cites the plan-quality standard for what a one-session phase contains.
+  - The fit heuristic is derived from historical session-length data across completed phases, not
+    from an invented size standard.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -12032,15 +12075,13 @@ items:
   session_budget: 1
   depends_on:
   - phase-idg-12
+  - phase-irs-03
   scope:
   - Build the agent that writes depends_on and systems locks for an approved plan's phases,
     validator-checked, and proposes a next_up ordering it never writes itself.
-  - Build the Gate 3 ratification flow where the owner ratifies, amends or rejects the proposal, with
-    the decision recorded.
-  - Twice-rejected mappings escalate to Gate 3 with the validator output attached.
   acceptance:
-  - 'REQ-022 R05 holds: one plan traces from proposal to ratified ordering with the owner decision
-    recorded.'
+  - 'REQ-022 R05 holds: one plan traces from proposed ordering to an owner decision recorded via
+    phase-irs-04''s `gate` verb, with no standalone ratification mechanism.'
   - The agent has no write path to next_up.
   verification:
   - uv run python -m src.governance
@@ -12066,10 +12107,12 @@ items:
   depends_on:
   - phase-irs-04
   - phase-auto-02
+  - phase-irs-03
   scope:
   - Dispatch developer agents into worktrees under the unchanged ADR-003 claim protocol and validator
     agents against their diffs, with validators seeing the requirement and never the rationale.
-  - Park a twice-rejected unit as blocked with its finding attached, surfaced in the Gate 5 queue.
+  - Propose the park (blocked edit, reason, resume condition) for human commit for a twice-rejected
+    unit, with its finding attached, surfaced in the Gate 5 queue.
   - Run the staged confidentiality check mechanically before any push; a failure blocks the push.
   - If phase-auto-01 descopes the supervised worker, fall back to plain Agent SDK dispatch per the
     PLAN-039 boundary table.
@@ -12099,6 +12142,7 @@ items:
   session_budget: 1
   depends_on:
   - phase-idg-01
+  - phase-irs-03
   scope:
   - Add the terminal delivered status to the idea status machine as append-only events, coordinated
     with the phase-idg-01 schema bundle rather than forked from it.
@@ -12245,9 +12289,15 @@ items:
   session_budget: 1
   depends_on:
   - phase-irs-04
+  - phase-irs-11
+  - phase-irs-06
+  - phase-irs-07
   scope:
   - Build the queue where gate items wait, each decision-ready - the proposal, the adversarial
     findings and the evidence, pre-digested, never a raw transcript.
+  - This phase owns the decision-ready assembly - evidence digestion and adversarial-findings
+    packaging. phase-irs-04's status verb is a bare operational table for the daemon operator, not
+    the owner-facing decision-ready surface built here.
   - Make Gate 5 batchable so the owner clears finished phases in one sitting, each still individually
     closed through the owner-invoked session-close review.
   acceptance:
@@ -12278,13 +12328,17 @@ items:
   session_budget: 1
   depends_on:
   - phase-irs-04
+  - phase-part-03
   scope:
-  - Implement the batch graph covering stages 3 through 7 with LangGraph Send fan-out to one branch
-    per accepted track, a G2 interrupt for the partition and one G3 interrupt per track's plan, so a
-    slow track never blocks a fast one.
+  - Implement the batch graph's per-track fan-out across stages 3 through 7 - LangGraph Send to one
+    branch per accepted track, a G2 interrupt for the partition and one G3 interrupt per track's
+    plan, so a slow track never blocks a fast one. This phase owns the fan-out mechanics only, not
+    the stage implementations themselves - phase-fit, review and mapping are phase-irs-05's,
+    phase-irs-06's and phase-irs-07's, dispatched into the graph by role contract rather than written
+    here.
   - Implement the three decision verbs at G2/G3, with amend as re-keying - the owner's amendment is
-    applied to the repository artifact, the branch's thread is abandoned, and reconcile reopens at the
-    position the amended records prove.
+    applied to the repository artifact, the branch's thread is abandoned, and reconcile reopens at
+    the position phase-part-03's structured partition record proves, not its markdown output.
   - Write the plan-to-contributing-ideas trace entry to the run ledger at phase-registration time, per
     PLAN-039.01 SS8.
   acceptance:
@@ -12336,3 +12390,37 @@ items:
   - test/
   next_action: Read phase-irs-09's landed ruling first - the graph's terminal write differs between the
     new-status and annotation-pattern forms.
+- id: phase-irs-16
+  title: Daemon process model - lock, signal handling and start/stop/status
+  plan: doc-idea-realization-system-plan
+  sources:
+  - doc-irs-orchestrator-design
+  - doc-idea-realization-system-requirements
+  - doc-idea-realization-system
+  systems:
+  - sys-realization
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-irs-04
+  scope:
+  - Build the daemon's process model on top of phase-irs-04's graph skeleton - the flock lock shared
+    by the daemon and manual tick invocations, signal handling for graceful shutdown, and the
+    start/stop/status CLI verbs.
+  - The daemon refuses to start in a linked worktree and runs in the primary checkout only.
+  - Detect and recover a stale lock left by a killed daemon process without manual intervention.
+  acceptance:
+  - A manual tick against a live daemon waits or exits on the lock; it never runs concurrently,
+    demonstrated under a lock-contention test.
+  - A stale lock left by a killed daemon process is detected and recovered automatically, demonstrated
+    by a forced-kill test.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - src/
+  - test/
+  next_action: Read phase-irs-04's flock usage before writing the daemon wrapper - the lock file path
+    and acquisition semantics must match exactly.

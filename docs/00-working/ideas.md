@@ -4505,6 +4505,7 @@ PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents 
 - relates_to → `000025`
 - relates_to → `000077`
 - relates_to ← `000128`
+- relates_to ← `000252`
 
 ---
 
@@ -11767,3 +11768,128 @@ Future direction named by the owner on 2026-09-16 while ruling on the PLAN-039.0
 
 - relates_to → `000247`
 - relates_to → `000028`
+
+---
+
+## 000251 · Review the three queued phases the 2026-09-16 phase review found defective but could not touch
+
+**Created 2026-09-16T12:04:08-04:00 · Status: `open`**
+
+The queued phase review of 2026-09-16 (PROMPT-035) froze its scope to next_up from phase-irs-03 onward, and its critique agents found real defects in three phases that sat outside that scope: phase-agx-09, phase-auto-03 and phase-auto-04. The owner ruled these are critical and must not be lost, and that they should receive the same treatment the in-scope phases got rather than being fixed off the cuff — capture, triage, an independent pass-1-equivalent critique, and only then correction.
+
+This is the anchor for that batch. The individual defects are recorded as separate ideas linked to this one.
+
+Evidence lives in the review's working directory: _working/phase-review/ (C.md and E.md carry the out-of-scope sections; phase-review-decisions.md entries 9, 17 and 20 carry the ranked write-ups).
+
+**Links**
+
+- relates_to ← `000252`
+- relates_to ← `000253`
+- relates_to ← `000254`
+
+---
+
+## 000252 · phase-agx-09 does not build the stale-claim recovery mechanism PLAN-039 tells phase-irs-04 to consume
+
+**Created 2026-09-16T12:04:26-04:00 · Status: `triaged`**
+
+PLAN-039's boundary table states that phase-irs-04 (the LangGraph orchestrator skeleton) consumes a stale-claim and orphaned-worktree recovery mechanism owned by phase-agx-09. But phase-agx-09's actual backlog scope is a documentation and architecture essay — it names no deliverable that is a runnable recovery mechanism. As written, phase-irs-04 depends on something phase-agx-09 never commits to producing.
+
+Found by group C's critique agent during the 2026-09-16 queued phase review; phase-agx-09 was outside that review's frozen scope so nothing was changed. The owner ruled on 2026-09-16 that phase-agx-09's scope should be amended to deliver an actual consumable mechanism rather than documentation alone, and that the phase should first get the same independent critique the in-scope phases received.
+
+Evidence: _working/phase-review/C.md, out-of-scope section; docs/00-working/phase-review-decisions.md entry 9.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-16T12:06:04-04:00): Verified against the current governed documents (worktree /code/d-system-worktrees/phase-review):
+
+- PLAN-039's de-duplication boundary table (docs/01-plans/PLAN-039-idea-realization-system.md, De-duplication boundaries section) states: "The orchestrator consumes phase-agx-09's procedures and defines none of its own" for run-level vs claim-protocol recovery, citing REQ-022 R19.
+- REQ-022 R19 (docs/06-requirements/REQ-022-idea-realization-system.md line 54) makes this a checkable requirement: "The orchestrator consumes claim-protocol recovery procedures from phase-agx-09's deliverables and defines none of its own," verified by "Grep the orchestrator for claim-recovery logic; audit against the boundary table in PLAN-039."
+- ARCH-006 (docs/07-architecture/ARCH-006-idea-realization-system.md, lines 106-110) repeats the same boundary claim in near-identical wording.
+- phase-agx-09's actual backlog scope (docs/09-backlog/backlog.yaml:10228-10252) is confirmed to be documentation-only: "Write the orchestration concern, idea 000082 - routing, multi-agent coordination and recovery paths, grounded in the claim protocol that already works" with deliverables docs/07-architecture/ and docs/08-governance/ only - no mechanism deliverable (script, procedure module, or runnable recovery flow) anywhere in scope or deliverables.
+- phase-irs-04 (backlog.yaml:11912 on) depends only on phase-irs-03, sources doc-irs-orchestrator-design; nothing in its scope names a fallback or alternate producer of the claim-recovery mechanism, so it is written to rely entirely on phase-agx-09's output.
+
+This confirms the idea's own claim: three governed documents (PLAN-039, REQ-022 R19, ARCH-006) all point phase-irs-04 at phase-agx-09 for a runnable recovery mechanism, but phase-agx-09's committed deliverables are prose only (docs/07-architecture/, docs/08-governance/). R19's grep-based verification method would find nothing to grep once phase-irs-04 is built, because the thing it is meant to consume was never built as code.
+
+Idea overlap: phase-agx-09's own scope text names idea 000082 ("Agent engineering: Orchestration — routing, multi-agent coordination, recovery paths") as its source idea. 000082's body itself already flags that "Recovery is where it thins out... There is no timeout on a claim, no way for a peer to determine whether a claim is active or abandoned, and no reclaim procedure" and lists this as unresolved. So 000252's defect is the same underlying gap 000082 already surfaced at the idea level - phase-agx-09 was scoped to answer 000082's recovery question but only committed to writing about it, not building it. No idea already asserts this specific phase-agx-09-vs-phase-irs-04 contract gap; 000252 is the first to name it concretely.
+
+Anchor: this idea is one of three defects (phase-agx-09, phase-auto-03, phase-auto-04) grouped under anchor idea 000251 per the 2026-09-16 queued phase review (PROMPT-035), which found them outside its frozen scope. Evidence already cited in the idea body: _working/phase-review/C.md out-of-scope section, and docs/00-working/phase-review-decisions.md entry 9, both confirmed to match verbatim.
+
+No existing plan, requirement or ADR already resolves this gap - PLAN-039/REQ-022/ARCH-006 all state the boundary as if phase-agx-09 already delivers a mechanism; none proposes amending phase-agx-09's scope to actually build one. This is a live contract mismatch, not something already fixed elsewhere.
+
+PROPOSED LINK: 000252 --relates_to--> 000082 (phase-agx-09's own scope cites idea 000082 as its source, and 000082's body already names the same unresolved claim-recovery/reclaim-procedure gap this idea's defect concretely reports on the phase built to answer it)
+
+</details>
+
+**Links**
+
+- relates_to → `000251`
+- relates_to → `000082`
+
+---
+
+## 000253 · phase-auto-03 and phase-auto-04 both declare sys-api, which ADR-003 would reject as concurrent despite PLAN-032 claiming they run in parallel
+
+**Created 2026-09-16T12:04:27-04:00 · Status: `triaged`**
+
+phase-auto-03 and phase-auto-04 each declare systems: [sys-api]. ADR-003's concurrency rule, implemented in collisions() at src/governance/backlog.py, treats a shared system as a reason two phases cannot be worked simultaneously — so the validator would reject the second claim. PLAN-032 nonetheless states the two run in parallel. One of the two is wrong: either the plan's parallel claim, or the phases' system declarations.
+
+Found by group E's critique agent during the 2026-09-16 queued phase review; both phases were outside that review's frozen scope so nothing was changed. Note this is structurally the same defect the review found inside its scope for phase-idg-08/-10/-11 against sys-governance, where the owner ruled that deliverables should be narrowed to specific files and a new document-authoring system id registered.
+
+Evidence: _working/phase-review/E.md, out-of-scope section; docs/00-working/phase-review-decisions.md entry 20.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-16T12:06:52-04:00): Confirmed current in docs/09-backlog/backlog.yaml:10498-10567 (checked in the phase-review worktree): phase-auto-03 (systems: [sys-api], deliverables src/api/routes/, schemas/, test/) and phase-auto-04 (systems: [sys-api], deliverables src/, sql/, schemas/, test/) still both declare sys-api, still contradicting PLAN-032:179-182's claim that they run in parallel. This idea restates a finding group E's critique already surfaced as out-of-scope (_working/phase-review/E.md, out-of-scope section, "phase-auto-03 and phase-auto-04 both declare systems: [sys-api]") and the owner recorded as decision 20 in docs/00-working/phase-review-decisions.md, which itself resolves onto decision 18 (recommendation: phase-auto-01 registers new sys-* ids, e.g. sys-agent-ops, for -02 through -05).
+
+New material beyond E.md's own scope: collisions() (src/governance/backlog.py:37-52) checks shared deliverable paths independently of shared systems. phase-auto-03's and phase-auto-04's deliverables already overlap on schemas/ and test/, and src/api/routes/ is a subpath of src/ - so registering distinct sys-* ids per decision 18 alone would not make these two phases concurrency-eligible; the deliverables would still collide under path_conflict().
+
+Same structural defect, in-scope elsewhere: phase-idg-08/-10/-11 share systems: [sys-governance] (decision 5, docs/00-working/phase-review-decisions.md), and R12 (_working/phase-review/rulings.md) found the identical deliverables-collision problem there - narrowing deliverables to specific files buys nothing while both phases still declare docs/08-governance/ as a deliverable. R12's specific remedy (narrow deliverables to per-code filenames and re-tag off sys-governance onto a new document-authoring system id) does not transfer directly to phase-auto-03/-04, because these are genuine new components sharing sys-api's scaffold placeholder, not phases colliding on a shared documentation folder - so this is not literally "one fix covers both." But both cases are blocked on the same class of remedy (register new systems.yaml entries) and the same class of obstacle (a governed-config change outside any one session's grant, per R12's note that phase-conc-03 is a genuine prerequisite for code reservation contention). Whoever eventually edits systems.yaml to resolve decision 18 could plausibly resolve both idg's and auto's collisions in the same systems.yaml change, even though the diagnosis and the specific new ids differ.
+
+No other idea in _data/ideas.jsonl covers this ADR-003/sys-api collision; idea's own links (relates_to -> 000251, the anchor for phase-agx-09/phase-auto-03/phase-auto-04's three deferred defects) are already correct and need no further link.
+
+</details>
+
+**Links**
+
+- relates_to → `000251`
+
+---
+
+## 000254 · phase-auto-04 carries no depends_on edge onto the P4 phases it needs
+
+**Created 2026-09-16T12:04:27-04:00 · Status: `triaged`**
+
+phase-auto-04 has no depends_on edge onto the P4 phases, despite PLAN-032 stating that building the ledger first means guessing at phase-agx-01 and phase-agx-05. The missing edge means nothing stops phase-auto-04 being claimed and built before the phases whose shape it depends on have landed. Note that src/governance/backlog.py validates dependency completeness only at claim time, so a missing edge stays invisible until someone claims the phase.
+
+Found by group E's critique agent during the 2026-09-16 queued phase review; phase-auto-04 was outside that review's frozen scope so nothing was changed.
+
+Evidence: _working/phase-review/E.md, out-of-scope section; docs/00-working/phase-review-decisions.md entry 17.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-16T12:05:51-04:00): Confirmed against the live backlog: PLAN-032's own text (docs/01-plans/PLAN-032-autonomous-agent-operations.md:184-191) states "this programme should run after P4," naming phase-agx-01 (truncation handling) and phase-agx-05 (delegation methodology) as bearing directly on what phase-auto-04's run ledger must record, and that "building the ledger first means guessing at them." But phase-auto-04's actual backlog entry (docs/09-backlog/backlog.yaml:10532-10570) carries depends_on: [phase-auto-01, phase-auto-02] only — no phase-agx-01 or phase-agx-05 edge. The P4 guidance survives only as a soft next_action note ("Read phase-agx-01 and phase-agx-05 first if they have landed"), not a hard edge. Contrast phase-auto-06, which gets the equivalent guidance as a real depends_on: [phase-agx-07] edge (backlog.yaml:10603, PLAN-032:162). Since readiness()/claim-time validation checks depends_on rather than next_action prose, nothing stops phase-auto-04 from being claimed and built before phase-agx-01/-05 land.
+
+This is exactly the same defect group-E's critique already surfaced during the 2026-09-16 queued phase review (PROMPT-035): both phase-auto-03/-04 and this dependency gap were found outside the review's frozen next_up scope, so nothing was changed in that session. The full write-up is docs/00-working/phase-review-decisions.md entry 17 ("phase-auto-04 has no depends_on edge onto the P4 phases it needs") and the underlying evidence is _working/phase-review/E.md's out-of-scope section. This idea's own link to 000251 (the anchor idea for the three phases the review found defective but could not touch) already records that grouping — 000252 covers phase-agx-09's scope gap and 000253 covers phase-auto-03/-04's sys-api collision; no further idea-to-idea link is needed beyond the existing relates_to->000251.
+
+No plan, requirement or ADR proposes fixing this edge yet; decision 17 is a flagged gap with no owner action taken, and no PLAN or backlog phase currently exists to add the phase-agx-01/phase-agx-05 depends_on edges to phase-auto-04. This idea is the first place that fix is tracked as actionable work.
+
+No promotion candidate: nothing has shipped this fix.
+
+</details>
+
+**Links**
+
+- relates_to → `000251`

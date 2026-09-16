@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-16'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-record-system, doc-idea-graph-lifecycle, doc-agent-engineering-delegation, doc-autonomous-agent-operations, doc-repeatable-idea-partition]
 ---
@@ -103,10 +103,10 @@ in full in `ADR-018`:
 - **Checkpoints cover crashes, not rejections.** Semantic failure (a validator says no, an
   adversary finds a blocker) follows the stage's failure path above; checkpoint resume covers
   process death only.
-- **Boundary against `phase-agx-09`**: that phase owns *claim-protocol* recovery — stale claims,
+- **Boundary against `phase-conc-04`**: that phase owns *claim-protocol* recovery — stale claims,
   orphaned worktrees, a claim held with a finding unwritten — for any agent, pipeline or not.
   The orchestrator owns *run-level* recovery: which stage a run is in and how it resumes. The
-  orchestrator consumes `phase-agx-09`'s procedures; it does not redefine them. `PLAN-039`
+  orchestrator consumes `phase-conc-04`'s procedures; it does not redefine them. `PLAN-039`
   carries this de-duplication table.
 
 ## Authority model
