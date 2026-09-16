@@ -7,6 +7,21 @@ next_up:
 - phase-port-02
 - phase-ses-01
 - phase-lit-09
+- phase-irs-03
+- phase-irs-01
+- phase-irs-04
+- phase-irs-14
+- phase-irs-11
+- phase-irs-13
+- phase-irs-05
+- phase-irs-06
+- phase-irs-07
+- phase-irs-08
+- phase-irs-09
+- phase-irs-15
+- phase-irs-10
+- phase-irs-02
+- phase-irs-12
 items:
 - id: phase-wbf-11
   title: HTML Viewer image formats, markdown rendering and image presentation (backfill)
