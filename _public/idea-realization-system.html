@@ -1,0 +1,400 @@
+<title>Idea Realization System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #F6F6F2;
+    --surface: #FDFDFB;
+    --ink: #1F2523;
+    --muted: #5C6663;
+    --line: #D9DBD2;
+    --accent: #0E7C6B;
+    --accent-soft: #E3EFEB;
+    --gate: #A96F14;
+    --gate-soft: #F4EAD7;
+    --rail: #6B6478;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151A19;
+      --surface: #1C2221;
+      --ink: #E6EAE7;
+      --muted: #97A29D;
+      --line: #2B3231;
+      --accent: #45BFA9;
+      --accent-soft: #1E2E2A;
+      --gate: #E2A94F;
+      --gate-soft: #322A1B;
+      --rail: #A29ab5;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151A19;
+    --surface: #1C2221;
+    --ink: #E6EAE7;
+    --muted: #97A29D;
+    --line: #2B3231;
+    --accent: #45BFA9;
+    --accent-soft: #1E2E2A;
+    --gate: #E2A94F;
+    --gate-soft: #322A1B;
+    --rail: #A29ab5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: 16.5px;
+    line-height: 1.62;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 28px 80px; }
+  h1, h2, h3 { font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; text-wrap: balance; }
+  h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 10px 0 14px; }
+  h2 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; }
+  h3 { font-size: 1.02rem; font-weight: 700; margin: 0 0 4px; }
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.86em;
+  }
+  code { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+  .eyebrow {
+    font-family: "Archivo", sans-serif; font-weight: 600; font-size: 0.74rem;
+    text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent);
+  }
+  .lede { font-size: 1.12rem; max-width: 62ch; color: var(--ink); margin: 0 0 18px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem;
+    border: 1px solid var(--line); background: var(--surface);
+    border-radius: 999px; padding: 4px 12px; color: var(--muted);
+  }
+  .chip strong { color: var(--ink); font-weight: 600; }
+  section { margin-top: 64px; }
+  .section-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 22px; }
+  .section-head .k {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--muted);
+  }
+  p { max-width: 68ch; }
+  p.note { color: var(--muted); font-size: 0.95rem; }
+
+  figure { margin: 34px 0 0; }
+  .diagram-frame { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 22px 10px; }
+  .diagram-frame svg { display: block; margin: 0 auto; max-width: 100%; height: auto; min-width: 700px; }
+  figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 10px; max-width: 76ch; }
+
+  .gates { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .gate-card {
+    border: 1px solid var(--line); border-top: 3px solid var(--gate);
+    background: var(--surface); border-radius: 5px; padding: 14px 16px 12px;
+  }
+  .gate-card .gid {
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.8rem;
+    color: var(--gate); letter-spacing: 0.06em;
+  }
+  .gate-card h3 { margin-top: 2px; }
+  .gate-card p { font-size: 0.88rem; color: var(--muted); margin: 6px 0 0; line-height: 1.5; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+  .table-frame { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  th {
+    font-family: "Archivo", sans-serif; font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.1em; text-align: left; color: var(--muted);
+    padding: 10px 14px; border-bottom: 2px solid var(--line); white-space: nowrap;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.id { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; white-space: nowrap; color: var(--accent); font-weight: 500; }
+  td.dep { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; white-space: nowrap; color: var(--muted); }
+  tbody tr.gate-row td { background: var(--gate-soft); }
+  tbody tr.gate-row td.id { color: var(--gate); }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } }
+  .panel { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 18px 20px; }
+  .panel.owner { border-top: 3px solid var(--gate); }
+  .panel.agents { border-top: 3px solid var(--accent); }
+  .panel ul { margin: 10px 0 0; padding-left: 18px; }
+  .panel li { margin: 5px 0; font-size: 0.93rem; }
+  .panel .who { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .panel .who.o { color: var(--gate); }
+  .panel .who.a { color: var(--accent); }
+
+  .subs { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .sub-card { border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: 14px 16px; }
+  .sub-card .pid { font-family: "IBM Plex Mono", monospace; font-size: 0.76rem; color: var(--rail); font-weight: 600; }
+  .sub-card h3 { margin: 3px 0 6px; }
+  .sub-card p { font-size: 0.87rem; color: var(--muted); margin: 0; line-height: 1.5; }
+  .sub-card .warn { color: var(--gate); font-weight: 500; }
+
+  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .prin { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; }
+  .prin h3 { font-size: 0.95rem; }
+  .prin p { font-size: 0.88rem; color: var(--muted); margin: 4px 0 0; line-height: 1.5; }
+
+  footer { margin-top: 72px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 0.82rem; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+  a { color: var(--accent); }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">D-System &middot; ARCH-006 &middot; idea 000247</div>
+  <h1>Idea Realization System</h1>
+  <p class="lede">One pipeline from an idea spoken in conversation to a delivered capability
+  verified against that idea &mdash; nine stages, five owner gates, and everything between them
+  automated with an audit trail.</p>
+  <div class="meta">
+    <span class="chip"><strong>9</strong>&ensp;stages</span>
+    <span class="chip"><strong>5</strong>&ensp;gate categories</span>
+    <span class="chip"><strong>13</strong>&ensp;glue phases</span>
+    <span class="chip"><strong>4</strong>&ensp;sub-programmes</span>
+    <span class="chip">LangGraph + Claude Agent SDK</span>
+    <span class="chip">2026-09-15</span>
+  </div>
+</header>
+
+<figure>
+  <div class="diagram-frame">
+  <svg viewBox="0 0 840 810" role="img" aria-label="The nine-stage pipeline: capture, triage, partition, planning, adversarial review, phase-fit check, dependency mapping, execution, and realization check, with five amber owner gates crossing the flow, dashed revise loops on the left, sub-programme supplies on the right, and the learning loop returning from stage nine to planning.">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+      </marker>
+      <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+      </marker>
+    </defs>
+
+    <!-- ===== stage boxes: x 170..440 (w 270) ===== -->
+    <!-- S1 -->
+    <g font-family="Archivo, sans-serif" font-size="13" font-weight="600">
+      <rect x="170" y="20" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="42" fill="var(--ink)">1&ensp;Capture</text>
+      <text x="192" y="60" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">owner + assistant &middot; append_idea.py</text>
+
+      <!-- G1 gate bar -->
+      <rect x="170" y="86" width="270" height="20" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.2"/>
+      <text x="305" y="100" text-anchor="middle" fill="var(--gate)" font-size="11">G1&ensp;idea approval</text>
+
+      <!-- S2 -->
+      <rect x="170" y="120" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="142" fill="var(--ink)">2&ensp;Triage</text>
+      <text x="192" y="160" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">one agent per idea, on append</text>
+
+      <!-- S3 -->
+      <rect x="170" y="186" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="208" fill="var(--ink)">3&ensp;Partition</text>
+      <text x="192" y="226" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">tracks &middot; new plan vs amendment</text>
+
+      <!-- G2 -->
+      <rect x="170" y="252" width="270" height="20" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.2"/>
+      <text x="305" y="266" text-anchor="middle" fill="var(--gate)" font-size="11">G2&ensp;track acceptance</text>
+
+      <!-- S4 -->
+      <rect x="170" y="286" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="308" fill="var(--ink)">4&ensp;Planning</text>
+      <text x="192" y="326" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">requirement + plan &middot; minimum scope</text>
+
+      <!-- S5 -->
+      <rect x="170" y="352" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="374" fill="var(--ink)">5&ensp;Adversarial review</text>
+      <text x="192" y="392" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">three altitudes &middot; findings recorded</text>
+
+      <!-- S6 -->
+      <rect x="170" y="418" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="440" fill="var(--ink)">6&ensp;Phase-fit check</text>
+      <text x="192" y="458" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">one session per phase, or split</text>
+
+      <!-- S7 -->
+      <rect x="170" y="484" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="506" fill="var(--ink)">7&ensp;Dependency mapping</text>
+      <text x="192" y="524" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">depends_on + locks &middot; proposes order</text>
+
+      <!-- G3 -->
+      <rect x="170" y="550" width="270" height="20" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.2"/>
+      <text x="305" y="564" text-anchor="middle" fill="var(--gate)" font-size="11">G3&ensp;plan approval &middot; owner ranks the order</text>
+
+      <!-- S8 -->
+      <rect x="170" y="584" width="270" height="70" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="606" fill="var(--ink)">8&ensp;Execution</text>
+      <text x="192" y="624" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">developers in worktrees &middot; validators</text>
+      <text x="192" y="640" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">twice-rejected &rarr; blocked, to G5 queue</text>
+
+      <!-- G4 -->
+      <rect x="170" y="668" width="270" height="20" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.2"/>
+      <text x="305" y="682" text-anchor="middle" fill="var(--gate)" font-size="11">G4&ensp;integration into dev</text>
+
+      <!-- S9 -->
+      <rect x="170" y="702" width="270" height="52" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text x="192" y="724" fill="var(--ink)">9&ensp;Realization check</text>
+      <text x="192" y="742" fill="var(--muted)" font-family="'IBM Plex Mono', monospace" font-size="10.5" font-weight="400">delivered, verified against the idea</text>
+
+      <!-- G5 -->
+      <rect x="170" y="768" width="270" height="20" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.2"/>
+      <text x="305" y="782" text-anchor="middle" fill="var(--gate)" font-size="11">G5&ensp;completion review &middot; batched /session-close</text>
+    </g>
+
+    <!-- ===== main flow arrows ===== -->
+    <g stroke="var(--accent)" stroke-width="1.6" fill="none">
+      <line x1="305" y1="72"  x2="305" y2="84"  marker-end="url(#ar)"/>
+      <line x1="305" y1="106" x2="305" y2="118" marker-end="url(#ar)"/>
+      <line x1="305" y1="172" x2="305" y2="184" marker-end="url(#ar)"/>
+      <line x1="305" y1="238" x2="305" y2="250" marker-end="url(#ar)"/>
+      <line x1="305" y1="272" x2="305" y2="284" marker-end="url(#ar)"/>
+      <line x1="305" y1="338" x2="305" y2="350" marker-end="url(#ar)"/>
+      <line x1="305" y1="404" x2="305" y2="416" marker-end="url(#ar)"/>
+      <line x1="305" y1="470" x2="305" y2="482" marker-end="url(#ar)"/>
+      <line x1="305" y1="536" x2="305" y2="548" marker-end="url(#ar)"/>
+      <line x1="305" y1="570" x2="305" y2="582" marker-end="url(#ar)"/>
+      <line x1="305" y1="654" x2="305" y2="666" marker-end="url(#ar)"/>
+      <line x1="305" y1="688" x2="305" y2="700" marker-end="url(#ar)"/>
+      <line x1="305" y1="754" x2="305" y2="766" marker-end="url(#ar)"/>
+    </g>
+
+    <!-- ===== revise / return loops, left side ===== -->
+    <g stroke="var(--muted)" stroke-width="1.3" fill="none" stroke-dasharray="5 4">
+      <!-- S5 findings -> S4 revise -->
+      <path d="M170,378 L128,378 L128,312 L168,312" marker-end="url(#arm)"/>
+      <!-- S6 split -> S5 re-review -->
+      <path d="M170,444 L104,444 L104,392 L168,392" marker-end="url(#arm)"/>
+    </g>
+    <g font-family="'IBM Plex Mono', monospace" font-size="10" fill="var(--muted)">
+      <text x="60" y="332">revise</text>
+      <text x="36" y="412">split re-enters</text>
+    </g>
+
+    <!-- ===== learning loop, right side ===== -->
+    <path d="M440,728 L806,728 L806,316 L444,316" stroke="var(--accent)" stroke-width="1.4" fill="none" stroke-dasharray="6 4" marker-end="url(#ar)"/>
+    <g font-family="'IBM Plex Mono', monospace" font-size="10" fill="var(--accent)">
+      <text x="800" y="520" text-anchor="end" transform="rotate(-90 800 520)">learning loop &middot; anti-pattern store &rarr; plan-quality standard</text>
+    </g>
+
+    <!-- ===== sub-programme supply rail, right ===== -->
+    <g stroke="var(--rail)" stroke-width="1.1" fill="none" stroke-dasharray="2 3">
+      <line x1="440" y1="146" x2="486" y2="146"/>
+      <line x1="440" y1="212" x2="486" y2="212"/>
+      <line x1="440" y1="312" x2="486" y2="312"/>
+      <line x1="440" y1="378" x2="486" y2="378"/>
+      <line x1="440" y1="510" x2="486" y2="510"/>
+      <line x1="440" y1="614" x2="486" y2="614"/>
+    </g>
+    <g font-family="'IBM Plex Mono', monospace" font-size="10.5" fill="var(--rail)">
+      <text x="492" y="143">idea-triage agent &middot; stopgap dispatch</text>
+      <text x="492" y="157">phase-irs-01</text>
+      <text x="492" y="209">PLAN-025 pack + partition-adversary</text>
+      <text x="492" y="223">consolidated by phase-irs-02</text>
+      <text x="492" y="309">planner phase-idg-12</text>
+      <text x="492" y="323">standard phase-idg-10</text>
+      <text x="492" y="375">engine: phase-agx-11/12 trio</text>
+      <text x="492" y="389">interim: single adversary</text>
+      <text x="492" y="507">governance validator, mechanical</text>
+      <text x="492" y="611">broker phase-auto-02 &middot; ADR-003 claims</text>
+      <text x="492" y="625">worker phase-auto-05, or SDK fallback</text>
+    </g>
+  </svg>
+  </div>
+  <figcaption>The pipeline as a state machine. Teal is automated flow; amber bars are the five
+  owner gates; dashed grey arrows on the left are the revise loops (review findings return a plan,
+  a split phase re-enters review); the dotted right rail names what each stage rides on in the
+  sub-programmes; the dashed teal return from stage&nbsp;9 is the learning loop that makes the
+  machine improve between runs.</figcaption>
+</figure>
+
+<section>
+  <div class="section-head"><h2>The five gates</h2><span class="k">decision categories, not interruptions</span></div>
+  <p>A gate is a category of decision reserved to the owner &mdash; not necessarily a separate
+  sitting. Gate items queue and arrive <em>decision-ready</em>: the proposal, the adversarial
+  findings against it, and the evidence, pre-digested. Throughput of the whole machine is set by
+  the owner's decision throughput, so gate presentation is a first-class design concern.</p>
+  <div class="gates">
+    <div class="gate-card"><span class="gid">G1</span><h3>Idea approval</h3><p>An idea enters the append-only log. Per idea, in conversation &mdash; as today.</p></div>
+    <div class="gate-card"><span class="gid">G2</span><h3>Track acceptance</h3><p>The partition's tracks and new-plan-vs-amendment rulings stand. One sitting per partition run.</p></div>
+    <div class="gate-card"><span class="gid">G3</span><h3>Plan approval</h3><p>A plan, its phases and their proposed ordering, after adversarial review. Ranking <code>next_up</code> stays here, with the owner.</p></div>
+    <div class="gate-card"><span class="gid">G4</span><h3>Integration</h3><p>A branch merges into <code>dev</code>. Enforced at the tool boundary by the capability broker &mdash; a run cannot merge itself.</p></div>
+    <div class="gate-card"><span class="gid">G5</span><h3>Completion review</h3><p>Batched: the owner clears a queue of finished phases in one sitting, each individually closed through <code>/session-close</code>.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Division of labor</h2><span class="k">the authority model</span></div>
+  <div class="cols">
+    <div class="panel owner">
+      <span class="who o">Owner-reserved, permanently</span>
+      <ul>
+        <li>Idea approval and <code>lineage</code> annotations</li>
+        <li>Partition acceptance and plan approval</li>
+        <li><code>next_up</code> ranking and all cross-track priority</li>
+        <li>Integration into <code>dev</code>; phase completion via <code>/session-close</code></li>
+        <li>Edits to <code>AGENTS.md</code> / <code>CLAUDE.md</code>; deletions under <code>_working/</code>; anything <code>_private/</code></li>
+      </ul>
+    </div>
+    <div class="panel agents">
+      <span class="who a">Agent-writable, always audited</span>
+      <ul>
+        <li>Idea <code>finding</code> annotations and permitted status moves</li>
+        <li>Draft documents; branch commits</li>
+        <li><code>depends_on</code> and <code>systems</code> locks within an approved plan</li>
+        <li>Run-ledger entries for every transition</li>
+        <li>Proposals &mdash; orderings, splits, <code>delivered</code> &mdash; that a gate disposes of</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Every role carries a written contract &mdash; inputs, outputs, and a binding
+  never-do column: triage never advances past <code>triaged</code>; validators never edit; the
+  planner drafts and does not decide; validators see the requirement and the diff, never the
+  developer's rationale.</p>
+</section>
+
+<section>
+  <div class="section-head"><h2>Sub-programmes</h2><span class="k">what each supplies</span></div>
+  <div class="subs">
+    <div class="sub-card"><span class="pid">PLAN-029 &middot; P1</span><h3>Idea graph &amp; lifecycle</h3>
+      <p>The idea schema bundle, the plan-quality standard, the promoted-draft location, the planner agent, and idea-level decomposition.</p></div>
+    <div class="sub-card"><span class="pid">PLAN-031 &middot; P4</span><h3>Agent engineering</h3>
+      <p>The delegation-scoping methodology, the expander/minimalist/arbiter engine, the anti-pattern store, and claim-protocol recovery.</p></div>
+    <div class="sub-card"><span class="pid">PLAN-032 &middot; P5</span><h3>Autonomous operations</h3>
+      <p>The capability broker, run ledger, supervised worker and trigger gateway &mdash; each conditional on the <code>phase-auto-01</code> ruling. <span class="warn">Fallbacks named for every component.</span></p></div>
+    <div class="sub-card"><span class="pid">PLAN-025</span><h3>Repeatable partition</h3>
+      <p>The partition workflow, prompt pack and corpus selection. <span class="warn">Still draft; its three check-ins consolidate into G2 via <code>phase-irs-02</code>.</span></p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>The thirteen glue phases</h2><span class="k">PLAN-039 &middot; none in next_up until the owner ranks them</span></div>
+  <div class="table-frame"><table>
+    <thead><tr><th>Phase</th><th>Builds</th><th>Depends on</th></tr></thead>
+    <tbody>
+      <tr><td class="id">phase-irs-01</td><td>Stopgap triage dispatch on append, with the reconciling sweep</td><td class="dep">&mdash;</td></tr>
+      <tr><td class="id">phase-irs-02</td><td>Consolidate PLAN-025's check-ins into Gate 2, recorded in GOV-003</td><td class="dep">phase-part-03</td></tr>
+      <tr><td class="id">phase-irs-03</td><td>Pipeline role contracts &mdash; the binding never-do column</td><td class="dep">&mdash;</td></tr>
+      <tr><td class="id">phase-irs-04</td><td>LangGraph orchestrator skeleton: interrupt gates, thin-state rule</td><td class="dep">phase-irs-03</td></tr>
+      <tr><td class="id">phase-irs-05</td><td>Phase-fit procedure and agent (distinct from idea decomposition)</td><td class="dep">phase-idg-10</td></tr>
+      <tr><td class="id">phase-irs-06</td><td>Three-altitude review procedure, interim adversarial engine</td><td class="dep">phase-idg-10</td></tr>
+      <tr><td class="id">phase-irs-07</td><td>Dependency-mapping agent and the G3 ratification flow</td><td class="dep">phase-idg-12</td></tr>
+      <tr><td class="id">phase-irs-08</td><td>Execution loop harness: dispatch, parking, confidentiality gate</td><td class="dep">phase-irs-04 &middot; phase-auto-02</td></tr>
+      <tr><td class="id">phase-irs-09</td><td>Terminal <code>delivered</code> status and the realization check</td><td class="dep">phase-idg-01</td></tr>
+      <tr><td class="id">phase-irs-10</td><td>Learning loop wired into the anti-pattern store</td><td class="dep">phase-agx-03 &middot; phase-irs-09</td></tr>
+      <tr><td class="id">phase-irs-11</td><td>Run budgets, hard caps and the kill switch</td><td class="dep">phase-irs-04</td></tr>
+      <tr><td class="id">phase-irs-12</td><td>End-to-end trace, forced-failure drill, metrics baselines</td><td class="dep">phase-irs-05&ndash;08</td></tr>
+      <tr><td class="id">phase-irs-13</td><td>Gate queue and decision-ready presentation; batched G5</td><td class="dep">phase-irs-04</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Orchestration principles</h2><span class="k">ADR-018</span></div>
+  <div class="principles">
+    <div class="prin"><h3>Thin state, repo wins</h3><p>Graph state carries run identity, stage and references &mdash; never record content. On disagreement the repository is authoritative and the run re-derives.</p></div>
+    <div class="prin"><h3>Checkpoints cover crashes</h3><p>Resume handles process death only. A validator's no or an adversary's blocker follows the stage's written failure path &mdash; revise, escalate, park. No stage wedges silently.</p></div>
+    <div class="prin"><h3>Budgets and a kill switch</h3><p>Every run carries a token budget with a hard cap that parks rather than exceeds; one owner-operable switch halts all dispatch.</p></div>
+    <div class="prin"><h3>Evidence over persona</h3><p>Every agent is the same model, so independence comes from executed tests and repository checks, not persona prompts &mdash; plus owner spot-audits of passed validations at G5.</p></div>
+    <div class="prin"><h3>Measured, not vibed</h3><p>Automation rate, cycle time and rework rate computed deterministically from the ledger and log; baselines recorded before targets are set.</p></div>
+    <div class="prin"><h3>It learns between runs</h3><p>Rejections, recurring findings and realization outcomes feed the anti-pattern store; the plan-quality standard cites the store when revised.</p></div>
+  </div>
+</section>
+
+<footer>
+  ARCH-006 &middot; REQ-022 &middot; PLAN-039 &middot; ADR-018 &middot; integrated to dev at ce7c21f &middot; 2026-09-15
+</footer>
+</div>
