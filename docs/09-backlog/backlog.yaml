@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lit-09
-- phase-irs-03
 - phase-irs-01
 - phase-auto-01
 - phase-auto-02
@@ -11977,8 +11976,19 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-realization-role-contracts
+  completion_evidence:
+  - docs/08-governance/GOV-014-realization-role-contracts.md
+  - .claude/agents/idea-triage.md
+  - .claude/agents/partition-adversary.md
+  - docs/03-sessions/SESS-2026-09-16-10-realization-role-contracts.md
+  result: GOV-014 covers all nine roles with inputs, outputs, never-do lists and the
+    300k per-dispatch ceiling; owner-reserved list verbatim from ARCH-006; R03/R13/R23
+    verified; two agent definitions updated through the generator chain; validator pass
+    4/4; adversary 2 minors, one fixed in one cycle, one accepted; owner accepted the
+    two unsourced defaults (300k ceiling, 1-in-10 G5 sampling) at the integration gate.
   priority: 2
   session_budget: 1
   depends_on: []
