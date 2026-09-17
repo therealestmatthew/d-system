@@ -290,7 +290,7 @@ CI regenerates it and fails on any difference.
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
-| PLAN-008 | doc-session-lifecycle | draft | 3 | 0 | 4 | agent-checkpoint, agent-codex-port, agent-ses06 |
+| PLAN-008 | doc-session-lifecycle | draft | 2 | 1 | 4 | agent-build, agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 4 | 0 | 4 | agent-architect, agent-cap03, agent-cap04, agent-cap07 |
 | PLAN-010 | doc-code-reservation-enforcement | draft | 1 | 0 | 0 | — |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
