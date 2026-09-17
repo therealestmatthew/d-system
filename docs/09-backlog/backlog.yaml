@@ -7073,7 +7073,8 @@ items:
   systems:
   - sys-portfolio
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-build
   priority: 1
   session_budget: 1
   depends_on: []
