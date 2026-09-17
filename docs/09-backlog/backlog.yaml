@@ -3,7 +3,6 @@ updated: '2026-09-16'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-port-02
 - phase-ses-01
 - phase-lit-09
 - phase-irs-03
@@ -4416,8 +4415,21 @@ items:
   - sys-backlog
   - sys-delivery
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-portable-workflows-ported
+  completion_evidence:
+  - agent-workflows/workflows.yaml
+  - tools/generate_agent_workflows.py
+  - .claude/commands/idea.md
+  - .codex/agents/idea-triage.toml
+  - test/test_agent_workflows.py
+  - docs/03-sessions/SESS-2026-09-16-08-portable-workflows-ported.md
+  result: Four canonical bodies added; generator extended to command, claude-agent and
+    codex-agent targets; eight adapters generated with provenance replacing hand-authored
+    copies; session-close excluded from every agent-discoverable kind with refusal tests;
+    --check reports 14 adapters current; suite 599 green; validator pass 4/4; adversary
+    blocker defused at integration, major refuted (gpt-5.6-luna verified), minor accepted.
   priority: 2
   session_budget: 1
   depends_on:
