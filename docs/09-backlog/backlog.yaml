@@ -3,7 +3,6 @@ updated: '2026-09-16'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-ses-01
 - phase-lit-09
 - phase-irs-03
 - phase-irs-01
@@ -2995,8 +2994,19 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-session-type-taxonomy
+  completion_evidence:
+  - docs/06-requirements/REQ-023-session-type-taxonomy.md
+  - docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md
+  - docs/03-sessions/SESS-2026-09-16-09-session-type-taxonomy.md
+  result: REQ-023 states per-type observable obligations with verification methods and
+    the universal rules once as non-negotiable; ADR-020 resolves brainstorming (ideas,
+    no governed artifact), mid-flight change (binds from point of change, recorded in
+    session-close's Decisions section) and declaration (inferred from claimed phase,
+    owner override). Shipped checkpoint/session-close treated as fixed constraints per
+    owner ruling. Validator pass; adversary 2 majors + 2 minors fixed in one cycle.
   priority: 1
   session_budget: 1
   depends_on: []
