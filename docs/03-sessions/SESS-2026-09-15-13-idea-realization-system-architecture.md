@@ -20,7 +20,7 @@ worktree `../d-system-worktrees/irs-architecture`. Peers hold no lock against it
 ## What the session did
 
 1. **Captured and triaged idea `000247`** (formalize the idea realization system into an
-   automated multi-agent pipeline). The triage agent recorded a finding and links to `000046`,
+   automated multi-agent pipeline). The triage agent recorded a finding naming `000046`,
    `000072`, `000078` and `000082`, and moved it to `triaged`. Capture and annotations were
    committed on `dev` per the standing capture path (`d682ddd`, `bef4c85`).
 2. **Took eight owner rulings**, all via `AskUserQuestion`, recorded as findings on `000247`:

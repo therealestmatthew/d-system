@@ -55,10 +55,12 @@ phases to them.
 
 ## Implementation phases
 
-Fifteen phases under `phase-irs-*`, registered in the backlog (two — the batch and realization
-graphs — added by the 2026-09-16 audit revision of `PLAN-039.01`, which found them unowned). None
-enters `next_up`; per the owner's ruling this track does not jump the queue, and its ordering ratification is itself a G3
-decision when the time comes.
+Seventeen phases under `phase-irs-*`, registered in the backlog — fifteen from this plan's first
+registration and its 2026-09-16 audit revision (which found the batch and realization graphs
+unowned), plus two splits (`phase-irs-16`, `-17`) from the queued-phase review of the same day.
+The owner queued the full track into `next_up` on 2026-09-16, dependency-ordered behind the four
+standing entries and woven with the external gate phases it needs, superseding this plan's
+original none-enters-`next_up` posture; ordering changes remain the owner's alone.
 
 | Phase | Title | Depends on | Requirements |
 |---|---|---|---|
