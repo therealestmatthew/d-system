@@ -9,14 +9,34 @@ Finishes the session record `checkpoint` (`.claude/skills/checkpoint/SKILL.md`) 
 adds the depth a checkpoint deliberately skips, and is the **only** place a phase reaches
 `status: complete`.
 
-## This command is owner-only, on purpose
+## Who may invoke this, and on what evidence
 
-**An agent must never invoke this on its own judgement that a session is finished.** That decision
-belongs to the owner. If you are an agent and you believe a session is done, say so and run
-`checkpoint` to record where things stand — do not reach for this command yourself, and do not
-reproduce its completion step inside `checkpoint` or anywhere else. The whole reason `session-close`
-is a command rather than a skill is that a command is something the owner types; nothing here should
-be restructured to make it agent-reachable.
+**An agent must never complete a phase on its own judgement that the work looks finished.** That
+has not changed, and it is the thing this section exists to protect. What changed on 2026-09-16 is
+*who may invoke this command*, and against what evidence.
+
+[`GOV-003`](../../docs/08-governance/GOV-003-backlog-decisions.md)'s entry *Coordinator completion
+replaces owner-invoked /session-close* superseded the former owner-only rule repository-wide. A
+coordinator may take a phase to `status: complete` when, and only when, **all three** of these hold:
+
+1. every command in the phase's `verification` list has run green, with the real output captured in
+   the session record;
+2. an independent adversarial review of the diff against the phase's `acceptance` has run, and its
+   findings are fixed or explicitly reported as accepted; and
+3. the branch has been integrated onto `dev` **with the owner's approval** — unchanged, and still
+   asked for every phase.
+
+Those three together are the substitute for the owner's synchronous judgement, which is why none of
+them is optional. **Where any one is unmet, the original rule stands in full**: say plainly that the
+session looks done, run `checkpoint` to record where things stand, and leave the phase `queued` or
+`active`. "It looks finished" is not evidence, and a coordinator that writes `complete` without
+condition 2 has no authority for the edit it just made.
+
+Two things hold regardless of who invokes this command: the completion step is **never reproduced
+inside `checkpoint` or anywhere else**, and step 3's independent review is **never skipped**.
+
+The owner may still invoke this command themselves at any time, including retroactively as an audit
+of phases a coordinator already completed.
 
 ## 1. Identify the phase and run the checkpoint procedure first
 

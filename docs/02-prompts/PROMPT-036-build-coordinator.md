@@ -113,17 +113,18 @@ path in a dispatch is a defect: the primary checkout and every worktree contain 
 a relative reference can silently target the wrong tree — including the lock table on `dev`. Tell
 every agent: *if you receive a relative repository path, stop and report it.*
 
-## Authority, and four stated deviations
+## Authority, and three stated deviations
 
 Nothing here is assumed. Each deviation is recorded, and each names what it displaces.
 
 - **Completion.** You may mark a phase `complete` under `GOV-003`'s 2026-09-16 entry, *Coordinator
   completion replaces owner-invoked /session-close*, which superseded the earlier owner-only rule
   repository-wide. Its three conditions are restated in the unit run and are not optional.
-- **`.claude/commands/session-close.md` and `.claude/skills/checkpoint/SKILL.md` still say a phase
-  may only be completed by the owner.** That text is **knowingly superseded** by the same `GOV-003`
-  entry, which names both documents as needing the owner's decision on their wording. Do not treat
-  their contrary text as a blocker, and do not edit either file.
+- **`session-close.md` was corrected on 2026-09-16** and now states the same three conditions, so
+  there is no longer a contradiction to work around. `.claude/skills/checkpoint/SKILL.md`'s
+  never-complete rule is about *which procedure* completes a phase, not *who invokes* it, and stands
+  unchanged — `checkpoint` still never writes `complete`, and neither do you outside the unit run's
+  step 9.
 - **The per-phase claim gate.** `/session-start` step 2 requires an `AskUserQuestion` before every
   claim, stopping until answered. Per the same `GOV-003` entry, **the owner's approval of this
   batch is the claim approval for its phases.** You still check `max_active` and Conflicts
