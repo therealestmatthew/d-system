@@ -2,8 +2,9 @@
 """Assemble the idea-batching analyst corpora from the folded idea log.
 
 Builds one corpus file per analyst for the idea-batching build (PROMPT-032), plus a
-manifest recording what the analysts actually received. The corpus is the `triaged`
-ideas minus every id the demo fast lane consumed, so it is smaller than the log and
+manifest recording what the analysts actually received. The corpus is the ideas
+selected by `--status` (one status or a comma-separated list, default `triaged`)
+minus every id the demo fast lane consumed, so it is smaller than the log and
 changes whenever either moves — which is why the build session reads the manifest
 rather than assuming a number.
 
@@ -28,6 +29,7 @@ as layered and possibly contradictory evidence; the set is computed, never hard-
 because the log is append-only and the set grows.
 
     uv run python tools/build_idea_corpus.py                    # build, random seed
+    uv run python tools/build_idea_corpus.py --status open      # a different status slice
     uv run python tools/build_idea_corpus.py --seed 1234        # reproduce a run
     uv run python tools/build_idea_corpus.py --stats            # report only, write nothing
 """
@@ -46,7 +48,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.db.ideas import INVERSE_LINK_TYPE, fold, load_events  # noqa: E402
+from src.db.ideas import INVERSE_LINK_TYPE, fold, legal_transitions, load_events  # noqa: E402
 
 OUT_DIR = ROOT / "_working" / "idea-corpus"
 EXCLUSIONS = ROOT / "docs" / "00-working" / "demo-fast-lane-exclusions.yaml"
@@ -60,7 +62,18 @@ CONSUMING_DISPOSITIONS = frozenset({"queued", "fixed"})
 #: typo or a schema drift, and is warned about rather than silently treated as `dropped`.
 KNOWN_DISPOSITIONS = CONSUMING_DISPOSITIONS | {"dropped"}
 
-CORPUS_STATUS = "triaged"
+DEFAULT_STATUS = "triaged"
+
+
+def valid_statuses() -> set[str]:
+    """The idea record system's legal status values, read from the schema rather than restated.
+
+    `legal_transitions()` already derives the `(from, to)` transition table out of
+    `schemas/idea.schema.json`; the status filter's valid set is exactly the union of both
+    sides of that table, so it needs no second, hard-coded list here.
+    """
+    transitions = legal_transitions()
+    return {source for source, _ in transitions} | {target for _, target in transitions}
 
 HEADER = """# Idea corpus — {analyst}
 
@@ -134,11 +147,18 @@ def findings_of(entry: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def build_corpus(
+    statuses: frozenset[str],
     exclusions: Path = EXCLUSIONS,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    """Select the corpus and compute the facts the manifest reports."""
+    """Select the corpus and compute the facts the manifest reports.
+
+    `statuses` is the caller's already-validated `--status` selection — one status or
+    several, defaulting to `{"triaged"}`. The `"triaged"` key in the returned facts is kept
+    under its historical name for `--stats` compatibility; it now counts every idea matching
+    the selected status set, not only literally-`triaged` ones.
+    """
     state = fold(load_events())
-    triaged = {k: v for k, v in state.items() if v.get("status") == CORPUS_STATUS}
+    triaged = {k: v for k, v in state.items() if v.get("status") in statuses}
     removed, returned = load_exclusions(exclusions)
     corpus = {k: v for k, v in triaged.items() if k not in removed}
 
@@ -247,6 +267,11 @@ def render(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
+        "--status",
+        default=DEFAULT_STATUS,
+        help="status or comma-separated statuses to select (default: triaged)",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         help="shuffle seed for R3; a random one is drawn and recorded if omitted",
@@ -265,9 +290,25 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    corpus, facts = build_corpus(args.exclusions)
+    requested = [s.strip() for s in args.status.split(",") if s.strip()]
+    valid = valid_statuses()
+    unknown = sorted(s for s in requested if s not in valid)
+    if unknown:
+        print(
+            f"build_idea_corpus: unrecognized status {', '.join(unknown)} — "
+            f"valid values are: {', '.join(sorted(valid))}",
+            file=sys.stderr,
+        )
+        return 1
+    statuses = frozenset(requested)
+
+    corpus, facts = build_corpus(statuses, args.exclusions)
     if not corpus:
-        print("build_idea_corpus: no triaged ideas selected — nothing to build", file=sys.stderr)
+        print(
+            f"build_idea_corpus: no ideas with status {sorted(statuses)} selected — "
+            "nothing to build",
+            file=sys.stderr,
+        )
         return 1
 
     seed = args.seed if args.seed is not None else random.randrange(2**31)
@@ -289,6 +330,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.stats:
         print(json.dumps(facts, indent=2))
         return 0
+
+    # Added only for the manifest, never for --stats: the `--stats` acceptance requirement is
+    # byte-for-byte identical output for the default run, which this field would break.
+    facts["status"] = sorted(statuses)
 
     args.out.mkdir(parents=True, exist_ok=True)
     for analyst, name, order, order_name, include_findings in plan:
