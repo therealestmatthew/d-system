@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lit-09
-- phase-irs-01
 - phase-auto-01
 - phase-auto-02
 - phase-irs-04
@@ -11884,8 +11883,21 @@ items:
   - sys-realization
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-stopgap-triage-dispatch
+  completion_evidence:
+  - tools/idea_dispatch.py
+  - test/test_idea_dispatch.py
+  - docs/08-governance/OPS-016-idea-dispatch.md
+  - docs/03-sessions/SESS-2026-09-16-11-stopgap-triage-dispatch.md
+  result: idea_dispatch.py ships watch (poll-triggered dispatch on created events past
+    the watermark), manual dispatch, and the reconciling sweep, with atomic per-idea
+    claim files against double dispatch, per-dispatch halt-flag checks, and OPS-016
+    marking it interim (retired by phase-irs-04; phase-auto-01 rules the gateway).
+    R06 initially failed (manual-only trigger), fixed in cycle 1; adversary major
+    (double-dispatch race) and three minors fixed in cycle 2; 30 tool tests, suite
+    629 green; merged under the owner's conditional pre-approval.
   priority: 2
   session_budget: 1
   depends_on: []

@@ -336,8 +336,8 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
-| PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 1 | 1 | agent-build |
-| PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 1 | 1 | agent-build |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 2 | agent-build |
+| PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
 
 ## Held codes
 
