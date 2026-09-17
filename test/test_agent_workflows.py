@@ -155,3 +155,134 @@ def test_execute_prompt_uses_canonical_checkpoint_fallback() -> None:
     assert "agent-workflows/checkpoint.md" in prompt
     assert ".claude/skills/checkpoint/SKILL.md" not in prompt
     assert "Never write `status: complete`." in prompt
+
+
+def _workflow(manifest: dict[str, Any], workflow_id: str) -> dict[str, Any]:
+    for workflow in manifest["workflows"]:
+        if workflow["id"] == workflow_id:
+            return workflow
+    raise KeyError(workflow_id)
+
+
+def _target(workflow: dict[str, Any], host: str, kind: str) -> dict[str, Any]:
+    for target in workflow["targets"]:
+        if target["host"] == host and target["kind"] == kind:
+            return target
+    raise KeyError((host, kind))
+
+
+# --- phase-port-02: safe commands and the idea-triage agent -----------------------------------
+
+
+def test_owner_only_workflow_cannot_target_a_claude_command() -> None:
+    """A command is reachable through Claude Code's SlashCommand tool, so it is agent-discoverable
+    exactly like a skill — an owner-only workflow (e.g. a future session-close-shaped entry) must be
+    refused there too, not only when targeting kind: skill."""
+    manifest = copy.deepcopy(_manifest())
+    workflow = _workflow(manifest, "idea")
+    workflow["authority"] = "owner-only"
+    with pytest.raises(generator.WorkflowError, match="owner-only workflow"):
+        generator.validate_and_render(manifest, ROOT)
+
+
+def test_session_close_is_not_a_declared_workflow() -> None:
+    """Session closure stays owner-only and hand-authored. It must never enter the manifest that
+    feeds agent-discoverable Claude/Codex adapters."""
+    manifest = _manifest()
+    ids = {workflow["id"] for workflow in manifest["workflows"]}
+    names = {workflow["name"] for workflow in manifest["workflows"]}
+    assert "session-close" not in ids
+    assert "session-close" not in names
+
+    outputs = generator.validate_and_render(manifest, ROOT)
+    session_close = (ROOT / ".claude" / "commands" / "session-close.md").resolve()
+    assert session_close not in outputs
+
+
+def test_claude_idea_triage_agent_retains_haiku_medium_and_turn_cap() -> None:
+    outputs = generator.validate_and_render(_manifest(), ROOT)
+    path = ROOT / ".claude" / "agents" / "idea-triage.md"
+    rendered = outputs[path]
+    assert "name: idea-triage" in rendered
+    assert "model: haiku" in rendered
+    assert "effort: medium" in rendered
+    assert "maxTurns: 30" in rendered
+    assert "tools: Read, Grep, Bash" in rendered
+
+
+def test_codex_idea_triage_agent_declares_verified_model_and_unsupported_limits() -> None:
+    outputs = generator.validate_and_render(_manifest(), ROOT)
+    path = ROOT / ".codex" / "agents" / "idea-triage.toml"
+    rendered = outputs[path]
+    assert 'model = "gpt-5.6-luna"' in rendered
+    assert 'model_reasoning_effort = "medium"' in rendered
+    assert 'sandbox_mode = "workspace-write"' in rendered
+    assert "turn or token" in rendered and "budget" in rendered
+    assert 'name = "idea-triage"' in rendered
+    # The generator writes the canonical body verbatim as developer_instructions; it must round-trip
+    # through TOML rather than being silently truncated or mis-escaped.
+    import tomllib
+
+    parsed = tomllib.loads(rendered)
+    assert parsed["developer_instructions"].startswith("# idea-triage-agent")
+    assert "Never write a `linked` event" in parsed["developer_instructions"]
+    assert "Never call `status ... promoted`" in parsed["developer_instructions"]
+
+
+def test_codex_agent_target_must_declare_unsupported_limits() -> None:
+    manifest = copy.deepcopy(_manifest())
+    workflow = _workflow(manifest, "idea-triage-agent")
+    target = _target(workflow, "codex", "agent")
+    target["render"]["unsupported_limits"] = []
+    with pytest.raises(generator.WorkflowError, match="unsupported_limits"):
+        generator.validate_and_render(manifest, ROOT)
+
+
+def test_claude_agent_render_requires_every_field() -> None:
+    manifest = copy.deepcopy(_manifest())
+    workflow = _workflow(manifest, "idea-triage-agent")
+    target = _target(workflow, "claude", "agent")
+    del target["render"]["max_turns"]
+    with pytest.raises(generator.WorkflowError, match="render.max_turns"):
+        generator.validate_and_render(manifest, ROOT)
+
+
+def test_no_generated_idea_triage_output_can_apply_a_link_or_promotion() -> None:
+    """R05/acceptance: no generated agent or skill may apply a link, promotion, discard, or backlog
+    completion transition. The role may only ever *propose* one and must say so explicitly in every
+    rendered form."""
+    outputs = generator.validate_and_render(_manifest(), ROOT)
+    # Check the role's two generated forms (Claude agent, Codex agent) for the explicit
+    # never-execute guarantees, and the driver's two generated forms (Claude command, Open Agent
+    # Skills skill) for never containing an unconditional promotion/status call of their own.
+    claude_role = outputs[ROOT / ".claude" / "agents" / "idea-triage.md"]
+    codex_role_toml = outputs[ROOT / ".codex" / "agents" / "idea-triage.toml"]
+    import tomllib
+
+    codex_role = tomllib.loads(codex_role_toml)["developer_instructions"]
+    for text in (claude_role, codex_role):
+        assert "Never write a `linked` event" in text
+        assert "Never call `status ... promoted`" in text
+        assert "PROPOSED LINK:" in text
+        assert "PROPOSED PROMOTION:" in text
+
+    claude_driver = outputs[ROOT / ".claude" / "commands" / "idea-triage.md"]
+    skills_driver = outputs[ROOT / ".agents" / "skills" / "idea-triage" / "SKILL.md"]
+    for text in (claude_driver, skills_driver):
+        assert "never moves an idea past `triaged`" in text
+        # The driver only ever *names* the sanctioned link/promotion commands as candidates the
+        # owner reviews by hand — it must never contain an executable invocation of either.
+        assert "uv run python tools/append_idea.py link" not in text
+        assert "uv run python tools/append_idea.py status <id> promoted" not in text
+
+
+def test_idea_triage_agent_capabilities_never_grant_a_status_write_tool() -> None:
+    """The idea-triage-agent role's tool allowlist must never include an edit/write capability,
+    since it is only ever permitted to run the sanctioned `annotate` command through a shell/run
+    capability — never `Edit`/`Write`, which could be used to hand-edit the append-only log."""
+    manifest = _manifest()
+    workflow = _workflow(manifest, "idea-triage-agent")
+    for target in workflow["targets"]:
+        assert "edit_files" not in target["capabilities"]
+        assert "write_files" not in target["capabilities"]
+        assert "ask_user" not in target["capabilities"]
