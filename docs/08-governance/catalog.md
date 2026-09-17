@@ -278,6 +278,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-16-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-08-portable-workflows-ported.md |
 | SESS-2026-09-16-09 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-09-session-type-taxonomy.md |
 | SESS-2026-09-16-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-10-realization-role-contracts.md |
+| SESS-2026-09-16-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-11-stopgap-triage-dispatch.md |
 
 ## Plans and their phases
 
@@ -350,4 +351,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-271 documents — adr: 17, architecture: 6, governance: 11, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 108.
+272 documents — adr: 17, architecture: 6, governance: 11, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 109.
