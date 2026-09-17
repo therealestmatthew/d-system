@@ -25,6 +25,11 @@ the session's memory, carries state.
 Revised 2026-09-16 against an adversarial review (2 blockers, 2 majors, 1 minor — all integrated)
 and the owner's rulings on worktree granularity, the claim gate and blocker escalation.
 
+The reasoning behind this pack's shape — why one worktree per phase, why questions are batched at
+the open, why a blocker goes to an agent first — is recorded in
+[GOV-013](../08-governance/GOV-013-coordinator-protocol.md), the coordinator protocol. Read that
+before *changing* this pack; you do not need it to *run* the pack.
+
 Paste everything below the rule into a fresh session in this repository, naming the batch.
 
 ---
@@ -54,9 +59,20 @@ anything in a later batch — and within a batch the listed order is a valid bui
 and resume command, and conflicts with `phase-lit-07`. Do not claim it. Do not remove it from
 `next_up`.
 
-**Verify the batch against the repository before starting.** A phase already `complete` is skipped
-and reported; a phase a peer has claimed is skipped and reported. The table is what was true when
-written, not a promise about now.
+**This partition was verified programmatically** against `docs/09-backlog/backlog.yaml` when
+written, not checked by hand: every one of the twenty-nine non-`phase-lit-09` `next_up` entries
+appears exactly once, in `next_up`'s own order; every phase was `status: queued`; and every
+`depends_on` edge resolved to an earlier or same-position phase in the global batch order, with the
+two external dependencies (`phase-port-01`, `phase-part-01`) already `complete`.
+
+**Verify the batch against the repository before starting anyway.** A phase already `complete` is
+skipped and reported; a phase a peer has claimed is skipped and reported. The table is what was
+true when written, not a promise about now.
+
+**What the first run is for.** Five phases per batch is an estimate of what one coordinator can
+carry, not a measured figure, and the unit run below has never been executed. Batch 1 is the
+evidence for both. Record in the close-out what the batch size should actually be, and every place
+the unit run did not survive contact with the real commands.
 
 ## Preflight
 

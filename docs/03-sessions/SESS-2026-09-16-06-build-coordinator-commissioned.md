@@ -9,7 +9,7 @@ owner: repository-owner
 created: '2026-09-16'
 updated: '2026-09-16'
 systems: [sys-realization, sys-backlog, sys-governance]
-depends_on: [doc-build-coordinator, doc-backlog-decisions, doc-prompt-pack-protocol, doc-session-phase-review-remaining-decisions]
+depends_on: [doc-build-coordinator, doc-coordinator-protocol, doc-backlog-decisions, doc-prompt-pack-protocol, doc-session-phase-review-remaining-decisions]
 ---
 
 # Build coordinator commissioned and the queue partitioned into six batches
@@ -101,9 +101,41 @@ superseded completion documents.
 
 ## Verification
 
-- `Governance OK: 31 systems, 261 documents, 25 memories, 278 backlog phases`
+- `Governance OK: 31 systems, 263 documents, 25 memories, 278 backlog phases`
 - `580 passed, 2 warnings`
-- `check_no_private_content: OK (668 tracked files, 0 identifiers checked)`, staged
+- `check_no_private_content: OK (670 tracked files, 0 identifiers checked)`, staged
+
+## The coordinator protocol
+
+The design knowledge behind `PROMPT-036` was extracted into
+[GOV-013](../08-governance/GOV-013-coordinator-protocol.md) at the owner's request, so a future
+coordinator-planning session inherits it rather than rediscovering it. It carries the constraint
+questions that must be answered before any partition is drawn, the completion trap, the four ways a
+shared batch worktree fails, questions-at-the-open, resolver-before-escalation, the
+name-every-deviation rule, the check-the-decision-record rule, context and cost discipline, and a
+nine-step checklist.
+
+It was fact-checked before commit: 0 blockers, 4 majors, 5 minors — no false claims, every
+quotation and all four cited incidents substantiated against the record. The majors were worth the
+pass:
+
+- **It violated its own rule.** `GOV-013` makes adversarial review of a coordinator prompt
+  mandatory, while `GOV-008`'s stage-7 gate and `GOV-009`'s equivalent make it "optional and run
+  only if the owner specifically requests it" — and `GOV-013` had not named that as a deviation,
+  two sections after requiring every deviation be named. Now named, with the reasoning: the optional
+  clause rests on an earlier pack audit having covered the substance, which does not reach a
+  coordinator prompt written outside that methodology. Where one *is* produced by `GOV-008`'s full
+  pipeline, its clause governs and `GOV-013` yields.
+- **It required of `PROMPT-036` two things `PROMPT-036` did not do** — state that the partition was
+  verified programmatically, and name which parameter the first run tests. Both claims lived only in
+  this session record. Added to the pack, which is where a reader looks.
+- **Cost and context discipline were in the pack but never extracted**, so a planning session
+  reading only `GOV-013` would have missed the model-assignment rules, the fix-cycle cap, the
+  descope ladder and selective injection. Both sections added.
+
+The minors were a title breaking the siblings' convention, a gloss that undersized `GOV-008`, "days
+earlier" where the record says one day, an unexplained deviation count, and the omitted
+fixed-port-per-worktree rule. All corrected.
 
 ## Unresolved
 

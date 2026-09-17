@@ -38,6 +38,7 @@ CI regenerates it and fails on any difference.
 | GOV-007 | governance | active | repository-owner | docs/08-governance/GOV-007-repo-orientation.md |
 | GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
 | GOV-009 | governance | active | repository-owner | docs/08-governance/GOV-009-research-protocol.md |
+| GOV-013 | governance | active | repository-owner | docs/08-governance/GOV-013-coordinator-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -341,4 +342,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-262 documents — adr: 16, architecture: 6, governance: 9, operation: 15, plan: 54, prompt: 36, requirement: 22, session: 104.
+263 documents — adr: 16, architecture: 6, governance: 10, operation: 15, plan: 54, prompt: 36, requirement: 22, session: 104.
