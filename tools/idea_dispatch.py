@@ -8,12 +8,20 @@ appended. It is the stopgap named by `PLAN-039.01` SS10: `phase-irs-04`'s daemon
 into its own reconcile loop and retires this tool (see `docs/08-governance/OPS-016-idea-dispatch.md`
 for the interim declaration).
 
-**Two entry points, one shared core:**
+**Three entry points, one shared core:**
 
-- `dispatch` — meant to run right after `tools/append_idea.py add` succeeds (wire it into
-  whatever calls the writer; nothing here modifies the writer to call it automatically, per the
-  owner ruling that the writer must succeed even when dispatch fails). Finds every idea created
-  after the install watermark that this tool has not yet dispatched, and dispatches each.
+- `watch` — the genuine automatic trigger (`REQ-022` R06). A long-running loop that polls the
+  idea log every `--interval` seconds (default `DEFAULT_POLL_INTERVAL`, a few seconds) and
+  dispatches each newly-created idea it finds, with no human action once the loop is started.
+  Built on `poll_once`, the same seam a test drives directly to exercise one tick without a real
+  sleep loop. Checks the halt flag before every individual dispatch attempt, not just once per
+  tick, and isolates a failing or raising dispatch so the loop keeps running.
+- `dispatch` — the one-shot form of the same core, meant to run right after
+  `tools/append_idea.py add` succeeds if an operator prefers per-append invocation over `watch`
+  (wire it into whatever calls the writer; nothing here modifies the writer to call it
+  automatically, per the owner ruling that the writer must succeed even when dispatch fails).
+  Finds every idea created after the install watermark that this tool has not yet dispatched,
+  and dispatches each.
 - `sweep` — the reconciling pass. Trusts only `fold()`'s status, never this tool's own memory of
   what it thinks it already sent: any post-watermark idea still `open` gets re-dispatched,
   whether the prior attempt failed, was killed mid-run, or the hook invocation was skipped
@@ -47,6 +55,7 @@ identical triage behavior.
 
 Usage:
     uv run python tools/idea_dispatch.py install
+    uv run python tools/idea_dispatch.py watch [--interval SECONDS]
     uv run python tools/idea_dispatch.py dispatch
     uv run python tools/idea_dispatch.py sweep
     uv run python tools/idea_dispatch.py status
@@ -58,6 +67,7 @@ import argparse
 import json
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
@@ -195,6 +205,97 @@ def dispatch(
     return results
 
 
+#: Default polling interval, in seconds, for the `watch` loop. A few seconds is enough to make
+#: an append feel immediate without hammering the log file.
+DEFAULT_POLL_INTERVAL = 5.0
+
+
+def poll_once(
+    log: Path | None = None,
+    state_file: Path = STATE_FILE,
+    halt_flag: Path = HALT_FLAG,
+    dispatch_fn: DispatchFn = default_dispatch,
+    budget_tokens: int = TRIAGE_TOKEN_CEILING,
+) -> list[DispatchResult]:
+    """One polling iteration of the `watch` loop's core: the same work `dispatch` does, except
+    the halt flag is re-checked immediately before every individual dispatch attempt (not just
+    once at entry), because a long-running watcher can have the flag dropped in mid-batch, and a
+    failed or raising `dispatch_fn` call is isolated here so it never kills the loop that calls
+    this repeatedly.
+
+    This is the seam `watch` calls on every tick, and the same seam a test can call directly to
+    drive one poll iteration without spinning up a thread or a real sleep loop. Semantics match
+    `dispatch` exactly otherwise: same watermark self-install, same not-yet-dispatched filter,
+    same watermark/dispatched-ids state advance.
+    """
+    if halted(halt_flag):
+        return []
+    state = _load_state(state_file)
+    if "watermark" not in state:
+        state = install(log, state_file)
+    watermark = int(state["watermark"])
+    already_dispatched = set(state.get("dispatched", []))
+
+    ideas = fold(load_events(log)) if log is not None else fold(load_events())
+    candidates = [
+        idea_id
+        for idea_id in _post_watermark_ids(ideas, watermark)
+        if idea_id not in already_dispatched
+    ]
+
+    results: list[DispatchResult] = []
+    for idea_id in candidates:
+        if halted(halt_flag):
+            break
+        entry = ideas[idea_id]
+        try:
+            result = dispatch_fn(idea_id, entry["title"], entry["body"], budget_tokens)
+        except Exception as exc:  # noqa: BLE001 - one bad dispatch must never kill the watcher
+            result = DispatchResult(idea_id, False, f"poll_once: dispatch_fn raised: {exc}")
+        results.append(result)
+        if result.ok:
+            already_dispatched.add(idea_id)
+            state["dispatched"] = sorted(already_dispatched)
+            _save_state(state, state_file)
+
+    return results
+
+
+def watch(
+    log: Path | None = None,
+    state_file: Path = STATE_FILE,
+    halt_flag: Path = HALT_FLAG,
+    dispatch_fn: DispatchFn = default_dispatch,
+    budget_tokens: int = TRIAGE_TOKEN_CEILING,
+    interval: float = DEFAULT_POLL_INTERVAL,
+    max_iterations: int | None = None,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> None:
+    """The genuine automatic trigger: a long-running loop that calls `poll_once` every
+    `interval` seconds, forever (or `max_iterations` times, for tests).
+
+    This is what makes R06 ("a test idea appended to the log is triaged with no human action")
+    literally true in operation: an operator starts `watch` once, and every idea appended after
+    that — by anyone, at any time — is picked up on the next tick with no per-append step. A
+    failed or raising dispatch inside one tick never stops the loop (`poll_once` isolates it);
+    the next tick, and the `sweep` command run on its own schedule, remain the recovery path for
+    anything a tick's dispatch attempt did not resolve.
+    """
+    iterations = 0
+    while max_iterations is None or iterations < max_iterations:
+        poll_once(
+            log=log,
+            state_file=state_file,
+            halt_flag=halt_flag,
+            dispatch_fn=dispatch_fn,
+            budget_tokens=budget_tokens,
+        )
+        iterations += 1
+        if max_iterations is not None and iterations >= max_iterations:
+            break
+        sleep_fn(interval)
+
+
 def sweep(
     log: Path | None = None,
     state_file: Path = STATE_FILE,
@@ -258,6 +359,16 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("install", help="record the creation watermark from the log's current state")
     sub.add_parser("dispatch", help="dispatch triage for every post-watermark idea not yet sent")
     sub.add_parser("sweep", help="re-dispatch every post-watermark idea fold() still shows open")
+    watch_parser = sub.add_parser(
+        "watch",
+        help="long-running loop: poll for new ideas and dispatch each with no human action",
+    )
+    watch_parser.add_argument(
+        "--interval",
+        type=float,
+        default=DEFAULT_POLL_INTERVAL,
+        help=f"seconds between polls (default {DEFAULT_POLL_INTERVAL})",
+    )
     sub.add_parser("status", help="print the watermark, dispatch count and halt state")
     return parser
 
@@ -281,6 +392,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{'ok' if result.ok else 'FAILED'} {result.idea}")
         if not results:
             print("nothing stuck" if not halted() else "halted — dispatched nothing")
+        return 0
+    if args.command == "watch":
+        print(f"watching (poll interval {args.interval}s) — Ctrl-C to stop")
+        try:
+            watch(interval=args.interval)
+        except KeyboardInterrupt:
+            print("watch stopped")
         return 0
     print(_status())
     return 0

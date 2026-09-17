@@ -136,6 +136,93 @@ def test_dispatch_does_not_redispatch_an_idea_already_sent(
     assert calls == [idea_id]  # second call found nothing new to dispatch
 
 
+def test_watch_dispatches_a_freshly_appended_idea_via_poll_with_no_human_action(
+    log: Path, state_file: Path, halt_flag: Path
+) -> None:
+    """The actual R06 trigger: `poll_once` is the tick `watch`'s loop calls. This drives one
+    poll iteration explicitly (no thread, no real sleep) against a log that already has the
+    watermark installed, appends a new idea through the real `append_idea.add` writer — the
+    same call `tools/append_idea.py add` makes — and asserts the stubbed dispatch fired for it
+    with no further action taken by the test beyond the poll itself."""
+    idea_dispatch.install(log, state_file)
+
+    event = append_idea.add("Test idea", "Body text", log)
+    idea_id = event["idea"]
+
+    calls: list[str] = []
+    results = idea_dispatch.poll_once(
+        log=log, state_file=state_file, halt_flag=halt_flag,
+        dispatch_fn=_triaging_dispatch_fn(log, calls),
+    )
+
+    assert calls == [idea_id]
+    assert results[0].ok
+    assert _fold(log)[idea_id]["status"] == "triaged"
+
+
+def test_watch_loop_ticks_and_dispatches_via_poll_once(
+    log: Path, state_file: Path, halt_flag: Path
+) -> None:
+    """Drives the actual `watch` loop (bounded to a couple of iterations, sleep stubbed out) to
+    confirm the loop itself calls `poll_once` on each tick and picks up an idea appended before
+    the loop starts — end-to-end through the real writer, no direct call to `dispatch`."""
+    idea_dispatch.install(log, state_file)
+    idea_id = append_idea.add("Test idea", "Body text", log)["idea"]
+
+    calls: list[str] = []
+    sleeps: list[float] = []
+    idea_dispatch.watch(
+        log=log, state_file=state_file, halt_flag=halt_flag,
+        dispatch_fn=_triaging_dispatch_fn(log, calls),
+        interval=0.01,
+        max_iterations=2,
+        sleep_fn=sleeps.append,
+    )
+
+    assert calls == [idea_id]
+    assert _fold(log)[idea_id]["status"] == "triaged"
+    assert sleeps == [0.01]  # one sleep between the two ticks, none after the last
+
+
+def test_watch_survives_a_raising_dispatch_fn_and_keeps_running(
+    log: Path, state_file: Path, halt_flag: Path
+) -> None:
+    """Failure isolation for the automatic trigger: a `dispatch_fn` that raises mid-tick must
+    not kill the watcher — the next append is still picked up on a later tick, and the sweep
+    remains the recovery path for the one that raised."""
+    idea_dispatch.install(log, state_file)
+    first_id = append_idea.add("First idea", "Body", log)["idea"]
+
+    def _raising(idea: str, title: str, body: str, budget_tokens: int):
+        raise RuntimeError("simulated crash mid-dispatch")
+
+    calls: list[str] = []
+    second_id_holder: list[str] = []
+
+    def _dispatch_fn(idea: str, title: str, body: str, budget_tokens: int):
+        if idea == first_id:
+            return _raising(idea, title, body, budget_tokens)
+        return _triaging_dispatch_fn(log, calls)(idea, title, body, budget_tokens)
+
+    def _sleep(_seconds: float) -> None:
+        # append the second idea between tick 1 (raises on first_id) and tick 2, simulating a
+        # real append happening while the watcher is running with no human re-invoking anything
+        second_id_holder.append(append_idea.add("Second idea", "Body", log)["idea"])
+
+    idea_dispatch.watch(
+        log=log, state_file=state_file, halt_flag=halt_flag,
+        dispatch_fn=_dispatch_fn,
+        interval=0.01,
+        max_iterations=2,
+        sleep_fn=_sleep,
+    )
+
+    second_id = second_id_holder[0]
+    assert calls == [second_id]
+    assert _fold(log)[first_id]["status"] == "open"  # left for sweep to recover
+    assert _fold(log)[second_id]["status"] == "triaged"
+
+
 # --- R07: a dispatch killed mid-run leaves the idea open; the sweep reconciles it ------
 
 
