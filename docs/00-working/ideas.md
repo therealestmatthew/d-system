@@ -3581,7 +3581,7 @@ Raised by the owner on 2026-09-10, phrased as a question.
 - **note** by repository-owner (2026-09-10T03:39:25-04:00): Owner elaboration, 2026-09-10. The question is sharper than framework portability alone. Once there is an orchestrated swarm of collaborative, specialised agents covering everything that needs doing, do we need Claude Code at all — or only an input that an always-on agent monitors? The shape the owner has in mind: a deterministic script watching an inbox, whose arrivals trigger a cascading series of loops and agent productivity, with no interactive session in the middle. Claude Code becomes one possible driver of that cascade rather than the thing the system is built around. Two caveats the owner stated explicitly: we may still want Claude Code even in that scenario, and this is not a case for discarding the question — the always-on framing makes it more worth answering, not less. Note the tension with the existing owner-only controls: an inbox-triggered cascade with no interactive session has no obvious place for /session-close, which is a command a person types precisely so an agent cannot reach the completion decision. Whatever replaces the interactive session has to preserve that boundary or consciously drop it.
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T03:38:39-04:00): PLAN-020 (portable agent workflows, promoted from 000067) creates the technical conditions to answer this question but does not itself decide it. The plan explicitly states in its "Out of scope" section that it "does not edit AGENTS.md or CLAUDE.md; any future need to change either requires the owner's separate, exact approval" — which reserves the framework-choice decision for after the portability contract is proven.
 
@@ -3594,6 +3594,21 @@ Related work: idea 000072 (Agents covering the full lifecycle) faces a parallel 
 The honest answer today, as the idea itself notes, is: "revisit when phase-port-01 and its siblings are complete." PLAN-020 is currently in phase-port-01 (active with agent-codex-port), and the manifest contract — which will make host capability differences explicit — is the evidence needed to decide whether the specific mechanisms identified (slash commands, subagent spawning) justify keeping Claude Code as a framework or not.
 
 PROPOSED LINK: 000069 --relates_to--> 000072 (both coordinate around PLAN-020's scope: retaining a dependency vs deferring work until the portable contract is proven)
+- **finding** by agent-build (2026-09-17T10:59:51-04:00): Codex capability probe, 2026-09-17. A full Codex session was run against this repository to establish what it can actually do, rather than inferring it. Raw response: docs/00-working/codex-capability-probe-response.md. Probe prompt: _working/codex-capability-probe.md. Claims there are tagged [demonstrated] / [documented] / [uncertain] by Codex itself.
+
+CAN DO, demonstrated: context-isolated sub-agents (fork_turns "none"), returning only a final result; nested dispatch; per-dispatch model selection; and - better than assumed - resuming BOTH completed and INTERRUPTED sub-agents with context intact (evidence: an agent interrupted mid-run resumed and recalled its pre-interrupt token). That satisfies GOV-013's resume-never-re-run rule directly. AGENTS.md is auto-injected at session start. Background shell works but must be polled; no unsolicited completion notification.
+
+HARD LIMITS, documented: four agents TOTAL including the coordinator, so at most three concurrent workers - any design assuming five parallel workers breaks. Structured multiple-choice questions exist only in Plan mode, cap at three per batch (not four), and Codex CANNOT put itself into Plan mode. No exposed remaining-context counter, so a numeric runway threshold cannot be followed - milestone-based stopping is required. No maxTurns or per-agent token budget, so phase-agx-01's truncation cap is unenforceable there.
+
+ENVIRONMENT: the sandbox's writable roots exclude /code/d-system-worktrees and expose .git read-only, so worktree creation, commits, rebases and merges all hit approval escalation. .codex/config.toml currently configures only the Playwright MCP server and no sandbox roots. This is a config fix, not a prompt fix, and it gates any practical Codex coordinator run.
+
+MODELS: gpt-6-astra, gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-5.5. Rough tiering for GOV-008's Haiku/Sonnet/Opus ladder: luna cheap, terra standard judgment, astra escalation-only. Existing .codex/agents/*.toml already use luna.
+
+REPOSITORY STATE: .codex/ holds eleven agent definitions (ten demo-* plus idea-triage) and config.toml; the ten demo files and config.toml are locally ignored via .git/info/exclude while idea-triage.toml is tracked - confirmed by git ls-files and git check-ignore. .agents/skills/ holds seven skills (backlog, checkpoint, d-system-overview, idea, idea-triage, log-anti-patterns, orient), all loaded. .claude/commands/ are Claude adapters and are not native Codex commands, though Codex can follow one as a plain procedure.
+
+CODEX'S OWN VERDICT: it can perform the coordinator job - isolated delegation, independent validation, adversarial review, real command execution, interrupted-agent resumption, model selection, owner-gated merging - provided the pack caps concurrent agents at three, uses terse result contracts, replaces exact context thresholds with milestone checkpoints, splits question batches to three in Plan mode, and anticipates approval gates. The one capability it will not promise at all is precise remaining-context measurement.
+
+Bearing on this idea's question: the evidence says the repository does NOT need Claude Code specifically, but the two harnesses are not interchangeable without a per-harness coordinator variant and a sandbox configuration change.
 
 </details>
 
