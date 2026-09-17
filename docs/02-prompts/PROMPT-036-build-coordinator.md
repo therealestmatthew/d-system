@@ -70,10 +70,11 @@ two external dependencies (`phase-port-01`, `phase-part-01`) already `complete`.
 skipped and reported; a phase a peer has claimed is skipped and reported. The table is what was
 true when written, not a promise about now.
 
-**What the first run is for.** Five phases per batch is an estimate of what one coordinator can
-carry, not a measured figure, and the unit run below has never been executed. Batch 1 is the
-evidence for both. Record in the close-out what the batch size should actually be, and every place
-the unit run did not survive contact with the real commands.
+**What batch 1 measured.** Five phases fit one coordinator session with over 97% of context budget
+unspent — batch size is not the binding constraint. **The binding variable is fix cycles, not phase
+count**: six phases is plausible for a documentation-heavy batch where fixes are cheap. Size a batch
+by expected fix cycles, not by phase count alone, and record the actual spend in the close-out so
+the next batch is sized on evidence rather than repeating the estimate.
 
 ## Preflight
 
@@ -137,9 +138,10 @@ Nothing here is assumed. Each deviation is recorded, and each names what it disp
   entry cannot fill a template, that is a blocking finding, exactly as `GOV-008` intends.
 
 **Unchanged and not yours:** the merge onto `dev` requires the owner's explicit yes, every phase,
-with the diff in front of them. `next_up` ranking is the owner's — never reorder, add or remove.
-You edit only the claimed phase's own backlog line plus the catalog `updated` date; a defect in
-another phase or a governed document is a **decision for the owner**, never an edit.
+with the diff in front of them. `next_up` **ranking** is the owner's — never reorder or add an
+entry, and never remove one other than the phase you just completed (step 9's one sanctioned
+removal). You edit only the claimed phase's own backlog line plus the catalog `updated` date; a
+defect in another phase or a governed document is a **decision for the owner**, never an edit.
 
 ## Agent hygiene
 
@@ -204,6 +206,12 @@ commands, and nothing else. If it reports failures, re-dispatch the creator with
 output**. A failing check is a result to record, not a step to retry until quiet. An agent's claim
 that a command passed is not evidence that it passed.
 
+Not every `verification` item is a command. Some are a judgment call — "read the taxonomy and
+confirm..." — which is exactly the reading your own context discipline forbids you to do. **Delegate
+those items to the validator and adversary templates instead of running them yourself**; note in
+the tracker which items were delegated for this reason. This is not a gap in verification, it is
+where that judgment belongs.
+
 **6. Adversarial review.** Dispatch the **adversary template**. This is a `GOV-003` condition for
 completion, not an optional extra. Its findings are fixed — within the two-cycle cap — or explicitly
 reported as accepted, in the evidence file and the close-out.
@@ -219,10 +227,14 @@ not a yes.
 
 **9. Integrate, complete, clean up.** After the owner's yes: **copy any gitignored evidence out of
 the worktree first**, then `git merge --ff-only agent/<phase-id>`, `git worktree remove`,
-`git branch -d`. Then set `status: complete` on that phase on `dev`, regenerate the catalog, and
-commit the two together as one small commit. Confirm all three `GOV-003` conditions held — green
-verification with captured output, adversarial review resolved, owner-approved integration — and
-record that in the tracker.
+`git branch -d`. Then set `status: complete` on that phase on `dev` and, if it is present in
+`next_up`, remove that one entry — `session-close.md` step 6 sanctions exactly this removal as part
+of the completion edit, and the governance validator requires it (a `complete` phase left in
+`next_up` is a validator error: `next_up[<position>]: <phase-id> is complete; remove it`). This is
+not a `next_up` edit in the sense the hard boundary below forbids; it is the one exception named
+there. Regenerate the catalog, and commit the two together as one small commit. Confirm all three
+`GOV-003` conditions held — green verification with captured output, adversarial review resolved,
+owner-approved integration — and record that in the tracker.
 
 **10. Update `tracker.md`.** You are its only writer. Then take the next phase.
 
@@ -238,7 +250,10 @@ carries absolute paths only.
 `acceptance`, `deliverables` and `verification` verbatim; the worktree path; and the instruction to
 commit its own work on the branch and stay strictly inside the declared `deliverables`. Tell it:
 *if the work genuinely requires a file outside them, stop and report — never widen the declaration
-yourself, and never edit a schema or a test to make a failing check pass.* ≤15-line return.
+yourself, and never edit a schema or a test to make a failing check pass.* If the deliverable
+allocates a new document code, tell it `--next-code` takes the **exact** schema `kind`, not an
+abbreviation: one of `plan`, `adr`, `architecture`, `prompt`, `session`, `requirement`,
+`walkthrough`, `operation`, `governance` — `requirement`, never `req`. ≤15-line return.
 
 **Validator.** Give it: the worktree path, the commit range, and the phase's `acceptance` and
 `verification` verbatim. **Nothing else** — not the creator's rationale, not its report. It runs
@@ -250,6 +265,14 @@ instruction to assume the work is broken and hunt for where it fails when execut
 acceptance satisfied in appearance only, deliverables overreaching the declaration, tests that
 assert nothing, a green command that does not exercise the claim it stands for. Read-and-run only;
 changes nothing; spawns no subagents. ≤15-line return plus its evidence file.
+
+A phase's declared `deliverables` can be invalidated by an earlier phase **in the same batch** —
+batch 1 saw `phase-irs-03` declare `.claude/agents/`, but `phase-port-02`, built earlier in the same
+batch, had just made those files generated output, so the real edit had to land in
+`agent-workflows/` instead. Tell the adversary to flag a mismatch between a declaration and where
+the edit actually landed, and treat one caused this way — a later phase adjusting to an earlier
+phase's already-merged change — as **forced and accepted**, not as the creator overreaching its
+declaration.
 
 **Blocker resolver.** When the run meets a blocker, **give it to an agent before halting.** Hand it
 the blocker, the evidence, the phase's entry and the relevant governing documents, and ask it to
@@ -294,7 +317,11 @@ with a claim held, say so explicitly in the report so the owner can release it.
 
 ## Hard boundaries
 
-- No `next_up` edits. No edits to another phase's backlog lines. No edits to `AGENTS.md`,
+- No `next_up` edits, **with exactly one exception**: step 9 removes a phase's own entry from
+  `next_up` at the moment that phase is marked `complete`, because the governance validator
+  requires it and `session-close.md` sanctions it as part of the completion edit. Never reorder
+  `next_up`, never add to it, and never remove any entry other than the phase you just completed —
+  ranking stays the owner's. No edits to another phase's backlog lines. No edits to `AGENTS.md`,
   `CLAUDE.md`, `session-close.md` or the checkpoint skill. No document-code allocation beyond the
   session records.
 - Never integrate onto `dev` without the owner's explicit yes for that phase.
@@ -303,3 +330,55 @@ with a claim held, say so explicitly in the report so the owner can release it.
 - **Never edit a schema or a test to make a failing check pass.** A schema that rejects a change is
   telling you the change is wrong; report it.
 - Never `git stash` a peer's uncommitted work, and never force an integration around it.
+
+## Running this on Codex
+
+Everything above is the default path, written for a Claude Code session, and stays unchanged. This
+section adds what a coordinator running this same pack on OpenAI Codex must do differently. One
+pack, two harnesses — do not fork a second document for Codex.
+
+- **Concurrency.** Codex's limit is **four agents total, including the coordinator** — at most
+  three sub-agents active at once. *Open the batch* dispatches one reconnaissance agent per phase in
+  parallel; on Codex a five-phase batch cannot do that in one wave, so run reconnaissance in **waves
+  of three**. The unit run itself dispatches one agent at a time per phase and is sequential
+  already, so it is unaffected.
+- **Questions.** Codex's structured multiple-choice mechanism exists only in **Plan mode**, and caps
+  at **three questions per batch**, not four — and Codex cannot switch itself into Plan mode. Outside
+  Plan mode (the default), ask in prose and end the turn; that is still a real stop, and the run
+  resumes when the owner replies. If the owner wants the structured mechanism for the batch-open
+  question round, **they must start the session in Plan mode themselves**; the coordinator cannot
+  arrange this.
+- **Runway.** Codex exposes no remaining-context counter, so the numeric runway rule above does not
+  translate. On Codex, stop at a **phase boundary** instead: finish the in-flight phase through step
+  9, or stop cleanly before step 1 of the next, whichever milestone comes first — never try to judge
+  a percentage of context remaining.
+- **Model tiers.** `GOV-008`'s Haiku / Sonnet / Opus ladder maps to `gpt-5.6-luna` (cheap, mechanical
+  gates), `gpt-5.6-terra` (standard judgment work — Sonnet's equivalent for the creator, validator
+  and adversary templates), and `gpt-6-astra` (escalation only, never pre-assigned, at most one per
+  batch, exactly as Opus is governed). The repository-defined agents already under `.codex/agents/
+  *.toml` are configured on `gpt-5.6-luna`; leave them as-is unless a dispatch needs judgment work,
+  in which case dispatch a built-in agent type on `gpt-5.6-terra` instead.
+- **Dispatch vocabulary.** Dispatch by `agent_type`: the built-ins `default`, `explorer` and
+  `worker`, or a repository-defined agent from `.codex/agents/*.toml` by its exact name. Context
+  isolation for a dispatch template (creator, validator, adversary, blocker resolver) is
+  `fork_turns: "none"` — each gets its own dispatch, never the coordinator's history.
+  `.claude/commands/` are Claude-specific adapters, not native Codex commands; Codex can read and
+  follow one as a plain procedure but does not invoke it as a command. `.agents/skills/` holds the
+  portable skill definitions both harnesses can use.
+- **Resume.** The resume-never-re-run rule holds on Codex and is better supported there: Codex can
+  resume both a **completed** and an **interrupted** sub-agent with its context intact, so a
+  truncated agent is resumed exactly as this pack already requires, on either harness.
+- **Sandbox — a prerequisite, not a workaround.** Codex's sandbox reports `/code/d-system-worktrees`
+  outside its writable roots and `.git` read-only, so worktree creation, commits, rebases and merges
+  all hit an approval escalation under the default configuration. **This is a `.codex/config.toml`
+  fix the owner must make before running a Codex batch** — the coordinator cannot route around a
+  sandbox boundary, and this pack does not attempt to.
+- **No turn or token caps.** Codex exposes no `maxTurns` and no per-agent token budget in its
+  dispatch interface; the two-fix-cycle cap and other cost protocols above still apply as policy,
+  they are just not mechanically enforced by the harness.
+
+Capabilities the probe left **[uncertain]** — whether a newly authored `.codex/agents/*.toml`
+definition hot-loads without a new session, whether dispatch-role subagent prohibitions are
+technical or instruction-level, exact dispatch-prompt length limits, and whether session/agent
+billing maps to public API token prices — are not assumed here. Where Codex behavior is not yet
+established, this pack does not rely on it.
