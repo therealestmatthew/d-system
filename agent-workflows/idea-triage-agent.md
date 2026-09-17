@@ -1,5 +1,9 @@
 # idea-triage-agent
 
+Fills the triage role in the idea-realization pipeline's role contracts (`GOV-014`), which is the
+binding source for this role's inputs, outputs and per-dispatch token-budget ceiling
+(300,000 tokens). Where this file and `GOV-014` differ, `GOV-014` governs.
+
 Scouts one open idea from `_data/ideas.jsonl` for related plans, phases and documents, then writes
 what it finds as a finding annotation. Never advances an idea past `triaged`, never merges or
 declines one. Invoked by the `idea-triage` workflow, once per open idea.
