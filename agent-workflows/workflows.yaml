@@ -86,3 +86,130 @@ workflows:
       run_commands: shell
       ask_user: structured-user-input
     unsupported: []
+- id: idea
+  name: idea
+  description: Record a parked idea, or move an existing one along, through the sanctioned writer.
+  authority: agent-invocable
+  source: agent-workflows/idea.md
+  requires:
+  - write_files
+  - run_commands
+  targets:
+  - host: claude
+    kind: command
+    path: .claude/commands/idea.md
+    capabilities:
+      write_files: Write
+      run_commands: Bash
+    unsupported: []
+    render:
+      argument_hint: "<the idea in prose> | status <id> <state> | revisit <id>"
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/idea/SKILL.md
+    capabilities:
+      write_files: filesystem
+      run_commands: shell
+    unsupported: []
+- id: backlog
+  name: backlog
+  description: Preflight the repo, show the top priority phases, and orient on one without claiming it.
+  authority: agent-invocable
+  source: agent-workflows/backlog.md
+  requires:
+  - read_files
+  - edit_files
+  - run_commands
+  - ask_user
+  targets:
+  - host: claude
+    kind: command
+    path: .claude/commands/backlog.md
+    capabilities:
+      read_files: Read
+      edit_files: Edit
+      run_commands: Bash
+      ask_user: AskUserQuestion
+    unsupported: []
+    render:
+      argument_hint: "[phase-id] [--claim|--go]"
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/backlog/SKILL.md
+    capabilities:
+      read_files: filesystem
+      edit_files: filesystem
+      run_commands: shell
+      ask_user: structured-user-input
+    unsupported: []
+- id: idea-triage
+  name: idea-triage
+  description: >-
+    Scout every open idea for related plans, phases and documents, record a finding on each, and move
+    it from open to triaged.
+  authority: agent-invocable
+  source: agent-workflows/idea-triage.md
+  requires:
+  - read_files
+  - run_commands
+  - dispatch_role
+  targets:
+  - host: claude
+    kind: command
+    path: .claude/commands/idea-triage.md
+    capabilities:
+      read_files: Read
+      run_commands: Bash
+      dispatch_role: Task
+    unsupported: []
+    render:
+      argument_hint: "[idea id] (optional — defaults to every open idea)"
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/idea-triage/SKILL.md
+    capabilities:
+      read_files: filesystem
+      run_commands: shell
+      dispatch_role: subagent-invocation
+    unsupported: []
+- id: idea-triage-agent
+  name: idea-triage
+  description: >-
+    Scouts one open idea from _data/ideas.jsonl for related plans, phases and documents, then writes
+    what it finds as a finding annotation. Never advances an idea past triaged, never merges or
+    declines one. Invoked by the idea-triage workflow, once per open idea.
+  authority: agent-invocable
+  source: agent-workflows/idea-triage-agent.md
+  requires:
+  - read_files
+  - search_files
+  - run_commands
+  targets:
+  - host: claude
+    kind: agent
+    path: .claude/agents/idea-triage.md
+    capabilities:
+      read_files: Read
+      search_files: Grep
+      run_commands: Bash
+    unsupported: []
+    render:
+      tools: "Read, Grep, Bash"
+      model: haiku
+      effort: medium
+      max_turns: 30
+  - host: codex
+    kind: agent
+    path: .codex/agents/idea-triage.toml
+    capabilities:
+      read_files: shell
+      search_files: shell
+      run_commands: shell
+    unsupported: []
+    render:
+      model: gpt-5.6-luna
+      model_reasoning_effort: medium
+      sandbox_mode: workspace-write
+      unsupported_limits:
+      - Claude's 30-turn maxTurns cap has no Codex equivalent; Codex enforces no per-agent turn
+        or token budget, so this role runs unbounded unless the host session itself is capped.
