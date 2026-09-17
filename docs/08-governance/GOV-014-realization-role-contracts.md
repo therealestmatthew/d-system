@@ -90,9 +90,8 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
 - **Inputs:** ideas at `triaged` status (Triage → Partition); `PLAN-025`'s prompt pack and corpus
   selection; the threshold or on-demand trigger that fires the stage.
 - **Outputs:** a *proposed* partition record — tracks, member ideas, and a new-plan-vs-amendment
-  ruling per track — plus `partition-adversary`'s findings against it (Partition → Planning, once
-  accepted). The record is a proposal until G2 accepts it; the agent's own output artifact is
-  never described as "accepted."
+  ruling per track (Partition → Planning, once accepted). The record is a proposal until G2
+  accepts it; the agent's own output artifact is never described as "accepted."
 - **Never-do:** never accept its own partition — acceptance is G2, owner-reserved; never proceed
   past an adversary blocker without one revision cycle first; never treat convergence between
   proposal and adversary review as substitute for the owner's acceptance.
