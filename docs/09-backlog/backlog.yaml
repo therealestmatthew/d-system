@@ -3,7 +3,6 @@ updated: '2026-09-16'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-part-02
 - phase-port-02
 - phase-ses-01
 - phase-lit-09
@@ -7073,8 +7072,18 @@ items:
   systems:
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-corpus-status-flag
+  completion_evidence:
+  - tools/build_idea_corpus.py
+  - test/test_build_idea_corpus.py
+  - docs/08-governance/OPS-015-build-idea-corpus.md
+  - docs/03-sessions/SESS-2026-09-16-07-corpus-status-flag.md
+  result: --status flag added (single or comma-separated, default triaged), CORPUS_STATUS
+    removed, valid set derived from the idea schema via legal_transitions(), statuses
+    recorded in manifest.json; 11 new tests, suite 591 green; default --stats byte-identical
+    to dev under a fixed seed; validator pass 5/5, adversarial review clean.
   priority: 1
   session_budget: 1
   depends_on: []
