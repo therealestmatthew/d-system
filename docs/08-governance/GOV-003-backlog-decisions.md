@@ -436,3 +436,62 @@ front of them.
 conclude the edits are forbidden. This entry is the authority it should find when it goes
 looking, and the alternatives — a runtime owner gate before each run, or patch-file-only
 enhancement — were offered and declined in the same ruling.
+
+## Coordinator completion replaces owner-invoked /session-close, repository-wide
+
+Owner decision, 2026-09-16, taken while commissioning the build coordinator
+([PROMPT-036](../02-prompts/PROMPT-036-build-coordinator.md)) for the twenty-nine queued phases.
+
+**This supersedes the session-close half of the ruling recorded above** under "the master plan and
+its sub-programmes", which held that "no standing owner-only rule is delegated: `/session-close`
+remains owner-invoked per phase, batched but never automated". That clause no longer stands. The
+same ruling's *other* half is untouched: **`next_up` ranking remains the owner's**, with any mapping
+agent proposing and never writing.
+
+**What replaces it.** A coordinator may mark a phase `complete` once, and only once, all three hold:
+
+1. every verification command in the phase's `verification` list has run green, with the real output
+   captured in the session record;
+2. an **independent adversarial review** of the phase's diff against its acceptance has run, and its
+   findings are fixed or explicitly reported as accepted; and
+3. the branch has been integrated onto `dev` **with the owner's approval**, which is unchanged and
+   is still asked for every phase.
+
+The completion edit is one small commit on `dev` immediately after that integration.
+
+**Scope.** Unlike the two prior exceptions — the demo track (2026-09-10) and the workbench track,
+each confined to a named phase prefix — this one is **repository-wide and standing**. It is the
+general rule from 2026-09-16 forward, for any phase and any coordinator.
+
+**What is bought and what is conceded.** This trades the owner's synchronous judgement at each phase
+boundary for an adversarial gate plus retroactive review: the owner reads the session records and
+may still run `/session-close` afterwards as an audit of phases already complete. A human remains in
+the loop at every boundary regardless, because **the integration ask is unchanged** — merging onto
+`dev` still requires the owner's explicit yes, with the diff in front of them. What moved is only
+which authority flips the status field. The earlier reasoning for why an agent must never decide a
+session is over still holds wherever the three conditions above are not met; this decision does not
+license an agent to complete a phase on its own assessment that the work looks done.
+
+**The per-phase claim gate is covered by batch approval.** `/session-start` step 2 requires an
+`AskUserQuestion` gate before every claim, stopping until answered. For a coordinator running an
+owner-approved batch, the owner's approval of that batch — which names the exact phases in build
+order — **is** the claim approval for those phases. The coordinator still checks `max_active` and
+the Conflicts column numerically before each claim and skips, untouched, any phase a peer holds.
+Questions that would have been raised at each gate are batched and put to the owner **before the
+first claim**, not phase by phase. The coordinator still stops mid-batch when a phase looks
+genuinely wrong — an acceptance condition nothing can verify, a missing deliverable, an undeclared
+dependency — or when it meets an obstacle it cannot pass. **A blocker is first given to an agent to
+resolve; only an unresolved blocker halts the run for the owner.**
+
+**Two documents now contradict this entry and need the owner's decision on their wording.** Neither
+was edited as part of this decision:
+
+- `.claude/commands/session-close.md`'s "This command is owner-only, on purpose" section, which
+  tells an agent it "must never invoke this" and that nothing "should be restructured to make it
+  agent-reachable".
+- `.claude/skills/checkpoint/SKILL.md`'s never-complete rule, which the demo-track exception also
+  deliberately left unedited.
+
+**Why recorded here:** an agent reading either of those documents, or the superseded clause above,
+would correctly conclude that coordinator completion is forbidden. This entry is the authority it
+should find when it goes looking, and it names precisely which earlier clause it displaces.
