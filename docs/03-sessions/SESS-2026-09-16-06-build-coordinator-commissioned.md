@@ -137,6 +137,117 @@ The minors were a title breaking the siblings' convention, a gloss that undersiz
 earlier" where the record says one day, an unexplained deviation count, and the omitted
 fixed-port-per-worktree rule. All corrected.
 
+## Review
+
+Independent pre-merge review by a fresh non-fork sub-agent, given the commit range and told to
+verify the documents' claims for itself rather than accept them. **0 blockers, 1 major, 2 minors;
+four of six areas clean.** Its findings, as returned:
+
+> **major — PROMPT-036's preflight miscounts a document it tells the coordinator to read.**
+> `PROMPT-036:63` says "Read `AGENTS.md`'s three *Concurrent agents* sections and `GOV-006`."
+> `AGENTS.md` actually has four: `:182` (claim a phase), `:218` (work in a worktree), `:269`
+> (complete and hand off), `:309` (resolve collisions). The omitted fourth section covers exactly
+> what a coordinator running many concurrent claims/merges needs — `backlog.yaml` conflict
+> resolution, duplicate-code collisions, source conflicts, post-rebase failures — and nothing else
+> in `PROMPT-036` or `GOV-013` restates it.
+>
+> **minor — GOV-003's new entry cites the wrong section title for what it supersedes.** It says it
+> supersedes the ruling "recorded above under 'the master plan and its sub-programmes'." No such
+> heading exists; the actual heading is `## The idea realization system re-frames four programmes
+> as sub-programmes` (`GOV-003:392`). Substance is right, label is wrong.
+>
+> **minor — the "verified programmatically" claim's method is unconfirmable from the repo, though
+> its result is true.** No script or saved output exists in the diff. I independently wrote and ran
+> the check: **the partition is in fact correct** — all 29 non-`phase-lit-09` entries appear exactly
+> once in `next_up`'s own order, every phase is `status: queued`, every batch is dependency-closed,
+> within-batch order is valid, and both external deps are genuinely `complete`. The claim's content
+> holds; the methodological assertion is unsourced, not wrong.
+>
+> **Clean — GOV-003 supersession scope.** Displaces only the session-close half; the
+> `next_up`-ranking half is left untouched and matches word-for-word.
+>
+> **Clean — PROMPT-036 / GOV-013 agreement.** Every rule in `GOV-013` cross-checked against
+> `PROMPT-036`. No contradiction found; the four named deviations match.
+>
+> **Clean — session record's numbers.** Re-ran fresh: governance, pytest and the private-content
+> check all match the cited figures exactly. All cited incidents check out verbatim.
+>
+> **Clean — diff scope.** The branch contains exactly two commits touching exactly the five
+> described files. Nothing out of scope.
+>
+> **Verdict: safe to merge to `dev` as it stands.**
+
+**All three findings were fixed before the merge**, not deferred: the preflight now names all four
+sections and says why the fourth matters; the `GOV-003` citation now quotes the real heading; and
+the partition claim now states it was script-checked when written *and* independently re-checked by
+a reviewer who wrote their own script — which is sourced, because the review above is the source.
+
+The review also surfaced, in passing, that `dev` had moved: another session committed `7830868`
+while this one worked, diverging the branch. That is why the integration below rebases first.
+
+## Decisions
+
+**Completion authority moved, and the owner was shown the contrary ruling first.** The owner
+pre-approved coordinator-invoked completion. `GOV-003` already held the opposite for this exact
+pipeline, recorded the day before. Rather than act on the newer instruction, the earlier ruling was
+put in front of them, along with the two prior exceptions that had granted something similar under
+conditions. They chose the demo track's pattern — an adversarial gate substituting for synchronous
+judgement — and chose to make it repository-wide rather than scoped to a prefix, which is broader
+than either precedent.
+
+**Per-phase worktrees, against the first draft.** The draft put a whole batch on one branch and
+worktree. The owner questioned it and an adversarial review independently rated it a blocker, for a
+reason neither had stated: `AGENTS.md` bundles worktree removal into the merge action, so the
+shared worktree would have been deleted after the first phase. Going per-phase restored the
+documented convention and dissolved the conflict.
+
+**Questions batched at the open, blockers to an agent first.** The owner's ruling on the claim gate
+produced a shape neither the command nor the first draft had: a reconnaissance pass over every unit
+before any claim, one batch of questions, then autonomous running — with a resolver agent standing
+between an obstacle and the owner's attention.
+
+**`GOV-013` was written because the owner asked for the reasoning to be durable**, not just the
+prompt. It is deliberately organised as design rules with incidents as evidence, so a future
+planning session inherits the constraints rather than rediscovering them.
+
+## Corrections
+
+Four, all mine, all caught by checking rather than by being told:
+
+- **The remaining-decisions count.** Reported as "15 of 46"; the verified figure was 23. The first
+  number was an estimate never checked.
+- **`phase-idg-08`'s tracking reference.** Reported as sitting behind idea `000253`. It was not:
+  `000253` covers `phase-auto-03`/`-04`, and no idea mentioned `phase-idg-08` at all. The phase had
+  neither a fix nor a record until ruling R48 closed it.
+- **An impossible option offered as a recommendation.** `phase-irs-12`'s sizing was put to the owner
+  with "raise `session_budget` to 2" recommended. `backlog.schema.json` enforces `const: 1` across
+  all phases. The applying agent tried it, governance rejected it, and it reverted rather than
+  editing the schema — which is the only reason a bad instruction did not become a repository-wide
+  change. R52 replaced it with the split that R5 had already established as correct.
+- **R18 reported as a clean fix.** It had left `phase-idg-10` and `phase-idg-11` colliding with each
+  other on the new `sys-gov-docs` id. Applying R49 then found the front is narrower still than
+  either diagnosis: only `phase-idg-01`, `-06` and `-10` are mutually disjoint.
+
+One process deviation worth naming rather than hiding: **this session ran unclaimed throughout**,
+across three session records and four commits to `dev`. The `PROMPT-035` run was unclaimed by
+design, and the work that followed simply continued in the same conversation. Peers held no lock
+against any of it. `brain/procedures/session-close-with-no-active-phase.md` describes the adjacent
+pattern — a phase closes and work continues — and its standing view applies here: the fix is
+claiming earlier, not manufacturing a checkpoint afterwards.
+
+## Left undone
+
+- **`.claude/commands/session-close.md` and `.claude/skills/checkpoint/SKILL.md` still tell an agent
+  it may never complete a phase.** `GOV-003` now says otherwise, repository-wide. Both were left
+  untouched deliberately — their wording is the owner's decision, and `CLAUDE.md`'s discipline about
+  proposing rather than editing governing text applies. `PROMPT-036` tells the coordinator they are
+  knowingly superseded so it does not stall. **This is the highest-value loose end**: an agent
+  reading either file mid-run has a real contradiction in front of it.
+- **Batch 1 has not been run.** Five per batch is an estimate; the unit run has never been executed
+  against the real commands. `PROMPT-036` now says so and names both as what the first run measures.
+- **`phase-lit-09`** stays in `next_up`, excluded from every batch, awaiting the owner's return to
+  the literature-review campaign.
+
 ## Unresolved
 
 - `.claude/commands/session-close.md` and `.claude/skills/checkpoint/SKILL.md` still tell an agent

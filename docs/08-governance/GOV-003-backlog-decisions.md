@@ -442,8 +442,8 @@ enhancement — were offered and declined in the same ruling.
 Owner decision, 2026-09-16, taken while commissioning the build coordinator
 ([PROMPT-036](../02-prompts/PROMPT-036-build-coordinator.md)) for the twenty-nine queued phases.
 
-**This supersedes the session-close half of the ruling recorded above** under "the master plan and
-its sub-programmes", which held that "no standing owner-only rule is delegated: `/session-close`
+**This supersedes the session-close half of the ruling recorded above** under *The idea realization
+system re-frames four programmes as sub-programmes*, which held that "no standing owner-only rule is delegated: `/session-close`
 remains owner-invoked per phase, batched but never automated". That clause no longer stands. The
 same ruling's *other* half is untouched: **`next_up` ranking remains the owner's**, with any mapping
 agent proposing and never writing.

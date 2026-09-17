@@ -59,8 +59,9 @@ anything in a later batch — and within a batch the listed order is a valid bui
 and resume command, and conflicts with `phase-lit-07`. Do not claim it. Do not remove it from
 `next_up`.
 
-**This partition was verified programmatically** against `docs/09-backlog/backlog.yaml` when
-written, not checked by hand: every one of the twenty-nine non-`phase-lit-09` `next_up` entries
+**This partition was checked by script against `docs/09-backlog/backlog.yaml` when written, and
+independently re-checked by a reviewer who wrote their own script rather than trusting this
+sentence.** Both runs agreed: every one of the twenty-nine non-`phase-lit-09` `next_up` entries
 appears exactly once, in `next_up`'s own order; every phase was `status: queued`; and every
 `depends_on` edge resolved to an earlier or same-position phase in the global batch order, with the
 two external dependencies (`phase-port-01`, `phase-part-01`) already `complete`.
@@ -76,8 +77,10 @@ the unit run did not survive contact with the real commands.
 
 ## Preflight
 
-1. **Read `AGENTS.md`'s three *Concurrent agents* sections and `GOV-006`** before anything else.
-   This run executes their hand-off procedure by hand; you cannot follow what you have not read.
+1. **Read all four of `AGENTS.md`'s *Concurrent agents* sections and `GOV-006`** before anything
+   else — claim a phase, work in a worktree, complete and hand off, **and resolve collisions**. This
+   run executes their hand-off procedure by hand, and the fourth section is the one you will need
+   when a rebase fails or two phases touch `backlog.yaml`: nothing in this pack restates it.
 2. In the primary checkout `/code/d-system`, on `dev`:
    `git status --short` (must be empty — never stash a peer's work), `git branch --show-current`,
    `git pull`, then `uv run python -m src.governance` and `uv run pytest`. **If the tree is dirty
