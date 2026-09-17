@@ -30,7 +30,9 @@ polls the idea log every `--interval` seconds (default 5) and dispatches each ne
 it finds, with **no per-append human step**: this is what makes `REQ-022` R06 ("a test idea
 appended to the log is triaged with no human action") hold in operation, not just inside a test
 harness. `install` runs itself on first tick if it was never run explicitly, so starting `watch`
-cold does not retroactively sweep the pre-existing backlog.
+cold does not retroactively sweep the pre-existing backlog — but it does print a warning listing
+every open idea that self-install is thereby excluding (see "Cold start" below); run `install`
+explicitly first if you would rather set the watermark quietly, on your own terms.
 
 `dispatch` still exists as the one-shot form of the same core, for an operator who prefers to
 invoke it by hand right after `tools/append_idea.py add` rather than run `watch` continuously —
@@ -84,19 +86,43 @@ is what keeps `REQ-022` R07 true: a dispatch that failed outright, was killed mi
 never invoked because the hook step was skipped, all converge on the same recoverable state — an
 idea sitting `open` past the watermark — and the sweep brings each one to `triaged`.
 
+**In-flight claim guard.** Before calling the dispatch callable for an idea, `dispatch`,
+`poll_once`, and `sweep` all atomically create a per-idea claim file
+(`_working/idea-dispatch-claims/<idea>.claim`, `O_CREAT | O_EXCL`) and remove it once the call
+returns — this works across processes, since `watch` and `sweep` are separate invocations with no
+shared memory. If a claim already exists and is not stale, that idea is skipped for this round
+rather than dispatched a second time: this is what stops `watch`/`sweep`, or two concurrent
+`watch`es, from both firing on the same idea while a prior dispatch for it is still in flight. A
+claim older than `CLAIM_STALE_SECONDS` (one hour) is presumed to belong to a dispatch whose process
+died mid-run and is taken over rather than honored, so `REQ-022` R07 keeps holding: a crashed
+dispatch's claim never permanently blocks the sweep that is supposed to recover it.
+
 `watch`, `dispatch`, and `sweep` all check `_working/orchestrator-halt` (`PLAN-039.01` SS9's kill
 switch) before every dispatch attempt — a stat-only file existence check, with no import of or
-dependency on any daemon code. `watch` re-checks it before each individual idea in a tick, not
-just once per tick, since it is long-running enough for the flag to be dropped mid-batch. With
-the flag present, all three commands dispatch nothing and report (or, for `watch`, simply tick
-with) that they are halted; removing the flag restores dispatch on the next attempt, with no
-other state change (the watermark and the dispatched-ids record are untouched by the halt/resume
-cycle itself).
+dependency on any daemon code — once at entry, and again immediately before each individual idea
+inside their loops, so a flag dropped mid-batch stops the rest of the batch, not just the next
+invocation. With the flag present, all three commands dispatch nothing and report (or, for
+`watch`, simply tick with) that they are halted; removing the flag restores dispatch on the next
+attempt, with no other state change (the watermark and the dispatched-ids record are untouched by
+the halt/resume cycle itself).
 
-Each dispatch is passed a budget ceiling of 300,000 tokens — `GOV-014`'s per-dispatch default for
-every pipeline role, including triage. This tool threads the number through so its dispatch
-contract already matches what the eventual daemon will enforce; it does not itself meter or
-enforce the ceiling — `phase-irs-11` builds enforcement against the run ledger.
+**Budget ceiling.** `GOV-014`'s per-dispatch token ceiling default for the triage role is 300,000
+tokens, recorded in code as `TRIAGE_TOKEN_CEILING` for traceability. `claude --help` exposes no
+per-invocation token-budget flag — only `--max-budget-usd` (a dollar amount) and `--autocompact`
+(a context-window size), neither of which is a token ceiling — so this tool does not pass the
+number to the `claude` subprocess at all; `default_dispatch` takes no `budget_tokens` argument.
+**The 300k ceiling is a contract obligation on the dispatched `idea-triage` agent itself, not
+something this host process meters, enforces, or transmits.** `phase-irs-11` builds real
+enforcement against the run ledger.
+
+**Cold start.** `install`, run explicitly, is silent — an operator who runs it by hand already
+knows it draws the line at the log's current contents. A first `dispatch`/`poll_once` (and hence
+`watch`) that finds no state file self-installs the same way, but **prints a warning to stderr**
+listing every currently-open idea it is thereby excluding from both future dispatch and `sweep`,
+handing them to the batch `/idea-triage` path instead — because that exclusion is otherwise
+invisible and permanent (those ideas never again look different from the pre-existing backlog).
+Run `install` explicitly before starting `watch`/`dispatch` for the first time if you want to set
+the watermark quietly and deliberately instead.
 
 ## Failure and recovery
 
@@ -107,6 +133,13 @@ calls, and that validation is untouched by this tool. Nothing here retries autom
 one `dispatch` call; recovery is the `sweep` command's job, run separately, exactly as `REQ-022`
 R07's verification method describes: kill a dispatch mid-run, run the sweep, confirm the idea
 reaches `triaged`.
+
+A dispatch process itself dying mid-run — as opposed to a killed `claude` subprocess it launched,
+which surfaces as an ordinary `FAILED` result — leaves its claim file behind under
+`_working/idea-dispatch-claims/`. That claim blocks a fresh dispatch on the same idea only until
+it goes stale (`CLAIM_STALE_SECONDS`, one hour); after that, `sweep` (or the next `dispatch`) takes
+the claim over and re-dispatches normally. This is the mechanism that keeps the claim guard from
+turning into its own silent-loss failure mode.
 
 A dispatch already recorded as sent is not re-sent by a later `dispatch` call, even if it silently
 failed without reporting `FAILED` (a killed process, for instance) — that gap is exactly what
@@ -163,16 +196,30 @@ once at install time, not a live count — the phase note that "41 pre-existing 
 the batch path is a snapshot at the time that line was written; the repo's actual open-idea count
 drifts independently of it, and this tool's behavior does not depend on the number at all.
 
-**Budget ceiling**: `GOV-014`'s per-dispatch token ceiling default, 300,000 tokens, threaded
-through as `TRIAGE_TOKEN_CEILING` and passed to every dispatch call. This tool does not meter or
-enforce it — `phase-irs-11` builds enforcement against the ledger; this stopgap only carries the
-number so the dispatch contract already matches what the daemon will enforce later.
+**Budget ceiling**: `GOV-014`'s per-dispatch token ceiling default, 300,000 tokens, is recorded here
+as `TRIAGE_TOKEN_CEILING` for traceability only. `claude --help` exposes no per-invocation
+token-budget flag — only `--max-budget-usd` (a dollar figure) and `--autocompact` (a context-window
+size), neither of which is a token ceiling — so this stopgap does not thread the number through to
+the `claude` subprocess at all. The 300k ceiling is a contract obligation on the dispatched
+`idea-triage` agent itself, not something this host process meters, enforces, or even transmits;
+`phase-irs-11` builds real enforcement against the run ledger.
 
 **Kill switch**: `_working/orchestrator-halt` (`PLAN-039.01` SS9) is checked, stat-only, before
-every dispatch attempt in both entry points. Its presence blocks all dispatch from this tool with
-no other state change; removing it restores dispatch immediately. This is what keeps the kill
-switch's "halts all pipeline dispatch" claim literally true while this stopgap is the only thing
-doing the dispatching.
+every dispatch attempt — once at entry to `dispatch`/`sweep`/`poll_once`, and again immediately
+before each individual idea inside their loops, so a flag dropped mid-batch stops the batch, not
+just the next call. Its presence blocks all dispatch from this tool with no other state change;
+removing it restores dispatch immediately. This is what keeps the kill switch's "halts all pipeline
+dispatch" claim literally true while this stopgap is the only thing doing the dispatching.
+
+**In-flight claim guard**: before calling `dispatch_fn` for an idea, `dispatch`/`sweep`/`poll_once`
+atomically create a per-idea claim file (`O_CREAT | O_EXCL`) under `_working/idea-dispatch-claims/`
+and remove it once the call returns — across processes, since `watch` and `sweep` are separate
+invocations with no shared memory. A claim already held by another in-flight dispatch causes that
+idea to be skipped this round, so `watch`/`sweep`, or two concurrent `watch`es, cannot both dispatch
+the same idea at once. A claim older than `CLAIM_STALE_SECONDS` is presumed to belong to a dispatch
+whose process died mid-run and is taken over rather than honored — this is what keeps `sweep`'s
+R07 recovery working even in the presence of the guard: a crashed dispatch's claim never blocks its
+own recovery.
 
 **Dispatch is encapsulated behind a callable** (`DispatchFn`) so tests substitute a stub and never
 spawn a real agent. The default implementation shells out to the `claude` CLI headlessly,

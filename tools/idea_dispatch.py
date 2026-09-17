@@ -36,16 +36,30 @@ once at install time, not a live count — the phase note that "41 pre-existing 
 the batch path is a snapshot at the time that line was written; the repo's actual open-idea count
 drifts independently of it, and this tool's behavior does not depend on the number at all.
 
-**Budget ceiling**: `GOV-014`'s per-dispatch token ceiling default, 300,000 tokens, threaded
-through as `TRIAGE_TOKEN_CEILING` and passed to every dispatch call. This tool does not meter or
-enforce it — `phase-irs-11` builds enforcement against the ledger; this stopgap only carries the
-number so the dispatch contract already matches what the daemon will enforce later.
+**Budget ceiling**: `GOV-014`'s per-dispatch token ceiling default, 300,000 tokens, is recorded here
+as `TRIAGE_TOKEN_CEILING` for traceability only. `claude --help` exposes no per-invocation
+token-budget flag — only `--max-budget-usd` (a dollar figure) and `--autocompact` (a context-window
+size), neither of which is a token ceiling — so this stopgap does not thread the number through to
+the `claude` subprocess at all. The 300k ceiling is a contract obligation on the dispatched
+`idea-triage` agent itself, not something this host process meters, enforces, or even transmits;
+`phase-irs-11` builds real enforcement against the run ledger.
 
 **Kill switch**: `_working/orchestrator-halt` (`PLAN-039.01` SS9) is checked, stat-only, before
-every dispatch attempt in both entry points. Its presence blocks all dispatch from this tool with
-no other state change; removing it restores dispatch immediately. This is what keeps the kill
-switch's "halts all pipeline dispatch" claim literally true while this stopgap is the only thing
-doing the dispatching.
+every dispatch attempt — once at entry to `dispatch`/`sweep`/`poll_once`, and again immediately
+before each individual idea inside their loops, so a flag dropped mid-batch stops the batch, not
+just the next call. Its presence blocks all dispatch from this tool with no other state change;
+removing it restores dispatch immediately. This is what keeps the kill switch's "halts all pipeline
+dispatch" claim literally true while this stopgap is the only thing doing the dispatching.
+
+**In-flight claim guard**: before calling `dispatch_fn` for an idea, `dispatch`/`sweep`/`poll_once`
+atomically create a per-idea claim file (`O_CREAT | O_EXCL`) under `_working/idea-dispatch-claims/`
+and remove it once the call returns — across processes, since `watch` and `sweep` are separate
+invocations with no shared memory. A claim already held by another in-flight dispatch causes that
+idea to be skipped this round, so `watch`/`sweep`, or two concurrent `watch`es, cannot both dispatch
+the same idea at once. A claim older than `CLAIM_STALE_SECONDS` is presumed to belong to a dispatch
+whose process died mid-run and is taken over rather than honored — this is what keeps `sweep`'s
+R07 recovery working even in the presence of the guard: a crashed dispatch's claim never blocks its
+own recovery.
 
 **Dispatch is encapsulated behind a callable** (`DispatchFn`) so tests substitute a stub and never
 spawn a real agent. The default implementation shells out to the `claude` CLI headlessly,
@@ -65,6 +79,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -85,8 +100,21 @@ STATE_FILE = ROOT / "_working" / "idea-dispatch-state.json"
 #: The kill switch (PLAN-039.01 SS9). A stat-only check with no dependency on daemon code.
 HALT_FLAG = ROOT / "_working" / "orchestrator-halt"
 
-#: GOV-014's per-dispatch token ceiling default for the triage role. Cited, not enforced, here —
-#: phase-irs-11 builds enforcement against the run ledger.
+#: Per-idea in-flight claim files live here — same ephemeral, gitignored, ungoverned state
+#: directory family as the watermark file (PLAN-015). A claim's mere existence means "a dispatch
+#: for this idea is in flight, somewhere" — across processes, since `watch` and `sweep` are
+#: separate invocations with no shared memory.
+CLAIMS_DIR = ROOT / "_working" / "idea-dispatch-claims"
+
+#: A claim older than this is presumed to belong to a dispatch whose process died mid-run (killed,
+#: crashed, OOM) rather than one genuinely still in flight — `default_dispatch`'s own subprocess
+#: timeout is 1800s, so a claim held twice that long is almost certainly abandoned. A stale claim
+#: never blocks `sweep`; that is what keeps R07 holding even with the claim guard in place.
+CLAIM_STALE_SECONDS = 3600.0
+
+#: GOV-014's per-dispatch token ceiling default for the triage role. Recorded here for
+#: traceability only — see the module docstring's "Budget ceiling" section for why this stopgap
+#: does not (and cannot, absent an invented CLI flag) pass it to the `claude` subprocess.
 TRIAGE_TOKEN_CEILING = 300_000
 
 
@@ -99,14 +127,54 @@ class DispatchResult:
     detail: str
 
 
-#: `(idea_id, title, body, budget_tokens) -> DispatchResult`. Tests pass a stub; production code
-#: uses `default_dispatch`.
-DispatchFn = Callable[[str, str, str, int], DispatchResult]
+#: `(idea_id, title, body) -> DispatchResult`. Tests pass a stub; production code uses
+#: `default_dispatch`. No `budget_tokens` parameter — see `TRIAGE_TOKEN_CEILING`'s docstring for
+#: why this stopgap does not thread a token figure through the dispatch call at all.
+DispatchFn = Callable[[str, str, str], DispatchResult]
 
 
 def halted(halt_flag: Path = HALT_FLAG) -> bool:
     """The kill switch: a stat-only check, no daemon import, no other side effect."""
     return halt_flag.exists()
+
+
+def _claim(
+    idea_id: str, claims_dir: Path = CLAIMS_DIR, stale_seconds: float = CLAIM_STALE_SECONDS
+) -> Path | None:
+    """Try to atomically claim `idea_id` for an in-flight dispatch.
+
+    Returns the claim file's path on success; `None` if some other process already holds a live
+    claim on this idea. A claim past `stale_seconds` old is treated as abandoned — its owner's
+    dispatch process is presumed dead — and is taken over rather than honored, so a crashed
+    dispatch's claim never permanently blocks recovery.
+    """
+    claims_dir.mkdir(parents=True, exist_ok=True)
+    claim_path = claims_dir / f"{idea_id}.claim"
+
+    def _create() -> bool:
+        try:
+            fd = os.open(str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        except FileExistsError:
+            return False
+        os.close(fd)
+        return True
+
+    if _create():
+        return claim_path
+
+    try:
+        age = time.time() - claim_path.stat().st_mtime
+    except FileNotFoundError:
+        age = stale_seconds + 1  # vanished between our failed create and this stat — retry
+    if age <= stale_seconds:
+        return None  # a live claim held by someone else
+
+    claim_path.unlink(missing_ok=True)  # stale — take it over
+    return claim_path if _create() else None  # lost the takeover race to a third party
+
+
+def _release(claim_path: Path) -> None:
+    claim_path.unlink(missing_ok=True)
 
 
 def _load_state(state_file: Path = STATE_FILE) -> dict[str, Any]:
@@ -134,13 +202,40 @@ def install(log: Path | None = None, state_file: Path = STATE_FILE) -> dict[str,
     return state
 
 
-def default_dispatch(idea: str, title: str, body: str, budget_tokens: int) -> DispatchResult:
+def _self_install(log: Path | None, state_file: Path) -> dict[str, Any]:
+    """Install from the log's current contents, the way `dispatch`/`poll_once` do the first time
+    they find no state file — and, unlike the explicit `install` command, warn about what this
+    excludes.
+
+    An operator who runs `install` by hand already knows the watermark takes every currently-open
+    idea out of this tool's reach; an operator who never ran it and gets silently self-installed
+    on a first `watch`/`dispatch` call does not, and would otherwise lose those ideas to both
+    dispatch and `sweep` with no visible trace. Print the exclusion so it is visible instead
+    (OPS-016 documents this behavior).
+    """
+    ideas = fold(load_events(log)) if log is not None else fold(load_events())
+    open_ids = sorted((idea_id for idea_id, entry in ideas.items() if entry["status"] == "open"), key=int)
+    state = install(log, state_file)
+    if open_ids:
+        print(
+            f"idea_dispatch: self-installed watermark at {state['watermark']:06d}; "
+            f"{len(open_ids)} open idea(s) at/below the watermark are excluded from this tool "
+            f"and left to the batch /idea-triage path: {', '.join(open_ids)}",
+            file=sys.stderr,
+        )
+    return state
+
+
+def default_dispatch(idea: str, title: str, body: str) -> DispatchResult:
     """Invoke the `idea-triage` role headlessly via the `claude` CLI, scoped to one idea.
 
     Runs the same `/idea-triage <id>` skill the batch path uses, so triage behavior does not
-    fork between the stopgap and the batch workflow. `budget_tokens` is passed through for
-    parity with the eventual daemon dispatch contract; the `claude` CLI itself is not asked to
-    enforce it here (see module docstring — enforcement is `phase-irs-11`'s job).
+    fork between the stopgap and the batch workflow. No token-budget figure is passed to this
+    subprocess call — `claude --help` exposes no per-invocation token-ceiling flag, only
+    `--max-budget-usd` (a dollar amount) and `--autocompact` (a context-window size), neither of
+    which is what GOV-014's 300,000-token ceiling means. See `TRIAGE_TOKEN_CEILING`'s docstring
+    and OPS-016: the ceiling is a contract obligation on the dispatched `idea-triage` agent, not
+    something this host process meters, enforces, or transmits.
     """
     del title, body  # the skill reads the idea's effective state itself via fold(); not needed here
     try:
@@ -166,22 +261,27 @@ def dispatch(
     log: Path | None = None,
     state_file: Path = STATE_FILE,
     halt_flag: Path = HALT_FLAG,
+    claims_dir: Path = CLAIMS_DIR,
     dispatch_fn: DispatchFn = default_dispatch,
-    budget_tokens: int = TRIAGE_TOKEN_CEILING,
 ) -> list[DispatchResult]:
     """The post-append hook. Dispatch every post-watermark idea this tool has not yet sent.
 
     Meant to be run right after `tools/append_idea.py add` succeeds — a separate process
     invocation, never a call inside the writer itself. Never installed automatically: a log with
-    no watermark state yet is installed from its own current contents on first call, so a first
-    `dispatch` right after the tool is wired in does not retroactively sweep every idea already
-    in the log.
+    no watermark state yet is installed from its own current contents on first call (with a
+    visible warning — see `_self_install`), so a first `dispatch` right after the tool is wired in
+    does not retroactively sweep every idea already in the log.
+
+    The halt flag is re-checked before every individual idea, not just once at entry, so a flag
+    dropped mid-batch stops the rest of the batch. Each idea is claimed (`_claim`) before
+    `dispatch_fn` runs and released after, so a concurrent `sweep` or a second `dispatch`/`watch`
+    cannot fire on the same idea while this one is still in flight.
     """
     if halted(halt_flag):
         return []
     state = _load_state(state_file)
     if "watermark" not in state:
-        state = install(log, state_file)
+        state = _self_install(log, state_file)
     watermark = int(state["watermark"])
     already_dispatched = set(state.get("dispatched", []))
 
@@ -194,8 +294,16 @@ def dispatch(
 
     results: list[DispatchResult] = []
     for idea_id in candidates:
+        if halted(halt_flag):
+            break
+        claim_path = _claim(idea_id, claims_dir)
+        if claim_path is None:
+            continue  # another process has this idea's dispatch in flight right now
         entry = ideas[idea_id]
-        result = dispatch_fn(idea_id, entry["title"], entry["body"], budget_tokens)
+        try:
+            result = dispatch_fn(idea_id, entry["title"], entry["body"])
+        finally:
+            _release(claim_path)
         results.append(result)
         if result.ok:
             already_dispatched.add(idea_id)
@@ -214,8 +322,8 @@ def poll_once(
     log: Path | None = None,
     state_file: Path = STATE_FILE,
     halt_flag: Path = HALT_FLAG,
+    claims_dir: Path = CLAIMS_DIR,
     dispatch_fn: DispatchFn = default_dispatch,
-    budget_tokens: int = TRIAGE_TOKEN_CEILING,
 ) -> list[DispatchResult]:
     """One polling iteration of the `watch` loop's core: the same work `dispatch` does, except
     the halt flag is re-checked immediately before every individual dispatch attempt (not just
@@ -225,14 +333,15 @@ def poll_once(
 
     This is the seam `watch` calls on every tick, and the same seam a test can call directly to
     drive one poll iteration without spinning up a thread or a real sleep loop. Semantics match
-    `dispatch` exactly otherwise: same watermark self-install, same not-yet-dispatched filter,
-    same watermark/dispatched-ids state advance.
+    `dispatch` exactly otherwise: same watermark self-install (with warning — `_self_install`),
+    same not-yet-dispatched filter, same claim guard per idea, same watermark/dispatched-ids state
+    advance.
     """
     if halted(halt_flag):
         return []
     state = _load_state(state_file)
     if "watermark" not in state:
-        state = install(log, state_file)
+        state = _self_install(log, state_file)
     watermark = int(state["watermark"])
     already_dispatched = set(state.get("dispatched", []))
 
@@ -247,11 +356,16 @@ def poll_once(
     for idea_id in candidates:
         if halted(halt_flag):
             break
+        claim_path = _claim(idea_id, claims_dir)
+        if claim_path is None:
+            continue  # another process has this idea's dispatch in flight right now
         entry = ideas[idea_id]
         try:
-            result = dispatch_fn(idea_id, entry["title"], entry["body"], budget_tokens)
+            result = dispatch_fn(idea_id, entry["title"], entry["body"])
         except Exception as exc:  # noqa: BLE001 - one bad dispatch must never kill the watcher
             result = DispatchResult(idea_id, False, f"poll_once: dispatch_fn raised: {exc}")
+        finally:
+            _release(claim_path)
         results.append(result)
         if result.ok:
             already_dispatched.add(idea_id)
@@ -265,8 +379,8 @@ def watch(
     log: Path | None = None,
     state_file: Path = STATE_FILE,
     halt_flag: Path = HALT_FLAG,
+    claims_dir: Path = CLAIMS_DIR,
     dispatch_fn: DispatchFn = default_dispatch,
-    budget_tokens: int = TRIAGE_TOKEN_CEILING,
     interval: float = DEFAULT_POLL_INTERVAL,
     max_iterations: int | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
@@ -287,8 +401,8 @@ def watch(
             log=log,
             state_file=state_file,
             halt_flag=halt_flag,
+            claims_dir=claims_dir,
             dispatch_fn=dispatch_fn,
-            budget_tokens=budget_tokens,
         )
         iterations += 1
         if max_iterations is not None and iterations >= max_iterations:
@@ -300,8 +414,8 @@ def sweep(
     log: Path | None = None,
     state_file: Path = STATE_FILE,
     halt_flag: Path = HALT_FLAG,
+    claims_dir: Path = CLAIMS_DIR,
     dispatch_fn: DispatchFn = default_dispatch,
-    budget_tokens: int = TRIAGE_TOKEN_CEILING,
 ) -> list[DispatchResult]:
     """The reconciling sweep. Re-dispatch every post-watermark idea `fold()` still shows `open`.
 
@@ -309,6 +423,12 @@ def sweep(
     killed mid-run may have already been recorded as sent, or may not have; either way, if the
     idea is still `open`, it is re-dispatched. This is what keeps R07 true: a killed or missed
     dispatch degrades to a retry through this sweep, never to silent loss.
+
+    The halt flag is re-checked before every candidate, not just once at entry. Each candidate is
+    claimed before `dispatch_fn` runs: a live claim (held by a `watch`/`dispatch` still actually
+    in flight) causes this sweep to skip that idea rather than double-dispatch it; a stale claim
+    (its owner's process presumed dead) is taken over, so a crashed dispatch's claim never blocks
+    the very recovery this sweep exists to provide.
     """
     if halted(halt_flag):
         return []
@@ -325,8 +445,16 @@ def sweep(
     results: list[DispatchResult] = []
     already_dispatched = set(state.get("dispatched", []))
     for idea_id in stuck:
+        if halted(halt_flag):
+            break
+        claim_path = _claim(idea_id, claims_dir)
+        if claim_path is None:
+            continue  # a dispatch for this idea is genuinely in flight elsewhere right now
         entry = ideas[idea_id]
-        result = dispatch_fn(idea_id, entry["title"], entry["body"], budget_tokens)
+        try:
+            result = dispatch_fn(idea_id, entry["title"], entry["body"])
+        finally:
+            _release(claim_path)
         results.append(result)
         if result.ok:
             already_dispatched.add(idea_id)
