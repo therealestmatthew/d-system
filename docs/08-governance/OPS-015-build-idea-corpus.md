@@ -29,6 +29,7 @@ now".
 
 ```bash
 uv run python tools/build_idea_corpus.py                 # build, drawing and recording a seed
+uv run python tools/build_idea_corpus.py --status open    # build a different status slice
 uv run python tools/build_idea_corpus.py --seed 1234     # reproduce an earlier run exactly
 uv run python tools/build_idea_corpus.py --stats         # report only, write nothing
 ```
@@ -57,17 +58,26 @@ word are not a leak; a `### Findings` section, a `LAYERED EVIDENCE` marker or an
 would be.
 
 `manifest.json` records what the analysts actually received: corpus size, the shuffle seed, the
-ids the fast lane excluded, the ids it recorded but returned, the layered-evidence set, and the
-per-author finding counts. **The build session reads this file rather than assuming a count.**
+status or statuses selected, the ids the fast lane excluded, the ids it recorded but returned,
+the layered-evidence set, and the per-author finding counts. **The build session reads this file
+rather than assuming a count.** `--stats` prints the same facts to stdout but never writes
+`manifest.json`, so its output carries no `status` field — that field exists only on a real build,
+where the byte-identical guarantee on `--stats` output does not apply.
 
 ## What the corpus is
 
-The `triaged` ideas, minus every id the demo fast lane's exclusion file
+The ideas selected by `--status` — one status or a comma-separated list, defaulting to
+`triaged` — minus every id the demo fast lane's exclusion file
 (`docs/00-working/demo-fast-lane-exclusions.yaml`) records with disposition `queued` or `fixed`.
+An unrecognized status is rejected before anything is read from the idea log, naming the valid
+set; that set comes from `schemas/idea.schema.json`'s status-transition table
+(`src.db.ideas.legal_transitions()`), not from a second list kept in the tool.
 
-`promoted`, `discarded` and `open` ideas are all outside the corpus. `open` is excluded by the
-same status filter rather than by a special case: the corpus is what has been triaged, and an
-idea captured after the sweep begins simply is not in it.
+By default — with no `--status` given — the corpus is the `triaged` ideas, exactly as before this
+flag existed. `promoted`, `discarded` and `open` ideas are all outside the default corpus.
+`open` is excluded by the same status filter rather than by a special case: the corpus is what
+has been triaged, and an idea captured after the sweep begins simply is not in it, unless
+`--status` is asked to include `open` explicitly.
 
 An idea the fast lane recorded as **`dropped`** stays *in* the corpus. That is the point of
 recording disposition rather than bare membership — an idea the fast lane considered and did not
@@ -87,8 +97,9 @@ hard-coded**, because the log is append-only and the set changes — it was eigh
 
 ## Failure and recovery
 
-Exits 1 if no triaged ideas are selected at all, which means the status filter or the exclusion
-file is wrong — check `--stats` before rebuilding.
+Exits 1 if an unrecognized `--status` is given, naming the valid set. Exits 1 if no ideas of the
+selected status(es) are selected at all once exclusions are applied, which means the status
+filter or the exclusion file is wrong — check `--stats` before rebuilding.
 
 If a number looks wrong, the defect is almost always in the event log or the exclusion file
 rather than in this script. Fix the log through `tools/append_idea.py`
@@ -105,8 +116,9 @@ To reproduce a previous run exactly, pass the `shuffle_seed` from that run's `ma
 Assemble the idea-batching analyst corpora from the folded idea log.
 
 Builds one corpus file per analyst for the idea-batching build (PROMPT-032), plus a
-manifest recording what the analysts actually received. The corpus is the `triaged`
-ideas minus every id the demo fast lane consumed, so it is smaller than the log and
+manifest recording what the analysts actually received. The corpus is the ideas
+selected by `--status` (one status or a comma-separated list, default `triaged`)
+minus every id the demo fast lane consumed, so it is smaller than the log and
 changes whenever either moves — which is why the build session reads the manifest
 rather than assuming a number.
 
@@ -131,11 +143,13 @@ as layered and possibly contradictory evidence; the set is computed, never hard-
 because the log is append-only and the set grows.
 
     uv run python tools/build_idea_corpus.py                    # build, random seed
+    uv run python tools/build_idea_corpus.py --status open      # a different status slice
     uv run python tools/build_idea_corpus.py --seed 1234        # reproduce a run
     uv run python tools/build_idea_corpus.py --stats            # report only, write nothing
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
+| `--status` | status or comma-separated statuses to select (default: triaged) |  |  |  |
 | `--seed` | shuffle seed for R3; a random one is drawn and recorded if omitted |  |  |  |
 | `--out` | output directory (default: _working/idea-corpus) |  |  |  |
 | `--exclusions` | fast-lane exclusion file; a missing file means an empty exclusion set |  |  |  |
