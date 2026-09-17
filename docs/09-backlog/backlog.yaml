@@ -10033,8 +10033,15 @@ items:
   - sys-delivery
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-build
+  session: doc-session-agent-surface-audit
+  completion_evidence:
+  - docs/08-governance/GOV-015-agent-surface-audit.md
+  - docs/04-decisions/ADR-021-claude-code-dependency.md
+  result: 44-row audit (38 keep, 6 redesign, 0 retire); ruled the repository needs an agent runner,
+    not Claude Code specifically, with three reversal triggers recorded. Two adversarial passes and
+    two fix cycles; all three acceptance conditions confirmed by independent re-check.
   priority: 1
   session_budget: 1
   depends_on: []
