@@ -11977,7 +11977,8 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-build
   priority: 2
   session_budget: 1
   depends_on: []
