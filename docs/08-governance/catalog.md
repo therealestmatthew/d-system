@@ -23,6 +23,7 @@ CI regenerates it and fails on any difference.
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
 | ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
 | ADR-018 | adr | draft | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
+| ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -166,6 +167,7 @@ CI regenerates it and fails on any difference.
 | REQ-020 | requirement | draft | repository-owner | docs/06-requirements/REQ-020-schema-consistency-testing.md |
 | REQ-021 | requirement | draft | repository-owner | docs/06-requirements/REQ-021-html-generation-design-system.md |
 | REQ-022 | requirement | draft | repository-owner | docs/06-requirements/REQ-022-idea-realization-system.md |
+| REQ-023 | requirement | draft | repository-owner | docs/06-requirements/REQ-023-session-type-taxonomy.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -344,4 +346,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-265 documents — adr: 16, architecture: 6, governance: 10, operation: 15, plan: 54, prompt: 36, requirement: 22, session: 106.
+267 documents — adr: 17, architecture: 6, governance: 10, operation: 15, plan: 54, prompt: 36, requirement: 23, session: 106.
