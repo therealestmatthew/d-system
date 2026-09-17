@@ -117,7 +117,9 @@ skill.
 with verification methods, and/or a `plan` document, each carrying an allocated code from
 `uv run python -m src.governance --next-code <kind>` (`AGENTS.md` step 3). Where the plan adds
 backlog phases, each phase carries `scope`, `acceptance`, `verification` and `deliverables`
-(`AGENTS.md` step 2; an open plan with no phases fails the governance check).
+(`AGENTS.md` step 2; an open plan with no phases fails the governance check). Per R1's session record
+contract, a planning session that touches a claimed backlog phase writes to that phase's one session
+record via `checkpoint`, the same as any other type.
 
 **Must never.** Write implementation code as part of the planning session itself. Mark a phase
 `status: complete`. Edit `AGENTS.md` or `CLAUDE.md` without the owner's explicit per-change approval
@@ -161,7 +163,12 @@ declared explicitly, defaulting to brainstorming if the owner does not say other
 overridable by the owner's explicit declaration at any point in the session.
 
 **Verification.** The session's first report states its type and, if inferred, names the phase field
-that produced the inference; if declared, names that it was declared and by whom.
+that produced the inference; if declared, names that it was declared and by whom. The session record
+names the session type and either the backlog-phase field it was inferred from, or the owner's
+explicit declaration. As of this writing, `/session-start` (`.claude/commands/session-start.md`)
+does not itself compute or state this inference — the obligation binds the session that opens, not
+that command — and wiring the inference into `/session-start` is noted as future work in `ADR-020`'s
+consequences rather than assumed to exist today.
 
 ## R6 — A session that changes type mid-flight is bound by the new type from the point of change
 
@@ -171,7 +178,8 @@ produce" and "must never" obligations in R2–R4 apply; obligations already sati
 type are not retroactively undone or redone. R1's universal rules apply before, during and after the
 change without exception, since they are not type-scoped.
 
-**Verification.** Where a session record exists, its narrative (in `session-close`'s `## Decisions`
-section, or a `checkpoint` note) states the type change and the point at which it happened. `git log`
-for the session shows no commit that satisfies a looser type's obligations after the point a stricter
-type began applying.
+**Verification.** Where a session record exists, `session-close`'s `## Decisions` section
+(`.claude/commands/session-close.md`, step 5) names the old type, the new type, and the point in the
+session at which the change happened — `checkpoint` regenerates its sections from scratch each run
+and keeps no narrative log, so it is not where this is recorded. `git log` for the session shows no
+commit that satisfies a looser type's obligations after the point a stricter type began applying.

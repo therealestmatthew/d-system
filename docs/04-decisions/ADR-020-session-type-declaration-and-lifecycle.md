@@ -64,11 +64,21 @@ does not split into two session records.
 **Why.** `PLAN-008` names this the common case, not the exception, and required it be "answered
 rather than deferred." The alternative — restart on every type change — would make the natural
 arc of a working session (think first, then decide, then build) require starting over at each turn,
-which is friction with no corresponding benefit: nothing about the checkpoint/session-close contract
-(`.claude/skills/checkpoint/SKILL.md`'s "one file per session" rule) requires a session record to
-have a single type for its whole life. The universal rules (`REQ-023` R1) already bind the session
-throughout regardless of type, so there is no confidentiality or governance gap in letting the type
-itself flex.
+which adds a step without changing what gets checked: nothing about the checkpoint/session-close
+contract (`.claude/skills/checkpoint/SKILL.md`'s "one file per session" rule) requires a session
+record to have a single type for its whole life. The universal rules (`REQ-023` R1) already bind
+the session throughout regardless of type, so there is no confidentiality or governance gap in
+letting the type itself flex.
+
+The change is recorded, not left unrecorded: `checkpoint` regenerates sections 2 through 6 of the
+session record from scratch each run and keeps no narrative log (`.claude/skills/checkpoint/SKILL.md`'s
+"Body sections, in this fixed order"), so it cannot carry a note of a type change. `session-close`
+can — its `## Decisions` section (`.claude/commands/session-close.md`, step 5) is written once, at
+session finalization, and is exactly where a mid-flight type change is recorded: naming the old
+type, the new type, and the point in the session at which the change happened. Until session-close
+runs, the change is real and binding from the moment it happens (per this decision's statement
+above); its written record simply arrives at the same point every other narrative fact about the
+session does.
 
 **Rejected alternative.** Requiring a new session record on every type change. Rejected because it
 contradicts `checkpoint`'s existing "one file per session" contract, which this phase treats as a
@@ -78,13 +88,18 @@ belongs, as a sentence, not as a reason to fork the record.
 
 ## Decision 3 — Type is inferred from the claimed phase by default, and the owner may declare or override it at any point
 
-**Decided:** When a session claims a backlog phase (per `/session-start`), the type is inferred by
-default from that phase's own nature — its `deliverables` and the kind of document or code it names.
-A phase whose deliverables are exclusively under `docs/0*` paths with no code or config path infers
-planning; a phase with code, schema, or config deliverables infers implementation. The owner may
-declare a type explicitly at any point, which overrides the inference. A session with no claimed
-phase (`AGENTS.md`'s "Owner-directed work with no backlog phase" provision) has no phase to infer
-from and must have its type declared.
+**Decided:** When a session claims a backlog phase (the claim `/session-start` performs), the type
+is inferred by default from that phase's own nature — its `deliverables` and the kind of document or
+code it names. A phase whose deliverables are exclusively under `docs/0*` paths with no code or
+config path infers planning; a phase with code, schema, or config deliverables infers implementation.
+The owner may declare a type explicitly at any point, which overrides the inference. A session with
+no claimed phase (`AGENTS.md`'s "Owner-directed work with no backlog phase" provision) has no phase
+to infer from and must have its type declared.
+
+This is an obligation on the session that opens — it names its type and, if inferred, the phase
+field the inference came from — not a claim that `/session-start` (`.claude/commands/session-start.md`)
+itself computes or states the inference today. It does not; wiring this into `/session-start` is
+noted as future work below rather than assumed to exist.
 
 **Why.** `PLAN-008` poses this as "declared by the owner, inferred from the claimed phase, or both"
 — not an either/or. Both mechanisms already exist independently: `/session-start` already reads a
@@ -109,3 +124,8 @@ override would force a wrong guess into the record with no way to correct it.
   or document kind is introduced.
 - `phase-ses-02` (build the opening entry points) can proceed against `REQ-023`'s per-type
   obligations without needing to relitigate the three questions this document answers.
+- **Future work.** `/session-start` (`.claude/commands/session-start.md`) does not currently compute
+  or state the type inference Decision 3 describes. If the owner wants that inference performed
+  automatically rather than by the opening session stating it in its first report, wiring it into
+  `/session-start` is a candidate for a later phase; this document does not require that wiring to
+  exist for Decision 3's obligation to hold today.
