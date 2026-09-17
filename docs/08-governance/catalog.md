@@ -296,7 +296,7 @@ CI regenerates it and fails on any difference.
 | PLAN-013 | doc-tooling-documentation | draft | 1 | 0 | 1 | agent-tool01 |
 | PLAN-014 | doc-governance-model | draft | 1 | 0 | 4 | agent-gemini, agent-gov02, agent-gov03 |
 | PLAN-015 | doc-ephemeral-working-plans | draft | 0 | 0 | 1 | agent-codex-architecture |
-| PLAN-016 | doc-idea-record-system | draft | 2 | 0 | 3 | agent-claude, agent-codex-architecture, agent-slate |
+| PLAN-016 | doc-idea-record-system | draft | 1 | 1 | 3 | agent-build, agent-claude, agent-codex-architecture, agent-slate |
 | PLAN-017 | doc-idea-plan-lifecycle | draft | 2 | 0 | 3 | agent-claude, agent-fold, agent-idea04 |
 | PLAN-017.01 | doc-idea-plan-idea-lifecycle | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-017.02 | doc-idea-plan-plan-lifecycle | draft | 2 | 0 | 0 | — |
@@ -306,7 +306,7 @@ CI regenerates it and fails on any difference.
 | PLAN-017.06 | doc-idea-plan-governance-delivery | draft | 1 | 0 | 0 | — |
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
-| PLAN-020 | doc-portable-agent-workflows | draft | 2 | 0 | 1 | agent-codex-port |
+| PLAN-020 | doc-portable-agent-workflows | draft | 1 | 1 | 1 | agent-build, agent-codex-port |
 | PLAN-021 | doc-live-demo | draft | 0 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 0 | 0 | 10 | agent-demo-data, agent-demo-stage, agent-fable |
 | PLAN-023 | doc-lit-campaign | draft | 1 | 1 | 7 | agent-lit |

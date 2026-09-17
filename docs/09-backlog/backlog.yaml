@@ -4416,7 +4416,8 @@ items:
   - sys-backlog
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-build
   priority: 2
   session_budget: 1
   depends_on:
@@ -4459,6 +4460,7 @@ items:
   - .agents/skills/backlog/SKILL.md
   - .codex/agents/idea-triage.toml
   - test/test_agent_workflows.py
+  - tools/generate_agent_workflows.py
   next_action: After phase-port-01 fixes the adapter contract, port the smallest
     command first and compare its accepted and refused behavior across both hosts.
 - id: phase-port-03
