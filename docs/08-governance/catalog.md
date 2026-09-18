@@ -31,6 +31,8 @@ CI regenerates it and fails on any difference.
 | ARCH-004 | architecture | active | repository-owner | docs/07-architecture/ARCH-004-architecture-overview.md |
 | ARCH-005 | architecture | draft | repository-owner | docs/07-architecture/ARCH-005-idea-node-classification.md |
 | ARCH-006 | architecture | draft | repository-owner | docs/07-architecture/ARCH-006-idea-realization-system.md |
+| ARCH-007 | architecture | draft | repository-owner | docs/07-architecture/ARCH-007-organizational-and-wbs-data-model.md |
+| ARCH-008 | architecture | draft | repository-owner | docs/07-architecture/ARCH-008-schema-catalog.md |
 | GOV-001 | governance | active | repository-owner | docs/08-governance/GOV-001-protocol.md |
 | GOV-002 | governance | active | repository-owner | docs/08-governance/GOV-002-backlog-protocol.md |
 | GOV-003 | governance | active | repository-owner | docs/08-governance/GOV-003-backlog-decisions.md |
@@ -355,4 +357,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-276 documents — adr: 18, architecture: 6, governance: 12, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 111.
+278 documents — adr: 18, architecture: 8, governance: 12, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 111.

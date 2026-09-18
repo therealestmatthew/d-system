@@ -166,9 +166,9 @@ remains conceptual and relational rather than becoming a field-by-field manual.
 
 ## Planned schema families
 
-New contracts are expected for `company`, `company-relationship`, `affiliation`, `person-alias`,
-`project-party`, `role-definition`, `engagement`, `engagement-project`, `contract`, `template`,
-`glossary-term`, `wbs-element`, and
+New contracts are expected for `identity-registry`, `company`, `company-relationship`, `affiliation`,
+`person-alias`, `project-party`, `role-definition`, `opportunity`, `engagement`,
+`engagement-project`, `contract`, `template`, `glossary-term`, `wbs-element`, and
 `wbs-change` (with baseline metadata placement still to be decided). Existing project, person,
 commitment, task, waiting-on, interaction, decision, and development-event contracts will be
 updated in dependent phases.
