@@ -33,6 +33,7 @@ CI regenerates it and fails on any difference.
 | ARCH-006 | architecture | draft | repository-owner | docs/07-architecture/ARCH-006-idea-realization-system.md |
 | ARCH-007 | architecture | draft | repository-owner | docs/07-architecture/ARCH-007-organizational-and-wbs-data-model.md |
 | ARCH-008 | architecture | draft | repository-owner | docs/07-architecture/ARCH-008-schema-catalog.md |
+| ARCH-009 | architecture | draft | repository-owner | docs/07-architecture/ARCH-009-schema-architecture-review.md |
 | GOV-001 | governance | active | repository-owner | docs/08-governance/GOV-001-protocol.md |
 | GOV-002 | governance | active | repository-owner | docs/08-governance/GOV-002-backlog-protocol.md |
 | GOV-003 | governance | active | repository-owner | docs/08-governance/GOV-003-backlog-decisions.md |
@@ -285,6 +286,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-16-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-11-stopgap-triage-dispatch.md |
 | SESS-2026-09-16-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-16-12-build-batch-1.md |
 | SESS-2026-09-17-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-17-01-agent-surface-audit.md |
+| SESS-2026-09-17-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-17-02-schema-architecture-review.md |
 
 ## Plans and their phases
 
@@ -357,4 +359,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-278 documents — adr: 18, architecture: 8, governance: 12, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 111.
+280 documents — adr: 18, architecture: 9, governance: 12, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 112.
