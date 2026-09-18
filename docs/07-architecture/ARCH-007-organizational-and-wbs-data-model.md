@@ -59,7 +59,8 @@ or centralize that stewardship; this work establishes the contracts it would lat
 Projects are connected to people and companies through `ProjectParty` records. A project party may
 identify a company, a person, or a person acting through a specific affiliation. The canonical
 `PartyRef` shape must make those alternatives mutually exclusive, validate every target across
-files, and represent unresolved names without pretending they are canonical identities. Each
+files, and reference a first-class provisional party when identity is unresolved rather than
+pretending a captured name is canonical. Each
 relationship has exactly one role and has start/end dates, so responsibility changes are historical
 rather than overwrites.
 
@@ -144,8 +145,9 @@ Project
 
 Where the meaning permits, commitments, waiting-on records, interactions, and decisions should use
 the same structured person/company `PartyRef` rather than person-only fields. A record must use either
-a validated party reference or an unresolved captured name, never an ambiguous mixture. Unresolved
-names remain text until identity is confirmed. Person-specific semantics are preserved where a
+a validated party reference or a first-class provisional party reference, never an ambiguous mixture.
+Provisional parties retain captured names, provenance, confidence, and review state until resolved,
+merged, or rejected. Person-specific semantics are preserved where a
 company cannot meaningfully act as the subject.
 
 ## Source and projection boundary
