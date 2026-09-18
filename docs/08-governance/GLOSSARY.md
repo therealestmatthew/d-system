@@ -379,10 +379,22 @@ The commercial or delivery relationship that officially begins at **qualified mu
 pursue or authorize work, before contract signature**. An engagement may contain projects and
 non-project work such as retainers, advisory support, and operational requests.
 
-### Contract
+### Business contract
 
 An agreement or related formal commercial document, including proposals, statements of work,
-amendments, renewals, or termination records. Multiple contracts may belong to one engagement.
+amendments, renewals, or termination records. Multiple business contracts may belong to one
+engagement. It is not a data contract or programming contract.
+
+### Data contract
+
+A machine-readable agreement describing a data object's shape, required properties, validation,
+ownership, compatibility, and versioning. It is governed by the schema registry, not by the
+business-contract schema.
+
+### Programming contract
+
+Executable interface expectations such as inputs, outputs, preconditions, postconditions, and
+invariants. It may reference a data contract but is not a business contract.
 
 ### Template
 

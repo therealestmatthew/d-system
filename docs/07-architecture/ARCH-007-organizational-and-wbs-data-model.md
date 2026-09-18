@@ -99,8 +99,10 @@ authorize work, before contract signature**. Pre-engagement prospect activity be
 interaction records and may later be linked to the engagement without changing its start date. This
 definition is the source wording for the future glossary term `Engagement`.
 
-`Contract` will be a separate schema for agreements, amendments, statements of work, and their
-parties, dates, status, and references. `Template` will be a separate schema for reusable document,
+`BusinessContract` will be a separate schema for agreements, amendments, statements of work, and
+their parties, dates, status, and references. It is distinct from a `DataContract` (the
+machine-readable agreement governed by `schema-registry`) and a `ProgrammingContract` (executable
+interface expectations and invariants). `Template` will be a separate schema for reusable document,
 process, or delivery patterns; a template is not a contract or an engagement and may be versioned
 and instantiated by either. Their exact legal, commercial, and content boundaries remain plan
 decisions.
@@ -168,7 +170,7 @@ remains conceptual and relational rather than becoming a field-by-field manual.
 
 New contracts are expected for `identity-registry`, `company`, `company-relationship`, `affiliation`,
 `person-alias`, `project-party`, `role-definition`, `opportunity`, `engagement`,
-`engagement-project`, `contract`, `template`, `glossary-term`, `wbs-element`, and
+`engagement-project`, `business-contract`, `template`, `glossary-term`, `wbs-element`, and
 `wbs-change` (with baseline metadata placement still to be decided). Existing project, person,
 commitment, task, waiting-on, interaction, decision, and development-event contracts will be
 updated in dependent phases.

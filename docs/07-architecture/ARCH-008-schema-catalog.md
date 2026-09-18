@@ -68,7 +68,7 @@ and migrations before the new domain schemas are implemented.
 | `opportunity` | Potential engagement before qualified mutual intent | Planned |
 | `engagement` | Commercial or delivery relationship beginning at qualified mutual intent; may include project and non-project work | Planned |
 | `engagement-project` | Explicit dated participation of a project in one or more engagements | Planned |
-| `contract` | Agreements, proposals, statements of work, amendments, renewals, and termination records | Planned |
+| `business-contract` | Legal and commercial agreements, proposals, statements of work, amendments, renewals, and termination records | Planned |
 | `template` | Reusable versioned document, process, or delivery patterns | Planned |
 | `glossary-term` | Structured vocabulary terms, definitions, synonyms, distinctions, and lineage | Planned |
 | `wbs-element` | Hierarchical project scope nodes, work packages, codes, and responsibility | Planned |
@@ -82,6 +82,9 @@ and migrations before the new domain schemas are implemented.
 - An engagement may contain projects and non-project work such as retainers, advisory support, and
   operational requests.
 - An engagement may have multiple typed contracts and related documents.
+- `business-contract` means literal legal/commercial paperwork. `data-contract` means a
+  machine-readable schema agreement, and `programming-contract` means executable interface
+  expectations; neither is the business-contract object.
 - Engagements and projects are many-to-many through an explicit participation record.
 - Existing IDs remain usable as aliases while the identity registry introduces stable prefixed
   opaque IDs. Six-digit idea codes remain idea-domain codes, not the global identity.
