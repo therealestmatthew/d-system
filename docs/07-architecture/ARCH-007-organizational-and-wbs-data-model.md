@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-17'
-updated: '2026-09-17'
+updated: '2026-09-18'
 systems: [sys-contracts, sys-portfolio, sys-capture, sys-governance]
 depends_on: [doc-architecture-overview, doc-structure-content-boundary]
 ---
@@ -158,11 +158,17 @@ company cannot meaningfully act as the subject.
 
 ## Source and projection boundary
 
-Historical corrections follow the immutable idea-log pattern: original events plus targeted
+For schemas choosing event history, historical corrections follow the immutable idea-log pattern:
+original events plus targeted
 amendments fold deterministically into the current resolved record. Both effective time and
 recorded time are retained so late corrections preserve what applied and what was known. This
 decision establishes correction semantics; the per-schema event storage design remains planning
-work. Shared analytical dimensions are cataloged separately from explicit record relationships.
+work. The owner's 2026-09-18 clarification also permits full-record replacement on amendment,
+without event chaining, under a declared per-schema history-retention policy. Each schema specifies
+record multiplicity independently: recurring or concurrent role assignments are distinct dated
+records with separate identities, while corrections amend the affected assignment. Role/context
+rules determine valid overlaps. See ARCH-008's amendment and multiplicity policies.
+Shared analytical dimensions are cataloged separately from explicit record relationships.
 Cross-object tags use authoritative `tag-assignment` records with provenance.
 
 The JSON and Markdown source records remain authoritative. New entity directories and schemas will

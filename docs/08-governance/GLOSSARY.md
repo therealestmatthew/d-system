@@ -500,6 +500,30 @@ The deterministic result of folding immutable original events and their amendmen
 specified event position, following the idea-log pattern. Subsequent amendments can produce a new
 current view without erasing the original evidence or earlier resolved views.
 
+### Amendment behavior
+
+The schema-declared method for changing an existing object: fold immutable events and amendments,
+or validate a complete replacement record under the same stable identity. History retention is
+declared separately; replacement alone does not guarantee historical reconstruction.
+
+### Record multiplicity
+
+Whether a schema permits one or multiple eligible records for a specified business key and context.
+It is independent of amendment behavior. One person may hold concurrent roles or repeat a role in
+different periods, with each assignment carrying its own identity and effective dates.
+
+### Role assignment occurrence
+
+One dated tenure in a role for a person or party within an organizational or project context.
+Returning to the same role creates another occurrence; correcting a tenure's dates amends the
+existing occurrence. Context-specific rules govern whether intervals may overlap.
+
+### Conflict resolution event
+
+For event-backed schemas, an explicit decision resolving incompatible amendments while preserving
+the conflicting events and the resolution's provenance. Independent amendments may combine;
+arrival order alone does not settle semantic conflicts.
+
 ---
 
 ## Plans and Work

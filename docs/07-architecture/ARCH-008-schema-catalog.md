@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-17'
-updated: '2026-09-17'
+updated: '2026-09-18'
 systems: [sys-contracts, sys-portfolio, sys-capture, sys-governance]
 depends_on: [doc-organizational-and-wbs-data-model, doc-architecture-overview]
 ---
@@ -149,13 +149,45 @@ and migrations before the new domain schemas are implemented.
 - Tags attach through shared `tag-assignment` records identifying the target object, tag, and
   provenance. Existing embedded tag arrays require migration or derived compatibility views;
   they must not become a second authoritative assignment source.
-- Historical corrections preserve both effective time (when the fact applied) and recorded time
-  (when the system learned it). Original events and amendments remain immutable, following the
-  idea event-log pattern; a deterministic fold produces the current resolved record.
-- The resolved record is current as of a specified event position, not permanently final. Later
+- For schemas using event history, historical corrections preserve both effective time (when the
+  fact applied) and recorded time (when the system learned it). Original events and amendments
+  remain immutable; a deterministic fold produces the current resolved record.
+- For those event-backed schemas, the resolved record is current as of a specified event position,
+  not permanently final. Later
   amendments produce a new resolved view while retaining the earlier evidence. Event ordering,
   amendment targeting, and conflict rules must make replay reproducible, including corrections
   recorded after their effective date.
+
+## Amendment behavior and record multiplicity
+
+Owner clarification, 2026-09-18: event chaining is not mandatory for every object. Each registered
+schema must declare amendment behavior and record multiplicity separately. This refines the earlier
+universal event-history proposal; no existing source records are overwritten by this design decision.
+
+| Policy | Required declaration |
+|---|---|
+| Amendment behavior | Event folding, or full-record replacement on amendment |
+| History retention | For replacement records, whether prior snapshots or audit metadata are retained, and what historical queries are supported |
+| Multiplicity | One record or multiple eligible records per declared business key and context |
+| Temporal eligibility | Effective interval, recurrence, overlap rules, and selection of records valid at a requested time |
+| Conflict handling | How incompatible amendments or invalid overlapping assignments are detected and resolved |
+
+Event folding preserves original events and amendments, using shared event metadata with typed,
+versioned domain payloads. Independent amendments may combine; incompatible amendments remain
+preserved and require an explicit resolution event. Full-record replacement instead validates a
+complete replacement under the same stable object identity, without requiring an amendment chain.
+Replacement does not itself promise historical reconstruction; retention must be declared.
+
+Multiplicity is independent of amendment behavior. A person may have several role assignments at
+once and may return to the same role in a later period. Each distinct assignment has its own identity,
+person/party, role, organizational or project context, and half-open effective interval. For example,
+one sponsor assignment in January and another in July are separate valid records; a concurrent
+advisor role is another assignment. A correction to January's dates amends that assignment rather
+than creating a new tenure. Validation must not deduplicate by person or person-plus-role alone.
+Overlaps are permitted or rejected by the applicable role/context rules, not globally prohibited.
+
+The existing idea log and proposed WBS change history retain their event-folding semantics.
+Other schemas' concrete policy selections remain part of the governed design and migration work.
 
 ## Implementation boundary
 
