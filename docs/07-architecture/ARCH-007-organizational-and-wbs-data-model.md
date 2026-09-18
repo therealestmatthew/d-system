@@ -86,10 +86,24 @@ project-specific roles.
 An `Engagement` represents the broader commercial relationship, assignment, statement of work, or
 contract context. It may connect companies, people, dates, status, and optional contract/SOW
 references. Engagements and projects have a many-to-many relationship with relationship-level dates
-and notes, allowing amendments, multiple SOWs, and projects spanning legal entities.
+and notes, allowing amendments, multiple SOWs, and projects spanning legal entities. An engagement
+may also contain non-project work such as retainers, advisory support, and operational requests;
+the eventual work-item contract will distinguish those from bounded projects.
 
 An engagement is not a replacement for a project: it answers “under what commercial relationship is
 this work being delivered?” while the project answers “what outcome is being pursued?”
+
+The lifecycle boundary is intentionally explicit: a prospect or sales conversation is not an
+engagement by itself. The governed plan must choose whether an engagement begins at a qualified
+opportunity, a mutual intent/authorization point, contract signature, or another recorded event.
+Pre-engagement prospect activity belongs to sales or interaction records and may later be linked to
+the engagement without changing its start date.
+
+`Contract` will be a separate schema for agreements, amendments, statements of work, and their
+parties, dates, status, and references. `Template` will be a separate schema for reusable document,
+process, or delivery patterns; a template is not a contract or an engagement and may be versioned
+and instantiated by either. Their exact legal, commercial, and content boundaries remain plan
+decisions.
 
 ## Work Breakdown Structure
 
@@ -142,10 +156,19 @@ loader checks, with database integrity checks where practical, not in an isolate
 Updates to current WBS state and its event history must be atomic at the writer/commit boundary;
 rebuild rejects a current/history mismatch.
 
+The long-term knowledge-system rule is that every durable object has an authoritative schema. A
+schema defines the object's identity, properties, lifecycle, validation, provenance, and allowed
+relationships; mappings among governed objects create analyzable data. Derived projections may
+exist, but their source schema and rebuild rule must be explicit. A structured `GlossaryTerm`
+schema will govern vocabulary entries, including definitions, synonyms, related terms,
+authoritative schema references, distinctions, lifecycle state, and lineage links. The glossary
+remains conceptual and relational rather than becoming a field-by-field manual.
+
 ## Planned schema families
 
 New contracts are expected for `company`, `company-relationship`, `affiliation`, `person-alias`,
-`project-party`, `role-definition`, `engagement`, `engagement-project`, `wbs-element`, and
+`project-party`, `role-definition`, `engagement`, `engagement-project`, `contract`, `template`,
+`glossary-term`, `wbs-element`, and
 `wbs-change` (with baseline metadata placement still to be decided). Existing project, person,
 commitment, task, waiting-on, interaction, decision, and development-event contracts will be
 updated in dependent phases.
@@ -165,6 +188,12 @@ updated in dependent phases.
 - Temporal convention: inclusive/exclusive bounds, open-ended intervals, overlap rules, and assertion timestamps.
 - Role-definition versioning, assignment overlap/cardinality rules, and warning versus blocking validation.
 - Engagement versus engagement-party semantics and date/status propagation.
+- Engagement start trigger and lifecycle boundary relative to prospecting, qualification,
+  authorization, and contract signing.
+- Contract and template scope, versioning, party links, and their relationship to engagements.
+- The schema registry/governance model for every durable object, including schema versioning,
+  mappings, derived projections, and validation ownership.
+- Glossary-term structure and its lineage links to schemas, decisions, plans, and implementation.
 - The WBS change fold, code/version rules, structural invariants, atomic writer convention, and baseline pinning.
 - Which existing records may reference companies and how unresolved counterparties are represented.
 - Migration fixtures, precedence/count checks, ambiguity output, and backward compatibility requirements.
