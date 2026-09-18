@@ -95,6 +95,8 @@ and migrations before the new domain schemas are implemented.
 - The initial domain-code set is documents, ideas, projects, engagements, and WBS elements.
   Companies, people, opportunities, contracts, templates, affiliations, aliases, roles, mappings,
   and events initially use global IDs only.
+- Opportunities use role-bearing links to multiple people and companies, including unresolved
+  provisional parties, rather than a single prospect/contact pair or free-text participants.
 - Time-bounded relationships use half-open intervals `[starts_on, ends_on)`.
 - Unresolved parties are first-class provisional records with provenance, confidence, and review
   status.
