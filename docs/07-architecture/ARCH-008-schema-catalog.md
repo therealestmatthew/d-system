@@ -92,6 +92,9 @@ and migrations before the new domain schemas are implemented.
   governed document also receives a global identity linked through the identity registry.
 - Human-readable domain codes are assigned only to object types that people routinely reference;
   other durable objects use their global identity alone.
+- The initial domain-code set is documents, ideas, projects, engagements, and WBS elements.
+  Companies, people, opportunities, contracts, templates, affiliations, aliases, roles, mappings,
+  and events initially use global IDs only.
 - Time-bounded relationships use half-open intervals `[starts_on, ends_on)`.
 - Unresolved parties are first-class provisional records with provenance, confidence, and review
   status.
