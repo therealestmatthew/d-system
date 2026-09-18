@@ -158,6 +158,13 @@ company cannot meaningfully act as the subject.
 
 ## Source and projection boundary
 
+Historical corrections follow the immutable idea-log pattern: original events plus targeted
+amendments fold deterministically into the current resolved record. Both effective time and
+recorded time are retained so late corrections preserve what applied and what was known. This
+decision establishes correction semantics; the per-schema event storage design remains planning
+work. Shared analytical dimensions are cataloged separately from explicit record relationships.
+Cross-object tags use authoritative `tag-assignment` records with provenance.
+
 The JSON and Markdown source records remain authoritative. New entity directories and schemas will
 be validated by the source preflight, then projected into DuckDB by the rebuild process. Join and
 history tables will represent relationships and append-only changes. Cross-record resolution rules

@@ -59,6 +59,7 @@ and migrations before the new domain schemas are implemented.
 | `identity-registry` | System-wide opaque IDs, domain-code mappings, aliases, supersession, merges, and splits | Planned |
 | `schema-registry` | Machine-readable schema definitions, versions, ownership, mappings, compatibility, and migrations | Foundational planned |
 | `schema-mapping` | Version-aware mappings between schema properties, identities, and transformations | Foundational planned |
+| `tag-assignment` | Shared object-to-tag relationships with provenance | Planned |
 | `provisional-party` | Unresolved party identity with captured names, provenance, confidence, and resolution lifecycle | Planned |
 | `company` | Legal entities and operational organizations, including brands, divisions, and teams | Planned |
 | `company-relationship` | Directed, typed, time-bounded relationships among companies | Planned |
@@ -139,6 +140,22 @@ and migrations before the new domain schemas are implemented.
 - Breaking schema changes require explicit new versions, migrations, compatibility notes, and
   old-to-new data validation. Domain stewards propose and validate changes; the repository owner
   approves their architectural and governance impact.
+
+## Shared dimensions and historical corrections
+
+- Shared analytical dimensions and explicit record relationships are distinct link categories.
+  A shared date, status, or other property is analytical metadata, not evidence that two records
+  are directly related. Mappings must state semantic compatibility before permitting analysis.
+- Tags attach through shared `tag-assignment` records identifying the target object, tag, and
+  provenance. Existing embedded tag arrays require migration or derived compatibility views;
+  they must not become a second authoritative assignment source.
+- Historical corrections preserve both effective time (when the fact applied) and recorded time
+  (when the system learned it). Original events and amendments remain immutable, following the
+  idea event-log pattern; a deterministic fold produces the current resolved record.
+- The resolved record is current as of a specified event position, not permanently final. Later
+  amendments produce a new resolved view while retaining the earlier evidence. Event ordering,
+  amendment targeting, and conflict rules must make replay reproducible, including corrections
+  recorded after their effective date.
 
 ## Implementation boundary
 

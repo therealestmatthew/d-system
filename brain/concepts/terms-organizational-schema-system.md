@@ -144,3 +144,26 @@ analysis, and mathematical processing without relying on duplicated free text.
 
 An immutable, collision-resistant, system-wide identifier allocated by the identity registry. It is
 separate from readable domain codes such as six-digit idea identifiers.
+
+### Shared analytical dimension
+
+A semantically compatible property through which different schemas can be analyzed together,
+such as effective date. Sharing a dimension does not by itself establish a relationship between
+individual records; mappings must define the property's meaning and compatibility.
+
+### Tag assignment
+
+A governed relationship connecting an object to a tag, with provenance. The shared
+`tag-assignment` schema supplies the assignment authority across object types.
+
+### Effective time and recorded time
+
+Effective time describes when a fact applied in the world; recorded time describes when the system
+learned that fact. Preserving both allows a correction entered today to describe a role change
+that took effect last month while retaining what was known before the correction.
+
+### Resolved record
+
+The deterministic result of folding immutable original events and their amendments through a
+specified event position, following the idea-log pattern. Subsequent amendments can produce a new
+current view without erasing the original evidence or earlier resolved views.
