@@ -59,6 +59,7 @@ and migrations before the new domain schemas are implemented.
 | `identity-registry` | System-wide opaque IDs, domain-code mappings, aliases, supersession, merges, and splits | Planned |
 | `schema-registry` | Machine-readable schema definitions, versions, ownership, mappings, compatibility, and migrations | Foundational planned |
 | `schema-mapping` | Version-aware mappings between schema properties, identities, and transformations | Foundational planned |
+| `provisional-party` | Unresolved party identity with captured names, provenance, confidence, and resolution lifecycle | Planned |
 | `company` | Legal entities and operational organizations, including brands, divisions, and teams | Planned |
 | `company-relationship` | Directed, typed, time-bounded relationships among companies | Planned |
 | `affiliation` | A person's time-bounded relationship to a company | Planned |
