@@ -88,6 +88,8 @@ and migrations before the new domain schemas are implemented.
 - Engagements and projects are many-to-many through an explicit participation record.
 - Existing IDs remain usable as aliases while the identity registry introduces stable prefixed
   opaque IDs. Six-digit idea codes remain idea-domain codes, not the global identity.
+- Existing document codes such as PLAN, ADR, ARCH, and REQ remain human-facing domain codes; each
+  governed document also receives a global identity linked through the identity registry.
 - Time-bounded relationships use half-open intervals `[starts_on, ends_on)`.
 - Unresolved parties are first-class provisional records with provenance, confidence, and review
   status.
