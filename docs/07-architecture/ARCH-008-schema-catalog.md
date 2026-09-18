@@ -23,8 +23,9 @@ an implemented capability.
 Every durable object has one authoritative schema defining its identity, properties, lifecycle,
 provenance, validation, and permitted relationships. Mappings among governed objects create the
 structured data used for analysis and mathematical processing. Derived projections must identify
-their source schema and deterministic rebuild rule. The future schema registry will make this
-catalog machine-readable and will manage schema versions, compatibility, and migrations.
+their source schema and deterministic rebuild rule. The foundational `schema-registry` will make
+this catalog machine-readable and will manage schema versions, compatibility, ownership, mappings,
+and migrations before the new domain schemas are implemented.
 
 ## Existing schema contracts
 
@@ -56,6 +57,7 @@ catalog machine-readable and will manage schema versions, compatibility, and mig
 | Schema | Intended authority | Status |
 |---|---|---|
 | `identity-registry` | System-wide opaque IDs, domain-code mappings, aliases, supersession, merges, and splits | Planned |
+| `schema-registry` | Machine-readable schema definitions, versions, ownership, mappings, compatibility, and migrations | Foundational planned |
 | `company` | Legal entities and operational organizations, including brands, divisions, and teams | Planned |
 | `company-relationship` | Directed, typed, time-bounded relationships among companies | Planned |
 | `affiliation` | A person's time-bounded relationship to a company | Planned |
@@ -87,6 +89,8 @@ catalog machine-readable and will manage schema versions, compatibility, and mig
   status.
 - WBS current state is a validated projection of append-only change events; baselines pin a
   replay position and integrity evidence.
+- The schema registry is separate from the identity registry and is implemented as a foundational
+  capability before the new domain schemas.
 
 ## Implementation boundary
 
