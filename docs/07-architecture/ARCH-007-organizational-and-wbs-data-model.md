@@ -108,6 +108,12 @@ process, or delivery patterns; a template is not a contract or an engagement and
 and instantiated by either. Their exact legal, commercial, and content boundaries remain plan
 decisions.
 
+Business file metadata, versions, and locations belong to `document-asset`; repository documentation
+continues to use the existing `document` contract. Template instances retain their originating
+template version, and later revisions are applied explicitly with derivation history preserved.
+Tasks and commitments may reference engagements directly with no project required, supporting
+non-project advisory and retainer work through the existing execution objects.
+
 ## Work Breakdown Structure
 
 Each project may have a tree of `WBSElement` records. An element is any node: root, workstream,

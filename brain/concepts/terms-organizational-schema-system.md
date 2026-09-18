@@ -69,6 +69,25 @@ invariants. It may reference a data contract but is not a business contract.
 A reusable, versioned document, process, or delivery pattern. A template is not a contract,
 engagement, or instantiated project.
 
+Objects created from a template retain the exact version used. Applying a later template revision
+is an explicit action that preserves the original derivation history.
+
+### Document asset
+
+A record describing a business file, its versions, and its storage locations, including PDFs,
+signed agreements, and externally hosted documents. The planned `document-asset` schema governs
+this metadata; the existing `document` schema governs repository documentation.
+
+### Document link
+
+A typed relationship between an object and a supporting document, recording the relationship's
+meaning and provenance.
+
+### External reference
+
+A provider-scoped identifier or URL associated with a target object and validity dates, such as
+an external CRM record ID or a document URL.
+
 ### Project
 
 A bounded delivery effort organized around an objective, schedule, parties, roles, scope, and

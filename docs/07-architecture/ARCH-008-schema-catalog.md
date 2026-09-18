@@ -74,6 +74,7 @@ and migrations before the new domain schemas are implemented.
 | `business-contract` | Legal and commercial agreements, proposals, statements of work, amendments, renewals, and termination records | Planned |
 | `engagement-contract` | Explicit many-to-many links between engagements and business contracts | Planned |
 | `document-link` | Typed links from objects to supporting documents with provenance | Planned |
+| `document-asset` | Business file metadata, versions, and storage locations, including signed agreements and externally hosted documents | Planned |
 | `external-reference` | Provider-scoped external identifiers or URLs, target object, and validity dates | Planned |
 | `template` | Reusable versioned document, process, or delivery patterns | Planned |
 | `glossary-term` | Structured vocabulary terms, definitions, synonyms, distinctions, and lineage | Planned |
@@ -89,12 +90,16 @@ and migrations before the new domain schemas are implemented.
   signature**.
 - An engagement may contain projects and non-project work such as retainers, advisory support, and
   operational requests.
+- Existing tasks and commitments may link directly to engagements, with projects optional, to
+  represent non-project work. This decision does not introduce a separate service-request schema.
 - An engagement may have multiple typed contracts and related documents.
 - A business contract may cover multiple engagements; `engagement-contract` records the
   many-to-many relationship, including master agreements spanning engagements.
 - Supporting-document relationships are separate `document-link` records with relationship type
-  and provenance. The representation of external paperwork versus governed repository documents
-  must be resolved before implementation.
+  and provenance. Business files use `document-asset` for metadata, versions, and locations;
+  the existing `document` schema continues to govern repository documentation.
+- Objects instantiated from templates retain the exact template version used. Later template
+  revisions are applied explicitly, preserving the original derivation history.
 - External identifiers and URLs are separate `external-reference` records carrying provider,
   value, target object, and validity dates.
 - `business-contract` means literal legal/commercial paperwork. `data-contract` means a
