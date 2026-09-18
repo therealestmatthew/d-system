@@ -67,13 +67,17 @@ and migrations before the new domain schemas are implemented.
 | `project-party` | Person/company participation in a project, with representation context and role | Planned |
 | `role-definition` | Reusable and project-specific role rules, cardinality, and requirements | Planned |
 | `opportunity` | Potential engagement before qualified mutual intent | Planned |
+| `opportunity-party` | Opportunity participant roles, dates, representation, provenance, and cardinality | Planned |
 | `engagement` | Commercial or delivery relationship beginning at qualified mutual intent; may include project and non-project work | Planned |
+| `engagement-party` | Engagement participant roles, dates, representation, provenance, and cardinality | Planned |
 | `engagement-project` | Explicit dated participation of a project in one or more engagements | Planned |
 | `business-contract` | Legal and commercial agreements, proposals, statements of work, amendments, renewals, and termination records | Planned |
 | `template` | Reusable versioned document, process, or delivery patterns | Planned |
 | `glossary-term` | Structured vocabulary terms, definitions, synonyms, distinctions, and lineage | Planned |
 | `wbs-element` | Hierarchical project scope nodes, work packages, codes, and responsibility | Planned |
 | `wbs-change` | Append-only WBS structural changes, replay order, provenance, and baseline support | Planned |
+| `wbs-baseline` | Approved WBS scope with identity, replay anchor or snapshot hash, approval, and supersession history | Planned |
+| `work-dependency` | Directed temporal and technical dependencies among typed work endpoints, with dependency type and provenance | Planned |
 
 ## Confirmed relationship rules
 
@@ -112,6 +116,14 @@ and migrations before the new domain schemas are implemented.
   capability before the new domain schemas.
 - Schema mappings are separate durable objects with their own identity, lifecycle, compatibility,
   validation status, and lineage.
+- Opportunity and engagement participation each have a separate role-bearing junction schema:
+  `opportunity-party` and `engagement-party`.
+- Each WBS baseline is a separate durable object carrying approval and supersession history.
+- Temporal and technical dependencies are first-class `work-dependency` objects connecting typed
+  endpoints such as tasks, commitments, WBS elements, and projects.
+- Breaking schema changes require explicit new versions, migrations, compatibility notes, and
+  old-to-new data validation. Domain stewards propose and validate changes; the repository owner
+  approves their architectural and governance impact.
 
 ## Implementation boundary
 

@@ -173,7 +173,10 @@ remains conceptual and relational rather than becoming a field-by-field manual.
 New contracts are expected for `identity-registry`, `company`, `company-relationship`, `affiliation`,
 `person-alias`, `project-party`, `role-definition`, `opportunity`, `engagement`,
 `engagement-project`, `business-contract`, `template`, `glossary-term`, `wbs-element`, and
-`wbs-change` (with baseline metadata placement still to be decided). Existing project, person,
+`wbs-change`, and `wbs-baseline`. Separate `opportunity-party` and `engagement-party` schemas
+hold participant relationships; `work-dependency` holds temporal and technical dependency links.
+The foundational `schema-registry` and `schema-mapping` govern these data contracts, with
+`provisional-party` providing durable unresolved identities. Existing project, person,
 commitment, task, waiting-on, interaction, decision, and development-event contracts will be
 updated in dependent phases.
 
