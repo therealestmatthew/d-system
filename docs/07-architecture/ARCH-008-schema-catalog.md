@@ -97,6 +97,11 @@ and migrations before the new domain schemas are implemented.
   and events initially use global IDs only.
 - Opportunities use role-bearing links to multiple people and companies, including unresolved
   provisional parties, rather than a single prospect/contact pair or free-text participants.
+- Opportunities use an explicit staged lifecycle with transition history, including identified,
+  qualifying, discovery, proposal, qualified_mutual_intent, won, lost, abandoned, and converted
+  states (final vocabulary remains a plan decision).
+- One opportunity may convert to multiple engagements through explicit conversion links recording
+  dates, reasons, and confidence.
 - Time-bounded relationships use half-open intervals `[starts_on, ends_on)`.
 - Unresolved parties are first-class provisional records with provenance, confidence, and review
   status.
