@@ -58,6 +58,7 @@ and migrations before the new domain schemas are implemented.
 |---|---|---|
 | `identity-registry` | System-wide opaque IDs, domain-code mappings, aliases, supersession, merges, and splits | Planned |
 | `schema-registry` | Machine-readable schema definitions, versions, ownership, mappings, compatibility, and migrations | Foundational planned |
+| `schema-mapping` | Version-aware mappings between schema properties, identities, and transformations | Foundational planned |
 | `company` | Legal entities and operational organizations, including brands, divisions, and teams | Planned |
 | `company-relationship` | Directed, typed, time-bounded relationships among companies | Planned |
 | `affiliation` | A person's time-bounded relationship to a company | Planned |
@@ -91,6 +92,8 @@ and migrations before the new domain schemas are implemented.
   replay position and integrity evidence.
 - The schema registry is separate from the identity registry and is implemented as a foundational
   capability before the new domain schemas.
+- Schema mappings are separate durable objects with their own identity, lifecycle, compatibility,
+  validation status, and lineage.
 
 ## Implementation boundary
 
