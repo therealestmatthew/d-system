@@ -90,6 +90,8 @@ and migrations before the new domain schemas are implemented.
   opaque IDs. Six-digit idea codes remain idea-domain codes, not the global identity.
 - Existing document codes such as PLAN, ADR, ARCH, and REQ remain human-facing domain codes; each
   governed document also receives a global identity linked through the identity registry.
+- Human-readable domain codes are assigned only to object types that people routinely reference;
+  other durable objects use their global identity alone.
 - Time-bounded relationships use half-open intervals `[starts_on, ends_on)`.
 - Unresolved parties are first-class provisional records with provenance, confidence, and review
   status.
