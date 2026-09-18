@@ -170,6 +170,10 @@ remains conceptual and relational rather than becoming a field-by-field manual.
 
 ## Planned schema families
 
+The current schema log is [ARCH-008](ARCH-008-schema-catalog.md). It includes the accepted
+`engagement-contract` many-to-many relationship, typed `document-link` records with provenance,
+and provider-scoped `external-reference` records with validity dates.
+
 New contracts are expected for `identity-registry`, `company`, `company-relationship`, `affiliation`,
 `person-alias`, `project-party`, `role-definition`, `opportunity`, `engagement`,
 `engagement-project`, `business-contract`, `template`, `glossary-term`, `wbs-element`, and

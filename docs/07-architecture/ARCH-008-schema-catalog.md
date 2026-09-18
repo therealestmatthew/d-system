@@ -72,6 +72,9 @@ and migrations before the new domain schemas are implemented.
 | `engagement-party` | Engagement participant roles, dates, representation, provenance, and cardinality | Planned |
 | `engagement-project` | Explicit dated participation of a project in one or more engagements | Planned |
 | `business-contract` | Legal and commercial agreements, proposals, statements of work, amendments, renewals, and termination records | Planned |
+| `engagement-contract` | Explicit many-to-many links between engagements and business contracts | Planned |
+| `document-link` | Typed links from objects to supporting documents with provenance | Planned |
+| `external-reference` | Provider-scoped external identifiers or URLs, target object, and validity dates | Planned |
 | `template` | Reusable versioned document, process, or delivery patterns | Planned |
 | `glossary-term` | Structured vocabulary terms, definitions, synonyms, distinctions, and lineage | Planned |
 | `wbs-element` | Hierarchical project scope nodes, work packages, codes, and responsibility | Planned |
@@ -87,6 +90,13 @@ and migrations before the new domain schemas are implemented.
 - An engagement may contain projects and non-project work such as retainers, advisory support, and
   operational requests.
 - An engagement may have multiple typed contracts and related documents.
+- A business contract may cover multiple engagements; `engagement-contract` records the
+  many-to-many relationship, including master agreements spanning engagements.
+- Supporting-document relationships are separate `document-link` records with relationship type
+  and provenance. The representation of external paperwork versus governed repository documents
+  must be resolved before implementation.
+- External identifiers and URLs are separate `external-reference` records carrying provider,
+  value, target object, and validity dates.
 - `business-contract` means literal legal/commercial paperwork. `data-contract` means a
   machine-readable schema agreement, and `programming-contract` means executable interface
   expectations; neither is the business-contract object.
