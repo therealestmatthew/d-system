@@ -94,10 +94,10 @@ An engagement is not a replacement for a project: it answers “under what comme
 this work being delivered?” while the project answers “what outcome is being pursued?”
 
 The lifecycle boundary is intentionally explicit: a prospect or sales conversation is not an
-engagement by itself. The governed plan must choose whether an engagement begins at a qualified
-opportunity, a mutual intent/authorization point, contract signature, or another recorded event.
-Pre-engagement prospect activity belongs to sales or interaction records and may later be linked to
-the engagement without changing its start date.
+engagement by itself. An engagement officially begins at **qualified mutual intent to pursue or
+authorize work, before contract signature**. Pre-engagement prospect activity belongs to sales or
+interaction records and may later be linked to the engagement without changing its start date. This
+definition is the source wording for the future glossary term `Engagement`.
 
 `Contract` will be a separate schema for agreements, amendments, statements of work, and their
 parties, dates, status, and references. `Template` will be a separate schema for reusable document,
