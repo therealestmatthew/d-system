@@ -12900,7 +12900,20 @@ items:
     elements and at least one disconfirming observation.
   deliverables:
   - docs/00-working/session-types-theory.md
-  next_action: Paste the Part 1 prompt into a fresh session and run it to its hard stop.
+  session: doc-session-session-taxonomy-theory
+  completion_evidence:
+  - docs/00-working/session-types-theory.md
+  - docs/03-sessions/SESS-2026-09-19-07-session-taxonomy-theory.md
+  result: Part 1 prompt executed to its hard stop. The theory document proposes thirteen session
+    types in three families (non-committing, committing, second-order), each carrying all five
+    prediction elements, plus the d-system binding table, a REQ-023/ADR-020 reconciliation
+    stating three departures, an Appendix A evaluation, four separately-scored structural
+    predictions and five open questions. Governance exits 0 and the five-element check passes on
+    all thirteen types. No raw transcript and no session-record contents were read, and the Part
+    2 prompt was not opened - attested in the session record. Halted for owner review; no
+    empirical work begun.
+  next_action: Owner reviews docs/00-working/session-types-theory.md. On their explicit go,
+    phase-tax-02 runs the Part 2 prompt in a separate session.
 - id: phase-tax-02
   title: Session-type taxonomy Part 2 - empirical test against transcripts and records
   plan: doc-session-taxonomy-investigation
