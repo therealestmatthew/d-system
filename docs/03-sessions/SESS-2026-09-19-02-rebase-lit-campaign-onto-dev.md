@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-rebase-lit-campaign-onto-dev
-code: SESS-2026-09-19-01
+code: SESS-2026-09-19-02
 title: Rebase agent/lit-campaign onto dev (161 commits behind, 14 ahead)
 kind: session
 status: active
@@ -14,6 +14,19 @@ systems:
 - sys-governance
 depends_on: []
 ---
+
+## Note on this document's own code
+
+This session was first written under code `SESS-2026-09-19-01`. That number was
+independently allocated the same day by three branches — `agent/phase-conc-01`,
+this branch, and `agent/checkpoint-unclaimed-dev` — because the session series is
+derived from documents on disk rather than reserved in `codes.yaml`, and no branch
+could see the others' unmerged commits. `agent/phase-conc-01` holds a real backlog
+claim and integrates first, so its code stands. This branch renumbered to
+`SESS-2026-09-19-02` (allocated with `--next-code session` after the rebase onto
+`dev`), per AGENTS.md's "the agent integrating second renumbers" rule. No reference
+to the old code existed outside this file and the generated catalog/ideas pages, so
+no cross-reference updates were needed.
 
 ## Phase
 
