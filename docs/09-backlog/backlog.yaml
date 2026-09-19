@@ -9036,8 +9036,22 @@ items:
   - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
-  next_action: Pick the threshold from the repository's own history before writing any code - measure
-    how long real claims have actually stayed open, rather than choosing a round number.
+  session: doc-session-stale-claim-signal
+  completion_evidence:
+  - src/governance/backlog.py
+  - src/governance/__main__.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - test/test_backlog.py
+  - docs/03-sessions/SESS-2026-09-19-01-stale-claim-signal.md
+  result: 'All three acceptance conditions judged Met against real command output - see
+    SESS-2026-09-19-01. governance and test_backlog.py are green; the real --ready output over
+    live claims shows a distinct state per claim (phase-conc-01 "no", phase-lit-07 "no evidence
+    - no agent/phase-id branch found" because its real branch/worktree do not follow the
+    agent/phase-id naming convention this signal assumes - recorded as Unresolved, not silently
+    hidden). Left active pending rebase, review and the owner''s integration call.'
+  next_action: Not yet rebased onto or reviewed for integration into dev. A reviewer should read
+    SESS-2026-09-19-01's Unresolved section on phase-lit-07's naming-convention gap before deciding
+    whether this phase's scope is fully satisfied or needs a follow-up.
 - id: phase-conc-02
   title: Refuse integration over a dirty primary checkout
   plan: doc-concurrency-git-safety
