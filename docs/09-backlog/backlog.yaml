@@ -12873,7 +12873,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-tax
   priority: 2
   session_budget: 1
   depends_on: []
