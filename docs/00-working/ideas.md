@@ -11897,6 +11897,7 @@ The recommendation arising from this is to keep systems as a reported advisory s
 **Links**
 
 - relates_to → `000251`
+- relates_to ← `000283`
 
 ---
 
@@ -12373,3 +12374,21 @@ https://www.reddit.com/r/ClaudeAI/s/iKsL6ra2DL
 The r/ClaudeAI moderators' index post, "r/ClaudeAI List of Ongoing Megathreads" — a directory linking to every ongoing megathread on that subreddit rather than a discussion in its own right. Threads it indexes include performance and bugs, usage limits, a "Built with Claude" project showcase, competitor comparison, and Claude identity/sentience/expression, plus a user problem report log with summaries of recent reports and a mirror subreddit for report posts.
 
 Saved on 2026-09-19 during the framework-generalization session. Useful as a route into community reporting on model behavior and limits; the showcase thread is the one that bears on this repository's own work.
+
+---
+
+## 000283 · Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
+
+**Created 2026-09-19T12:56:54-04:00 · Status: `open`**
+
+Three agents working concurrently on 2026-09-19 each allocated SESS-2026-09-19-01 for a different session, on three different branches, and none could have detected the others. A fourth collision the same day, on SESS-2026-09-14-10, was found during a rebase.
+
+The cause is specific and is not the one the existing collision rule assumes. Document codes in the reserved series are protected by reserving them in codes.yaml before the document exists, so a peer reading codes.yaml sees the reservation. Session codes work differently: they are a dated series whose same-day sequence number is derived by looking at the session documents present on disk. Historical practice confirms no session code has ever been pre-reserved in codes.yaml, and the reserved list is documented as being for codes claimed before their document exists, which does not apply once the record is written.
+
+The consequence is that reserving a session code is not possible in the ordinary way, and an agent on a branch sees only the session documents its own branch carries. Every concurrent branch therefore observes the same highest same-day sequence and allocates the same next number. The existing rule that the agent integrating second renumbers still recovers correctly, but it is manual recovery scaling with the number of concurrent sessions, and with three branches it required renaming files, editing code fields and chasing cross-references on two of them.
+
+This is a concrete sub-problem for phase-conc-03, which owns making document-code allocation collision-proof across concurrent sessions. It also matters for any team adapting this model: allocating an identifier by reading the state of your own branch guarantees collisions the moment two people work at once. An identifier needs to come from somewhere all writers can see before they commit.
+
+**Links**
+
+- relates_to → `000253`
