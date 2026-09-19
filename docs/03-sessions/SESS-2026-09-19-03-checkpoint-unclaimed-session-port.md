@@ -25,7 +25,9 @@ against `dev`), and re-run its verification against current `dev` state.
 
 The change itself, ported unmodified from `agent/checkpoint-unclaimed`: `agent-workflows/checkpoint.md`
 (source of truth) and `.claude/commands/session-close.md` (hand-written) gain a "Sessions with no
-claimed phase" branch, addressing idea `000237` (three findings: 2026-09-10, 09-14, 09-15, 09-19) —
+claimed phase" branch, addressing idea `000237` (created 2026-09-14, annotated with findings
+2026-09-15 and 09-19; an earlier occurrence of the same defect is recorded separately, on
+`SESS-2026-09-10-01`, not as an event on this idea) —
 the checkpoint skill said "If no phase is active for this session, say so and stop. There is nothing
 to record," while `AGENTS.md` requires exactly such a session to write a `kind: session` record. The
 generated files `.claude/skills/checkpoint/SKILL.md` and `.agents/skills/checkpoint/SKILL.md` were
