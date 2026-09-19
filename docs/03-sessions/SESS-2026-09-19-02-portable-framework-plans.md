@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-portable-framework-plans
-code: SESS-2026-09-19-01
+code: SESS-2026-09-19-02
 title: Portable multi-developer framework - plans, requirements and proposed phases
 kind: session
 status: active
@@ -43,7 +43,8 @@ runs the full backlog audit unconditionally before any subcommand's own logic �
 that file, not guessed. Session-code allocation above and catalog regeneration were both blocked by
 this until the two new plan files were temporarily removed from the working tree (`git stash push` on
 exactly the four new/changed files, run the command, `git stash pop`) to get a clean audit long enough
-to allocate `SESS-2026-09-19-01`; `docs/08-governance/catalog.md` could not be regenerated the same
+to allocate what was then `SESS-2026-09-19-01` (later renumbered to `SESS-2026-09-19-02`; see
+Unresolved); `docs/08-governance/catalog.md` could not be regenerated the same
 way without also losing the `sys-fw-*` system registrations it would need to reflect, so it is left
 unchanged at its last committed content, which remains internally consistent since nothing else in
 this session's diff changes what it should say once the plans are covered.
@@ -132,12 +133,57 @@ Unclaimed session; no line of `docs/09-backlog/backlog.yaml` was touched, per th
 instruction to leave that file to the peer session already committing to it from the primary
 checkout.
 
+## Follow-up: backlog coverage added, rebase, renumbering
+
+The coordinator corrected the no-`backlog.yaml`-edits instruction above: it existed only to avoid
+colliding with commits the owner was making to that file from the primary checkout, and nothing else
+edits it on this branch. Three things followed, dated the same day as the rest of this record.
+
+1. **Rebased onto current `dev`** (`f08b086` → `a7fb9f3`). Clean rebase, no conflicts in either
+   generated file (`catalog.md`, `docs/00-working/ideas.md`) or anywhere else - the peer branches that
+   advanced `dev` did not touch any path this session's commits touch.
+2. **Pasted the eight proposed phases into `docs/09-backlog/backlog.yaml`** as `status: queued` with
+   no `agent` field, `updated` left at `'2026-09-19'`, nothing added to `next_up`. Regenerated
+   `docs/08-governance/catalog.md`.
+3. **Renumbered the session code.** `SESS-2026-09-19-01` (allocated earlier the same session) turned
+   out to have been allocated independently by three other branches the same day - idea `000283`
+   records the collision class: the session series' sequence is computed from documents on disk, so
+   two branches that never see each other's commits compute the same "next" number. This file was
+   renamed to `SESS-2026-09-19-02` and its `code:` field updated to match; `created` stays `2026-09-19`.
+   `docs/00-working/ideas.md` names the old code in idea `000283`'s own text as a historical fact
+   about the collision (not a live reference) and was left as-is.
+
+Re-run verification after all three steps, against the fully staged tree:
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 287 documents, 26 memories, 286 backlog phases
+
+$ uv run pytest
+629 passed, 2 warnings in 51.55s
+
+$ uv run python tools/check_no_private_content.py   # run with changes staged
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
+check_no_private_content: OK (717 tracked files, 0 identifiers checked)
+```
+
+All three of the earlier cascading pytest failures
+(`test_repository_backlog_covers_all_open_plans`, `test_committed_catalog_matches_regenerated_output`,
+`test_catalog_flag_writes_committed_file`) are gone along with the two governance errors that caused
+them. The two "not met" acceptance items above (`governance exits 0`, and the implicit "backlog left
+untouched") are superseded by this follow-up: governance now exits 0, and `backlog.yaml` was
+deliberately touched on the coordinator's explicit correction.
+
 ## Unresolved
 
-- `docs/08-governance/catalog.md` will need regeneration once the two plans gain backlog coverage
-  and `--catalog` can run again; it is left at its prior committed content in this session's diff
-  because regenerating it now would require temporarily removing the very plans this session exists
-  to add.
+- **Session-code renumbering may need a second pass at integration.** Another agent was renumbering
+  two other branches' collided `SESS-2026-09-19-01` allocations concurrently with this one. The
+  allocator computes "next" from documents on disk, so whichever of us integrates first fixes the
+  number for the others; whoever integrates second (or third) may find `SESS-2026-09-19-02` already
+  taken and need to renumber again. This is not coordinated here, per the coordinator's instruction -
+  it is a fact for whoever integrates to check, not a task this session owns.
+- `next_up` was deliberately left unchanged; queue ranking of the eight new phases is the owner's
+  call, not this session's.
 - Three ideas from the batch were left unpromoted on purpose (`000272` answered in place; `000273`
   and `000280` left open) - see `PLAN-040`'s "Ideas not promoted in this batch" section for the full
   reasoning and revisit conditions.
