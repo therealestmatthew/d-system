@@ -90,8 +90,10 @@ someone has to interpret.
 - **`## Phase`** — one line naming the work, not a phase id, and marking the session unclaimed:
   `` Unclaimed — owner-directed work, no backlog phase. `checkpoint-unclaimed` — record an
   owner-directed session that holds no claim. `` Use the branch/worktree slug as the handle and
-  restate the owner's instruction in one sentence. **Never write a phase id here that you do not
-  hold**, and never adopt a peer's phase or a phase that closed earlier in the conversation.
+  restate the owner's instruction in one sentence. Write that restatement on the first checkpoint of
+  the session and reuse it verbatim on every later run of the same session; re-deriving a fresh
+  paraphrase each run would make a no-op run produce a diff. **Never write a phase id here that you
+  do not hold**, and never adopt a peer's phase or a phase that closed earlier in the conversation.
 - **`## Verification`** — the repository-wide gates, because nothing declared a narrower list. Run
   all three, in this order, and record the literal command and output of each:
 
