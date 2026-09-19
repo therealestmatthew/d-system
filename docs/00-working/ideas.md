@@ -7407,6 +7407,7 @@ No related plan or requirement document found that covers the claim-system revis
 - relates_to → `000025`
 - relates_to ← `000152`
 - relates_to ← `000168`
+- relates_to ← `000280`
 
 ---
 
@@ -11409,7 +11410,7 @@ Also worth covering: a checkpoint invoked from the primary checkout while a peer
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-maximize-review (2026-09-15T16:47:22-04:00): Second occurrence, 2026-09-15. The owner invoked /session-close on a read-only investigation session that claimed no phase, and the command hit exactly the gap this idea describes. Recorded because the first occurrence (SESS-2026-09-14-12) was a long planning session and this one is the opposite shape - a single short investigation - which shows the gap is not specific to large owner-directed sittings.
 
@@ -11420,6 +11421,9 @@ Two steps did work unchanged and should survive the amendment. Step 7's gates ar
 One datum for the open question this idea raises about what replaces the independent review as the honesty gate. Here there was nothing for a reviewer to verify against a declared list, but there was something verifiable: a drift test caught the session's own error. Appending the idea without regenerating docs/00-working/ideas.md turned test_ideas.py::test_the_committed_markdown_matches_regenerated_output red, which the step 7 gates surfaced. For a phaseless session whose output is data writes rather than code, the existing drift tests may already be the proportionate gate, and the sub-agent review may be the wrong instrument rather than a missing one. That is a candidate answer to the question, not a settled one.
 
 The record shape question this idea leaves open was resolved by following the 2026-09-14 precedent: SESS-2026-09-15-12 uses the same six-section contract with Phase stating none/unclaimed, and an Unresolved section in place of Review since no review ran. That is now two hand-written instances of the same shape, which is the argument for making it the contract rather than re-deciding it a third time.
+- **finding** by agent-framework (2026-09-19T12:24:59-04:00): Recurrence observed 2026-09-19. The owner invoked the checkpoint workflow on an unclaimed, owner-directed session (framework generalization and idea capture; fourteen ideas appended and committed as 6cc3ec1). The workflow could not run at all: its step 1 resolves the phase by finding the backlog entry with status active and agent set to this session, and finding none, its instruction is to stop. The only active claim was a peer's, phase-lit-07 held by agent-lit, which the workflow correctly forbids touching.
+
+The result is that a session doing real, committed work has no mechanism to record itself, even though AGENTS.md explicitly sanctions unclaimed owner-directed sessions in its Concurrent agents: claim a phase section. Every body section the contract specifies is derived from the phase's verification and acceptance lists, so the gap is structural rather than a missing branch: there is no phase from which to derive them. A fix needs to define what sections 3 and 4 contain when no acceptance list exists.
 
 </details>
 
@@ -11861,7 +11865,7 @@ Evidence: _working/phase-review/E.md, out-of-scope section; docs/00-working/phas
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-16T12:06:52-04:00): Confirmed current in docs/09-backlog/backlog.yaml:10498-10567 (checked in the phase-review worktree): phase-auto-03 (systems: [sys-api], deliverables src/api/routes/, schemas/, test/) and phase-auto-04 (systems: [sys-api], deliverables src/, sql/, schemas/, test/) still both declare sys-api, still contradicting PLAN-032:179-182's claim that they run in parallel. This idea restates a finding group E's critique already surfaced as out-of-scope (_working/phase-review/E.md, out-of-scope section, "phase-auto-03 and phase-auto-04 both declare systems: [sys-api]") and the owner recorded as decision 20 in docs/00-working/phase-review-decisions.md, which itself resolves onto decision 18 (recommendation: phase-auto-01 registers new sys-* ids, e.g. sys-agent-ops, for -02 through -05).
 
@@ -11870,6 +11874,23 @@ New material beyond E.md's own scope: collisions() (src/governance/backlog.py:37
 Same structural defect, in-scope elsewhere: phase-idg-08/-10/-11 share systems: [sys-governance] (decision 5, docs/00-working/phase-review-decisions.md), and R12 (_working/phase-review/rulings.md) found the identical deliverables-collision problem there - narrowing deliverables to specific files buys nothing while both phases still declare docs/08-governance/ as a deliverable. R12's specific remedy (narrow deliverables to per-code filenames and re-tag off sys-governance onto a new document-authoring system id) does not transfer directly to phase-auto-03/-04, because these are genuine new components sharing sys-api's scaffold placeholder, not phases colliding on a shared documentation folder - so this is not literally "one fix covers both." But both cases are blocked on the same class of remedy (register new systems.yaml entries) and the same class of obstacle (a governed-config change outside any one session's grant, per R12's note that phase-conc-03 is a genuine prerequisite for code reservation contention). Whoever eventually edits systems.yaml to resolve decision 18 could plausibly resolve both idg's and auto's collisions in the same systems.yaml change, even though the diagnosis and the specific new ids differ.
 
 No other idea in _data/ideas.jsonl covers this ADR-003/sys-api collision; idea's own links (relates_to -> 000251, the anchor for phase-agx-09/phase-auto-03/phase-auto-04's three deferred defects) are already correct and need no further link.
+- **finding** by agent-framework (2026-09-19T12:38:36-04:00): Same defect class observed 2026-09-19 in the concurrency-and-git-safety track. phase-conc-01 declares systems sys-governance and sys-backlog, phase-conc-02 declares sys-governance and sys-delivery, and phase-conc-03 declares sys-governance. All three are queued, ready, priority 1, with no dependencies between them, which reads as an invitation to run them in parallel. ADR-003's overlap rule rejects the second and third claims on the shared sys-governance lock, so at most one of the three can be active at a time.
+
+This matters more than the auto-03/auto-04 pair because sys-governance is declared by a large share of the backlog, so it behaves as a global mutex rather than a genuine resource boundary. The underlying question is whether a system is the right granularity for the lock at all, or whether the deliverable paths already declared on each phase would express the real conflict more precisely: these three phases touch different files under src/governance/ and would not collide in practice.
+- **finding** by agent-framework (2026-09-19T12:40:41-04:00): Third instance found the same day, 2026-09-19, and this one is already blocking real work rather than merely threatening to. phase-lit-07 and phase-lit-09 both declare sys-research, so the phase-lit-09 claim commit will fail the validator for as long as phase-lit-07 stays active. phase-lit-07 is being held active deliberately because one acceptance condition genuinely fails, which is the correct use of the status, so the block is not a stale claim that could be cleaned up.
+
+PROMPT-031's mapping instructs that phase-lit-07 remains active throughout and phase-lit-09 is claimed under a distinct agent id. That instruction cannot be carried out. A distinct agent id satisfies only the one-phase-per-agent rule; the disjoint-systems rule in ADR-003 is evaluated per phase regardless of which agent holds it. A governed prompt therefore directs a sequence the validator refuses, and nothing detected the contradiction until an agent tried to follow it.
+
+Across three instances in one day (auto-03/auto-04 on sys-api, conc-01/02/03 on sys-governance, lit-07/lit-09 on sys-research) the pattern is consistent: a system name is used to describe a subject area, while the validator treats it as an exclusive lock. The two readings coincide only when a system is small enough that any two phases touching it really would collide.
+- **finding** by agent-framework (2026-09-19T12:50:25-04:00): Correction to the three findings above, recorded 2026-09-19 after an investigation actually read the code rather than inferring the mechanism from the phases' behaviour. The premise those findings share is wrong.
+
+The concurrency check in src/governance/backlog.py does not lock on systems alone. Its collisions() function already compares systems OR deliverables OR the dependency closure, and ADR-003 designed it that way deliberately. So the claim that deliverables would express the real conflict more precisely than systems is misdirected: deliverables are already part of the check. What the three instances actually demonstrate is narrower and still real, that the systems clause blocks pairs whose deliverables are provably disjoint, so it contributes false conflicts on top of a path check that would have permitted the work.
+
+Measured over the backlog as it stood in the investigating worktree, 129 phases and 8,256 pairs: 1,003 pairs share a system while having fully disjoint deliverables, which is 12.1 percent of all pairs and 65.5 percent of everything the systems clause blocks. A further 589 pairs have disjoint systems but overlapping deliverables, and those are already caught today by the deliverables clause, so nothing is currently slipping through. Both figures were computed against a stale checkout, roughly 129 phases rather than the 278 on the integration branch, so the proportions are indicative and the absolute counts are not current.
+
+On whether deliverables are trustworthy enough to carry the lock alone: across 54 completed phases, none had zero overlap between declared deliverables and recorded completion evidence, so the declarations are not wrong. But only 5 matched exactly and 46, being 85 percent, touched real paths they never declared, mostly session records and tests. Deliverables are a reliable floor rather than a complete inventory.
+
+The recommendation arising from this is to keep systems as a reported advisory signal but stop the systems clause from blocking in collisions(), leaving the lock on deliverables plus dependency closure, and to require that a phase widen its declared deliverables to match its completion evidence before it closes.
 
 </details>
 
@@ -12172,3 +12193,183 @@ PROPOSED LINK: 000268 --extends--> 000061 (finalizes the same three-axis idea on
 PROPOSED LINK: 000268 --relates_to--> 000236 (both require a precise separation of idea classification/lifecycle semantics from terminal delivery status)
 
 </details>
+
+---
+
+## 000269 · Framework: templates/schemas for governance docs
+
+**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+
+Design a generalized template + JSON Schema for governance documents (GOV-style) for the portable multi-developer framework in docs/framework/. Should capture: what problem the governance rule solves, the rule itself, incident/rationale section, and status. Distinct from protocol docs (see companion idea) — governance docs state standing rules and their justification.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000270 · Framework: templates/schemas for protocol docs
+
+**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+
+Design a generalized template + JSON Schema for protocol documents in docs/framework/ — step-by-step operational procedures (e.g., claim protocol, worktree protocol, session-close protocol), distinct from governance docs which state rules/rationale rather than procedure. Protocol template should include: trigger condition, ordered steps, verification/exit criteria, and failure handling.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000271 · Framework: phase template/schema
+
+**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+
+The generalized framework (docs/framework/) has requirement.template.md and plan.template.md but no standalone phase.schema.json/phase.template describing a single backlog phase in isolation (it currently only appears embedded inside plan examples). Create a dedicated phase template/schema: id, plan reference, depends_on, systems, deliverables, acceptance, verification, scope, status.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000272 · Framework: workstream concept — new organizational layer above plans
+
+**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+
+Introduce a "workstream" (name TBD, alternatives: track, lane, module) as a new layer in the generalized framework, above plans and phases. A workstream represents a parallel, modular track of work assigned to one device/developer (e.g., UI workstream, agent-orchestration workstream, backend/deterministic-design workstream). Each workstream contains one or more plans, each plan composed of one or more phases, and cross-references numerous requirements (many-to-many between workstreams and requirements). Workstreams are the unit that lets modular packages interface with each other to assemble the final product. Needs: workstream.template.md, workstream.schema.json, and documentation of how workstreams relate to systems/deliverables in the existing backlog.yaml concurrency model (docs/framework/03-governance, 05-schemas).
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000273 · Framework: master HTML document for the meta-project itself
+
+**Created 2026-09-19T12:00:06-04:00 · Status: `open`**
+
+Create a plan (and eventually the artifact) for a master HTML document that presents/encompasses the "generalized multi-developer agentic workflow framework" meta-project (docs/framework/) as a cohesive, navigable whole — likely for onboarding new teams/repos or for presenting the framework's design. Should link/summarize: overview principles, workflows, governance, templates, schemas, and analysis findings once available.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000274 · Framework: agent-driven extraction of reusable generalities from key documents
+
+**Created 2026-09-19T12:02:22-04:00 · Status: `open`**
+
+Iterate through this repository's key documents (AGENTS.md, CLAUDE.md, GOV-*, ADRs, PLAN-*, session records) using agents whose job is to extract the durable details and re-express them as reusable, scalable generalities for the portable framework in docs/framework/. Distinct from 000067 (portable agent workflows from one source of truth), which is about single-sourcing workflow definitions; this is about mining existing governance/decision prose for what generalizes beyond d-system. Candidate agent specs are drafted in docs/framework/06-analysis/agent-workflows.md (pattern extraction, governance effectiveness).
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000275 · Sub-agent per session record to extract decisions and outstanding items
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Dispatch a sub-agent per session record in docs/03-sessions/ with instructions to extract, as structured output: the actual key decisions made; any new requirements discovered; anything postponed or declared out of scope; anything flagged as requiring further investigation; and any outstanding action items. The goal is to recover commitments and decisions currently buried in session prose, where nothing surfaces them after the session ends. Output feeds the backlog, the ideas log, and the decision records.
+
+**Links**
+
+- relates_to → `000281`
+- relates_to → `000276`
+
+---
+
+## 000276 · Analyze how decision records are written and propose session-protocol enhancements
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Separately from extracting their content, analyze the way decision records and session records are written — is the form actually optimal and efficient for the reader who comes later? Assess structure, length, signal-to-noise, and whether the required fields earn their place. Output is a proposed set of enhancements to the session documentation protocols specifically: the checkpoint skill and the session-close command. Relates to 000237 (amend checkpoint/session-close for an unclaimed session).
+
+**Links**
+
+- relates_to → `000281`
+- relates_to ← `000275`
+
+---
+
+## 000277 · Framework: template and schema for session documentation
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Define a template and an authoritative schema for session documentation (checkpoint-written and session-close-finalized records), aligned with this repository's existing design principles for governed documents rather than invented separately. Must cover the fields the extraction sub-agents need to find reliably: decisions, new requirements, deferred/out-of-scope items, investigation items, outstanding action items, verification output, completion evidence. Companion to 000269-000271 (governance, protocol, phase templates) and to 000267 (govern every durable object with an authoritative schema).
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000278 · Framework: requirement and plan templates with schemas
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Provide requirement and plan document templates plus matching JSON Schemas for the portable framework in docs/framework/. Drafts of the two templates exist (docs/framework/05-schemas/requirement.template.md, plan.template.md); the schemas do not, so nothing validates them. Ideation-phase priority: requirements templates are the first artifact a new repository needs before any planning can start.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000279 · Framework: GitHub issue and pull request templates, with multiple issue types
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Provide GitHub issue templates and a pull request template for the portable framework. Issues need more than one type — an idea-capture issue is one type, distinct from a defect report, an investigation item, and a decision-needed item — so that the capture path stays one step and the type is legible without reading the body. The PR template should carry phase completion evidence: acceptance criteria, verification output, scope confirmation, session record link. Drafts exist at docs/framework/05-schemas/github-issue-idea.template.md and github-pr.template.md; the remaining issue types do not.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000280 · Adapt the claim and worktree system for multiple developers on separate machines
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+The current claim system assumes every agent shares one primary checkout, so the lock table on the integration branch is readable by all of them. With several developers on separate machines, each with their own clone and their own agents, claims must survive that. Candidate approach without new infrastructure: a shared project board for visibility, claims still committed to the integration branch, integration through pull requests reviewed by a lead rather than direct fast-forward merges, and a documented race-recovery path when two claims collide. Deliberately avoids standing up a service. Relates to 000151 (revisit the claim system's shared-checkout assumption), 000152 (worktree registry), and 000020/000250 (MCP-mediated coordination) as the heavier alternative.
+
+**Links**
+
+- relates_to → `000151`
+
+---
+
+## 000281 · Framework: portable starter kit for bootstrapping a new repository
+
+**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+
+Package the generalized framework as a starter kit a new repository can adopt in one pass: orientation file, backlog structure, code-reservation file, session-start and session-close commands, issue and pull request templates, and the document templates. Success condition is that a new repository copies the kit, customizes a small number of named files, and can immediately run the plan-then-phase-then-claim workflow without inventing anything. First real test is a fresh repository built from scratch rather than d-system itself.
+
+**Links**
+
+- relates_to ← `000269`
+- relates_to ← `000270`
+- relates_to ← `000271`
+- relates_to ← `000272`
+- relates_to ← `000273`
+- relates_to ← `000274`
+- relates_to ← `000275`
+- relates_to ← `000276`
+- relates_to ← `000277`
+- relates_to ← `000278`
+- relates_to ← `000279`
+
+---
+
+## 000282 · Reference: r/ClaudeAI index of ongoing megathreads
+
+**Created 2026-09-19T12:06:08-04:00 · Status: `open`**
+
+https://www.reddit.com/r/ClaudeAI/s/iKsL6ra2DL
+
+The r/ClaudeAI moderators' index post, "r/ClaudeAI List of Ongoing Megathreads" — a directory linking to every ongoing megathread on that subreddit rather than a discussion in its own right. Threads it indexes include performance and bugs, usage limits, a "Built with Claude" project showcase, competitor comparison, and Claude identity/sentience/expression, plus a user problem report log with summaries of recent reports and a mirror subreddit for report posts.
+
+Saved on 2026-09-19 during the framework-generalization session. Useful as a route into community reporting on model behavior and limits; the showcase thread is the one that bears on this repository's own work.
