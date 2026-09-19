@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import tempfile
 from datetime import date
 from pathlib import Path
@@ -379,6 +380,53 @@ def audit_idea_priority(root: Path, today: date | None = None) -> list[str]:
         return [f"ideas-priority inputs: {exc}"]
 
 
+def git_claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[str, dict[str, Any]]:
+    """Gather the two mechanical staleness signals `stale_claim_signal` evaluates.
+
+    Runs read-only git commands only — a single `git worktree list --porcelain` and, per
+    phase, a `git log` against `agent/<phase-id>` — and never mutates repository state. A
+    phase whose branch has no commits yet (not created, or not visible from this checkout)
+    contributes no evidence for either signal, matching the "no branch yet" case
+    `stale_claim_signal` documents as not-stale.
+    """
+    try:
+        listing = subprocess.run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        listing = ""
+    worktree_branches = {
+        line.split("refs/heads/", 1)[1]
+        for line in listing.splitlines()
+        if line.startswith("branch ") and "refs/heads/" in line
+    }
+    evidence: dict[str, dict[str, Any]] = {}
+    for phase_id in phase_ids:
+        branch = f"agent/{phase_id}"
+        try:
+            commit_date = subprocess.run(
+                ["git", "log", "-1", "--format=%ad", "--date=short", branch],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            commit_date = ""
+        if not commit_date:
+            evidence[phase_id] = {"days_since_commit": None, "worktree_exists": None}
+            continue
+        evidence[phase_id] = {
+            "days_since_commit": (today - date.fromisoformat(commit_date)).days,
+            "worktree_exists": branch in worktree_branches,
+        }
+    return evidence
+
+
 def write_catalog(root: Path, rendered: str) -> None:
     """Write the rendered catalog to disk atomically, matching the committed newline convention."""
     target = public_path(root, "docs/08-governance/catalog.md")
@@ -431,7 +479,13 @@ def main() -> int:
             print(f"ERROR {exc}")
             return 1
     elif args.backlog or args.ready:
-        print(render_backlog(catalog, result["documents"], ready_only=args.ready))
+        active_ids = [item["id"] for item in catalog["items"] if item["status"] == "active"]
+        evidence = git_claim_evidence(ROOT, active_ids, date.today())
+        print(
+            render_backlog(
+                catalog, result["documents"], ready_only=args.ready, claim_evidence=evidence
+            )
+        )
     elif args.catalog:
         rendered = render_catalog(result["register"], result["documents"], catalog["items"])
         write_catalog(ROOT, rendered)

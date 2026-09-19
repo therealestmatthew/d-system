@@ -89,6 +89,46 @@ Each active phase names its `agent`, one active phase per agent, and a phase rel
 
 Two things are deliberately not machine-checked. A phase that edits files outside its declared `systems` and `deliverables` defeats the disjointness rule entirely — the declarations are what the validator can see, and diff review is what confirms the work stayed inside them. Adjacency in the `systems.yaml` dependency graph is also unchecked: an agent working a system that `depends_on` a peer's active system must treat the upstream contract as frozen at the commit it branched from and build against merged `main`, never against a peer's branch.
 
+### The stale-claim signal
+
+`--ready` and `--backlog` both add a **Stale?** column to the active-claims table
+(`phase-conc-01`, `REQ-013` R01–R03). It reports, per active phase, one of three text
+states rendered by [`claim_report_state`](../../src/governance/backlog.py) — never a
+verdict, only what the check could see:
+
+| State | Meaning |
+|---|---|
+| `no` | Both mechanical signals were evaluated and neither fired. |
+| `STALE: <signal>` | A signal fired, naming which one: `no commit on its branch in Nd (> 2d)`, or `worktree missing`. |
+| `no evidence: no agent/<phase-id> branch found` | The branch `agent/<phase-id>` has no commits to read at all, so neither signal could be evaluated. This is also the state a claim shows when its real branch does not follow the `agent/<phase-id>` naming convention this check assumes — the check has nothing wrong to report, and nothing confirmed clean either. |
+| `no signal evaluated` | This run gathered no git evidence for the phase at all (a caller that never wired up [`git_claim_evidence`](../../src/governance/__main__.py)). |
+
+The two signals [`stale_claim_signal`](../../src/governance/backlog.py) evaluates are
+mechanical, not judgement calls:
+
+- **Branch commit recency** — days since the most recent commit on `agent/<phase-id>`,
+  fires past `STALE_CLAIM_DAYS` (`2`, set from this repository's own history: of 17
+  claim-to-completion pairs on `dev` measured 2026-09-19, the longest gap was 1 day and
+  most closed the same day; the threshold is double that observed maximum).
+- **Worktree presence** — whether `git worktree list` currently shows a worktree checked
+  out on `agent/<phase-id>`; its absence fires the signal.
+
+**What the signal does not prove** (`REQ-013` R02): it is evidence for the owner, never
+proof the agent is dead. A session reading, thinking, or blocked on external input for
+longer than the threshold produces the identical reading to an abandoned one. A missing
+worktree read from a machine that never held it is not evidence at all — worktree
+directories are local filesystem state, not replicated by git. And a claim whose branch
+does not exist yet is reported as `no evidence`, never as stale: "claimed a moment ago" and
+"abandoned before starting" produce the same absence, and only a person can tell them
+apart.
+
+**The report is an input to a human decision, and releases nothing.** No code under
+`src/governance/` writes `status: queued` over another agent's claim — `REQ-013` R03's
+negative half, checked by grep in `test/test_backlog.py`. The authorized recovery
+procedure that *does* release a stale claim is `phase-conc-04`'s, written into
+[GOV-003](GOV-003-backlog-decisions.md); it consumes this signal as evidence rather than
+re-deriving staleness.
+
 ## Capture before implementation
 
 1. Read all open plans and the accepted decision record. Find existing phases before creating duplicates.

@@ -9033,6 +9033,7 @@ items:
   - uv run pytest test/test_backlog.py
   deliverables:
   - src/governance/backlog.py
+  - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
   next_action: Pick the threshold from the repository's own history before writing any code - measure

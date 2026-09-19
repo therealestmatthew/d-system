@@ -11,7 +11,13 @@ from typing import Any
 import pytest
 
 from src.governance.__main__ import ROOT, audit, audit_backlog
-from src.governance.backlog import readiness, render_backlog
+from src.governance.backlog import (
+    STALE_CLAIM_DAYS,
+    claim_report_state,
+    readiness,
+    render_backlog,
+    stale_claim_signal,
+)
 
 TODAY = date(2026, 9, 5)
 
@@ -395,6 +401,96 @@ def test_next_up_rejects_a_completed_phase(
     ]
     catalog["next_up"] = ["phase-demo-01"]
     assert any("is complete; remove it" in error for error in check(backlog_repo))
+
+
+def test_stale_claim_signal_fires_on_branch_recency_alone() -> None:
+    assert stale_claim_signal(STALE_CLAIM_DAYS, True) is None
+    signal = stale_claim_signal(STALE_CLAIM_DAYS + 1, True)
+    assert signal is not None and "no commit on its branch" in signal
+
+
+def test_stale_claim_signal_fires_on_missing_worktree_alone() -> None:
+    assert stale_claim_signal(0, False) == "worktree missing"
+    assert stale_claim_signal(0, True) is None
+
+
+def test_stale_claim_signal_does_not_flag_a_claim_with_no_branch_yet() -> None:
+    """A claim recorded a moment ago, before its branch exists, is not proof of abandonment."""
+    assert stale_claim_signal(None, None) is None
+
+
+def test_claim_report_state_distinguishes_three_cases() -> None:
+    assert claim_report_state(None) == "no signal evaluated"
+    assert claim_report_state({"days_since_commit": None, "worktree_exists": None}) == (
+        "no evidence: no agent/<phase-id> branch found"
+    )
+    assert claim_report_state({"days_since_commit": 0, "worktree_exists": True}) == "no"
+    stale = claim_report_state(
+        {"days_since_commit": STALE_CLAIM_DAYS + 5, "worktree_exists": True}
+    )
+    assert stale.startswith("STALE: ")
+
+
+def test_ready_report_names_the_stale_signal_beside_a_live_claim(backlog_repo: Any) -> None:
+    """REQ-013 R01: a stale claim is reported as a distinct state naming its signal, and a
+    live claim in the same run is not flagged."""
+    root, catalog, result = backlog_repo
+    result["systems"].append({"id": "sys-other"})
+    catalog["max_active"] = 2
+    catalog["items"][0].update(status="active", agent="agent-one")
+    catalog["items"].append(
+        phase(
+            id="phase-demo-02",
+            status="active",
+            agent="agent-two",
+            systems=["sys-other"],
+            deliverables=["ts/src/other.tsx"],
+        )
+    )
+    assert check(backlog_repo) == []
+    evidence = {
+        "phase-demo-01": {"days_since_commit": 0, "worktree_exists": True},
+        "phase-demo-02": {"days_since_commit": STALE_CLAIM_DAYS + 3, "worktree_exists": True},
+    }
+    report = render_backlog(catalog, result["documents"], claim_evidence=evidence)
+    live_row = next(line for line in report.splitlines() if line.startswith("| phase-demo-01 "))
+    stale_row = next(line for line in report.splitlines() if line.startswith("| phase-demo-02 "))
+    assert live_row.rstrip("|").rstrip().endswith("no")
+    assert "STALE:" in stale_row
+    assert f"{STALE_CLAIM_DAYS + 3}d" in stale_row
+
+
+def test_ready_report_names_the_stale_signal_in_ready_only_mode_too(backlog_repo: Any) -> None:
+    """The active-claims table, and its stale column, render in --ready as well as --backlog."""
+    root, catalog, result = backlog_repo
+    catalog["items"][0].update(status="active", agent="agent-one")
+    assert check(backlog_repo) == []
+    evidence = {"phase-demo-01": {"days_since_commit": None, "worktree_exists": False}}
+    report = render_backlog(
+        catalog, result["documents"], ready_only=True, claim_evidence=evidence
+    )
+    row = next(line for line in report.splitlines() if line.startswith("| phase-demo-01 "))
+    assert "STALE: worktree missing" in row
+
+
+def test_no_governance_code_writes_a_claim_release() -> None:
+    """REQ-013 R03's negative half: no code path in src/governance/ clobbers a peer's claim
+    by writing status: queued over it. This is a grep, not a behavioral run, because the
+    property being tested is the absence of a code path rather than one input/output pair.
+    `inspect_backlog` and `render_backlog` legitimately *read* "queued" as one of several
+    status strings; the forbidden shape is an *assignment* of "queued" to a status field."""
+    assignment_patterns = (
+        '["status"] = "queued"',
+        "['status'] = 'queued'",
+        "status: queued",
+        "status='queued'",
+        'status="queued"',
+    )
+    governance_src = ROOT / "src" / "governance"
+    for path in governance_src.rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for pattern in assignment_patterns:
+            assert pattern not in text, f"{path} contains a claim-release assignment: {pattern}"
 
 
 def test_backlog_without_next_up_still_orders_by_priority(

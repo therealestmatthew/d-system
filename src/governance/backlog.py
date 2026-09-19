@@ -14,6 +14,74 @@ OPEN_PLANS = {"draft", "approved", "active"}
 # States that legitimately hold a worktree; every other state must release its claim.
 CLAIMED_STATES = {"active", "blocked", "complete"}
 
+# Stale-claim threshold, measured rather than guessed (phase-conc-01, 2026-09-19): of 17
+# claim-to-completion pairs recorded on `dev`'s history, the longest gap was 1 day and most
+# phases closed the same day they were claimed. The threshold is double that observed
+# maximum, so an ordinary session in flight is never flagged.
+STALE_CLAIM_DAYS = 2
+
+
+def stale_claim_signal(days_since_commit: int | None, worktree_exists: bool | None) -> str | None:
+    """Name the first mechanical staleness signal that fires for one active claim, or None.
+
+    Both inputs must already be evaluable without judgement — no "seems abandoned":
+
+    - `days_since_commit`: days since the most recent commit on `agent/<phase-id>`, or
+      `None` when that branch has no commits to read (including a claim not yet paired
+      with a branch at all).
+    - `worktree_exists`: whether a `git worktree list` entry currently checks out
+      `agent/<phase-id>` on this host, or `None` when there is no branch to check a
+      worktree against.
+
+    What firing does **not** prove:
+
+    - That the agent holding the claim is dead, crashed or unreachable. A session that is
+      reading, thinking, or blocked on external input for longer than the threshold
+      produces the identical signal to an abandoned one; branch and filesystem evidence
+      cannot distinguish the two.
+    - That work is missing. An agent may have committed to a fork, a remote branch this
+      check was not run against, or an unmerged local ref outside `agent/<phase-id>`.
+    - Anything, when `worktree_exists` is read on a machine that never held the worktree.
+      Worktree directories are local filesystem state; they are not replicated by git, so a
+      "missing" reading from the wrong host is not evidence at all.
+    - That releasing the claim is safe or authorized. This function names a signal for a
+      person to read; it performs no release and recommends none.
+
+    A claim with no branch yet (`days_since_commit is None` and `worktree_exists is None`)
+    is reported as not-stale: the absence of a branch is exactly as consistent with "claimed
+    a moment ago" as with "abandoned before ever starting," and the second case is what
+    `phase-conc-04`'s human-run recovery procedure exists to judge, not this function.
+    """
+    if days_since_commit is not None and days_since_commit > STALE_CLAIM_DAYS:
+        return f"no commit on its branch in {days_since_commit}d (> {STALE_CLAIM_DAYS}d)"
+    if worktree_exists is False:
+        return "worktree missing"
+    return None
+
+
+def claim_report_state(evidence: dict[str, Any] | None) -> str:
+    """One of three text states for a claim's row, kept distinct rather than collapsed.
+
+    - No `evidence` mapping at all: this run gathered nothing for the phase (e.g. a caller
+      that never wired up git access). Reported as "no signal evaluated" — silence, not a
+      clean bill of health.
+    - `evidence` present but both fields are `None`: no commit was found on
+      `agent/<phase-id>`, so there is no branch to read either signal from. This is the
+      state a claim lands in when its actual branch does not follow the standing
+      `agent/<phase-id>` naming convention (AGENTS.md) — the check has nothing to evaluate,
+      which is itself worth surfacing rather than silently reading as "not stale".
+    - Otherwise: `stale_claim_signal` ran on real evidence, and either named a signal or
+      confirmed none fired.
+    """
+    if evidence is None:
+        return "no signal evaluated"
+    days = evidence.get("days_since_commit")
+    worktree = evidence.get("worktree_exists")
+    if days is None and worktree is None:
+        return "no evidence: no agent/<phase-id> branch found"
+    signal = stale_claim_signal(days, worktree)
+    return f"STALE: {signal}" if signal else "no"
+
 
 def path_conflict(left: str, right: str) -> bool:
     """True when two declared paths are equal or one contains the other."""
@@ -206,13 +274,24 @@ def readiness(item: dict[str, Any], items: dict[str, Any]) -> str:
 
 
 def render_backlog(
-    catalog: dict[str, Any], documents: dict[str, Any], ready_only: bool = False
+    catalog: dict[str, Any],
+    documents: dict[str, Any],
+    ready_only: bool = False,
+    claim_evidence: dict[str, dict[str, Any]] | None = None,
 ) -> str:
-    """Render deterministic Markdown. The YAML catalog remains the only editable state."""
+    """Render deterministic Markdown. The YAML catalog remains the only editable state.
+
+    `claim_evidence`, keyed by phase ID, optionally supplies `days_since_commit` and
+    `worktree_exists` per active claim so the report can name a stale-claim signal beside
+    that claim's row (see `stale_claim_signal`). Callers with no such evidence — or running
+    against a phase this run did not gather evidence for — simply omit the key; the report
+    then states plainly that no signal was evaluated, rather than implying a claim is live.
+    """
     items = {item["id"]: item for item in catalog["items"]}
     next_up = catalog.get("next_up", [])
     ordered = queue_order(items, next_up)
     counts = Counter(readiness(item, items) for item in ordered)
+    claim_evidence = claim_evidence or {}
 
     def cell(value: str) -> str:
         return value.replace("|", "\\|").replace("\n", " ")
@@ -227,14 +306,15 @@ def render_backlog(
         "",
         f"Active claims: {len(claimed)} of {max_active} allowed.",
         "",
-        "| Claimed phase | Agent | Locked systems |",
-        "|---|---|---|",
+        "| Claimed phase | Agent | Locked systems | Stale? |",
+        "|---|---|---|---|",
     ]
     for item in claimed:
         agent = item.get("agent", "unclaimed")
-        lines.append(f"| {item['id']} | {agent} | {', '.join(item['systems'])} |")
+        stale = claim_report_state(claim_evidence.get(item["id"]))
+        lines.append(f"| {item['id']} | {agent} | {', '.join(item['systems'])} | {stale} |")
     if not claimed:
-        lines.append("| — | — | — |")
+        lines.append("| — | — | — | — |")
     if next_up:
         lines += [
             "",
