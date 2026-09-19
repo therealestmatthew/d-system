@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-portable-framework-plans
-code: SESS-2026-09-19-02
+code: SESS-2026-09-19-04
 title: Portable multi-developer framework - plans, requirements and proposed phases
 kind: session
 status: active
@@ -43,8 +43,9 @@ runs the full backlog audit unconditionally before any subcommand's own logic �
 that file, not guessed. Session-code allocation above and catalog regeneration were both blocked by
 this until the two new plan files were temporarily removed from the working tree (`git stash push` on
 exactly the four new/changed files, run the command, `git stash pop`) to get a clean audit long enough
-to allocate what was then `SESS-2026-09-19-01` (later renumbered to `SESS-2026-09-19-02`; see
-Unresolved); `docs/08-governance/catalog.md` could not be regenerated the same
+to allocate what was then `SESS-2026-09-19-01` (renumbered twice since - to `SESS-2026-09-19-02`,
+then, after a second same-day collision, to `SESS-2026-09-19-04`; see Unresolved);
+`docs/08-governance/catalog.md` could not be regenerated the same
 way without also losing the `sys-fw-*` system registrations it would need to reflect, so it is left
 unchanged at its last committed content, which remains internally consistent since nothing else in
 this session's diff changes what it should say once the plans are covered.
@@ -174,14 +175,57 @@ them. The two "not met" acceptance items above (`governance exits 0`, and the im
 untouched") are superseded by this follow-up: governance now exits 0, and `backlog.yaml` was
 deliberately touched on the coordinator's explicit correction.
 
+## Follow-up 2: second collision, renumber to -04, second rebase
+
+`SESS-2026-09-19-02` collided with `agent/lit-campaign`, which took `-02` concurrently and reconciled
+first. Per the coordinator's instruction, `--next-code` was not called for the fix - the allocator on
+this branch cannot see `agent/lit-campaign`'s or `agent/checkpoint-unclaimed-dev`'s session documents,
+so it would have handed back `-02` again, reproducing the same collision. `-04` was assigned manually:
+file renamed `SESS-2026-09-19-02-portable-framework-plans.md` → `SESS-2026-09-19-04-portable-framework-plans.md`,
+`code:` field updated to match, `created` left at `2026-09-19`. Internal references to the old `-02`
+code in this file's own prose were updated to describe the renumbering history rather than silently
+dropped.
+
+Also rebased a second time onto `dev`, which had advanced from `a7fb9f3` to `3e25247` since the first
+rebase. Conflicts appeared only in the two generated files as expected
+(`docs/00-working/ideas.md`, `docs/08-governance/catalog.md`); both were resolved by taking one side
+and then regenerating rather than hand-merging, per instruction (`uv run python -m src.governance
+--catalog`, `uv run python tools/generate_ideas_md.py`).
+
+Verification re-run after this rebase and the renumber, against the fully staged tree:
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 287 documents, 26 memories, 286 backlog phases
+
+$ uv run pytest
+629 passed, 2 warnings in 49.37s
+
+$ uv run python tools/check_no_private_content.py   # run with changes staged
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
+check_no_private_content: OK (717 tracked files, 0 identifiers checked)
+```
+
+Neither generated file actually conflicted on this rebase - both `docs/00-working/ideas.md` and the
+pre-renumber content of `docs/08-governance/catalog.md` applied cleanly against `dev` at `3e25247`.
+`catalog.md` still needed a manual regeneration afterward, not because of a merge conflict but because
+it had to pick up this session's own renumber (`-02` -> `-04`); confirmed with a byte-for-byte diff
+against a fresh `--catalog` run before staging it.
+
 ## Unresolved
 
-- **Session-code renumbering may need a second pass at integration.** Another agent was renumbering
-  two other branches' collided `SESS-2026-09-19-01` allocations concurrently with this one. The
-  allocator computes "next" from documents on disk, so whichever of us integrates first fixes the
-  number for the others; whoever integrates second (or third) may find `SESS-2026-09-19-02` already
-  taken and need to renumber again. This is not coordinated here, per the coordinator's instruction -
-  it is a fact for whoever integrates to check, not a task this session owns.
+- **The predicted second renumber happened, and was resolved to `-04`.** `SESS-2026-09-19-02`
+  collided with `agent/lit-campaign`'s own `-02` (also a same-day, on-disk-only allocation). Current
+  allocation across the four branches once this was noticed: `-01` stayed with `agent/phase-conc-01`
+  (holds a real backlog claim), `-02` stayed with `agent/lit-campaign` (reconciled first), `-03` went
+  to `agent/checkpoint-unclaimed-dev`, and this file moved to `-04` - assigned manually rather than
+  via `--next-code`, which would have handed back `-02` again since the allocator on this branch still
+  cannot see the other three. This is direct evidence for `phase-conc-03` (collision-proof code
+  allocation): two independent renumbers were needed for one document in one day, both undetectable by
+  the tool itself, both requiring an out-of-band coordinator to observe all branches at once and
+  assign by hand. A third collision on the same code, at integration, remains possible for the same
+  structural reason and is not coordinated here, per instruction - it is a fact for whoever integrates
+  to check, not a task this session owns.
 - `next_up` was deliberately left unchanged; queue ranking of the eight new phases is the owner's
   call, not this session's.
 - Three ideas from the batch were left unpromoted on purpose (`000272` answered in place; `000273`
