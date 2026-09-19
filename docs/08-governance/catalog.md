@@ -117,6 +117,8 @@ CI regenerates it and fails on any difference.
 | PLAN-038 | plan | draft | repository-owner | docs/01-plans/PLAN-038-backlog-status-regression-guard.md |
 | PLAN-039 | plan | draft | repository-owner | docs/01-plans/PLAN-039-idea-realization-system.md |
 | PLAN-039.01 | plan | draft | repository-owner | docs/01-plans/PLAN-039.01-orchestrator-design.md |
+| PLAN-040 | plan | draft | repository-owner | docs/01-plans/PLAN-040-portable-framework-document-templates.md |
+| PLAN-041 | plan | draft | repository-owner | docs/01-plans/PLAN-041-portable-framework-content-extraction.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -176,6 +178,8 @@ CI regenerates it and fails on any difference.
 | REQ-021 | requirement | draft | repository-owner | docs/06-requirements/REQ-021-html-generation-design-system.md |
 | REQ-022 | requirement | draft | repository-owner | docs/06-requirements/REQ-022-idea-realization-system.md |
 | REQ-023 | requirement | draft | repository-owner | docs/06-requirements/REQ-023-session-type-taxonomy.md |
+| REQ-024 | requirement | draft | repository-owner | docs/06-requirements/REQ-024-portable-framework-document-templates.md |
+| REQ-025 | requirement | draft | repository-owner | docs/06-requirements/REQ-025-portable-framework-content-extraction.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -293,6 +297,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-19-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-01-stale-claim-signal.md |
 | SESS-2026-09-19-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-02-rebase-lit-campaign-onto-dev.md |
 | SESS-2026-09-19-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-03-checkpoint-unclaimed-session-port.md |
+| SESS-2026-09-19-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-04-portable-framework-plans.md |
 
 ## Plans and their phases
 
@@ -352,6 +357,8 @@ CI regenerates it and fails on any difference.
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 2 | agent-build |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
+| PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
+| PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 
 ## Held codes
 
@@ -365,4 +372,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-286 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 54, prompt: 36, requirement: 23, session: 117.
+291 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 56, prompt: 36, requirement: 25, session: 118.
