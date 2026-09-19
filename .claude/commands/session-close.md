@@ -43,6 +43,20 @@ of phases a coordinator already completed.
 If `$ARGUMENTS` names a phase, use it; otherwise use the session's active phase — ask if more than
 one is plausible.
 
+**If there is no active phase, the session is unclaimed and this command still runs.** `AGENTS.md`
+provides for owner-directed work with no backlog phase, and requires a `kind: session` record for it
+all the same. Take `checkpoint`'s "Sessions with no claimed phase" branch and carry it through the
+steps below: steps 2, 3, 4, 5, 7, 8 and 9 apply unchanged in substance, step 6 has no phase to
+complete, and the review in step 3 judges the self-declared conditions instead of a backlog
+acceptance list. Step 8 matters most here, not least: an unclaimed session run in the primary
+checkout has no branch and no integration procedure to catch work left uncommitted, so that step is
+the only thing that does.
+Do not invent a phase, do not retroactively claim one, and do not re-run this against a phase that
+already closed earlier in the conversation. That last case — a phase closed mid-conversation and the
+owner kept going — has its own recorded handling in
+`brain/procedures/session-close-with-no-active-phase.md`; read it before deciding which situation you
+are in.
+
 Run every step of `.claude/skills/checkpoint/SKILL.md` now, in full, against the current state.
 Follow that document directly rather than repeating its steps here — this command extends the same
 session record, and `## Phase` through `## Unresolved` must reflect the repository **as it stands at
@@ -60,7 +74,8 @@ Work out the exact commit range this session produced, and state it explicitly f
 step 3 — do not make it guess:
 
 - **Work done on `agent/<phase-id>`:** the range is `dev...HEAD` (or `dev...agent/<phase-id>` if not
-  yet merged).
+  yet merged). An unclaimed session's branch is named after the work (`agent/<slug>`) rather than a
+  phase; the range is the same `dev...HEAD`.
 - **Work done directly on `dev`** (the GOV-003 primary-checkout exception): find the commit that set
   this phase's `status: active` — `git log --oneline -- docs/09-backlog/backlog.yaml` will show it —
   and use `<that commit>..HEAD`.
@@ -72,7 +87,11 @@ this session's own context and conclusions, which defeats the entire point of a 
 it, in the prompt itself since it starts with nothing:
 
 - The phase id, its `scope`, `acceptance` and `verification` lists from `docs/09-backlog/backlog.yaml`
-  (paste them; do not just name the file).
+  (paste them; do not just name the file). **For an unclaimed session there is no such list**: paste
+  instead the owner's instruction as given, the self-declared acceptance conditions from the record's
+  `## Acceptance`, and the three repository-wide gates the record verified against — and say plainly
+  that these conditions were written by the session being reviewed, so the reviewer weighs whether
+  they are a fair reading of the instruction as well as whether they hold.
 - The exact commit range from step 2, and instructions to run `git diff <range>` and `git log
   <range>` itself.
 - The session record's current path and content.
@@ -106,6 +125,11 @@ Write these as narrative, the way an owner would want to read them in six months
 restatement of the backlog's `scope` bullets.
 
 ## 6. Decide completion — the only step that may write `status: complete`
+
+**An unclaimed session completes nothing.** There is no phase line, so this step writes no `status`,
+touches no `backlog.yaml` and prunes no `next_up` entry, however clean the review came back. All-`Met`
+self-declared conditions are not authority to complete anything; the session record is the whole
+deliverable. Say so in step 9 and move on.
 
 Mark the phase complete **only if both hold**:
 
@@ -163,7 +187,8 @@ This step commits. It does not push, and it does not add a remote — those rema
 
 ## 9. Report
 
-State plainly: whether the phase reached `status: complete` or was left open and why, the sub-agent
+State plainly: whether the phase reached `status: complete` or was left open and why — or, for an
+unclaimed session, that no phase existed to complete and none was created, the sub-agent
 review's actual verdict (not a rosier restatement of it), the session record's code, and whether step
 8 committed (and its commit hash) or was skipped because the session worked in a worktree. This is
 the one report in the session lifecycle that should read as a finished account, not a status ping.
