@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-18'
-updated: '2026-09-18'
+updated: '2026-09-19'
 systems: [sys-contracts, sys-portfolio, sys-capture, sys-governance, sys-projection]
 depends_on: [doc-schema-catalog, doc-organizational-and-wbs-data-model, doc-schema-architecture-review]
 ---

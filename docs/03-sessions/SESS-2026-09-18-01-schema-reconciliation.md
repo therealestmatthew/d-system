@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-09-18'
-updated: '2026-09-18'
+updated: '2026-09-19'
 systems: [sys-contracts, sys-portfolio, sys-capture, sys-governance, sys-projection]
 depends_on: [doc-schema-decision-reconciliation, doc-schema-catalog, doc-schema-architecture-review]
 ---
@@ -34,7 +34,16 @@ phase is claimed or completed; no runtime schema migration is performed.
 - A read-only check confirmed the original committed log and canonical captured log remain intact
   prefixes of the reconciled log. Triage appends new events through tools/append_idea.py only.
 - Earlier approval attempts were blocked by a usage-limit response; subsequent authorized work
-  resumed successfully. Final post-rebase validation and merge results are recorded below when run.
+  resumed successfully.
+- Reconciliation committed as 75f7043. Rebase onto dev reported up to date; the post-rebase
+  governance check passed (31 systems, 282 documents, 26 memories, 278 phases). Full post-rebase
+  suite: 629 passed, two existing dependency deprecation warnings, 58.45 seconds.
+- Staged confidentiality check passed its path check; private identifier content was unavailable
+  in the worktree (zero identifiers checked). No private source was read.
+- Integration is authorized by the owner. The coordinator will fast-forward dev after this evidence
+  commit, verifying that the primary idea files still match their preserved copies before clearing
+  only those already-committed changes. Unrelated untracked files are retained. The worktree is kept
+  because it contains ignored/local assets; no force removal is authorized by this reconciliation.
 
 ## Remaining work
 
