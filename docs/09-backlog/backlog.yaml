@@ -12594,3 +12594,262 @@ items:
   - test/
   next_action: Read phase-irs-04's flock usage before writing the daemon wrapper - the lock file path
     and acquisition semantics must match exactly.
+- id: phase-fwt-01
+  title: Governance and protocol document templates and schemas
+  plan: doc-portable-framework-document-templates
+  sources:
+  - doc-portable-framework-document-templates-requirements
+  systems:
+  - sys-fw-templates
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write docs/00-working/framework/05-schemas/governance.template.md and governance.schema.json,
+    requiring a stated rule, the problem it solves, and an incident/rationale section.
+  - Write docs/00-working/framework/05-schemas/protocol.template.md and protocol.schema.json,
+    requiring a trigger condition, an ordered step list, verification/exit criteria and failure
+    handling.
+  - Confirm the two schemas reject each other's shape (a governance-shaped document fails the
+    protocol schema and vice versa).
+  acceptance:
+  - REQ-024 R01 holds - a filled governance example validates; the same example with its
+    incident/rationale section removed fails.
+  - REQ-024 R02 holds - a filled protocol example validates; a governance-shaped example fails the
+    protocol schema and a protocol-shaped example fails the governance schema.
+  verification:
+  - uv run python -m src.governance
+  - A short jsonschema script validating the passing and failing examples named in the acceptance
+    conditions above.
+  deliverables:
+  - docs/00-working/framework/05-schemas/governance.template.md
+  - docs/00-working/framework/05-schemas/governance.schema.json
+  - docs/00-working/framework/05-schemas/protocol.template.md
+  - docs/00-working/framework/05-schemas/protocol.schema.json
+  next_action: Draft governance.template.md first; the protocol template is easier to bound once the
+    governance shape's incident/rationale section is settled.
+
+- id: phase-fwt-02
+  title: Standalone backlog phase template and schema
+  plan: doc-portable-framework-document-templates
+  sources:
+  - doc-portable-framework-document-templates-requirements
+  systems:
+  - sys-fw-templates
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write docs/00-working/framework/05-schemas/phase.template.md and phase.schema.json describing a
+    single backlog phase in isolation - id, plan reference, depends_on, systems, deliverables,
+    acceptance, verification, scope, status.
+  - Validate the schema against an existing, unmodified d-system backlog.yaml phase item (e.g.
+    phase-conc-01), without editing backlog.yaml to fit the schema.
+  acceptance:
+  - REQ-024 R03 holds - phase.schema.json validates an existing phase item extracted verbatim from
+    backlog.yaml.
+  - The extraction script requires no edit to backlog.yaml to make the source phase item pass.
+  verification:
+  - uv run python -m src.governance
+  - A short script extracting one real phase item and validating it against phase.schema.json.
+  deliverables:
+  - docs/00-working/framework/05-schemas/phase.template.md
+  - docs/00-working/framework/05-schemas/phase.schema.json
+  next_action: Extract phase-conc-01 from backlog.yaml as the reference shape before drafting the
+    schema, so the schema is built to fit an item already in use rather than an invented one.
+
+- id: phase-fwt-03
+  title: Requirement and plan document schemas
+  plan: doc-portable-framework-document-templates
+  sources:
+  - doc-portable-framework-document-templates-requirements
+  systems:
+  - sys-fw-templates
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write docs/00-working/framework/05-schemas/requirement.schema.json and plan.schema.json.
+  - Reconcile the existing draft requirement.template.md and plan.template.md against the new
+    schemas, editing the drafts where they do not hold up rather than treating them as fixed.
+  acceptance:
+  - REQ-024 R04 holds for requirement.schema.json - a filled, placeholder-free instance of
+    requirement.template.md validates, and an instance missing acceptance criteria fails.
+  - REQ-024 R04 holds for plan.schema.json - a filled, placeholder-free instance of plan.template.md
+    validates, and an instance missing scope or phases fails.
+  verification:
+  - uv run python -m src.governance
+  - A short jsonschema script validating a passing and a deliberately incomplete instance of each
+    template.
+  deliverables:
+  - docs/00-working/framework/05-schemas/requirement.schema.json
+  - docs/00-working/framework/05-schemas/plan.schema.json
+  - docs/00-working/framework/05-schemas/requirement.template.md
+  - docs/00-working/framework/05-schemas/plan.template.md
+  next_action: Read the existing requirement.template.md and plan.template.md drafts against
+    REQ-024 R04 before writing either schema, and note in the phase's session record anywhere the
+    draft's shape had to change.
+
+- id: phase-fwt-04
+  title: Session-record document schema
+  plan: doc-portable-framework-document-templates
+  sources:
+  - doc-portable-framework-document-templates-requirements
+  systems:
+  - sys-fw-templates
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write docs/00-working/framework/05-schemas/session-record.schema.json.
+  - Reconcile the existing draft session-record.template.md against it, covering the fields
+    PLAN-041's extraction phases need to find reliably (decisions, new requirements,
+    deferred/out-of-scope items, investigation items, outstanding action items, verification output,
+    completion evidence).
+  acceptance:
+  - A filled, placeholder-free instance of session-record.template.md validates against the schema;
+    an instance missing any of the fields listed in scope fails.
+  - The schema's required-field list is legible without cross-referencing PLAN-041 - a reader of the
+    schema alone can see what a session record must carry.
+  verification:
+  - uv run python -m src.governance
+  - A short jsonschema script validating a passing and a deliberately incomplete instance.
+  deliverables:
+  - docs/00-working/framework/05-schemas/session-record.schema.json
+  - docs/00-working/framework/05-schemas/session-record.template.md
+  next_action: List the fields PLAN-041's three analysis phases actually need to extract before
+    writing the schema, so the required-field list is derived from a real downstream reader.
+
+- id: phase-fwt-05
+  title: GitHub issue and pull request templates
+  plan: doc-portable-framework-document-templates
+  sources:
+  - doc-portable-framework-document-templates-requirements
+  systems:
+  - sys-fw-templates
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add at least one more GitHub issue template beyond the existing idea-capture draft (a defect
+    report, at minimum), with front matter or labels that differ from the idea-capture template so
+    the type is legible without reading the body.
+  - Reconcile the existing github-pr.template.md draft to require acceptance criteria, verification
+    output, scope confirmation and a session-record link.
+  acceptance:
+  - REQ-024 R05 holds - the two issue templates' front matter/label blocks differ from each other.
+  - The PR template carries all four required fields (acceptance criteria, verification output,
+    scope confirmation, session-record link).
+  verification:
+  - uv run python -m src.governance
+  - diff of the two issue templates' front matter/label blocks; grep of the PR template for the four
+    required fields.
+  deliverables:
+  - docs/00-working/framework/05-schemas/github-issue-idea.template.md
+  - docs/00-working/framework/05-schemas/github-issue-defect.template.md
+  - docs/00-working/framework/05-schemas/github-pr.template.md
+  next_action: Decide the minimum viable issue-type label set (idea, defect, at least) before
+    drafting either template, so the two share one labeling convention.
+
+- id: phase-fwa-01
+  title: Cross-document pattern extraction for the portable framework
+  plan: doc-portable-framework-content-extraction
+  sources:
+  - doc-portable-framework-content-extraction-requirements
+  systems:
+  - sys-fw-analysis-patterns
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Read AGENTS.md, docs/08-governance/GOV-*.md, docs/04-decisions/ADR-*.md and docs/01-plans/PLAN-*.md
+    for patterns that repeat across documents and apply to any multi-developer repository, not only
+    d-system.
+  - Write docs/00-working/framework/06-analysis/extracted-patterns.md with at least five entries,
+    each naming the pattern, a d-system source path, and a generalized form free of d-system-specific
+    identifiers.
+  acceptance:
+  - REQ-025 R01 holds.
+  - REQ-025 R04 holds for this file (cites idea 000274 and the batch anchor 000281).
+  verification:
+  - uv run python -m src.governance
+  - grep for a source-path citation on each entry; manual read confirming no d-system-specific
+    identifier appears in a generalized-form statement.
+  deliverables:
+  - docs/00-working/framework/06-analysis/extracted-patterns.md
+  next_action: List candidate patterns from AGENTS.md alone first (it is the shortest, densest
+    source), then check each candidate against GOV-*/ADR-*/PLAN-* for repetition before writing entries.
+
+- id: phase-fwa-02
+  title: Session-record decision and commitment extraction
+  plan: doc-portable-framework-content-extraction
+  sources:
+  - doc-portable-framework-content-extraction-requirements
+  systems:
+  - sys-fw-analysis-sessions
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Extract, from at least ten docs/03-sessions/*.md records spanning more than one calendar week -
+    decisions made, newly discovered requirements, deferred/out-of-scope items, open investigation
+    items, and outstanding action items.
+  - Write docs/00-working/framework/06-analysis/session-record-extraction.md with the five category
+    headings recurring per covered record (a category may be stated empty for a given record).
+  acceptance:
+  - REQ-025 R02 holds.
+  - REQ-025 R04 holds for this file (cites idea 000275 and the batch anchor 000281).
+  verification:
+  - uv run python -m src.governance
+  - grep for the five category headings recurring per covered record; count covered records against
+    docs/03-sessions/.
+  deliverables:
+  - docs/00-working/framework/06-analysis/session-record-extraction.md
+  next_action: Pick the ten-plus session records first (spanning more than one week) and list them at
+    the top of the output file before extracting, so coverage is auditable before content is written.
+
+- id: phase-fwa-03
+  title: Session and decision record form critique and protocol enhancement proposals
+  plan: doc-portable-framework-content-extraction
+  sources:
+  - doc-portable-framework-content-extraction-requirements
+  systems:
+  - sys-fw-analysis-protocol
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Assess the form (not the content) of session and decision records - structure, length,
+    signal-to-noise - separately from phase-fwa-02's content extraction.
+  - Write docs/00-working/framework/06-analysis/session-protocol-enhancements.md with specific,
+    concrete enhancement proposals to the session-writing protocols.
+  - Do not edit .claude/skills/checkpoint/ or .claude/commands/session-close.md in this phase; acting
+    on the proposals is separate, future, owner-gated work.
+  acceptance:
+  - REQ-025 R03 holds - the file exists with concrete proposals, and the phase's diff touches no
+    path under .claude/skills/ or .claude/commands/.
+  - REQ-025 R04 holds for this file (cites idea 000276 and the batch anchor 000281).
+  verification:
+  - uv run python -m src.governance
+  - git diff for this phase's branch, confirmed to touch no path under .claude/skills/ or
+    .claude/commands/.
+  deliverables:
+  - docs/00-working/framework/06-analysis/session-protocol-enhancements.md
+  next_action: Read the checkpoint SKILL.md and session-close command once, to name what the current
+    protocol actually asks for, before assessing whether records satisfy it well.
