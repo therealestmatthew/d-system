@@ -11898,6 +11898,7 @@ The recommendation arising from this is to keep systems as a reported advisory s
 
 - relates_to → `000251`
 - relates_to ← `000283`
+- relates_to ← `000284`
 
 ---
 
@@ -12388,6 +12389,24 @@ The cause is specific and is not the one the existing collision rule assumes. Do
 The consequence is that reserving a session code is not possible in the ordinary way, and an agent on a branch sees only the session documents its own branch carries. Every concurrent branch therefore observes the same highest same-day sequence and allocates the same next number. The existing rule that the agent integrating second renumbers still recovers correctly, but it is manual recovery scaling with the number of concurrent sessions, and with three branches it required renaming files, editing code fields and chasing cross-references on two of them.
 
 This is a concrete sub-problem for phase-conc-03, which owns making document-code allocation collision-proof across concurrent sessions. It also matters for any team adapting this model: allocating an identifier by reading the state of your own branch guarantees collisions the moment two people work at once. An identifier needs to come from somewhere all writers can see before they commit.
+
+**Links**
+
+- relates_to → `000253`
+
+---
+
+## 000284 · Decompose sys-governance, which currently functions as a global mutex
+
+**Created 2026-09-19T13:03:55-04:00 · Status: `open`**
+
+sys-governance is declared on 83 of 278 phases, roughly 30 percent of the backlog, measured against dev on 2026-09-19. Because the concurrency check treats a shared system as a conflict, declaring it makes a phase mutually exclusive with nearly a third of all other work. Three dependency-free, same-priority phases (phase-conc-01, phase-conc-02, phase-conc-03) cannot run together for this reason alone despite touching different files.
+
+Owner direction, 2026-09-19: in future sys-governance should be reserved for work that genuinely audits or alters the governance system as a whole. Everything else that currently declares it needs somewhere more precise to go.
+
+What to investigate. First, what the 83 phases actually touch, and whether they cluster into coherent sub-systems that would each be small enough for a shared declaration to imply a real collision. Candidate axes include the validator, the backlog and claim machinery, document codes and the catalog, the session and checkpoint workflows, and the governance documents themselves. Second, whether sub-systems are the right granularity at all, or whether the lock should bind to individual files or directory prefixes, given that every phase already declares deliverables and the measured overlap between declared deliverables and recorded completion evidence shows declarations are a reliable floor but an incomplete inventory. Third, what a re-declaration costs: completed phases carry their declarations as historical record, so changing them retroactively is not free and may not be desirable.
+
+Relates to 000253, which records the false-conflict measurements, and to the separate finding that the check already compares deliverables and dependency closure alongside systems rather than systems alone.
 
 **Links**
 
