@@ -10,7 +10,10 @@ from typing import Any
 
 import pytest
 
-from src.governance.__main__ import ROOT, audit, inventory, parse_frontmatter, public_path
+import subprocess
+
+from src.governance.__main__ import ROOT, audit, git_claim_evidence, inventory, parse_frontmatter, public_path
+from src.governance.backlog import claim_report_state
 
 TODAY = date(2026, 9, 5)
 
@@ -227,6 +230,63 @@ def test_registry_integrity(repository: Path) -> None:
     assert any("missing path" in error for error in errors)
     assert any("dependency cycle" in error for error in errors)
     assert any("unknown owner" in error for error in errors)
+
+
+def test_git_log_failure_yields_no_evidence(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A `git log` fault must read as unknown, never as a definite negative.
+
+    Only the `git log` call is faulted here; `git worktree list` still runs for real. The
+    branch has no readable commit, so both signals collapse to unknown and the report says
+    "no evidence" rather than crashing or fabricating a stale reading.
+    """
+    real_run = subprocess.run
+
+    def faulty_run(cmd: list[str], **kwargs: Any) -> Any:
+        if cmd[:2] == ["git", "log"]:
+            raise subprocess.CalledProcessError(1, cmd)
+        return real_run(cmd, **kwargs)
+
+    monkeypatch.setattr(subprocess, "run", faulty_run)
+    evidence = git_claim_evidence(ROOT, ["phase-conc-01"], date(2026, 9, 19))
+    assert evidence["phase-conc-01"] == {"days_since_commit": None, "worktree_exists": None}
+    assert claim_report_state(evidence["phase-conc-01"]) == "no evidence: no agent/<phase-id> branch found"
+
+
+def test_worktree_list_failure_does_not_report_stale(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A `git worktree list` fault must read as unknown, not as "worktree missing".
+
+    Only the `git worktree list` call is faulted here; `git log` still runs for real against
+    a throwaway repository with a branch `agent/phase-demo` committed today. Before the fix,
+    an empty worktree listing made every branch read as absent, so a claim committed today
+    was reported STALE despite live evidence to the contrary. The fixed behaviour must leave
+    `worktree_exists` as `None` — unknown, not a negative — so the report stays "no" for a
+    claim with a recent commit.
+    """
+    real_run = subprocess.run
+
+    def run_git(*args: str) -> None:
+        real_run(["git", *args], cwd=tmp_path, capture_output=True, text=True, check=True)
+
+    run_git("init", "-q")
+    run_git("config", "user.email", "test@example.com")
+    run_git("config", "user.name", "Test")
+    run_git("checkout", "-q", "-b", "agent/phase-demo")
+    (tmp_path / "file.txt").write_text("content\n")
+    run_git("add", "file.txt")
+    run_git("commit", "-q", "-m", "initial commit")
+
+    def faulty_run(cmd: list[str], **kwargs: Any) -> Any:
+        if cmd[:3] == ["git", "worktree", "list"]:
+            raise subprocess.CalledProcessError(1, cmd)
+        return real_run(cmd, **kwargs)
+
+    monkeypatch.setattr(subprocess, "run", faulty_run)
+    evidence = git_claim_evidence(tmp_path, ["phase-demo"], date.today())
+    assert evidence["phase-demo"]["days_since_commit"] == 0
+    assert evidence["phase-demo"]["worktree_exists"] is None
+    assert claim_report_state(evidence["phase-demo"]) == "no"
 
 
 def test_idea_staging_directory_is_ungoverned() -> None:

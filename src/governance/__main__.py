@@ -397,8 +397,10 @@ def git_claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[st
             text=True,
             check=True,
         ).stdout
+        worktree_listing_available = True
     except (OSError, subprocess.CalledProcessError):
         listing = ""
+        worktree_listing_available = False
     worktree_branches = {
         line.split("refs/heads/", 1)[1]
         for line in listing.splitlines()
@@ -422,7 +424,7 @@ def git_claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[st
             continue
         evidence[phase_id] = {
             "days_since_commit": (today - date.fromisoformat(commit_date)).days,
-            "worktree_exists": branch in worktree_branches,
+            "worktree_exists": (branch in worktree_branches) if worktree_listing_available else None,
         }
     return evidence
 
