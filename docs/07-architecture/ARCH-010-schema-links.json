@@ -1,0 +1,704 @@
+{
+  "schema_map_version": 2,
+  "source_documents": [
+    "ARCH-007",
+    "ARCH-008",
+    "ARCH-009",
+    "ARCH-010"
+  ],
+  "links": [
+    {
+      "dimension": "portfolio scope",
+      "from": "project",
+      "to": "commitment",
+      "cardinality": "1:N",
+      "direction": "project contains commitment",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "portfolio scope",
+      "from": "project",
+      "to": "task",
+      "cardinality": "1:N",
+      "direction": "project contains task",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "execution decomposition",
+      "from": "commitment",
+      "to": "task",
+      "cardinality": "1:N",
+      "direction": "commitment decomposes to task",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "portfolio context",
+      "from": "project",
+      "to": "interaction",
+      "cardinality": "1:N",
+      "direction": "project contextualizes interaction",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "portfolio context",
+      "from": "project",
+      "to": "decision",
+      "cardinality": "1:N",
+      "direction": "project contextualizes decision",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "decision provenance",
+      "from": "interaction",
+      "to": "decision",
+      "cardinality": "1:N",
+      "direction": "interaction records decision context",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "portfolio context",
+      "from": "project",
+      "to": "waiting-on",
+      "cardinality": "1:N",
+      "direction": "project contextualizes waiting-on",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "portfolio context",
+      "from": "project",
+      "to": "development-event",
+      "cardinality": "1:N",
+      "direction": "project contextualizes development event",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "memory scope",
+      "from": "project",
+      "to": "memory",
+      "cardinality": "1:N",
+      "direction": "project scopes memory",
+      "link_type": "direct",
+      "status": "implemented",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "taxonomy",
+      "from": "project",
+      "to": "tag",
+      "cardinality": "N:M",
+      "direction": "project is classified by tag",
+      "link_type": "junction",
+      "mapping_schema": "tag-assignment",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "legacy participation",
+      "from": "person",
+      "to": "project",
+      "cardinality": "N:M",
+      "direction": "person participates in project",
+      "link_type": "junction",
+      "mapping_schema": "project-party",
+      "status": "partial",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "organizational identity",
+      "from": "person",
+      "to": "company",
+      "cardinality": "N:M over time",
+      "direction": "person is affiliated with company",
+      "link_type": "junction",
+      "mapping_schema": "affiliation",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "identity aliases",
+      "from": "person",
+      "to": "person-alias",
+      "cardinality": "1:N",
+      "direction": "person owns alias",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "company hierarchy",
+      "from": "company",
+      "to": "company",
+      "cardinality": "N:M over time",
+      "direction": "company relates to company",
+      "link_type": "junction",
+      "mapping_schema": "company-relationship",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "project participation",
+      "from": "project",
+      "to": "project-party",
+      "cardinality": "1:N",
+      "direction": "project records party relationship",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "party target",
+      "from": "project-party",
+      "to": "party-reference",
+      "cardinality": "one typed reference per participation",
+      "direction": "project-party identifies person/company/affiliation",
+      "link_type": "embedded_reference",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "project roles",
+      "from": "project",
+      "to": "role-definition",
+      "cardinality": "1:N",
+      "direction": "project defines role",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "role assignment",
+      "from": "role-definition",
+      "to": "project-party",
+      "cardinality": "1:N",
+      "direction": "role is assigned to project party",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "opportunity participation",
+      "from": "opportunity",
+      "to": "opportunity-party",
+      "cardinality": "1:N",
+      "direction": "opportunity records party link",
+      "link_type": "direct",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "opportunity target",
+      "from": "opportunity-party",
+      "to": "party-reference",
+      "cardinality": "one typed reference per participation",
+      "direction": "opportunity-party identifies party",
+      "link_type": "embedded_reference",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "commercial participation",
+      "from": "engagement",
+      "to": "engagement-party",
+      "cardinality": "1:N",
+      "direction": "engagement records party link",
+      "link_type": "direct",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "engagement target",
+      "from": "engagement-party",
+      "to": "party-reference",
+      "cardinality": "one typed reference per participation",
+      "direction": "engagement-party identifies party",
+      "link_type": "embedded_reference",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "commercial delivery",
+      "from": "engagement",
+      "to": "project",
+      "cardinality": "N:M",
+      "direction": "engagement covers project",
+      "link_type": "junction",
+      "mapping_schema": "engagement-project",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "commercial paperwork",
+      "from": "engagement",
+      "to": "business-contract",
+      "cardinality": "N:M",
+      "direction": "engagement is evidenced by contract",
+      "link_type": "junction",
+      "mapping_schema": "engagement-contract",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "document lineage",
+      "from": "document",
+      "to": "document-link",
+      "cardinality": "1:N",
+      "direction": "document participates in typed lineage",
+      "link_type": "direct",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "scope hierarchy",
+      "from": "project",
+      "to": "wbs-element",
+      "cardinality": "1:N",
+      "direction": "project owns WBS element",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "WBS hierarchy",
+      "from": "wbs-element",
+      "to": "wbs-element",
+      "cardinality": "1:N",
+      "direction": "parent contains child",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "responsibility",
+      "from": "wbs-element",
+      "to": "project-party",
+      "cardinality": "N:1 optional",
+      "direction": "WBS element is owned by responsible party",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "scope attachment",
+      "from": "task",
+      "to": "wbs-element",
+      "cardinality": "N:1 optional",
+      "direction": "task is scoped to work package",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "scope attachment",
+      "from": "commitment",
+      "to": "wbs-element",
+      "cardinality": "N:1 optional",
+      "direction": "commitment is scoped to work package",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "WBS history",
+      "from": "wbs-change",
+      "to": "wbs-element",
+      "cardinality": "N:1 or event payload",
+      "direction": "change affects element",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "WBS approval",
+      "from": "wbs-baseline",
+      "to": "wbs-change",
+      "cardinality": "N:1 replay anchor",
+      "direction": "baseline pins WBS history",
+      "link_type": "direct",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "execution dependency",
+      "from": "work-dependency",
+      "to": "task",
+      "cardinality": "N:1 or typed endpoint",
+      "direction": "dependency endpoint is task",
+      "link_type": "mapping",
+      "status": "proposed",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "identity resolution",
+      "from": "identity-registry",
+      "to": "* durable object",
+      "cardinality": "1:N",
+      "direction": "global identity aliases domain object",
+      "link_type": "mapping",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "schema governance",
+      "from": "schema-registry",
+      "to": "schema-mapping",
+      "cardinality": "1:N",
+      "direction": "registry governs mapping",
+      "link_type": "direct",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "schema transformation",
+      "from": "schema-mapping",
+      "to": "schema",
+      "cardinality": "N:2",
+      "direction": "mapping connects source and target schema versions",
+      "link_type": "mapping",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "capture provenance",
+      "from": "capture",
+      "to": "staged-record",
+      "cardinality": "1:N",
+      "direction": "capture produces staged candidates",
+      "link_type": "direct",
+      "status": "intake / contract-only",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "field provenance",
+      "from": "evidence",
+      "to": "capture",
+      "cardinality": "N:1",
+      "direction": "evidence cites raw capture",
+      "link_type": "direct",
+      "status": "embedded",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "vocabulary lineage",
+      "from": "glossary-term",
+      "to": "schema/document/decision",
+      "cardinality": "N:M",
+      "direction": "term is defined or evidenced by governed artifact",
+      "link_type": "mapping",
+      "status": "planned",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "dimension": "idea realization",
+      "from": "idea",
+      "to": "document",
+      "cardinality": "N:M",
+      "direction": "idea promotes or links to document",
+      "link_type": "mapping",
+      "status": "implemented in idea projection",
+      "category": "record_relationship",
+      "review_origin": "ARCH-009"
+    },
+    {
+      "category": "record_relationship",
+      "from": "opportunity",
+      "to": "engagement",
+      "dimension": "commercial conversion",
+      "cardinality": "1:N; reverse cardinality pending",
+      "direction": "opportunity references engagement",
+      "link_type": "junction",
+      "mapping_schema": "conversion record; placement pending",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "task",
+      "to": "engagement",
+      "dimension": "non-project work",
+      "cardinality": "optional; maximum pending",
+      "direction": "task references engagement",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "commitment",
+      "to": "engagement",
+      "dimension": "non-project work",
+      "cardinality": "optional; maximum pending",
+      "direction": "commitment references engagement",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "party-reference",
+      "to": "provisional-party",
+      "dimension": "unresolved identity",
+      "cardinality": "one target alternative",
+      "direction": "party-reference references provisional-party",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "party-reference",
+      "to": "person",
+      "dimension": "resolved identity",
+      "cardinality": "one target alternative",
+      "direction": "party-reference references person",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "party-reference",
+      "to": "company",
+      "dimension": "resolved identity",
+      "cardinality": "one target alternative",
+      "direction": "party-reference references company",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "project-party",
+      "to": "affiliation",
+      "dimension": "representation",
+      "cardinality": "N:1 optional",
+      "direction": "project-party references affiliation",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "opportunity-party",
+      "to": "affiliation",
+      "dimension": "representation",
+      "cardinality": "N:1 optional",
+      "direction": "opportunity-party references affiliation",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "engagement-party",
+      "to": "affiliation",
+      "dimension": "representation",
+      "cardinality": "N:1 optional",
+      "direction": "engagement-party references affiliation",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "person-alias",
+      "to": "affiliation",
+      "dimension": "organizational identity",
+      "cardinality": "N:1 optional",
+      "direction": "person-alias references affiliation",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "business-contract",
+      "to": "document-asset",
+      "dimension": "agreement evidence",
+      "cardinality": "N:M",
+      "direction": "business-contract references document-asset",
+      "link_type": "junction",
+      "mapping_schema": "document-link",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "document-link",
+      "to": "document-asset",
+      "dimension": "supporting files",
+      "cardinality": "one target alternative",
+      "direction": "document-link references document-asset",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "document-link",
+      "to": "document",
+      "dimension": "supporting documentation",
+      "cardinality": "one target alternative",
+      "direction": "document-link references document",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "external-reference",
+      "to": "identity-registry",
+      "dimension": "target identity",
+      "cardinality": "N:1 object identity",
+      "direction": "external-reference references identity-registry",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "document-asset",
+      "to": "external-reference",
+      "dimension": "file location",
+      "cardinality": "multiple locations; representation pending",
+      "direction": "document-asset references external-reference",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "tag-assignment",
+      "to": "tag",
+      "dimension": "classification",
+      "cardinality": "N:1",
+      "direction": "tag-assignment references tag",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "tag-assignment",
+      "to": "identity-registry",
+      "dimension": "classified object",
+      "cardinality": "N:1 object identity",
+      "direction": "tag-assignment references identity-registry",
+      "link_type": "direct",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "template",
+      "to": "identity-registry",
+      "dimension": "instantiation lineage",
+      "cardinality": "1:N instances per pinned template version",
+      "direction": "template references identity-registry",
+      "link_type": "junction",
+      "mapping_schema": "version lineage; representation pending",
+      "status": "accepted_design"
+    },
+    {
+      "category": "record_relationship",
+      "from": "glossary-term",
+      "to": "schema-registry",
+      "dimension": "vocabulary authority",
+      "cardinality": "N:M",
+      "direction": "glossary-term references schema-registry",
+      "link_type": "junction",
+      "mapping_schema": "typed lineage reference",
+      "status": "accepted_design"
+    }
+  ],
+  "scope": "Design map, not runtime registry. Observed references do not imply enforced integrity.",
+  "shared_dimension_groups": [
+    {
+      "category": "shared_analytical_dimension",
+      "dimension": "effective time",
+      "members": [
+        "affiliation",
+        "person-alias",
+        "company-relationship",
+        "project-party",
+        "opportunity-party",
+        "engagement-party",
+        "engagement-project",
+        "external-reference"
+      ],
+      "pairwise_association": true,
+      "join_rule": "Align meaning, precision and effective intervals; matching dates do not imply record relationships."
+    },
+    {
+      "category": "shared_analytical_dimension",
+      "dimension": "classification",
+      "members": [
+        "project",
+        "company",
+        "person",
+        "opportunity",
+        "engagement",
+        "business-contract",
+        "template"
+      ],
+      "pairwise_association": true,
+      "join_rule": "Compare through tag-assignment using tag identity and taxonomy version."
+    },
+    {
+      "category": "shared_analytical_dimension",
+      "dimension": "lifecycle status",
+      "members": [
+        "project",
+        "opportunity",
+        "engagement",
+        "business-contract"
+      ],
+      "pairwise_association": true,
+      "join_rule": "Explicit semantic mapping required; identical status labels alone are insufficient."
+    }
+  ],
+  "unresolved": [
+    "Exact conversion/template-use schema placement",
+    "Optionality and cardinalities marked pending",
+    "Full property-level dimension coverage awaits final schema definitions",
+    "Replace review wildcard endpoints with validated registry identities before runtime use",
+    "Correct schema-mapping N:2 shorthand into named source and target version endpoints"
+  ]
+}

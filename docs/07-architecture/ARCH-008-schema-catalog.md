@@ -29,6 +29,10 @@ and migrations before the new domain schemas are implemented.
 
 ## Existing schema contracts
 
+The source/validator/loader/projection inventory is in ARCH-009's Current contract inventory.
+These rows establish file existence, not uniform production maturity. ARCH-010 records review
+corrections and remaining verification; configuration contracts and embedded fragments are included.
+
 | Schema | Current role |
 |---|---|
 | `backlog` | Governed phase queue, statuses, dependencies, acceptance, and verification |
@@ -190,6 +194,11 @@ The existing idea log and proposed WBS change history retain their event-folding
 Other schemas' concrete policy selections remain part of the governed design and migration work.
 
 ## Implementation boundary
+
+The accepted-decision and outstanding-work index is
+[ARCH-010](ARCH-010-schema-decision-reconciliation.md). The updated machine-readable design links
+are in [the reconciled link map](ARCH-010-schema-links.json). ARCH-009's original map remains a dated
+review snapshot, not the current design map.
 
 The catalog records design intent only. Each planned schema requires a governed requirement and plan,
 source contract, representative data, cross-record validation, projection/DDL work where needed,

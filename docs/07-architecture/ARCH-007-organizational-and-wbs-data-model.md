@@ -42,6 +42,10 @@ have several simultaneous or historical affiliations.
 string list in `Person`. An alias may reference an affiliation, carry validity dates and current or
 primary state, and resolve multiple organizational addresses to one person.
 
+Aliases carry normalized values, organizational context, provenance, and review state. Shared or
+reused addresses are permitted subject to explicit validation rules; matching an email alone must
+not merge people. Normalization algorithms and primary-status scope remain implementation decisions.
+
 ```text
 Person
   └── Affiliation ── Company
@@ -70,6 +74,11 @@ quantity. Optional project `scale` and `complexity` metadata can guide which rol
 controlled vocabulary and consumers must be defined before they become validation inputs. Existing
 `project.stakeholders` and `person.projects` fields are migration inputs, not long-term parallel
 authorities.
+
+Role rules are configurable by project type and project, including allowed party types,
+required/optional status, cardinality, and assignment overlap. During migration the new relationship
+records become authoritative; legacy stakeholder and person-project fields are generated for a
+temporary compatibility period, measured for usage, and retired in an explicit later phase.
 
 ```text
 Project ──< ProjectParty >── Person
@@ -171,7 +180,7 @@ rules determine valid overlaps. See ARCH-008's amendment and multiplicity polici
 Shared analytical dimensions are cataloged separately from explicit record relationships.
 Cross-object tags use authoritative `tag-assignment` records with provenance.
 
-The JSON and Markdown source records remain authoritative. New entity directories and schemas will
+The registered JSON, JSONL, YAML, and Markdown source records remain authoritative. New entity directories and schemas will
 be validated by the source preflight, then projected into DuckDB by the rebuild process. Join and
 history tables will represent relationships and append-only changes. Cross-record resolution rules
 (for example, whether a referenced company or affiliation exists) belong in source validation and
@@ -210,20 +219,11 @@ updated in dependent phases.
 - Making WBS codes a substitute for task IDs, schedules, or financial accounting structures.
 - Retaining duplicated project/person relationship fields as independent authorities.
 
-## Open decisions for the governed plan
+## Decision reconciliation and remaining work
 
-- Exact company kinds, statuses, legal identifier/jurisdiction rules, and external identifier shapes.
-- Alias uniqueness, normalization, shared values, conflict handling, and privacy rules.
-- The canonical polymorphic party-reference shape and its cross-file/database validation rules.
-- Temporal convention: inclusive/exclusive bounds, open-ended intervals, overlap rules, and assertion timestamps.
-- Role-definition versioning, assignment overlap/cardinality rules, and warning versus blocking validation.
-- Engagement versus engagement-party semantics and date/status propagation.
-- Engagement start trigger and lifecycle boundary relative to prospecting, qualification,
-  authorization, and contract signing.
-- Contract and template scope, versioning, party links, and their relationship to engagements.
-- The schema registry/governance model for every durable object, including schema versioning,
-  mappings, derived projections, and validation ownership.
-- Glossary-term structure and its lineage links to schemas, decisions, plans, and implementation.
-- The WBS change fold, code/version rules, structural invariants, atomic writer convention, and baseline pinning.
-- Which existing records may reference companies and how unresolved counterparties are represented.
-- Migration fixtures, precedence/count checks, ambiguity output, and backward compatibility requirements.
+[ARCH-010](ARCH-010-schema-decision-reconciliation.md) records accepted decisions, superseded
+alternatives, idea lineage, and genuinely unresolved design work. ARCH-008 is the current schema
+log. Earlier open questions about engagement start, half-open dates, provisional parties, template
+version pinning, registry separation, and migration compatibility are settled there.
+
+WBS source requested by the owner: [PMI, Work Breakdown Structure basic principles](https://www.pmi.org/learning/library/work-breakdown-structure-basic-principles-4883).

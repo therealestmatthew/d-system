@@ -7,12 +7,28 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-16'
+updated: '2026-09-18'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
 
 # Accepted choices for phased backlog delivery
+
+## Schema-design reconciliation — 2026-09-18
+
+The owner authorized reconciliation, commit and merge of the schema design. ARCH-010 records the
+accepted decisions and remaining work. The future project-party authority supersedes the older
+project.stakeholders design target below when its governed migration lands; runtime behavior is
+unchanged. Legacy fields will be derived temporarily and then retired. No phase is completed here.
+
+Two uncommitted idea captures independently allocated overlapping IDs. The canonical primary log,
+including MDM ideas 000255/000256, is retained with its original event bytes. The duplicate worktree
+capture is preserved as evidence, with correspondence in ARCH-010, not appended as conflicting
+creation events. No committed event is rewritten.
+
+Two delegated reviews used ARCH-009. The review on agent/schema-architecture is retained;
+agent/schema-review-01 stays unmerged and must allocate a new code before later integration.
+ARCH-010 carries forward its additional findings so the collision does not hide unresolved work.
 
 Authority: the user's [saved questionnaire answers](../00-working/codex-answers.md), plus the subsequent instruction: “All of the above for the ones I left more than one answer - you figure out the right blend from there.” The raw answers are preserved without editing. This record translates those choices into actionable constraints; it does not mark any feature implemented.
 

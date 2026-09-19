@@ -355,13 +355,13 @@ engagement, or project.
 
 ### Legal entity
 
-An organization recognized as a distinct legal person or business unit for legal, contractual, or
-financial purposes. A legal entity is a kind of company, not merely an alias for a company with a
-different name.
+An organization with a distinct legally recognized identity. Operational divisions, teams and brands
+are not automatically legal entities. Legal identity is modeled separately from display names.
 
 ### Prospect
 
-A potential client or counterparty before an opportunity is established. Not itself an engagement.
+A potential client or counterparty. A prospect can participate in an opportunity before an engagement
+exists; the party and pipeline record have separate identities.
 
 ### Prospecting
 
@@ -523,6 +523,95 @@ existing occurrence. Context-specific rules govern whether intervals may overlap
 For event-backed schemas, an explicit decision resolving incompatible amendments while preserving
 the conflicting events and the resolution's provenance. Independent amendments may combine;
 arrival order alone does not settle semantic conflicts.
+
+### Identity registry
+
+The planned authority for allocating global object identities and recording domain-code aliases,
+resolution, supersession, merges and splits. IDs are never reused. Existing document-code allocation
+continues to supply human-facing document codes linked to those identities.
+
+### Schema registry
+
+The planned foundational register of data contracts, versions, ownership, compatibility, mappings,
+validation and migrations. Each schema declares amendment behavior, history retention and record
+multiplicity. Object identities are managed by the separate identity registry.
+
+### Provisional party
+
+A durable unresolved identity record holding captured names, provenance, confidence and review
+state. It may later resolve to a person or company while retaining its earlier evidence.
+
+### Party reference (PartyRef)
+
+A shared typed reference to a person, company or provisional party, with affiliation context when
+representation is known. It must validate its target and mutually exclusive alternatives.
+
+### Opportunity party and engagement party
+
+Separate dated participation records for an opportunity or engagement, carrying role,
+representation and provenance. Multiple people or companies can participate in each context.
+
+### Company relationship
+
+A directed, typed relationship between organizational identities with effective dates and
+provenance, such as ownership, control, organizational hierarchy or succession.
+
+### Role definition
+
+A reusable or project-specific specification of participation responsibilities, permitted party
+types, required status, cardinality and overlap rules. Project type, scale and complexity guide
+the set of roles without hard-coding one global staffing pattern.
+
+### Workstream
+
+A grouping of related project scope within the WBS. Workstream membership alone does not define
+execution order or a dependency.
+
+### Deliverable
+
+A defined output or result of work. A WBS may organize scope around deliverables, distinct from
+the executable tasks used to produce them.
+
+### Control account
+
+An optional WBS management grouping for monitoring scope and associated performance. Its detailed
+use and allowed position in this system remain design decisions.
+
+### WBS code and WBS change
+
+A WBS code is a readable, versioned hierarchical label for an element with a stable internal ID.
+A WBS change is an immutable event recording a structural or scope amendment from which current
+WBS state can be reconstructed. Moves may explicitly change codes while preserving prior labels.
+
+### Work dependency
+
+A directed temporal or technical dependency between typed work endpoints, such as tasks,
+commitments, WBS elements or projects. Its type and provenance are governed independently of
+the WBS parent-child hierarchy.
+
+### Engagement-project and engagement-contract
+
+Explicit relationship records connecting engagements to projects or business contracts. Both
+relationships are many-to-many; a master agreement may cover several engagements.
+
+### Event envelope and domain payload
+
+Shared event metadata records identity, actor, effective/recorded times and amendment references;
+a typed, versioned domain payload specifies the operation. The reusable envelope need not be a
+separately stored object. Exact fields remain part of the event-contract design.
+
+### Master data management (MDM)
+
+Management of authoritative identities and shared data through quality rules, stewardship,
+resolution, provenance and lifecycle controls. The full MDM system and its dedicated stewardship
+agent are parked ideas; current identity governance establishes a foundation for them.
+
+### Idea classification axes
+
+Ontological classification describes what an idea concerns or is; epistemic classification
+describes its knowledge/evidence standing; temporal classification describes its time-related
+context. These axes are distinct from workflow state. Their exact values, links, tags and
+transition rules remain the subject of idea 000268.
 
 ---
 
