@@ -498,3 +498,63 @@ systems:
     SDK agents (ADR-018), and the glue phases PLAN-039 holds around the P1, P4, P5 and PLAN-025
     sub-programmes. Planned only - no orchestrator code exists yet; the paths listed are the
     governing documents, and implementation phases will widen them as components land.
+- id: sys-fw-templates
+  name: Portable framework document templates and schemas
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/00-working/framework/05-schemas
+  - docs/00-working/framework/README.md
+  - docs/00-working/framework/INDEX.md
+  depends_on:
+  - sys-governance
+  description: The template-plus-schema family for the portable multi-developer agentic framework
+    (idea 000281 and its batch, PLAN-040) - governance-rule, protocol, phase, requirement, plan,
+    session-record, GitHub-issue and PR document shapes meant for a *future* repository's own
+    governance engine, not an extension of this one's. Registered separately from sys-governance,
+    which is d-system's own validation engine, for the same reason sys-gov-docs was split from it -
+    phases authoring these templates never touch src/governance/. Planned only; the paths are the
+    ungoverned staging directory (ADR-010) the templates are drafted in today.
+- id: sys-fw-analysis-patterns
+  name: Portable framework - cross-document pattern extraction
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-041-portable-framework-content-extraction.md
+  depends_on:
+  - sys-governance
+  description: The pattern-extraction pass (idea 000274, PLAN-041) that reads AGENTS.md, GOV-*,
+    ADRs and PLANs and re-expresses recurring, repository-independent patterns for the portable
+    framework. Registered separately from sys-fw-analysis-sessions and sys-fw-analysis-protocol so
+    the three analysis phases can be claimed and worked independently - they read overlapping source
+    material but write disjoint output files and depend on none of each other's results.
+- id: sys-fw-analysis-sessions
+  name: Portable framework - session record decision extraction
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-041-portable-framework-content-extraction.md
+  depends_on:
+  - sys-governance
+  description: The per-session-record extraction pass (idea 000275, PLAN-041) that recovers
+    decisions, newly discovered requirements, deferred/out-of-scope items, open investigation items
+    and outstanding action items from docs/03-sessions/*.md. Registered separately from
+    sys-fw-analysis-patterns and sys-fw-analysis-protocol for the same concurrency reason.
+- id: sys-fw-analysis-protocol
+  name: Portable framework - session/decision record form critique
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-041-portable-framework-content-extraction.md
+  depends_on:
+  - sys-governance
+  description: The form-critique pass (idea 000276, PLAN-041) that assesses how session and decision
+    records are written - structure, length, signal-to-noise - as distinct from what they say, and
+    proposes protocol enhancements. Deliberately does not touch .claude/skills/checkpoint/ or
+    .claude/commands/session-close.md; those are a later, separately-claimed phase once this analysis
+    exists. Registered separately from sys-fw-analysis-patterns and sys-fw-analysis-sessions for the
+    same concurrency reason.
