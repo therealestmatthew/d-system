@@ -298,6 +298,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-19-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-02-rebase-lit-campaign-onto-dev.md |
 | SESS-2026-09-19-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-03-checkpoint-unclaimed-session-port.md |
 | SESS-2026-09-19-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-04-portable-framework-plans.md |
+| SESS-2026-09-19-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-05-framework-generalization-and-concurrency.md |
 
 ## Plans and their phases
 
@@ -372,4 +373,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-291 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 56, prompt: 36, requirement: 25, session: 118.
+292 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 56, prompt: 36, requirement: 25, session: 119.

@@ -286,96 +286,21 @@ Time 5:30 — All analysis complete
 
 ## Success Metrics
 
-Framework is complete when:
+**Status: NOT met. This document previously marked these complete; that was false.**
 
-- [x] README explains the philosophy clearly
-- [x] Templates are usable by humans and agents
-- [x] Agent workflows are detailed enough to execute without clarification
-- [x] Analysis documents surface actionable improvements
-- [x] Governance docs clearly state why each rule exists
-- [x] Workflow docs can be followed step-by-step
-- [x] Framework successfully applied to new repo (hackathon)
-- [x] Session record captures lessons for next repo
+An independent review on 2026-09-19 found this file self-certifying eight success metrics as done
+while its own file tree showed most of the structure still `(TBD)`. Four of the eight planned
+sections are empty. What exists is a skeleton plus five templates and one agent-specification file —
+not a framework a team could pick up and use.
 
----
+- [ ] README explains the philosophy clearly
+- [ ] Templates are usable by humans and agents
+- [ ] Agent workflows are detailed enough to execute without clarification
+- [ ] Analysis documents surface actionable improvements
+- [ ] Governance docs clearly state why each rule exists
+- [ ] Workflow docs can be followed step-by-step
+- [ ] Framework successfully applied to new repo (hackathon)
+- [ ] Session record captures lessons for next repo
 
-## Questions to Revisit After Phase 1 Analysis
-
-1. **What's the minimal viable governance for a hackathon?** (Can we skip anything?)
-2. **Which patterns from d-system are universal?** (Apply to all repos)
-3. **Which patterns are d-system-specific?** (Generalize or remove)
-4. **What makes decision-making slow?** (Automate or eliminate)
-5. **What makes session handoff unclear?** (Better template)
-6. **Can we automate any governance checks?** (CI/pre-commit hooks)
-7. **Should we create sub-frameworks?** (E.g., minimal for hackathons vs. robust for ongoing)
-
----
-
-## Framework File Structure Reference
-
-```
-docs/framework/
-├── README.md                        # Overview, how to use
-├── INDEX.md                         # This file
-│
-├── 01-overview/
-│   ├── framework-intro.md           # (TBD)
-│   ├── principles.md                # (TBD)
-│   └── scalability-patterns.md      # (TBD)
-│
-├── 02-workflows/
-│   ├── multi-developer-workflow.md  # (TBD)
-│   ├── planning-workflow.md         # (TBD)
-│   ├── execution-workflow.md        # (TBD)
-│   ├── concurrent-coordination.md   # (TBD)
-│   └── agent-deployment-checklist.md # (TBD)
-│
-├── 03-governance/
-│   ├── governance-overview.md       # (TBD)
-│   ├── backlog-system.md            # (TBD)
-│   ├── claim-protocol.md            # (TBD)
-│   ├── worktree-protocol.md         # (TBD)
-│   ├── conflict-resolution.md       # (TBD)
-│   └── session-close-protocol.md    # (TBD)
-│
-├── 04-templates/
-│   ├── CLAUDE.md.template           # (TBD)
-│   ├── README.md.template           # (TBD)
-│   ├── backlog.yaml.template        # (TBD)
-│   ├── codes-reserved.yaml.template # (TBD)
-│   ├── .claude-commands-session-start.md.template   # (TBD)
-│   └── .claude-commands-session-close.md.template   # (TBD)
-│
-├── 05-schemas/
-│   ├── github-issue-idea.template.md          # ✓
-│   ├── github-pr.template.md                  # ✓
-│   ├── session-record.template.md             # ✓
-│   ├── requirement.template.md                # ✓
-│   ├── plan.template.md                       # ✓
-│   ├── requirement.schema.json                # (TBD)
-│   ├── plan.schema.json                       # (TBD)
-│   ├── phase.schema.json                      # (TBD)
-│   ├── session-record.schema.json             # (TBD)
-│   └── decision-record.schema.json            # (TBD)
-│
-└── 06-analysis/
-    ├── agent-workflows.md                     # ✓
-    ├── extracted-patterns.md                  # (TBD - Agent 1)
-    ├── governance-effectiveness-study.md     # (TBD - Agent 2)
-    ├── session-documentation-quality.md      # (TBD - Agent 3)
-    ├── decision-capture-efficiency.md        # (TBD - Agent 4)
-    └── recommended-enhancements.md           # (TBD - Agent 5)
-```
-
----
-
-## Next Immediate Actions
-
-1. **Review this INDEX.md** — Confirm plan makes sense
-2. **Run Phase 1 agents** — Get analysis results by end of Day 1
-3. **Review analysis** — Team lead reads all 5 outputs
-4. **Prioritize** — Which improvements are most valuable?
-5. **Execute Phases 2-6** — Create remaining documents
-6. **Test on new repo** — Use framework for AWS + Anthropic hackathon
-7. **Iterate** — Capture learnings, improve framework
-
+The governed successor to this staging area is `PLAN-040` and `PLAN-041`, with eight phases queued
+as `phase-fwt-*` and `phase-fwa-*`. Treat those as authoritative and this directory as notes.
