@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-literature-review-pass-4
-code: SESS-2026-09-14-10
+code: SESS-2026-09-14-13
 title: Literature review Pass 4 — synthesis, adversarial synthesis review and the final gate
 kind: session
 status: active

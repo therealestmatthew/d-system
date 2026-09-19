@@ -209,7 +209,7 @@ assert saturation**, whatever the number comes out at.
 
 A third, still later ruling, separate from both sections above. Made at the close of
 `phase-lit-07` (the session recorded as
-[SESS-2026-09-14-10](../03-sessions/SESS-2026-09-14-10-literature-review-pass-4.md)), when the
+[SESS-2026-09-14-13](../03-sessions/SESS-2026-09-14-13-literature-review-pass-4.md)), when the
 owner approved a ninth session — one past the seven-session estimate, at the top of the accepted
 six-to-eight range — to close the three evidence gaps that session's final gate measured, plus
 the clean-room H4 re-derivation the owner elected to include. `phase-lit-09` carries the scope

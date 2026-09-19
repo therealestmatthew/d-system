@@ -260,6 +260,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-14-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-10-workbench-features-defects-plan.md |
 | SESS-2026-09-14-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-11-decompose-sys-ui-lock.md |
 | SESS-2026-09-14-12 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-12-programme-planning-coordination.md |
+| SESS-2026-09-14-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-14-13-literature-review-pass-4.md |
 | SESS-2026-09-15-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-01-settle-workbench-vocabulary.md |
 | SESS-2026-09-15-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-02-concurrency-git-safety-plan.md |
 | SESS-2026-09-15-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-15-03-idea-graph-lifecycle-plan.md |
