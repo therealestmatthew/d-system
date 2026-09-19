@@ -9020,7 +9020,7 @@ items:
   - sys-governance
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-conc
   priority: 1
   session_budget: 1
@@ -9046,6 +9046,7 @@ items:
   - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
+  - test/test_governance.py
   session: doc-session-stale-claim-signal
   completion_evidence:
   - src/governance/backlog.py
@@ -9053,15 +9054,18 @@ items:
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
   - docs/03-sessions/SESS-2026-09-19-01-stale-claim-signal.md
-  result: 'All three acceptance conditions judged Met against real command output - see
-    SESS-2026-09-19-01. governance and test_backlog.py are green; the real --ready output over
-    live claims shows a distinct state per claim (phase-conc-01 "no", phase-lit-07 "no evidence
-    - no agent/phase-id branch found" because its real branch/worktree do not follow the
-    agent/phase-id naming convention this signal assumes - recorded as Unresolved, not silently
-    hidden). Left active pending rebase, review and the owner''s integration call.'
-  next_action: Not yet rebased onto or reviewed for integration into dev. A reviewer should read
-    SESS-2026-09-19-01's Unresolved section on phase-lit-07's naming-convention gap before deciding
-    whether this phase's scope is fully satisfied or needs a follow-up.
+  result: 'All three acceptance conditions met against real command output - see
+    SESS-2026-09-19-01. The --ready report shows a distinct state per claim, including
+    "no evidence" where a claim''s branch does not follow the agent/phase-id convention,
+    so an unknown is never printed as live. STALE_CLAIM_DAYS is 2, measured from 17
+    claim-to-completion pairs. No code releases a claim; a grep test over src/governance/
+    keeps it so. Independent adversarial review confirmed one defect - a git worktree list
+    failure reported a live claim as stale - now fixed, with fault-injection tests covering
+    both git failure paths. Integrated onto dev with the owner''s approval; governance exit
+    0, 638 passed. Three follow-ups accepted rather than fixed, recorded as idea 000286.'
+  next_action: Complete. The phase-lit-07 branch-naming gap it surfaced is recorded in
+    SESS-2026-09-19-01's Unresolved section and belongs to a follow-up, not to this phase.
+
 - id: phase-conc-02
   title: Refuse integration over a dirty primary checkout
   plan: doc-concurrency-git-safety
