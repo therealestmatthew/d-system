@@ -130,6 +130,20 @@ Recorded here because `REQ-026` R02's verification asks this record for exactly 
   `docs/00-working/`.
 - No `_private/` path was read or written.
 
+**The exclusions above hold for this session without qualification.** One related event happened
+after the theory was registered and is recorded here so no reader has to reconstruct it:
+
+- **A post-registration provenance scout ran at the owner's direction**, after the theory document
+  was written, verified and committed at `5dcfb65`. A sub-agent read the ten most recent session
+  records on `dev` and wrote its findings to `_working/session-provenance-scout-2026-09-19.md`
+  (gitignored, ungoverned). It was instructed to return only a file path, a record count and any
+  unreadable file — no finding, no quotation, no summary — and **this session did not read its
+  output**. The owner reads the file directly.
+- R02's guarantee is therefore intact in both halves: the theory was registered before any evidence
+  was examined, and no session-record content entered this session's context at any point, before
+  or after registration. The registration boundary is commit `5dcfb65`, which `phase-tax-02` may
+  cite as the point the theory was frozen.
+
 ## Decisions taken at orientation
 
 Three questions were put to the owner before the claim, and all three were answered:
