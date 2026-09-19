@@ -32,6 +32,11 @@ separately-claimed phase once the analysis exists to justify it.
 `000274`, `000275` and `000276` read overlapping source material (d-system's governing prose and
 session records) but produce three disjoint output files and depend on none of each other's results:
 
+*Amended 2026-09-19:* the form-critique pass now runs from a pre-drafted prompt,
+`docs/00-working/PROMPT-session-taxonomy-part3-record-templates.md`, and `phase-fwa-03` depends on
+`phase-tax-02` ([PLAN-042](PLAN-042-session-taxonomy-investigation.md)), whose evidence-tested
+taxonomy and per-record structure table are its inputs. The other two passes stay independent.
+
 | Pass | Idea | Reads | Writes |
 |---|---|---|---|
 | Pattern extraction | `000274` | `AGENTS.md`, `GOV-*`, ADRs, PLANs | `docs/00-working/framework/06-analysis/extracted-patterns.md` |

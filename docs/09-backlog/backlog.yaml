@@ -4,6 +4,8 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lit-09
+- phase-tax-01
+- phase-tax-02
 - phase-auto-01
 - phase-auto-02
 - phase-irs-04
@@ -12837,8 +12839,14 @@ items:
   status: queued
   priority: 2
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-tax-02
   scope:
+  - Execute docs/00-working/PROMPT-session-taxonomy-part3-record-templates.md as this phase's
+    method, taking phase-tax-02's outputs as inputs - the evidence-tested taxonomy
+    (docs/00-working/session-taxonomy.md) and the per-record structure table
+    (_private/analysis/session-taxonomy/record-structure.tsv). Its proposed session-record
+    schema is input to phase-fwt-04, which is otherwise unchanged.
   - Assess the form (not the content) of session and decision records - structure, length,
     signal-to-noise - separately from phase-fwa-02's content extraction.
   - Write docs/00-working/framework/06-analysis/session-protocol-enhancements.md with specific,
@@ -12857,3 +12865,70 @@ items:
   - docs/00-working/framework/06-analysis/session-protocol-enhancements.md
   next_action: Read the checkpoint SKILL.md and session-close command once, to name what the current
     protocol actually asks for, before assessing whether records satisfy it well.
+- id: phase-tax-01
+  title: Session-type taxonomy Part 1 - theoretical model with falsifiable predictions
+  plan: doc-session-taxonomy-investigation
+  sources:
+  - doc-session-taxonomy-investigation-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Execute docs/00-working/PROMPT-session-taxonomy-part1-theory.md verbatim - propose the
+    portable-core plus d-system-binding taxonomy, every type carrying predictions bound to
+    observables and at least one disconfirming observation (REQ-026 R01).
+  - Read no raw transcript and no session-record contents; REQ-023 and ADR-020 are inputs to
+    build on, with departures stated explicitly (REQ-026 R02).
+  - Halt after delivering the theory document. Part 2 runs only on the owner's explicit go, in
+    a separate session.
+  acceptance:
+  - REQ-026 R01 holds - docs/00-working/session-types-theory.md exists, every proposed type
+    carries all five prediction elements, and a REQ-023 reconciliation section exists.
+  - REQ-026 R02 holds - the session record names the inputs used and attests that no transcript
+    or session-record contents were read.
+  verification:
+  - uv run python -m src.governance
+  - Read session-types-theory.md and confirm every proposed type carries the five prediction
+    elements and at least one disconfirming observation.
+  deliverables:
+  - docs/00-working/session-types-theory.md
+  next_action: Paste the Part 1 prompt into a fresh session and run it to its hard stop.
+- id: phase-tax-02
+  title: Session-type taxonomy Part 2 - empirical test against transcripts and records
+  plan: doc-session-taxonomy-investigation
+  sources:
+  - doc-session-taxonomy-investigation-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-tax-01
+  scope:
+  - Execute docs/00-working/PROMPT-session-taxonomy-part2-evidence.md verbatim - deterministic
+    reduction of the transcript corpus, mechanical pre-classification, one judgment wave, and
+    the prediction scorecard against Part 1's registered theory.
+  - Keep every derived reduction under _private/analysis/session-taxonomy/ only (REQ-026 R04);
+    no agent, orchestrator included, reads a raw transcript (R06).
+  - Produce record-structure.tsv covering every SESS file, ready as phase-fwa-03's input (R05).
+  acceptance:
+  - REQ-026 R03 holds - docs/00-working/session-taxonomy.md exists, leads with a scorecard
+    covering every Part 1 prediction, and contains no edit or instruction to edit CLAUDE.md or
+    AGENTS.md.
+  - REQ-026 R04, R05 and R06 hold - derived data only under _private/analysis/session-taxonomy/,
+    the staged private-content check passes, record-structure.tsv covers every SESS file, and
+    the session record names the reduction-script location and the confirmed promotion idea id.
+  verification:
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py with the changes staged
+  - Compare record-structure.tsv row count against ls docs/03-sessions/SESS-*.md | wc -l
+  deliverables:
+  - docs/00-working/session-taxonomy.md
+  next_action: Wait for the owner's explicit go after their review of session-types-theory.md,
+    then paste the Part 2 prompt into a fresh session.

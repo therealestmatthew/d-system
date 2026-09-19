@@ -12290,6 +12290,16 @@ Dispatch a sub-agent per session record in docs/03-sessions/ with instructions t
 
 Separately from extracting their content, analyze the way decision records and session records are written — is the form actually optimal and efficient for the reader who comes later? Assess structure, length, signal-to-noise, and whether the required fields earn their place. Output is a proposed set of enhancements to the session documentation protocols specifically: the checkpoint skill and the session-close command. Relates to 000237 (amend checkpoint/session-close for an unclaimed session).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-tax (2026-09-19T15:06:11-04:00): Execution registered: phase-fwa-03 runs the pre-drafted prompt docs/00-working/PROMPT-session-taxonomy-part3-record-templates.md as its method and now depends on phase-tax-02 (PLAN-042, session-taxonomy investigation), which supplies its inputs - the evidence-tested taxonomy and the per-record structure table under _private/analysis/session-taxonomy/.
+
+</details>
+
 **Links**
 
 - relates_to → `000281`
@@ -12302,6 +12312,16 @@ Separately from extracting their content, analyze the way decision records and s
 **Created 2026-09-19T12:02:23-04:00 · Status: `open`**
 
 Define a template and an authoritative schema for session documentation (checkpoint-written and session-close-finalized records), aligned with this repository's existing design principles for governed documents rather than invented separately. Must cover the fields the extraction sub-agents need to find reliably: decisions, new requirements, deferred/out-of-scope items, investigation items, outstanding action items, verification output, completion evidence. Companion to 000269-000271 (governance, protocol, phase templates) and to 000267 (govern every durable object with an authoritative schema).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-tax (2026-09-19T15:06:11-04:00): Input registered: the session-record schema proposal produced when phase-fwa-03 executes the session-taxonomy Part 3 prompt (PLAN-042) feeds phase-fwt-04, which is otherwise unchanged.
+
+</details>
 
 **Links**
 
