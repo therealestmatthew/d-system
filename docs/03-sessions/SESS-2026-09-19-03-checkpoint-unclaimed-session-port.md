@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-checkpoint-unclaimed-session-port
-code: SESS-2026-09-19-01
+code: SESS-2026-09-19-03
 title: Port the checkpoint/session-close unclaimed-session amendment onto dev
 kind: session
 status: active
@@ -108,7 +108,12 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
   Not fixed here: `docs/00-working/` and the ideas system are outside this session's scope and are
   reported to the owner/coordinator for whichever concurrent session is touching
   `docs/00-working/ideas.md` or `_data/ideas.jsonl` to regenerate.
-- This session's own code, `SESS-2026-09-19-01`, was allocated via
-  `uv run python -m src.governance --next-code session` at a point when four other agents were
-  reported to be running concurrently and may allocate the same code; per `AGENTS.md`, the agent
-  integrating second renumbers.
+- This session's own code was first allocated as `SESS-2026-09-19-01` via
+  `uv run python -m src.governance --next-code session`, at a point when other agents were running
+  concurrently and could allocate the same code without seeing this branch's unmerged commit. That
+  risk materialized: `agent/phase-conc-01` and `agent/lit-campaign` both independently took
+  `SESS-2026-09-19-01` too. `agent/phase-conc-01` holds a real backlog claim and integrates first,
+  so its code stands; `agent/lit-campaign` renumbered to `SESS-2026-09-19-02`; this session, cut
+  from the same stale base and rebased last, renumbered to `SESS-2026-09-19-03` per `AGENTS.md`'s
+  "the agent integrating second [or later] renumbers" rule. The only reference to the old code
+  outside this file was the generated catalog, which was regenerated after the rename.
