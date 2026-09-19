@@ -12408,6 +12408,18 @@ What to investigate. First, what the 83 phases actually touch, and whether they 
 
 Relates to 000253, which records the false-conflict measurements, and to the separate finding that the check already compares deliverables and dependency closure alongside systems rather than systems alone.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-framework (2026-09-19T13:07:25-04:00): Owner direction, 2026-09-19: widen this investigation to every system, not sys-governance alone. sys-governance is the worst instance at 83 of 278 phases, but the defect is general — a system name blocks concurrency whenever two phases share it, even when their declared file claims are provably disjoint, so any system declared broadly enough behaves as a mutex over its share of the backlog. The audit should therefore run across all 31 systems, ranking each by how many phase pairs it blocks that have no deliverable overlap, rather than treating sys-governance as a special case and leaving the rest unexamined.
+
+The owner also notes this repository has already done one round of exactly this work, splitting a single over-broad system into several more granular ones for the same reason. That precedent should be found before any new decomposition is designed: it will show what granularity was chosen, how existing phases were re-declared, whether completed phases' historical declarations were left alone or rewritten, and whether the split actually reduced false conflicts afterwards. Repeating the analysis from scratch when a worked example exists in the history would waste the evidence already paid for. Search the decision records, the governance notes and systems.yaml's own history for it.
+
+</details>
+
 **Links**
 
 - relates_to → `000253`
