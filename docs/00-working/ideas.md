@@ -7464,6 +7464,7 @@ No governed plan or backlog phase exists for building this registry. The _tmpage
 - relates_to → `000151`
 - relates_to → `000025`
 - relates_to ← `000168`
+- relates_to ← `000285`
 
 ---
 
@@ -12423,3 +12424,21 @@ The owner also notes this repository has already done one round of exactly this 
 **Links**
 
 - relates_to → `000253`
+
+---
+
+## 000285 · Never remove the lit-campaign worktree; the phase-lit series shares it across phases
+
+**Created 2026-09-19T13:20:05-04:00 · Status: `open`**
+
+Owner ruling, 2026-09-19. Every agent in the phase-lit series has worked out of the single worktree at /code/d-system-worktrees/lit-campaign, building on what previous phases left there. Removing it would be extremely detrimental, and the loss would be silent: gitignored content never travels with a merge, so anything under an ignored path in that worktree exists only on that disk.
+
+This conflicts with the standard hand-off procedure in AGENTS.md, whose cleanup step runs git worktree remove followed by git branch -d after integration. Applied literally to agent/lit-campaign that step destroys the shared working context the remaining phase-lit phases depend on. The clash is structural rather than accidental: the protocol assumes one worktree per phase, created at claim time and discarded at integration, while this track has used one worktree per campaign across many phases.
+
+Two things to settle. Whether the hand-off procedure needs an explicit exception for a worktree shared across a phase series, or whether such a worktree should be registered somewhere the procedure can check before removing anything. And whether anything in that worktree that must survive is currently unprotected because it sits under a gitignored path, which is the failure the AGENTS.md note about gitignored content not travelling already warns about in general terms.
+
+Relates to 000152, a registry of active worktrees agents register in before starting and deregister from when finished, which would give the cleanup step something to consult.
+
+**Links**
+
+- relates_to → `000152`
