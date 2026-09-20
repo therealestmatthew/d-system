@@ -3,7 +3,6 @@ updated: '2026-09-20'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-lit-09
 - phase-conc-03
 - phase-conc-02
 - phase-tax-02
@@ -6680,7 +6679,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit-3c
   priority: 3
   session_budget: 1
@@ -6751,17 +6750,14 @@ items:
     demonstrated. The independent close review found the first duplicate-rate figure wrong -
     a comma-split delimiter defect phase-lit-08 had already diagnosed - and it was recomputed
     before this record was written.'
-  next_action: 'All five acceptance conditions Met after the close review forced one
-    correction (SESS-2026-09-19-07). NOT complete: GOV-003 coordinator completion requires
-    verification green, an independent review with findings fixed, AND integration onto dev
-    with the owner''s approval. The first two hold; the third has not happened. Integration is
-    additionally blocked by 13 untracked entries in the primary checkout, which AGENTS.md step
-    7 forbids integrating over and which phase-conc-02 exists to refuse. Ask the owner to
-    approve integration and clear or accept those entries, then the phase may complete.
-    Outstanding and not this phase''s to fix: ten stale H4 references in 07_anti_novelty_case.md
-    (line numbers in the session record), a commit hash cited in 06_hypothesis_tests.md that a
-    rebase invalidated, and no fixed tokenisation rule for result_ids in PLAN-023.03, which has
-    now produced a wrong duplicate rate in two consecutive phases.'
+  next_action: 'Complete. All five acceptance conditions Met, the last only after the
+    independent close review forced a correction to the duplicate rate (SESS-2026-09-19-07).
+    Integrated into dev on the owner''s approval, 2026-09-20. Outstanding and deliberately
+    not this phase''s: ten stale H4 references in 07_anti_novelty_case.md with line numbers
+    in the session record; a commit hash in 06_hypothesis_tests.md invalidated by a rebase;
+    and no fixed result_ids tokenisation rule in PLAN-023.03, captured as an idea. phase-lit-07
+    remains queued awaiting the owner''s scoping decision, now informed by this phase''s
+    LIT-07 G re-measures.'
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan

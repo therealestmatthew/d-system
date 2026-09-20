@@ -110,12 +110,16 @@ uv run pytest                        -> 638 passed, 2 warnings                  
    4 were confirmed unchanged by the independent close review's own reruns.
 
 All five conditions are met on the evidence recorded here, condition 4 only after the correction the
-independent review forced. The phase nonetheless stays `active` — see `## Review` and `## Decisions`
-for why completion is not available on this pass.
+independent review forced. With the owner's approval for integration given on 2026-09-20, all three
+`GOV-003` coordinator-completion conditions hold and the phase reached `status: complete`.
 
 ## Backlog
 
-`phase-lit-09` — `status: active`, `agent: agent-lit-3c`.
+`phase-lit-09` — `status: complete`, `agent: agent-lit-3c`, removed from `next_up` in the same
+change. Completed under `GOV-003`'s coordinator-completion rule, all three conditions holding:
+verification green with real output recorded above; an independent non-fork review run, whose one
+blocking finding was fixed and whose findings are recorded verbatim in `## Review`; and integration
+onto `dev` with the owner's approval, given 2026-09-20.
 
 `next_action`: All five acceptance conditions measured Met; ready for the owner's `/session-close`
 review. Two open findings are recorded below and are not this phase's to fix: ten stale H4 references
@@ -350,4 +354,8 @@ them.
 ruling 1 nothing was applied. 18 of 30 standing flags are now recorded `disputed`. Whether that
 changes the campaign's headline collision count is a scoping decision the owner has deferred.
 
-**Integration has not happened and the phase is not complete.** See `## Backlog`.
+**The `PLAN-023.03` tokenisation gap is captured as an idea** rather than fixed here, on the owner's
+direction — amending a governed evidence contract mid-campaign needs its own requirement and plan.
+
+**`phase-lit-07`'s scoping decision is deferred to a fresh session**, on the owner's direction, so it
+is taken against the verified numbers rather than at the end of a long session.
