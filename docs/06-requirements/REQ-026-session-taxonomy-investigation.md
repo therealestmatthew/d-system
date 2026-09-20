@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-19'
-updated: '2026-09-19'
+updated: '2026-09-20'
 systems: [sys-governance]
 depends_on: [doc-session-type-taxonomy-requirements, doc-session-type-decisions]
 ---
@@ -37,11 +37,31 @@ REQ-023 reconciliation section exists.
 
 The theory is registered before any evidence is examined: the session that writes it reads no
 raw transcript and no session-record contents (record titles for orientation only), and does not
-read the Part 2 prompt. The two phases run as separate sessions with the owner's explicit go
-between them.
+read the Part 2 prompt. **"The session" includes every agent it dispatches** — a sub-agent reading
+what the session may not read is the session reading it, and its report reaching the session's
+context is the same exclusion breached at one remove. The two phases run as separate sessions with
+the owner's explicit go between them.
 
-**Verification:** `phase-tax-01`'s session record names its inputs and attests the exclusions;
-`phase-tax-02`'s session record cites `session-types-theory.md` as a pre-existing input.
+The boundary is the **commit that adds `docs/00-working/session-types-theory.md`**. Before it, the
+exclusions bind absolutely. After it the theory is frozen and cannot be shaped by anything read
+later, so a post-registration read does not breach this requirement — but it is disclosed in the
+session record, naming what was read and whether any of it entered the session's context.
+
+**Verification:** `phase-tax-01`'s session record names its inputs and attests the exclusions, and
+discloses any post-registration read with its position relative to the boundary commit; the
+ordering is independently checkable from git author dates, which survive a rebase where committer
+dates do not. `phase-tax-02`'s session record cites `session-types-theory.md` as a pre-existing
+input.
+
+**Amendment, 2026-09-20.** The sub-agent clause and the boundary paragraph were added after
+`phase-tax-01` completed, on a defect its independent reviewer raised: R02 as first written said
+"the session" without saying whether a dispatched agent counted, where `R06` addresses sub-agents
+explicitly — so the omission could be read either way. **This amendment does not move the bar
+`phase-tax-01` was judged against.** That phase satisfied both readings on evidence the reviewer
+verified independently: its theory commit precedes any session-record read by 82 minutes, its one
+dispatched scout ran after the boundary, and that scout's findings were written to a gitignored path
+and never entered the session's context. The clause is stated for `phase-tax-02`, which dispatches
+sub-agents by design and where the ambiguity would otherwise be load-bearing.
 
 ## R03 — Evidence-tested taxonomy with a prediction scorecard
 

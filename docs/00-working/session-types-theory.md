@@ -765,3 +765,99 @@ Registered so the empirical phase has a way to reject the framework rather than 
 - **Unusable entry signals.** If first-prompt intent does not predict dominant activity better than
   chance, the router proposal in §7 fails regardless of whether the types themselves are real, and
   path-scoped loading is vindicated.
+
+---
+
+## 11. Owner rulings on §8's open questions
+
+Settled by the owner on 2026-09-20, after `phase-tax-01` closed and before `phase-tax-02` was
+claimed. Recorded here rather than in a governed document because `PLAN-042` states that nothing
+under it creates governed policy, and because these rulings travel with the theory into Part 2,
+which is what needs them.
+
+**The theory itself is unchanged by these rulings.** Nothing below rewrites a type, a prediction or
+a disconfirming observation. They settle how the registered theory is *measured* and what the
+proposals *recommend* — deliberately, so the registration boundary established at `phase-tax-01`'s
+delivery commit still means what it says.
+
+### Q1 — Unit of analysis: two labels per session
+
+**Ruled:** each session carries an **entry type**, classified from its first prompt, and a
+**dominant type**, classified from its activity. Not one label; not a full segmentation.
+
+This is the ruling Part 2's design most depends on. It needs no transcript segmentation — two
+labels, not a timeline — and it makes three things testable that a single label would have
+destroyed by construction:
+
+- **S3** (mid-flight type change is common) becomes a direct count: sessions whose entry type differs
+  from their dominant type. `ADR-020` Decision 2 already asserts this is the common case, so the
+  model and the existing decision record are now testable against each other.
+- **S4** (the most common shape is Construction opened by Inquiry) becomes a single cross-tabulation
+  of the two labels.
+- Every prediction phrased as "common as a segment, uncommon as a session" — A2 Capture's most of all
+  — survives, because the entry label captures what the session opened as even when the dominant
+  label records what it became.
+
+**Consequence for scoring:** each type's frequency band is scored against the **dominant** label.
+The entry label is scored separately, and the disagreement between them is a finding in its own
+right rather than noise to reconcile.
+
+### Q2 — Family A is exempt from session records entirely
+
+**Ruled:** Inquiry, Capture and Exploration produce no session record. Not a cheap one-line append;
+no record.
+
+The family is defined by carrying no obligations, and adding one — however light — makes it Family
+B-lite and charges that cost against the most frequent session type there is. Capture already leaves
+a durable trace through the idea log, so the genuinely unrecorded types are Inquiry and Exploration,
+which by definition changed nothing that a record would be describing.
+
+**The accepted cost, stated plainly:** if Part 2 confirms **S1**, the repository's session records
+are a minority of its sessions and its own history is unrepresentative of its own work. That is
+accepted as the price of keeping the light types light, not overlooked.
+
+### Q3 — Governance gets an identification rule, not a protocol
+
+**Ruled:** B6 Governance stays a type, but its d-system binding is a **router rule**, not a fourth
+obligation profile in `REQ-023`.
+
+Its value is recognising the entry signal and **refusing**: an agent that hears "from now on" should
+know it has been handed something it may not write, and escalate to the owner rather than draft it.
+Writing a full must-read / must-produce / must-never profile would specify a protocol for work no
+agent is permitted to perform.
+
+This keeps the model's sharpest identification finding intact — that "from now on" (B6, owner-
+reserved) and an idea-capture request (A2, any agent may write) are one word apart in the first
+prompt and a permission boundary apart in consequence. That is the highest-risk misidentification
+in the model and the router is where it gets caught.
+
+### Q4 — C4 Rehearsal is kept and scored
+
+**Ruled:** the type stays, and spends its scorecard row, knowing its most likely outcome is
+disconfirmation by absence.
+
+If rehearsal never appears as a session's primary purpose, that absence is the finding: a system
+whose end-to-end behaviour is only ever checked by whoever just built it has no independent
+verification step. A type that fails loudly is worth more than a type never registered, and the cost
+is one row.
+
+### Q5 — Frequency bands are scored over both populations, separately
+
+**Ruled:** every band is scored twice — once over transcripts, once over session records — and both
+are reported, rather than scoring transcripts alone.
+
+This is a departure from §4's stated single population and from the recommendation put to the owner,
+taken deliberately for what the delta shows. Scoring records alone would have guaranteed every
+Family A type read 0% for a reason unrelated to whether the type is real; scoring transcripts alone
+would have left **S1** — that the transcript/record gap *is* Family A — as an inference rather than a
+measurement. Scoring both makes S1 directly visible as the difference between two columns.
+
+**Consequence for Part 2:** the scorecard carries two frequency columns per prediction, and a
+prediction may be confirmed in one population and disconfirmed in the other. That is a real result to
+report as such, not a conflict to resolve in favour of whichever column is tidier.
+
+### What remains unsettled
+
+`REQ-026` R02's wording — whether a dispatched sub-agent counts as "the session" — is **not** an open
+question of the theory and is not ruled on here. It is a defect in the requirement text, raised by
+`phase-tax-01`'s independent reviewer, and is being corrected in `REQ-026` itself.
