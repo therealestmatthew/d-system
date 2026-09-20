@@ -236,3 +236,27 @@ against a fresh `--catalog` run before staging it.
   explicitly out of scope for this session. Whether a read-only subcommand like `--next-code` should
   be reachable independently of backlog health is a question for whoever owns that engine, not
   answered here.
+
+## Review
+
+Backfilled 2026-09-19 after the fact. This branch was integrated without a dedicated adversarial
+review of its own diff — the omission is recorded here rather than papered over.
+
+What did review it: the session-close review of `SESS-2026-09-19-05` examined this branch's output
+as part of the 44-commit range and made one finding bearing directly on it. The framework material
+under `docs/00-working/framework/`, roughly 1,990 lines, goes beyond what ADR-010 describes that
+directory as holding — "not a commitment... nothing here is worked" — and `INDEX.md` self-certified
+eight success metrics as complete while its own file tree showed most sections still `(TBD)`. Those
+metrics have since been withdrawn and marked false. The plans and requirements produced here
+(`PLAN-040`, `PLAN-041`, `REQ-024`, `REQ-025`) and the eight queued phases were owner-directed and
+are not affected by that finding.
+
+One decision recorded in `PLAN-040` has since been qualified by the owner. The workstream layer of
+idea `000272` was rejected here on the grounds that the concurrency lock reads only `systems`,
+`deliverables` and `depends_on`, so a label above plans adds nothing. That reasoning holds for
+locking, but answers a different question than the owner was asking: a workstream is an *ownership*
+unit naming who owns which paths, which then feeds the lock rather than replacing it. The owner
+revived it on those terms on 2026-09-19; see `000288`.
+
+Verdict: **integrated without dedicated review.** A retrospective review of
+`git diff` over this branch's commits remains available and is not blocked by anything.

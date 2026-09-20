@@ -119,3 +119,33 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
   from the same stale base and rebased last, renumbered to `SESS-2026-09-19-03` per `AGENTS.md`'s
   "the agent integrating second [or later] renumbers" rule. The only reference to the old code
   outside this file was the generated catalog, which was regenerated after the rename.
+
+## Review
+
+Backfilled 2026-09-19 after the fact. An independent non-fork subagent reviewed this change before
+integration; this record predates the review and did not carry its result.
+
+**One confirmed defect, fixed before merge.** The no-op guarantee did not hold for the new unclaimed
+path. `## Acceptance` was explicitly pinned to write-once, reuse-verbatim wording, but `## Phase`
+was not — it said only "restate the owner's instruction in one sentence", a fresh paraphrase task.
+Two consecutive runs against unchanged state could therefore produce a non-empty diff, defeating the
+contract's stated justification that checkpointing is cheap enough to run on impulse. Fixed in
+`b317246` by extending the same verbatim-reuse instruction to `## Phase`, with both `SKILL.md` files
+regenerated and `--check` clean.
+
+A second, factual finding: this record originally stated idea `000237` carried findings dated
+2026-09-10, 09-14, 09-15 and 09-19. The idea was created 09-14 and annotated 09-15 and 09-19; the
+09-10 occurrence is real but recorded in `SESS-2026-09-10-01-demo-agent-factory.md`, not as an idea
+event. The error originated in the orchestrator's brief and was corrected in `656bc08`.
+
+Verified clean: the claimed-phase path is unchanged in substance, every insertion being additive and
+conditioned on the unclaimed case; no path lets an unclaimed session mark anything `complete`; the
+generated `SKILL.md` files differ from source only in frontmatter; the GOV-003
+coordinator-completion amendment in `session-close.md` is intact and untouched.
+
+Two findings accepted rather than fixed, recorded as `000286`: the self-declared acceptance review
+cannot verify the pasted instruction against an independent record, and `checkpoint.md` still does
+not route the mid-conversation-closed-phase case to
+`brain/procedures/session-close-with-no-active-phase.md` the way `session-close.md` now does.
+
+Verdict: **integrate with named follow-ups.**

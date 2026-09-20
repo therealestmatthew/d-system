@@ -12244,6 +12244,7 @@ Introduce a "workstream" (name TBD, alternatives: track, lane, module) as a new 
 **Links**
 
 - relates_to → `000281`
+- relates_to ← `000288`
 
 ---
 
@@ -12362,6 +12363,7 @@ The current claim system assumes every agent shares one primary checkout, so the
 **Links**
 
 - relates_to → `000151`
+- relates_to ← `000288`
 
 ---
 
@@ -12414,6 +12416,7 @@ This is a concrete sub-problem for phase-conc-03, which owns making document-cod
 **Links**
 
 - relates_to → `000253`
+- relates_to ← `000288`
 
 ---
 
@@ -12488,3 +12491,33 @@ Third, agent-workflows/checkpoint.md does not route the mid-conversation-closed-
 Before one is written, note the coverage bound both documents impose on themselves. They rest on 49 deep-read matrix rows out of 387 collision candidates surfaced by search, so 340 candidates have never been deep-read, including 20 of the top prescore band's 32. The duplicate-discovery rate fell from 20.0 percent to 15.0 percent as later searches targeted neglected hypotheses, a trend toward finding more new material rather than less, and neither document claims saturation anywhere. An implication phrased as the literature does not show X means only that this campaign's search did not surface it.
 
 phase-lit-09 is the work that closes those gaps: the 15 missing chaining rows, the 20 unread top-band candidates, the duplicate-rate trend and the clean-room H4 re-derivation. Building a consuming plan before it runs would commit to inherit targets chosen from an eighth of the pool, on evidence that explicitly says a better-fitting candidate may sit among the unread. The consuming plan is therefore downstream of phase-lit-09, not parallel to it, and this idea exists so the gap is not rediscovered a fourth time.
+
+---
+
+## 000288 · Accepted design for multi-developer coordination in a new repository
+
+**Created 2026-09-19T21:04:03-04:00 · Status: `open`**
+
+Owner decisions, 2026-09-19, for a hackathon repository built for five developers on separate machines. Recorded here because the reasoning exists nowhere else.
+
+Team shape. Each developer runs agents on their own machine; nobody orchestrates centrally. Each owns one workstream or component of the product, for example the user interface, the product's own agent orchestration, or the deterministic backend. Assume teammates are not experienced multi-agent orchestrators and will work with a single agent each.
+
+Two layers, not one. The inner layer is this repository's existing single-developer multi-agent claim and coordination design, kept as is, because it already works for one person running several agents. The outer layer is new: it coordinates between developers. The two are designed to work in conjunction rather than one replacing the other.
+
+Claims are workstream-level and rare. A developer claims ownership of a workstream by committing to a shared file on the integration branch, once per workstream rather than once per task. Rarity is what makes a git-based claim viable: the race that fires constantly with per-task claims almost never fires when a claim is made once and held.
+
+No claim service. Provisioning third-party software requires company approval on a timeline the hackathon cannot absorb. The design must therefore work with git and the existing forge alone. This rules out the HTTP claim service considered earlier, not on technical grounds but on procurement.
+
+A board only if it is generated. A human-visible board showing who owns what is wanted, but only if it is produced from the repository automatically. Two places maintained by hand will drift, and a board that disagrees with the source of truth is worse than no board.
+
+Identifiers are author-scoped. Allocation collides because it requires reading state a branch cannot see, which produced five collisions in one day here, one of them while recovering from another. Namespacing every identifier by author removes the need to coordinate at all: a session code or document code carries its author, so two people cannot allocate the same one, offline, with no reservation file and no renumber rule. Readability is kept; the whole failure class is removed. Relates to 000283.
+
+Workstreams are revived as an ownership layer. Idea 000272 proposed a workstream above plans, and it was rejected on the grounds that the concurrency lock reads only systems, deliverables and dependencies, so the label added nothing to locking. That reasoning holds for locking and answers a different question than the one being asked. A workstream names who owns what and which paths that ownership covers; it does not replace the lock, it feeds it, because one person's declared paths are the boundary others stay out of. This supersedes the rejection recorded in PLAN-040.
+
+Relates to 000280, which asked how claims work across machines and is answered by the two-layer design above; to 000272, whose rejection is now qualified; and to 000283 on identifier allocation.
+
+**Links**
+
+- relates_to → `000280`
+- relates_to → `000272`
+- relates_to → `000283`
