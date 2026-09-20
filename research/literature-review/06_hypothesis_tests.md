@@ -581,141 +581,196 @@ hypothesis: >
   weight while derivative agreement is discounted. (Review-instructions text.) The frozen
   register makes the topological character explicit: "graph-topological epistemic signal ...
   discounted based on shared lineage" — a sharper, more specific claim than the
-  review-instructions' general wording. Both phrasings are addressed together below since the
-  same evidence bears on each; the frozen phrasing's topological language is, if anything, the
-  closer match to what was found.
+  review-instructions' general wording. Both phrasings are addressed together below because the
+  evidence now closes the gap between them: sources found since the prior reconciliation satisfy
+  the frozen register's sharper topological reading directly, not merely the general one.
 strongest_challenger: >
-  Against the frozen register's graph-topological reading: epistemic-sybil-resistance-bara-2026
-  (component_overlap=4, architecture_overlap=2, full_text) remains the closest match, unmoved by
-  this phase's search. Against the review-instructions' general reading:
-  goldman-experts-which-ones-should-you-trust-2001 (component_overlap=4, architecture_overlap=1,
-  full_text) is the new strongest challenger, backward-chained this phase
-  (`00_search_ledger.csv`, LIT-08-S055/S056) from reliability-testimonial-norms-scientific-
-  communities-synthese (component_overlap=3, architecture_overlap=2, preprint_version), itself
-  found via a dedicated collision search that also deep-read
-  barakat-corroboration-provenance-patterns-tapp2017 (component_overlap=4, architecture_overlap=3,
-  full_text, `critical_collision: yes`, second review: confirmed),
-  extending-nanopublications-knowledge-provenance (component_overlap=3, architecture_overlap=2,
-  full_text), and provenance-based-interpretation-multi-agent-information-analysis-2020
-  (component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second
-  review: confirmed) — 32 new ledger rows in total (LIT-08-S025 through S056), the first dedicated
-  collision search this campaign has run for H4 since the single Pass 3 search of `phase-lit-06`.
+  grading-narrators-isnad-rijal-claim-provenance-2026 (ISNAD; component_overlap=4,
+  architecture_overlap=3, full_text, `critical_collision: yes`, second review 2026-09-19:
+  disputed on component score only — re-derived 5->4, flag and hypotheses_challenged
+  unaffected) is the strongest challenger found against either phrasing, because it is the only
+  source in this file's H4 evidence that combines all three elements the frozen register's
+  falsification clause names in one place: a derivation-chain topology (the isnad, a directed
+  narrator-to-narrator transmission chain), an explicit computed discount for shared lineage
+  (Sec.4.3's muta ba'at cross-chain corroboration check, which withholds a tier upgrade when two
+  converging chains share a narrator identity, an upstream source, or a model family), and an
+  explicitly mixed human-agent narrator scope (`narrator_type` spans source|scraper|model|human,
+  with contradictions arbitrated by a human by default). This row was added by this campaign's own
+  `LIT-09-S034/S035` and was not evaluated in the prior reconciliation (`LIT-08 X5`, 2026-09-14),
+  which read only bara-2026, barakat-2017, extending-nanopublications, DIVE-2020,
+  Mayo-Wilson-2014, and Goldman-2001 — none of which combine all three elements in one source.
+  not-all-agreement-counts-as-corroboration-2026 (PACT; component_overlap=4,
+  architecture_overlap=2, full_text, `critical_collision: yes`, second review 2026-09-19:
+  disputed on two factual corrections applied, scores confirmed unchanged) is the second new
+  addition: a formally proved (Proposition 1, an identifiability result), empirically validated
+  discount for repeated/derivative agreement, computed over a supplied provenance partition — but
+  scoped to machine sensor/VLM sources only, with zero evidence-contributing human agents, which
+  the second review confirmed directly by an exhaustive grep of the primary text. Both new rows
+  were found by this phase's own collision searches (`LIT-09-S034` through `LIT-09-S053` and
+  onward), after the prior reconciliation's search had already run and closed.
 evidence:
   - >
-    (Unchanged.) bara-2026, Sec.6, a provenance DAG G=(V,E_G) with a closed-form discount
-    kappa_m = 1/(1+rho(m-1)) (Sec.5.2, Corollary 2) for corroborating reports sharing an
-    evidentiary root — a graph-topological structure with matching mathematics for the frozen
-    register's "graph-topological ... discounted based on shared lineage" phrasing. Scoped
-    AI-agent-only (human_agent_scope field), with the practical protocol left as an open problem
-    (Sec.9) and no deployed aggregator.
+    grading-narrators-isnad-rijal-claim-provenance-2026 (arxiv:2607.24117, full HTML text read):
+    Sec.4.1 defines the isnad as "the ordered, gap-free sequence of narrators from origin to the
+    point of serving"; Sec.4.3's muta ba'at mechanism upgrades a claim's tier when it "reaches the
+    system via disjoint narrator sets and independent sources," explicitly checking for and
+    discounting correlation from a shared model family, upstream source, or narrator identity
+    before granting the upgrade — an operational, chain-topology-based instance of exactly H4's
+    claim. The second review's one contested point does not touch this: it re-derives
+    component_overlap from 5 to 4 because the paper's own Sec.2.3 concedes "subjective logic
+    supplies chain-discounting arithmetic but no operational registry lifecycle" — i.e. the
+    discount math is imported from josang-subjective-logic-book-2016, and ISNAD's own contribution
+    is the narrator-registry lifecycle built around it. That concession bears on whether ISNAD
+    itself invented the mechanism; it does not bear on whether the mechanism, as literature
+    predating this campaign, already exists and already covers a mixed human-agent narrator scope
+    — which the row's own confirmed fields establish that it does.
   - >
-    barakat-corroboration-provenance-patterns-tapp2017 (full 7-page paper, retrieved via curl after
-    a 403 on WebFetch): a PROV-graph corroboration methodology explicitly scoped to "computational
-    or human" sources (Abstract) — broader actor scope than bara-2026 — computing a graph-derived
-    reliability score. But Sec.5 states plainly the built methodology "assumed independence among
-    witnesses"; the paper's only treatment of shared-dependency discounting is Eq.8, a sketched,
-    never-implemented rewrite citing an external analogy (Townend et al. 2005's channel weighting,
-    backward-chained this phase to Eckhardt & Lee 1985's N-version-programming reliability theory),
-    with no worked example and no reappearance anywhere else in the paper.
+    not-all-agreement-counts-as-corroboration-2026 (PACT; arxiv:2609.01662, full HTML text read):
+    Proposition 1 proves source-local numerical attributes alone cannot distinguish a repeated
+    derivation from a separately countable acquisition; the coordinatewise meet within a supplied
+    provenance partition is then the unique rule satisfying singleton fidelity and
+    insertion-non-amplification (Propositions 2-3), empirically reducing ncsAURC by 0.0557 and
+    leaving 720 typed responses unchanged under 1x-8x within-camera duplication. A graph/partition-
+    topology-based discount mechanism, formally guaranteed rather than merely proposed. Sec.2.2's
+    own "substantive precedents" citation (Denoeux 2008, Josang et al. 2010) situates this as a
+    further derivative refinement of a sensor-fusion/belief-function lineage running back to Julier
+    & Uhlmann's 1997 covariance intersection, sixteen to eighteen years earlier — confirmed by the
+    second review's correction to the row's `derivative_ancestor` field. Scope is fully
+    machine-source (camera/VLM outputs); humans appear only as handover recipients, confirmed by
+    the second review's exhaustive text grep — so this row alone does not reach H4's mixed-agent
+    requirement, but it independently corroborates that the discount mechanism itself is thoroughly
+    established, arriving at essentially the same shape as bara-2026's kappa_m from an unrelated
+    sensor-fusion lineage rather than from AI-Sybil-resistance framing.
   - >
-    extending-nanopublications-knowledge-provenance (full 15-page paper, retrieved via curl): a
-    real, deployed (197K+ facts) provenance/trust ontology (PROV-K) linking claims to multiple
-    supporting/conflicting sources with a certainty degree — but searched specifically for an
-    independence/shared-lineage discount and found to have none. Reliability rests on naive
-    sufficiency/consistency counting over supporting-vs-conflicting sentences, with no treatment of
-    whether two supporting sentences might share a dependent origin.
+    (Unchanged from the prior reconciliation.) epistemic-sybil-resistance-bara-2026
+    (component_overlap=4, architecture_overlap=2, full_text): Sec.6's provenance DAG
+    G=(V,E_G) with the closed-form discount kappa_m = 1/(1+rho(m-1)) (Sec.5.2, Corollary 2) for
+    reports sharing an evidentiary root remains the most rigorous single graph-topological
+    formalization found. Still AI-agent-only in scope (human_agent_scope field), with practical
+    provenance authentication left as an open problem (Sec.9). Presented as this paper's own
+    original contribution, not attributed to a prior mechanism — a second, apparently independent
+    origin of the same discount shape alongside the sensor-fusion lineage below.
   - >
-    provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE; full 6-page paper,
-    retrieved via curl, superseding an earlier abstract-only read): a real, implemented, live system
-    with a demonstrated (not merely stated) mixed human-machine appraisal scope — Sec.2.1's
-    Appraisal class is "a human or machine agent's judgment," and the one worked example shows a
-    named human user co-participating with multiple machine agents in the same provenance graph.
-    But its three implemented confidence-propagation policies (minimum/maximum/average) are not
+    (Unchanged.) barakat-corroboration-provenance-patterns-tapp2017 (component_overlap=4,
+    architecture_overlap=3, full_text, `critical_collision: yes`, second review: confirmed): a
+    PROV-graph corroboration methodology explicitly scoped to "computational or human" sources
+    (Abstract), computing a graph-derived reliability score (Eq.1) — but Sec.5 states plainly the
+    built methodology "assumed independence among witnesses," and the paper's only treatment of
+    shared-dependency discounting is Eq.8, a sketched, never-implemented rewrite citing an external
+    analogy (Townend et al. 2005's channel weighting, itself traced back to Eckhardt & Lee 1985's
+    N-version-programming reliability theory), with no worked example and no reappearance anywhere
+    else in the paper. A third, independent lineage (distributed fault tolerance) converging on the
+    same discount-for-shared-dependency idea, not yet delivered as a built mechanism here.
+  - >
+    (Unchanged.) provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE,
+    component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second
+    review: confirmed): a real, implemented, live system with a demonstrated mixed human-machine
+    appraisal scope (Sec.2.1's Appraisal class is "a human or machine agent's judgment," with a
+    named human user co-participating with machine agents in one worked provenance graph). Its
+    three implemented confidence-propagation policies (minimum/maximum/average) are not
     topology-aware and do not discount for shared lineage; the specific H4 mechanism is named only
-    as future work (Sec.3.3), citing Kuter & Golbeck 2007, which this phase's own backward chain
-    (LIT-08-S054) confirms does not supply it either on a full read (general Bayesian trust
-    propagation, no corroboration-boost-from-diversity term).
+    as future work (Sec.3.3), citing Kuter & Golbeck 2007, confirmed by this file's own prior
+    backward chain (LIT-08-S054) not to supply it either.
   - >
-    reliability-testimonial-norms-scientific-communities-synthese (Mayo-Wilson 2014; full 30-page
-    author preprint): eight proven theorems and 4,500-network simulations on how communication
-    topology affects testimony reliability among human scientists — network-structure-sensitive, but
-    its formal machinery evaluates whole belief-update *strategies*, not a per-claim discount
-    function for a specific dependent witness. Its own footnote 1 names the source this dispatch
-    backward-chained to next: "Goldman [2001] argues that, because experts' judgments might be
-    highly correlated due to common information, agreement cannot always provide greater evidence
-    of a hypothesis."
+    (Unchanged.) goldman-experts-which-ones-should-you-trust-2001 (component_overlap=4,
+    architecture_overlap=1, full_text, `critical_collision: yes`, second review: confirmed with one
+    locator correction): a fourth, independent lineage (Bayesian testimony epistemology): a
+    closed-form proof (Sec.4, Eqs.1-6') that a "blind follower" or "non-discriminating reflector"
+    of another witness adds zero extra evidential weight, materially the same discount shape as
+    bara-2026's kappa_m, twenty-five years earlier, at wider (agent-model-agnostic) scope but
+    characterized narratively rather than via an explicit graph structure — no traversal, no
+    worked graph example. Extended by reliability-testimonial-norms-scientific-communities-synthese
+    (Mayo-Wilson 2014, component_overlap=3, architecture_overlap=2, preprint_version) with
+    network-topology-sensitive convergence results, though that paper's own formal machinery
+    evaluates whole belief-update strategies rather than a per-claim discount function.
   - >
-    goldman-experts-which-ones-should-you-trust-2001 (full 26-page peer-reviewed paper, retrieved
-    via an open PDF mirror): a general, agent-model-agnostic, closed-form Bayesian proof (Sec.4,
-    Eqs.1-6) that a "blind follower" of another witness adds *zero* extra evidential weight beyond
-    the original witness — "no larger revision is warranted in the two-concurring-believers case
-    than in the single-believer case" (p.100-101) — while genuinely independent witnesses do add
-    weight. Materially the general-reading mechanism H4 describes: independent paths strengthen
-    weight, derivative (non-independent) agreement is discounted, here to zero in the limiting
-    case. 25 years old, peer-reviewed, foundational to an entire expert-testimony sub-literature
-    (Mayo-Wilson 2014 formally extends it). Independence is stipulated via hypothetical causal-route
-    scenarios (blind follower, non-discriminating reflector, partly-autonomous reasoner), not
-    computed from a provenance graph or topology — no PROV-O-style structure, no graph traversal,
-    anywhere in the paper.
+    (Unchanged.) extending-nanopublications-knowledge-provenance (component_overlap=3,
+    architecture_overlap=2, full_text): a real, deployed (197K+ facts) provenance/trust ontology
+    searched specifically for an independence/shared-lineage discount and confirmed to have none —
+    reliability rests on naive sufficiency/consistency counting over supporting-vs-conflicting
+    sentences, with no treatment of shared dependent origin.
+  - >
+    (Unchanged.) uspto-10445654-feedforward-evidence-graph-confidence-patent (component_overlap=3,
+    architecture_overlap=2, full_text): the patent's noisy-OR combining function is gated on a
+    named independence assumption ("the noisy-OR combination can be utilized when the sources of
+    evidence are independent," col.6) — a real but binary independence gate on which formula to
+    apply, not a graded discount for correlated/derivative agreement. Confirms "evidence graph" is
+    independently coined vocabulary (this campaign's phase-lit-01 finding) rather than a shared
+    mechanism with D-System's own use of the term.
   - >
     (Unchanged.) Negative result, dong-berti-equille-srivastava-truth-discovery-copying-detection-2009:
     the closest named prior-art family for H4 by mechanism shape (HMM-detected copier/independent
     classification feeding a Bayesian truth-decision model), deep-read specifically for this
-    hypothesis and recorded as not challenging it — correlation-based copier detection over a fixed,
-    closed set of structured web sources, not a derivation-graph topology.
+    hypothesis and recorded as not challenging it — correlation-based copier detection over a
+    fixed, closed set of structured web sources, not a derivation-graph topology.
 assessment: >
-  The two phrasings genuinely diverge here, and the scope record is explicit that they must not be
-  blended, so the best case is argued separately for each.
-  Under the review-instructions' general phrasing — independent paths strengthen epistemic weight,
-  derivative agreement is discounted — the case that this is already known is now strong. Goldman
-  (2001) is a mature, peer-reviewed, closed-form Bayesian proof of exactly this: dependent
-  ("blind follower") agreement adds no weight, independent agreement does, and the result has stood
-  for 25 years as the foundation of an entire expert-testimony sub-literature that Mayo-Wilson
-  (2014) formally extends with network-topology sensitivity. Combined with the campaign's own
-  earlier finding (H3) that rich, typed, multi-actor provenance representation is thoroughly known,
-  this is the textbook shape of "known component, new integration": the discount-for-dependence
-  principle is old and proven (Goldman), explicit provenance/derivation-graph representation is
-  separately old and proven (PROV-O, evidence graphs, this file's H3 block), and wiring the first
-  onto the second — computing the discount from the graph rather than stipulating it narratively —
-  is what remains unshown as one working system, not a mechanism nobody knows how to build.
-  Under the frozen register's sharper graph-topological phrasing, the case is much weaker. Nothing
-  found combines broad scope, graph-topological computation, and maturity: bara-2026 is
-  graph-topological and formally closed-form but AI-agent-only and left as an open protocol
-  problem; barakat is broader in scope (human-and-computational) and graph-based but its own Eq.8
-  discount term is an unimplemented sketch that never reappears in the paper; extending-nanopublications
-  and DIVE are real deployed provenance/appraisal systems with no independence-discount mechanism at
-  all. Treated uncharitably under this reading, H4 is still close to an unformalized restatement of
-  bara-2026's closed-form proof, narrowly scoped — the same reading the prior assessment gave, now
-  reinforced rather than displaced by a much larger, dedicated search that consistently found the
-  graph-topological formalization specifically to be recent and narrow.
-  Checked against this file's two-condition rule: this phase's search satisfies condition 1 for both
-  phrasings — 32 queries across vocabulary discovery, backward chaining (to Townend/Eckhardt-Lee and
-  to Goldman/Mayo-Wilson), and direct collision queries, every candidate deep-read from primary text.
-  Condition 2 splits by phrasing. For the general reading, it is satisfied: Goldman and Mayo-Wilson
-  are a genuinely mature, peer-reviewed, decades-spanning comparator family, and Goldman's blind-
-  follower proof is a real, if narrative rather than graph-computed, instance of the same discount
-  mechanism — this is a positive finding, not an absence, so the route-two saturation question does
-  not even need to be reached for this reading; the mechanism is established, and the status moves to
-  `KNOWN_COMPONENT_NEW_INTEGRATION`. For the graph-topological reading, condition 2 fails on
-  maturity in the same shape it fails for H1: the found family (bara-2026, barakat's Eq.8 sketch) is
-  one narrow 2026 preprint and one unimplemented citation-sketch from a 2017 workshop paper, not an
-  established tradition — so a negative result here does not license `POTENTIALLY_DISTINCT`, and the
-  graph-topological reading stays `INSUFFICIENT_EVIDENCE`, unchanged from the prior reconciliation
-  but for a sharper reason: not "the search was thin" (it was not, this phase), but "the field this
-  specific search mapped is thin," which is a fact about the literature this dispatch's search
-  established, not about search effort.
-  `status` below is a single permitted token, as the file's own vocabulary constraint requires; it
-  cannot carry both readings at once, so it records the review-instructions general phrasing's
-  verdict — `KNOWN_COMPONENT_NEW_INTEGRATION` — as primary. That follows this file's own
-  front-matter rule ("the review-instructions text ... is primary; a frozen-register nuance is
-  noted wherever it changes the assessment, never blended into a merged phrasing"), which is the
-  same rule H8's block already applies: H8's bare `status` likewise carries only its
-  review-instructions verdict, with the frozen register's stricter reading argued in full above
-  rather than folded into the token. The frozen-register graph-topological reading's verdict —
-  `INSUFFICIENT_EVIDENCE` — is not demoted by this choice; it is fully argued immediately above,
-  and the summary table below states both against their respective phrasings, matching the
-  convention H8's table row already uses.
-status: KNOWN_COMPONENT_NEW_INTEGRATION
+  The best case that D-System is not distinct here, stated before any counter-argument: H4's
+  claim, read at the narrow scope the frozen register itself states — a graph-topological discount
+  of corroboration that shares lineage, applied to knowledge from a mix of human and agent sources
+  — is not a new idea. It is a specific instance of the general, decades-old statistical and
+  epistemological principle that non-independent evidence must not be double-counted, and that
+  principle has now been found independently re-derived and re-applied, in closed or operational
+  form, across at least four unconnected lineages: Bayesian testimony epistemology (Goldman 2001,
+  extended by Mayo-Wilson 2014), distributed multi-version fault tolerance (Eckhardt & Lee 1985 ->
+  Townend et al. 2005, cited into barakat-2017), sensor fusion and belief-function combination
+  (Julier & Uhlmann 1997, Denoeux 2008, Josang 2010/2016, applied into PACT-2026 and, for its
+  discounting arithmetic, into ISNAD-2026), and at least one apparently self-originated 2026
+  AI-agent formalization (bara-2026's kappa_m). Per this campaign's own methodology (`CLAUDE.md`
+  Sec.12, "this same rule applies when evaluating D-System's convergence hypothesis"), these are
+  not independent confirmations of novelty but four traceable ancestor lineages, each already
+  wired to a graph or chain-topology representation by at least one 2026 paper (bara-2026's
+  provenance DAG, ISNAD-2026's isnad chains, PACT-2026's provenance partition) — meaning the "new
+  integration" step the prior reconciliation treated as the open gap (marrying a known discount
+  formula to a known graph representation) has already been done, more than once, in settings
+  structurally analogous to D-System's own knowledge-state graph: reports, claims, or observations
+  reaching a system via distinct derivation paths that must be checked for shared ancestry before
+  being counted as independent corroboration. ISNAD-2026 closes the remaining gap by name: its
+  narrator_type field spans source, scraper, model, and human, and its muta ba'at check discounts
+  cross-chain agreement for shared narrator identity, upstream source, or model family — confirmed
+  by an independent second review on 2026-09-19 as an accurately described, non-overstated
+  mechanism (the review's only correction lowers the component score from 5 to 4, on the separate
+  point that ISNAD's own discount arithmetic is imported from subjective logic rather than
+  original to the paper, not on whether the described mechanism exists or covers a mixed
+  human-agent scope). No single row reaches a confirmed component_overlap of 5 ("materially
+  equivalent mechanism") — the honest caveat against reading this as flatly settled — but this is
+  no longer, as the prior reconciliation found, "one narrow 2026 preprint and one unimplemented
+  citation-sketch." It is three independent 2026 graph/topology-based instantiations of the same
+  discount idea (two of them confirmed by independent review not to overstate their own claims),
+  layered on top of a forty-year cross-domain derivation history, with the specific combination of
+  graph topology, computed shared-lineage discount, and mixed human-agent narrator scope that the
+  frozen register's falsification clause names already present, together, in one deep-read primary
+  source. This is not an unformalized restatement of a single narrow paper; it is an established,
+  independently-recurring pattern that D-System's own knowledge-state graph would be one further
+  domain application of.
+  This changes the verdict from the prior reconciliation (`LIT-08 X5`, 2026-09-14), which had not
+  yet read grading-narrators-isnad-rijal-claim-provenance-2026 or
+  not-all-agreement-counts-as-corroboration-2026 — both added to `04_evidence_matrix.csv` by this
+  phase's own collision searches (`LIT-09-S034/S035`, `LIT-09-S052/S053`) after the prior
+  reconciliation had already run and closed. That prior reconciliation split H4's status by
+  phrasing — `KNOWN_COMPONENT_NEW_INTEGRATION` for the review-instructions' general wording,
+  `INSUFFICIENT_EVIDENCE` for the frozen register's sharper graph-topological wording — reasoning
+  that the graph-topological family it had found (bara-2026 alone, plus barakat's unimplemented
+  Eq.8 sketch) was "one narrow 2026 preprint... not an established tradition." With ISNAD-2026 and
+  PACT-2026 added, that specific reasoning no longer holds: the graph-topological family is now
+  three independent 2026 instantiations resting on a forty-year cross-domain ancestor base, and one
+  of the three (ISNAD-2026) is confirmed, not merely claimed, to cover a mixed human-agent scope.
+  The gap between the two phrasings that motivated the prior split verdict is accordingly closed;
+  both phrasings are assessed here as the same status.
+  Checked against this file's two-condition rule (search effort and field maturity): condition 1 is
+  satisfied by the prior reconciliation's own 32-query dedicated collision search plus this
+  phase's further collision searches that produced the two new rows above (`00_search_ledger.csv`,
+  `LIT-09-S034` through `LIT-09-S053` and surrounding rows). Condition 2, which failed for the
+  frozen-register phrasing in the prior reconciliation on field-maturity grounds, is now satisfied
+  for both phrasings: three independent 2026 graph-topology-based instantiations plus a forty-year
+  ancestor lineage across four unconnected research traditions is a mature, established field
+  finding, not a thin one — the same standard this file already applies elsewhere (e.g. H3, H9) to
+  call a field "thoroughly known." No row combines full mixed-agent scope with a confirmed
+  materially-equivalent (component_overlap=5) score, so `LIKELY_ALREADY_KNOWN` is not stretched to
+  claim total, unqualified prior anticipation of D-System's own knowledge-state-graph
+  instantiation — but the underlying mechanism H4 actually names, independent of which specific
+  knowledge domain it is wired into, is established well past the threshold this file uses
+  elsewhere to move off `INSUFFICIENT_EVIDENCE` or a split verdict.
+status: LIKELY_ALREADY_KNOWN
 ```
 
 ---
