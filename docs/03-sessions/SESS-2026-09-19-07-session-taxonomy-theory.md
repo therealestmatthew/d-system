@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-09-19'
-updated: '2026-09-19'
+updated: '2026-09-20'
 systems: [sys-governance]
 depends_on: [doc-session-taxonomy-investigation]
 ---
@@ -23,7 +23,7 @@ depends_on: [doc-session-taxonomy-investigation]
 **1. `uv run python -m src.governance`**
 
 ```
-Governance OK: 35 systems, 295 documents, 26 memories, 288 backlog phases
+Governance OK: 35 systems, 296 documents, 26 memories, 288 backlog phases
 ```
 
 **2. "Read session-types-theory.md and confirm every proposed type carries the five prediction
@@ -62,7 +62,7 @@ verification list; run anyway because the session commits a tracked document.
 
 ```
 note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
-check_no_private_content: OK (737 tracked files, 0 identifiers checked)
+check_no_private_content: OK (738 tracked files, 0 identifiers checked)
 ```
 
 **Recorded as a partial result, not a pass.** The identifier list is derived from
@@ -134,15 +134,22 @@ Recorded here because `REQ-026` R02's verification asks this record for exactly 
 after the theory was registered and is recorded here so no reader has to reconstruct it:
 
 - **A post-registration provenance scout ran at the owner's direction**, after the theory document
-  was written, verified and committed at `eb74e94`. A sub-agent read the ten most recent session
-  records on `dev` and wrote its findings to `_working/session-provenance-scout-2026-09-19.md`
-  (gitignored, ungoverned). It was instructed to return only a file path, a record count and any
-  unreadable file — no finding, no quotation, no summary — and **this session did not read its
-  output**. The owner reads the file directly.
+  was written, verified and committed. A sub-agent read the ten most recent session records on
+  `dev` and wrote its findings to `_working/session-provenance-scout-2026-09-19.md` (gitignored,
+  ungoverned). It was instructed to return only a file path, a record count and any unreadable file
+  — no finding, no quotation, no summary — and **this session did not read its output**. The owner
+  reads the file directly.
 - R02's guarantee is therefore intact in both halves: the theory was registered before any evidence
   was examined, and no session-record content entered this session's context at any point, before
-  or after registration. The registration boundary is commit `eb74e94`, which `phase-tax-02` may
-  cite as the point the theory was frozen.
+  or after registration.
+
+**The registration boundary**, which `phase-tax-02` may cite as the point the theory was frozen, is
+the commit titled **"Deliver the session-type theory document (`phase-tax-01`)"** — the first of
+this branch's four commits, and the only one that adds
+`docs/00-working/session-types-theory.md`. It is identified by that title rather than by a hash on
+purpose: this branch was rebased onto `dev` twice during the session and the hash changed both
+times. `git log --diff-filter=A -- docs/00-working/session-types-theory.md` resolves it whatever
+the hash turns out to be.
 
 ## Decisions taken at orientation
 
