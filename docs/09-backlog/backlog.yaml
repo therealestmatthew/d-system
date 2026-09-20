@@ -6742,17 +6742,26 @@ items:
   - research/literature-review/05_critical_collisions.md
   - research/literature-review/06_hypothesis_tests.md
   - research/literature-review/08_surviving_distinctions.md
-  result: '105 searches logged (LIT-09-S001-S105), 19 top-band sources deep-read, 31 new
-    inventory rows, 18 new matrix rows, 6 independent second reviews. Chaining coverage
+  result: '105 searches logged (LIT-09-S001-S105), 19 top-band sources deep-read (18
+    genuinely unread), 31 new inventory rows, 18 new matrix rows, 6 independent second
+    reviews of which 5 returned disputed and 3 concluded no trigger fires. Chaining coverage
     closed to 0 missing on both strategy phases across 53 strong rows. H4 re-derived
-    clean-room to LIKELY_ALREADY_KNOWN and propagated into 08. Duplicate rate 10.4 percent,
-    falling from 15.0; saturation not asserted and not demonstrated.'
-  next_action: 'All five acceptance conditions measured Met (SESS-2026-09-19-07); ready for
-    the owner''s /session-close review. Two findings are recorded and are not this phase''s
-    to fix - ten stale H4 references in 07_anti_novelty_case.md (a phase-lit-07 deliverable,
-    deliberately left outside this phase''s declarations) and two duplicate inventory rows.
-    phase-lit-07 was released to queued this session and awaits the owner''s scoping
-    decision, now informed by this phase''s LIT-07 G re-measures.'
+    clean-room to LIKELY_ALREADY_KNOWN and propagated into 08. Duplicate rate 6.4-7.7 percent
+    against a settled denominator of 392, falling from 15.0; saturation neither asserted nor
+    demonstrated. The independent close review found the first duplicate-rate figure wrong -
+    a comma-split delimiter defect phase-lit-08 had already diagnosed - and it was recomputed
+    before this record was written.'
+  next_action: 'All five acceptance conditions Met after the close review forced one
+    correction (SESS-2026-09-19-07). NOT complete: GOV-003 coordinator completion requires
+    verification green, an independent review with findings fixed, AND integration onto dev
+    with the owner''s approval. The first two hold; the third has not happened. Integration is
+    additionally blocked by 13 untracked entries in the primary checkout, which AGENTS.md step
+    7 forbids integrating over and which phase-conc-02 exists to refuse. Ask the owner to
+    approve integration and clear or accept those entries, then the phase may complete.
+    Outstanding and not this phase''s to fix: ten stale H4 references in 07_anti_novelty_case.md
+    (line numbers in the session record), a commit hash cited in 06_hypothesis_tests.md that a
+    rebase invalidated, and no fixed tokenisation rule for result_ids in PLAN-023.03, which has
+    now produced a wrong duplicate rate in two consecutive phases.'
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan
