@@ -1,12 +1,11 @@
 schema_version: 1
-updated: '2026-09-19'
+updated: '2026-09-20'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lit-09
 - phase-conc-03
 - phase-conc-02
-- phase-tax-01
 - phase-tax-02
 - phase-auto-01
 - phase-auto-02
@@ -12876,7 +12875,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-tax
   priority: 2
   session_budget: 1
@@ -12911,9 +12910,20 @@ items:
     predictions and five open questions. Governance exits 0 and the five-element check passes on
     all thirteen types. No raw transcript and no session-record contents were read, and the Part
     2 prompt was not opened - attested in the session record. Halted for owner review; no
-    empirical work begun.
-  next_action: Owner reviews docs/00-working/session-types-theory.md. On their explicit go,
-    phase-tax-02 runs the Part 2 prompt in a separate session.
+    empirical work begun. Closed 2026-09-20 through owner-invoked /session-close. Verification
+    re-run green at close against merged dev - governance OK (35 systems, 296 documents), 638
+    tests passed, and check_no_private_content OK with all 31 identifiers checked in the primary
+    checkout. An independent non-fork sub-agent reviewed the range 9bba035..b6d5af1 plus the
+    claim commit and returned both acceptance conditions HOLDS; it corroborated the R02 ordering
+    from git author dates, finding the theory frozen 82 minutes before any session record was
+    read, and confirmed no portable-layer type definition names a d-system artifact. Its two
+    findings were stale bookkeeping lines in the record, both fixed in the closing commit. It
+    flagged one wording ambiguity for the requirement's author - R02 does not say whether a
+    dispatched sub-agent counts as "the session", where R06 addresses sub-agents explicitly.
+  next_action: None - phase complete. phase-tax-02 runs the Part 2 prompt on the owner's explicit
+    go, citing the commit that adds session-types-theory.md as the registration boundary. Before
+    it starts, the owner may want to settle the deliverable's first open question (whether the
+    unit of analysis is the session or the segment) and the R02 sub-agent wording.
 - id: phase-tax-02
   title: Session-type taxonomy Part 2 - empirical test against transcripts and records
   plan: doc-session-taxonomy-investigation

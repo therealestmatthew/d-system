@@ -364,7 +364,7 @@ CI regenerates it and fails on any difference.
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
-| PLAN-042 | doc-session-taxonomy-investigation | draft | 1 | 1 | 0 | agent-tax |
+| PLAN-042 | doc-session-taxonomy-investigation | draft | 1 | 0 | 1 | agent-tax |
 
 ## Held codes
 
