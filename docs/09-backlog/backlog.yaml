@@ -6851,8 +6851,13 @@ items:
     a primary source with a locator, and 08 lists only distinctions that survive
     07's strongest decomposition argument.
   - The A review ran against the evidence matrix and its findings are applied or recorded;
-    the final gate measurements show the methodology's stop conditions met against
-    the ledger and matrix, demonstrated rather than declared.
+    the final gate takes all eight stop-condition measurements against the ledger,
+    inventory, matrix and deliverables as they stand at the gate, each with its
+    population named, and saturation is reported as a trend with no assertion that
+    the condition holds. Per the owner ruling of 2026-09-20 recorded in PROMPT-031
+    (rulings 9 and 10), this half requires the measurement, not the condition - the
+    campaign closes as a first research memo with saturation measured and explicitly
+    not demonstrated.
   verification:
   - uv run python -m src.governance
   - uv run python tools/check_no_private_content.py with the changes staged

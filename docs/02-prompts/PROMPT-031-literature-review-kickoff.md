@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-12'
-updated: '2026-09-14'
+updated: '2026-09-20'
 systems:
 - sys-research
 - sys-backlog
@@ -154,6 +154,10 @@ into the document that gate or dispatch actually reads, as noted.
    "mostly yield duplicates or clearly adjacent work"; 20% is not that. `LIT-07 G`'s saturation
    measurement reports the trend and must not assert the condition holds.
 
+   **Extended, not overturned, by the 2026-09-20 ruling below** (*How `phase-lit-07` closes*):
+   saturation still may not be asserted, and `phase-lit-07` may now close while reporting that it
+   is unmet.
+
 Not a ruling, recorded because it bears on the runway: the campaign has used six sessions of a
 seven-session estimate, against an owner-accepted range of six to eight. `phase-lit-07` is the
 seventh.
@@ -241,6 +245,55 @@ and 8 bind unchanged. Ruling 8 in particular: this phase **reports its duplicate
 `phase-lit-08`'s 58/387 (15.0%) as a trend and may not assert saturation**, whatever the number
 comes out at. `phase-lit-07` remains `active` under `agent-lit` throughout and is revisited by
 the owner after this phase's gate re-measures `LIT-07 G`'s measurements 2, 4 and 5.
+
+
+## How `phase-lit-07` closes (owner ruling, 2026-09-20)
+
+A fourth ruling, later than all three sections above and separate from each. It gets its own
+section for the reason the `phase-lit-08` mapping gives: a reader looking for what the
+pre-synthesis check-in decided on 2026-09-14 must not find a 2026-09-20 ruling mixed into it. It
+**extends check-in ruling 8 rather than overturning it** — saturation is still not demonstrated and
+still may not be asserted.
+
+Made at the owner's revisit of `phase-lit-07`'s close, after `phase-lit-09`'s gate re-measured
+`LIT-07 G`'s measurements 2, 4 and 5. The full reasoning is in
+[SESS-2026-09-19-08](../03-sessions/SESS-2026-09-19-08-literature-review-pass-3c.md)'s addendum;
+this section is the authoritative copy, because `LIT-07 G` and any future coordinator read this
+record and not one session record among 120.
+
+9. **The campaign closes as a first research memo with saturation measured and explicitly not
+   demonstrated.** `phase-lit-07` may close while reporting a stop condition it has not met,
+   provided it reports it honestly and names the population each measurement was taken against.
+
+   This is the permission ruling 8 withheld. Ruling 8 forbids *asserting* saturation and says
+   nothing about closing without it, which left the phase's stop-conditions acceptance unclaimable
+   as written — exactly the gap `phase-lit-07`'s 2026-09-14 close review found when it judged that
+   half **Not Met**. The ruling closes the gap in the acceptance, not in the evidence.
+
+   It introduces no new doctrine. [`PROMPT-030`](PROMPT-030-literature-review-coordinator.md)
+   already states that the campaign "produces a **first research memo**. It does not establish
+   final novelty, and no close-out may claim it does."
+
+10. **Do not commission a tenth search session.** The duplicate rate has fallen at every
+    measurement — **20.0% (`phase-lit-06`, 44/220) → 15.0% (`phase-lit-08`, 58/387) → 6.4–7.7%
+    (`phase-lit-09`, 25–30/392)**. The methodology's stop condition is that additional searches
+    "mostly yield duplicates or clearly adjacent work"; more than nine results in ten are new. On
+    this trend a tenth session would lower the rate again — spending a session to move further from
+    the condition it was spent to satisfy, and taking the campaign to ten sessions against an
+    owner-accepted range of six to eight.
+
+    `phase-lit-09` was the ninth session and closed two of the three gaps `LIT-07 G` measured:
+    measurement 2 now measures 0 missing forward-chaining and 0 missing backward-chaining rows
+    across 53 strong rows, against the 15 and 5 it recorded, and the deep-read condition is met by
+    coverage with 0 of 32 top-band candidates unread rather than by count alone. Saturation is the
+    one that remains, and it moved further out of reach.
+
+**What this changes in the documents a gate reads.** `phase-lit-07`'s acceptance in
+`docs/09-backlog/backlog.yaml` is amended in the same change that records this ruling, so its
+stop-conditions half requires each condition **measured with its population named**, and saturation
+**reported as a trend**, in place of requiring the conditions to hold. Its scope and its first
+acceptance condition are unchanged. `LIT-07 G` itself is unchanged: it already takes eight
+measurements and already reports saturation as a trend under ruling 8.
 
 ---
 
