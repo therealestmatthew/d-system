@@ -12521,3 +12521,27 @@ Relates to 000280, which asked how claims work across machines and is answered b
 - relates_to → `000280`
 - relates_to → `000272`
 - relates_to → `000283`
+
+---
+
+## 000289 · Fix the result_ids tokenisation and duplicate-rate rule in the evidence contract
+
+**Created 2026-09-20T17:02:06-04:00 · Status: `open`**
+
+PLAN-023.03 defines the search ledger's result_ids field but fixes no rule for how to tokenise it, and no rule for how a duplicate is matched against the inventory. That gap has now produced a wrong duplicate rate in two consecutive literature-review phases.
+
+phase-lit-08's close review caught the first instance: the coordinator split result_ids on commas as well as semicolons, inflating the denominator. It diagnosed the cause and named the rule — the delimiter is the semicolon alone.
+
+phase-lit-09 reproduced it exactly. The rule was passed verbatim into every dispatch that phase, including the gate's. The gate still split on commas, reporting 67/642 = 10.4 percent. phase-lit-09's own close review caught it by re-running phase-lit-08's validated method as a control: semicolon-only reproduces phase-lit-08's known-good denominator of 387 exactly, and gives 392 for phase-lit-09 rather than 642. Four LIT-09 rows carry commas and no semicolon at all, because a single identifier is written with its author list and title inline.
+
+A rule that has to be re-passed into every dispatch, and that fails anyway, is not a rule the contract is enforcing.
+
+Two things are unspecified and both need settling:
+
+1. Tokenisation. State in PLAN-023.03 that result_ids is semicolon-delimited, that a token may contain commas, and that empty and "none" tokens are discarded.
+
+2. Duplicate matching. The numerator is currently a judgment call, and two independent measurements of phase-lit-09 disagreed: the gate got 30 and the coordinator got 25 over the same settled denominator of 392, a spread of 6.4 to 7.7 percent. The contract should state which field a token is matched against, and what normalisation applies to identifier prefixes, so that a duplicate rate is reproducible rather than re-derived.
+
+Worth considering alongside: a mechanical check that recomputes a phase's duplicate rate from the ledger, so the figure is never hand-derived by the gate agent that is also reporting it. The campaign's own saturation stop-condition rests on this number, and check-in ruling 8 forbids asserting saturation from it — which makes an unreproducible number worse than a missing one.
+
+Recorded from phase-lit-09's close, 2026-09-20. Instances: SESS-2026-09-14-04 (phase-lit-08) and SESS-2026-09-19-08 (phase-lit-09).

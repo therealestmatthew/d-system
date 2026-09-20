@@ -373,3 +373,57 @@ direction — amending a governed evidence contract mid-campaign needs its own r
 
 **`phase-lit-07`'s scoping decision is deferred to a fresh session**, on the owner's direction, so it
 is taken against the verified numbers rather than at the end of a long session.
+
+## Addendum — work after `phase-lit-09` reached complete
+
+`phase-lit-09` reached `status: complete` and integrated into `dev` earlier in this same
+conversation. Everything below happened after that, in the same session, **without a new phase
+claim**. Recorded here rather than in a second record, per
+`brain/procedures/session-close-with-no-active-phase.md`, which names this as a structural pattern
+in how sessions here actually run rather than a one-off slip: a phase closes, the owner keeps
+directing work, and `/session-close` is eventually invoked against a state its written procedure
+does not literally describe.
+
+Named plainly because the procedure asks for it: this is a process deviation. The fix is to claim
+earlier next time, not to manufacture a retrospective claim now.
+
+**What was done.** Idea `000289` was captured through `tools/append_idea.py` recording the
+`PLAN-023.03` tokenisation gap, and committed to `dev` (`79e71d8`). `git push origin dev` was
+attempted on the owner's instruction and **refused by the environment's permission classifier**;
+it was not worked around. 40 commits remain unpushed, including all nine sessions of campaign
+evidence, which exist on this machine only.
+
+**A finding this phase's own work created.** `phase-lit-07`'s `next_action` is now stale and
+actively misleading. It offers the owner two branches — "direct a ninth search session to close the
+gaps, or rule on how the phase closes against an acceptance half that ruling 8 makes unclaimable as
+written" — and `phase-lit-09` *was* that ninth session. Two of the three gaps it names are closed:
+gate measurement 2 now measures 0 missing on both chaining phases against the 15-and-5 it records,
+and the deep-read coverage condition it calls "met by count not coverage" is now met by coverage,
+with 0 of 32 top-band candidates unread. Only saturation remains, and it moved the wrong way: the
+duplicate rate fell again, from 15.0% to 6.4-7.7%, so the stop condition is further from
+demonstrable than when `phase-lit-07` paused.
+
+That entry is not this session's to edit — `phase-lit-07` is a queued phase this session does not
+hold — so it is recorded here and put to the owner rather than silently corrected.
+
+**A correction inside this addendum.** Committing idea `000289` left `docs/00-working/ideas.md`
+unregenerated, and `test_the_committed_markdown_matches_regenerated_output` failed — 1 failed, 637
+passed. This is precisely the failure the `checkpoint` contract predicts for a session that writes
+data without a code phase: "the suite's drift tests are what fail when a generated file was left
+unregenerated after a data write, which is most of what a session with no code phase does." Fixed by
+running `tools/generate_ideas_md.py` (289 ideas) and re-running the suite: **638 passed**. Recorded
+rather than quietly repaired, because the commit that introduced it is already on `dev`.
+
+**A second correction, same addendum.** The commit for this addendum was first made with
+`git add -A` — the command this repository's own `/session-close` step 8 template prints — which
+swept in 13 untracked entries belonging to another session: nine `.agents/skills/` directories, two
+`.codex/agents/` TOMLs and two root-level `.idea-capture-*.txt` files. `AGENTS.md` forbids touching a
+peer's uncommitted work. The commit was local and unpushed, so it was undone with
+`git reset --soft HEAD~1`, those paths were unstaged, and the commit remade with only this session's
+two files. The 13 entries are untracked again. Worth noting that the template command and the rule
+are in tension: `git add -A` is safe only in a tree with no foreign untracked work, and nothing in
+the procedure checks that first.
+
+**No phase reached `status: complete` in the `/session-close` invocation that produced this
+addendum.** `phase-lit-09` had already completed earlier in the conversation; nothing was re-closed,
+no phase was invented, and no new claim was made.
