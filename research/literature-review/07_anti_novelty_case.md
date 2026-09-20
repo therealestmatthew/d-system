@@ -192,14 +192,17 @@ derivative agreement is discounted) is the organizing question of the truth-disc
 The general principle H4 states — independent corroboration counts, derivative agreement does not —
 is a foundational, 25-year-old, mathematically proven result (Goldman 2001) with a direct
 2009 computational instantiation (Dong et al.) and a 2026 graph-topological formalization (Bara).
-As `06_hypothesis_tests.md`'s H4 block records, this is enough to move the general-phrasing reading
-of H4 to `KNOWN_COMPONENT_NEW_INTEGRATION`. The frozen register's sharper graph-topological
-phrasing is not equally settled by this component — see §14 below and the "what remains" discussion.
-**Caveat carried per the owner's ruling on `phase-lit-08`:** H4's `KNOWN_COMPONENT_NEW_INTEGRATION`
-status itself rests on a general/graph-topological split that a coordinator dispatch pre-framed
-rather than a worker independently deriving; the risk that this framing shaped the outcome was
-disclosed by the worker and judged real and contestable on independent close review. This document
-carries that caveat rather than treating H4's status as fully settled.
+`06_hypothesis_tests.md`'s H4 block, re-derived clean-room by `LIT-09 H4R` (2026-09-19) from the
+evidence alone, now assesses both the review-instructions' general phrasing and the frozen
+register's sharper graph-topological phrasing of H4 at the same status, `LIKELY_ALREADY_KNOWN`,
+retiring the general/graph-topological split this section previously carried. Two further 2026
+sources found after that split was first drawn — `grading-narrators-isnad-rijal-claim-provenance-2026`
+(ISNAD) and `not-all-agreement-counts-as-corroboration-2026` (PACT), neither among the bullets above —
+close the thin graph-topological coverage the split had rested on; see `06_hypothesis_tests.md`'s H4
+block for their full assessment. The coordinator-pre-framing caveat this section previously carried
+is resolved along with the split: `H4R` was dispatched to re-derive the split, or its absence,
+clean-room from the evidence and without being told what to conclude, and its finding is that the
+split does not hold. This document reports that status; it does not re-derive it.
 
 ---
 
@@ -418,8 +421,8 @@ locator-cited matrix rows, several with formal proofs (AGM, MemTX, toki), produc
 (Zep, Kumiho, LangGraph), or granted patents (Istari).
 
 Against that decomposition, `06_hypothesis_tests.md`'s eleven hypothesis verdicts place nine of the
-eleven at `LIKELY_ALREADY_KNOWN` (H2, H7, H8's review-instructions phrasing, H9) or
-`KNOWN_COMPONENT_NEW_INTEGRATION` (H3, H4's general phrasing, H5, H6, H8's frozen-register
+eleven at `LIKELY_ALREADY_KNOWN` (H2, H4, H7, H8's review-instructions phrasing, H9) or
+`KNOWN_COMPONENT_NEW_INTEGRATION` (H3, H5, H6, H8's frozen-register
 phrasing, H10) — every one of these is a case where the decomposition above accounts fully for the
 mechanism, and what D-System adds is combination, not invention. That is not "nothing remains" in
 the trivial sense; recombining fourteen established components into one coherent two-system
@@ -432,13 +435,16 @@ distinction between `NOVEL` and the four permitted statuses), "known components,
 a mechanism gap; it is exactly what a successful anti-novelty case is supposed to find, and this
 document finds it for nine of eleven hypotheses.
 
-Three points do not fully decompose, and it would misrepresent the campaign's own findings to claim
-otherwise. All three carry `INSUFFICIENT_EVIDENCE` in `06_hypothesis_tests.md` — a status this
+Two points do not fully decompose, and it would misrepresent the campaign's own findings to claim
+otherwise. Both carry `INSUFFICIENT_EVIDENCE` in `06_hypothesis_tests.md` — a status this
 document must not upgrade, since re-deriving hypothesis status is exactly the reconciliation task
 item 0 of this dispatch already performed, and this file does not repeat or second-guess it. Naming
 them here is not a claim that they survive the decomposition as distinct; it is a report of what the
 decomposition itself could not close, which `08_surviving_distinctions.md` then carries forward
-under its own, separate discipline.
+under its own, separate discipline. (H4's graph-topological reading previously stood here as a third
+point; `06_hypothesis_tests.md`'s H4 block now assesses that reading, together with the general
+phrasing, at `LIKELY_ALREADY_KNOWN` — see §6 above — so it has no subject left in this list and is
+removed rather than carried as an empty entry.)
 
 1. **H1's specific axis content.** Agent memory (§7) is a mature field, and two of its members
    (MythologIQ, SUBIT) come structurally close to an orthogonal multi-axis classification — but
@@ -450,17 +456,7 @@ under its own, separate discipline.
    candidates are ten-weeks-old, single-author, unreviewed repositories, not an established
    tradition. This is a hole in the *search's findings*, not a proven gap in the *field*.
 
-2. **H4's graph-topological reading specifically.** §6 above shows the general principle (discount
-   derivative agreement, weight independent corroboration) is established (Goldman 2001,
-   Mayo-Wilson 2014) — enough to move the review-instructions phrasing of H4 to
-   `KNOWN_COMPONENT_NEW_INTEGRATION`. The frozen register's sharper claim — computing that discount
-   from an explicit provenance-graph topology, at mixed human-agent scope — is not equally closed:
-   the one graph-topological formalization found (Bara 2026) is AI-agent-only and leaves its
-   practical protocol as an open problem, and Barakat's (2017) discount term is a bare, never-
-   implemented algebraic sketch. As carried from item 0's reconciliation, this reading stays
-   `INSUFFICIENT_EVIDENCE`, and the caveat on H4's status noted in §6 above applies here too.
-
-3. **H11's runtime-to-knowledge closure into decision/rationale content.** §13-14 above establish
+2. **H11's runtime-to-knowledge closure into decision/rationale content.** §13-14 above establish
    that runtime signals feeding back into an upstream artifact is real and quantitatively evaluated
    (Bajaj), and that a requirements-specific closed loop is real and implemented (EvoReqs) — but the
    first closes onto a single derived metric, and the second closes onto a closed, hand-authored
@@ -472,10 +468,10 @@ under its own, separate discipline.
    weighing in synthesis, but is not, by this file's own rule, sufficient on its own to call the
    mechanism absent from the wider field.
 
-None of these three is a distinctiveness claim. Each is, precisely, a point where this campaign's
+Neither of these two is a distinctiveness claim. Each is, precisely, a point where this campaign's
 search — bounded by the coverage caveat stated at the top of this document — could not complete the
-decomposition either way. The decomposition is not a failure at these three points; it is where the
+decomposition either way. The decomposition is not a failure at these two points; it is where the
 decomposition's own evidentiary bar (a mature, on-topic comparator family whose best member shows the
 same mechanism) was not met by what this campaign found, distinguished explicitly from a bar this
 campaign proved could not be met. That distinction, and what if anything should be inherited or
-investigated further at each of the three points, is `08_surviving_distinctions.md`'s task.
+investigated further at each of the two points, is `08_surviving_distinctions.md`'s task.
