@@ -23,6 +23,21 @@
 > `04_evidence_matrix.csv` and `05_critical_collisions.md` are not edited here — this file's
 > `strongest_challenger` entries cite the matrix's already-recorded scores directly.
 
+> **Further reconciled against `phase-lit-09`'s H4 clean-room re-derivation, 2026-09-19 (`H4R`,
+> commit `7141767`).** Two new evidence-matrix rows found by this phase's own collision searches —
+> grading-narrators-isnad-rijal-claim-provenance-2026 and not-all-agreement-counts-as-corroboration-
+> 2026 — were read after the `LIT-08 X5` reconciliation above had already run and closed, and
+> neither was considered by it. `H4R` re-derived the H4 block from the evidence alone against that
+> new material and found the split verdict `LIT-08 X5` gave H4 (`KNOWN_COMPONENT_NEW_INTEGRATION`
+> for the review-instructions general phrasing, `INSUFFICIENT_EVIDENCE` for the frozen register's
+> graph-topological phrasing) no longer holds: both phrasings now converge on
+> `LIKELY_ALREADY_KNOWN`. Only the H4 block was re-derived. This pass (`phase-lit-09 X5`, fix cycle
+> 1) reconciles the surrounding shared prose and the summary table to the new H4 block — the
+> decision-rule paragraph below and the summary table's H4 row previously described the superseded
+> split verdict as current; both are corrected here to describe it as historical and to state the
+> current verdict from the H4 block itself. No block content is touched by this reconciliation pass;
+> all eleven `## H<n>` blocks remain exactly as `H4R` committed them.
+
 Verdicts follow `docs/01-plans/PLAN-023-literature-review-campaign/PLAN-023.01-scope-record.md`.
 Per that record, the review-instructions text (`research/literature-review/CLAUDE.md`, §4) is
 primary; a frozen-register (`research/pre-literature-hypotheses.yaml`) nuance is noted wherever
@@ -104,21 +119,26 @@ that, a hypothesis stays at `INSUFFICIENT_EVIDENCE` regardless of how many queri
 what is missing is not effort but *the right kind of finding*, a fact about the field, not about how
 hard this campaign looked.
 
-H1, H4, and H11 are assessed against this two-condition rule below, applied uniformly. All three had
-a dedicated collision search run against them this phase for the first time, satisfying condition 1
-for all three alike. Where they differ is condition 2, and each difference is argued explicitly in
-its own block rather than merely asserted: H1's comparator family fails on maturity (four
-candidates, the most-implemented eleven weeks old and single-author, one proving a formally
-different triple entirely); H11's comparator family is mature (a 2010–2023 peer-reviewed lineage,
+H1, H4, and H11 were assessed against this two-condition rule when `phase-lit-08` ran a dedicated
+collision search against each for the first time, satisfying condition 1 for all three alike at that
+point. Where they differed was condition 2, and each difference was argued explicitly in its own
+block rather than merely asserted: H1's comparator family fails on maturity (four candidates, the
+most-implemented eleven weeks old and single-author, one proving a formally different triple
+entirely) — unchanged since. H11's comparator family is mature (a 2010–2023 peer-reviewed lineage,
 plus two 2026 preprints) but its best-implemented member is a different mechanism shape — a
 closed, hand-authored control-loop reaction, not a narrower instance of H11's evidence-revises-
-knowledge claim; H4, uniquely, splits by phrasing — its general (review-instructions) reading now
-has a genuine, mature, same-mechanism comparator (Goldman 2001, backward-chained this phase from
-Mayo-Wilson 2014), while its frozen-register graph-topological reading fails on maturity in the
-same shape as H1's. None of the three clears both conditions for `POTENTIALLY_DISTINCT`. H4's
-general reading does clear the bar for treating its mechanism as established rather than merely
-searched-for, which moves that one reading's status to `KNOWN_COMPONENT_NEW_INTEGRATION` — the
-only status change among the three. `NOVEL` remains unavailable to all of them.
+knowledge claim — also unchanged since. H4, at that point, split by phrasing — its general
+(review-instructions) reading had a genuine, mature, same-mechanism comparator (Goldman 2001,
+backward-chained that phase from Mayo-Wilson 2014), moving that one reading's status to
+`KNOWN_COMPONENT_NEW_INTEGRATION`, while its frozen-register graph-topological reading still failed
+on maturity in the same shape as H1's and stayed `INSUFFICIENT_EVIDENCE`. That split verdict has
+since been superseded: two further sources found by `phase-lit-09`'s own collision searches
+(grading-narrators-isnad-rijal-claim-provenance-2026 and
+not-all-agreement-counts-as-corroboration-2026) closed the maturity gap on the graph-topological
+reading as well, and a clean-room re-derivation (`phase-lit-09 H4R`) converged both phrasings on a
+single `LIKELY_ALREADY_KNOWN` verdict — see the H4 block below, which is the current source of
+truth. H1 and H11 remain as `phase-lit-08` left them: neither clears both conditions for
+`POTENTIALLY_DISTINCT`. `NOVEL` remains unavailable to all three.
 
 ---
 
@@ -1502,42 +1522,49 @@ status: INSUFFICIENT_EVIDENCE
 
 | Hyp. | Status | Strongest challenger (source_id) | Challenger count |
 |---|---|---|---|
-| H1 | INSUFFICIENT_EVIDENCE | mythologiq-agent-memory-oss / subit-wiki-epistemic-hmm-oss (closest new candidates, both mechanism-mismatched — see block) | 6 |
-| H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 13 |
-| H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied) | 11 |
-| H4 | KNOWN_COMPONENT_NEW_INTEGRATION (review-instructions general phrasing); INSUFFICIENT_EVIDENCE (frozen-register graph-topological phrasing) | goldman-experts-which-ones-should-you-trust-2001 (general) / epistemic-sybil-resistance-bara-2026 (graph-topological) | 6 |
-| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 9 |
+| H1 | INSUFFICIENT_EVIDENCE | mythologiq-agent-memory-oss / subit-wiki-epistemic-hmm-oss (closest new candidates, both mechanism-mismatched — see block) | 8 |
+| H2 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 16 |
+| H3 | KNOWN_COMPONENT_NEW_INTEGRATION | log-is-the-agent-event-sourced-reactive-graphs-2026 / omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (tied on score); grading-narrators-isnad-rijal-claim-provenance-2026 (closest by mechanism fit at a lower score — see block) | 16 |
+| H4 | LIKELY_ALREADY_KNOWN (both phrasings converge — see block) | grading-narrators-isnad-rijal-claim-provenance-2026 (ISNAD) / not-all-agreement-counts-as-corroboration-2026 (PACT) | 9 |
+| H5 | KNOWN_COMPONENT_NEW_INTEGRATION | solozobov-verify-gated-completion-admission-control-2026 / zep-graphiti-temporal-kg-agent-memory-2025 (tied; log-is-the-agent dropped on review) | 10 |
 | H6 | KNOWN_COMPONENT_NEW_INTEGRATION | omniscientist-coevolving-ecosystem-human-ai-scientists-2026 | 3 |
-| H7 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 10 |
+| H7 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied) | 12 |
 | H8 | LIKELY_ALREADY_KNOWN (review-instructions phrasing); KNOWN_COMPONENT_NEW_INTEGRATION (frozen-register phrasing) | langgraph-checkpoint-library-oss (review-instructions) / solozobov-verify-gated-completion-admission-control-2026 (frozen-register, assembly half only) | 4 |
-| H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied; zep-graphiti/langgraph's contribution to this row is weaker than the raw count implies — see block) | 18 |
-| H10 | KNOWN_COMPONENT_NEW_INTEGRATION | memtx-transactional-belief-commit-2026 | 4 |
+| H9 | LIKELY_ALREADY_KNOWN | graph-native-cognitive-memory-belief-revision-semantics-2026 / jansen-bosch-architecture-as-decisions-wicsa-2005 (tied; zep-graphiti/langgraph's contribution to this row is weaker than the raw count implies — see block) | 23 |
+| H10 | KNOWN_COMPONENT_NEW_INTEGRATION | memtx-transactional-belief-commit-2026 | 7 |
 | H11 | INSUFFICIENT_EVIDENCE | requirement-evolution-requirements-adaptive-systems-seams-2012 (closest built candidate, different mechanism shape — see block) | 8 |
 
 `phase-lit-08` ran the first dedicated collision search this campaign has aimed at H1, H4, and H11
-specifically, and the result is not uniform, though it was checked for uniformity deliberately —
-the same mistake `phase-lit-06`'s first pass made (moving H1 and H11 toward `POTENTIALLY_DISTINCT`
-while leaving H4 behind, for hypotheses in materially the same evidential position) is exactly what
-this reconciliation set out not to repeat. Applying the two-condition rule stated at the top of this
-file uniformly: all three hypotheses satisfy condition 1 (a genuinely dedicated, multi-strategy,
-primary-text-verified search ran for each, for the first time). Condition 2 — a mature, on-topic
-comparator family whose closest member instantiates the *same* mechanism, even narrowly — is where
-they separate. H1's comparator family (mythologiq-agent-memory-oss, subit-wiki-epistemic-hmm-oss,
-toki, symbolic-memory) fails on maturity: the closest candidates are weeks-old, single-author,
-unreviewed repositories, or (toki) a rigorous proof of an unrelated triple. H11's comparator family
-(the 2010-2023 awareness-requirements lineage, plus krentsel and bajaj) is genuinely mature but
-fails on mechanism match: its best-implemented member, EvoReqs, closes a loop over a closed,
-hand-authored rule vocabulary — a control-loop reaction, not a narrower instance of
+specifically, and the result was not uniform at that time, though it was checked for uniformity
+deliberately — the same mistake `phase-lit-06`'s first pass made (moving H1 and H11 toward
+`POTENTIALLY_DISTINCT` while leaving H4 behind, for hypotheses in materially the same evidential
+position) is exactly what that reconciliation set out not to repeat. Applying the two-condition rule
+stated at the top of this file uniformly: all three hypotheses satisfied condition 1 (a genuinely
+dedicated, multi-strategy, primary-text-verified search ran for each, for the first time). Condition
+2 — a mature, on-topic comparator family whose closest member instantiates the *same* mechanism,
+even narrowly — is where they separated at that point. H1's comparator family
+(mythologiq-agent-memory-oss, subit-wiki-epistemic-hmm-oss, toki, symbolic-memory) fails on
+maturity: the closest candidates are weeks-old, single-author, unreviewed repositories, or (toki) a
+rigorous proof of an unrelated triple. H11's comparator family (the 2010-2023
+awareness-requirements lineage, plus krentsel and bajaj) is genuinely mature but fails on mechanism
+match: its best-implemented member, EvoReqs, closes a loop over a closed, hand-authored rule
+vocabulary — a control-loop reaction, not a narrower instance of
 evidence-becomes-provenance-bearing-knowledge. Both stay `INSUFFICIENT_EVIDENCE`, re-examined and
 confirmed unchanged, for related but distinct reasons that are argued in full in their own blocks
-rather than asserted here. H4 is the one hypothesis where condition 2 is satisfied — for its
-review-instructions general phrasing only: Goldman (2001), backward-chained this phase from
-Mayo-Wilson (2014), is a mature, peer-reviewed, closed-form demonstration of the general discount
-mechanism H4 describes, moving that phrasing's status to `KNOWN_COMPONENT_NEW_INTEGRATION`. H4's
-frozen-register graph-topological phrasing fails condition 2 on maturity in the same shape H1's
-does — the graph-topological formalization this phase's search found (bara-2026, barakat's Eq.8
-sketch) is one narrow, largely unimplemented corner, not an established tradition — and stays
-`INSUFFICIENT_EVIDENCE`.
+rather than asserted here.
+H4 was, at that same point, the one hypothesis where condition 2 was satisfied only for its
+review-instructions general phrasing — Goldman (2001), backward-chained from Mayo-Wilson (2014), a
+mature, peer-reviewed, closed-form demonstration of the general discount mechanism H4 describes —
+while its frozen-register graph-topological phrasing still failed condition 2 on maturity in the
+same shape H1's does, producing the split verdict this table showed at the time
+(`KNOWN_COMPONENT_NEW_INTEGRATION` on the general phrasing, `INSUFFICIENT_EVIDENCE` on the
+graph-topological one). That split has since been superseded within this same phase: two further
+sources found by this phase's own collision searches after this reconciliation had already run and
+closed (grading-narrators-isnad-rijal-claim-provenance-2026 and
+not-all-agreement-counts-as-corroboration-2026) closed the maturity gap on the graph-topological
+reading as well, and a clean-room re-derivation (`phase-lit-09 H4R`) converged both phrasings on
+`LIKELY_ALREADY_KNOWN`. See the H4 block above for the full argument; it is the current source of
+truth and is not restated here.
 This phase's own duplicate-discovery rate (58/387 = 15.0% raw, 37/347 = 10.7% distinct, computed
 against the pre-phase inventory snapshot) is lower than `LIT-06 G`'s campaign-wide 20.0%/17.3% — a
 falling duplicate rate, i.e. more new material found, not less, which argues against approaching
@@ -1545,11 +1572,12 @@ saturation rather than for it. Per the owner's ruling, saturation is not claimed
 on that basis; route one of the decision rule stays closed for all three uniformly, and every
 status change or non-change above rests on route two — search depth and comparator quality — argued
 explicitly, hypothesis by hypothesis, rather than on the duplicate-rate trend. `NOVEL` remains
-unavailable to all three; none meets the bar this file states for `POTENTIALLY_DISTINCT`, and all
-three (H4's graph-topological reading included) remain open to revision by a further, more targeted
-search this reconciliation did not perform. Every other remaining gap in the table above is a gap
-in what any single found system's *scope* combines (cross-lifecycle span for H6/H10;
-knowledge-bearing consolidation for H8's frozen phrasing) — not a gap in whether the field knows how
-to build the underlying mechanisms, and not a search-quality question the way H1/H4/H11 are. That
-distinction is what separates `KNOWN_COMPONENT_NEW_INTEGRATION` from `INSUFFICIENT_EVIDENCE` in this
-review's vocabulary.
+unavailable to all three; none met the bar this file states for `POTENTIALLY_DISTINCT` at that
+point. H1 and H11 remain open to revision by a further, more targeted search this reconciliation did
+not perform; H4 has since received exactly that further evidence and moved off its split verdict
+entirely, as argued in its own block. Every other remaining gap in the table above is a gap in what
+any single found system's *scope* combines (cross-lifecycle span for H6/H10; knowledge-bearing
+consolidation for H8's frozen phrasing) — not a gap in whether the field knows how to build the
+underlying mechanisms, and not a search-quality question the way H1/H11 still are. That distinction
+is what separates `KNOWN_COMPONENT_NEW_INTEGRATION` from `INSUFFICIENT_EVIDENCE` in this review's
+vocabulary.
