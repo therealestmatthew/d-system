@@ -6734,10 +6734,25 @@ items:
   - research/literature-review/05_critical_collisions.md
   - research/literature-review/06_hypothesis_tests.md
   - research/literature-review/08_surviving_distinctions.md
-  next_action: Run /resume-lit-review in a fresh session (or paste PROMPT-031's
-    kick-off paragraph). The backlog queue and the PROMPT-031 phase-lit-09 mapping
-    carry everything a fresh coordinator needs; SESS-2026-09-14-13 records where
-    the evidence stands.
+  session: doc-session-literature-review-pass-3c
+  completion_evidence:
+  - research/literature-review/00_search_ledger.csv
+  - research/literature-review/03_source_inventory.csv
+  - research/literature-review/04_evidence_matrix.csv
+  - research/literature-review/05_critical_collisions.md
+  - research/literature-review/06_hypothesis_tests.md
+  - research/literature-review/08_surviving_distinctions.md
+  result: '105 searches logged (LIT-09-S001-S105), 19 top-band sources deep-read, 31 new
+    inventory rows, 18 new matrix rows, 6 independent second reviews. Chaining coverage
+    closed to 0 missing on both strategy phases across 53 strong rows. H4 re-derived
+    clean-room to LIKELY_ALREADY_KNOWN and propagated into 08. Duplicate rate 10.4 percent,
+    falling from 15.0; saturation not asserted and not demonstrated.'
+  next_action: 'All five acceptance conditions measured Met (SESS-2026-09-19-07); ready for
+    the owner''s /session-close review. Two findings are recorded and are not this phase''s
+    to fix - ten stale H4 references in 07_anti_novelty_case.md (a phase-lit-07 deliverable,
+    deliberately left outside this phase''s declarations) and two duplicate inventory rows.
+    phase-lit-07 was released to queued this session and awaits the owner''s scoping
+    decision, now informed by this phase''s LIT-07 G re-measures.'
 - id: phase-gov-05
   title: Fail the governance check when a phase silently leaves complete
   plan: doc-backlog-status-regression-guard-plan
