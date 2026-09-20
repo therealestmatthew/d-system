@@ -6734,6 +6734,7 @@ items:
   - research/literature-review/04_evidence_matrix.csv
   - research/literature-review/05_critical_collisions.md
   - research/literature-review/06_hypothesis_tests.md
+  - research/literature-review/08_surviving_distinctions.md
   next_action: Run /resume-lit-review in a fresh session (or paste PROMPT-031's
     kick-off paragraph). The backlog queue and the PROMPT-031 phase-lit-09 mapping
     carry everything a fresh coordinator needs; SESS-2026-09-14-13 records where
