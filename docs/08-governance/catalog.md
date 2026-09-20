@@ -304,7 +304,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-19-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-06-session-taxonomy-prompt.md |
 | SESS-2026-09-19-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-07-session-taxonomy-theory.md |
 | SESS-2026-09-19-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-19-08-literature-review-pass-3c.md |
-| SESS-2026-09-20-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-20-01-taxonomy-rulings-and-req026-amendment.md |
+| SESS-2026-09-20-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-20-01-literature-review-pass-4-close.md |
 
 ## Plans and their phases
 
@@ -366,7 +366,7 @@ CI regenerates it and fails on any difference.
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
-| PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 1 | 1 | agent-tax |
+| PLAN-042 | doc-session-taxonomy-investigation | draft | 1 | 0 | 1 | agent-tax |
 
 ## Held codes
 

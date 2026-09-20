@@ -6874,22 +6874,23 @@ items:
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
   session: doc-session-literature-review-pass-4
-  next_action: 'Owner ruling given 2026-09-20: the campaign closes as a first research memo
-    with saturation MEASURED and explicitly NOT demonstrated, rather than waiting on a stop
-    condition the evidence is moving away from. Two edits implement it and are this phase''s
-    first work, not done yet: write the ruling into PROMPT-031 alongside check-in rulings 1-8,
-    which is its authoritative home, and amend this phase''s acceptance so its stop-conditions
-    half requires the measurement rather than the condition. The full ruling and its reasoning
-    are in SESS-2026-09-19-08''s addendum. SUPERSEDED, do not act on the prior text: it offered
-    "direct a ninth search session to close the gaps" as one of two branches, and phase-lit-09
-    was that session. It closed two of the three gaps - gate measurement 2 now measures 0
-    missing forward-chaining and 0 missing backward-chaining rows across 53 strong rows,
-    against the 15 and 5 recorded here, and the deep-read condition is now met by coverage with
-    0 of 32 top-band candidates unread, not merely by count. Only saturation remains, and it
-    moved further out of reach: the duplicate rate fell 15.0 to 6.4-7.7 percent. Do not
-    commission a tenth search session. The synthesis deliverables 07 through 13 stand as
-    written except for ten stale H4 references in 07_anti_novelty_case.md, line numbers in
-    SESS-2026-09-19-08.'
+  next_action: 'Ready for the owner''s /session-close review and the second owner
+    integration of agent/lit-campaign into dev. Recorded in SESS-2026-09-20-01, which
+    is this phase''s second session record; the deliverables were written in
+    SESS-2026-09-14-13. The owner''s 2026-09-20 ruling is implemented: rulings 9 and 10
+    are in PROMPT-031 in their own dated section, this phase''s acceptance now requires
+    the measurement rather than the condition, and 07_anti_novelty_case.md is reconciled
+    to 06/08''s unified H4 status (its "does not fully decompose" list goes from three
+    items to two, matching 08''s Category 3). LIT-07 G was re-run against the current
+    files - ledger 1,200 rows, inventory 1,154, matrix 67 - and all eight stop conditions
+    are measured with populations named: seven met, saturation measured and explicitly
+    NOT demonstrated at a falling 20.0 to 15.0 to 6.4-7.7 percent, which ruling 9 makes a
+    closing outcome rather than a blocker. One of two fix cycles used. The gate reported
+    two false failures and one PASS on 16 percent of its population; all were caught by
+    the coordinator''s independent recomputation and every number was reproduced
+    independently - see the session record, which names this as a three-gate pattern
+    rather than an incident. Do not commission a tenth search session (ruling 10).'
+
 - id: phase-kit-01
   title: Build the kit's six commands
   plan: doc-consultant-demo-kit
