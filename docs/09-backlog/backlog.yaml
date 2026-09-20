@@ -6751,7 +6751,7 @@ items:
     a comma-split delimiter defect phase-lit-08 had already diagnosed - and it was recomputed
     before this record was written.'
   next_action: 'Complete. All five acceptance conditions Met, the last only after the
-    independent close review forced a correction to the duplicate rate (SESS-2026-09-19-07).
+    independent close review forced a correction to the duplicate rate (SESS-2026-09-19-08).
     Integrated into dev on the owner''s approval, 2026-09-20. Outstanding and deliberately
     not this phase''s: ten stale H4 references in 07_anti_novelty_case.md with line numbers
     in the session record; a commit hash in 06_hypothesis_tests.md invalidated by a rebase;

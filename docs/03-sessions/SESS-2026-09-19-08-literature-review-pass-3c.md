@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-literature-review-pass-3c
-code: SESS-2026-09-19-07
+code: SESS-2026-09-19-08
 title: Literature review Pass 3c — chaining completion, top-band deep reads and the clean-room H4 re-derivation
 kind: session
 status: active
@@ -328,6 +328,20 @@ reported as a defect in anyone's work.
 **The unread top-band count was stated as 19 and is 18.** Both duplicate pairs already carried matrix
 rows on `dev` before the phase began. The dispatch-time payload of 19 was right to dispatch, since one
 duplicate was only discovered on reading, but the retrospective figure is 18.
+
+**This record was renumbered from `SESS-2026-09-19-07` to `SESS-2026-09-19-08`.** A peer session
+working `phase-tax-01` allocated the same code and integrated into `dev` first, while this phase was
+in its close review. `AGENTS.md`'s rule is mechanical and left no judgment to exercise — codes are
+free before merge and permanent after, so the agent integrating second renumbers. The document `id`
+(`doc-session-literature-review-pass-3c`) is permanent and independent of the code, so it did not
+change; the file name, the `code:` field and `phase-lit-09`'s own `next_action` reference did.
+`phase-tax-01`'s reference to its own `SESS-2026-09-19-07` was left untouched.
+
+No `GOV-003` entry accompanies this, because the collision was resolved by applying a stated rule
+rather than by making a choice. What is worth noting is that both sessions allocated correctly:
+`--next-code session` is not a reservation, and two agents calling it before either commits will
+both be told the same number. Reserving the code in `codes.yaml` alongside the backlog claim, which
+`AGENTS.md` already recommends, would have prevented it.
 
 ## Left undone
 
