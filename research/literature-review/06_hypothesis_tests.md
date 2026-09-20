@@ -147,6 +147,14 @@ strongest_challenger: >
   toki-bitemporal-operator-algebra-contradiction-2026 (component_overlap=3,
   architecture_overlap=2, full_text) and symbolic-memory-prolog-oss (component_overlap=2,
   architecture_overlap=1, full_text) are weaker but read in full below for completeness.
+  `phase-lit-09` added two further H1-tagged rows via its general deep-extraction and reconciliation
+  batches, not a dedicated H1 search: grading-narrators-isnad-rijal-claim-provenance-2026
+  (component_overlap=5, architecture_overlap=3, full_text, `critical_collision: yes`, second review:
+  disputed — component re-derived 5->4, flag unaffected, hypotheses_challenged H1;H3;H4 confirmed as
+  appropriately hedged) and provenance-enhanced-statements-dec-2026 (component_overlap=4,
+  architecture_overlap=3, full_text, `critical_collision: yes`, second review: disputed — component
+  re-derived 4->3, reviewer concludes no trigger fires). Neither displaces mythologiq or subit-wiki as
+  the closest match; both are read in full below.
 evidence:
   - >
     (Unchanged from the prior reconciliation.) eywa, Table 2 / Sec.4.3, and burns-groth, Sec.3.2-3.3:
@@ -196,10 +204,29 @@ evidence:
     H1/H2/H4-relevant primitive beyond those bare fields exists only as open-issue design prose,
     confirmed absent from the shipped code by a zero-hit search for the design issues' own named
     predicates.
+  - >
+    grading-narrators-isnad-rijal-claim-provenance-2026 (full HTML text, arxiv.org/html/2607.24117v1,
+    Sec.4.1-4.2 actor/provenance-model fields, read as part of the `phase-lit-09` deep-extraction
+    batch, not a dedicated H1 search): a genuine two-axis state — an ordinal, weakest-link chain grade
+    plus a claim lifecycle/serve-review-quarantine status — attached to every claim, governed by a
+    domain-conditioned, version-sensitive narrator-authority registry with an open-source, tested
+    (157 passing tests) reference implementation. Second review confirmed this framing as
+    appropriately hedged, not an overstatement, and re-derived the component score from 5 to 4 (flag
+    unaffected). But the state carries only two axes — grade and lifecycle — not D-System's three;
+    an ontological-type axis independent of both is absent entirely, the same content gap mythologiq
+    and eywa already show, just with a different pair of fields present and a different one missing.
+  - >
+    provenance-enhanced-statements-dec-2026 (full HTML text, arxiv.org/html/2606.15246v1,
+    Sec.3.2.2/4.2-4.3): a single epistemic-modality axis (doxastic/epistemic/conjectural/verbatim/
+    delusional) with no ontological-type or lifecycle-stage axis anywhere in the paper — the weakest
+    H1 state-model candidate found across the whole campaign, not merely a mismatched-content triple
+    but one axis where D-System proposes three. Second review re-derived the component score from 4
+    to 3 specifically because "state model has one epistemic-modality axis against D-System's
+    orthogonal ontological×epistemic×lifecycle triple" and confirmed no trigger fires.
 assessment: >
   The best case that D-System's orthogonal ontological+epistemic+lifecycle state model is already
-  known now draws on six sources rather than two, and the strongest of the new four come closer
-  than eywa or Burns & Groth ever did. mythologiq-agent-memory-oss genuinely has two of D-System's
+  known now draws on eight sources rather than two, and the strongest of the six new candidates come
+  closer than eywa or Burns & Groth ever did. mythologiq-agent-memory-oss genuinely has two of D-System's
   three axes as independent enums on one record, confirmed against its JSON Schema rather than its
   README; subit-wiki-epistemic-hmm-oss is a real, working three-axis-to-combinatorial-state
   implementation with a probabilistic typed-transition decoder, the same shape H1 and H2 propose
@@ -212,27 +239,37 @@ assessment: >
   across four separate fields rather than tracking it as one independently-varying value. subit-wiki
   has three genuinely independent axes but of the wrong content (discourse stance, not D-System's
   ontological/epistemic/lifecycle triple). eywa and Burns & Groth, as already established, turn out
-  on close reading not to be orthogonal at all. Six candidates, six different ways of missing the
-  specific claim, and not one candidate that gets the axis *content* and the *independence* and the
-  *maturity* right together.
-  Checked against this file's two-condition rule for route two of `POTENTIALLY_DISTINCT`: this
-  phase's search satisfies condition 1 in full — vocabulary discovery, backward chaining, and direct
+  on close reading not to be orthogonal at all. grading-narrators-isnad has the right shape for two
+  axes (an ordinal grade, a lifecycle status) but no third; provenance-enhanced-statements has only
+  one axis of any kind. Eight candidates, eight different ways of missing the specific claim, and not
+  one candidate that gets the axis *content* and the *independence* and the *maturity* right together.
+  Checked against this file's two-condition rule for route two of `POTENTIALLY_DISTINCT`: `phase-lit-08`'s
+  search satisfies condition 1 in full — vocabulary discovery, backward chaining, and direct
   collision queries were all run specifically for H1, for the first time in this campaign, and every
   candidate was deep-read from primary text rather than credited from a summary (the same discipline
-  that caught eywa and burns-groth's overclaims in the first place). Condition 2 is where it fails.
-  The four new candidates are not a mature, established comparator family: the most implemented
+  that caught eywa and burns-groth's overclaims in the first place). `phase-lit-09` ran no dedicated
+  H1 search of its own — its two additions arrived via general deep-extraction and reconciliation
+  batches — so it neither strengthens nor needs to re-argue condition 1; it only supplies two more
+  data points for condition 2, and neither moves it. Condition 2 is where the hypothesis fails.
+  The six new candidates are not a mature, established comparator family: the most implemented
   (mythologiq) is ten weeks old, single-author, 12 stars, unreviewed; subit-wiki is a smaller hobby
   project with 2 of 9 tests failing; symbolic-memory implements almost none of what it was nominated
-  for; only toki carries formal weight, and it proves an unrelated triple. H1's own falsification
-  bar asks for "a materially equivalent *established* framework" — a thorough search of this
-  specific, thin, very-recent corner of GitHub and arXiv does not establish that no such framework
-  exists elsewhere; it establishes that this corner doesn't have one. That is a genuine, re-examined
-  finding, not a restatement of the prior assessment, and it leaves the verdict exactly where it was:
-  this campaign has not searched enough of the *right* ground to say the claim is absent, only enough
-  of this ground to say these six candidates are not it. The frozen register's narrower "not
-  commonly integrated" phrasing does not change this — mythologiq's distributed epistemic axis and
-  subit-wiki's wrong-content triple remain materially different mechanisms from an orthogonal
-  (O,E,L) triple, not looser instances of the same one, under either phrasing.
+  for; only toki carries formal weight, and it proves an unrelated triple. grading-narrators-isnad is
+  the most procedurally mature of the six (157 passing tests, Zenodo-archived, Apache-2.0) but is
+  still a single-author, ~2-month-old preprint, and its own second review confirms it as two axes,
+  hedged, not three; provenance-enhanced-statements is a similarly recent single-author preprint with
+  a single axis. H1's own falsification bar asks for "a materially equivalent *established* framework"
+  — a thorough search of this specific, thin, very-recent corner of GitHub and arXiv does not
+  establish that no such framework exists elsewhere; it establishes that this corner doesn't have
+  one. That is a genuine, re-examined finding, not a restatement of the prior assessment, and it
+  leaves the verdict exactly where it was: this campaign has not searched enough of the *right*
+  ground to say the claim is absent, only enough of this ground to say these eight candidates are not
+  it. The frozen register's narrower "not commonly integrated" phrasing does not change this —
+  mythologiq's distributed epistemic axis, subit-wiki's wrong-content triple, grading-narrators-isnad's
+  missing third axis, and provenance-enhanced-statements' single axis all remain materially different
+  mechanisms from an orthogonal (O,E,L) triple, not looser instances of the same one, under either
+  phrasing. Status is unchanged from the prior reconciliation: this phase's two incidental additions
+  are re-examined and found not to change it, not silently carried forward.
 status: INSUFFICIENT_EVIDENCE
 ```
 
@@ -256,7 +293,16 @@ strongest_challenger: >
   only via the directly-falsifies trigger — idea-level anticipation of H2 — not mechanism-level
   equivalence, since no tool existed at publication). Per the owner's ruling that disputes are
   recorded, not applied, the matrix's original 5/4 scores stand undisputed-unapplied, and this
-  file's citations continue to use them. 13 rows challenge H2 in total.
+  file's citations continue to use them. `phase-lit-09` adds three more H2-tagged rows, none of
+  which unseats Kumiho or Jansen & Bosch: provenance-enhanced-statements-dec-2026 (H1;H2;H3,
+  component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second review:
+  disputed — component re-derived 4->3, no trigger fires), mitigating-provenance-role-collapse-typed-
+  memory-2026 (H2;H3;H5, component_overlap=4, architecture_overlap=2, full_text, `critical_collision:
+  yes`, second review: confirmed), and prov-agent-2025 (H2;H3;H9, component_overlap=4,
+  architecture_overlap=3, full_text, `critical_collision: yes`, second review: disputed — the row's
+  own `transition_model` cell is NOT_APPLICABLE and states H2's bar is not met; the reviewer flagged
+  this as a self-contradiction, and it is not counted as H2 evidence here — see below). 16 rows
+  challenge H2 in total.
 evidence:
   - >
     graph-native-cognitive-memory (Kumiho), Sec.7 (per Abstract/Sec.1 summary): a formal
@@ -286,6 +332,30 @@ evidence:
     database-applications-sql-1999, p.249-250 (the append-only transaction-time table, formalized
     1999); agm-partial-meet-contraction-revision-1985 (the axiomatic ancestor cited directly by
     both graph-native-cognitive-memory and decision-oriented-programming-aporia-2026).
+  - >
+    provenance-enhanced-statements-dec-2026 (full HTML text, arxiv.org/html/2606.15246v1,
+    Sec.3.2.2): one explicit, formally defined transition operator (`settle`, `r' = r ∪ {(φ,T)}`)
+    moving a statement from conjectural to factual status while retaining the superseded state — a
+    real, if narrow, typed, provenance-linked knowledge-state transition. Second review found the
+    paper itself attributes origination of this operator to a companion preprint (ref [45]) rather
+    than to this paper, and re-derived the component score from 4 to 3 partly on that basis ("transition
+    model has exactly one named operator... explicitly inherited... rather than originated here").
+  - >
+    mitigating-provenance-role-collapse-typed-memory-2026 (full 15-page PDF, arxiv.org/pdf/2605.25869,
+    Sec.3.2-3.3): confirmed on independent review at component_overlap=4. Its contradiction handling
+    is real and benchmarked (BEAM-100K CR category, 32.30 vs. next-best 20.60) but is, per the row's
+    own field, "retrieval-time role assignment, not a persisted transition object" — a typed outcome
+    computed at query time over an implicit history, not an append-only transition graph of the kind
+    H2 proposes.
+  - >
+    prov-agent-2025 (full 7-page PDF, arxiv.org/pdf/2508.02866v3, Sec.III): listed by the row as
+    challenging H2 alongside H3 and H9, but the row's own `transition_model` cell is NOT_APPLICABLE
+    and states directly that the Agent_Decision chain "is a PROV-derivation chain, not a typed
+    transition object with its own provenance record." Independent review confirmed this as a
+    self-contradiction — H2's own falsification bar is explicitly not met by the row's own cells —
+    and recorded it as disputed rather than corrected, per the binding rule against altering
+    `hypotheses_challenged`. Not counted as H2 evidence here for that reason; the same source's real
+    contribution is to H9, discussed in that block below.
 assessment: >
   If any hypothesis in this review is dead on arrival, it is this one. The idea that reasoning/
   decision history should be preserved as explicit, typed, non-overwritten transitions distinct
@@ -295,17 +365,27 @@ assessment: >
   & Bosch 2005, formally extended by Zimmermann et al. 2009), a W3C provenance standard (PROV-O,
   2013), and multiple production 2025-2026 agent-memory systems (Zep/Graphiti, Kumiho) — one of
   which (Kumiho) has a published, if partially unreproduced, formal correspondence proof to the
-  AGM postulates specifically. Thirteen of the matrix's 49 rows challenge H2; two reach the
+  AGM postulates specifically. Sixteen of the matrix's 67 rows challenge H2; two reach the
   matrix's ceiling component-overlap score of 5 (disputed on review to 4 and 3 respectively — see
   `strongest_challenger` above; the flags survive regardless). This is not a thin or contested
-  finding.
+  finding, and `phase-lit-09`'s three additions do not change that: provenance-enhanced-statements'
+  one named transition is real but is, by the paper's own text, inherited from a companion preprint
+  rather than an original contribution — a further data point for prior art, not against it;
+  mitigating-provenance-role-collapse's contradiction-resolution mechanism is confirmed and
+  benchmarked but operates at retrieval time over an implicit history, not as a persisted,
+  provenance-carrying transition object, so it corroborates the general finding without adding a
+  materially stronger instance; and prov-agent-2025's H2 tag is a disputed self-contradiction — the
+  row's own `transition_model` cell states plainly that no typed transition object exists in the
+  system — and is excluded from this hypothesis's evidence rather than credited.
   Qualification: none of these sources combine transition-preservation with D-System's full
   proposed epistemic+ontological+lifecycle state model (H1) simultaneously, and Kumiho's own
   formal correspondence is explicitly scoped to "a deliberately simple propositional logic over
   ground triples," with its strongest reported benchmark carrying a self-disclosed independent-
   reproduction gap. But H2 as literally worded is about the transition-preservation mechanism
   itself, not that combination, and on that literal claim the field's coverage is thorough and
-  multi-lineage, not a single narrow precedent.
+  multi-lineage, not a single narrow precedent. Status is unchanged from the prior reconciliation:
+  the density of independent corroboration only grows this phase (13 -> 16 rows), and none of the
+  three additions supplies a stronger instance than what was already established.
 status: LIKELY_ALREADY_KNOWN
 ```
 
@@ -321,12 +401,28 @@ hypothesis: >
 strongest_challenger: >
   log-is-the-agent-event-sourced-reactive-graphs-2026 (component_overlap=4, architecture_overlap=4,
   full_text) and omniscientist-coevolving-ecosystem-human-ai-scientists-2026 (component_overlap=4,
-  architecture_overlap=4, full_text). 11 rows challenge H3 in total, including two added by
-  `phase-lit-08`'s H4-targeted search that this file had not previously discussed:
+  architecture_overlap=4, full_text) remain the matrix's highest-scoring H3 rows. `phase-lit-09`'s
+  strongest addition by mechanism fit, not raw score, is grading-narrators-isnad-rijal-claim-
+  provenance-2026 (component_overlap=5, architecture_overlap=3, full_text, `critical_collision: yes`,
+  second review: disputed — component re-derived 5->4, flag unaffected, hypotheses_challenged
+  H1;H3;H4 confirmed as appropriately hedged, not an overstatement): its domain-conditioned
+  narrator-authority registry actually drives an automated serve/review/quarantine decision, the
+  closest single system found in this campaign to computing an outcome from graded authority rather
+  than merely recording it. 16 rows challenge H3 in total, including two added by `phase-lit-08`'s
+  H4-targeted search that this file had not previously discussed:
   extending-nanopublications-knowledge-provenance (component_overlap=3, architecture_overlap=2,
   full_text) and provenance-based-interpretation-multi-agent-information-analysis-2020 (DIVE,
   component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`, second
-  review: confirmed).
+  review: confirmed), and five added by `phase-lit-09`: grading-narrators-isnad (above),
+  provenance-enhanced-statements-dec-2026 (H1;H2;H3, component_overlap=4, architecture_overlap=3,
+  full_text, `critical_collision: yes`, second review: disputed — component re-derived 4->3, no
+  trigger fires), inter-agent-trust-models-comparative-study-2025 (H3 only, component_overlap=3,
+  architecture_overlap=2, no collision), mitigating-provenance-role-collapse-typed-memory-2026
+  (H2;H3;H5, component_overlap=4, architecture_overlap=2, full_text, `critical_collision: yes`,
+  second review: confirmed), and prov-agent-2025 (H2;H3;H9, component_overlap=4,
+  architecture_overlap=3, full_text, `critical_collision: yes`, second review: disputed — component
+  re-derived 4->3, no trigger fires, and the row's own cells rule out H3; discussed below and not
+  counted toward H3).
 evidence:
   - >
     log-is-the-agent, Sec.6/Sec.8: a total, worked-example-verified provenance/lineage chain
@@ -373,6 +469,50 @@ evidence:
     without a given contribution. But this is explicitly manual and user-triggered, not automated
     arbitration; DIVE's three confidence-propagation policies (minimum/maximum/average) compute
     over evidence diversity without weighting by actor identity or authority.
+  - >
+    grading-narrators-isnad-rijal-claim-provenance-2026 (full HTML text, arxiv.org/html/2607.24117v1,
+    Sec.4.1-4.4): two decoupled, automated mechanisms — weakest-link bounding (a chain's grade is the
+    minimum grade over its narrators, itself a function of a domain-conditioned actor-authority
+    registry) and matn contradiction detection — combine via an explicit serve/review/quarantine
+    decision matrix. This is the closest match found in the whole campaign to authority actually
+    driving an automated outcome rather than sitting beside one. But the paper's own
+    `human_agent_scope` field records that final content adjudication on a flagged contradiction is
+    human by explicit design ("LLM auto-resolution deliberately disabled 'due to known
+    unreliability'") — the automated step is triage (serve/review/quarantine), not the resolution of
+    which claim is correct. Second review confirmed the H1;H3;H4 tag as appropriately hedged, not an
+    overstatement, and re-derived the component score from 5 to 4 (flag unaffected).
+  - >
+    provenance-enhanced-statements-dec-2026 (full HTML text, arxiv.org/html/2606.15246v1, Sec.4):
+    provenance gates a statement's epistemic-modality type (doxastic/epistemic/conjectural) but the
+    paper states directly it provides "no explicit trust score or source-reliability ranking between
+    worlds" — categorical typing substitutes for graded authority, the same shape as extending-
+    nanopublications' evidence-count-only classification already discussed above, just gating type
+    rather than a reliability tier. Second review confirmed no trigger fires and that H3 is, in the
+    row's own words, "only partially engaged."
+  - >
+    inter-agent-trust-models-comparative-study-2025 (arXiv HTML render, arxiv.org/html/2511.03434):
+    a taxonomy of six agent-trust mechanisms (Brief/Claim/Proof/Stake/Reputation/Constraint)
+    explicitly acknowledging that Reputation is vulnerable to "Sybil attacks, ballot stuffing,
+    collusion... mitigated only partially." But every mechanism gates whether to trust an *acting*
+    agent for its *next action*, not whether to credit a *knowledge claim* — a genuinely different
+    mechanism family (agent-to-agent authorization, not claim-provenance arbitration) under a
+    partially overlapping vocabulary (trust, evidence, attestation, lineage), confirmed by the row's
+    own actor-model field.
+  - >
+    mitigating-provenance-role-collapse-typed-memory-2026 (full 15-page PDF, arxiv.org/pdf/2605.25869,
+    Sec.3.2/4.7): a real, benchmarked, automated contradiction-resolution mechanism (BEAM-100K CR
+    category, 32.30 vs. next-best 20.60) — but resolution is via recency plus evidential grounding,
+    explicitly not authority/trust-scoring arbitration, and the row's own `actor_model` field is
+    NOT_APPLICABLE (no distinct actor identity is modeled at all). A second, independently confirmed
+    instance of "automated resolution exists, but not wired to actor-authority," alongside
+    extending-nanopublications.
+  - >
+    prov-agent-2025 (full 7-page PDF, arxiv.org/pdf/2508.02866v3): listed by the row as an H3
+    challenger, but its own `conflict_trust_mechanism` cell is NOT_APPLICABLE and states directly
+    "no arbitration, trust scoring, or authority-weighted conflict resolution" exists — the provenance
+    graph supports post-hoc human traceability, not automated conflict resolution. Independent review
+    confirmed this as a self-contradiction (the row's own cells rule out H3) and recorded it as
+    disputed rather than corrected. Not counted as H3 evidence here.
 assessment: >
   The two halves of H3 are individually well established but no found source combines them.
   Rich, typed, multi-actor provenance representation is thoroughly known (PROV-O, EVI, log-is-
@@ -403,6 +543,31 @@ assessment: >
   materially equivalent working arbitration mechanism that draws on the rich provenance dimensions,
   so this stops short of LIKELY_ALREADY_KNOWN, but the ingredients are too mature to call the
   combination distinct.
+  `phase-lit-09` sharpens this qualification rather than reversing it. grading-narrators-isnad is
+  the closest thing found in the whole campaign to a fifth, contrary data point: its serve/review/
+  quarantine decision is genuinely automated and genuinely a function of the narrator-authority
+  registry — the first source in this review where authority actually computes an outcome rather
+  than merely being recorded beside one. But by the paper's own explicit design, that automated step
+  is triage, not adjudication: when the matn check flags a contradiction, a human muhaddith decides,
+  with LLM auto-resolution deliberately disabled. That is a fourth instance of the same pattern, not
+  a break from it — one step closer to the claimed mechanism than EVI, TGMS, or DIVE, but still
+  stopping short of it at the same point they do: the content decision itself. mitigating-provenance-
+  role-collapse adds a second confirmed instance of "automated resolution exists, but not wired to
+  actor-authority" (recency-plus-grounding, no actor model at all), reinforcing rather than
+  displacing extending-nanopublications as the sole automated-but-source-agnostic exception.
+  provenance-enhanced-statements substitutes categorical typing for a trust score, another instance
+  of "provenance gates something, but not gradedly, and not by authority." inter-agent-trust-models
+  is the clearest false friend among the five: it names the correlated-agreement problem directly,
+  in language that echoes H4, but its trust mechanisms gate agent *authorization* for a next action,
+  not knowledge-claim arbitration — a different mechanism family under partially shared vocabulary,
+  exactly the caution this campaign's own thesis-discipline rule exists to enforce. prov-agent-2025's
+  H3 tag does not survive scrutiny at all: the row's own `conflict_trust_mechanism` cell rules it out,
+  and it is excluded from this hypothesis's evidence rather than credited, per the disputed-not-
+  applied resolution recorded in `05`. None of these five additions, individually or together, closes
+  the specific gap this block has identified twice now: an automated rule that resolves a disagreement
+  by weighing the actors' authority, not merely alongside recording it. Status is unchanged from the
+  prior reconciliation: sixteen rows now challenge H3 (up from eleven), and the closest addition
+  narrows the gap without closing it.
 status: KNOWN_COMPONENT_NEW_INTEGRATION
 ```
 
@@ -576,6 +741,10 @@ strongest_challenger: >
   but not separately discussed below: its three confidence-propagation policies (minimum/maximum/
   average, per H4's evidence above) select over evidence diversity, not the dissent/authority/
   convergence dimensions H5 lists, so it does not change the qualification's conclusion.
+  `phase-lit-09` adds one more H5-tagged row, confirmed on independent second review:
+  mitigating-provenance-role-collapse-typed-memory-2026 (component_overlap=4, architecture_overlap=2,
+  full_text, `critical_collision: yes`, second review: confirmed). It does not unseat solozobov or
+  zep-graphiti and does not change the qualification below.
 evidence:
   - >
     solozobov, Sec.6, Table 9, Sec.6.1-6.2: an explicit context compiler distinguishing canonical/
@@ -599,6 +768,14 @@ evidence:
     (-8.11 vs -2.95 R@5 points) — quantified evidence that provenance-correctness, not just
     provenance-presence, materially changes what a retrieval system trusts.
   - >
+    mitigating-provenance-role-collapse-typed-memory-2026 (full 15-page PDF, arxiv.org/pdf/2605.25869,
+    Sec.3.2): every fact exposed to the answer model carries a "provenance closure" back to its raw
+    grounding evidence spans — a real, confirmed, benchmarked provenance-aware context-construction
+    mechanism. But the row's own fields record no actor/authority dimension (`actor_model`:
+    NOT_APPLICABLE) and no independence/convergence weighting (`convergence_independence_mechanism`:
+    NOT_APPLICABLE) — evidential grounding and recency drive selection, not the dissent/authority/
+    convergence dimensions H5 lists.
+  - >
     None of these sources implement the full enumerated set: dissent, authority, and convergence
     as explicit, first-class selection dimensions are absent from every source read at this
     detail (recorded per-row in each strongest_difference field above).
@@ -616,7 +793,10 @@ assessment: >
   or four of them. Dissent, authority, and convergence specifically as first-class retrieval
   inputs were not found in any source at this detail. The mechanism family (topology/lineage/
   recency-aware retrieval) is known; the specific seven-dimension enumeration D-System proposes
-  is an untested combination, not a demonstrated one.
+  is an untested combination, not a demonstrated one. mitigating-provenance-role-collapse adds a
+  further confirmed instance of provenance-aware context construction (evidential grounding, not
+  dissent/authority/convergence), reinforcing rather than changing this qualification. Status is
+  unchanged from the prior reconciliation.
 status: KNOWN_COMPONENT_NEW_INTEGRATION
 ```
 
@@ -701,8 +881,12 @@ strongest_challenger: >
   disputed on independent second review (`05_critical_collisions.md`): Kumiho re-derived to 4/3,
   Jansen & Bosch to 3/2 (the latter's flag surviving only via idea-level anticipation, not
   mechanism-level equivalence — no tool existed at publication). Per the owner's ruling, disputes
-  are recorded, not applied; the matrix's original 5/4 scores stand and are cited as-is. 10 rows
-  challenge H7 in total.
+  are recorded, not applied; the matrix's original 5/4 scores stand and are cited as-is.
+  `phase-lit-09` adds the standards-body citation the prior assessment's "multiple standards bodies"
+  language anticipated but had not yet evidenced: iso-42010-conceptual-model-working-group-page
+  (H7;H9, component_overlap=3, architecture_overlap=2, full_text, no collision) and
+  iso-42010-2022-architecture-description-standard (H7 only, component_overlap=3,
+  architecture_overlap=2, secondary_coverage, no collision). 12 rows challenge H7 in total.
 evidence:
   - >
     jansen-bosch, Sec.4.2-4.3, p.81-83: "A design decision may result in additional requirements
@@ -734,6 +918,21 @@ evidence:
     converging, 15+ years apart, on decision-rationale-as-first-class-object and automated
     provenance-graph capture, respectively, as solutions to the same "knowledge vaporization"
     problem.
+  - >
+    iso-42010-conceptual-model-working-group-page (full page, iso-architecture.org/42010/cm/,
+    read in full): Architecture Rationale is defined as "the explanation, justification or
+    reasoning about Architecture Decisions that have been made and architectural alternatives not
+    chosen" — a standardized decision-plus-rationale pairing predating D-System by roughly a decade
+    (ISO 42010:2011) to over two decades (IEEE 1471-2000). The general-purpose Correspondence/
+    Correspondence Rule mechanism names "traceability, dependency, constraint and obligation" as
+    relation types between architecture-description elements.
+  - >
+    iso-42010-2022-architecture-description-standard (free iTeh preview, 15 pages of the paywalled
+    standard, read in full through Clause 5.2.3; the standard's own rationale-defining clauses,
+    5.2.12 and 6.10, sit past the preview and are corroborated only via the working-group page above
+    — recorded as `access_limitation: secondary_coverage` for that reason): confirms the same
+    Decision/Rationale/Correspondence vocabulary from the normative standard's own Terms and
+    Definitions (Clause 3), independent of the companion working-group page.
 assessment: >
   This is one of the most densely prior-arted hypotheses in the entire review. The claim that
   development artifacts are the downstream, traceable result of a persistent decision/
@@ -742,15 +941,21 @@ assessment: >
   by Zimmermann et al. 2009), model-based systems engineering's "digital thread" (2022), a
   granted US patent commercially operated as a digital-engineering platform (priority 2023,
   granted 2025), and a 2026 agentic-coding tool (Aporia) explicitly self-described as an
-  application of 1991-era design-rationale notation. Ten of the matrix's 49 rows challenge H7,
+  application of 1991-era design-rationale notation. Twelve of the matrix's 67 rows challenge H7,
   two at the matrix's ceiling overlap score (disputed on review to 4 and 3 respectively — see
-  `strongest_challenger` above).
+  `strongest_challenger` above). The "multiple standards bodies" claim made in this paragraph before
+  this phase is now directly evidenced rather than merely implied: ISO/IEC/IEEE 42010 (2011, 2022,
+  and its IEEE 1471-2000 predecessor) standardizes exactly the Decision+Rationale pairing this
+  hypothesis proposes, independent of the ADR research tradition already cited above.
   Qualification: most of these chains start at Decision or Requirement, not at Idea/Reasoning/
   Evidence as D-System's fuller lifecycle proposes, and none combines the chain with an
-  append-only, typed-transition data model carrying the epistemic apparatus H1-H4 describe. But
-  H7's literal claim is about the existence and traceability of the provenance chain itself, and
-  on that claim the field's coverage — spanning three decades, multiple standards bodies, and a
-  granted patent — is thorough.
+  append-only, typed-transition data model carrying the epistemic apparatus H1-H4 describe. ISO
+  42010 is no exception — a documentation-structure standard, not an executable or queryable
+  system, per its own row's `strongest_difference` field: it prescribes what an architecture
+  description must record, not any state, transition, actor-authority, or runtime-feedback
+  mechanism. But H7's literal claim is about the existence and traceability of the provenance chain
+  itself, and on that claim the field's coverage — spanning three decades, multiple standards
+  bodies, and a granted patent — is thorough. Status is unchanged from the prior reconciliation.
 status: LIKELY_ALREADY_KNOWN
 ```
 
@@ -848,8 +1053,20 @@ strongest_challenger: >
   (`05_critical_collisions.md`): Kumiho re-derived to 4/3, Jansen & Bosch to 3/2 (the latter's
   flag surviving only via idea-level anticipation, not mechanism-level equivalence — no tool
   existed at publication). Per the owner's ruling, disputes are recorded, not applied; the
-  matrix's original 5/4 scores stand and are cited as-is. 18 of the matrix's 49 rows challenge
-  H9 — the single most heavily challenged hypothesis in the review.
+  matrix's original 5/4 scores stand and are cited as-is. `phase-lit-09` adds five more H9-tagged
+  rows: iso-42010-conceptual-model-working-group-page (H7;H9, component_overlap=3,
+  architecture_overlap=2, full_text, no collision), antoniol-recovering-traceability-links-tse-2002
+  (H9 only, component_overlap=3, architecture_overlap=2, full_text, no collision), prov-agent-2025
+  (H2;H3;H9, component_overlap=4, architecture_overlap=3, full_text, `critical_collision: yes`,
+  second review: disputed — component re-derived 4->3, no trigger fires, but H9 specifically is
+  confirmed as the one hypothesis of the three the row's own cells actually support),
+  arnold-bohner-software-change-impact-analysis-book-1996 (H9;H10, component_overlap=3,
+  architecture_overlap=1, secondary_coverage, no collision), and
+  chianti-cia-tool-java-icse-2005 (H9;H10, component_overlap=4, architecture_overlap=2,
+  secondary_coverage, `critical_collision: yes`, second review: disputed — component re-derived
+  4->3, no trigger fires, and the reviewer argues the H9 tag is backwards against the frozen
+  register; discussed below and not counted as H9 evidence). 23 of the matrix's 67 rows challenge
+  H9 — still the single most heavily challenged hypothesis in the review.
 evidence:
   - >
     graph-native-cognitive-memory (Kumiho): agent outputs "automatically versioned, addressable,
@@ -889,14 +1106,59 @@ evidence:
     lists, the reviewer called H9 "the more overstated" (`05`, source 9). Neither point changes
     the verdict below, given the remaining six-plus independently-scored traditions, but both are
     recorded so the density claim is not overstated by two of its weaker members.
+  - >
+    iso-42010-conceptual-model-working-group-page (full page, read in full) and
+    antoniol-recovering-traceability-links-tse-2002 (full 14-page PDF, sdml.cs.kent.edu mirror,
+    matching TSE pagination 970-983): two further, independently mature traditions — a standardized
+    Correspondence/Correspondence Rule mechanism naming "traceability" explicitly as one of several
+    bidirectional relation types between architecture elements, and a canonical, widely cited
+    (WCRE1999->ICSM2000->TSE2002 lineage) automated code-to-document IR-based link-recovery method
+    with a symmetric forward/backward query. Both are real, on-point additions to the density claim;
+    neither combines with an epistemic-claim, decision, or evidence model (both rows'
+    `conflict_trust_mechanism`/`provenance_model` fields are NOT_APPLICABLE beyond artifact linkage).
+  - >
+    prov-agent-2025 (full 7-page PDF, arxiv.org/pdf/2508.02866v3, Sec.IV-B): the one hypothesis of
+    the row's three-hypothesis tag (H2;H3;H9) that survives independent review intact — Q1-Q3
+    demonstrate genuine multi-hop backward traceability from an agent decision through its prompts
+    and model invocations to originating sensor data, and Q4-Q5 demonstrate forward traceability to
+    downstream results, all in a real, running, cross-facility-deployed system. (H2 and H3 are ruled
+    out by the row's own cells and are not counted toward those hypotheses; see those blocks above.)
+  - >
+    arnold-bohner-software-change-impact-analysis-book-1996 (known only via Li et al. 2012's
+    open-access survey, since the book itself could not be obtained through any exhausted access
+    route): the traceability-based CIA class this book is credited with founding traces forward from
+    a changed element across abstraction levels (requirements/design/code/tests) — foundational
+    background for H9's cross-artifact traceability claim, though known only through secondary
+    characterization and access-limited accordingly.
+  - >
+    chianti-cia-tool-java-icse-2005: listed by the row as challenging H9 alongside H10, but
+    independent review argues this is backwards against the frozen register
+    (`research/pre-literature-hypotheses.yaml`, lines 89-98), which requires bidirectional tracing to
+    reach reasoning, evidence, assumptions, and decisions — Chianti's backward isolation terminates
+    at atomic code changes and never reaches any of those endpoints, confirmed by the row's own
+    NOT_APPLICABLE calls on every epistemic-apparatus field. Not counted as H9 evidence here; see the
+    H10 block below for the parallel finding on that hypothesis.
 assessment: >
   Bidirectional traceability — forward from intent to artifact, backward from artifact to
   rationale — is essentially the organizing promise of the requirements-traceability, design-
   rationale, digital-thread, and provenance-ontology literatures combined, and this campaign
   found it independently demonstrated across three decades and at least seven distinct
   technical traditions, several at production scale (Zep/Graphiti, LangGraph, Kumiho, the
-  granted Istari patent). Eighteen of the matrix's 49 rows challenge this hypothesis — more than
-  any other. By raw density of independent corroboration, this is the review's clearest case.
+  granted Istari patent). Twenty-three of the matrix's 67 rows challenge this hypothesis — more
+  than any other, and the density only grows this phase: two further mature traditions (the ISO
+  42010 standards lineage, the classical requirements-traceability-recovery literature via Antoniol
+  2002) and a real, deployed system (prov-agent-2025, whose H9 contribution survives review even
+  where its H2/H3 tags do not) are added. By raw density of independent corroboration, this remains
+  the review's clearest case.
+  One addition is explicitly excluded rather than credited: chianti-cia-tool-java-icse-2005's H9 tag
+  is disputed as backwards against the frozen register by its own second review — H9 requires
+  backward tracing to reach reasoning, evidence, assumptions, and decisions, and Chianti's
+  backward-isolation mechanism, however precise and empirically validated, terminates at atomic code
+  changes and never reaches any of those endpoints. This is exactly the shared-name-not-shared-
+  mechanism risk this campaign's own thesis-discipline rule warns against: Chianti's "impact
+  analysis" and D-System's "epistemic traceability" share a propagate/isolate shape but not an
+  object domain, and crediting it as H9 support would be the error, not the omission. It is not
+  counted here.
   Qualification: no single source combines all of D-System's proposed traceability directions
   (idea -> decision -> requirement -> specification -> plan -> phase -> implementation ->
   verification -> deployment -> runtime -> revised knowledge) into one continuous chain across
@@ -905,7 +1167,8 @@ assessment: >
   established more thoroughly than any other hypothesis in this review — bounded, like every
   claim in this file, by the coverage caveat that 340 of 387 collision candidates surfaced by
   this campaign were never deep-read (`07_anti_novelty_case.md`'s coverage caveat), not a claim
-  that no unread source could sharpen or contest the picture.
+  that no unread source could sharpen or contest the picture. Status is unchanged from the prior
+  reconciliation.
 status: LIKELY_ALREADY_KNOWN
 ```
 
@@ -923,9 +1186,17 @@ hypothesis: >
   reading and the evidence bears on it directly; the review-instructions phrasing is satisfied
   by the same evidence a fortiori.
 strongest_challenger: >
-  memtx-transactional-belief-commit-2026 (component_overlap=4, architecture_overlap=2,
-  full_text). 4 rows challenge H10 in total; H10 has exactly one source with component_overlap
-  above 2.
+  memtx-transactional-belief-commit-2026 (component_overlap=4, architecture_overlap=2, full_text)
+  remains the only H10 source with component_overlap above 3 and the only one unchanged by this
+  phase. `phase-lit-09` adds three more H10-tagged rows, none of which displaces it:
+  ferrante-ottenstein-warren-program-dependence-graph-1987 (H10 only, component_overlap=2,
+  architecture_overlap=1, full_text, no collision), arnold-bohner-software-change-impact-analysis-
+  book-1996 (H9;H10, component_overlap=3, architecture_overlap=1, secondary_coverage, no collision),
+  and chianti-cia-tool-java-icse-2005 (H9;H10, component_overlap=4, architecture_overlap=2,
+  secondary_coverage, `critical_collision: yes`, second review: disputed — component re-derived
+  4->3, no trigger fires, and the reviewer argues the H10 tag is backwards against the frozen
+  register's own falsification criterion; discussed below and not counted toward H10). 7 rows
+  challenge H10 in total; H10 still has exactly one source with component_overlap above 3.
 evidence:
   - >
     memtx, Sec.3.4/3.5 (full HTML text, arxiv.org/html/2607.23929v2, read twice): "retracting a belief triggers typed cascading repair of its derived
@@ -955,6 +1226,34 @@ evidence:
     perry-wolf-foundations-software-architecture-1992, Sec.5.1: names forward/backward
     architecture<->requirements<->design dependency analysis as a desired, unmet capability,
     three decades before this campaign.
+  - >
+    ferrante-ottenstein-warren-program-dependence-graph-1987 (full 31-page PDF,
+    csa.iisc.ac.in mirror): the foundational data-dependence-plus-control-dependence structure
+    underlying nearly all subsequent program-slicing and change-impact tooling, including an
+    incremental-update algorithm (Sec.5) that re-triggers analysis only on the edges a change
+    actually affects — the mechanistic ancestor of "compute what a change affects," decades before
+    this campaign, but confined entirely to compiler-internal program representations with no
+    knowledge-state, provenance, actor, or epistemic-claim model of any kind (H1-H4 all
+    NOT_APPLICABLE per the row). Sharpens H10's ancestry; does not challenge its actual claim.
+  - >
+    arnold-bohner-software-change-impact-analysis-book-1996 (known only via Li et al. 2012's
+    open-access survey, the book itself unobtainable through any exhausted access route): the
+    named, foundational origin of "change impact analysis" and its most-cited definition — the
+    literal ancestor vocabulary this campaign's own methodology maps H10's "epistemic blast radius"
+    onto (`research/literature-review/CLAUDE.md` Sec.6's translation table). Everything reported
+    about it, via secondary coverage only, concerns code/artifact-level structural dependency, not
+    epistemic claims or evidence-triggered propagation.
+  - >
+    chianti-cia-tool-java-icse-2005: listed by the row as challenging H10 alongside H9, but
+    independent review argues this is backwards against the frozen register's own falsification
+    criterion (`research/pre-literature-hypotheses.yaml`, lines 100-109), which requires propagation
+    "from epistemic change rather than only artifact/requirement change" to falsify H10 — Chianti's
+    forward-propagate/backward-isolate pipeline, however precise and empirically validated (52% of
+    tests affected per edit on average, isolated to 3.95% of atomic changes), propagates only from
+    artifact (code) change, the exact category the criterion excludes. The reviewer's own words:
+    Chianti is "the generic shape of essentially any change-impact or build-dependency tool," not a
+    mechanism mirroring D-System's heterogeneous, epistemic-claim-bearing propagation. Not counted
+    as H10 evidence here.
 assessment: >
   A real, machine-verified system already performs the core mechanism H10 (and especially the
   frozen register's sharper bar) describes: an epistemic retraction cascades, correctness-
@@ -973,6 +1272,25 @@ assessment: >
   decisions/requirements/plans/artifacts/tests, triggered by epistemic rather than only artifact
   change) is a recombination that the field's own survey confirms nobody has built yet, not a
   mechanism nobody knows how to build.
+  `phase-lit-09`'s three additions reinforce this reading rather than change it. Chianti is the
+  most mature, most empirically validated artifact-level change-impact tool found across this
+  entire campaign — more so even than memtx, which is confined to a multi-AI-agent-only memory
+  store — and its own second review still finds it falls on the wrong side of H10's own
+  falsification criterion: propagation "from epistemic change," not from artifact/code change alone.
+  That a mature, 20-year-old, real-world-validated exemplar of exactly this category still does not
+  cross the bar is itself informative — it shows the artifact-level CIA tradition genuinely stops at
+  the boundary the frozen register draws, rather than the boundary being an artifact of thin
+  search — but it is evidence for the qualification above, not against it, and it must not be
+  counted as a positive H10 challenger merely because it shares "change impact" vocabulary with the
+  hypothesis's own name; doing so would be exactly the shared-name-not-shared-mechanism error this
+  campaign's thesis discipline exists to catch. arnold-bohner and ferrante-ottenstein-warren are
+  ancestry, not challengers: they establish how old and well-studied artifact-level change-impact
+  analysis is, which is precisely what makes its failure to cross into epistemic-change propagation
+  notable rather than a search gap. Status is unchanged from the prior reconciliation: memtx remains
+  the only source that meets H10's core mechanism, and the specific cross-lifecycle,
+  epistemic-triggered scope D-System proposes remains, per the field's own survey and now a second,
+  independent confirmation from its most mature artifact-level exemplar, an unbuilt recombination
+  rather than an unknown mechanism.
 status: KNOWN_COMPONENT_NEW_INTEGRATION
 ```
 
