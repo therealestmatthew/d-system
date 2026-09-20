@@ -1498,3 +1498,475 @@ at the zero-weight boundary and only qualitative in between. This does not move 
 
 **Resolution.** One correction applied to `04_evidence_matrix.csv`: `verbatim_notes`'s page locator
 (p.101 -> p.102). No score, flag, or `hypotheses_challenged` value changed.
+
+---
+
+## 25. mitigating-provenance-role-collapse-typed-memory-2026
+
+Jin, Z., Wang, B., Li, J., Xu, R., Zhang, M. "Mitigating Provenance-Role Collapse in Long-Term
+Agents via Typed Memory Representation." arXiv preprint, 2026. arXiv:2605.25869.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. MemIR's typed memory store
+`M = {P, S, H, T, V, A, R}` separates raw evidence (Page/Span atoms) from derived, factually-
+authorized claims (Claim atoms, each requiring a non-empty grounding support set `sup(x) ⊆ S`),
+and attaches a full evidential-lineage "provenance closure" to every fact exposed to the answer
+model — a real, benchmarked structural analog to D-System's backward-traceability and epistemic-
+status primitives (BEAM-100K contradiction-resolution: 32.30 vs next-best 20.60). This implements
+one epistemic axis only (grounded-claim vs. raw), with no ontological/lifecycle classification, no
+actor/authority dimension, and recency-plus-grounding conflict resolution rather than independence-
+weighted corroboration.
+
+**What it would falsify.** At full strength this contributes to challenging H2 (typed transitions
+with attached provenance — MemIR's contradiction handling is retrieval-time role assignment, not a
+persisted transition object), H3 (provenance-based epistemic-status tracking, matched closely for
+raw-vs-derived typing but with no actor/authority dimension), and H5 (topology/provenance-aware
+context construction, matched closely by the multi-route projection and provenance-scoped
+utilization pipeline). It does not falsify H1 (no O/E/L triple), H4 (no independence-aware
+convergence mechanism), or H6–H11 (no requirement/specification/plan/execution/deployment/runtime
+linkage of any kind — confined to conversational long-term-memory QA).
+
+second_review: confirmed: component_overlap_score 4 and architecture_overlap_score 2 both
+independently re-derived and confirmed (a case for architecture 3 was considered and set aside as
+understatement, not overstatement); flag stands on the component trigger. hypotheses_challenged
+H2;H3;H5 confirmed as correctly scoped. No factual corrections found.
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=4, architecture_overlap=2, flag fires on the
+component trigger. H2, H3 and H5 challenged, correctly scoped as challenged rather than falsified
+given the single-epistemic-axis, single-actor, no-lifecycle limitations documented in the row's own
+`strongest_difference` field.
+
+**Independent reviewer position.** Read the full 15-page PDF directly (arxiv.org/pdf/2605.25869,
+page count confirmed via `pdfinfo`) and verified every checkable claim in the row against it: the
+`M = {P, S, H, T, V, A, R}` state formalism (Sec.3) exact match; the support-set constraint and its
+quoted sentence (Sec.3.1) exact verbatim; the Sec.4.7 case-study quote (C23:01/C23:02/C13:01,
+3pm-vs-4pm conflict) exact verbatim; Table 2's contradiction-resolution figures (32.30 vs 20.60)
+exact; the ablation's exactly-4-component-removal design (Sec.4.4/Fig.3); the evaluation scale
+(LoCoMo 1,540 questions/4 categories/12 baselines — independently re-counted at 12 rows in Table
+1 — /2 backbones; BEAM-100K 400 questions/10 categories/100K-token histories); `implementation_
+availability` (no MemIR repo; the one GitHub link is a baseline, not the system itself); `derivative_
+ancestor` (source-monitoring theory, Johnson, Hashtroudi & Lindsay 1993 — a cognitive-psychology
+paper, not a prior computational system); and the NOT_APPLICABLE calls on `transition_model`,
+`actor_model` and `convergence_independence_mechanism`. Re-derives component_overlap=4 (not 5 —
+one epistemic axis only, no O/E/L triple, no actor/authority dimension, recency+grounding conflict
+resolution rather than independence-weighted corroboration) and architecture_overlap=2 (defensible
+though borderline; a case exists for 3 given depth within its corner — an understatement direction,
+not an overstatement one). Found no factual errors anywhere in the row.
+
+**Resolution.** No matrix changes needed beyond `second_review` itself. No score, flag, or
+`hypotheses_challenged` value is changed; no factual corrections were found.
+
+---
+
+## 26. grading-narrators-isnad-rijal-claim-provenance-2026
+
+Raja, A.Z.: Grading the Narrators: An Isnad-Rijal Framework for Claim-Level Provenance in
+Multi-Agent Knowledge Systems, arXiv preprint, 27 Jul 2026. arxiv:2607.24117.
+
+**Overlap.** component_overlap=5, architecture_overlap=3. ISNAD attaches graded, per-domain
+transmitter reliability to claim-level transmission chains, with a weakest-link chain grade, a
+completeness (ittisal) rule, and — its most direct H4 collision — an explicit cross-chain
+corroboration mechanism (muta'ba'at) that discounts agreement from narrators sharing a model
+family, an upstream source, or narrator identity, rather than simply counting agreeing sources. A
+domain-conditioned, version-sensitive actor-authority model (the narrator registry) is a further
+close analog to D-System's proposed authority/reliability dimensions.
+
+**What it would falsify.** At full strength this contributes to falsifying H1 (an ordinal, not
+numeric, chain grade plus a lifecycle status — a genuine two-axis state, though not D-System's full
+ontological+epistemic+lifecycle triple), H3 (provenance as conflict-resolution input — directly on
+point) and H4 (independence-aware convergence, including an explicit non-naive independence check).
+It does not extend to H6–H11: the framework is scoped entirely to claim/knowledge provenance, with
+no requirement/specification/plan/execution/artifact/test/deployment/runtime linkage, and no
+epistemic-blast-radius propagation across dependent claims when a narrator's grade changes.
+
+second_review: disputed: score re-derivation recorded, not applied (component_overlap_score
+re-derived 5->4; flag stands regardless since 4 still crosses threshold; architecture_overlap_score
+3 confirmed). One factual correction applied to evaluation_method (nine corruption types, not
+eight; locator: arxiv.org/html/2607.24117v1 Sec.8.1). hypotheses_challenged H1;H3;H4 confirmed as
+appropriately hedged, not an overstatement.
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=5, architecture_overlap=3, flag fires on both the
+component and (independently) the architecture-adjacent claim-provenance depth. H1;H3;H4 challenged,
+framed as a close, directly comparable 2026 treatment of D-System's provenance-as-conflict-input and
+independence-aware-convergence claims.
+
+**Independent reviewer position.** Confirmed PDF, HTML and TeX Source all present at
+arxiv.org/abs/2607.24117, and read the full HTML across Secs 2.3, 4.1–4.5, 5, 6, 8.1–8.7 and Related
+Work — the same sections the row's `evidence_locator` claims. Every verbatim quote in the row
+checked word-for-word and matched (the isnad definition, minimum-grade rule, truth-discovery
+contrast, sahih-chain-with-contradiction sentence, narrator-registry schema, deployment-not-
+demonstrated caveat, the evaluation design figures, the 4,057-claim/29% quarantine result,
+corroboration 100% on two of three corpora, and the 4.8% coverage ceiling). Found one FACTUAL ERROR:
+`evaluation_method` states "eight deterministic corruption types"; Sec.8.1 names nine (OCR noise,
+digit swap, sign flip, negation drop, unit corruption, formula mangling, entity swap, fabricated
+numerics, regime confusion). Re-derives `component_overlap_score` 5 as 4: the row's own narrative
+hedges below the ceiling score it carries — `provenance_model` says "close to" D-System's H2/H3
+concept and `convergence_independence_mechanism` says "a materially close analog" of H4, both
+describing strong overlap rather than the material equivalence a 5 requires; independently, Sec.2.3
+concedes "Subjective logic supplies chain-discounting arithmetic but no operational registry
+lifecycle" — the discounting arithmetic is prior art (Josang) and this paper's contribution is the
+operational assembly around it. Confirms `architecture_overlap_score` 3, and that the flag still
+fires (4 still crosses the ≥4 threshold). Confirms `hypotheses_challenged` H1;H3;H4 as appropriately
+hedged, not an overstatement.
+
+**Resolution.** One factual correction applied to `04_evidence_matrix.csv`: `evaluation_method`
+("eight" → "nine deterministic corruption types," with the nine named, per Sec.8.1). The
+`component_overlap_score` re-derivation (5→4) is recorded here and in `second_review` but NOT
+applied to the matrix, per the binding rule on score fields — the flag is unaffected either way,
+since 4 still crosses the component threshold. `architecture_overlap_score`, `critical_collision`
+and `hypotheses_challenged` are unchanged.
+
+---
+
+## 27. not-all-agreement-counts-as-corroboration-2026
+
+Not All Agreement Counts as Corroboration: Provenance-Conserving Multi-View Fusion for Typed
+Action Admission in Human-Robot Collaboration, arXiv preprint, 2026. arxiv:2609.01662 (PACT).
+
+**Overlap.** component_overlap=4, architecture_overlap=2. PACT proves (Proposition 1) that
+source-local numerical attributes alone cannot distinguish a repeated derivation from a separately
+countable acquisition, then defines a coordinatewise-meet rule over a formal provenance partition —
+a graded, formally guaranteed independence-conditioned evidence-conservation mechanism, empirically
+validated (a 0.0557 ncsAURC reduction; 720 typed responses unchanged under 1x–8x within-camera
+duplication). This is D-System's closest known collision on H4: discounting derivative/correlated
+agreement rather than counting it as independent corroboration.
+
+**What it would falsify.** At full strength this contributes to falsifying H4's general shape — a
+formally proved, empirically validated discount-derivative-agreement mechanism. It does not engage
+H1 (no ontological/epistemic/lifecycle state classification — sources carry a continuous opinion
+vector, not a typed state), H2 beyond a narrow "typed, reason-preserving outcome" echo (no
+provenance-attached state-to-state transition graph), or H3 (no actor-authority/trust-arbitration
+model — provenance here means acquisition lineage, not an authored claim's source-agent); and zero
+requirement/plan/execution/artifact/test/deployment/software-runtime linkage (H6–H11 all
+NOT_APPLICABLE). The paper's own Related Work situates its exact mechanism within a pre-existing,
+decades-old dependence-aware sensor-fusion and belief-function lineage it explicitly credits as
+"substantive precedents" — a further derivative refinement, not a first solution.
+
+second_review: disputed: score re-derivation both confirmed and recorded without change
+(component_overlap_score 4, architecture_overlap_score 2 — both re-derived identically). Two
+factual corrections applied: implementation_availability (a public repository,
+github.com/ZekaiJ/PACT, is referenced via a title-footnote within the row's own read scope; the
+reviewer's claim of a Data Availability statement "before the Conclusion" was independently
+re-checked and found to sit in the back matter after Sec.9 and both appendices, outside the row's
+claimed read scope — the title-footnote reference alone still corrects the row's "no public code
+repository" understatement, not the collision-flattering direction) and derivative_ancestor (the
+"substantive precedents" quote in
+Sec.2.2 attaches to Denoeux 2008 and Josang et al. 2010 only, not to Julier & Uhlmann 1997, which
+appears two sentences earlier as general background; the derivative-not-originating conclusion is
+unaffected). INTERPRETIVE OVERSTATEMENT recorded, wording NOT changed: strongest_dsystem_overlap
+calls this "exactly D-System's H4 claim"; H4's falsification criterion requires equivalent
+corroboration over mixed human-agent knowledge, and the reviewer found zero evidence-contributing
+human sources anywhere in the text — the mechanism is reached in a pure-machine-source setting only.
+The row's own human_agent_scope and strongest_difference fields already document this gap; only the
+word "exactly" overstates it, and per this campaign's rule against silently rewriting an
+interpretive field, that field is left as written.
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=4, architecture_overlap=2, flag fires on the
+component trigger (H4 challenged). `strongest_dsystem_overlap` characterizes PACT's mechanism as
+"exactly D-System's H4 claim." `implementation_availability` states no public code repository is
+referenced. `derivative_ancestor` names Julier & Uhlmann (1997) and Josang et al. (2010) together as
+the paper's own cited "substantive precedents."
+
+**Independent reviewer position.** Read v1 raw HTML (arxiv.org/html/2609.01662v1), confirmed as the
+row's source by matching v1's section numbering to the row's locators (v2, posted 2026-09-16,
+renumbers Discussion/Conclusion from Sec.8/9 to Sec.7/8 — flagged for later dispatches to pin the
+version). Re-derived both scores and confirmed them identically: component 4 (the provenance-
+partition coordinatewise-meet rule with a formal identifiability proof, Prop.1, is a genuine
+mechanism-level match to H4); architecture 2 (every other D-System dimension genuinely
+NOT_APPLICABLE, verified directly). Verified the 0.0557 ncsAURC figure and the 720-typed-response
+duplication result both appear verbatim. FACTUAL ERROR 1: the paper carries a title-footnote
+directly under the abstract — "Project: github.com/ZekaiJ/PACT" — and a Data Availability statement
+naming the same repository, confirmed live (HTTP 200, checked 2026-09-20). [X2's own spot-check
+of this claim (2026-09-19) found the Data Availability statement sits in the back matter after
+Sec.9 Conclusion and both appendices, not "before the Conclusion" as reported here — outside the
+material the row's own evidence_locator claims to have read (which lists Sec.9 and Appendix A as
+NOT read in full). The title-footnote reference alone, which is within the row's front-matter read
+scope, is sufficient to correct the row's "no public code repository" claim; see Resolution.] The
+row's "no public code repository" claim makes the source look less substantiated than it is, not
+the collision-flattering direction. FACTUAL ERROR 2: the "substantive precedents" quote (Sec.2.2) attaches to Denoeux (2008)
+[7] and Josang et al. (2010) [8] only — "Denoeux's cautious rule is... [7]. Subjective Logic
+distinguishes cumulative from averaging fusion... [8]. These are substantive precedents..."; Julier
+& Uhlmann's covariance intersection [20] appears two sentences earlier as general background, not as
+the referent of "these." The derivative-not-originating conclusion survives unaffected — Denoeux and
+Josang remain 16–18-year-old precedents the paper explicitly credits. INTERPRETIVE OVERSTATEMENT:
+`strongest_dsystem_overlap` calls this "exactly D-System's H4 claim." H4's falsification criterion
+requires equivalent corroboration over mixed human-agent knowledge; grepping every occurrence of
+"human" across the full text found the paper's sources exclusively camera/VLM outputs, with humans
+appearing only as recipients of the robot's handover action and as a target for future
+"meaningful human control" evaluation — never as evidence-contributing agents. The row's own
+`human_agent_scope` and `strongest_difference` fields already document this gap accurately; the
+word "exactly" is what overstates it. Suggested softening: "the core discounting mechanism of H4,
+in a fully-automated (non-human-source) instantiation."
+
+**Resolution.** Two corrections applied to `04_evidence_matrix.csv`: `implementation_availability`
+(corrected to state the repository is referenced via title-footnote, within the row's read scope)
+and `derivative_ancestor` (corrected to attach the "substantive precedents" quote to Denoeux and
+Josang only, with Julier & Uhlmann recharacterized as background and the "16–29 years" span
+corrected to "16–18 years" to match the corrected precedent set). `strongest_dsystem_overlap`'s
+"exactly D-System's H4 claim" wording is NOT changed — the overstatement is interpretive, not
+factual, and is recorded here with the reviewer's suggested softening rather than silently
+rewritten. **Spot-check finding:** X2's own independent verification of the reviewer's Data
+Availability claim (fetching arxiv.org/html/2609.01662v1 directly) found it positioned in the back
+matter, after Sec.9 Conclusion and both appendices — not "before the Conclusion" as the reviewer's
+report stated — and therefore outside the row's own claimed read scope. `implementation_
+availability` is corrected on the title-footnote reference alone, which does fall within that scope;
+the Data Availability statement's exact location is recorded but not relied upon for the correction.
+No score, flag, or `hypotheses_challenged` value is changed — both scores were confirmed, not
+disputed.
+
+---
+
+## 28. prov-agent-2025
+
+Souza, R., Gueroudji, A., DeWitt, S., Rosendo, D., Ghosal, T., Ross, R., Balaprakash, P., Ferreira
+da Silva, R. "PROV-AGENT: Unified Provenance for Tracking AI Agent Interactions in Agentic
+Workflows." Proceedings of the 21st IEEE International Conference on e-Science (e-Science),
+Chicago, IL, USA, 2025. arXiv:2508.02866.
+
+**Overlap.** component_overlap=4, architecture_overlap=3. A real, open-source, running system
+extending W3C PROV-O with typed AIAgent/AgentTool/AIModelInvocation classes, demonstrating genuine
+multi-hop bidirectional traceability from an agent decision through its prompts, model invocations,
+and originating data across a distributed HPC/edge/cloud workflow at Oak Ridge National Laboratory
+— backed by a real cross-facility deployment (Q1–Q5 worked queries, Sec.IV-B).
+
+**What it would falsify.** At full strength this bears on H9 (bidirectional epistemic traceability
+— genuinely demonstrated, backward and forward, within one workflow-execution graph) and, more
+weakly, H2/H3 (typed, provenance-linked agent-action representation). It does not falsify H2 (no
+typed transition object with its own provenance record — the Agent_Decision chain is a PROV-
+derivation chain) or H3 (no arbitration, trust scoring, or authority-weighted conflict resolution).
+It says nothing about H1 (no O/E/L classification), H4 (no multi-source corroboration/independence
+mechanism), or H6–H8/H10–H11 beyond the single scientific-workflow domain — the improvement loop is
+entirely human-driven, not automated feedback-to-knowledge.
+
+second_review: disputed: score re-derivation recorded, not applied (component_overlap_score
+re-derived 4->3; architecture_overlap_score 3 confirmed). Reviewer concludes no trigger fires
+(neither score reaches 4; contiguous-stage run tops out at 2 against a threshold of 4);
+critical_collision left unchanged per the binding rule. Two factual corrections applied:
+derivative_ancestor's section citation (Sec.II-A -> Sec.II-B) and evaluation_method (the Q1-Q5
+workflow is Sec.IV-B's own admitted stand-in -- "mimics the agentic additive manufacturing workflow
+under development" -- not the live deployment "one real additive-manufacturing use case" had
+implied). hypotheses_challenged DISPUTED, NOT changed: the row lists H2;H3, but the row's own
+transition_model and conflict_trust_mechanism cells are NOT_APPLICABLE and state H2's and H3's
+falsification bars are explicitly not met -- only H9 is supported by the row's own cells. Recorded
+as a disputed self-contradiction per the binding rule against changing hypotheses_challenged; not
+applied.
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on both
+triggers. hypotheses_challenged lists H2;H3;H9, framed as a real running system on point for H9's
+bidirectional-traceability claim and H2/H3's typed, provenance-linked agent-action representation.
+`derivative_ancestor` attributes PROV-AGENT's distinction from Davis et al. 2017 and Friedman et al.
+2020 to Sec.II-A. `evaluation_method` frames the Q1–Q5 queries as run against "one real additive-
+manufacturing use case."
+
+**Independent reviewer position.** Read the full arXiv v3 PDF (arxiv.org/pdf/2508.02866v3, 7 pages,
+nothing paywalled). FACTUAL ERROR 1: the Davis/Friedman-distinguishing sentence falls under Sec.II-B
+("W3C PROV and Extensions for Workflows, AI, and Agents"), not Sec.II-A. FACTUAL ERROR 2:
+`hypotheses_challenged` lists H2 and H3, contradicting the row's own cells — `transition_model` is
+NOT_APPLICABLE and states the Agent_Decision chain "is a PROV-derivation chain, not a typed
+transition object with its own provenance record" (H2's falsification bar explicitly not met), and
+`conflict_trust_mechanism` is NOT_APPLICABLE and states "no arbitration, trust scoring, or
+authority-weighted conflict resolution" exists (H3's bar explicitly not met) — only H9 is supported
+by the row's own cells. FACTUAL ERROR 3: `evaluation_method` frames Q1–Q5 as run "against one real
+additive-manufacturing use case," but Sec.IV-B says the workflow "mimics the agentic additive
+manufacturing workflow under development" and that "the direct live data connection between the
+sensors and simulation is still under development" — demonstrated on a stand-in, not the live
+deployment. Re-derives `component_overlap_score` 4 as 3: the multi-hop bidirectional traceability
+the score rests on is the canonical intrinsic capability of W3C PROV's graph design (used/
+wasGeneratedBy/wasInformedBy chains) over the standard already catalogued in this campaign as
+`w3c-prov-o-2013`, per the row's own `derivative_ancestor` text, not attributable to this paper;
+PROV-AGENT's genuine contribution is domain vocabulary (AIAgent, AgentTool, AIModelInvocation,
+Prompt, ResponseData, SchedulingData, TelemetryData) plus a working implementation — "multiple
+relevant primitives" (3), not "strong mechanism overlap" (4). Confirms `architecture_overlap_score`
+3 (12 of ~17 architectural dimensions NOT_APPLICABLE per the row itself; "near end-to-end" (4)
+unsupported). ALL FOUR TRIGGERS CHECKED AND NONE FIRE: neither score reaches 4; no hypothesis
+materially falsified (H2/H3 ruled out by the row's own cells, H9 only a narrow single-domain partial
+instance); the four-contiguous-stage test fails (Reasoning→Decision is 2 contiguous, then Execution
+and Runtime Evidence are each isolated by uncovered Artifact/Verification/Deployment stages —
+maximum contiguous run 2 against a threshold of 4).
+
+**Resolution.** Two corrections applied to `04_evidence_matrix.csv`: `derivative_ancestor` (Sec.II-A
+→ Sec.II-B) and `evaluation_method` (corrected to reflect Sec.IV-B's own stand-in-workflow
+admission). The `component_overlap_score` re-derivation (4→3) is recorded here and in
+`second_review` but NOT applied. `hypotheses_challenged`'s self-contradiction (H2;H3 listed despite
+the row's own NOT_APPLICABLE cells ruling them out) is recorded as disputed but NOT changed, per the
+binding rule against altering that field regardless of how the dispute arose. `architecture_
+overlap_score` and `critical_collision` are unchanged.
+
+---
+
+## 29. chianti-cia-tool-java-icse-2005
+
+Ren, X., Ryder, B.G., Stoerzer, M., Tip, F. "Chianti: a change impact analysis tool for Java
+programs." Proceedings, 27th International Conference on Software Engineering (ICSE 2005),
+pp.664-665, 2005. 10.1109/icse.2005.1553643.
+
+**Overlap.** component_overlap=4, architecture_overlap=2. A fully automated, empirically validated
+tool implementing the two-directional propagate-then-isolate pattern at the heart of D-System's H10
+epistemic-blast-radius hypothesis: given an edit, determine everything downstream potentially
+affected (forward, to regression tests); given one affected test, determine the minimal upstream
+subset of atomic changes actually responsible (backward isolation) — demonstrated on a full year of
+Daikon's real CVS history (avg. 52% of tests affected per edit; each affected test traceable to just
+3.95% of the atomic changes on average, Sec.5).
+
+**What it would falsify.** At full strength this bears on H9 and H10's general shape (bidirectional
+propagate/isolate over a dependency structure). It is entirely confined to two homogeneous,
+syntactically well-defined artifact types (Java source and its regression/unit tests) linked by one
+mechanism (call-graph correlation of atomic changes); no heterogeneous cross-lifecycle graph (no
+decisions, requirements, specifications, or plans as first-class typed objects), no actor/
+provenance/authority model, no epistemic-claim representation, and no state/lifecycle model of any
+kind — deterministic static/dynamic program analysis over one homogeneous domain, not propagation
+over a mixed human-agent epistemic knowledge structure.
+
+second_review: disputed: score re-derivation recorded, not applied (component_overlap_score
+re-derived 4->3; architecture_overlap_score 2 confirmed, undisputed). Reviewer concludes no trigger
+fires (component 3, architecture 2, no direct falsification, contiguous-stage run tops out at 2
+against a threshold of 4); critical_collision left unchanged per the binding rule. One factual
+correction applied: access_limitation was mislabeled full_text -- it described the OOPSLA 2004
+substitute's access, not this row's own ICSE 2005 DOI target, whose text was never obtained by
+anyone (IEEE Xplore returned HTTP 418 to the reviewer's own fetch; OpenAlex reports is_oa false; no
+PDF found at any author-hosted mirror); corrected to secondary_coverage. hypotheses_challenged
+DISPUTED, NOT changed: the reviewer argues H10 and H9 are listed backwards against the frozen
+hypotheses register -- H10's own falsification criterion requires propagation FROM EPISTEMIC CHANGE,
+which Chianti's artifact-only propagation excludes by the criterion's own wording, and H9 requires
+backward tracing reaching reasoning/evidence/assumptions/decisions, none of which Chianti's
+code-change trace reaches. Recorded as disputed per the binding rule against changing hypotheses_
+challenged; not applied.
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=4, architecture_overlap=2, flag fires on the
+component trigger. hypotheses_challenged H9;H10, framed as structurally mirroring D-System's H10
+epistemic-blast-radius pattern. `access_limitation` recorded as full_text, on the strength of the
+freely available OOPSLA 2004 companion paper describing the same tool.
+
+**Independent reviewer position.** Independently established the access reality: ieeexplore.ieee.org
+/document/1553643 and /abstract/document/1553643/ both returned HTTP 418 to the reviewer's own
+fetch; OpenAlex's record for the DOI independently reports `is_oa` false and `any_repository_has_
+fulltext` false; targeted searches of prolangs.cs.vt.edu, people.cs.vt.edu and research.ibm.com for
+an ICSE-2005-specific PDF all 404'd. Read the same substitute the first assessor did — the OOPSLA
+2004 companion paper (prolangs.cs.vt.edu/refs/docs/oopsla04.pdf, 17 pages confirmed via `pdfinfo`,
+matching pp.432-448) — NOT the 2-page ICSE 2005 tool-demo printing; zero pages of the actually-cited
+document have been read by anyone. FACTUAL ERROR: `access_limitation: full_text` is mislabeled — it
+describes the substitute's access, not this source's; `secondary_coverage`, or full_text with an
+explicit substitution note, fits the schema's intent (`interpretation_confidence: medium` already
+partially compensates). CORROBORATED: downloaded and grepped the full OOPSLA text and found zero
+epistemic apparatus anywhere (only incidental hits for "design decisions made when constructing an
+example" and a citation to the Java Language Specification), independently confirming the row's
+NOT_APPLICABLE calls on state/provenance/actor/decision/requirement/specification models; references
+[21] (Ryder & Tip, PASTE'01) and [3] (Bohner & Arnold) both check out exactly as `derivative_
+ancestor` describes. Re-derives `component_overlap_score` 4 as 3: Chianti's forward-propagate/
+backward-isolate pipeline is real but is a deterministic call-graph correlation over one homogeneous
+non-epistemic domain (Java source plus its own test suite) — the generic shape of essentially any
+change-impact or build-dependency tool, not a mechanism mirroring D-System's heterogeneous,
+multi-typed, trust/confidence-bearing provenance topology; the row's own `strongest_difference`
+documents this gap while the score does not reflect it. Checked both hypothesis challenges against
+the frozen register rather than the row: H10 (`research/pre-literature-hypotheses.yaml` lines
+100-109) requires "established impact-analysis systems already performing equivalent propagation
+FROM EPISTEMIC CHANGE rather than only artifact/requirement change" to falsify it — Chianti
+propagates only from artifact (code) change, the exact category H10's own criterion excludes, so
+listing it as a challenger to H10 is backwards. H9 (lines 89-98) requires bidirectional tracing
+reaching reasoning, evidence, assumptions and decisions — Chianti's backward trace terminates at
+atomic code changes and never reaches any of those endpoints, which the row's own fields confirm do
+not exist in this source. ALL FOUR TRIGGERS FAIL: component 3, architecture 2 (row's own score,
+undisputed), no direct falsification per the above, and the contiguous-stage trigger tops out at 2
+(Artifact→Verification only; `deployment_linkage` NOT_APPLICABLE breaks the chain before Runtime
+Evidence) against a threshold of 4. NOT IN DISPUTE: DOI/venue/page identity, the author-list mismatch
+already flagged by the dispatcher, and the derivative-ancestor lineage — all check out against
+Crossref and the primary text.
+
+**Resolution.** One correction applied to `04_evidence_matrix.csv`: `access_limitation` (`full_text`
+→ `secondary_coverage`). The `component_overlap_score` re-derivation (4→3) is recorded here and in
+`second_review` but NOT applied. `hypotheses_challenged`'s backwards-listed H9/H10 challenge is
+recorded as disputed but NOT changed, per the binding rule. `architecture_overlap_score` and
+`critical_collision` are unchanged.
+
+---
+
+## 30. provenance-enhanced-statements-dec-2026
+
+Vitali, F., Pasqual, V.: Provenance-Enhanced Statements in Knowledge Graphs, arXiv preprint, 2026.
+arxiv:2606.15246 (DEC).
+
+**Overlap.** component_overlap=4, architecture_overlap=3. Cognitive worlds classify knowledge-graph
+statements by a single epistemic-modality axis (doxastic/epistemic/conjectural/verbatim/delusional),
+with one explicit named transition operator (`settle`) moving a statement from conjectural to
+factual status while retaining the superseded state — directly on point for H1 (orthogonal state
+classification, single-axis rather than three-axis) and H2 (typed, provenance-linked knowledge-state
+transition), sharing D-System's own "capta"/attributed-claim framing.
+
+**What it would falsify.** At full strength this bears on H1 (single epistemic-modality axis, no
+ontological-type or lifecycle-stage axis, so H1's orthogonal triple is not reproduced), H2 (exactly
+one transition type rather than an open, typed vocabulary with attached per-transition provenance —
+and that one operator is itself inherited from a companion preprint, not originated here), and H3
+(provenance gates epistemic type categorically but carries no graded authority/reliability
+weighting, only partially engaged). It does not engage H4 (no independence-aware corroboration
+mechanism at all) or H6–H11 (confined entirely to the RDF/knowledge-graph layer, zero requirement/
+plan/execution/artifact/test/deployment/runtime linkage).
+
+second_review: disputed: score re-derivation recorded, not applied (component_overlap_score
+re-derived 4->3; architecture_overlap_score 3 defensible, confirmed). Reviewer concludes no trigger
+fires; critical_collision and hypotheses_challenged left unchanged per the binding rule. Two factual
+corrections applied: evidence_locator's section numbering (Sec.5/Sec.6 conflation corrected to
+Sec.4/Sec.5/Sec.6; locator: arxiv.org/html/2606.15246v1) and convergence_independence_mechanism's
+unverifiable quotation (no such sentence appears in the source; recorded as an absence-based
+inference instead).
+
+### Review — 2026-09-19
+
+**First assessment position.** component_overlap=4, architecture_overlap=3, flag fires on both
+triggers. hypotheses_challenged H1;H2;H3, hedged as "partially engaged" / "not reproduced" rather
+than falsified. `evidence_locator` cites "Sec.5 (DEC framework...)" and "Sec.6 (reasoner
+subsection... and Related Works)." `convergence_independence_mechanism` presents as a direct quote
+that the paper states DEC "lacks explicit mechanisms for detecting convergent multiple-source
+agreement."
+
+**Independent reviewer position.** Re-fetched and grepped arxiv.org/html/2606.15246v1 independently.
+Confirmed accurate: authors, title, arXiv id; the capta-vs-data framing verbatim (offset ~24049);
+the five world-types; the settle-operator formalization `r' = r ∪ {(φ,T)}` (Sec.3.2.2) verbatim; the
+governing-predicate RDF-star example (Sec.4.2/4.3); refs [18]=Fagin et al. 1995, [26]=Hintikka 1962,
+[45]=Vitali 2026 (arXiv:2508.07304); the Related Works verbatim quote (Sec.6) exact; the
+shared-world description as background-fact merging, not corroboration. STRENGTHENS the row's own
+lineage finding: the paper states outright at Sec.3.2.2 (offset ~130269) that "[45] introduces the
+dynamic operator settle" — attributing origination of its central transition mechanism to the
+companion preprint directly, not merely deferring proofs to it as the row states; `derivative_
+ancestor` is correct and understates how explicit the paper is. FACTUAL ERROR 1 (locator): the row's
+`evidence_locator` cites "Sec.5 (DEC framework...)" and "Sec.6 (reasoner subsection... and Related
+Works)"; the paper's actual structure is Sec.4 = The DEC Framework, Sec.5 = A reasoner for cognitive
+worlds, Sec.6 = Related works — the framework is mislabeled by one section, and the reasoner and
+Related Works, two distinct sections, are conflated under one label. FACTUAL ERROR 2 (unverifiable
+quotation): `convergence_independence_mechanism` presents as a direct quote that DEC "lacks explicit
+mechanisms for detecting convergent multiple-source agreement." An exhaustive search of the full raw
+HTML (abstract, intro, Secs 2-7, Conclusions, future work, Related Works) found ZERO occurrences of
+"convergen," "lacks" or "independence" anywhere in the document — this sentence does not appear in
+the source. The underlying conclusion (no convergence or corroboration mechanism exists) is
+independently supportable by absence — nothing in Table 1 or the reasoner spec implements one — but
+must be recorded as an inference, not a quotation; net scoring effect is neutral-to-negative for the
+collision, so this is not part of a pattern favoring collisions, but it is a sourcing defect.
+Re-derives `component_overlap_score` 4 as 3: the row's own `strongest_difference` already establishes
+that no candidate primitive reaches D-System's claimed structure — state model has one epistemic-
+modality axis against D-System's orthogonal ontological×epistemic×lifecycle triple (H1 not
+reproduced); transition model has exactly one named operator, `settle`, explicitly inherited from
+ref [45] rather than originated here (H2 not reproduced); provenance/trust is categorical typing
+only with no graded authority or reliability score (H3 "only partially engaged," the row's own
+words); convergence has zero mechanism (H4 unaddressed); everything downstream of reasoning (H6-H11)
+is NOT_APPLICABLE — four candidate primitives each independently confirmed narrower-or-absent is
+"multiple relevant primitives" (3), not "strong mechanism overlap" (4). Confirms `architecture_
+overlap_score` 3 as defensible (confined to a single representational layer with no execution,
+artifact, verification, deployment or runtime linkage at all). ALL FOUR TRIGGERS FAIL: component 3,
+architecture 3, no direct falsification of H1-H3 (the row itself claims only "challenged"/
+"partially engaged," never falsified), and no four-contiguous-stage span (content confined to
+Reasoning, arguably touching Knowledge Update via `settle`).
+
+**Resolution.** Two corrections applied to `04_evidence_matrix.csv`: `evidence_locator` (Sec.5/Sec.6
+conflation split correctly into Sec.4/Sec.5/Sec.6) and `convergence_independence_mechanism` (the
+unverifiable direct quote replaced with an absence-based inference, citing the exhaustive grep and
+the Table 1/reasoner-spec absence it rests on). The `component_overlap_score` re-derivation (4→3) is
+recorded here and in `second_review` but NOT applied. `architecture_overlap_score`,
+`hypotheses_challenged` and `critical_collision` are unchanged — the reviewer did not dispute them.
