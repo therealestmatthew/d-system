@@ -6868,17 +6868,22 @@ items:
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
   session: doc-session-literature-review-pass-4
-  next_action: 'Owner scoping decision. /session-close ran 2026-09-14: the independent close
-    review corroborated acceptance 1 Met and acceptance 2 Not met in its stop-conditions half
-    with zero discrepancies, so the phase stays active - completion requires every condition
-    met. The synthesis work is finished; what fails is the campaign-level evidence, recorded
-    rather than asserted away: gate measurement 2 (15 of 39 strong collisions, all added in
-    phase-lit-06/08 after the chaining passes, have no forward-chaining rows and 5 no backward
-    rows), saturation (duplicate rate fell 20.0% to 15.0%; ruling 8 forbids claiming it), and
-    the 20-30 deep-read condition met by count (49 rows) not coverage (20 of 32 top-band
-    candidates never read). The owner decides: direct a ninth search session to close the gaps,
-    or rule on how the phase closes against an acceptance half that ruling 8 makes unclaimable
-    as written. The campaign has no further phases.'
+  next_action: 'Owner ruling given 2026-09-20: the campaign closes as a first research memo
+    with saturation MEASURED and explicitly NOT demonstrated, rather than waiting on a stop
+    condition the evidence is moving away from. Two edits implement it and are this phase''s
+    first work, not done yet: write the ruling into PROMPT-031 alongside check-in rulings 1-8,
+    which is its authoritative home, and amend this phase''s acceptance so its stop-conditions
+    half requires the measurement rather than the condition. The full ruling and its reasoning
+    are in SESS-2026-09-19-08''s addendum. SUPERSEDED, do not act on the prior text: it offered
+    "direct a ninth search session to close the gaps" as one of two branches, and phase-lit-09
+    was that session. It closed two of the three gaps - gate measurement 2 now measures 0
+    missing forward-chaining and 0 missing backward-chaining rows across 53 strong rows,
+    against the 15 and 5 recorded here, and the deep-read condition is now met by coverage with
+    0 of 32 top-band candidates unread, not merely by count. Only saturation remains, and it
+    moved further out of reach: the duplicate rate fell 15.0 to 6.4-7.7 percent. Do not
+    commission a tenth search session. The synthesis deliverables 07 through 13 stand as
+    written except for ten stale H4 references in 07_anti_novelty_case.md, line numbers in
+    SESS-2026-09-19-08.'
 - id: phase-kit-01
   title: Build the kit's six commands
   plan: doc-consultant-demo-kit

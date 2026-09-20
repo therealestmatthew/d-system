@@ -427,3 +427,44 @@ the procedure checks that first.
 **No phase reached `status: complete` in the `/session-close` invocation that produced this
 addendum.** `phase-lit-09` had already completed earlier in the conversation; nothing was re-closed,
 no phase was invented, and no new claim was made.
+
+### Owner ruling, 2026-09-20 — how `phase-lit-07` closes
+
+Recorded here in full because the addendum is where the design goes when the work is not being
+built in the same breath. **This ruling's authoritative home is `PROMPT-031`, alongside check-in
+rulings 1-8, and writing it there is the first work of whichever session claims `phase-lit-07`.**
+A per-campaign ruling that lives only in a session record — one of 120 — is a ruling nobody finds.
+`PROMPT-031`'s own precedence note is explicit that rulings live in the kick-off record, and that
+where a ruling changes how a gate behaves it is written into the document that gate actually reads.
+
+**The ruling.** The campaign closes as a **first research memo with saturation measured and
+explicitly not demonstrated**, rather than waiting on a stop condition the evidence is moving away
+from.
+
+**Why this is the right call on the evidence rather than a concession.** `PROMPT-030` already states
+that the campaign "produces a **first research memo**. It does not establish final novelty, and no
+close-out may claim it does." Check-in ruling 8 already forbids asserting saturation. What was
+missing was permission for the phase to *close* while honestly reporting a stop condition it has not
+met — and without that permission the acceptance half is unclaimable as written, which is precisely
+what `phase-lit-07`'s close review found on 2026-09-14.
+
+The duplicate-rate trend is the reason waiting would not help. It has fallen at every measurement:
+**20.0% (`phase-lit-06`) -> 15.0% (`phase-lit-08`) -> 6.4-7.7% (`phase-lit-09`)**. The methodology's
+stop condition is that additional searches "mostly yield duplicates or clearly adjacent work". More
+than nine results in ten are new. A tenth search session would, on this trend, lower the rate again
+rather than raise it — spending a session to move further from the condition it was spent to satisfy,
+and taking the campaign to ten against an owner-accepted range of six to eight.
+
+**The two edits that implement it**, neither done in this session:
+
+1. Write the ruling into `PROMPT-031` in the form its check-in rulings already use, so `LIT-07 G`
+   and any future coordinator read it where they already look.
+2. Amend `phase-lit-07`'s acceptance so its stop-conditions half requires the **measurement** —
+   each stop condition measured, with its population named, and saturation reported as a trend — in
+   place of requiring the condition to hold. Its scope and its other acceptance condition are
+   unchanged.
+
+Both are governed-document changes and belong to the session that claims `phase-lit-07`, not to an
+unclaimed continuation at the end of a long session. `phase-lit-07`'s `next_action` was updated in
+this session to point here and to retract its superseded text; its `scope` and `acceptance` were
+deliberately left untouched.
