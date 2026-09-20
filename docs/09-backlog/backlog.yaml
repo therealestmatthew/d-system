@@ -4,6 +4,8 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lit-09
+- phase-conc-03
+- phase-conc-02
 - phase-tax-01
 - phase-tax-02
 - phase-auto-01
