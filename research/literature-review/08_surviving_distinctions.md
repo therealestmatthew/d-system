@@ -38,6 +38,44 @@ agent-memory systems (Zep/Graphiti, Kumiho) — see `07_anti_novelty_case.md` §
 D-System's full H1 state model simultaneously; on H2's literal, narrower claim, the field's coverage
 is thorough and multi-lineage.
 
+### H4 — Independence-aware convergence
+
+**Status:** `LIKELY_ALREADY_KNOWN`. `06_hypothesis_tests.md`'s H4 block, re-derived clean-room by
+`LIT-09 H4R` (2026-09-19) from the evidence alone, assesses the review-instructions' general phrasing
+and the frozen register's graph-topological phrasing at the same status, retiring the prior
+reconciliation's split between them. The graph-topological family the prior reconciliation had found
+too thin — `epistemic-sybil-resistance-bara-2026`'s provenance-DAG discount kappa_m alone, plus
+`barakat-corroboration-provenance-patterns-tapp2017`'s unimplemented Eq.8 sketch — has grown, via this
+campaign's own collision searches (`LIT-09-S034/S035`, `LIT-09-S052/S053`), to three independent 2026
+instantiations: `grading-narrators-isnad-rijal-claim-provenance-2026` (ISNAD) and
+`not-all-agreement-counts-as-corroboration-2026` (PACT) join bara-2026. ISNAD is the strongest
+challenger because it combines all three elements the frozen register's falsification clause names in
+one source: a derivation-chain topology (the isnad), an explicit computed discount for shared lineage
+(Sec.4.3's muta ba'at cross-chain check), and a confirmed mixed human-agent narrator scope
+(`narrator_type` spans source|scraper|model|human, second-review-confirmed). This sits atop a
+forty-year cross-domain ancestor base: Bayesian testimony epistemology (Goldman 2001, extended by
+Mayo-Wilson 2014), distributed multi-version fault tolerance (Eckhardt & Lee 1985 -> Townend et al.
+2005, cited into barakat-2017), and sensor fusion/belief-function combination (Julier & Uhlmann 1997,
+Denoeux 2008, Josang 2010/2016, feeding both PACT and ISNAD's own discount arithmetic). Per
+`06_hypothesis_tests.md`, this is an established, independently-recurring pattern rather than one
+narrow preprint, past the same maturity threshold this file uses elsewhere (H3, H9) to call a field
+thoroughly known. No single row reaches a confirmed component_overlap of 5, so this is not read as
+total, unqualified prior anticipation of D-System's own knowledge-state-graph instantiation — but the
+specific combination the frozen register names is present, together, in one deep-read primary source.
+
+**Carried caveat, now resolved.** This entry previously split in two, and Category 2's H4 entry
+carried a caveat from the owner's ruling closing `phase-lit-08`: that H4's general/graph-topological
+split was pre-loaded by a coordinator dispatch's framing rather than independently derived by the
+worker who ran the search, and that any re-derivation of the split or the status was the owner's
+call, not a dispatch's own. `H4R` was dispatched to perform exactly that re-derivation, clean-room,
+from the evidence alone, without being told what to conclude. Its finding resolves the caveat by
+retiring the split: two 2026 sources found after the prior reconciliation closed the specific gap
+that the split rested on — thin graph-topological coverage — so both phrasings now assess to the same
+status, and the two-entry structure this file previously used for H4 no longer reflects
+`06_hypothesis_tests.md`. This does not mean the original worry was unfounded; the concern that the
+split needed independent re-derivation was correct, and that re-derivation is what produced this
+single entry.
+
 ### H7 — Development provenance
 
 **Status:** `LIKELY_ALREADY_KNOWN`. Ten matrix rows challenge H7, spanning the ADR tradition
@@ -100,28 +138,6 @@ write-back "pending policies"; DIVE's refutation mechanism is manual and user-tr
 without engaging its own actor-trust machinery, the pattern is some evidence that
 authority-weighted automated arbitration carries a correctness or liability risk builders did not
 want to accept, not proof the combination is hard to build.
-
-### H4 — Independence-aware convergence (review-instructions phrasing)
-
-**Status:** `KNOWN_COMPONENT_NEW_INTEGRATION` for the review-instructions' general phrasing only; the
-frozen register's graph-topological phrasing is a separate reading, placed in Category 3 below and
-not blended with this one. Goldman (2001) is a mature, peer-reviewed, closed-form Bayesian proof that
-dependent agreement adds no weight while independent agreement does — foundational to an entire
-expert-testimony sub-literature Mayo-Wilson (2014) formally extends (`07_anti_novelty_case.md` §6).
-Combined with H3's finding that rich provenance representation is separately mature, wiring the
-discount principle onto explicit provenance/derivation-graph representation — computing the discount
-from the graph rather than stipulating it narratively — is what remains unshown as one working
-system, not a mechanism nobody knows how to build.
-
-**Carried caveat, binding on this entry specifically.** Per the owner's ruling closing
-`phase-lit-08`: H4's general/graph-topological split, and the finding that the general reading
-clears the bar for `KNOWN_COMPONENT_NEW_INTEGRATION`, was pre-loaded by a coordinator dispatch's
-framing rather than independently derived by the worker who ran the search. The worker disclosed this
-unprompted, and the independent close review judged the risk real and contestable. The owner closed
-the phase with the status standing and this caveat travelling with it. This file carries the caveat
-forward; it does not treat H4's Category 2 placement as more settled than `06_hypothesis_tests.md`
-itself treats it, and any re-derivation of the split or the status is the owner's call, not this
-dispatch's.
 
 ### H5 — Topology-aware context transfer
 
@@ -208,21 +224,6 @@ closest candidates are ten-weeks-old, single-author, 12-star, unreviewed reposit
 campaign's search of that specific, thin, very-recent corner of GitHub and arXiv does not establish
 that no established framework exists elsewhere; it establishes that this corner does not have one.
 
-### H4 — Independence-aware convergence (frozen-register, graph-topological phrasing)
-
-**Status:** `INSUFFICIENT_EVIDENCE` for this phrasing specifically, kept separate from the
-general-phrasing reading in Category 2. Nothing found combines broad (mixed human-agent) scope,
-graph-topological computation, and field maturity together: `epistemic-sybil-resistance-bara-2026`
-is graph-topological and formally closed-form but AI-agent-only, with the practical protocol left as
-an open problem; `barakat-corroboration-provenance-patterns-tapp2017` is broader in scope and
-graph-based but its own discount term (Eq.8) is an unimplemented sketch that never reappears in the
-paper; `extending-nanopublications-knowledge-provenance` and
-`provenance-based-interpretation-multi-agent-information-analysis-2020` are real deployed
-provenance/appraisal systems with no independence-discount mechanism at all. The same carried caveat
-from Category 2's H4 entry — that the general/graph-topological split itself was coordinator-framed
-rather than independently derived, disclosed by the worker and judged real and contestable on
-review — applies here too.
-
 ### H11 — Runtime-to-knowledge closure
 
 **Status:** `INSUFFICIENT_EVIDENCE`. The awareness-requirements lineage (2010-2023, peer-reviewed at
@@ -246,16 +247,19 @@ worth keeping distinct rather than flattening into an identical reason.
 
 | Category | Hypotheses | Count |
 |---|---|---|
-| 1 — Already known | H2, H7, H8 (review-instructions phrasing), H9 | 4 |
-| 2 — Known component, new integration | H3, H4 (general phrasing), H5, H6, H8 (frozen-register phrasing), H10 | 5 (6 entries; H8 counted once, in both categories by phrasing) |
-| 3 — Possibly requiring new mechanism design | H1, H4 (graph-topological phrasing), H11 | 3 (2 hypotheses; H4 counted once, in both categories by phrasing) |
+| 1 — Already known | H2, H4, H7, H8 (review-instructions phrasing), H9 | 5 |
+| 2 — Known component, new integration | H3, H5, H6, H8 (frozen-register phrasing), H10 | 4 (5 entries; H8 counted once, in both categories by phrasing) |
+| 3 — Possibly requiring new mechanism design | H1, H11 | 2 |
 
-Nine of eleven hypotheses place cleanly in Categories 1-2 — the anti-novelty case accounts for them
-in full. H8 and H4 each split by phrasing rather than placing in one category outright, per
+Ten of eleven hypotheses place cleanly in a single category — the anti-novelty case accounts for
+them in full. Only H8 splits by phrasing rather than placing in one category outright, per
 `06_hypothesis_tests.md`'s own rule against blending the review-instructions and frozen-register
-readings; this file preserves that split rather than resolving it into a single row. Three
-hypothesis-readings (H1, H4's graph-topological phrasing, H11) remain in Category 3 — not because
-this campaign found them distinct, but because this campaign's search, bounded by the coverage
-caveat stated at the top of this file, could not complete their decomposition either way. Whether
-that unresolved status should drive further search, a scoped design investigation, or synthesis-phase
-architectural revision is a decision for later phases of this campaign, not this dispatch.
+readings; this file preserves that split rather than resolving it into a single row. H4 no longer
+splits: `LIT-09 H4R`'s clean-room re-derivation in `06_hypothesis_tests.md` found the gap between its
+two phrasings closed, so this file now carries H4 as one entry in Category 1 rather than divided
+across Categories 2 and 3 (see H4's Category 1 entry above for the caveat this resolves). Two
+hypotheses (H1, H11) remain in Category 3 — not because this campaign found them distinct, but
+because this campaign's search, bounded by the coverage caveat stated at the top of this file, could
+not complete their decomposition either way. Whether that unresolved status should drive further
+search, a scoped design investigation, or synthesis-phase architectural revision is a decision for
+later phases of this campaign, not this dispatch.
