@@ -85,6 +85,51 @@ now. Recording the reasoning here means the next reader does not have to re-deri
 back-referenced the workstream question (`000280` cites the shared-checkout assumption it inherits
 from `000272`'s framing); this section is the settled answer they can point at.
 
+### Amendment, 2026-09-19: ownership is a different question (`000288`)
+
+The owner ruled on this the same day, for a hackathon repository built for five developers on
+separate machines (idea `000288`, recorded because the reasoning behind it exists nowhere else).
+**This supersedes the verdict above, not the reasoning that produced it.**
+
+The locking argument two sections up is correct and stays correct: the concurrency check reads
+`systems`, `deliverables` and `depends_on`, nothing else, and a workstream label carries no
+information that check does not already get more precisely from `systems`/`domain`. Read as an
+answer to "does a workstream change what the lock does," the verdict was and remains **no**.
+
+That is not the question the owner was asking. A workstream, on the owner's ruling, is not a
+locking primitive at all — it is an **ownership** unit. It names who owns what and which paths that
+ownership covers: the user interface, the product's own agent orchestration, the deterministic
+backend, and so on, one per developer, each running a single agent rather than orchestrating many.
+Ownership and locking are different questions because they operate at different rates and different
+scopes. The lock arbitrates concurrent phases within one shared checkout, rechecked on every claim.
+A workstream is claimed once per developer, rarely enough that the git-based race the phase-level
+lock exists to prevent almost never fires at this rate — see `000288`'s point that rarity is what
+makes a git-based claim viable here. It is the outer of two layers: the inner layer is this
+repository's existing single-developer multi-agent claim and coordination design, kept as is; the
+outer layer coordinates *between* developers, and the two are designed to work in conjunction rather
+than one replacing the other.
+
+**A workstream is a source of path declarations, not a competitor to `systems` or `deliverables`.**
+It does not sit above a plan the way `000272` originally framed it (a container holding several
+plans, cross-referencing many requirements) and it does not add a field the lock reads. Instead, a
+developer's workstream claim — a record committed once to a shared file on the integration branch —
+declares the paths that developer owns, and those declared paths become the boundary that feeds the
+*existing* lock: other developers' plans should not declare `systems`/`deliverables` that fall inside
+paths another workstream already claims. The workstream record is upstream of a plan's `systems`
+declaration, supplying the ownership fact a plan author consults before writing that declaration; it
+is not a new field on the plan or a new thing the concurrency check parses. Whether that record takes
+the shape of a new template (`workstream.template.md`/`workstream.schema.json`, as `000272`
+originally asked for) or a simpler shared file is downstream design work this amendment does not
+settle — it settles only that the concept has a place, as ownership metadata, not as a locking
+primitive.
+
+**What does not change.** No document in this template family needs a `workstream` field to
+participate in the concurrency check; `sys-fw-templates`'s `domain: governance` grouping and every
+other phase's `systems` declaration mean exactly what they meant before this amendment. What changes
+is that "no new document kind" is no longer the complete answer to `000272` — the layer above locking
+that the original verdict declined to add is a different layer than the ownership layer the owner
+asked for on 2026-09-19, and the latter is accepted.
+
 ## Design: five document shapes, one shared system
 
 | Shape | Ideas | Deliverables (under `docs/00-working/framework/05-schemas/`) |
@@ -136,8 +181,11 @@ schema, per REQ-024's per-requirement verification methods.
 
 ## Ideas not promoted in this batch
 
-- **`000272`** (workstream layer) — answered above rather than promoted; the answer is "no new
-  document kind," recorded as a design decision in this plan rather than left as an open idea.
+- **`000272`** (workstream layer) — answered above rather than promoted; the original answer was "no
+  new document kind" for locking purposes, and that holds. The owner's 2026-09-19 ruling (`000288`,
+  see the amendment above) qualifies the conclusion: a workstream is accepted as an ownership unit
+  that feeds the lock with path declarations, not as a locking primitive itself. Recorded as a design
+  decision in this plan, amended in place, rather than left as an open idea.
 - **`000273`** (master HTML document) — not ready. Its own text says it links and summarizes
   "workflows, governance, templates, schemas, and analysis findings **once available**"; none of
   those exist yet outside two ungoverned drafts. Promoting it now would produce a document about
