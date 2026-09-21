@@ -9333,8 +9333,19 @@ items:
   - docs/08-governance/codes.yaml
   - test/test_codes.py
   - AGENTS.md
-  next_action: Establish first whether codes.yaml on dev can serve as the reservation point, or whether
-    a pre-merge reservation needs somewhere else to live. That choice decides the whole phase.
+  session: doc-session-code-allocation-collision-proof
+  next_action: 'All three acceptance conditions met; both verification commands green
+    (governance exit 0; pytest test/test_codes.py 57 passed, 48 before this phase).
+    The design question the phase named as deciding everything is answered: codes.yaml
+    on dev cannot serve as the reservation point, because a worktree cannot check out
+    dev at all and so cannot commit there, and reading committed state is the defect
+    rather than a fix for it. Reservations live in the git common directory, which every
+    worktree of one repository shares with no commit and no merge, one file per code
+    created with O_CREAT | O_EXCL. The owner approved the AGENTS.md replacement wording
+    on 2026-09-21, the deliverables were widened on dev to cover that file before it was
+    touched, and the edit is on this branch. Ready for an independent review of git diff
+    dev..agent/phase-conc-03 and the owner''s integration decision; not complete, since
+    GOV-003 requires both.'
 - id: phase-conc-04
   title: Write the claim-recovery procedure and record it in GOV-003
   plan: doc-concurrency-git-safety
