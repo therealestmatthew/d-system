@@ -18,7 +18,10 @@ remains, say so. That is a successful research result."
 **Coverage caveat, carried forward from the owner's ruling and binding on everything below.** This
 case is built from the 67 rows this campaign deep-read, not from the full candidate pool. 336 of
 400 collision candidates surfaced by search have never been deep-read, including 2 of the 32
-candidates in the top prescore band (band = max of the two prescores) — the campaign's own stop
+candidates in the top prescore band (band = max of the two prescores) — `dhar-vaidhyanathan-varma-agenticakm-2026`
+and `epistemic-sybil-resistance-multiplying-agents-2026`, each a documented near-duplicate of a
+source this campaign did deep-read, under the partner ids `dhar-vaidhyanathan-varma-agenticakm-2026-arxiv`
+and `epistemic-sybil-resistance-bara-2026` respectively — the campaign's own stop
 condition was met by count of sources compared, not by coverage of that band. Every claim below that
 a component "is established" rests on the sources actually read; it is not a claim that the 336
 unread candidates would not sharpen or contest the picture. Separately, on search completeness: this
