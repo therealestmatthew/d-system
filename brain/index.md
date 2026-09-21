@@ -56,6 +56,7 @@ brain/
 - [Recompute a Delegated Measurement](procedures/recompute-a-delegated-measurement.md)
 - [A Check That Cannot Fail Is Not a Check](procedures/a-check-that-cannot-fail-is-not-a-check.md)
 - [When a Hook Blocks a Write, Hand Off a Candidate](procedures/hook-blocked-writes-hand-off-a-candidate.md)
+- [When a Check Cannot Run Where You Are, Report the Limitation — Do Not Widen Your Own Access](procedures/report-the-limitation-do-not-widen-your-access.md)
 
 ### Episodes
 *(none yet — add session summaries here)*

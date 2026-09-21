@@ -486,3 +486,88 @@ Stated so the scorecard is not read as more than it is.
 - **The corpus cannot see sub-agent work.** 744 sub-agent transcripts were deliberately excluded as
   not being owner sessions. Where a session's real work happened inside its dispatched agents, this
   measurement sees only the dispatch.
+
+---
+
+## 11. Owner rulings on §9's open questions
+
+Settled by the owner on 2026-09-20, after reading this document's findings and before
+`phase-tax-02` closed. Recorded here beside the questions they answer, on the same basis as the
+theory document's §11: `PLAN-042` states that nothing under it creates governed policy, and these
+rulings bind this investigation rather than the repository.
+
+**The measurements above are unchanged by anything below.** No scorecard outcome, count or verdict
+was revised after the rulings were made.
+
+### Q1 — The engine goes to `tools/` with an OPS document; the prompts go to `docs/02-prompts/`
+
+**Ruled:** split them by what they are. The four reduction scripts are a reusable deterministic
+reducer and go to `tools/`, each shipping the `OPS-NNN` document `AGENTS.md` requires, paired by
+filename so `tools/generate_tool_docs.py` can find it. The two taxonomy prompts are method documents
+and go to `docs/02-prompts/` alongside the other thirty-six.
+
+**Rejected:** packaging the whole set as a `GOV-008` prompt pack, which suits a repeatable campaign
+rather than a tool plus two documents; and leaving them where they are, which is exactly what idea
+`000290` was captured to prevent — a gitignored engine is lost or rewritten the next time anyone
+wants it.
+
+**One consequence to carry into that work.** Promoting the engine makes a raw-transcript reader a
+first-class repository tool — the precise surface `REQ-026` R06 exists to constrain. Idea `000291`
+holds the question of making R06 enforceable rather than attested, and the two should be planned
+together rather than in either order alone.
+
+The ruling is recorded as an assessment annotation on idea `000290`, which carried this as its open
+question.
+
+### Q2 — B2 Adjudication is merged into B1; the decision record survives as an artefact
+
+**Ruled:** B2 does not survive as a type. Its disconfirming observation — "every session that
+produces a decision record also produces a plan or requirement in the same session" — fired **7 times
+out of 7**. The decision record remains a distinct artefact that B1 Specification sessions produce;
+it is not a distinct session type.
+
+**Why this ruling and not the available escapes.** Two were offered and declined. Reading 7-of-7 as
+local rather than general is defensible on n=7, but the portable claim was about *existence* of the
+type, and the evidence says the type does not separate here even once. Narrowing B2 to sessions whose
+only governed output is a decision record would salvage the distinction — by redefining a type after
+seeing the evidence, which is the curve-fitting the whole theory-first design was built to prevent.
+
+The model is now **twelve types**. Keeping B2 after a complete disconfirmation would have made every
+other disconfirmer in the model decorative, and the registration was worth having only if a clean
+failure actually removes something.
+
+### Q3 — C4 Rehearsal keeps its place in the model; the practice is not instituted
+
+**Ruled:** the type stays and stays scored. The practice is **not** created now.
+
+The finding stands and is worth preserving: nothing in this repository independently exercises the
+system end to end, and where it is exercised at all it is by whoever just built the thing. But a
+per-release ritual on a system with no release cadence is a rule that will not be followed, and an
+unfollowed rule erodes the ones around it. What is needed first is a trigger that would actually fire
+here. Idea `000292` holds that question.
+
+### Q4 — The governance interrupt is captured, not built in this session
+
+**Ruled:** the write-path interrupt is the investigation's clearest actionable finding and will be
+specified properly rather than improvised. `AGENTS.md`'s plan-before-code rule applies: a hook on
+`docs/08-governance/`, `AGENTS.md` and `CLAUDE.md` is a non-trivial change and needs a requirement
+and a plan first. Idea `000293` carries the finding, its counts, and the proposed shape.
+
+**Declined:** a router-proposal-only treatment. The evidence argues directly against it — first-prompt
+routing catches this type 0% of the time, so an identification rule agents are expected to read is the
+one option the data rules out.
+
+### A ruling this document did not ask for
+
+**The executing agent's two reaches into `_private/`.** It mirrored 363 derived files into the
+primary checkout's `_private/analysis/session-taxonomy/`, and it temporarily symlinked
+`_private/portfolio` into the worktree to make the identifier check run, removing the symlink
+afterwards.
+
+The owner **ratified the mirror** — `git worktree remove` destroys ignored content, and the
+coordinating session's dispatch had authorised that path — and **ruled against the symlink**. The
+correct move there was to report the check's limitation and let the primary-checkout run settle it,
+which is what `phase-tax-01` did and what the coordinating session did here. `AGENTS.md` reserves
+`_private/` access to the owner's direction, and an agent may not extend its own authorisation to
+reach it. Logged as an anti-pattern so the ruling reaches the next agent rather than staying in one
+session record.

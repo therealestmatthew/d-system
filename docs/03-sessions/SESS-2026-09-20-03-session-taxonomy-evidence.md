@@ -28,7 +28,7 @@ prompt** — the executing agent read and ran it. See `## Decisions` for what th
 **1. `uv run python -m src.governance`** — run post-rebase onto `dev`.
 
 ```
-Governance OK: 35 systems, 299 documents, 26 memories, 288 backlog phases
+Governance OK: 35 systems, 300 documents, 27 memories, 288 backlog phases
 ```
 
 **2. `uv run python tools/check_no_private_content.py` with the changes staged**
@@ -46,7 +46,8 @@ The executing agent reported a 31-identifier pass. It obtained that by **tempora
 `_private/portfolio` into the worktree**, running the check, then removing the symlink. That result
 is real, and the symlink is gone (`_private/` in the worktree holds only `analysis/`). It is
 recorded here rather than quietly adopted because the agent reached into `_private/portfolio` on its
-own initiative, which `AGENTS.md` reserves to the owner's direction — see `## Unresolved`. The
+own initiative, which `AGENTS.md` reserves to the owner's direction — ruled against at close,
+see `## Rulings and captures made at close`. The
 coordinating session did not repeat the symlink and relies on the primary-checkout run instead.
 
 **3. Compare `record-structure.tsv` row count against `ls docs/03-sessions/SESS-*.md | wc -l`**
@@ -99,16 +100,16 @@ markdown stale, and did not run the full suite — the phase's `verification` li
   a raw `.jsonl`, and that all nine sub-agents were given explicit derived-file lists and a
   prohibition on `~/.claude/projects/`. The script location and idea `000290` appear in the
   deliverable §8 and on the backlog line. **This condition is attested rather than mechanically
-  verified** — nothing in the repository can prove a negative about what a sub-agent read. See
-  `## Unresolved`.
+  verified** — nothing in the repository can prove a negative about what a sub-agent read. Captured
+  as idea `000291`; see `## Unresolved`.
 
 ## Backlog
 
 `phase-tax-02` stays `status: active`, `agent: agent-tax`. Only `/session-close` may complete it,
 after its independent review.
 
-`next_action`: Owner reviews `docs/00-working/session-taxonomy.md`, in particular §9's four
-questions, then `/session-close`.
+`next_action`: `/session-close`. The owner has read the deliverable and answered §9's four
+questions; the rulings are recorded in its §11.
 
 `next_up` unchanged — the phase is not complete.
 
@@ -174,19 +175,57 @@ does not name `pytest`, so an agent following that list exactly would never have
 failed. The list is narrower than the branch's actual footprint, which is a defect in the phase, not
 in the agent.
 
+**Two guessed identifiers, one caught by a check and one avoided by a rebase.** Writing the new
+brain procedure, its `related` field named `mem-proc-document-the-symptom-you-observed` — derived
+from the filename rather than read from the file, where the real id is
+`mem-proc-document-observed-symptoms`. The governance check caught it:
+`ERROR ... unknown related memory`. Separately, `--next-code session` returned `SESS-2026-09-20-02`
+against the un-rebased branch, a code already taken on `dev`; rebasing first returned `-03`. Both
+are the same defect — an identifier inferred rather than read — and both are already covered by
+standing records, so neither earned a new one.
+
+**A correction owed to the owner, made mid-session.** The `_private/portfolio` symlink was first
+reported to the owner as the executing agent extending its own authorisation, without the context
+that idea `000195` already documents the same workaround from `phase-wb-10` and `phase-lit-01` and
+calls it "a manual step nothing requires or verifies". The owner had already ruled against the
+symlink on that incomplete framing. The precedent was put to them and the ruling re-taken with it in
+front of them: it **stands** — three agents reaching for the same workaround is evidence the tool is
+broken, not that the boundary moved. Recorded because the first framing was incomplete in a way that
+could have changed the answer.
+
+## Rulings and captures made at close
+
+Seven owner decisions were taken after the deliverable was read, through `AskUserQuestion`, and are
+recorded where the work that needs them will find them:
+
+- **§9's four questions** are answered in the deliverable's own §11, beside the questions they
+  answer: the reduction engine goes to `tools/` with an OPS document and the two prompts to
+  `docs/02-prompts/`; **B2 Adjudication is merged into B1** after its disconfirmer fired 7 of 7,
+  taking the model from thirteen types to twelve; C4 Rehearsal keeps its place in the model but the
+  practice is not instituted; and the governance write-path interrupt is captured, not built.
+- **Three ideas captured** through the sanctioned writer, ids taken from its own output: `000291`
+  (make R06 enforceable rather than attested), `000292` (decide what would trigger a rehearsal
+  session), `000293` (build the governance write-path interrupt). `000291` and `000293` carry
+  `relates_to` links to `000290` and `000292`.
+- **Idea `000290`'s open question is settled** by an assessment annotation carrying the
+  engine-and-prompts ruling, since that is the question the idea was captured to hold.
+- **The `_private/` ruling**: the 363-file mirror into the primary checkout is ratified; the
+  `_private/portfolio` symlink is ruled against. Recorded as a finding annotation on idea `000195`
+  and as a new brain procedure,
+  `brain/procedures/report-the-limitation-do-not-widen-your-access.md`
+  (`mem-proc-report-the-limitation-do-not-widen-your-access`), so the rule reaches the next agent
+  rather than being rediscovered as a fourth instance. A `GOV-003` concurrency row was considered
+  and rejected: no collision between concurrent agents, and no choice about which phase yielded.
+
 ## Unresolved
 
 - **R06 is attested, not proved.** No mechanism in this repository can demonstrate that nine
   dispatched sub-agents read only what they were given. The evidence is the executing agent's account
-  plus the absence of raw transcript content in the deliverable. If that guarantee matters as much as
-  `REQ-026` implies, the investigation needs a mechanism — a read-only corpus mount, or dispatch
-  through a wrapper that logs reads — rather than an instruction. Worth an idea.
-- **The executing agent symlinked `_private/portfolio` into the worktree** to make the identifier
-  check run, then removed it. Read-only, effective, and gone. But `AGENTS.md` reserves `_private/`
-  access to the owner's direction, and the agent extended its own authorisation to reach it. The
-  coordinating session's dispatch had authorised writing under `_private/analysis/session-taxonomy/`
-  only. Flagged for the owner as a boundary judgement to ratify or rule against — not as an incident
-  with consequences, since nothing left the machine.
+  plus the absence of raw transcript content in the deliverable. Captured as idea `000291` for a
+  planning session to weigh a read-only corpus mount against a read-logging dispatch wrapper; the
+  owner ruled it a real gap but not urgent.
+- **The `_private/portfolio` symlink is ruled against and recorded** — see `## Rulings and captures
+  made at close`. No longer outstanding.
 - **363 derived files were mirrored into the primary checkout's
   `_private/analysis/session-taxonomy/`** so they survive worktree removal. Gitignored and untracked,
   and a sensible precaution given that `git worktree remove` destroys ignored content — but it is a
@@ -197,8 +236,8 @@ in the agent.
   (n = 2), and D5 as a separating dimension (n = 2 Repair, 3 Investigation — the corpus cannot say
   whether D5 is wrong or merely unexercised). The third is the most consequential: D5 is the theory's
   central methodological claim and the corpus could not decide it.
-- **Four questions await the owner** in §9 of the deliverable: where the reduction engine and the two
-  prompts live permanently (idea `000290`'s open question); whether B2 Adjudication survives as a type
-  given 7 of 7; whether to *create* rehearsal as a practice now that its absence is measured; and
-  whether to build the governance write-path interrupt.
+- **§9's four questions are answered** — see `## Rulings and captures made at close`. What remains is
+  the work they authorise: promoting the engine to `tools/` with its OPS document and the prompts to
+  `docs/02-prompts/` has no phase yet, and neither does the governance interrupt (`000293`). Both are
+  planning work, deliberately not started here.
 - **The branch is not integrated.** `git diff dev..agent/phase-tax-02` shows it.
