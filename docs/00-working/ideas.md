@@ -9692,7 +9692,7 @@ Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (ide
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-13T19:40:36-04:00): ## Duplicate of 000150 with distinct framing
 
@@ -9719,6 +9719,7 @@ Ideas 000152 (worktree registry) and 000158 (idea ID collisions) are related pro
 000150 is the authoritative record of this issue. 000195 is a duplicate, found independently and adding technical detail about the worktree mandate. The owner should decide whether to close 000195 as a duplicate of 000150 or keep it for the distinct session context it provides.
 
 PROPOSED LINK: 000195 --supersedes--> 000150 (both report the identical issue found 2026-09-12; 000150 has owner's ruling and campaign context; 000195 emphasizes worktree mandate commits and session detail)
+- **finding** by agent-tax (2026-09-20T21:42:08-04:00): Third recorded instance, 2026-09-20, in phase-tax-02. The agent executing the Part 2 taxonomy prompt hit the same wall this idea describes - check_no_private_content reporting OK with 0 identifiers checked in a worktree - and reached for the same workaround the phase-wb-10 and phase-lit-01 sessions reached for: it temporarily symlinked _private/portfolio into the worktree, ran the check to get a real 31-identifier pass, then removed the symlink. The symlink is gone and _private/ in that worktree held only analysis/ afterwards. Owner ruling, same day, with this idea's precedent in front of them: the ruling against the symlink STANDS. Three agents independently reaching for the same workaround is evidence the tool is broken, not that the authorisation boundary moved - AGENTS.md reserves _private/ to the owner's direction, and this idea already calls the step one that nothing requires or verifies. The sanctioned behaviour is the one phase-tax-01 and phase-tax-02's coordinating session both used: report that the check ran at half strength, decline to call it a pass, and let the primary-checkout run at integration settle it. Recorded as brain/procedures/report-the-limitation-do-not-widen-your-access.md so the rule reaches the next agent rather than being rediscovered as a fourth instance.
 
 </details>
 
@@ -12565,3 +12566,126 @@ The campaign is complete, so this has no remaining caller in its original form, 
 The habit half of this is recorded separately as the brain procedure mem-proc-recompute-a-delegated-measurement, which says to recompute a delegated measurement rather than read it. That procedure and this idea are the two halves of the same finding: the procedure is what an agent does today, and this is the work that would make the procedure unnecessary for this battery.
 
 Related: mem-proc-check-that-cannot-fail covers the adjacent failure of a check that cannot fail at all.
+
+---
+
+## 000291 · Promote the session-taxonomy reduction engine to tools/ with an OPS doc
+
+**Created 2026-09-20T21:41:31-04:00 · Status: `open`**
+
+The session-type taxonomy investigation (PLAN-042, phase-tax-02) needed a deterministic
+reduction of the raw Claude Code transcript corpus before any agent could read anything,
+because REQ-026 R06 forbids an agent from opening a raw transcript. Four scripts were written
+to do it: reduce_sessions.py (parses every top-level .jsonl in the corpus project directories
+and emits a per-session manifest, a prompts-only file, and an activity signature),
+record_structure.py (a structural census of every docs/03-sessions/SESS-* record),
+stage1_classify.py (a rule pass assigning candidate entry and dominant session-type labels),
+and make_digests.py (bounded per-session digests sized for sub-agent scopes).
+
+They are reusable infrastructure, not one-off analysis. The CLAUDE.md / AGENTS.md revamp will
+want to rerun them, as will any future usage audit, any question about how sessions are
+actually run, and Part 3 of this investigation (the record-quality and template phase).
+
+The proposal is to promote the SCRIPTS ONLY to tools/, with an OPS document under
+docs/08-governance/ describing the derived layers, the privacy boundary, and how to rerun
+them. The derived OUTPUTS are never promoted: they contain owner prompt text and must stay
+under _private/analysis/session-taxonomy/ inside the gitignored boundary (ADR-009), and the
+scripts must keep writing there by default.
+
+Open for the owner to decide, and deliberately not decided here: whether the engine and the
+two investigation prompts belong in tools/ plus an OPS doc, in a prompt pack under GOV-008,
+or staying in docs/00-working/. Until the owner rules, the scripts live alongside their
+outputs in _private/analysis/session-taxonomy/.
+
+**Annotations**
+
+- **assessment** by repository-owner (2026-09-20T21:42:00-04:00): Owner ruling, 2026-09-20, settling this idea's open question on where the engine lives. The four reduction scripts go to tools/ with an OPS document, per AGENTS.md's rule that a new tool under tools/ ships with its own OPS-NNN doc paired by filename. The two taxonomy prompts go to docs/02-prompts/ as method documents alongside the other prompts. Rejected: packaging the whole set as a GOV-008 prompt pack, which fits a repeatable campaign rather than a tool plus two documents; and leaving them in _private/analysis/, which is what this idea was captured to prevent, since a gitignored engine is lost or rewritten the next time someone wants it. One consequence to carry into that work: promoting the engine makes a raw-transcript reader a first-class repository tool, which is exactly the surface REQ-026 R06 exists to constrain - see idea 000292 on making R06 enforceable rather than attested.
+
+**Links**
+
+- relates_to ← `000292`
+
+---
+
+## 000292 · Make REQ-026 R06's "no agent reads a raw transcript" enforceable rather than attested
+
+**Created 2026-09-20T21:41:38-04:00 · Status: `open`**
+
+The session-taxonomy investigation (PLAN-042, phase-tax-02) dispatched nine sub-agents
+under a requirement that none of them read a raw transcript. Compliance was established
+by instruction plus the executing agent's account in the session record. Nothing in the
+repository can prove a negative about what a dispatched agent read, so R06 is attested,
+not verified - and its verification clause implies a guarantee that no mechanism backs.
+
+Two candidate mechanisms, neither evaluated: a read-only corpus mount or copy that agents
+are pointed at instead of ~/.claude/projects/, so the raw path is simply not reachable;
+or dispatch through a wrapper that logs every read an agent performs, making a breach
+detectable after the fact rather than preventable.
+
+The owner ruled on 2026-09-20 that this is a real gap but not urgent - the investigation
+is finished and the corpus is not going anywhere - and that it should be captured for a
+planning session that can weigh the two approaches rather than built ad hoc. Raised by
+phase-tax-02's coordinating session; recorded in SESS-2026-09-20-03's Unresolved section.
+
+**Links**
+
+- relates_to → `000291`
+
+---
+
+## 000293 · Decide what would trigger a rehearsal session, now that the absence of one is measured
+
+**Created 2026-09-20T21:41:38-04:00 · Status: `open`**
+
+The session-taxonomy investigation (PLAN-042, phase-tax-02) predicted a Rehearsal session
+type - the system executed end to end as a user would, to discover whether it works rather
+than to change it - and then measured its complete absence. Nothing in this repository
+independently exercises the system end to end; where it is exercised at all, it is by
+whoever just built the thing being exercised. That is the finding: there is no independent
+verification step.
+
+The owner ruled on 2026-09-20 that the type stays in the model and is kept scored, but
+that the practice is NOT instituted now. The reason is that a per-release ritual on a
+system with no release cadence is a rule that will not be followed, and an unfollowed rule
+erodes the ones around it. What is needed first is a trigger that actually fires here -
+candidates include a demo or workshop date, a workbench UI change that crosses some
+threshold, or a fixed interval - and that is a planning decision, not a ritual to declare.
+
+Related: phase-demo-05 and phase-wb-07 already carry rehearsal work items, so the practice
+has precedent in this repository even though no session's primary purpose was ever a
+rehearsal.
+
+**Links**
+
+- relates_to ← `000294`
+
+---
+
+## 000294 · Build the governance write-path interrupt - the taxonomy investigation's clearest actionable finding
+
+**Created 2026-09-20T21:41:38-04:00 · Status: `open`**
+
+The session-taxonomy investigation (PLAN-042, phase-tax-02) measured that governance
+changes never announce themselves. Zero of 98 live transcripts OPENED as a governance
+session, yet 28 wrote to a governance path - and 27 of those 28 (96%) did it inside a
+session that was about something else entirely.
+
+The consequence is specific and it contradicts what Part 1's theory proposed: a router
+that identifies session type from the first prompt catches this type 0% of the time. Only
+a write-path trigger can. That matters more for governance than for any other type,
+because a governance change binds every future session and arrives, on this evidence,
+inside a diff about something unrelated - which is precisely how AGENTS.md's own
+2026-09-09 incident happened.
+
+Proposed shape, not yet specified: a hook firing on writes to docs/08-governance/,
+AGENTS.md and CLAUDE.md, that names what is about to change and requires acknowledgement.
+Whether it belongs in settings.json as a hook, in a router proposal, or somewhere else is
+open.
+
+The owner ruled on 2026-09-20 to capture this rather than improvise a hook at the end of a
+long session: AGENTS.md's plan-before-code rule means a non-trivial change needs a
+requirement and a plan first. Evidence and counts are in docs/00-working/session-taxonomy.md.
+
+**Links**
+
+- relates_to → `000293`

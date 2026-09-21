@@ -13154,12 +13154,12 @@ items:
     288 backlog phases); pytest 638 passed; record-structure.tsv 123 data rows == 123 SESS
     files. The staged private-content check reports 0 identifiers in a worktree (no _private/
     portfolio there); the conclusive 31-identifier run belongs in the primary checkout at
-    integration. pytest failed first on a stale generated ideas.md after idea 000290 was
+    integration. pytest failed first on a stale generated ideas.md after idea 000291 was
     appended, and was fixed by regenerating it. Stage 0 parsed all 113
     transcripts with 0 parse errors and 0 unrecognised record types; no agent read a raw
     transcript. Engine and derived outputs at _private/analysis/session-taxonomy/
     (reduce_sessions.py, record_structure.py, make_digests.py, stage1_classify.py); promotion
-    idea 000290 captured and present in the fold.'
+    idea 000291 captured and present in the fold.'
   next_action: /session-close. The owner has read the deliverable and ruled on all four of
     its section 9 questions; the rulings are recorded in its section 11. The
-    session record must name the reduction-script location and idea 000290.
+    session record must name the reduction-script location and idea 000291.

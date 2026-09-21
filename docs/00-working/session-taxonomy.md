@@ -439,7 +439,7 @@ gitignored `_private/` boundary (`ADR-009`), and nowhere trackable:
 **The engine** is four scripts, kept alongside the outputs at the same path:
 `reduce_sessions.py` (Stage 0), `record_structure.py` (Stage 0b), `make_digests.py` (Stage 0c) and
 `stage1_classify.py` (Stage 1). An idea proposing the **scripts only** be promoted to `tools/` with
-an OPS document is captured as **`000290`** (*promote the session-taxonomy reduction engine to
+an OPS document is captured as **`000291`** (*promote the session-taxonomy reduction engine to
 tools/ with an OPS doc*). The derived outputs are never promoted: they carry owner prompt text.
 
 **`record-structure.tsv` is ready for Part 3** — the record-quality and template phase
@@ -459,7 +459,7 @@ Few, and only the ones that change the design.
 
 1. **Where should the engine and the two prompts live permanently?** `tools/` plus an OPS document;
    a prompt pack under `GOV-008`; or staying in `docs/00-working/` and `_private/analysis/`. This is
-   `000290`'s open question and the reason the idea was captured rather than acted on.
+   `000291`'s open question and the reason the idea was captured rather than acted on.
 2. **Does B2 Adjudication survive as a type?** Its disconfirmer fired 7 times out of 7. The evidence
    says merge it into B1 and keep the decision record as an artefact. That is a change to the model,
    not a measurement, so it is yours.
@@ -508,15 +508,15 @@ and go to `docs/02-prompts/` alongside the other thirty-six.
 
 **Rejected:** packaging the whole set as a `GOV-008` prompt pack, which suits a repeatable campaign
 rather than a tool plus two documents; and leaving them where they are, which is exactly what idea
-`000290` was captured to prevent — a gitignored engine is lost or rewritten the next time anyone
+`000291` was captured to prevent — a gitignored engine is lost or rewritten the next time anyone
 wants it.
 
 **One consequence to carry into that work.** Promoting the engine makes a raw-transcript reader a
-first-class repository tool — the precise surface `REQ-026` R06 exists to constrain. Idea `000291`
+first-class repository tool — the precise surface `REQ-026` R06 exists to constrain. Idea `000292`
 holds the question of making R06 enforceable rather than attested, and the two should be planned
 together rather than in either order alone.
 
-The ruling is recorded as an assessment annotation on idea `000290`, which carried this as its open
+The ruling is recorded as an assessment annotation on idea `000291`, which carried this as its open
 question.
 
 ### Q2 — B2 Adjudication is merged into B1; the decision record survives as an artefact
@@ -544,14 +544,14 @@ The finding stands and is worth preserving: nothing in this repository independe
 system end to end, and where it is exercised at all it is by whoever just built the thing. But a
 per-release ritual on a system with no release cadence is a rule that will not be followed, and an
 unfollowed rule erodes the ones around it. What is needed first is a trigger that would actually fire
-here. Idea `000292` holds that question.
+here. Idea `000293` holds that question.
 
 ### Q4 — The governance interrupt is captured, not built in this session
 
 **Ruled:** the write-path interrupt is the investigation's clearest actionable finding and will be
 specified properly rather than improvised. `AGENTS.md`'s plan-before-code rule applies: a hook on
 `docs/08-governance/`, `AGENTS.md` and `CLAUDE.md` is a non-trivial change and needs a requirement
-and a plan first. Idea `000293` carries the finding, its counts, and the proposed shape.
+and a plan first. Idea `000294` carries the finding, its counts, and the proposed shape.
 
 **Declined:** a router-proposal-only treatment. The evidence argues directly against it — first-prompt
 routing catches this type 0% of the time, so an identification rule agents are expected to read is the

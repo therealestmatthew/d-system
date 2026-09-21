@@ -28,7 +28,7 @@ prompt** — the executing agent read and ran it. See `## Decisions` for what th
 **1. `uv run python -m src.governance`** — run post-rebase onto `dev`.
 
 ```
-Governance OK: 35 systems, 300 documents, 27 memories, 288 backlog phases
+Governance OK: 35 systems, 302 documents, 28 memories, 292 backlog phases
 ```
 
 **2. `uv run python tools/check_no_private_content.py` with the changes staged**
@@ -47,7 +47,28 @@ The executing agent reported a 31-identifier pass. It obtained that by **tempora
 is real, and the symlink is gone (`_private/` in the worktree holds only `analysis/`). It is
 recorded here rather than quietly adopted because the agent reached into `_private/portfolio` on its
 own initiative, which `AGENTS.md` reserves to the owner's direction — ruled against at close,
-see `## Rulings and captures made at close`. The
+see `**A third identifier collision, in the idea log this time, resolved by renumbering.** At
+integration, `_data/ideas.jsonl` conflicted: a peer session on `dev` had created idea `000290`
+(replace the literature-review campaign gate with a deterministic one) at 21:26, and this branch had
+created its own `000290` (promote the reduction engine) at 20:17. Mine was 69 minutes older and
+still the one that renumbered, because `AGENTS.md`'s rule is integration order, not creation order —
+codes are free before merge and permanent after, and the peer's was already on `dev`.
+
+Resolved the sanctioned way rather than by hand-editing an append-only log: this branch's four idea
+appends were dropped, the branch was rebased, and all four were re-allocated through
+`tools/append_idea.py` with their ids taken from the writer's own output. The mapping is engine
+`000290`→`000291`, R06 `000291`→`000292`, rehearsal `000292`→`000293`, governance interrupt
+`000293`→`000294`; the annotations and both `relates_to` links were re-applied against the new ids,
+and fifteen references across this record, the deliverable and the backlog line were remapped. The
+peer's `000290` is untouched.
+
+This is the **third** collision of the same shape in two days — a session record code on
+`phase-lit-09`, a session record code avoided here by rebasing first, and now an idea id. All three
+have one cause: allocation reads the working tree rather than `dev`. `phase-conc-03` (make
+document-code allocation collision-proof across concurrent sessions) is first in `next_up` and is
+the fix; `append_idea.py` should be in its scope, which the phase does not currently say.
+
+## Rulings and captures made at close`. The
 coordinating session did not repeat the symlink and relies on the primary-checkout run instead.
 
 **3. Compare `record-structure.tsv` row count against `ls docs/03-sessions/SESS-*.md | wc -l`**
@@ -73,11 +94,11 @@ AssertionError: docs/00-working/ideas.md is generated. Regenerate it with
 tools/generate_ideas_md.py; do not edit it by hand.
 ```
 
-The executing agent appended idea `000290` through the sanctioned writer but left the generated
+The executing agent appended idea `000291` through the sanctioned writer but left the generated
 markdown stale, and did not run the full suite — the phase's `verification` list does not name
 `pytest`, so nothing in its instructions forced it to. Fixed by the coordinating session with
 `tools/generate_ideas_md.py` (`wrote docs/00-working/ideas.md — 290 ideas`) in commit
-`Regenerate ideas.md after appending idea 000290`. The green run above is post-fix.
+`Regenerate ideas.md after appending idea 000291`. The green run above is post-fix.
 
 ## Acceptance
 
@@ -98,10 +119,10 @@ markdown stale, and did not run the full suite — the phase's `verification` li
 - **REQ-026 R06 holds** — **Met on the evidence available.** Reduction ran once through four scripts
   at `_private/analysis/session-taxonomy/`; the agent reports that no agent, itself included, opened
   a raw `.jsonl`, and that all nine sub-agents were given explicit derived-file lists and a
-  prohibition on `~/.claude/projects/`. The script location and idea `000290` appear in the
+  prohibition on `~/.claude/projects/`. The script location and idea `000291` appear in the
   deliverable §8 and on the backlog line. **This condition is attested rather than mechanically
   verified** — nothing in the repository can prove a negative about what a sub-agent read. Captured
-  as idea `000291`; see `## Unresolved`.
+  as idea `000292`; see `## Unresolved`.
 
 ## Backlog
 
@@ -203,11 +224,11 @@ recorded where the work that needs them will find them:
   `docs/02-prompts/`; **B2 Adjudication is merged into B1** after its disconfirmer fired 7 of 7,
   taking the model from thirteen types to twelve; C4 Rehearsal keeps its place in the model but the
   practice is not instituted; and the governance write-path interrupt is captured, not built.
-- **Three ideas captured** through the sanctioned writer, ids taken from its own output: `000291`
-  (make R06 enforceable rather than attested), `000292` (decide what would trigger a rehearsal
-  session), `000293` (build the governance write-path interrupt). `000291` and `000293` carry
-  `relates_to` links to `000290` and `000292`.
-- **Idea `000290`'s open question is settled** by an assessment annotation carrying the
+- **Three ideas captured** through the sanctioned writer, ids taken from its own output: `000292`
+  (make R06 enforceable rather than attested), `000293` (decide what would trigger a rehearsal
+  session), `000294` (build the governance write-path interrupt). `000292` and `000294` carry
+  `relates_to` links to `000291` and `000293`.
+- **Idea `000291`'s open question is settled** by an assessment annotation carrying the
   engine-and-prompts ruling, since that is the question the idea was captured to hold.
 - **The `_private/` ruling**: the 363-file mirror into the primary checkout is ratified; the
   `_private/portfolio` symlink is ruled against. Recorded as a finding annotation on idea `000195`
@@ -221,7 +242,7 @@ recorded where the work that needs them will find them:
 
 - **R06 is attested, not proved.** No mechanism in this repository can demonstrate that nine
   dispatched sub-agents read only what they were given. The evidence is the executing agent's account
-  plus the absence of raw transcript content in the deliverable. Captured as idea `000291` for a
+  plus the absence of raw transcript content in the deliverable. Captured as idea `000292` for a
   planning session to weigh a read-only corpus mount against a read-logging dispatch wrapper; the
   owner ruled it a real gap but not urgent.
 - **The `_private/portfolio` symlink is ruled against and recorded** — see `## Rulings and captures
@@ -238,6 +259,6 @@ recorded where the work that needs them will find them:
   central methodological claim and the corpus could not decide it.
 - **§9's four questions are answered** — see `## Rulings and captures made at close`. What remains is
   the work they authorise: promoting the engine to `tools/` with its OPS document and the prompts to
-  `docs/02-prompts/` has no phase yet, and neither does the governance interrupt (`000293`). Both are
+  `docs/02-prompts/` has no phase yet, and neither does the governance interrupt (`000294`). Both are
   planning work, deliberately not started here.
 - **The branch is not integrated.** `git diff dev..agent/phase-tax-02` shows it.
