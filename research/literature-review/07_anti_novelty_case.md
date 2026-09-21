@@ -11,16 +11,16 @@ Knowledge Graph + PROV-O + Event Sourcing + Belief Revision + Argumentation + Tr
 ```
 
 This document builds that case component by component, each backed by rows from
-`04_evidence_matrix.csv` (49 rows, 24 flagged `critical_collision: yes`) with locators, then states
+`04_evidence_matrix.csv` (67 rows, 30 flagged `critical_collision: yes`) with locators, then states
 what is left once the decomposition is applied — the required last step per §14: "If nothing
 remains, say so. That is a successful research result."
 
 **Coverage caveat, carried forward from the owner's ruling and binding on everything below.** This
-case is built from the 49 rows this campaign deep-read, not from the full candidate pool. 340 of
-387 collision candidates surfaced by search have never been deep-read, including 20 of the 32
+case is built from the 67 rows this campaign deep-read, not from the full candidate pool. 336 of
+400 collision candidates surfaced by search have never been deep-read, including 2 of the 32
 candidates in the top prescore band (band = max of the two prescores) — the campaign's own stop
 condition was met by count of sources compared, not by coverage of that band. Every claim below that
-a component "is established" rests on the sources actually read; it is not a claim that the 340
+a component "is established" rests on the sources actually read; it is not a claim that the 336
 unread candidates would not sharpen or contest the picture. Separately, on search completeness: this
 campaign's duplicate-discovery rate fell from 20.0% (44/220, `phase-lit-06`) to 15.0% (58/387,
 `phase-lit-08`) when later searches targeted previously neglected hypotheses — a trend toward more
@@ -87,7 +87,7 @@ A typed, multi-actor, standards-grounded provenance vocabulary — the raw mater
 2013 W3C Recommendation with a decade of extensions (EVI, 2021) and direct 2025-2026 application to
 both agent memory and software-development rationale capture. Nothing in the sources this campaign
 read disputes that the vocabulary itself is established — a claim bounded, like every claim in this
-document, by the coverage caveat above (340 of 387 candidates never deep-read).
+document, by the coverage caveat above (336 of 400 candidates never deep-read).
 
 ---
 
