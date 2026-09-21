@@ -12,7 +12,10 @@ as novel, and nothing below is a claim that D-System should be renamed or refram
 
 The same coverage caveat that opens `07_anti_novelty_case.md` applies here without restatement in
 full: 336 of 400 collision candidates surfaced by this campaign's searches were never deep-read,
-including 2 of the top-prescore band's 32 candidates, and no claim of search saturation is made for
+including 2 of the top-prescore band's 32 candidates — `dhar-vaidhyanathan-varma-agenticakm-2026`
+and `epistemic-sybil-resistance-multiplying-agents-2026`, each a documented near-duplicate of a
+source this campaign did deep-read, under the partner ids `dhar-vaidhyanathan-varma-agenticakm-2026-arxiv`
+and `epistemic-sybil-resistance-bara-2026` respectively — and no claim of search saturation is made for
 any hypothesis. Every category placement below is bounded by what this campaign actually found, not
 by what the full candidate pool would show if read.
 
