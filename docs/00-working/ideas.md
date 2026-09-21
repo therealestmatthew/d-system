@@ -12547,6 +12547,10 @@ Worth considering alongside: a mechanical check that recomputes a phase's duplic
 
 Recorded from phase-lit-09's close, 2026-09-20. Instances: SESS-2026-09-14-04 (phase-lit-08) and SESS-2026-09-19-08 (phase-lit-09).
 
+**Links**
+
+- extended_by ← `000295`
+
 ---
 
 ## 000290 · Replace the literature-review campaign gate with a deterministic script
@@ -12689,3 +12693,69 @@ requirement and a plan first. Evidence and counts are in docs/00-working/session
 **Links**
 
 - relates_to → `000293`
+
+---
+
+## 000295 · The duplicate-rate figures printed in the campaign records do not reproduce
+
+**Created 2026-09-21T10:16:11-04:00 · Status: `open`**
+
+SESS-2026-09-20-02 records a coordinator finding that recomputing phase-lit-09's duplicate-rate denominator from `00_search_ledger.csv` gives 402 result identifiers, 387 distinct, against the 392 that earlier records settled on. The independent close review of 2026-09-21 could reproduce neither figure: under a plain `;` split of `result_ids` over the 2026-09-19 rows it measured 392 tokens and 386 distinct.
+
+That is now a fourth defensible value for the same denominator (386, 387, 392, 402), each produced by a different tokenisation of a column that mixes source ids with free-text citations. The direction survives under all four — the rate lands far from "mostly duplicates" every way it is counted — but the specific numbers printed in the session records and in the deliverables' coverage caveats are not independently reproducible, and they are currently written as though they were.
+
+Extends 000289, which is about fixing the tokenisation rule in the evidence contract. This idea is narrower and about the records rather than the contract: once 000289 fixes the rule, the figures already printed across the campaign's session records and deliverables need either restating under the fixed rule or marking explicitly as unreproducible.
+
+Found by the phase-lit-07 close review, 2026-09-21. Recorded as given; not fixed, because amending a governed evidence contract and the records that depend on it needs its own requirement and plan.
+
+**Links**
+
+- extends → `000289`
+- relates_to → `000296`
+
+---
+
+## 000296 · The source inventory's status column is out of sync with the evidence matrix
+
+**Created 2026-09-21T10:16:11-04:00 · Status: `open`**
+
+`03_source_inventory.csv` marks 51 rows `status: deep_read`, but `04_evidence_matrix.csv` carries 67 rows — 17 sources that have a full matrix row with a populated `evidence_locator` are not marked deep_read in the inventory.
+
+The inventory is a named population in phase-lit-07's amended acceptance, so this is not cosmetic: any measurement that counts deep-read sources from the inventory rather than from the matrix gets a different answer, and both files are cited as authorities in different deliverables. The 2026-09-14 `LIT-07 A` adversarial review logged this as an observation rather than a blocking finding, and it was never closed.
+
+Related: the same class of desync produced the stale "49 rows, 24 flagged" population carried in six deliverables against a matrix that measures 67 and 30. A campaign whose files are appended across nine sessions needs a consistency check between the three CSVs, not just within each one.
+
+Found by the phase-lit-07 close review, 2026-09-21. Anchor for the corpus-integrity defects that review surfaced outside the phase's own acceptance.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lrr (2026-09-21T10:16:22-04:00): Anchor for three corpus-integrity defects surfaced by phase-lit-07's independent close review on 2026-09-21, outside that phase's own acceptance: 000295 (duplicate-rate figures do not reproduce; a fourth denominator value, extends 000289), this idea (inventory status desync, 51 deep_read vs 67 matrix rows), and 000297 (PROMPT-029 undercounts the deliverables at thirteen). They share a cause worth one planning session rather than three: the campaign's three CSVs and fourteen deliverables were appended across nine sessions with no cross-file consistency check, so populations stated in one file drifted from the file that defines them. The review's verbatim findings are in SESS-2026-09-20-02's ## Review section. Not fixed here; phase-lit-07's own blocking gap is separate and named in its next_action.
+
+</details>
+
+**Links**
+
+- relates_to ← `000295`
+- relates_to ← `000297`
+
+---
+
+## 000297 · PROMPT-029's gate contract undercounts the campaign deliverables
+
+**Created 2026-09-21T10:16:11-04:00 · Status: `open`**
+
+The `LIT-07 G` gate contract in `docs/02-prompts/PROMPT-029-*` states its deliverables stop condition as "All thirteen deliverables exist". The campaign produced fourteen files, `00_search_ledger.csv` plus `01` through `13`.
+
+The gate reported the filesystem accurately (14 files present, `00`–`13`), so no measurement was wrong — the contract text is what undercounts, presumably written when `00` was not counted as a deliverable. Left unfixed it is a trap for any future re-run of the gate, which could read "thirteen" as licence to stop checking at `12`, or report a mismatch against a correct filesystem.
+
+Trivial to fix in wording; recorded rather than fixed because PROMPT-029 is a governed prompt and the campaign's own rule is that a defect found while rendering or reviewing is an owner decision, not a fix folded into the finding session.
+
+Found by the phase-lit-07 close review, 2026-09-21.
+
+**Links**
+
+- relates_to → `000296`
