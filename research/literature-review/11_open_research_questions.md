@@ -7,14 +7,17 @@ with the matrix rows or ledger evidence that leave it open. None of these is ans
 question is not a distinctiveness claim, and none of them is presented as evidence that D-System is
 or is not novel.
 
-**Coverage caveat, binding on this document.** This list is drawn from the 49 rows this campaign
-deep-read, not the full candidate pool: 340 of 387 collision candidates have never been deep-read,
-including 20 of the top prescore band's 32 candidates. Several questions below are, in effect,
-questions about what that unread remainder would show — those are named explicitly as such, not
-folded into claims about the literature at large. On search completeness: the duplicate-discovery
-rate fell from 20.0% (44/220, `phase-lit-06`) to 15.0% (58/387, `phase-lit-08`) when later searches
-targeted previously neglected ground — a trend, stated without asserting saturation, which this
-document does not claim anywhere.
+**Coverage caveat, binding on this document.** This list is drawn from the 67 rows this campaign
+deep-read, not the full candidate pool: 336 of 400 collision candidates have never been deep-read,
+including 2 of the top prescore band's 32 candidates — `dhar-vaidhyanathan-varma-agenticakm-2026`
+and `epistemic-sybil-resistance-multiplying-agents-2026`, each a documented near-duplicate of a
+source this campaign did deep-read, under the partner ids
+`dhar-vaidhyanathan-varma-agenticakm-2026-arxiv` and `epistemic-sybil-resistance-bara-2026`
+respectively. Several questions below are, in effect, questions about what that unread remainder
+would show — those are named explicitly as such, not folded into claims about the literature at
+large. On search completeness: the duplicate-discovery rate fell from 20.0% (44/220, `phase-lit-06`)
+to 15.0% (58/387, `phase-lit-08`) when later searches targeted previously neglected ground — a
+trend, stated without asserting saturation, which this document does not claim anywhere.
 
 ---
 
@@ -43,28 +46,39 @@ not evaluate its consequences against D-System's own requirements — that compa
 
 ## Questions tied to H4 — independence-aware convergence
 
-**Q3. Can a closed-form, graph-topological independence discount be extended to mixed human-agent
-provenance scope, or does mixed-scope graph-topological corroboration remain genuinely unbuilt?**
-`epistemic-sybil-resistance-bara-2026`'s own Sec.9 leaves the practical protocol as an explicit open
-problem and scopes the mechanism to AI-agent report multiplicity only;
-`barakat-corroboration-provenance-patterns-tapp2017`'s Eq.8 discount term is a sketched, unimplemented
-citation of an external analogy (Townend et al. 2005, backward-chained this campaign to Eckhardt &
-Lee 1985's N-version-programming reliability theory) that never reappears in the paper. Neither
-source answers whether the extension to mixed scope is a straightforward engineering step or a
-genuinely open research problem. Open.
+**Q3. Withdrawn.** Previously asked: can a closed-form, graph-topological independence discount be
+extended to mixed human-agent provenance scope, or does mixed-scope graph-topological corroboration
+remain genuinely unbuilt? The question rested on a two-source evidentiary base —
+`epistemic-sybil-resistance-bara-2026` (AI-agent-only, its own Sec.9 leaving the practical protocol
+an explicit open problem) and `barakat-corroboration-provenance-patterns-tapp2017` (an unimplemented
+Eq.8 sketch) — that this campaign's own subsequent collision searches have superseded.
+`06_hypothesis_tests.md`'s H4 block, re-derived clean-room by `LIT-09 H4R` (2026-09-19), adds two
+further 2026 sources: `grading-narrators-isnad-rijal-claim-provenance-2026` (ISNAD) and
+`not-all-agreement-counts-as-corroboration-2026` (PACT). ISNAD specifically combines graph topology,
+an explicit computed discount for shared lineage, and a confirmed mixed human-agent narrator scope in
+one source — evidence that bears directly on what Q3 asked. Withdrawn rather than re-aimed at a
+narrower target, per the owner's ruling that a reconciliation pass drops a question whose premise the
+campaign has retired instead of inventing a replacement; see `06_hypothesis_tests.md`'s H4 block for
+the current evidence.
 
-**Carried caveat.** Per the owner's ruling closing `phase-lit-08`, H4's general/graph-topological
-split — and the finding that only the general phrasing clears the bar for
-`KNOWN_COMPONENT_NEW_INTEGRATION` — was pre-loaded by a coordinator dispatch's framing rather than
-independently derived by the worker who ran the search, disclosed unprompted, and judged real and
-contestable on independent review. Q3 and Q4 below inherit that caveat: an independently-reframed
-search might draw the general/graph-topological line differently.
+**Judgment call, flagged for review.** No row combines full mixed-agent scope with a confirmed
+component_overlap of 5 ("materially equivalent mechanism") — the one honest gap
+`06_hypothesis_tests.md` itself names for H4. A narrower version of Q3 (does a *materially
+equivalent*, not merely component_overlap=4, graph-topological, mixed-scope discount exist?) could be
+argued to still be open on the current evidence. This dispatch does not write that narrower question
+in, to avoid inventing a research question during a reconciliation pass; it is named here only so the
+owner can decide whether it belongs in a future pass.
 
-**Q4. Given that caveat, would an independently-framed re-derivation of H4's phrasing split reach the
-same condition-2 boundary, or does the coordinator's original framing itself determine where the
-line falls?** This is a question about the campaign's own method rather than about the literature,
-but it bears directly on how much weight H4's status should carry into synthesis. Open, and not
-resolvable by this dispatch — it is a decision for the owner, per the ruling's own terms.
+**Q4. Withdrawn — resolved.** Previously asked: given the risk that H4's general/graph-topological
+split was pre-loaded by a coordinator dispatch's framing rather than independently derived, would an
+independently-framed re-derivation reach the same condition-2 boundary, or does the coordinator's
+original framing itself determine where the line falls? This was a question about the campaign's own
+method rather than about the literature, and it has since been answered by the campaign's own
+subsequent work: `LIT-09 H4R` (2026-09-19) performed exactly that re-derivation, clean-room, from the
+evidence alone and without being told what to conclude, and found that the split does not hold —
+`06_hypothesis_tests.md`'s H4 block, `07_anti_novelty_case.md` §6, and
+`08_surviving_distinctions.md`'s H4 entry all record this. Withdrawn as resolved by that
+re-derivation, not merely as a premise that went stale.
 
 ---
 
@@ -100,7 +114,7 @@ software-development-lifecycle system under one collective-evolution frame the w
 two-system architecture proposes?** OmniScientist is a full, evaluated instance of integrated
 human-agent knowledge evolution in scientific-research production; AgenticAKM and the ADR lineage
 cover the development-lifecycle side. This campaign found no source pairing both under one frame. Q7
-asks whether such a pairing exists outside the 49 rows read, not whether it is impossible — the
+asks whether such a pairing exists outside the 67 rows read, not whether it is impossible — the
 campaign's search was not aimed specifically at cross-domain pairings as a search target in its own
 right. Open.
 
@@ -156,13 +170,15 @@ this campaign's search — bounded to the corners it covered — has not yet fou
 
 ## Questions about the campaign's own coverage
 
-**Q11. What would the 340 never-deep-read candidates show if read — particularly for H1, H4's
-graph-topological phrasing, and H11, where condition 2 (comparator maturity or mechanism match) is
-exactly what each is missing?** This campaign's own stop condition was met by count of sources
-compared (49), not by coverage of the top prescore band (20 of its 32 candidates remain unread). This
-is not answerable by this dispatch; it is the natural next search target for a future phase, and the
-question this campaign's own coverage caveat exists to keep visible rather than let the existing
-49-row matrix quietly stand in for "the literature." Open.
+**Q11. What would the 336 never-deep-read candidates show if read — particularly for H1 and H11,
+where condition 2 (comparator maturity or mechanism match) is exactly what each is missing?** This
+campaign's own stop condition was met by count of sources compared (67), not by coverage of the top
+prescore band (2 of its 32 candidates remain unread — see the coverage caveat above for which two).
+This is not answerable by this dispatch; it is the natural next search target for a future phase, and
+the question this campaign's own coverage caveat exists to keep visible rather than let the existing
+67-row matrix quietly stand in for "the literature." H4's graph-topological phrasing is no longer
+listed here: `06_hypothesis_tests.md`'s H4 block now finds condition 2 satisfied for that reading, so
+it is not a case where the unread remainder is doing the work of an open condition-2 gap. Open.
 
 **Q12. Is the falling duplicate-discovery rate (20.0% at `phase-lit-06`, 15.0% at `phase-lit-08`) a
 real signal about the richness of the fields being searched, or an artifact of `phase-lit-08`'s
@@ -183,13 +199,13 @@ made either way; this question is posed, not answered, by that ruling. Open.
 |---|---|---|---|
 | Q1 | Does a mature comparator exist for H1's specific orthogonal triple? | H1 | A search finding a multi-year, multi-author, or peer-reviewed system combining the right axis content and independence |
 | Q2 | Is MythologIQ's derived-third-axis pattern a viable alternative to full independence? | H1 | The experiment in `12_experiment_proposals.md` |
-| Q3 | Can graph-topological discounting extend to mixed human-agent scope? | H4 (graph-topological) | The experiment in `12_experiment_proposals.md`; a dedicated search of the mixed-scope corroboration literature |
-| Q4 | Does H4's phrasing split hold under independent re-derivation? | H4, method caveat | Owner-directed re-derivation, not this dispatch |
+| Q3 | Withdrawn — see "Q3. Withdrawn" above | H4 (graph-topological) | N/A — superseded by `06_hypothesis_tests.md`'s unified H4 verdict |
+| Q4 | Withdrawn — resolved, see "Q4. Withdrawn — resolved" above | H4, method | N/A — resolved by `LIT-09 H4R`'s clean-room re-derivation |
 | Q5 | Why do mature provenance systems decline to automate arbitration? | H3 | A search aimed specifically at engineering/liability rationale in EVI's, TGMS's, or comparable systems' own design documentation |
 | Q6 | Does any system combine H5's seven context-selection dimensions? | H5 | A dedicated collision search for dissent/authority/convergence as first-class retrieval inputs |
 | Q7 | Does any system pair knowledge-construction and dev-lifecycle systems under one frame? | H6 | A dedicated cross-domain-pairing search, not yet run by this campaign |
 | Q8 | Does any system consolidate execution results into typed knowledge, not opaque state? | H8 (frozen-register) | A dedicated search for "ontological" or "typed" state consolidation in agent-runtime literature |
 | Q9 | Does cross-lifecycle epistemic-retraction propagation exist anywhere at scale? | H10 | Extending MemTX-style verification to a cross-lifecycle scope, or finding a system that already has |
 | Q10 | Does a working system close the evidence-to-knowledge-revision loop H11 claims? | H11 | A search outside requirements engineering specifically, or a scoped experiment (`12_experiment_proposals.md`) |
-| Q11 | What would the 340 unread candidates show? | Coverage | Deep-reading the top prescore band's remaining 20 candidates |
+| Q11 | What would the 336 unread candidates show? | Coverage | Deep-reading the top prescore band's remaining 2 candidates |
 | Q12 | Is the falling duplicate rate a real trend or a one-time targeting effect? | Method | A third, independently-aimed dedicated collision pass |
