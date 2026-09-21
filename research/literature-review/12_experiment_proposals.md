@@ -7,41 +7,36 @@ hypothesis that ended `POTENTIALLY_DISTINCT` or `INSUFFICIENT_EVIDENCE` in `06_h
 **Which hypotheses qualify.** Zero of the eleven hypotheses ended `POTENTIALLY_DISTINCT` — the
 review-instructions' allowed-status vocabulary was used exactly, and `06_hypothesis_tests.md`'s own
 summary table records nine of eleven hypothesis-readings at `LIKELY_ALREADY_KNOWN` or
-`KNOWN_COMPONENT_NEW_INTEGRATION`. Three hypothesis-readings ended `INSUFFICIENT_EVIDENCE`: H1, H11,
-and H4's frozen-register graph-topological phrasing specifically. This document ties one experiment
-to each of the three.
+`KNOWN_COMPONENT_NEW_INTEGRATION`. Two hypothesis-readings ended `INSUFFICIENT_EVIDENCE`: H1 and H11.
+This document ties one experiment to each.
 
-**Why H4 is included despite its `status:` field reading `KNOWN_COMPONENT_NEW_INTEGRATION`.** H4's
-YAML block in `06_hypothesis_tests.md` carries a single `status:` token
-(`KNOWN_COMPONENT_NEW_INTEGRATION`) because the file's own status vocabulary permits only one token
-per block and the block explicitly states it records "the review-instructions general phrasing's
-verdict... as primary." But the same block's `assessment` field argues the two phrasings separately
-and states outright: "the graph-topological reading stays `INSUFFICIENT_EVIDENCE`, unchanged from the
-prior reconciliation." `08_surviving_distinctions.md` independently confirms this by placing "H4
-(graph-topological phrasing)" in its own Category 3 — the `INSUFFICIENT_EVIDENCE` category — as a
-distinct entry from "H4 (general phrasing)" in Category 2. Reading the block's own text rather than
-only its single-token field, the graph-topological reading is an `INSUFFICIENT_EVIDENCE`
-hypothesis-reading in every sense this dispatch's instruction cares about, and Experiment 2 below is
-scoped to that reading specifically — not to H4's general phrasing, which is not included here because
-`06_hypothesis_tests.md` treats it as settled at `KNOWN_COMPONENT_NEW_INTEGRATION` on a genuine
-positive finding (Goldman 2001), not an unresolved search.
-
-**Carried caveat, binding on Experiment 2.** Per the owner's ruling closing `phase-lit-08`, H4's
-general/graph-topological split itself — including which reading each candidate source belongs to —
-was pre-loaded by a coordinator dispatch's framing rather than independently derived by the worker
-who ran the search, disclosed unprompted, and judged real and contestable on independent review.
-Experiment 2 is scoped against the frozen register's own wording directly, not against the
-coordinator's framing of it, to keep that dependency as small as it can be, but the caveat still
-applies to how the experiment's target is defined.
+**Experiment 2 is withdrawn.** An earlier version of this document tied a second experiment to H4's
+frozen-register graph-topological phrasing, on the reasoning that although
+`06_hypothesis_tests.md`'s H4 block carried a single `status:` token
+(`KNOWN_COMPONENT_NEW_INTEGRATION`), its own text argued the two phrasings separately and left the
+graph-topological reading at `INSUFFICIENT_EVIDENCE`. That reasoning no longer holds:
+`06_hypothesis_tests.md`'s H4 block has since been re-derived clean-room by `LIT-09 H4R`
+(2026-09-19) and now carries a single status, `LIKELY_ALREADY_KNOWN`, for both the
+review-instructions' general phrasing and the frozen register's graph-topological phrasing — the
+general/graph-topological split this document previously relied on has been retired, not reworded;
+`07_anti_novelty_case.md` §6 and `08_surviving_distinctions.md`'s H4 entry carry the same unified
+status. Per the owner's ruling closing this reconciliation, Experiment 2 is withdrawn rather than
+re-aimed: the distinction it was designed to test was not sustained once the evidence was
+reconciled, and inventing a new research question for its slot during a reconciliation pass is how
+the stale claims this reconciliation corrects arrived in the first place. See "Experiment 2 —
+Withdrawn" below for the full note; Experiments 1 and 3 keep their original numbers.
 
 **Coverage caveat, binding on this document.** Every experiment below is designed against the
-comparators this campaign's 49 deep-read matrix rows actually found, not the full candidate pool: 340
-of 387 collision candidates have never been deep-read, including 20 of the top prescore band's 32
-candidates. A future search of that remainder could surface a stronger baseline than the ones named
-here, which would strengthen rather than invalidate the experimental design. On search completeness:
-the duplicate-discovery rate fell from 20.0% (44/220, `phase-lit-06`) to 15.0% (58/387,
-`phase-lit-08`) — a trend, stated without asserting saturation, which this document does not claim
-anywhere.
+comparators this campaign's 67 deep-read matrix rows actually found, not the full candidate pool: 336
+of 400 collision candidates have never been deep-read, including 2 of the top prescore band's 32
+candidates — `dhar-vaidhyanathan-varma-agenticakm-2026` and
+`epistemic-sybil-resistance-multiplying-agents-2026`, each a documented near-duplicate of a source
+this campaign did deep-read, under the partner ids `dhar-vaidhyanathan-varma-agenticakm-2026-arxiv`
+and `epistemic-sybil-resistance-bara-2026` respectively. A future search of that remainder could
+surface a stronger baseline than the ones named here, which would strengthen rather than invalidate
+the experimental design. On search completeness: the duplicate-discovery rate fell from 20.0%
+(44/220, `phase-lit-06`) to 15.0% (58/387, `phase-lit-08`) — a trend, stated without asserting
+saturation, which this document does not claim anywhere.
 
 ---
 
@@ -104,59 +99,27 @@ complexity of full independence by default.
 
 ---
 
-## Experiment 2 — Does a graph-topological, mixed-human-agent-scope corroboration discount do
-anything a naive extension of Goldman's proof or Bara's AI-agent-only formula does not? (ties to H4,
-frozen-register graph-topological phrasing)
+## Experiment 2 — Withdrawn
 
-**Hypothesis this tests:** H4's frozen-register phrasing — "graph-topological epistemic signal...
-discounted based on shared lineage" — kept separate from H4's general phrasing per
-`06_hypothesis_tests.md`'s own rule against blending the two readings. Verdict for this reading:
-`INSUFFICIENT_EVIDENCE`; condition 1 satisfied (32 queries, backward chaining to Townend/Eckhardt-Lee
-and to Goldman/Mayo-Wilson, direct collision queries), condition 2 failed on maturity — the one
-graph-topological formalization found (`epistemic-sybil-resistance-bara-2026`) is AI-agent-only with
-its practical protocol left an open problem, and `barakat-corroboration-provenance-patterns-tapp2017`'s
-discount term is an unimplemented sketch.
+**What this slot previously proposed.** An earlier version of this document proposed testing whether
+a graph-topological, mixed-human-agent-scope corroboration discount does anything a naive extension
+of Goldman's (2001) proof or Bara's (`epistemic-sybil-resistance-bara-2026`) AI-agent-only formula
+does not, tied to H4's frozen-register graph-topological phrasing, which the prior reconciliation had
+argued — reading past the block's single `status:` token to its `assessment` text — remained at
+`INSUFFICIENT_EVIDENCE` as a reading distinct from H4's general phrasing.
 
-**Baselines to compare against.**
-
-1. **Naive vote-counting**, the shape `extending-nanopublications-knowledge-provenance`'s PROV-K
-   system actually implements: reliability from sufficiency/consistency counting over
-   supporting-vs-conflicting sources, with no treatment of whether two supporting sources share a
-   dependent origin.
-2. **Bara's closed-form discount, extended naively to mixed scope**:
-   `kappa_m = 1/(1+rho(m-1))` (Sec.5.2, Corollary 2 of `epistemic-sybil-resistance-bara-2026`) applied
-   to a provenance DAG without modification, substituting D-System's mixed human-agent transition
-   provenance for Bara's AI-agent-only report set — the most direct way to test whether the
-   AI-agent-only scoping in the original paper was a genuine technical limitation or an
-   unexercised generalization.
-3. **Goldman's blind-follower discount**, applied narratively rather than graph-computed: the general
-   reading's already-established mechanism (`goldman-experts-which-ones-should-you-trust-2001`),
-   included as the baseline representing H4's *general* phrasing, which this experiment does not aim
-   to re-test but does use as a floor — D-System's graph-topological mechanism should be expected to
-   do at least as well as this narrative-only baseline to be worth its added complexity.
-
-**Design.** Using D-System's actual transition-provenance data model (actor identity, domain
-authority, evidence, method, lineage, delegation — H3's provenance fields), construct a test corpus of
-corroborating claims with known ground-truth shared-ancestry structure spanning both human and agent
-actors — for example, a human reviewer's judgment that derives from (and adds no independent
-information beyond) an agent's earlier finding, alongside a genuinely independent second agent's
-corroborating finding reached by a different method. Compute the epistemic weight each of the three
-baselines and D-System's proposed mechanism assign to the corroborating set. The distinguishing
-question is whether D-System's mechanism, once actually specified precisely enough to compute a
-number, differs measurably from baseline 2 (Bara's formula extended naively to mixed scope) — or
-whether it turns out to be the same computation under different names, which would mean the
-"mixed-scope" extension bara-2026's Sec.9 left open is in fact straightforward, not a genuinely open
-research problem.
-
-**What would close the `INSUFFICIENT_EVIDENCE` status either way.** If baseline 2 handles the
-mixed-scope case adequately once implemented, H4's graph-topological reading collapses cleanly into
-`KNOWN_COMPONENT_NEW_INTEGRATION` alongside its general phrasing — the "open problem" Bara's Sec.9
-names would turn out to be a straightforward engineering extension, not a genuine research gap. If
-mixed human-agent scope requires machinery none of the three baselines have (for example, because
-human "authority" and agent "method" are not commensurable in the way Bara's formula assumes
-same-type report multiplicity to be), that is the positive finding distinguishing D-System's claim
-from every found baseline, and it would be the first result in this campaign actually demonstrating
-(not merely searching for) a gap in the graph-topological corroboration literature.
+**Why it is withdrawn, not re-aimed.** `06_hypothesis_tests.md`'s H4 block has since been re-derived
+clean-room by `LIT-09 H4R` (2026-09-19) and now assesses both the review-instructions' general
+phrasing and the frozen register's graph-topological phrasing at the same status,
+`LIKELY_ALREADY_KNOWN` — the split this experiment was designed to probe has been retired, not
+reworded; see `06_hypothesis_tests.md`'s H4 block, `07_anti_novelty_case.md` §6, and
+`08_surviving_distinctions.md`'s H4 entry. Per the owner's ruling closing this reconciliation, the
+distinction Experiment 2 existed to test — whether graph-topological, mixed-scope discounting was a
+genuinely open research problem separate from the general reading — was not sustained once the
+evidence was reconciled, so it is dropped rather than re-aimed at a new target: inventing a research
+question during a reconciliation pass is how the stale claims this reconciliation corrects arrived in
+the first place. Experiments 1 and 3 keep their original numbers; this slot is kept, carrying only
+this withdrawal note, rather than removed or silently renumbered away.
 
 ---
 
@@ -219,12 +182,13 @@ without building for over a decade — directly answering open question Q10 in
 | Experiment | Hypothesis / reading | Baselines | Distinguishing question |
 |---|---|---|---|
 | 1 | H1 | MythologIQ (derived third axis), SUBIT-wiki-shape (independent axes, D-System content) | Does independent axis tracking beat post-hoc derivation on epistemic-status-sensitive tasks? |
-| 2 | H4 (frozen-register, graph-topological phrasing only — see reasoning above) | PROV-K naive vote-counting, Bara's formula extended to mixed scope, Goldman's narrative discount as a floor | Does mixed human-agent scope need machinery none of the three baselines have? |
+| 2 | Withdrawn — see "Experiment 2 — Withdrawn" above | — | — |
 | 3 | H11 | EvoReqs (rule-triggered, closed vocabulary), Bajaj (derived metric) | Does D-System's mechanism absorb evidence types and revise content a closed-vocabulary or single-metric baseline cannot? |
 
-All three experiments are designed to produce evidence bearing on `06_hypothesis_tests.md`'s
+Experiments 1 and 3 are designed to produce evidence bearing on `06_hypothesis_tests.md`'s
 condition 2 (a mature comparator family whose best member instantiates the same mechanism) —
 specifically, whether the closest baseline this campaign found already does what D-System claims once
 actually run against it, or whether a real gap remains once tested rather than merely searched for.
-None of the three experiments has been run by this dispatch; each is a proposal, tied explicitly to
-the hypothesis-reading it targets and to the matrix rows establishing its baselines.
+Neither has been run by this dispatch; each is a proposal, tied explicitly to the hypothesis-reading
+it targets and to the matrix rows establishing its baselines. Experiment 2 is withdrawn, not
+proposed, per the note above.
