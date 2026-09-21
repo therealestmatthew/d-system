@@ -7,16 +7,19 @@ D-System's architecture (`CLAUDE.md` §2; that is synthesis-phase work by other 
 makes no code change. Every row below carries the `source_id` establishing it, so each
 recommendation is traceable back to a specific deep-read, locator-cited matrix row.
 
-**Coverage caveat, binding on this document.** This list is built from the 49 rows this campaign
-deep-read, not the full candidate pool: 340 of 387 collision candidates surfaced by search have
-never been deep-read, including 20 of the top prescore band's 32 candidates. The 49 rows are not
-represented here as the strongest candidates the campaign could have found, only as the strongest
-candidates it actually read. A future pass through the unread 340 could surface a better-fitting
-standard or implementation for any item below without contradicting it. On search completeness more
-generally: this campaign's duplicate-discovery rate fell from 20.0% (44/220, `phase-lit-06`) to
-15.0% (58/387, `phase-lit-08`) when later searches targeted previously neglected hypotheses — a
-trend toward more new material being found, and no claim of saturation is made anywhere in this
-document.
+**Coverage caveat, binding on this document.** This list is built from the 67 rows this campaign
+deep-read, not the full candidate pool: 336 of 400 collision candidates surfaced by search have
+never been deep-read, including 2 of the top prescore band's 32 candidates —
+`dhar-vaidhyanathan-varma-agenticakm-2026` and `epistemic-sybil-resistance-multiplying-agents-2026`,
+each a documented near-duplicate of a source this campaign did deep-read, under the partner ids
+`dhar-vaidhyanathan-varma-agenticakm-2026-arxiv` and `epistemic-sybil-resistance-bara-2026`
+respectively. The 67 rows are not represented here as the strongest candidates the campaign could
+have found, only as the strongest candidates it actually read. A future pass through the unread 336
+could surface a better-fitting standard or implementation for any item below without contradicting
+it. On search completeness more generally: this campaign's duplicate-discovery rate fell from 20.0%
+(44/220, `phase-lit-06`) to 15.0% (58/387, `phase-lit-08`) when later searches targeted previously
+neglected hypotheses — a trend toward more new material being found, and no claim of saturation is
+made anywhere in this document.
 
 ---
 
@@ -168,8 +171,7 @@ validity and strength") is itself a design signal worth carrying forward (see
 
 **Inherit:** the closed-form result that a "blind follower" of another witness contributes zero
 additional evidential weight, while genuinely independent witnesses do add weight, as the
-mathematical basis for D-System's convergence/discount computation (H4's general, review-instructions
-phrasing).
+mathematical basis for D-System's convergence/discount computation (H4).
 
 **Matrix row:** `goldman-experts-which-ones-should-you-trust-2001` (Goldman, *Philosophy and
 Phenomenological Research* 63(1), 2001, pp.85-110, DOI 10.1111/j.1933-1592.2001.tb00093.x,
@@ -179,19 +181,25 @@ Phenomenological Research* 63(1), 2001, pp.85-110, DOI 10.1111/j.1933-1592.2001.
 theorems plus ~4,500-network simulations, code published per the author's website,
 `access_limitation: preprint_version`).
 
-**Related, narrower formalization to study for a graph-topological computation specifically:**
+**Related, narrower formalization for graph-topological computation specifically:**
 `epistemic-sybil-resistance-bara-2026` (arxiv:2609.01873, `access_limitation: full_text`) gives a
-closed-form discount `kappa_m = 1/(1+rho(m-1))` for corroborating reports sharing an evidentiary root
-— the closest graph-topological formalization this campaign found, but scoped to AI-agent report
-multiplicity only, with the practical protocol left as an explicit open problem (Sec.9) and no
-deployed aggregator. This is flagged as a study target, not a settled reuse recommendation — see the
-H4 discussion in `10_architecture_implications.md` and the experiment in
-`12_experiment_proposals.md`.
+closed-form discount `kappa_m = 1/(1+rho(m-1))` for corroborating reports sharing an evidentiary root,
+scoped to AI-agent report multiplicity only, with the practical protocol left as an explicit open
+problem (Sec.9) and no deployed aggregator. `06_hypothesis_tests.md`'s H4 block — re-derived
+clean-room by `LIT-09 H4R` (2026-09-19) — finds bara-2026 no longer stands alone as the
+graph-topological family: two further 2026 sources, `grading-narrators-isnad-rijal-claim-provenance-2026`
+(ISNAD) and `not-all-agreement-counts-as-corroboration-2026` (PACT), join it, and ISNAD specifically
+combines graph topology, a computed shared-lineage discount, and a confirmed mixed human-agent scope
+in one source. This entry remains a study target rather than a settled reuse recommendation because
+no row reaches a confirmed component_overlap of 5 ("materially equivalent mechanism") — see
+`10_architecture_implications.md`'s H4 discussion for the fuller implication.
 
 **Why inherit rather than recreate:** the discount-for-dependence principle is a 25-year-old, proven
 result; deriving equivalent arithmetic independently would duplicate settled mathematics.
-`06_hypothesis_tests.md`'s H4 block used exactly this pairing (Goldman plus Mayo-Wilson) to move the
-general phrasing of H4 to `KNOWN_COMPONENT_NEW_INTEGRATION`.
+`06_hypothesis_tests.md`'s H4 block rests its unified `LIKELY_ALREADY_KNOWN` verdict — covering
+both the review-instructions' general phrasing and the frozen register's graph-topological phrasing
+at the same status — in part on this Goldman/Mayo-Wilson pairing, together with the ISNAD/PACT
+graph-topological sources named above.
 
 ---
 
