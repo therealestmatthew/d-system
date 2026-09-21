@@ -313,8 +313,9 @@ Perform these in order. Do not mark a phase complete before the post-rebase vali
   Never resolve with `--ours` or `--theirs` on this file — either one silently deletes a peer's work.
 - **A duplicate-code error means you and a peer took the same number.** Codes are free before
   merge and permanent after, so the agent integrating second renumbers: allocate again, rename
-  the file, and update any reference you added. Reserve your code in `codes.yaml` alongside your
-  backlog claim to avoid the race entirely.
+  the file, and update any reference you added. `--next-code` now reserves the code it hands you
+  against every worktree on this machine, so this should only arise between agents on different
+  machines — see [GOV-005](docs/08-governance/GOV-005-document-codes.md).
 - **A conflict in `src/`, `ts/`, `schemas/` or `sql/` means the safety rule was bypassed.** Disjoint
   phases should not produce source conflicts. Stop, do not force a merge, and report it: the phases'
   declared `systems` or `deliverables` were wrong, and the declarations need fixing before either
