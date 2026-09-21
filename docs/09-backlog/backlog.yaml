@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-20'
+updated: '2026-09-21'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -6874,23 +6874,27 @@ items:
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
   session: doc-session-literature-review-pass-4
-  next_action: 'Ready for the owner''s /session-close review and the second owner
-    integration of agent/lit-campaign into dev. Recorded in SESS-2026-09-20-02, which
-    is this phase''s second session record; the deliverables were written in
-    SESS-2026-09-14-13. The owner''s 2026-09-20 ruling is implemented: rulings 9 and 10
-    are in PROMPT-031 in their own dated section, this phase''s acceptance now requires
-    the measurement rather than the condition, and 07_anti_novelty_case.md is reconciled
-    to 06/08''s unified H4 status (its "does not fully decompose" list goes from three
-    items to two, matching 08''s Category 3). LIT-07 G was re-run against the current
-    files - ledger 1,200 rows, inventory 1,154, matrix 67 - and all eight stop conditions
-    are measured with populations named: seven met, saturation measured and explicitly
-    NOT demonstrated at a falling 20.0 to 15.0 to 6.4-7.7 percent, which ruling 9 makes a
-    closing outcome rather than a blocker. One of two fix cycles used. The gate reported
-    two false failures and one PASS on 16 percent of its population; all were caught by
-    the coordinator''s independent recomputation and every number was reproduced
-    independently - see the session record, which names this as a three-gate pattern
-    rather than an incident. Do not commission a tenth search session (ruling 10).'
-
+  next_action: 'BLOCKED on acceptance condition 1, which does not hold. An independent
+    close review ran 2026-09-21 at the owner''s direction (GOV-003 coordinator-completion
+    condition 2) and is pasted verbatim in SESS-2026-09-20-02''s ## Review section. It
+    confirms acceptance condition 2 holds as amended and that the 2026-09-20 amendment is
+    faithful to the ruling it cites. Condition 1 fails on three independent counts, all
+    re-checked directly by the coordinator: (a) 09, 10, 11 and 12 still assert the H4
+    general/graph-topological split that 06, 07 and 08 have retired - 12''s Experiment 2
+    exists only because of it and quotes a sentence attributed to 06 that grep finds nowhere
+    in 06, while 06''s H4 block carries one status token, LIKELY_ALREADY_KNOWN; (b)
+    13_validated_bibliography.md is missing the two sources 988dcea added to 07
+    (grading-narrators-isnad-rijal-claim-provenance-2026 and
+    not-all-agreement-counts-as-corroboration-2026), which scope item 3 requires promoted
+    through the five verification steps; (c) 07, 08, 09, 10, 11 and 13 all carry a "49 rows,
+    24 flagged" matrix population against a matrix that measures 67 rows and 30 flagged, and
+    09 and 11 assert "20 of 32 top-band unread" where the band reproduces at 0 of 32,
+    contradicting PROMPT-031 ruling 10 committed the same day. None of this needs new
+    searching. Next action is the owner''s call between a reconciliation pass over 09-13 and
+    an explicit ruling amending condition 1, recorded the way condition 2''s amendment was.
+    Do not mark complete until one of those happens. Phase stays active under agent-lit,
+    holding sys-research; the agent field is retained as the record of who did the work per
+    AGENTS.md completion step 5.'
 - id: phase-lrr-01
   title: Deterministic extraction of the campaign corpus
   plan: doc-literature-review-report-page

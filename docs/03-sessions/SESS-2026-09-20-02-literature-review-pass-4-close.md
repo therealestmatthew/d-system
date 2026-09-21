@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-09-20'
-updated: '2026-09-20'
+updated: '2026-09-21'
 systems:
 - sys-research
 depends_on:
@@ -215,6 +215,181 @@ Recorded here rather than in `GOV-003`, which takes decisions that required a ch
 not. The commit message on this record's own commit still names the pre-renumber code, since it was
 written before the collision surfaced.
 
+## Review — independent close review, 2026-09-21
+
+Run at the owner's direction after they observed that `phase-lit-07` was still `active` and asked
+why `/session-close` had not taken it to `complete`. It had not: this record's own `## Backlog`
+section left the phase `active`, and no completion commit was ever made. The owner's most recent
+close was `5a2a609`, against `phase-tax-02`.
+
+`GOV-003`'s *Coordinator completion replaces owner-invoked /session-close* requires an independent
+adversarial review of the diff against acceptance before any coordinator may write `status:
+complete`. The only such review on record, `0ea60dd` of 2026-09-14, concluded **acceptance 2 not
+met** and predates the 2026-09-20 amendment that changed acceptance 2's wording. No review had run
+against the amended text. This one did.
+
+Dispatched as a fresh non-fork subagent with the phase's `scope`, `acceptance` and `verification`
+pasted in full, the four commits that constitute this phase's diff (`cc6d76b`, `988dcea`,
+`37aef77`, `5b3848c`, with the peer's `e27706f` and `782fd4a` excluded), and this record's path.
+Its findings are pasted below rather than summarised.
+
+### Condition 1 — DOES NOT HOLD
+
+> The record's three specific claims for this condition all check out. The condition as a whole does
+> not, because of things the record does not mention.
+>
+> **What checks out:** All 14 files `00`–`13` exist. `07_anti_novelty_case.md`'s "does not fully
+> decompose" list is now exactly two points (H1, H11) and `08_surviving_distinctions.md`'s Category 3
+> is exactly `H1, H11`. They match. The "nine of eleven" tally in `07` still adds up, and every
+> grouping matches the `status:` token in `06`. The two sources `988dcea` newly names each have one
+> matrix row with a full `evidence_locator`, one inventory row, and 11 and 6 references respectively
+> in `06` — matching the record's claim exactly.
+>
+> **Why it still fails.** Four of the seven synthesis deliverables still assert, as load-bearing
+> claims, things that `06`/`07`/`08` now say the opposite of. The H4 general/graph-topological split
+> was retired in `06` and `08` by `phase-lit-09` and in `07` by this session — but `09`, `10`, `11`
+> and `12` were never reconciled and were not in this session's write scope.
+>
+> - `12_experiment_proposals.md:10-22` — the entire justification for Experiment 2 existing:
+>   *"Three hypothesis-readings ended `INSUFFICIENT_EVIDENCE`: H1, H11, and H4's frozen-register
+>   graph-topological phrasing specifically"* (now two), *"H4's YAML block in `06` carries a single
+>   `status:` token (`KNOWN_COMPONENT_NEW_INTEGRATION`)"* (it reads `LIKELY_ALREADY_KNOWN`), a direct
+>   quotation *"the graph-topological reading stays `INSUFFICIENT_EVIDENCE`, unchanged from the prior
+>   reconciliation"* attributed to `06`'s H4 block — `grep` finds that sentence nowhere in `06` — and
+>   *"`08_surviving_distinctions.md` independently confirms this by placing 'H4 (graph-topological
+>   phrasing)' in its own Category 3"*, where `08`'s summary now says by name: *"H4 no longer
+>   splits… this file now carries H4 as one entry in Category 1 rather than divided across
+>   Categories 2 and 3."*
+> - `09_reuse_recommendations.md:193-194` — *"`06_hypothesis_tests.md`'s H4 block used exactly this
+>   pairing (Goldman plus Mayo-Wilson) to move the general phrasing of H4 to
+>   `KNOWN_COMPONENT_NEW_INTEGRATION`."* It did not; it is `LIKELY_ALREADY_KNOWN` with no split.
+> - `10_architecture_implications.md:54-75, 211` — §1.3 is built on the split and carries the
+>   coordinator-pre-framing caveat that `988dcea` declared resolved.
+> - `11_open_research_questions.md:44-66, 186-187` — Q3 and Q4 are questions about the split and the
+>   pre-framing caveat.
+>
+> These are checkable citations that do not survive being opened, which is the substance of "every
+> synthesis claim traces."
+>
+> **Second, independent failure: `13_validated_bibliography.md` is now incomplete by its own
+> definition, and this session caused it.** Its first sentence: *"Every source a synthesis claim
+> (`07` through `12`) rests on… run through the evidence contract's five-step promotion."* Matching
+> every matrix `source_id` against the text of `07`–`12` and against `13`: 45 of 67 matrix rows are
+> cited by `07`–`12`; exactly **2 of those 45 are absent from `13`** — and they are precisely the two
+> that `988dcea` added to `07`. Neither has been through the five verification steps anywhere. Phase
+> scope item 3 requires that promotion into `13`.
+>
+> **Third: stale population counts inside the deliverables, including the one this session edited.**
+> `07:13` still reads *"`04_evidence_matrix.csv` (49 rows, 24 flagged `critical_collision: yes`)"* —
+> the matrix is 67 rows with 30 flagged. The coverage caveat in `07`, `09`, `10`, `11`, `12` and `13`
+> all state "49 rows" and "340 of 387 collision candidates… never been deep-read, including 20 of the
+> 32 candidates in the top prescore band." Using `07`'s own stated band definition ("max of the two
+> prescores"), the band reproduces at exactly 32 — and **0 of the 32 are unread**, not 20. So
+> `09:12` and `11:162` assert 20-of-32 unread while `PROMPT-031` ruling 10, committed in the same
+> session, asserts 0-of-32 — a contradiction inside the closing change set.
+>
+> Note the 2026-09-14 `LIT-07 A` review classified exactly this defect class as **blocking** ("a
+> stale '34 rows' denominator against the 49-row matrix"). It has recurred at 49-vs-67 and was not
+> caught.
+
+### Condition 2 — HOLDS as amended, and the amendment is faithful to the ruling as recorded
+
+> The ruling was recorded in `SESS-2026-09-19-08-literature-review-pass-3c.md` by commit `28f4d56`,
+> which landed **before** the phase was claimed (`db15eca`). Its implementing instruction reads:
+>
+> > Amend `phase-lit-07`'s acceptance so its stop-conditions half requires the **measurement** — each
+> > stop condition measured, with its population named, and saturation reported as a trend — in place
+> > of requiring the condition to hold. Its scope and its other acceptance condition are unchanged.
+>
+> The amended acceptance text is a near-verbatim rendering of that. Scope and condition 1 are
+> genuinely untouched — diffing `cc6d76b` against `backlog.yaml`, the only change is condition 2's
+> second clause. The one phrase the amendment adds that the ruling does not contain — *"against the
+> ledger, inventory, matrix and deliverables **as they stand at the gate**"* — is a **tightening**,
+> not a relaxation: it forces re-measurement against current files, which is what then happened
+> (1,200/1,154/67 vs the 2026-09-14 run's 1,095/49). I looked for the pattern flagged in my brief —
+> an agent quietly widening its own bar — and did not find it here.
+>
+> Two qualifications, neither fatal:
+>
+> 1. **The relaxation is broader than its justification.** Ruling 9's entire rationale concerns
+>    *saturation* (one condition). The implementing wording it dictates — and therefore the
+>    amendment — replaces "condition holds" with "condition measured" for **all eight**. Nothing
+>    rides on this today (seven of eight measured Met), but a future gate could report all eight
+>    unmet and still satisfy the letter of condition 2. The widening originates in the owner's
+>    recorded wording, not in the amending session.
+> 2. **The ruling's only provenance is agent-written text.** There is no owner-authored artifact in
+>    the repository. The timing is exculpatory (recorded before the claim, in a prior session), but
+>    it cannot be verified from the repository that the owner said it.
+>
+> Condition 2's four requirements each hold: the `A` review ran against the evidence matrix with 9
+> findings all addressed in one fix cycle; all eight measurements were taken against the current
+> files; each carries an explicit population; and saturation is reported as "Measured, NOT
+> demonstrated". Seven of eight measurements reproduced independently, all as claimed.
+
+### Numbers recomputed independently
+
+| Claim in the record | Measured | Verdict |
+|---|---|---|
+| Ledger 1,200 rows | 1,200 data rows, 15 cols | reproduces |
+| Inventory 1,154 rows | 1,154 data rows | reproduces |
+| Matrix 67 rows | 67 data rows, 43 cols | reproduces |
+| M1: 72 domains, 0 below 2 queries, D48=6, D38=42 | 72 domains; 0 below 2; D48=6, D57=10, D38=42 | exact |
+| M2: 53 rows overlap ≥ 3; 0 missing phase B, 0 missing C | 53 rows; 0 missing B, 0 missing C | exact |
+| M3: no `NOVEL` verdict among H1–H11 | 11 tokens, none `NOVEL`; 3 `NOVEL` hits all state it is unavailable | reproduces |
+| M4: 0 blank cells across 2,881 | 0 blank across 43 × 67 = 2,881 | exact |
+| M5: 25–30/392 = 6.4–7.7% | 392 tokens, 27 duplicates → 6.9% | in range |
+| M6: 30 flagged, 18 disputed / 12 confirmed, 0 pending | 30 yes; 18 disputed / 12 confirmed; 0 pending | exact |
+| M7: 14 files `00`–`13` | 14 files `00`–`13` | reproduces |
+| `check_no_private_content`: 31 identifiers | 31 identifiers checked | reproduces |
+| "402 identifiers, 387 distinct" | 392 tokens / 386 distinct under a plain `;` split | **does not reproduce** |
+| Deliverables: "49 rows, 24 flagged", "20 of 32 unread" | 67 rows, 30 flagged; **0 of 32** unread | **stale/false** |
+| `13`: "every source a synthesis claim rests on" | 2 of 45 cited sources missing | **fails** |
+| Inventory `status: deep_read` | 51 marked vs 67 matrix rows; 17 unmarked | inconsistent |
+
+> On the `402/387` line: neither figure reproduced, which paradoxically *strengthens* the record's
+> own point (idea `000289`) — there is now a fourth defensible value (386). The record's conclusion
+> (direction robust, figure not settled) survives; the specific numbers it prints are not
+> independently reproducible.
+
+### Verification command output, re-run 2026-09-21
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 302 documents, 28 memories, 292 backlog phases
+EXIT=0
+
+$ uv run pytest
+638 passed, 2 warnings in 54.39s
+EXIT=0
+
+$ uv run python tools/check_no_private_content.py
+check_no_private_content: OK (747 tracked files, 31 identifiers checked)
+EXIT=0
+```
+
+The content half did run — 31 identifiers, in the primary checkout where `_private/portfolio/`
+exists. Counts differ from this record's earlier `297 documents / 26 memories / 288 phases / 739
+files` because the peer's `phase-tax-02` merged afterwards; not a discrepancy.
+
+### Verdict and coordinator spot-check
+
+**Not safe to mark complete.** Acceptance condition 2 holds as amended and the amendment is faithful
+to its ruling. Acceptance condition 1 does not hold.
+
+Four of the review's findings were re-checked directly by the coordinator before recording, because
+a review that overturns a close deserves the same scepticism as the close it overturns. All four
+reproduced:
+
+- `06`'s H4 block carries one `status:` token at line 793, `LIKELY_ALREADY_KNOWN` — so `09`'s and
+  `12`'s statements about a split and a `KNOWN_COMPONENT_NEW_INTEGRATION` token are both false.
+- `grep -c 'graph-topological reading stays' 06_hypothesis_tests.md` returns `0`; `12` quotes that
+  sentence as `06`'s at line 19.
+- Both sources `07` newly cites return `0` occurrences in `13` and `1` in `07`.
+- The matrix measures 67 rows and 30 `critical_collision: yes` against the "49 rows, 24 flagged"
+  text carried in `07`, `08`, `09`, `10`, `11` and `13`.
+
+The phase therefore stays `status: active`. No completion edit was made.
+
 ## Unresolved
 
 - **The campaign's saturation stop condition is not met and will not be met by more searching.**
@@ -252,3 +427,23 @@ the owner's `/session-close` review and the second owner integration of `agent/l
 `dev`. The branch is green and rebased on `dev`; `git diff dev..agent/lit-campaign` shows it. If
 the owner reads "alongside check-in rulings 1-8" as requiring the ruling inside the numbered
 check-in list rather than its own dated section, that is a one-line move.
+
+### Addendum, 2026-09-21 — the close review ran, and the phase does not close
+
+The `## Review` section above supersedes this section's `next_action`. The owner asked on
+2026-09-21 why the phase was still `active`, believing they had already run `/session-close`; they
+had, but against `phase-tax-02` (`5a2a609`), not this phase. They then directed that the review run
+first and that completion follow its verdict.
+
+It did not. Acceptance condition 1 does not hold: `09`, `10`, `11` and `12` still assert an H4
+split that `06`, `07` and `08` have retired, `13` is missing the two sources `988dcea` added to
+`07`, and six deliverables carry a "49 rows, 24 flagged" population against a matrix that measures
+67 and 30. The phase stays `status: active` under `agent-lit`, and the `agent` field is kept as the
+record of who did the work per `AGENTS.md`'s completion step 5 — `status: active` is what holds the
+`sys-research` lock, not that field.
+
+The owner also settled the placement question this section left open: the 2026-09-20 ruling
+**stays as its own dated section** in `PROMPT-031`, not folded into the numbered check-in list, on
+`PROMPT-031`'s own stated convention that a later ruling gets its own section rather than being
+misdated into a check-in it was not part of. No move is needed; that open question is closed.
+
