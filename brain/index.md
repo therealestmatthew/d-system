@@ -54,6 +54,8 @@ brain/
 - [When You and a Peer Take the Same Identifier, the One Integrating Second Renumbers](procedures/yield-and-renumber-a-collided-identifier.md)
 - [Document the Symptom You Observed, Not the One You Inferred](procedures/document-the-symptom-you-observed.md)
 - [Recompute a Delegated Measurement](procedures/recompute-a-delegated-measurement.md)
+- [A Check That Cannot Fail Is Not a Check](procedures/a-check-that-cannot-fail-is-not-a-check.md)
+- [When a Hook Blocks a Write, Hand Off a Candidate](procedures/hook-blocked-writes-hand-off-a-candidate.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
