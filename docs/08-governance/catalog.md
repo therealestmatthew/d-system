@@ -63,6 +63,7 @@ CI regenerates it and fails on any difference.
 | OPS-014 | operation | active | repository-owner | docs/08-governance/OPS-014-generate-overview.md |
 | OPS-015 | operation | active | repository-owner | docs/08-governance/OPS-015-build-idea-corpus.md |
 | OPS-016 | operation | active | repository-owner | docs/08-governance/OPS-016-idea-dispatch.md |
+| OPS-017 | operation | active | repository-owner | docs/08-governance/OPS-017-lit-report-extract.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -388,4 +389,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-305 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 58, prompt: 36, requirement: 27, session: 128.
+306 documents — adr: 18, architecture: 10, governance: 12, operation: 17, plan: 58, prompt: 36, requirement: 27, session: 128.
