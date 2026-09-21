@@ -1240,7 +1240,7 @@ assessment: >
   that many stages simultaneously — most sources cover a contiguous subset. But the mechanism
   class itself, and multiple examples spanning most individual stage-to-stage links, are
   established more thoroughly than any other hypothesis in this review — bounded, like every
-  claim in this file, by the coverage caveat that 340 of 387 collision candidates surfaced by
+  claim in this file, by the coverage caveat that 336 of 400 collision candidates surfaced by
   this campaign were never deep-read (`07_anti_novelty_case.md`'s coverage caveat), not a claim
   that no unread source could sharpen or contest the picture. Status is unchanged from the prior
   reconciliation.
