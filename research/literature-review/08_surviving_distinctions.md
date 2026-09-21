@@ -11,8 +11,8 @@ as novel, and nothing below is a claim that D-System should be renamed or refram
 `CLAUDE.md` §2, that revision happens only in later synthesis, by other dispatches.
 
 The same coverage caveat that opens `07_anti_novelty_case.md` applies here without restatement in
-full: 340 of 387 collision candidates surfaced by this campaign's searches were never deep-read,
-including 20 of the top-prescore band's 32 candidates, and no claim of search saturation is made for
+full: 336 of 400 collision candidates surfaced by this campaign's searches were never deep-read,
+including 2 of the top-prescore band's 32 candidates, and no claim of search saturation is made for
 any hypothesis. Every category placement below is bounded by what this campaign actually found, not
 by what the full candidate pool would show if read.
 
@@ -102,7 +102,7 @@ this matrix row).
 
 ### H9 — Bidirectional epistemic traceability
 
-**Status:** `LIKELY_ALREADY_KNOWN`. Eighteen of the matrix's 49 rows challenge H9 — the single most
+**Status:** `LIKELY_ALREADY_KNOWN`. Twenty-three of the matrix's 67 rows challenge H9 — the single most
 heavily challenged hypothesis in the review — spanning the ADR tradition, digital-thread MBSE work,
 PROV-O-extended evidence graphs, and multiple 2025-2026 production systems (see
 `07_anti_novelty_case.md` §§2, 8-11). Per `06_hypothesis_tests.md`'s qualification, no single source
