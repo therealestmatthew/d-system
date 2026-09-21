@@ -13386,3 +13386,201 @@ going forward or retired in favour of deriving deep-read status from matrix memb
 **Links**
 
 - relates_to → `000289`
+- relates_to ← `000309`
+- relates_to ← `000310`
+
+---
+
+## 000309 · 05_critical_collisions.md's preamble says 24 rows where the file holds 30 sections
+
+**Created 2026-09-21T15:27:55-04:00 · Status: `triaged`**
+
+The file's own opening paragraph reads "One section per critical_collision: yes row in
+04_evidence_matrix.csv - 24 rows, derived directly from that file". Measured on 2026-09-21
+by tools/lit_report_extract.py: the file holds 30 "## N. <slug>" sections, and the matrix
+holds exactly 30 rows with critical_collision: yes. The two sets are set-equal in both
+directions, so the 30 is right and the preamble's 24 is stale.
+
+The staleness is explained a few lines further down in the same preamble, which says
+"Sections 1-19 follow the order the coordinator cross-checked the original 19-row
+derivation against; sections 20-24 were appended by LIT-08 X4 for the five rows dispatched
+to it as a second-review batch". So the file grew past 24 after that sentence was written
+and nobody updated the count. 19 + 5 = 24, and six more sections arrived later.
+
+Found while building the report extractor for phase-lrr-01. Not repaired: PLAN-043 puts any
+edit to research/literature-review/ out of scope, and the campaign has deliberately left
+known data defects unrepaired rather than edit evidence after the fact.
+
+The consequence is for readers, not for any count the report computes. PLAN-043's report
+renders deliverable prose as written, so a reader of the rendered 05 will see a figure that
+its own file contradicts, sitting next to a measured collision count of 30. This needs a
+decision about whether stale prose inside a closed corpus is corrected, annotated in the
+rendered output, or left to stand.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T15:29:31-04:00): The stale-count defect this idea reports is already named, in the same words, in the session
+record that found it: SESS-2026-09-21-04-literature-review-corpus-extraction.md's "Corpus defects
+surfaced, and deliberately not repaired" section lists it under "further defects... not yet
+tracked as ideas" (05_critical_collisions.md's "24 rows" preamble vs. the measured 30 sections),
+alongside a second untracked defect (phase-lrr-02's acceptance being written as "01-13" when
+01-13 is eleven Markdown files plus two CSVs, not thirteen Markdown files) that has no idea filed
+for it yet either.
+
+PLAN-043 (the literature-review report page)'s "Out of scope" section is explicit and directly
+answers the idea's question for the repair-in-place option: "Everything REQ-027 lists as out of
+scope, and in particular any edit to research/literature-review/. If the report reveals a defect
+in a deliverable, that is an idea and an owner decision, not a fix folded into a rendering phase."
+So editing 05's preamble in place is ruled out by an existing document, not merely a campaign
+norm — this is the standing ruling the idea asks whether one already exists.
+
+REQ-027 does not separately address the "annotate in the rendered output" option; PLAN-043's R04
+verification note (line 82-86) treats corpus defects as "findings about the corpus, to be
+reported, not silently linked to something plausible," which is about the report's own
+verification runs, not about surfacing a defect to a reader inside the rendered page. So the
+"correct in place" branch is settled (no); "annotate in rendered output" and "leave to stand" are
+both still open, and nothing in PLAN-043, REQ-027, PROMPT-030, PROMPT-031 or GOV-003 rules
+between them.
+
+GOV-003 (the accepted backlog-decisions record) has no standing ruling on leaving campaign
+evidence unrepaired; grepping it for "unrepaired" and for literature-review/corpus terms turns up
+nothing on point.
+
+phase-lrr-01 (the report extractor phase, PLAN-043's first phase) is where this was found, and
+its backlog entry's follow-up list already names ideas 000289, 000307 and 000308 as open
+follow-ups that block nothing — 000309 is a fourth follow-up from the same phase, not yet added to
+that list.
+
+Idea 000308 (the source inventory's status field is stale for 16 rows with evidence-matrix rows,
+already linked relates_to by this idea) is the closest sibling: both are stale-figure defects
+inside the same closed campaign corpus, found by the same extraction work, and both close with
+the same open question of whether corpus evidence defects get fixed, annotated, or left standing.
+000308's body raises exactly this question independently, so an owner decision here would likely
+settle both at once.
+- **finding** by agent-lrr (2026-09-21T15:30:18-04:00): Correction to the preceding triage finding, on two points of fact. Neither changes its
+conclusion, which stands: PLAN-043's out-of-scope section rules out repairing the corpus in
+place, and no document rules between annotating the defect in the rendered output and
+leaving the stale prose to stand.
+
+First, the finding says the sibling defect from the same session - the "01-13 is eleven
+Markdown deliverables not thirteen" wording - "still has no idea filed for it". It does.
+Idea 000310 was filed at 2026-09-21T15:28:11-04:00, a few minutes before this triage ran,
+and 000309 and 000310 already carry a relates_to link in both directions.
+
+Second, the finding says phase-lrr-01's backlog entry "already lists ideas 000289, 000307,
+000308 as open, non-blocking follow-ups". It does not. phase-lrr-01's entry has no idea
+list at all; its next_action reads "Ready. First phase of PLAN-043; nothing blocks it."
+That list belongs to phase-lit-07, the literature-review campaign's closing phase, whose
+next_action names exactly those three ids. The two phases are adjacent in subject and
+neither is the other.
+
+Recorded here rather than by amending the annotation, so the original reading stays legible
+alongside what it got wrong.
+
+</details>
+
+**Links**
+
+- relates_to → `000308`
+- relates_to ← `000310`
+
+---
+
+## 000310 · 01-13 is eleven Markdown deliverables not thirteen, and phase-lrr-02's acceptance is unsatisfiable as written
+
+**Created 2026-09-21T15:28:11-04:00 · Status: `triaged`**
+
+research/literature-review/ holds fourteen deliverables matching [0-9][0-9]_*. Measured on
+2026-09-21 by tools/lit_report_extract.py: eleven are Markdown and three are CSV -
+00_search_ledger.csv, 03_source_inventory.csv and 04_evidence_matrix.csv. So the range
+01-13 covers thirteen files, of which only eleven are Markdown.
+
+Three governed documents describe that range as if all of it were Markdown:
+
+- PLAN-043's phase table and risks section say "Render all thirteen Markdown deliverables
+  faithfully" and "phase-lrr-02 verifies against all thirteen, not a sample".
+- REQ-027 R02's verification reads "for each of 01-13, assert the rendered output contains
+  no line beginning with '## ' or '- ' outside a <pre> block, and that every Markdown table
+  in the source produced a <table>".
+- phase-lrr-02's scope and acceptance in docs/09-backlog/backlog.yaml carry both wordings.
+
+As written this cannot be satisfied. 03 and 04 are CSVs: they have no '## ' headings to
+count and no Markdown tables to convert, so the h2-equality assertion is vacuous on them at
+best and a failure at worst, depending on how the check is implemented. The requirement
+plainly means the Markdown deliverables, and the CSVs are covered instead by REQ-027 R03 as
+the browsable tables.
+
+No count is affected. phase-lrr-01's extractor measures 14 deliverables, 11 Markdown, 3 CSV,
+and its tests recompute rather than hardcode, so nothing shipped depends on the wrong figure.
+
+What needs deciding is the wording, before phase-lrr-02 is picked up: whether R02 and
+phase-lrr-02's acceptance are restated as the eleven Markdown deliverables, or as "each
+Markdown deliverable in 01-13", and whether PLAN-043's two "thirteen" sentences are amended
+in the same pass. An agent that picks up phase-lrr-02 against the current text will either
+fail a check that was never satisfiable or quietly narrow the acceptance to make it pass.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T15:29:15-04:00): Verified independently. research/literature-review/ has 14 files matching [0-9][0-9]_*: 11 .md
+(01-02, 05-13) and 3 .csv (00, 03, 04). Confirmed by directory listing, not just the extractor's
+own count.
+
+Three "thirteen"/"01-13" sentences that need rewording before phase-lrr-02 is picked up:
+
+- PLAN-043 line 81 (Risks): "`phase-lrr-02` verifies against all thirteen, not a sample."
+- docs/09-backlog/backlog.yaml, phase-lrr-02 scope (line 6961-6963): "Render all thirteen
+  Markdown deliverables faithfully ... and verify against all thirteen, not a sample."
+- docs/09-backlog/backlog.yaml, phase-lrr-02 acceptance (line 6966-6967): "For each of 01-13
+  the rendered output contains no line beginning with '## ' or '- ' outside a pre block, and the
+  count of h2 elements equals the count of '^## ' in the source."
+- REQ-027 R02 verification (line 70-72): "for each of `01`-`13`, assert the rendered output
+  contains no line beginning with `## ` or `- ` outside a `<pre>` block, and that every Markdown
+  table in the source produced a `<table>`. Count `<h2>` elements against `^## ` occurrences in
+  the source and assert equality."
+
+All four wrongly sweep 03_source_inventory.csv and 04_evidence_matrix.csv into a Markdown-shaped
+check: those two files have no '## ' headings and no Markdown tables, so the h2-count-equality
+assertion is vacuous (0 == 0) on them at best, or a spurious failure at worst depending on how a
+future implementer reads "for each of 01-13" literally. R01 (line 55-63) and PLAN-043's own phase
+table (line 67, "Markdown deliverables render faithfully") do NOT have this problem -- R01 counts
+all fourteen deliverables generically (reachability, not Markdown structure) and correctly keeps
+00/03/04 out of the Markdown claim.
+
+R03 (line 74-84) already covers 00, 03 and 04 as the three browsable CSV tables, with its own
+verification (sort/filter/row-count assertions) that does not depend on R02's wording at all. So
+R03's coverage does account for two of the three CSVs R02 wrongly sweeps in (03 and 04; 00 is not
+in the 01-13 range R02 names, so R02 only mis-sweeps 03 and 04, not 00). Fixing R02 to read "each
+Markdown deliverable in 01-13" (or spelling out the eleven ids) does not touch R03 or its
+verification in any way -- they are independent checks over disjoint file sets once R02's wording
+is corrected.
+
+No shipped code or test is affected: phase-lrr-01's extractor (tools/lit_report_extract.py) and
+its tests (test/test_lit_report_extract.py) recompute counts from the corpus rather than
+hardcoding 11/13/14, confirmed by reading test/test_lit_report_extract.py (e.g. the deliverables
+== 14 assertion and the comment at line 168 noting the three table row/column counts are
+"recomputed from the CSV, not compared to 1200/1154/67").
+
+What needs an owner decision before phase-lrr-02 starts: reword the four sentences above to say
+"the eleven Markdown deliverables" (or equivalently "each Markdown deliverable in 01-13"), in
+PLAN-043, REQ-027 R02 and both the scope and acceptance of phase-lrr-02 in backlog.yaml, in one
+pass so the three documents stay consistent. This idea does not decide the exact wording, only
+that the four sentences above are the ones to change.
+
+Related ideas: 000308 and 000309 are already linked as relates_to by the idea's author; not
+independently re-verified here since this finding is scoped to the wording defect, not to those
+ideas' own content.
+
+</details>
+
+**Links**
+
+- relates_to → `000308`
+- relates_to → `000309`
