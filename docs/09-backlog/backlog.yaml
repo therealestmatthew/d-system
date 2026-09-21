@@ -9332,6 +9332,7 @@ items:
   - docs/08-governance/GOV-005-document-codes.md
   - docs/08-governance/codes.yaml
   - test/test_codes.py
+  - AGENTS.md
   next_action: Establish first whether codes.yaml on dev can serve as the reservation point, or whether
     a pre-merge reservation needs somewhere else to live. That choice decides the whole phase.
 - id: phase-conc-04
