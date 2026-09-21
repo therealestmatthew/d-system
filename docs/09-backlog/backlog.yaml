@@ -5,7 +5,6 @@ max_active: 3
 next_up:
 - phase-conc-03
 - phase-conc-02
-- phase-tax-02
 - phase-auto-01
 - phase-auto-02
 - phase-irs-04
@@ -13120,7 +13119,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-tax
   priority: 2
   session_budget: 1
@@ -13150,16 +13149,22 @@ items:
   completion_evidence:
   - docs/00-working/session-taxonomy.md
   - docs/03-sessions/SESS-2026-09-20-03-session-taxonomy-evidence.md
-  result: 'Post-rebase onto dev: Governance OK (35 systems, 300 documents, 26 memories,
-    288 backlog phases); pytest 638 passed; record-structure.tsv 123 data rows == 123 SESS
-    files. The staged private-content check reports 0 identifiers in a worktree (no _private/
-    portfolio there); the conclusive 31-identifier run belongs in the primary checkout at
-    integration. pytest failed first on a stale generated ideas.md after idea 000291 was
-    appended, and was fixed by regenerating it. Stage 0 parsed all 113
+  result: 'At close, in the primary checkout against merged dev: Governance OK (35 systems,
+    302 documents, 28 memories, 292 backlog phases); pytest 638 passed; check_no_private_content
+    OK (747 tracked files, 31 identifiers checked) - the conclusive full-strength run, every
+    worktree run having reported 0 identifiers because no worktree carries _private/portfolio.
+    record-structure.tsv covers 125 of 125 SESS files. It did not at first: the reduction ran at
+    123 == 123 and two further records existed by close. The independent review rejected this
+    session''s argument that R05''s "at run time" clause made that acceptable, and disproved its
+    claim that re-running could not converge, by running the script; the table was regenerated
+    (125 rows, no existing row changed) and the deliverable''s dependent figures recomputed.
+    pytest also failed first on a stale generated ideas.md after the promotion idea was appended,
+    and was fixed by regenerating it. Stage 0 parsed all 113
     transcripts with 0 parse errors and 0 unrecognised record types; no agent read a raw
     transcript. Engine and derived outputs at _private/analysis/session-taxonomy/
     (reduce_sessions.py, record_structure.py, make_digests.py, stage1_classify.py); promotion
     idea 000291 captured and present in the fold.'
-  next_action: /session-close. The owner has read the deliverable and ruled on all four of
-    its section 9 questions; the rulings are recorded in its section 11. The
-    session record must name the reduction-script location and idea 000291.
+  next_action: None - phase complete. Follow-on work has no phases yet. Promoting the reduction
+    engine to tools/ with an OPS doc and the prompts to docs/02-prompts/ (idea 000291), and
+    building the governance write-path interrupt (000294), are both planning work needing a
+    requirement and plan first.

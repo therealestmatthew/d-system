@@ -444,12 +444,21 @@ tools/ with an OPS doc*). The derived outputs are never promoted: they carry own
 
 **`record-structure.tsv` is ready for Part 3** — the record-quality and template phase
 (`PROMPT-session-taxonomy-part3-record-templates.md`, serving ideas `000276` and `000277`, and
-consumed by `phase-fwa-03`). It covers all 123 records with sections-present-versus-contract, line
+consumed by `phase-fwa-03`). It covers all 125 records with sections-present-versus-contract, line
 count, front-matter completeness and non-contract sections. Collected here; analysed there. Three
-headline numbers it already carries: **86 of 123** records satisfy the checkpoint contract
-(`Phase`/`Verification`/`Acceptance`/`Backlog`/`Unresolved`), **74 of 123** the session-close
-contract (`Review`/`Decisions`/`Corrections`/`Left undone`), **97 of 123** have complete front
-matter, and the corpus uses **151 distinct non-contract section headings**.
+headline numbers it already carries: **88 of 125** records satisfy the checkpoint contract
+(`Phase`/`Verification`/`Acceptance`/`Backlog`/`Unresolved`), **74 of 125** the session-close
+contract (`Review`/`Decisions`/`Corrections`/`Left undone`), **98 of 125** have complete front
+matter, and the corpus uses **159 distinct non-contract section headings**.
+
+**Regenerated at close (2026-09-20).** The table first ran at 123 records and was regenerated to 125
+during `/session-close`, after `phase-tax-02`'s independent review found that "covers every SESS
+file" is the requirement body's unqualified demand and that the two absent records — a peer's
+`SESS-2026-09-20-02` and this phase's own `SESS-2026-09-20-03` — could simply be added. Re-running
+`record_structure.py` is deterministic, reads no transcript, changes none of the 123 existing rows,
+and converges: 125 rows against 125 files. The four figures above are the regenerated ones; the
+distinct-heading count moved most (151 → 159), which matters because heading drift is the dimension
+`phase-fwa-03` exists to assess.
 
 ---
 
