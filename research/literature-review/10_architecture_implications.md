@@ -34,7 +34,8 @@ and bidirectional traceability claim are, on the literal wording of these hypoth
 PROV-O, the AGM/ADR/digital-thread lineages, and requirements-traceability research respectively (see
 `09_reuse_recommendations.md`, recommendations 1, 2, 4, 8). The implication for the conceptual
 architecture is not that these primitives are wrong to keep — the campaign's own method treats
-"known components, integrated" as a successful finding, not a defect (`CLAUDE.md` §14) — but that
+known components assembled into a new integration as a successful finding, not a defect
+(`CLAUDE.md` §14) — but that
 documenting them as established, vocabulary-mapped concepts rather than original inventions is what
 the evidence supports, and what any downstream design or requirements document describing them
 should reflect.
@@ -46,9 +47,9 @@ H3 found that two independent, mature 2021-2026 provenance systems (EVI and TGMS
 typed, multi-actor provenance machinery and then deliberately declined to automate conflict
 arbitration on top of it — EVI's own text states resolution "ultimately require[s] human judgment,"
 and TGMS explicitly disables provenance-based write-back "pending... policies." `06_hypothesis_tests.md`
-records this as "some evidence that the combination carries a correctness or liability risk its
-builders did not want to accept — not proof that it is hard, but a reason the absence may not be
-mere neglect." The implication: if D-System's conceptual architecture treats automated,
+records this as "some evidence that authority-weighted automated arbitration carries a correctness
+or liability risk its builders did not want to accept — not proof that it is hard, but a reason the
+absence may not be mere neglect." The implication: if D-System's conceptual architecture treats automated,
 provenance-weighted conflict resolution as a natural extension of having provenance data, the
 literature suggests two careful engineering teams considered and rejected exactly that step. The
 architecture should treat automated arbitration as its own explicit, separately-justified design

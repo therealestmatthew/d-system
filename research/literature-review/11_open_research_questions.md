@@ -87,9 +87,9 @@ re-derivation, not merely as a premise that went stale.
 **Q5. Why do mature, independently-built provenance systems consistently stop short of automating
 conflict arbitration?** EVI's authors state resolution "ultimately require[s] human judgment"; TGMS
 explicitly disables provenance-based write-back "pending... policies." `06_hypothesis_tests.md` reads
-this as "some evidence that the combination carries a correctness or liability risk its builders did
-not want to accept — not proof that it is hard, but a reason the absence may not be mere neglect."
-This campaign found the *pattern* of declining to automate, in two independent 2021-2026 systems, but
+this as "some evidence that authority-weighted automated arbitration carries a correctness or
+liability risk its builders did not want to accept — not proof that it is hard, but a reason the
+absence may not be mere neglect." This campaign found the *pattern* of declining to automate, in two independent 2021-2026 systems, but
 not the underlying reason — whether it is a demonstrated correctness risk, an unaddressed technical
 difficulty, a liability concern specific to each system's domain, or simply unaddressed demand. Open.
 
