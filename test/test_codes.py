@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -9,8 +10,10 @@ from typing import Any
 import pytest
 import yaml
 
+from src.governance import reservations
 from src.governance.__main__ import ROOT
 from src.governance.codes import (
+    allocated,
     inspect_codes,
     inspect_register,
     next_code,
@@ -391,3 +394,155 @@ def test_missing_code_is_tolerated_before_enforcement(register: dict[str, Any]) 
                            "created": "2026-09-05"}}
     assert inspect_codes(register, documents, strict=False) == []
     assert inspect_codes(register, documents, strict=True) != []
+
+
+# --- REQ-013 R05: allocation is collision-proof across concurrent worktrees -----------------
+#
+# The defect these cover is not arithmetic. `next_code()` was correct as a function; it was
+# called against committed state alone, so two worktrees that both allocated before either
+# merged computed the same code and discovered it at merge. This repository paid for that twice
+# in session codes (`5b3848c`, `94f7978`) and once in the idea log (`65491d4`).
+#
+# R05's verification has two halves and the second is the one worth the machinery: "confirm the
+# reservation is visible to the second caller before the first has merged". A test that only
+# calls `reserve()` twice in one process proves mutual exclusion but not *sharing*, so the
+# worktree tests below build a real git repository with real linked worktrees and check that a
+# reservation taken in one is seen from the other with nothing committed anywhere.
+
+
+@pytest.fixture
+def repo_with_worktrees(tmp_path: Path) -> dict[str, Path]:
+    """A real git repository with two linked worktrees, committed once so branches exist."""
+    import subprocess
+
+    primary = tmp_path / "primary"
+    primary.mkdir()
+
+    def git(*args: str, cwd: Path = primary) -> None:
+        subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True)
+
+    git("init", "-b", "dev")
+    git("config", "user.email", "test@example.invalid")
+    git("config", "user.name", "Test")
+    (primary / "seed.txt").write_text("seed\n")
+    git("add", "seed.txt")
+    git("commit", "-m", "seed")
+
+    first = tmp_path / "wt-first"
+    second = tmp_path / "wt-second"
+    git("worktree", "add", "-b", "agent/first", str(first), "dev")
+    git("worktree", "add", "-b", "agent/second", str(second), "dev")
+    return {"primary": primary, "first": first, "second": second}
+
+
+def test_allocated_counts_a_pre_merge_reservation_as_spent(
+    bare_register: dict[str, Any],
+) -> None:
+    """The reserved set joins committed documents and register holds as codes already gone."""
+    documents = {"doc-a": doc("PLAN-001")}
+    assert "PLAN-002" in allocated(bare_register, documents, {"PLAN-002"})
+    assert next_code("plan", bare_register, documents) == "PLAN-002"
+    assert next_code("plan", bare_register, documents, reserved={"PLAN-002"}) == "PLAN-003"
+
+
+def test_reservations_do_not_disturb_allocation_in_another_series(
+    bare_register: dict[str, Any],
+) -> None:
+    """A held SESS code must not push the PLAN counter; series are independent."""
+    documents = {"doc-a": doc("PLAN-001")}
+    reserved = {"SESS-2026-09-21-01"}
+    assert next_code("plan", bare_register, documents, reserved=reserved) == "PLAN-002"
+
+
+def test_dated_allocation_skips_a_reserved_same_day_sequence(
+    bare_register: dict[str, Any],
+) -> None:
+    """The session-code collision this phase exists for, at the arithmetic level."""
+    documents: dict[str, Any] = {}
+    first = next_code("session", bare_register, documents, today=TODAY)
+    assert first == "SESS-2026-09-05-01"
+    second = next_code("session", bare_register, documents, today=TODAY, reserved={first})
+    assert second == "SESS-2026-09-05-02"
+    assert first != second
+
+
+def test_reserve_is_mutually_exclusive(tmp_path: Path) -> None:
+    """Two callers racing for one code: exactly one wins, by O_EXCL rather than by a lock."""
+    import subprocess
+
+    subprocess.run(["git", "init", "-b", "dev"], cwd=tmp_path, check=True, capture_output=True)
+    assert reservations.reserve(tmp_path, "PLAN-777") is True
+    assert reservations.reserve(tmp_path, "PLAN-777") is False
+    assert "PLAN-777" in reservations.active(tmp_path)
+    assert reservations.release(tmp_path, "PLAN-777") is True
+    assert reservations.release(tmp_path, "PLAN-777") is False
+    assert "PLAN-777" not in reservations.active(tmp_path)
+
+
+def test_reserve_refuses_a_code_that_would_escape_the_store(tmp_path: Path) -> None:
+    """A code is a filename here, so a traversal attempt is rejected rather than normalised."""
+    import subprocess
+
+    subprocess.run(["git", "init", "-b", "dev"], cwd=tmp_path, check=True, capture_output=True)
+    for bad in ("../escape", "PLAN/001", "", "plan-001"):
+        with pytest.raises(ValueError):
+            reservations.reserve(tmp_path, bad)
+
+
+def test_two_worktrees_share_one_reservation_store(repo_with_worktrees: dict[str, Path]) -> None:
+    """R05's second half: the reservation is visible to the second caller pre-merge.
+
+    Nothing is committed in either worktree. If the store were a tracked file this assertion
+    would fail, which is the argument against putting reservations in `codes.yaml` on `dev`.
+    """
+    first, second = repo_with_worktrees["first"], repo_with_worktrees["second"]
+    assert reservations.reservation_dir(first) == reservations.reservation_dir(second)
+
+    assert reservations.reserve(first, "SESS-2026-09-21-01") is True
+    assert "SESS-2026-09-21-01" in reservations.active(second)
+    assert reservations.reserve(second, "SESS-2026-09-21-01") is False
+
+
+def test_two_worktrees_allocating_the_same_kind_get_different_codes(
+    repo_with_worktrees: dict[str, Path], bare_register: dict[str, Any]
+) -> None:
+    """R05 itself, end to end, with nothing merged between the two allocations."""
+    first, second = repo_with_worktrees["first"], repo_with_worktrees["second"]
+    documents: dict[str, Any] = {}
+
+    def allocate(root: Path) -> str:
+        for _ in range(10):
+            code = next_code(
+                "session", bare_register, documents, today=TODAY, reserved=reservations.active(root)
+            )
+            if reservations.reserve(root, code):
+                return code
+        raise AssertionError("exhausted attempts")
+
+    from_first = allocate(first)
+    from_second = allocate(second)
+    assert from_first == "SESS-2026-09-05-01"
+    assert from_second == "SESS-2026-09-05-02"
+    assert from_first != from_second
+
+
+def test_prune_drops_a_satisfied_reservation_and_keeps_an_outstanding_one(
+    repo_with_worktrees: dict[str, Path],
+) -> None:
+    """A reservation whose document has landed is released; one still in flight is not."""
+    first = repo_with_worktrees["first"]
+    reservations.reserve(first, "PLAN-900")
+    reservations.reserve(first, "PLAN-901")
+    dropped = reservations.prune(first, {"doc-landed": doc("PLAN-900")})
+    assert dropped == ["PLAN-900"]
+    assert reservations.active(first) == {"PLAN-901"}
+
+
+def test_prune_drops_an_expired_reservation(repo_with_worktrees: dict[str, Path]) -> None:
+    """An agent that allocated and never wrote cannot hold a hole in the series forever."""
+    first = repo_with_worktrees["first"]
+    reservations.reserve(first, "PLAN-902")
+    assert reservations.prune(first, {}) == []
+    later = time.time() + reservations.TTL_SECONDS + 1
+    assert reservations.prune(first, {}, now=later) == ["PLAN-902"]
+    assert reservations.active(first) == set()

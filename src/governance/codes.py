@@ -54,10 +54,22 @@ def held_codes(register: dict[str, Any]) -> dict[str, str]:
     }
 
 
-def allocated(register: dict[str, Any], documents: dict[str, Any]) -> list[str]:
-    """Every code the repository has spent: in use, reserved or retired."""
-    return [meta["code"] for meta in documents.values() if meta.get("code")] + list(
-        held_codes(register)
+def allocated(
+    register: dict[str, Any],
+    documents: dict[str, Any],
+    reserved: set[str] | None = None,
+) -> list[str]:
+    """Every code the repository has spent: in use, reserved, retired or reserved pre-merge.
+
+    `reserved` carries the codes held by `src/governance/reservations.py` — allocations in flight
+    from this or another worktree that have not merged yet. Committed state alone is what
+    `REQ-013` R05 calls the defect, so an allocator that ignores this argument is the old
+    behaviour.
+    """
+    return (
+        [meta["code"] for meta in documents.values() if meta.get("code")]
+        + list(held_codes(register))
+        + sorted(reserved or ())
     )
 
 
@@ -67,12 +79,23 @@ def next_code(
     documents: dict[str, Any],
     parent: str | None = None,
     today: date | None = None,
+    reserved: set[str] | None = None,
 ) -> str:
-    """The next free code for a kind; a pure function of committed repository state."""
+    """The next free code for a kind, treating pre-merge reservations as already spent.
+
+    Pure in its arguments, so it stays straightforward to test; the impurity lives in the caller,
+    which reads the reservation store and passes `reserved` in. Without that argument this is the
+    committed-state-only allocator `REQ-013` R05 rejects, and two worktrees calling it before
+    either merges get the same answer.
+    """
     series = series_by_kind(register).get(kind)
     if not series:
         raise ValueError(f"no series is registered for kind {kind}")
-    spent = [parsed for value in allocated(register, documents) if (parsed := parse_code(value))]
+    spent = [
+        parsed
+        for value in allocated(register, documents, reserved)
+        if (parsed := parse_code(value))
+    ]
     mine = [parsed for parsed in spent if parsed["series"] == series["code"]]
 
     if series["numbering"] == "dated":

@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-09-21'
 systems: [sys-governance]
 depends_on: [doc-governance-protocol, doc-adr-document-codes]
 ---
@@ -91,17 +91,75 @@ document's slug is fine; changing its code is not.
 
 ## Concurrent agents
 
-The register on `main` is the ledger and `uv run python -m src.governance` is the check, exactly as
-[ADR-003](../04-decisions/ADR-003-multi-agent-concurrency.md) treats the backlog. Two agents that
-independently take the same counter code collide at the second agent's post-rebase run, as a
-duplicate-code error naming both files.
+`--next-code` does not just compute a free code; it **takes** it. Computing and taking are one
+operation from a peer's point of view, because anything less is the defect: an allocator that reads
+only committed state gives two worktrees the same answer, and they find out at merge.
 
-The later-integrating agent renumbers. Codes are free before merge and permanent after, so this
-costs one edit and never rewrites history. An agent that knows it will write a document should
-reserve the code in the same small commit as its backlog claim, which removes the race entirely.
+### Two different things are called a reservation
+
+They are unrelated, and confusing them will waste an afternoon.
+
+| | **Register reservation** (`codes.yaml`) | **Pre-merge reservation** (allocation-time) |
+|---|---|---|
+| Lives in | `reserved:` in `codes.yaml`, tracked and committed | `<git common dir>/code-reservations/`, untracked |
+| Lasts | Until the document is written, often weeks | Minutes, between `--next-code` and the document |
+| Declares | "This planned document owns this code" | "An allocation is in flight; do not hand this out" |
+| Written by | A person, deliberately, with a reason and a phase | `--next-code`, automatically |
+| Survives a clone | Yes | No, and it should not |
+
+The rest of this section is about the second kind. The first is described under *Reservations and
+retirements* above and is unchanged.
+
+### How a pre-merge reservation works
+
+Each allocation creates one file named for the code, using `O_CREAT | O_EXCL`. The kernel admits
+exactly one creator, so of two agents racing for `SESS-2026-09-21-01` exactly one is told it has it
+and the other retries with `-02`. There is no lock file and nothing to repair after a crash.
+
+The store sits in the **git common directory** — what `git rev-parse --git-common-dir` resolves to,
+which is the same `.git` from the primary checkout and from every linked worktree. That is the only
+place a reservation can live and still satisfy [REQ-013](../06-requirements/REQ-013-concurrency-git-safety.md)
+R05's requirement that it be visible to the second caller *before the first has merged*:
+
+- a tracked file is invisible until it merges, which is the defect restated;
+- `codes.yaml` on `dev` cannot be written from a worktree at all, because a worktree cannot check
+  out `dev` (`fatal: 'dev' is already used by worktree at ...`);
+- `_tmpagent/` is tracked, so it has the first problem.
+
+Being untracked and machine-local is correct rather than a compromise: a reservation is a statement
+about work in flight on this machine, and it means nothing to a fresh clone.
+
+### Releasing
+
+Allocation prunes before it allocates, so this is usually automatic:
+
+- **Satisfied** — the code now appears on a scanned document. The allocation landed, and holding it
+  longer would skip a code nobody spent.
+- **Expired** — a fortnight has passed without that happening, which only collects reservations
+  whose session ended without writing the document.
+
+Release one by hand when you allocated a code and decided not to write it:
+
+```bash
+uv run python -m src.governance --release-code SESS-2026-09-21-01
+```
+
+### What this replaces
+
+Reserving the code in `codes.yaml` alongside the backlog claim was the standing workaround, and it
+is no longer needed — it was a convention protecting against a mechanism defect, and the mechanism
+is fixed. Doing it anyway is harmless, just redundant. Renumbering at integration remains the
+correct response to a duplicate-code error, for the cases this does not cover: two agents on
+**different machines**, or an allocation whose reservation was pruned as expired before its document
+was written.
+
+Codes stay free before merge and permanent after, and the register plus
+`uv run python -m src.governance` remain the ledger and the check, exactly as
+[ADR-003](../04-decisions/ADR-003-multi-agent-concurrency.md) treats the backlog.
 
 Dated series do not contend across days, and contend within a day only between agents finishing on
-that day.
+that day — which is precisely when session codes collide, and why this repository renumbered a
+session record twice before the mechanism existed.
 
 ## The catalog
 

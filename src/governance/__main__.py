@@ -19,11 +19,17 @@ from jsonschema import Draft7Validator, FormatChecker  # type: ignore[import-unt
 
 from src.db.ideas import fold, load_events
 from src.db.source_validation import data_root
+from src.governance import reservations
 from src.governance.backlog import inspect_backlog, render_backlog
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
 
 ROOT = Path(__file__).resolve().parents[2]
+
+#: How many candidates an allocation tries before giving up. Each failed pass means a peer
+#: took that exact code in the microseconds between our read and our write, so the bound is
+#: generous by orders of magnitude against `max_active: 3`.
+RESERVATION_ATTEMPTS = 50
 # Navigation and the user's execution input are explicitly exempt, not all README files.
 # Directories that hold ungoverned material: parked ideas and notes that have not
 # earned a code yet. See ADR-010. Anything here is exempt from front-matter rules.
@@ -444,6 +450,35 @@ def write_catalog(root: Path, rendered: str) -> None:
         raise
 
 
+def allocate(kind: str, result: dict[str, Any], parent: str | None) -> str:
+    """Allocate a code and hold it against peers before returning it.
+
+    The two steps are inseparable, which is why they live together here rather than in
+    `codes.next_code`. Computing a free code and *taking* it must be one operation from a peer's
+    point of view, or two worktrees both compute `SESS-2026-09-21-01`, both believe it is free,
+    and the second discovers the collision only at merge — the failure `REQ-013` R05 names.
+
+    Satisfied and expired reservations are pruned first so an abandoned allocation cannot push the
+    series forward forever. The retry loop re-reads the store on each pass, so a code a peer took
+    between our read and our write is seen on the next candidate rather than overwritten.
+    """
+    reservations.prune(ROOT, result["documents"])
+    for _ in range(RESERVATION_ATTEMPTS):
+        code = next_code(
+            kind,
+            result["register"],
+            result["documents"],
+            parent,
+            reserved=reservations.active(ROOT),
+        )
+        if reservations.reserve(ROOT, code):
+            return code
+    raise ValueError(
+        f"could not reserve a {kind} code after {RESERVATION_ATTEMPTS} attempts; "
+        f"inspect {reservations.reservation_dir(ROOT)}"
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     output = parser.add_mutually_exclusive_group()
@@ -458,6 +493,11 @@ def main() -> int:
         help="Regenerate docs/08-governance/catalog.md and print it",
     )
     output.add_argument("--next-code", metavar="KIND", help="Print the next free code for a kind")
+    output.add_argument(
+        "--release-code",
+        metavar="CODE",
+        help="Drop a pre-merge reservation taken by --next-code but never written",
+    )
     parser.add_argument("--parent", metavar="DOC_ID", help="Allocate a sub-code under this plan")
     args = parser.parse_args()
     if args.parent and not args.next_code:
@@ -476,9 +516,15 @@ def main() -> int:
         return 1
     if args.next_code:
         try:
-            print(next_code(args.next_code, result["register"], result["documents"], args.parent))
+            print(allocate(args.next_code, result, args.parent))
         except ValueError as exc:
             print(f"ERROR {exc}")
+            return 1
+    elif args.release_code:
+        if reservations.release(ROOT, args.release_code):
+            print(f"released {args.release_code}")
+        else:
+            print(f"ERROR no reservation held for {args.release_code}")
             return 1
     elif args.backlog or args.ready:
         active_ids = [item["id"] for item in catalog["items"] if item["status"] == "active"]
