@@ -6823,7 +6823,7 @@ items:
   systems:
   - sys-research
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lit
   priority: 3
   session_budget: 1
@@ -6872,27 +6872,38 @@ items:
   - research/literature-review/11_open_research_questions.md
   - research/literature-review/12_experiment_proposals.md
   - research/literature-review/13_validated_bibliography.md
-  session: doc-session-literature-review-pass-4
-  next_action: 'Both acceptance conditions hold. The reconciliation pass the 2026-09-21
-    close review required is done: 09-12 reconciled against the retired H4 split, Experiment
-    2 withdrawn with its reason recorded per the owner ruling and without renumbering,
-    13 completed at 48 Part A entries (three sources added, one of them - the QOC 1991 paper -
-    cited by author name and missed by the close review), and every stale population figure
-    re-measured across 06-13. Three overclaimed or fabricated quotations were removed. LIT-07 G
-    took all eight stop-condition measurements with populations named, using one of two fix
-    cycles after it mismeasured three conditions; six of the eight were independently
-    recomputed by the coordinator before dispatch and all reproduced. Saturation is measured
-    and explicitly not demonstrated, per rulings 9 and 10. An independent adversarial close
-    review ran twice - the first correctly raising as blocking that the diff was moving under
-    it, which was the coordinator''s error - and against the frozen diff returned both
-    conditions HOLD and safe to mark complete. A coordinator saturation finding was raised and
-    then withdrawn: the rule is documented at 06_hypothesis_tests.md:72-79 and reproduces
-    exactly at 58/387 = 15.0%; ideas 000307 and 000308 were captured and the 000289 annotation
-    amended. Rebased onto dev, governance exits 0, 651 tests pass. Remaining: GOV-003
-    completion condition 3 - integration onto dev with the owner''s approval, which is asked
-    for every phase and has not yet been given. The completion edit is one small commit on dev
-    immediately after that integration. Phase stays active under agent-lit, holding
-    sys-research, until then.'
+  session: doc-session-literature-review-pass-4-reconciliation
+  completion_evidence:
+  - research/literature-review/07_anti_novelty_case.md
+  - research/literature-review/08_surviving_distinctions.md
+  - research/literature-review/09_reuse_recommendations.md
+  - research/literature-review/10_architecture_implications.md
+  - research/literature-review/11_open_research_questions.md
+  - research/literature-review/12_experiment_proposals.md
+  - research/literature-review/13_validated_bibliography.md
+  - docs/03-sessions/SESS-2026-09-21-02-literature-review-pass-4-reconciliation.md
+  result: 'Both acceptance conditions met. All seven synthesis deliverables exist and
+    trace; 09-12 reconciled against the retired H4 split, Experiment 2 withdrawn with
+    its reason recorded and without renumbering, 13 complete at 48 Part A entries with
+    zero cited sources missing and zero entries outside the matrix, three fabricated or
+    overclaimed quotations removed, and every population figure re-measured across 06-13.
+    LIT-07 G took all eight stop-condition measurements with populations named, using one
+    of two fix cycles after mismeasuring three conditions; the coordinator independently
+    recomputed six of the eight before dispatch and all reproduced. Saturation measured
+    and explicitly NOT demonstrated, per rulings 9 and 10 - the campaign closes as a first
+    research memo, not a novelty claim. An independent adversarial review ran twice and
+    against the frozen diff returned both conditions HOLD, safe to mark complete.
+    Verification: governance exit 0 (35 systems, 305 documents, 292 phases); pytest 651
+    passed; check_no_private_content OK, 762 tracked files, 31 identifiers checked, run in
+    the primary checkout after integration where the content half genuinely runs.
+    Integrated to dev by fast-forward on the owner''s approval. Closes PLAN-023 - this was
+    the campaign''s last open phase, across ten sessions against a six-to-eight estimate,
+    with the single permitted Opus escalation never spent.'
+  next_action: Complete. Campaign closed. Follow-ups live as ideas 000289 (the duplicate-rate
+    rule is documented in a deliverable rather than the evidence contract, and result_ids
+    tokenisation is unfixed), 000307 (no dedupe rule for population counts; PROMPT-031 ruling
+    10's "0 of 32" reproduces under neither consistent reading) and 000308 (the inventory's
+    status field is stale for 16 rows with matrix rows). None blocks anything.
 - id: phase-lrr-01
   title: Deterministic extraction of the campaign corpus
   plan: doc-literature-review-report-page
