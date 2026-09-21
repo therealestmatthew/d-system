@@ -526,23 +526,115 @@ def test_two_worktrees_allocating_the_same_kind_get_different_codes(
     assert from_first != from_second
 
 
-def test_prune_drops_a_satisfied_reservation_and_keeps_an_outstanding_one(
-    repo_with_worktrees: dict[str, Path],
-) -> None:
-    """A reservation whose document has landed is released; one still in flight is not."""
-    first = repo_with_worktrees["first"]
-    reservations.reserve(first, "PLAN-900")
-    reservations.reserve(first, "PLAN-901")
-    dropped = reservations.prune(first, {"doc-landed": doc("PLAN-900")})
-    assert dropped == ["PLAN-900"]
-    assert reservations.active(first) == {"PLAN-901"}
-
-
 def test_prune_drops_an_expired_reservation(repo_with_worktrees: dict[str, Path]) -> None:
     """An agent that allocated and never wrote cannot hold a hole in the series forever."""
     first = repo_with_worktrees["first"]
     reservations.reserve(first, "PLAN-902")
-    assert reservations.prune(first, {}) == []
+    assert reservations.prune(first) == []
     later = time.time() + reservations.TTL_SECONDS + 1
-    assert reservations.prune(first, {}, now=later) == ["PLAN-902"]
+    assert reservations.prune(first, now=later) == ["PLAN-902"]
     assert reservations.active(first) == set()
+
+
+def test_prune_keeps_a_reservation_whose_document_exists_locally(
+    repo_with_worktrees: dict[str, Path],
+) -> None:
+    """Regression for the collision that satisfied-pruning reintroduced.
+
+    Releasing a reservation because its code appears on a scanned document is judged against the
+    *local* working tree. An allocating worktree would therefore retire its own reservation while
+    the document was still unmerged, and the next peer to allocate would be handed the same code
+    with nothing committed anywhere — the collision this module exists to prevent, reopened by its
+    own cleanup. Expiry is the only automatic release, so this reservation stands.
+    """
+    first = repo_with_worktrees["first"]
+    reservations.reserve(first, "PLAN-900")
+    (first / "docs").mkdir(exist_ok=True)
+    (first / "docs" / "PLAN-900-thing.md").write_text("written but not merged\n")
+    assert reservations.prune(first) == []
+    assert reservations.active(first) == {"PLAN-900"}
+
+
+def test_a_written_but_unmerged_document_does_not_free_its_code_for_a_peer(
+    repo_with_worktrees: dict[str, Path], bare_register: dict[str, Any]
+) -> None:
+    """The same defect stated as the behaviour that matters, across two worktrees."""
+    first, second = repo_with_worktrees["first"], repo_with_worktrees["second"]
+
+    def allocate(root: Path, documents: dict[str, Any]) -> str:
+        reservations.prune(root)
+        for _ in range(10):
+            code = next_code(
+                "session", bare_register, documents, today=TODAY, reserved=reservations.active(root)
+            )
+            if reservations.reserve(root, code):
+                return code
+        raise AssertionError("exhausted attempts")
+
+    mine = allocate(first, {})
+    # The first worktree writes its document and allocates again in the same session. The second
+    # worktree cannot see that file: it is on an unmerged branch.
+    again = allocate(first, {"doc-mine": doc(mine)})
+    theirs = allocate(second, {})
+
+    assert mine != again
+    assert theirs not in {mine, again}
+
+
+def test_release_validates_on_the_same_terms_as_reserve(tmp_path: Path) -> None:
+    """The destroying function must not be laxer than the creating one.
+
+    `reserve()` only ever creates a file; `release()` unlinks one, and `--release-code` passes
+    operator input straight to it. Unvalidated, `../config` removed the repository's git config.
+    """
+    import subprocess
+
+    subprocess.run(["git", "init", "-b", "dev"], cwd=tmp_path, check=True, capture_output=True)
+    reservations.reserve(tmp_path, "PLAN-001")
+    canary = reservations.reservation_dir(tmp_path).parent / "CANARY"
+    canary.write_text("do not delete")
+
+    for bad in ("../CANARY", "..", ".", "PLAN/001", "", "plan-001"):
+        with pytest.raises(ValueError):
+            reservations.release(tmp_path, bad)
+    assert canary.exists()
+
+
+def test_a_damaged_reservation_still_expires(repo_with_worktrees: dict[str, Path]) -> None:
+    """A crash between create and write leaves an empty file; it must not hold a code forever."""
+    first = repo_with_worktrees["first"]
+    directory = reservations.reservation_dir(first)
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / "PLAN-903").write_text("")
+    (directory / "PLAN-904").write_text("not json")
+    (directory / "PLAN-905").write_text('{"at": null}')
+
+    assert reservations.prune(first) == []
+    later = time.time() + reservations.TTL_SECONDS + 1
+    assert reservations.prune(first, now=later) == ["PLAN-903", "PLAN-904", "PLAN-905"]
+    assert reservations.active(first) == set()
+
+
+def test_the_cli_allocate_path_reserves_what_it_returns(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Cover `__main__.allocate` itself, not a reimplementation of it.
+
+    The end-to-end worktree tests build the compute-and-take loop inline, so without this the
+    production function — the one that actually runs `prune` before allocating — had no coverage,
+    which is how the satisfied-pruning defect survived its own test suite.
+    """
+    import subprocess
+
+    from src.governance import __main__ as entry
+
+    subprocess.run(["git", "init", "-b", "dev"], cwd=tmp_path, check=True, capture_output=True)
+    monkeypatch.setattr(entry, "ROOT", tmp_path)
+    register = dict(yaml.safe_load((ROOT / "docs/08-governance/codes.yaml").read_text()))
+    result = {"register": {**register, "reserved": [], "retired": []}, "documents": {}}
+
+    first = entry.allocate("plan", result, None)
+    second = entry.allocate("plan", result, None)
+    assert first == "PLAN-001"
+    assert second == "PLAN-002"
+    assert reservations.active(tmp_path) == {"PLAN-001", "PLAN-002"}

@@ -23,12 +23,19 @@ work in flight on this machine, and it is meaningless to a fresh clone.
 
 Mutual exclusion is the filesystem's, not ours. Each reservation is one file created with
 `O_CREAT | O_EXCL`, which the kernel guarantees to be atomic: of two callers racing for the same
-code, exactly one create succeeds and the loser retries with the next candidate. No lock file, no
-ordering assumption, and nothing to clean up after a crash mid-write.
+code, exactly one create succeeds and the loser retries with the next candidate. No lock file and
+no ordering assumption. A crash between the create and the write leaves an empty file, which still
+holds its code — `prune()` falls back to the file's mtime so such a reservation still expires
+rather than holding a code forever.
 
-Reservations are released when they are satisfied — the code now appears on a scanned document —
-or when they expire. Both are pruned on every allocation, so an agent that allocates a code and
-never writes the document cannot leak a hole in the series indefinitely.
+**A reservation is released by time or by hand, never by observing that the document exists.**
+Judging a reservation "satisfied" because its code appears on a scanned document was the obvious
+rule and it is wrong: `audit()` walks the *local* working tree, so an allocating worktree would
+retire its own reservation while the document is still unmerged and invisible to peers — and the
+next peer to allocate would be handed the same code, with nothing committed anywhere. That is the
+collision this module exists to prevent, reintroduced by its own cleanup. A reservation whose
+document has landed is harmless by comparison: it only makes the allocator skip a code that is
+genuinely spent.
 """
 
 from __future__ import annotations
@@ -98,20 +105,38 @@ def active(root: Path) -> set[str]:
     return {name for name, _ in _entries(reservation_dir(root))}
 
 
-def prune(root: Path, documents: dict[str, Any], now: float | None = None) -> list[str]:
-    """Drop reservations that are satisfied or expired; return what was dropped.
+def _age(directory: Path, name: str, meta: dict[str, Any], moment: float) -> float:
+    """How long a reservation has stood, in seconds.
 
-    A reservation is *satisfied* once its code appears on a scanned document — the allocation it
-    was protecting has landed, and holding it any longer would push the series forward by a code
-    nobody spent. It is *expired* once `TTL_SECONDS` has passed without that happening.
+    The stamp inside the file is preferred, but it is not trusted: a reservation written by a
+    crashed process is empty, and one edited by hand may hold anything. Either way the file's own
+    mtime is a sound lower bound, so a damaged reservation expires on schedule instead of holding
+    its code forever.
+    """
+    stamp = meta.get("at")
+    if isinstance(stamp, (int, float)) and not isinstance(stamp, bool):
+        return moment - float(stamp)
+    try:
+        return moment - (directory / name).stat().st_mtime
+    except OSError:
+        return 0.0
+
+
+def prune(root: Path, now: float | None = None) -> list[str]:
+    """Drop expired reservations; return what was dropped.
+
+    Expiry is the *only* automatic release. See this module's docstring for why "the document
+    exists, so the reservation is satisfied" is not a safe rule: it is judged against the local
+    working tree, and applying it hands a peer a code that is already spent on an unmerged branch.
+
+    A reservation for a code that has since landed is left standing until it expires. That costs
+    nothing — the allocator would skip that code anyway, because the document now carries it.
     """
     directory = reservation_dir(root)
-    spent = {meta["code"] for meta in documents.values() if meta.get("code")}
     moment = time.time() if now is None else now
     dropped = []
     for name, meta in _entries(directory):
-        age = moment - float(meta.get("at", moment))
-        if name in spent or age > TTL_SECONDS:
+        if _age(directory, name, meta, moment) > TTL_SECONDS:
             try:
                 (directory / name).unlink()
             except FileNotFoundError:
@@ -128,8 +153,7 @@ def reserve(root: Path, code: str, holder: str | None = None) -> bool:
     `O_CREAT | O_EXCL` is the whole mechanism: the kernel admits exactly one creator, so two
     callers racing for one code cannot both be told they have it.
     """
-    if not code or not set(code) <= _SAFE:
-        raise ValueError(f"refusing to reserve malformed code {code!r}")
+    _check(code, "reserve")
     directory = reservation_dir(root)
     directory.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(
@@ -146,12 +170,29 @@ def reserve(root: Path, code: str, holder: str | None = None) -> bool:
 
 
 def release(root: Path, code: str) -> bool:
-    """Drop one reservation by name. True when it existed, False when it did not."""
+    """Drop one reservation by name. True when it existed, False when it did not.
+
+    Validated on exactly the same terms as `reserve()`. The asymmetry is worth naming because it
+    was there and it was the dangerous way round: `reserve()` only ever *creates* a file, while
+    this function *unlinks* one, and it took operator input from `--release-code` straight through
+    to `unlink`. `../config` would have removed the repository's git config.
+    """
+    _check(code, "release")
     try:
         (reservation_dir(root) / code).unlink()
     except FileNotFoundError:
         return False
     return True
+
+
+def _check(code: str, verb: str) -> None:
+    """Reject anything that is not a bare code before it is used as a filename.
+
+    `.` and `..` are excluded explicitly: both are built entirely from permitted characters, so a
+    character-set test alone lets them through to name a directory rather than a reservation.
+    """
+    if not code or code in {".", ".."} or not set(code) <= _SAFE:
+        raise ValueError(f"refusing to {verb} malformed code {code!r}")
 
 
 def _holder(root: Path) -> str:

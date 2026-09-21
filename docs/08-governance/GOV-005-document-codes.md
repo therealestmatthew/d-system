@@ -131,12 +131,9 @@ about work in flight on this machine, and it means nothing to a fresh clone.
 
 ### Releasing
 
-Allocation prunes before it allocates, so this is usually automatic:
-
-- **Satisfied** — the code now appears on a scanned document. The allocation landed, and holding it
-  longer would skip a code nobody spent.
-- **Expired** — a fortnight has passed without that happening, which only collects reservations
-  whose session ended without writing the document.
+**Expiry is the only automatic release.** Allocation prunes expired reservations before it
+allocates, so an allocation abandoned without writing its document cannot hold a code forever. The
+horizon is a fortnight, which only ever collects reservations whose session ended without writing.
 
 Release one by hand when you allocated a code and decided not to write it:
 
@@ -144,14 +141,28 @@ Release one by hand when you allocated a code and decided not to write it:
 uv run python -m src.governance --release-code SESS-2026-09-21-01
 ```
 
+A reservation whose document *has* been written is deliberately left standing until it expires. The
+obvious alternative — release it as soon as its code appears on a document — is unsafe, and was
+built and removed during `phase-conc-03` rather than reasoned away:
+
+> The scan walks the **local working tree**. An allocating worktree would therefore retire its own
+> reservation while the document was still unmerged and invisible to every peer, and the next peer
+> to allocate would be handed the same code — with nothing committed anywhere. That is the
+> collision this mechanism exists to prevent, reopened by its own cleanup. It fires in ordinary
+> single-machine use: a session that allocates a session code, writes the record, then allocates a
+> second code for a plan or an ADR.
+
+Leaving the reservation standing costs nothing, because the allocator would skip that code anyway
+once the document carries it.
+
 ### What this replaces
 
 Reserving the code in `codes.yaml` alongside the backlog claim was the standing workaround, and it
 is no longer needed — it was a convention protecting against a mechanism defect, and the mechanism
 is fixed. Doing it anyway is harmless, just redundant. Renumbering at integration remains the
-correct response to a duplicate-code error, for the cases this does not cover: two agents on
-**different machines**, or an allocation whose reservation was pruned as expired before its document
-was written.
+correct response to a duplicate-code error, for the two cases this does not cover: two agents on
+**different machines**, which share no git directory; or an allocation whose reservation expired
+before its document was written, which takes a fortnight.
 
 Codes stay free before merge and permanent after, and the register plus
 `uv run python -m src.governance` remain the ledger and the check, exactly as

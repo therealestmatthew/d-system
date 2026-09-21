@@ -458,11 +458,13 @@ def allocate(kind: str, result: dict[str, Any], parent: str | None) -> str:
     point of view, or two worktrees both compute `SESS-2026-09-21-01`, both believe it is free,
     and the second discovers the collision only at merge — the failure `REQ-013` R05 names.
 
-    Satisfied and expired reservations are pruned first so an abandoned allocation cannot push the
-    series forward forever. The retry loop re-reads the store on each pass, so a code a peer took
-    between our read and our write is seen on the next candidate rather than overwritten.
+    Expired reservations are pruned first, so an allocation abandoned without writing its document
+    cannot hold a hole in the series forever. Nothing else is pruned — see `reservations`' module
+    docstring for why "the document exists" is not a safe release rule. The retry loop re-reads the
+    store on each pass, so a code a peer took between our read and our write is seen on the next
+    candidate rather than overwritten.
     """
-    reservations.prune(ROOT, result["documents"])
+    reservations.prune(ROOT)
     for _ in range(RESERVATION_ATTEMPTS):
         code = next_code(
             kind,
