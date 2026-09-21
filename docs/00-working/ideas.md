@@ -12545,3 +12545,23 @@ Two things are unspecified and both need settling:
 Worth considering alongside: a mechanical check that recomputes a phase's duplicate rate from the ledger, so the figure is never hand-derived by the gate agent that is also reporting it. The campaign's own saturation stop-condition rests on this number, and check-in ruling 8 forbids asserting saturation from it — which makes an unreproducible number worse than a missing one.
 
 Recorded from phase-lit-09's close, 2026-09-20. Instances: SESS-2026-09-14-04 (phase-lit-08) and SESS-2026-09-19-08 (phase-lit-09).
+
+---
+
+## 000290 · Replace the literature-review campaign gate with a deterministic script
+
+**Created 2026-09-20T21:26:16-04:00 · Status: `open`**
+
+Every measurement in the campaign's phase gate (PROMPT-029 Block G and the LIT-0x G sections) is computable from files on disk by a deterministic script: per-domain distinct-query counts over 00_search_ledger.csv, chaining coverage joining 04_evidence_matrix.csv to the ledger's subject_source_id, blank-cell counts over the matrix, second_review completeness, deliverable presence, and the duplicate rate. None of them needs judgment. They were nonetheless dispatched to a language model at every phase, and three consecutive gate runs reported false results.
+
+What happened, recorded because the pattern is the argument. On 2026-09-14 the gate counted a domain's title as a mandated search variant, and read the contract phrase "rows 20-30" as a line-number range rather than a row-count target. On 2026-09-20, against changed files, it silently restricted one measurement's row population to a single strategy_phase and failed two domains that pass comfortably (6 and 10 distinct queries against a threshold of 2), and it repeated the line-range error exactly, reporting PASS over 473 of 2,881 cells. Its fix cycle then introduced a third error, failing two more domains for not reproducing parenthetical notation - "cognitive architecture (SOAR, ACT-R)" - verbatim in a query string when every component term was present. Unreviewed, that run would have failed phase-lit-07 on two conditions that are met.
+
+Block G already carries a written warning against exactly this failure mode: "a gate that narrows its own scope silently reports PASS on the part it skipped". The warning did not prevent any of the three. That is the evidence that the fix is not more prose in the dispatch.
+
+Every error was caught by the coordinator independently recomputing the number, and each recomputation was a few lines of script over files already on disk. That is the script this idea proposes writing: the gate's population derivations belong in code where they can be read, tested and reused, not re-derived by a fresh model instance each phase.
+
+The campaign is complete, so this has no remaining caller in its original form, and that is the open question the owner should weigh: whether the work is worth doing for a finished campaign, whether it generalises into a reusable gate-runner for any measurement battery in this repository, or whether it should be recorded and declined. The generalisable half is the part with a future.
+
+The habit half of this is recorded separately as the brain procedure mem-proc-recompute-a-delegated-measurement, which says to recompute a delegated measurement rather than read it. That procedure and this idea are the two halves of the same finding: the procedure is what an agent does today, and this is the work that would make the procedure unnecessary for this battery.
+
+Related: mem-proc-check-that-cannot-fail covers the adjacent failure of a check that cannot fail at all.
