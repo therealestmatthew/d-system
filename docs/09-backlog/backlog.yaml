@@ -13146,5 +13146,15 @@ items:
   - Compare record-structure.tsv row count against ls docs/03-sessions/SESS-*.md | wc -l
   deliverables:
   - docs/00-working/session-taxonomy.md
-  next_action: Wait for the owner's explicit go after their review of session-types-theory.md,
-    then paste the Part 2 prompt into a fresh session.
+  completion_evidence:
+  - 'uv run python -m src.governance: Governance OK: 35 systems, 298 documents, 26 memories, 288
+    backlog phases.'
+  - 'uv run python tools/check_no_private_content.py with the changes staged: OK (741 tracked
+    files, 31 identifiers checked).'
+  - 'record-structure.tsv data rows 123 == ls docs/03-sessions/SESS-*.md | wc -l 123.'
+  - 'Stage 0 reduction: 113 transcripts parsed, 0 parse errors, 0 unrecognised record types; no
+    agent read a raw transcript.'
+  - 'Engine at _private/analysis/session-taxonomy/ (reduce_sessions.py, record_structure.py,
+    make_digests.py, stage1_classify.py); promotion idea 000290 captured and present in the fold.'
+  next_action: Owner review of docs/00-working/session-taxonomy.md, then /session-close. The
+    session record must name the reduction-script location and idea 000290.
