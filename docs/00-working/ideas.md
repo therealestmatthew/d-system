@@ -12783,3 +12783,453 @@ Found by the independent review of `phase-conc-03`, 2026-09-21.
 - **finding** by agent-conc (2026-09-21T10:56:59-04:00): Concrete instance found while retiring the workaround in phase-conc-03. GOV-005 and AGENTS.md were both updated on 2026-09-21 (commits e6e5fbc and e976201); PLAN-005:87 was not, because it is status: complete and outside that phase's acceptance. The general question is what happens to a completed plan whose mechanism is later replaced - edit it and you rewrite the record of what was decided, leave it and you ship stale guidance. REQ-013 R10 is the requirement this falls under, and phase-conc-06 owns that reconciliation.
 
 </details>
+
+---
+
+## 000299 · Anchor: regenerated explorer pages and the relationship graph behind them, 2026-09-21
+
+**Created 2026-09-21T11:00:15-04:00 · Status: `triaged`**
+
+Five asks raised together on 2026-09-21, after a one-off HTML snapshot of the folded idea state and
+both priority queues was published as a Claude artifact. The owner's reaction was that the snapshot
+should not be a one-off: the same views should be regeneratable pages, extended to the other
+document families, and the relationships between those families should be understood and possibly
+mapped in a graph database.
+
+They belong together because they share a question - what the surfaces are, what links them, and
+where the link data comes from - but each is recorded separately so none is lost inside another.
+Members carry a relates_to edge to this anchor.
+
+Members:
+
+- an auto-regenerated page for the idea log, its statuses and the priority queue
+- an auto-regenerated page for the backlog and next_up
+- prompt and plan explorer pages
+- a session investigating the relationships between all of these
+- an evaluation of Neo4j for graph-mapping those relationships, including links down to code files
+
+The relationship investigation is the one the owner named as possibly needing its own session. The
+page asks may or may not be one deliverable; the owner said "an html page (or a few)" and did not
+rule on how they split.
+
+**Annotations**
+
+- **note** by repository-owner (2026-09-21T11:00:23-04:00): Members captured in this batch: 000300 (idea log and priority queue page), 000301 (backlog and next_up page), 000302 (prompt and plan explorers), 000303 (relationship investigation), 000304 (Neo4j graph evaluation, including code-file links). Each carries a relates_to edge back here; 000304 also relates_to 000303, which is the question it would answer with a graph.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:46-04:00): Anchor 000299 proposes five connected asks around auto-regenerated explorer pages and relationship mapping between document families: an idea-log page (000300), a backlog page (000301), prompt/plan explorers (000302), an investigation of relationships between families (000303), and a Neo4j evaluation (000304).
+
+Existing governed work already covers substantial ground:
+
+1. Interactive explorer panels exist and are complete. PLAN-022's phase-wb-06 ("Idea and Backlog explorer panels", status: complete) already delivers ts/src/stage/IdeaExplorerRegion.tsx and BacklogExplorerRegion.tsx — interactive React panels hosted in the workbench with sort, filter, and queue-view toggles. REQ-007 W06 and REQ-011 R15 specify their behavior and verify they work. These eclipse what 000300 and 000301 ask for as *static* HTML pages if the workbench explorers are a sufficient surface.
+
+2. A specific outstanding question exists in REQ-014 R14 about generated HTML pages. The requirement explicitly asks: "The question of whether a generated ideas-and-backlog HTML page is still wanted is ruled on, given both explorers now ship in the workbench." It points to idea 000042 ("Generate an ideas & backlog HTML page for an at-a-glance view") and notes: "If the workbench explorers make the generated page redundant, saying so and closing 000042 satisfies it." This ruling has not been made.
+
+3. HTML generation infrastructure exists. PLAN-036-html-generation-design-system.md and REQ-021-html-generation-design-system.md establish the atlas-page.html and overview-page.html families. REQ-006 R08 describes a skill that orchestrates generation into _public/. tools/generate_ideas_md.py already renders folded idea state as markdown. None of this work is complete or sized, but the framework is documented.
+
+4. Prompt and plan explorer pages (000302) are not addressed by any existing plan or phase.
+
+5. The relationship investigation (000303) is not owned by any existing requirement or phase. REQ-014 covers graph structure via node classification (R01-R03), cross-document links (R04), and connection maintenance (R11), but does not scope a session to investigate existing relationships.
+
+6. Graph database evaluation (000304) overlaps with idea 000005 ("Graph databases and GitNexus") and 000044 ("Explore graph database tooling for a documentation & knowledge database"). Neither is scoped by an existing plan.
+
+Overlap with idea 000042 is the most immediate: 000042 is a direct precursor to 000300/000301 but is blocked on REQ-014 R14's ruling. If that ruling proceeds, 000042 and the page asks in this anchor are the same ask. If it declines the page as redundant with the workbench explorers, the page asks disappear with it.
+
+PROPOSED LINK: 000299 --relates_to--> 000042 (Idea 000042 is the original ask for generated idea/backlog pages; 000300 and 000301 revise and extend that ask after a one-off snapshot, but REQ-014 R14 requires ruling on whether a generated page is still wanted given workbench explorers already exist)
+
+PROPOSED LINK: 000299 --relates_to--> 000005 (Idea 000005 proposes graph databases broadly; 000304 narrows this to Neo4j evaluation for relationship mapping between repository entities)
+
+PROPOSED LINK: 000299 --relates_to--> 000044 (Both 000304 and 000044 propose exploring graph database tooling for knowledge infrastructure; 000304 targets relationship mapping between documents and code, while 000044 targets documentation and knowledge retrieval)
+
+</details>
+
+**Links**
+
+- relates_to ← `000300`
+- relates_to ← `000301`
+- relates_to ← `000302`
+- relates_to ← `000303`
+- relates_to ← `000304`
+
+---
+
+## 000300 · Auto-regenerated HTML page for the idea log, its statuses and the priority queue
+
+**Created 2026-09-21T11:00:15-04:00 · Status: `triaged`**
+
+An HTML page showing the idea log - every idea with its current status - alongside the priority
+queue, and able to be regenerated automatically rather than hand-built each time.
+
+Raised 2026-09-21 after a one-off snapshot of the same content was produced as a published artifact
+from a throwaway script. The snapshot proved the content is worth having; the ask is that it become
+a standing, regenerated page.
+
+What the owner said, kept as given: "an html page (or a few) that can be auto-regenerated to show
+the idea log + status and priority queue". Whether this is its own page or one view inside a shared
+explorer is not ruled on here.
+
+Known adjacent material worth checking during triage rather than assuming: tools/generate_ideas_md.py
+already renders the same fold plus docs/00-working/ideas-priority.yaml as markdown, so a generator
+and its data access pattern exist; the HTML generation framework (PLAN-003) and the design-system
+track are where a page family would live; the workbench already hosts an HTML Viewer.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:27-04:00): Idea 000300 asks for an auto-regenerated HTML page of the idea log showing current status and priority queue. This is a focused version of a broader ask already recorded.
+
+**Direct overlap with 000042**: Idea 000042 ("Generate an ideas & backlog HTML page for an at-a-glance view") asks for essentially the same deliverable—a generated page showing ideas and the priority queue. The difference is scope: 000042 is combined (ideas + backlog), while 000300 is idea-specific. 000042 has been waiting for phase-idg-08 to rule on whether to build it, given that the workbench now ships IdeaExplorerRegion and BacklogExplorerRegion. That ruling will directly affect 000300's feasibility and priority.
+
+**Part of anchor idea 000299** (already linked via relates_to): Five related asks raised together on 2026-09-21 after a one-off HTML snapshot proved the content is worth having:
+- 000300: Idea log page (this one)
+- 000301: Backlog page
+- 000302: Prompt and plan explorer pages
+- 000303: Investigation of relationships between ideas, backlog, prompts and plans
+- 000304: Neo4j evaluation for graph-mapping relationships
+
+**Gating decision**: Phase-idg-08 ("Wrap idea metrics as a command and rule on the generated page") explicitly rules on "000042: whether a generated ideas-and-backlog HTML page is still wanted now that IdeaExplorerRegion and BacklogExplorerRegion both ship in the workbench" (from backlog.yaml, phase-idg-08 scope). This decision gates 000300, since 000042 is the same ask.
+
+**Infrastructure and precedent exist**:
+- tools/generate_ideas_md.py already renders the idea data structure deterministically, including the priority queue from docs/00-working/ideas-priority.yaml
+- PLAN-003 (approved status, 2026-09-05) provides the dynamic HTML generation framework (FastAPI + React)
+- PLAN-036 (active status, 2026-09-14) covers the design system with component libraries, template families, and palette libraries
+- PLAN-019 (draft status, 2026-09-08) establishes the priority queue file structure
+- REQ-021 (draft, 2026-09-15) defines HTML generation requirements and explicitly separates supply (asset libraries via PLAN-036) from demand (whether the page is wanted, decided by phase-idg-08)
+- Five shipped pages in _public/ and two template families (atlas, overview) demonstrate the design patterns
+
+**Deliverability**: The actual HTML page does not exist yet. Phase-idg-08's ruling on 000042 must come first to determine whether 000300 is wanted. If approved, it would be built using PLAN-003's framework and PLAN-036's design system assets, with data drawn from the existing fold() function already used by tools/generate_ideas_md.py.
+
+PROPOSED LINK: 000300 --relates_to--> 000042 (same ask—generated page showing ideas and priority queue; decision on 000042 via phase-idg-08 gates 000300)
+
+</details>
+
+**Links**
+
+- relates_to → `000299`
+
+---
+
+## 000301 · Auto-regenerated HTML page for the backlog and next_up
+
+**Created 2026-09-21T11:00:15-04:00 · Status: `triaged`**
+
+An HTML page showing the backlog and its next_up ordering, regenerated automatically like the idea
+page asked for alongside it.
+
+Raised 2026-09-21 in the same breath as the idea-log page, from the same one-off artifact snapshot,
+which rendered next_up with each phase's status and its outstanding dependencies and made the
+ready-to-claim set visible at a glance.
+
+What the owner said, kept as given: the regenerated pages should show "the backlog and next up".
+
+Not ruled on: whether this is a separate page or a second view in one explorer, and whether it
+replaces or complements the existing --backlog report from src.governance.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:26-04:00): Idea 000301 asks for an auto-regenerated HTML page showing the backlog and its next_up ordering, part of a 5-idea cluster raised 2026-09-21 around auto-regenerated explorer pages and the relationship graph behind them (anchor 000299).
+
+Related governed work already explicitly covering this decision:
+
+**PLAN-029 (Idea graph and lifecycle, P1)** has phase-idg-08 ("Wrap idea metrics as a command and rule on the generated page") which carries explicit scope to "Rule on 000042: whether a generated ideas-and-backlog HTML page is still wanted now that IdeaExplorerRegion and BacklogExplorerRegion both ship in the workbench." REQ-014 R14 formalizes this as a requirement: the ruling on generated ideas-and-backlog pages is mandatory, and must state what value the generated page would add over the workbench explorers, or decline it.
+
+**PLAN-036 (HTML generation and design system, P9)** documents the intentional governance boundary: R12 forbids any HTML design phase from building or deciding on report pages; that ruling is reserved to phase-idg-08 (per PLAN-029). The plan explicitly names 000042 as the candidate page under this rule, stating "P9 is the **supply**: the families, components and palettes any generated page is assembled from" while "phase-idg-08 decides whether a given report page exists."
+
+**Related earlier idea:**
+
+000042 ("Generate an ideas & backlog HTML page for an at-a-glance view", status triaged) asks for a similar combined view of ideas and backlog phases. 000301 is more narrowly scoped to backlog+next_up; 000300 focuses on the idea log side. All three are part of the same cluster (000299-000304) and share common questions about whether separate pages are still worth building given the workbench explorers now exist.
+
+**No governance gap.** The decision mechanism is in place. 000301 is not waiting for a plan to be written; it is waiting for phase-idg-08 to rule whether auto-regenerated backlog pages are wanted. If the ruling is yes, the page would be built using PLAN-003 and PLAN-036's asset families; if no, the idea can be closed. Either way, the path is clear.
+
+**Summary:** Related to existing governed work and directly depends on a decision reserved to phase-idg-08 in PLAN-029. No plan or infrastructure gap; the only question is the owner's judgement on whether the workbench explorers have superseded the need for generated pages.
+
+</details>
+
+**Links**
+
+- relates_to → `000299`
+
+---
+
+## 000302 · Prompt explorer and plan explorer pages
+
+**Created 2026-09-21T11:00:15-04:00 · Status: `triaged`**
+
+Explorer pages for the prompt corpus and the plan corpus, in the same auto-regenerated family as
+the idea and backlog pages.
+
+Raised 2026-09-21, listed by the owner as "the prompt and plan explorers" alongside the idea-log and
+backlog pages. Recorded as one idea because the owner named them as a pair; a triage or planning
+pass may find they are two deliverables.
+
+What an explorer shows is not specified. The neighbouring asks suggest: every document in the family
+with its status and front matter, and the links between it and other families - which is also the
+subject of the relationship investigation raised at the same time.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:42-04:00): Idea 000302 asks for explorer pages for the prompt and plan document families, modeled on the idea-log and backlog pages that already exist or are planned.
+
+ANCHOR RELATIONSHIP: This idea is one of five members in the anchor idea framework recorded at 000299 (Anchor: regenerated explorer pages and the relationship graph behind them, 2026-09-21). The framework bundles five related ideas because they share a common question about what explorer surfaces are, what links them, and where link data comes from. The anchor groups:
+- 000300 (auto-regenerated HTML page for idea log)
+- 000301 (auto-regenerated HTML page for backlog)
+- 000302 (prompt explorer and plan explorer pages) — this idea
+- 000303 (investigate relationships between the families)
+- 000304 (Neo4j evaluation for graph-mapping)
+
+EXPLORER COMPONENT ALREADY SHIPPED: The workbench already implements a reusable explorer table component (`ts/src/stage/explorer/ExplorerRegion.tsx`, phase-wb-06, session SESS-2026-09-11-04). This generic component parameterizes by data source (backend routes) and column set, and is wrapped by two thin consumers (`IdeaExplorerRegion.tsx`, `BacklogExplorerRegion.tsx`). The component provides sort, filter, view toggle (standard/queue), and status dropdown — the machinery 000302 would need for prompt and plan explorers. The implementation is described in detail in SESS-2026-09-11-04 checkpoint.
+
+RELATED IDEA WITH TRIAGED STATUS: Idea 000042 (Generate an ideas & backlog HTML page for an at-a-glance view, status: triaged) requests a similar auto-generated page showing ideas and backlog. Its body notes unresolved questions about where the generator script should live (tools/ or src/) and whether output should be static or dynamic, with dependencies on the HTML generation framework. 000302 is narrower (prompt and plan explorers only), but faces the same underlying questions about page generation infrastructure.
+
+HTML GENERATION FRAMEWORK: Three related plans provide infrastructure 000302 could leverage:
+- PLAN-003 (Dynamic HTML Generation Website Tool) — builds a FastAPI/React pipeline with YAML→JSON conversion, Tailwind styling, and composable block components for general website pages. Status: approved.
+- PLAN-036 (HTML generation and design system, P9) — focuses on the template, component, and palette libraries (not the FastAPI/React pipeline itself). Includes audit of pre-build phase-html-* requirements, and asset libraries that serve five shipped pages. Status: active.
+- PLAN-043 (Literature-review campaign report page) — deterministic page generator following the generate_overview.py precedent (static templates with {{TOKEN}} substitution, no wall-clock labels). Status: approved.
+
+PROMPT INFRASTRUCTURE: Prompts are documented in docs/02-prompts/ (PROMPT-001 through PROMPT-036 exist). The prompt-pack methodology (ADR-017, GOV-008) is the governing standard for multi-agent builds. The prompt corpus is voluminous but has no dedicated explorer/catalog; 000302 would be the first ask for indexable navigation of prompts as a document family.
+
+PLAN CORPUS DOCUMENTATION: Plans live in docs/01-plans/ and are governed by the planning system documented across PLAN-016 (idea record system), PLAN-017 (idea-plan lifecycle), and PLAN-029 (idea graph lifecycle). Plans have a catalog generator (docs/08-governance/catalog.md), but no dedicated explorer page; 000302 would add that.
+
+RELATIONSHIP INVESTIGATION (000303): The anchor framework explicitly includes 000303 (investigate relationships between the families) as a prerequisite or parallel concern. The investigation spans ideas, backlog phases, prompts, and plans — understanding which families link to which is a design prerequisite for 000302's links/relationships display (if any).
+
+NO OVERLAPPING PROMOTION: None of the plans, requirements, or governed documents fully deliver the specific ask in 000302 (explorer pages for prompts and plan corpora). The workbench explorers deliver for ideas and backlog; the HTML generation framework provides tooling but not the prompt/plan instances; the relationship investigation (000303) is a separate work item needed to answer design questions 000302 will face.
+
+PROPOSED LINK: 000302 --extends--> 000042 (both request explorer/generated pages over document families; 000042 is earlier and broader but now triaged, while 000302 narrows to prompt+plan after the owner's 2026-09-21 ask).
+
+</details>
+
+**Links**
+
+- relates_to → `000299`
+
+---
+
+## 000303 · Investigate the relationships between ideas, backlog phases, prompts and plans
+
+**Created 2026-09-21T11:00:15-04:00 · Status: `triaged`**
+
+A session to work out how the document families actually relate to each other - ideas, backlog
+phases and next_up, prompts, plans - before or alongside building explorer pages over them.
+
+Raised 2026-09-21: "we may need a session to investigate the relationships between them". The owner
+raised it while asking for regenerated explorer pages for each family, so the motivation is that a
+page per family is not enough if the interesting information is the edges between families.
+
+What exists today, to be checked rather than assumed during triage: ideas carry typed links to other
+ideas and a promoted_to pointer at plans; backlog phases carry depends_on, systems and source-plan
+links; governed documents carry depends_on in front matter and are indexed in the catalog. Whether
+those are the same relation expressed four ways, and what is missing, is the question.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:51-04:00): Idea 000303 asks to investigate whether the typed links between ideas, backlog phases, prompts, and plans are different instances of the same relationship or whether something is missing.
+
+## What exists to be checked
+
+The idea correctly identifies four document families, each with its own relationship schema:
+
+1. **Ideas** carry:
+   - `promoted_to` pointer to a plan document
+   - Typed links to other ideas (`extends`, `relates_to`, `supersedes`)
+   - Proposed `component_of` (for composition) and `forked_from` reasoning (PLAN-029/ARCH-005, phase-idg-01)
+
+2. **Backlog phases** carry:
+   - `depends_on` edges to other phases (phases, not documents)
+   - `systems` list naming system responsibilities
+   - `source-plan` or `plan` pointer back to the governing plan document
+   - `sources` array naming requirement and architecture documents
+
+3. **Governed documents** (plans, requirements, ADRs, architecture, etc.) carry:
+   - `depends_on` in front matter naming other document codes
+   - `parent` (for child plans) establishing hierarchies
+   - `supersedes` (implicit in status, not a field)
+
+4. **Prompts** carry:
+   - No documented relationship pointers back to decisions, requirements, or phases in the corpus
+   - No backlog reference
+   - No idea pointer
+
+## Related materials that clarify the system
+
+The investigation idea references specific documents as things to check:
+
+- **ARCH-006** (Idea realization system) defines nine-stage pipeline with hand-off contracts explicitly named: each producer→consumer pair has an artifact (e.g., Triage→Partition is a `finding` annotation and `triaged` status; Planning→Review is a requirement and plan document pair). The pipeline treats plans, phases, requirements, and annotations as distinct artifacts in a supply chain.
+
+- **ARCH-005** (Idea node classification) proposes three-axis taxonomy for ideas and sketches composition/abstraction. It explicitly names 000053 (idea-to-document links) as related but separate from tagging.
+
+- **ADR-006** and **GOV-005** define how document codes are allocated and what they express — a numeric series per kind, but the binding references use semantic slugs (`doc-*` ids), not codes.
+
+- **PLAN-016** (Idea record system) designs ideas as append-only events that fold to current state, with timestamps preserved for historical analysis.
+
+- **PLAN-029** (Idea graph and lifecycle, P1) explicitly designs the idea schema and its links, including the proposed `component_of` type and the new three-axis classification fields. This plan actively touches the question by bundling four schema extensions.
+
+- **PLAN-030** (Document and backlog governance, P2) governs the document-backlog relationship, including whether a document is still accurate and which phases actually delivered it.
+
+- **PLAN-039** (Idea realization system) orchestrates all nine stages into a single automated pipeline with typed artifacts between stages.
+
+- **research/architecture/development_traceability_model.md** proposes a conceptual relationship vocabulary (informs, derives, planned_by, produces, realizes, deployed_as, observed_as, etc.) that maps from ideas/observations through claims/problems, decisions, requirements, constraints, specifications, designs, plans, phases, tasks, and artifacts. This document does not claim to be implemented anywhere yet; it is a research artifact and vocabulary proposal.
+
+## Related ideas already on the backlog
+
+000299 is an anchor idea grouping five related asks raised 2026-09-21:
+- 000300 Auto-regenerated HTML page for the idea log
+- 000301 Auto-regenerated HTML page for the backlog and next_up
+- 000302 Prompt explorer and plan explorer pages
+- 000303 Investigate the relationships (this idea)
+- 000304 Evaluate Neo4j for graph-mapping the relationships
+
+Other related ideas address pieces of this:
+- 000018 Tagging and plan-mapping system for ideas
+- 000046 An idea planner agent that turns a promoted idea into a governed plan
+- 000047 Audit what makes a plan document qualitatively good
+- 000049 Define where a promoted plan or requirement document lives
+- 000053 Allow ideas to link directly to plan/document IDs, not just other ideas
+- 000055 A connection-builder agent for the full idea corpus
+- 000061 Classify idea nodes by ontological, epistemic, and lifecycle type
+- 000162 An append-only event log for knowledge state
+- 000163 Knowledge classification axes and the weighting that drives retrieval
+
+## What nobody has done yet
+
+No session has run the systematic check the idea asks for. PLAN-029 and PLAN-030 are both active and both touch the relationship definitions, but neither has a phase that verifies whether the four relationship schemas (idea.promoted_to, phase.depends_on/source_plan, document.depends_on, prompt.???) express the same thing four ways or whether something is missing.
+
+The development_traceability_model.md proposes a conceptual vocabulary (informs, derives_requirement, planned_by, produces, realizes, deployed_as, observed_as) that is richer than what any of the four families currently express. Whether that richer vocabulary should be built into the system, or whether the current four schemas are adequate and just need to be wired up consistently, has not been decided.
+
+Prompts are notably absent from this analysis — they carry no backpointer to the ideas, plans, or phases that use them, and no tool in the system currently maps from a prompt to the decision it formalizes or the phase that executes it.
+
+## Verification that this idea is not already delivered
+
+No existing plan phase, no requirement, and no architecture document currently claims to answer the question "do these four families express the same relationship uniformly or is something missing?"
+
+PLAN-029 and PLAN-030 are both active/scoped, and together they govern the idea schema and document-backlog relationship, but neither has an acceptance criterion stating "the relationship vocabulary across all four families has been examined and found to be [sufficient/inconsistent/incomplete]."
+
+PROPOSED LINK: 000303 --relates_to--> 000299 (both part of same 2026-09-21 explorer/relationship-mapping batch)
+PROPOSED LINK: 000303 --relates_to--> 000304 (Neo4j evaluation is proposed as the implementation mechanism for mapping these relationships)
+PROPOSED LINK: 000303 --relates_to--> 000162 (knowledge state events may be the missing field that connects all four families)
+
+</details>
+
+**Links**
+
+- relates_to → `000299`
+- relates_to ← `000304`
+
+---
+
+## 000304 · Evaluate Neo4j for graph-mapping the relationships, including links down to code files
+
+**Created 2026-09-21T11:00:16-04:00 · Status: `triaged`**
+
+Investigate Neo4j as the place to map the relationships between the repository's entities, rather
+than holding them only as front matter, YAML and JSONL fields read by bespoke tooling.
+
+Raised 2026-09-21 alongside the explorer-page asks and the relationship investigation. The owner's
+second question is part of the same ask: "can we also connect prompts and plans and whatnot to
+specific code or code files?" - that is, whether the graph reaches past documents into the code
+they produced, so a plan or prompt can be traced to the files that exist because of it.
+
+Recorded as given, including the named technology. Whether a graph database is warranted at all,
+and whether DuckDB or the existing derived layer would do, is for the evaluation to answer, not for
+capture to pre-empt.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-21T11:02:47-04:00): Idea 000304 proposes evaluating Neo4j for graph-mapping relationships between repository entities, specifically including links to code files. It was raised 2026-09-21 as part of an anchor batch (000299) asking for regenerated explorer pages over document families and the relationship graph behind them.
+
+The idea relates to three distinct but overlapping evaluation efforts already planned:
+
+1. **phase-ret-08** (PLAN-033, G27 group): "Evaluate a code-graph tool against this repository's code". This phase surveys code-structure retrieval tools (functions, classes, imports) under REQ-018 R11. The contract requires evaluating a successor to the archived GitNexus/KuzuDB tool named in idea 000005. 000304 differs from this: it asks about entity relationships (ideas, plans, phases, documents), not code structure; the link-to-code requirement in 000304 is about tracing which files were produced by which plans/prompts, not parsing code structure itself.
+
+2. **phase-ret-06 and phase-ret-07** (PLAN-033, G28 group): Documentation corpus surveys covering structured, graph, and vector approaches, culminating in one decision. Idea 000044 is explicitly the graph-database survey for this corpus (documentation and knowledge database). 000304 differs: it covers entity relationships across document families (ideas, plans, phases, prompts, backlog) and the code relationship, whereas 000044 is specifically about documentation-corpus graphing.
+
+3. **000299 and 000303** (both 2026-09-21): The immediate context. 000299 anchors the explorer-page asks and "the relationships between those families should be understood and possibly mapped in a graph database". 000303 proposes investigating relationships between ideas, backlog phases, prompts and plans. 000304 is the evaluation task for a specific technology (Neo4j) raised as part of answering that anchor.
+
+There is also 000005 "Graph databases and GitNexus" and 000044 "Explore graph database tooling for a documentation & knowledge database", both of which are already related to the graph-database question but scoped differently (code structure vs. documentation).
+
+The repository has development_traceability_model.md in research/architecture/ which documents a conceptual relationship model from ideas through code artifacts. It defines the semantic chain from observation to running system, which is the backbone of what 000304 asks about. Current infrastructure includes DuckDB derived layer from _data/ JSON and ADR-001's governance metadata in Markdown front matter, both of which hold relationship data but are not queryable as a graph.
+
+The evaluation 000304 proposes sits at the intersection of three question domains: (1) explorer surfaces for document families, (2) entity relationship mapping across the system, and (3) code traceability. Whether Neo4j (or another graph database) is warranted, and whether existing DuckDB/derived layer would suffice, is the open question it proposes to answer.
+
+PROPOSED LINK: 000304 --relates_to--> 000044 (both evaluate graph databases, 000304 for entity/code relationships, 000044 for documentation corpus; distinct scopes but potentially overlapping tooling decisions)
+
+PROPOSED LINK: 000304 --relates_to--> 000005 (both about graph databases for repository understanding; 000005 is code-structure graphs with KuzuDB/GitNexus archived, 000304 is entity-relationship graphs with Neo4j)
+
+</details>
+
+**Links**
+
+- relates_to → `000299`
+- relates_to → `000303`
+
+---
+
+## 000305 · The /idea workflow mandates a temp file but never says where to put it
+
+**Created 2026-09-21T11:11:38-04:00 · Status: `open`**
+
+`agent-workflows/idea.md:15` — the generated source for `.claude/commands/idea.md` and `.agents/skills/source-command-idea/SKILL.md` — instructs an agent to "write the title and body to a temporary file, then pass that file" to `tools/append_idea.py --file`. That instruction is right: it is what keeps prose containing backticks, quotes or newlines away from the shell.
+
+It never names a directory. So the default outcome is a file written wherever the agent happens to be, which is the repository root. Two such files, `.idea-capture-1.txt` and `.idea-capture-2.txt`, sat untracked at the root from 2026-09-17 until 2026-09-21, and in that time were swept into `git add -A` twice by sessions that did not create them — once during a `/session-close` recorded in `SESS-2026-09-19-08:420`, and once during `phase-conc-03`'s completion commit. Both times the paths had to be unstaged by hand. On 2026-09-21 the owner did not recognise the files and asked what they were.
+
+Nothing was ever lost: both files were byte-for-byte identical to ideas `000267` and `000268`, which the same invocations had already written to the log. The cost is not data, it is that untracked litter accumulates at the root of a repository whose `git status` agents are expected to read as a signal, and that a reader cannot tell a leftover from something unfinished.
+
+The fix is one clause naming a location. `_working/` is already gitignored and ungoverned and exists for exactly this class of file; the scratchpad directory a session is given would also do. It belongs in `agent-workflows/idea.md`, the generated source — editing `.claude/commands/idea.md` directly would be overwritten by the next generator run.
+
+Found while investigating the untracked files on 2026-09-21.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-conc (2026-09-21T11:11:48-04:00): Anchor for the two systemic gaps behind the four untracked files the owner asked about on 2026-09-21: this idea (the /idea workflow never names a temp-file location, so root-level litter is the default) and 000306 (nothing binds .codex/agents/*.toml to the .claude/agents/*.md definitions they copy). Both were found by an investigation whose primary question - had any owner ask been captured to a file and then lost before reaching the log - came back clean: .idea-capture-1.txt and -2.txt were byte-for-byte identical to ideas 000267 and 000268, both already triaged. The files were deleted on the owner's 2026-09-21 ruling, along with the two hand-ported Codex TOMLs. SESS-2026-09-19-08:420 records an earlier session sweeping the same four paths into a git add -A and having to unstage them.
+
+</details>
+
+**Links**
+
+- relates_to ← `000306`
+
+---
+
+## 000306 · Nothing binds .codex/agents/*.toml to the .claude/agents/*.md definitions they copy
+
+**Created 2026-09-21T11:11:38-04:00 · Status: `open`**
+
+Twelve of the thirteen files in `.codex/agents/` are hand-written ports of tracked `.claude/agents/*.md` agent definitions, and no test, generator check or governance rule binds a port to its original. They can drift silently, and two of them already had.
+
+`.codex/agents/demo-agent-evidence-checker.toml` and `.codex/agents/demo-agent-objection-panel.toml` were written by hand on 2026-09-17 with no commit, session record or backlog phase attributing them. Their `developer_instructions` were byte-identical to the corresponding `.claude/agents/*.md` bodies, but they carried only four keys — `name`, `description`, `model_reasoning_effort` ("high"), `developer_instructions` — against the six the sanctioned generator emits (`tools/generate_agent_workflows.py`), which also requires `model` and `sandbox_mode` and raises outright when `unsupported_limits` is absent so a missing turn cap stays visible.
+
+That omission was not cosmetic for these two agents in particular. `.claude/agents/demo-agent-evidence-checker.md` declares `tools: Read, Grep, Glob`, and its own prose states: "Your tools are `Read`, `Grep` and `Glob`. **`Bash` is deliberately excluded** ... Excluding it is what makes the claim true rather than decorative." The TOML carried that sentence verbatim while declaring no tool scope at all — a file whose text guaranteed a property the file did not implement. The objection panel had the same defect.
+
+The owner ruled on 2026-09-21 to delete both rather than commit a misleading file or leave it untracked. Nothing of substance was lost: the `developer_instructions` are preserved in the tracked `.claude/agents/*.md` originals, and the only values not recorded elsewhere are the two `model_reasoning_effort = "high"` settings, noted here. What the deletion does lose is the evidence that a port was attempted, which is why this idea exists.
+
+The general question: should `.codex/agents/` be generated from `agent-workflows/workflows.yaml` rather than hand-ported, with a drift test in `test/` the way `docs/08-governance/catalog.md` has one? `GOV-015` rules that "shipped agent definition" includes Codex-side definitions, and `ADR-021` covers the Claude-dependency question, but neither requires the two surfaces to agree. Whether the demo kit belongs on the Codex surface at all is a separate owner decision that no document currently answers.
+
+Found while investigating the untracked files on 2026-09-21.
+
+**Links**
+
+- relates_to → `000305`
