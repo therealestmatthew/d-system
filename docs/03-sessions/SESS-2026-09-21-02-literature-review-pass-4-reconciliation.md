@@ -279,3 +279,110 @@ through all ten sessions.
 Ten sessions against a seven-session estimate and an owner-accepted range of six to eight. This is
 the second consecutive session to run no searches, and ruling 10 forbids only a tenth *search*
 session.
+
+## Review — independent adversarial close review
+
+Required by `GOV-003`'s *Coordinator completion replaces owner-invoked /session-close*: a
+coordinator may write `status: complete` only after an independent adversarial review of the
+phase's diff against its acceptance.
+
+**The review ran twice.** The first run was dispatched against a branch this session was still
+committing to — a thirteenth commit landed and the session record grew while it was in flight. It
+raised that as a blocking procedural finding and it was right; **the fault was the coordinator's.**
+The branch was then frozen at `0c6636e` with a clean tree, and the review re-ran against
+`git diff 7ab8cb8..0c6636e` with nothing touching the branch until it reported.
+
+### First run — three blocking findings
+
+1. The required final-gate re-run was absent from the reviewed diff. It had run, outside what the
+   review was handed.
+2. The diff was not stable. Correct, and the coordinator's error.
+3. The saturation figures in six deliverables did not reproduce. **This finding originated in a
+   coordinator error and both parties were wrong** — see *Measurement 5* above.
+
+It also found one real defect the coordinator had not: a paraphrase presented inside quotation
+marks as `06`'s text, at `10:49` and `11:90`.
+
+### Second run — verdict
+
+> **Acceptance condition 1 — HOLDS.** **Acceptance condition 2 — HOLDS**, measurement-taken as
+> amended, with populations named and saturation reported as a trend and explicitly not asserted.
+>
+> **Safe to mark complete.**
+
+On the saturation reproduction, which it was explicitly asked to attack rather than accept:
+
+> I rebuilt it from scratch, not from your description of it. [...] This matches
+> `06_hypothesis_tests.md:72–79`'s own stated method and its own stated result (58/387=15.0%,
+> 37/347=10.7%) to the digit [...] **Your reproduction holds. My original finding 3 was wrong**,
+> and specifically wrong in the way you diagnosed: I tested rules the campaign never used and
+> never checked `url_or_doi` or a pre-phase snapshot.
+
+It reproduced six of the eight gate measurements independently against current files, all matching,
+and re-ran every condition-1 check against the frozen HEAD to look for damage from the late
+commits `1d77db1` and `0c6636e`, finding none.
+
+It named two things it verified by consistency rather than full independent rebuild, which is
+recorded here rather than smoothed over: `phase-lit-06`'s 44/220 and `phase-lit-09`'s 25–30/392,
+and measurement 1's "410/410 variant components" sub-claim.
+
+### One reviewer correction that is itself wrong
+
+The second run stated that `"known components, integrated"` — the third pseudo-quote the `X2` fix
+cycle found at `10:37`, attributed to the methodology's §14 — is "real in
+`research/literature-review/CLAUDE.md`", and therefore that the original text was not fabricated.
+
+**It is not there.** Whitespace-normalised, the string `known components` appears nowhere in
+`research/literature-review/CLAUDE.md` or in the root `CLAUDE.md`. The original attribution was a
+pseudo-quote, the fix was correct, and the reviewer's correction of it is an error. Recorded
+because a review that overturns a finding deserves the same scepticism as the finding.
+
+The outcome is unaffected: the reviewer endorsed the resulting form either way, and `10:37` now
+presents the point as paraphrase without quotation marks.
+
+## Acceptance
+
+1. **All seven synthesis deliverables exist; every synthesis claim traces to a primary source with
+   a locator; `08` lists only distinctions surviving `07`'s strongest decomposition argument —
+   Met.** `07`–`13` present. The three defects that failed this condition on 2026-09-21 are closed:
+   `09`–`12` reconciled to `06`'s single H4 status token, `13` complete by its own definition at 48
+   Part A entries with zero cited sources missing and zero entries outside the matrix, and every
+   stale population figure re-measured across `06`–`13`. Three fabricated or overclaimed
+   quotations were removed. The independent review re-derived each check and judged the condition
+   **HOLDS**.
+2. **The `A` review ran and its findings are applied or recorded; the final gate takes all eight
+   stop-condition measurements against the files as they stand, each population named, saturation
+   reported as a trend with no assertion — Met.** `LIT-07 A` ran 2026-09-14 with 9 findings, all
+   addressed in one fix cycle. All eight measurements were taken against current files, every
+   population named, and saturation reported as a falling trend and explicitly **not**
+   demonstrated. The independent review judged the condition **HOLDS**.
+
+## Verification
+
+Run in the worktree at `0c6636e`:
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 304 documents, 28 memories, 292 backlog phases
+EXIT=0
+
+$ uv run pytest
+651 passed, 2 warnings in 51.44s
+EXIT=0
+```
+
+`uv run python tools/check_no_private_content.py` reported
+`OK (759 tracked files, 0 identifiers checked)` in the worktree. **That is not a passing content
+verification** — `_private/portfolio/` is gitignored and never travels to a worktree, so the tool
+builds an empty identifier list and passes by not looking. The run that checks content happens in
+the primary checkout and is recorded below.
+
+## Backlog
+
+`phase-lit-07` is the campaign's last open phase; `01`–`06`, `08` and `09` are all `complete`.
+
+Completion follows `GOV-003`'s three conditions: the verification commands are green with real
+output recorded above, the independent adversarial review has run and returned **safe to mark
+complete**, and the third condition — **integration onto `dev` with the owner's approval** — is
+unchanged and is asked for every phase. The completion edit is one small commit on `dev`
+immediately after that integration, and not before.
