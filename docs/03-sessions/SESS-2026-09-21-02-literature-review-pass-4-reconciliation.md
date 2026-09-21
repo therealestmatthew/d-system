@@ -15,7 +15,6 @@ depends_on:
 ---
 
 # Literature review Pass 4 reconciliation
-
 ## Phase
 
 `phase-lit-07` — Literature review Pass 4: synthesis, adversarial synthesis review and validated
@@ -25,6 +24,72 @@ required before the phase could close.
 
 `phase-lit-07` is the campaign's last open phase. `phase-lit-01` through `06`, `08` and `09` are
 all `complete`, verified from the backlog at session start.
+
+## Verification
+
+Run in the worktree at `0c6636e`:
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 304 documents, 28 memories, 292 backlog phases
+EXIT=0
+
+$ uv run pytest
+651 passed, 2 warnings in 51.44s
+EXIT=0
+```
+
+`uv run python tools/check_no_private_content.py` reported
+`OK (759 tracked files, 0 identifiers checked)` in the worktree. **That is not a passing content
+verification** — `_private/portfolio/` is gitignored and never travels to a worktree, so the tool
+builds an empty identifier list and passes by not looking. The run that checks content happens in
+the primary checkout and is recorded below.
+
+## Acceptance
+
+1. **All seven synthesis deliverables exist; every synthesis claim traces to a primary source with
+   a locator; `08` lists only distinctions surviving `07`'s strongest decomposition argument —
+   Met.** `07`–`13` present. The three defects that failed this condition on 2026-09-21 are closed:
+   `09`–`12` reconciled to `06`'s single H4 status token, `13` complete by its own definition at 48
+   Part A entries with zero cited sources missing and zero entries outside the matrix, and every
+   stale population figure re-measured across `06`–`13`. Three fabricated or overclaimed
+   quotations were removed. The independent review re-derived each check and judged the condition
+   **HOLDS**.
+2. **The `A` review ran and its findings are applied or recorded; the final gate takes all eight
+   stop-condition measurements against the files as they stand, each population named, saturation
+   reported as a trend with no assertion — Met.** `LIT-07 A` ran 2026-09-14 with 9 findings, all
+   addressed in one fix cycle. All eight measurements were taken against current files, every
+   population named, and saturation reported as a falling trend and explicitly **not**
+   demonstrated. The independent review judged the condition **HOLDS**.
+
+## Backlog
+
+`phase-lit-07` is the campaign's last open phase; `01`–`06`, `08` and `09` are all `complete`.
+
+Written to `backlog.yaml` this run: `status: active`, `agent: agent-lit`, holding
+`sys-research`. `phase-lit-07` is not in `next_up`, so nothing was pruned.
+
+Completion follows `GOV-003`'s three conditions: the verification commands are green with real
+output recorded above, the independent adversarial review has run and returned **safe to mark
+complete**, and the third condition — **integration onto `dev` with the owner's approval** — is
+unchanged and is asked for every phase. The completion edit is one small commit on `dev`
+immediately after that integration, and not before.
+
+## Unresolved
+
+- **Saturation is measured and explicitly not demonstrated.** Unchanged by this session and not
+  addressable by more searching, per rulings 9 and 10.
+- **The duplicate-rate tokenisation gap** — idea `000289`, now joined by `000307` and `000308`.
+  All three need their own requirement and plan; a governed evidence contract is not amended
+  mid-campaign.
+- **Two duplicate inventory rows and two near-duplicate pairs**, deliberately unrepaired.
+- **18 of 30 critical-collision flags are recorded `disputed`.** Under check-in ruling 1 nothing was
+  applied. Whether that changes the campaign's headline collision count remains the owner's scoping
+  decision, unchanged by this session.
+- **`06` cites a commit hash that does not exist on the branch** — the preamble names `7141767` for
+  `H4R`; a rebase rewrote it. Carried from `phase-lit-09` and still unfixed, since a hash cited
+  inside a file on a rebasing branch drifts again.
+- **The branch-naming gap**, recorded above.
 
 ## The branch and worktree were gone, and were recreated from `dev`
 
@@ -179,22 +244,6 @@ both recorded here rather than left for a reviewer to discover:
    `0 identifiers checked` on this branch. Not recorded as a passing content verification; the real
    run is in the primary checkout. Idea `000150`, unchanged.
 
-## Unresolved
-
-- **Saturation is measured and explicitly not demonstrated.** Unchanged by this session and not
-  addressable by more searching, per rulings 9 and 10.
-- **The duplicate-rate tokenisation gap** — idea `000289`, now joined by `000307` and `000308`.
-  All three need their own requirement and plan; a governed evidence contract is not amended
-  mid-campaign.
-- **Two duplicate inventory rows and two near-duplicate pairs**, deliberately unrepaired.
-- **18 of 30 critical-collision flags are recorded `disputed`.** Under check-in ruling 1 nothing was
-  applied. Whether that changes the campaign's headline collision count remains the owner's scoping
-  decision, unchanged by this session.
-- **`06` cites a commit hash that does not exist on the branch** — the preamble names `7141767` for
-  `H4R`; a rebase rewrote it. Carried from `phase-lit-09` and still unfixed, since a hash cited
-  inside a file on a rebasing branch drifts again.
-- **The branch-naming gap**, recorded above.
-
 ## `LIT-07 G` — the final gate
 
 Dispatched per Block G plus the `LIT-07 G` section, Haiku, payload narrowed only. **One fix cycle
@@ -339,50 +388,3 @@ because a review that overturns a finding deserves the same scepticism as the fi
 
 The outcome is unaffected: the reviewer endorsed the resulting form either way, and `10:37` now
 presents the point as paraphrase without quotation marks.
-
-## Acceptance
-
-1. **All seven synthesis deliverables exist; every synthesis claim traces to a primary source with
-   a locator; `08` lists only distinctions surviving `07`'s strongest decomposition argument —
-   Met.** `07`–`13` present. The three defects that failed this condition on 2026-09-21 are closed:
-   `09`–`12` reconciled to `06`'s single H4 status token, `13` complete by its own definition at 48
-   Part A entries with zero cited sources missing and zero entries outside the matrix, and every
-   stale population figure re-measured across `06`–`13`. Three fabricated or overclaimed
-   quotations were removed. The independent review re-derived each check and judged the condition
-   **HOLDS**.
-2. **The `A` review ran and its findings are applied or recorded; the final gate takes all eight
-   stop-condition measurements against the files as they stand, each population named, saturation
-   reported as a trend with no assertion — Met.** `LIT-07 A` ran 2026-09-14 with 9 findings, all
-   addressed in one fix cycle. All eight measurements were taken against current files, every
-   population named, and saturation reported as a falling trend and explicitly **not**
-   demonstrated. The independent review judged the condition **HOLDS**.
-
-## Verification
-
-Run in the worktree at `0c6636e`:
-
-```
-$ uv run python -m src.governance
-Governance OK: 35 systems, 304 documents, 28 memories, 292 backlog phases
-EXIT=0
-
-$ uv run pytest
-651 passed, 2 warnings in 51.44s
-EXIT=0
-```
-
-`uv run python tools/check_no_private_content.py` reported
-`OK (759 tracked files, 0 identifiers checked)` in the worktree. **That is not a passing content
-verification** — `_private/portfolio/` is gitignored and never travels to a worktree, so the tool
-builds an empty identifier list and passes by not looking. The run that checks content happens in
-the primary checkout and is recorded below.
-
-## Backlog
-
-`phase-lit-07` is the campaign's last open phase; `01`–`06`, `08` and `09` are all `complete`.
-
-Completion follows `GOV-003`'s three conditions: the verification commands are green with real
-output recorded above, the independent adversarial review has run and returned **safe to mark
-complete**, and the third condition — **integration onto `dev` with the owner's approval** — is
-unchanged and is asked for every phase. The completion edit is one small commit on `dev`
-immediately after that integration, and not before.
