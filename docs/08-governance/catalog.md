@@ -354,7 +354,7 @@ CI regenerates it and fails on any difference.
 | PLAN-023.03 | doc-lit-campaign-evidence-contract | draft | 0 | 1 | 8 | agent-lit, agent-lit-3c |
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 1 | 0 | 2 | agent-build, agent-partition |
-| PLAN-026 | doc-concurrency-git-safety | active | 7 | 1 | 2 | agent-conc, agent-night |
+| PLAN-026 | doc-concurrency-git-safety | active | 7 | 0 | 3 | agent-conc, agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 0 | 1 | agent-night |

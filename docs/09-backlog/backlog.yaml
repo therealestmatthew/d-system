@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-lrr-01
-- phase-conc-03
 - phase-conc-02
 - phase-auto-01
 - phase-auto-02
@@ -9305,7 +9304,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-conc
   priority: 1
   session_budget: 1
@@ -9334,20 +9333,46 @@ items:
   - test/test_codes.py
   - AGENTS.md
   session: doc-session-code-allocation-collision-proof
-  next_action: 'All three acceptance conditions met; verification green (governance
-    exit 0; pytest test/test_codes.py 61 passed, 48 before this phase; full suite 651
-    passed; mypy clean; zero new ruff errors against dev''s ten pre-existing ones).
-    The design question the phase named as deciding everything is answered: codes.yaml
-    on dev cannot serve as the reservation point, because a worktree cannot check out
-    dev at all and so cannot commit there. Reservations live in the git common
-    directory, one file per code created with O_CREAT | O_EXCL. GOV-003 condition 2 is
-    discharged: an independent review ran, returned yes-with-caveats, and all three
-    caveats were reproduced locally and fixed in e6e5fbc - satisfied-pruning reopened
-    the very collision the phase closes, release() could unlink an arbitrary file, and
-    a crashed reservation never expired. Findings and fixes are in SESS-2026-09-21-01''s
-    ## Review section. What remains is condition 3, the owner''s integration approval,
-    which is theirs alone. AGENTS.md was edited at e976201 on the owner''s explicit
-    2026-09-21 approval, with deliverables widened first at 0ff54e2.'
+  completion_evidence:
+  - src/governance/reservations.py
+  - src/governance/codes.py
+  - src/governance/__main__.py
+  - test/test_codes.py
+  - docs/08-governance/GOV-005-document-codes.md
+  - AGENTS.md
+  - docs/03-sessions/SESS-2026-09-21-01-code-allocation-collision-proof.md
+  result: 'Allocation now computes and takes a code as one operation. Reservations live
+    in the git common directory, which every worktree of one repository shares with no
+    commit and no merge, one file per code created with O_CREAT | O_EXCL. The phase''s
+    open design question is answered and recorded: codes.yaml on dev cannot serve as the
+    reservation point, because a worktree cannot check out dev at all and so cannot
+    commit there, and reading committed state is the defect rather than a fix for it.
+    Verification: uv run python -m src.governance exit 0, "Governance OK: 35 systems,
+    303 documents, 28 memories, 292 backlog phases"; uv run pytest test/test_codes.py
+    61 passed, against 48 before this phase. Full suite 651 passed, mypy clean across 25
+    source files, and zero new ruff errors against dev''s ten pre-existing ones, verified
+    by the reviewer running the branch''s ruff against a git archive extraction of dev.
+    check_no_private_content ran from the primary checkout after integration and actually
+    checked content: OK, 758 tracked files, 31 identifiers. GOV-003 condition 2 was
+    discharged by an independent review that returned yes-with-caveats and found three
+    real defects, all reproduced locally and fixed in e6e5fbc: satisfied-pruning reopened
+    the very collision the phase closes (a worktree retired its own reservation while the
+    document was still unmerged, handing a peer the same code with nothing committed);
+    release() could unlink an arbitrary file, so --release-code ../config would have
+    removed .git/config; and a crashed reservation never expired. The review also neutered
+    the mechanism and re-ran each test, finding six of nine catch the defect and three test
+    adjacent properties - recorded rather than counting all nine as R05 evidence. AGENTS.md
+    was edited at e976201 on the owner''s explicit 2026-09-21 approval, with the phase''s
+    deliverables widened at 0ff54e2 first so peers saw the wider lock.'
+  next_action: 'Complete. All three acceptance conditions Met, the third only after the
+    independent review found that satisfied-pruning reopened the collision the phase
+    closes; the fix and the reproduction are in SESS-2026-09-21-01''s ## Review section.
+    Integrated into dev on the owner''s approval, 2026-09-21. Follow-on work has no
+    phases: PLAN-005:87 still describes the retired hand-reservation workaround as live
+    guidance (idea captured), and reservations are machine-local by design, so two agents
+    on different machines can still collide - GOV-005 names that as one of the two cases
+    renumbering still covers.'
+
 - id: phase-conc-04
   title: Write the claim-recovery procedure and record it in GOV-003
   plan: doc-concurrency-git-safety

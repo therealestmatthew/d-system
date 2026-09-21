@@ -12759,3 +12759,27 @@ Found by the phase-lit-07 close review, 2026-09-21.
 **Links**
 
 - relates_to → `000296`
+
+---
+
+## 000298 · PLAN-005 still states the retired code-reservation workaround as live guidance
+
+**Created 2026-09-21T10:56:51-04:00 · Status: `open`**
+
+`docs/01-plans/PLAN-005-document-code-system.md:87` reads "An agent that knows it will write a document reserves its code in the same small commit as its backlog claim". That was the correct design when written, and `phase-conc-03` retired it on 2026-09-21: `--next-code` now reserves the code it hands you against every worktree on the machine, so the manual reservation is redundant. `GOV-005` and `AGENTS.md` were both updated; `PLAN-005` was not.
+
+`PLAN-005` is `status: complete`, so the line reads as a record of the then-design rather than an instruction, and it was outside `phase-conc-03`'s acceptance, which named only `GOV-005`. It was deliberately left alone rather than swept up. But an agent grepping the corpus for how code reservation works will find it stated in the present tense with nothing marking it superseded, which is the failure class `REQ-013` R10 exists for: a governed document describing a mechanism not in force.
+
+The question this needs answered is general, not local: **what happens to a completed plan whose described mechanism is later replaced?** Editing it rewrites the historical record of what was decided; leaving it produces stale guidance. A dated superseded-by note is the obvious third option but there is no convention for one. Worth deciding once rather than per document, since the corpus has 90-plus complete phases and their plans will keep accumulating this.
+
+Found by the independent review of `phase-conc-03`, 2026-09-21.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-conc (2026-09-21T10:56:59-04:00): Concrete instance found while retiring the workaround in phase-conc-03. GOV-005 and AGENTS.md were both updated on 2026-09-21 (commits e6e5fbc and e976201); PLAN-005:87 was not, because it is status: complete and outside that phase's acceptance. The general question is what happens to a completed plan whose mechanism is later replaced - edit it and you rewrite the record of what was decided, leave it and you ship stale guidance. REQ-013 R10 is the requirement this falls under, and phase-conc-06 owns that reconciliation.
+
+</details>
