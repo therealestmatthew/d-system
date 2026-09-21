@@ -12896,6 +12896,9 @@ track are where a page family would live; the workbench already hosts an HTML Vi
 
 **Annotations**
 
+- **note** by repository-owner (2026-09-21T12:00:36-04:00): PRIOR ART, 2026-09-21: a working implementation of this idea was written and thrown away in the session that captured it, before the owner ruled the generated pages are kept. It was a single generator script that folded the idea log through src.db.ideas.fold, resolved docs/00-working/ideas-priority.yaml and backlog.yaml next_up into ranked tables with titles and statuses, computed each phase's outstanding dependencies to show which are claimable now, and emitted one self-contained HTML page - counters, status distributions, the two queues, the open-idea table and the promoted table. It also carried a conditional banner reporting how far the hand-ranked queue had drifted from the log, which is what surfaced that the queue was eight days and sixty-five captures stale.
+
+Two findings from writing it, worth more than the code: the fold plus the two YAML files are sufficient to render everything this idea asks for, with no new data layer; and the drift between a hand-ranked queue and the log is worth computing and displaying, not just recording. The script itself lived in a session scratchpad and is gone - deliberately, since it was written as a throwaway without the design-system assets PLAN-036 is meant to supply, and should not become load-bearing by accident. Whoever builds this should expect an afternoon, not a project.
 
 <details>
 <summary>1 finding(s)</summary>
