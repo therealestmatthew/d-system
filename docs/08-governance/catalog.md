@@ -120,6 +120,7 @@ CI regenerates it and fails on any difference.
 | PLAN-040 | plan | draft | repository-owner | docs/01-plans/PLAN-040-portable-framework-document-templates.md |
 | PLAN-041 | plan | draft | repository-owner | docs/01-plans/PLAN-041-portable-framework-content-extraction.md |
 | PLAN-042 | plan | draft | repository-owner | docs/01-plans/PLAN-042-session-taxonomy-investigation.md |
+| PLAN-043 | plan | approved | repository-owner | docs/01-plans/PLAN-043-literature-review-report-page.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -182,6 +183,7 @@ CI regenerates it and fails on any difference.
 | REQ-024 | requirement | draft | repository-owner | docs/06-requirements/REQ-024-portable-framework-document-templates.md |
 | REQ-025 | requirement | draft | repository-owner | docs/06-requirements/REQ-025-portable-framework-content-extraction.md |
 | REQ-026 | requirement | draft | repository-owner | docs/06-requirements/REQ-026-session-taxonomy-investigation.md |
+| REQ-027 | requirement | draft | repository-owner | docs/06-requirements/REQ-027-literature-review-report-page.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -368,6 +370,7 @@ CI regenerates it and fails on any difference.
 | PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 1 | 1 | agent-tax |
+| PLAN-043 | doc-literature-review-report-page | approved | 4 | 0 | 0 | — |
 
 ## Held codes
 
@@ -381,4 +384,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-299 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 57, prompt: 36, requirement: 26, session: 124.
+301 documents — adr: 18, architecture: 10, governance: 12, operation: 16, plan: 58, prompt: 36, requirement: 27, session: 124.

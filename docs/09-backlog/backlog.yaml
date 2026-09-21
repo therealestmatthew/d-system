@@ -6891,6 +6891,162 @@ items:
     independently - see the session record, which names this as a three-gate pattern
     rather than an incident. Do not commission a tenth search session (ruling 10).'
 
+- id: phase-lrr-01
+  title: Deterministic extraction of the campaign corpus
+  plan: doc-literature-review-report-page
+  sources:
+  - doc-literature-review-report-requirements
+  systems:
+  - sys-research
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build the extractor that reads research/literature-review/ and emits a stable structured
+    form - the fourteen files, the three CSVs' rows and columns, the 11 hypothesis blocks in 06
+    and the 30 collision sections in 05, each with a stable anchor id.
+  - Derive every count from the files rather than restating a recorded figure, per REQ-027 R05.
+    The extractor computes; the renderer never does.
+  - Emit nothing to _public/ in this phase. The output is the structured form the later phases
+    render.
+  acceptance:
+  - Running the extractor twice against an unchanged tree produces byte-identical output.
+  - The emitted deliverable set equals the files matching research/literature-review/[0-9][0-9]_*
+    on disk, and the emitted row counts equal 1200 (ledger), 1154 (inventory) and 67 (matrix)
+    measured from the CSVs at run time, not hardcoded.
+  - Every hypothesis block H1-H11 and every one of the 30 collision sections carries a stable
+    anchor id that a later phase can link to.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - tools/lit_report_extract.py
+  - test/test_lit_report_extract.py
+  next_action: Ready. First phase of PLAN-043; nothing blocks it.
+
+- id: phase-lrr-02
+  title: Report template family, shell and faithful Markdown rendering
+  plan: doc-literature-review-report-page
+  sources:
+  - doc-literature-review-report-requirements
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-lrr-01
+  scope:
+  - Build the template family under templates/html/ with a {{TOKEN}} contract commented at the
+    top of each template, plus a stylesheet under templates/styles/, following the
+    overview-*.html precedent rather than introducing a parallel look (REQ-027 R09).
+  - Render all thirteen Markdown deliverables faithfully - headings, ordered and unordered lists,
+    tables, fenced code, inline code, blockquotes and links - and verify against all thirteen,
+    not a sample. 05 and 06 carry nested tables inside blockquotes and are the hard cases.
+  - Build the entry page and navigation so every deliverable is reachable in at most two clicks.
+  acceptance:
+  - For each of 01-13 the rendered output contains no line beginning with '## ' or '- ' outside a
+    pre block, and the count of h2 elements equals the count of '^## ' in the source.
+  - Every Markdown table in every source deliverable produced a table element.
+  - All fourteen deliverables are reachable from the entry page, the thirteen in at most two
+    clicks and the ledger directly.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  deliverables:
+  - templates/html/lit-report-page.html
+  - templates/styles/lit-report.css
+  next_action: Blocked on phase-lrr-01's structured form.
+
+- id: phase-lrr-03
+  title: The three browsable tables, including the 43-column matrix
+  plan: doc-literature-review-report-page
+  sources:
+  - doc-literature-review-report-requirements
+  systems:
+  - sys-html
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-lrr-02
+  scope:
+  - Render the ledger (1200 x 15), the inventory (1154 x 13) and the matrix (67 x 43) as tables
+    sortable by any column and filterable by free text.
+  - Give the matrix column-visibility control with a default subset that fits a 1280px viewport
+    without the page body scrolling horizontally.
+  - Carry each table's data inline in its own view per PLAN-043's inlining decision, so the
+    ledger's 1.6MB is paid only when the ledger is opened and no fetch is needed at all.
+  - If the 1200-row ledger misses REQ-027 R10's 500ms filter bound, virtualise rows. Do not
+    introduce a fetch.
+  acceptance:
+  - Sorting a named column ascending then descending changes row order and leaves row count
+    unchanged, on all three tables.
+  - Filtering by a term present in exactly n rows leaves exactly n rows, on all three tables.
+  - Toggling a matrix column off removes its cells and the page body still does not scroll
+    horizontally at 1280px.
+  - Rendered row counts equal 1200, 1154 and 67. A ledger filter keystroke updates rows in under
+    500ms, measured and recorded.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - Browser-driven verification of sort, filter, column visibility and the filter timing, with
+    real measured output recorded
+  deliverables:
+  - templates/html/lit-report-table.html
+  next_action: Blocked on phase-lrr-02's template family.
+
+- id: phase-lrr-04
+  title: Cross-links, epistemic framing, generator assembly and the drift test
+  plan: doc-literature-review-report-page
+  sources:
+  - doc-literature-review-report-requirements
+  systems:
+  - sys-html
+  - sys-research
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-lrr-03
+  scope:
+  - Resolve cross-references as links - a source_id to its inventory and matrix rows, an H1-H11
+    token to its block in 06, a deliverable cited by number to that deliverable.
+  - Report dangling references as findings about the corpus rather than linking them to something
+    plausible. The campaign has two known duplicate inventory rows and at least one matrix row
+    citing a path that 404s; expect real dangling references and record them.
+  - Put REQ-027 R06's framing on the entry page - first research memo not a final novelty claim,
+    saturation measured and explicitly not demonstrated, the duplicate rate shown as the falling
+    trend it is - and R07's disputed share, 18 of 30 flags recorded disputed.
+  - Assemble tools/generate_lit_report.py, write its OPS document per AGENTS.md, and add the
+    committed-output drift test.
+  acceptance:
+  - Zero dangling internal links, with every unresolved reference either linked or listed as a
+    known non-target with its reason.
+  - The entry page carries the memo statement, the saturation statement with the 20.0 to 15.0 to
+    6.4-7.7 percent trend, and the 18-of-30 disputed count. No page asserts saturation holds, and
+    every occurrence of NOVEL in the output sits inside a statement that it is unavailable.
+  - Running the generator twice against an unchanged tree produces byte-identical output, and the
+    drift test fails when the committed page does not match a fresh regeneration.
+  - check_no_private_content passes with changes staged AND the real _private/portfolio/ present,
+    so the content half runs rather than being skipped.
+  verification:
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run python tools/check_no_private_content.py with the changes staged and _private/ present
+  - uv run python tools/generate_lit_report.py twice, with the diff of the two outputs recorded
+  deliverables:
+  - tools/generate_lit_report.py
+  - docs/08-governance/OPS-017-generate-lit-report.md
+  - _public/literature-review/index.html
+  next_action: Blocked on phase-lrr-03's tables.
+
 - id: phase-kit-01
   title: Build the kit's six commands
   plan: doc-consultant-demo-kit
