@@ -13146,11 +13146,16 @@ items:
   - Compare record-structure.tsv row count against ls docs/03-sessions/SESS-*.md | wc -l
   deliverables:
   - docs/00-working/session-taxonomy.md
+  session: doc-session-session-taxonomy-evidence
   completion_evidence:
   - docs/00-working/session-taxonomy.md
-  result: 'Governance OK (35 systems, 298 documents, 26 memories, 288 backlog phases);
-    check_no_private_content OK with the changes staged (741 tracked files, 31 identifiers
-    checked); record-structure.tsv 123 data rows == 123 SESS files. Stage 0 parsed all 113
+  - docs/03-sessions/SESS-2026-09-20-03-session-taxonomy-evidence.md
+  result: 'Post-rebase onto dev: Governance OK (35 systems, 300 documents, 26 memories,
+    288 backlog phases); pytest 638 passed; record-structure.tsv 123 data rows == 123 SESS
+    files. The staged private-content check reports 0 identifiers in a worktree (no _private/
+    portfolio there); the conclusive 31-identifier run belongs in the primary checkout at
+    integration. pytest failed first on a stale generated ideas.md after idea 000290 was
+    appended, and was fixed by regenerating it. Stage 0 parsed all 113
     transcripts with 0 parse errors and 0 unrecognised record types; no agent read a raw
     transcript. Engine and derived outputs at _private/analysis/session-taxonomy/
     (reduce_sessions.py, record_structure.py, make_digests.py, stage1_classify.py); promotion
