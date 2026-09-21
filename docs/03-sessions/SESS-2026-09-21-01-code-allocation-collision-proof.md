@@ -161,11 +161,12 @@ Exit code 0.
 ### `uv run pytest test/test_codes.py`
 
 ```
-57 passed, 2 warnings in 2.50s
+61 passed, 2 warnings in 2.82s
 ```
 
-48 before this session; nine added. The full suite was also run as a regression check and is green
-at `647 passed, 2 warnings in 51.02s`, against 638 on `dev`.
+48 before this session; thirteen added, after the review's findings replaced one test and added
+five. The full suite is green at `651 passed, 2 warnings in 51.33s`, against 638 on `dev`, and
+`uv run mypy src/` reports `Success: no issues found in 25 source files`.
 
 ### `uv run python tools/check_no_private_content.py` with the changes staged
 
@@ -198,10 +199,88 @@ person or engagement.
    from the second, and that the second's attempt to take the same code returns `False`. Nothing is
    committed in either worktree at any point.
 3. **`GOV-005` describes the mechanism actually in force, with no surviving instruction to work
-   around it by hand — Met for `GOV-005`; see *Left undone* for `AGENTS.md`.** The *Concurrent
+   around it by hand — Met.** The *Concurrent
    agents* section was rewritten: the workaround is retired explicitly, and the two unrelated things
    now called a reservation are separated in a table, because confusing the committed `codes.yaml`
    register reservation with the ephemeral pre-merge one would waste an afternoon.
+
+## Review — independent close review, 2026-09-21
+
+Run per `GOV-003`'s coordinator-completion condition 2: a fresh non-fork subagent, given the
+phase's `scope`, `acceptance` and `verification` verbatim, the diff range, and instructions to
+probe the mechanism adversarially rather than read it.
+
+**Verdict: yes-with-caveats.** Acceptances 2 and 3 held cleanly. Acceptance 1 held, with one
+residual path that turned out to be a real defect. The reviewer built its own scratch repository
+with eight linked worktrees and raced eight allocator processes off a spin-barrier: all eight got
+distinct contiguous codes. It then re-ran the same race with `reserved` forced empty — the old
+allocator — and got `distinct: 1 of 4`, which is the counterfactual proving the tests measure the
+fix rather than passing either way.
+
+It also checked, per-test, whether each new test would still pass with the mechanism neutered:
+**six of nine fail when neutered** and are genuine evidence; three test adjacent properties
+(over-reach, input validation, TTL). The record should not count all nine as R05 evidence, and now
+does not.
+
+The ruff claim was verified independently by extracting `dev` with `git archive` and running the
+branch's ruff against it: identical error sets, ten in each, the only difference being the
+pre-existing `E501` displaced from line 427 to 433. **Zero new lint or type errors.**
+
+### Three defects, all reproduced locally before being fixed
+
+Each was re-run by the coordinator rather than accepted on the reviewer's word.
+
+**1. Satisfied-pruning reopened the collision the phase exists to close.** `prune()` released a
+reservation once its code appeared on a scanned document — but `audit()` walks the *local* working
+tree, so an allocating worktree retired its own reservation while the document was still unmerged:
+
+```
+A allocates:                         SESS-2026-09-21-01
+A's tree has it: True | B's tree has it: False
+A's 2nd allocation prunes:           ['SESS-2026-09-21-01']   <-- deleted as "satisfied"
+B allocates:                         SESS-2026-09-21-01
+A committed anything? no
+COLLISION: True
+```
+
+This contradicts acceptance 1's literal wording, "before either commits". It fires in ordinary
+single-machine use — a session that allocates a session code, writes the record, then allocates a
+second code. Expiry is now the only automatic release. After the fix the same probe gives `-01`,
+`-02`, `-03` and `COLLISION: False`.
+
+The reviewer also noted that the old test asserted this behaviour was *correct*, so no test would
+ever have caught it. That test is gone, replaced by two that assert the opposite.
+
+**2. `release()` validated nothing while `reserve()` did** — the dangerous way round, since
+`reserve()` only creates a file and `release()` unlinks one, with `--release-code` passing operator
+input straight through:
+
+```
+canary exists before: True
+release('../CANARY') -> True
+canary exists after:  False
+```
+
+Against the live repository `--release-code ../config` would have removed `.git/config`. Both
+functions now share one guard, which also rejects `.` and `..` — both pass a character-set test.
+
+**3. A crash between create and write leaked a code permanently.** An empty reservation file gives
+`meta = {}`, so `age` computed as zero and the reservation never expired. `prune()` now falls back
+to the file's mtime.
+
+**4. This record contradicted the branch.** Its *Left undone* still said `AGENTS.md` "was **not**
+edited" and scored acceptance 3 as half-met, both written before `e976201`. Corrected above.
+
+### Not fixed, and why
+
+- **`PLAN-005:87`** still says an agent "reserves its code in the same small commit as its backlog
+  claim". `PLAN-005` is `status: complete`, so it reads as a record of the then-design rather than a
+  live instruction, and it is outside acceptance 3's named targets. Left alone.
+- **Reservations remain machine-local**, so agents on different machines can still collide.
+  `GOV-005` names this as one of the two cases renumbering still covers.
+- **A hand-edited reservation with a non-numeric `at`** can still raise an uncaught `TypeError` or
+  `AttributeError` from `prune()`. It fails closed — no duplicate code is issued — and requires
+  someone to have edited a file in `.git/` by hand. Not worth a guard; noted here instead.
 
 ## Decisions
 
@@ -231,18 +310,13 @@ person or engagement.
 
 ## Left undone
 
-- **`AGENTS.md` still carries the retired workaround** — "Reserve your code in `codes.yaml` alongside
-  your backlog claim to avoid the race entirely", in *Concurrent agents: resolve collisions*. It is
-  now redundant rather than wrong, and following it is harmless. It was **not** edited: `AGENTS.md`
-  and `CLAUDE.md` may not be modified without the owner's explicit approval for that specific
-  change, and this phase's declared deliverables do not include it. Proposed replacement, for the
-  owner to accept or reject:
-
-  > **A duplicate-code error means you and a peer took the same number.** Codes are free before
-  > merge and permanent after, so the agent integrating second renumbers: allocate again, rename the
-  > file, and update any reference you added. `--next-code` now reserves the code it hands you
-  > against every worktree on this machine, so this should only arise between agents on different
-  > machines — see [GOV-005](docs/08-governance/GOV-005-document-codes.md).
+- **`AGENTS.md`'s retired workaround was replaced**, after the owner approved the specific wording
+  on 2026-09-21. The phase's deliverables were widened on `dev` at `0ff54e2` to cover the file
+  before it was touched, so peers saw the wider lock first, and the edit is `e976201`. `AGENTS.md`
+  is not modified for any reason without explicit per-change approval; this is the record that it
+  was given. The `.claude/settings.json` deny rule on `Edit(AGENTS.md)` is what made this a
+  two-step operation rather than something an agent could do silently — a worked example for
+  `phase-conc-08`, which reconciles that file permission by permission against `REQ-013` R14.
 
 - **`ruff` is red on `dev` and remains red**, with 10 pre-existing errors including
   `src/governance/__main__.py:433` E501 inside this phase's deliverable path. Not fixed: it is
@@ -273,5 +347,6 @@ and this session's own first half is the argument for not skipping either.
 
 `next_action`: All three acceptance conditions are met and both verification commands are green.
 Ready for an independent review of `git diff dev..agent/phase-conc-03` and the owner's integration
-decision. The `AGENTS.md` wording in *Left undone* needs the owner's yes or no before anyone edits
-that file.
+decision. The independent review `GOV-003` requires has run — its findings and the three fixes
+they produced are in `## Review` above — so condition 2 is discharged; what remains is the owner's
+integration approval, which is condition 3 and is theirs alone.

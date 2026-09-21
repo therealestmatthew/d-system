@@ -9334,18 +9334,20 @@ items:
   - test/test_codes.py
   - AGENTS.md
   session: doc-session-code-allocation-collision-proof
-  next_action: 'All three acceptance conditions met; both verification commands green
-    (governance exit 0; pytest test/test_codes.py 57 passed, 48 before this phase).
+  next_action: 'All three acceptance conditions met; verification green (governance
+    exit 0; pytest test/test_codes.py 61 passed, 48 before this phase; full suite 651
+    passed; mypy clean; zero new ruff errors against dev''s ten pre-existing ones).
     The design question the phase named as deciding everything is answered: codes.yaml
     on dev cannot serve as the reservation point, because a worktree cannot check out
-    dev at all and so cannot commit there, and reading committed state is the defect
-    rather than a fix for it. Reservations live in the git common directory, which every
-    worktree of one repository shares with no commit and no merge, one file per code
-    created with O_CREAT | O_EXCL. The owner approved the AGENTS.md replacement wording
-    on 2026-09-21, the deliverables were widened on dev to cover that file before it was
-    touched, and the edit is on this branch. Ready for an independent review of git diff
-    dev..agent/phase-conc-03 and the owner''s integration decision; not complete, since
-    GOV-003 requires both.'
+    dev at all and so cannot commit there. Reservations live in the git common
+    directory, one file per code created with O_CREAT | O_EXCL. GOV-003 condition 2 is
+    discharged: an independent review ran, returned yes-with-caveats, and all three
+    caveats were reproduced locally and fixed in e6e5fbc - satisfied-pruning reopened
+    the very collision the phase closes, release() could unlink an arbitrary file, and
+    a crashed reservation never expired. Findings and fixes are in SESS-2026-09-21-01''s
+    ## Review section. What remains is condition 3, the owner''s integration approval,
+    which is theirs alone. AGENTS.md was edited at e976201 on the owner''s explicit
+    2026-09-21 approval, with deliverables widened first at 0ff54e2.'
 - id: phase-conc-04
   title: Write the claim-recovery procedure and record it in GOV-003
   plan: doc-concurrency-git-safety
