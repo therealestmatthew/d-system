@@ -64,16 +64,19 @@ the primary checkout and is recorded below.
 
 ## Backlog
 
-`phase-lit-07` is the campaign's last open phase; `01`–`06`, `08` and `09` are all `complete`.
+`phase-lit-07` — **`status: complete`**, `agent: agent-lit` retained as the record of who did the
+work, `session: doc-session-literature-review-pass-4-reconciliation`, with
+`completion_evidence` naming the seven synthesis deliverables and this record. It was not in
+`next_up`, so nothing was pruned.
 
-Written to `backlog.yaml` this run: `status: active`, `agent: agent-lit`, holding
-`sys-research`. `phase-lit-07` is not in `next_up`, so nothing was pruned.
+**All nine `phase-lit-*` phases now read `complete`.** `PLAN-023` is closed and the campaign is
+over.
 
-Completion follows `GOV-003`'s three conditions: the verification commands are green with real
-output recorded above, the independent adversarial review has run and returned **safe to mark
-complete**, and the third condition — **integration onto `dev` with the owner's approval** — is
-unchanged and is asked for every phase. The completion edit is one small commit on `dev`
-immediately after that integration, and not before.
+`GOV-003`'s three coordinator-completion conditions were met in order: the verification commands
+ran green with real output recorded above; the independent adversarial review ran and returned
+**safe to mark complete**; and the branch was integrated onto `dev` by fast-forward **on the
+owner's explicit approval**, asked for and given at the close. The completion edit is commit
+`21a523d`, made immediately after that integration and not before.
 
 ## Unresolved
 
@@ -388,3 +391,97 @@ because a review that overturns a finding deserves the same scepticism as the fi
 
 The outcome is unaffected: the reviewer endorsed the resulting form either way, and `10:37` now
 presents the point as paraphrase without quotation marks.
+
+## Integration and hand-off
+
+Recorded here rather than left implicit, because the record's earlier sections were written
+before integration and described it as still pending.
+
+- **Integrated** to `dev` by `git merge --ff-only agent/lit-campaign`. 13 files, 775 insertions,
+  238 deletions.
+- **The private-content check then ran where it can actually see content.** In the primary
+  checkout, after integration, with this phase's files tracked:
+  `check_no_private_content: OK (762 tracked files, 31 identifiers checked)`, exit 0. **This is
+  the run that counts.** Every in-worktree run this session reported `0 identifiers checked` and
+  none of them is a passing content verification.
+- **Backed up to `origin`** — `agent/lit-campaign` pushed at `bb8598e`. The first attempt was
+  refused by the environment's permission classifier; the second succeeded. The previous session
+  recorded the same refusal and did not retry, which is why ten sessions of campaign evidence had
+  existed on one machine only.
+- **Cleaned up**: worktree removed, `agent/lit-campaign` deleted locally after confirming it was
+  merged into `dev` and present on `origin`. The only ignored content in the worktree was
+  `.venv/` and caches — nothing needing rescue.
+- **`dev` itself is not pushed.** The completion commit `21a523d` exists on this machine only.
+  All campaign *content* is on `origin` via the branch; the delta is the completion commit.
+  Publishing the shared trunk was treated as a separate decision from the integration the owner
+  approved, and was not taken.
+
+## Decisions
+
+- **The band figure reports 2 of 32 under the exact-`source_id` rule, with both sources named.**
+  The owner's call, over the alternative of collapsing the near-duplicate pairs to 0 of 31. The
+  reasoning: the exact-id figure is mechanically reproducible from the inventory as it stands,
+  and naming the two sources as documented near-duplicates of works that *were* deep-read stops
+  it misleading. `PROMPT-031` ruling 10 was left untouched, because an agent does not edit a
+  record of the owner's rulings.
+- **`06`'s coverage caveat was brought into scope**, on the owner's ruling, under `LIT-07 X1`
+  item 0's existing write authority — so the campaign does not close with a known-false figure
+  standing in a deliverable. Nothing else in `06` was touched.
+- **`LIT-07 A` was not re-dispatched.** Its declared inputs are `07`, `08`, `06` and `04`; this
+  session changed `07` and `08` only in corrected figures, and `A` never covered `09`–`13`.
+  Re-running it would have widened a section's inputs mid-campaign and put a met condition back
+  at risk.
+- **`13`'s two new entries take Part A's format, not five-step promotion records.** Scope item 3
+  scopes the five steps to *seed* sources, which is Part B's contract; these are
+  synthesis-cited matrix sources.
+- **Experiment 2 was withdrawn in place rather than re-aimed or renumbered**, on the owner's
+  ruling — with the stated reason that inventing a research question during a reconciliation
+  pass is how the stale claims arrived in the first place. The same principle was applied to
+  `11`'s Q3 and Q4, and the dispatch flagged both as judgment calls for review; the independent
+  review endorsed them as the correct conservative reading.
+- **`phase-lrr-01` was not claimed.** It declares `sys-research` and so collided with this
+  phase's lock. The owner chose a read-only scout over amending the phase's declared systems to
+  make a claim fit. The scout wrote nothing.
+
+## Corrections
+
+Two, both the coordinator's, both caught within the session.
+
+1. **I reported the campaign's saturation figures as unreproducible. They reproduce exactly.**
+   I tested two tokenisation rules of my own invention and asserted a defect without finding the
+   method the campaign documents at `06_hypothesis_tests.md:72-79` — membership in the source
+   inventory as it stood immediately before the phase, matched on **either** `source_id` **or**
+   `url_or_doi`. Under it: 387 raw identifiers, 347 distinct, 58 duplicates, 15.0%, matching
+   `06` to the digit. The false claim reached an idea annotation, this session record, a commit
+   message and an independent reviewer's blocking finding before I caught it. The annotation on
+   `000289` was amended in place to withdraw it, and the narrower true finding kept: the rule
+   lives in a deliverable rather than the evidence contract, so a gate reading only the contract
+   cannot find it — which is exactly why `LIT-07 G` produced a non-standard figure.
+2. **I dispatched the first independent close review against a branch I was still committing
+   to.** It raised that as a blocking procedural finding and was right. The branch was frozen at
+   `0c6636e` and the review re-run against a stable diff, with nothing touching the branch until
+   it reported.
+
+A third correction runs the other way: the second review stated that `10:37`'s
+`"known components, integrated"` was a real quotation from the methodology. It is not — the
+string appears nowhere in either `CLAUDE.md`, whitespace-normalised. The original attribution was
+a pseudo-quote and the fix was correct.
+
+## Left undone
+
+- **`dev` is unpushed**, as above. One command, awaiting the owner's call on publishing the trunk.
+- **Three follow-up ideas, none blocking**: `000289` (the duplicate-rate rule is documented in a
+  deliverable rather than the evidence contract; `result_ids` tokenisation still unfixed),
+  `000307` (no dedupe rule for population counts; ruling 10's "0 of 32" reproduces under neither
+  consistent reading), `000308` (the inventory's `status` field is stale for 16 rows that have
+  matrix rows — previously recorded as "four" and as "17", both wrong).
+- **The gate's method errors are a campaign-level pattern, not four incidents.** Four consecutive
+  gates have reported false results that only independent recomputation caught. Idea `000290`
+  already proposes replacing the gate with a deterministic script; this session is the strongest
+  evidence yet for it.
+- **The branch-naming gap** — `agent/lit-campaign` never matched `AGENTS.md`'s `agent/<phase-id>`
+  rule, so the stale-claim signal reported "no evidence" for this claim throughout. Recorded in
+  `SESS-2026-09-19-01`; belongs to a follow-up, and is now moot for this campaign.
+- **`06` cites a commit hash that does not exist** — `7141767` for `H4R`, rewritten by a rebase.
+  Carried from `phase-lit-09` and still unfixed, since a hash cited inside a file on a rebasing
+  branch drifts again.
