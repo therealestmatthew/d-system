@@ -6892,7 +6892,7 @@ items:
     contradicting PROMPT-031 ruling 10 committed the same day. None of this needs new
     searching. Next action is the owner''s call between a reconciliation pass over 09-13 and
     an explicit ruling amending condition 1, recorded the way condition 2''s amendment was.
-    Do not mark complete until one of those happens. Phase stays active under agent-lit,
+    Do not mark complete until one of those happens. The owner ruled on 2026-09-21 that the reconciliation pass drops Experiment 2 from 12_experiment_proposals.md and records why: it exists only to test the H4 general/graph-topological split, which 06, 07 and 08 have retired at a unified LIKELY_ALREADY_KNOWN, so the distinction it was designed to test was not sustained. Drop it rather than re-aiming it - inventing a research question during a reconciliation pass is how the stale claims arrived - and say in the deliverable that it was withdrawn, rather than silently renumbering the experiments that remain. Phase stays active under agent-lit,
     holding sys-research; the agent field is retained as the record of who did the work per
     AGENTS.md completion step 5.'
 - id: phase-lrr-01
