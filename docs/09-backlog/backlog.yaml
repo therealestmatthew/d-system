@@ -6875,7 +6875,7 @@ items:
   - research/literature-review/13_validated_bibliography.md
   session: doc-session-literature-review-pass-4
   next_action: 'Ready for the owner''s /session-close review and the second owner
-    integration of agent/lit-campaign into dev. Recorded in SESS-2026-09-20-01, which
+    integration of agent/lit-campaign into dev. Recorded in SESS-2026-09-20-02, which
     is this phase''s second session record; the deliverables were written in
     SESS-2026-09-14-13. The owner''s 2026-09-20 ruling is implemented: rulings 9 and 10
     are in PROMPT-031 in their own dated section, this phase''s acceptance now requires

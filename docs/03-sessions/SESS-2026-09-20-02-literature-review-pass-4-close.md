@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: doc-session-literature-review-pass-4-close
-code: SESS-2026-09-20-01
+code: SESS-2026-09-20-02
 title: Literature review Pass 4 close — the owner's closing ruling recorded, 07 reconciled and the final gate re-measured
 kind: session
 status: active
@@ -197,6 +197,23 @@ fix cycle 1 (Haiku). One of two fix cycles used. **No Opus escalation spent** �
 single permitted escalation remains unspent. Nine sessions used against a seven-session estimate
 and an owner-accepted range of six to eight; this is the tenth session but the first that ran no
 searches, and ruling 10 forbids a tenth *search* session.
+
+## A code collision resolved at integration
+
+This record was written as `SESS-2026-09-20-01` and renumbered to `SESS-2026-09-20-02` when
+`dev` moved mid-session: a peer (`agent-tax`) integrated `phase-tax-02` and
+`SESS-2026-09-20-01-taxonomy-rulings-and-req026-amendment.md` while this work was in progress,
+taking the same code.
+
+No judgment was involved — `AGENTS.md` fixes the outcome: codes are free before merge and
+permanent after, so the agent integrating second renumbers. That was this session. The rebase's
+only content conflict was `docs/08-governance/catalog.md`, which is generated and was resolved by
+regenerating rather than by taking either side; `backlog.yaml` auto-merged and both claims were
+verified present afterward.
+
+Recorded here rather than in `GOV-003`, which takes decisions that required a choice. This one did
+not. The commit message on this record's own commit still names the pre-renumber code, since it was
+written before the collision surfaced.
 
 ## Unresolved
 
