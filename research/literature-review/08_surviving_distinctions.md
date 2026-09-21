@@ -29,7 +29,7 @@ mechanism as an open question would misstate the evidence.
 
 ### H2 — Typed transition semantics as reasoning memory
 
-**Status:** `LIKELY_ALREADY_KNOWN`. Thirteen matrix rows challenge H2, two at the matrix's ceiling
+**Status:** `LIKELY_ALREADY_KNOWN`. Sixteen matrix rows challenge H2, two at the matrix's ceiling
 component-overlap score of 5 (`graph-native-cognitive-memory-belief-revision-semantics-2026`,
 `jansen-bosch-architecture-as-decisions-wicsa-2005`) — both disputed on independent second review
 to 4/3 and 3/2 respectively, disputes recorded but not applied per the owner's ruling
@@ -81,7 +81,7 @@ single entry.
 
 ### H7 — Development provenance
 
-**Status:** `LIKELY_ALREADY_KNOWN`. Ten matrix rows challenge H7, spanning the ADR tradition
+**Status:** `LIKELY_ALREADY_KNOWN`. Twelve matrix rows challenge H7, spanning the ADR tradition
 (Jansen & Bosch 2005, Zimmermann et al. 2009), MBSE's "digital thread" concept (2022 chapter, a
 granted 2025 US patent), and a 2026 agentic-coding tool self-described as an application of 1991-era
 QOC notation — see `07_anti_novelty_case.md` §§8-11. Per the qualification recorded in
