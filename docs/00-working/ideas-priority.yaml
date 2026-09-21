@@ -1,22 +1,44 @@
 schema_version: 1
-updated: '2026-09-13'
+updated: '2026-09-21'
 # Ideas that jump the queue, in order. Everything else falls back to status then ID
 # (open before triaged; lower ID first within a status). Hand-edited, like backlog.yaml's
 # next_up — reordering is an operational decision, not a fact logged in _data/ideas.jsonl.
-# Empty at creation: idea 000039, which this file implements, was promoted to PLAN-019 in
-# the same session and is no longer something to look at next.
+#
+# Re-ranked 2026-09-21 by owner ruling, after the queue had gone eight days and roughly
+# sixty-five captures out of step with the log. The shape chosen was "keep the current front,
+# extend behind it": the three entries front-loaded on 2026-09-12 hold their places and the
+# queue grows to cover what has landed since. Target depth 12-15; the result is 16, because
+# trimming previously-ranked entries was not part of the ruling.
 next_up:
-# Front of the queue, 2026-09-12. The idea-batching pack is built, merged and corrected, but
-# has NOT had its GOV-008 stage 5 adversarial audit — no analyst may be dispatched before that
-# audit and the owner's approval. 000157 carries that plus two hygiene items; full write-up in
-# docs/00-working/handoff-demo-cut-and-batching-pack.md. 000158 is behind it because it was
-# found while integrating that work and nothing currently guards the race it describes.
+# Front of the queue, held from 2026-09-12. The idea-batching pack is built, merged and
+# corrected, but has NOT had its GOV-008 stage 5 adversarial audit — no analyst may be
+# dispatched before that audit and the owner's approval. 000157 carries that plus two hygiene
+# items; full write-up in docs/00-working/handoff-demo-cut-and-batching-pack.md. 000158 is
+# behind it because it was found while integrating that work and nothing currently guards the
+# race it describes.
 - '000157'
 - '000158'
 - '000195'
-# 000099 removed 2026-09-13: discarded as verified-resolved by owner ruling during the
-# idea-batching partition. Its PTY failures are fixed and the suite is green; the queue
-# cannot hold a discarded idea, and the governance check enforces that.
+# Added 2026-09-21 at position 4 by owner ruling. 000303 gates two other ideas — 000302
+# (prompt and plan explorers) and 000304 (Neo4j evaluation) are both annotated as held behind
+# it — so it is ranked for attention even though the owner left it unscheduled. Queue
+# placement is attention order, not a commitment to run a session.
+- '000303'
+# Repo-hygiene defects that bite agents rather than users, added 2026-09-21. Ordered by
+# consequence: a writer that corrupts the backlog, then the gap between a role contract's
+# binding never-do and the tool boundary, then the system lock that serializes nearly every
+# phase, then session-code collisions the document-code fix never reached.
+- '000240'
+- '000241'
+- '000284'
+- '000283'
+# Literature-campaign findings that outlive the campaign, added 2026-09-21. The owner ruled
+# that per-pass data corrections stay with phase-lit-* and are not ranked here; these two are
+# kept because they are the same defect class — a gate that cannot tell contract-correct data
+# from absent data — and that class survives whatever produced it.
+- '000214'
+- '000219'
+# Held from 2026-09-12, unchanged in relative order.
 - '000066'
 - '000041'
 - '000038'

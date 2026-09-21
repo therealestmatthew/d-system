@@ -38,12 +38,19 @@ Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority
 1. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
 2. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
 3. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
-4. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-5. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-6. `000038` — Formalize the requirements-vs-plans process and design
-7. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-8. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-9. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+4. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
+5. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
+6. `000241` — Review agents are dispatched with write tools they are only told not to use
+7. `000284` — Decompose sys-governance, which currently functions as a global mutex
+8. `000283` — Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
+9. `000214` — A gate reported PASS on "blank required fields" after checking 4 of the contract's 43 required fields
+10. `000219` — A gate that silently drops tokens it did not expect cannot tell contract-correct data from a typo
+11. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+12. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+13. `000038` — Formalize the requirements-vs-plans process and design
+14. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+15. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+16. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -329,6 +336,8 @@ PROPOSED LINK: 000005 --relates_to--> 000004 (both about knowledge retrieval mec
 - relates_to → `000044`
 - relates_to → `000004`
 - relates_to ← `000044`
+- relates_to ← `000299`
+- relates_to ← `000304`
 
 ---
 
@@ -1916,6 +1925,7 @@ Unresolved: where the generator script and its output should live (tools/ alongs
 
 **Annotations**
 
+- **assessment** by repository-owner (2026-09-21T11:35:09-04:00): OWNER RULING, 2026-09-21: the generated page is still wanted. Asked directly against the fact that IdeaExplorerRegion and BacklogExplorerRegion both ship in the workbench (phase-wb-06, complete), the owner ruled that generated pages serve a different need from the interactive explorers - shareable, snapshot-able, and readable without running the app - and that both surfaces survive. This satisfies REQ-014 R14 as a keep, not a decline; phase-idg-08 executes the ruling rather than re-deciding it. Recorded in GOV-003 the same day. 000300 (idea log and priority queue page) and 000301 (backlog and next_up page) are the 2026-09-21 refinements of this ask and are released by the same ruling. The owner ruled the page asks stay off the idea priority queue because phase-idg-08 carries them; queueing them as well would rank the same work twice.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -1937,6 +1947,9 @@ The key unresolved design questions in 000042's body (generator location, static
 **Links**
 
 - relates_to ← `000071`
+- relates_to ← `000299`
+- relates_to ← `000300`
+- extended_by ← `000302`
 
 ---
 
@@ -2020,6 +2033,8 @@ PROPOSED LINK: 000044 --relates_to--> 000045 (Companion explorations of alternat
 - relates_to → `000045`
 - relates_to ← `000005`
 - relates_to ← `000043`
+- relates_to ← `000299`
+- relates_to ← `000304`
 
 ---
 
@@ -8056,6 +8071,7 @@ Related: 000163 (classification axes), 000018 (tagging for ideas, deferred), 000
 - relates_to → `000018`
 - relates_to → `000032`
 - relates_to ← `000161`
+- relates_to ← `000303`
 
 ---
 
@@ -12847,6 +12863,9 @@ PROPOSED LINK: 000299 --relates_to--> 000044 (Both 000304 and 000044 propose exp
 
 **Links**
 
+- relates_to → `000042`
+- relates_to → `000005`
+- relates_to → `000044`
 - relates_to ← `000300`
 - relates_to ← `000301`
 - relates_to ← `000302`
@@ -12911,6 +12930,7 @@ PROPOSED LINK: 000300 --relates_to--> 000042 (same ask—generated page showing 
 **Links**
 
 - relates_to → `000299`
+- relates_to → `000042`
 
 ---
 
@@ -12977,6 +12997,7 @@ subject of the relationship investigation raised at the same time.
 
 **Annotations**
 
+- **assessment** by repository-owner (2026-09-21T11:35:09-04:00): OWNER RULING, 2026-09-21, gate: what surface the prompt and plan explorers should take - two more thin consumers of the existing ExplorerRegion, generated pages in the same family as 000300 and 000301, or both - is deliberately not decided yet. It is held behind 000303 (relationship investigation), because what an explorer should surface depends on what the edges between the document families turn out to be. RELEASED BY: 000303 reporting what each family actually carries and what is missing. Until then this idea is parked by decision, not by oversight.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -13014,6 +13035,7 @@ PROPOSED LINK: 000302 --extends--> 000042 (both request explorer/generated pages
 **Links**
 
 - relates_to → `000299`
+- extends → `000042`
 
 ---
 
@@ -13129,6 +13151,7 @@ PROPOSED LINK: 000303 --relates_to--> 000162 (knowledge state events may be the 
 **Links**
 
 - relates_to → `000299`
+- relates_to → `000162`
 - relates_to ← `000304`
 
 ---
@@ -13151,6 +13174,7 @@ capture to pre-empt.
 
 **Annotations**
 
+- **assessment** by repository-owner (2026-09-21T11:35:09-04:00): OWNER RULING, 2026-09-21, gate: the Neo4j evaluation is held behind 000303 (relationship investigation). The owner declined to evaluate a graph store before the edges it would hold have been established - choosing a container before measuring the contents. RELEASED BY: 000303 reporting the actual and missing relationships between ideas, backlog phases, prompts and plans. The scope question raised at triage - whether this merges with 000005 and 000044 or stays scoped to document-to-code traceability - was not ruled on and stays open for whoever plans it; the relates_to edges to both were written on 2026-09-21 so the overlap is visible from the log.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -13181,6 +13205,8 @@ PROPOSED LINK: 000304 --relates_to--> 000005 (both about graph databases for rep
 
 - relates_to → `000299`
 - relates_to → `000303`
+- relates_to → `000044`
+- relates_to → `000005`
 
 ---
 
