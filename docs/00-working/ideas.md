@@ -12563,9 +12563,57 @@ Worth considering alongside: a mechanical check that recomputes a phase's duplic
 
 Recorded from phase-lit-09's close, 2026-09-20. Instances: SESS-2026-09-14-04 (phase-lit-08) and SESS-2026-09-19-08 (phase-lit-09).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-lit (2026-09-21T12:16:50-04:00): WITHDRAWN AND CORRECTED, 2026-09-21, by the coordinator who wrote it.
+
+The original text of this annotation claimed the campaign's recorded saturation trend line
+was not reproducible from 00_search_ledger.csv. That claim was wrong and is withdrawn in full.
+
+The duplicate-rate rule IS documented, and it is documented in the campaign's own deliverable:
+06_hypothesis_tests.md lines 72-79 state it precisely. A result identifier counts as a
+duplicate if it appears in 03_source_inventory.csv AS THAT FILE STOOD IMMEDIATELY BEFORE THE
+PHASE BEGAN - for phase-lit-08, commit 83fb42b^, the parent of the first LIT-08 search, so no
+LIT-08 row can add an entry to the inventory it is being checked against - matched on EITHER
+the source_id column OR the url_or_doi column.
+
+Reproduced exactly under that rule: 82 LIT-08 ledger rows, 387 raw identifiers, 347 distinct,
+58 duplicates = 15.0%. Both the raw figure and the 347 distinct count match 06's record to the
+digit.
+
+The error was mine and it was a process failure, not a measurement failure: I tested two rules
+the campaign never used - within-phase token collision, and recurrence against earlier ledger
+phases - and asserted a defect without first reading the deliverable that states the method.
+Neither of my rules checked url_or_doi, and neither used a pre-phase snapshot. The figures they
+produced (5.9%, 10.3%, 3.7% and 7.3%, 10.9%, 4.2%) are measurements of different quantities,
+not competing measurements of this one.
+
+What stands from the original annotation: nothing about the trend line. The recorded figures
+20.0%, 15.0% and 6.4-7.7% are supported, reproducible under a stated rule, and need no
+correction in any deliverable.
+
+What this idea's actual subject remains: the rule is documented in a DELIVERABLE (06) rather
+than in the evidence contract (PLAN-023.03), which is where a rule that governs every phase's
+measurement belongs. A gate reading only the contract cannot find it - and the LIT-07 G gate of
+this session did exactly that, independently producing the within-phase figure of 5.9% for
+phase-lit-06 because the contract gave it no rule to apply. That is the real defect, and it is
+narrower than what this annotation first claimed: not an unreproducible number, but a
+reproducible rule recorded in the wrong place.
+
+The result_ids tokenisation half of this idea is untouched by this correction and still stands
+as originally recorded.
+
+</details>
+
 **Links**
 
 - extended_by ← `000295`
+- relates_to ← `000307`
+- relates_to ← `000308`
 
 ---
 
@@ -13262,3 +13310,79 @@ Found while investigating the untracked files on 2026-09-21.
 **Links**
 
 - relates_to → `000305`
+
+---
+
+## 000307 · Fix the source dedupe rule behind the top-prescore band figure in the evidence contract
+
+**Created 2026-09-21T11:56:46-04:00 · Status: `open`**
+
+The evidence contract (PLAN-023.03) fixes no rule for deduplicating sources when a
+population is counted, and the literature-review campaign's top-prescore-band figure
+lands on a different number under each defensible rule. This is the same class of defect
+as the result_ids tokenisation gap, found in a different measurement.
+
+Measured on 2026-09-21 during phase-lit-07's reconciliation pass, against the files as
+they stood:
+
+- Deduplicating by exact source_id: candidate pool 400, never deep-read 336, top band 32,
+  band unread 2.
+- Additionally collapsing the two documented near-duplicate pairs
+  (dhar-vaidhyanathan-varma-agenticakm-2026 with its -arxiv partner, and
+  epistemic-sybil-resistance-multiplying-agents-2026 with epistemic-sybil-resistance-bara-2026):
+  pool 398, never deep-read 334, top band 31, band unread 0.
+
+PROMPT-031 ruling 10, committed 2026-09-20, asserts "0 of 32 top-band candidates unread".
+That figure reproduces under neither rule: it takes the band size from the first and the
+unread count from the second. The ruling's substance is unaffected - its conclusion is that
+no tenth search session should be commissioned, and the deep-read coverage conclusion holds
+under both readings - but the specific figure is not reproducible from the campaign's own
+files.
+
+The owner ruled on 2026-09-21 that the deliverables carry the exact-source_id figure
+(2 of 32) and name both sources as documented near-duplicates of sources that were
+deep-read, so the number cannot mislead. That is a per-campaign decision about wording,
+not a rule in the contract. The contract still fixes no dedupe rule, so the next
+measurement over any population faces the same fork.
+
+Needs its own requirement and plan, like 000289. Two things to settle: whether near-duplicate
+pairs collapse for counting purposes, and whether the inventory's known duplicate rows are
+excluded from population denominators. Do not amend a governed evidence contract mid-campaign.
+
+**Links**
+
+- relates_to → `000289`
+
+---
+
+## 000308 · The source inventory's status field is stale for 16 rows that have evidence-matrix rows
+
+**Created 2026-09-21T11:56:46-04:00 · Status: `open`**
+
+03_source_inventory.csv's status field does not track what was actually deep-read, and
+every recorded count of the drift has so far been wrong.
+
+Measured independently twice on 2026-09-21, by a dispatched worker and by the coordinator,
+both reproducing exactly: 51 inventory rows carry status deep_read, the evidence matrix
+carries 67 rows, and 16 source_ids present in the matrix are not marked deep_read in the
+inventory. A source with a matrix row has by definition been deep-read, so the inventory
+understates deep-read coverage by 16.
+
+The drift has been recorded twice before at the wrong figure. PROMPT-031's phase-lit-09
+section describes "four rows still status: candidate despite having matrix rows", carried
+forward as an operational fact. The independent close review of 2026-09-21 recorded
+"51 marked vs 67 matrix rows; 17 unmarked". Neither reproduces; the measured value is 16.
+
+The practical consequence is that any population derived from the inventory's status field
+rather than from matrix membership undercounts deep-read sources. phase-lit-07's
+reconciliation pass used matrix membership for exactly this reason and stated the predicate
+in the deliverables.
+
+Nobody should repair the inventory as a side effect of other work - the rows are evidence
+and the campaign has deliberately left known data defects unrepaired rather than edit
+evidence mid-campaign. This needs a decision about whether the status field is maintained
+going forward or retired in favour of deriving deep-read status from matrix membership.
+
+**Links**
+
+- relates_to → `000289`

@@ -162,6 +162,19 @@ both recorded here rather than left for a reviewer to discover:
    `maclean-young-bellotti-moran-qoc-design-space-analysis-1991`, cited by author name rather than
    slug in `07` and `09`. Found by `X3`'s own author-name cross-check and added. A slug-only match
    undercounts, which is why the method matters.
+6. **Commit `6936b98` carries an inaccurate message.** It reads "Annotate 000289: the recorded
+   saturation trend line is not reproducible" — a claim withdrawn later the same session (see
+   *Measurement 5* above) — and it also swept this session record into the same commit, which the
+   message does not mention. The repository's `pre-commit` hook runs only
+   `check_no_private_content.py` and stages nothing, so the cause is not established. History was
+   deliberately **not** rewritten to fix it: a dispatched agent was committing to the same branch
+   at the time, and rewriting under it risks losing its work. The message is wrong, the record
+   says so, and that is the honest resolution.
+7. **The independent close review ran against a moving target, and that was the coordinator's
+   error.** Commits landed and the session record grew while the review was in flight, and the
+   review said so as a blocking procedural finding. It was right. A second review was run against
+   a frozen diff; see *Review* below.
+
 5. **`check_no_private_content.py` verifies nothing in a worktree.** It reported
    `0 identifiers checked` on this branch. Not recorded as a passing content verification; the real
    run is in the primary checkout. Idea `000150`, unchanged.
@@ -181,3 +194,88 @@ both recorded here rather than left for a reviewer to discover:
   `H4R`; a rebase rewrote it. Carried from `phase-lit-09` and still unfixed, since a hash cited
   inside a file on a rebasing branch drifts again.
 - **The branch-naming gap**, recorded above.
+
+## `LIT-07 G` — the final gate
+
+Dispatched per Block G plus the `LIT-07 G` section, Haiku, payload narrowed only. **One fix cycle
+of the two available was used.** Populations named per Block G.
+
+| # | Stop condition | Measurement | Population |
+|---|---|---|---|
+| 1 | Domain coverage | **Met.** 0 domains below 2 distinct queries; min D48 = 6, max D38 = 42. 410/410 variant components covered | 72 D-domains; 339 mandated variants from `PLAN-023.02`, 410 components |
+| 2 | Chaining | **Met.** 53/53 carry a `strategy_phase: B` row and 53/53 a `strategy_phase: C` row; 0 missing either | 53 matrix rows with `max(component, architecture) overlap ≥ 3` |
+| 3 | Challengers | **Met.** All 11 carry a permitted status; **no `NOVEL`** | H1–H11 in `06_hypothesis_tests.md` |
+| 4 | Matrix completeness | **Blanks met; band exceeded.** 0 blank cells; 67 rows against a 20–30 band | 43 fields × 67 rows = 2,881 cells |
+| 5 | Saturation | **Measured, NOT demonstrated.** Duplicates falling | See below — the figure is rule-dependent |
+| 6 | Second review | **Met.** 0 pending — 12 confirmed, 18 disputed | 30 `critical_collision: yes` rows |
+| 7 | Deliverables | **Met.** 14 files present, `00` through `13` | `research/literature-review/` |
+| 8 | A-review findings | **Met.** 0 unaddressed-and-unrecorded; 9 findings, all addressed in one fix cycle | `LIT-07 A`, 2026-09-14 |
+
+Measurement 5 is reported as a trend and **not asserted**, per check-in ruling 8 as extended by
+ruling 9. Recording it unmet is the required outcome under the amended acceptance, not a gate
+failure.
+
+### The gate mismeasured a fourth time, and the coordinator's recomputation caught it again
+
+Three consecutive gates before this one reported false results. This is the fourth. **Every
+measurement in the table above was independently recomputed by the coordinator — six of the eight
+before the gate was even dispatched — and the gate's first run disagreed with three of them.**
+
+- **Measurement 2 — false PASS on the wrong population.** The gate measured the 30
+  `critical_collision: yes` rows. The condition names rows with **either overlap score ≥ 3**, which
+  is 53 rows; the two sets are different and neither contains the other. The corrected run
+  reproduces 0 missing across all 53.
+- **Measurement 4 — narrowed scope, PASS on 16% of the population.** The gate chose 7 "required"
+  fields and measured 469 of 2,881 cells. The matrix header carries 43 columns. **This is the third
+  consecutive gate to make this exact error**, and this dispatch warned about it by name in
+  writing. The corrected full-matrix measure holds at 0 blanks.
+- **Measurement 1 second half — an assertion, not a measurement.** "Substantively covered" with no
+  count, sourced from the domain map's `Tradition` fields rather than the variants the section
+  names. Corrected to 410/410 components from `PLAN-023.02`.
+
+The pattern is now four for four and is no longer attributable to any single gate. A gate trusted
+without independent recomputation would have failed this phase on two conditions that are met.
+
+### Measurement 5, and a coordinator error corrected before it reached a deliverable
+
+The gate's measurement 5 disagreed with the campaign's recorded trend line, and the coordinator
+initially concluded the recorded figures were unreproducible. **That conclusion was wrong and is
+withdrawn.**
+
+The rule is documented, in the campaign's own deliverable. `06_hypothesis_tests.md:72-79` states
+it precisely: an identifier counts as a duplicate if it appears in `03_source_inventory.csv` **as
+that file stood immediately before the phase began** — for `phase-lit-08`, commit `83fb42b^`, the
+parent of the first `LIT-08` search, so no `LIT-08` row can add an entry to the inventory it is
+checked against — matched on **either** the `source_id` column **or** `url_or_doi`.
+
+Reproduced exactly under that rule: 82 `LIT-08` ledger rows, 387 raw identifiers, 347 distinct,
+**58 duplicates = 15.0%**. Both the raw figure and the 347 distinct count match `06` to the digit.
+
+The coordinator's error was procedural, not arithmetic: two rules the campaign never used were
+tested — within-phase token collision, and recurrence against earlier ledger phases — and a defect
+was asserted before reading the deliverable that states the method. Neither tested rule checked
+`url_or_doi`; neither used a pre-phase snapshot. The figures they produced measure different
+quantities, not the same one differently.
+
+**The recorded figures 20.0%, 15.0% and 6.4-7.7% are supported and need no correction in any
+deliverable.** The finding annotation on idea `000289` has been amended to withdraw the claim.
+
+What survives is narrower and real: **the rule lives in a deliverable rather than in the evidence
+contract**, which is where a rule governing every phase's measurement belongs. A gate reading only
+`PLAN-023.03` cannot find it — and `LIT-07 G` did exactly that, independently producing a
+within-phase figure of 5.9% for `phase-lit-06` because the contract gave it no rule to apply. That
+is the defect: not an unreproducible number, but a reproducible rule recorded in the wrong place.
+
+## Spend
+
+One session, no searches, no ledger rows added — the ledger stands at 1,200 rows. Six dispatches:
+`X1` plus two fix cycles (Sonnet), `X2` (Sonnet), `X3` (Sonnet), `G` plus one fix cycle (Haiku),
+and the independent close review (Sonnet). `X1` used both its fix cycles; `X2` and `X3` used none;
+`G` used one of two.
+
+**No Opus escalation was spent.** The campaign's single permitted escalation remains unspent
+through all ten sessions.
+
+Ten sessions against a seven-session estimate and an owner-accepted range of six to eight. This is
+the second consecutive session to run no searches, and ruling 10 forbids only a tenth *search*
+session.
