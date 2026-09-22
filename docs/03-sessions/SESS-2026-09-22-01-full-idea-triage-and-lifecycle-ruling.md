@@ -216,3 +216,74 @@ governed behaviour:
 - **Six ideas whose work shipped stay open** until `phase-idg-01` ships the states, plus `000278`.
 - **`000296` is superseded but not discarded**; the writer warns and permits.
 - **Nothing pushed.** Eight commits sit on `dev` in the primary checkout at the owner's instruction.
+
+## Addendum — work after the close
+
+This record was finalized and committed at `7ceb37b`. The owner then directed three more pieces of
+work in the same conversation, without a new claim, and invoked `/session-close` again afterwards.
+Per `brain/procedures/session-close-with-no-active-phase.md` this is an addendum to the existing
+record rather than a second record: it is one continuous session. The procedure's usual shape has a
+phase reaching `complete` before the extra work begins; here nothing was claimed at any point, so
+the deviation is the same one already named in `## Unresolved`, continued past the close.
+
+**`5ec45ea` — the provenance constraint, and a broken commit.** The close review had noted that
+`linked` and `status` events carry no author field, so its finding that no agent wrote a link was
+inference from timing rather than proof. The owner's response: links route through them for approval,
+so process settles it. Correct — but the same gap bites the approved lifecycle change, because
+`phase-idg-01`'s acceptance requires an agent-written terminal state to be distinguishable from an
+owner-ratified one *by reading the log*, and an agent will write those `status` events. The owner
+ruled to fold the constraint into `phase-idg-01`'s `next_action`: the marking mechanism has to carry
+provenance itself. The commit that did this **contained a `backlog.yaml` that does not parse.**
+
+**`10e2daf` — the repair, and the third instance.** The break was `: ` inside an unquoted plain
+scalar — "Links are unaffected: the owner approves..." — which is the exact hazard the anti-pattern
+procedure written four hours earlier names in its own last line. The verification ran and failed;
+the `git add` and `git commit` that followed were separate commands in the same block, so the commit
+proceeded with the traceback printed directly above it. The procedure now carries the third instance
+and a new rule as step 3's second paragraph: **the verification has to be able to stop the commit.**
+An assertion that does not gate what follows is not a gate.
+
+**`ce8c6c2` — prioritising prevention.** The owner asked whether an idea exists for the sanctioned
+writer and whether it could go to the top. It does — `000240` — and the honest finding was that it
+has no requirement, no plan and no phase, so ranking is all that can be done for it today. It takes
+position 1 of the idea queue, displacing the front held since 2026-09-12, and the queue file states
+in full that nothing can be claimed for it until a planning pass runs. Separately `phase-gov-05`
+was ranked first in `backlog.yaml`'s `next_up`: queued, ready, dependency-free and previously
+unranked, which meant the one shipped defence against the damage `000224` records was invisible to
+anyone reading the queue. Detection and prevention are now both ranked, and the record distinguishes
+them — `phase-gov-05` catches a completed phase being reverted; the writer would stop the malformed
+write that reverts it. `phase-dgov-06` was deliberately not ranked: it is blocked behind
+`phase-gov-01`.
+
+**Verification at addendum close:**
+
+```
+$ uv run python -m src.governance
+Governance OK: 35 systems, 308 documents, 29 memories, 293 backlog phases
+```
+
+```
+$ uv run pytest
+688 passed, 2 warnings
+```
+
+```
+$ uv run python tools/check_no_private_content.py   # with changes staged
+check_no_private_content: OK (768 tracked files, 31 identifiers checked)
+```
+
+**Not independently reviewed.** The sub-agent review recorded in `## Review` covered
+`90e212e~1..7ceb37b`. The three commits above are unreviewed; the broken-file incident was caught
+and fixed by the session itself, which is the weaker form of the same check.
+
+**Addendum corrections, beyond the five already listed:**
+
+- **Broke `backlog.yaml` a third time and committed it.** First time a parse failure reached
+  history. Repaired in the next commit; nothing was pushed in between.
+- **Wrote a check that could not stop what followed**, having documented the general form of that
+  mistake in `brain/` on 2026-09-12 and reinforced it four hours earlier the same day.
+
+**Still left undone, unchanged:** no worktree was used at any point; six ideas whose work shipped
+stay open until `phase-idg-01` ships the terminal states; `000296` is superseded but not discarded;
+nothing is pushed — eleven commits from this session sit on `dev` in the primary checkout, alongside
+five from the concurrent `agent-lrr` session.
