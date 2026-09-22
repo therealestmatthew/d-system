@@ -49,6 +49,7 @@ brain/
 - [Resolving Staged Idea-Triage Follow-ups via AskUserQuestion](procedures/resolve-idea-triage-followups.md)
 - [Auditing a Document for Accuracy Introduces New False Claims](procedures/audit-your-own-corrections.md)
 - [Runtime Behavior Needs Runtime Evidence](procedures/runtime-behavior-needs-runtime-evidence.md)
+- [Edit backlog.yaml By Anchored Block, And Parse Before You Trust It](procedures/edit-backlog-yaml-by-anchored-block.md)
 - [Scope Dispatches to the Turn Budget](procedures/scope-dispatches-to-the-turn-budget.md)
 - [A Question You Want Answered Belongs in the Tool, Not in Your Closing Paragraph](procedures/ask-through-the-tool.md)
 - [When You and a Peer Take the Same Identifier, the One Integrating Second Renumbers](procedures/yield-and-renumber-a-collided-identifier.md)

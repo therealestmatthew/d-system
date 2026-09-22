@@ -607,6 +607,21 @@ resolves, and the owner ratifies a queue of them in one sitting. This is the fir
 terminal transition in the idea log; the ratification step is what keeps it from being a unilateral
 close, and `phase-idg-01` builds it that way or not at all.
 
+**Amended the same day, on the agent-writable point.** The owner accepted the agent-writable terminal
+transition, with one condition: **an agent-written terminal state announces itself as awaiting review.**
+The transition marks the idea as pending the owner's sign-off, so a close never passes silently into the
+log as though it had been ratified — and it **never blocks**. Downstream work proceeds on the closed
+idea; the owner's ratification catches up in batch.
+
+Two things follow, and `phase-idg-01` owns both. The agent that writes the close surfaces it in its own
+report rather than leaving the owner to notice a status change in the log. And the pending closes
+accumulate in a queue the owner clears in one sitting — `phase-irs-13` already builds exactly that, a
+gate queue with decision-ready presentation and batched completion review, so this is a consumer of
+that queue rather than a second one. The marking mechanism itself — a field on the status event, or a
+separate ratification event appended later — is left to `phase-idg-01`, since it is the phase holding
+the schema; the binding constraint is that a reader can always tell a ratified close from an unratified
+one, and that an unratified close stops nothing.
+
 **Why recorded here:** four rulings that change a schema, a transition table and a backfill policy,
 none of which is visible from the phase line that now carries them. An agent reaching `phase-idg-01`
 or `phase-irs-09` needs the reasoning, not just the amended scope.

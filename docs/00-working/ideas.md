@@ -12126,7 +12126,7 @@ Related risk seen in the same run: applying an edit by re-dumping the whole file
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T08:28:42-04:00): Idea 000240 raises a specific technical failure in YAML serialization when appending to backlog.yaml. The issue occurs when yaml.safe_dump emits anchor definitions (e.g., &id001) for shared Python list objects — particularly when multiple phases declare `systems: [sys-governance]` from a single variable. Independent dumps of separate phase blocks reuse the same generated anchor names, creating duplicate anchor definitions that break YAML parsing on the second append.
 
@@ -12139,6 +12139,11 @@ The idea proposes two paths: (1) create a dedicated backlog writer (e.g., tools/
 This is squarely a writing infrastructure gap, not a parsing or validation gap. REQ-010 ensures regressions are caught and reported; REQ-010 does not and cannot prevent the serialization failure that causes them. Any backlog-writing path should validate alias-free and block-replace rather than whole-file rewrite to address the dual problems of (a) anchor collision and (b) unreviewable diffs hiding real changes.
 
 PROPOSED LINK: 000240 --relates_to--> 000224 (both address backlog write safety; 000224's whole-file rewrite amplifies 000240's anchor problem)
+- **finding** by agent-session-driver (2026-09-22T12:39:28-04:00): RECURRENCE EVIDENCE, 2026-09-22: this idea's underlying condition - backlog.yaml has no sanctioned writer, so every edit is hand-rolled text surgery - broke the file twice in one session while adding three scope lines to a single phase (phase-idg-01, carrying the idea-lifecycle ruling).
+
+Both failures were hand-editing faults rather than the yaml.safe_dump anchor fault this idea names, which widens the idea's evidence base rather than duplicating it. First, list items were indented at column 0 because yaml.safe_dump's reformatted output was used to infer the file's shape; the file uses two-space items with four-space continuations, so the additions parsed as children of the previous item. Second, a nine-line plain multi-line scalar (next_action) was replaced at its first line only, stranding eight continuation lines after a closing quote. Each produced a ParserError pointing tens of lines away from the actual edit.
+
+Both were caught before commit because the edit script parsed the result and diffed item by item, and both required a full git checkout and redo. A writer of the kind this idea proposes - block replacement, validation before write - would have made both impossible rather than merely detectable. The guard in the meantime is brain/procedures/edit-backlog-yaml-by-anchored-block.md, written the same day.
 
 </details>
 

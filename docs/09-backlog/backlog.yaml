@@ -9669,6 +9669,10 @@ items:
     given, and promoted accepts a later transition to delivered.
   - 'Every idea whose work shipped is closed into the state its own finding evidences, and no idea is
     left discarded while its annotations say it was resolved: 000099 and 000129 are corrected.'
+  - 'An agent-written terminal state is distinguishable from an owner-ratified one by reading the log,
+    and the agent that writes it surfaces it in its own report - a close never passes silently as though
+    ratified. An unratified close blocks nothing: downstream work proceeds and ratification catches up
+    in batch, through the gate queue phase-irs-13 builds rather than a second queue.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
