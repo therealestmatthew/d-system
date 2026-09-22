@@ -3,6 +3,7 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
+- phase-gov-05
 - phase-conc-02
 - phase-auto-01
 - phase-auto-02

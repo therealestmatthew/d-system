@@ -35,11 +35,11 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
-2. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
-3. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
-4. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
-5. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
+1. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
+2. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
+3. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
+4. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
+5. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
 6. `000241` — Review agents are dispatched with write tools they are only told not to use
 7. `000284` — Decompose sys-governance, which currently functions as a global mutex
 8. `000283` — Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
