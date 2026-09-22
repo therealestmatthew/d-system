@@ -10614,7 +10614,7 @@ Worth checking the remaining 400+ inventory rows for other instances; this one s
 
 ## 000214 · A gate reported PASS on "blank required fields" after checking 4 of the contract's 43 required fields
 
-**Created 2026-09-13T16:49:21-04:00 · Status: `open`**
+**Created 2026-09-13T16:49:21-04:00 · Status: `triaged`**
 
 LIT-04 G's measurement 2 is "blank required fields across this phase's rows (gate: 0)". The gate reported 0 and PASS, and named the fields it checked: source_id, citation, source_type, research_domain. Four of the forty-three fields the evidence contract marks required.
 
@@ -10637,6 +10637,44 @@ Same family as [[000147]] and [[000201]], and directly relevant to the LIT-05, L
 **Annotations**
 
 - **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: approved - Block G in PROMPT-029 now requires every gate to report the population it measured, not only the count, to name every trigger it tested where a rule has more than one, and to derive a field list from its contract rather than choosing a subset. Applied to the delegation pack in this session; binds the LIT-05, LIT-06 and LIT-07 gates.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T08:29:05-04:00): Idea 000214 (false PASS on blank-field gate) is a well-characterized measurement defect in the literature-review campaign's gate infrastructure, and it belongs to a documented defect class with related ideas 000147, 000201, 000219, and 000290.
+
+**Document references:**
+
+The evidence contract that defines the 43 required fields for the evidence matrix (deliverable 04) is PLAN-023.03, lines 72–132. The gate in question is LIT-04 G's measurement 2, part of Block G in PROMPT-029 (the delegation pack for the campaign).
+
+GOV-014 (lines 47–54 and 198–199) establishes the evidence rule that "a validator's verdict is grounded in **executed tests and repository checks**... never in a persona assertion of confidence." It is restated for R23 as "every verdict traces to executed tests and repository checks captured in the report; a claim with no command behind it is not evidence."
+
+Idea 000214 exemplifies exactly this problem at gate level: a gate that reports "0 blank required fields found" without naming its denominator (which fields it checked) cannot be distinguished from a gate measuring the wrong thing. This is silent failure — no false FAIL to flag it, only data luck preventing an actual failure.
+
+**Related ideas (existing links and plausible overlap):**
+
+- **000147**: Evidence contract format issue (already linked as relates_to). Same campaign, same gates.
+- **000201**: Variant grammar parsing issue (related to gate measurement correctness). Mentioned in 000214's body as same family.
+- **000215**: Model tracking/compliance — "nothing records which model actually ran" — relates_to 000214 per the fold. Same campaign.
+- **000218**: LIT-05 G measurement 3 structurally unsatisfiable. Related gate measurement defect in the same campaign.
+- **000219**: Gate silently drops tokens it did not expect (LIT-05 G measurement 4). Silent failure like 000214. Both trace to gate-parsing, not data. Relates_to 000218 but plausibly should relate to 000214 as gate-defect siblings.
+- **000290**: Replace the literature-review campaign gate with a deterministic script. Proposes a solution (move from LLM gate to deterministic file-reading script) that would eliminate the denominator-hiding problem entirely.
+
+**Completed phases and deliverables:**
+
+Phases phase-lit-04 through phase-lit-09 have all shipped (backlog.yaml status: complete). All captured evidence in 04_evidence_matrix.csv and 00_search_ledger.csv is from execution under the defective gate infrastructure PROMPT-029 Block G defines.
+
+**Assessment:**
+
+This is not a pre-execution alert to catch before a phase runs. It is a measurement-system defect in an already-executed campaign. The idea is correctly scoped — it names the specific gate, its measurement number, the defect, the fix space, and the general principle (reporting population measured makes a PASS verifiable, not just a count). No missing information; no confusion with other ideas.
+
+The class of related ideas (000147, 000201, 000219) and the proposed solution (000290) all belong in the literature-review improvement backlog. They do not belong in a plan yet — that would be ownership and decomposition, not triage.
+
+**No promotion to any governed document.** This is not "already delivered" — it is a named defect in the gate logic that shipped as-is in the completed phases.
+
+PROPOSED LINK: 000214 --relates_to--> 000219 (both are silent gate failures; 000219 silently drops tokens, 000214 silently checks subset of fields)
+
+</details>
 
 **Links**
 
@@ -10741,7 +10779,7 @@ Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
 
 ## 000219 · A gate that silently drops tokens it did not expect cannot tell contract-correct data from a typo
 
-**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+**Created 2026-09-13T22:12:26-04:00 · Status: `triaged`**
 
 LIT-05 G's measurement 4 tallies hypotheses_challenged across H1 to H11. The field is semicolon-separated and may carry the contract's NOT_DETERMINABLE_FROM_ACCESS where access was too limited to assess any hypothesis.
 
@@ -10754,6 +10792,44 @@ Block G already says a gate that narrows its own scope silently reports PASS on 
 Worth considering whether Block G should require every gate that parses a multi-valued field to report the complete token inventory it found, with counts, including tokens outside the expected set, rather than only the tally it was asked for.
 
 Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T08:29:10-04:00): Idea 000219 documents a specific gate failure in LIT-05 where a gate silently discarded a NOT_DETERMINABLE_FROM_ACCESS token that was actually correct per the evidence contract (field 34, hypotheses_challenged). The gate cannot distinguish contract-correct data from genuine defects when it narrows its scope silently.
+
+Directly related to the same defect class:
+
+**Idea 000214** ("A gate reported PASS on 'blank required fields' after checking 4 of the contract's 43 required fields") - Same family, different manifestation: silent field selection narrowing instead of token filtering. Both violate the principle that "a gate that narrows its own scope silently reports PASS on the part it skipped" (Block G, PROMPT-029). 000214 identified that gates reporting only numerators are unverifiable and proposed requiring denominator reporting. Block G was amended accordingly in session SESS-2026-09-13-03.
+
+**Idea 000290** ("Replace the literature-review campaign gate with a deterministic script") - Documents three consecutive false gate results in the campaign (2026-09-14, 2026-09-20 × 2) showing that language model gates silently narrow scope: population restriction, line-range misinterpretation, and substring-matching errors. 000290 proposes abandoning language model gates in favor of deterministic scripts for this category of measurements. The campaign's Block G warning about scope-narrowing did not prevent any three failures.
+
+Governance documents:
+
+**PLAN-023.03** (evidence contract) - Defines field 34 (hypotheses_challenged) as ";"-separated, permitting NOT_DETERMINABLE_FROM_ACCESS as a valid value for abstract_only rows. The contract is machine-readable; gates should derive constraints from it rather than inferring them.
+
+**PROMPT-029 Block G** (gate procedure) - States: "Report the population you measured, not only the count… derive [lists] from contract rather than choosing a subset... a gate that narrows its own scope silently reports PASS on the part it skipped, and no fix cycle is ever opened for a false PASS." Amended per 000214 to require population naming and trigger enumeration; neither amendment prevented 000219 or the failures catalogued in 000290.
+
+**GOV-014** (evidence rule) - Validators must ground verdicts in executed tests and repository checks, never assertions. Gates parsing unstructured fields must report what they found, including unexpected tokens, not what passed filtering.
+
+Status of campaign phases:
+
+**phase-lit-05** (where 000219 was raised, SESS-2026-09-13-04): Continues; LIT-05 G measurements were re-measured after Block G amendment.
+
+**phase-lit-07** (synthesis): Complete as of SESS-2026-09-14-07; integrated to dev.
+
+**phase-lit-09** (final gap closure): Complete; no follow-up phases remain.
+
+The campaign has closed without systematic gate replacement. 000219 remains a documented failure pattern, not a changed implementation. Its existence, linked alongside 000214 and resolved by Block G prose amendments, demonstrates that written warnings about silent scope-narrowing do not prevent implementation failures in language model gates. 000290's proposal to replace gates with deterministic code directly addresses this, treating the token-dropping case (000219) as one instance of a broader class of failures that scripted measurement could prevent.
+
+PROPOSED LINK: 000219 --relates_to--> 000214 (both silent scope-narrowing gate failures; 000214 raised the principle, 000219 shows it in the parsing layer; 000214's denominator fix applies to measurement scope, not token filtering)
+
+PROPOSED LINK: 000219 --relates_to--> 000290 (000219 is one of three consecutive gate failures 000290 cites as evidence that deterministic scripting should replace language model gates)
+
+</details>
 
 **Links**
 
@@ -11493,7 +11569,7 @@ Related: the companion idea about phase-prog-* phases declaring neither docs/09-
 
 ## 000240 · yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
 
-**Created 2026-09-15T09:32:19-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:19-04:00 · Status: `triaged`**
 
 Appending backlog items with yaml.safe_dump emits YAML anchors and aliases whenever two items share a Python list object — for example three phases all declaring systems: [sys-governance] built from one variable. The first block is valid YAML on its own. The second independently-dumped block reuses the same generated anchor name, and the file then carries two &id001 definitions and fails to parse.
 
@@ -11514,6 +11590,26 @@ Cheaper interim: a test asserting backlog.yaml contains no YAML anchor. That wou
 
 Related risk seen in the same run: applying an edit by re-dumping the whole file reflowed all 6,264 lines, which is unreviewable and hides real changes. Any writer must replace the targeted block, not rewrite the file.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T08:28:42-04:00): Idea 000240 raises a specific technical failure in YAML serialization when appending to backlog.yaml. The issue occurs when yaml.safe_dump emits anchor definitions (e.g., &id001) for shared Python list objects — particularly when multiple phases declare `systems: [sys-governance]` from a single variable. Independent dumps of separate phase blocks reuse the same generated anchor names, creating duplicate anchor definitions that break YAML parsing on the second append.
+
+The idea is already linked to 000242 (phase deliverable declaration issue) and relates directly to 000224 (whole-file backlog write that silently reverted four completed phases). While REQ-010 guards against status regressions in backlog.yaml via git-relative comparisons, it does not address the serialization problem that causes the regression in the first place.
+
+The core issue is that backlog.yaml has no sanctioned writer. By contrast, tools/append_idea.py exists explicitly to prevent misformatted idea entries — it generates identifiers, validates against schema, and appends safely. No equivalent exists for backlog phases. The overnight run of 2026-09-15 observed the anchor problem in phase-prog-01/04 and the phase-conc-* track, confirming it occurs in live operation.
+
+The idea proposes two paths: (1) create a dedicated backlog writer (e.g., tools/append_backlog.py) that validates before writing and replaces targeted blocks rather than rewriting the whole file, or (2) add a cheaper interim test asserting backlog.yaml contains no YAML anchors. Both are practical; the first addresses root cause, the second catches latent damage at the commit that introduced it.
+
+This is squarely a writing infrastructure gap, not a parsing or validation gap. REQ-010 ensures regressions are caught and reported; REQ-010 does not and cannot prevent the serialization failure that causes them. Any backlog-writing path should validate alias-free and block-replace rather than whole-file rewrite to address the dual problems of (a) anchor collision and (b) unreviewable diffs hiding real changes.
+
+PROPOSED LINK: 000240 --relates_to--> 000224 (both address backlog write safety; 000224's whole-file rewrite amplifies 000240's anchor problem)
+
+</details>
+
 **Links**
 
 - relates_to → `000242`
@@ -11522,7 +11618,7 @@ Related risk seen in the same run: applying an edit by re-dumping the whole file
 
 ## 000241 · Review agents are dispatched with write tools they are only told not to use
 
-**Created 2026-09-15T09:32:20-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:20-04:00 · Status: `triaged`**
 
 The mandatory independent review in the completion gate is typically dispatched to a general-purpose agent, which carries the full tool set including Edit and Write. The prompt tells it to change nothing. Compliance is therefore a matter of instruction-following rather than capability.
 
@@ -11535,6 +11631,34 @@ An unexplained instruction to disregard part of its own process. The verdict was
 Worth deciding: whether review dispatches in this repository should be constrained to read-only agent types by rule rather than by prompt. AGENTS.md and GOV-008 both describe reviews as read-and-run, and several roster agents are already defined that way — demo-adversary, demo-validator-code, demo-validator-check. The gap is that nothing requires a review to use one of them.
 
 Also unresolved: whether an agent instructing its caller to disregard part of its own output should be treated as automatic disqualification of that review, which is how the overnight run treated it, or as something milder that warrants a follow-up question instead.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T08:28:43-04:00): Review agents are currently dispatched with write tools when compliance with "do not change anything" relies only on instruction-following. The gap is enforceability at the tool boundary versus instruction-level compliance.
+
+Related material found:
+
+**Direct precedent**: The repository already defines read-only agent roles successfully — demo-validator-code, demo-validator-check, demo-adversary, partition-adversary, demo-agent-evidence-checker all carry `tools: Read, Grep, Glob, Bash` in their frontmatter (no Edit or Write). The validator charter in `demo-validator-code.md` says explicitly "Read-and-run only; changes nothing" and its tool set matches that statement. This pattern is available and proven in the codebase.
+
+**Binding role contracts**: `GOV-014` (Idea realization pipeline role contracts) defines the validator role with a never-do list including "never edit the diff or fix a finding itself" — but these are instructions, not capability constraints. The validator contract also specifies a per-dispatch token ceiling and explicitly binds the role for every dispatch; the contract itself is the authority for agent tool restrictions.
+
+**Planned enforcement infrastructure**: `PLAN-032` (Autonomous agent operations) describes idea 000031 "Capability and approval broker for agent actions" as the solution. It states plainly: "The thing that made that run safe to leave unattended was a bounded capability set: merge locally but never push, write these ten phases complete and no others, never touch ts/ or src/, never write to the idea log. That was enforced by an agent choosing to comply, which is precisely the enforcement 000031 calls insufficient." `phase-auto-02` is "Build the capability and approval broker, enforced at the tool boundary" — this is the work that makes enforcement possible rather than hoped-for.
+
+**Agent engineering framework**: `PLAN-031` (Agent engineering and delegation) covers how agents are instructed, observed, coordinated and reviewed (P4, the largest programme). It discusses guides, sensors, orchestration, and the deliberation trio. This is the home for any standing rule about review-agent tool restrictions.
+
+**Operational incident**: The overnight programme-finalize run of 2026-09-15 that surfaces in the idea's own text confirms this is not theoretical — a general-purpose agent was dispatched for review, returned a finding, and prefaced its output with an instruction to disregard part of its own process ("Ignore that — irrelevant probe, not part of the required verification"). The review was discarded and re-run with a read-only agent type. This is the evidence that proposal and reality have diverged.
+
+Worth noting: 000165 (The enforcement harness: make a violation impossible rather than forbidden) states the same principle at system level — enforcement via capability vs instruction. That idea extends 000079 (Agent engineering: Guides) and relates to 000051 (Agent harness and guardrails).
+
+PROPOSED LINK: 000241 --relates_to--> 000031 (Capability and approval broker; the planned enforcement solution)
+PROPOSED LINK: 000241 --relates_to--> 000165 (The enforcement harness principle applied system-wide)
+PROPOSED LINK: 000241 --relates_to--> 000079 (Agent engineering: Guides; where standing rules would live)
+
+</details>
 
 ---
 
@@ -12420,7 +12544,7 @@ Saved on 2026-09-19 during the framework-generalization session. Useful as a rou
 
 ## 000283 · Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
 
-**Created 2026-09-19T12:56:54-04:00 · Status: `open`**
+**Created 2026-09-19T12:56:54-04:00 · Status: `triaged`**
 
 Three agents working concurrently on 2026-09-19 each allocated SESS-2026-09-19-01 for a different session, on three different branches, and none could have detected the others. A fourth collision the same day, on SESS-2026-09-14-10, was found during a rebase.
 
@@ -12429,6 +12553,54 @@ The cause is specific and is not the one the existing collision rule assumes. Do
 The consequence is that reserving a session code is not possible in the ordinary way, and an agent on a branch sees only the session documents its own branch carries. Every concurrent branch therefore observes the same highest same-day sequence and allocates the same next number. The existing rule that the agent integrating second renumbers still recovers correctly, but it is manual recovery scaling with the number of concurrent sessions, and with three branches it required renaming files, editing code fields and chasing cross-references on two of them.
 
 This is a concrete sub-problem for phase-conc-03, which owns making document-code allocation collision-proof across concurrent sessions. It also matters for any team adapting this model: allocating an identifier by reading the state of your own branch guarantees collisions the moment two people work at once. An identifier needs to come from somewhere all writers can see before they commit.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T08:29:03-04:00): Idea 000283 identifies a concrete sub-problem within the concurrency-and-git-safety programme (P3): **session codes lack the collision-proof allocation mechanism that was implemented for document codes in phase-conc-03**.
+
+## Relationship to completed work
+
+**phase-conc-03** (status: complete, SESS-2026-09-21-01 documents it) made document-code allocation collision-proof by storing pre-merge reservations in git common directory (.git/code-reservations/), visible to all worktrees on the same machine before any code merges. This satisfies **REQ-013 R05** (document codes cannot be allocated twice across concurrent sessions).
+
+**Session codes are structurally excluded from this mechanism.** Unlike document codes, which may be reserved in codes.yaml before a document exists, session codes have never been pre-reserved because they are dated series whose code is assigned only when the session record itself is written. Historical practice confirms no session code appears in codes.yaml's reserved list. The root cause: an agent on branch A sees only the session documents on branch A when computing "highest same-day sequence number". An agent on branch B, working concurrently, sees only branch B's documents and computes the same highest sequence, allocating the same next code. The three collisions on 2026-09-19 and the fourth collision on 2026-09-14 (surfaced during rebase) are the empirical record; this session's own dispatch to phase-conc-03 was dispatched to phase-lrr-01 first and could not run because of a collision with phase-lit-07.
+
+## Document audit
+
+**GOV-005** (Document code assignment protocol, section "Concurrent agents") explicitly discusses session codes at line 172-173: "Dated series do not contend across days, and contend within a day only between agents finishing on that day — which is precisely when session codes collide, and why this repository renumbered a session record twice before the mechanism existed." The text acknowledges the collision but attributes it to timing within a single day rather than to the allocation mechanism itself being unsound. The statement that "dated series do not contend" is not supported — they contend if allocation reads local disk state.
+
+**ADR-006** (Per-kind document codes, section "Consequences" line 89) states "Dated series avoid the contention entirely" but provides no mechanism to achieve this. It appears to assume dated codes are immune by design, which is not true when allocation is derived from local documents.
+
+**SESS-2026-09-21-01** (session record for phase-conc-03, section "Not fixed and why") explicitly names this gap: "Reservations remain machine-local, so agents on different machines can still collide. GOV-005 names this as one of the two cases renumbering still covers." But the problem is narrower: reservations are machine-local, which is by design, but agents on the **same machine on different branches** collide because allocation reads from local disk, not from the shared reservation store.
+
+**SESS-2026-09-19-04** documents the concrete incident: three agents on 2026-09-19 each allocated SESS-2026-09-19-01 for different sessions on three unintegrated branches; all three saw their own branch as the only source of truth for the highest sequence number.
+
+## Related ideas
+
+**000253** (relates_to link already present) documents phase concurrency defects from ADR-003's overlap rules, a distinct but related problem about locking on shared systems declarations.
+
+**000158** (idea IDs collide across branches) documents the same failure pattern for idea identifiers: two agents on different branches allocate the same sequential ID by reading only their local state. The diagnosis and remedies proposed there are relevant here.
+
+**000283 relates to 000158:** Both demonstrate that sequential allocation from local-only state guarantees collisions in concurrent branches. 000158 names author-scoped identifiers as one remedy that would apply equally to session and document codes.
+
+## Proposed next steps
+
+This is a true sub-problem for phase-conc-03's successor work. It does not contradict phase-conc-03's completion — document codes are collision-proof — but it identifies unsolved ground: session codes remain vulnerable to the same collision pattern that motivated phase-conc-03's reservation mechanism. Three remedies are possible:
+
+1. Extend the pre-merge reservation mechanism to session codes (parallel to document codes)
+2. Change session code allocation to not be sequential by same-day number (e.g., author-scoped, timestamp-based, or content-addressed)
+3. Accept session-code collisions as a known operational cost, documented and recovered by renumbering (current state)
+
+No plan or phase currently owns this work.
+
+## Accuracy notes
+
+Idea 000283's framing is accurate: session codes are allocated by looking at session documents on disk, not from a reserved register like document codes. The collision incidents are factual and documented in session records and commits. The distinction that codes.yaml reservations cannot serve session codes (because they're only assigned after the document exists and are a dated series) is correct.
+
+</details>
 
 **Links**
 
@@ -12439,7 +12611,7 @@ This is a concrete sub-problem for phase-conc-03, which owns making document-cod
 
 ## 000284 · Decompose sys-governance, which currently functions as a global mutex
 
-**Created 2026-09-19T13:03:55-04:00 · Status: `open`**
+**Created 2026-09-19T13:03:55-04:00 · Status: `triaged`**
 
 sys-governance is declared on 83 of 278 phases, roughly 30 percent of the backlog, measured against dev on 2026-09-19. Because the concurrency check treats a shared system as a conflict, declaring it makes a phase mutually exclusive with nearly a third of all other work. Three dependency-free, same-priority phases (phase-conc-01, phase-conc-02, phase-conc-03) cannot run together for this reason alone despite touching different files.
 
@@ -12453,11 +12625,28 @@ Relates to 000253, which records the false-conflict measurements, and to the sep
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-framework (2026-09-19T13:07:25-04:00): Owner direction, 2026-09-19: widen this investigation to every system, not sys-governance alone. sys-governance is the worst instance at 83 of 278 phases, but the defect is general — a system name blocks concurrency whenever two phases share it, even when their declared file claims are provably disjoint, so any system declared broadly enough behaves as a mutex over its share of the backlog. The audit should therefore run across all 31 systems, ranking each by how many phase pairs it blocks that have no deliverable overlap, rather than treating sys-governance as a special case and leaving the rest unexamined.
 
 The owner also notes this repository has already done one round of exactly this work, splitting a single over-broad system into several more granular ones for the same reason. That precedent should be found before any new decomposition is designed: it will show what granularity was chosen, how existing phases were re-declared, whether completed phases' historical declarations were left alone or rewritten, and whether the split actually reduced false conflicts afterwards. Repeating the analysis from scratch when a worked example exists in the history would waste the evidence already paid for. Search the decision records, the governance notes and systems.yaml's own history for it.
+- **finding** by agent-idea-triage (2026-09-22T08:28:54-04:00): Related plans and ideas found. The decomposition request is substantiated by two concurrent programmes that cite sys-governance's breadth as a practical blocker.
+
+PLAN-026 (Concurrency, git safety and enforcement, P3) explicitly documents that all nine phases in the concurrency-hardening programme declare sys-governance, and "seven of the nine name a file under docs/08-governance/". The plan states: "A shared system is a collision, so the realistic ceiling for this programme is one agent at a time" — meaning the concurrency hardening work itself is serialized entirely by sys-governance's breadth. The plan treats this as expected: "This is not a defect to engineer around. P3's subject matter is the governance corpus itself, and the corpus is one surface."
+
+PLAN-030 (Document and backlog governance, P2) finds the same pattern: "All seven declare sys-governance and five declare sys-backlog, so the programme's internal ceiling is one agent at a time."
+
+The measurement in the idea (83 of 278 phases = 30%) is confirmed: the current backlog carries 85 of 292 phases (29.1%) declaring sys-governance. Two measurements now exist: the live one on 2026-09-19 from the idea, and the plan partition. Both cluster near 30%.
+
+The decomposition approach has already been applied once. sys-gov-docs was split from sys-governance per the owner's 2026-09-16 ruling, registered separately in systems.yaml (lines 439-453). This split allows "phases that write new documents in this directory [to avoid] touching the engine's own paths" — showing that sys-governance's original scope was indeed broad enough to serialize unrelated work.
+
+The investigation axes listed in the idea — validator machinery, backlog/claim machinery, document codes/catalog, session/checkpoint workflows, governance documents themselves — are consistent with what sys-gov-docs already separated. A parallel frontier is the question whether sys-gov-docs itself should be further granulated (e.g., sys-gov-docs-code-allocation, sys-gov-docs-backlog-schema separate from sys-gov-docs-session).
+
+ADR-003 (Multi-agent concurrency) documents the collisions() function that rejects "two phases naming the same sys-* ID" as concurrent work. The rule is correct; the problem addressed here is the scope of the IDs themselves, not the rule they invoke.
+
+Idea 000234 (Decompose sys-ui, which serializes almost every frontend phase under the concurrency validator) is a parallel decomposition task applied to the frontend system. The owner directed it to run before P10 (PLAN-028) to avoid redeclaration; sys-governance decomposition would have the same cascading redeclaration cost if applied retroactively, as noted in 000284's own body.
+
+PROPOSED LINK: 000284 --relates_to--> 000234 (parallel decomposition of coarse system locks to break artificial serialization)
 
 </details>
 
@@ -13620,3 +13809,52 @@ The amendment lands in phase-lrr-02, which is the phase it unblocks.
 
 - relates_to → `000308`
 - relates_to → `000309`
+- relates_to ← `000311`
+
+---
+
+## 000311 · PLAN-043's named top rendering risk does not exist: no deliverable has a table inside a blockquote
+
+**Created 2026-09-22T08:27:56-04:00 · Status: `open`**
+
+PLAN-043's Risks section opens with "The Markdown in these deliverables is not simple.
+05 and 06 carry nested tables inside blockquotes, long verbatim quotations, and section
+headings generated by different dispatches across nine sessions. A renderer that handles
+01's prose may not handle 05." phase-lrr-02's scope repeats the claim: "05 and 06 carry
+nested tables inside blockquotes and are the hard cases."
+
+Measured on 2026-09-22 across all eleven Markdown deliverables:
+
+  grep -cE '^[[:space:]]*>.*\|' on every [0-9][0-9]_*.md  ->  0 for all eleven
+
+No line anywhere in the corpus carries a blockquote marker and a pipe character. More
+specifically:
+
+- 05_critical_collisions.md contains zero pipe characters and zero blockquote lines. It has
+  no tables at all, nested or otherwise. It is the file the risk names as the hard case and
+  it is the simplest structurally.
+- 06_hypothesis_tests.md has 35 blockquote lines and 13 table rows, but they never overlap.
+  Its blockquotes are the reconciliation notes in the preamble; its one table is the trailing
+  Summary table, outside any blockquote.
+
+The actual rendering load is volume, not nesting. 01_terminology_map.md carries 749 table
+rows across 74 separate tables, which is the real stress case and is not what the risk
+describes.
+
+Verified the same day that markdown-it-py (commonmark preset, table and strikethrough
+enabled) satisfies every REQ-027 R02 assertion against all eleven files on the first
+attempt: heading counts equal in every file, every file with table rows produced table
+elements, and no '## ' or '- ' line survives outside a pre block.
+
+The consequence is misdirection, not breakage. An agent picking up phase-lrr-02 against the
+current text will budget for a nested-table problem that is not there, and may reject an
+adequate renderer for failing to solve it. The risk statement should either be corrected to
+name the volume problem, or struck.
+
+Related: the owner's 2026-09-22 ruling on 000310 already amends PLAN-043's Risks section for
+a separate defect (the "all thirteen" wording), so there is an amendment pass in flight that
+could carry this correction if the owner wants it.
+
+**Links**
+
+- relates_to → `000310`
