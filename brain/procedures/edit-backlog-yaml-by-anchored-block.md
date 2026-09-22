@@ -35,6 +35,13 @@ Four steps, in order:
 4. **Run `uv run python -m src.governance` and `uv run pytest`** afterwards, because a file can parse
    and still be wrong.
 
+**Step 3 must gate the commit, not merely precede it.** Run the edit-and-verify script as its own
+command and read its result before staging anything. A script that ends in an assertion is only a
+check if a failed assertion stops what follows — chaining `git add`/`git commit` into the same block
+after it means the commit runs regardless, and a broken file reaches history with a green-looking
+transcript above it. This is `brain/procedures/a-check-that-cannot-fail-is-not-a-check.md` wearing a
+different hat.
+
 ## The two ways it broke, 2026-09-22
 
 Both happened while adding three scope lines to one phase. Each produced a `ParserError` at a line
@@ -76,3 +83,19 @@ this procedure exists to prevent — a number read off the wrong thing and not c
 
 Neither error changes the guard, but a procedure that misreports the evidence it was written from
 is weaker than one that does not. `wc -l` and `sed -n` settle both in one command each.
+
+
+## Third instance, 2026-09-22, same day as the first two
+
+A `: ` inside a plain scalar. The sentence "Links are unaffected: the owner approves every edge"
+was appended to `next_action`, and a colon-space inside an unquoted scalar starts a mapping — the
+exact hazard the **two ways it broke** section above already names in its last line.
+
+Two things made this worse than the first two. The procedure warning against it had been written
+four hours earlier by the same agent that then did it. And the verify step ran in a script whose
+assertion failed, while the `git add` and `git commit` that followed were separate commands in the
+same block — so the broken file was committed with the traceback visible directly above the commit
+hash. The fix was a repair commit; nothing was pushed.
+
+The rule that would have caught it, now step 3's second paragraph: the verification has to be able
+to stop the commit. Writing the check and then stepping around it is not a check.
