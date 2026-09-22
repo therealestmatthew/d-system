@@ -4,7 +4,7 @@ schema_version: 1
 id: batch-002
 title: Two governance guards, then the autonomous-operations broker and the orchestrator skeleton
   it gates
-status: queued
+status: in_progress
 sequence: 2
 created: '2026-09-22'
 updated: '2026-09-22'
