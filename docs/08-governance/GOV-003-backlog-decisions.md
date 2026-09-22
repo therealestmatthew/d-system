@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-21'
+updated: '2026-09-22'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -554,3 +554,59 @@ them parked by decision rather than by oversight.
 **Why recorded here:** `REQ-014` R14 reads as an open question, and an agent reaching `phase-idg-08`
 would otherwise re-litigate a decision the owner has already made. This entry is the authority that
 agent should find.
+
+## The idea lifecycle gains three terminal states, and promoted stops being one — 2026-09-22
+
+Idea `000236` asked for a terminal `resolved` status. The case for it had accumulated on its own:
+seven ideas triaged on 2026-09-22 carried a `PROPOSED PROMOTION` line from their scout because their
+work had demonstrably shipped, and none of them fitted either existing terminal state — `promoted`
+requires a governed document in `promoted_to`, `discarded` asserts rejection. Worse, `000099` and
+`000129` already sat `discarded` carrying annotations that said "verified resolved", so the log
+contradicted itself rather than admit the gap.
+
+**The owner ruled on 2026-09-22, in four parts.**
+
+**Three new terminal states, split by what the idea produced:**
+
+- **`delivered`** — a working capability now exists and was verified. `000232` (image formats shipped
+  as code), `000234` (`sys-ui` decomposed with the concurrency ceiling measured) and `000237`
+  (unclaimed-session support) are the shape of this.
+- **`resolved`** — the ask was satisfied without building anything, typically a question answered or
+  a rule written. `000228` ("adjacent means contiguous") and `000229` (the disputed collision flags
+  stand) are the shape of this.
+- **`absorbed`** — the substance was folded into another document that now carries it, with no
+  artifact of its own. `000225` and `000226` (both into `PROMPT-029`) and `000233` (into `PLAN-028`'s
+  fifth design decision) are the shape of this.
+
+**Each requires a pointer, as `promoted` does** — a document code, phase id or commit hash recording
+where the delivery happened. A terminal state with no reference is an assertion; the pointer is what
+makes the log auditable later.
+
+**`promoted` becomes non-terminal.** An idea that became a plan is in flight, not finished, and
+reaches `delivered` when that plan's work actually ships. The log should answer "what did we build",
+not "what did we write a plan about". The seven already-promoted ideas are unaffected until their
+work ships; no transition is backfilled onto them.
+
+**One `delivered`, two paths into it.** `phase-irs-09` already plans a terminal `delivered` status
+written after the realization pipeline's own verification. That is the same state: the pipeline
+implements a second path into it rather than inventing a parallel one. Whoever builds either phase
+reads the other first.
+
+**Backfill is in scope, by appending events.** Ideas whose work demonstrably shipped are closed into
+the state their own finding evidences, and `000099` and `000129` are corrected. `_data/ideas.jsonl`
+is append-only; a correction is a later event, never a rewritten line.
+
+**Where the work lands:** folded into `phase-idg-01`, which already ships the idea schema bundle and
+touches `schemas/idea.schema.json`, `src/db/ideas.py` and `tools/append_idea.py` in one change. Its
+scope, acceptance and `next_action` were amended on 2026-09-22 to carry this ruling. A separate phase
+would have collided with it on every file it needs.
+
+**Authority for the new states** follows the realization pipeline's own pattern rather than the
+owner-only rule: an agent proposes the close with its evidence, a second agent verifies the pointer
+resolves, and the owner ratifies a queue of them in one sitting. This is the first agent-writable
+terminal transition in the idea log; the ratification step is what keeps it from being a unilateral
+close, and `phase-idg-01` builds it that way or not at all.
+
+**Why recorded here:** four rulings that change a schema, a transition table and a backfill policy,
+none of which is visible from the phase line that now carries them. An agent reaching `phase-idg-01`
+or `phase-irs-09` needs the reasoning, not just the amended scope.

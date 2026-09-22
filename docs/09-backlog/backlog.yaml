@@ -9648,12 +9648,27 @@ items:
     graph layer, with the migration cost stated.'
   - Move ARCH-005 from draft to accepted in the same change, now that its governing requirement exists.
   - Restrict lineage to the owner's voice, as note and assessment already are.
+  - 'Add the three terminal statuses the owner ruled on 2026-09-22, raised by idea 000236: delivered,
+    a working capability exists and was verified; resolved, the ask was satisfied without building
+    anything, typically a question answered or a rule written; absorbed, the substance was folded into
+    another document that now carries it. Each requires a pointer as promoted does - a document code,
+    phase id or commit hash recording where the delivery happened.'
+  - 'Make promoted non-terminal in the same change, per the same ruling: an idea that became a plan is
+    in flight, not finished, and reaches delivered when that plan''s work ships. The seven already-promoted
+    ideas are unaffected until their work ships; this phase backfills no transition onto them.'
+  - 'Backfill the ideas whose work demonstrably shipped, and correct 000099 and 000129, which are marked
+    discarded while carrying "verified resolved" annotations - the log contradicts itself there today.
+    Correction appends events; it never rewrites a line.'
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
   - 'REQ-014 R07 holds: every pre-change idea folds to identical derived state and _data/ideas.jsonl''s
     existing lines are byte-identical.'
   - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
+  - delivered, resolved and absorbed are legal statuses, each rejected by the writer when no pointer is
+    given, and promoted accepts a later transition to delivered.
+  - 'Every idea whose work shipped is closed into the state its own finding evidences, and no idea is
+    left discarded while its annotations say it was resolved: 000099 and 000129 are corrected.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -9663,7 +9678,11 @@ items:
   - tools/append_idea.py
   - docs/04-decisions/
   - docs/07-architecture/ARCH-005-idea-node-classification.md
-  next_action: Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
+  next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
+    terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
+    pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
+    state rather than inventing one - check that phase before changing the transition table.
+    Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
     fields before recording why they are fields inverts the reasoning. Name the three fields and
     their enum values in lowercase snake_case, one token per ARCH-005 type (e.g. concept, artifact,
     process, event / axiom, hypothesis, anti_pattern / generative_seed, strategic_directive,

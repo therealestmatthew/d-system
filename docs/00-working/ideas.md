@@ -11937,6 +11937,13 @@ Belongs to P1 (idea graph and lifecycle, PLAN-029) by subject matter; recorded h
 
 **Annotations**
 
+- **assessment** by repository-owner (2026-09-22T12:30:49-04:00): OWNER RULING, 2026-09-22: accepted, and widened. This idea asked for one terminal status, resolved. The owner ruled for three, split by what the idea produced: delivered (a working capability exists and was verified), resolved (the ask was satisfied without building anything - a question answered, a rule written) and absorbed (the substance was folded into another document that now carries it). Each requires a pointer as promoted does: a document code, phase id or commit hash recording where the delivery happened.
+
+Three further parts of the ruling this idea did not ask for. promoted becomes non-terminal - an idea that became a plan is in flight, not finished, and reaches delivered when that plan's work ships. The delivered state is the same one phase-irs-09 plans for orchestrator-verified delivery, so that phase implements a second path into it rather than inventing a parallel status. And the backfill this idea implied is explicitly in scope: ideas whose work demonstrably shipped get closed into the state their finding evidences, and 000099 and 000129 - discarded while carrying verified-resolved annotations, the self-contradiction this idea cited - are corrected by appending events, never by rewriting lines.
+
+Authority is the pipeline's pattern rather than owner-only: an agent proposes the close with evidence, a second agent verifies the pointer resolves, the owner ratifies a queue in one sitting. This is the first agent-writable terminal transition in the idea log.
+
+The work is folded into phase-idg-01, which already ships the idea schema bundle and touches schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py in one change; its scope, acceptance and next_action were amended the same day. Full ruling with rationale is in GOV-003.
 
 <details>
 <summary>1 finding(s)</summary>
@@ -12542,7 +12549,7 @@ PROPOSED LINK: 000248 --relates_to--> 000082 (both address multi-agent orchestra
 
 ## 000249 · Watch for external events beyond the repository as pipeline triggers
 
-**Created 2026-09-15T23:16:02-04:00 · Status: `open`**
+**Created 2026-09-15T23:16:02-04:00 · Status: `triaged`**
 
 The owner wants the orchestrator's event surface explored beyond repo-internal watchers: reacting to things that do not fall within the repository - external events arriving from the outside world. PLAN-039.01 deliberately scopes the daemon's watchers to repo-internal events only and names phase-auto-03's trigger gateway (idea 000028, PLAN-032/P5) as the sole door to the outside, conditional on the phase-auto-01 design ruling. This idea asks for the detail of that outside half in the daemon's context: what external event sources matter (webhooks, schedules, mail, other systems), and how they compose with the daemon - the stated clean composition being that the gateway injects events by writing where the daemon's watchers already look, so the daemon hosts always-on behavior while the gateway remains the only external door. Exploratory; no specific external source is chosen yet.
 
@@ -12550,9 +12557,20 @@ The owner wants the orchestrator's event surface explored beyond repo-internal w
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-fable (2026-09-16T01:20:51-04:00): Audit finding M17 (2026-09-16 Opus audit of PLAN-039.01): the stated composition - the gateway injects events by writing where the watchers already look - is blocked by the sanctioned-writer rule: _data/ideas.jsonl has a sole sanctioned writer (tools/append_idea.py, OPS-005) and the decisions inbox is owner-decision plumbing, not general ingress. An external gateway needs a third, neutral inbox with its own schema and writer discipline; 000250's MCP-mediated service is a candidate home for it.
+- **finding** by agent-idea-triage (2026-09-22T12:07:19-04:00): Idea 000249 ("Watch for external events beyond the repository as pipeline triggers") is addressed at the design and planning level, with implementation scoped and gated.
+
+PLAN-039.01 (Orchestrator design, section 2) explicitly names this idea: "External triggers remain `phase-auto-03`'s territory; `000249` records that an external gateway would need its own neutral inbox with writer discipline... The gateway injects events by writing where the daemon's watchers already look, so the daemon hosts always-on behavior while the gateway remains the only external door." The design specifies the composition mechanism and notes the writer-discipline constraint.
+
+phase-auto-03 ("Build the external trigger gateway with deduplicated events") in backlog.yaml operationalizes the design, scoping filesystem, scheduled, webhook and CLI events normalized to one event shape, with deduplication by payload hash and provider-neutral separation from the execution layer.
+
+REQ-017 (Autonomous agent operations requirements) R05–R07 detail the trigger gateway specifications: four source types, deduplication, and provider-neutrality.
+
+Already linked: 000247 (idea realization system parent), 000028 (external trigger gateway, the phase-auto-03 deliverable), 000248 (orchestrator daemon host). No new overlaps detected.
+
+Idea is exploratory as stated and addresses the "what external sources matter and how they compose" question at design level. Implementation is phase-auto-03 (queued, depends_on phase-auto-01 and phase-auto-02).
 
 </details>
 
@@ -12566,9 +12584,36 @@ The owner wants the orchestrator's event surface explored beyond repo-internal w
 
 ## 000250 · Mediate orchestrator state and dev writes through a remote MCP server
 
-**Created 2026-09-16T01:20:31-04:00 · Status: `open`**
+**Created 2026-09-16T01:20:31-04:00 · Status: `triaged`**
 
 Future direction named by the owner on 2026-09-16 while ruling on the PLAN-039.01 audit: the orchestrator's durable concerns should eventually move behind a remote service mediated by an MCP server, aligned with the future direction of the repository. Two concerns were named explicitly, with "other details" to follow: (1) the run ledger's future home - for now it is a tracked append-only log (_data/runs.jsonl with schema and sanctioned writer, per the round-4 ruling), with the remote MCP-mediated location as the future state; (2) mediation of the daemon's writes to dev - for now the daemon proposes and a human commits (claims, parks), with the MCP/remote server later mediating that authority along with other details. Exploratory: the idea is to design what such a server owns (ledger storage, decision inbox, write brokering), how it relates to P5's capability broker (phase-auto-02) and trigger gateway (phase-auto-03), and what stays in-repo as the source of truth.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:25-04:00): Idea 000250 explicitly names the future MCP server direction for orchestrator state mediation. It is already cited in PLAN-039.01-orchestrator-design.md (lines 25, 159-160) as explicitly out of scope for phase-irs-04's skeleton build, noting the remote/MCP future for ledger and write mediation.
+
+Related governed documents:
+- PLAN-039.01 (orchestrator design): Sections 2, 5, 6 detail the current in-repo ledger and propose-then-commit pattern; section 5 explicitly declares the ledger's "future remote home (`000250`) will preserve" the indexed-narrative-vs-truth relationship
+- PLAN-039 (IRS master plan): Dependencies on phase-auto-02 (capability broker) and phase-auto-03 (trigger gateway), which the idea names as related coordination concerns
+
+Related ideas with MCP server architecture overlap:
+- 000247 (IRS formalization, already linked): Parent idea that led to PLAN-039/PLAN-039.01
+- 000028 (external trigger gateway, already linked): Covers phase-auto-03's external event surface; orthogonal to 000250's ledger/daemon-write mediation but both relate to moving concerns behind MCP
+- 000020 (MCP-mediated multi-agent coordination): Broader scope (claims, docs, worktree checkouts); 000250 is the orchestrator-specific instance of the same pattern
+- 000159/000160 (MCP tool surface and file-access enforcement): Design questions about MCP boundaries; 000250 is a specific consumer of that surface
+- 000165/000166 (enforcement harness and MCP migration): Governance and migration concerns that would apply when 000250 is realized
+
+No conflicts detected. The idea is properly scoped as exploratory design for orchestrator state, orthogonal to the current phase-irs-04 skeleton (which explicitly excludes it as out of scope for 2026-09-16 decisions).
+
+PROPOSED LINK: 000250 --relates_to--> 000020 (both propose MCP server patterns; 000250 is orchestrator-specific instance of broader coordination model)
+PROPOSED LINK: 000250 --relates_to--> 000159 (000159 asks the file-access enforcement question that 000250's daemon-write mediation would partially address)
+PROPOSED LINK: 000250 --relates_to--> 000160 (000250 is a consumer of the MCP tool surface 000160 designs)
+
+</details>
 
 **Links**
 
@@ -12579,13 +12624,44 @@ Future direction named by the owner on 2026-09-16 while ruling on the PLAN-039.0
 
 ## 000251 · Review the three queued phases the 2026-09-16 phase review found defective but could not touch
 
-**Created 2026-09-16T12:04:08-04:00 · Status: `open`**
+**Created 2026-09-16T12:04:08-04:00 · Status: `triaged`**
 
 The queued phase review of 2026-09-16 (PROMPT-035) froze its scope to next_up from phase-irs-03 onward, and its critique agents found real defects in three phases that sat outside that scope: phase-agx-09, phase-auto-03 and phase-auto-04. The owner ruled these are critical and must not be lost, and that they should receive the same treatment the in-scope phases got rather than being fixed off the cuff — capture, triage, an independent pass-1-equivalent critique, and only then correction.
 
 This is the anchor for that batch. The individual defects are recorded as separate ideas linked to this one.
 
 Evidence lives in the review's working directory: _working/phase-review/ (C.md and E.md carry the out-of-scope sections; phase-review-decisions.md entries 9, 17 and 20 carry the ranked write-ups).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:08:03-04:00): Status of the three defects found by the 2026-09-16 phase review (PROMPT-035):
+
+**Defect 1 — phase-agx-09 (idea 000252): STILL OPEN — repointed, not fixed**
+
+Decision entry 9 flagged that phase-irs-04 depends on a stale-claim recovery mechanism, but phase-agx-09 only builds documentation/architecture, not a runnable deliverable. The owner initially ruled to amend phase-agx-09. However, an independent review found that phase-conc-04 already owns the recovery deliverable in full, and PLAN-031 (phase-agx-09's plan) never mentions claim/worktree recovery. The remedy (commit 9b0396a, 2026-09-16) repointed PLAN-039, REQ-022 R19, and ARCH-006 instead of fixing phase-agx-09. Phase-agx-09 remains unchanged — it still has only a documentation scope with no runnable recovery deliverable. The defect persists, but the boundary has been clarified by repointing the consuming plan to phase-conc-04 instead.
+
+**Defect 2 — phase-auto-03/-04 systems (idea 000253): CORRECTED**
+
+Decision entry 20 flagged that both phases declared `systems: [sys-api]`, violating the disjoint-systems rule despite PLAN-032 claiming they run in parallel. Commit 9b0396a (2026-09-16) corrected this:
+- phase-auto-03 changed from `sys-api` to `sys-auto-gateway`
+- phase-auto-04 changed from `sys-api` to `sys-auto-ledger`
+
+Both phases now use distinct system ids and can run concurrently without collision.
+
+**Defect 3 — phase-auto-04 depends_on (idea 000254): CORRECTED**
+
+Decision entry 17 flagged missing `depends_on` edges to the P4 phases (phase-agx-01 and phase-agx-05). Commit 9b0396a (2026-09-16) corrected this:
+- phase-auto-04's `depends_on` expanded from `[phase-auto-01, phase-auto-02]` to `[phase-auto-01, phase-auto-02, phase-agx-01, phase-agx-05]`
+
+The phase now cannot be claimed before its P4 dependencies complete, preventing the risk of guessing at their shape.
+
+Summary: Defects 2 and 3 (phase-auto-03/-04) have been corrected via system id registration and explicit dependency edges added on 2026-09-16. Defect 1 (phase-agx-09) remains open in the phase itself but was resolved by repointing the consuming plan to its actual provider (phase-conc-04). The three individual defect ideas (000252, 000253, 000254) are all currently in `triaged` status.
+
+</details>
 
 **Links**
 
@@ -12987,9 +13063,25 @@ PROPOSED LINK: 000268 --relates_to--> 000236 (both require a precise separation 
 
 ## 000269 · Framework: templates/schemas for governance docs
 
-**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+**Created 2026-09-19T12:00:05-04:00 · Status: `triaged`**
 
 Design a generalized template + JSON Schema for governance documents (GOV-style) for the portable multi-developer framework in docs/framework/. Should capture: what problem the governance rule solves, the rule itself, incident/rationale section, and status. Distinct from protocol docs (see companion idea) — governance docs state standing rules and their justification.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:01-04:00): Idea 000269 asks for templates and schemas for governance documents as part of a portable framework family. This is explicitly covered by PLAN-040 (Portable framework document template and schema family), which is a draft plan created 2026-09-19 that synthesizes six framework ideas from that batch (000269, 000270, 000271, 000277, 000278, 000279).
+
+Specifically, phase-fwt-01 (Governance and protocol document templates and schemas) in the backlog is queued to deliver governance.template.md, governance.schema.json, protocol.template.md, and protocol.schema.json — exactly what 000269 describes. The phase is part of PLAN-040's phased delivery schedule and already exists in docs/09-backlog/backlog.yaml with status "queued" and priority 2.
+
+The idea's ask is fully delivered by existing plan work.
+
+PROPOSED PROMOTION: 000269 -> PLAN-040 (phase-fwt-01 delivers governance and protocol document templates/schemas)
+
+</details>
 
 **Links**
 
@@ -12999,9 +13091,21 @@ Design a generalized template + JSON Schema for governance documents (GOV-style)
 
 ## 000270 · Framework: templates/schemas for protocol docs
 
-**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+**Created 2026-09-19T12:00:05-04:00 · Status: `triaged`**
 
 Design a generalized template + JSON Schema for protocol documents in docs/framework/ — step-by-step operational procedures (e.g., claim protocol, worktree protocol, session-close protocol), distinct from governance docs which state rules/rationale rather than procedure. Protocol template should include: trigger condition, ordered steps, verification/exit criteria, and failure handling.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:13-04:00): Idea 000270 asks for a generalized template and JSON Schema for protocol documents — step-by-step operational procedures with trigger conditions, ordered steps, verification/exit criteria, and failure handling, distinct from governance docs. The ask is comprehensively covered in PLAN-040 (Portable framework document template and schema family) and REQ-024 (Portable framework document template and schema requirements), both created 2026-09-19. PLAN-040 explicitly lists this idea and 000269 as inputs to phase-fwt-01 (line 162), with REQ-024.R02 specifying the protocol schema and template requirements. PLAN-040's phasing section outlines the full template/schema deliverable set. The idea relates to 000269 (governance docs template, a companion addressing the parallel need for governance-rule documents) and both feed into the portable framework starter-kit initiative anchored by 000281. No other plan, requirement, or decision found covering this territory before PLAN-040.
+
+PROPOSED LINK: 000270 --extends--> 000269 (both govern related template/schema shapes for different document kinds in the same framework initiative)
+
+</details>
 
 **Links**
 
@@ -13011,9 +13115,19 @@ Design a generalized template + JSON Schema for protocol documents in docs/frame
 
 ## 000271 · Framework: phase template/schema
 
-**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+**Created 2026-09-19T12:00:05-04:00 · Status: `triaged`**
 
 The generalized framework (docs/framework/) has requirement.template.md and plan.template.md but no standalone phase.schema.json/phase.template describing a single backlog phase in isolation (it currently only appears embedded inside plan examples). Create a dedicated phase template/schema: id, plan reference, depends_on, systems, deliverables, acceptance, verification, scope, status.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:27-04:00): Idea 000271 asks for a dedicated phase template and schema. PLAN-040 ("Portable framework document template and schema family") was created directly from this batch of ideas (000269–000281) and explicitly names 000271 in its summary. Phase-fwt-02 ("Standalone backlog phase template and schema", status: queued) is the queued backlog phase that delivers exactly this work: it writes `docs/00-working/framework/05-schemas/phase.template.md` and `phase.schema.json` describing a single backlog phase in isolation with all the fields idea 000271 names (id, plan reference, depends_on, systems, deliverables, acceptance, verification, scope, status). The idea's content is already fully incorporated into the plan as a committed backlog phase awaiting execution.
+
+</details>
 
 **Links**
 
@@ -13023,9 +13137,29 @@ The generalized framework (docs/framework/) has requirement.template.md and plan
 
 ## 000272 · Framework: workstream concept — new organizational layer above plans
 
-**Created 2026-09-19T12:00:05-04:00 · Status: `open`**
+**Created 2026-09-19T12:00:05-04:00 · Status: `triaged`**
 
 Introduce a "workstream" (name TBD, alternatives: track, lane, module) as a new layer in the generalized framework, above plans and phases. A workstream represents a parallel, modular track of work assigned to one device/developer (e.g., UI workstream, agent-orchestration workstream, backend/deterministic-design workstream). Each workstream contains one or more plans, each plan composed of one or more phases, and cross-references numerous requirements (many-to-many between workstreams and requirements). Workstreams are the unit that lets modular packages interface with each other to assemble the final product. Needs: workstream.template.md, workstream.schema.json, and documentation of how workstreams relate to systems/deliverables in the existing backlog.yaml concurrency model (docs/framework/03-governance, 05-schemas).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:46-04:00): Idea 000272 (workstream concept as organizational layer) is directly addressed and resolved in PLAN-040's amendment dated 2026-09-20. The plan contains a dedicated "The workstream question (000272)" section followed by an amendment explaining the owner's ruling on 2026-09-19 (recorded via idea 000288).
+
+Original verdict in PLAN-040: No new workstream document kind — the layer cannot express anything about locking that systems/domain already express more precisely.
+
+Owner's amendment (superseding prior verdict, not the reasoning): Workstream IS accepted, but as an ownership unit, not a locking primitive. It declares ownership paths that feed the concurrency lock as metadata, sits upstream of plan systems declarations, and operates at different scope/rate than the phase-level lock. Whether workstream takes shape as a new template (workstream.template.md/schema.json, as 000272 asked) or simpler shared file is downstream design work not yet settled.
+
+Related documents: REQ-024 (requirement R06 explicitly addresses the workstream question), SESS-2026-09-19-04 (session record discussing the decision), PLAN-040 itself.
+
+Related ideas: 000281 (starter kit framework, already linked), 000288 (owner's multi-developer coordination design that justifies workstream), 000280 (multi-machine claim adaptation, separate but related).
+
+PROPOSED LINK: 000272 --relates_to--> 000288 (owner's multi-developer coordination design directly answers 000272's workstream concept question)
+
+</details>
 
 **Links**
 
@@ -13036,9 +13170,32 @@ Introduce a "workstream" (name TBD, alternatives: track, lane, module) as a new 
 
 ## 000273 · Framework: master HTML document for the meta-project itself
 
-**Created 2026-09-19T12:00:06-04:00 · Status: `open`**
+**Created 2026-09-19T12:00:06-04:00 · Status: `triaged`**
 
 Create a plan (and eventually the artifact) for a master HTML document that presents/encompasses the "generalized multi-developer agentic workflow framework" meta-project (docs/framework/) as a cohesive, navigable whole — likely for onboarding new teams/repos or for presenting the framework's design. Should link/summarize: overview principles, workflows, governance, templates, schemas, and analysis findings once available.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:08:00-04:00): Idea 000273 ("Framework: master HTML document for the meta-project itself") belongs to the 2026-09-19 portable framework batch (anchor 000281) alongside template, schema, and analysis ideas 000269-000279.
+
+PLAN-040 explicitly defers 000273 as "not ready" because it depends on framework content (templates, schemas, analysis findings) that PLAN-040 and PLAN-041 will produce. PLAN-040 recommends revisiting once both plans deliver their content.
+
+Related plans supply infrastructure or upstream content:
+- PLAN-036 (HTML generation and design system): provides the template families, components, and palette libraries that would build the master document
+- PLAN-040 (Portable framework document templates): produces governance, protocol, phase, requirement, plan, and session record schemas that the master document will reference
+- PLAN-041 (Portable framework content extraction): produces analysis and patterns the document will draw from
+
+Related ideas: 000281 (portable starter kit, already linked) and the batch 000269-000279 all relate_to 000281. Separate cluster 000300/301/302 (auto-regenerated explorer pages) uses the same HTML infrastructure but are distinct deliverables—specific pages for ideas/backlog/prompts, not the meta-project framework document.
+
+No existing plan or document delivers 000273. It is blocked on upstream work and ready to revisit for planning once PLAN-040/041 ship.
+
+PROPOSED LINK: 000273 --relates_to--> 000281 (already exists; confirmed here)
+
+</details>
 
 **Links**
 
@@ -13048,9 +13205,27 @@ Create a plan (and eventually the artifact) for a master HTML document that pres
 
 ## 000274 · Framework: agent-driven extraction of reusable generalities from key documents
 
-**Created 2026-09-19T12:02:22-04:00 · Status: `open`**
+**Created 2026-09-19T12:02:22-04:00 · Status: `triaged`**
 
 Iterate through this repository's key documents (AGENTS.md, CLAUDE.md, GOV-*, ADRs, PLAN-*, session records) using agents whose job is to extract the durable details and re-express them as reusable, scalable generalities for the portable framework in docs/framework/. Distinct from 000067 (portable agent workflows from one source of truth), which is about single-sourcing workflow definitions; this is about mining existing governance/decision prose for what generalizes beyond d-system. Candidate agent specs are drafted in docs/framework/06-analysis/agent-workflows.md (pattern extraction, governance effectiveness).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:35-04:00): This idea's ask has been fully converted into a governed requirement and is queued for execution.
+
+REQ-025 (Portable framework content extraction requirements), created 2026-09-19, explicitly cites idea 000274 as one of three ideas it addresses. The requirement specifies R01: "Pattern extraction cites its sources — docs/00-working/framework/06-analysis/extracted-patterns.md contains at least five entries, each naming the pattern, at least one d-system source document by path, and a generalized form stated without reference to d-system-specific names."
+
+This directly answers the idea's stated ask: "Iterate through this repository's key documents (AGENTS.md, CLAUDE.md, GOV-*, ADRs, PLAN-*, session records) using agents whose job is to extract the durable details and re-express them as reusable, scalable generalities for the portable framework."
+
+The backlog already contains phase-fwa-01 (Cross-document pattern extraction for the portable framework, priority 2, queued status, session budget 1) which implements R01. The phase's acceptance criteria explicitly state "REQ-025 R04 holds for this file (cites idea 000274 and the batch anchor 000281)."
+
+PROPOSED PROMOTION: 000274 -> REQ-025 (requirement and phase-fwa-01 already govern this idea's full ask)
+
+</details>
 
 **Links**
 
@@ -13060,9 +13235,23 @@ Iterate through this repository's key documents (AGENTS.md, CLAUDE.md, GOV-*, AD
 
 ## 000275 · Sub-agent per session record to extract decisions and outstanding items
 
-**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+**Created 2026-09-19T12:02:23-04:00 · Status: `triaged`**
 
 Dispatch a sub-agent per session record in docs/03-sessions/ with instructions to extract, as structured output: the actual key decisions made; any new requirements discovered; anything postponed or declared out of scope; anything flagged as requiring further investigation; and any outstanding action items. The goal is to recover commitments and decisions currently buried in session prose, where nothing surfaces them after the session ends. Output feeds the backlog, the ideas log, and the decision records.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T12:07:39-04:00): Idea 000275 has been fully promoted and is now active as phase-fwa-02 ("Session-record decision and commitment extraction") in docs/09-backlog/backlog.yaml (status: queued, priority 2). The phase scope exactly matches the idea's ask: extract decisions, newly discovered requirements, deferred/out-of-scope items, open investigation items, and outstanding action items from at least ten session records spanning more than one week.
+
+The idea is part of PLAN-041 ("Portable framework content extraction from repository history", created 2026-09-19) and has corresponding formal requirements in REQ-025 R02. It is linked to related ideas 000276 (form critique, now phase-fwa-03) and 000281 (framework starter kit), with which it forms a batch anchor. The phase deliverable is docs/00-working/framework/06-analysis/session-record-extraction.md.
+
+PROPOSED PROMOTION: 000275 -> PLAN-041 (formalized as phase-fwa-02, queued in backlog with scope and acceptance criteria matching the idea exactly)
+
+</details>
 
 **Links**
 
@@ -13073,7 +13262,7 @@ Dispatch a sub-agent per session record in docs/03-sessions/ with instructions t
 
 ## 000276 · Analyze how decision records are written and propose session-protocol enhancements
 
-**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+**Created 2026-09-19T12:02:23-04:00 · Status: `triaged`**
 
 Separately from extracting their content, analyze the way decision records and session records are written — is the form actually optimal and efficient for the reader who comes later? Assess structure, length, signal-to-noise, and whether the required fields earn their place. Output is a proposed set of enhancements to the session documentation protocols specifically: the checkpoint skill and the session-close command. Relates to 000237 (amend checkpoint/session-close for an unclaimed session).
 
@@ -13081,9 +13270,20 @@ Separately from extracting their content, analyze the way decision records and s
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-tax (2026-09-19T15:06:11-04:00): Execution registered: phase-fwa-03 runs the pre-drafted prompt docs/00-working/PROMPT-session-taxonomy-part3-record-templates.md as its method and now depends on phase-tax-02 (PLAN-042, session-taxonomy investigation), which supplies its inputs - the evidence-tested taxonomy and the per-record structure table under _private/analysis/session-taxonomy/.
+- **finding** by agent-idea-triage (2026-09-22T12:08:13-04:00): Idea 000276 is fully integrated into governance as phase-fwa-03 (PLAN-041, "Portable framework content extraction").
+
+PLAN-042 (session-type taxonomy investigation) explicitly names phase-fwa-03 as serving 000276's "session/decision record form critique" and identifies it as dependent on phase-tax-02 for structured input (record-structure.tsv). REQ-025 R03 specifies the deliverable: `docs/00-working/framework/06-analysis/session-protocol-enhancements.md` containing field verdicts per contract section, proposed templates (checkpoint and session-close output), proposed schema per 000267, and adoption path.
+
+The pre-drafted prompt (`docs/00-working/PROMPT-session-taxonomy-part3-record-templates.md`) confirms the mission: assess structure, length, signal-to-noise of session and decision records; propose enhancements to session-writing protocols (checkpoint skill and session-close command); and field-by-field audit for each consumer (owners reviewing sessions, extraction agents 000275, governance gates, future audits, CLAUDE.md revamp).
+
+Related work: 000275 (session-record decision extraction, relates_to 000276), 000281 (batch anchor), 000237 (unclaimed-session coverage mentioned in prompt constraints). Neighboring plans: PLAN-008 (session lifecycle protocols — foundational discussion), PLAN-040 (portable framework templates — consumes this phase's schema), PLAN-042 (session-type taxonomy — supplies phase-fwa-03's inputs).
+
+Phase-fwa-03 is queued in backlog.yaml awaiting phase-tax-02 completion and owner go-ahead. The idea asks for analysis, not implementation; REQ-025 R03 explicitly gates action on checkpoint/session-close against "this analysis existing" as a later separately-claimed phase.
+
+PROPOSED LINK: 000276 --relates_to--> 000237 (both address session-record completeness; 000237 specifically names unclaimed sessions as a gap phase-fwa-03's form critique must cover)
 
 </details>
 
@@ -13096,7 +13296,7 @@ Separately from extracting their content, analyze the way decision records and s
 
 ## 000277 · Framework: template and schema for session documentation
 
-**Created 2026-09-19T12:02:23-04:00 · Status: `open`**
+**Created 2026-09-19T12:02:23-04:00 · Status: `triaged`**
 
 Define a template and an authoritative schema for session documentation (checkpoint-written and session-close-finalized records), aligned with this repository's existing design principles for governed documents rather than invented separately. Must cover the fields the extraction sub-agents need to find reliably: decisions, new requirements, deferred/out-of-scope items, investigation items, outstanding action items, verification output, completion evidence. Companion to 000269-000271 (governance, protocol, phase templates) and to 000267 (govern every durable object with an authoritative schema).
 
@@ -13104,9 +13304,27 @@ Define a template and an authoritative schema for session documentation (checkpo
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-tax (2026-09-19T15:06:11-04:00): Input registered: the session-record schema proposal produced when phase-fwa-03 executes the session-taxonomy Part 3 prompt (PLAN-042) feeds phase-fwt-04, which is otherwise unchanged.
+- **finding** by agent-idea-triage (2026-09-22T12:08:17-04:00): ## Finding for Idea 000277
+
+**Idea 000277 is precisely what phase-fwt-04 is scoped to deliver.** The idea asks for "Framework: template and schema for session documentation" covering checkpoint-written and session-close-finalized records. Phase-fwt-04 in the backlog ("Session-record document schema") has identical scope: write `docs/00-working/framework/05-schemas/session-record.schema.json` and reconcile the existing draft `session-record.template.md` against it.
+
+**Current state:**
+- Template exists: `/code/d-system/docs/00-working/framework/05-schemas/session-record.template.md` is a well-formed draft with front matter and body sections.
+- Prose schema documented: `.claude/skills/checkpoint/SKILL.md` formally specifies the current session-record structure (front matter fields: schema_version, id, code, title, kind, status, owner, created, updated, systems, depends_on; body sections: Phase, Verification, Acceptance, Backlog, Unresolved).
+- JSON Schema missing: `session-record.schema.json` does not yet exist — this is the deliverable phase-fwt-04 must produce.
+
+**Related documents:**
+- PLAN-040 (Portable framework document templates) — the container plan; phase-fwt-04 is one of six phases producing a matched template/schema family for portable framework adoption.
+- REQ-024 (Portable framework document templates requirements) — specifies requirements for governance, protocol, phase, requirement, plan, and GitHub templates (R01-R06), but notably lacks an explicit requirement statement for session records, despite 000277 being cited in the plan.
+- PLAN-041 (Portable framework content extraction) — depends on this schema to extract decisions and actions reliably from existing session records.
+- PLAN-042 (Session taxonomy investigation) — phase-fwa-03 (session/decision record form critique) feeds phase-fwt-04 as input per backlog.yaml.
+
+**Batch context:** Ideas 000269-000279 form a framework batch (all linked to anchor 000281 for portable starter kit). Idea 000277 is the session-record shape in this family.
+
+**Phasing status:** phase-fwt-04 is `queued`, priority 2, depends on completion of PLAN-041's data extraction phases. The phase is ready to claim and execute.
 
 </details>
 
