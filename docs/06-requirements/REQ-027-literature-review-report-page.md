@@ -125,7 +125,7 @@ hedging misrepresents the campaign.
 
 ### Where the duplicate-rate figures come from
 
-The first two points, **20.0%** and **15.0%**, appear verbatim in five campaign deliverables. The
+The first two points, **20.0%** and **15.0%**, appear verbatim in six campaign deliverables (`06`, `07`, `09`, `10`, `11`, `12`). The
 third, **6.4–7.7%**, does **not** appear anywhere in `research/literature-review/` — it is recorded
 only in the campaign's session records, [`SESS-2026-09-19-08`](../03-sessions/SESS-2026-09-19-08-literature-review-pass-3c.md)
 and [`SESS-2026-09-20-02`](../03-sessions/SESS-2026-09-20-02-literature-review-pass-4-close.md),

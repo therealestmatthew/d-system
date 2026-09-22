@@ -530,3 +530,45 @@ def test_the_uncorroborated_duplicate_rate_figure_carries_its_provenance(
     assert "SESS-2026-09-19-08" in provenance
     assert "SESS-2026-09-20-02" in provenance
     assert "6.4" in index
+
+
+def test_fill_does_not_substitute_into_an_already_substituted_value() -> None:
+    """Substitution is one pass over the template, so token order cannot change the result.
+
+    Found by the adversarial review of this phase. A loop of `str.replace` over a growing
+    result is order-dependent: a value substituted early that contains a later token's
+    `{{TOKEN}}` shape has that shape replaced too, silently corrupting the value, and neither
+    of `fill()`'s checks can catch it because both look at the template and never re-scan the
+    output. Rendered Markdown is a substitution value here, so a deliverable containing literal
+    `{{FOOTER}}`-shaped text would hit exactly this. None does today; the single pass means it
+    would not matter if one did.
+    """
+    template = "<a>{{A}}</a><b>{{B}}</b>"
+    forwards = lit_report_render.fill(template, {"A": "look at {{B}} here", "B": "REPLACED"})
+    backwards = lit_report_render.fill(
+        template, dict(reversed(list({"A": "look at {{B}} here", "B": "REPLACED"}.items())))
+    )
+    assert forwards == "<a>look at {{B}} here</a><b>REPLACED</b>"
+    assert forwards == backwards
+
+
+def test_raw_html_in_markdown_is_escaped_not_passed_through() -> None:
+    """`REQ-027` R08 forbids a script tag; CommonMark passes raw HTML through by default.
+
+    Found by the adversarial review of this phase. No deliverable contains raw HTML today, so
+    `html=False` changes nothing in the rendered corpus -- verified byte-identical -- but a
+    deliverable that grew a literal `<script>` later would otherwise render it live on a page
+    generated from files this module trusts completely.
+    """
+    rendered = lit_report_render.render_markdown("<script>alert(1)</script>\n\nA <b>b</b> c.\n")
+    assert "<script>" not in rendered
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in rendered
+    assert "<b>" not in rendered
+
+
+def test_no_deliverable_currently_contains_raw_html_or_token_shaped_text() -> None:
+    """The corpus assumption both guards above rest on, asserted rather than trusted."""
+    for path in sorted(CORPUS.glob(_MARKDOWN_DELIVERABLE_GLOB)):
+        source = path.read_text(encoding="utf-8")
+        assert "{{" not in source, f"{path.name} contains token-shaped text"
+        assert "<script" not in source.lower(), f"{path.name} contains a script tag"

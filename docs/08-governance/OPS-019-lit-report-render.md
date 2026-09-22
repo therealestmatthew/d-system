@@ -151,7 +151,7 @@ byte-identical strings.
 
 `REQ-027` R06 requires the entry page to state the campaign's falling duplicate-discovery rate as a
 trend: "20.0% → 15.0% → 6.4–7.7%". Verified against the corpus on 2026-09-22: 20.0% and 15.0%
-appear across five deliverables in `research/literature-review/`, but 6.4–7.7% appears **nowhere**
+appear across six deliverables in `research/literature-review/`, but 6.4–7.7% appears **nowhere**
 in that directory. It is recorded only in two files under `docs/03-sessions/`, outside the corpus
 `tools/lit_report_extract.py` reads, and `data["counts"]` carries no duplicate-rate field of any
 kind — there is nothing for this module to read that third figure from.

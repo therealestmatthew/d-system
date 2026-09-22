@@ -91,7 +91,17 @@ _CSS_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
 
 _TOKEN_RE = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
 
-_MARKDOWN_IT = MarkdownIt("commonmark").enable("table").enable("strikethrough")
+#: CommonMark plus tables and strikethrough, verified against all eleven Markdown deliverables.
+#:
+#: `html=False` is the one departure from the bare "commonmark" preset, and it is deliberate.
+#: CommonMark passes raw HTML through untouched, so a literal `<script>` in a deliverable would
+#: render as a live script tag — breaking `REQ-027` R08's self-containment guarantee, on a page
+#: generated from files this module trusts completely. No deliverable contains raw HTML today,
+#: so escaping instead of passing through changes nothing in the rendered output; it means a
+#: deliverable that grew one later would show it as text rather than execute it.
+_MARKDOWN_IT = (
+    MarkdownIt("commonmark", {"html": False}).enable("table").enable("strikethrough")
+)
 
 
 def load_template(name: str) -> str:
@@ -124,6 +134,14 @@ def fill(template: str, tokens: dict[str, str]) -> str:
     comment strip in `load_template()`, `templates/styles/lit-report.css`'s own header comment
     mentioned `{{INLINE_STYLES}}` as documentation, exactly as `templates/styles/overview.css`'s
     does) without that being mistaken for an unfilled placeholder in `template` itself.
+
+    Substitution is a **single pass over the original template**, not a loop of `str.replace`
+    over a growing result. A loop is order-dependent: a value substituted early that happens to
+    contain a later token's `{{TOKEN}}` shape would have that shape replaced too, silently
+    corrupting the value with no error raised, because the checks above look at `template` and
+    never re-scan the output. Rendered Markdown is a substitution value here, so any deliverable
+    that ever contained literal `{{FOOTER}}`-shaped text would hit exactly that. No deliverable
+    does today; a single pass means it would not matter if one did.
     """
     declared = set(_TOKEN_RE.findall(template))
     supplied = set(tokens)
@@ -135,9 +153,7 @@ def fill(template: str, tokens: dict[str, str]) -> str:
     unfilled = declared - supplied
     if unfilled:
         raise ValueError(f"fill(): unfilled token(s) remain: {', '.join(sorted(unfilled))}")
-    rendered = template
-    for key, value in tokens.items():
-        rendered = rendered.replace("{{" + key + "}}", value)
+    rendered = _TOKEN_RE.sub(lambda match: tokens[match.group(1)], template)
     return rendered
 
 
