@@ -15361,3 +15361,37 @@ Related: 000287 carries the finding this came from.
 **Links**
 
 - relates_to → `000287`
+
+---
+
+## 000316 · Enforce the batch-table schema in the governance check
+
+**Created 2026-09-22T16:43:25-04:00 · Status: `open`**
+
+Batch tables were abstracted out of the build coordinator prompt (PROMPT-036) on 2026-09-22 into docs/09-backlog/batches/*.yaml, validated in shape by schemas/batch.schema.json. Nothing checks them. A `uv run python -m src.governance --batches` check should: validate every table against the schema; resolve every phase id against backlog.yaml and fail on one that does not exist; confirm each declared parallel group contains no pair joined by a depends_on edge, and that no phase depends on one later in the batch order; flag a table whose declared status contradicts its phases' actual status in the backlog (every phase complete but the table still queued, or vice versa); and fail when more than one table is in_progress, which is the state the coordinator's selection rule treats as unambiguous. Deferred deliberately at the owner's direction so the data and prompt work could land first; it is implementation code and so needs a requirement document, a plan document and backlog phases before it is written, per AGENTS.md step 3.
+
+**Links**
+
+- relates_to ← `000317`
+
+---
+
+## 000317 · Register backlog batching and orchestration as a governance protocol
+
+**Created 2026-09-22T16:46:17-04:00 · Status: `promoted` · became doc-batch-orchestration-protocol**
+
+The owner asked on 2026-09-22, mid-session, that backlog batching and orchestration be registered as a protocol once the batch-table abstraction lands. The mechanism by then exists as three separate things with no governing document tying them together: schemas/batch.schema.json (the table contract), docs/09-backlog/batches/*.yaml (the tables themselves), and PROMPT-036 (the coordinator that selects and runs one). GOV-013 records the coordinator protocol's reasoning but predates the tables and says nothing about how a batch is composed, sequenced, parallelised or selected. The protocol should rule: who may author a batch table and when; how a composition is verified before it is declared queued; what the four statuses mean and who moves them; the selection rule across tables and when ambiguity forces the owner to be asked; that stage membership is a permission bounded by max_active and the Conflicts column rather than an instruction to run concurrently; and how a table is superseded rather than edited once a run has opened against it. Open question for the owner: whether this extends GOV-013 or becomes its own GOV document.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-batch (2026-09-22T16:53:42-04:00): Delivered the same session, 2026-09-22, on branch agent/batch-tables: the protocol is GOV-016, batch orchestration protocol. The open question resolved to its own governance document rather than an extension of GOV-013 — GOV-013 governs designing a coordinator and is read by a planning session, while GOV-016 governs the batch table artifact and is read by whoever composes a batch and by the coordinator that runs one. GOV-013 and PROMPT-036 gained prose pointers to it; the metadata depends_on edge from PROMPT-036 was left out because GOV-016 to GOV-013 to PROMPT-036 closes a dependency cycle the validator rejects.
+
+</details>
+
+**Links**
+
+- relates_to → `000316`
