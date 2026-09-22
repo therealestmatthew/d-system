@@ -1,9 +1,8 @@
 schema_version: 1
-updated: '2026-09-21'
+updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-lrr-01
 - phase-conc-02
 - phase-auto-01
 - phase-auto-02
@@ -6913,7 +6912,7 @@ items:
   - sys-research
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-lrr
   priority: 2
   session_budget: 1
@@ -6939,7 +6938,32 @@ items:
   deliverables:
   - tools/lit_report_extract.py
   - test/test_lit_report_extract.py
-  next_action: Ready. First phase of PLAN-043; nothing blocks it.
+  session: doc-session-literature-review-corpus-extraction
+  completion_evidence:
+  - tools/lit_report_extract.py
+  - test/test_lit_report_extract.py
+  - docs/08-governance/OPS-017-lit-report-extract.md
+  - docs/03-sessions/SESS-2026-09-21-04-literature-review-corpus-extraction.md
+  result: >-
+    Complete. The extractor reads research/literature-review/ and emits 4,314,428 bytes of key-
+    sorted JSON; two runs are byte-identical, verified by cmp both before and after the review
+    fixes. Every figure is measured at run time and the tests recompute rather than compare
+    against literals: 14 deliverables (11 markdown, 3 csv), ledger 1200x15, inventory 1154x13,
+    matrix 67x43, 30 collision sections (18 disputed, 12 confirmed), 11 hypothesis blocks - all
+    matching acceptance. Collision anchors key on the slug rather than the section number, which
+    survives renumbering and doubles as the join key to the matrix; the slug-to-matrix
+    relationship is asserted as a bijection, set-equal both ways, and holds for all 30.
+    Verification: governance OK (307 documents), pytest 688 passed. An independent adversarial
+    review ran mutation tests, PYTHONHASHSEED variation, anchor-collision attempts and every
+    error path, and found no blocker. Its two confirmed defects were fixed on branch
+    agent/phase-lrr-01-fixes: an unguarded columns.index lookup of source_id that escaped as a
+    raw traceback against the error contract OPS-017 states, and a module docstring saying
+    thirteen Markdown files where the corpus holds eleven, which generate_tool_docs.py had
+    propagated into OPS-017. Its third finding, phase-lrr-04 declaring an already-consumed OPS
+    code, is filed as idea 000312. Known corpus defects were reported and left unrepaired per
+    PLAN-043, and the phase surfaced two further findings, ideas 000309 and 000311.
+  next_action: Complete. phase-lrr-02 is next and consumes this extractor directly; no
+    fixture stands between them.
 
 - id: phase-lrr-02
   title: Report template family, shell and faithful Markdown rendering
