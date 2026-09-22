@@ -2477,6 +2477,7 @@ PROPOSED LINK: 000053 --relates_to--> 000055 (connection-builder agent would ben
 - extends → `000018`
 - relates_to ← `000055`
 - relates_to ← `000061`
+- relates_to ← `000313`
 
 ---
 
@@ -3468,6 +3469,7 @@ No existing governed requirement or plan was found that delivers cross-agent ski
 - relates_to ← `000069`
 - relates_to ← `000072`
 - relates_to ← `000079`
+- relates_to ← `000306`
 
 ---
 
@@ -7210,6 +7212,7 @@ No related plan, phase or document beyond PLAN-023.03 and its dependent delegati
 - relates_to ← `000212`
 - relates_to ← `000213`
 - relates_to ← `000214`
+- relates_to ← `000289`
 
 ---
 
@@ -10821,6 +10824,7 @@ PROPOSED LINK: 000214 --relates_to--> 000219 (both are silent gate failures; 000
 - relates_to → `000290`
 - relates_to ← `000215`
 - extended_by ← `000219`
+- relates_to ← `000297`
 
 ---
 
@@ -11519,6 +11523,7 @@ Related: 000148 (patent source_type enum gap, still open), 000230 (anchor for al
 - relates_to → `000148`
 - relates_to → `000230`
 - relates_to ← `000209`
+- relates_to ← `000289`
 
 ---
 
@@ -13513,6 +13518,7 @@ PROPOSED PROMOTION: No promotion is justified; the preconditions exist but the k
 - relates_to ← `000277`
 - relates_to ← `000278`
 - relates_to ← `000279`
+- relates_to ← `000314`
 
 ---
 
@@ -13750,6 +13756,10 @@ phase-lit-09 is the work that closes those gaps: the 15 missing chaining rows, t
 
 </details>
 
+**Links**
+
+- relates_to ← `000315`
+
 ---
 
 ## 000288 · Accepted design for multi-developer coordination in a new repository
@@ -13878,6 +13888,8 @@ PROPOSED LINK: 000289 --relates_to--> 000227 (both name unspecified scoring/matc
 
 **Links**
 
+- relates_to → `000147`
+- relates_to → `000227`
 - extended_by ← `000295`
 - relates_to ← `000307`
 - relates_to ← `000308`
@@ -13922,6 +13934,7 @@ Related: mem-proc-recompute-a-delegated-measurement documents the procedure that
 
 - relates_to ← `000214`
 - relates_to ← `000219`
+- relates_to ← `000297`
 
 ---
 
@@ -14183,6 +14196,7 @@ PROPOSED LINK: 000296 --supersedes--> 000308 (000308 documents the same defect w
 
 - relates_to ← `000295`
 - relates_to ← `000297`
+- superseded_by ← `000308`
 
 ---
 
@@ -14220,6 +14234,8 @@ PROPOSED LINK: 000297 --relates_to--> 000290 (both address PROMPT-029 gate issue
 **Links**
 
 - relates_to → `000296`
+- relates_to → `000214`
+- relates_to → `000290`
 
 ---
 
@@ -14611,6 +14627,7 @@ PROPOSED LINK: 000303 --relates_to--> 000162 (knowledge state events may be the 
 - relates_to → `000299`
 - relates_to → `000162`
 - relates_to ← `000304`
+- relates_to ← `000313`
 
 ---
 
@@ -14756,6 +14773,7 @@ PROPOSED LINK: 000306 --relates_to--> 000067 (both address portable agent workfl
 **Links**
 
 - relates_to → `000305`
+- relates_to → `000067`
 
 ---
 
@@ -14864,6 +14882,7 @@ PROPOSED LINK: 000308 --supersedes--> 000296 (000308 corrects the unmarked count
 **Links**
 
 - relates_to → `000289`
+- supersedes → `000296`
 - relates_to ← `000309`
 - relates_to ← `000310`
 
@@ -15233,3 +15252,112 @@ The second approach is more robust: it avoids both the initial collision and fut
 **Links**
 
 - relates_to → `000310`
+
+---
+
+## 000313 · Triage scouts keep proposing edges the link vocabulary cannot express
+
+**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+
+Two instances in one day, 2026-09-22, during a session that triaged all 73 open ideas:
+
+- A scout triaging 000224 (a whole-file backlog write silently reverted four completed phases)
+  proposed `000224 --relates_to--> PLAN-038`, the plan that implements the monotonicity check that
+  idea asks for. Unwritable: `tools/append_idea.py link --target` takes a six-digit idea id, and
+  document-code targets are part of phase-idg-01's unshipped schema bundle.
+- A scout triaging 000281 (the portable starter kit) proposed `000281 --depends_on--> 000269`.
+  Unwritable for a different reason: the vocabulary is `extends`, `supersedes`, `relates_to` only.
+  A dependency direction between ideas has no edge type, though `depends_on` exists on both backlog
+  phases and governed documents.
+
+**Recorded deliberately as a duplicate.** 000053 already asks for the first half of this - ideas
+linking directly to plan and document ids - and phase-idg-01 carries document-code link targets in
+its scope. The owner's instruction on capturing it anyway: "if it's redundant, it's just a signal."
+That is the point. The recurrence is the data: two independent agents, working different ideas,
+reached for edges the vocabulary does not have, on the same day, without either one having read
+000053.
+
+What this entry adds beyond 000053:
+
+- The second half. 000053 is about *what* an edge may point at. `depends_on` is about *what the
+  edge means* - a direction the current three types cannot carry, since `extends` is not dependency
+  and `relates_to` is symmetric in practice.
+- A live backlog of unwritten edges. At least one proposed edge is sitting in a finding today
+  waiting for the capability, and a backfill pass will be needed when it ships.
+- Evidence of recurrence rather than a single report, which is what ADR-010 says the append-only
+  list exists to produce.
+
+Related: 000303 (investigate the relationships between ideas, backlog phases, prompts and plans)
+is where the question of whether four families express the same relations belongs; this is one
+concrete symptom of it.
+
+**Links**
+
+- relates_to → `000053`
+- relates_to → `000303`
+
+---
+
+## 000314 · The portable framework will deliver every component and no assembly
+
+**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+
+Triage of 000281 on 2026-09-22 found that the starter kit itself is unowned, while all of its parts
+are planned.
+
+The 2026-09-19 framework batch (000269-000281) produced PLAN-040, PLAN-041, REQ-024 and REQ-025,
+and seven queued phases: phase-fwt-01 through -05 write the governance, protocol, phase, requirement,
+plan and session-record templates and schemas, and phase-fwa-01 through -03 extract patterns,
+decisions and record critiques from this repository's history.
+
+None of them assembles the result. Both PLAN-040 and REQ-024 explicitly exclude "packaging the
+finished template family into the starter kit 000281 describes", stating it "depends on this
+requirement's deliverables existing first and is not itself ready to plan". PLAN-041 leaves it
+unowned too.
+
+So when every queued framework phase completes, the templates, schemas and analyses will exist and
+the thing the batch was for - a kit that bootstraps a new repository - still will not, with no phase
+waiting to build it and nothing in the backlog that would surface the gap.
+
+Worth deciding at the point phase-fwt-* and phase-fwa-* finish, not before: whether assembly is its
+own phase, whether it needs a plan of its own or an amendment to PLAN-040, and what "bootstraps a
+new repository" has to include beyond the file set - the narrative documentation and adoption path
+that make a template family usable by someone who did not build it.
+
+Related: 000281 is the anchor this came from and carries the finding.
+
+**Links**
+
+- relates_to → `000281`
+
+---
+
+## 000315 · The literature campaign's recommendations have no consuming phase
+
+**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+
+Triage of 000287 on 2026-09-22 confirmed the gap rather than dissolving it, after the campaign
+closed.
+
+phase-lit-07 produced 09_reuse_recommendations.md and 10_architecture_implications.md as synthesis
+deliverables on 2026-09-19. phase-lit-09 closed evidence gaps inside the campaign rather than
+consuming its output. The phase-lrr-* series renders the material as a report page but plans nothing
+that acts on it. No phase in the backlog depends on either file.
+
+A multi-week adversarial campaign - nine phases, an evidence contract, two independent review passes
+and a pre-synthesis check-in producing eight owner rulings - therefore terminates in two documents
+that nothing is scheduled to read.
+
+The triage scout also noted the gap has been rediscovered more than once, which is the reason to
+keep the record rather than treat it as already known.
+
+Worth deciding: whether a consuming phase is warranted at all given the campaign's own stated
+coverage bound of 13 percent of the candidate pool, or whether the honest disposition is to record
+the recommendations as reference material and say so, rather than leaving them in a state that reads
+as pending action.
+
+Related: 000287 carries the finding this came from.
+
+**Links**
+
+- relates_to → `000287`
