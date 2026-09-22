@@ -9656,9 +9656,6 @@ items:
   - 'Make promoted non-terminal in the same change, per the same ruling: an idea that became a plan is
     in flight, not finished, and reaches delivered when that plan''s work ships. The seven already-promoted
     ideas are unaffected until their work ships; this phase backfills no transition onto them.'
-  - 'Backfill the ideas whose work demonstrably shipped, and correct 000099 and 000129, which are marked
-    discarded while carrying "verified resolved" annotations - the log contradicts itself there today.
-    Correction appends events; it never rewrites a line.'
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -9667,12 +9664,17 @@ items:
   - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
   - delivered, resolved and absorbed are legal statuses, each rejected by the writer when no pointer is
     given, and promoted accepts a later transition to delivered.
-  - 'Every idea whose work shipped is closed into the state its own finding evidences, and no idea is
-    left discarded while its annotations say it was resolved: 000099 and 000129 are corrected.'
   - 'An agent-written terminal state is distinguishable from an owner-ratified one by reading the log,
     and the agent that writes it surfaces it in its own report - a close never passes silently as though
     ratified. An unratified close blocks nothing: downstream work proceeds and ratification catches up
-    in batch, through the gate queue phase-irs-13 builds rather than a second queue.'
+    in batch.'
+  - 'The pending closes are derivable from the log by any consumer, so no queue has to exist for the
+    close to be recorded. phase-irs-13''s gate queue is the intended presentation once it ships, and is
+    deliberately not a build dependency of this phase - making it one would park an owner-approved
+    lifecycle change behind five unbuilt phases.'
+  - 'A close proposed by one agent is verified by a second before the owner sees it, per the ruling''s
+    authority model - the verifier checks that the cited pointer actually resolves. Without this the
+    ruling degrades to a single agent closing ideas unchecked, which is not what was approved.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -9694,6 +9696,50 @@ items:
     use on this schema. Reuse or extract the document registry src/governance/__main__.py:158 builds,
     rather than re-scanning docs/ independently inside tools/append_idea.py - a second, independent
     scanner drifts from the governance check's own source of truth for what documents exist.
+- id: phase-idg-13
+  title: Backfill the idea log into the new terminal states
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - Sweep the idea log for ideas whose work demonstrably shipped and close each into the state its own
+    finding evidences - delivered, resolved or absorbed - with the pointer each state requires.
+  - 'Seven closes are already evidenced by triage findings written 2026-09-22 and are the starting set,
+    not the whole job: 000222, 000225, 000226, 000232, 000234, 000237 and 000278. The sweep looks for
+    the rest rather than stopping at the known ones.'
+  - 'Move 000099 and 000129 from discarded to resolved. Read the GOV-003 entry before doing it: this
+    reverses an owner ruling of 2026-09-13, made deliberately when no state fitted, and is not the
+    correction of an oversight. Both carry annotations saying they were discarded by that ruling.'
+  - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
+    is removed or edited.
+  acceptance:
+  - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
+    phase id in the backlog, or a commit hash in this repository's history.
+  - 'The seven ideas named in scope are closed or explicitly deferred with a reason; a silent omission
+    is a failure of this phase, not a smaller result.'
+  - 000099 and 000129 are resolved rather than discarded, and the reversal is legible from the log
+    without reading this phase.
+  - Every pre-change idea not touched by this phase folds to identical derived state.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  next_action: Split out of phase-idg-01 on 2026-09-22 by owner ruling, because sweeping the whole log
+    is a different job from adding the states with a different failure mode - a missed idea is silent,
+    where a broken schema is loud. Do not start before phase-idg-01 ships the states; there is nothing
+    to close into until then. The sweep is a read of every idea's findings, so budget for reading 300+
+    annotations rather than for a mechanical pass.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle

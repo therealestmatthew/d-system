@@ -15,7 +15,7 @@ scope: project
 ## The rule
 
 `docs/09-backlog/backlog.yaml` has **no sanctioned writer**. Every edit is hand-rolled text surgery
-against a file of roughly 9,600 lines, and the file is the repository's lock table — a broken parse
+against a file of 13,278 lines, and the file is the repository's lock table — a broken parse
 blocks every agent, not just the one that broke it.
 
 So: **edit by anchored block replacement, then parse the result before believing the edit worked.**
@@ -47,8 +47,8 @@ list items sit at two spaces with four-space continuations (`  - item`). The add
 children of the previous item rather than siblings, and the block ended in the wrong place.
 
 **A plain multi-line scalar quoted at its first line only.** `next_action` was an unquoted scalar
-spanning nine lines. Replacing just its first line with a single-quoted string left the remaining
-eight continuation lines stranded after the closing quote. Two consequences worth remembering: a
+spanning eight lines — the `next_action:` line plus seven continuations. Replacing just its first
+line with a single-quoted string left the seven continuation lines stranded after the closing quote. Two consequences worth remembering: a
 multi-line plain scalar must be replaced **whole**, and a plain scalar cannot contain `: ` — write
 ` - ` or restructure the sentence instead of reaching for a colon.
 
@@ -63,3 +63,16 @@ writes anchors into backlog.yaml) proposes `tools/append_backlog.py` doing block
 alias validation, and idea `000224` records the whole-file write that silently reverted four
 completed phases while the governance check still exited zero. Until one of those ships, this
 procedure is the guard.
+
+## Corrected 2026-09-22 by an independent review
+
+Two figures in the first draft of this procedure were wrong, and both were the same kind of mistake
+this procedure exists to prevent — a number read off the wrong thing and not checked.
+
+- The file was described as "roughly 9,600 lines". It is **13,278**. 9,600 was the *line number of
+  the block being edited*, mistaken for the file's length.
+- The broken scalar was described as spanning nine lines with eight continuations. It spans
+  **eight** — one `next_action:` line plus **seven** continuations.
+
+Neither error changes the guard, but a procedure that misreports the evidence it was written from
+is weaker than one that does not. `wc -l` and `sed -n` settle both in one command each.

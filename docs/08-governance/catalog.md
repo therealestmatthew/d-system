@@ -314,6 +314,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-21-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-21-02-literature-review-pass-4-reconciliation.md |
 | SESS-2026-09-21-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-21-03-idea-capture-rulings-and-queue-rerank.md |
 | SESS-2026-09-21-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-21-04-literature-review-corpus-extraction.md |
+| SESS-2026-09-22-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-01-full-idea-triage-and-lifecycle-ruling.md |
 
 ## Plans and their phases
 
@@ -361,7 +362,7 @@ CI regenerates it and fails on any difference.
 | PLAN-026 | doc-concurrency-git-safety | active | 7 | 0 | 3 | agent-conc, agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
-| PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 0 | 1 | agent-night |
+| PLAN-029 | doc-idea-graph-lifecycle | active | 13 | 0 | 1 | agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 7 | 0 | 1 | agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | active | 6 | 0 | 1 | agent-night |
@@ -390,4 +391,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-307 documents — adr: 18, architecture: 10, governance: 12, operation: 17, plan: 58, prompt: 36, requirement: 27, session: 129.
+308 documents — adr: 18, architecture: 10, governance: 12, operation: 17, plan: 58, prompt: 36, requirement: 27, session: 130.

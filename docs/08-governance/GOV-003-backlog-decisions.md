@@ -560,9 +560,15 @@ agent should find.
 Idea `000236` asked for a terminal `resolved` status. The case for it had accumulated on its own:
 seven ideas triaged on 2026-09-22 carried a `PROPOSED PROMOTION` line from their scout because their
 work had demonstrably shipped, and none of them fitted either existing terminal state — `promoted`
-requires a governed document in `promoted_to`, `discarded` asserts rejection. Worse, `000099` and
-`000129` already sat `discarded` carrying annotations that said "verified resolved", so the log
-contradicted itself rather than admit the gap.
+requires a governed document in `promoted_to`, `discarded` asserts rejection. `000099` and `000129`
+show the cost: both were closed as `discarded` while their annotations record them as resolved, one
+"Superseded and resolved", the other "Verified resolved".
+
+**Stated precisely, after an independent review corrected this entry on 2026-09-22:** those two are
+not an oversight and not a self-contradiction the log fell into. Both annotations say "discarded by
+owner ruling 2026-09-13" — the owner chose `discarded` deliberately, because it was the least wrong
+of two terminal states, neither of which fitted. The first draft of this entry described them as the
+log contradicting itself, which overstated the case and obscured what moving them actually is.
 
 **The owner ruled on 2026-09-22, in four parts.**
 
@@ -584,8 +590,10 @@ makes the log auditable later.
 
 **`promoted` becomes non-terminal.** An idea that became a plan is in flight, not finished, and
 reaches `delivered` when that plan's work actually ships. The log should answer "what did we build",
-not "what did we write a plan about". The seven already-promoted ideas are unaffected until their
-work ships; no transition is backfilled onto them.
+not "what did we write a plan about". Ideas already at `promoted` are unaffected until their work
+ships; no transition is backfilled onto them. **Do not read a count into this** — the figure was
+"seven" when this entry was written and was ten hours later, on the same day, because three more
+ideas were promoted after the ruling. Read the log.
 
 **One `delivered`, two paths into it.** `phase-irs-09` already plans a terminal `delivered` status
 written after the realization pipeline's own verification. That is the same state: the pipeline
@@ -593,8 +601,22 @@ implements a second path into it rather than inventing a parallel one. Whoever b
 reads the other first.
 
 **Backfill is in scope, by appending events.** Ideas whose work demonstrably shipped are closed into
-the state their own finding evidences, and `000099` and `000129` are corrected. `_data/ideas.jsonl`
-is append-only; a correction is a later event, never a rewritten line.
+the state their own finding evidences. `_data/ideas.jsonl` is append-only; a correction is a later
+event, never a rewritten line.
+
+**`000099` and `000129` move to `resolved`, and doing so reverses the 2026-09-13 ruling.** The owner
+confirmed this on 2026-09-22 with the correction above in front of them: the earlier ruling was made
+without a state that fitted, and now that one exists, applying it retroactively makes the log say
+what actually happened. This is recorded as a reversal rather than a repair so that nobody later
+reads the move as cleanup and nobody re-litigates the original decision as an error — it was the
+right call with the vocabulary available at the time.
+
+**The backfill is its own phase.** Split out of `phase-idg-01` into `phase-idg-13` on 2026-09-22,
+after the review observed that the phase's scope had roughly doubled while its `session_budget`
+stayed at one. Sweeping the whole log is a different job from adding the states, with a different
+failure mode: a missed idea is silent, where a broken schema is loud. `phase-idg-13` depends on
+`phase-idg-01` and names the seven already-evidenced closes as its starting set rather than its
+whole scope.
 
 **Where the work lands:** folded into `phase-idg-01`, which already ships the idea schema bundle and
 touches `schemas/idea.schema.json`, `src/db/ideas.py` and `tools/append_idea.py` in one change. Its
