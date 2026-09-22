@@ -23,6 +23,7 @@ from src.governance import reservations
 from src.governance.backlog import inspect_backlog, render_backlog
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
+from src.governance.regression import audit as audit_status_regression
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -511,6 +512,10 @@ def main() -> int:
         backlog_errors, catalog = audit_backlog(ROOT, result)
         errors.extend(backlog_errors)
         errors.extend(audit_idea_priority(ROOT))
+    if catalog:
+        regression_errors, regression_warnings = audit_status_regression(ROOT, catalog)
+        errors.extend(regression_errors)
+        warnings.extend(regression_warnings)
     for warning in warnings:
         print(f"WARNING {warning}")
     for error in errors:
