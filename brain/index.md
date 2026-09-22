@@ -45,6 +45,7 @@ brain/
 - [Add a New Project](procedures/add-new-project.md)
 - [Add a Brain Memory Entry](procedures/add-brain-memory.md)
 - [Verify Before Claiming Ignorance](procedures/verify-before-claiming-ignorance.md)
+- [A Pipe Discards The Exit Code You Were Guarding On](procedures/a-pipe-discards-the-exit-code-you-were-guarding-on.md)
 - [Handling /session-close When No Phase Is Active](procedures/session-close-with-no-active-phase.md)
 - [Resolving Staged Idea-Triage Follow-ups via AskUserQuestion](procedures/resolve-idea-triage-followups.md)
 - [Auditing a Document for Accuracy Introduces New False Claims](procedures/audit-your-own-corrections.md)

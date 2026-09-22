@@ -15252,6 +15252,7 @@ The second approach is more robust: it avoids both the initial collision and fut
 **Links**
 
 - relates_to → `000310`
+- relates_to ← `000318`
 
 ---
 
@@ -15395,3 +15396,59 @@ The owner asked on 2026-09-22, mid-session, that backlog batching and orchestrat
 **Links**
 
 - relates_to → `000316`
+
+---
+
+## 000318 · --next-code has no read-only form, so a read-only audit cannot check the next code without taking it
+
+**Created 2026-09-22T18:03:10-04:00 · Status: `open`**
+
+uv run python -m src.governance --next-code <kind> does not report a code, it allocates one. It
+atomically creates .git/code-reservations/<CODE> in the git common directory, which every
+worktree on the machine shares. That reservation is correct and load-bearing: next_code() is a
+pure function of committed state, so two worktrees allocating before either merges compute the
+same number. The repository has paid for that collision three times - 5b3848c and 94f7978 are
+renumbers after a session-code collision, and 65491d4 is the same failure in the idea log.
+
+The problem is that there is no way to ask what the next code would be without taking it.
+"What is next?" and "give me next" are the same invocation.
+
+Observed on 2026-09-22. The read-only adversarial review of phase-lrr-01 - an agent with no write
+tools at all - needed to evidence its finding that phase-lrr-04's declared deliverable path named
+an already-consumed code. It ran --next-code operation and quoted the answer, OPS-018. That call
+reserved OPS-018. The audit consumed the very resource its finding was about.
+
+Three consequences:
+
+1. An agent with no write access still mutates shared governance state, because the mutation
+   happens inside a command it is permitted to run. Read-only intent does not make --next-code a
+   read-only command.
+2. Any audit that performs this check is non-idempotent. Run it twice and it answers OPS-018, then
+   OPS-019. The check alters what it is checking, and a later reader cannot reproduce it.
+3. The reservation is invisible in git status and in any diff, so nothing in the normal review path
+   surfaces it.
+
+The damage in this instance was small and is already undone. Reservations carry a fourteen-day TTL
+(src/governance/reservations.py TTL_SECONDS) pruned by the next allocation, and --release-code
+exists for exactly this case - GOV-005's "Releasing" section says "Release one by hand when you
+allocated a code and decided not to write it." OPS-018 was released the same day. But the recovery
+depended on someone noticing an unexpected number and reading the mechanism; nothing prompted it.
+
+Two fixes worth considering, and they are complementary:
+
+- A read-only query. --peek-code <kind>, or --next-code --dry-run, that computes and prints the
+  next free code without creating a reservation. This removes the trap at source rather than
+  asking every future auditor to remember it. It is the smaller and more durable of the two.
+- Move the prohibition into the auditor agent definitions under .claude/agents/ rather than into
+  each dispatch prompt. The prompt-level instruction used on 2026-09-22 protects only the runs
+  someone remembers to protect.
+
+A third option, doing nothing, is defensible now that the expiry and the release command are
+known - but it leaves the non-idempotence, which is the part that actually misleads a reader.
+
+Related: 000312 records that phase-lrr-04's declared OPS path names a consumed code, which is the
+finding whose evidence-gathering triggered this.
+
+**Links**
+
+- relates_to → `000312`
