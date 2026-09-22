@@ -70,8 +70,15 @@ not the stages. Then:
    `in_progress`, two runnable tables share a `sequence`, or the owner named a batch at kickoff that
    is not the one the rule selects. One `AskUserQuestion`, the rule's own pick first, with each
    table's title and the phases it holds.
-4. **No table is `queued` or `in_progress`** — report that the batch queue is empty and stop. Do not
-   compose a batch yourself; composing and superseding tables is the owner's.
+4. **No table is `queued` or `in_progress`** — the queue is empty. Do not stop with a blank page,
+   and do not compose a table yourself: **propose one, and let the owner decide.** Read `next_up`,
+   compute a dependency-closed candidate batch with its stage decomposition using the real collision
+   rule — shared `systems`, prefix-overlapping `deliverables` — and put it to the owner in one
+   `AskUserQuestion`: the proposed membership, what serializes it, and the options to take it,
+   resize it, or stop. On their yes, write the table per `GOV-016` and run it. On a decline or no
+   answer, stop and report. You are the session that has just read the backlog, so a worked proposal
+   costs the owner far less than an empty report — but composing and superseding tables remains
+   theirs to authorise, and an unanswered proposal is not a yes.
 
 `superseded` and `complete` tables are never selected. If the owner names a batch at kickoff, that
 naming wins over the rule — but say which one the rule would have picked before you proceed.

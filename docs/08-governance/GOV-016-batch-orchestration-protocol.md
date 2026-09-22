@@ -112,10 +112,21 @@ interrupted batch without anyone remembering a number. The rule:
 2. None `in_progress` — the lowest-`sequence` `queued` table.
 3. Ask the owner only when the choice is genuinely ambiguous: more than one `in_progress`, two
    runnable tables sharing a `sequence`, or a batch named at kickoff that is not the rule's pick.
-4. Nothing runnable — report an empty queue and stop.
+4. Nothing runnable — propose a candidate batch and stop for the owner's answer (below).
 
 `superseded` and `complete` tables are never selected. An owner naming a batch overrides the rule,
 and the coordinator says which table the rule would have picked before proceeding.
+
+**An empty queue is answered with a proposal, not a blank page.** A coordinator that finds nothing
+runnable has just read the backlog and the claiming rules, which makes it the cheapest place in the
+system to draw a candidate partition — and `GOV-013`'s first lesson is that a partition drawn
+*without* having read those rules is worthless. So it computes a dependency-closed candidate from
+`next_up`, with its stage decomposition, and puts that to the owner as a question.
+
+This does not move composition authority. The coordinator proposes; the owner disposes; only after a
+yes does a table get written. The distinction matters because a coordinator that both composes and
+executes its own work has no gate left between a bad partition and merged commits — and an
+unanswered proposal is not a yes.
 
 The `sequence` field exists precisely so that several `queued` tables are not ambiguous. Asking on
 every kickoff because more than one batch is waiting would move the organising load back onto the
