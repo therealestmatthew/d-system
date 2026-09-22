@@ -372,6 +372,36 @@ def test_ragged_csv_row_is_an_error(tmp_path: Path) -> None:
         lit_report_extract.extract(tmp_path)
 
 
+def test_missing_source_id_column_is_an_error(tmp_path: Path) -> None:
+    """A renamed or dropped `source_id` header must not escape as a raw `ValueError`.
+
+    `OPS-017` promises every failure prints `error: <what>` and exits 1 with no traceback.
+    `list.index` raises `ValueError`, which `main()` does not catch, so the guard is what makes
+    that promise true for the one header the tool actually looks up by name.
+    """
+    (tmp_path / "00_search_ledger.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+    (tmp_path / "03_source_inventory.csv").write_text("source_id,b\nx,2\n", encoding="utf-8")
+    (tmp_path / "04_evidence_matrix.csv").write_text("renamed_id,b\nx,2\n", encoding="utf-8")
+    (tmp_path / "05_critical_collisions.md").write_text("# c\n", encoding="utf-8")
+    (tmp_path / "06_hypothesis_tests.md").write_text("# h\n", encoding="utf-8")
+    with pytest.raises(lit_report_extract.ExtractError, match="required column 'source_id'"):
+        lit_report_extract.extract(tmp_path)
+
+
+def test_cli_reports_a_missing_column_without_a_traceback(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    (tmp_path / "00_search_ledger.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+    (tmp_path / "03_source_inventory.csv").write_text("source_id,b\nx,2\n", encoding="utf-8")
+    (tmp_path / "04_evidence_matrix.csv").write_text("renamed_id,b\nx,2\n", encoding="utf-8")
+    (tmp_path / "05_critical_collisions.md").write_text("# c\n", encoding="utf-8")
+    (tmp_path / "06_hypothesis_tests.md").write_text("# h\n", encoding="utf-8")
+    assert lit_report_extract.main(["--corpus", str(tmp_path)]) == 1
+    captured = capsys.readouterr()
+    assert "required column 'source_id'" in captured.err
+    assert "Traceback" not in captured.err
+
+
 def test_cli_writes_the_same_bytes_it_prints(tmp_path: Path) -> None:
     out = tmp_path / "extract.json"
     assert lit_report_extract.main(["--out", str(out)]) == 0

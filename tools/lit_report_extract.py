@@ -24,7 +24,7 @@ Three things carry that guarantee, and each has its own test:
 What comes out, per `phase-lrr-01`'s scope:
 
 - `deliverables` — the fourteen files matching `[0-9][0-9]_*`, each with its anchor, its byte count
-  and digest, and, for the thirteen Markdown files, the full source text for `phase-lrr-02` to
+  and digest, and, for the eleven Markdown files, the full source text for `phase-lrr-02` to
   render. `CLAUDE.md` and `HANDOFF.md` sit in the same directory and fall outside that glob; they
   are the campaign's own working instructions, not deliverables.
 - `tables` — the three CSVs as `columns` plus `rows` (a list of row lists, aligned to `columns`).
@@ -203,10 +203,27 @@ def classify_second_review(value: str) -> str:
     return word if word in SECOND_REVIEW_VERDICTS else "unrecognised"
 
 
+def _column_index(table: dict[str, Any], column: str) -> int:
+    """The position of a named column, as an `ExtractError` rather than a `ValueError`.
+
+    `list.index` raises `ValueError`, which `main()` does not catch, so a matrix whose
+    `source_id` header was renamed or dropped by a hand-edit would exit 1 through the default
+    traceback path — contradicting this tool's documented contract that every failure prints
+    `error: <what>` and nothing else.
+    """
+    columns: list[str] = table["columns"]
+    try:
+        return columns.index(column)
+    except ValueError as exc:
+        raise ExtractError(
+            f"{table['filename']}: required column {column!r} is missing from the header"
+        ) from exc
+
+
 def _matrix_rows_by_source_id(matrix: dict[str, Any]) -> dict[str, dict[str, str]]:
     """The matrix keyed by `source_id`. A duplicated id keeps its first row; see `counts`."""
     columns: list[str] = matrix["columns"]
-    index = columns.index("source_id")
+    index = _column_index(matrix, "source_id")
     keyed: dict[str, dict[str, str]] = {}
     for row in matrix["rows"]:
         keyed.setdefault(row[index], dict(zip(columns, row, strict=True)))
@@ -259,7 +276,7 @@ def _duplicate_source_ids(table: dict[str, Any]) -> list[str]:
     The inventory has two of these (idea `000308`). They are reported, never deduplicated: the
     report renders the corpus as it stands, and a repair here would hide a tracked defect.
     """
-    index: int = table["columns"].index("source_id")
+    index = _column_index(table, "source_id")
     seen: dict[str, int] = {}
     for row in table["rows"]:
         seen[row[index]] = seen.get(row[index], 0) + 1

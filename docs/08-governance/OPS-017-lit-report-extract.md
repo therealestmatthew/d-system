@@ -156,7 +156,7 @@ Three things carry that guarantee, and each has its own test:
 What comes out, per `phase-lrr-01`'s scope:
 
 - `deliverables` — the fourteen files matching `[0-9][0-9]_*`, each with its anchor, its byte count
-  and digest, and, for the thirteen Markdown files, the full source text for `phase-lrr-02` to
+  and digest, and, for the eleven Markdown files, the full source text for `phase-lrr-02` to
   render. `CLAUDE.md` and `HANDOFF.md` sit in the same directory and fall outside that glob; they
   are the campaign's own working instructions, not deliverables.
 - `tables` — the three CSVs as `columns` plus `rows` (a list of row lists, aligned to `columns`).
