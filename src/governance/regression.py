@@ -31,6 +31,7 @@ unaffected.
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -107,19 +108,52 @@ def find_regressions(
     return findings
 
 
+#: An HTML/markdown comment. Stripped before searching so a phase id hidden inside one — an
+#: entry nobody would actually see rendered — cannot satisfy R3's escape hatch invisibly.
+_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
+
+#: Characters that continue an identifier for the purpose of `_mentions`. Phase ids are
+#: `[a-z]+` and digits joined by hyphens, so a hyphen counts as a "word" character here —
+#: unlike `\b` in the `re` module, which treats `-` as a boundary and would let
+#: `phase-lit-07` match inside a mention of `phase-lit-07-something-else`.
+_ID_CHAR = re.compile(r"[A-Za-z0-9-]")
+
+
+def _mentions(text: str, phase_id: str) -> bool:
+    """Whether `phase_id` appears in `text` as a whole identifier, not as a piece of a longer
+    one. Comments are stripped first (see `_COMMENT`). Guards the R3 escape hatch against a
+    `GOV-003` entry that merely contains the target as a prefix or suffix of a different phase
+    id — `phase-lit-070` must not silence `phase-lit-07`.
+    """
+    text = _COMMENT.sub("", text)
+    start = 0
+    while True:
+        index = text.find(phase_id, start)
+        if index == -1:
+            return False
+        before = text[index - 1] if index > 0 else ""
+        after = text[index + len(phase_id)] if index + len(phase_id) < len(text) else ""
+        if not _ID_CHAR.match(before) and not _ID_CHAR.match(after):
+            return True
+        start = index + 1
+
+
 def is_recorded(prior_decisions: str | None, working_decisions: str, phase_id: str) -> bool:
     """R3: the reversal is permitted when this change adds a `GOV-003` entry naming `phase_id`.
 
-    A substring search, not a parse, by design (see module docstring). `prior_decisions` of
+    A whole-identifier search, not a parse, by design (see module docstring) — deliberately
+    loose about the *shape* of the entry, so an ordinary sentence naming the phase counts, but
+    strict about *which* identifier it names: `phase_id` must appear as itself, not as a
+    substring of a different phase id, and not only inside a comment. `prior_decisions` of
     `None` means `GOV-003` did not exist, or was unreadable, at the comparison ref; that is
     treated as "not previously mentioned", so any mention in the working copy counts as this
     change having recorded it.
     """
-    if phase_id not in working_decisions:
+    if not _mentions(working_decisions, phase_id):
         return False
     if prior_decisions is None:
         return True
-    return phase_id not in prior_decisions
+    return not _mentions(prior_decisions, phase_id)
 
 
 def check(

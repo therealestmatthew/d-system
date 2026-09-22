@@ -12,6 +12,9 @@ from typing import Any
 
 import yaml
 
+import src.governance.regression as regression
+from src.governance.__main__ import ROOT, audit_backlog, main
+from src.governance.__main__ import audit as audit_docs
 from src.governance.regression import audit, check, find_regressions, is_recorded
 
 GOV003_HEADER = "# Accepted choices\n\n"
@@ -105,6 +108,48 @@ def test_is_recorded_false_when_entry_predates_the_change() -> None:
 def test_is_recorded_true_when_gov003_did_not_exist_before() -> None:
     working = "phase-example was reopened because X.\n"
     assert is_recorded(None, working, "phase-example") is True
+
+
+def test_is_recorded_defeats_prefix_collision() -> None:
+    """A different phase id that merely contains the target as a prefix must not silence it —
+    `phase-lit-070` naming itself must not be read as `phase-lit-07` being recorded."""
+    prior = GOV003_HEADER
+    working = GOV003_HEADER + "phase-lit-070 was reopened because X.\n"
+    assert is_recorded(prior, working, "phase-lit-07") is False
+
+
+def test_is_recorded_defeats_suffix_collision() -> None:
+    """Same failure mode, on the other side: the target must not match as a suffix of a
+    longer id either."""
+    prior = GOV003_HEADER
+    working = GOV003_HEADER + "megaphase-lit-07 was reopened because X.\n"
+    assert is_recorded(prior, working, "phase-lit-07") is False
+
+
+def test_is_recorded_true_for_a_bare_prose_mention() -> None:
+    """An ordinary sentence naming the phase id as a whole word still counts — the escape
+    hatch is deliberately loose about the entry's shape (PLAN-038), only strict about which
+    identifier it names."""
+    prior = GOV003_HEADER
+    working = GOV003_HEADER + "See the writeup: phase-example needed a second look.\n"
+    assert is_recorded(prior, working, "phase-example") is True
+
+
+def test_is_recorded_defeats_commented_out_mention() -> None:
+    """A mention hidden inside an HTML/markdown comment must not count — nobody reading the
+    rendered document would see it, so it is not a durable, visible record of the decision."""
+    prior = GOV003_HEADER
+    working = GOV003_HEADER + "<!-- phase-example was reopened because X. -->\n"
+    assert is_recorded(prior, working, "phase-example") is False
+
+
+def test_is_recorded_defeats_commented_out_mention_even_with_visible_text_around() -> None:
+    prior = GOV003_HEADER
+    working = (
+        GOV003_HEADER
+        + "Some visible text.\n<!-- phase-example was reopened. -->\nMore visible text.\n"
+    )
+    assert is_recorded(prior, working, "phase-example") is False
 
 
 # --- integration: a real git repository ----------------------------------------------------
@@ -301,3 +346,59 @@ def test_check_returns_only_the_requested_severity(tmp_path: Path, monkeypatch: 
 
     errors, warnings = check(tmp_path, "HEAD", "warning", current, GOV003_HEADER)
     assert warnings and not errors
+
+
+# --- integration: the real `uv run python -m src.governance` entry point -------------------
+
+
+def test_main_reports_a_status_regression_through_the_real_entry_point(
+    monkeypatch: Any, capsys: Any
+) -> None:
+    """R5, and the wiring itself: run the actual `main()` entry point against this
+    repository's own, already-valid `ROOT`, with only the `HEAD` copy of `backlog.yaml`
+    faked to claim a real, currently-non-complete phase was `complete`.
+
+    This is deliberately end-to-end through `src.governance.__main__.main()` rather than
+    through `src.governance.regression` directly: every other test in this file can keep
+    passing even if `__main__.py` stops calling the guard at all (as a mutation test showed).
+    Only a test that walks the same path `python -m src.governance` walks — `main()` calling
+    `audit_status_regression`, its result reaching `errors`/`warnings`, and finally the
+    printed report — can catch that wiring silently disappearing.
+    """
+    errors, _, result = audit_docs(ROOT)
+    assert errors == []
+    backlog_errors, live_catalog = audit_backlog(ROOT, result)
+    assert backlog_errors == []
+    target = next(item for item in live_catalog["items"] if item["status"] != "complete")
+
+    fabricated_prior = yaml.safe_dump(
+        {
+            "items": [
+                {
+                    "id": target["id"],
+                    "status": "complete",
+                    "session": "SESS-2026-09-01-01",
+                    "completion_evidence": ["schemas/backlog.schema.json"],
+                    "result": "fabricated for this test",
+                }
+            ]
+        }
+    )
+
+    def fake_read_text_at(root: Path, ref: str, path: str) -> str | None:
+        if path == regression.DECISIONS_PATH:
+            return ""  # no GOV-003 entry names the target under either base
+        if path == regression.BACKLOG_PATH and ref == "HEAD":
+            return fabricated_prior
+        return None  # dev, or anything else: unreadable, skip with a note
+
+    monkeypatch.setattr(regression, "read_text_at", fake_read_text_at)
+    monkeypatch.setattr("sys.argv", ["governance"])
+
+    exit_code = main()
+    output = capsys.readouterr().out
+
+    assert exit_code != 0
+    assert target["id"] in output
+    assert "status-regression" in output
+    assert "complete ->" in output
