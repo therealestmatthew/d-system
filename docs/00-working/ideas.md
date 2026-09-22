@@ -13421,7 +13421,7 @@ rendered output, or left to stand.
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-21T15:29:31-04:00): The stale-count defect this idea reports is already named, in the same words, in the session
 record that found it: SESS-2026-09-21-04-literature-review-corpus-extraction.md's "Corpus defects
@@ -13480,6 +13480,25 @@ neither is the other.
 
 Recorded here rather than by amending the annotation, so the original reading stays legible
 alongside what it got wrong.
+- **finding** by agent-lrr (2026-09-22T08:21:01-04:00): Owner ruling, 2026-09-22. The stale prose is annotated in the rendered report output and
+never corrected in the source.
+
+The renderer emits 05's preamble verbatim, as it does all deliverable prose, and places a
+visible editorial note beside it recording the measured section count and the fact that the
+file's own text disagrees. research/literature-review/ stays untouched, per PLAN-043's
+out-of-scope rule.
+
+The ruling deliberately does not generalise. A mechanism that flagged every measurable
+contradiction in deliverable prose was considered and declined as an unspecified feature
+that would widen phase-lrr-04 past its declared scope. This is one annotation for one known
+defect, not a contradiction-detection pass.
+
+The reasoning given: it matches how the report already treats the campaign's disputed
+findings - surfaced rather than smoothed - and REQ-027 R06's refusal to drop the campaign's
+hedging. A reader without access to the idea log otherwise cannot tell which number is right.
+
+Implementation lands in phase-lrr-02 (the renderer emits the note) and is verified in
+phase-lrr-04 alongside the rest of the epistemic framing.
 
 </details>
 
@@ -13527,7 +13546,7 @@ fail a check that was never satisfiable or quietly narrow the acceptance to make
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-21T15:29:15-04:00): Verified independently. research/literature-review/ has 14 files matching [0-9][0-9]_*: 11 .md
 (01-02, 05-13) and 3 .csv (00, 03, 04). Confirmed by directory listing, not just the extractor's
@@ -13577,6 +13596,23 @@ that the four sentences above are the ones to change.
 Related ideas: 000308 and 000309 are already linked as relates_to by the idea's author; not
 independently re-verified here since this finding is scoped to the wording defect, not to those
 ideas' own content.
+- **finding** by agent-lrr (2026-09-22T08:21:01-04:00): Owner ruling, 2026-09-22. The wording is corrected to name the eleven Markdown deliverables
+rather than the numeric range 01-13.
+
+Four places are amended in one pass: REQ-027 R02's statement and verification, PLAN-043's
+two "thirteen" sentences in its phase table and risks section, and phase-lrr-02's scope and
+acceptance in the backlog. REQ-027 R03 is untouched - triage confirmed it already covers
+03_source_inventory.csv and 04_evidence_matrix.csv independently as browsable tables, so the
+two files the R02 wording wrongly swept in lose nothing.
+
+The alternative considered and declined was keeping the 01-13 range and making the Markdown
+assertions conditional on file format. It was rejected as a smaller diff that leaves a
+requirement reading as though thirteen Markdown files exist, needing a footnote to be read
+correctly.
+
+REQ-027 is status: draft, so this is an ordinary amendment rather than a superseding revision.
+
+The amendment lands in phase-lrr-02, which is the phase it unblocks.
 
 </details>
 
