@@ -11113,7 +11113,7 @@ PROPOSED LINK: 000221 --relates_to--> 000230 (contract resolution belongs in the
 
 ## 000222 · Demo kit skills roster, owner-authored: the six the kit actually ships
 
-**Created 2026-09-13T23:29:29-04:00 · Status: `open`**
+**Created 2026-09-13T23:29:29-04:00 · Status: `triaged`**
 
 The consultant demo kit's six skills, given by the owner on 2026-09-13 and replacing the skill roster
 proposed during the earlier design round. These are the ones the owner aligned with.
@@ -11144,6 +11144,34 @@ Naming: demo-skill-, demo-cmd-, demo-agent-. This accepts that demo- names two d
 among the agents in this repository, since the stage build already owns demo-adversary, demo-orch-
 and demo-creator-.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:21-04:00): Idea 000222 (Demo kit skills roster, owner-authored) specifies the six skills that the owner aligned with on 2026-09-13 for the consultant demo kit: flowchart, brainstorm, ask-me, meeting-notes, scorecard, and make-it-a-skill.
+
+Related documents:
+- PLAN-024 (Consultant demo kit build) explicitly references idea 000222 and lists these six skills in its component specifications section.
+- REQ-008 (Consultant demo kit requirements) also references 000222 as the source for the current roster, replacing the design-round proposals.
+- Related idea 000223 (Demo kit commands roster) is already linked as relates_to->000222.
+
+Implementation status:
+All six skills are fully built and present in .claude/skills/:
+- demo-skill-ask-me (elicitation engine, called by three others)
+- demo-skill-flowchart (process to diagram)
+- demo-skill-brainstorm (structured ideation)
+- demo-skill-meeting-notes (raw notes to structured summary)
+- demo-skill-scorecard (weighted comparison matrix)
+- demo-skill-make-it-a-skill (watches manual work, drafts reusable skill)
+
+Phase-kit-02 (Build the kit's six self-announcing skills) in the backlog is marked complete, delivering exactly what this idea specifies. Verification shows each skill names itself in output, firing descriptions are explicit, and the required integrations are present.
+
+PROPOSED PROMOTION: 000222 -> PLAN-024 (all six specified skills delivered by phase-kit-02)
+
+</details>
+
 **Links**
 
 - relates_to ← `000223`
@@ -11152,7 +11180,7 @@ and demo-creator-.
 
 ## 000223 · Demo kit commands roster, owner-authored: the six the kit actually ships
 
-**Created 2026-09-13T23:29:29-04:00 · Status: `open`**
+**Created 2026-09-13T23:29:29-04:00 · Status: `triaged`**
 
 The consultant demo kit's six commands, given by the owner on 2026-09-13 and replacing the command
 roster proposed during the earlier design round, exactly as the skills roster was replaced.
@@ -11181,6 +11209,24 @@ no component carries code, git, debugging or repository content. demo-cmd-contex
 Claude knows, where the replaced context-me built the context file; whether the kit still teaches
 how to create one is open.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:37:43-04:00): Idea 000223 documents the six demo-kit commands the owner authored. The commands are fully delivered: `demo-cmd-askme`, `demo-cmd-context-check`, `demo-cmd-explain-this`, `demo-cmd-rubber-duck`, `demo-cmd-second-opinion`, and `demo-cmd-teach-me` are tracked in `.claude/commands/`.
+
+Related idea 000222 (Demo kit skills roster) is the companion to this roster and carries the same status: delivered and documented.
+
+The idea is explicitly named and required in PLAN-024 (Consultant demo kit build) at line 42 and REQ-008 (Consultant demo kit requirements) at line 49. PLAN-024 records that on 2026-09-13 the owner replaced the original command roster wholesale with these six (idea 000223). REQ-008 K16 requires every component to carry its type prefix `demo-cmd-`, which all six do.
+
+No related plan or requirement beyond PLAN-024 and REQ-008 found. The idea itself functions as an inventory record of a delivered artifact set.
+
+PROPOSED LINK: 000223 --relates_to--> 000222 (sibling roster for the demo kit)
+
+</details>
+
 **Links**
 
 - relates_to → `000222`
@@ -11189,7 +11235,7 @@ how to create one is open.
 
 ## 000224 · A whole-file backlog write silently reverted four completed phases, and governance exits 0 either way
 
-**Created 2026-09-14T00:55:05-04:00 · Status: `open`**
+**Created 2026-09-14T00:55:05-04:00 · Status: `triaged`**
 
 Commit 5ecb203 on dev ("Adopt the owner's command and skill rosters") rewrote
 docs/09-backlog/backlog.yaml from a stale copy. Its intended change was correct — scope,
@@ -11224,6 +11270,22 @@ ever been complete, or that carries session/completion_evidence/result, should n
 to queued or active without the change saying so. A monotonicity assertion over phase status
 across commits would have failed this commit at the point it was made.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:19-04:00): Idea 000224 reports the incident where commit 5ecb203 rewrote backlog.yaml from a stale copy, silently reverting four completed phases to their prior state. The governance validator exits 0 on both the good and bad versions because it does not check phase-status monotonicity. The idea proposes the solution: a check that fails when a phase leaves `complete` or loses its completion evidence without an explicit decision recorded.
+
+That solution is now specified in REQ-010 (Backlog status-regression guard requirements) and implemented by PLAN-038 (Backlog status-regression guard), whose phase-gov-05 is currently queued. PLAN-038 directly addresses the detection gap identified in this idea, with the exact check proposed here: a monotonicity assertion that compares prior and current backlog state and fails when a completed phase regresses.
+
+Idea 000240 (yaml anchors breaking backlog.yaml) was just triaged and linked here; it addresses a separate corruption path in backlog.yaml writes, not the status-regression issue in this idea.
+
+PROPOSED LINK: 000224 --relates_to--> PLAN-038 (plan that implements the monotonicity check this idea proposes)
+
+</details>
+
 **Links**
 
 - relates_to ← `000240`
@@ -11232,7 +11294,7 @@ across commits would have failed this commit at the point it was made.
 
 ## 000225 · No dispatch owns 06_hypothesis_tests.md after the second reviews land, so it ships stale by construction
 
-**Created 2026-09-14T00:55:05-04:00 · Status: `open`**
+**Created 2026-09-14T00:55:05-04:00 · Status: `triaged`**
 
 The delegation pack (PROMPT-029) gives LIT-06 X1 the job of writing 06_hypothesis_tests.md, and
 gives LIT-06 X2 the matrix second_review field and a dated subsection of 05_critical_collisions.md.
@@ -11271,6 +11333,15 @@ in which case 06 should say so in its own text. This is the same shape as 000221
 
 - **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: LIT-07 X1 reconciles 06_hypothesis_tests.md against the corrected evidence matrix as its item 0, before writing 07_anti_novelty_case.md. It reads each block's strongest_challenger against that row's current matrix values and its dated review subsection in 05, says so in the block where a review undercuts the challenger, and re-derives the status from the evidence that stands. H11 and H1 are known to need it and are named in the pack; the dispatch is told not to assume they are the only two. Written into PROMPT-029 as LIT-07 X1 item 0. This closes the writer gap for 06 but not the general shape - 000221 remains open on second_review's stated sole writer.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:36-04:00): Resolved by owner direction during phase-lit-06 close. The issue identified a real dispatch gap: PROMPT-029 delegated 06_hypothesis_tests.md writing to LIT-06 X1 but had no dispatch to reconcile it after independent reviews returned disputed verdicts on 13 of 19 rows. This was caught by phase-lit-06's close review, and the owner directed the reconciliation to run inside phase-lit-06 itself rather than delay until LIT-07. The reconciliation work was then formalized into check-in ruling 4: "LIT-07 X1 reconciles 06_hypothesis_tests.md as its item 0, before writing 07." This became idempotent pack item in PROMPT-029 and subsequent dispatches. All four subsequent phases (lit-07, lit-08, lit-09) completed with 06_hypothesis_tests.md properly reconciled (as recorded in SESS-2026-09-14-01 and follow-up session records). The gap was resolved; no outstanding dispatch work remains.
+
+PROPOSED PROMOTION: 000225 -> PROMPT-029 (reconciliation of 06_hypothesis_tests.md formalized into LIT-07 X1 item 0 per check-in ruling 4)
+
+</details>
+
 **Links**
 
 - relates_to → `000221`
@@ -11280,7 +11351,7 @@ in which case 06 should say so in its own text. This is the same shape as 000221
 
 ## 000226 · Pass 2's deep reads overstated collisions in one direction, and seven of nineteen rows scored high on material their own locators never reached
 
-**Created 2026-09-14T00:55:42-04:00 · Status: `open`**
+**Created 2026-09-14T00:55:42-04:00 · Status: `triaged`**
 
 phase-lit-06 dispatched an independent second review for every critical collision — nineteen of
 them, each reviewer receiving only the source and that row's 43 matrix fields, never the first
@@ -11340,6 +11411,19 @@ at page 4 is visible at write time rather than at second review. Recorded from p
 
 - **assessment** by repository-owner (2026-09-14T09:09:12-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: NO ROW IS RE-READ. The 42 factual corrections from the second reviews already landed, and the scores stand under the ruling that keeps the nineteen flags. The defect is addressed by prevention instead: Block D now requires a deep-extraction dispatch to establish what access the source really permits before scoring, to record in evidence_locator the range it read AND anything available it did not read with the reason, and never to code a field NOT_DETERMINABLE_FROM_ACCESS when reachable material answers it. access_limitation describes what the source permits, never how far the read got - recording abstract_only when full text was freely reachable is a false statement about the source. Written into PROMPT-029's Block D.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:18-04:00): Idea 000226 reports findings from phase-lit-06's second review of literature campaign collisions: seven of nineteen rows scored high on material their own evidence locators never reached, indicating one-directional overstating of collisions. The idea asked whether rows should be re-read and whether evidence-extraction dispatches should disclose what they actually read.
+
+Related ideas 000203 and 000209 both concern Pass 2 deep-read accuracy. Idea 000230 is the anchor coordinating pre-synthesis rulings. All exist as existing linked relationships.
+
+The findings have been fully addressed: owner ruling (SESS-2026-09-14-01, 2026-09-14T09:09:12-04:00) decided NO ROW IS RE-READ, but implemented prevention instead. Block D of PROMPT-029 (delegation pack) now requires deep-extraction dispatches to establish access limitations before scoring, record evidence_locator ranges for what was read and available-but-unread, and never code NOT_DETERMINABLE_FROM_ACCESS when reachable material answers the question. This read-disclosure requirement was written into PROMPT-029 and carried through phases lit-07, lit-08, and lit-09, which have all completed. PLAN-023.03's evidence contract was also updated with the patent scoring ruling and "adjacent" definition clarification, both stemming from phase-lit-06 findings. The literature campaign closed 2026-09-19 (phase-lit-09 complete).
+
+PROPOSED PROMOTION: 000226 -> PROMPT-029 (Block D's read-disclosure requirement directly implements the prevention mechanism idea 000226 identified as needed, delivered through the entire campaign's synthesis phases)
+
+</details>
+
 **Links**
 
 - relates_to → `000203`
@@ -11350,7 +11434,7 @@ at page 4 is visible at write time rather than at second review. Recorded from p
 
 ## 000227 · The evidence contract has no rule for scoring a patent, and a coordinator invented one mid-campaign
 
-**Created 2026-09-14T00:55:42-04:00 · Status: `open`**
+**Created 2026-09-14T00:55:42-04:00 · Status: `triaged`**
 
 The evidence contract (PLAN-023.03) says nothing about how to assess a patent. Its source_type
 enum has no patent bucket either, which is already recorded as 000148 — granted patents were filed
@@ -11388,6 +11472,17 @@ and the patent) are among the nineteen critical collisions, so this is not an ed
 
 - **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: a patent's WHOLE PUBLISHED DISCLOSURE is prior art - specification and claims together - and both overlap scores derive from all of it. A published application discloses its contents regardless of what was ultimately claimed, and this campaign measures what is already known, not what is legally protected. This REJECTS the claims-only re-derivation applied to us20250165226a1-ai-digital-thread-patent during phase-lit-06 as using the wrong standard: that rule is the test for infringement and validity. The row's architecture overlap of 4 and its critical_collision: yes both stand. Where claims are materially narrower than the specification, record the difference in strongest_difference rather than adjusting a score. Written into PLAN-023.03. The source_type enum still has no patent bucket; 000148 remains open.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:46-04:00): The patent-scoring question asked in this idea HAS BEEN DECIDED. PLAN-023.03 now contains a new section titled "Scoring a patent (owner ruling, pre-synthesis check-in 2026-09-14)" which answers the core question: "A patent's whole published disclosure is prior art — specification and claims together — and both overlap scores are derived from all of it." This ruling was made on 2026-09-14 and rejects the mid-campaign improvisation (score claims only) that provoked this idea. The ruling restores the architecture overlap score of 4 and critical_collision flag for us20250165226a1-ai-digital-thread-patent. It is one of five pre-synthesis rulings tracked in anchor idea 000230 (pre-synthesis check-in decisions).
+
+However, the idea also asks whether "the same treatment extends to other artifact kinds the contract's rubric was not written for — standards, dissertations, whitepapers and live software libraries". The patent ruling alone does not address that broader question. These other artifact types remain without explicit contract guidance for scoring.
+
+Related: 000148 (patent source_type enum gap, still open), 000230 (anchor for all five pre-synthesis rulings). The evidence contract at PLAN-023.03 is the authoritative source.
+
+</details>
+
 **Links**
 
 - relates_to → `000148`
@@ -11397,7 +11492,7 @@ and the patent) are among the nineteen critical collisions, so this is not an ed
 
 ## 000228 · "Spans at least four adjacent stages" does not say whether adjacent means contiguous, and the two readings flip the trigger
 
-**Created 2026-09-14T00:56:14-04:00 · Status: `open`**
+**Created 2026-09-14T00:56:14-04:00 · Status: `triaged`**
 
 PLAN-023.03's CRITICAL_COLLISION flag rules list four triggers. The fourth reads: flag a source
 yes if "it spans at least four adjacent stages in: Reasoning -> Decision -> Requirement ->
@@ -11437,6 +11532,19 @@ LIT-07's final gate recounts collisions.
 
 - **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: 'adjacent' in PLAN-023.03's fourth CRITICAL_COLLISION trigger means CONTIGUOUS - four consecutive stages with no gap. A source covering Reasoning, Artifact, Verification and Knowledge Update does not fire it; Artifact to Verification to Deployment to Runtime Evidence does. The strict reading is chosen because the loose one inflates the collision count in the direction that flatters H0, which is the campaign's known exposure. Written into PLAN-023.03 with the phase-lit-06 evidence that surfaced it.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:30-04:00): RESOLVED: Idea 000228 raised an open contract ambiguity about PLAN-023.03's fourth CRITICAL_COLLISION trigger. The trigger requires a source to "span at least four adjacent stages" but "adjacent" was undefined, permitting two readings: STRICT (four consecutive stages with no gap) or LOOSE (any four stages from the ordered chain).
+
+The ambiguity was surfaced during phase-lit-06 when two independent reviewers reached different stage counts under the two readings on the same source (evidence-graphs-fair-computation-defeasible-reasoning-2021: 3 contiguous vs. 5 scattered), causing the trigger to fire under one reading and not the other.
+
+RESOLUTION: Owner ruling at the pre-synthesis check-in (2026-09-14) clarified that "adjacent" means CONTIGUOUS—four consecutive stages with no gap. The ruling is documented in PLAN-023.03 section "Adjacent means contiguous" (lines 159–170), with full rationale: the strict reading is chosen because the loose one inflates the collision count in a direction that flatters H0, the campaign's known exposure. An assessment annotation capturing the complete ruling text is already recorded on the idea.
+
+The issue is CLOSED. No outstanding action items remain. The evidence contract now carries the clarification needed for LIT-07's final gate to recount collisions with unambiguous trigger semantics.
+
+</details>
+
 **Links**
 
 - relates_to → `000230`
@@ -11445,7 +11553,7 @@ LIT-07's final gate recounts collisions.
 
 ## 000229 · Six critical-collision flags survive only because no dispatch was authorised to drop them
 
-**Created 2026-09-14T00:56:14-04:00 · Status: `open`**
+**Created 2026-09-14T00:56:14-04:00 · Status: `triaged`**
 
 phase-lit-06's nineteen independent second reviews returned six verdicts in which the reviewer,
 re-deriving both overlap scores from the contract's own rubric, found that NO trigger fires at
@@ -11487,6 +11595,23 @@ disputing their flags: log-is-the-agent (H2;H3;H5;H7;H9 -> H2;H9), langgraph (dr
 
 - **assessment** by repository-owner (2026-09-14T09:09:11-04:00): OWNER RULING, pre-synthesis check-in 2026-09-14: the nineteen critical-collision flags STAND. The six disputes in which a reviewer re-derived a score one level lower and found no trigger fires are recorded in second_review and in 05_critical_collisions.md, and are not applied. No score, no critical_collision value and no hypotheses_challenged value changes. LIT-06 G's measurement 2 therefore needs no re-run and the population LIT-07 G inherits stays at 19. The five recommended narrowings of hypotheses_challenged are likewise recorded, not applied. LIT-07 X1 weighs all of it when it reconciles 06_hypothesis_tests.md. Recorded in PROMPT-031's check-in entry, ruling 1 and ruling 6.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:54-04:00): RELATED DOCUMENTS AND RULINGS FOUND:
+
+Idea 000229 documents six critical-collision flags that survived disputed re-reviews during phase-lit-06. The issue: reviewers re-derived the scores one level lower and concluded no trigger fires, yet the coordinator recorded them only as "disputed" without changing the flags, pending owner direction.
+
+This decision was already resolved. The owner made ruling 1 at the pre-synthesis check-in (2026-09-14), recorded in PROMPT-031 § Pre-synthesis check-in: "The nineteen critical-collision flags stand. Six reviewers re-derived a score one level lower and concluded no trigger fires; those are recorded as `disputed` in `second_review` and in `05_critical_collisions.md`, and no score, `critical_collision` or `hypotheses_challenged` value was changed."
+
+The ruling was enacted: PLAN-023.03 (evidence contract) documents the final call. Phase-lit-07 (synthesis pass) completed 2026-09-21 with status: complete, incorporating all pre-synthesis check-in rulings. The phase result confirms "Integrated to dev by fast-forward on the owner's approval. Closes PLAN-023."
+
+Related: Idea 000230 is the anchor for all five rulings; ideas 000227 (patent scoring), 000228 (adjacent stages definition), 000225 (hypothesis tests update), and 000226 (depth defect handling) are the other four decision points queued at the same check-in.
+
+Idea 000229 is fully documented and resolved through the literature campaign's pre-synthesis check-in ruling, which stands unchanged through phase-lit-07's completion.
+
+</details>
+
 **Links**
 
 - relates_to → `000230`
@@ -11495,7 +11620,7 @@ disputing their flags: log-is-the-agent (H2;H3;H5;H7;H9 -> H2;H9), langgraph (dr
 
 ## 000230 · Anchor: the five rulings the literature campaign's pre-synthesis check-in has to produce
 
-**Created 2026-09-14T00:56:45-04:00 · Status: `open`**
+**Created 2026-09-14T00:56:45-04:00 · Status: `triaged`**
 
 phase-lit-06 closed its gate on 2026-09-14 and the campaign stopped for the owner's one scheduled
 pause (PROMPT-031 ratified decision 1), which is also the first of the two owner integrations of
@@ -11535,6 +11660,29 @@ campaign's phases and no check caught it. [[000224]]
 
 - **assessment** by repository-owner (2026-09-14T09:09:22-04:00): CHECK-IN HELD, 2026-09-14, ruling: proceed. All five rulings this anchor was created to collect are now made and recorded in PROMPT-031's check-in entry, with each behaviour-changing ruling also written into the document that governs it - PLAN-023.03 for the patent rule and the contiguous definition, PROMPT-029 for Block D's read-disclosure requirement and LIT-07 X1's reconcile-first step. Three further rulings were taken at the same sitting: the nineteen flags stand and the five recommended narrowings are recorded not applied; rulings go into the governing documents rather than the kickoff record alone; and phase-lit-07 must NOT claim saturation, because LIT-06 G measured a 20.0 percent duplicate rate (44/220, recomputed independently and reproduced exactly) and four results in five were new. phase-lit-07 is unblocked and was deliberately not started in the same session.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:53-04:00): All five rulings were made and are fully recorded. The pre-synthesis check-in was held 2026-09-14 (SESS-2026-09-14-01-literature-review-pass-3) and produced eight rulings, five of which anchor the linked ideas:
+
+Ruling 1 (000229): Nineteen critical-collision flags stand; disputes recorded unapplied in PROMPT-031, SESS-2026-09-14-01, and 05_critical_collisions.md.
+
+Ruling 2 (000227): Patent's whole disclosure is prior art; written into PLAN-023.03. The coordinator's claims-only improvisation was reversed.
+
+Ruling 3 (000228): "Adjacent" means contiguous (four consecutive stages); written into PLAN-023.03.
+
+Ruling 4 (000225): LIT-07 X1 item 0 reconciles 06_hypothesis_tests.md. Superseded same day when phase-lit-06's close review found the need urgent; the reconciliation ran inside phase-lit-06 instead.
+
+Ruling 5 (000226): No row is re-read; Block D dispatch narrowed to declare what was read instead.
+
+Rulings 6–8 (recorded in PROMPT-031 and SESS-2026-09-14-01 but not anchored as separate ideas): narrowings recorded unapplied, behavior-changing rulings written into governing documents, saturation not demonstrated and must not be claimed.
+
+PROMPT-031 "wins by precedence" and carries the official dated entry LIT-07 K requires. All rulings were written into the documents they govern (evidence contract, delegation pack, plan). Campaign closed 2026-09-21 after all phases (lit-06 through lit-09) completed.
+
+No additional rulings discovered; no gaps in the record.
+
+</details>
+
 **Links**
 
 - relates_to ← `000225`
@@ -11547,7 +11695,7 @@ campaign's phases and no check caught it. [[000224]]
 
 ## 000231 · generate_glossary.py reports the unfiltered term count for a filtered glossary, so the number is useless as evidence
 
-**Created 2026-09-14T13:10:55-04:00 · Status: `open`**
+**Created 2026-09-14T13:10:55-04:00 · Status: `triaged`**
 
 `tools/generate_glossary.py` builds `entries = load_concepts()` at line 102, then `render()` applies
 the tag and system filters internally into a local `filtered` list (lines 68-73). The success line
@@ -11578,11 +11726,27 @@ Also worth checking at the same time whether any other tool under `tools/` print
 before a filter, since this pattern would not be visible in any test that only asserts the
 generated file's content.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:38:34-04:00): Confirmed: tools/generate_glossary.py line 119 reports `len(entries)` (pre-filter count) instead of the filtered term count. When run with `--tag` or `--system`, a filtered glossary rendering 18 headings still prints "9 term(s)" — the unfiltered total. The rendering itself is correct; the defect is in what the tool claims it did.
+
+OPS-004 documents the tool's purpose and expected result. No existing plan or requirement specifically covers tool output accuracy, though REQ-015 R12–R13 address related measurement correctness concerns: output that looks like evidence but comes from the wrong population is actionable in decisions but wrong as proof.
+
+The fix is one line: report `len(filtered)` instead of `len(entries)`. Whether to also name the unfiltered total (e.g., "18 of 61 term(s)") for filtered runs is a design choice; doing so would make a filtered invocation self-evidently filtered.
+
+Checked: generate_ideas_md.py, build_idea_corpus.py, and three other tools printing counts — none have the same issue. This pattern (count before filter) is not systemic.
+
+</details>
+
 ---
 
 ## 000232 · HTML Viewer supports the already-served image formats (.png, .jpg, .jpeg, .gif, .webp, .ico)
 
-**Created 2026-09-14T19:49:56-04:00 · Status: `open`**
+**Created 2026-09-14T19:49:56-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, for the workbench viewer batch (G48, PLAN-027/P11). Add the already-served image formats to the HTML Viewer's selectable file types so images display in the panel the same way .html and .svg already do. Raised as ".png" and widened by the owner the same day to every image type ts/vite.config.ts already serves: .png, .jpg, .jpeg, .gif, .webp and .ico.
 
@@ -11598,9 +11762,20 @@ Open question for the planning session: whether the iframe's bare-image presenta
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-prog (2026-09-14T23:04:00-04:00): Delivered 2026-09-14, verified against the code during phase-prog-02 (P11 finalization). All six formats are present in COMPATIBLE_EXTENSIONS at ts/src/stage/HtmlViewerRegion.tsx:30-35 (commit 6896efc). This idea shipped independently of the markdown work, as its own text required, and did not inherit 000118 dependency on 000110. Its one open question — whether bare-image iframe presentation is acceptable or an image needs wrapping for consistency — was answered in the build rather than deferred to this planning session: images are wrapped in a fitted, centred HTML document (commit 2e35ae7), with a follow-up serving image bytes to sub-resource requests rather than the wrapper (commit 71cc841), the ?raw=1 discriminator at ts/vite.config.ts:278. The answer is the same for all six, as the idea required. No question remains for P11 to settle. Status deliberately left at open, not moved: promoted is false (no governed document was produced) and discarded is false (the work was built, not rejected). Recorded in place per the owner ruling of 2026-09-14; see 000236 and PLAN-027.
+- **finding** by agent-idea-triage (2026-09-22T11:38:24-04:00): Idea 000232 requested adding image formats (.png, .jpg, .jpeg, .gif, .webp, .ico) to the HTML Viewer's selectable file types. This functionality has been fully delivered and shipped.
+
+The work was completed in phase-wbf-01 (PLAN-027/P11) on 2026-09-14 and shipped in commits 6896efc (COMPATIBLE_EXTENSIONS array), 2e35ae7 (fitted wrapper document for image presentation), and 71cc841 (?raw=1 discriminator for sub-resource requests).
+
+Current state: COMPATIBLE_EXTENSIONS in ts/src/stage/HtmlViewerRegion.tsx:25-36 includes all six image formats. The File Browser's "Open in HTML Viewer" context menu action automatically supports them via the shared constant (FileBrowserRegion.tsx imports COMPATIBLE_EXTENSIONS).
+
+The idea's open question—whether bare-image iframe presentation was acceptable or images needed wrapping for consistency—was answered in the build: images are wrapped in a fitted centred document for legible presentation.
+
+Requirement REQ-012-workbench-features-defects.md R01 confirms the delivery with commit references and specific test expectations.
+
+PROPOSED PROMOTION: 000232 -> PLAN-027 (All six image formats delivered in phase-wbf-01, commits 6896efc/2e35ae7/71cc841, COMPATIBLE_EXTENSIONS live in production code)
 
 </details>
 
@@ -11614,7 +11789,7 @@ Open question for the planning session: whether the iframe's bare-image presenta
 
 ## 000233 · Panels maximize to full screen and collapse back to their slot
 
-**Created 2026-09-14T19:50:11-04:00 · Status: `open`**
+**Created 2026-09-14T19:50:11-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised for the HTML Viewer specifically and motivated by demoability: expand the viewer to fill the screen, then collapse it back to the position it came from. On a projector the viewer's slot is too small to read generated pages from the back of a room, and switching layouts to get more room loses the arrangement.
 
@@ -11631,7 +11806,7 @@ Related: 000133 revisits panel geometry on the G43 model and is the nearest exis
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-maximize-review (2026-09-15T16:47:07-04:00): Read-only investigation, 2026-09-15, of PLAN-028 design decision 5 against the shipped code, at the owner's request. The ruling stands on the owner's decision: phase-arch-17 keeps depends_on [phase-arch-07, phase-arch-09] and its queue position. Recorded so the mechanism is not re-derived.
 
@@ -11646,6 +11821,11 @@ On the dependency edges: REQ-011 R25-R28 as written require neither sub-slots (R
 Scale check on the motivation: in layout-1 the HTML Viewer's main slot is column 2 of [1.4fr, 1fr] and row 2 of [0.25fr, 1.3fr, 1.15fr] - about 20 percent of the grid, roughly 785x478px at 1920x1080. In layout-2 it is about 13 percent. Maximizing is a 5x and 8x area gain. The projector complaint is quantitatively correct.
 
 Two further notes for whoever executes this. There is no automated fill or zero-scroll check in the repository - test/ holds 22 files, none browser-driven, and grepping test/, tools/ and js/ for W15, scrollHeight or 1366 returns nothing - so R26 is a demo-validator-web Playwright run at four window sizes by two layouts by two states, and it is the largest line item in the phase. And available today at zero cost: the viewer's existing embed/open-in-tab toggle (HtmlViewerRegion.tsx:510-519) opens the selected page full-screen in a browser tab, served with a CSP sandbox header - not maximize-and-collapse, but a full-screen generated page on a projector at one click.
+- **finding** by agent-idea-triage (2026-09-22T11:38:41-04:00): Idea 000233 is fully incorporated into PLAN-028 (Workbench Architecture Quality) under design decision #5. The scope question it raises — whether maximize is a HTML Viewer feature (P11/G48) or a general slot capability (P10/G43) — is definitively settled: panel maximize belongs to P10's G43 (Slot/panel architecture) workstream and is assigned to phase-arch-17 in the backlog.
+
+The idea's existing links to 000133 (Revisit slot geometries) and 000141 (Slots as configuration schemas) are appropriate and already recorded. Both are in the same G43 workstream. PLAN-028 design decision #5 explains why maximize is slot-level, not viewer-level: building it inside any single panel creates a second geometry path outside the slot model, which is the divergence G43 exists to prevent. All constraints (zero scroll, fill assertions at multiple resolutions, transient state not persisted to ADR-016, PTY session preservation) are specified in PLAN-028 and carried into REQ-011 rows R25–R28.
+
+Phase-arch-17 exists in the backlog but has not yet been completed. No related plan, requirement or decision is missing.
 
 </details>
 
