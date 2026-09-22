@@ -1,0 +1,104 @@
+<!--
+  Literature-review campaign report — deliverable / table-view page shell (PLAN-043,
+  REQ-027 phase-lrr-02). One instance per rendered deliverable (01-13) and, per the plan's
+  decision to defer table data behind their own views, one instance per browsable table
+  (ledger, inventory, matrix) built in phase-lrr-03. Both cases fill {{CONTENT}} — prose for
+  a deliverable, a <table> for a table view — so this single shell serves both.
+
+  Consumed by the (not-yet-built) generator under tools/, which fills every {{TOKEN}} below
+  with plain string substitution — no templating dependency is assumed or required, since
+  none is declared in pyproject.toml. The generator computes nothing; every figure inside
+  {{SOURCE_META}} and every figure inside {{CONTENT}} itself comes from
+  research/literature-review/ (REQ-027 R05).
+
+  Token contract:
+    {{PAGE_TITLE}}       - plain text, the browser <title>, e.g. "05 Critical collisions —
+                            D-System Literature Review"
+    {{INLINE_STYLES}}    - the full contents of templates/styles/lit-report.css, inlined
+                            here so the rendered page is one self-contained file with no
+                            network dependency (R08) — no CDN, no remote font, no fetch
+    {{SITE_TITLE}}       - plain text, the report's name, e.g. "D-System Literature-Review
+                            Campaign Report". The markup below wraps it in a link back to
+                            the entry page at the sibling path "index.html", matching the
+                            generate_overview.py precedent of naming a generated entry page
+                            index.html
+    {{BREADCRUMB}}       - pre-rendered HTML, the trail back to the entry page (already
+                            includes its own link(s); this template only supplies the <nav>
+                            it sits inside)
+    {{NAV}}              - pre-rendered HTML, the <li> list of sibling deliverables (the
+                            other twelve plus the three table views), one of them marked
+                            the current page (R01: every deliverable reachable in at most
+                            two clicks from the entry page)
+    {{SOURCE_FILENAME}}  - plain text, e.g. "05_critical_collisions.md" or
+                            "04_evidence_matrix.csv"
+    {{SOURCE_META}}      - pre-rendered HTML, byte count / line count / digest of the
+                            source file, read from disk by the generator, never recomputed
+                            client-side
+    {{EDITORIAL_NOTES}}  - pre-rendered HTML, zero or more notes ABOUT the source (not the
+                            source's own content). Each note the generator emits should
+                            carry the class "lr-editorial-note" so lit-report.css renders
+                            it visually distinct from {{CONTENT}} — a reader must not be
+                            able to mistake an editorial note for the source saying it.
+                            Empty string when there are none; the surrounding container
+                            collapses via :empty when this token is empty
+    {{CONTENT}}          - pre-rendered HTML, the deliverable body (rendered Markdown) or
+                            the table view's <table>. Carries no wrapper of its own; this
+                            template supplies the ".lr-prose" typography scope
+    {{FOOTER}}           - pre-rendered HTML, e.g. what generated this page and from what
+
+  Self-contained (R08): no external stylesheet link, no script tag, no remote asset. Light
+  and dark legibility (R09) come entirely from lit-report.css's :root custom properties and
+  its prefers-color-scheme override; this template makes no colour decisions itself. Wide
+  {{CONTENT}} (a 1,200-row table, a 1,305-line deliverable) never grows the page body past
+  its container — lit-report.css makes <table> and <pre> scroll horizontally inside
+  themselves, so this shell needs no overflow handling of its own.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}}</title>
+<style>
+{{INLINE_STYLES}}
+</style>
+</head>
+<body>
+<div class="lr">
+  <header class="lr__masthead">
+    <a class="lr__site-title" href="index.html">{{SITE_TITLE}}</a>
+    <nav class="lr__breadcrumb" aria-label="Breadcrumb">
+      {{BREADCRUMB}}
+    </nav>
+  </header>
+
+  <div class="lr__layout">
+    <nav class="lr__nav" aria-label="Deliverables">
+      <p class="lr__nav-title">Deliverables</p>
+      <ul class="lr__nav-list">
+        {{NAV}}
+      </ul>
+    </nav>
+
+    <main class="lr__main">
+      <div class="lr__source-meta">
+        <span class="lr__source-filename">{{SOURCE_FILENAME}}</span>
+        {{SOURCE_META}}
+      </div>
+
+      <div class="lr__editorial-notes">
+        {{EDITORIAL_NOTES}}
+      </div>
+
+      <article class="lr__content lr-prose">
+        {{CONTENT}}
+      </article>
+    </main>
+  </div>
+
+  <footer class="lr__footer">
+    {{FOOTER}}
+  </footer>
+</div>
+</body>
+</html>

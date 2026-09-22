@@ -1,0 +1,75 @@
+<!--
+  Literature-review campaign report — entry page (PLAN-043, REQ-027 phase-lrr-02). The
+  single page every deliverable and table view must be reachable from in at most two clicks
+  (R01). Rendered to the sibling path "index.html" that lit-report-page.html's site-title
+  link and breadcrumb trail assume.
+
+  Consumed by the (not-yet-built) generator under tools/, which fills every {{TOKEN}} below
+  with plain string substitution — no templating dependency is assumed or required, since
+  none is declared in pyproject.toml. The generator computes nothing; the corpus counts and
+  the duplicate-rate figures inside the framing statement come from
+  research/literature-review/, never recomputed here (R05, R06).
+
+  Token contract:
+    {{PAGE_TITLE}}         - plain text, the browser <title>
+    {{INLINE_STYLES}}      - the full contents of templates/styles/lit-report.css, inlined
+                              here so the rendered page is one self-contained file with no
+                              network dependency (R08)
+    {{SITE_TITLE}}         - plain text, the report's name
+    {{FRAMING}}            - pre-rendered HTML, REQ-027 R06 and R07's epistemic posture:
+                              first research memo not a final novelty claim, saturation
+                              measured and explicitly NOT demonstrated (the falling
+                              duplicate rate as the trend it is, not a stop condition), and
+                              the disputed share of the critical collisions (18 of 30). The
+                              markup below gives this its own prominent, bordered block via
+                              lit-report.css's ".lr__framing" — it cannot be styled to look
+                              like a footnote or be mistaken for one
+    {{COUNTS}}              - pre-rendered HTML, the measured corpus figures (row/column
+                              counts for the three tables, line counts for the Markdown
+                              deliverables) — copied from source, never recomputed
+    {{DELIVERABLE_INDEX}}  - pre-rendered HTML, the <li> list of links to all fourteen
+                              deliverables plus the three table views
+    {{FOOTER}}              - pre-rendered HTML, e.g. what generated this page and from
+                              what
+
+  Self-contained (R08): no external stylesheet link, no script tag, no remote asset. Light
+  and dark legibility (R09) come entirely from lit-report.css's :root custom properties and
+  its prefers-color-scheme override; this template makes no colour decisions itself.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}}</title>
+<style>
+{{INLINE_STYLES}}
+</style>
+</head>
+<body>
+<div class="lr">
+  <header class="lr__masthead">
+    <h1 class="lr__site-title">{{SITE_TITLE}}</h1>
+  </header>
+
+  <section class="lr__framing lr-prose" aria-label="Report framing">
+    {{FRAMING}}
+  </section>
+
+  <section class="lr__counts" aria-label="Corpus counts">
+    {{COUNTS}}
+  </section>
+
+  <nav class="lr__index" aria-label="Deliverables">
+    <h2 class="lr__index-title">Deliverables</h2>
+    <ul class="lr__index-list">
+      {{DELIVERABLE_INDEX}}
+    </ul>
+  </nav>
+
+  <footer class="lr__footer">
+    {{FOOTER}}
+  </footer>
+</div>
+</body>
+</html>

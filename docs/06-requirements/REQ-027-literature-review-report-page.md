@@ -123,10 +123,25 @@ ruling 9 makes measured-not-demonstrated the closing posture, and `PROMPT-030` f
 close-out claiming final novelty. A report that renders the deliverables faithfully but drops their
 hedging misrepresents the campaign.
 
+### Where the duplicate-rate figures come from
+
+The first two points, **20.0%** and **15.0%**, appear verbatim in five campaign deliverables. The
+third, **6.4–7.7%**, does **not** appear anywhere in `research/literature-review/` — it is recorded
+only in the campaign's session records, [`SESS-2026-09-19-08`](../03-sessions/SESS-2026-09-19-08-literature-review-pass-3c.md)
+and [`SESS-2026-09-20-02`](../03-sessions/SESS-2026-09-20-02-literature-review-pass-4-close.md),
+which sit outside the corpus the extractor reads.
+
+This is a **stated exception to R05**, ruled by the owner on 2026-09-22. The trend is the
+campaign's actual finding and R06's purpose depends on all three points, so the figure is kept
+rather than dropped. The report carries it as a **cited literal** whose provenance is visible on
+the page, and the extractor is not widened to read session records. Nothing on the page may present
+this figure as measured from a deliverable.
+
 **Verification**: assert the entry page contains the memo statement and the saturation statement.
 Grep the full generated output for `NOVEL` and assert every occurrence sits inside a statement that
-it is unavailable. Assert the duplicate-rate figures match the values in the source deliverables
-rather than being recomputed.
+it is unavailable. Assert that **20.0%** and **15.0%** match the values in the source deliverables
+rather than being recomputed, and that the page's **6.4–7.7%** is accompanied by a visible citation
+naming the session records as its source.
 
 ## R07 — The disputed share of the evidence is visible
 

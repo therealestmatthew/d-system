@@ -1,0 +1,518 @@
+/*
+  Literature-review campaign report — stylesheet for the templates/html/lit-report-*.html
+  family (PLAN-043, REQ-027).
+
+  Inlined verbatim into lit-report-page.html's and lit-report-index.html's
+  {{INLINE_STYLES}} token by the generator, exactly as overview.css is inlined into
+  overview-page.html, so each rendered page is one self-contained file with no external
+  stylesheet link (REQ-027 R08: opens from the filesystem, no network, no build step).
+  System font stack only — no webfont fetch.
+
+  Unlike overview.css, this family's pages are never embedded inside another page's DOM —
+  each is its own standalone document (R08) — so the colour palette lives on :root rather
+  than being scoped under a block class. Structural selectors are still scoped under `.lr`
+  so this file can sit safely alongside another inlined stylesheet if a future page ever
+  does combine them.
+
+  Colour scheme (R09): the full light palette is defined as custom properties on :root;
+  @media (prefers-color-scheme: dark) redefines only the colour tokens, never layout. body
+  always gets an explicit background from a variable — it is never left transparent, so a
+  dark-mode browser chrome around a light-mode body (or vice versa) cannot happen.
+
+  Wide-content rule (constraint 5 / the CSS must-style list): tables and fenced code blocks
+  must scroll inside themselves, never the page body. No wrapper <div> is assumed around
+  either element, because markdown-it-py emits bare <table> and <pre> with no wrapper and
+  this phase does not touch the renderer. Instead `table { display: block; overflow-x:
+  auto; }` and `pre { overflow-x: auto; }` below make the element itself the scroll
+  container — the standard no-markup-cooperation-required technique for this problem.
+*/
+
+:root {
+  --lr-bg: #ffffff;
+  --lr-bg-alt: #f6f8fa;
+  --lr-fg: #1b1f24;
+  --lr-fg-muted: #57606a;
+  --lr-border: #d0d7de;
+  --lr-link: #0969da;
+  --lr-link-visited: #6639ba;
+  --lr-code-bg: #f6f8fa;
+  --lr-code-fg: #1b1f24;
+  --lr-blockquote-border: #d0d7de;
+  --lr-blockquote-fg: #57606a;
+  --lr-table-header-bg: #f6f8fa;
+  --lr-table-row-alt: #f6f8fa;
+  --lr-editorial-bg: #fff8c5;
+  --lr-editorial-border: #9a6700;
+  --lr-editorial-fg: #4d3800;
+  --lr-framing-bg: #ddf4ff;
+  --lr-framing-border: #0969da;
+  --lr-framing-fg: #1b1f24;
+  --lr-nav-active-bg: #ddf4ff;
+  --lr-hr: #d0d7de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --lr-bg: #0d1117;
+    --lr-bg-alt: #161b22;
+    --lr-fg: #e6edf3;
+    --lr-fg-muted: #9198a1;
+    --lr-border: #30363d;
+    --lr-link: #4493f8;
+    --lr-link-visited: #b083f0;
+    --lr-code-bg: #161b22;
+    --lr-code-fg: #e6edf3;
+    --lr-blockquote-border: #30363d;
+    --lr-blockquote-fg: #9198a1;
+    --lr-table-header-bg: #161b22;
+    --lr-table-row-alt: #161b22;
+    --lr-editorial-bg: #3b2e00;
+    --lr-editorial-border: #d4a72c;
+    --lr-editorial-fg: #f0e6b8;
+    --lr-framing-bg: #0c2d48;
+    --lr-framing-border: #4493f8;
+    --lr-framing-fg: #e6edf3;
+    --lr-nav-active-bg: #0c2d48;
+    --lr-hr: #30363d;
+  }
+}
+
+* ,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--lr-bg);
+}
+
+body {
+  margin: 0;
+  background: var(--lr-bg);
+  color: var(--lr-fg);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--lr-link);
+}
+
+a:visited {
+  color: var(--lr-link-visited);
+}
+
+.lr {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- masthead: site title + breadcrumb (lit-report-page.html) ---- */
+
+.lr__masthead {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--lr-border);
+  background: var(--lr-bg-alt);
+}
+
+.lr__site-title {
+  display: inline-block;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--lr-fg);
+}
+
+.lr__site-title:visited {
+  color: var(--lr-fg);
+}
+
+h1.lr__site-title {
+  margin: 0;
+  padding: 0;
+}
+
+.lr__breadcrumb {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--lr-fg-muted);
+}
+
+.lr__breadcrumb a {
+  color: var(--lr-fg-muted);
+}
+
+.lr__breadcrumb .lr__breadcrumb-sep {
+  margin: 0 0.35rem;
+  color: var(--lr-fg-muted);
+}
+
+/* ---- two-column layout: sibling nav + main content ---- */
+
+.lr__layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.lr__nav {
+  flex: 0 0 15rem;
+  min-width: 0;
+  border: 1px solid var(--lr-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.8rem;
+  background: var(--lr-bg-alt);
+}
+
+.lr__nav-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--lr-fg-muted);
+}
+
+.lr__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.lr__nav-link {
+  display: block;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--lr-fg);
+}
+
+.lr__nav-link:visited {
+  color: var(--lr-fg);
+}
+
+.lr__nav-link--active {
+  background: var(--lr-nav-active-bg);
+  font-weight: 600;
+}
+
+.lr__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ---- source-meta strip ---- */
+
+.lr__source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--lr-border);
+  font-size: 0.8rem;
+  color: var(--lr-fg-muted);
+}
+
+.lr__source-filename {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--lr-fg);
+}
+
+/* ---- editorial notes: visually distinct from the source content they annotate ---- */
+
+.lr__editorial-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.lr__editorial-notes:empty {
+  display: none;
+  margin-bottom: 0;
+}
+
+/* Each note the generator emits into the page's EDITORIAL_NOTES token should carry this
+   class so it picks up the distinct treatment; the surrounding .lr__editorial-notes
+   container above only provides spacing. */
+.lr-editorial-note {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--lr-editorial-border);
+  border-left-width: 4px;
+  border-radius: 4px;
+  background: var(--lr-editorial-bg);
+  color: var(--lr-editorial-fg);
+  font-size: 0.85rem;
+}
+
+.lr-editorial-note::before {
+  content: "Editorial note";
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---- shared prose typography for the CONTENT and FRAMING token slots ---- */
+
+.lr-prose h1,
+.lr-prose h2,
+.lr-prose h3,
+.lr-prose h4,
+.lr-prose h5,
+.lr-prose h6 {
+  margin: 1.4em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lr-prose > h1:first-child,
+.lr-prose > h2:first-child,
+.lr-prose > h3:first-child {
+  margin-top: 0;
+}
+
+.lr-prose h1 { font-size: 1.6rem; }
+.lr-prose h2 { font-size: 1.35rem; padding-bottom: 0.25em; border-bottom: 1px solid var(--lr-border); }
+.lr-prose h3 { font-size: 1.15rem; }
+.lr-prose h4 { font-size: 1.02rem; }
+.lr-prose h5 { font-size: 0.92rem; }
+.lr-prose h6 { font-size: 0.85rem; color: var(--lr-fg-muted); }
+
+.lr-prose p {
+  margin: 0.6em 0;
+}
+
+.lr-prose ul,
+.lr-prose ol {
+  margin: 0.6em 0;
+  padding-left: 1.6em;
+}
+
+.lr-prose li + li {
+  margin-top: 0.2em;
+}
+
+.lr-prose li > ul,
+.lr-prose li > ol {
+  margin: 0.2em 0;
+}
+
+.lr-prose hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1px solid var(--lr-hr);
+}
+
+.lr-prose strong {
+  font-weight: 700;
+}
+
+.lr-prose em {
+  font-style: italic;
+}
+
+.lr-prose del {
+  text-decoration: line-through;
+  color: var(--lr-fg-muted);
+}
+
+.lr-prose a {
+  text-decoration: underline;
+}
+
+.lr-prose blockquote {
+  margin: 0.8em 0;
+  padding: 0.1em 1em;
+  border-left: 3px solid var(--lr-blockquote-border);
+  color: var(--lr-blockquote-fg);
+}
+
+.lr-prose blockquote > :first-child {
+  margin-top: 0;
+}
+
+.lr-prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.lr-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--lr-code-bg);
+  color: var(--lr-code-fg);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.lr-prose pre {
+  margin: 0.8em 0;
+  padding: 0.75em 1em;
+  border: 1px solid var(--lr-border);
+  border-radius: 6px;
+  background: var(--lr-code-bg);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.lr-prose pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.85em;
+}
+
+/* Wide tables scroll inside themselves, never the page body (constraint 5 / R03 / R10). */
+.lr-prose table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0.8em 0;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.lr-prose th,
+.lr-prose td {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--lr-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.lr-prose thead th {
+  background: var(--lr-table-header-bg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lr-prose tbody tr:nth-child(even) {
+  background: var(--lr-table-row-alt);
+}
+
+/* ---- framing block (lit-report-index.html): the epistemic posture, prominent ---- */
+
+/* The provenance line inside the framing block. REQ-027 R06 keeps the third duplicate-rate
+   figure even though it is not in the corpus, on condition its source is visible on the page;
+   this styles it as a citation - smaller and set apart - without letting it read as fine print
+   a reader is meant to skip. */
+.lr-provenance {
+  margin-top: 0.85rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--lr-framing-border);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+
+.lr__framing {
+  margin: 1rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--lr-framing-border);
+  border-left-width: 5px;
+  border-radius: 6px;
+  background: var(--lr-framing-bg);
+  color: var(--lr-framing-fg);
+}
+
+.lr__framing.lr-prose > :first-child {
+  margin-top: 0;
+}
+
+.lr__framing.lr-prose > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---- counts strip (lit-report-index.html) ---- */
+
+.lr__counts {
+  margin: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--lr-border);
+  border-radius: 6px;
+  background: var(--lr-bg-alt);
+  font-size: 0.85rem;
+  color: var(--lr-fg-muted);
+}
+
+.lr__counts strong {
+  color: var(--lr-fg);
+}
+
+/* ---- deliverable index (lit-report-index.html) ---- */
+
+.lr__index {
+  margin: 1rem;
+}
+
+.lr__index-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--lr-fg);
+}
+
+.lr__index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.5rem;
+}
+
+.lr__index-item {
+  border: 1px solid var(--lr-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+}
+
+.lr__index-item a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lr__index-item p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--lr-fg-muted);
+}
+
+/* ---- footer ---- */
+
+.lr__footer {
+  margin: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--lr-border);
+  font-size: 0.7rem;
+  color: var(--lr-fg-muted);
+}
+
+.lr__footer code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---- narrow widths: stack the sidebar above the content ---- */
+
+@media (max-width: 720px) {
+  .lr__layout {
+    flex-direction: column;
+  }
+
+  .lr__nav {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
