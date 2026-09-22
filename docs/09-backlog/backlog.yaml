@@ -9688,6 +9688,11 @@ items:
     terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
     pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
     state rather than inventing one - check that phase before changing the transition table.
+    A status event carries no author field, and neither does a linked event, so the acceptance line
+    requiring an agent-written close to be distinguishable from an owner-ratified one has nothing in
+    the existing event shape to lean on - the marking mechanism has to carry that provenance itself,
+    whichever form it takes. Links are unaffected: the owner approves every edge before it is written,
+    so their provenance is a fact about the process rather than the record.
     Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
     fields before recording why they are fields inverts the reasoning. Name the three fields and
     their enum values in lowercase snake_case, one token per ARCH-005 type (e.g. concept, artifact,
