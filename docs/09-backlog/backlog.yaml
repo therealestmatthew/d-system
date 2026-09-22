@@ -6973,7 +6973,8 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-lrr
   priority: 2
   session_budget: 1
   depends_on:
