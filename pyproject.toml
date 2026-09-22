@@ -18,6 +18,7 @@ dependencies = [
     # ConPTY backend for the demo terminal adapter (ADR-013 section 4, src/demo/windows.py).
     # Windows-only: this marker keeps Linux/macOS installs from ever pulling it.
     "pywinpty>=2.0.14; sys_platform == 'win32'",
+    "markdown-it-py>=4.2.0",
 ]
 
 [project.optional-dependencies]

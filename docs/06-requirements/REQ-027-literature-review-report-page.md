@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-20'
-updated: '2026-09-20'
+updated: '2026-09-22'
 systems: [sys-html, sys-research]
 depends_on: [doc-lit-campaign, doc-html-generation-design-system-requirements]
 ---
@@ -67,9 +67,16 @@ fails this requirement.
 Headings, ordered and unordered lists, tables, fenced code blocks, inline code, blockquotes and
 links each render as the corresponding HTML element rather than as literal Markdown text.
 
-**Verification**: for each of `01`–`13`, assert the rendered output contains no line beginning with
-`## ` or `- ` outside a `<pre>` block, and that every Markdown table in the source produced a
-`<table>`. Count `<h2>` elements against `^## ` occurrences in the source and assert equality.
+**Verification**: for each of the **eleven Markdown deliverables** — `01`–`13` excluding
+`03_source_inventory.csv` and `04_evidence_matrix.csv`, which R03 covers as browsable tables —
+assert the rendered output contains no line beginning with `## ` or `- ` outside a `<pre>` block,
+and that every Markdown table in the source produced a `<table>`. Count `<h2>` elements against
+`^## ` occurrences in the source and assert equality.
+
+The range `01`–`13` names thirteen files, but only eleven of them are Markdown. The assertions
+above have no meaning against a CSV, which carries no headings and no Markdown tables. R01's and
+R03's uses of the same range are unaffected: R01 counts reachability across all fourteen
+deliverables, CSVs included, and R03 covers the three CSVs directly.
 
 ## R03 — The three CSVs are browsable tables
 

@@ -6984,13 +6984,16 @@ items:
   - Build the template family under templates/html/ with a {{TOKEN}} contract commented at the
     top of each template, plus a stylesheet under templates/styles/, following the
     overview-*.html precedent rather than introducing a parallel look (REQ-027 R09).
-  - Render all thirteen Markdown deliverables faithfully - headings, ordered and unordered lists,
-    tables, fenced code, inline code, blockquotes and links - and verify against all thirteen,
-    not a sample. 05 and 06 carry nested tables inside blockquotes and are the hard cases.
+  - Render all eleven Markdown deliverables faithfully - headings, ordered and unordered lists,
+    tables, fenced code, inline code, blockquotes and links - and verify against all eleven,
+    not a sample. 01-13 names thirteen files but only eleven are Markdown; 03 and 04 are CSVs
+    and belong to REQ-027 R03. 05 and 06 carry nested tables inside blockquotes and are the
+    hard cases.
   - Build the entry page and navigation so every deliverable is reachable in at most two clicks.
   acceptance:
-  - For each of 01-13 the rendered output contains no line beginning with '## ' or '- ' outside a
-    pre block, and the count of h2 elements equals the count of '^## ' in the source.
+  - For each of the eleven Markdown deliverables the rendered output contains no line beginning
+    with '## ' or '- ' outside a pre block, and the count of h2 elements equals the count of
+    '^## ' in the source.
   - Every Markdown table in every source deliverable produced a table element.
   - All fourteen deliverables are reachable from the entry page, the thirteen in at most two
     clicks and the ledger directly.
