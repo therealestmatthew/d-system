@@ -6998,7 +6998,10 @@ items:
   - uv run pytest
   deliverables:
   - templates/html/lit-report-page.html
+  - templates/html/lit-report-index.html
   - templates/styles/lit-report.css
+  - tools/lit_report_render.py
+  - test/test_lit_report_render.py
   next_action: Blocked on phase-lrr-01's structured form.
 
 - id: phase-lrr-03
