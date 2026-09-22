@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-09-16'
+updated: '2026-09-22'
 systems: [sys-realization, sys-backlog, sys-governance]
 depends_on: [doc-prompt-pack-protocol, doc-backlog-decisions, doc-irs-orchestrator-design, doc-idea-realization-system-plan]
 ---
@@ -18,57 +18,97 @@ The owner's kickoff prompt for a session that **builds** queued backlog phases, 
 time, through dispatched agents, while the session itself stays a minimal-context coordinator.
 
 It is deliberately **generic and idempotent**: the same prompt runs every batch, and every re-run
-is a resume. The batch number is named at kickoff; nothing else changes between runs. A batch
-interrupted halfway is resumed by pasting the same prompt with the same number — the tracker, not
-the session's memory, carries state.
+is a resume. **Nothing about the batch is named at kickoff** — the coordinator discovers the batch
+tables under `docs/09-backlog/batches/` and selects one by the rule below, asking the owner only
+when the choice is genuinely ambiguous. A batch interrupted halfway is resumed by pasting this same
+prompt: the table is still `in_progress`, so the same rule selects it again, and the tracker rather
+than the session's memory carries state.
 
 Revised 2026-09-16 against an adversarial review (2 blockers, 2 majors, 1 minor — all integrated)
-and the owner's rulings on worktree granularity, the claim gate and blocker escalation.
+and the owner's rulings on worktree granularity, the claim gate and blocker escalation. Revised
+again 2026-09-22, when the hard-coded batch table was abstracted into
+`docs/09-backlog/batches/*.yaml` under `schemas/batch.schema.json`, and stage-level parallelism
+became something a table can declare.
 
 The reasoning behind this pack's shape — why one worktree per phase, why questions are batched at
 the open, why a blocker goes to an agent first — is recorded in
-[GOV-013](../08-governance/GOV-013-coordinator-protocol.md), the coordinator protocol. Read that
-before *changing* this pack; you do not need it to *run* the pack.
+[GOV-013](../08-governance/GOV-013-coordinator-protocol.md), the coordinator protocol. The batch
+tables this pack selects among are governed by
+[GOV-016](../08-governance/GOV-016-batch-orchestration-protocol.md), the batch orchestration
+protocol. Read either before *changing* this pack; you do not need them to *run* it.
 
-Paste everything below the rule into a fresh session in this repository, naming the batch.
+Paste everything below the rule into a fresh session in this repository. Naming a batch is
+optional and overrides the selection rule; say nothing and the coordinator picks.
 
 ---
 
 ## Mission
 
-Build every phase in the named batch, in the listed order, to the point where each is verified,
-integrated and complete. You are the **coordinator**: you sequence, you dispatch, you verify
+Build every phase in the selected batch table, stage by stage in its listed order, to the point
+where each is verified, integrated and complete. You are the **coordinator**: you sequence, you dispatch, you verify
 evidence, and you hold almost nothing in your own context. **You build nothing yourself.**
 
-## The batches
+## The batch table
 
-Twenty-nine phases in six batches. Each batch is dependency-closed — nothing in it depends on
-anything in a later batch — and within a batch the listed order is a valid build order.
+**The batch is not written into this prompt.** Each one lives as its own table under
+`docs/09-backlog/batches/`, validated in shape by `schemas/batch.schema.json` and described by
+[the directory's README](../09-backlog/batches/README.md). A table holds grouping, sequencing and
+parallelism only; every phase fact stays in `backlog.yaml`, which is authoritative wherever the two
+disagree. The tables replaced a table hard-coded here, which went stale the moment a batch was built
+or a phase was ranked into the queue.
 
-| Batch | Phases, in build order |
-|---|---|
-| 1 | `phase-part-02`, `phase-port-02`, `phase-ses-01`, `phase-irs-03`, `phase-irs-01` |
-| 2 | `phase-auto-01`, `phase-auto-02`, `phase-irs-04`, `phase-irs-16`, `phase-part-03` |
-| 3 | `phase-irs-14`, `phase-irs-11`, `phase-idg-01`, `phase-idg-10`, `phase-idg-11` |
-| 4 | `phase-dgov-01`, `phase-idg-12`, `phase-irs-05`, `phase-irs-06`, `phase-irs-07` |
-| 5 | `phase-irs-13`, `phase-irs-08`, `phase-irs-09`, `phase-irs-15`, `phase-agx-03` |
-| 6 | `phase-irs-10`, `phase-irs-02`, `phase-irs-12`, `phase-irs-17` |
+### Selecting one
 
-`phase-lit-09` sits in `next_up` and is **excluded from every batch** by the owner's instruction of
-2026-09-16: it belongs to the literature-review campaign, has its own coordinator (`PROMPT-030`)
-and resume command, and conflicts with `phase-lit-07`. Do not claim it. Do not remove it from
-`next_up`.
+Read every `docs/09-backlog/batches/*.yaml` — the `id`, `title`, `status` and `sequence` lines only,
+not the stages. Then:
 
-**This partition was checked by script against `docs/09-backlog/backlog.yaml` when written, and
-independently re-checked by a reviewer who wrote their own script rather than trusting this
-sentence.** Both runs agreed: every one of the twenty-nine non-`phase-lit-09` `next_up` entries
-appears exactly once, in `next_up`'s own order; every phase was `status: queued`; and every
-`depends_on` edge resolved to an earlier or same-position phase in the global batch order, with the
-two external dependencies (`phase-port-01`, `phase-part-01`) already `complete`.
+1. **Exactly one table is `in_progress`** — that is your batch. This is a resume: its `tracker.md`
+   already exists, and you continue from the first phase that is not `complete`. Never restart a
+   phase the tracker says is built.
+2. **None is `in_progress`** — take the lowest-`sequence` table whose status is `queued`.
+3. **Ask the owner** when, and only when, the choice is genuinely ambiguous: more than one table is
+   `in_progress`, two runnable tables share a `sequence`, or the owner named a batch at kickoff that
+   is not the one the rule selects. One `AskUserQuestion`, the rule's own pick first, with each
+   table's title and the phases it holds.
+4. **No table is `queued` or `in_progress`** — report that the batch queue is empty and stop. Do not
+   compose a batch yourself; composing and superseding tables is the owner's.
 
-**Verify the batch against the repository before starting anyway.** A phase already `complete` is
-skipped and reported; a phase a peer has claimed is skipped and reported. The table is what was
-true when written, not a promise about now.
+`superseded` and `complete` tables are never selected. If the owner names a batch at kickoff, that
+naming wins over the rule — but say which one the rule would have picked before you proceed.
+
+### Verifying it
+
+**Verify the selected table against the repository before starting**, however recent its `verified`
+block is; that block is history, not a licence to skip the check. Confirm each phase exists and is
+`queued`, each `external_depends_on` entry is `complete`, and no `after` entry sits in the same or a
+later stage. A phase already `complete` is skipped and reported; a phase a peer has claimed is
+skipped and reported. If verification fails on the composition itself — a missing phase, an external
+dependency that is not complete — that is a decision for the owner, not a table you edit.
+
+### Running its stages
+
+Stages run **in listed order**. A stage opens only when every phase in the one before is `complete`
+and integrated.
+
+Within a stage, `parallel: false` means build its phases one at a time in listed order.
+`parallel: true` is a **permission, not an instruction**: the stage's phases carry no dependency
+edge between them and no shared system or overlapping deliverable path, so the claim validator will
+admit them together — but you still check `max_active` and the Conflicts column **numerically**
+before every claim, and a parallel stage of three runs serially when a peer's claims leave room for
+one. Each concurrently-built phase gets its own branch, its own worktree and its own creator,
+validator and adversary dispatches; no two share a file. Merges stay **one phase at a time, in the
+stage's listed order**, each with the owner's explicit yes.
+
+A phase's `conflicts_with` records why a phase with no dependency still sits in a later stage. The
+reason is a lock, not an ordering — do not read it as slack you may reclaim.
+
+### Updating it
+
+You own the selected table's `status` and `updated` fields and nothing else in it:
+`queued` → `in_progress` when you claim the batch's first phase, `in_progress` → `complete` in the
+close-out when its last phase is `complete`. Never edit a table's composition — stages, phases,
+exclusions — and never touch another table. A composition that turns out to be wrong is a decision
+for the owner.
 
 **What batch 1 measured.** Five phases fit one coordinator session with over 97% of context budget
 unspent — batch size is not the binding constraint. **The binding variable is fix cycles, not phase
@@ -87,8 +127,8 @@ the next batch is sized on evidence rather than repeating the estimate.
    `git pull`, then `uv run python -m src.governance` and `uv run pytest`. **If the tree is dirty
    or either check is red, stop and report.** Building on a broken tree buries whose failure is
    whose.
-3. Create `/code/d-system/_working/build-b<N>/` — gitignored, ungoverned, and **not** repository
-   content — holding:
+3. Create `/code/d-system/_working/build-<table-id>/` — `build-batch-002` for `batch-002` — which
+   is gitignored, ungoverned, and **not** repository content, holding:
    - `tracker.md` — the run's memory: the batch list, then one line per phase (id, state
      `pending / claimed / built / verified / reviewed / merged / complete / skipped / blocked`, and
      a one-line verdict). **Re-read it instead of remembering.** A dead session resumes from it.
@@ -171,20 +211,25 @@ wall-clock against the runway.
 
 ## Open the batch
 
-Before claiming anything, dispatch **one reconnaissance agent per phase, in parallel** — read-only,
+Select and verify the table first, per *The batch table* above. Then, before claiming anything,
+dispatch **one reconnaissance agent per phase, in parallel** — read-only,
 each writing its phase's evidence file. Each reads its phase's entry and the documents its `plan`
 and `sources` name, and reports: what the phase actually requires, whether every acceptance
 condition is observable by a listed verification command, whether the deliverables cover the scope,
 and **anything that would make a careful person decline to claim it**.
 
 Then put every question they raise to the owner in **one batch** — `AskUserQuestion`, four at a
-time, recommendation first in each option. This is the one scheduled interruption of the run. After
-it, build.
+time, recommendation first in each option. This is the one scheduled interruption of the run — if
+the selection rule had to ask which table to run, fold that question into this same batch rather
+than interrupting twice. After it, set the table's `status` to `in_progress` and its `updated` to
+today, commit that one-line change **on `dev` in the primary checkout** — the table is tracked, and
+a run state recorded only in a worktree is invisible to the next coordinator — and build.
 
 ## The unit run
 
-For each phase in the batch, in order. This mirrors `PLAN-039.01` section 6, the design this loop
-executes by hand until `phase-irs-08` builds it.
+For each phase in the batch, stage by stage in the table's order, and within a stage either
+concurrently or one at a time as *Running its stages* allows. This mirrors `PLAN-039.01` section 6,
+the design this loop executes by hand until `phase-irs-08` builds it.
 
 **1. Claim.** Re-run `uv run python -m src.governance --ready`. Check **numerically** that
 `max_active` has room and the phase's Conflicts column is `—`. If a peer holds a conflicting system
@@ -311,9 +356,14 @@ with a claim held, say so explicitly in the report so the owner can release it.
 2. Confirm no worktree or branch from this batch is left behind: `git worktree list`,
    `git branch --list 'agent/*'`.
 3. Confirm every evidence file was copied out before its worktree was removed.
-4. A batch session record: phases completed, skipped and blocked; decisions filed; spend posture
-   per `GOV-008` — loop counts, any Opus escalation, wall-clock against runway.
-5. Report to the owner: what completed, what did not and why, and the decisions awaiting them.
+4. If every phase in the table is now `complete`, set the table's `status` to `complete` and its
+   `updated` to today, on `dev`, in one small commit. If any phase is not, the table stays
+   `in_progress` so the next session's selection rule resumes it — say so in the report.
+5. A batch session record: the table run, phases completed, skipped and blocked; decisions filed;
+   which stages ran concurrently and which were serialized by the claim budget rather than by the
+   table; and spend posture per `GOV-008` — loop counts, any Opus escalation, wall-clock against
+   runway. Record the actual fix-cycle spend, which is what the next batch is sized on.
+6. Report to the owner: what completed, what did not and why, and the decisions awaiting them.
 
 ## Hard boundaries
 
@@ -321,7 +371,10 @@ with a claim held, say so explicitly in the report so the owner can release it.
   `next_up` at the moment that phase is marked `complete`, because the governance validator
   requires it and `session-close.md` sanctions it as part of the completion edit. Never reorder
   `next_up`, never add to it, and never remove any entry other than the phase you just completed —
-  ranking stays the owner's. No edits to another phase's backlog lines. No edits to `AGENTS.md`,
+  ranking stays the owner's. No edits to another phase's backlog lines. **In the batch tables, you
+  edit the selected table's `status` and `updated` and nothing else** — never a composition, never an
+  exclusion, never another table, and never a new table: composing and superseding batches is the
+  owner's. No edits to `AGENTS.md`,
   `CLAUDE.md`, `session-close.md` or the checkpoint skill. No document-code allocation beyond the
   session records.
 - Never integrate onto `dev` without the owner's explicit yes for that phase.
