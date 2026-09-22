@@ -11839,13 +11839,29 @@ Phase-arch-17 exists in the backlog but has not yet been completed. No related p
 
 ## 000234 · Decompose sys-ui, which serializes almost every frontend phase under the concurrency validator
 
-**Created 2026-09-14T20:07:22-04:00 · Status: `open`**
+**Created 2026-09-14T20:07:22-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised while planning parallel execution of P10 (PLAN-028). sys-ui is declared by 14 of the 17 phase-arch-* phases, and the concurrency validator treats a shared system as a collision, so at most one sys-ui phase can ever be active. Measured against the finalized P10 plan by running src.governance.backlog.collisions() over all 17 phases: the real concurrency ceiling is 2, reached only in the first two dependency waves, and waves 3 through 6 are strictly serial regardless of how many agents are available. max_active is 3 and is never reachable. The critical path is six sessions deep (phase-arch-01, 05, 06, 07, 09, 17).
 
 The ask: split sys-ui in docs/08-governance/systems.yaml into components that can be locked independently - candidate seams observed in the tree are the layout/slot engine, the panel implementations under ts/src/stage, the notes strip and rotator, and the explorer panels - so that two frontend phases touching different surfaces stop colliding on a single system id. Deliverable paths would need the same treatment: docs/00-working/ is currently a shared deliverable that collides phase-arch-11, 14 and 16 with each other for no real reason, and ts/src/stage/ collides phase-arch-08 with 09 and phase-arch-13 with 17.
 
 The owner directed on 2026-09-14 that this runs BEFORE the rest of the P10 track, because every phase-arch-* phase would otherwise have to redeclare its systems afterward. Note the counter-consideration recorded at the time: a finer lock table admits more concurrency but also admits more genuine conflicts that the coarse lock was accidentally preventing, so the split should be argued from observed seams in the code rather than from a wish for more parallelism.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:40:52-04:00): Idea 000234 is fully delivered and recorded in SESS-2026-09-14-11 (Decompose sys-ui so frontend phases stop serializing on one lock).
+
+The ask — decompose sys-ui into independently-lockable components to break false serialization across phase-arch-* phases — was implemented in phase-arch-00, completed and merged to dev on 2026-09-14. The session log documents the complete delivery: seven new system ids (sys-wb-layout, sys-wb-styles, sys-wb-shared, sys-wb-terminal, sys-wb-notes, sys-wb-explorers, sys-wb-viewer) were introduced to systems.yaml and the seventeen phase-arch-* phases were redeclared. Measurement confirms the result: the concurrency ceiling rose from 2 to 3 among the seventeen phases, and from 3 to 4 across all nineteen (phase-arch-00 included). All acceptance conditions met; governance check passes.
+
+Phase-arch-00 is part of PLAN-028 (Workbench architecture and quality, P10), which governs the entire track. Related work: idea 000233 (panel maximize) was ruled into the same plan; idea 000284 documents a parallel decomposition of sys-governance for the same collision-breaking reason; phase-arch-18, also in PLAN-028, will retire the coarse sys-ui id once peers release their claims. ADR-003 documents the underlying collision rule.
+
+PROPOSED PROMOTION: 000234 -> PLAN-028 (delivered by phase-arch-00 in workbench architecture track)
+
+</details>
 
 **Links**
 
@@ -11857,13 +11873,41 @@ The owner directed on 2026-09-14 that this runs BEFORE the rest of the P10 track
 
 ## 000235 · Two-track coordinator prompt pack: a demo-mandatory track and a programme-execution track
 
-**Created 2026-09-14T20:07:34-04:00 · Status: `open`**
+**Created 2026-09-14T20:07:34-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised the night before the 2026-09-15 demo. The owner asked for a master prompt instructing a coordinator model to run parallel agent sessions, and on being shown that P10 admits at most two concurrent sessions and delivers nothing to a demo tomorrow, ruled for two separate tracks: a demo-mandatory track run first, and a programme-execution track run with whatever time remains.
 
 The general capability worth keeping past tomorrow night: a reusable pack that turns a set of backlog phases into a coordinator prompt, computed from the backlog rather than written by hand. The inputs it needs are already mechanical - depends_on gives the waves, src.governance.backlog.collisions() gives which phases inside a wave may be claimed together, and max_active bounds the rest. Today that analysis was run ad hoc in a session and pasted into prose; a second run would redo it from scratch.
 
 Distinct from the idea-partition pack (PLAN-025, PROMPT-034), which partitions ideas into programmes. This one sequences already-planned phases into dispatchable waves and would consume the partition's output rather than duplicate it. Related to 000234: the coordinator's usefulness is bounded by how coarse the lock table is, so a pack that reports "your ceiling is 2, here is why" is more honest than one that assumes agents can always be added.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:33-04:00): Idea 000235 proposes a reusable coordinator prompt pack that automates phase-wave sequencing and concurrency analysis, addressing a pattern observed in PLAN-028 (P10): "Today that analysis was run ad hoc in a session and pasted into prose; a second run would redo it from scratch."
+
+**Related Plans & Analysis:**
+
+PLAN-028's "Execution order and real concurrency" section (2026-09-14) contains the exact ad hoc analysis idea 000235 wants to automate: running `src.governance.backlog.collisions()` on phases to compute dependency waves, determine system collisions, and establish actual concurrency ceilings. P10's analysis showed max_active = 3 is only reachable in wave 1; waves 3–6 enforce max concurrent = 1. PLAN-025 (idea-partition pack, PROMPT-034) is explicitly different—it partitions ideas into programmes, not phases into waves.
+
+**Governance Context:**
+
+GOV-008 (prompt-pack protocol) defines the eight-stage pack pipeline, mandating a coordinator prompt as a required artifact; a missing prompt is a blocking finding. GOV-013 (coordinator protocol) establishes the principle "templates as prompts, never freehand composition"—the coordinator prompt pack would instantiate templates from computed phase metadata rather than hand-write batches. ADR-017 records this two-session methodology as standard. PROMPT-036 (existing build coordinator) demonstrates the current form: hardcoded batches verified manually against the backlog.
+
+**Technical Foundation:**
+
+`src/governance/backlog.py` provides `collisions()`, `dependency_closure()`, and `concurrency_errors()`—the primitives needed. Backlog YAML carries `max_active`, `depends_on`, and `systems` declarations. The capability requested—"depends_on gives the waves, collisions() gives which phases may be claimed together, max_active bounds the rest"—maps directly to existing code.
+
+**Constraint from 000234:**
+
+Idea 000234 (decompose sys-ui) documents the ceiling problem: 14 of 17 phases declare `sys-ui`; the validator treats shared systems as collisions, so concurrency is severely constrained until the lock table is split. Coordinator prompt pack must report this ceiling honestly—idea 000235 notes "a pack that reports 'your ceiling is 2, here is why' is more honest than one that assumes agents can always be added."
+
+PROPOSED LINK: 000235 --relates_to--> 000234 (concurrency ceiling governs coordinator's feasible batch sizes and max_active utilization)
+
+</details>
 
 **Links**
 
@@ -11874,7 +11918,7 @@ Distinct from the idea-partition pack (PLAN-025, PROMPT-034), which partitions i
 
 ## 000236 · Add a terminal "resolved" idea status, distinct from promoted and discarded
 
-**Created 2026-09-14T23:03:26-04:00 · Status: `open`**
+**Created 2026-09-14T23:03:26-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised during phase-prog-02 (P11 finalization) when four ideas that had shipped that same evening had no honest status to move to.
 
@@ -11891,6 +11935,29 @@ What it would touch. schemas/idea.schema.json: the status enum, the transition t
 
 Belongs to P1 (idea graph and lifecycle, PLAN-029) by subject matter; recorded here rather than folded into P11, which builds none of it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:11-04:00): FINDING: Terminal "resolved" status needed for delivered ideas without governed documents
+
+Idea 000236 proposes adding a third terminal status to the idea lifecycle, distinct from the two existing terminals (promoted and discarded). This addresses a real gap: four ideas (000110, 000118, 000119, 000232) shipped to dev on 2026-09-14 as working code but have no honest status to occupy. Promoted requires a governed document in promoted_to, which these lack. Discarded means rejected, contradicting delivery.
+
+Current evidence of the gap:
+- PLAN-027 (G48 HTML Viewer) documents that all four ideas are delivered in commits 593597e, 6896efc, 2e35ae7, 71cc841, verified against code, yet remain triaged/open with findings noting completion. REQ-012 records verification details for each.
+- Two prior G56 ideas (000099, 000129) were marked discarded with "Verified resolved" annotations as a workaround, making the log contradict itself.
+- The backlog notes: "The four delivered ideas keep their status deliberately: the lifecycle has no resolved state, tracked as 000236."
+
+The scope spans: schemas/idea.schema.json (status enum, legal transitions, whether revisited reopens it), src/db/ideas.py (legal_transitions() reads the schema; status ordering matters in workbench queue views), UI rendering (IdeaExplorerRegion, workbench), and generation (generate_ideas_md.py).
+
+Related but distinct: phase-irs-09 proposes a "delivered" status for the realization system—ideas verified by the realization agent through orchestrator/plan-based workflow. That is specialized delivery validation; 000236 addresses simpler "built and shipped as code" cases without orchestrator involvement.
+
+The four G48 ideas (000110, 000118, 000119, 000232) and G56 precedent (000099, 000129) are already linked to this idea as relates_to edges and form the primary evidence base for both the need and scope.
+
+</details>
+
 **Links**
 
 - relates_to → `000110`
@@ -11903,7 +11970,7 @@ Belongs to P1 (idea graph and lifecycle, PLAN-029) by subject matter; recorded h
 
 ## 000237 · Amend the checkpoint and session-close skills to cover a session with no claimed phase
 
-**Created 2026-09-14T23:52:45-04:00 · Status: `open`**
+**Created 2026-09-14T23:52:45-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised after a long planning session that produced two coordinator prompts, a phase split, four session prompts and several integrations - and could not be recorded by either skill, because both assume a claimed phase.
 
@@ -11917,7 +11984,7 @@ Also worth covering: a checkpoint invoked from the primary checkout while a peer
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-maximize-review (2026-09-15T16:47:22-04:00): Second occurrence, 2026-09-15. The owner invoked /session-close on a read-only investigation session that claimed no phase, and the command hit exactly the gap this idea describes. Recorded because the first occurrence (SESS-2026-09-14-12) was a long planning session and this one is the opposite shape - a single short investigation - which shows the gap is not specific to large owner-directed sittings.
 
@@ -11931,6 +11998,15 @@ The record shape question this idea leaves open was resolved by following the 20
 - **finding** by agent-framework (2026-09-19T12:24:59-04:00): Recurrence observed 2026-09-19. The owner invoked the checkpoint workflow on an unclaimed, owner-directed session (framework generalization and idea capture; fourteen ideas appended and committed as 6cc3ec1). The workflow could not run at all: its step 1 resolves the phase by finding the backlog entry with status active and agent set to this session, and finding none, its instruction is to stop. The only active claim was a peer's, phase-lit-07 held by agent-lit, which the workflow correctly forbids touching.
 
 The result is that a session doing real, committed work has no mechanism to record itself, even though AGENTS.md explicitly sanctions unclaimed owner-directed sessions in its Concurrent agents: claim a phase section. Every body section the contract specifies is derived from the phase's verification and acceptance lists, so the gap is structural rather than a missing branch: there is no phase from which to derive them. A fix needs to define what sections 3 and 4 contain when no acceptance list exists.
+- **finding** by agent-idea-triage (2026-09-22T11:41:57-04:00): Idea 000237 is already fully delivered and integrated.
+
+Created 2026-09-14, the idea identified a critical gap: the checkpoint skill said "if no phase is active for this session, say so and stop — there is nothing to record," while AGENTS.md explicitly provides for unclaimed owner-directed sessions and requires them to produce a kind: session record.
+
+The work was completed and integrated via commit 99a0f5e ("Port checkpoint/session-close unclaimed-session amendment onto dev") on 2026-09-19, recorded in SESS-2026-09-19-03. A comprehensive "Sessions with no claimed phase" branch was added to both `.claude/skills/checkpoint/SKILL.md` and `.claude/commands/session-close.md`, fully addressing the idea's ask. The amendment specifies how unclaimed sessions are recorded, what gates they run against, how acceptance conditions are self-declared from the owner's instruction, and how the sub-agent review procedure operates (or does not) when no phase exists to review against.
+
+The feature is now actively used: SESS-2026-09-21-03 (idea capture and queue ranking, same-day after 000237's annotation findings) demonstrates the unclaimed-session contract working as specified, including the three repository-wide verification gates and the self-declared acceptance conditions the amendment defines.
+
+PROPOSED PROMOTION: 000237 -> PLAN-020 (Portable Agent Workflows owns the checkpoint skill and session-close command that deliver this amendment)
 
 </details>
 
@@ -11942,7 +12018,7 @@ The result is that a session doing real, committed work has no mechanism to reco
 
 ## 000238 · HTML Viewer steps through a directory's files instead of scrolling one long page
 
-**Created 2026-09-15T00:28:19-04:00 · Status: `open`**
+**Created 2026-09-15T00:28:19-04:00 · Status: `triaged`**
 
 Owner request, 2026-09-14, raised during the demo-night viewer work and motivated by demoability. The owner does not want to present the agent lexicon page (_public/skills-and-agents-lexicon.html) by scrolling through it. They want the viewer to iterate through the individual files - stepping from one diagram to the next in the panel - so each is shown on its own, fitted and centred, while they talk.
 
@@ -11958,11 +12034,29 @@ Constraints: REQ-006 R02 zero page scroll and REQ-007 W15's fill assertions at 1
 
 Context already shipped that makes this cheap: COMPATIBLE_EXTENSIONS now admits six image formats plus .md and .htm; served images are wrapped route-side in a fitted, centred document; and the six canonical diagrams are tracked at _public/images/, which is the obvious directory to point the viewer at and step through.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:21-04:00): Idea 000238 requests HTML Viewer file stepping (previous/next navigation or timed rotation through directory files), explicitly distinct from phase-wbf-06 (notes-strip rotator variants, ideas 000131/000132).
+
+Not yet specified or delivered. Searched PLAN-027 (workbench features plan, which covers the remaining HTML Viewer work as phase-wbf-01/02) and REQ-012 (its requirements table). Neither mentions file stepping. REQ-007 W07/W08 (HTML Viewer requirements) specify a searchable dropdown filter and tabs but no stepping controls. Checked HtmlViewerRegion.tsx for implementation—no stepping logic exists; only selectedFile tracking for individual tab display.
+
+The feature is structurally feasible per the idea's own assessment: HtmlViewerRegion already holds files, filteredFiles, and per-tab selectedFile; stepping would move selectedFile along the filtered array; shared header control would act on the active tab.
+
+The open design question stated in the idea—manual (previous/next controls) vs. automatic (timer-driven rotation)—remains unresolved and would need owner decision. Manual stepping overlaps with phase-wbf-06's rotation mechanism only in concept, not in surface or implementation.
+
+No related idea found yet by overlap; idea 000232 (image format support, shipped) was a prerequisite enabling image display. No plan, requirement, or ADR governs this feature.
+
+</details>
+
 ---
 
 ## 000239 · AGENTS.md's single-line backlog rule does not describe what programme-finalize phases actually do
 
-**Created 2026-09-15T09:32:19-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:19-04:00 · Status: `triaged`**
 
 AGENTS.md states: "The only line of backlog.yaml you may touch is your own phase's, plus the catalog updated date." Every phase-prog-* phase necessarily violates this — its entire job is to add a dozen new phases under a new prefix, and it also edits the shared next_up list.
 
@@ -11973,6 +12067,24 @@ So the rule and the practice have diverged across the whole track, and nothing f
 Worth deciding: whether the rule gains a stated exception for phases whose deliverable *is* backlog entries, or whether such phases should declare docs/09-backlog/backlog.yaml as an explicit deliverable so the lock is visible to peers. Unresolved either way: AGENTS.md is owner-only, so the rule half of this cannot be changed by an agent.
 
 Related: the companion idea about phase-prog-* phases declaring neither docs/09-backlog/README.md nor backlog.yaml itself, which is the same gap seen from the deliverables side.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:38-04:00): The idea surfaces a documented divergence between stated rule and observed practice across the entire phase-prog-* track. AGENTS.md line 265 states: "The only line of `backlog.yaml` you may touch is your own phase's, plus the catalog `updated` date." Yet every phase-prog-* phase (12 phases total, status complete across the track) necessarily violates this by adding a dozen new phases under a new prefix and editing the shared `next_up` list — this is their sole deliverable.
+
+The divergence was first surfaced during the overnight run of 2026-09-15 by the independent reviewer on phase-prog-01, then confirmed present on phase-prog-02 and phase-prog-03 (already complete). PLAN-030 (document and backlog governance) acknowledges this as a known fact in its requirements section: "every `phase-prog-*` phase rewrites `backlog.yaml` without declaring it, including the three that produced this plan."
+
+Two candidate resolutions exist: (1) state an explicit exception in AGENTS.md for phases whose deliverable is backlog entries, or (2) require such phases to declare `docs/09-backlog/backlog.yaml` as a deliverable so the lock is visible to peers. Unresolved either way: the rule as written is what peers rely on to know a claim is safe, so an undocumented exception weakens the lock table's meaning. AGENTS.md is owner-only (per AGENTS.md lines 7-22), so an agent cannot implement the rule fix itself.
+
+Related to 000242 (scope naming a file deliverables omit) and 000245 (deliverables as lock before phase vs manifest after). The overnight run documented all three as views of the same gap: a declaration that does not match the work.
+
+PROPOSED LINK: 000239 --supersedes--> 000242 (same gap seen from the rule side vs deliverables side; 000239 is the rule component, 000242 is the declaration component)
+
+</details>
 
 **Links**
 
@@ -12084,7 +12196,7 @@ PROPOSED LINK: 000241 --relates_to--> 000079 (Agent engineering: Guides; where s
 
 ## 000242 · A phase whose scope names a file its deliverables omit is a lock that does not cover the work
 
-**Created 2026-09-15T09:32:20-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:20-04:00 · Status: `triaged`**
 
 Every phase-prog-* phase's scope requires registering a new prefix in docs/09-backlog/README.md, but only phase-prog-03 declared that file as a deliverable. phase-prog-01, -02 and the nine that followed did not. phase-prog-02 wrote the file anyway and listed it as completion evidence, which means the write happened outside the declared lock and nothing noticed.
 
@@ -12096,6 +12208,26 @@ Worth deciding: whether the governance check should flag a phase whose scope tex
 
 Related: the companion idea about AGENTS.md's single-line backlog rule, which is the same gap seen from the rule side rather than the declaration side.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:42:02-04:00): 000242 raises a governance lock defect: phase-prog-* phases' scope text names files they modify (like docs/09-backlog/backlog.yaml) but don't declare them in deliverables, breaking the collision rules that depend on accurate path declarations.
+
+**Related ideas:** 000239 (AGENTS.md rule side of the same gap) and 000245 (semantics of deliverables before/after phase completion).
+
+**Related plan:** PLAN-030, section 5, explicitly predicts this as the first finding of its containment check — "every `phase-prog-*` phase rewrites `backlog.yaml` without declaring it, including the three that produced this plan." R12 states this prediction deliberately because it indicates enforcement by agent choice only.
+
+**Governance enforcement:** ADR-003 (Safety rule, collision detection) depends on accurate deliverables declarations to reject overlapping phase claims. src/governance/backlog.py enforces this via path_conflict() and collisions() functions.
+
+**Evidence:** phase-prog-04 registered twelve phases in backlog.yaml (417-line rewrite per 000242) but declared only README.md as a deliverable. phase-prog-02 similarly modified README.md without declaring it. Only phase-prog-03 declared README.md in deliverables.
+
+The three ideas (000239, 000242, 000245) represent the same governance gap from three angles: rule prose, declaration enforcement, and semantic duality. PLAN-030 builds the containment check that reports these violations without blocking — the ownership question (whether to narrow rules, widen declarations, or separate before/after semantics) is left to the owner.
+
+</details>
+
 **Links**
 
 - relates_to ← `000239`
@@ -12106,7 +12238,7 @@ Related: the companion idea about AGENTS.md's single-line backlog rule, which is
 
 ## 000243 · The idea partition's programme-level sizings contradict its own group tables
 
-**Created 2026-09-15T09:32:20-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:20-04:00 · Status: `triaged`**
 
 docs/00-working/idea-batching-partition.md gives each programme a size in its prose header and then gives each of its groups a size in the table immediately below. For P2 the header says 4-5 phases; the group table says G05 2 phases, G06 1 each across three members, G07 under 1, G08 trivial — which sums to 5-6 phases plus two fragments. The two figures cannot both be right.
 
@@ -12120,6 +12252,22 @@ Unresolved: whether the discrepancy is systematic. The overnight run checked P2 
 
 Related: the companion idea about the partition carrying factual errors that finalize phases inherit, which is the same document's reliability seen from the content side rather than the arithmetic side.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:54-04:00): Idea 000243 identifies a specific arithmetic discrepancy in the partition document: programme-level sizings contradict their own group tables. In P2, the header states 4-5 phases while the group table sums to 5-6 plus fragments. This was discovered during phase-prog-05 (finalize P2, completed) and is documented in its result: "Registered seven phases under phase-dgov-*, against a partition header of 4-5 that contradicts its own group table summing to 5-6 plus two fragments." Spot checks of P1, P3, P4, P6, P9 show the pattern is not uniform.
+
+The related idea 000244 identifies four factual errors in the partition's scope lines, discovered during phase-prog-* execution. These are distinct issues: 000243 concerns arithmetic/sizing accuracy, 000244 concerns factual correctness of documented dependencies and gates. Both relate to the partition's reliability as a secondary source being used as a primary one (it was synthesized on 2026-09-13 from four analyst reports).
+
+The phase-prog-* finalization phases have already surfaced these issues: phase-prog-05 documented the sizing contradiction; phase-prog-08 corrected the false premise about P6's gate. However, neither issue has been systematically resolved across all twelve programmes.
+
+These remain as open governance questions: (1) whether to re-derive each programme's headline size from its group table or formally record it as deliberate compression, and (2) whether remaining programmes' scope lines should be pre-verified before claiming phases. The issues are documented but not yet closed. The two ideas are already linked via `relates_to` and represent two facets of the same document's reliability problem — neither are one defect but two distinct governance questions arising from phase-prog-* execution discoveries.
+
+</details>
+
 **Links**
 
 - relates_to → `000244`
@@ -12128,7 +12276,7 @@ Related: the companion idea about the partition carrying factual errors that fin
 
 ## 000244 · The idea partition carries factual errors that finalize phases inherit and execute
 
-**Created 2026-09-15T09:32:20-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:20-04:00 · Status: `triaged`**
 
 docs/00-working/idea-batching-partition.md is the source every phase-prog-* phase works from, and its scope lines are copied into the backlog phases verbatim. Agents then execute those lines without re-checking them. Four errors surfaced in a single night of doing so, on 2026-09-15.
 
@@ -12146,6 +12294,25 @@ Worth deciding: whether the remaining programmes' scope lines should be re-verif
 
 Unresolved: how many more remain. Four surfaced across ten phases, and those ten were not chosen for error-proneness — they were simply the ten that ran.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:51-04:00): Idea 000244 and 000243 are already linked (`relates_to`); they identify distinct but related partition-document problems: 000243 focuses on sizing arithmetic contradictions, 000244 on factual state errors that finalize phases inherit.
+
+All four factual errors cited in 000244 have been discovered and corrected during plan finalization. Phase-prog-06, phase-prog-07, and phase-prog-08 validated their scope against the codebase while drafting PLAN-033 (P6), PLAN-034 (P7), and PLAN-035 (P8) respectively:
+
+- **P6's gate error**: PLAN-033 discovers phase-mem-10 is status queued, ready, and never claimed — the partition's claim that "nothing collects" the evidence is false. Recorded in SESS-2026-09-15-07.
+- **P7's 000033 error**: PLAN-034 confirms phase-idea-07 is complete and fold() ships; the dormancy filing is stale. Recorded in SESS-2026-09-15-08.
+- **P8's 000024 error**: PLAN-035 confirms all four schema tables exist and rebuild_db.py loads them; only CLAUDE.md documentation gap remains.
+- **P8's G36**: Marked RESOLVED in partition, verification confirmed.
+
+The finalization phases operated as a correction control: they didn't inherit the partition errors blindly but re-verified critical scope statements against the repository. The partition's as-of date (2026-09-13) is already three days stale by execution time; the open question remains whether to add a standing note to the partition stating its state claims must be re-checked before phase claiming.
+
+</details>
+
 **Links**
 
 - relates_to ← `000243`
@@ -12154,7 +12321,7 @@ Unresolved: how many more remain. Four surfaced across ten phases, and those ten
 
 ## 000245 · A deliverables entry means "locked" before a phase and reads as "produced" after it
 
-**Created 2026-09-15T09:32:20-04:00 · Status: `open`**
+**Created 2026-09-15T09:32:20-04:00 · Status: `triaged`**
 
 phase-prog-12 declares docs/06-requirements/ in its deliverables. Its central ruling was that no requirement document should be written for P12 — so after close, the field reads as a claim about output that is false.
 
@@ -12168,6 +12335,27 @@ Worth deciding: whether a completed phase should carry completion_evidence as it
 
 Unresolved: whether retroactively narrowing a deliverables entry is ever right, given it would rewrite a lock that peers relied on while the phase was live. The overnight run left phase-prog-12's declaration as found for that reason.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:36-04:00): Idea 000245 asks whether the `deliverables` field should be split into separate concerns: a pre-completion lock and a post-completion manifest, or whether both roles should be reconciled at phase close.
+
+The core finding: SESS-2026-09-15-11-standalone-explorations-plan.md acknowledges this exact issue. phase-prog-12 declared `docs/06-requirements/` as a deliverable (correctly locking peers during execution), but the phase's ruling was to NOT write a requirement document. After completion, the field reads as a claim about output that is false. The session notes it was "worth a line in a future backlog-hygiene pass; not worth blocking on."
+
+Related but distinct ideas: 000239 and 000242 both surface deliverables declaration gaps (undeclared backlog.yaml and README.md files), surfaced in the same review run. Those are governance problems (locked work not matching declared paths). Idea 000245 is different—it asks whether the field itself has two incompatible meanings (lock before, manifest after) that need reconciling.
+
+All three were found by the same independent reviewer on 2026-09-15 but address distinct contract questions: 000239/000242 are about undeclared deliverables; 000245 is about the field's dual semantics.
+
+No related plan, requirement or ADR found—the issue is acknowledged as deferred pending owner decision about whether to split the field or reconcile at close.
+
+PROPOSED LINK: 000245 --relates_to--> 000242 (both surface deliverables field issues, though 000242 is undeclared paths while 000245 is dual semantics)
+PROPOSED LINK: 000245 --relates_to--> 000239 (same review run, same deliverables contract uncertainty, though 000239 focuses on AGENTS.md's backlog rule)
+
+</details>
+
 **Links**
 
 - relates_to → `000242`
@@ -12176,7 +12364,7 @@ Unresolved: whether retroactively narrowing a deliverables entry is ever right, 
 
 ## 000246 · Terminal panel drops its connection and restarts unprovoked, and it cost a live demo
 
-**Created 2026-09-15T16:35:34-04:00 · Status: `open`**
+**Created 2026-09-15T16:35:34-04:00 · Status: `triaged`**
 
 Owner report, 2026-09-15. While testing ahead of a live demo, the workbench terminal panel was
 observed randomly dropping its connection and restarting on its own — no layout switch, no
@@ -12213,6 +12401,24 @@ this one is a defect investigation and does not belong inside that audit's scope
 
 Reported on Linux, in the bash panel. Whether CMD and PowerShell on the owner's Windows machine
 show the same behavior is unknown and is an owner-machine check.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T11:41:41-04:00): Defect is unowned — no phase claims investigation or fix.
+
+Idea 000246 (terminal drops unprovoked) relates to 000113 (terminal audit, phase-arch-16) and 000137 (websocket close reason, phase-wbf-09), but addresses a distinct failure mode: a session dying with no user action, not a documented transition. The idea's own text draws this boundary explicitly: "this one is the unprovoked case — the session dying while nobody touched it — which no row of [the audit] would catch."
+
+REQ-012 R20–R21 cover two terminal defects scheduled for phase-wbf-09 (cap race between registry check and accept; close-reason handling on cap refusal). Neither addresses spontaneous drops. phase-arch-16 (PLAN-028, G47) audits terminal persistence across three shells; its scope is "provoked transitions" — layout switches, visible-panel switches, re-assignment, collapse/drop/restore, page reload — each "one a user causes." Unprovoked drops fall outside that audit's observable set.
+
+The defect blocked a live demo (2026-09-15). Diagnosis is the deliverable: what closes the socket, whether the restart is frontend reconnecting or a second session opening, whether the PTY survives backend-side, and whether it correlates with the dev server, orphaned processes, or the six-session cap being silently reached.
+
+No REQ-012 row, no phase-wbf-* or phase-arch-* phase, no plan entry covers this investigation. It is triaged and linked but not yet assigned or sequenced.
+
+</details>
 
 **Links**
 
@@ -12294,7 +12500,7 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 
 ## 000248 · Expand the orchestrator daemon into a host for other always-on agents
 
-**Created 2026-09-15T23:15:55-04:00 · Status: `open`**
+**Created 2026-09-15T23:15:55-04:00 · Status: `triaged`**
 
 The PLAN-039.01 daemon's skeleton - single-instance lock, watcher registry, tick loop, ledger, kill switch, and the budget/dispatch adapter with role-contract binding - is generic always-on infrastructure, not idea-pipeline-specific. The owner wants to explore, in more detail, expanding it to host other always-on agents beyond the idea realization pipeline. No specific agent is in mind yet; the exploration is the point. The design's seam is already there: a new always-on behavior arrives as either a new watcher (another repo-internal event source that wakes the tick) or a new run kind (another graph beside intake/batch/unit/realization with its own start condition, gates and re-derivation row), and every addition inherits the kill switch, budgets, repo-wins recovery, audit ledger and manual-tick degraded mode. Constraint the exploration must respect: expansions land as new watchers or run kinds through the normal plan-and-phase path, not by the daemon quietly accreting jobs, and the daemon schedules rather than becoming a general process supervisor (phase-auto-05's territory if built).
 
@@ -12302,9 +12508,28 @@ The PLAN-039.01 daemon's skeleton - single-instance lock, watcher registry, tick
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-fable (2026-09-16T01:20:51-04:00): Audit finding M16 (2026-09-16 Opus audit of PLAN-039.01): the generic-host seam this idea depends on is asserted, not designed - the written design has three hardcoded watchers and pipeline-specific start conditions and re-derivation inline in tick.py and state.py, with no watcher registry, run-kind protocol or plug-in point. The seam must be created (a registration interface for watchers and run kinds) before this idea is actionable; the PLAN-039.01 revision records it as future work rather than claiming it exists.
+- **finding** by agent-idea-triage (2026-09-22T11:42:09-04:00): Idea 000248 proposes exploring the expansion of the PLAN-039.01 daemon skeleton — single-instance lock, watcher registry, tick loop, ledger, kill switch, and budget/dispatch adapter — from idea-pipeline-specific infrastructure into a generic host for other always-on agents.
+
+Related governed documents and phases:
+- PLAN-039 (Idea realization system master plan) frames the daemon architecture
+- PLAN-039.01 (Orchestrator design) details the daemon: §2 process model and §3 watcher registry
+- phase-irs-04 (LangGraph orchestrator skeleton) and phase-irs-16 (Daemon process model) build the daemon under PLAN-039
+- PLAN-032 (Autonomous agent operations, P5) and REQ-017 define the broader always-on infrastructure: external trigger gateway (phase-auto-03), run ledger (phase-auto-04), capability broker (phase-auto-02), and supervised worker (phase-auto-05)
+- Idea 000030 (Always-on worker host and watchdog) covers supervised execution at broader scale
+
+Related ideas:
+- 000247 (idea pipeline formalization) — this idea extends it
+- 000249 (Watch for external events) and 000250 (Mediate orchestrator state via MCP) — neighbouring orchestrator expansion asks captured same week, both relating to 000247 and 000248
+- 000082 (Agent orchestration, routing and recovery) — triaged, covers multi-agent coordination broadly
+- 000168 (Orchestrator handoff and per-worktree queues) — triaged, overlaps orchestrator concerns
+
+No backlog phase currently names expansion of the daemon beyond idea realization into general agent hosting. The daemon is purpose-built for one pipeline; 000248 identifies its generic seams (new watchers, new run kinds) as a platform. The constraint it names — expansions arrive through normal plan-and-phase path, not accreted — maps to how PLAN-039 already gates phase changes through the governance process.
+
+PROPOSED LINK: 000248 --relates_to--> 000030 (both address always-on agent hosting infrastructure)
+PROPOSED LINK: 000248 --relates_to--> 000082 (both address multi-agent orchestration patterns)
 
 </details>
 
