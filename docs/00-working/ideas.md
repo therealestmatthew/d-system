@@ -1407,6 +1407,7 @@ The idea itself explicitly names two related initiatives: 000020 (MCP-mediated m
 - relates_to → `000028`
 - relates_to → `000020`
 - relates_to ← `000165`
+- relates_to ← `000241`
 
 ---
 
@@ -4294,6 +4295,7 @@ PROPOSED LINK: 000079 --relates_to--> 000051 (Agent harness and guardrails: enfo
 - extends → `000078`
 - relates_to → `000067`
 - relates_to → `000051`
+- relates_to ← `000241`
 
 ---
 
@@ -8319,6 +8321,7 @@ PROPOSED LINK: 000165 --relates_to--> 000160 (both about mediating writes throug
 - relates_to ← `000159`
 - relates_to ← `000160`
 - relates_to ← `000169`
+- relates_to ← `000241`
 
 ---
 
@@ -10432,7 +10435,7 @@ No related plan, phase or document found with remaining discrepancies. No overla
 
 ## 000208 · The governance --catalog flag prints and never writes, so the claim-forced catalog regeneration silently no-ops and leaves dev red
 
-**Created 2026-09-13T16:47:45-04:00 · Status: `open`**
+**Created 2026-09-13T16:47:45-04:00 · Status: `triaged`**
 
 AGENTS.md requires the catalog regeneration a phase claim forces to be committed with the claim, because the claim moves generated output and leaving it unregenerated leaves dev red on test_committed_catalog_matches_regenerated_output. It names the command as `uv run python -m src.governance --catalog`.
 
@@ -10456,11 +10459,18 @@ Same family as [[000147]], [[000148]], [[000149]] and [[000201]]: an instrument'
 
 
 <details>
-<summary>3 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-13T16:55:26-04:00): Second instance in the same session, different tool, same shape. tools/append_idea.py appends to _data/ideas.jsonl but does not regenerate docs/00-working/ideas.md, which is generated output that test_ideas.py::test_the_committed_markdown_matches_regenerated_output diffs in CI. Appending 000208-000214 in phase-lit-04 therefore left the tree red until tools/generate_ideas_md.py was run (commit 79580b0). Neither the idea skill nor the tool's own output mentions the projection; the tool prints "created NNNNNN at <timestamp>" and exits 0, so nothing signals that a second command is owed. That is the same failure shape as the --catalog case this idea records: a sanctioned writer completes successfully while leaving a derived artifact stale, and only the full test suite detects it. Worth considering whether the two fixes are one fix - a writer that regenerates its own projection, or a single pre-commit hook that regenerates every derived file and fails on drift, rather than each tool growing its own follow-up step for callers to remember.
 - **finding** by agent-lit (2026-09-13T18:56:10-04:00): The redirect this idea proposes as the fix has its own failure mode, hit during the phase-lit-04 close. `uv run python -m src.governance --catalog > docs/08-governance/catalog.md` truncates the target file before the command runs, so any run where validation fails destroys the catalog instead of leaving it stale. At close, a YAML syntax error introduced into backlog.yaml (a colon-space inside a plain scalar in a `result:` field) made the validator exit non-zero; the catalog was already truncated from 26266 bytes to 227 and had to be restored with `git checkout`. Nothing warned: the shell reports the redirect's success, not the generator's, and the `&&` chain that followed simply short-circuited. So the documented one-liner converts a recoverable stale-file state into a destroyed-file state exactly when the repository is already in an invalid state and the operator is least likely to be looking for a second failure. Safer form, and worth writing into whatever wording the owner approves: generate to a temporary file, check the exit status, and only then move it into place. Same reasoning applies to `tools/generate_ideas_md.py`, which writes its own target directly and would face the same question if it ever fails mid-write.
 - **finding** by agent-lit (2026-09-13T19:07:14-04:00): Correction to this idea's framing: the behaviour was already known and already recorded, and this phase rediscovered it rather than discovering it. brain/procedures/a-check-that-cannot-fail-is-not-a-check.md, written 2026-09-12 - the day before phase-lit-04 - names this exact flag as its worked example ("A flag named --catalog sounds like it regenerates the catalog file; it may only print the catalog to stdout"), states plainly that it prints rather than writes, and gives the correct drift check: `diff <(uv run python -m src.governance --catalog) docs/08-governance/catalog.md`. SESS-2026-09-13-01 records the same thing again from Pass 1b. The phase-lit-04 coordinator read neither and ran the anti-pattern the procedure exists to prevent, then reported it as a novel finding. Two consequences worth keeping. First, the prior record was documentation, and documentation did not stop the third recurrence in three days across different sessions - which is the argument for changing the tool rather than writing the warning a fourth time, and is what the owner directed on 2026-09-13. Second, the recurrence is itself evidence about where this repository's knowledge actually lands: a brain procedure naming the exact command did not reach the session that needed it, because nothing in the session's entry path surfaces brain/procedures by topic. That retrieval gap is the more general problem and is not fixed by fixing this tool.
+- **finding** by agent-idea-triage (2026-09-22T10:25:38-04:00): 000208 identifies a critical governance tool defect where the `--catalog` flag's documented and actual behavior diverge. The command prints catalog markdown to stdout but does not write to file, yet AGENTS.md requires catalog regeneration on every phase claim and OPS-001 documents the command as writing `docs/08-governance/catalog.md` directly. This silent no-op causes phase claims to ship with stale catalogs, leaving dev red on `test_committed_catalog_matches_regenerated_output`.
+
+Related documentation: PLAN-005 (phase-doc-02, complete), OPS-001 (line 39-40), GOV-005 (catalog section), AGENTS.md (claim protocol). The defect is well-documented in the idea: both LIT-04 dispatch and coordinator verification failed independently in phase-lit-04 (commit 3414226), and the test remained red until manual fix in 2ea3080.
+
+No other open ideas show overlap with this specific governance tool bug. Idea 000201 (linked, about PROMPT-029 grammar) is from the same family of "documented contract vs actual behavior" issues but addresses a different system.
+
+Propose no links or promotions: this is unique discovery needing owner judgement on fix approach (tool rewrite, documentation correction, CI check, or combination).
 
 </details>
 
@@ -10473,7 +10483,7 @@ Same family as [[000147]], [[000148]], [[000149]] and [[000201]]: an instrument'
 
 ## 000209 · Pass 2 deep reads correct bibliographic facts into the evidence matrix while the inventory keeps the wrong ones, and no rule says which wins
 
-**Created 2026-09-13T16:48:05-04:00 · Status: `open`**
+**Created 2026-09-13T16:48:05-04:00 · Status: `triaged`**
 
 The evidence contract gives the source inventory (deliverable 03) and the evidence matrix (deliverable 04) overlapping bibliographic fields — citation, source_type, url_or_doi / url_doi — but no rule for what happens when a Pass 2 deep read discovers the inventory's value is wrong.
 
@@ -10501,6 +10511,24 @@ Same family as [[000199]]: the contract fixes a column's vocabulary but not the 
 
 - **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: the evidence matrix is authoritative for any deep-read source, and a deep-read dispatch may write bibliographic corrections back into the source inventory, not only the status field. This relaxes the narrower phase-lit-04 ruling that confined inventory edits to status - that ruling governed Pass 2a only and is superseded from phase-lit-05 onward. Practical effect for LIT-05 and later: when a deep read establishes from the source's own page that an inventory field is wrong (source_type, citation, year, url_or_doi), correct the inventory row in the same commit as the matrix row, so the two deliverables do not drift and the 400+ row inventory improves as reading proceeds. The correction is still evidence: log the verification lookup as a ledger row the way phase-lit-04 did (strategy_phase D, with the enum mismatch noted), so the change is traceable rather than silent. LIT-07 X3 builds the validated bibliography from the matrix for deep-read sources and from the inventory for everything else. The five known-wrong rows from phase-lit-04 (em-llm, evidence-graphs, keim-kaplan source_type; de-boer authorship; us20250165226a1 grant status) are the first backlog for this rule and should be corrected early in phase-lit-05.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:25:36-04:00): Idea 000209 names an unresolved rule in the evidence contract (PLAN-023.03): when a Pass 2 deep read discovers an error in the inventory's bibliographic facts (source_type, citation, url_or_doi), the contract does not specify whether the correction propagates back to the inventory, whether it is recorded as an overwrite or as an additional field, or which deliverable is authoritative when they disagree.
+
+Related to: PLAN-023.03 (evidence contract schema) and phase-lit-04/phase-lit-07 (Pass 2a and Pass 4 which depend on the rule). The issue blocks LIT-07's bibliography synthesis: a bibliography built from the inventory would ship known-wrong values; one built from the matrix covers only the 20-30 deeply read sources, not the 400+.
+
+Overlaps with related ideas on the same contract surface: 000203 (identity verification at source), 000226 (Pass 2 deep reads and collision accuracy), 000199 (collision_candidate behavior), 000148 (no source_type bucket for patents/dissertations), 000212 (CSV line-ending convention), 000221 (second_review writer), 000227 (patent scoring rule), 000289 (result_ids tokenization), 000296/000308 (inventory/evidence matrix sync).
+
+Same family as 000199: the contract specifies vocabulary but not the mechanical rule a downstream deliverable depends on. This cluster belongs together in the phase-lit-07 synthesis gate, since the authority question is not an agent's mid-campaign decision.
+
+PROPOSED LINK: 000209 --relates_to--> 000199 (same contract family: specifies vocabulary, not mechanical resolution rule)
+PROPOSED LINK: 000209 --relates_to--> 000148 (same evidence-contract surface: missing source_type buckets)
+PROPOSED LINK: 000209 --relates_to--> 000212 (same evidence-contract surface: unfixed CSV format conventions)
+PROPOSED LINK: 000209 --relates_to--> 000227 (same evidence-contract surface: no scoring rule for patents)
+
+</details>
+
 **Links**
 
 - relates_to → `000203`
@@ -10510,7 +10538,7 @@ Same family as [[000199]]: the contract fixes a column's vocabulary but not the 
 
 ## 000210 · A source_id slug names the wrong author, and the slug is a stable identifier the ledger already points at
 
-**Created 2026-09-13T16:48:32-04:00 · Status: `open`**
+**Created 2026-09-13T16:48:32-04:00 · Status: `triaged`**
 
 The inventory row solozobov-verify-gated-completion-admission-control-2026 attributes the paper to "Solozobov", in both the source_id slug and the citation field. The paper's own title page names only Hai-Duong Nguyen and Xuan-The Tran (Vietnam Maritime University); "Solozobov" appears nowhere in its text. Found by the LIT-04 X3 deep read on 2026-09-13 and recorded in that source's matrix row and ledger rows; the inventory was left untouched per the phase's deep-read-marking ruling.
 
@@ -10530,6 +10558,25 @@ Worth checking whether other slugs in the 400+ row inventory carry the same defe
 
 - **assessment** by repository-owner (2026-09-13T19:08:34-04:00): OWNER RULING, 2026-09-13: freeze the slug, correct the citation. source_id is an opaque stable key once committed evidence points at it, and is not rewritten to fix a fact it appears to encode - the ledger rows that already reference solozobov-verify-gated-completion-admission-control-2026 are the reproducibility record and are not rewritten. The correct authorship (Hai-Duong Nguyen and Xuan-The Tran, Vietnam Maritime University) already stands in the evidence matrix citation field. phase-lit-05 additionally records the correction where a reader of the inventory will hit it, so the wrong name is not silently propagated by anyone reading that file alone; under the 000209 ruling the inventory citation may now be corrected directly. The general consequence, worth carrying into any future campaign rather than just this one: a source_id that encodes authorship can become false, and an opaque identifier cannot. That is a design question for the evidence contract, not something to settle by renaming one row.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:25:50-04:00): Idea 000210 already carries an owner ruling (SESS-2026-09-13-03) freezing the `source_id` slug and correcting the citation field. The decision: `source_id` is an opaque stable identifier once committed evidence points at it, and is not rewritten to fix a fact it appears to encode; the ledger rows already referencing it form the reproducibility record and must not be modified. Phase-lit-05 is tasked with recording the authorship correction in the inventory citation field.
+
+Related evidence: 
+- 000203 (triaged): General principle — verify identity at the source, not the aggregator
+- 000209 (open): The inverse problem — matrix vs. inventory disagree on facts, and no rule governs precedence; the owner's ruling on this idea indirectly answers 000209 by establishing that inventory corrections are appended separately, not writable back into prior rows
+- 000296 (open): Inventory status column out of sync with evidence matrix — a symptom of the same inventory/matrix coupling problem
+- 000308 (open): Inventory status field stale for 16 rows — another inventory data consistency issue
+
+Broader evidence:
+- PLAN-023.03 (evidence contract) defines `source_id` as a "stable slug" but does not specify format or what happens when a slug encodes a false fact. The contract was finalized 2026-09-12/14, and the Solozobov case surfaced 2026-09-13 during LIT-04 X3, exposing the design gap the owner's ruling addresses.
+- The owner's conclusion carries a design recommendation for future campaigns: source_id should not encode authorship at all, since an opaque identifier cannot become false.
+
+This idea's triaging work is complete. The ruling exists, implementation is assigned to phase-lit-05, and related inventory inconsistencies are tracked separately (000209, 000296, 000308).
+
+</details>
+
 **Links**
 
 - relates_to → `000203`
@@ -10538,7 +10585,7 @@ Worth checking whether other slugs in the 400+ row inventory carry the same defe
 
 ## 000211 · The ledger append path validates nothing on write, so five malformed rows shipped and were caught only by a post-hoc audit
 
-**Created 2026-09-13T16:48:32-04:00 · Status: `open`**
+**Created 2026-09-13T16:48:32-04:00 · Status: `triaged`**
 
 During phase-lit-04, the LIT-04 X2 dispatch appended five ledger rows (LIT-04-S016, S018, S020, S026, S027) that silently dropped one or two of the evidence contract's 15 required columns — `duplicate_handling` and/or `chain_decision`. The worker's own append script validated CSV shape for the evidence matrix but not for the ledger. Nothing failed at write time. The rows were caught only by a full-file field-count audit run afterwards, and repaired by byte-level CSV surgery before the phase gate.
 
@@ -10554,6 +10601,30 @@ What would prevent a recurrence:
 
 Same family as [[000147]], [[000149]] and [[000201]]: the evidence contract fixes a format but no instrument enforces it, and the gap surfaces as silently malformed evidence rather than an error.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:25:54-04:00): Idea 000211 describes the ledger append path having zero validation at write time, permitting five malformed rows (LIT-04-S016, S018, S020, S026, S027) to ship without error in phase-lit-04. The rows silently dropped the `duplicate_handling` and/or `chain_decision` columns required by the evidence contract (PLAN-023.03, which defines 15 required ledger columns). The malformed rows were caught only by post-hoc audit.
+
+Related governance and known issues:
+
+- PLAN-023.03-evidence-contract.md defines the ledger format with 15 required columns, but provides no validation tool or enforcement mechanism
+- The evidence contract is already central to PLAN-023 (literature review campaign), and related validation issues are tracked in ideas 000289 (result_ids tokenisation), 000307 (source dedupe rule), 000295 (duplicate-rate figures don't reproduce), 000296 (inventory status out of sync), 000308 (inventory field stale), and 000309 (deliverable count mismatch)
+- Sibling idea 000212 addresses the related problem that the evidence contract names no CSV line-ending convention, and the three deliverables do not agree on CRLF vs LF
+- Idea 000197 records that deliverables disagree on line endings and the standing CRLF warning can corrupt LF ones
+- The contract already links to PLAN-023.03 in backlog.yaml for phase-lit-04 and subsequent phases
+
+The idea proposes three prevention strategies: a tiny row-validation tool run after append, adding well-formedness measurement to the gate procedure (Block G), and shipping a sanctioned ledger append helper (similar to tools/append_idea.py for ideas). The core insight—that silent malformation threatens reproducibility more than an explicit error would—applies broadly across the evidence contract's use in the campaign.
+
+PROPOSED LINK: 000211 --relates_to--> 000212 (both address CSV format and validation gaps in the evidence contract)
+PROPOSED LINK: 000211 --relates_to--> 000147 (evidence contract identifier format)
+PROPOSED LINK: 000211 --relates_to--> 000149 (ledger enum incompleteness)
+
+</details>
+
 **Links**
 
 - relates_to → `000201`
@@ -10562,7 +10633,7 @@ Same family as [[000147]], [[000149]] and [[000201]]: the evidence contract fixe
 
 ## 000212 · The evidence contract names no CSV line-ending convention, and the campaign's three deliverables do not agree
 
-**Created 2026-09-13T16:49:02-04:00 · Status: `open`**
+**Created 2026-09-13T16:49:02-04:00 · Status: `triaged`**
 
 The search ledger is CRLF-terminated on every row (889 lines as of phase-lit-04). The source inventory and the evidence matrix are LF-only. The evidence contract specifies line endings for none of them, so the divergence is not a violation of anything — it is an absence.
 
@@ -10578,6 +10649,26 @@ What to settle:
 
 Same family as [[000147]], [[000148]], [[000201]] and [[000211]]: the contract fixes the semantics of a column but not the mechanics of the file, and the gap surfaces during an append rather than at validation.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:25:58-04:00): Related document: PLAN-023.03 (Literature-review evidence contract) confirms the problem. The contract specifies file locations, reproducibility-ledger format columns, source inventory format, and evidence matrix extraction schema, but does NOT specify line-ending conventions for any of the three CSV files (00_search_ledger.csv, 03_source_inventory.csv, 04_evidence_matrix.csv).
+
+Documented inconsistency: Session records (SESS-2026-09-13-02, SESS-2026-09-13-04, SESS-2026-09-14-07, backlog.yaml) consistently show the ledger as CRLF-terminated while inventory and matrix files are LF-only. The backlog.yaml verification rule for phase-lit-08 codifies "Ledger integrity - CRLF on every line... matrix and inventory LF-only", but this rule lives in operational guidance rather than the contractual evidence contract.
+
+Related idea 000197 (The literature-review deliverables disagree on line endings) documents the same issue specifically for the literature campaign, noting the hazard to downstream dispatches that inherit the wrong convention. 000212 generalizes this to the contract level and identifies the root cause: PLAN-023.03's silence on line endings.
+
+Both ideas link to 000147 (relating to contract underspecification), and both are in the same family as 000148, 000201, 000211 (all contract gaps surfacing as append hazards rather than validation errors).
+
+The proposed fix matches 000212's analysis: state the convention in PLAN-023.03 or normalize at a phase boundary. No related requirement or ADR found.
+
+PROPOSED LINK: 000212 --relates_to--> 000197 (same line-ending issue generalized from campaign-specific to contract level)
+
+</details>
+
 **Links**
 
 - relates_to → `000147`
@@ -10586,7 +10677,7 @@ Same family as [[000147]], [[000148]], [[000201]] and [[000211]]: the contract f
 
 ## 000213 · The top-20 deep-read list carried one paper twice under two identifier forms, with dedup_of none on both rows
 
-**Created 2026-09-13T16:49:02-04:00 · Status: `open`**
+**Created 2026-09-13T16:49:02-04:00 · Status: `triaged`**
 
 The ranked top-20 collision-candidate list that phase-lit-03 produced, and that phase-lit-04 deep-read, contained the same paper in two of its twenty slots: dhar-vaidhyanathan-varma-agenticakm-2026 (a ResearchGate record, source_type `conference`) and dhar-vaidhyanathan-varma-agenticakm-2026-arxiv (arxiv:2602.04445, source_type `preprint`) are both AgenticAKM by Dhar, Vaidhyanathan and Varma. Identical pre-scores (5/4), same domain (D39), both tied at rank 1, and — the part that matters — `dedup_of: none` on both rows.
 
@@ -10605,6 +10696,26 @@ What needs settling:
 - whether anything should detect the pattern mechanically — two rows whose slugs differ only by an identifier-form suffix, or whose titles match, are cheap to flag.
 
 Worth checking the remaining 400+ inventory rows for other instances; this one surfaced only because both copies reached the top twenty.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:04-04:00): Idea 000213 describes one observed instance of duplicate papers in the top-20 deep-read list (dhar-vaidhyanathan-varma-agenticakm appearing under both a ResearchGate and an arXiv identifier form, both with dedup_of: none). The issue is part of a documented family of evidence-contract specification gaps.
+
+**Related ideas:** 000213 already links to 000199 via relates_to. The body of 000199 names three other ideas in the same contract-gap family: 000147 (identifier format inconsistency), 000148 (missing patent bucket), 000149 (missing strategy_phase value). All four point to underspecified areas of PLAN-023.03's evidence contract.
+
+**Related governed documents:** PLAN-023.03 (Literature-review evidence contract) governs the `dedup_of` and `collision_candidate` fields at the center of this issue. PLAN-023-overview and PLAN-023.02 document the phases that produced the top-20 list. PLAN-043 (Literature-review campaign report page) explicitly acknowledges the problem at line 83-84: "the campaign has two known duplicate inventory rows and at least one matrix row citing a path that 404s". REQ-027 (literature-review report page requirements) will surface dangling references through R04 once the report renders.
+
+The owner's 2026-09-13 ruling that resolved the specific instance (arXiv row deep-read, ResearchGate row dropped, rank-21 promoted) addresses the symptom, not the mechanism. Idea 000213's body identifies the root cause: the contract specifies dedup rules for same-source-in-different-domain but not for same-work-under-different-identifier-forms, and neither rule tells the top-20 selection whether to dedup by row or by work.
+
+PROPOSED LINK: 000213 --relates_to--> 000147 (same evidence-contract specification gap family, distinct from existing 000213->000199 link)
+PROPOSED LINK: 000213 --relates_to--> 000148 (same evidence-contract specification gap family)
+PROPOSED LINK: 000213 --relates_to--> 000149 (same evidence-contract specification gap family)
+
+</details>
 
 **Links**
 
@@ -10679,13 +10790,15 @@ PROPOSED LINK: 000214 --relates_to--> 000219 (both are silent gate failures; 000
 **Links**
 
 - relates_to → `000147`
+- relates_to → `000290`
 - relates_to ← `000215`
+- extended_by ← `000219`
 
 ---
 
 ## 000215 · The delegation pack fixes a model per section but nothing records which model actually ran, so compliance is unverifiable after the fact
 
-**Created 2026-09-13T18:52:43-04:00 · Status: `open`**
+**Created 2026-09-13T18:52:43-04:00 · Status: `triaged`**
 
 PROMPT-029 states models per section and calls them not the coordinator's to change: K and G on Haiku, S/X/R/C/A on Sonnet, Opus never pre-assigned and at most one documented escalation per campaign. GOV-009 treats the single Opus escalation as a governed resource the session record must name.
 
@@ -10703,6 +10816,29 @@ What a fix could look like, none of it an agent's call:
 
 Raised by the independent reviewer at the close of phase-lit-04 on 2026-09-13, as an observation outside the acceptance conditions. Same family as [[000214]]: a claim the campaign presents as measured turns out to rest on an assertion nobody can recompute.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:06-04:00): Idea 000215 identifies a compliance gap: the delegation pack (PROMPT-013) specifies a fixed model per section, but nothing records which model actually ran, leaving compliance unverifiable after execution.
+
+Related existing work:
+- phase-agx-05 (PLAN-031) covers runtime-evidence convention as part of delegation-scoping methodology, aimed at instrumenting runtime behavior
+- REQ-016 R09 requires delegation-scoping methodology to "choose a model" but does not require recording actual execution
+- REQ-016 R04 specifies audit verdicts must cite "model assignment" but only at audit time, not at runtime
+- PROMPT-013 specifies delegation pack format with model names but no execution log or actual-vs-planned tracking
+
+The tension is clear: phase-agx-05 addresses runtime evidence collection but delegates model recording to the methodology rather than mandating it explicitly. The gap sits between specification (what should run) and audit (what ran).
+
+Possibly related to 000139 (Delegation-scoping methodology with built-in continual improvement) and 000032 (Evidence-backed provenance graph for memories, reports and recommendations) at a conceptual level, though neither explicitly addresses model-runtime compliance recording.
+
+PROPOSED LINK: 000215 --relates_to--> 000139 (both concern delegation methodology and retrospective accuracy)
+PROPOSED LINK: 000215 --relates_to--> 000032 (both concern provenance and evidence recording)
+
+</details>
+
 **Links**
 
 - relates_to → `000214`
@@ -10711,7 +10847,7 @@ Raised by the independent reviewer at the close of phase-lit-04 on 2026-09-13, a
 
 ## 000216 · A brain procedure naming the exact failing command did not reach the session that repeated the failure, three days running
 
-**Created 2026-09-13T19:17:22-04:00 · Status: `open`**
+**Created 2026-09-13T19:17:22-04:00 · Status: `triaged`**
 
 brain/procedures/a-check-that-cannot-fail-is-not-a-check.md was written on 2026-09-12 specifically to stop agents building verifications that cannot fail. Its worked example is the governance --catalog flag, named explicitly, with the correct drift check spelled out. SESS-2026-09-13-01 recorded the same trap again from Pass 1b. On 2026-09-13 the phase-lit-04 coordinator ran the identical anti-pattern - ran --catalog, checked git status, saw a clean tree, reported the catalog current - and presented it as a new discovery. Three occurrences in three days, in three different sessions, with a procedure sitting in the repository the whole time that would have prevented all three.
 
@@ -10728,6 +10864,24 @@ Worth deciding:
 
 This is the general case behind [[000208]] and is the reason a fourth warning would not have worked. Same family as [[000214]] in one respect: both are cases where the campaign trusted an instrument to do something it was never verified to do.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:04-04:00): Core issue: brain/procedures exist to prevent recurring failures (specifically brain/procedures/a-check-that-cannot-fail-is-not-a-check.md written 2026-09-12) but the same anti-pattern was repeated three times in three days. Root cause is routing/discovery, not knowledge — the session entry path (CLAUDE.md, AGENTS.md, session-start.md) never surfaces brain/procedures as something to consult before acting. CLAUDE.md mentions brain/ only as a destination for recording corrections, not as a resource to retrieve before working.
+
+The body identifies four specific decisions needed: (1) Should brain/procedures be indexed by trigger/situation rather than title?; (2) Should session entry surface procedures matching the phase's declared systems or the commands being run?; (3) Is the procedure format itself failing to reach agents, making this a system problem rather than a documentation problem?; (4) Should a recorded correction that fails to prevent recurrence three times be treated as evidence that the mechanism does not work?
+
+Related to 000208 (the specific --catalog flag bug that triggered this observation) and 000214 (incomplete gate verification) as siblings in the "instrument was never verified to work" family.
+
+Found strong overlap with knowledge-retrieval architecture planning: PLAN-033 (Retrieval and knowledge infrastructure, P6) directly addresses retrieval systems but focuses on vector/code-graph search, not procedural discovery. 000002 (Prioritised search order for agentic knowledge retrieval) addresses the ordering problem that underlies this. 000043 (Documentation database for knowledge retrieval) and 000082 (Agent engineering: Orchestration — routing, multi-agent coordination) both touch retrieval routing.
+
+No existing plan explicitly covers procedure discovery as a routing problem in the session entry path.
+
+</details>
+
 **Links**
 
 - relates_to → `000208`
@@ -10736,7 +10890,7 @@ This is the general case behind [[000208]] and is the reason a fourth warning wo
 
 ## 000217 · The literature-review branch model and the claim protocol collide, and it will recur at every phase
 
-**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+**Created 2026-09-13T22:12:26-04:00 · Status: `triaged`**
 
 PLAN-023 has every campaign phase commit to one long-lived branch, agent/lit-campaign, which the owner integrates into dev only twice. AGENTS.md has each phase claimed on dev, where backlog.yaml is the lock table, and src/governance/backlog.py:67 rejects an agent holding two active phases.
 
@@ -10750,11 +10904,29 @@ Worth deciding deliberately rather than re-deriving each session. Options a futu
 
 Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:25-04:00): Related material found: ADR-003 (multi-agent concurrency), PLAN-023 (literature-review campaign), PLAN-026 (concurrency/git-safety), phase-conc-* phases (concurrency hardening).
+
+The collision is structural: PLAN-023 holds phases on one long-lived branch (agent/lit-campaign) with only two integrations to dev (pre-synthesis and close-out), while ADR-003's claim protocol requires each phase claimed on dev with backlog.yaml as the lock table—one active claim per agent at a time. When phase-lit-04 closed on the campaign branch (2026-09-13, commit e9b32ab), dev's lock table still showed it active, rejecting phase-lit-05's claim until the owner forced an early integration. The session record (SESS-2026-09-13-04) documents this explicitly: "The structural collision recurs at any future un-integrated close" and names three options the owner might weigh: claim on campaign branch only and reconcile at integration; hold one standing claim across all seven phases; or amend PLAN-023 to accept integration at every phase boundary.
+
+PLAN-026 addresses broader concurrency hardening but not this specific decision about persistent claims vs. per-phase claims. phase-conc-* phases handle claim recovery, document-code collision-proofing, and branch protection, but do not resolve whether multi-phase campaigns should follow the standard per-phase-claim model or adopt a different claiming discipline.
+
+Related ideas with potential connection: 000025 (abandoned-claim recovery), 000041 (multi-agent clobbering), 000204 (resolved work leaves idea open). No idea overlaps exactly; this collision is specific to campaigns using PLAN-023's model.
+
+No related plan, requirement or backlog phase found that already resolves the design choice itself—only infrastructure work (PLAN-026, phase-conc-*) that presumes the choice has been made.
+
+</details>
+
 ---
 
 ## 000218 · LIT-05's item order makes its own gate measurement 3 structurally unsatisfiable
 
-**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+**Created 2026-09-13T22:12:26-04:00 · Status: `triaged`**
 
 The delegation pack gives phase-lit-05 the item order S1 to X1 to X2 to G. S1 runs forward chaining over every evidence-matrix row scoring 3 or higher. X1 and X2 then deep-read new sources into the matrix, and some of those new rows also score 3 or higher.
 
@@ -10769,6 +10941,24 @@ Candidate corrections, for the owner to choose between rather than an agent to p
 Note this is a defect in PROMPT-029, a governed prompt. No agent may author or edit a prompt mid-campaign.
 
 Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:16-04:00): Gate defect in phase-lit-05 arising from phase item order.
+
+The LIT-05 item order (S1 → X1 → X2 → G) guarantees a measurement 3 failure at every run: measurement 3 requires all rows with overlap score ≥3 to carry both strategy_phase B and C ledger rows; rows created by X1/X2 are given B coverage by their own deep read but cannot have C coverage because forward chaining (S1) runs before they exist. The gate fails by construction, not by worker error, and requires a fix cycle every run. Session record SESS-2026-09-13-04 documents the failure and its fix via a re-dispatch to S1.
+
+This is the third gate defect in the campaign's sequence: 000214 (false PASS from incomplete field checking in LIT-04), 000219 (false PASS from silent token dropping in LIT-05, already links_to 000218), and 000290 (proposal to replace LLM-based gates with deterministic scripts). Backlog entry for phase-lit-05 notes this will cost phase-lit-06 a fix cycle "the same way" — a structural defect in one phase creating predictable rework in the next.
+
+The phase's acceptance criteria were met after the fix cycle (gate measurements 1, 2, 4, 5 passed cleanly; measurement 3 passed after S1 re-dispatch). PROMPT-029 (the governed prompt) at line 721 prescribes the item order; PROMPT-029 is itself a governed document that no agent may edit mid-campaign.
+
+Proposal already recorded in backlog for the owner to weigh: reorder phase to X1, X2, S1, G so chaining runs last over the final matrix; or split S1 into a pre-pass and a post-pass; or scope measurement 3 to rows existing when chaining ran (weaker; stops measuring what it is for).
+
+</details>
 
 **Links**
 
@@ -10834,12 +11024,14 @@ PROPOSED LINK: 000219 --relates_to--> 000290 (000219 is one of three consecutive
 **Links**
 
 - relates_to → `000218`
+- extends → `000214`
+- relates_to → `000290`
 
 ---
 
 ## 000220 · Counting mentions as inheritance manufactures shared ancestors, and every error it makes flatters H0
 
-**Created 2026-09-13T22:12:26-04:00 · Status: `open`**
+**Created 2026-09-13T22:12:26-04:00 · Status: `triaged`**
 
 During phase-lit-05, the LIT-05 K kickoff was asked to rank foundational works by how many evidence-matrix rows inherit from each, so the deep read could start with the strongest shared lineages. It counted how many rows MENTION a work's name in the derivative_ancestor field, which is not the same thing, and the difference is not neutral.
 
@@ -10855,6 +11047,26 @@ Possible durable fix, for the owner to weigh: state in the evidence contract or 
 
 Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:31-04:00): Idea 000220 addresses a data-quality defect in the evidence matrix discovered during phase-lit-05. The issue: counting mentions of works in the `derivative_ancestor` field was treated as counting inheritance relationships, which manufactured false shared ancestors and inflated evidence for hypothesis H0.
+
+Related documents:
+
+PLAN-023.03 (the evidence contract, `PLAN-023-literature-review-campaign/PLAN-023.03-evidence-contract.md`) defines `derivative_ancestor` at lines 117–119 as "`source_id` or citation of the shared ancestor when this source inherits its mechanism; `none` when independent." The definition does not explicitly state that the field contains prose which may name works a row does NOT descend from, including withdrawn claims and explicit contrasts. This omission enabled the counting error: a method that matches strings against `derivative_ancestor` cannot distinguish between a mention of a work as ancestry and a mention of a work in an explicit contrast or rejected claim.
+
+The defect was discovered in SESS-2026-09-13-04 (Pass 2b) when the coordinator re-derived the shared-lineage counts from the file rather than relying on the summary. Two fix cycles were spent and the arithmetic did not fully close until the contract gap was identified.
+
+Related ideas: 000218 (already linked as relates_to) — LIT-05's item order defeats its own gate measurement 3. Several other evidence contract gaps exist as open ideas: 000227 (no rule for scoring patents), 000289 (result_ids tokenisation ambiguity), 000307 (source dedupe rule ambiguity). These are distinct gaps, not overlapping with 000220's derivative_ancestor issue.
+
+No plan, requirement or decision currently records a fix for the derivative_ancestor ambiguity. Idea 000220 proposes either clarifying the evidence contract explicitly, or creating a structured `ancestor` field to remove prose ambiguity entirely.
+
+</details>
+
 **Links**
 
 - relates_to → `000218`
@@ -10863,7 +11075,7 @@ Raised by the coordinator during phase-lit-05 (Pass 2b). See SESS-2026-09-13-04.
 
 ## 000221 · The evidence contract names LIT-06 X2 as second_review's only writer, but LIT-04 and LIT-05 both write it
 
-**Created 2026-09-13T22:44:40-04:00 · Status: `open`**
+**Created 2026-09-13T22:44:40-04:00 · Status: `triaged`**
 
 PLAN-023.03's evidence-matrix schema says field 43, second_review, is "filled only by LIT-06 X2". In practice every phase that sets critical_collision to yes has also written second_review at the same time, because the contract separately forbids a blank cell and the flag rules say a yes sets second_review to pending.
 
@@ -10876,6 +11088,22 @@ This was found by the independent review at phase-lit-05's close, which flagged 
 Resolving it is a contract change and therefore the owner's call, not an agent's. The plausible readings are that second_review's writer clause should say the flagging dispatch sets pending and LIT-06 X2 sets the outcome; or that the field should be split into a request and a result; or that the clause is right and the flag rules should not imply a write. An agent should not pick among these mid-campaign, and PROMPT-029 and PLAN-023.03 are both governed documents.
 
 Raised by the coordinator at phase-lit-05's close. See SESS-2026-09-13-04.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T10:26:10-04:00): Idea 000221 documents a literal contract inconsistency in PLAN-023.03.03 (evidence-matrix schema) vs. observed practice across phase-lit-04 and phase-lit-05. Field 43 (second_review) states "filled only by LIT-06 X2" but both LIT-04 and LIT-05 write it when marking critical_collision yes — per the same contract forbidding blank cells and the flag rules implying a pending write.
+
+Related to multiple other evidence-contract findings: 000147 (identifier format), 000148 (source_type enum missing patent), 000212 (CSV line-ending convention), 000214 (gate checking only 4/43 fields), 000227 (patent scoring rule), and 000289 (result_ids tokenisation). Anchor idea 000230 names five rulings the pre-synthesis check-in must produce, likely including this contract resolution.
+
+Referenced in SESS-2026-09-13-04 close notes and explicitly marked as owner judgement — not agent-resolvable because PLAN-023.03 and PROMPT-029 are governed documents. No plausible direct overlap with other open ideas.
+
+PROPOSED LINK: 000221 --relates_to--> 000230 (contract resolution belongs in the pre-synthesis check-in's five rulings)
+
+</details>
 
 **Links**
 
@@ -10995,6 +11223,10 @@ What would prevent a recurrence is a check the validator does not currently have
 ever been complete, or that carries session/completion_evidence/result, should not silently regress
 to queued or active without the change saying so. A monotonicity assertion over phase status
 across commits would have failed this commit at the point it was made.
+
+**Links**
+
+- relates_to ← `000240`
 
 ---
 
@@ -11439,6 +11671,7 @@ The owner directed on 2026-09-14 that this runs BEFORE the rest of the P10 track
 
 - relates_to → `000233`
 - relates_to ← `000235`
+- relates_to ← `000284`
 
 ---
 
@@ -11613,6 +11846,7 @@ PROPOSED LINK: 000240 --relates_to--> 000224 (both address backlog write safety;
 **Links**
 
 - relates_to → `000242`
+- relates_to → `000224`
 
 ---
 
@@ -11659,6 +11893,12 @@ PROPOSED LINK: 000241 --relates_to--> 000165 (The enforcement harness principle 
 PROPOSED LINK: 000241 --relates_to--> 000079 (Agent engineering: Guides; where standing rules would live)
 
 </details>
+
+**Links**
+
+- relates_to → `000031`
+- relates_to → `000165`
+- relates_to → `000079`
 
 ---
 
@@ -12653,6 +12893,7 @@ PROPOSED LINK: 000284 --relates_to--> 000234 (parallel decomposition of coarse s
 **Links**
 
 - relates_to → `000253`
+- relates_to → `000234`
 
 ---
 
@@ -12823,6 +13064,11 @@ The campaign is complete, so this has no remaining caller in its original form, 
 The habit half of this is recorded separately as the brain procedure mem-proc-recompute-a-delegated-measurement, which says to recompute a delegated measurement rather than read it. That procedure and this idea are the two halves of the same finding: the procedure is what an agent does today, and this is the work that would make the procedure unnecessary for this battery.
 
 Related: mem-proc-check-that-cannot-fail covers the adjacent failure of a check that cannot fail at all.
+
+**Links**
+
+- relates_to ← `000214`
+- relates_to ← `000219`
 
 ---
 
