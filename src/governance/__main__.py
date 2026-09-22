@@ -38,6 +38,7 @@ EXEMPT_DIRS = ("docs/00-working/",)
 EXEMPT = {
     "docs/README.md",
     "docs/09-backlog/README.md",
+    "docs/09-backlog/batches/README.md",
     "docs/08-governance/catalog.md",
     "docs/08-governance/GLOSSARY.md",
     *(
