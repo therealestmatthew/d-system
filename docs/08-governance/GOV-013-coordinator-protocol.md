@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-09-16'
+updated: '2026-09-22'
 systems: [sys-backlog, sys-governance, sys-realization]
 depends_on: [doc-prompt-pack-protocol, doc-research-protocol, doc-backlog-decisions, doc-build-coordinator]
 ---
@@ -25,6 +25,12 @@ has to produce a coordinator prompt, not for the coordinator itself.
 It was extracted from writing [PROMPT-036](../02-prompts/PROMPT-036-build-coordinator.md) on
 2026-09-16, and every rule below earns its place from something that actually went wrong or nearly
 did in that exercise. Where a rule cites an incident, the incident is the argument.
+
+[GOV-016](GOV-016-batch-orchestration-protocol.md) governs the artifact this design produces work
+for: how a batch is composed, verified, sequenced into stages, declared runnable and selected. Read
+it when you are composing a batch; read this when you are designing the coordinator that runs one.
+The *Partitioning* section below is the design-time view of what `GOV-016` then governs as a
+durable table.
 
 ## Establish the constraints before designing anything
 

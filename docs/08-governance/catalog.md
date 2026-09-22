@@ -47,6 +47,7 @@ CI regenerates it and fails on any difference.
 | GOV-013 | governance | active | repository-owner | docs/08-governance/GOV-013-coordinator-protocol.md |
 | GOV-014 | governance | active | repository-owner | docs/08-governance/GOV-014-realization-role-contracts.md |
 | GOV-015 | governance | active | repository-owner | docs/08-governance/GOV-015-agent-surface-audit.md |
+| GOV-016 | governance | active | repository-owner | docs/08-governance/GOV-016-batch-orchestration-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -315,6 +316,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-21-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-21-03-idea-capture-rulings-and-queue-rerank.md |
 | SESS-2026-09-21-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-21-04-literature-review-corpus-extraction.md |
 | SESS-2026-09-22-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-01-full-idea-triage-and-lifecycle-ruling.md |
+| SESS-2026-09-22-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-03-batch-table-abstraction.md |
 
 ## Plans and their phases
 
@@ -391,4 +393,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-308 documents — adr: 18, architecture: 10, governance: 12, operation: 17, plan: 58, prompt: 36, requirement: 27, session: 130.
+310 documents — adr: 18, architecture: 10, governance: 13, operation: 17, plan: 58, prompt: 36, requirement: 27, session: 131.
