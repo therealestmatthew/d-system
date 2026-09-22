@@ -7002,6 +7002,7 @@ items:
   - templates/styles/lit-report.css
   - tools/lit_report_render.py
   - test/test_lit_report_render.py
+  - docs/08-governance/OPS-019-lit-report-render.md
   next_action: Blocked on phase-lrr-01's structured form.
 
 - id: phase-lrr-03
