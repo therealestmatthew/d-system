@@ -1,0 +1,76 @@
+# Partition close, portfolio move, session lifecycle and the first two realization foundations
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-001
+title: Partition close, portfolio move, session lifecycle and the first two realization foundations
+status: complete
+sequence: 1
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: PROMPT-036's original batch 1, written 2026-09-16 from next_up's order, script-checked
+  when written and independently re-checked by a reviewer who wrote their own script. Built and integrated
+  before 2026-09-22; recorded here in the batch-table format when the table was abstracted out of
+  the prompt.
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-port-01
+  expected_status: complete
+  note: Establish canonical workflows and portable skill adapters — depended on by phase-port-02.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or
+    overlapping deliverable path.'
+  phases:
+  - id: phase-part-02
+    title: Make the corpus status selectable and test the corpus builder
+    after: []
+    conflicts_with:
+    - phase-irs-03
+    - phase-irs-01
+  - id: phase-port-02
+    title: Port safe commands and the idea-triage agent
+    after: []
+    conflicts_with:
+    - phase-ses-01
+    - phase-irs-03
+    - phase-irs-01
+- stage: 2
+  parallel: true
+  rationale: Cut after stage 1 because phase-ses-01 shares a locked system or deliverable path with
+    phase-port-02; phase-irs-03 shares a locked system or deliverable path with phase-part-02, phase-port-02.
+  phases:
+  - id: phase-ses-01
+    title: Define the session type taxonomy and per-type context
+    after: []
+    conflicts_with:
+    - phase-port-02
+  - id: phase-irs-03
+    title: Write the pipeline role contracts
+    after: []
+    conflicts_with:
+    - phase-part-02
+    - phase-port-02
+    - phase-irs-01
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-irs-01 shares a locked system or deliverable path with
+    phase-irs-03.
+  phases:
+  - id: phase-irs-01
+    title: Stopgap triage dispatch on append, with the reconciling sweep
+    after: []
+    conflicts_with:
+    - phase-part-02
+    - phase-port-02
+    - phase-irs-03
+notes: 'The run that measured batch sizing: five phases fit one coordinator session with over 97%
+  of context budget unspent, establishing that fix cycles rather than phase count are the binding
+  constraint. The stage decomposition below is retrospective — it was computed on 2026-09-22 when
+  this table was written, and records what could have run concurrently. The run itself was serial,
+  one phase at a time, because the coordinator of the day had no notion of stages.'

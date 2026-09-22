@@ -1,0 +1,133 @@
+# Two governance guards, then the autonomous-operations broker and the orchestrator skeleton it gates
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-002
+title: Two governance guards, then the autonomous-operations broker and the orchestrator skeleton
+  it gates
+status: queued
+sequence: 2
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: 'Composed 2026-09-22 at the owner''s direction: next_up''s first seven entries, which
+  are PROMPT-036''s original batch 2 with the two newly ranked guards ahead of it. Replaces that batch.
+  Verified the same day against backlog.yaml — every phase queued and unclaimed, every dependency
+  edge resolving to an earlier phase in this batch or to a complete phase outside it, and every stage
+  boundary computed from real systems and deliverables collisions rather than asserted.'
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-irs-03
+  expected_status: complete
+  note: Write the pipeline role contracts — depended on by phase-irs-04.
+- id: phase-part-01
+  expected_status: complete
+  note: Write the reusable partition pack — depended on by phase-part-03.
+- id: phase-part-02
+  expected_status: complete
+  note: Make the corpus status selectable and test the corpus builder — depended on by phase-part-03.
+excluded:
+- id: phase-lit-09
+  reason: Belongs to the literature-review campaign, which has its own coordinator (PROMPT-030) and
+    resume command, and conflicts with phase-lit-07. Excluded from every batch by the owner's instruction
+    of 2026-09-16. It is no longer in next_up, and is recorded here so its absence reads as a decision
+    rather than an oversight.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-gov-05
+    title: Fail the governance check when a phase silently leaves complete
+    after: []
+    conflicts_with:
+    - phase-conc-02
+    - phase-auto-01
+    - phase-auto-02
+    - phase-irs-04
+    - phase-irs-16
+    - phase-part-03
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-conc-02 shares a locked system or deliverable path with
+    phase-gov-05.
+  phases:
+  - id: phase-conc-02
+    title: Refuse integration over a dirty primary checkout
+    after: []
+    conflicts_with:
+    - phase-gov-05
+    - phase-auto-01
+    - phase-auto-02
+    - phase-irs-04
+    - phase-part-03
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-auto-01 shares a locked system or deliverable path with
+    phase-conc-02.
+  phases:
+  - id: phase-auto-01
+    title: Design the autonomous-operations architecture and rule what to build
+    after: []
+    conflicts_with:
+    - phase-gov-05
+    - phase-conc-02
+    - phase-auto-02
+    - phase-irs-04
+    - phase-part-03
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-auto-02 depends on phase-auto-01.
+  phases:
+  - id: phase-auto-02
+    title: Build the capability and approval broker, enforced at the tool boundary
+    after:
+    - phase-auto-01
+    conflicts_with:
+    - phase-gov-05
+    - phase-conc-02
+    - phase-auto-01
+    - phase-irs-04
+    - phase-irs-16
+    - phase-part-03
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-irs-04 depends on phase-auto-02.
+  phases:
+  - id: phase-irs-04
+    title: LangGraph orchestrator skeleton with interrupt gates and the thin-state rule
+    after:
+    - phase-auto-02
+    conflicts_with:
+    - phase-gov-05
+    - phase-conc-02
+    - phase-auto-01
+    - phase-auto-02
+    - phase-irs-16
+    - phase-part-03
+- stage: 6
+  parallel: true
+  rationale: Cut after stage 5 because phase-irs-16 depends on phase-irs-04; phase-part-03 shares
+    a locked system or deliverable path with phase-irs-04.
+  phases:
+  - id: phase-irs-16
+    title: Daemon process model - lock, signal handling and start/stop/status
+    after:
+    - phase-irs-04
+    conflicts_with:
+    - phase-gov-05
+    - phase-auto-02
+    - phase-irs-04
+  - id: phase-part-03
+    title: Build the partition-ideas workflow
+    after: []
+    conflicts_with:
+    - phase-gov-05
+    - phase-conc-02
+    - phase-auto-01
+    - phase-auto-02
+    - phase-irs-04
+notes: 'Nearly serial by construction: five of the seven phases declare sys-governance, so the claim
+  validator refuses any two of them at once. The single genuine parallel pair is the last stage.'

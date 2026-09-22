@@ -1,0 +1,72 @@
+# Batch graph and run budgets, with the idea schema bundle and plan-quality standard
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-003
+title: Batch graph and run budgets, with the idea schema bundle and plan-quality standard
+status: queued
+sequence: 3
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
+  the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
+  and unclaimed, no edge pointing later in the global order. Its stage decomposition was computed
+  then, not in the original.'
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-irs-04
+  expected_status: complete
+  note: LangGraph orchestrator skeleton with interrupt gates and the thin-stat — depended on by phase-irs-14.
+- id: phase-part-03
+  expected_status: complete
+  note: Build the partition-ideas workflow — depended on by phase-irs-14.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or
+    overlapping deliverable path.'
+  phases:
+  - id: phase-irs-14
+    title: Batch graph with per-track fan-out and the amend-as-re-key flow
+    after: []
+    conflicts_with:
+    - phase-irs-11
+    - phase-idg-01
+  - id: phase-idg-10
+    title: Audit the plan corpus and write the plan-quality standard
+    after: []
+    conflicts_with:
+    - phase-idg-11
+- stage: 2
+  parallel: true
+  rationale: Cut after stage 1 because phase-irs-11 shares a locked system or deliverable path with
+    phase-irs-14; phase-idg-11 shares a locked system or deliverable path with phase-idg-10.
+  phases:
+  - id: phase-irs-11
+    title: Run budgets, hard caps and the kill switch
+    after: []
+    conflicts_with:
+    - phase-irs-14
+    - phase-idg-01
+  - id: phase-idg-11
+    title: Define where a promoted plan lives before it earns a code
+    after: []
+    conflicts_with:
+    - phase-idg-01
+    - phase-idg-10
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-idg-01 shares a locked system or deliverable path with
+    phase-irs-11, phase-idg-11.
+  phases:
+  - id: phase-idg-01
+    title: Ship the idea schema bundle and record the scope-fork decision
+    after: []
+    conflicts_with:
+    - phase-irs-14
+    - phase-irs-11
+    - phase-idg-11

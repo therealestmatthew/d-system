@@ -1,0 +1,100 @@
+# The learning loop, the Gate 2 consolidation, trace baselines and the forced-failure drill
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-006
+title: The learning loop, the Gate 2 consolidation, trace baselines and the forced-failure drill
+status: queued
+sequence: 6
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: 'PROMPT-036''s original batch 6, unchanged in membership, carried over on 2026-09-22 and
+  re-checked the same day: every phase still queued and unclaimed, no edge pointing later in the global
+  order.'
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-agx-03
+  expected_status: complete
+  note: Build the anti-pattern store with recurrence detection, populated from — depended on by phase-irs-10.
+- id: phase-irs-06
+  expected_status: complete
+  note: Three-altitude review procedure with the interim adversarial engine — depended on by phase-irs-10.
+- id: phase-irs-08
+  expected_status: complete
+  note: Execution loop harness for developer and validator dispatch — depended on by phase-irs-10.
+- id: phase-irs-09
+  expected_status: complete
+  note: Terminal delivered status and the realization check — depended on by phase-irs-10.
+- id: phase-idg-10
+  expected_status: complete
+  note: Audit the plan corpus and write the plan-quality standard — depended on by phase-irs-10.
+- id: phase-part-03
+  expected_status: complete
+  note: Build the partition-ideas workflow — depended on by phase-irs-02.
+- id: phase-irs-05
+  expected_status: complete
+  note: Phase-fit procedure and agent — depended on by phase-irs-12.
+- id: phase-irs-07
+  expected_status: complete
+  note: Dependency-mapping agent and the Gate 3 ratification flow — depended on by phase-irs-12.
+- id: phase-irs-14
+  expected_status: complete
+  note: Batch graph with per-track fan-out and the amend-as-re-key flow — depended on by phase-irs-12.
+- id: phase-irs-15
+  expected_status: complete
+  note: Realization graph against the delivered-state ruling — depended on by phase-irs-12.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-irs-10
+    title: Wire the learning loop into the anti-pattern store
+    after: []
+    conflicts_with:
+    - phase-irs-02
+    - phase-irs-12
+    - phase-irs-17
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-irs-02 shares a locked system or deliverable path with
+    phase-irs-10.
+  phases:
+  - id: phase-irs-02
+    title: Consolidate PLAN-025's check-ins into Gate 2 and record the amendment
+    after: []
+    conflicts_with:
+    - phase-irs-10
+    - phase-irs-12
+    - phase-irs-17
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-irs-12 shares a locked system or deliverable path with
+    phase-irs-02.
+  phases:
+  - id: phase-irs-12
+    title: End-to-end trace and metrics baselines
+    after:
+    - phase-irs-10
+    conflicts_with:
+    - phase-irs-10
+    - phase-irs-02
+    - phase-irs-17
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-irs-17 depends on phase-irs-12.
+  phases:
+  - id: phase-irs-17
+    title: Forced-failure drill across the assembled pipeline
+    after:
+    - phase-irs-10
+    - phase-irs-12
+    conflicts_with:
+    - phase-irs-10
+    - phase-irs-02
+    - phase-irs-12
+notes: The tail of the realization pipeline; every phase here depends on most of what precedes it,
+  so the batch is fully serial and cannot be reordered.

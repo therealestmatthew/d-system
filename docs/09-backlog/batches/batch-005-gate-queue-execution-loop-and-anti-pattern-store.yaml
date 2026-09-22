@@ -1,0 +1,102 @@
+# The gate queue, the execution-loop harness, delivered status and the anti-pattern store
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-005
+title: The gate queue, the execution-loop harness, delivered status and the anti-pattern store
+status: queued
+sequence: 5
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: 'PROMPT-036''s original batch 5, unchanged in membership, carried over on 2026-09-22 and
+  re-checked the same day: every phase still queued and unclaimed, no edge pointing later in the global
+  order.'
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-irs-04
+  expected_status: complete
+  note: LangGraph orchestrator skeleton with interrupt gates and the thin-stat — depended on by phase-irs-13.
+- id: phase-irs-11
+  expected_status: complete
+  note: Run budgets, hard caps and the kill switch — depended on by phase-irs-13.
+- id: phase-irs-06
+  expected_status: complete
+  note: Three-altitude review procedure with the interim adversarial engine — depended on by phase-irs-13.
+- id: phase-irs-07
+  expected_status: complete
+  note: Dependency-mapping agent and the Gate 3 ratification flow — depended on by phase-irs-13.
+- id: phase-auto-02
+  expected_status: complete
+  note: Build the capability and approval broker, enforced at the tool boundar — depended on by phase-irs-08.
+- id: phase-irs-03
+  expected_status: complete
+  note: Write the pipeline role contracts — depended on by phase-irs-08.
+- id: phase-idg-01
+  expected_status: complete
+  note: Ship the idea schema bundle and record the scope-fork decision — depended on by phase-irs-09.
+- id: phase-irs-14
+  expected_status: complete
+  note: Batch graph with per-track fan-out and the amend-as-re-key flow — depended on by phase-irs-15.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or
+    overlapping deliverable path.'
+  phases:
+  - id: phase-irs-13
+    title: Gate queue and decision-ready presentation with batched completion review
+    after: []
+    conflicts_with:
+    - phase-irs-08
+    - phase-irs-09
+    - phase-irs-15
+  - id: phase-agx-03
+    title: Build the anti-pattern store with recurrence detection, populated from what exists
+    after: []
+    conflicts_with:
+    - phase-irs-08
+    - phase-irs-09
+    - phase-irs-15
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-irs-08 shares a locked system or deliverable path with
+    phase-irs-13, phase-agx-03.
+  phases:
+  - id: phase-irs-08
+    title: Execution loop harness for developer and validator dispatch
+    after: []
+    conflicts_with:
+    - phase-irs-13
+    - phase-irs-09
+    - phase-irs-15
+    - phase-agx-03
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-irs-09 shares a locked system or deliverable path with
+    phase-irs-08.
+  phases:
+  - id: phase-irs-09
+    title: Terminal delivered status and the realization check
+    after: []
+    conflicts_with:
+    - phase-irs-13
+    - phase-irs-08
+    - phase-irs-15
+    - phase-agx-03
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-irs-15 depends on phase-irs-09.
+  phases:
+  - id: phase-irs-15
+    title: Realization graph against the delivered-state ruling
+    after:
+    - phase-irs-09
+    conflicts_with:
+    - phase-irs-13
+    - phase-irs-08
+    - phase-irs-09
+    - phase-agx-03

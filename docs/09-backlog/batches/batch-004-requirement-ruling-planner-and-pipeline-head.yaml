@@ -1,0 +1,94 @@
+# The mandatory-requirement ruling, the idea planner agent, and the first three pipeline phases
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-004
+title: The mandatory-requirement ruling, the idea planner agent, and the first three pipeline phases
+status: queued
+sequence: 4
+created: '2026-09-22'
+updated: '2026-09-22'
+coordinator: PROMPT-036
+provenance: 'PROMPT-036''s original batch 4, unchanged in membership, carried over on 2026-09-22 and
+  re-checked the same day: every phase still queued and unclaimed, no edge pointing later in the global
+  order.'
+verified:
+  date: '2026-09-22'
+  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
+    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
+    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+external_depends_on:
+- id: phase-idg-10
+  expected_status: complete
+  note: Audit the plan corpus and write the plan-quality standard — depended on by phase-idg-12.
+- id: phase-idg-11
+  expected_status: complete
+  note: Define where a promoted plan lives before it earns a code — depended on by phase-idg-12.
+- id: phase-irs-03
+  expected_status: complete
+  note: Write the pipeline role contracts — depended on by phase-idg-12.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-dgov-01
+    title: Rule when a requirement is mandatory, classify the corpus, enforce forward
+    after: []
+    conflicts_with:
+    - phase-idg-12
+    - phase-irs-05
+    - phase-irs-06
+    - phase-irs-07
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-idg-12 depends on phase-dgov-01.
+  phases:
+  - id: phase-idg-12
+    title: Build the idea planner agent and check it against the standard
+    after:
+    - phase-dgov-01
+    conflicts_with:
+    - phase-dgov-01
+    - phase-irs-05
+    - phase-irs-06
+    - phase-irs-07
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-irs-05 shares a locked system or deliverable path with
+    phase-idg-12.
+  phases:
+  - id: phase-irs-05
+    title: Phase-fit procedure and agent
+    after: []
+    conflicts_with:
+    - phase-dgov-01
+    - phase-idg-12
+    - phase-irs-06
+    - phase-irs-07
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-irs-06 shares a locked system or deliverable path with
+    phase-irs-05.
+  phases:
+  - id: phase-irs-06
+    title: Three-altitude review procedure with the interim adversarial engine
+    after: []
+    conflicts_with:
+    - phase-dgov-01
+    - phase-idg-12
+    - phase-irs-05
+    - phase-irs-07
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-irs-07 shares a locked system or deliverable path with
+    phase-irs-06.
+  phases:
+  - id: phase-irs-07
+    title: Dependency-mapping agent and the Gate 3 ratification flow
+    after:
+    - phase-idg-12
+    conflicts_with:
+    - phase-dgov-01
+    - phase-idg-12
+    - phase-irs-05
+    - phase-irs-06
+notes: 'Fully serial: every phase either depends on its predecessor or collides with it on systems.'
