@@ -6768,7 +6768,8 @@ items:
   - sys-backlog
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 2
   session_budget: 1
   depends_on: []

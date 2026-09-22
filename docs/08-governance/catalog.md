@@ -375,7 +375,7 @@ CI regenerates it and fails on any difference.
 | PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
-| PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 1 | 0 | 0 | — |
+| PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 1 | 0 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 2 | agent-build |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
