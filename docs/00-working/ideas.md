@@ -13810,6 +13810,7 @@ The amendment lands in phase-lrr-02, which is the phase it unblocks.
 - relates_to → `000308`
 - relates_to → `000309`
 - relates_to ← `000311`
+- relates_to ← `000312`
 
 ---
 
@@ -13854,6 +13855,48 @@ name the volume problem, or struck.
 Related: the owner's 2026-09-22 ruling on 000310 already amends PLAN-043's Risks section for
 a separate defect (the "all thirteen" wording), so there is an amendment pass in flight that
 could carry this correction if the owner wants it.
+
+**Links**
+
+- relates_to → `000310`
+
+---
+
+## 000312 · phase-lrr-04's declared OPS deliverable names a document code that phase-lrr-01 already consumed
+
+**Created 2026-09-22T08:32:25-04:00 · Status: `open`**
+
+docs/09-backlog/backlog.yaml declares docs/08-governance/OPS-017-generate-lit-report.md as a
+deliverable of phase-lrr-04. That code is taken. phase-lrr-01 allocated OPS-017 through the
+sanctioned allocator on 2026-09-21 and shipped docs/08-governance/OPS-017-lit-report-extract.md
+under it. Confirmed live on 2026-09-22:
+
+  $ uv run python -m src.governance --next-code operation
+  OPS-018
+
+So the generator's operations document needs OPS-018, and phase-lrr-04's declared path is
+wrong as written.
+
+Found by the independent adversarial review of phase-lrr-01 on 2026-09-22. The collision was
+already named in prose in SESS-2026-09-21-04's "Consequence for phase-lrr-04" section, which
+recorded it as the owner's to update because AGENTS.md permits a session to touch only its
+own phase's line in the backlog. The owner was asked on 2026-09-21 and chose to handle both
+this and the phase-lrr-02 acceptance rewording themselves.
+
+What the review added is that nothing durable tracked it. The two sibling defects found in
+the same session were filed as 000309 and 000310 and both now carry owner rulings; this
+third one existed only as a paragraph in a session record, which is not a surface anyone
+picking up phase-lrr-04 would read first.
+
+Not a blocker. An agent following AGENTS.md's rule to allocate through --next-code rather
+than reading a directory would be handed OPS-018 and would likely self-correct, noticing the
+declared path disagreed. The defect is that the governed record is wrong right now, and the
+correction depends on an agent noticing rather than on the record being right.
+
+Two ways to close it: correct the declared path to OPS-018-generate-lit-report.md, or drop
+the code from the path in the backlog and let the allocator decide at the time. The second
+avoids the same collision recurring if another phase allocates an operations code before
+phase-lrr-04 runs.
 
 **Links**
 
