@@ -23,7 +23,22 @@ Subcommands:
   through this subcommand that exits anything other than 0 or 2. Every refusal, including a
   refusal caused by a failure to evaluate the call, is recorded to the audit log wherever the log
   itself is writable, tagged with a short reason (`no-capability`, `malformed-payload`,
-  `audit-write-failed`, `unexpected-error`, or the ordinary `denied by configured policy`).
+  `audit-write-failed`, `unexpected-error`, `interrupted`, or the ordinary `denied by configured
+  policy`).
+
+  The exit code is decided before anything is written to stdout or stderr, and writing the output
+  is never allowed to change it: a broken pipe, a closed stdout, or any other `OSError` while
+  printing the decision is swallowed, and this command still exits 0 or 2 as already decided. A
+  `BrokenPipeError` specifically also gets its underlying stream redirected to `os.devnull`, so
+  the interpreter's own shutdown-time flush of the broken stream cannot fail again and override
+  the exit code with Python's own broken-pipe exit status (observed as 120 before this fix; see
+  `docs/03-sessions/` for the phase's fix-cycle-2 session record). `KeyboardInterrupt` during
+  `check` is treated the same as any other failure to evaluate the call: exit 2. `SIGTERM` is
+  handled from the moment `check` starts and exits the process with code 2 immediately (via
+  `os._exit`, bypassing any further Python-level flushing that could change the code). `SIGKILL`
+  cannot be handled by any process, this one included, and simply kills the process outright —
+  that is not a refusal and nothing here changes that; a caller relying on `check` for a real
+  denial must not treat an unexplained process death as equivalent to a recorded refusal.
 - `request` — record a new approval request (`--scope`, `--reason`, `--expires` required).
 - `list-pending` — print every pending (undecided, unexpired) approval as JSON.
 - `decide` — record a decision (`--id`, `--decision approved|denied`, `--by`) against an
@@ -44,22 +59,82 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import signal
 import sys
 from pathlib import Path
+from typing import IO
 
 from src.broker import approvals, enforcement
 
 
+def _install_sigterm_fail_closed() -> None:
+    """SIGTERM received at any point during `check` exits the process with code 2, immediately.
+
+    Uses `os._exit()` rather than raising or calling `sys.exit()`: a normal exit still runs
+    Python's interpreter-shutdown machinery (buffered-stream flushing, `atexit` callbacks), any
+    of which failing could change the process's final exit code the way a broken stdout did
+    before this fix (F6). `os._exit()` terminates immediately with exactly the code given, and
+    nothing downstream of the signal can override it.
+
+    Best-effort: `signal.signal()` raises `ValueError` off the main thread, which this catches
+    and ignores rather than letting installation itself become a new failure mode. `SIGKILL`
+    cannot be caught by any process — no handler here or anywhere else changes that; a `SIGKILL`
+    is not a refusal, it is the process simply ceasing to exist, and a caller must not treat the
+    two as equivalent.
+    """
+    try:
+        signal.signal(signal.SIGTERM, lambda signum, frame: os._exit(2))
+    except (ValueError, OSError):
+        pass
+
+
+def _write_best_effort(stream: IO[str], text: str) -> None:
+    """Write one line to `stream`, swallowing any `OSError` — a broken pipe, a closed file
+    descriptor, anything else that makes the write itself fail. Callers use this only after the
+    exit code has already been decided, so a failed write never changes what this process exits
+    with (F6)."""
+    try:
+        stream.write(text + "\n")
+        stream.flush()
+    except BrokenPipeError:
+        # A later, interpreter-shutdown flush of the same broken stream would raise again and
+        # Python overrides the process exit code to 120 when that happens during shutdown.
+        # Redirecting the underlying file descriptor to devnull makes that final flush succeed
+        # silently, so the exit code this function's caller already decided on is what the
+        # process actually exits with.
+        try:
+            devnull_fd = os.open(os.devnull, os.O_WRONLY)
+            try:
+                os.dup2(devnull_fd, stream.fileno())
+            finally:
+                os.close(devnull_fd)
+        except OSError:
+            pass
+    except OSError:
+        pass
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     """The tool-boundary call. Fail-closed: every path through this function returns 0 (the
-    capability was evaluated and allowed) or 2 (the call is blocked, whether because the
-    capability was evaluated and denied or because this call could not be evaluated at all).
-    There is no path that returns anything else — a decision this function cannot make is a
-    refusal, not a pass, per the coordinator's fix-cycle-1 ruling on F1-F3."""
+    capability was evaluated and allowed) or 2 (the call is blocked — evaluated and denied, or
+    not evaluable at all, or interrupted). There is no path that returns anything else.
+
+    The exit code is fully decided before any output is attempted (F6): a failure to write the
+    decision to stdout, or the refusal message to stderr, never changes the code this function
+    returns. `KeyboardInterrupt` during evaluation is caught and treated as a refusal, same as
+    any other failure to evaluate the call. `SIGTERM` is handled separately, from the moment this
+    function starts (`_install_sigterm_fail_closed`), and exits the process directly rather than
+    returning through this function at all.
+    """
+    _install_sigterm_fail_closed()
+
     state_dir = Path(args.state_dir)
     payload: dict[str, object] = {}
     capability: str | None = None
     reason = "unexpected-error"
+    stderr_message: str | None = None
+    decision: enforcement.Decision | None = None
 
     try:
         raw = sys.stdin.read()
@@ -91,18 +166,29 @@ def _cmd_check(args: argparse.Namespace) -> int:
         except OSError as exc:
             reason = "audit-write-failed"
             raise ValueError(f"could not write the audit record: {exc}") from exc
+    except KeyboardInterrupt:
+        reason = "interrupted"
+        stderr_message = f"denied ({reason}): interrupted"
     except Exception as exc:  # fail closed: any error here is a refusal, never a silent pass
-        print(f"denied ({reason}): {exc}", file=sys.stderr)
+        stderr_message = f"denied ({reason}): {exc}"
+
+    if stderr_message is not None:
+        # The decision could not be evaluated at all: this is always a refusal, and the exit
+        # code is fixed at 2 before anything is written.
+        exit_code = 2
         enforcement.record_refusal(
             reason=reason,
             capability=capability,
             state_dir=state_dir,
             context=payload,
         )
-        return 2
+        _write_best_effort(sys.stderr, stderr_message)
+        return exit_code
 
-    print(json.dumps(decision.to_dict(), sort_keys=True))
-    return 0 if decision.allowed else 2
+    assert decision is not None  # the only way past the try/except above without an exception
+    exit_code = 0 if decision.allowed else 2
+    _write_best_effort(sys.stdout, json.dumps(decision.to_dict(), sort_keys=True))
+    return exit_code
 
 
 def _cmd_request(args: argparse.Namespace) -> int:

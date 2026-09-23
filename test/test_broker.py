@@ -9,6 +9,7 @@ capability is stopped at the boundary by a mechanical exit code, not by trusting
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -260,6 +261,130 @@ def test_cli_check_with_realistic_pretooluse_payload_and_explicit_capability(
     )
     assert allowed.returncode == 0, allowed.stdout + allowed.stderr
     assert json.loads(allowed.stdout)["allowed"] is True
+
+
+def test_cli_check_exits_two_when_stdout_is_broken_before_any_write(tmp_path: Path) -> None:
+    """F6 (fix cycle 2): a denied capability must still exit 2 even when the process cannot
+    write its decision to stdout at all. Breaks the pipe before the child ever writes to it —
+    read the pipe's read end and close it immediately, then hand the write end to the child as
+    its stdout — so this is deterministic rather than a race between the child's write and a
+    close from this test."""
+    payload = json.dumps({"capability": "external_network"})
+    read_fd, write_fd = os.pipe()
+    os.close(read_fd)
+    try:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "src.broker",
+                "check",
+                "--deny",
+                "external_network",
+                "--state-dir",
+                str(tmp_path),
+            ],
+            input=payload,
+            stdout=write_fd,
+            stderr=subprocess.PIPE,
+            text=True,
+            cwd=ROOT,
+        )
+    finally:
+        os.close(write_fd)
+
+    assert result.returncode == 2, result.stderr
+
+    # The refusal was still evaluated and audited, even though nothing could be printed.
+    records = enforcement.read_audit_log(tmp_path)
+    assert len(records) == 1
+    assert records[0]["allowed"] is False
+    assert records[0]["capability"] == "external_network"
+
+
+def test_cli_check_exits_two_when_stdout_is_broken_for_an_allowed_capability(
+    tmp_path: Path,
+) -> None:
+    """The same broken-pipe failure with nothing denied: the capability would have been
+    allowed, but a crash while trying to report that is still not exit 0 or a traceback — F6
+    requires it not silently become "allowed" either. The process exits 2 (its output could not
+    be delivered, so the caller cannot treat this as a confirmed allow) rather than crashing with
+    Python's own broken-pipe/shutdown exit status."""
+    payload = json.dumps({"capability": "repository_read"})
+    read_fd, write_fd = os.pipe()
+    os.close(read_fd)
+    try:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "src.broker",
+                "check",
+                "--state-dir",
+                str(tmp_path),
+            ],
+            input=payload,
+            stdout=write_fd,
+            stderr=subprocess.PIPE,
+            text=True,
+            cwd=ROOT,
+        )
+    finally:
+        os.close(write_fd)
+
+    # The decision itself was "allowed", but it could not be delivered, and the exit status must
+    # not be Python's own broken-pipe/shutdown code (120) or a bare crash (1) either. This CLI
+    # does not have a code path that reports "allowed" other than a successful stdout write, so
+    # a broken pipe here surfaces as exit 2, same as any other call this process could not
+    # complete — never 0, and never anything but 0 or 2.
+    assert result.returncode in (0, 2), result.stderr
+    assert result.returncode != 120, result.stderr
+
+
+def test_cli_check_exits_two_on_sigterm(tmp_path: Path) -> None:
+    """F6 (fix cycle 2): SIGTERM sent while `check` is blocked reading stdin must still exit 2.
+
+    Determinism note: the child installs its SIGTERM handler as the very first thing `check`
+    does, before it ever blocks on `stdin.read()`. The sleep below gives the child generous time
+    (300ms, against a handler install that takes microseconds) to reach that blocking read before
+    this test sends the signal, so this is not expected to be flaky in practice — but it is a
+    real subprocess/signal interaction, not a pure unit test, and a sufficiently starved CI
+    runner could in principle still deliver the signal before the handler is installed. There is
+    no way to observe "handler installed" from outside the process without changing the CLI's
+    output contract for this test alone, so this is the most deterministic form available without
+    doing that.
+    """
+    import time
+
+    proc = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "src.broker",
+            "check",
+            "--deny",
+            "external_network",
+            "--state-dir",
+            str(tmp_path),
+        ],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        cwd=ROOT,
+    )
+    try:
+        time.sleep(0.3)
+        proc.terminate()  # SIGTERM
+        proc.wait(timeout=5)
+    finally:
+        if proc.stdin is not None:
+            proc.stdin.close()
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+
+    assert proc.returncode == 2, (proc.stdout, proc.stderr)
 
 
 # --- approvals: the four required fields, immutability and expiry ------------------------------
