@@ -11006,7 +11006,8 @@ items:
   - sys-api
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 2
   session_budget: 1
   depends_on:
@@ -11037,9 +11038,8 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - src/
-  - schemas/
-  - test/
+  - src/broker/
+  - test/test_broker.py
   next_action: Build this before anything else in the programme. It will look like over-engineering while
     nothing runs unattended, which is the correct shape for a safety gate.
 - id: phase-auto-03
