@@ -3,7 +3,6 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-gov-05
 - phase-conc-02
 - phase-auto-01
 - phase-auto-02
@@ -6768,7 +6767,7 @@ items:
   - sys-backlog
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 2
   session_budget: 1
@@ -6812,6 +6811,17 @@ items:
     PLAN-038''s "Two bases, two severities" table carry the reasoning; the plan''s earlier
     position that dev-relative comparison would be a separate phase is superseded and in
     scope here.'
+  session: doc-session-backlog-status-regression-guard
+  completion_evidence:
+  - src/governance/regression.py
+  - test/test_backlog_status_regression.py
+  - docs/03-sessions/SESS-2026-09-22-04-backlog-status-regression-guard.md
+  result: 'Guard added and wired into the governance audit. Post-rebase verification on dev:
+    "Governance OK: 35 systems, 313 documents, 30 memories, 293 backlog phases" and "763 passed,
+    2 warnings in 61.05s". Adversarial review raised two findings — a HIGH substring bypass in the
+    GOV-003 escape hatch and untested entry-point wiring — both fixed in one cycle and confirmed by
+    mutation test. REQ-010 R6 dev comparison verified to warn without changing the exit code.'
+
 - id: phase-lit-07
   title: Literature review Pass 4 — synthesis, adversarial synthesis review and validated
     bibliography
