@@ -46,6 +46,7 @@ CI regenerates it and fails on any difference.
 | GOV-007 | governance | active | repository-owner | docs/08-governance/GOV-007-repo-orientation.md |
 | GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
 | GOV-009 | governance | active | repository-owner | docs/08-governance/GOV-009-research-protocol.md |
+| GOV-010 | governance | active | repository-owner | docs/08-governance/GOV-010-plan-quality-standard.md |
 | GOV-013 | governance | active | repository-owner | docs/08-governance/GOV-013-coordinator-protocol.md |
 | GOV-014 | governance | active | repository-owner | docs/08-governance/GOV-014-realization-role-contracts.md |
 | GOV-015 | governance | active | repository-owner | docs/08-governance/GOV-015-agent-surface-audit.md |
@@ -400,9 +401,8 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | ADR-019 | reserved | Promoted-plan staging decision; deliverable of phase-idg-11. |
-| GOV-010 | reserved | Plan-quality standard; deliverable of phase-idg-10. |
 | GOV-011 | reserved | Promoted-plan staging protocol; deliverable of phase-idg-11. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-322 documents — adr: 19, architecture: 11, governance: 14, operation: 18, plan: 58, prompt: 37, requirement: 27, session: 138.
+323 documents — adr: 19, architecture: 11, governance: 15, operation: 18, plan: 58, prompt: 37, requirement: 27, session: 138.
