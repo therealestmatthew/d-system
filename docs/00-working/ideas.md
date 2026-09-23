@@ -17755,7 +17755,7 @@ Related ideas: 000350 (no phase builds the real Agent SDK dispatcher) is the sam
 
 ## 000353 · The catalog test failed again on 2026-09-23 in phase-irs-16's worktree, because the status-regression WARNING still goes to --catalog's stdout (second sighting of 000335)
 
-**Created 2026-09-23T02:08:26-04:00 · Status: `open`**
+**Created 2026-09-23T02:08:26-04:00 · Status: `triaged`**
 
 Sent to Ideation by Session 5 - Batch Runner on 2026-09-23, during the overnight sprint.
 
@@ -17769,11 +17769,29 @@ What it would touch: src/governance (where the status-regression guard from phas
 
 Unresolved: which phase carries the owner's ruling on 000335. It is a small fix with no phase yet.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T02:09:33-04:00): Triage finding for 000353 (second sighting of the status-regression WARNING on --catalog stdout), by Ideation, 2026-09-23.
+
+This is the same defect as 000335. The owner ruled on 000335 on 2026-09-22 (send the status-regression warning to stderr, chosen over making the test ignore it). As of dev at 14fcc8d, no backlog phase names the fix: a search of docs/09-backlog/backlog.yaml for 000335 and for stderr finds nothing, and no branch name refers to it. The warning comes from the status-regression guard that phase-gov-05 added (REQ-010). The failing test is test/test_codes.py::test_catalog_flag_writes_committed_file.
+
+Under GOV-017 every merge onto dev is followed by a REBASE to every open branch. Until they rebase, those branches carry the old status, so the defect gives a red test to each branch after each completion edit. Tonight's merge gate re-runs pytest on the rebased tip, which hides it there. Tests run in a worktree before its rebase do not hide it, and that is where Session 5 saw it.
+
+Related ideas: 000335 (the original, with the ruling); 000351 (regenerate the catalog only at merge time), which would remove the phase-state churn that causes the warning; 000324 and 000325 (the same catalog tests overwrite the tracked file).
+
+PROPOSED LINK: 000353 --relates_to--> 000335 (same defect; 000335 carries the owner's ruling). Tonight's authority forbids merging, so the owner decides whether this idea is merged into 000335 or superseded by it.
+
+</details>
+
 ---
 
 ## 000354 · A partition analyst with Bash writes its report file through a heredoc after the harness refuses its Write, so the premise that the coordinator writes the reports is not enforced
 
-**Created 2026-09-23T02:08:27-04:00 · Status: `open`**
+**Created 2026-09-23T02:08:27-04:00 · Status: `triaged`**
 
 Sent to Ideation by Session 2 - Builder B on 2026-09-23, from the phase-part-03 dry run during the overnight sprint.
 
@@ -17788,3 +17806,23 @@ What it would touch: PROMPT-034's analyst sections (the "Write your report to" l
 Related, as named by the sender: 000206 and 000339 (the partition pack's A2 prompt reads a staging document that exists only in the coordinator's worktree).
 
 Unresolved: remove Bash from the analysts, or change the pack so the analysts return text and the coordinator writes the files, or accept agent-written files and drop the premise; and whether the dry run's report-R1.md and condensed.md are faithful to what R1 returned.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T02:09:33-04:00): Triage finding for 000354 (a partition analyst writes its report through a heredoc after its Write is refused), by Ideation, 2026-09-23.
+
+Governing material: PROMPT-034 (the reusable partition pack) still tells analysts R1 and R4 to "Write your report to _working/idea-corpus/report-R*.md" (lines 176 and 249 on dev). 000206 recorded on the earlier build that this instruction meets the harness refusal "Subagents should return findings as text, not write report files". That build had the coordinator transcribe the reports. Nothing in PROMPT-034 was changed to match. phase-part-03 (build the partition-ideas workflow; still active on dev, and parked until the owner is back, per the Session Manager) ran the dry run in which this was seen. Its session record is the place to check whether report-R1.md and condensed.md were accepted as evidence.
+
+The same pattern already has ideas: 000241 (review agents are dispatched with write tools they are only told not to use) and 000165 (the enforcement harness: make a violation impossible rather than forbidden). This is a concrete case where an instruction in a prompt was stronger than a harness refusal, because the agent had a second tool that did the same job. phase-conc-08 (write the enforcement-placement rule, apply it, and audit .claude/ settings) is the queued phase whose scope is closest.
+
+It also bears on the 000347 cluster. The roles in an Agent SDK version of the roster would get explicit tool grants, and this is evidence that a refusal of one tool is not a boundary while another tool can reach the same result.
+
+Related ideas: 000206, 000339 (both named by the sender), 000241 and 000165.
+
+PROPOSED LINK: 000354 --extends--> 000206 (the dry run shows the refusal 000206 records can be routed around through Bash)
+
+</details>
