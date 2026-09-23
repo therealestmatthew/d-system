@@ -4,13 +4,26 @@ Run: uv run python -m src.broker <subcommand>
 
 Subcommands:
 
-- `check` — the tool-boundary call. Reads a tool-call payload as JSON from stdin (at minimum a
-  `capability` field; any other fields, such as `tool_name` or `tool_input`, are carried into the
-  audit record as context but play no part in the decision). Denials are supplied on the command
-  line with repeatable `--deny CAPABILITY` flags — this CLI owns no built-in policy, matching
-  `enforcement.check()`'s permissive default. Prints the decision as JSON to stdout. Exit code 0
-  means the capability is allowed; exit code 2 means it is denied. This is the exit-code contract
-  a process boundary (for example a pre-execution hook) blocks a call on.
+- `check` — the tool-boundary call, and the one a `PreToolUse` hook runs. `--capability NAME`
+  names the capability this call is checking; a real `PreToolUse` payload has no `capability`
+  field of its own, so the supported wiring is one hook entry per capability, with the hook's
+  command naming the capability explicitly (see `src/broker/__init__.py` for the exact form).
+  Reads the raw hook payload as JSON from stdin — `tool_name`, `tool_input` and any other fields
+  are carried into the audit record as `context`, and a `capability` field in that JSON is used
+  only if `--capability` is not given (`--capability` takes precedence). Denials are supplied on
+  the command line with repeatable `--deny CAPABILITY` flags — this CLI owns no built-in policy,
+  matching `enforcement.check()`'s permissive default. Capability names are normalised
+  (whitespace-stripped, case-folded) before comparison. Prints the decision as JSON to stdout.
+
+  **Exit code contract, and it is fail-closed on every path:** exit 0 means the capability was
+  evaluated and allowed. Exit 2 means the call is blocked — either because the capability was
+  evaluated and denied, or because this command could not evaluate the call at all (no capability
+  named, malformed JSON on stdin, a `--state-dir` that could not be written to, or any other
+  unexpected error). A decision the broker cannot make is a refusal, not a pass: there is no path
+  through this subcommand that exits anything other than 0 or 2. Every refusal, including a
+  refusal caused by a failure to evaluate the call, is recorded to the audit log wherever the log
+  itself is writable, tagged with a short reason (`no-capability`, `malformed-payload`,
+  `audit-write-failed`, `unexpected-error`, or the ordinary `denied by configured policy`).
 - `request` — record a new approval request (`--scope`, `--reason`, `--expires` required).
 - `list-pending` — print every pending (undecided, unexpired) approval as JSON.
 - `decide` — record a decision (`--id`, `--decision approved|denied`, `--by`) against an
@@ -21,9 +34,10 @@ to `_working/broker` (gitignored — see `src/broker/enforcement.py`). Tests nev
 default; they always pass their own `tmp_path`.
 
 Nothing in this repository invokes this module automatically yet. See the docstring in
-`src/broker/__init__.py` for the intended wiring (a Claude Code `PreToolUse` hook piping the
-tool-call JSON to `check` on stdin) and why building that wiring is outside this phase's
-declared deliverables (`src/broker/`, `test/test_broker.py`).
+`src/broker/__init__.py` for the intended wiring — a `PreToolUse` hook entry per capability, with
+`--capability` naming the capability and the hook's matcher selecting which tools it applies to —
+and why building that wiring (a `.claude/settings.json` change) is outside this phase's declared
+deliverables (`src/broker/`, `test/test_broker.py`).
 """
 
 from __future__ import annotations
@@ -37,30 +51,56 @@ from src.broker import approvals, enforcement
 
 
 def _cmd_check(args: argparse.Namespace) -> int:
-    raw = sys.stdin.read()
+    """The tool-boundary call. Fail-closed: every path through this function returns 0 (the
+    capability was evaluated and allowed) or 2 (the call is blocked, whether because the
+    capability was evaluated and denied or because this call could not be evaluated at all).
+    There is no path that returns anything else — a decision this function cannot make is a
+    refusal, not a pass, per the coordinator's fix-cycle-1 ruling on F1-F3."""
+    state_dir = Path(args.state_dir)
+    payload: dict[str, object] = {}
+    capability: str | None = None
+    reason = "unexpected-error"
+
     try:
-        payload = json.loads(raw) if raw.strip() else {}
-    except json.JSONDecodeError as exc:
-        print(f"invalid JSON on stdin: {exc}", file=sys.stderr)
-        return 1
-    if not isinstance(payload, dict):
-        print("tool-call payload on stdin must be a JSON object", file=sys.stderr)
-        return 1
+        raw = sys.stdin.read()
+        try:
+            parsed = json.loads(raw) if raw.strip() else {}
+        except json.JSONDecodeError as exc:
+            reason = "malformed-payload"
+            raise ValueError(f"invalid JSON on stdin: {exc}") from exc
+        if not isinstance(parsed, dict):
+            reason = "malformed-payload"
+            raise ValueError("tool-call payload on stdin must be a JSON object")
+        payload = parsed
 
-    capability = payload.get("capability") or args.capability
-    if not capability:
-        print(
-            "no capability named: pass --capability, or a 'capability' field in the stdin payload",
-            file=sys.stderr,
+        capability = args.capability or payload.get("capability")
+        if not capability:
+            reason = "no-capability"
+            raise ValueError(
+                "no capability named: pass --capability (the supported PreToolUse wiring), "
+                "or a 'capability' field in the stdin payload"
+            )
+
+        try:
+            decision = enforcement.check(
+                capability,
+                denied=args.deny,
+                state_dir=state_dir,
+                context=payload,
+            )
+        except OSError as exc:
+            reason = "audit-write-failed"
+            raise ValueError(f"could not write the audit record: {exc}") from exc
+    except Exception as exc:  # fail closed: any error here is a refusal, never a silent pass
+        print(f"denied ({reason}): {exc}", file=sys.stderr)
+        enforcement.record_refusal(
+            reason=reason,
+            capability=capability,
+            state_dir=state_dir,
+            context=payload,
         )
-        return 1
+        return 2
 
-    decision = enforcement.check(
-        capability,
-        denied=args.deny,
-        state_dir=Path(args.state_dir),
-        context=payload,
-    )
     print(json.dumps(decision.to_dict(), sort_keys=True))
     return 0 if decision.allowed else 2
 
@@ -106,7 +146,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     check = sub.add_parser("check", help="Decide whether a capability may proceed.")
-    check.add_argument("--capability", default=None, help="Capability name, if not in stdin JSON.")
+    check.add_argument(
+        "--capability",
+        default=None,
+        help="Capability name for this call. Takes precedence over a 'capability' field in the "
+        "stdin payload; a real PreToolUse payload never has one, so this is the supported wiring.",
+    )
     check.add_argument(
         "--deny",
         action="append",

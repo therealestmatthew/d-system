@@ -75,6 +75,28 @@ def test_audit_record_carries_call_context(tmp_path: Path) -> None:
     assert record["context"]["tool_name"] == "Edit"
 
 
+def test_check_normalizes_capability_and_denied_names(tmp_path: Path) -> None:
+    """F4 (fix cycle 1): `External_Network` and `" external_network "` are refused when
+    `external_network` is denied, and the normalised name is what gets recorded."""
+    decision = enforcement.check(
+        "External_Network", denied=[" external_network "], state_dir=tmp_path
+    )
+
+    assert decision.allowed is False
+    assert decision.capability == "external_network"
+
+
+def test_record_refusal_is_always_denied_and_best_effort(tmp_path: Path) -> None:
+    decision = enforcement.record_refusal(
+        reason="no-capability", capability=None, state_dir=tmp_path
+    )
+
+    assert decision.allowed is False
+    assert "no-capability" in decision.reason
+    [record] = enforcement.read_audit_log(tmp_path)
+    assert record["allowed"] is False
+
+
 # --- enforcement CLI: R03 demonstrated at a real process boundary ------------------------------
 
 
@@ -122,18 +144,122 @@ def test_cli_check_blocks_a_denied_capability_with_exit_code_two(tmp_path: Path)
     assert records[0]["context"]["tool_name"] == "Bash"
 
 
-def test_cli_check_rejects_a_payload_naming_no_capability(tmp_path: Path) -> None:
+def test_cli_check_fails_closed_on_no_capability(tmp_path: Path) -> None:
+    """F1 (fix cycle 1): a real PreToolUse payload never carries a 'capability' field. Missing
+    one must exit 2 (blocking), not 1, and must still leave an audit record of the refusal."""
     result = _run_broker("check", stdin=json.dumps({"tool_name": "Bash"}), state_dir=tmp_path)
 
-    assert result.returncode == 1
-    assert "no capability" in result.stderr
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "no-capability" in result.stderr
+
+    [record] = enforcement.read_audit_log(tmp_path)
+    assert record["allowed"] is False
+    assert "no-capability" in record["reason"]
 
 
-def test_cli_check_rejects_malformed_stdin(tmp_path: Path) -> None:
+def test_cli_check_fails_closed_on_malformed_stdin(tmp_path: Path) -> None:
+    """F2 (fix cycle 1): malformed JSON on stdin must exit 2, not 1, and still be audited."""
     result = _run_broker("check", stdin="not json", state_dir=tmp_path)
 
-    assert result.returncode == 1
-    assert "invalid JSON" in result.stderr
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "malformed-payload" in result.stderr
+
+    [record] = enforcement.read_audit_log(tmp_path)
+    assert record["allowed"] is False
+    assert "malformed-payload" in record["reason"]
+
+
+def test_cli_check_fails_closed_on_non_object_stdin(tmp_path: Path) -> None:
+    result = _run_broker("check", stdin="[1, 2, 3]", state_dir=tmp_path)
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "malformed-payload" in result.stderr
+
+
+@pytest.mark.skipif(
+    hasattr(__import__("os"), "geteuid") and __import__("os").geteuid() == 0,
+    reason="root bypasses the permission bits this test relies on",
+)
+def test_cli_check_fails_closed_on_unwritable_state_dir(tmp_path: Path) -> None:
+    """F3 (fix cycle 1): an unwritable --state-dir must not crash the process. It must exit 2, and
+    the refusal is attempted best-effort — the log itself cannot be written here, so nothing lands
+    in it, which is the documented trade-off for a state dir this broken."""
+    import os
+
+    locked_parent = tmp_path / "locked"
+    locked_parent.mkdir()
+    locked_parent.chmod(0o500)  # read + execute only: cannot create a child inside it
+    state_dir = locked_parent / "state"
+    try:
+        payload = json.dumps({"capability": "external_network"})
+        result = _run_broker(
+            "check", "--deny", "external_network", stdin=payload, state_dir=state_dir
+        )
+
+        assert result.returncode == 2, result.stdout + result.stderr
+        assert "audit-write-failed" in result.stderr
+        assert not state_dir.exists()
+    finally:
+        locked_parent.chmod(0o700)
+        os.rmdir(locked_parent)
+
+
+@pytest.mark.parametrize(
+    "capability",
+    ["External_Network", " external_network ", "EXTERNAL_NETWORK", "\texternal_network\n"],
+)
+def test_cli_check_normalizes_case_and_whitespace_variants(
+    tmp_path: Path, capability: str
+) -> None:
+    """F4 (fix cycle 1): case and whitespace variants of a denied capability name are refused,
+    not waved through as a different string."""
+    payload = json.dumps({"capability": capability})
+
+    result = _run_broker(
+        "check", "--deny", "external_network", stdin=payload, state_dir=tmp_path
+    )
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    decision = json.loads(result.stdout)
+    assert decision["allowed"] is False
+    assert decision["capability"] == "external_network"
+
+
+def test_cli_check_with_realistic_pretooluse_payload_and_explicit_capability(
+    tmp_path: Path,
+) -> None:
+    """F5 (fix cycle 1): the supported wiring — a real PreToolUse payload (no 'capability'
+    field) with --capability naming the capability on the command line. Denied blocks with
+    exit 2; without --deny it is allowed with exit 0, and the raw payload lands in context."""
+    payload = json.dumps(
+        {
+            "session_id": "abc123",
+            "hook_event_name": "PreToolUse",
+            "tool_name": "WebFetch",
+            "tool_input": {"url": "https://example.com"},
+        }
+    )
+
+    denied = _run_broker(
+        "check",
+        "--capability",
+        "external_network",
+        "--deny",
+        "external_network",
+        stdin=payload,
+        state_dir=tmp_path,
+    )
+    assert denied.returncode == 2, denied.stdout + denied.stderr
+    denied_decision = json.loads(denied.stdout)
+    assert denied_decision["allowed"] is False
+    assert denied_decision["context"]["tool_name"] == "WebFetch"
+    assert denied_decision["context"]["hook_event_name"] == "PreToolUse"
+
+    allowed = _run_broker(
+        "check", "--capability", "external_network", stdin=payload, state_dir=tmp_path
+    )
+    assert allowed.returncode == 0, allowed.stdout + allowed.stderr
+    assert json.loads(allowed.stdout)["allowed"] is True
 
 
 # --- approvals: the four required fields, immutability and expiry ------------------------------
