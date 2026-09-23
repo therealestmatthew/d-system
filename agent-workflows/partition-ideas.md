@@ -241,7 +241,8 @@ corpus date from step 2, not today's date. If a partition document or record alr
 date, suffix rather than overwrite; an earlier partition document is never edited. A document or
 record that belongs to **this** sweep — the markdown carries this sweep's run stamp, or the record
 carries this manifest's seed — is this sweep's own draft, left by an interrupted synthesis, and is
-continued under the same name rather than orphaned:
+continued under the same name rather than orphaned. A pair whose record is `accepted` is never
+continued, whatever its seed:
 
 ```bash
 uv run python - <CORPUS DATE> "$CORPUS" <<'EOF'
@@ -251,12 +252,16 @@ stamp = (f"<!-- partition-ideas: seed={m['shuffle_seed']} corpus_size={m['corpus
          f"status={','.join(m.get('status', ['triaged']))} -->")
 def ours(stem):
     md, js = pathlib.Path(stem + ".md"), pathlib.Path(stem + ".json")
+    try:
+        record = json.loads(js.read_text(encoding="utf-8"))
+        seed, state = record["manifest"]["shuffle_seed"], record.get("state")
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        seed = state = None
+    if state == "accepted":
+        return False  # the owner ruled on it at GATE 3; never a draft to continue
     if md.exists() and md.read_text(encoding="utf-8").startswith(stamp):
         return True
-    try:
-        return json.loads(js.read_text(encoding="utf-8"))["manifest"]["shuffle_seed"] == m["shuffle_seed"]
-    except (OSError, ValueError, TypeError, KeyError):
-        return False
+    return seed == m["shuffle_seed"]
 base, n = f"docs/00-working/idea-partition-{sys.argv[1]}", 2
 stem = base
 while pathlib.Path(stem + ".md").exists() or pathlib.Path(stem + ".json").exists():
