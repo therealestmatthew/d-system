@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-22'
+updated: '2026-09-23'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -10208,12 +10208,15 @@ items:
     not duplicate coverage triage already established.
   - Per ARCH-006's stage 4 minimum-scope duty, the draft's phases are already decomposed to minimum
     scope - one session each - not left as a descriptive phase table for a later phase to split.
+  - Its decision between drafting a paired requirement and drafting a plan only uses phase-dgov-01's
+    rule for when a requirement is mandatory (GOV-001-protocol.md), not the agent's own judgement.
   acceptance:
   - 'REQ-014 R19 holds: run against a promoted idea carrying findings and links, the draft cites them,
     and the agent allocated no code and marked nothing promoted.'
   - 'REQ-014 R20 holds: the draft is checked against phase-idg-10''s standard and conforms to its named
     sections.'
-  - The draft lands where phase-idg-11 defined, not straight into docs/01-plans/.
+  - The draft lands at the promoted-plan location phase-idg-11 defines (ADR-019 and GOV-011), not straight
+    into docs/01-plans/. That location is where phase-irs-07 reads the approved plan from.
   - 'REQ-022 R09 holds: the draft''s phases are already split to minimum scope; a deliberately
     non-conformant draft is returned to the planner.'
   verification:
@@ -10222,6 +10225,7 @@ items:
   deliverables:
   - .claude/agents/
   - docs/08-governance/
+  - test/
   next_action: 000072's planner bullet in P4 duplicates this. phase-prog-06 owns that ruling - confirm
     it was struck before building, or this gets built twice.
 - id: phase-dgov-01
@@ -10244,6 +10248,8 @@ items:
     lacks one.
   - Enforce the rule on new plans only, grandfathering that list, so the trunk does not go red on 14-plus
     plans written before the rule existed.
+  - 'Write two fixture tests: one showing the rule gives the same answer for five plans (R01), and one
+    showing a failing check names the fixture plan (R03).'
   acceptance:
   - 'REQ-015 R01 holds: the rule applied to five plans chosen without regard to outcome yields the same
     answer for a second reader.'
@@ -12651,7 +12657,8 @@ items:
   acceptance:
   - 'REQ-022 R11 holds: a deliberately oversized phase is split and each part re-enters review.'
   - The fit heuristic is derived from historical session-length data across completed phases, not
-    from an invented size standard.
+    from an invented size standard. This is judged by the session-close independent review, not by a
+    mechanical command.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -12715,8 +12722,8 @@ items:
   - Build the agent that writes depends_on and systems locks for an approved plan's phases,
     validator-checked, and proposes a next_up ordering it never writes itself.
   acceptance:
-  - 'REQ-022 R05 holds: one plan traces from proposed ordering to an owner decision recorded via
-    phase-irs-04''s `gate` verb, with no standalone ratification mechanism.'
+  - 'REQ-022 R05 holds as far as this phase: one plan traces to a proposed ordering ready for a decision.
+    Ratification through phase-irs-04''s `gate` verb is tested in phase-irs-13.'
   - The agent has no write path to next_up.
   verification:
   - uv run python -m src.governance
