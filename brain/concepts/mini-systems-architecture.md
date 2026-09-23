@@ -6,7 +6,7 @@ tags: [frameworks, agentic-systems, knowledge-base]
 source_model: anthropic/claude-sonnet-4-6
 project: d-system
 created: 2026-09-05
-updated: 2026-09-05
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-json-sot]
 scope: global
@@ -14,7 +14,7 @@ scope: global
 
 ## Summary
 
-Ten derived systems that act on the project/commitment/task/person/tag data to surface awareness, diagnose health, and synthesize actionable output. Organized in three tiers.
+A proposed set of ten derived systems that would act on the project/commitment/task/person/tag data to surface awareness, diagnose health, and synthesize actionable output, organized in three tiers. **Proposed, not built:** `sys-signals` and `sys-synthesis` are `status: planned` in `docs/08-governance/systems.yaml`; none of the Tier 2 views or Tier 3 generators below exists yet. The only DuckDB views today are the capture views in `sql/003_capture_views.sql`.
 
 ## Tier Architecture
 

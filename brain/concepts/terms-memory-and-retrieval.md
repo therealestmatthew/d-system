@@ -7,7 +7,7 @@ systems: [sys-brain, sys-retrieval]
 source_model: anthropic/claude-sonnet-5
 project: d-system
 created: 2026-09-07
-updated: 2026-09-07
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-data-and-storage]
 scope: global
@@ -35,8 +35,8 @@ rationale for a choice; a rationale is a `decision` memory.
 ### Entity (memory sense)
 
 A memory holding facts about a specific thing, e.g. `mem-entity-d-system`. Not a domain-data entity
-(see Data and Storage) and not itself validated as a schema-governed record — it is a fact *about* the
-system, not a row *in* it.
+(see Data and Storage): like every memory it is validated against `schemas/memory.schema.json`, but it
+is a fact *about* the system, not a record *in* it.
 
 ### Procedure (memory type)
 

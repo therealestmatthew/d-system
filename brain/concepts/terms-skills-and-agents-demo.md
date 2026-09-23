@@ -7,7 +7,7 @@ systems: [sys-brain]
 source_model: anthropic/claude-opus-5
 project: d-system
 created: 2026-09-10
-updated: 2026-09-10
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-systems-vocabulary]
 scope: global
@@ -68,8 +68,9 @@ which is why a tool that returns a large output is expensive even when the answe
 A model in a loop with tools and a goal, where the model decides which tool to call next and when it
 is finished. What separates an agent from a single model call is not the model but the loop and the
 tools around it. Not autonomy in the sense of unsupervised — the surrounding program still decides
-what is permitted, and in this repository `.claude/settings.json` denies edits to `AGENTS.md`,
-`CLAUDE.md`, `_private/**` and `_data/ideas.jsonl` outright.
+what is permitted, and in this repository `.claude/settings.json` denies edits to `_private/**`,
+`_data/ideas.jsonl`, `.agents/**` and `.codex/**` outright, and to `AGENTS.md` and `CLAUDE.md` inside
+worktrees.
 
 ### Agentic loop
 
@@ -83,7 +84,7 @@ can recover from a failed command: the failure is just another result to read.
 A second agent started by the first, with its own context window, its own tool set and its own loop,
 which reports one result back to the caller. The point is context isolation: the sub-agent's
 intermediate tool output never enters the caller's context, only its final report does. In this
-repository `.claude/agents/` holds twelve definitions — a Markdown file whose front matter sets
+repository `.claude/agents/` holds fourteen definitions — a Markdown file whose front matter sets
 `name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
 instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
 
@@ -100,8 +101,9 @@ every sub-agent starting without the caller's context.
 
 A folder of instructions the model loads when a task calls for it: `SKILL.md` with YAML front matter
 giving a `name` and a `description`, a Markdown body containing the procedure, and optionally
-supporting files the body points to. This repository has four under `.claude/skills/` — `orient`,
-`checkpoint`, `d-system-overview` and `log-anti-patterns`. A skill is instructions, not code:
+supporting files the body points to. This repository has eleven under `.claude/skills/` — among them `orient`,
+`checkpoint`, `d-system-overview`, `log-anti-patterns` and `partition-ideas`, plus six `demo-skill-*`
+skills used in the training session. A skill is instructions, not code:
 `d-system-overview` tells
 the agent to run `tools/generate_overview.py` and report what it printed; the determinism lives in
 the tool, not in the skill.
@@ -118,7 +120,8 @@ use the skill rather than to summarise it.
 A named prompt the user triggers by typing `/<name>` — a **slash command** — defined in this
 repository as a Markdown file
 under `.claude/commands/` with `description` and `argument-hint` front matter. `/backlog`, `/idea`,
-`/idea-triage`, `/session-start`, `/session-close` and `/resume-lit-review` are the six here.
+`/idea-triage`, `/session-start`, `/session-close` and `/resume-lit-review` are the working six here,
+alongside six `demo-cmd-*` commands used in the training session.
 A command is invoked by the person; a skill is
 loaded by the model when it judges the task matches; a tool is called by the model as a step. That is
 the whole distinction between the three — who initiates.
@@ -146,19 +149,21 @@ shell behind a websocket. Governed phases are budgeted in sessions — one phase
 ### Memory
 
 Anything deliberately written down so a later session can read it, since the context does not survive
-the conversation. Three kinds here: `brain/` holds model-agnostic Markdown entries — this file is one
-— `docs/05-memories/` holds governed cross-session context, and `CLAUDE.md` is loaded automatically
-every session. Not recall by the model: memory is a file that something chooses to read back.
+the conversation. Two kinds here: `brain/` holds model-agnostic Markdown entries — this file is one
+— and `CLAUDE.md` is loaded automatically every session. `docs/05-memories/` is only a navigation
+pointer to `brain/`, not a second store. Not recall by the model: memory is a file that something chooses to read back.
 
 ### Advanced topics, named but not covered in depth
 
 - **Hooks** — shell commands the harness runs automatically at fixed points in the loop, configured
   in `settings.json`. None are configured in this repository; the equivalent guarantees here come
-  from `permissions.deny` and the governance check.
+  from `permissions.deny`, the governance check, and an opt-in git `pre-commit` hook
+  (`tools/git-hooks/pre-commit`) that runs the private-content check — a git hook, not a harness
+  hook.
 - **Agent permissions** — the allow and deny rules deciding which tool calls run, prompt for
-  approval, or are refused. `.claude/settings.json` here denies writes to `AGENTS.md`, `CLAUDE.md`,
-  `_private/**` and `_data/ideas.jsonl`, enforcing in the harness what the working agreement states
-  in prose.
+  approval, or are refused. `.claude/settings.json` here denies writes to `_private/**`,
+  `_data/ideas.jsonl`, `.agents/**` and `.codex/**`, and to `AGENTS.md` and `CLAUDE.md` inside
+  worktrees, enforcing in the harness what the working agreement states in prose.
 - **Observability** — recording what an agent did (tool calls, tokens, cost, outcome) so a run can be
   audited afterwards rather than reconstructed from its output.
 - **Agent SDK** — the library for building agents of your own on the same loop, tool and sub-agent

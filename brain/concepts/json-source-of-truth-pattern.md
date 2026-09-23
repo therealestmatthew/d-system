@@ -6,7 +6,7 @@ tags: [frameworks, knowledge-base, python]
 source_model: anthropic/claude-sonnet-4-6
 project: d-system
 created: 2026-09-05
-updated: 2026-09-08
+updated: 2026-09-23
 confidence: high
 related: [mem-decision-json-first]
 scope: global
@@ -33,9 +33,9 @@ data/d_system.duckdb           ← query here, never write directly
 ## Rules
 
 - **Edit JSON, then rebuild.** Never INSERT directly into DuckDB — the next rebuild will overwrite it.
-- **DuckDB is gitignored.** The `data/` directory is in `.gitignore`, same as `_private/`. Only `_data/` and `brain/` are committed.
+- **DuckDB is gitignored.** The `data/` directory is in `.gitignore`, same as `_private/`. The database is never committed; its sources are.
 - **Rebuild is idempotent.** Drop all tables, recreate from SQL schema, reload all files. Safe to run anytime.
-- **One file per entity.** Each project, commitment, and task gets its own JSON file — tasks point back to their commitment by ID rather than being embedded (ADR-008). Tags are the exception — all tags live in a single `_data/tags.json` array.
+- **One file per entity.** Each entity record (project, person, commitment, task, interaction, decision, waiting-on, development event) gets its own JSON file — a task points to its commitment and/or project by optional ID rather than being embedded (ADR-008). Tags and ideas are the exceptions — all tags live in a single `_data/tags.json` array, and all idea events in the append-only `_data/ideas.jsonl`.
 - **Real content never goes in `_data/`.** Writing an entity file with real names, clients or personal content into the tracked `_data/` reintroduces exactly what ADR-009 relocated. Write it under the resolved data root instead.
 
 ## Why This Matters for AI Workflows

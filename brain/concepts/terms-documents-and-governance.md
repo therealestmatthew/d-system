@@ -7,7 +7,7 @@ systems: [sys-governance]
 source_model: anthropic/claude-sonnet-5
 project: d-system
 created: 2026-09-07
-updated: 2026-09-08
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-plans-and-work]
 scope: global
@@ -51,9 +51,12 @@ and a fresh regeneration, the same pattern the generated glossary follows.
 ### Reserved code
 
 A code claimed for a document that does not exist yet, typically because a backlog phase names it as
-a future deliverable, recorded under `reserved` in `codes.yaml`. Not a document — `--next-code` skips
-it, and using the number fails until the reservation is removed in the same change that adds the
-document.
+a future deliverable, recorded under `reserved` in `codes.yaml` (a *register reservation*). Not a
+document — `--next-code` skips it, and using the number fails until the reservation is removed in the
+same change that adds the document. Not the same as a *pre-merge reservation*: the untracked file
+under `<git common dir>/code-reservations/` that `--next-code` writes automatically so two worktrees
+cannot be handed the same code, which expires after 14 days and is dropped with `--release-code`. See
+`docs/08-governance/GOV-005-document-codes.md`.
 
 ### Retired code
 
@@ -71,6 +74,7 @@ verify that a plan's claims are actually true. See `docs/08-governance/GOV-001-p
 ### Document code allocation
 
 Running `uv run python -m src.governance --next-code <kind>` (with `--parent <doc-id>` for a child
-plan) to obtain the next free code before creating a document. Not a guess or a directory listing — a
-pure function of committed state, so two agents on the same commit compute the same answer. See
+plan) to obtain the next free code before creating a document. Not a guess or a directory listing, and not
+a pure read of committed state — it also *takes* the code by writing a pre-merge reservation (see
+Reserved code), so two worktrees on the same commit are not handed the same answer. See
 `docs/08-governance/GOV-005-document-codes.md`.
