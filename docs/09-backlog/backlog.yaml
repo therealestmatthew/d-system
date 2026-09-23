@@ -2948,11 +2948,11 @@ items:
     checkout's private root, per command for the capture, promotion, rebuild and governance
     steps; never export it for the session. A relative path resolves inside the worktree,
     where _private/ does not exist, and promotion would create a new root there that worktree
-    removal deletes (owner ruling, 2026-09-23).
+    removal deletes (owner ruling, 2026-09-23). uv run pytest and the leak check run with it
+    unset, because the tests assume the fictional example set (GOV-001).
   - _capture/ (raw captures, staging, promoted and discarded) is anchored to the checkout the
     commands run in, so it lands in the worktree. Copy it back to the primary checkout's
-    _capture/ before the worktree is removed; it is gitignored, so no merge carries it. uv run pytest and the leak check run with it
-    unset, because the tests assume the fictional example set (GOV-001).
+    _capture/ before the worktree is removed; it is gitignored, so no merge carries it.
   - Confirm no project has regained a retired cadence value. The owner reassigned
     the original three during phase-cap-02; see GOV-003.
   - Respect the structure/content boundary; captured content stays private until promoted,
@@ -2965,7 +2965,7 @@ items:
   - No project carries a retired review_cadence value. The private-root rebuild validates
     every project against schemas/project.schema.json, which allows only current values.
   - Every promoted record traces back to a raw capture. Each entry in _capture/promoted/
-    names a capture_id that resolves to a file in _capture/raw/.
+    names a capture_id, at .staged.capture_id, that resolves to a file in _capture/raw/.
   - No entity record under _data/ and no _data/tags.json changed. _data/ideas.jsonl is
     excluded, since ideas recorded during the session are written there by design (GOV-006).
     Both git commands in verification print nothing.
@@ -2978,9 +2978,9 @@ items:
   verification:
   - D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio uv run python tools/rebuild_db.py
   - D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio uv run python -m src.governance
-  - git diff --name-only dev...HEAD -- _data/ ':!_data/ideas.jsonl'
-  - git status --short -- _data/ ':!_data/ideas.jsonl'
-  - List _capture/promoted/ and confirm each entry's capture_id resolves in _capture/raw/.
+  - git diff --name-only dev...HEAD -- _data/ ':(exclude)_data/ideas.jsonl'
+  - git status --short -- _data/ ':(exclude)_data/ideas.jsonl'
+  - List _capture/promoted/ and confirm each entry's .staged.capture_id resolves in _capture/raw/.
   - uv run python tools/check_no_private_content.py (with the session record staged)
   - uv run pytest (with D_SYSTEM_DATA_ROOT unset)
   deliverables:
