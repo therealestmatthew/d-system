@@ -336,6 +336,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-22-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-11-capability-and-approval-broker.md |
 | SESS-2026-09-22-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-13-r02-r04-open-and-tmpagent-cleanup.md |
 | SESS-2026-09-23-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-01-langgraph-orchestrator-skeleton.md |
+| SESS-2026-09-23-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-03-prompt-planner-batch-opening-packs.md |
 | SESS-2026-09-23-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-04-dev-lint-and-type-fixes.md |
 
 ## Plans and their phases
@@ -412,4 +413,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-330 documents — adr: 19, architecture: 11, governance: 15, operation: 20, plan: 58, prompt: 37, requirement: 27, session: 143.
+331 documents — adr: 19, architecture: 11, governance: 15, operation: 20, plan: 58, prompt: 37, requirement: 27, session: 144.
