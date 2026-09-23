@@ -20,6 +20,8 @@ readability; the backlog is authoritative when the two disagree.
 | `batch-004` | queued | 4 | Mandatory-requirement ruling, idea planner agent, first three pipeline phases |
 | `batch-005` | queued | 5 | Gate queue, execution-loop harness, delivered status, anti-pattern store |
 | `batch-006` | queued | 6 | Learning loop, Gate 2 consolidation, trace baselines, forced-failure drill |
+| `batch-007` | queued | 7 | Portfolio seeding, the reliability chain, the signals and the weekly review (`PLAN-044` wave 1) |
+| `batch-008` | queued | 8 | Specification phases for quick entry, reminders, external intake and the `ARCH-010` model (`PLAN-044` wave 2) |
 
 ## Status, and who moves it
 

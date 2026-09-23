@@ -1,0 +1,324 @@
+# Portfolio seeding, the reliability chain, signals and the weekly review
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-007
+title: Portfolio seeding, the reliability chain, signals and the weekly review
+status: queued
+sequence: 7
+created: '2026-09-23'
+updated: '2026-09-23'
+coordinator: PROMPT-036
+provenance: 'PLAN-044 wave 1, composed on 2026-09-23 from the owner''s rulings relayed by the Session
+  Manager (GOV-003): the path to phase-syn-03 after phase-cap-08, plus phase-pc-01, phase-pc-02, phase-conc-07,
+  phase-rel-07 and phase-pc-03. The same phases are in next_up, so Builders may take them by assignment
+  first; PROMPT-036 skips a phase that is already complete or claimed.'
+verified:
+  date: '2026-09-23'
+  method: 'Script over docs/09-backlog/backlog.yaml using src.governance.backlog.collisions: every phase
+    id resolved and queued with no agent; every depends_on edge resolved to an earlier stage of this table,
+    to a complete phase, or to a phase listed in external_depends_on; each phase placed in the earliest
+    stage after its in-table dependencies that holds no phase it collides with.'
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or overlapping
+    deliverable path.'
+  phases:
+  - id: phase-cap-08
+    title: Seed the portfolio through the capture pipeline
+    after: []
+    conflicts_with:
+    - phase-rel-04
+  - id: phase-rel-03
+    title: Enforce source references and global identities
+    after: []
+    conflicts_with:
+    - phase-rel-04
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-01
+    - phase-sig-07
+    - phase-rel-07
+    - phase-pc-01
+    - phase-pc-02
+  - id: phase-conc-07
+    title: Decide the backup posture for non-git state and verify it by restoring
+    after: []
+    conflicts_with:
+    - phase-rel-04
+    - phase-rel-05
+    - phase-sig-07
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-rel-04 depends on phase-rel-03.
+  phases:
+  - id: phase-rel-04
+    title: Make project stakeholders the membership authority
+    after:
+    - phase-rel-03
+    conflicts_with:
+    - phase-cap-08
+    - phase-rel-03
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-01
+    - phase-sig-07
+    - phase-rel-07
+    - phase-pc-01
+    - phase-pc-02
+    - phase-conc-07
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-rel-05 shares a locked system or deliverable path with phase-rel-04.
+  phases:
+  - id: phase-rel-05
+    title: Specify failure-safe projection publication
+    after:
+    - phase-rel-03
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-06
+    - phase-sig-01
+    - phase-rel-07
+    - phase-pc-01
+    - phase-pc-02
+    - phase-conc-07
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-rel-06 depends on phase-rel-05.
+  phases:
+  - id: phase-rel-06
+    title: Implement atomic rebuild and failure recovery
+    after:
+    - phase-rel-04
+    - phase-rel-05
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-05
+    - phase-sig-01
+    - phase-rel-07
+    - phase-pc-01
+    - phase-pc-02
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-sig-01 depends on phase-rel-06.
+  phases:
+  - id: phase-sig-01
+    title: Add a reproducible SQL view installation boundary
+    after:
+    - phase-rel-06
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-07
+    - phase-sig-08
+    - phase-rel-07
+    - phase-pc-01
+    - phase-pc-02
+- stage: 6
+  parallel: true
+  rationale: Cut after stage 5 because phase-sig-02 depends on phase-sig-01; phase-rel-07 shares a locked
+    system or deliverable path with phase-sig-01.
+  phases:
+  - id: phase-sig-02
+    title: Implement Stale Radar
+    after:
+    - phase-sig-01
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-07
+    - phase-sig-08
+  - id: phase-rel-07
+    title: Unify database paths and application access helpers
+    after:
+    - phase-rel-06
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-01
+    - phase-pc-01
+    - phase-pc-02
+    - phase-pc-03
+- stage: 7
+  parallel: true
+  rationale: Cut after stage 6 because phase-sig-03 shares a locked system or deliverable path with phase-sig-02;
+    phase-pc-01 shares a locked system or deliverable path with phase-rel-07; phase-pc-03 depends on phase-rel-07.
+  phases:
+  - id: phase-sig-03
+    title: Implement the Accountability Ledger
+    after:
+    - phase-sig-01
+    - phase-rel-04
+    - phase-cap-08
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-07
+    - phase-sig-08
+  - id: phase-pc-01
+    title: Project every accepted project field into the database, starting with repository
+    after: []
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-01
+    - phase-sig-07
+    - phase-rel-07
+    - phase-pc-02
+  - id: phase-pc-03
+    title: Specify API routes and UI views for projects, people, commitments and tasks
+    after:
+    - phase-rel-07
+    conflicts_with:
+    - phase-rel-07
+- stage: 8
+  parallel: true
+  rationale: Cut after stage 7 because phase-sig-05 shares a locked system or deliverable path with phase-sig-03;
+    phase-pc-02 shares a locked system or deliverable path with phase-pc-01.
+  phases:
+  - id: phase-sig-05
+    title: Implement Cognitive Load Estimator
+    after:
+    - phase-sig-01
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-07
+    - phase-sig-08
+  - id: phase-pc-02
+    title: Read and write capture-promoted tags under the private data root
+    after:
+    - phase-rel-03
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-rel-05
+    - phase-rel-06
+    - phase-sig-01
+    - phase-rel-07
+    - phase-pc-01
+- stage: 9
+  parallel: false
+  rationale: Cut after stage 8 because phase-sig-06 shares a locked system or deliverable path with phase-sig-05.
+  phases:
+  - id: phase-sig-06
+    title: Implement weekly Commitment Velocity
+    after:
+    - phase-sig-01
+    - phase-cap-08
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-04
+    - phase-sig-07
+    - phase-sig-08
+- stage: 10
+  parallel: false
+  rationale: Cut after stage 9 because phase-sig-04 shares a locked system or deliverable path with phase-sig-06.
+  phases:
+  - id: phase-sig-04
+    title: Implement Project Health Signal
+    after:
+    - phase-sig-02
+    - phase-sig-03
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-07
+    - phase-sig-08
+- stage: 11
+  parallel: true
+  rationale: Cut after stage 10 because phase-sig-07 shares a locked system or deliverable path with phase-sig-04;
+    phase-syn-01 depends on phase-sig-04.
+  phases:
+  - id: phase-sig-07
+    title: Define durable velocity snapshot ownership
+    after:
+    - phase-sig-06
+    conflicts_with:
+    - phase-rel-03
+    - phase-rel-04
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-08
+    - phase-pc-01
+    - phase-conc-07
+  - id: phase-syn-01
+    title: Generate deterministic project context packs
+    after:
+    - phase-sig-03
+    - phase-sig-04
+    - phase-sig-05
+    - phase-rel-04
+    conflicts_with:
+    - phase-syn-02
+    - phase-syn-03
+- stage: 12
+  parallel: true
+  rationale: Cut after stage 11 because phase-sig-08 depends on phase-sig-07; phase-syn-02 depends on
+    phase-syn-01.
+  phases:
+  - id: phase-sig-08
+    title: Persist weekly velocity observations
+    after:
+    - phase-sig-07
+    conflicts_with:
+    - phase-sig-01
+    - phase-sig-02
+    - phase-sig-03
+    - phase-sig-05
+    - phase-sig-06
+    - phase-sig-04
+    - phase-sig-07
+  - id: phase-syn-02
+    title: Create a manual session briefing workflow
+    after:
+    - phase-syn-01
+    - phase-sig-02
+    conflicts_with:
+    - phase-syn-01
+    - phase-syn-03
+- stage: 13
+  parallel: false
+  rationale: Cut after stage 12 because phase-syn-03 depends on phase-syn-02, phase-sig-08.
+  phases:
+  - id: phase-syn-03
+    title: Create the weekly review workflow
+    after:
+    - phase-syn-02
+    - phase-sig-08
+    conflicts_with:
+    - phase-syn-01
+    - phase-syn-02

@@ -131,6 +131,7 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | plan | draft | repository-owner | docs/01-plans/PLAN-041-portable-framework-content-extraction.md |
 | PLAN-042 | plan | draft | repository-owner | docs/01-plans/PLAN-042-session-taxonomy-investigation.md |
 | PLAN-043 | plan | approved | repository-owner | docs/01-plans/PLAN-043-literature-review-report-page.md |
+| PLAN-044 | plan | draft | repository-owner | docs/01-plans/PLAN-044-productivity-core-enhancements.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -168,6 +169,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-035 | prompt | active | repository-owner | docs/02-prompts/PROMPT-035-queued-phase-review-pack.md |
 | PROMPT-036 | prompt | active | repository-owner | docs/02-prompts/PROMPT-036-build-coordinator.md |
 | PROMPT-037 | prompt | active | repository-owner | docs/02-prompts/PROMPT-037-session-manager-starter-messages.md |
+| PROMPT-039 | prompt | active | repository-owner | docs/02-prompts/PROMPT-039-productivity-core-builder-prompts.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -405,6 +407,7 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
+| PLAN-044 | doc-productivity-core-enhancements | draft | 9 | 0 | 0 | — |
 
 ## Held codes
 
@@ -417,4 +420,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-335 documents — adr: 19, architecture: 11, governance: 15, operation: 21, plan: 58, prompt: 37, requirement: 27, session: 147.
+337 documents — adr: 19, architecture: 11, governance: 15, operation: 21, plan: 59, prompt: 38, requirement: 27, session: 147.

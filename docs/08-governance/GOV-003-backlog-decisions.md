@@ -745,3 +745,42 @@ restates step 9.
 
 **Why recorded here:** the first changes what a branch must pass before it may integrate. An agent
 reading only `AGENTS.md` step 6 would send `READY` with `governance` and `pytest` alone.
+
+## Productivity core: the weekly-review path moves up, and new entity work starts as specification — 2026-09-23
+
+On 2026-09-23 the real data root held 34 projects and no people, commitments or tasks, and no phase
+that uses the data was in `next_up` (idea `000022`). The owner ruled the following, relayed by the
+Session Manager, after idea triage on every related open idea. [PLAN-044](../01-plans/PLAN-044-productivity-core-enhancements.md)
+carries the plan.
+
+1. **`phase-cap-08` is queued directly after `phase-part-03`.** It writes real records under the
+   primary checkout's private root, using the absolute `D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio`
+   per command, and copies `_capture/` back before the worktree is removed. A relative path resolves
+   inside the worktree, where promotion would create a new root that removal deletes. Its outputs
+   were amended accordingly; the old acceptance line was already satisfied by the fictional example set.
+2. **The path to the weekly review (`phase-syn-03`) follows `phase-cap-08` in `next_up`**, ahead of
+   the idea-realization and idea-graph front. Its systems do not overlap that front, so Builders can
+   build it while the Batch Runner runs `batch-003` to `batch-006`.
+3. **The prompt pack is two batch tables plus a short prompt document.** `batch-007` is wave 1 and
+   `batch-008` wave 2; `PROMPT-039` carries the prompts for seeding and for the specification phases.
+4. **New entity work starts with one specification phase per idea**, in the `phase-prog-*` pattern:
+   entity API routes and UI views (`000360`), quick entry (`000361`), reminders (`000362`), external
+   intake (`000363`), and the `ARCH-010` organisational model (`000365`, with the opportunity entity
+   `000364` decided inside it).
+5. **`phase-html-01` to `phase-html-10` depend on `phase-des-01`**, whose audit may retire some of them.
+6. **Capture-promoted tags live in a `tags.json` under `D_SYSTEM_DATA_ROOT`** (`000343`), merged with
+   the shared taxonomy at rebuild; promotion writes new tags there. Promotion already refused to write
+   the tracked file, so the new phase adds the reader and writer rather than fixing a leak.
+7. **Project tags on ideas (`000366`) and idea-to-template links (`000367`) are idea-graph work.**
+   `000366` is added to `phase-idg-04`'s scope, and `000367` to `phase-idg-01`'s as a decision in its
+   scope-fork ADR. Neither gets a productivity-core phase.
+8. **Quick entry writes into capture staging** (`000361`). A direct writer to the data root, which
+   would need an ADR amending `ADR-007`, is refused.
+9. **Two waves.** Wave 1: the weekly-review path, `000345`, `000343`, `phase-conc-07`, and the `000360`
+   specification after `phase-rel-07`. Wave 2: the specifications for `000361`, `000362` (after
+   `phase-sig-03`), `000363` (after `phase-cap-08`), and the `000365` design pass.
+10. **The links proposed by triage go into `PLAN-044`'s traceability table as proposals only.**
+
+**Why recorded here:** these rulings move roughly twenty existing phases ahead of the idea-realization
+front, add a dependency edge to ten HTML phases, and widen two idea-graph phases. None of that is
+visible from any single phase's own lines.

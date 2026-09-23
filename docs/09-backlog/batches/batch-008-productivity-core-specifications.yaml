@@ -1,0 +1,90 @@
+# Specification phases for quick entry, reminders, external intake and the ARCH-010 model
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-008
+title: Specification phases for quick entry, reminders, external intake and the ARCH-010 model
+status: queued
+sequence: 8
+created: '2026-09-23'
+updated: '2026-09-23'
+coordinator: PROMPT-036
+provenance: PLAN-044 wave 2, composed on 2026-09-23 from the owner's rulings relayed by the Session Manager
+  (GOV-003). Its external dependencies are wave-1 phases in batch-007, so it becomes runnable when those
+  complete.
+verified:
+  date: '2026-09-23'
+  method: 'Script over docs/09-backlog/backlog.yaml using src.governance.backlog.collisions: every phase
+    id resolved and queued with no agent; every depends_on edge resolved to an earlier stage of this table,
+    to a complete phase, or to a phase listed in external_depends_on; each phase placed in the earliest
+    stage after its in-table dependencies that holds no phase it collides with.'
+external_depends_on:
+- id: phase-cap-08
+  expected_status: complete
+  note: Seed the portfolio through the capture pipeline — depended on by phase-pc-04, phase-pc-06.
+- id: phase-sig-03
+  expected_status: complete
+  note: Implement the Accountability Ledger — depended on by phase-pc-05.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or overlapping
+    deliverable path.'
+  phases:
+  - id: phase-pc-04
+    title: Specify a quick-entry front end that writes into capture staging
+    after: []
+    conflicts_with:
+    - phase-pc-05
+    - phase-pc-06
+    - phase-pc-09
+  - id: phase-pc-07
+    title: Close ARCH-010's identity, party, role and object-policy gates
+    after: []
+    conflicts_with:
+    - phase-pc-08
+    - phase-pc-09
+- stage: 2
+  parallel: true
+  rationale: Cut after stage 1 because phase-pc-05 shares a locked system or deliverable path with phase-pc-04;
+    phase-pc-08 depends on phase-pc-07.
+  phases:
+  - id: phase-pc-05
+    title: Specify reminders when a commitment falls due or goes overdue
+    after: []
+    conflicts_with:
+    - phase-pc-04
+    - phase-pc-06
+    - phase-pc-09
+  - id: phase-pc-08
+    title: Close ARCH-010's commercial lifecycle, relationship, WBS and contract gates, with the opportunity
+      entity
+    after:
+    - phase-pc-07
+    conflicts_with:
+    - phase-pc-07
+    - phase-pc-09
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-pc-06 shares a locked system or deliverable path with phase-pc-05.
+  phases:
+  - id: phase-pc-06
+    title: Specify external intake from email, calendar and meeting transcripts
+    after: []
+    conflicts_with:
+    - phase-pc-04
+    - phase-pc-05
+    - phase-pc-09
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-pc-09 shares a locked system or deliverable path with phase-pc-06.
+  phases:
+  - id: phase-pc-09
+    title: Close ARCH-010's remaining gates and write the organisational model's requirement and plan
+    after:
+    - phase-pc-08
+    conflicts_with:
+    - phase-pc-04
+    - phase-pc-05
+    - phase-pc-06
+    - phase-pc-07
+    - phase-pc-08

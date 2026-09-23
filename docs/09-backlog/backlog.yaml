@@ -5,6 +5,26 @@ max_active: 3
 next_up:
 - phase-part-03
 - phase-cap-08
+- phase-rel-03
+- phase-rel-04
+- phase-rel-05
+- phase-rel-06
+- phase-sig-01
+- phase-sig-02
+- phase-sig-03
+- phase-sig-05
+- phase-sig-06
+- phase-sig-04
+- phase-sig-07
+- phase-sig-08
+- phase-syn-01
+- phase-syn-02
+- phase-syn-03
+- phase-pc-01
+- phase-pc-02
+- phase-conc-07
+- phase-rel-07
+- phase-pc-03
 - phase-irs-14
 - phase-irs-11
 - phase-idg-01
@@ -465,7 +485,8 @@ items:
   status: queued
   priority: 2
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-des-01
   scope:
   - Record authored YAML as canonical and generated JSON as ignored build output in
     an ADR.
@@ -499,6 +520,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-01
   - phase-rel-02
   scope:
@@ -531,6 +553,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-01
   scope:
   - Create strict Pydantic models from the agreed contract boundary for site, page
@@ -562,6 +585,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-02
   - phase-html-03
   scope:
@@ -596,6 +620,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-01
   scope:
   - Add the planned router/styling dependencies and CSS-first design tokens to the
@@ -630,6 +655,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-04
   - phase-html-05
   scope:
@@ -666,6 +692,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-03
   - phase-html-05
   scope:
@@ -698,6 +725,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-06
   - phase-html-07
   scope:
@@ -733,6 +761,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-02
   - phase-html-04
   - phase-html-08
@@ -770,6 +799,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
+  - phase-des-01
   - phase-html-09
   scope:
   - Execute the original automated and manual verification checklist against the completed
@@ -9794,6 +9824,9 @@ items:
   - 'Make promoted non-terminal in the same change, per the same ruling: an idea that became a plan is
     in flight, not finished, and reaches delivered when that plan''s work ships. The seven already-promoted
     ideas are unaffected until their work ships; this phase backfills no transition onto them.'
+  - 'Decide in the scope-fork ADR whether a template or building-block asset (idea 000367, with 000083
+    and 000084) is a third link-target shape now or later. Record the decision; build the target only if
+    it fits this change without widening its deliverables (owner ruling, 2026-09-23).'
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -10012,6 +10045,10 @@ items:
   - Add a tag registry with a controlled vocabulary, in the shape _data/tags.json already uses for projects.
   - Allow tags to be assigned retroactively through the sanctioned writer.
   - Make tags queryable, and reject an unregistered tag rather than accepting free text.
+  - Support tagging an idea with the projects it belongs to, so the log can be filtered per project and
+    other projects can find transferable ideas (idea 000366, owner ruling 2026-09-23). Whether project
+    is a tag category or a separate field is decided here. A project tag can name a client, so it
+    follows the 000343 ruling - project tags that name real projects live under the private data root.
   acceptance:
   - 'REQ-014 R10 holds: a tag added to an existing idea is queryable, the vocabulary is a registry file,
     and an unregistered tag is rejected.'
@@ -13644,3 +13681,312 @@ items:
     engine to tools/ with an OPS doc and the prompts to docs/02-prompts/ (idea 000291), and
     building the governance write-path interrupt (000294), are both planning work needing a
     requirement and plan first.
+- id: phase-pc-01
+  title: Project every accepted project field into the database, starting with repository
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-projection
+  - sys-contracts
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a repository column to the projects table and load it in tools/rebuild_db.py (idea 000345).
+  - Add a test that compares every property in the project, person, commitment and task schemas with
+    the columns of their tables, and fails on a property that has no column and is not on an explicit
+    list of deliberately unprojected fields.
+  - Record each field on that list and the reason it is not projected, in the test file.
+  acceptance:
+  - A project with a repository value rebuilds with the value queryable in the projects table.
+  - Removing the repository column makes the new test fail, naming the field.
+  - Every schema property of the four entities is either a column or on the list with a reason.
+  verification:
+  - uv run python tools/rebuild_db.py
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - sql/001_schema.sql
+  - tools/rebuild_db.py
+  - test/test_projection_fields.py
+  next_action: Read ARCH-010's projection-integrity gate first; this phase closes it for the four
+    existing entities only, not for the planned schemas.
+- id: phase-pc-02
+  title: Read and write capture-promoted tags under the private data root
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-capture
+  - sys-projection
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rel-03
+  scope:
+  - Owner ruling on 000343 (2026-09-23) - a tags.json under D_SYSTEM_DATA_ROOT holds tags promoted
+    from a capture. The tracked _data/tags.json keeps only the shared taxonomy.
+  - Source validation and tools/rebuild_db.py read both files and merge them. An id present in both
+    is an error, not an override.
+  - Capture structuring resolves known tags against the merged set.
+  - Promotion creates a new tag in the data root's tags.json. When the data root is the tracked
+    _data/, promotion keeps refusing and the tag stays held, as it does today.
+  - Extend phase-rel-03's tag-reference check to the merged set, so a real project may carry a
+    private tag.
+  acceptance:
+  - With D_SYSTEM_DATA_ROOT set to a scratch root holding a tags.json, a rebuild loads the tags from
+    both files, and a project referencing a private tag validates.
+  - A duplicate id across the two files fails validation and names both files.
+  - Promoting a held tag writes it to the data root's tags.json and never to _data/tags.json. With the
+    default data root, promotion refuses it.
+  - Tests use a scratch data root and never read _private/.
+  verification:
+  - uv run pytest
+  - uv run python tools/rebuild_db.py
+  - uv run python -m src.governance
+  - uv run python tools/check_no_private_content.py (with the changes staged)
+  deliverables:
+  - src/db/source_validation.py
+  - tools/rebuild_db.py
+  - src/capture/structure.py
+  - src/capture/promote.py
+  - test/test_private_tags.py
+  next_action: Read src/capture/promote.py's refusal (the create-identity path for a tag) and the
+    comment on ADR-009 in src/db/source_validation.py before changing either.
+- id: phase-pc-03
+  title: Specify API routes and UI views for projects, people, commitments and tasks
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-api
+  - sys-ui
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rel-07
+  scope:
+  - Write the requirement for entity routes and views (idea 000360) with observable statements and
+    verification methods.
+  - Settle with the owner which views come first, whether the first routes are read-only, and how the
+    routes follow ADR-015's rules (repository-bounded, validated server-side, read-only except named
+    actions).
+  - The routes read the database through phase-rel-07's access helper and honour D_SYSTEM_DATA_ROOT.
+    No private content reaches a tracked file or a generated output that is tracked.
+  - Add the plan section and session-sized build phases.
+  acceptance:
+  - A requirement document exists and every row maps to at least one new phase.
+  - Every new phase is session-sized, with acceptance and verification.
+  - The owner's answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/06-requirements/
+  - docs/01-plans/PLAN-044-productivity-core-enhancements.md
+  - docs/09-backlog/README.md
+  next_action: Specification only; build nothing. Until phase-cap-08 has run, views show only the
+    fictional example set, so say which data the owner will see first.
+- id: phase-pc-04
+  title: Specify a quick-entry front end that writes into capture staging
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-capture
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-cap-08
+  scope:
+  - Write the requirement for a quick-entry path for people, commitments and tasks (idea 000361) that
+    writes staged records, so promotion stays the owner's action (ADR-007). A direct writer to the
+    data root is out of scope (owner ruling, 2026-09-23).
+  - Use phase-cap-08's session record to state where capture friction actually was.
+  - Add the plan section and session-sized build phases.
+  acceptance:
+  - A requirement document exists and every row maps to at least one new phase.
+  - The requirement states that nothing it specifies writes the data root.
+  - The owner's answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/06-requirements/
+  - docs/01-plans/PLAN-044-productivity-core-enhancements.md
+  - docs/09-backlog/README.md
+  next_action: Specification only. Start from tools/append_idea.py's interface and from the friction
+    phase-cap-08 recorded.
+- id: phase-pc-05
+  title: Specify reminders when a commitment falls due or goes overdue
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-synthesis
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-sig-03
+  scope:
+  - Write the requirement for due and overdue reminders (idea 000362), built on the Accountability
+    Ledger.
+  - Settle with the owner how a reminder reaches them. A push reminder needs the trigger gateway
+    (phase-auto-03) and the supervised worker (phase-auto-05); a pull reminder can ride the session
+    briefing (phase-syn-02). Name which the first build phase delivers.
+  - Add the plan section and session-sized build phases, with depends_on edges to the auto phases
+    where push is chosen.
+  acceptance:
+  - A requirement document exists and every row maps to at least one new phase.
+  - The delivery channel is the owner's recorded choice, not an assumption.
+  - The owner's answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/06-requirements/
+  - docs/01-plans/PLAN-044-productivity-core-enhancements.md
+  - docs/09-backlog/README.md
+  next_action: Specification only. Read phase-sig-03's result for what the ledger holds before
+    specifying what a reminder says.
+- id: phase-pc-06
+  title: Specify external intake from email, calendar and meeting transcripts
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  systems:
+  - sys-capture
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-cap-08
+  scope:
+  - Write the requirement for external intake (idea 000363) as new raw-intake channels that flow
+    through the same structuring, routing and owner promotion.
+  - One requirement section per source, each naming its access method and credential decision (OAuth,
+    local export or a watched folder), which the owner makes.
+  - State for each source where raw data is stored (gitignored, under the private root), what staging
+    keeps, and what promotion may write (ADR-009, PLAN-006).
+  - Add the plan section and session-sized build phases.
+  acceptance:
+  - A requirement document exists and every row maps to at least one new phase.
+  - Every source has a recorded access and storage decision from the owner.
+  - The owner's answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/06-requirements/
+  - docs/01-plans/PLAN-044-productivity-core-enhancements.md
+  - docs/09-backlog/README.md
+  next_action: Specification only. Handle no real mail, calendar or transcript content in this
+    session; the questions are about access and storage, not samples.
+- id: phase-pc-07
+  title: Close ARCH-010's identity, party, role and object-policy gates
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  - doc-schema-decision-reconciliation
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Put ARCH-010's Identity, Party contracts, Roles and aliases, and Object policies gates to the owner
+    as batched questions, each with a recommendation, and record the answers in ARCH-010.
+  - These four come first because every later gate refers to identities, parties or the event
+    envelope.
+  - Build nothing and write no schema.
+  acceptance:
+  - Each of the four gates in ARCH-010's Remaining work table is marked decided, with the decision
+    stated, or is marked deferred with the owner's reason.
+  - The answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/07-architecture/ARCH-010-schema-decision-reconciliation.md
+  next_action: Design only (idea 000365). Read ARCH-007 and ARCH-010 in full first; the accepted
+    decisions constrain the questions.
+- id: phase-pc-08
+  title: Close ARCH-010's commercial lifecycle, relationship, WBS and contract gates, with the opportunity entity
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  - doc-schema-decision-reconciliation
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-pc-07
+  scope:
+  - Put ARCH-010's Commercial lifecycle, Relationships, WBS and Contract/template assets gates to the
+    owner and record the answers in ARCH-010.
+  - Decide the opportunity entity (idea 000364) here - its states, transition guards and conversion
+    into one or more engagements - since it depends on the commercial lifecycle and relationships gates.
+  - Build nothing and write no schema.
+  acceptance:
+  - Each of the four gates is marked decided or deferred with the owner's reason.
+  - The opportunity entity's states and its conversion to engagements are recorded.
+  - The answers are recorded in GOV-003.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/07-architecture/ARCH-010-schema-decision-reconciliation.md
+  next_action: Design only. Start from phase-pc-07's recorded identity and party decisions.
+- id: phase-pc-09
+  title: Close ARCH-010's remaining gates and write the organisational model's requirement and plan
+  plan: doc-productivity-core-enhancements
+  sources:
+  - doc-productivity-core-enhancements
+  - doc-schema-decision-reconciliation
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-pc-08
+  scope:
+  - Put ARCH-010's Registry coverage, Projection integrity, Vocabulary and Idea lineage gates to the
+    owner and record the answers.
+  - Write the requirement and a new plan for the organisational model (ideas 000257 to 000267 and
+    000364), with session-sized build phases under a new prefix registered in the backlog README.
+    000255 and 000256 stay parked as ARCH-010 marks them.
+  - Satisfy ARCH-010's Delivery row, including the adversarial review it names.
+  acceptance:
+  - Every row in ARCH-010's Remaining work table is decided or deferred with a reason.
+  - A requirement and a plan exist, and every requirement row maps to at least one new phase.
+  - An adversarial review of the plan is recorded, with every finding fixed or accepted.
+  verification:
+  - uv run python -m src.governance
+  - uv run python -m src.governance --ready
+  deliverables:
+  - docs/07-architecture/ARCH-010-schema-decision-reconciliation.md
+  - docs/06-requirements/
+  - docs/01-plans/
+  - docs/09-backlog/README.md
+  next_action: Specification only. Allocate the requirement and plan codes with --next-code; do not
+    reuse PLAN-044.
