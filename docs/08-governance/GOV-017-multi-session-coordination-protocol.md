@@ -126,9 +126,10 @@ column is empty against every active claim, and takes the earliest such phase in
 order (`next_up` first). **The owner approves each assignment** before it is sent. `/session-start`'s
 own claim-approval question still goes to the owner as written.
 
-The Conflicts column can miss real overlap: phases that edit the same directory under different
-system ids are not flagged (ideas `000321`, `000322`). The Scout's candidate reports name such
-hazards, and **two phases a Scout report flags as overlapping never run at the same time**, even
+The Conflicts column compares a phase only against phases already active, and only through their
+declared systems and deliverable paths (`collisions()` in `src/governance/backlog.py`). It therefore
+misses a phase assigned but not yet claimed, and files a phase will edit without declaring them. The
+Scout's candidate reports check both against the assignments in flight and name such hazards, and **two phases a Scout report flags as overlapping never run at the same time**, even
 when the Conflicts column is empty.
 
 Two notices keep slot allocation ahead of new work: the Batch Runner sends `NEXT-BATCH` before it
