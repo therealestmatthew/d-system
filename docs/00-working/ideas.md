@@ -15686,6 +15686,7 @@ already delivers this idea's actual ask.
 **Links**
 
 - relates_to → `000320`
+- relates_to → `000347`
 - relates_to ← `000320`
 - relates_to ← `000327`
 - relates_to ← `000332`
@@ -15779,6 +15780,7 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 **Links**
 
 - relates_to → `000319`
+- relates_to → `000347`
 - relates_to ← `000319`
 - relates_to ← `000327`
 - relates_to ← `000334`
@@ -16202,6 +16204,7 @@ PROPOSED LINK: 000327 --relates_to--> 000319 (Session Manager setup raises the s
 - relates_to → `000168`
 - relates_to → `000248`
 - relates_to → `000319`
+- relates_to → `000347`
 - extended_by ← `000328`
 - extended_by ← `000332`
 - relates_to ← `000334`
@@ -16278,6 +16281,7 @@ No related plan, phase or document found beyond the two governance documents and
 **Links**
 
 - extends → `000327`
+- relates_to → `000347`
 - relates_to ← `000334`
 
 ---
@@ -16514,6 +16518,7 @@ PROPOSED LINK: idea 000332 --relates_to--> 000319 (both aim to make decisions an
 
 - extends → `000327`
 - relates_to → `000319`
+- relates_to → `000347`
 
 ---
 
@@ -16668,6 +16673,7 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to → `000328`
 - relates_to → `000320`
 - relates_to → `000247`
+- relates_to → `000347`
 - relates_to ← `000340`
 
 ---
@@ -16856,7 +16862,7 @@ Phase-cap-06 is queued but not yet complete; the identity call for new categorie
 
 ## 000338 · Amend PLAN-039.01 to name the per-idea dispatch-authorization gate that phase-irs-04 added to the intake graph
 
-**Created 2026-09-23T00:50:45-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:45-04:00 · Status: `triaged`**
 
 From Session 5 - Batch Runner, 2026-09-23.
 
@@ -16868,11 +16874,55 @@ What it would touch: docs/01-plans/PLAN-039.01 (sections 1 and 7), and possibly 
 
 Unresolved: where the per-idea owner decision is recorded (an idea annotation, a status, or a separate record), and whether other run kinds need the same gate.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:39-04:00): # Triage Finding: Idea 000338
+
+**Idea:** Amend PLAN-039.01 to name the per-idea dispatch-authorization gate that phase-irs-04 added to the intake graph
+
+## Summary
+
+This idea requests a documentation amendment to PLAN-039.01 sections 1 and 7 to formally document a dispatch-authorization gate that phase-irs-04 has implemented in the intake graph. The gate was approved by the owner on 2026-09-23 as a deviation from the existing plan. It requires a recorded owner decision for each idea before triage dispatch can proceed, in addition to the tick-level `--dispatch` flag.
+
+## Related Documents and Plans
+
+**Primary document requiring amendment:**
+- PLAN-039.01 (Orchestrator design) - Child plan of PLAN-039; its run-kind table (§1) and gates section (§7) do not currently document this per-idea gate, creating a divergence between documented design and implemented code.
+
+**Active implementation phase:**
+- phase-irs-04 (LangGraph orchestrator skeleton with interrupt gates and the thin-state rule) — currently active in the backlog; this phase implements the intake graph where the dispatch-authorization gate lives. The phase is building PLAN-039.01's design; this amendment ensures the plan's documentation stays current with the implementation.
+
+**Related governance:**
+- GOV-014 (Realization role contracts) — documents the role contracts and dispatch authorization mechanisms
+- REQ-022 (Idea realization system requirements) — captures the intake stage requirements that this gate supports
+
+## Unresolved Questions
+
+Per the idea's own statement, two details remain unresolved:
+1. **Where the per-idea owner decision is recorded** — whether as an idea annotation, a status field, or a separate record type
+2. **Whether other run kinds need the same gate** — intake is documented here, but batch/unit/realization runs may need similar per-item owner authorization
+
+These details should be clarified before the amendment is committed, likely during phase-irs-04's session record or gate-decision documentation.
+
+## Overlap Analysis
+
+No overlapping ideas identified. Searched related ideas about orchestrator design (000247: "Formalize the idea realization system"; 000248: "Expand the orchestrator daemon"; 000249, 000250: future directions), but none propose the same documentation amendment or conflict with this idea's scope.
+
+## Outcome
+
+This is a straightforward documentation amendment once the unresolved implementation details are finalized. No promotion or link proposals apply.
+
+</details>
+
 ---
 
 ## 000339 · The partition pack's A2 prompt reads a staging document that exists only in the coordinator's worktree, so A2 cannot find it
 
-**Created 2026-09-23T00:50:45-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:45-04:00 · Status: `triaged`**
 
 From Session 2 - Builder B, 2026-09-23, found during phase-part-03.
 
@@ -16884,11 +16934,60 @@ What it would touch: PROMPT-034's A2 prompt, and possibly REQ-009 and the /parti
 
 Unresolved: the fix. Options include passing A2 the worktree's absolute path, having the coordinator place the draft where subagents can read it (for example _tmpagent/ with a claim, or the scratchpad), or running the A2 subagent inside the coordinator's worktree.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:39-04:00): # 000339: The partition pack's A2 prompt reads a staging document that exists only in the coordinator's worktree, so A2 cannot find it
+
+## Summary
+
+The `/partition-ideas` workflow (implemented in phase-part-03, guided by PLAN-025 and REQ-009) has a blocking issue: the A2 audit prompt in PROMPT-034 instructs the adversary to read "the merged staging document in docs/00-working/", but the document is written by the coordinator to their own worktree, while A2 runs in the primary checkout. As a result, A2 cannot locate the document.
+
+## Related documents
+
+**PROMPT-034** (Reusable partition pack): Contains the A2 audit brief (section A2, lines 370-410), which asks the auditor to read "the merged staging document in docs/00-working/" as input.
+
+**REQ-009** (Repeatable idea-partition requirements): Section "Two harness constraints bind the design" (lines 76-80) explicitly documents that "subagents also inherit the primary checkout as their working directory regardless of the coordinator's worktree, so corpus and report paths resolve there rather than in the worktree."
+
+**PLAN-025** (Repeatable idea partition — a reusable pack, a status flag and one workflow): Documents the constraint at lines 114-118, stating that subagents inherit the primary checkout and the corpus and reports live in the primary checkout's gitignored `_working/idea-corpus/`.
+
+**.claude/skills/partition-ideas/SKILL.md** (in agent/phase-part-03 branch): Implements the workflow and documents the stoppage at section 6 (Audit 2 — A2): "The owner ruled on 2026-09-23 that this workflow stops here until that is resolved; it does not copy the draft into the primary checkout on its own." The workflow asks the owner to decide how audit 2 should read the draft.
+
+**PLAN-015** (Ephemeral working plans and the working directory): Lines 58-77 explain that ignored files do not reach worktrees and that `_tmpagent/` (tracked and shared) is the solution for sharing files between worktrees. This provides one potential path for resolution.
+
+**ADR-010** (Idea staging): Governs where staging artifacts belong (docs/00-working/ per line 32 of PROMPT-034).
+
+## Technical constraint
+
+The issue stems from a fixed harness constraint (REQ-009, R11): subagents run in the primary checkout regardless of where the coordinator's worktree is located. The partition staging document is written to docs/00-working/ in the coordinator's worktree during synthesis (step 5 of the workflow), making it inaccessible to A2, which runs later as a subagent in the primary checkout.
+
+## Options already identified
+
+The idea itself lists three options:
+1. Pass A2 the worktree's absolute path (as an argument to the A2 prompt)
+2. Have the coordinator place the draft where subagents can read it (e.g., in `_tmpagent/` with a claim, per PLAN-015's mechanism, or in the scratchpad)
+3. Run the A2 subagent inside the coordinator's worktree
+
+## Current state
+
+The workflow was built with a workaround: it stops before dispatching A2 and asks the owner to decide how to proceed. This is captured in the SKILL.md (section 6) and was recorded as the owner's ruling on 2026-09-23. The issue remains unresolved pending the owner's direction on which solution to pursue.
+
+## Related overlap
+
+Idea 000206 documents a symmetric harness constraint: subagents cannot write report files. That constraint was resolved by having the coordinator transcribe returned reports, a pattern that now affects every pack using report files as hand-offs between dispatches and gates. The A2 issue here is the inverse: a subagent cannot read a file written by the coordinator in a sibling worktree.
+
+PROPOSED LINK: 000339 --relates_to--> 000206 (both document harness constraints on subagent I/O; A2's read constraint mirrors 000206's write constraint)
+
+</details>
+
 ---
 
 ## 000340 · Monitor each parallel session's context use and have the Session Manager find safe points to clear or compact each one
 
-**Created 2026-09-23T00:50:46-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:46-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-23 and forwarded by the Session Manager.
 
@@ -16907,17 +17006,61 @@ Unresolved:
 
 Related: 000319 (state capture and session resumability), 000334 (the Session Manager system in the delivery system), 000327 (the session roster).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:39-04:00): # Triage: 000340 — Monitor each parallel session's context use and have the Session Manager find safe points to clear or compact each one
+
+## Idea
+000340 proposes that the Session Manager (introduced in 2026-09-22 as part of GOV-017 and PROMPT-037) should monitor each parallel session's context use and identify safe points to clear or compact session state without losing work.
+
+## Existing Related Work
+
+### Governed Documents
+**GOV-017** (Multi-session coordination protocol) defines the Session Manager system that coordinates parallel interactive sessions. It covers session roles (meta sessions: Session Manager, Ideation, Prompt Planner; execution sessions: Batch Runner, two Builders, Standby Builder, Scout), the primary-checkout lock, claim-slot allocation, merge approval relay, and the message contract between sessions. The board is kept at `_working/session-manager/board.md` (gitignored).
+
+**PROMPT-037** (Session Manager kickoff and starter messages) carries the text the owner pastes to activate the multi-session protocol and the starter messages for each role. It specifies no tests in the primary checkout and one pytest run at a time per worktree to avoid catalog corruption.
+
+Both documents define the current protocol but do not address context usage monitoring. The idea's body lists unresolved questions:
+- What counts as "state on disk" for each role (for Ideation: drafted rulings and ideas written, not just kept in scratchpad)
+- Whether a cleared session needs a resume brief to pick up its role
+- The threshold at which to act (context usage ceiling)
+
+**PLAN-039.01** (Orchestrator design) designs the LangGraph orchestrator for the autonomous idea-realization system with four run kinds (`intake`, `batch`, `unit`, `realization`). It touches on state management through a run ledger (`_data/runs.jsonl`) and re-derivation rules, but is not about the interactive Session Manager protocol.
+
+### Related Ideas
+Three ideas are correctly linked as `relates_to`:
+- **000319** (Investigate proper state capture and session resumability) — addresses what state must be captured for sessions to resume cleanly
+- **000327** (A roster of role-based parallel interactive sessions...) — the foundational idea that became GOV-017
+- **000334** (Carry the Session Manager system into the automated agency delivery system built on LangGraph and the Claude Agent SDK) — addresses how to integrate GOV-017 into the autonomous operations layer
+
+## What This Idea Asks For
+The idea asks for monitoring mechanisms and safe-point detection within the existing multi-session coordination framework. Automating it would require:
+- The Agent SDK or LangGraph layer to read context usage and programmatically start or restart sessions
+- Mechanisms to measure context consumption per session
+- Rules for what constitutes a "safe point" (when no lock is held and state is on disk)
+- Potentially resume briefs if sessions need to be restarted after being cleared
+
+## Finding
+000340 identifies a capability gap in the Session Manager system defined in GOV-017 and implemented in PROMPT-037. The protocol successfully coordinates parallel sessions through locks and messages, but does not automate context monitoring or provide guidance on when and how to clear/compact long-running sessions. This touches coordination protocol (GOV-017) and the delivery system (000334). No related plan, phase or requirement document yet addresses context usage monitoring for the interactive multi-session roster.
+
+</details>
+
 **Links**
 
 - relates_to → `000319`
 - relates_to → `000334`
 - relates_to → `000327`
+- relates_to → `000347`
 
 ---
 
 ## 000341 · sys-capture's paths in the systems registry omit the phase-cap-05 and phase-cap-06 files, so the registry no longer shows where capture lives
 
-**Created 2026-09-23T00:50:46-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:46-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, 2026-09-23, noticed during phase-cap-06.
 
@@ -16929,6 +17072,43 @@ What it would touch: the sys-capture entry in the systems registry (systems.yaml
 
 Unresolved: whether the governance check should flag files under a system's directories that the system's registered paths do not list, so the registry cannot silently fall behind again. Also whether phase completion should require updating the registry.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Triage: 000341 — sys-capture's paths in the systems registry
+
+## Finding
+
+The idea accurately reflects the current state of `docs/08-governance/systems.yaml` (`sys-capture` entry, lines 48–71). The registry lists nine paths from phase-cap-03 and phase-cap-04:
+- `src/capture/raw.py` (phase-cap-03)
+- `tools/capture.py` (phase-cap-04)
+- Four schemas and test files (phases -03 and -04)
+
+But `src/capture/structure.py` and `src/capture/routing.py` exist on disk, added by phase-cap-05 ("structuring and routing", documented in PLAN-009-capture-build.md). The registry does not list them, so `tools/load_context.py` and session scoping cannot find which files belong to capture without grepping the whole repository.
+
+**Related ideas and governance constraints:**
+
+1. **000027** ("No mechanical check that a completed phase's actual diff stayed inside its declared systems/deliverables") — addresses the sibling problem: phases can edit files outside their declared systems/deliverables, but the governance check does not catch this, only diff review does (GOV-002, line 90: "the declarations are what the validator can see, and diff review is what confirms the work stayed inside them").
+
+2. **000023** ("_tmpagent/'s claim protocol has no entry in the systems.yaml maturity registry") — same registry gap: another subsystem (_tmpagent/AGENTS.md and claims.jsonl) is active and documented but not registered.
+
+3. **GOV-002** explicitly documents that "two things are deliberately not machine-checked": phase stray beyond declared paths (mentioned above), and adjacency in the dependency graph. The governance check will not flag 000341's condition — it can only detect registry-declared paths, not actual files.
+
+The idea's unresolved questions are well-founded: whether the governance check should flag files under a system's declared directories that the system's registered paths do not list (would catch this immediately and prevent future drift), and whether phase completion should require an explicit registry update step. Currently, neither gate exists, so registry gaps survive only by diff review catching them during session handoff or by someone noticing the mismatch by hand.
+
+## Proposed overlaps
+
+The idea overlaps with but does not subsume 000027, which frames the broader mechanical-check question. 000027 asks whether phases can stray; 000341 asks whether the registry can fall behind. Both surface the same enforcement gap (deliberately unchecked per GOV-002), but tackle it from different angles.
+
+PROPOSED LINK: 000341 --relates_to--> 000027 (both expose registry/systems drift that governance check deliberately does not flag)
+
+PROPOSED LINK: 000341 --relates_to--> 000023 (parallel registry-entry gaps in separate subsystems)
+
+</details>
+
 **Links**
 
 - relates_to ← `000342`
@@ -16937,7 +17117,7 @@ Unresolved: whether the governance check should flag files under a system's dire
 
 ## 000342 · REQ-002's status note still says only R1, R2 and R5 are implemented, but phase-cap-05 and phase-cap-06 now implement R3, R4 and R6 to R15
 
-**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:47-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, 2026-09-23, noticed during phase-cap-06.
 
@@ -16951,6 +17131,44 @@ Unresolved: whether to refresh the note when phase-cap-06 merges, since phase-ca
 
 Related: the idea recorded in the same turn about sys-capture's paths in the systems registry falling behind phase-cap-05 and phase-cap-06. Both are records that did not keep up with the capture build.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Idea 000342: REQ-002's status note is stale after phase-cap-05 completion
+
+## Finding
+
+Idea 000342 identifies an accurate documentation drift: the status note in REQ-002 (Capture and structuring requirements) currently states on line 20-22 that "R1, R2 and R5 are implemented (raw-only CLI and inbox intake, `phase-cap-04`); everything else — structuring, routing, review, promotion and the entity model — is still proposed only."
+
+This status is now stale. The backlog.yaml records confirm:
+
+- **phase-cap-04** (complete): Implemented R1, R2, R5 — raw intake only, no structuring
+- **phase-cap-05** (complete): Implements R3, R4, R6-R8 — evidence scoring per field, protected-field validation, routing rules, and all three channels converging
+- **phase-cap-06** (active): Implements R9-R15 — bulk promotion, review presentation, identity decisions, and dated corrections
+- **phase-cap-07** (complete): Implements R18-R24 — entity model projection into DuckDB
+
+The idea correctly notes that the status note misrepresents the current delivery state and would mislead readers about what is actually built. The note should be refreshed to reflect post-phase-cap-05 reality — at minimum acknowledging that structuring, routing, and field-level evidence (R3, R4, R6-R8) are now complete, and that review and promotion (R9-R15) are under active development in phase-cap-06.
+
+The idea also surfaces an unresolved question about timing: whether to refresh the note when phase-cap-06 merges (since it completes part of the list) or in a separate small change, and whether requirement status notes should be updated as part of phase completion in general. That is a legitimate governance question worth surfacing to the owner.
+
+## Related context
+
+- **PLAN-009** (Build the capture and structuring system) defines the phases and their scope
+- **REQ-002** status note (docs/06-requirements/REQ-002-capture-requirements.md, line 20-22) is the exact subject
+- **Backlog.yaml** records the actual status of each phase
+- **Already linked:** 000341 (sys-capture paths in the systems registry omit phase-cap-05 and phase-cap-06 files) — both ideas capture a pattern of documentation falling behind as capture implementation advanced; both are records that did not keep up with the build
+
+No other ideas found with direct overlap to this specific documentation refresh task.
+
+## Conclusion
+
+This is a concrete, actionable finding about a documentation maintenance task that would benefit readers and prevent misconceptions about implementation scope. The idea correctly identifies both the specific stale statement and the broader governance question about how to keep status notes synchronized with actual delivery.
+
+</details>
+
 **Links**
 
 - relates_to → `000341`
@@ -16959,7 +17177,7 @@ Related: the idea recorded in the same turn about sys-capture's paths in the sys
 
 ## 000343 · Rule whether tags created from a capture belong in the tracked _data/tags.json, since a client-name tag approved in review would be committed
 
-**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:47-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, 2026-09-23. It arose from the owner's ruling during the phase-cap-06 review.
 
@@ -16980,9 +17198,53 @@ Unresolved: which option; whether the same question applies to categories under 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T00:50:47-04:00): Owner ruling, 2026-09-23 (asked by Ideation): tags promoted from a capture go under the private, gitignored data root (_private/portfolio/ for real records). The tracked _data/tags.json keeps only the shared, non-confidential taxonomy, so nothing a capture produces can be committed by accident. Chosen over splitting the tag file, over keeping one tracked file with a confidentiality check, and over deciding later.
+- **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Triage Finding: 000343
+
+**Idea 000343:** Rule whether tags created from a capture belong in the tracked _data/tags.json, since a client-name tag approved in review would be committed
+
+## Summary
+
+Idea 000343 raises a critical confidentiality risk: if tags created during capture intake are promoted into _data/tags.json (the tracked taxonomy), then a tag created from a real client name could be committed to git history, violating the rule in AGENTS.md that forbids writing confidential identifiers into tracked files. The owner has already ruled on this idea (2026-09-23): tags promoted from a capture go under the private, gitignored data root (_private/portfolio/ for real records); the tracked _data/tags.json keeps only shared, non-confidential taxonomy.
+
+## Related Documents and Context
+
+**ADR-009 (structure/content boundary)** — Establishes the core principle that structure is tracked and content is not. A client identifier in a tag is content, not structure. This ADR defines the test: "would this file still be correct if a different person adopted the system?" A tag named after a real client clearly fails this test. The ADR records that the history was squashed on 2026-09-09 specifically to remove identifiers that appeared in earlier commits.
+
+**PLAN-006 (confidentiality sweep)** — Completed on 2026-09-09, verified that no confidential identifier names any path or blob in the tracked tree, and only then pushed to origin. The plan documents that a client identifier was found as a first-class tag in _data/tags.json and had to be removed, making this idea's concern a concrete past incident.
+
+**AGENTS.md (Confidentiality and publishing section)** — Explicitly forbids: "Never write a confidential identifier into a tracked file — not in code, a document, a commit message, or a session record describing the identifiers." This is the governing rule that 000343 is asking how to apply within the capture promotion workflow.
+
+**GOV-001 (data root rule)** — States that "_data/tags.json and _data/ideas.jsonl are shared taxonomy and process data, not portfolio content, and are always read from the tracked _data/ regardless of the override." This clarifies that tags.json is intended for shared identifiers, not capture-derived ones.
+
+**PLAN-009, phase-cap-06** — The active phase currently building review and promotion into the source of truth. The phase scope includes "take the identity decision for held people, projects, tags and tag categories" but does not specify where promoted tags are written. The owner's ruling on 000343 answers this: they belong in the private data root, not _data/tags.json.
+
+## Related Idea
+
+**000337 (tag category approval path)** — Linked as `relates_to`. The owner ruled on 000337 (2026-09-22) that tag categories should move out of the enum in schemas/tag.schema.json and into data such as _data/tags.json. There is a potential tension between the two rulings: if categories live in _data/tags.json (a structure decision for 000337's approval path), but capture-derived tags should not go there (the content boundary of 000343), then the implementation must distinguish between shared taxonomy categories and capture-derived identifiers. The ruling on 000343 treats this by sending all capture-derived tags to _private/portfolio/, keeping _data/tags.json reserved for the shared taxonomy only. This is consistent with both decisions.
+
+## Owner Ruling (Already Recorded)
+
+The owner ruled on 2026-09-23:
+
+> Tags promoted from a capture go under the private, gitignored data root (_private/portfolio/ for real records). The tracked _data/tags.json keeps only the shared, non-confidential taxonomy, so nothing a capture produces can be committed by accident. Chosen over splitting the tag file, over keeping one tracked file with a confidentiality check, and over deciding later.
+
+This ruling closes the three unresolved alternatives named in the idea's body.
+
+## Implementation Status
+
+Phase-cap-06 is active. The promotion code must be updated to:
+1. Write any tag created from a capture to the private data root (_private/portfolio/tags.json or equivalent location under D_SYSTEM_DATA_ROOT)
+2. Preserve the current behavior of writing shared taxonomy tags to _data/tags.json only
+3. Ensure _data/tags.json never gains a tag that originated from captured content, eliminating the accidental-commit risk
+
+The distinction is driven by the ruling on 000337: once tag categories move into data (not schema), the categories themselves (shared structure) belong in _data/tags.json; the capture-derived instances (content) belong in _private/portfolio/.
+
+## No Unaddressed Overlap
+
+The linked idea 000337 is the only other idea touching this decision. No other idea proposes an overlapping approach to capture-derived tags or related data-root placement. Ideas that mention tags broadly (000018, 000004, etc.) address different concerns (idea tagging, search, RAG) and do not propose a capture integration path.
 
 </details>
 
@@ -16994,7 +17256,7 @@ Unresolved: which option; whether the same question applies to categories under 
 
 ## 000344 · Archive a local copy of every source the literature review references
 
-**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:47-04:00 · Status: `triaged`**
 
 From Session 4 - Scout, 2026-09-23. It recovers an owner ask that never reached dev.
 
@@ -17011,6 +17273,57 @@ Unresolved:
 
 Related: 000315 (the literature campaign's recommendations have no consuming phase), which the owner ruled on 2026-09-23 should get a phase.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Triage finding for idea 000344
+
+Idea 000344: "Archive a local copy of every source the literature review references"
+
+## What was found
+
+This idea has already recovered a draft plan from the unmerged branch `agent/research-article` where the owner's original ask (posed during phase-lit-07 on 2026-09-14) was captured. The draft plan (PLAN-039-literature-review-source-archival.md on the unmerged branch) exists and is 141 lines long, covering scope, constraints, storage options, fetch tooling, and acceptance checks.
+
+### Related governed documents
+
+**Literature campaign plans and phases:**
+- PLAN-023-literature-review-campaign — the main literature campaign plan that encompasses phase-lit-01 through phase-lit-09 (and phase-lrr-* phases for reporting)
+- phase-lit-07 (Literature review Pass 4 — synthesis): where the owner's question "do we have a copy saved of every article or source we are referencing?" was asked on 2026-09-14
+- No existing plan, requirement or phase on dev yet addresses source archival; the draft on the unmerged branch is currently the only governed proposal
+
+### Related ideas
+
+000315 (The literature campaign's recommendations have no consuming phase) — already linked as `relates_to` on this idea. That idea covers the gap in consuming the campaign's synthesis outputs (09_reuse_recommendations.md and 10_architecture_implications.md), while 000344 covers archiving the input materials. Both are post-campaign follow-on work but distinct in scope.
+
+### Status of the draft plan
+
+PLAN-039-literature-review-source-archival.md is draft-status on the unmerged branch with five open owner decisions that it explicitly flags:
+- Scope tier: A (49 deep-read sources), B (~1,067 kept sources), or C (~1,121 all sources)
+- Storage location under `_private/`
+- Backup/durability mechanism
+- Fetch tooling per source type
+- Re-fetch policy for updated sources
+
+The draft mentions that phase-arc-01 (requirements and design, not implementation) is the intended first phase, but no phase-arc-* phases exist on dev yet. The unmerged branch does show a research/sources/archive-extractions/ directory with example archive structures and some pre-existing archive material already being collected.
+
+### Code collision issue
+
+PLAN-039 on dev is now allocated to the orchestrator design (PLAN-039-idea-realization-system.md, dated 2026-09-15 and updated 2026-09-16). The draft plan on the unmerged branch used PLAN-039 originally, but that code has since been claimed for a different document. The owner's recovery of this idea (capturing it on Session 4 - Scout, 2026-09-23) notes this collision: "That record used an idea id and a PLAN-039 code that dev has since reused for other things, so it never reached dev."
+
+## Conclusion
+
+000344 recovers a well-developed draft plan that did not reach dev because the unmerged branch holding it was never integrated. The idea itself is complete and well-stated. The plan needs:
+1. A new plan code (PLAN-039 is taken on dev)
+2. Owner decisions on the five open questions
+3. Decision whether to salvage the draft as-is or let phase-arc-01 re-scopes it
+
+No related plan or requirement document on dev currently addresses source archival. The already-linked idea (000315) is related but distinct — it covers recommendations consumption, not source archival.
+
+</details>
+
 **Links**
 
 - relates_to → `000315`
@@ -17019,7 +17332,7 @@ Related: 000315 (the literature campaign's recommendations have no consuming pha
 
 ## 000345 · project.repository has no column in the DuckDB database, so the rebuild drops it without warning
 
-**Created 2026-09-23T00:50:48-04:00 · Status: `open`**
+**Created 2026-09-23T00:50:48-04:00 · Status: `triaged`**
 
 From Session 4 - Scout, 2026-09-23. Found in the unmerged Codex review on branch agent/schema-review-01.
 
@@ -17033,3 +17346,132 @@ Unresolved:
 - Add the column, or remove the field from the schema.
 - Whether the rebuild should fail or warn when a schema field has no matching column, which would catch the whole class of problem.
 - What else the unmerged review on agent/schema-review-01 found that never reached dev.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:41-04:00): # 000345: project.repository has no column in the DuckDB database, so the rebuild drops it without warning
+
+## What was found
+
+Idea 000345 reports a real silent data loss bug in the schema-to-database projection:
+
+**Schema presence**: `schemas/project.schema.json` lines 53–56 define a `repository` field as a VARCHAR string: "Where this project's own code or content actually lives, when it is not this repository — a local path or a remote URL."
+
+**DDL absence**: `sql/001_schema.sql` lines 4–17 create the `projects` table with 12 columns (id, name, status, category, type, description, tags, started, target_date, last_reviewed, review_cadence, notes). No `repository` column exists.
+
+**Rebuild data loss**: `tools/rebuild_db.py` lines 149–158 load projects with an INSERT statement that supplies exactly 12 values, matching the 12 DDL columns. The `repository` field is read from the JSON source (`p.get("repository")` would retrieve it from the schema-validated input) but never appears in the insert parameter list. The field silently drops.
+
+**Validation passes, queryability fails**: A project JSON file with a `repository` field validates successfully against the schema, but once rebuilt into DuckDB, the field is gone. Any code attempting to query `projects.repository` fails; there is no warning during rebuild.
+
+## Related documents and decisions
+
+**ARCH-009 (Adversarial schema, source and projection review)** — This review explicitly identifies "projection loss of repository/capture fields" as one of its findings (mentioned in ARCH-010 line 79). The review flagged this class of problem, and ARCH-010 lines 78–79 note that "a separate ARCH-009-schema-adversarial-review.md" on the unmerged branch agent/schema-review-01 identified the same issue. The problem was carried forward into the integrated review but not yet acted on.
+
+**PLAN-035 (Schema consistency and testing, P8)** and **REQ-020** — These documents implement a schema/DDL consistency check to catch this class of drift. However, REQ-020 R03 specifies the check should catch divergence between "CLAUDE.md, the DDL and `src/models/`", making it a model-boundary check. Whether that scope includes a direct schema-to-DDL comparison (which would catch `project.repository` immediately) depends on phase-sch-01's implementation. The check may pass zero if it only examines Pydantic model and TypeScript type coverage, never looking at the raw gap between JSON schema and SQL table definitions.
+
+**Idea 000024** — "Four entity schemas are validated in the pipeline with no DDL table" — addresses a related but distinct issue: four entity types (interactions, decisions, waiting-on, development-events) with schemas but no DDL tables at all. That drift has been partially resolved (PLAN-035 confirms the four tables now exist in sql/001_schema.sql lines 81–140), though documentation lags. The `project.repository` case is different: the table exists, one column is missing, and the loss happens silently without even a validation warning.
+
+## Why this matters
+
+The JSON is the source of truth (ADR-009). A field that passes schema validation but never reaches the database suggests storage while actually losing data. Unlike a completely absent field, this creates a "looks stored but cannot be queried" state where downstream code either (a) must never rely on the field, or (b) silently produces null/missing results that look like the field was never set rather than was lost in rebuild.
+
+## What remains unresolved
+
+1. **Add the column** to `sql/001_schema.sql` and update the rebuild to insert it, or **remove the field** from `schemas/project.schema.json` if the field was never intended for the DuckDB query layer.
+2. **Warn or fail during rebuild** if a schema field has no matching DDL column — this catches the whole class of problem, not just `repository`.
+3. **Examine the unmerged review** on agent/schema-review-01 to surface any other fields suffering the same loss that the integrated ARCH-009 review may not have named explicitly.
+
+No existing open idea overlaps with the specific `project.repository` field issue. Idea 000024 covers the broader schema/DDL mismatch category but focuses on missing tables, not missing columns.
+
+</details>
+
+---
+
+## 000346 · Add a pre-tool guard that refuses a Bash command whose heredoc body contains its own terminator line
+
+**Created 2026-09-23T01:11:38-04:00 · Status: `triaged`**
+
+From Session 2 - Builder B, 2026-09-23. The owner approved recording it through the log-anti-patterns skill.
+
+As given: add a pre-tool guard that refuses a Bash command whose heredoc body contains its own terminator line. An example is a <<'EOF' body that contains a line that is exactly "EOF".
+
+What happened: on 2026-09-23 in phase-part-03, this collision ended a heredoc early. Bash then ran the rest of the text as commands, and backtick fragments in it ran as command substitutions. One of them built a full corpus into the worktree root.
+
+Why it matters: quoting the delimiter (<<'EOF') stops variable and command expansion inside the body, but only while the body lasts. If the body contains the terminator line, everything after it runs as shell. Prose and file content pasted into a heredoc can easily contain a line like "EOF", especially when the content is itself about shell. This is the same class of failure that permanently corrupted idea 000019 through a shell-quoted --body, and the reason the idea skill requires --file.
+
+What it would touch: a PreToolUse hook on Bash in .claude/settings.json (changing that file needs the owner's approval), and the procedure brain/procedures/never-pass-file-content-through-a-heredoc.md, which merged onto dev at a37455c just before this idea was recorded.
+
+Unresolved:
+- Detection rules: which heredoc forms to parse (<<, <<-, quoted or unquoted delimiters, several heredocs in one command), and whether to refuse or only warn.
+- Whether the guard should also refuse heredocs that write file content at all, pointing to the Write tool instead, as the procedure's title suggests.
+- How the guard coexists with the broker's per-role blocks (000333).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-23T01:11:41-04:00): Triage finding for idea 000346.
+
+Addresses a real failure mode from phase-part-03 (2026-09-23): a heredoc whose body contains its own terminator line ("EOF" in this case) causes the remainder of the text to run as shell commands, executing backticks and command substitutions uncontrollably. This is the same failure class that corrupted idea 000019 (Extend idea schema with Notes, Review, and Linkage) through a shell-quoted --body argument; OPS-005 (Append an event to the idea log) now mandates --file over --body precisely to avoid this.
+
+Related work already exists:
+- **Existing PreToolUse hooks** are documented in SESS-2026-09-22-11-capability-and-approval-broker.md; Claude Code already supports wiring guards into .claude/settings.json, and hooks blocking writes to AGENTS.md and CLAUDE.md have been proven to work (as of 2026-09-12).
+- **ADR-022** (Build the capability broker before the gateway, ledger or worker) frames the tool-boundary enforcement mechanism that pre-tool guards would occupy.
+- **Idea 000051** (Agent harness and guardrails) covers the broader category of enforcement mechanisms (hooks, tests, settings.json configuration) to which this guard belongs.
+
+Unresolved questions named in the idea itself:
+- Detection rules: which heredoc forms to parse (<<, <<-, quoted/unquoted delimiters, multiple heredocs per command), and whether to refuse or only warn on collision.
+- Whether the guard should also refuse heredocs that write file content, redirecting authors to the Write tool instead (suggested by the procedure title on agent/heredoc-procedure branch).
+- How this specific guard coexists with the broker's per-role capability blocks (idea 000333).
+
+The procedure brain/procedures/never-pass-file-content-through-a-heredoc.md was on branch agent/heredoc-procedure when the scout ran. [Driver correction, Ideation: it merged onto dev at a37455c before this finding was recorded.]
+
+PROPOSED LINK: idea 000346 --relates_to--> 000019 (same failure class; 000019 was corrupted by shell-quoted --body passing prose through the shell; this guard prevents the analogous case in heredocs)
+PROPOSED LINK: idea 000346 --relates_to--> 000051 (both address agent harness and guardrail enforcement through hooks and settings.json)
+
+</details>
+
+---
+
+## 000347 · ANCHOR: a morning session to capture what the multi-session system showed on its first night, and how to optimize and improve it
+
+**Created 2026-09-23T01:11:38-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-23 and forwarded by the Session Manager. This is an anchor idea: the related asks below are linked to it so they surface together for one future session.
+
+As given: hold a morning session to capture the key findings from the Session Manager multi-session system that ran on the night of 2026-09-22 to 2026-09-23, and how to optimize and improve it.
+
+Focus areas, as the owner named them:
+1. A possible LangChain/LangGraph and Claude Agent SDK implementation of the system.
+2. New agent roles the owner wants to consider: the Documenter (000332), the question-relay session (000328), and others.
+3. Controlled clearing and compaction of sessions.
+4. Better management of state, memory and context.
+
+Ideas batched onto this anchor:
+- 000327: the role-based session roster, governed by GOV-017.
+- 000328: the question-relay session.
+- 000332: the Documenter role.
+- 000334: carrying the Session Manager system (GOV-017) into the LangGraph and Agent SDK delivery system.
+- 000340: monitoring each session's context use and finding safe points to clear or compact it.
+- 000319: state capture and session resumability.
+- 000320: the always-on action-request broker.
+
+Evidence to read first: the Session Manager's working files in _working/session-manager/, namely board.md, morning-handoff.md and owner-actions.md. They are gitignored, so they exist only in the primary checkout on this machine and should be read or copied before anyone cleans that directory. The night's tracked record is on dev: GOV-017, PROMPT-037, and the ideas captured through the Ideation session that night, starting at 000321.
+
+Unresolved: whether the morning session produces a plan, a requirement, an update to GOV-017, or a set of new ideas; and which of the four focus areas comes first.
+
+**Links**
+
+- relates_to ← `000319`
+- relates_to ← `000320`
+- relates_to ← `000327`
+- relates_to ← `000328`
+- relates_to ← `000332`
+- relates_to ← `000334`
+- relates_to ← `000340`
