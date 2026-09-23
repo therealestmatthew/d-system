@@ -27,6 +27,13 @@ Both are fixed by the harness and are built around, not worked around (`REQ-009`
 - **Subagents cannot write report files.** Each analyst and audit returns its report as text, and
   **the coordinator writes it** to the corpus directory. The pack's own words "write your report
   to ..." are satisfied by the coordinator, never by asking the subagent to try.
+
+  A refused write is not enough on its own. In the first dry run, an analyst on a general-purpose
+  agent was refused its report write and wrote the file through a shell command instead (idea
+  `000354`). So `R1` and `R4` go to `partition-analyst`, an agent type whose only tools are Read,
+  Grep and Glob: it has no tool that writes a file or runs a command. This departs from the
+  pack's "Dispatch to a general-purpose agent" line for those two sections, by the owner's ruling;
+  the dispatched blocks themselves are unchanged.
 - **Subagents run in the primary checkout, whatever the coordinator's worktree.** So the corpus and
   every report live in the **primary checkout's** gitignored `_working/idea-corpus/`, which is where
   the pack's relative paths resolve for the agents reading them. Resolve it once:
@@ -206,7 +213,8 @@ EOF
 3. **Save exactly what you send** to `$CORPUS/dispatch-<SECTION>.txt` — the extracted text, with no
    stamp and nothing added — so the dispatch can be diffed against the pack afterwards.
 4. **Dispatch that text, and only that text, as the whole prompt**, to the agent and model the pack
-   names for the section: `R1` and `R4` to a general-purpose agent, `A1` and `A2` to
+   names for the section, except that `R1` and `R4` go to `partition-analyst` instead of the
+   pack's general-purpose agent (see *Where things live*); `A1` and `A2` go to
    `partition-adversary`; model sonnet for all four. Never escalate the model on your own.
 5. **Truncation.** If the returned report is cut off — it stops mid-section or lacks a section its
    block requires — resume that same agent and ask it to continue from where it stopped. Never
