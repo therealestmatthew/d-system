@@ -1410,6 +1410,7 @@ The idea itself explicitly names two related initiatives: 000020 (MCP-mediated m
 - relates_to → `000020`
 - relates_to ← `000165`
 - relates_to ← `000241`
+- relates_to ← `000333`
 
 ---
 
@@ -15258,7 +15259,7 @@ The second approach is more robust: it avoids both the initial collision and fut
 
 ## 000313 · Triage scouts keep proposing edges the link vocabulary cannot express
 
-**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+**Created 2026-09-22T13:44:47-04:00 · Status: `triaged`**
 
 Two instances in one day, 2026-09-22, during a session that triaged all 73 open ideas:
 
@@ -15292,6 +15293,30 @@ Related: 000303 (investigate the relationships between ideas, backlog phases, pr
 is where the question of whether four families express the same relations belongs; this is one
 concrete symptom of it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:16-04:00): # Finding: Idea 000313
+
+Idea 000313 ("Triage scouts keep proposing edges the link vocabulary cannot express") records two concrete instances where agents, while triaging other ideas, reached for link types the current schema does not support. The idea is deliberately captured as a duplicate of 000053 ("Allow ideas to link directly to plan/document IDs") to signal recurrence rather than a first report — two independent scouts proposed unwritable edges on the same day.
+
+## What was found
+
+**Document-code link targets** (first example): Scout triaging 000224 wanted to record that the idea relates to `PLAN-038`, but `tools/append_idea.py link --target` accepts only six-digit idea IDs (per `schemas/idea.schema.json`'s link `target` field). This is explicitly in scope for **phase-idg-01** ("Ship the idea schema bundle and record the scope-fork decision"), which includes "document-code link targets" as part of its acceptance criteria (`REQ-014 R01`).
+
+**`depends_on` edge type** (second example): Scout triaging 000281 proposed `000281 --depends_on--> 000269` to express a dependency. The current idea link vocabulary (`schemas/idea.schema.json` line 84) supports only `extends`, `supersedes`, and `relates_to`. The `depends_on` relationship type is used extensively on plans and backlog phases (`depends_on` arrays in `docs/09-backlog/backlog.yaml`) but is not in the idea schema. No plan I found proposes adding it to ideas; PLAN-017.04 ("Annotations and relationship contributions") discusses the three link types as sufficient for known relationships and defers additional vocabulary pending actual need.
+
+**Cross-idea links already recorded:** Both relevant overlaps are already linked: `000313 --relates_to--> 000053` (the document-code target issue) and `000313 --relates_to--> 000303` (the broader investigation of relationships between ideas, phases, prompts and plans). No additional edge proposal is needed.
+
+## The signal
+
+The recurrence itself is the value of this entry: two agents reached for edges the vocabulary cannot express within a single day's triage run, without either one having read 000053's existing finding. This demonstrates that the vocabulary gap is live and recurring, not a one-off edge case.
+
+</details>
+
 **Links**
 
 - relates_to → `000053`
@@ -15301,7 +15326,7 @@ concrete symptom of it.
 
 ## 000314 · The portable framework will deliver every component and no assembly
 
-**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+**Created 2026-09-22T13:44:47-04:00 · Status: `triaged`**
 
 Triage of 000281 on 2026-09-22 found that the starter kit itself is unowned, while all of its parts
 are planned.
@@ -15327,6 +15352,26 @@ that make a template family usable by someone who did not build it.
 
 Related: 000281 is the anchor this came from and carries the finding.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Triage finding: 000314
+
+Idea 000314 correctly identifies an unowned component of the 2026-09-19 framework batch. The batch (000269-000281) produced four governed documents: PLAN-040 (Portable framework document templates), PLAN-041 (Portable framework content extraction), REQ-024, and REQ-025. Both plans explicitly exclude "packaging the finished template family into the starter kit 000281 describes" from their scope, stating it "depends on this requirement's deliverables existing first and is not itself ready to plan."
+
+The eight queued phases (phase-fwt-01 through -05 for templates/schemas, phase-fwa-01 through -03 for content extraction) will deliver reusable templates, schemas, and generalized patterns from d-system's history. When they complete, the components for a starter kit will exist, but the assembly work — organizing those components, writing the narrative documentation and adoption path that 000314 names, and deciding what "bootstraps a new repository" must include beyond the file set — remains unowned.
+
+This finding was already recorded against idea 000281 (the batch anchor), which documented the gap. Idea 000314 is a forward-looking triage, raising the gap to the surface as a decision point now that the component delivery is planned. Both PLAN-040 (section "Out of scope") and PLAN-041 (same section) name 000281 and acknowledge this dependency.
+
+Related documents: PLAN-040, PLAN-041, REQ-024, REQ-025 (phase-fwt-01 through -05, phase-fwa-01 through -03).
+
+Existing link is appropriate: 000314 --relates_to--> 000281, since 000281 is the starter-kit anchor and anchor for the entire batch that makes this assembly decision necessary.
+
+</details>
+
 **Links**
 
 - relates_to → `000281`
@@ -15335,7 +15380,7 @@ Related: 000281 is the anchor this came from and carries the finding.
 
 ## 000315 · The literature campaign's recommendations have no consuming phase
 
-**Created 2026-09-22T13:44:47-04:00 · Status: `open`**
+**Created 2026-09-22T13:44:47-04:00 · Status: `triaged`**
 
 Triage of 000287 on 2026-09-22 confirmed the gap rather than dissolving it, after the campaign
 closed.
@@ -15359,6 +15404,33 @@ as pending action.
 
 Related: 000287 carries the finding this came from.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Triage: 000315 — The literature campaign's recommendations have no consuming phase
+
+**Related work:** Idea 000287 carries the original finding that prompted this triage. The session record SESS-2026-09-22-01 flags this as one of two "unowned structural gaps, now captured as 000314 and 000315 but owned by no phase."
+
+**Campaign deliverables:** phase-lit-07 produced `09_reuse_recommendations.md` and `10_architecture_implications.md` as synthesis deliverables on 2026-09-19. Both files exist in `research/literature-review/` and are listed in phase-lit-07's deliverables in the backlog (`docs/09-backlog/backlog.yaml`). The recommendations are substantive and every claim is traceable to cited deep reads in the evidence matrix.
+
+**Evidence and scope constraints:** Both documents explicitly state they make no architecture change and are bounded to 49 deep-read matrix rows out of 387 collision candidates — approximately 13 percent of the candidate pool. The duplicate-discovery rate (20.0% → 15.0% → 6.4–7.7%) shows a trend toward finding more new material rather than saturation, and neither document claims saturation.
+
+**Phases that interact with the campaign output but do not consume recommendations:**
+
+- `phase-lit-09` (complete) — closed three evidence gaps within the campaign itself (forward/backward chaining, top-band deep reads, H4 re-derivation), not consuming the recommendations. Evidence gathering, not recommendation implementation.
+- `phase-lrr-01` through `phase-lrr-04` (in progress or planned) — part of PLAN-043, which builds a deterministic, navigable HTML report page rendering all fourteen campaign deliverables. The plan explicitly states "everything `REQ-027` lists as out of scope, and in particular any edit to `research/literature-review/`. If the report reveals a defect in a deliverable, that is an idea and an owner decision, not a fix folded into a rendering phase." These phases render the materials; they do not plan to implement the architectural recommendations or act on the reuse findings.
+
+**No consuming plan found:** A `grep` of `docs/01-plans`, `docs/06-requirements`, `docs/04-decisions`, `docs/08-governance`, and `docs/09-backlog/backlog.yaml` for distinctive terms (`reuse`, `consuming`, `architecture implications`, `09_reuse`, `10_architecture`) finds only the backlog entries listing the deliverables themselves and PLAN-043's rendering work. No phase depends on these files as inputs, and no plan currently proposes to act on their findings.
+
+**The core decision:** Idea 000315's body correctly names the gap as a decision point: "whether a consuming phase is warranted at all given the campaign's own stated coverage bound of 13 percent of the candidate pool, or whether the honest disposition is to record the recommendations as reference material and say so, rather than leaving them in a state that reads as pending action." The campaign output is pending action by its current filing. An owner ruling is required to resolve the disposition: either build a consuming phase downstream of phase-lit-09 (which closed the evidence gaps), or formally record these documents as reference material with no follow-up phase.
+
+PROPOSED LINK: 000315 --relates_to--> 000287 (both identify the same gap: campaign recommendations have no consuming phase)
+
+</details>
+
 **Links**
 
 - relates_to → `000287`
@@ -15367,9 +15439,50 @@ Related: 000287 carries the finding this came from.
 
 ## 000316 · Enforce the batch-table schema in the governance check
 
-**Created 2026-09-22T16:43:25-04:00 · Status: `open`**
+**Created 2026-09-22T16:43:25-04:00 · Status: `triaged`**
 
 Batch tables were abstracted out of the build coordinator prompt (PROMPT-036) on 2026-09-22 into docs/09-backlog/batches/*.yaml, validated in shape by schemas/batch.schema.json. Nothing checks them. A `uv run python -m src.governance --batches` check should: validate every table against the schema; resolve every phase id against backlog.yaml and fail on one that does not exist; confirm each declared parallel group contains no pair joined by a depends_on edge, and that no phase depends on one later in the batch order; flag a table whose declared status contradicts its phases' actual status in the backlog (every phase complete but the table still queued, or vice versa); and fail when more than one table is in_progress, which is the state the coordinator's selection rule treats as unambiguous. Deferred deliberately at the owner's direction so the data and prompt work could land first; it is implementation code and so needs a requirement document, a plan document and backlog phases before it is written, per AGENTS.md step 3.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Idea 000316: Enforce the batch-table schema in the governance check
+
+## Summary
+
+Idea 000316 proposes adding schema validation checks for batch tables to the governance check system (currently `uv run python -m src.governance`). The requested checks would validate table structure against `schemas/batch.schema.json`, resolve phase IDs against `backlog.yaml`, verify stage boundaries do not violate dependency constraints, detect status inconsistencies between the batch table and actual phase status, and prevent multiple tables from being in `in_progress` state simultaneously.
+
+## Related Documents Found
+
+**GOV-016 (batch orchestration protocol)** is the authoritative source on the current state. Line 163 explicitly references this idea: "Idea `000316` holds the governance check that would — schema validation, phase-id resolution, stage boundaries proved against `depends_on`, a table whose declared status contradicts its phases, more than one table `in_progress`. Until it exists, every guarantee above rests on the composing session running the check by hand and recording it in `provenance`."
+
+GOV-016 section "What is not yet enforced" explains that:
+- Nothing mechanically validates batch tables
+- The selection rule's first case assumes at most one table is `in_progress`, and nothing prevents two
+- All current guarantees depend on manual verification recorded in `provenance`
+
+**docs/09-backlog/batches/README.md** notes (line 51-52): "Nothing validates these tables yet — idea `000316` holds the governance check that would, and `000317` the protocol that would govern how they are authored."
+
+**Session SESS-2026-09-22-03** (batch table abstraction session) states in its Unresolved section: "Nothing validates the batch tables mechanically...Idea `000316` holds that check; it is implementation code and so needs a requirement document, a plan document and backlog phases before it is written."
+
+**PROMPT-036 (build coordinator)** references the batch schema and mentions batch table selection but does not contain the validation logic this idea proposes.
+
+## Related Idea
+
+Idea 000317 ("Register backlog batching and orchestration as a governance protocol") relates to this idea with a `relates_to` link. That idea has already been promoted to GOV-016, which is the governance protocol document now describing when and how batch tables are composed, verified, sequenced, selected and superseded. Idea 000317's open question about whether this should extend GOV-013 was resolved to a separate GOV document, now GOV-016.
+
+## Current Status
+
+The idea is deliberately deferred pending the writing of a requirement document and a plan document for the implementation, as per AGENTS.md step 3 (requirement-before-code). The batch table abstraction and the orchestration protocol (000317) landed in session SESS-2026-09-22-03, which created the preconditions for this work but explicitly left the mechanical validation to a later phase.
+
+## No Related Plan, Requirement or Backlog Phase Found
+
+No existing plan, requirement document or backlog phase was found that covers the implementation of these governance checks. The idea awaits the requirements and planning phases that must precede its implementation.
+
+</details>
 
 **Links**
 
@@ -15401,7 +15514,7 @@ The owner asked on 2026-09-22, mid-session, that backlog batching and orchestrat
 
 ## 000318 · --next-code has no read-only form, so a read-only audit cannot check the next code without taking it
 
-**Created 2026-09-22T18:03:10-04:00 · Status: `open`**
+**Created 2026-09-22T18:03:10-04:00 · Status: `triaged`**
 
 uv run python -m src.governance --next-code <kind> does not report a code, it allocates one. It
 atomically creates .git/code-reservations/<CODE> in the git common directory, which every
@@ -15449,6 +15562,40 @@ known - but it leaves the non-idempotence, which is the part that actually misle
 Related: 000312 records that phase-lrr-04's declared OPS path names a consumed code, which is the
 finding whose evidence-gathering triggered this.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Triage: Idea 000318
+
+Idea 000318: "--next-code has no read-only form, so a read-only audit cannot check the next code without taking it"
+
+## Finding
+
+This idea identifies a real defect in the governance code-allocation system (GOV-005). The `--next-code` command atomically allocates a code by creating a reservation file in the git common directory; there is no separate read-only query form to compute the next code without taking it. During the 2026-09-22 adversarial review of phase-lrr-01, a read-only audit agent needed to verify evidence about consumed codes and ran `--next-code operation` to check what the next OPS code would be. That single invocation reserved OPS-018, defeating the non-idempotent check it was meant to support and creating the problem idea 000312 documents — a collision between phase-lrr-04's declared deliverable and a code already in use.
+
+**Related governed documents:**
+- GOV-005 (Document code assignment protocol) § "Concurrent agents" describes `--next-code` and pre-merge reservations but does not mention read-only forms.
+- REQ-001 (Document code assignment requirements) specifies that allocation is deterministic but does not address read-only queries.
+
+**Related ideas:**
+- 000312 (already linked, relates_to): phase-lrr-04's declared OPS deliverable names a consumed code — the finding whose evidence-gathering triggered this issue.
+
+**Related concerns:**
+- 000241 ("Review agents are dispatched with write tools they are only told not to use") and 000051 ("Agent harness and guardrails") address the broader problem of read-only agents having access to tools with side effects, though they are not specific to code allocation.
+
+**Suggested fixes (from idea body):**
+1. A read-only query form (`--peek-code <kind>` or `--next-code --dry-run`) that computes the next code without creating a reservation — smaller, more durable than relying on auditor memory.
+2. Move the read-only prohibition into agent definitions under `.claude/agents/` rather than into each dispatch prompt, so the constraint applies automatically rather than depending on per-session instruction.
+
+The problem surfaced only in an adversarial audit context with explicit read-only constraints; it would not arise in normal development workflows that expect code allocation as part of the work. The recovery (code release via `--release-code`) is known and the reservation carries a fourteen-day expiry, so the damage here was small and already undone. However, the non-idempotence problem remains: a future audit running this check twice gets different answers, which misleads readers about what was verified.
+
+No existing plan or phase has been written to address this issue.
+
+</details>
+
 **Links**
 
 - relates_to → `000312`
@@ -15457,7 +15604,7 @@ finding whose evidence-gathering triggered this.
 
 ## 000319 · Investigate proper state capture and session resumability
 
-**Created 2026-09-22T19:49:59-04:00 · Status: `open`**
+**Created 2026-09-22T19:49:59-04:00 · Status: `triaged`**
 
 What state must a long-running coordinated session capture so that it resumes cleanly after death, and where does that state have to live to be useful to someone other than the session that wrote it?
 
@@ -15537,7 +15684,7 @@ already delivers this idea's actual ask.
 
 ## 000320 · An always-on broker that orders and routes conflicting action requests from concurrent agents
 
-**Created 2026-09-22T19:50:18-04:00 · Status: `open`**
+**Created 2026-09-22T19:50:18-04:00 · Status: `triaged`**
 
 A long-lived agent or service that receives action requests from every agent working in the repository, routes them, and orders the ones that could conflict — rather than each agent independently checking a lock table and hoping.
 
@@ -15623,12 +15770,13 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 - relates_to → `000319`
 - relates_to ← `000319`
 - relates_to ← `000327`
+- relates_to ← `000334`
 
 ---
 
 ## 000321 · The --ready conflict check misses shared file paths between phases whose system ids differ
 
-**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+**Created 2026-09-22T20:51:44-04:00 · Status: `triaged`**
 
 Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md (a run of `uv run python -m src.governance --ready` on dev at 178ae3a).
 
@@ -15646,9 +15794,55 @@ Related: the deliverable-overlap miss between phase-wbf-01 and phase-wbf-02, rec
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-22T21:52:45-04:00): CORRECTION from Session 4 - Scout, 2026-09-22. The premise of this idea is wrong. src/governance/backlog.py collisions() (line 105) compares deliverable paths across different system ids, including containment through path_conflict(), so a different system id does not hide a shared declared path. The real gap is different, and Ideation confirmed both parts in the code: (1) the --ready Conflicts column compares each candidate only against phases that are already active (backlog.py line 151). It never compares two ready candidates with each other, so two phases can both show an empty Conflicts column and still collide once both are claimed. (2) The column only sees declared deliverables. Edits a phase makes outside its deliverables list, such as tests or codes.yaml, are invisible to it. The arch-02 and wbf-* case is still a real hazard for picking phases together, but the cause is the candidate-against-candidate gap, not the difference in system ids. Related: 000242 (a phase whose scope names a file its deliverables omit).
+- **finding** by agent-idea-triage (2026-09-22T22:53:18-04:00): # Triage: 000321 (The --ready conflict check misses shared file paths between phases whose system ids differ)
+
+## Finding
+
+The premise stated in this idea is incorrect — the conflict check in `src/governance/backlog.py` (line 105, the `collisions()` function) does compare deliverable paths across different system ids, including containment checks, so a different system id does not hide a shared declared path. However, the correction identifying a real gap is valid and significant.
+
+The actual conflict-detection gap identified by Session 4 (Scout) in the correction annotation consists of two independent parts:
+
+1. **Candidate-against-candidate comparison is missing.** The `claim_conflicts()` function (line 146) only compares each ready candidate against phases that are already `active`. It never compares two ready candidates with each other. This means two phases can both show an empty Conflicts column in the `--ready` report and still collide once both are claimed simultaneously. The Scout confirmed this by reading the code at backlog.py line 151: `if other["status"] == "active"`. This is a genuine hazard in selecting concurrent phases from the ready list.
+
+2. **Undeclared file edits are invisible to the check.** The Conflicts column only sees deliverables that phases have explicitly declared in their `deliverables` field. Edits a phase makes outside this list—such as tests, codes.yaml amendments, or other implicit file changes—are not detected by the conflict check and therefore cannot prevent a collision. This is deliberate design (ADR-003 states this is a review responsibility), but it means the --ready report gives a false impression of safety for phases that touch undeclared paths.
+
+The arch-02 and wbf-* case from the original observation is still a real scheduling hazard for picking phases together, but the cause is the candidate-against-candidate gap, not the difference in system ids.
+
+## Related Plans and Documents
+
+- **ADR-003** (Worktree-isolated concurrent agents over a disjoint backlog) states explicitly that "A phase that edits files outside its declared `systems` and `deliverables` defeats the check, and no validator can detect that before the diff exists — it remains a review responsibility" (line 98–99). The concurrency model assumes declarations are trustworthy and builds no validation into the mechanism itself.
+
+- **GOV-002** (Session backlog planning and execution protocol) documents the `--ready` command output and the Conflicts column, which displays results from the `claim_conflicts()` function in backlog.py (line 146–152).
+
+- **PLAN-032** (Autonomous agent operations, P5) depends on ADR-003's concurrency model and therefore relies on the same conflict-detection mechanism.
+
+- The conflict-detection implementation in **backlog.py** (line 146–152, `claim_conflicts()`): only compares against active phases, never against other queued/ready candidates.
+
+## Related Ideas
+
+The correction annotation itself references:
+
+- **000242** (A phase whose scope names a file its deliverables omit is a lock that does not cover the work) — directly addressed in the correction as one half of the real gap: undeclared file edits invisible to the check.
+
+- **000322** (phase-wbf-01 and phase-wbf-02 share a deliverable file (HtmlViewerRegion.tsx) but are not flagged as conflicting) — mentioned in the correction annotation as "the deliverable-overlap miss between phase-wbf-01 and phase-wbf-02, recorded as a separate idea from the same report." This records the concrete case from Scout's 2026-09-22 report.
+
+- **000027** (No mechanical check that a completed phase's actual diff stayed inside its declared systems/deliverables) — related to the undeclared edits gap; covers the phase-completion verification side of the same problem.
+
+## What Stays Unknown
+
+The correction identifies the gap but leaves open which half should be addressed first or how to address either:
+
+1. Should the fix be in the conflict-check implementation (add candidate-against-candidate comparison, or add path analysis)?
+2. Or should it be in the system registry (enforce "no two systems may cover the same path")?
+3. Should undeclared file edits be detected earlier, or remain a review responsibility as ADR-003 currently states?
+
+The Scout's standing advice is to never run phase-arch-02 at the same time as any wbf-* UI phase until one of these decisions is made.
+
+PROPOSED LINK: 000321 --relates_to--> 000242 (both describe undeclared file edits as invisible to the conflict check)
+PROPOSED LINK: 000321 --relates_to--> 000322 (000322 records a concrete example of phases sharing a deliverable but showing no conflict)
 
 </details>
 
@@ -15660,7 +15854,7 @@ Related: the deliverable-overlap miss between phase-wbf-01 and phase-wbf-02, rec
 
 ## 000322 · phase-wbf-01 and phase-wbf-02 share a deliverable file (HtmlViewerRegion.tsx) but are not flagged as conflicting
 
-**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+**Created 2026-09-22T20:51:44-04:00 · Status: `triaged`**
 
 Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md (a run of `uv run python -m src.governance --ready` on dev at 178ae3a).
 
@@ -15676,9 +15870,22 @@ Related: the separate idea from the same report about system ids that differ but
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-22T21:52:46-04:00): CORRECTION from Session 4 - Scout, 2026-09-22. This is explained, and the overlap check did not miss it. collisions() in src/governance/backlog.py compares deliverable paths, including containment, so phase-wbf-01 and phase-wbf-02 will be flagged as conflicting as soon as one of them is active. The --ready Conflicts column showed nothing because it compares each candidate only against already-active phases (backlog.py line 151), and neither phase was active. The underlying gap is the same as in 000321's correction: two ready candidates are never compared with each other. That leaves this idea as a special case of 000321 as corrected.
+- **finding** by agent-idea-triage (2026-09-22T22:53:18-04:00): # Idea 000322: phase-wbf-01 and phase-wbf-02 share HtmlViewerRegion.tsx deliverable
+
+## Finding
+
+Idea 000322 observes that phase-wbf-01 and phase-wbf-02 both declare `ts/src/stage/HtmlViewerRegion.tsx` as a deliverable yet the `--ready` conflict check did not flag them as conflicting. The correction annotation has already explained this: both phases share system `sys-ui`, so the `collisions()` function in `src/governance/backlog.py` does detect the conflict. The conflict does not appear in `--ready` because `claim_conflicts()` only compares each candidate against already-active phases, not against other ready candidates.
+
+**Plan-level acknowledgment.** PLAN-027 (workbench-features-defects) explicitly names this as a known issue at lines 212–216: "One collision risk is worth naming rather than encoding: `phase-arch-02`, the identifier migration, may rename `HtmlViewerRegion.tsx` itself, which `phase-wbf-01` and `phase-wbf-02` edit. That is a file-level conflict for a coordinator to sequence, not a vocabulary dependency."
+
+**Related work.** Idea 000321 is a more general case: it covers phases with different system ids that edit the same files, which the current conflict check also misses between ready candidates. Idea 000320 (a broker for coordinating conflicting requests) addresses the broader coordination problem of which this is one instance.
+
+**Governance context.** ADR-003 describes the conflict detection mechanism: active phases must be disjoint in systems, deliverables paths, and have no transitive depends_on links. The constraint applies only to active phases, not to pairs of ready candidates.
+
+The issue is triaged by existing plan and ADR documentation. The underlying gap (no conflict check between two ready candidates) is a known design choice documented in the governance layer.
 
 </details>
 
@@ -15690,7 +15897,7 @@ Related: the separate idea from the same report about system ids that differ but
 
 ## 000323 · phase-mem-01 lists a deliverable path that does not exist: docs/04-decisions/008-memory-workflow.md
 
-**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+**Created 2026-09-22T20:51:44-04:00 · Status: `triaged`**
 
 Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md.
 
@@ -15702,11 +15909,33 @@ The ask: fix the backlog entry in docs/09-backlog/backlog.yaml before anyone cla
 
 Unresolved: what the correct deliverable is. It could be a new ADR with a newly allocated number, an existing document under another name, or the intent may have changed. This needs the owner's decision or a document-code allocation. A second question is whether the governance check should reject a deliverable path in docs/ that does not follow the ADR-NNN naming pattern.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:18-04:00): # Triage: 000323
+
+Idea 000323 reports that phase-mem-01's deliverable path `docs/04-decisions/008-memory-workflow.md` does not exist and represents a blocking issue for anyone who claims the phase.
+
+**What was found:**
+
+The deliverable path is indeed missing. Verified in backlog.yaml line 1233 where phase-mem-01 lists `docs/04-decisions/008-memory-workflow.md` as a deliverable; the file does not exist in `docs/04-decisions/`. The only file matching "008" in that directory is ADR-008-record-types.md, which documents a different subject (record types) and is unrelated to memory workflow.
+
+Phase-mem-01 is titled "Reconcile memory-agent contracts with accepted choices" per backlog.yaml lines 1207-1235. Its scope is to revise contracts A–D to preserve direct authorized edits, manual selected-session invocation and owner-approved promotion/conflict resolution; use Chronicle as the working role name; and remove unconditional semantic-search thresholds. The source plan is PLAN-001 (doc-agent-memory, "Agent Memory System — Design Plan"), which contains detailed contract specifications for Vault Scribe, Chronicle, and The Librarian (lines 40–227 of PLAN-001). The phase is also named in GOV-003 (backlog-decisions) under the decision "Memory writers — Keep direct human and authorized-agent edits with validation" and in GOV-004 (backlog-capture) as addressing "Contract D and writer permissions."
+
+The missing deliverable is a genuine blocker: a session claiming phase-mem-01 would lack a target for its work and might inadvertently create a file that conflicts with ADR numbering or overwrites an existing document. The unresolved question is what the correct deliverable should be — whether it should be a new ADR documenting the reconciled contract specifications (with a newly allocated ADR number), updates to PLAN-001 itself, or another governed document. This requires the owner's decision.
+
+No overlap with other open ideas found. No related idea links exist yet.
+
+</details>
+
 ---
 
 ## 000324 · Catalog tests in test/test_codes.py overwrite the real tracked catalog.md, so concurrent or interrupted pytest runs corrupt it
 
-**Created 2026-09-22T21:00:08-04:00 · Status: `open`**
+**Created 2026-09-22T21:00:08-04:00 · Status: `triaged`**
 
 Observed by Ideation on 2026-09-22, cause confirmed by the Session Manager.
 
@@ -15720,6 +15949,44 @@ What it would touch: test/test_codes.py. One option is to have the tests work on
 
 Unresolved: whether the governance CLI can take a root argument for the tests to use, and whether a general guard should stop tests from writing under ROOT.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:18-04:00): # Triage: 000324 (Catalog tests in test/test_codes.py overwrite the real tracked catalog.md)
+
+## Related Governance and Documents
+
+**GOV-017** (Multi-session coordination protocol) directly addresses this incident. It names ideas 000324 and 000325 explicitly in the "Primary-checkout lock" section, documenting that test/test_codes.py overwrites docs/08-governance/catalog.md while it runs and restores it afterwards, and that two overlapping /session-start preflight runs on 2026-09-22 left the catalog holding only "CORRUPTED". GOV-017 resolves the hazard by forbidding all pytest runs in the primary checkout; tests run in the session's own worktree instead, and includes a one-pytest-run-per-worktree rule to prevent the same corruption pattern elsewhere.
+
+## Tests Identified
+
+The two problematic tests are identified and directly accessible for review or refactoring:
+- `test_catalog_flag_writes_committed_file` (test/test_codes.py, lines 205-228): writes "CORRUPTED" to the real docs/08-governance/catalog.md, runs the governance CLI, then restores it in a finally block
+- `test_catalog_flag_writes_nothing_when_audit_fails` (test/test_codes.py, lines 231-250): same pattern with the audit mocked to fail
+
+Both tests exist because they verify the --catalog flag writes to disk (not just stdout) and does not truncate a file that already exists when the audit fails. They achieve this by explicitly corrupting the file, running the command, and checking the state.
+
+## Other Repository Root Writes
+
+Audit of test/ shows no other tests that write to tracked files under the repository root. Tests in test_generate_overview.py, test_overview_tools.py, and others that write output use tmp_path fixtures. The catalog tests are the only tracked-file writers found.
+
+## Related Ideas
+
+Idea 000325 (Point the --catalog tests in test/test_codes.py at a tmp_path copy) already exists and is linked to 000324 as `relates_to`. That idea proposes the specific fix: give the tests a temporary copy of the catalog to write to, leaving the tracked file untouched. The body of 000325 notes this incident and its confirmed cause, and proposes this as a solution.
+
+## Status of Root Fix
+
+GOV-017 prevents the hazard from surfacing in practice (primary-checkout pytest is now forbidden), but the root fix — repointing the tests at a tmp_path copy — has not been implemented. The tests still write to the tracked file when run in any worktree, and a concurrent or interrupted run would corrupt that worktree's catalog. The governance protocol works around it; the tests themselves remain unchanged.
+
+## Summary
+
+The incident is documented, the affected tests are identified and accessible, related proposal (000325) exists and is linked, and the governing rule (GOV-017) is now in place. The root cause — the tests writing to a tracked file — persists but is operationally prevented in the multi-session protocol. Whether to implement the specific fix proposed in 000325 is a decision for the owner, but the triage work has fully surfaced the area: what happened, where it happened, why, and what the current mitigation is.
+
+</details>
+
 **Links**
 
 - relates_to ← `000325`
@@ -15728,13 +15995,44 @@ Unresolved: whether the governance CLI can take a root argument for the tests to
 
 ## 000325 · Point the --catalog tests in test/test_codes.py at a tmp_path copy instead of the tracked catalog.md
 
-**Created 2026-09-22T21:00:08-04:00 · Status: `open`**
+**Created 2026-09-22T21:00:08-04:00 · Status: `triaged`**
 
 Sent to Ideation by Prompt Planner on 2026-09-22.
 
 As given: test/test_codes.py's two --catalog tests overwrite the real docs/08-governance/catalog.md with "CORRUPTED" and restore it afterwards, so overlapping runs leave it corrupted. They could point the target at a tmp_path copy instead.
 
 Overlap: this is the same hazard as the catalog-corruption idea Ideation recorded in the same turn (the two are linked). That idea records the incident and its confirmed cause: Session 1 and Session 2 ran pytest in the primary checkout at the same time. This one proposes a specific fix: give the tests a tmp_path copy of the catalog to write to. Both are recorded as given, per ADR-010. Triage can decide whether one should supersede the other.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:19-04:00): # Triage: Idea 000325
+
+**Idea:** "Point the --catalog tests in test/test_codes.py at a tmp_path copy instead of the tracked catalog.md"
+
+## Finding
+
+Idea 000325 proposes a test isolation fix for a known failure mode documented in GOV-017. The two `--catalog` tests in test/test_codes.py (`test_catalog_flag_writes_committed_file` and `test_catalog_flag_writes_nothing_when_audit_fails`) currently overwrite the tracked `docs/08-governance/catalog.md` during test execution and restore it afterwards. When overlapping pytest runs happen (as documented in GOV-017's "primary-checkout lock" section), the restoration can fail, leaving the catalog corrupted — exactly the incident recorded in related idea 000324 on 2026-09-22.
+
+The governance CLI (`src/governance/__main__.py`) currently has no `--root` argument and hardcodes ROOT at the module level. However, test/test_codes.py already establishes precedent for monkeypatching the ROOT variable (line 632, `monkeypatch.setattr(entry, "ROOT", tmp_path)` in `test_the_cli_allocate_path_reserves_what_it_returns`). The tests could apply the same pattern to isolate catalog mutations to temporary copies, eliminating the corruption hazard.
+
+Overlap: This idea is already linked (relates_to) to 000324 (the incident it proposes to fix). GOV-017 explicitly names both ideas and the failure mode they address. PLAN-005-document-code-system.md describes the original --catalog implementation; OPS-001-operations.md documents the current operational use.
+
+## Specifics
+
+- **Related idea:** 000324 (`relates_to` link already present) — records the identical catalog corruption incident
+- **Governance document:** GOV-017, section "The primary-checkout lock", explicitly names this problem and ideas 000324 and 000325
+- **Source code:** test/test_codes.py lines 205-228 (test_catalog_flag_writes_committed_file) and 231-251 (test_catalog_flag_writes_nothing_when_audit_fails)
+- **Precedent:** test/test_codes.py line 632 shows the same ROOT monkeypatch technique already in use
+
+## Assessment
+
+The idea is a targeted fix for a documented failure mode. Implementation requires no changes to the governance CLI itself — the tests can be modified to work around the hardcoded ROOT by reusing existing monkeypatch techniques from the same test file. The fix directly addresses the test isolation problem that GOV-017's multi-session coordination protocol is designed to prevent.
+
+</details>
 
 **Links**
 
@@ -15744,7 +16042,7 @@ Overlap: this is the same hazard as the catalog-corruption idea Ideation recorde
 
 ## 000326 · PLAN-032's coverage table still maps REQ-017 R02 and R04 to phase-auto-02 unconditionally, while ADR-022 records them as open
 
-**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+**Created 2026-09-22T21:52:40-04:00 · Status: `triaged`**
 
 From Session 5 - Batch Runner, as adversary finding F1 on phase-auto-01. The Session Manager forwarded it on 2026-09-22, with the owner's approval to capture it.
 
@@ -15756,11 +16054,47 @@ The ask: amend PLAN-032's coverage table and REQ-017 so they match what ADR-022 
 
 Unresolved: whether the right amendment is to mark R02 and R04 as conditional on an ADR-022 follow-up, to move them to a later phase, or to change REQ-017 itself. Amending a governed plan and requirement needs a phase or the owner's direction.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:19-04:00): # Triage finding: 000326
+
+**Idea 000326** identifies a documented discrepancy between PLAN-032's requirement coverage table and ADR-022's explicit handling of requirements R02 and R04.
+
+## What was found
+
+The conflict is real and verifiable:
+
+- **PLAN-032** (lines 200, 202): the coverage table maps `R02 (Narrow, named capability sets per run)` and `R04 (Approvals carry scope, reason, expiry, immutable decision)` to `phase-auto-02` with no condition.
+
+- **ADR-022** (lines 93-100): explicitly records R02 and R04 as **open, not claimed** by phase-auto-02. The decision text states: "`R02` and `R04` are recorded here as open, not claimed... They are answered once the gateway, the ledger, or continued direct use of the broker inside chat sessions produces real requests to design a named taxonomy and an approval path against."
+
+- **REQ-017** (lines 92-96): acknowledges this explicitly: "a design that ships the permissive shape leaves those two open until there are real requests to write them against — which must then be recorded as open rather than claimed."
+
+This issue was found as Adversary Finding F1 in `phase-auto-01` (backlog.yaml line 10998: "Adversary F1 (PLAN-032 coverage table and REQ-017 still read R02/R04 as covered) accepted by the owner as out of scope and sent to Ideation"). That acceptance and forwarding created this idea on 2026-09-22.
+
+## Why it matters
+
+A session claiming `phase-auto-02` would read PLAN-032's table and believe R02 and R04 are fully scoped and settled to that phase, contradicting ADR-022's explicit decision that they remain open for future work. The plan and the decision record are the authorities that phase-scope depends on, so the mismatch is a governance inconsistency, not merely a documentation typo.
+
+## No related plan or phase found
+
+No phase currently in backlog.yaml is scoped to amend PLAN-032's coverage table and REQ-017's status annotation to match ADR-022's decision. The question of whether to mark R02 and R04 as conditional on an ADR-022 follow-up phase, to move them to a future phase, or to change REQ-017's row text itself requires a new phase or the owner's direct amendment.
+
+</details>
+
+**Links**
+
+- relates_to ← `000333`
+
 ---
 
 ## 000327 · A roster of role-based parallel interactive sessions coordinated by a Session Manager through cross-session messages
 
-**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+**Created 2026-09-22T21:52:40-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-22. The owner set this system up and ran it that same day, before it was recorded as an idea. This entry records the concept after the fact, as the owner asked.
 
@@ -15800,16 +16134,63 @@ Unresolved:
 
 The question-relay session is recorded as its own idea, linked to this one.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:19-04:00): # Triage finding for idea 000327
+
+**Title:** A roster of role-based parallel interactive sessions coordinated by a Session Manager through cross-session messages
+
+## Summary
+
+Idea 000327 describes a live multi-session parallel coordination setup that ran on 2026-09-22, with a Session Manager orchestrating several roles (Ideation, Prompt Planner, Builders, Scout, Batch Runner) through turn-based access to the primary checkout. The body states: "GOV-017 now governs the arrangement. This idea records the concept and its open questions; GOV-017 is the working rule."
+
+## What I found
+
+**Implemented protocol:**
+- `GOV-017` (`docs/08-governance/GOV-017-multi-session-coordination-protocol.md`) is the formal governance document that specifies the multi-session coordination protocol. It was written and merged on 2026-09-22 (commit 20fd4cf) and is the authoritative statement of the arrangement.
+- `PROMPT-037` (`docs/02-prompts/PROMPT-037-session-manager-starter-messages.md`) carries the starter messages that put GOV-017 into effect — the kickoff and role-specific instructions for each session.
+- `GOV-003` (`docs/08-governance/GOV-003-backlog-decisions.md`) records the six owner rulings of 2026-09-22 that depart from AGENTS.md while sessions run under GOV-017: Ideation commits ideas in the primary checkout, reports under `_working/session-manager/` are gitignored, builders build assigned phases, merge approval is relayed, batch table status changes are committed in turns, and preflight tests run in worktrees not the primary checkout.
+
+**Unresolved questions noted in the idea's body:**
+1. Whether GOV-017 is sufficient as the permanent home for the contract, or whether AGENTS.md's "Concurrent agents" sections and `/session-start` command also need to be updated (requires owner approval)
+2. Overlap with related ideas: 000320 (always-on broker), 000168 (expand claim system), 000248 (always-on agents in orchestrator daemon)
+3. Session resumability: what state must be captured if the Session Manager dies mid-turn (000319)
+4. Whether session roles should be configurable per day rather than fixed
+
+**Status:** GOV-017 delivers the working protocol itself but does not resolve these architectural questions about integration with the existing AGENTS.md framework, potential consolidation with broker and orchestrator initiatives, or session resumability. The idea remains valuable as a record of the first day's questions and a checkpoint for future refinement.
+
+## Related documents
+
+- `GOV-017` governs the protocol; `/session-start` and AGENTS.md "Concurrent agents" sections do not yet reference it
+- `PROMPT-037` operationalizes GOV-017 with starter messages approved by the owner on 2026-09-22
+- `GOV-003` records the six departures from AGENTS.md that apply under this protocol
+
+## Proposed links
+
+The idea's body explicitly identifies overlaps with three other ideas that are not yet linked:
+
+PROPOSED LINK: 000327 --relates_to--> 000168 (both explore multi-agent coordination and expanded claim/responsibility system)
+PROPOSED LINK: 000327 --relates_to--> 000248 (both address always-on infrastructure and agent orchestration)
+PROPOSED LINK: 000327 --relates_to--> 000319 (Session Manager setup raises the state-capture and resumability question from 000319 in a live multi-session context)
+
+</details>
+
 **Links**
 
 - relates_to → `000320`
 - extended_by ← `000328`
+- extended_by ← `000332`
+- relates_to ← `000334`
 
 ---
 
 ## 000328 · A question-relay session that fields every other session's questions for the owner, queued in arrival order and asked in batches
 
-**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+**Created 2026-09-22T21:52:40-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-22, as an addition to the role-based session roster (the linked idea).
 
@@ -15834,15 +16215,55 @@ Unresolved:
 - Remote Control on mobile does not render AskUserQuestion previews, so any draft text has to go in the question text itself.
 - What happens to queued questions if the relay session dies.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:20-04:00): # Finding for idea 000328
+
+## Summary
+
+Idea 000328 proposes adding a new session role (question-relay session) to the multi-session coordination architecture already implemented and documented in 000327 (the roster of role-based parallel sessions). The idea directly extends 000327 and would require updates to two existing governed documents that already structure this coordination system.
+
+## Related Documents
+
+**Governing Documents:**
+- The multi-session coordination protocol (GOV-017), created 2026-09-22, documents the session roster in a table and the message contract in a second table. Adding the question-relay session would require:
+  - Adding a row to the session roster table (section "The sessions") listing the question-relay role, its group (meta), and claim slot (never)
+  - Adding rows to the message contract table (section "The message contract") for two new message types: QUESTION (from other sessions to relay) and ANSWER (from relay to requesting sessions)
+  - Possibly updating the "Departures from AGENTS.md" section if the relay session changes how questions flow (currently GOV-006 tells every session to use AskUserQuestion directly)
+
+- Session Manager starter messages (PROMPT-037), created 2026-09-22, contains the kickoff text and starter message template. Adding the question-relay session would require:
+  - A new role section under "Role sections" with that session's specific instructions
+  - Possibly updates to the "Shared contract" section if the relay session introduces new message types or flow rules
+
+**Parent Idea:**
+- Idea 000327 (a roster of role-based parallel interactive sessions coordinated by a Session Manager) defines the concept after implementation. Idea 000328 extends it by proposing a specific new session type for centralized question handling. The extension is already recorded as a link.
+
+**Related Ideas:**
+- Idea 000319 (investigate proper state capture and session resumability) is named in the open questions of 000327 as a related concern: if the relay session dies mid-queue, what happens to waiting questions and answers in flight?
+- Idea 000320 (an always-on broker that orders and routes conflicting action requests from concurrent agents) is mentioned in 000327's unresolved section as potentially overlapping with the Session Manager's own brokering function; a relay session would extend that pattern to questions.
+
+## Implementation Scope
+
+The idea lists unresolved questions about queue handling, context retention, batch sizing (AskUserQuestion takes at most four questions per batch call), and mobile-client compatibility. These suggest planning phases would be needed before implementation. The document updates themselves are scoped and well-bounded: add one session role to two tables in GOV-017, add one role section to PROMPT-037, and decide on the message types and flow rules the coordination contract needs.
+
+No related plan, phase or document found beyond the two governance documents and the parent idea that already record the system's architecture.
+
+</details>
+
 **Links**
 
 - extends → `000327`
+- relates_to ← `000334`
 
 ---
 
 ## 000329 · GOV-010's P9 says PLAN-038 never dates its supersession, but the replacing ruling is dated elsewhere in the plan
 
-**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+**Created 2026-09-22T22:25:38-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
 
@@ -15852,6 +16273,38 @@ Context: GOV-010 (the plan and requirement quality standard) is being written in
 
 Related: the other P9 wording correction from the same verification (the PLAN-015 dated-block claim), and the GOV-010 pattern-wrap idea. All three were recorded in the same turn.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:20-04:00): # Triage of idea 000329
+
+**Idea:** 000329 — GOV-010's P9 says PLAN-038 never dates its supersession, but the replacing ruling is dated elsewhere in the plan
+
+**Effective state:** Title and body match what was recorded; no existing links or annotations.
+
+## Finding
+
+Idea 000329 reports a factual error in GOV-010's content judgement P9 ("A superseded passage is marked, dated and explained, and the old text is kept readable"). The P9 finding currently states that PLAN-038 "records that an earlier draft proposed comparing against `HEAD` alone and that the owner's ruling replaced it. Both mark and explain the change, but neither says when it was made."
+
+However, PLAN-038 line 39 contains an explicit date: "**Two bases, two severities** (owner ruling, 2026-09-14, `REQ-010` R6)." This is the dated ruling that marks when the decision was made. The P9 wording therefore incorrectly claims that PLAN-038 lacks a date when it actually provides one.
+
+The issue is present on branch `agent/phase-idg-10` in commit 936a061 (the most recent correction to GOV-010), where the document has not yet merged to `dev`. The issue is part of a batch of three P9-related corrections from the same verification session:
+
+1. **This issue**: 000329 — P9 incorrectly says PLAN-038 has no date
+2. **Related issue**: 000331 — P9 says PLAN-015 amendment blocks name the owner and session, but the second block names only the owner
+3. **Related issue**: 000330 — GOV-010's requirement-row pattern wraps across two source lines in inline code
+
+Ideas 000331 and 000329 are already linked via `relates_to` (recorded 2026-09-22T22:25:44-04:00). The context notes that if these fixes are made on `agent/phase-idg-10` before it merges to dev, the ideas can be closed with no separate phase.
+
+**Governed documents consulted:** GOV-010 (via `git show agent/phase-idg-10:`), PLAN-038-backlog-status-regression-guard.md, PLAN-015-ephemeral-working-plans.md. No other related plans, requirements, decisions or backlog phases found.
+
+**No proposed links or promotions.** The relationship to 000331 is already recorded.
+
+</details>
+
 **Links**
 
 - relates_to ← `000331`
@@ -15860,7 +16313,7 @@ Related: the other P9 wording correction from the same verification (the PLAN-01
 
 ## 000330 · GOV-010's requirement-row pattern wraps across two source lines inside inline code, so copying it gives a newline where it needs a space
 
-**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+**Created 2026-09-22T22:25:38-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
 
@@ -15870,11 +16323,43 @@ Context: GOV-010 (the plan and requirement quality standard) is being written in
 
 Unresolved: whether other governed documents have inline code that wraps across source lines, and whether a check should catch it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:20-04:00): # Triage of 000330
+
+**Idea 000330** ("GOV-010's requirement-row pattern wraps across two source lines inside inline code, so copying it gives a newline where it needs a space") — the issue is confirmed and unresolved on branch `agent/phase-idg-10`.
+
+**Status of the issue:** On the branch, GOV-010 at lines 110–111 shows the pattern `^\| R[0-9]+` wrapping onto a second line with `\|`. Anyone copying the inline code gets:
+```
+^\| R[0-9]+
+\|
+```
+with a newline where the pattern needs a space. The fix is to keep the entire pattern on one source line.
+
+**Related ideas:** Two other ideas were recorded in the same verification session (2026-09-22, Session 1 - Builder A) from the same work on GOV-010:
+- 000329 (GOV-010's P9 says PLAN-038 never dates its supersession, but the replacing ruling is dated elsewhere in the plan) — a content accuracy issue
+- 000331 (GOV-010's P9 says each PLAN-015 amendment block names the owner and the session, but the second dated block names no session) — also a content accuracy issue; already linked to 000329
+
+All three are defects found while verifying fixes in phase-idg-10. Neither 000329 nor 000331 is a duplicate of 000330 — they address different types of issues in the same document — but they are sibling findings from the same audit session.
+
+**Unresolved:** The idea's body notes two open questions: whether other governed documents have inline code that wraps across source lines, and whether a check should catch such issues. No existing search of the docs revealed similar wrapping patterns elsewhere, and no existing verification mechanism flags inline code line wrapping.
+
+**Deliverables and timing:** GOV-010 is a deliverable of phase-idg-10 on branch `agent/phase-idg-10`. The idea notes that if the fix is made on that branch before it merges to dev, this idea can be closed with no separate phase.
+
+PROPOSED LINK: 000330 --relates_to--> 000329 (same GOV-010 verification session; different defect type)
+PROPOSED LINK: 000330 --relates_to--> 000331 (same GOV-010 verification session; different defect type)
+
+</details>
+
 ---
 
 ## 000331 · GOV-010's P9 says each PLAN-015 amendment block names the owner and the session, but the second dated block names no session
 
-**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+**Created 2026-09-22T22:25:38-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
 
@@ -15884,6 +16369,187 @@ Context: GOV-010 (the plan and requirement quality standard) is being written in
 
 Related: the other P9 wording correction from the same verification (the PLAN-038 supersession date).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:21-04:00): # Triage: 000331
+
+**Idea 000331** ("GOV-010's P9 says each PLAN-015 amendment block names the owner and the session, but the second dated block names no session") is a valid wording issue in GOV-010 (the plan and requirement quality standard).
+
+## Finding
+
+The issue is accurate. I verified on branch `agent/phase-idg-10` that:
+
+1. GOV-010's P9 content judgement currently states: "Meets it. `PLAN-015` places each amendment in a dated block naming the owner and the session."
+
+2. PLAN-015 on the same branch contains two different block formats in its Approach section:
+   - First block: "**Amended 2026-09-06 by the owner (`SESS-2026-09-06-10`).**" — names owner, date, and session id
+   - Second block: "**Answered 2026-09-06 by the owner.**" — names owner and date, but does NOT name a session id
+
+3. The "Answered" block responds to the open question about pruning policy, making it a distinct type of amendment that names no session reference.
+
+The P9 wording is therefore too broad in claiming that "each amendment" follows the full pattern. To conform to its own standard, the text should distinguish amendment blocks (which do name owner and session) from other dated responses that name owner and date only. Narrowing the wording would align GOV-010's description with what PLAN-015 actually demonstrates.
+
+## Related content
+
+- **GOV-010** (`docs/08-governance/GOV-010-plan-quality-standard.md`) — the document containing the incorrect claim, on branch `agent/phase-idg-10`
+- **PLAN-015** (`docs/01-plans/PLAN-015-ephemeral-working-plans.md`) — the plan that is being described, contains the amendment blocks in question
+- **Related ideas from same verification session** — 000329 (PLAN-038 supersession dating issue) and 000330 (requirement-row pattern wrapping issue) — these were discovered in the same phase-idg-10 verification pass on 2026-09-22
+
+The branch has not yet applied the fix mentioned in the context: this finding remains open and ready for correction when GOV-010 lands on dev.
+
+PROPOSED LINK: 000331 --relates_to--> 000329 (both are P9 wording issues discovered in phase-idg-10 verification, 2026-09-22)
+PROPOSED LINK: 000331 --relates_to--> 000330 (both are GOV-010 issues discovered in the same verification pass)
+
+</details>
+
 **Links**
 
 - relates_to → `000329`
+
+---
+
+## 000332 · A dedicated Documenter session in the multi-session roster that validates completed session records and writes up missed architecture and decisions
+
+**Created 2026-09-22T22:53:16-04:00 · Status: `triaged`**
+
+Raised by the owner on 2026-09-22, as a further role for the multi-session roster (000327, governed by GOV-017). The owner wants to explore it in more detail later.
+
+As given: add a dedicated documenter role. It waits for sessions to complete, validates each completed session record, and writes any core architecture and decisions that may have been missed.
+
+What it would do, as described:
+- Wait for other sessions to finish their work.
+- Validate the completed session record.
+- Find core architecture and decisions that the working session did not document, and write them up.
+
+Why: the building sessions focus on their phase, and decisions made along the way can go unrecorded or be recorded only in gitignored working files. A session that only documents would review every finished session for this, instead of each builder doing it for itself.
+
+What it would touch: the session-record and /session-close process, docs/03-sessions/, ADRs in docs/04-decisions/ and architecture docs in docs/07-architecture/, document-code allocation, and GOV-017's roster and message contract. It would need a message that tells it a session is complete, and turns in the primary checkout, or its own worktree and branch, for what it writes.
+
+Nearby ideas to read first: 000275 (a sub-agent per session record to extract decisions and outstanding items), 000276 (analyze how decision records are written and propose session-protocol enhancements), 000277 (a template and schema for session documentation), and 000319 (state capture, since decisions kept only in gitignored _working/ files are lost).
+
+Unresolved:
+- What "completed" means as a trigger: phase merged, /session-close run, or TURN DONE on a merge.
+- What validating a session record checks, and against what: the phase's acceptance, the diff, and the review verdict.
+- Whether the Documenter writes ADRs itself or proposes them for the owner to accept, since ADR acceptance is the owner's decision.
+- Whether it may amend a record another session wrote, or only annotate or add to it.
+- How it overlaps the review agents already in the completion gate, and /session-close's independent review.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T22:53:21-04:00): idea 000332 proposes a new session role for the multi-session coordination protocol (GOV-017), extending the roster defined for 000327 (the multi-session roster itself). The Documenter would wait for other sessions to complete, validate their session records against stated conditions, and write up architecture and decisions the building sessions may have left unrecorded.
+
+## Related ideas and their status
+
+000327 (the multi-session roster, governed by GOV-017) defines eight current roles — Session Manager, Ideation, Prompt Planner, Batch Runner, Builder A, Builder B, Standby Builder, and Scout. idea 000332 proposes adding a ninth: Documenter. The idea explicitly states it extends 000327 and would touch GOV-017's roster and message contract (PROMPT-037).
+
+Four ideas explore related ground:
+- 000275 (sub-agent per session record to extract decisions and outstanding items) — now promoted to PLAN-041 as phase-fwa-02, queued in backlog. This is one-time extraction and analysis, not a live role.
+- 000276 (analyze how decision records are written and propose session-protocol enhancements) — triaged, linked to 000275, part of PLAN-041 via REQ-025. Also analysis, not a runtime role.
+- 000277 (framework: template and schema for session documentation) — triaged. Provides structure for session records.
+- 000319 (investigate proper state capture and session resumability) — open. Overlaps on the goal of keeping decisions durable and recoverable, but focuses on resumability across sessions rather than live documentation.
+
+## Existing mechanisms and overlap
+
+The `/session-close` command (`.claude/commands/session-close.md`) already includes an independent sub-agent review (step 3), launched after checkpoint runs. This review checks that acceptance conditions hold and flags claims the diff does not support. It is per-session, not a dedicated role, and happens during session close rather than after.
+
+PLAN-008 (session opening and closing protocols) governs checkpoint and /session-close but does not name a Documenter role.
+
+## Related governed documents
+
+- GOV-017 (multi-session coordination protocol) — defines the current eight roles, their message contract, the primary-checkout lock, claim slots, and merge gate. No Documenter role is named.
+- PROMPT-037 (session manager starter messages) — starter messages for the eight current roles. Would need extension if a Documenter role is added.
+- PLAN-041 (portable framework content extraction) — where idea 000275 was promoted. Covers extraction of decisions from finished session records as a batch analysis pass, distinct from the live role idea 000332 proposes.
+- REQ-025 (portable framework content extraction requirements) — requirements for the extraction work (R02 covers session-record extraction of the five categories 000275 names).
+
+## Unresolved questions the idea correctly names
+
+The idea lists five open questions that would need settling before the role is built: what "completed" means as a trigger; what validation checks; whether the Documenter writes ADRs or proposes them; whether it may amend records written by other sessions or only annotate; and how it relates to the review agents already in the completion gate and /session-close's independent review.
+
+## Distinct from existing work
+
+The Documenter differs from both the existing /session-close review and the extraction work in PLAN-041. The review in /session-close is per-session and synchronous (part of closing). The extraction in PLAN-041 is one-time, post-hoc analysis of finished records. The Documenter would be a persistent, asynchronous role that monitors for completed sessions and validates/augments them as they finish, with authority to write into docs/03-sessions/, docs/04-decisions/, and docs/07-architecture/ as part of the ongoing multi-session coordination.
+
+PROPOSED LINK: idea 000332 --extends--> 000327 (proposes adding a Documenter role to the multi-session roster)
+PROPOSED LINK: idea 000332 --relates_to--> 000319 (both aim to make decisions and session state durable; Documenter as a runtime role vs resumability investigation)
+
+</details>
+
+**Links**
+
+- extends → `000327`
+
+---
+
+## 000333 · Decide which capabilities the broker denies first, and investigate before any denial is wired into .claude/settings.json
+
+**Created 2026-09-22T22:53:21-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-22 and forwarded by the Session Manager.
+
+As given: decide which capabilities the autonomous-operations broker should deny first, and investigate that before any denial is wired into .claude/settings.json.
+
+Why it came up: Session 5 - Batch Runner produced an example hook that denied WebFetch and WebSearch in every session. That conflicts with CLAUDE.md's "Verify before claiming ignorance" rule, which requires a session to search, including the web, before saying it does not know something. A denial applied in the shared settings file reaches every session, not just the unattended runs the broker exists to gate.
+
+What the governed documents leave undefined: ADR-022 (broker-first autonomous operations) defers the capability taxonomy. The broker as designed denies nothing by default. REQ-017 R02 (narrow, named capability sets per run) and R04 (approvals with scope, reason, expiry and an immutable decision) are still open, and that is the mismatch 000326 records against PLAN-032's coverage table.
+
+What it would touch: the broker's capability taxonomy and first denial set (PLAN-032, phase-auto-02), .claude/settings.json and any hooks, and how a denial is scoped. It should apply per run or per role, not to every interactive session.
+
+Unresolved:
+- Which capabilities to deny first, and why.
+- Whether denials apply only to unattended or broker-gated runs, or also to interactive sessions.
+- How a denial coexists with standing rules such as "Verify before claiming ignorance".
+- Who approves a change to the shared settings file.
+
+Related: 000326 (the PLAN-032/REQ-017 R02 and R04 coverage mismatch) and 000031 (the capability and approval broker for agent actions).
+
+**Links**
+
+- relates_to → `000326`
+- relates_to → `000031`
+
+---
+
+## 000334 · Carry the Session Manager system (GOV-017) into the automated agency delivery system built on LangGraph and the Claude Agent SDK
+
+**Created 2026-09-22T22:53:22-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-22 and forwarded by the Session Manager.
+
+As given: consider where the Session Manager system built on 2026-09-22 should be injected into, adapted into, or recreated as part of the automated agency delivery system built on LangChain/LangGraph and the Claude Agent SDK.
+
+What the Session Manager system is: GOV-017 (the multi-session coordination protocol) and PROMPT-037 (the session starter messages). Its parts are:
+- role-based parallel sessions;
+- a primary-checkout lock;
+- claim-slot allocation;
+- a merge gate, where the Session Manager relays each merge request to the owner and the owner's approval back;
+- a typed message contract (TURN?, GRANTED, TURN DONE, READY, REBASE, BLOCKED, FREE, IDEA).
+Today it is run by live interactive Claude Code sessions talking through cross-session messages.
+
+The three options named:
+- Inject: the automated system uses the Session Manager protocol as it is, for example by talking to a live Session Manager.
+- Adapt: the protocol's rules, such as the lock turns, claim slots and merge gate, become nodes, state or edges in the LangGraph orchestrator.
+- Recreate: the automated system builds its own equivalent, and GOV-017 stays the protocol for interactive sessions only.
+
+What it would touch: the idea realization system's orchestrator, meaning phase-irs-04 (the LangGraph skeleton, next in batch-002) and phase-irs-16 (the daemon process model); ADR-018 (LangGraph orchestration); GOV-017 and PROMPT-037.
+
+Unresolved:
+- Which of the three options, and whether the answer differs for each part of the protocol.
+- Whether it has to be decided before phase-irs-04 starts, since that phase fixes the orchestrator's shape.
+- How the daemon's "propose, then observe" claim model in phase-irs-16 compares with the Session Manager's granted-turn model.
+- Whether the owner's merge approval stays human in the automated system.
+
+Related: 000327 (the session roster), 000328 (the question-relay session), 000320 (the always-on action-request broker).
+
+**Links**
+
+- relates_to → `000327`
+- relates_to → `000328`
+- relates_to → `000320`
