@@ -17914,3 +17914,33 @@ PROPOSED LINK: 000356 --relates_to--> 000320 (both concern ordering concurrent w
 **Links**
 
 - relates_to → `000347`
+
+---
+
+## 000357 · Review-overdue warnings still go to governance stdout, so --catalog will break again from 2026-12-06
+
+**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+
+src/governance/__main__.py:190/523: "review overdue since ..." warnings still print to stdout. ARCH-002 and GOV-001 have review_after 2026-12-05, so from 2026-12-06 --catalog stdout gets WARNING lines and test_catalog_flag_writes_committed_file fails on every branch. Relates to 000335. The owner decides whether all warnings go to stderr.
+
+(From Session 3 - Standby Builder, relayed to Ideation.)
+
+---
+
+## 000358 · Align /session-start and PROMPT-036 merge steps with the GOV-017 gate
+
+**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+
+.claude/commands/session-start.md §8-9 and PROMPT-036 step 9 leave out the ruff/mypy gate checks and the refuse_dirty_integration.py check before ff-merge, which GOV-017 and PROMPT-037 now require (branch agent/docs-gov017-amendments).
+
+(From Prompt Planner, relayed to Ideation.)
+
+---
+
+## 000359 · Coordinate agent sessions from other providers (Gemini, Codex) under the multi-session protocol
+
+**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+
+Support coordinating agent sessions from other providers (Gemini, Codex) under the multi-session protocol, not just Claude Code sessions. This includes whether the coordination can be adapted onto LangChain/LangGraph with multi-provider model support. Likely relates to 000347 (the Session Manager automation cluster) and P3 (session-manager-on-langgraph.md).
+
+(From the owner, relayed by Session Manager to Ideation.)
