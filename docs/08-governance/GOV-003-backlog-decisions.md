@@ -664,7 +664,7 @@ sessions run under `GOV-017`:
    conflict-free phases and approved by the owner, rather than taking the first ready phase themselves.
 4. **A `GRANTED merge` relayed by the Session Manager is the owner's approval** under `AGENTS.md`
    step 8, for every session.
-5. **A batch table's `status` line is committed in the primary checkout** inside a `batch` turn
+5. **A batch table's `status` and `updated` lines are committed in the primary checkout** inside a `batch` turn
    (ruled later the same night, when Prompt Planner found that `PROMPT-036`'s batch-open commit had
    no turn purpose).
 6. **Preflight `pytest` runs in the worktree, never the primary checkout.** On 2026-09-22 two

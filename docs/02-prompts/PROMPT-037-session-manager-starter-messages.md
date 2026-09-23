@@ -62,7 +62,7 @@ Roster
    Reading there is fine. Never write, commit, merge or switch branches there without a grant.
      send  TURN? <claim|idea|batch> <phase or batch-id>
            (a claim carries its catalog regen; batch = a batch table's status
-           line only; merges go through READY below)
+           and updated lines only; merges go through READY below)
      wait  GRANTED (or QUEUED <n>)
      do    only the stated purpose; leave `git status` clean
      send  TURN DONE <sha>

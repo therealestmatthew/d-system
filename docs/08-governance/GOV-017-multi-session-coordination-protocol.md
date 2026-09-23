@@ -45,7 +45,7 @@ Each of these is an owner ruling of 2026-09-22, recorded in
 4. **Merge approval is relayed.** `AGENTS.md` step 8 says to ask the owner before integrating. Under
    this protocol a `GRANTED merge` from the Session Manager is the owner's approval, for every
    session, including where `/session-start` or `PROMPT-036` says to ask the owner in the session.
-5. **A batch table's `status` line is committed in the primary checkout** inside a `batch` turn, as
+5. **A batch table's `status` and `updated` lines are committed in the primary checkout** inside a `batch` turn, as
    `PROMPT-036` requires when it opens or closes a batch (owner ruling, 2026-09-22, later that night).
 6. **Preflight tests run in the worktree.** `/session-start` step 1 (via `/backlog`) and `PROMPT-036`
    preflight step 2 run `uv run pytest` in the primary checkout. Under this protocol that run happens
@@ -179,7 +179,7 @@ sent to the name `Session Manager`.
 | Message | From | Meaning |
 |---|---|---|
 | `ACK <session> <state>` | any | Orientation received; states phase, branch and worktree, or none |
-| `TURN? <claim\|idea\|batch> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` line, as `PROMPT-036` sets it when it opens or closes a batch; merges go through `READY` |
+| `TURN? <claim\|idea\|batch> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines, as `PROMPT-036` sets it when it opens or closes a batch; merges go through `READY` |
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
 | `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean |
