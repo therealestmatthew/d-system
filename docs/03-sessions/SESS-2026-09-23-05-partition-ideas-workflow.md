@@ -355,14 +355,22 @@ that is a JSON list or string (no crash). It found step 2, step 5 and GATE 3 con
 `accepted` means, the adapters current and identical, and the diff inside the declared
 deliverables. **No finding survived.**
 
-## Resume state (overnight safe point, 2026-09-23)
+## Resume state (overnight sprint safe point, 2026-09-23, after the dry run)
 
-- Branch `agent/phase-part-03` is pushed. The build is in `d8428df`, and this record and the
-  backlog checkpoint are in the commits after it.
-- An independent `demo-adversary` review of `dev...HEAD` was dispatched before the safe point, and
-  its result had not returned when this was written. **Next step on resume:** if its report is in
-  the session, fix or accept each finding and record it here under `## Review`. If the session was
-  cleared, dispatch a fresh review of `dev...agent/phase-part-03` with the same brief. Then rebase,
-  re-run governance and pytest in the worktree, and send READY. After the owner-approved merge,
-  request `TURN? dryrun phase-part-03` and run the dry run listed under Verification.
-- Separately, `agent/heredoc-procedure` (`e2ad13a`) is owner-approved and queued third for merge.
+- **Merged:** the build and both fix cycles reached dev at `32db922` through a delegated
+  `GRANTED merge`. The claim is still active, held by `agent-builder-b`, and the phase is not
+  complete.
+- **Branch:** `agent/phase-part-03` is pushed with the dry-run evidence and the PARK question in
+  the commits after `32db922`. None of it is on dev yet. Worktree:
+  `/code/d-system-worktrees/phase-part-03`.
+- **Primary checkout `_working/idea-corpus/`** (gitignored): this sweep's corpus (seed
+  `656057328`, 325 ideas), `dispatch-R1.txt`, `dispatch-R4.txt`, the stamped `report-R4.md`, R1's
+  self-written `report-R1.md` and `condensed.md` (untouched), and `previous-2026-09-13/` holding the
+  ten earlier files.
+- **Parked** by the Session Manager's ruling: the completion edit waits for the owner's A/B/C
+  choice under `## Unresolved`.
+- **Next step once the owner rules:** carry out the chosen option. B and C run in a `dryrun` turn.
+  Record the outcome here. Send the branch's record commits through READY, never by checking out
+  files onto dev. After `GRANTED merge`, make the completion edit, then remove the worktree and
+  branch.
+- R4, the phase-fit procedure and agent (`phase-irs-05`), cannot start while this claim is held.
