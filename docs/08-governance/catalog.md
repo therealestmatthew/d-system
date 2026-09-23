@@ -52,6 +52,7 @@ CI regenerates it and fails on any difference.
 | GOV-015 | governance | active | repository-owner | docs/08-governance/GOV-015-agent-surface-audit.md |
 | GOV-016 | governance | active | repository-owner | docs/08-governance/GOV-016-batch-orchestration-protocol.md |
 | GOV-017 | governance | active | repository-owner | docs/08-governance/GOV-017-multi-session-coordination-protocol.md |
+| GOV-018 | governance | active | repository-owner | docs/08-governance/GOV-018-three-altitude-review-procedure.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -168,6 +169,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-035 | prompt | active | repository-owner | docs/02-prompts/PROMPT-035-queued-phase-review-pack.md |
 | PROMPT-036 | prompt | active | repository-owner | docs/02-prompts/PROMPT-036-build-coordinator.md |
 | PROMPT-037 | prompt | active | repository-owner | docs/02-prompts/PROMPT-037-session-manager-starter-messages.md |
+| PROMPT-038 | prompt | active | repository-owner | docs/02-prompts/PROMPT-038-single-adversary-engine.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -418,4 +420,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-336 documents — adr: 19, architecture: 11, governance: 15, operation: 21, plan: 58, prompt: 37, requirement: 27, session: 148.
+338 documents — adr: 19, architecture: 11, governance: 16, operation: 21, plan: 58, prompt: 38, requirement: 27, session: 148.
