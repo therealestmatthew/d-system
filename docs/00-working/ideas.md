@@ -15837,3 +15837,53 @@ Unresolved:
 **Links**
 
 - extends → `000327`
+
+---
+
+## 000329 · GOV-010's P9 says PLAN-038 never dates its supersession, but the replacing ruling is dated elsewhere in the plan
+
+**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+
+From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
+
+As given: GOV-010's finding P9 says PLAN-038 never dates its supersession. The ruling that replaces it is dated elsewhere in the plan: "(owner ruling, 2026-09-14, REQ-010 R6)". Correct the P9 wording.
+
+Context: GOV-010 (the plan and requirement quality standard) is being written in phase-idg-10 on branch agent/phase-idg-10 (last commit 936a061 when this was recorded). It is not on dev yet. If the fix is made on that branch before it merges, this idea can be closed with no separate phase.
+
+Related: the other P9 wording correction from the same verification (the PLAN-015 dated-block claim), and the GOV-010 pattern-wrap idea. All three were recorded in the same turn.
+
+**Links**
+
+- relates_to ← `000331`
+
+---
+
+## 000330 · GOV-010's requirement-row pattern wraps across two source lines inside inline code, so copying it gives a newline where it needs a space
+
+**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+
+From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
+
+As given: GOV-010 gives the requirement-row regular expression `^\| R[0-9]+ \|` as inline code, and in the source that inline code wraps onto a second line. Anyone who copies the pattern from the source gets a newline where the pattern needs a space, so it no longer matches. Keep the pattern on one source line.
+
+Context: GOV-010 (the plan and requirement quality standard) is being written in phase-idg-10 on branch agent/phase-idg-10 (last commit 936a061 when this was recorded). It is not on dev yet. If the fix is made on that branch before it merges, this idea can be closed with no separate phase.
+
+Unresolved: whether other governed documents have inline code that wraps across source lines, and whether a check should catch it.
+
+---
+
+## 000331 · GOV-010's P9 says each PLAN-015 amendment block names the owner and the session, but the second dated block names no session
+
+**Created 2026-09-22T22:25:38-04:00 · Status: `open`**
+
+From Session 1 - Builder A, found while verifying the fixes in phase-idg-10, 2026-09-22.
+
+As given: GOV-010's finding P9 says PLAN-015 puts "each" amendment in a dated block naming the owner and the session. PLAN-015's second dated block is an answer, not an amendment, and names no session. Narrow the wording so it does not claim more than PLAN-015 shows.
+
+Context: GOV-010 (the plan and requirement quality standard) is being written in phase-idg-10 on branch agent/phase-idg-10 (last commit 936a061 when this was recorded). It is not on dev yet. If the fix is made on that branch before it merges, this idea can be closed with no separate phase.
+
+Related: the other P9 wording correction from the same verification (the PLAN-038 supersession date).
+
+**Links**
+
+- relates_to → `000329`
