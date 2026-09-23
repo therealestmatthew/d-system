@@ -266,6 +266,15 @@ Owner rulings from this session. Each changed what was built.
 - The first corpus-id pattern in the step-5 check matched any heading containing six digits,
   including finding bodies (178 matches against a corpus of 152). It now matches only the builder's
   entry heading, `## <id> — `.
+- **A cause reported before it was checked, twice (2026-09-23).** (1) The READY for the analyst
+  fix told the Session Manager that dev's two catalog-test failures also occurred "without my
+  changes" before they had been run on dev. A throwaway worktree at `f6216e9` then gave `2 failed,
+  59 passed`, and a follow-up message said the claim was now verified. (2) One failed dispatch to
+  `partition-analyst` right after its merge was reported as "agent types load when a session
+  starts", with BLOCKED and a request for a restart. Minutes later the harness listed the type in
+  the same session. The resume state was corrected. At the owner's direction this is recorded as
+  the brain procedure `mem-proc-verify-a-cause-before-you-report-it` (branch
+  `agent/verify-cause-procedure`).
 
 ## Review
 
