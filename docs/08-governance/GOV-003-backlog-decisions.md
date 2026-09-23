@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-22'
+updated: '2026-09-23'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -678,3 +678,49 @@ sessions run under `GOV-017`:
 **Why recorded here:** these rulings change who may write in the primary checkout and how an
 integration is approved. An agent reading only `AGENTS.md` would treat an Ideation commit or a relayed
 approval as a violation.
+
+## Batch-003 opening pack: order, split and fixes — 2026-09-23
+
+The owner answered the eight-question opening pack for batch-003 (`_working/session-manager/batch-003-opening-pack.md`),
+collected on mobile on 2026-09-22. Four of the eight answers change tracked files; this entry records
+those four so an agent reading only the phase lines has the reasoning.
+
+**`phase-irs-11` runs before `phase-irs-14` (Q1).** `phase-irs-11` builds the run-budget cap and kill
+switch (REQ-022 R20/R21) and now tests its "multi-stage run" acceptance line against `phase-irs-04`'s
+intake graph — its own tick-then-gate sequence — rather than against a batch or unit run that does not
+exist yet at this point in the build order. `phase-irs-14` gains `phase-irs-11` in `depends_on`, so
+every dispatch its batch graph adds is covered by the cap and kill switch from its first run. The
+batch-003 table's stage 1 and stage 2 are swapped accordingly: stage 1 is now `phase-irs-11` and
+`phase-idg-10`, stage 2 is `phase-irs-14` (`after: [phase-irs-11]`) and `phase-idg-11`.
+
+**The terminal-state authority process splits out of `phase-idg-01` into `phase-idg-14` (Q4), the
+same reasoning as the `phase-idg-13` split above.** `phase-idg-01` keeps the schema change — the
+three ARCH-005 axes, `component_of`, `lineage`, document-code link targets, the ADR, and the three
+terminal statuses with their pointer requirement. `phase-idg-14` (new, `phase-idg-14` was unused; not
+added to any batch table or to `next_up`) depends on `phase-idg-01` and builds the two-agent
+propose/verify/ratify process this repository's 2026-09-22 lifecycle ruling (above) approved for
+reaching `delivered`/`resolved`/`absorbed`.
+
+Two further owner answers shape `phase-idg-14`'s acceptance (Q5) and its provenance shape (Q6).
+**Acceptance is narrowed to what a verification command can observe:** "the log distinguishes an
+agent-written terminal state from an owner-ratified one, through a field." The clause requiring the
+proposing agent to surface the close in its own report moves to `next_action`, since no test can read
+an agent's report text. **The provenance field is named now rather than left to the builder:** a
+`proposed_by: agent|owner` field on the status event.
+
+**Four review fixes are applied (Q8), all extra verification lines or deliverable paths.**
+`phase-irs-14` gains a verification line naming the (not-yet-written) two-track different-speeds
+test. `phase-irs-11` gains two, naming the low-cap park-and-resume test and the kill-switch
+trip-and-clear test. `phase-idg-11` gains `uv run pytest` in `verification`, matching every sibling
+phase. `phase-idg-01` gains `test/` and `src/governance/` in `deliverables`. None of the named test
+paths exist yet, so each line names the test by what it checks rather than a path, per the owner's
+instruction that the builder fills in the path once the test file exists.
+
+**Q3 (the stale `phase-part-03` dependency in PLAN-039.01 §12) is deliberately not touched here.**
+The owner's answer puts that one-line plan correction in `phase-irs-14`'s own branch, so it merges
+with the phase it describes rather than riding in this fixes branch.
+
+**Why recorded here:** the split and the reorder both change `depends_on` edges and a batch table's
+stage composition without being visible from either phase's own diff in isolation — an agent reaching
+`phase-idg-01`, `phase-idg-14`, `phase-irs-11` or `phase-irs-14` needs the reasoning, not just the
+amended entries.

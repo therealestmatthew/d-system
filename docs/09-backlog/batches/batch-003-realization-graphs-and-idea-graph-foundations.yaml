@@ -6,7 +6,7 @@ title: Batch graph and run budgets, with the idea schema bundle and plan-quality
 status: queued
 sequence: 3
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-23'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
   the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
@@ -30,11 +30,10 @@ stages:
   rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or
     overlapping deliverable path.'
   phases:
-  - id: phase-irs-14
-    title: Batch graph with per-track fan-out and the amend-as-re-key flow
+  - id: phase-irs-11
+    title: Run budgets, hard caps and the kill switch
     after: []
     conflicts_with:
-    - phase-irs-11
     - phase-idg-01
   - id: phase-idg-10
     title: Audit the plan corpus and write the plan-quality standard
@@ -43,14 +42,15 @@ stages:
     - phase-idg-11
 - stage: 2
   parallel: true
-  rationale: Cut after stage 1 because phase-irs-11 shares a locked system or deliverable path with
-    phase-irs-14; phase-idg-11 shares a locked system or deliverable path with phase-idg-10.
+  rationale: Cut after stage 1 because phase-irs-14 depends on phase-irs-11 (batch-003 Q1, so its
+    dispatches are covered by the cap and kill switch from their first run); phase-idg-11 shares a
+    locked system or deliverable path with phase-idg-10.
   phases:
-  - id: phase-irs-11
-    title: Run budgets, hard caps and the kill switch
-    after: []
+  - id: phase-irs-14
+    title: Batch graph with per-track fan-out and the amend-as-re-key flow
+    after:
+    - phase-irs-11
     conflicts_with:
-    - phase-irs-14
     - phase-idg-01
   - id: phase-idg-11
     title: Define where a promoted plan lives before it earns a code

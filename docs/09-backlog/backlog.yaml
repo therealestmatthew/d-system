@@ -9770,17 +9770,6 @@ items:
   - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
   - delivered, resolved and absorbed are legal statuses, each rejected by the writer when no pointer is
     given, and promoted accepts a later transition to delivered.
-  - 'An agent-written terminal state is distinguishable from an owner-ratified one by reading the log,
-    and the agent that writes it surfaces it in its own report - a close never passes silently as though
-    ratified. An unratified close blocks nothing: downstream work proceeds and ratification catches up
-    in batch.'
-  - 'The pending closes are derivable from the log by any consumer, so no queue has to exist for the
-    close to be recorded. phase-irs-13''s gate queue is the intended presentation once it ships, and is
-    deliberately not a build dependency of this phase - making it one would park an owner-approved
-    lifecycle change behind five unbuilt phases.'
-  - 'A close proposed by one agent is verified by a second before the owner sees it, per the ruling''s
-    authority model - the verifier checks that the cited pointer actually resolves. Without this the
-    ruling degrades to a single agent closing ideas unchecked, which is not what was approved.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -9790,14 +9779,16 @@ items:
   - tools/append_idea.py
   - docs/04-decisions/
   - docs/07-architecture/ARCH-005-idea-node-classification.md
+  - test/
+  - src/governance/
   next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
     terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
     pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
     state rather than inventing one - check that phase before changing the transition table.
-    A status event carries no author field, and neither does a linked event, so the acceptance line
-    requiring an agent-written close to be distinguishable from an owner-ratified one has nothing in
-    the existing event shape to lean on - the marking mechanism has to carry that provenance itself,
-    whichever form it takes. Links are unaffected - the owner approves every edge before it is written,
+    The two-agent propose/verify/ratify authority process for reaching a terminal state, and the
+    provenance marking it needs, were split out on 2026-09-23 into phase-idg-14 (owner ruling,
+    batch-003 Q4) - this phase ships the statuses and their pointer requirement only, not the
+    process that reaches them. Links are unaffected - the owner approves every edge before it is written,
     so their provenance is a fact about the process rather than the record.
     Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
     fields before recording why they are fields inverts the reasoning. Name the three fields and
@@ -9851,6 +9842,57 @@ items:
     where a broken schema is loud. Do not start before phase-idg-01 ships the states; there is nothing
     to close into until then. The sweep is a read of every idea's findings, so budget for reading 300+
     annotations rather than for a mechanical pass.
+- id: phase-idg-14
+  title: Build the terminal-state authority process - propose, verify, ratify
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - Build the two-agent authority process for reaching a terminal state (delivered, resolved or
+    absorbed), per the owner's 2026-09-22 ruling raised by idea 000236 - an agent proposes the close
+    with its evidence (a pointer), a second agent verifies the pointer resolves, and the owner
+    ratifies a queue of them in one sitting. This is the first agent-writable terminal transition in
+    the idea log.
+  - 'Mark provenance with a proposed_by: agent|owner field on the status event (owner-named shape,
+    batch-003 Q6), so a reader can always tell a ratified close from an unratified one.'
+  - 'An agent-written close announces itself as awaiting review and never blocks: downstream work
+    proceeds on the closed idea, and the owner''s ratification catches up in batch.'
+  - Consume phase-irs-13's gate queue for the owner's batched ratification once it ships, but do not
+    depend on it - the marking mechanism must stand alone until then.
+  acceptance:
+  - 'The log distinguishes an agent-written terminal state from an owner-ratified one, through a
+    field.'
+  - 'A close proposed by one agent is verified by a second agent, who confirms the cited pointer
+    resolves, before it is treated as ratified; a close missing either step remains marked as
+    agent-written rather than ratified.'
+  - 'Pending (unratified) closes are derivable from the log by any consumer without phase-irs-13''s
+    gate queue existing - that queue is the intended presentation once it ships, not a build
+    dependency of this phase.'
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - tools/append_idea.py
+  - src/db/ideas.py
+  - test/
+  next_action: 'Split out of phase-idg-01 on 2026-09-23 by owner ruling (batch-003 Q4) - the schema
+    change and the authority process are two different failure modes, the same reasoning that split
+    phase-idg-13 out on 2026-09-22. Do not start before phase-idg-01 ships the terminal statuses and
+    their pointer requirement; there is nothing to propose a close into until then. The agent that
+    writes a terminal-state close surfaces it in its own report, so the owner does not have to notice
+    a status change in the log by reading it - this requirement lives here as a next_action rather
+    than in acceptance because no test can read an agent''s report text (batch-003 Q5). Neither the
+    existing status event nor a linked event carries an author field, which is why the proposed_by
+    field is being added rather than reused (batch-003 Q6).'
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle
@@ -10196,6 +10238,7 @@ items:
   - It is consistent with GOV-005's rule that a code is permanent once it reaches the trunk.
   verification:
   - uv run python -m src.governance
+  - uv run pytest
   deliverables:
   - docs/04-decisions/ADR-019-promoted-plan-staging.md
   - docs/08-governance/GOV-011-promoted-plan-staging.md
@@ -12895,6 +12938,12 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
+  - 'uv run pytest -k low_cap_park_and_resume - the test asserting a low-cap run parks and then
+    resumes cleanly, with its ledger intact, once the cap is raised; name is a placeholder until
+    the test file exists.'
+  - 'uv run pytest -k kill_switch_trip_and_clear - the test asserting the kill switch trips the
+    intake graph''s multi-stage tick-then-gate run and dispatch resumes once the switch is cleared;
+    name is a placeholder until the test file exists.'
   deliverables:
   - src/
   - test/
@@ -13039,6 +13088,7 @@ items:
   depends_on:
   - phase-irs-04
   - phase-part-03
+  - phase-irs-11
   scope:
   - Implement the batch graph's per-track fan-out across stages 3 through 7 - LangGraph Send to one
     branch per accepted track, a G2 interrupt for the partition and one G3 interrupt per track's
@@ -13060,6 +13110,9 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
+  - 'uv run pytest -k two_track_different_speeds - the fixture test asserting a fast track reaches
+    its own G3 while a slower sibling track is still in an earlier stage, with neither track gating
+    on the other; name is a placeholder until the test file exists.'
   deliverables:
   - src/
   - test/
