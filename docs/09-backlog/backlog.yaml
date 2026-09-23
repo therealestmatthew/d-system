@@ -3,7 +3,6 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-irs-04
 - phase-irs-16
 - phase-part-03
 - phase-irs-14
@@ -12559,7 +12558,7 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 2
   session_budget: 1
@@ -12605,6 +12604,29 @@ items:
   - docs/08-governance/OPS-023-append-decision.md
   next_action: Pin the LangGraph dependency and confine its import surface to src/orchestrator/ (graphs/,
     tick, state, gates) before writing the first node.
+  session: doc-session-langgraph-orchestrator-skeleton
+  completion_evidence:
+  - src/orchestrator/__init__.py
+  - src/orchestrator/tick.py
+  - src/orchestrator/graphs/intake.py
+  - schemas/run.schema.json
+  - schemas/gate-decision.schema.json
+  - tools/append_run.py
+  - tools/append_decision.py
+  - docs/08-governance/OPS-022-append-run.md
+  - docs/08-governance/OPS-023-append-decision.md
+  - docs/04-decisions/ADR-018-langgraph-orchestration.md
+  - test/test_orchestrator.py
+  - docs/03-sessions/SESS-2026-09-23-01-langgraph-orchestrator-skeleton.md
+  result: 'LangGraph orchestrator skeleton in src/orchestrator/ (intake graph, tick, thin state with
+    re-derivation by thread re-keying, interrupt-only gates, CLI tick/gate/halt/resume-dispatch), the run
+    ledger and decision inbox with schemas, writers and OPS-022/023, langgraph==1.2.12 and
+    langgraph-checkpoint-sqlite==3.1.1 pinned, ADR-018 accepted. Attended-only: dispatch needs the
+    --dispatch flag and a per-idea dispatch-authorization decision (owner-approved deviation from
+    PLAN-039.01, idea 000338). Post-rebase verification: "Governance OK: 35 systems, 330 documents, 30
+    memories, 293 backlog phases"; pytest "905 passed"; ruff "All checks passed!"; mypy "no issues found
+    in 42 source files"; the claim grep matches only the R19 boundary docstring. Validator PASS; adversary
+    one MEDIUM (the gate) ruled keep; one lint/type fix cycle.'
 - id: phase-irs-05
   title: Phase-fit procedure and agent
   plan: doc-idea-realization-system-plan
