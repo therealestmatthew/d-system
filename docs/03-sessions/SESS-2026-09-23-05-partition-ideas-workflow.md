@@ -372,6 +372,30 @@ that is a JSON list or string (no crash). It found step 2, step 5 and GATE 3 con
 `accepted` means, the adapters current and identical, and the diff inside the declared
 deliverables. **No finding survived.**
 
+### Review of the read-only analyst change (option C, 2026-09-23)
+
+A fresh `demo-adversary` review of `d50b54b` (skill dispatch) and `7fe932b` (the
+`partition-analyst` agent file) against `origin/dev` checked six constraints and found **no
+blocker, major or minor finding**:
+
+- The agent file's body says nothing about findings, other analysts or a control, so R4's context
+  stays clean.
+- It adds no analysis instructions; it covers only how the report is returned and how a large
+  file is read.
+- `tools: Read, Grep, Glob` leaves no write route. `.mcp.json` configures only Playwright, and in
+  this repository an agent gets an MCP tool only by listing it. The review relies on Claude Code's
+  frontmatter semantics and the repository's existing read-only agents here; it did not dispatch
+  a live agent. The R1 re-run exercises this.
+- `corpus-R1.md` is 14,882 lines, about eight ranged reads; `maxTurns: 60` leaves room.
+- The skill names `partition-analyst` consistently. The only remaining "general-purpose agent"
+  text for R1 and R4 is in `PROMPT-034`, which is unchanged by ruling. The adapters are current and
+  identical.
+- The frontmatter matches the other hand-written agent files.
+
+Two notes, accepted without change: the fix is built but not yet exercised end to end, which is
+the R1 re-run's job; and the commit message's "option A" means the follow-up question's option,
+not the `## Unresolved` question's option A. The Decisions section above names both.
+
 ## Resume state (overnight sprint safe point, 2026-09-23, after the dry run)
 
 - **Merged:** the build and both fix cycles reached dev at `32db922` through a delegated
