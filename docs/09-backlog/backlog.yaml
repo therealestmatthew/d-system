@@ -10078,7 +10078,8 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 2
   session_budget: 1
   depends_on: []
@@ -10104,6 +10105,8 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/08-governance/GOV-010-plan-quality-standard.md
+  - docs/08-governance/codes.yaml
+  - templates/governance/document.md
   next_action: PLAN-016 and PLAN-017 are named in 000047 as the dense end of the corpus. Start there and
     find the thin end honestly rather than picking a weak plan to make the point.
 - id: phase-idg-11

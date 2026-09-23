@@ -368,7 +368,7 @@ CI regenerates it and fails on any difference.
 | PLAN-026 | doc-concurrency-git-safety | active | 6 | 1 | 3 | agent-conc, agent-coord, agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 10 | 0 | 2 | agent-demo-a, agent-prog |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
-| PLAN-029 | doc-idea-graph-lifecycle | active | 13 | 0 | 1 | agent-night |
+| PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 1 | 1 | agent-builder-a, agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 7 | 0 | 1 | agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | active | 6 | 0 | 1 | agent-night |
