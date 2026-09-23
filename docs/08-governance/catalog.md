@@ -329,6 +329,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-22-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-06-refuse-dirty-integration.md |
 | SESS-2026-09-22-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-07-governance-protocol-templates.md |
 | SESS-2026-09-22-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-08-autonomous-operations-architecture.md |
+| SESS-2026-09-22-09 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-09-plan-quality-standard.md |
 | SESS-2026-09-22-10 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-10-capture-structuring-routing.md |
 
 ## Plans and their phases
@@ -405,4 +406,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-323 documents — adr: 19, architecture: 11, governance: 15, operation: 18, plan: 58, prompt: 37, requirement: 27, session: 138.
+324 documents — adr: 19, architecture: 11, governance: 15, operation: 18, plan: 58, prompt: 37, requirement: 27, session: 139.
