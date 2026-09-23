@@ -8540,6 +8540,7 @@ The links are already correct and complete; 000168 is the survey layer that unif
 - relates_to → `000156`
 - relates_to → `000169`
 - relates_to ← `000164`
+- relates_to ← `000327`
 
 ---
 
@@ -12286,6 +12287,8 @@ The three ideas (000239, 000242, 000245) represent the same governance gap from 
 - relates_to ← `000239`
 - relates_to ← `000240`
 - relates_to ← `000245`
+- relates_to ← `000321`
+- relates_to ← `000336`
 
 ---
 
@@ -12549,6 +12552,7 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 - extended_by ← `000248`
 - relates_to ← `000249`
 - relates_to ← `000250`
+- relates_to ← `000334`
 
 ---
 
@@ -12593,6 +12597,7 @@ PROPOSED LINK: 000248 --relates_to--> 000082 (both address multi-agent orchestra
 - relates_to → `000030`
 - relates_to → `000082`
 - relates_to ← `000249`
+- relates_to ← `000327`
 
 ---
 
@@ -15356,7 +15361,7 @@ Related: 000281 is the anchor this came from and carries the finding.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Triage finding: 000314
 
@@ -15369,6 +15374,7 @@ This finding was already recorded against idea 000281 (the batch anchor), which 
 Related documents: PLAN-040, PLAN-041, REQ-024, REQ-025 (phase-fwt-01 through -05, phase-fwa-01 through -03).
 
 Existing link is appropriate: 000314 --relates_to--> 000281, since 000281 is the starter-kit anchor and anchor for the entire batch that makes this assembly decision necessary.
+- **finding** by agent-ideation (2026-09-23T00:50:48-04:00): Owner ruling, 2026-09-22 (asked by Ideation): add one assembly phase after the framework component phases, to package the templates, schemas and pattern extraction into the starter kit. Chosen over widening an existing framework plan and over deciding later.
 
 </details>
 
@@ -15408,7 +15414,7 @@ Related: 000287 carries the finding this came from.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T22:53:17-04:00): # Triage: 000315 — The literature campaign's recommendations have no consuming phase
 
@@ -15428,12 +15434,14 @@ Related: 000287 carries the finding this came from.
 **The core decision:** Idea 000315's body correctly names the gap as a decision point: "whether a consuming phase is warranted at all given the campaign's own stated coverage bound of 13 percent of the candidate pool, or whether the honest disposition is to record the recommendations as reference material and say so, rather than leaving them in a state that reads as pending action." The campaign output is pending action by its current filing. An owner ruling is required to resolve the disposition: either build a consuming phase downstream of phase-lit-09 (which closed the evidence gaps), or formally record these documents as reference material with no follow-up phase.
 
 PROPOSED LINK: 000315 --relates_to--> 000287 (both identify the same gap: campaign recommendations have no consuming phase)
+- **finding** by agent-ideation (2026-09-23T00:50:48-04:00): Owner ruling, 2026-09-22 (asked by Ideation): plan a phase that acts on the literature campaign's recommendations. It should go through the reuse recommendations and the architecture implications, and turn the accepted ones into ideas or backlog work. Chosen over marking them reference-only and over deciding later.
 
 </details>
 
 **Links**
 
 - relates_to → `000287`
+- relates_to ← `000344`
 
 ---
 
@@ -15679,6 +15687,9 @@ already delivers this idea's actual ask.
 
 - relates_to → `000320`
 - relates_to ← `000320`
+- relates_to ← `000327`
+- relates_to ← `000332`
+- relates_to ← `000340`
 
 ---
 
@@ -15774,7 +15785,7 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 
 ---
 
-## 000321 · The --ready conflict check misses shared file paths between phases whose system ids differ
+## 000321 · The --ready Conflicts column compares candidates only against active phases, never against each other, and sees only declared deliverables
 
 **Created 2026-09-22T20:51:44-04:00 · Status: `triaged`**
 
@@ -15848,11 +15859,13 @@ PROPOSED LINK: 000321 --relates_to--> 000322 (000322 records a concrete example 
 
 **Links**
 
+- relates_to → `000242`
 - relates_to ← `000322`
+- relates_to ← `000336`
 
 ---
 
-## 000322 · phase-wbf-01 and phase-wbf-02 share a deliverable file (HtmlViewerRegion.tsx) but are not flagged as conflicting
+## 000322 · phase-wbf-01 and phase-wbf-02 share HtmlViewerRegion.tsx but --ready shows no conflict, because it never compares two ready candidates
 
 **Created 2026-09-22T20:51:44-04:00 · Status: `triaged`**
 
@@ -15892,6 +15905,7 @@ The issue is triaged by existing plan and ADR documentation. The underlying gap 
 **Links**
 
 - relates_to → `000321`
+- relates_to ← `000336`
 
 ---
 
@@ -15913,7 +15927,7 @@ Unresolved: what the correct deliverable is. It could be a new ADR with a newly 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T22:53:18-04:00): # Triage: 000323
 
@@ -15928,6 +15942,7 @@ Phase-mem-01 is titled "Reconcile memory-agent contracts with accepted choices" 
 The missing deliverable is a genuine blocker: a session claiming phase-mem-01 would lack a target for its work and might inadvertently create a file that conflicts with ADR numbering or overwrites an existing document. The unresolved question is what the correct deliverable should be — whether it should be a new ADR documenting the reconciled contract specifications (with a newly allocated ADR number), updates to PLAN-001 itself, or another governed document. This requires the owner's decision.
 
 No overlap with other open ideas found. No related idea links exist yet.
+- **finding** by agent-ideation (2026-09-23T00:50:49-04:00): Owner ruling, 2026-09-22 (asked by Ideation): leave the deliverable docs/04-decisions/008-memory-workflow.md as it is. Do not drop it or change it. The owner's reading is that it was probably planned to be created and has not been yet.
 
 </details>
 
@@ -16184,9 +16199,13 @@ PROPOSED LINK: 000327 --relates_to--> 000319 (Session Manager setup raises the s
 **Links**
 
 - relates_to → `000320`
+- relates_to → `000168`
+- relates_to → `000248`
+- relates_to → `000319`
 - extended_by ← `000328`
 - extended_by ← `000332`
 - relates_to ← `000334`
+- relates_to ← `000340`
 
 ---
 
@@ -16309,6 +16328,7 @@ Ideas 000331 and 000329 are already linked via `relates_to` (recorded 2026-09-22
 
 **Links**
 
+- relates_to ← `000330`
 - relates_to ← `000331`
 
 ---
@@ -16356,6 +16376,11 @@ PROPOSED LINK: 000330 --relates_to--> 000329 (same GOV-010 verification session;
 PROPOSED LINK: 000330 --relates_to--> 000331 (same GOV-010 verification session; different defect type)
 
 </details>
+
+**Links**
+
+- relates_to → `000329`
+- relates_to → `000331`
 
 ---
 
@@ -16411,6 +16436,7 @@ PROPOSED LINK: 000331 --relates_to--> 000330 (both are GOV-010 issues discovered
 **Links**
 
 - relates_to → `000329`
+- relates_to ← `000330`
 
 ---
 
@@ -16487,6 +16513,7 @@ PROPOSED LINK: idea 000332 --relates_to--> 000319 (both aim to make decisions an
 **Links**
 
 - extends → `000327`
+- relates_to → `000319`
 
 ---
 
@@ -16516,7 +16543,7 @@ Related: 000326 (the PLAN-032/REQ-017 R02 and R04 coverage mismatch) and 000031 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T23:01:08-04:00): # Triage finding for idea 000333
 
@@ -16555,6 +16582,7 @@ No additional links are warranted beyond these.
 ## No promotion identified
 
 The idea's content is not yet delivered by any governed document — it is a decision that is still open after phase-auto-01's permissive-default ruling in ADR-022. The existing documents defer this exact question rather than answering it.
+- **finding** by agent-ideation (2026-09-23T00:50:49-04:00): Owner ruling, 2026-09-22 (asked by Ideation): broker blocks apply per role. Each session role (Builder, Scout, Ideation and so on) gets its own set of blocks, rather than blocks for unattended runs only or for every session. Which capabilities each role blocks is still undecided.
 
 </details>
 
@@ -16600,7 +16628,7 @@ Related: 000327 (the session roster), 000328 (the question-relay session), 00032
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T23:01:08-04:00): # Triage finding: 000334 (Carry the Session Manager system into the automated agency delivery system)
 
@@ -16630,6 +16658,7 @@ Already linked (correctly): 000327 (session roster), 000328 (question-relay sess
 000334 is correctly scoped to phase-irs-04 and phase-irs-16, where the outlined questions must be decided. No existing plan, requirement, ADR or backlog phase has yet answered those unresolved questions. The work is planned but not yet built; no promotion to existing document is warranted.
 
 PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into the automated pipeline is a core design question within the umbrella automation effort)
+- **finding** by agent-ideation (2026-09-23T00:50:49-04:00): Owner ruling, 2026-09-22 (asked by Ideation): phase-irs-04 (the LangGraph orchestrator skeleton) proceeds as planned. Whether to inject, adapt or recreate the Session Manager system is decided in the later daemon-process phase (phase-irs-16), not before phase-irs-04.
 
 </details>
 
@@ -16638,6 +16667,8 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to → `000327`
 - relates_to → `000328`
 - relates_to → `000320`
+- relates_to → `000247`
+- relates_to ← `000340`
 
 ---
 
@@ -16661,7 +16692,7 @@ Related: 000324 and 000325, which concern the same two catalog tests in test/tes
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T23:03:21-04:00): # Triage: 000335 (status-regression WARNING breaks --catalog stdout contract)
 
@@ -16689,6 +16720,7 @@ The status-regression check (phase-gov-05, implemented by PLAN-038) reports dev-
 - phase-gov-05 in docs/09-backlog/backlog.yaml — the implementation phase that added the status-regression check
 
 The unresolved choice (stderr vs test change) is exactly what the idea names, and it is a genuine design point: REQ-010 was written before the `--catalog` stdout contract was at risk, so the requirement does not anticipate this conflict.
+- **finding** by agent-ideation (2026-09-23T00:50:49-04:00): Owner ruling, 2026-09-22 (asked by Ideation): send the status-regression warning to stderr, so the --catalog stdout stays byte-identical to the catalog file for the test and for every redirect. Chosen over making the test ignore the warning.
 
 </details>
 
@@ -16719,7 +16751,7 @@ Related: 000321 and 000322 (other gaps in what the conflict check can see), and 
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T23:42:01-04:00): idea 000336 reports that the `path_conflict()` function in `src/governance/backlog.py` (line 86-89) does not expand glob patterns in declared deliverables. A pattern like `test/test_orchestrator*.py` is treated as a literal filename and will not match other paths it should protect against, such as `test/test_orchestrator_graph.py`.
 
@@ -16744,8 +16776,15 @@ PROPOSED LINK: idea 000336 --relates_to--> 000321 (both identify gaps where the 
 PROPOSED LINK: idea 000336 --relates_to--> 000322 (same conflict-check gap, concrete example)
 PROPOSED LINK: idea 000336 --relates_to--> 000242 (related class of deliverable-lock defect)
 - **finding** by agent-ideation (2026-09-22T23:42:02-04:00): Evidence from Session 4 - Scout, relayed by the Session Manager on 2026-09-22 (source: _working/session-manager/scout/glob-deliverables-audit.md, gitignored). Confirmed that path_conflict compares literal path segments and does not expand globs. Correction to the idea's wording: a glob deliverable still collides with an enclosing directory (for example test/), so it misses sibling files rather than protecting nothing. No phase on any branch or worktree declares a glob deliverable today. Session 5 has already switched phase-irs-04 to the concrete test/test_orchestrator.py. Neither public_path nor the backlog schema rejects glob characters. Suggested guard, for the owner to decide: reject the characters * ? [ in deliverables.
+- **finding** by agent-ideation (2026-09-23T00:50:50-04:00): Owner ruling, 2026-09-22 (asked by Ideation): support wildcard deliverables rather than rejecting them, unless that turns out to be infeasible. Ideation had recommended rejecting them for simplicity. The owner asked why reject if support is more useful. Ideation's answer: support is feasible. A wildcard can be matched against literal paths (fnmatch), and two wildcards can be compared conservatively, treating them as a conflict when their fixed directory prefixes overlap. That also handles files that do not exist yet, because nothing is expanded against the working tree.
 
 </details>
+
+**Links**
+
+- relates_to → `000321`
+- relates_to → `000322`
+- relates_to → `000242`
 
 ---
 
@@ -16770,7 +16809,7 @@ Unresolved:
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T23:42:02-04:00): ## Triage Finding: Tag Category Approval Path
 
@@ -16805,5 +16844,192 @@ No other idea proposes this specific workflow. Ideas 000024 (entity schema valid
 ### Not yet delivered
 
 Phase-cap-06 is queued but not yet complete; the identity call for new categories is in scope but the approval-to-application path is unresolved design work.
+- **finding** by agent-ideation (2026-09-23T00:50:50-04:00): Owner ruling, 2026-09-22 (asked by Ideation): move the tag categories out of the enum in schemas/tag.schema.json and into data (for example _data/tags.json), so that approving a new category is a data edit rather than a schema change. Chosen over locking only the tag schema file and over an owner-run step outside phases.
 
 </details>
+
+**Links**
+
+- relates_to ← `000343`
+
+---
+
+## 000338 · Amend PLAN-039.01 to name the per-idea dispatch-authorization gate that phase-irs-04 added to the intake graph
+
+**Created 2026-09-23T00:50:45-04:00 · Status: `open`**
+
+From Session 5 - Batch Runner, 2026-09-23.
+
+As given: amend PLAN-039.01 section 1 (the run-kind table) and section 7 (gates) so they name the per-idea "dispatch-authorization" gate that phase-irs-04 added to the intake graph (src/orchestrator/graphs/intake.py). The owner approved the gate on 2026-09-23 as a deviation from the plan. Before triage dispatches for an idea, the gate requires a recorded owner decision for that idea, in addition to the tick-level --dispatch flag. The plan currently gives intake no gate at all.
+
+Why it matters: the plan and the built code now disagree. Anyone reading PLAN-039.01 would expect intake to dispatch with no per-idea gate, and would not know where the owner decision has to be recorded.
+
+What it would touch: docs/01-plans/PLAN-039.01 (sections 1 and 7), and possibly the recorded deviation in phase-irs-04's session record.
+
+Unresolved: where the per-idea owner decision is recorded (an idea annotation, a status, or a separate record), and whether other run kinds need the same gate.
+
+---
+
+## 000339 · The partition pack's A2 prompt reads a staging document that exists only in the coordinator's worktree, so A2 cannot find it
+
+**Created 2026-09-23T00:50:45-04:00 · Status: `open`**
+
+From Session 2 - Builder B, 2026-09-23, found during phase-part-03.
+
+As given: in the reusable partition pack (PROMPT-034, REQ-009), the A2 prompt sends audit 2 to read "the merged staging document in docs/00-working/". Subagents run in the primary checkout, but the synthesis step writes that tracked draft in the coordinator's worktree. As written, A2 cannot find it. The owner ruled that /partition-ideas stops before A2 until this is resolved (phase-part-03).
+
+Why it matters: the pack's second audit cannot run, so a partition cannot be completed end to end with it.
+
+What it would touch: PROMPT-034's A2 prompt, and possibly REQ-009 and the /partition-ideas command.
+
+Unresolved: the fix. Options include passing A2 the worktree's absolute path, having the coordinator place the draft where subagents can read it (for example _tmpagent/ with a claim, or the scratchpad), or running the A2 subagent inside the coordinator's worktree.
+
+---
+
+## 000340 · Monitor each parallel session's context use and have the Session Manager find safe points to clear or compact each one
+
+**Created 2026-09-23T00:50:46-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-23 and forwarded by the Session Manager.
+
+As given: monitor each parallel session's context use, and have the Session Manager identify safe points to /clear or /compact each session. A safe point means the session holds no lock and its state is on disk.
+
+Today: the Session Manager can only ask each session to report its own usage (it sent a CONTEXT? request on 2026-09-23) and tell the owner when a clear looks safe. /clear and /compact are local commands that only the owner can run. Sessions can only estimate their own context use.
+
+What automating it needs: the Agent SDK or LangGraph layer, which can read usage and start or restart sessions programmatically.
+
+What it would touch: GOV-017 (a CONTEXT message type and what counts as a safe point), the roster sessions, and the delivery system in 000334.
+
+Unresolved:
+- What counts as "state on disk" for each role. For Ideation, for example, it means drafted rulings and ideas have been written, not just kept in the scratchpad.
+- Whether a cleared session needs a resume brief to pick up its role.
+- The threshold at which to act.
+
+Related: 000319 (state capture and session resumability), 000334 (the Session Manager system in the delivery system), 000327 (the session roster).
+
+**Links**
+
+- relates_to → `000319`
+- relates_to → `000334`
+- relates_to → `000327`
+
+---
+
+## 000341 · sys-capture's paths in the systems registry omit the phase-cap-05 and phase-cap-06 files, so the registry no longer shows where capture lives
+
+**Created 2026-09-23T00:50:46-04:00 · Status: `open`**
+
+From Session 1 - Builder A, 2026-09-23, noticed during phase-cap-06.
+
+As given: sys-capture's paths in systems.yaml list only the phase-cap-03 and phase-cap-04 files. They are missing the files added by phase-cap-05 and phase-cap-06: src/capture/structure.py, src/capture/routing.py, src/capture/promote.py, src/capture/review.py, tools/review.py, OPS-024 and schemas/correction.schema.json. The registry no longer shows where capture lives.
+
+Why it matters: the systems registry is how sessions and the governance check find which files belong to which system. A registry that is out of date misleads anyone scoping or locking capture work.
+
+What it would touch: the sys-capture entry in the systems registry (systems.yaml).
+
+Unresolved: whether the governance check should flag files under a system's directories that the system's registered paths do not list, so the registry cannot silently fall behind again. Also whether phase completion should require updating the registry.
+
+**Links**
+
+- relates_to ← `000342`
+
+---
+
+## 000342 · REQ-002's status note still says only R1, R2 and R5 are implemented, but phase-cap-05 and phase-cap-06 now implement R3, R4 and R6 to R15
+
+**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+
+From Session 1 - Builder A, 2026-09-23, noticed during phase-cap-06.
+
+As given: the status note in REQ-002 (the capture requirements) still says that only R1, R2 and R5 are implemented, and that structuring, routing, review and promotion are "proposed only". phase-cap-05 and phase-cap-06 now implement R3, R4 and R6 through R15. Refresh the note.
+
+Why it matters: anyone reading REQ-002 would conclude that most of the capture pipeline does not exist, and might plan work that is already built.
+
+What it would touch: the status note in docs/06-requirements/REQ-002.
+
+Unresolved: whether to refresh the note when phase-cap-06 merges, since phase-cap-06's own work completes part of that list, or in a separate small change. Also whether requirement status notes should be updated as part of phase completion in general.
+
+Related: the idea recorded in the same turn about sys-capture's paths in the systems registry falling behind phase-cap-05 and phase-cap-06. Both are records that did not keep up with the capture build.
+
+**Links**
+
+- relates_to → `000341`
+
+---
+
+## 000343 · Rule whether tags created from a capture belong in the tracked _data/tags.json, since a client-name tag approved in review would be committed
+
+**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+
+From Session 1 - Builder A, 2026-09-23. It arose from the owner's ruling during the phase-cap-06 review.
+
+As given: decide whether tags created from a capture belong in the tracked _data/tags.json. GOV-001 treats tags.json as shared taxonomy that is always tracked. ADR-009 (the structure/content boundary) says everything promoted from a capture is content. So a client-name tag approved in review would be committed. Pending this ruling, phase-cap-06 keeps writing to tags.json and prints a warning.
+
+Why it matters: this is a confidentiality risk, not only a question of where files go. AGENTS.md forbids writing a confidential identifier into any tracked file. A tag named after a real client, written into _data/tags.json and committed, would put that name in git history. The history was squashed on 2026-09-09 precisely to remove such identifiers (PLAN-006). The tools/check_no_private_content.py gate only catches identifiers it already knows about.
+
+What it would touch: _data/tags.json, the data root rule in GOV-001 (D_SYSTEM_DATA_ROOT and _private/portfolio/), phase-cap-06's promotion code, and the owner's ruling on 000337 (move tag categories out of the schema into data). That ruling named _data/tags.json only as an example, so it should be read together with this one.
+
+Options (not yet ruled):
+- Tags promoted from a capture go under the data root (_private/portfolio/ for real records), and _data/tags.json keeps only the shared, non-confidential taxonomy.
+- Split tags into a tracked taxonomy part and a private, content-derived part.
+- Keep a single tracked file, but require an explicit confidentiality check before a promoted tag is written to it.
+
+Unresolved: which option; whether the same question applies to categories under the 000337 ruling; and whether any capture-derived tag has already been committed and needs checking.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T00:50:47-04:00): Owner ruling, 2026-09-23 (asked by Ideation): tags promoted from a capture go under the private, gitignored data root (_private/portfolio/ for real records). The tracked _data/tags.json keeps only the shared, non-confidential taxonomy, so nothing a capture produces can be committed by accident. Chosen over splitting the tag file, over keeping one tracked file with a confidentiality check, and over deciding later.
+
+</details>
+
+**Links**
+
+- relates_to → `000337`
+
+---
+
+## 000344 · Archive a local copy of every source the literature review references
+
+**Created 2026-09-23T00:50:47-04:00 · Status: `open`**
+
+From Session 4 - Scout, 2026-09-23. It recovers an owner ask that never reached dev.
+
+The owner's question, asked during phase-lit-07 on 2026-09-14: "do we have a copy saved of every article or source we are referencing?"
+
+Why it is being recorded again: it was captured only on the unmerged branch agent/research-article. That record used an idea id and a PLAN-039 code that dev has since reused for other things, so it never reached dev. The same branch holds a 141-line draft plan for the archive that could be salvaged.
+
+What it would touch: research/literature-review/ and the literature campaign's source lists, somewhere to store the copies (with licensing and size in mind, and possibly gitignored), and a record that maps each cited source to its archived copy.
+
+Unresolved:
+- Whether to salvage the draft plan on agent/research-article, which needs a new code because PLAN-039 is taken on dev.
+- Tracked or gitignored storage.
+- How to handle paywalled sources or sources that cannot be downloaded.
+
+Related: 000315 (the literature campaign's recommendations have no consuming phase), which the owner ruled on 2026-09-23 should get a phase.
+
+**Links**
+
+- relates_to → `000315`
+
+---
+
+## 000345 · project.repository has no column in the DuckDB database, so the rebuild drops it without warning
+
+**Created 2026-09-23T00:50:48-04:00 · Status: `open`**
+
+From Session 4 - Scout, 2026-09-23. Found in the unmerged Codex review on branch agent/schema-review-01.
+
+As given: the project schema accepts a `repository` field, but the DuckDB rebuild drops it without any warning, so the query layer loses that field. On dev, the architecture documents ARCH-009 and ARCH-010 do not mention it.
+
+Why it matters: the JSON is the source of truth and the database is derived from it. A field that validates but never reaches the database looks stored but cannot be queried, and nothing reports the loss.
+
+What it would touch: schemas/project.schema.json, sql/001_schema.sql (the projects table), tools/rebuild_db.py, and possibly ARCH-009 and ARCH-010.
+
+Unresolved:
+- Add the column, or remove the field from the schema.
+- Whether the rebuild should fail or warn when a schema field has no matching column, which would catch the whole class of problem.
+- What else the unmerged review on agent/schema-review-01 found that never reached dev.
