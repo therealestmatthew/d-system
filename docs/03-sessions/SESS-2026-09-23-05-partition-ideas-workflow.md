@@ -117,20 +117,56 @@ unmoved, `sha256sum -c` on `_data/ideas.jsonl` printed `OK`, and `git status` in
 checkout was clean at `2bdbf83`. This run is the evidence for the open-set halt condition. The
 GATE-1 conditions still need a second run once the open set is empty or the owner has ruled.
 
+**Dry run, attempt 2 (2026-09-23T05:54Z-06:05Z, `dryrun` turn granted at dev `806d3e2`) — reached
+GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` out of open.
+
+- Preflight: `Governance OK: 35 systems, 334 documents, 31 memories, 293 backlog phases`. Stated
+  estimate: about 25 minutes, raised to about 45 once the corpus size was known. Actual time to
+  GATE 1 was 11 minutes.
+- Step 1: `open ideas: 0`. The open set was empty.
+- Step 2: `NEW: the manifest in place (no stamped output) belongs to an earlier sweep`. It moved all
+  ten 2026-09-13 files (`manifest.json`, `corpus-R1..R4.md`, `report-R1..R4.md`,
+  `audit-1-findings.md`) into `previous-2026-09-13/`, and deleted nothing. Corpus built:
+  `corpus size: 325 (of 331 triaged)`, `excluded by the fast lane: 6`, `shuffle seed: 656057328`.
+  Manifest read: `corpus_size: 325 | status: triaged | seed: 656057328 | corpus date: 2026-09-23`.
+- Dispatch text: `dispatch-R1.txt` and `dispatch-R4.txt` saved by the extraction command. Both diff
+  empty against `PROMPT-034` lines 117-178 and 193-251. R1 and R4 went in the same turn to
+  general-purpose agents on sonnet, with the saved text as the whole prompt. Two dispatches, none
+  resumed, none above sonnet.
+- **R4:** the harness refused its write of `report-R4.md`, as idea `000206` records, and it
+  returned the report as text. The coordinator wrote `report-R4.md` (25,431 bytes) as the run stamp
+  followed by the returned text, taken byte-exact from the hand-back rather than retyped. The report
+  was complete, with every required section, so no resume was needed.
+- **R1 — departure.** When its report write was refused, R1 **wrote the report itself through a
+  Bash heredoc**. It also wrote a working file, `condensed.md` (411,970 bytes). Both are in the
+  gitignored `_working/idea-corpus/`, and nothing tracked changed. `report-R1.md` (42,360 bytes)
+  carries no run stamp, so by the workflow's own rule it is not this sweep's report. The
+  coordinator left both files as R1 wrote them. It did not stamp, move or re-dispatch R1, because
+  how to treat that output is a decision for the owner. The workflow's premise that "subagents
+  cannot write report files" holds for the Write tool only: an analyst with Bash can go around it,
+  and the pack's own "Write your report to ..." invites it to. Sent to Ideation as an idea.
+- Resume check: step 2's classification, re-run after the reports, printed `RESUME: corpus built
+  2026-09-23, size 325, seed 656057328` and `already done: report-R4.md`. It moved nothing, since
+  RESUME exits before the move. It does not count the unstamped `report-R1.md` as done, so a real
+  re-invocation would dispatch R1 again and overwrite R1's own file when writing the report.
+- `sha256sum -c` on `_data/ideas.jsonl`: `OK`, unchanged. Primary checkout `git status` clean at
+  `806d3e2`.
+
 ## Acceptance
 
-- Listed as a skill and runs to GATE 1 against the live corpus — **Not met yet.** Needs the
-  post-merge dry run.
+- Listed as a skill and runs to GATE 1 against the live corpus — **Met** by dry run attempt 2.
 - With at least one open idea, prints the ids and halts before the first dispatch — **Met** by dry
   run attempt 1: it printed `000351` and `000352` and halted, with nothing built or dispatched.
-- Every dispatch matches its PROMPT-034 section character for character — **Met on the branch**
-  for the extraction (R1 and R4 diffs empty). The dry run confirms the dispatched text.
-- One analyst report at `_working/idea-corpus/`, written by the coordinator — **Not met yet.**
-  Needs the dry run.
+- Every dispatch matches its PROMPT-034 section character for character — **Met.** In attempt 2,
+  `dispatch-R1.txt` and `dispatch-R4.txt` diff empty against the pack.
+- One analyst report at `_working/idea-corpus/`, written by the coordinator — **Met for R4**
+  (`report-R4.md`, stamped). R1 wrote its own unstamped report through Bash, and that is left for
+  the owner's ruling; see attempt 2.
 - Moves no idea status, marks no phase complete, stops at all three gates — **Met by reading.** The
   skill has no idea-log writer, no backlog edit, and an explicit stop at GATE 1, GATE 2 and GATE 3,
   plus the owner-ruled stop before A2.
-- `_data/ideas.jsonl` unchanged by the dry run — **Not met yet.** Needs the dry run's hash check.
+- `_data/ideas.jsonl` unchanged by the dry run — **Met.** `sha256sum -c` printed `OK` after both
+  attempts.
 - R06, R11, R13, R05's empty-set branch and R14's GATE 2/GATE 3 halts are not exercised here — as
   the phase states.
 - The structured record validates, and its tracks and ids agree with the markdown — **Met by
