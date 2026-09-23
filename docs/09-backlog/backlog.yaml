@@ -2853,6 +2853,7 @@ items:
   - test/test_capture_review.py
   - test/test_capture_promotion.py
   - schemas/correction.schema.json
+  - docs/08-governance/OPS-024-review.md
   next_action: Build promotion first, then the review presentation that feeds it.
 - id: phase-cap-07
   title: Project the expanded entity model into DuckDB
