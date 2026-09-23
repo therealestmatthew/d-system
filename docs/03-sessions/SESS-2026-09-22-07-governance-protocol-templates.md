@@ -76,9 +76,10 @@ PASS  protocol.template.md headings against protocol.schema.json sections
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-b`. `next_action`: All acceptance conditions are met on
-agent/phase-fwt-01; waiting for the owner-approved merge onto dev, after which session-close
-completes the phase.
+`status: complete`, `agent: agent-builder-b`, `session: doc-session-governance-protocol-templates`.
+`completion_evidence` lists the four template and schema files, the five fixtures, `check_schemas.py`
+and this record. The phase was not in `next_up`. It was completed after the owner-approved
+fast-forward merge onto dev at `cf56de8`.
 
 ## Unresolved
 
@@ -147,4 +148,3 @@ findings, condition by condition:
   not deliverables of this phase.
 - phase-fwt-02 to phase-fwt-04 can add their cases to `check_schemas.py`'s `CASES` and `TEMPLATES`
   lists instead of writing new scripts.
-- Completion waits on the owner-approved merge. After it, session-close sets `status: complete`.

@@ -13029,7 +13029,7 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 2
   session_budget: 1
@@ -13058,9 +13058,27 @@ items:
   - docs/00-working/framework/05-schemas/protocol.schema.json
   - docs/00-working/framework/05-schemas/examples
   - docs/00-working/framework/05-schemas/check_schemas.py
-  next_action: All acceptance conditions are met on agent/phase-fwt-01; waiting for the
-    owner-approved merge onto dev, after which session-close completes the phase.
+  next_action: None - complete.
   session: doc-session-governance-protocol-templates
+  completion_evidence:
+  - docs/00-working/framework/05-schemas/governance.template.md
+  - docs/00-working/framework/05-schemas/governance.schema.json
+  - docs/00-working/framework/05-schemas/protocol.template.md
+  - docs/00-working/framework/05-schemas/protocol.schema.json
+  - docs/00-working/framework/05-schemas/examples/governance.valid.md
+  - docs/00-working/framework/05-schemas/examples/governance.no-incident.md
+  - docs/00-working/framework/05-schemas/examples/protocol.valid.md
+  - docs/00-working/framework/05-schemas/examples/governance-shape-labelled-protocol.md
+  - docs/00-working/framework/05-schemas/examples/protocol-shape-labelled-governance.md
+  - docs/00-working/framework/05-schemas/check_schemas.py
+  - docs/03-sessions/SESS-2026-09-22-07-governance-protocol-templates.md
+  result: 'Governance and protocol templates and schemas shipped; the schemas validate a document
+    converted to its front matter and level-2 headings. check_schemas.py: 7 cases and 2 template
+    checks, "0 failure(s)" - REQ-024 R01 and R02 hold, including relabelled-kind fixtures that show
+    rejection by structure. Post-rebase on dev b5cecfb: "Governance OK: 35 systems, 316 documents,
+    30 memories, 293 backlog phases" and "767 passed, 2 warnings". Independent adversarial review:
+    both conditions hold, no blocking or major findings. Merged onto dev at cf56de8 with the
+    owner''s approval.'
 
 - id: phase-fwt-02
   title: Standalone backlog phase template and schema
