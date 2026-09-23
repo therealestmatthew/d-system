@@ -9849,6 +9849,7 @@ items:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
   systems:
+  - sys-contracts
   - sys-portfolio
   owner: repository-owner
   status: queued
@@ -9881,6 +9882,7 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
+  - schemas/idea.schema.json
   - tools/append_idea.py
   - src/db/ideas.py
   - test/

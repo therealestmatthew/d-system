@@ -11,12 +11,17 @@ coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
   the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
   and unclaimed, no edge pointing later in the global order. Its stage decomposition was computed
-  then, not in the original.'
+  then, not in the original. On 2026-09-23 the owner''s batch-003 Q1 answer moved phase-irs-11 to
+  stage 1 and phase-irs-14 to stage 2, with phase-irs-14 gaining depends_on phase-irs-11; the
+  composition was re-checked by script that day (see verified).'
 verified:
-  date: '2026-09-22'
-  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
-    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
-    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+  date: '2026-09-23'
+  method: 'Script over docs/09-backlog/backlog.yaml after the Q1 reorder: every phase id resolved;
+    the one in-batch depends_on edge (phase-irs-14 on phase-irs-11) points to an earlier stage; stage
+    boundaries follow from that edge and from collisions() in src/governance/backlog.py (irs-11/idg-01,
+    idg-10/idg-11, irs-14/idg-01, idg-11/idg-01), with no colliding pair in one stage. At that date
+    phase-irs-04 was complete, phase-part-03 was not yet complete (external dependency of
+    phase-irs-14), and phase-idg-10 was already complete, built outside the batch.'
 external_depends_on:
 - id: phase-irs-04
   expected_status: complete
