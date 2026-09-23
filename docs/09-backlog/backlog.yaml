@@ -7531,10 +7531,9 @@ items:
   - .claude/skills/partition-ideas/SKILL.md
   - .agents/skills/partition-ideas/SKILL.md
   - schemas/idea-partition-record.schema.json
-  next_action: Write the open-set gate first and run it against the live log, which has
-    had a non-empty open set every time it has been checked since the first sweep, so the
-    non-empty path is the one that can actually be exercised. Read the count from fold()
-    rather than from this line.
+  next_action: Branch work done; after the owner-approved merge, run the dry run to GATE 1
+    in a dryrun turn and record its evidence in SESS-2026-09-23-05 before the completion edit.
+  session: doc-session-partition-ideas-workflow
 - id: phase-prog-01
   title: Finalize the concurrency, git safety and enforcement plan (P3)
   plan: doc-concurrency-git-safety
