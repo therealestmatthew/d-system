@@ -60,6 +60,7 @@ brain/
 - [When a Hook Blocks a Write, Hand Off a Candidate](procedures/hook-blocked-writes-hand-off-a-candidate.md)
 - [When a Check Cannot Run Where You Are, Report the Limitation — Do Not Widen Your Own Access](procedures/report-the-limitation-do-not-widen-your-access.md)
 - [Never Pass File Content Through a Heredoc](procedures/never-pass-file-content-through-a-heredoc.md)
+- [Verify a Cause Before You Report It](procedures/verify-a-cause-before-you-report-it.md)
 
 ### Episodes
 *(none yet — add session summaries here)*
