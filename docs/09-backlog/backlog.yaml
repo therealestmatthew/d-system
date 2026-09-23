@@ -3,7 +3,6 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-auto-01
 - phase-auto-02
 - phase-irs-04
 - phase-irs-16
@@ -10949,7 +10948,7 @@ items:
   - sys-api
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 2
   session_budget: 1
@@ -10984,6 +10983,19 @@ items:
   - docs/07-architecture/
   next_action: This is the most speculative programme in the partition and four of its five ideas came
     from a research pass rather than an incident. Recommending less is a legitimate outcome.
+  session: doc-session-autonomous-operations-architecture
+  completion_evidence:
+  - docs/04-decisions/ADR-022-broker-first-autonomous-operations.md
+  - docs/07-architecture/ARCH-011-autonomous-operations-architecture.md
+  - docs/03-sessions/SESS-2026-09-22-08-autonomous-operations-architecture.md
+  result: 'ADR-022 records the broker-first ordering as a decision with its reason and ships the broker
+    as an enforcement point with a permissive default, recording REQ-017 R02 and R04 as open rather
+    than claimed. ARCH-011 rules the broker (000031) built now and defers the gateway (000028), ledger
+    (000029) and worker (000030) with reasons attached; both name backlog.yaml as the lock table and the
+    governance validator as the lock check. Post-rebase verification: "Governance OK: 35 systems, 319
+    documents, 30 memories, 293 backlog phases"; pytest "767 passed, 2 warnings". Validator PASS on all
+    four conditions; two fix cycles. Adversary F1 (PLAN-032 coverage table and REQ-017 still read R02/R04
+    as covered) accepted by the owner as out of scope and sent to Ideation.'
 - id: phase-auto-02
   title: Build the capability and approval broker, enforced at the tool boundary
   plan: doc-autonomous-agent-operations
