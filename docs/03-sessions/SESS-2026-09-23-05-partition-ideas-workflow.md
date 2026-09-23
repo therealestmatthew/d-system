@@ -144,7 +144,7 @@ GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` 
   coordinator left both files as R1 wrote them. It did not stamp, move or re-dispatch R1, because
   how to treat that output is a decision for the owner. The workflow's premise that "subagents
   cannot write report files" holds for the Write tool only: an analyst with Bash can go around it,
-  and the pack's own "Write your report to ..." invites it to. Sent to Ideation as an idea.
+  and the pack's own "Write your report to ..." invites it to. Recorded as idea `000354`.
 - Resume check: step 2's classification, re-run after the reports, printed `RESUME: corpus built
   2026-09-23, size 325, seed 656057328` and `already done: report-R4.md`. It moved nothing, since
   RESUME exits before the move. It does not count the unstamped `report-R1.md` as done, so a real
@@ -198,7 +198,7 @@ GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` 
   - **C. Fix the dispatch first, then re-run R1 (recommended).** Move both files aside, stop
     analysts from writing files, then re-run R1 under option B. Two ways to stop them: dispatch R1
     and R4 to a read-only agent type, or amend `PROMPT-034`'s "Write your report to ..." line (idea
-    sent to Ideation). This is the only option that makes the workflow's "the coordinator writes
+    `000354`). This is the only option that makes the workflow's "the coordinator writes
     every report" premise hold. It is new work beyond this phase's approved scope, so it needs the
     owner's approval.
   - **Other:** the owner's own ruling.
