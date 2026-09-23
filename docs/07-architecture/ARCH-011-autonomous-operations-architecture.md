@@ -109,8 +109,12 @@ broker's near-term use is enforcing capability bounds inside agent sessions that
 (the pattern the 2026-09-15 run improvised by hand), not gating a trigger-driven system that does not
 exist yet. That is accepted: PLAN-032 states this plainly as the most speculative programme in the
 partition, and a design phase that cannot recommend building less than the partition sized is a
-design phase in name only. `phase-auto-03` through `phase-auto-05` return to `queued` in
-`docs/09-backlog/backlog.yaml` with this document as their reasoning, not dropped from the backlog.
+design phase in name only. `phase-auto-03` through `phase-auto-05` were already `status: queued` in
+`docs/09-backlog/backlog.yaml`, gated by their `depends_on` on `phase-auto-01`, before this phase
+ran, and this phase makes no edit to that file — they remain `queued` rather than returning to it.
+This document records the reasoning for deferring the three components; it is not dropped from the
+backlog, and this document is the reasoning a reader of the backlog should be pointed to, but nothing
+here or in `backlog.yaml` itself currently cites it.
 
 ## Which shape the broker ships in
 
