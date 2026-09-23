@@ -165,13 +165,22 @@ with `git worktree prune` after `git worktree remove`.
 
 ## Refuse integration over a dirty primary checkout
 
-`tools/git-hooks/refuse_dirty_integration.py` (`phase-conc-02`) is a **pre-merge script run by hand
-at the integration step**, immediately before `git merge --ff-only agent/<phase-id>` in *Concurrent
-agents: complete and hand off* step 9 above:
+`tools/git-hooks/refuse_dirty_integration.py` (`phase-conc-02`) is a **pre-merge script, run by
+hand, in the primary checkout, immediately before** `git merge --ff-only agent/<phase-id>`:
 
 ```bash
 uv run python tools/git-hooks/refuse_dirty_integration.py
 ```
+
+**What is, and is not, wired up.** `AGENTS.md`'s *Concurrent agents: complete and hand off*
+step 9 performs the merge itself, and that document is unmodified by this phase — no agent may
+edit `AGENTS.md` without the owner's explicit approval, and none was sought here. Nothing today
+calls this script automatically: not step 9, not a git hook, not CI. It is discoverable only by
+an agent who reads this section and chooses to run it before the merge, exactly as the command
+above shows; an agent following `AGENTS.md`'s literal steps would not encounter it. A one-line
+addition to step 9 that would close this gap is proposed, for the owner to decide, on this
+phase's build evidence (`_working/build-batch-002/phase-conc-02-build.md`) — not here, because
+`AGENTS.md` cannot be edited in this session.
 
 **Placement and reason.** Git has no event that fires on `git stash` — there is no stash hook to
 attach a guard to, so a rule against stashing would be unenforceable prose, exactly what this
@@ -187,14 +196,28 @@ guards has no git event of its own. `docs/01-plans/PLAN-026-concurrency-git-safe
 as one of the three design decisions this phase settles without a new ADR; `phase-conc-08`
 generalises the placement question this decision answers narrowly.
 
+**It always inspects the primary checkout**, never whatever path or worktree it is pointed at.
+`--repo` (default: current directory) is resolved to the primary checkout via
+`git rev-parse --git-common-dir` before either check runs, so pointing it at a linked worktree —
+by mistake, since sibling worktree paths are easy to transpose — still catches dirt in the real
+primary checkout rather than reporting the linked worktree's own, unrelated cleanliness.
+
 It refuses on two conditions, either sufficient alone: an unrelated path reported dirty by
-`git status --porcelain` (staged, unstaged or untracked — every path is named in the refusal), or a
-non-empty `git stash list`. The second condition is what makes the refusal survive `git stash`: a
+`git status --porcelain` in the primary checkout (staged, unstaged or untracked — every path is
+named in the refusal), or a non-empty `git stash list` there. Both conditions are deliberate, not
+side effects: **"clean" for this guard means no working-tree changes *and* no stash entries.** A
 peer's uncommitted work stashed away shows a clean working tree, but the stash entry itself is the
-evidence that work is in flight, and this is exactly the mechanism the `000041` incident used to
-clobber a peer's changes. Refusing on the stash list closes that path rather than teaching it.
+evidence that work is in flight, and stashing to clear the refusal is exactly the mechanism the
+`000041` incident used to clobber a peer's changes — refusing on the stash list closes that path
+rather than teaching it. The refusal names each stash entry (ref and message) and states plainly
+that a stash counts as uncommitted work: restore and commit it, or have its owner drop it
+deliberately, before integrating. One accepted consequence: a single pre-existing, unrelated
+stash — left over from anyone's earlier work, not necessarily a live collision — blocks every
+future integration until it is resolved. That is the guard's own, stricter definition of "clean,"
+not the plain `git status` sense of the word; it is intentional, and the cost is a human finding
+and resolving one stash entry, not a false pass on the failure this phase exists to prevent.
 
 The integration branch is configuration, not a hard-coded name — pass `--integration-branch` or set
 `D_SYSTEM_INTEGRATION_BRANCH`; it defaults to `dev`, today's integration branch, and is used only to
-name the branch in the refusal message. A clean checkout with no stash exits 0 and is not refused, so
-the guard does not block ordinary work.
+name the branch in the refusal message. A clean primary checkout with no stash exits 0 and is not
+refused, so the guard does not block ordinary work.
