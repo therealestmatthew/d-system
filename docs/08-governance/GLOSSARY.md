@@ -626,8 +626,11 @@ agent are parked ideas; current identity governance establishes a foundation for
 ### Idea classification axes
 
 Ontological classification describes what an idea concerns or is; epistemic classification
-describes its knowledge/evidence standing; temporal classification describes its time-related
-context. These axes are distinct from workflow state. Their exact values, links, tags and
+describes its knowledge/evidence standing; lifecycle classification describes where the idea sits in
+the arc from raw thought to executed and reviewed work (Axis 3 in
+`docs/07-architecture/ARCH-005-idea-node-classification.md`, which is still a draft; `REQ-014` R01
+names the three as ontological, epistemic and lifecycle, stored as distinct fields rather than tags).
+These axes are distinct from the idea's workflow status (`open`, `triaged` and so on). Their exact values, links, tags and
 transition rules remain the subject of idea 000268.
 
 ---
