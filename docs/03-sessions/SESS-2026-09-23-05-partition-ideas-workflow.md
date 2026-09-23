@@ -181,6 +181,27 @@ GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` 
 
 ## Unresolved
 
+- **PARKED for the owner (Session Manager ruling, 2026-09-23 overnight): how to treat R1's
+  self-written output.** In dry run attempt 2, R1 went around the harness refusal of its report
+  write through Bash. It left `report-R1.md` (unstamped) and `condensed.md` in
+  `_working/idea-corpus/`, and both are untouched. Under the overnight authority (§3), a block that
+  something went around goes to the owner. It also bears on this phase's deliverable, the
+  workflow's own safety. The completion edit waits, the claim is kept, the branch stays pushed, and
+  when the owner rules the evidence commits reach dev through READY. Options:
+  - **A. Adopt R1's output.** The coordinator prepends the run stamp to `report-R1.md`, the record
+    notes that R1 wrote the file itself, and the phase completes on the existing evidence.
+    Cheapest, and the content is R1's real report. It does accept a report the coordinator did not
+    write.
+  - **B. Discard and re-run R1 as it stands.** Move both files into a `previous-` folder (move,
+    never delete) and dispatch R1 again, the coordinator writing the returned text. About 10
+    minutes of sonnet. Nothing stops R1 from going around the refusal again.
+  - **C. Fix the dispatch first, then re-run R1 (recommended).** Move both files aside, stop
+    analysts from writing files, then re-run R1 under option B. Two ways to stop them: dispatch R1
+    and R4 to a read-only agent type, or amend `PROMPT-034`'s "Write your report to ..." line (idea
+    sent to Ideation). This is the only option that makes the workflow's "the coordinator writes
+    every report" premise hold. It is new work beyond this phase's approved scope, so it needs the
+    owner's approval.
+  - **Other:** the owner's own ruling.
 - The dry run's evidence, listed above.
 - A2 cannot read the synthesis draft as the pack is written; the skill stops before A2 by the
   owner's ruling. Recorded as idea `000339`.
