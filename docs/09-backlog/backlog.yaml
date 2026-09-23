@@ -7,6 +7,7 @@ next_up:
 - phase-grd-02
 - phase-dam-01
 - phase-grd-03
+- phase-grd-04
 - phase-gov-01
 - phase-dgov-06
 - phase-cap-08
@@ -13709,6 +13710,8 @@ items:
     and PROMPT-037's builder role script step 5 (R05).
   - Put the AGENTS.md lines 155-156 correction to the owner as exact old and new text, and apply it
     only on the owner's approval of that change (R11).
+  - 'State in GOV-017 and the hook''s operations document that a failing hook is never bypassed with
+    --no-verify: commit the fix, or if the check is wrong, stop and report (owner, 2026-09-23; R13).'
   acceptance:
   - A scratch branch with one phase status changed and the catalog not regenerated fails governance
     naming catalog.md; after --catalog it passes; the plain check leaves git status empty.
@@ -13722,6 +13725,7 @@ items:
     completion-edit line.
   - The added governance run time and the hook run time are measured and recorded in the session
     record.
+  - GOV-017 and the hook's operations document state the no-bypass rule.
   - AGENTS.md shows the owner-approved text, or the session record states that approval was not given
     and the lines are unchanged.
   verification:
@@ -13808,8 +13812,8 @@ items:
   - Add the plan-versus-registered check to the governance command, in both directions, with the
     first direction limited to plans created on or after 2026-09-22 (R09; D8).
   - Make READY in GOV-017's merge gate and PROMPT-037 item 4 carry both tools' output, with a nonzero
-    result from either proceeding only on the owner's recorded sign-off naming what it accepts (R10;
-    D9).
+    result from either proceeding only on the owner's recorded sign-off naming what it accepts, and,
+    once phase-dgov-06's check exists, its output as a non-blocking report (R10; D9, D10).
   - Write an OPS document for each new tool.
   acceptance:
   - 'Baseline tool: removed test (1), newly skipped test (1), added test (0), unchanged run (0), test
@@ -13840,6 +13844,50 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   next_action: Waits for phase-grd-02. Start with the plan-versus-registered check, the one that reads
     only repository files.
+- id: phase-grd-04
+  title: 'The S3 next_up rule: refuse a queued phase with no dispositioned GOV-018 review record'
+  plan: doc-deterministic-guards
+  sources:
+  - doc-deterministic-guards-requirements
+  - doc-deterministic-guards
+  - doc-three-altitude-review-procedure
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-grd-03
+  scope:
+  - Add a governance check that fails for each phase in next_up with no review record under
+    docs/08-governance/reviews/ that lists it in target.phases or target.later_added_phases, has status
+    dispositioned, and has no finding whose last disposition is escalated-g3 (REQ-028 R12; PLAN-045
+    D11).
+  - Exempt exactly the 19 phases listed in REQ-028 R12, as a literal list in the code, so the exemption
+    cannot grow by accident.
+  - Name the rule in GOV-018 and GOV-002 where a phase enters next_up.
+  acceptance:
+  - 'Fixtures: a next_up phase with no record (1); with a dispositioned record (0); with a record whose
+    finding''s last disposition is escalated-g3 (1); with an open record (1); a grandfathered phase
+    with no record (0).'
+  - The repository's result is recorded; any phase it refuses is named in the session record and put to
+    the owner rather than exempted in code (PLAN-045 OQ7).
+  verification:
+  - uv run pytest test/test_review_gate.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - src/governance/review_gate.py
+  - src/governance/__main__.py
+  - test/test_review_gate.py
+  - docs/08-governance/
+  next_action: Waits for phase-grd-03. Before claiming, check whether phase-gov-01 and phase-dgov-06 have
+    review records (PLAN-045 OQ7); without them the repository fails the new check.
 - id: phase-dam-01
   title: Amend ARCH-006, GOV-014, GOV-018, REQ-022 and the session commands to the 2026-09-23 rulings
   plan: doc-design-document-amendments
@@ -13870,8 +13918,10 @@ items:
     to the Validator's input rule in GOV-014 (R07).
   - Add four dated GOV-003 entries (Q15, Q8, the agent-proposed label, and the document changes)
     (R08; D4).
-  - Put the exact AGENTS.md 179-180 and CLAUDE.md 137, 141 and 144 text from PLAN-046 D5 to the owner
-    in this session, and apply only what the owner confirms (R09, R10).
+  - Put the exact AGENTS.md 179-180 and 284-286 and CLAUDE.md 137, 141 and 144 text from PLAN-046 D5
+    to the owner in this session, and apply only what the owner confirms (R09, R10).
+  - Correct the passages in REQ-029 problem 9 that name main as the integration branch or cite the
+    withdrawn primary-checkout exception (idea 000377, included by the owner's ruling; R12).
   - Edit agent-workflows/orient.md and regenerate the orient skill; regenerate the catalog (R11; D6).
   acceptance:
   - The completion grep over REQ-029 problem 1's files returns no owner-only completion statement
@@ -13885,7 +13935,10 @@ items:
   - session-close.md step 3 mentions the session record only to exclude it.
   - GOV-003 has the four entries.
   - CLAUDE.md and AGENTS.md show the owner-confirmed text, or the session record states that
-    confirmation was not given and the lines are unchanged.
+    confirmation was not given and the lines are unchanged, for each of the three changes.
+  - git grep -n -w main over GOV-001, GOV-002, GOV-005, OPS-001 and session-close.md lists each
+    remaining main with its reason, and session-close.md no longer presents the primary-checkout
+    exception as current.
   verification:
   - uv run python tools/generate_agent_workflows.py --check
   - uv run python -m src.governance --catalog

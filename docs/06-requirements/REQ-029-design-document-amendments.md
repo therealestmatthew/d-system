@@ -28,8 +28,9 @@ The governing documents contradict each other and the owner's rulings. Each case
    `.claude/commands/session-start.md` lines 191-192 and 224, the orient skill's source
    (`agent-workflows/orient.md`, rendered to `.claude/skills/orient/SKILL.md` lines 77-80),
    `.claude/commands/resume-lit-review.md` line 182, `GOV-014` lines 34, 175 and 195,
-   `ARCH-006`'s G5 row and authority model, and `AGENTS.md` lines 179-180 (idea `000378`, with the
-   owner's ruling of 2026-09-23 that `GOV-003` governs).
+   `ARCH-006`'s G5 row and authority model, and `AGENTS.md` lines 179-180. `AGENTS.md` lines 284-286
+   (hand-off step 5) have the agent set `status: complete` itself, before integration (idea
+   `000378`, with the owner's ruling of 2026-09-23 that `GOV-003` governs).
 2. **G4.** `ARCH-006` says integration is "enforced at the tool boundary by P5's capability
    broker". No such enforcement exists: the broker's approval store is not connected to its check,
    and no hook is configured (Scout report `orchestration-1-evidence.md`, stage 8 row). The owner
@@ -59,6 +60,13 @@ The governing documents contradict each other and the owner's rulings. Each case
    141 lists seven tables (`sql/001_schema.sql` creates 16); line 144 says tasks are embedded in
    commitment JSON, while `tools/rebuild_db.py` reads them from `_data/tasks/` as first-class
    records. The owner approved correcting these on 2026-09-23, relayed by the Session Manager.
+9. **Governing documents still name `main` as the integration branch.** `dev` has been the
+   integration branch since 2026-09-09 (`AGENTS.md`). Still saying `main`: `GOV-001` line 181,
+   `GOV-002` lines 168 and 170, `OPS-001` lines 132 and 154 (`git switch main`), and `GOV-005` line
+   88 (codes are permanent "once it reaches `main`"). `.claude/commands/session-close.md` lines 79
+   and 165 cite "the GOV-003 primary-checkout exception", which `GOV-003` withdrew on 2026-09-12
+   (idea `000377`, with its triage finding's line corrections). The owner ruled on 2026-09-23 to
+   include it in this phase.
 
 ## Observable requirements and verification
 
@@ -71,10 +79,11 @@ The governing documents contradict each other and the owner's rulings. Each case
 | R05 | `GOV-014` has a Test Author contract with inputs, outputs, never-do and a per-dispatch ceiling; its write scope is `test/` only; the Developer contract excludes `test/`; every count of the roles says ten; `ARCH-006` stage 8's Role and Failure path columns name the Test Author, its order relative to the Developer, and what happens when a Developer disputes one of its tests | Read the contract and the stage 8 row; `grep -n "nine"` in `GOV-014` returns no count of roles |
 | R06 | The spot-audit is replaced in `GOV-014`, `ARCH-006` and `REQ-022` R23 by a sampled independent re-review with a stated sampling rule, reviewer type and inputs | `grep -n -i "spot-audit"` over the three files returns no line requiring the owner to spot-audit; the new rule is readable in `GOV-014`'s Validator contract |
 | R07 | `/session-close` step 3 does not give the reviewer the session record, and says why; `GOV-014` states that the close review is bound by the Validator's input rule | Read step 3; the only mention of the session record in step 3 is the prohibition |
-| R08 | `GOV-003` has a dated entry for each ruling in problem 7, quoting the ruling, stating it is standing, and naming what it changes | Read the three entries |
+| R08 | `GOV-003` has a dated entry for each ruling in problem 7, quoting the ruling, stating it is standing, and naming what it changes. The agent-proposed entry states that the label is the idea body's first line (for example "Proposed by <session>, not the owner") until the idea system has a field for it | Read the three entries |
 | R09 | `CLAUDE.md` lines 137, 141 and 144 read exactly as the text the owner confirmed in the executing session; if the owner has not confirmed it there, the lines are unchanged and the session record says so | `git diff CLAUDE.md` shows either the confirmed text or nothing |
-| R10 | `AGENTS.md` lines 179-180 change only with the owner's approval of the exact old and new text, given for that change; otherwise they are unchanged and the session record says so | `git diff AGENTS.md` shows either the approved text or nothing |
+| R10 | `AGENTS.md` lines 179-180 and 284-286 each change only with the owner's approval of that change's exact old and new text, put to the owner in the same session; otherwise they are unchanged and the session record says so | `git diff AGENTS.md` shows the approved text, or nothing, for each |
 | R11 | The generated orient skill matches its source, and governance and the catalog are current | `uv run python tools/generate_agent_workflows.py --check` exits 0; `uv run python -m src.governance` exits 0; `git diff --exit-code docs/08-governance/catalog.md` after `--catalog` |
+| R12 | None of the passages in problem 9 names `main` as the integration branch or cites the withdrawn primary-checkout exception as current | `git grep -n -w main` over the five files lists each remaining `main` with the reason it stays (for example, a reference to the `main` branch itself); `grep -n "primary-checkout exception"` in `session-close.md` returns no line presenting it as current |
 
 ## What each requirement is not
 
@@ -89,5 +98,6 @@ The governing documents contradict each other and the owner's rulings. Each case
   command runner) is a separate ruling with its own work.
 - **R08 does not build the agent-proposed label** in the idea schema or writer. It records the
   ruling (`PLAN-046`, OQ2).
+- **R12 does not rename or protect the `main` branch** (idea `000066`). It corrects text only.
 - **R09 and R10 are not approvals.** `CLAUDE.md` and `AGENTS.md` each require the owner's explicit
   approval of the specific change; a relayed summary is not treated as that approval.

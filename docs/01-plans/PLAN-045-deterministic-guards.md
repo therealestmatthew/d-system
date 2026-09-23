@@ -58,8 +58,8 @@ G3 (OQ5).
 
 ## Decisions
 
-**D1. Three phases, not one.** The nine items are three new tools with operations documents and
-tests, two governance checks, CI and hook changes, and procedure text in `GOV-017` and `PROMPT-037`.
+**D1. Three phases, not one; a fourth added by ruling.** The nine items are three new tools with
+operations documents and tests, two governance checks, CI and hook changes, and procedure text in `GOV-017` and `PROMPT-037`.
 That does not fit one session. The split follows what each check protects:
 
 - `phase-grd-01` makes `dev` fail loudly on stale generated files: (b), (c), (d) and the completion
@@ -70,7 +70,8 @@ That does not fit one session. The split follows what each check protects:
 - `phase-grd-03` checks what a branch brings: (e), (f) and the plan-versus-registered check, plus
   the merge-gate text that uses them.
 
-(g) is `phase-dgov-06`, moved rather than merged (D2). One phase per tool was rejected: the three
+(g) is `phase-dgov-06`, moved rather than merged (D2). `phase-grd-04`, the S3 `next_up` rule, was
+added after review by the owner's ruling (D11). One phase per tool was rejected: the three
 trunk checks would each re-edit the governance command and the same `GOV-017` passages and run in
 sequence anyway. The owner ruled on 2026-09-22 that whether a phase fits one session is judged by the
 agent planning it, not put to the owner; the judgement is reported here and at G3.
@@ -80,11 +81,11 @@ deliverables-diff check against `REQ-015` R12-R13 under `PLAN-030`, with accepta
 known failing case (the `phase-prog-*` phases that rewrite `backlog.yaml` without declaring it).
 Merging it into `phase-grd-03` would mean cancelling a phase another plan owns, amending `PLAN-030`
 and `REQ-015`, and re-deriving acceptance that already exists, with no change to what gets built.
-The cost of moving it is only a queue position: this plan proposes `phase-gov-01` (its dependency,
-which it collides with on file) and `phase-dgov-06` in `next_up` directly after `phase-grd-03`.
-`phase-dgov-06` reports rather than blocks (`REQ-015` R13); idea `000398` asked for a commit-time
-refusal. That difference is kept, not resolved here (OQ3). `next_up` ranking is the owner's; the
-order on this branch is a proposal ratified or changed at G3.
+The cost of moving it is only a queue position: `phase-gov-01` (its dependency, which it collides
+with on file) and `phase-dgov-06` go in `next_up` after the guards phases, in the order the owner
+ruled (OQ1). `phase-dgov-06` reports rather than blocks (`REQ-015` R13), although idea `000398`
+asked for a commit-time refusal; the owner ruled that it stays report-only and that `READY` carries
+its output (OQ3, D10).
 
 **D3. The staleness checks live inside the governance command.** The alternative, adding
 `tools/generate_ideas_md.py --check` and a catalog comparison as separate CI and hook steps, was
@@ -110,7 +111,9 @@ worktree mid-phase. The hook runs from the primary checkout's `tools/git-hooks/`
 sessions the moment it is on `dev`, and a commit in `phase-grd-01`'s own worktree runs the **old**
 hook. The phase therefore tests the new hook by running `sh tools/git-hooks/pre-commit` directly
 against staged changes in its worktree, not through `git commit`, and changes no git configuration.
-It measures the hook's run time and records it.
+It measures the hook's run time and records it. The owner ruled on 2026-09-23 (answer to OQ2):
+"never --no-verify. Commit the fix; if the check is wrong, stop and report". `phase-grd-01` writes
+that into `GOV-017` and the hook's operations document (`REQ-028` R13).
 
 **D6. CI-green-before-grant is a tool the Session Manager runs.** `tools/check_dev_ci.py` asks `gh`
 for the latest completed run for `dev`'s head commit and exits 0, 1 or 2 (`REQ-028` R06). The
@@ -141,13 +144,30 @@ Advisory-only output was rejected: problem 1 in `REQ-028` shows that output nobo
 on is not read. The owner's sign-off names the tests or lines it accepts, so a justified deletion or
 a documented ignore can still merge.
 
+**D10. `READY` carries the deliverables diff once it exists.** Ruled by the owner on 2026-09-23
+(answer to OQ3): "dgov-06 stays report-only, and READY carries its output". `phase-grd-03` writes the
+`READY` rule in `GOV-017` and `PROMPT-037` before `phase-dgov-06` builds the check, so the rule names
+the check and applies from the day it exists. The alternative, adding the text to `phase-dgov-06`,
+would change the scope and deliverables of a phase another plan owns (`PLAN-030`), which the owner's
+ruling did not ask for.
+
+**D11. The S3 `next_up` rule is its own phase, `phase-grd-04`.** Ruled by the owner on 2026-09-23
+(answer to OQ4): "the S3 next_up rule is its own guards phase, after grd-03". The rule is the owner's
+earlier ruling on idea `000394`: "S3 next_up rule refuses, grandfathers current 19". The check reads
+the review records `GOV-018` writes. A phase in `next_up` needs a record that lists it, is
+`dispositioned`, and has no finding whose last disposition is `escalated-g3`. The exempt set is the
+19 phases in `next_up` on `dev` at `f1b891d`, listed in `REQ-028` R12. Folding the rule into
+`phase-grd-03` was rejected: the owner asked for its own phase, and `phase-grd-03` already carries two
+tools and a governance check. OQ7 asks about the two phases the exemption does not cover.
+
 ## Implementation phases
 
 | Phase | What | Requirements | Depends on |
 |---|---|---|---|
-| `phase-grd-01` | Stale generated files fail loudly: catalog and `ideas.md` checks inside governance; the CI catalog step; governance in the pre-commit hook; the catalog regeneration named in the completion edit; the `AGENTS.md` 155-156 proposal | R01-R05, R11 | none |
+| `phase-grd-01` | Stale generated files fail loudly: catalog and `ideas.md` checks inside governance; the CI catalog step; governance in the pre-commit hook; the catalog regeneration named in the completion edit; the `AGENTS.md` 155-156 proposal | R01-R05, R11, R13 | none |
 | `phase-grd-02` | Green `dev` CI before each grant: `tools/check_dev_ci.py`, its operations document and tests, and the grant rule in `GOV-017` and `PROMPT-037` | R06 | `phase-grd-01` (both edit `GOV-017` and `PROMPT-037`) |
 | `phase-grd-03` | Branch guards: the test-baseline tool, the diff-pattern tool, the plan-versus-registered check, and the merge-gate text that uses them | R07-R10 | `phase-grd-02` (same two documents; and the governance entry point `phase-grd-01` changes) |
+| `phase-grd-04` | The S3 `next_up` rule: governance refuses a queued phase with no dispositioned review record, with the 19 grandfathered | R12 | `phase-grd-03` (the governance entry point) |
 
 Moved, not new: `phase-gov-01` (code-reservation enforcement, `PLAN-010`) and `phase-dgov-06` (the
 deliverables diff, `PLAN-030`, `REQ-015` R12-R13), proposed in `next_up` after `phase-grd-03` (D2).
@@ -167,6 +187,8 @@ deliverables diff, `PLAN-030`, `REQ-015` R12-R13), proposed in `next_up` after `
 | R09 | `phase-grd-03` | Three fixture plans; repository run exits 0 with counts |
 | R10 | `phase-grd-03` | The `GOV-017` and `PROMPT-037` diffs |
 | R11 | `phase-grd-01` | `AGENTS.md` diff or the record of no approval |
+| R12 | `phase-grd-04` | Five fixtures; the repository's result recorded |
+| R13 | `phase-grd-01` | The `GOV-017` and hook operations-document diffs |
 
 Every row maps to a phase, and each new phase carries at least one row.
 
@@ -175,10 +197,11 @@ Every row maps to a phase, and each new phase carries at least one row.
 Computed from declared `systems` and `deliverables` with `uv run python -m src.governance --ready`
 on this branch:
 
-- `phase-part-03` is active and declares `sys-governance`. All three guards phases, `phase-dam-01`
+- `phase-part-03` is active and declares `sys-governance`. All four guards phases, `phase-dam-01`
   (`PLAN-046`), `phase-gov-01` and `phase-dgov-06` declare it, so none can be claimed until
   `phase-part-03` completes.
-- The three guards phases share `sys-governance`, `GOV-017` and `PROMPT-037`; they run in order.
+- The four guards phases share `sys-governance`; the first three also share `GOV-017` and
+  `PROMPT-037`, and the last two the governance entry point. They run in order.
 - `phase-dam-01` shares `sys-governance`, `AGENTS.md` and `docs/08-governance/` with
   `phase-grd-01`; they cannot run at the same time.
 - `phase-conc-08` (`PLAN-026`, queued, not in `next_up`) declares `sys-governance` and
@@ -188,9 +211,10 @@ on this branch:
   given; if its rule then concludes otherwise, that is a finding for the owner, not a reason for
   this plan to wait.
 
-Real concurrency is one of these phases at a time. The proposed `next_up` order on this branch is
-`phase-grd-01`, `phase-grd-02`, `phase-dam-01`, `phase-grd-03`, `phase-gov-01`, `phase-dgov-06`,
-inserted after `phase-part-03` and before `phase-cap-08` (OQ1). `phase-grd-01` goes first so its
+Real concurrency is one of these phases at a time. The `next_up` order, ruled by the owner on
+2026-09-23 (answer to OQ1), is `phase-grd-01`, `phase-grd-02`, `phase-dam-01`, `phase-grd-03`,
+`phase-gov-01`, `phase-dgov-06`, after `phase-part-03` and before `phase-cap-08`. `phase-grd-04` is
+placed directly after `phase-grd-03`, per the owner's answer to OQ4. `phase-grd-01` goes first so its
 check catches a stale catalog in every later phase's own commits.
 
 ## Out of scope
@@ -199,9 +223,6 @@ check catches a stale catalog in every later phase's own commits.
   lines only; the existing sites are a separate decision because some are explained (`intake.py:90`
   names a gap in LangGraph's type stubs).
 - **Mutation testing** (idea `000400`). The owner's Q8 ruling named `000408`, `000409` and S7 only.
-- **The S3 `next_up` review-record rule** (idea `000394`), ruled by the owner on 2026-09-23 ("S3
-  next_up rule refuses, grandfathers current 19"). It is a governance check but was not in the
-  Scout's step 1; OQ4 asks where it goes.
 - **Automatic merge by a non-builder session.** Scout O-3 kept builders' self-merge under `GOV-017`
   until P3's merge-gate nodes exist.
 - **Security review** (idea `000410`, mapping Q9). It changes the plan standard and the merge
@@ -209,20 +230,29 @@ check catches a stale catalog in every later phase's own commits.
 
 ## Open questions
 
-- **OQ1. Queue position.** Who: the owner, at G3. Leaning: after `phase-part-03`, ahead of
-  `phase-cap-08`, because `phase-cap-08` also waits for the owner's real captures (restart file,
-  section 4) and the guards protect every phase after them.
-- **OQ2. Hook bypass.** Should a session ever commit with `--no-verify` when the governance check
-  fails mid-phase? Who: the owner, at G3. Leaning: no; commit the fix instead, and if the check itself
-  is wrong, stop and report.
-- **OQ3. Report or refuse for the deliverables diff.** `phase-dgov-06` reports; idea `000398` asked
-  to refuse. Who: the owner, when `phase-dgov-06` is claimed. Leaning: keep report-only as `REQ-015`
-  R13 states, and have `READY` carry its output so the Session Manager sees it.
-- **OQ4. The S3 `next_up` rule.** Who: the owner, at G3. Leaning: its own phase under this plan,
-  after `phase-grd-03`, since it adds another check to the same command.
-- **OQ5. The Scout's two CI ideas.** Their ids are pending from Ideation. Who: the planner, before
-  G3; this plan's idea list and the partition reconciliation (OQ6) cite them.
+Answered by the owner on 2026-09-23, relayed by the Session Manager:
+
+- **OQ1. Queue position.** Ruled: "queue after part-03 is grd-01, grd-02, dam-01, grd-03, gov-01,
+  dgov-06, then cap-08, as proposed." Applied in `next_up`, with `phase-grd-04` after `phase-grd-03`
+  (OQ4).
+- **OQ2. Hook bypass.** Ruled: "never --no-verify. Commit the fix; if the check is wrong, stop and
+  report." Applied in D5, `REQ-028` R13 and `phase-grd-01`.
+- **OQ3. Report or refuse for the deliverables diff.** Ruled: "dgov-06 stays report-only, and READY
+  carries its output." Applied in D10, `REQ-028` R10 and `phase-grd-03`.
+- **OQ4. The S3 `next_up` rule.** Ruled: "the S3 next_up rule is its own guards phase, after grd-03."
+  Applied as `phase-grd-04` (D11, `REQ-028` R12).
+
+Still open:
+
+- **OQ5. The Scout's two CI ideas.** Their ids are pending from Ideation's next turn. Who: the
+  planner, before G3; this plan's idea list and the partition reconciliation (OQ6) cite them.
 - **OQ6. Partition reconciliation.** The owner's partition-before-planning rule applies, and the
   `phase-part-03` sweep covers these ideas. Who: the planner, when the sweep's result is accepted and
   before G3. If the sweep puts any of these ideas in a different track, this plan is revised or the
   difference is put to the owner.
+- **OQ7. `phase-gov-01` and `phase-dgov-06` under the S3 rule.** The owner placed both in `next_up`
+  (OQ1), but neither is among the 19 exempt phases and neither has a review record. When
+  `phase-grd-04` lands, governance would refuse them. Who: the owner, at G3. Leaning: review both
+  under `GOV-018` before `phase-grd-04` lands, rather than widen the exempt list the owner fixed at
+  "current 19". Both plans (`PLAN-010`, `PLAN-030`) predate `GOV-010`, so the entry check is exempt
+  and only the phase altitude runs.

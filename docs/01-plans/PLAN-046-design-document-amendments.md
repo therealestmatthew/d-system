@@ -45,12 +45,13 @@ answers unnumbered, so each is given here with the board's words and the item it
 
 Ideas covered: `000378` (completion authority contradicts itself), `000402` in the one instance
 `000378` describes (not the general consistency check `000402` proposes), and the owner's rulings
-above. Idea `000377` (governance documents still name `main` as the integration branch) is the same
-kind of drift but was not in the task statement; OQ1 asks whether to include it.
+above, and `000377` (governance documents still name `main` as the integration branch), included by
+the owner's ruling of 2026-09-23 (answer to OQ1).
 
 ## Decisions
 
-**D1. One phase, as ruled, judged to fit one session.** The phase edits about ten files. It fits
+**D1. One phase, as ruled, judged to fit one session.** The phase edits about fifteen files; the
+five that `000377` adds each need a one-line change. It fits
 one session because none of the work is design: every ruling is settled, the exact
 `AGENTS.md` and `CLAUDE.md` text is fixed below, the Test Author's placement is fixed in D7, and the
 one new contract (the Test Author) follows the shape of the nine existing ones in `GOV-014`. There
@@ -74,8 +75,8 @@ before it passed) is kept. What changes: the sample is re-reviewed by a dedicate
 (owner ruling of 2026-09-23 that reviews backing a merge come from a validator or adversary type,
 never general-purpose), which is not the reviewer that passed it, with the requirement and the diff
 only; its result goes to the owner at G5. The alternative, a new rate, has no data behind it; the
-existing text already says the rate changes "once G5 sittings give real data". OQ3 asks the owner to
-confirm.
+existing text already says the rate changes "once G5 sittings give real data". Ruled by the owner on
+2026-09-23 (answer to OQ3): "re-review 1 in 10, plus every once-rejected unit".
 
 **D4. One `GOV-003` entry per standing ruling, plus one for the document changes.** The task
 statement lists three `GOV-003` entries (Q15, Q8, the agent-proposed label). This plan adds a
@@ -86,7 +87,9 @@ rule a document still states. The alternative, only the three entries named in t
 leave a reader of `GOV-003` with no record of why `ARCH-006`, `GOV-014` and `GOV-018` changed, and
 the next session that finds the old text in a session record or a plan would not know which is
 current. The cost is one more entry to keep true. The fourth entry records rulings the owner made;
-it adds no rule.
+it adds no rule. The agent-proposed entry records the form the owner ruled on 2026-09-23 (answer to
+OQ2): "GOV-003 records the ruling, and the body's first line is the label until an idea-system field
+exists".
 
 **D5. `AGENTS.md` and `CLAUDE.md` changes are proposals the executing session puts to the owner.**
 `CLAUDE.md` and `AGENTS.md` each forbid editing either without the owner's explicit approval of the
@@ -111,6 +114,24 @@ New:
   phase complete. A phase is completed by `/session-close`, or by a coordinator under the three conditions in
   GOV-003's entry "Coordinator completion replaces owner-invoked /session-close" - never on an agent's own judgement
   that the work looks done.
+```
+
+`AGENTS.md` lines 284-286 (hand-off step 5), put to the owner in the same session as 179-180 (owner's
+answer to OQ4, 2026-09-23). Old:
+
+```text
+5. Update your phase: `status: complete`, `session:`, `completion_evidence:` (files that exist now),
+   and `result:` summarizing the actual verification output. Keep the `agent` field as the record of
+   who did the work.
+```
+
+New:
+
+```text
+5. Update your phase: `session:`, `completion_evidence:` (files that exist now), and `result:`
+   summarizing the actual verification output. Keep the `agent` field as the record of who did the
+   work. Do not set `status: complete` here: `/session-close` sets it, or a coordinator does under the
+   three conditions in GOV-003's entry "Coordinator completion replaces owner-invoked /session-close".
 ```
 
 `CLAUDE.md` lines 137, 141 and 144. Old:
@@ -144,13 +165,13 @@ the Developer may not change them; a Developer who holds that a test is wrong re
 the Validator rules on it, and only the Test Author changes the test; this follows the stage's
 two-cycle path and then parks the unit, like any other finding. The alternative, leaving stage 8
 unchanged until the `unit` graph is built, would leave `GOV-014` and `ARCH-006` disagreeing about
-who works in stage 8. The owner confirms this text at G3 (OQ7).
+who works in stage 8. Ruled by the owner on 2026-09-23 (answer to OQ7): "Test Author stage-8 text as proposed".
 
 ## Implementation phases
 
 | Phase | What | Requirements | Depends on |
 |---|---|---|---|
-| `phase-dam-01` | Amend `ARCH-006`, `GOV-014`, `GOV-018`, `REQ-022` R23, `/session-start`, `/session-close` step 3, `/resume-lit-review`, the orient skill's source; add four `GOV-003` entries; put the `AGENTS.md` and `CLAUDE.md` text to the owner and apply what is confirmed; regenerate the orient skill and the catalog | R01-R11 | none |
+| `phase-dam-01` | Amend `ARCH-006`, `GOV-014`, `GOV-018`, `REQ-022` R23, `/session-start`, `/session-close` step 3, `/resume-lit-review`, the orient skill's source, and the `main`-branch passages from `000377`; add four `GOV-003` entries; put the `AGENTS.md` and `CLAUDE.md` text to the owner and apply what is confirmed; regenerate the orient skill and the catalog | R01-R12 | none |
 
 ## Requirement coverage
 
@@ -164,6 +185,7 @@ who works in stage 8. The owner confirms this text at G3 (OQ7).
 | R08 | The four `GOV-003` entries |
 | R09, R10 | `git diff` of `CLAUDE.md` and `AGENTS.md`, and the owner's confirmation or its absence, recorded |
 | R11 | `generate_agent_workflows.py --check`, governance, catalog diff |
+| R12 | The `main` grep, with each remaining line explained |
 
 Every requirement maps to the one phase.
 
@@ -180,35 +202,31 @@ stale catalog in `phase-dam-01`'s own commits; the order is the owner's at G3 (`
 
 ## Out of scope
 
-- **`AGENTS.md` line 284** (step 5 has the agent write `status: complete`), which `000378` also
-  cites. It was not in the task statement; it is listed for the owner (OQ4).
-- **Building the agent-proposed label** in `schemas/idea.schema.json` and `tools/append_idea.py`
-  (OQ2).
+- **Building the agent-proposed label** in `schemas/idea.schema.json` and `tools/append_idea.py`.
+  Until then the body's first line is the label (OQ2).
 - **The reviewer contract and dispatch** (Scout step 2, O-5, O-6): a new agent type and three
   procedure edits, planned separately.
 - **Security review in the plan standard** (mapping Q9) and **verdict recording** (mapping Q7).
-  Both are owner rulings of 2026-09-23 that change `GOV-010` and the merge gate; neither was in the
-  task statement. OQ5 asks where they go.
-- **Idea `000377`'s `main`-versus-`dev` drift**, unless the owner adds it (OQ1).
+  Ruled by the owner on 2026-09-23 (answer to OQ5): "Q7/Q9 go in a second docs phase, after the
+  reviewer contract". That phase is not planned here.
 
 ## Open questions
 
-- **OQ1. Include `000377`?** Five documents still name `main` as the integration branch
-  (`GOV-001:181`, `GOV-002:168` and `:170`, `OPS-001:132` and `:154`, `GOV-005:88`), and
-  `session-close.md:79` and `:165` cite a withdrawn exception. Who: the owner, at G3. Leaning:
-  include it; the edits are one line each, and `phase-dam-01` already edits `session-close.md`.
-- **OQ2. The agent-proposed label's form.** Scout-1 item 3 (c) says "a labelled
-  'agent-proposed' state". A new idea status or field is a schema and writer change. Who: the owner,
-  at G3. Leaning: `GOV-003` records the ruling now, and the idea bodies' existing first line
-  ("Proposed by <session>, not the owner") serves as the label until a separate idea-system phase
-  adds a field.
-- **OQ3. The re-review's parameters** (D3). Who: the owner, at G3. Leaning: keep one in ten plus
-  every once-rejected unit.
-- **OQ4. `AGENTS.md` line 284.** Who: the owner. Leaning: put its text to the owner in the same
-  session as lines 179-180, since both contradict `GOV-003` in the same way.
-- **OQ5. Where the Q7 and Q9 rulings go.** Who: the owner, at G3. Leaning: a second docs phase after
-  the reviewer contract (Scout step 2), because both change what a reviewer is given and records.
+Answered by the owner on 2026-09-23, relayed by the Session Manager:
+
+- **OQ1. Include `000377`?** Ruled: "include 000377". Applied: `REQ-029` problem 9 and R12.
+- **OQ2. The agent-proposed label's form.** Ruled: "GOV-003 records the ruling, and the body's first
+  line is the label until an idea-system field exists". Applied: D4, `REQ-029` R08.
+- **OQ3. The re-review's parameters.** Ruled: "re-review 1 in 10, plus every once-rejected unit".
+  Applied: D3.
+- **OQ4. `AGENTS.md` line 284.** Ruled: "AGENTS.md 284 is put to the owner in the same session as
+  179-180". Applied: D5, `REQ-029` R10.
+- **OQ5. Where the Q7 and Q9 rulings go.** Ruled: "Q7/Q9 go in a second docs phase, after the
+  reviewer contract". Recorded under Out of scope.
+- **OQ7. The Test Author's stage 8 text.** Ruled: "Test Author stage-8 text as proposed". Applied:
+  D7.
+
+Still open:
+
 - **OQ6. Partition reconciliation.** As in `PLAN-045` OQ6: reconciled with the `phase-part-03`
   sweep's accepted result before G3.
-- **OQ7. The Test Author's stage 8 text** (D7). Who: the owner, at G3. Leaning: as proposed, since
-  it is the owner's own design applied to the existing failure path.
