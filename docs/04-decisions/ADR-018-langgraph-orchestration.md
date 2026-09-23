@@ -4,10 +4,10 @@ id: doc-adr-langgraph-orchestration
 code: ADR-018
 title: Orchestrate the idea realization pipeline with LangGraph over the Claude Agent SDK
 kind: adr
-status: draft
+status: accepted
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-22'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-idea-realization-system]
 ---
@@ -16,8 +16,11 @@ depends_on: [doc-idea-realization-system]
 
 ## Status
 
-Draft. Owner-selected on 2026-09-15 (recorded on idea `000247`); accepted when `PLAN-039`'s
-orchestrator phase lands the first working graph.
+Accepted 2026-09-22. Owner-selected on 2026-09-15 (recorded on idea `000247`); `phase-irs-04`
+landed the first working graph -- `src/orchestrator/graphs/intake.py`, a checkpointed,
+interruptible LangGraph state graph running end to end under `test/test_orchestrator.py`,
+including the checkpoint-loss and killed-process resumption drills this ADR's boundary rule
+promises (REQ-022 R16, R17).
 
 ## Context
 

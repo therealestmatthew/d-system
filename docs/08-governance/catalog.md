@@ -22,7 +22,7 @@ CI regenerates it and fails on any difference.
 | ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
 | ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
-| ADR-018 | adr | draft | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
+| ADR-018 | adr | accepted | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
 | ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ADR-021 | adr | accepted | repository-owner | docs/04-decisions/ADR-021-claude-code-dependency.md |
 | ADR-022 | adr | accepted | repository-owner | docs/04-decisions/ADR-022-broker-first-autonomous-operations.md |
@@ -70,6 +70,8 @@ CI regenerates it and fails on any difference.
 | OPS-016 | operation | active | repository-owner | docs/08-governance/OPS-016-idea-dispatch.md |
 | OPS-017 | operation | active | repository-owner | docs/08-governance/OPS-017-lit-report-extract.md |
 | OPS-019 | operation | active | repository-owner | docs/08-governance/OPS-019-lit-report-render.md |
+| OPS-022 | operation | active | repository-owner | docs/08-governance/OPS-022-append-run.md |
+| OPS-023 | operation | active | repository-owner | docs/08-governance/OPS-023-append-decision.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -409,4 +411,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-327 documents — adr: 19, architecture: 11, governance: 15, operation: 18, plan: 58, prompt: 37, requirement: 27, session: 142.
+329 documents — adr: 19, architecture: 11, governance: 15, operation: 20, plan: 58, prompt: 37, requirement: 27, session: 142.
