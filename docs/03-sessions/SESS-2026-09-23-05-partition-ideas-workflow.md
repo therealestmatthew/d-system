@@ -174,6 +174,38 @@ Owner rulings from this session. Each changed what was built.
   including finding bodies (178 matches against a corpus of 152). It now matches only the builder's
   entry heading, `## <id> — `.
 
+## Review
+
+Independent adversarial review (a fresh `demo-adversary` subagent) of `dev...agent/phase-part-03`
+at `d8428df` and `0cbc826`. It returned after the overnight safe point, and **its findings are not
+yet fixed**. As reported:
+
+- Acceptance: conditions 1, 2, 4 and 6 are **Not yet** (the post-merge dry run). Condition 3
+  **Holds at extraction level**: all six sections were re-extracted, and the R1 and R4 diffs
+  against the pack are empty. Conditions 5 and 7 **Hold**. Conditions 8 and 9 are **met by fixture,
+  with gaps** (MEDIUM-1, MEDIUM-2). The generator check, the 20 workflow tests and governance
+  passed. The two generated `SKILL.md` files are byte-identical.
+- **HIGH:** step 2's resume check crashes with `KeyError: 'manifest'` on any
+  `docs/00-working/idea-partition-*.json` that lacks the key, including a half-written record, so
+  one malformed file blocks every later invocation.
+- **MEDIUM-1:** step 5's cross-check never looks at `decline_candidates`. A candidate id outside
+  the corpus, and outside every group and unbatched, passes with `0 problem(s)`, contrary to the
+  schema's own stated invariant.
+- **MEDIUM-2:** the same-day naming cannot tell an earlier sweep's document from this sweep's own
+  half-written one. A crash mid-step-5 leaves an orphaned `.md`, and the re-run takes `-2`.
+- **MEDIUM-3:** the move-aside snippet has no stamp awareness. Run during a RESUME by mistake, it
+  moves the current sweep's stamped `report-R1.md` away with everything else.
+- **LOW:** a manifest built but not yet used by any report is classified NEW, which rebuilds the
+  corpus with a new seed. Nothing is lost, but the rebuild is wasted.
+- **LOW:** the extraction regex assumes no fenced block is nested inside a pack section. That
+  holds today (12 fences, 6 pairs), but nothing enforces it.
+- Areas that held: no quoted brief, no idea-log or backlog write, and no scope creep. R4 is R1's
+  block with the findings references removed and nothing added. Idea `000339` exists as cited.
+
+**Next:** fix HIGH, MEDIUM-1, MEDIUM-2 and MEDIUM-3 in `agent-workflows/partition-ideas.md`,
+regenerate, and re-run the fixtures with a case for each finding. Decide the two LOWs (fix or
+accept), then record the outcomes here.
+
 ## Resume state (overnight safe point, 2026-09-23)
 
 - Branch `agent/phase-part-03` is pushed. The build is in `d8428df`, and this record and the
