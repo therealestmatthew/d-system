@@ -2801,8 +2801,9 @@ items:
   - src/capture/structure.py
   - src/capture/routing.py
   - test/test_capture_routing.py
-  next_action: Build the routing table and the never-invent validation against the
-    matrix fixtures.
+  next_action: All acceptance conditions are met on agent/phase-cap-05; waiting for the
+    owner-approved merge onto dev, after which the completion edit is made.
+  session: doc-session-capture-structuring-routing
 - id: phase-cap-06
   title: Build review and promotion into the source of truth
   plan: doc-capture-build
