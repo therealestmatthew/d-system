@@ -120,21 +120,41 @@ def load_raw(capture_id: str, raw_dir: Path = RAW_DIR) -> dict[str, Any]:
     return record
 
 
+def _single(entity: Mapping[str, Any], name: str) -> str | None:
+    value = entity.get(name)
+    if value is not None and not isinstance(value, str):
+        raise StructuringError(f"field {name!r} must be a string or null, not {value!r}")
+    return value
+
+
+def _several(entity: Mapping[str, Any], name: str) -> list[str]:
+    values = entity.get(name)
+    if values is None:
+        return []
+    if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
+        raise StructuringError(f"field {name!r} must be a list of strings, not {values!r}")
+    return values
+
+
 def unresolved_references(entity: Mapping[str, Any], known: KnownIdentities) -> list[str]:
-    """Name every field value that refers to a person, project or tag not yet known."""
+    """Name every field value that refers to a person, project or tag not yet known.
+
+    A reference field of the wrong shape is refused rather than guessed at: a bare string
+    in a list field would otherwise be read one character at a time.
+    """
     found: list[str] = []
     for name in PERSON_FIELDS:
-        value = entity.get(name)
+        value = _single(entity, name)
         if value is not None and value not in known.people:
             found.append(f"{name}={value!r}")
     for name in PERSON_LIST_FIELDS:
-        found += [f"{name}={v!r}" for v in entity.get(name) or [] if v not in known.people]
+        found += [f"{name}={v!r}" for v in _several(entity, name) if v not in known.people]
     for name in UNRESOLVED_NAME_FIELDS:
-        found += [f"{name}={v!r}" for v in entity.get(name) or []]
-    project = entity.get("project_id")
+        found += [f"{name}={v!r}" for v in _several(entity, name)]
+    project = _single(entity, "project_id")
     if project is not None and project not in known.projects:
         found.append(f"project_id={project!r}")
-    found += [f"tags={t!r}" for t in entity.get("tags") or [] if t not in known.tags]
+    found += [f"tags={t!r}" for t in _several(entity, "tags") if t not in known.tags]
     return found
 
 
@@ -145,6 +165,8 @@ def _field_evidence(
     quote = spec.get("quote")
     provenance: dict[str, Any] = {"capture_id": capture_id, "quote": quote}
     if quote is not None:
+        # The first occurrence: a quote repeated in the capture is still verbatim, and the
+        # proposal carries no offset to choose between occurrences.
         start = content.find(quote)
         if start < 0:
             raise StructuringError(
@@ -241,17 +263,20 @@ def stage_capture(
 ) -> list[dict[str, Any]]:
     """Structure every proposal for one capture and write them to staging.
 
-    All proposals are checked before any is written, so a refused proposal leaves staging
-    exactly as it was. Returns the staged records written.
+    Every proposal is checked, and every id confirmed free, before anything is written, so a
+    refused proposal or an id collision leaves staging exactly as it was. Returns the staged
+    records written.
     """
     raw = load_raw(capture_id, raw_dir)
     identities = known if known is not None else KnownIdentities.load()
     records = [structure(raw, proposal, identities) for proposal in proposals]
 
+    paths = [staging_dir / f"{record['id']}.json" for record in records]
+    taken = sorted(str(p) for p in paths if p.exists())
+    if taken or len(set(paths)) != len(paths):
+        raise StructuringError(f"staged record id collision: {taken or 'within this capture'}")
+
     staging_dir.mkdir(parents=True, exist_ok=True)
-    for record in records:
-        path = staging_dir / f"{record['id']}.json"
-        if path.exists():
-            raise StructuringError(f"staged record id collision: {path}")
+    for record, path in zip(records, paths, strict=True):
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return records

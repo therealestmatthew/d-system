@@ -471,3 +471,70 @@ def test_the_same_fixture_through_all_three_channels_routes_identically(
     assert [route for _, route, _ in session_result] == ["flagged", "flagged", "flagged"]
     assert comparable(inbox_raw) == session_result
     assert comparable(cli_raw) == session_result
+
+
+# --- Review findings: malformed references, truthy flags, atomic staging ---------------
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("participants", 5),
+        ("participants", "dana"),
+        ("tags", "ai-tools"),
+        ("decided_by_names", [3]),
+        ("promised_to", ["jordan-rivera"]),
+        ("project_id", 7),
+    ],
+)
+def test_a_reference_field_of_the_wrong_shape_is_refused_naming_it(
+    capture: dict[str, Any], raw_dir: Path, staging_dir: Path, field: str, value: Any
+) -> None:
+    proposal = {"entity_type": "interaction", "fields": {field: explicit(value, "Jordan")}}
+    with pytest.raises(StructuringError, match=field):
+        _stage(capture, raw_dir, staging_dir, proposal)
+    assert not staging_dir.exists()
+
+
+@pytest.mark.parametrize("flag", ["true", 1, "yes"])
+def test_a_truthy_non_boolean_review_flag_does_not_count_as_a_flag(
+    capture: dict[str, Any], raw_dir: Path, staging_dir: Path, flag: Any
+) -> None:
+    spec = inferred("2026-10-02", "by Friday")
+    spec["review_flag"] = flag
+    proposal = {"entity_type": "commitment", "fields": {"due_date": spec}}
+    with pytest.raises(StructuringError, match="due_date"):
+        _stage(capture, raw_dir, staging_dir, proposal)
+    assert not staging_dir.exists()
+
+
+def test_a_high_stakes_record_with_an_unresolved_reference_is_held_not_flagged(
+    capture: dict[str, Any], raw_dir: Path, staging_dir: Path
+) -> None:
+    proposal = {
+        "entity_type": "decision",
+        "fields": {
+            "decision": explicit("Drop the old parser", "drop the old parser"),
+            "decided_by_names": explicit(["Dana"], "Jordan"),
+        },
+    }
+    [record] = _stage(capture, raw_dir, staging_dir, proposal)
+    assert record["route"] == "held"
+
+
+def test_an_id_collision_leaves_staging_untouched(
+    capture: dict[str, Any], raw_dir: Path, staging_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(structure, "_new_id", lambda _at: "staged-20260922T000000Z-000000")
+    proposals = [
+        {"entity_type": "task", "fields": {"description": explicit("send deck", "send the")}},
+        {"entity_type": "note", "fields": {"description": explicit("workshop", "a workshop")}},
+    ]
+    with pytest.raises(StructuringError, match="collision"):
+        _stage(capture, raw_dir, staging_dir, *proposals)
+    assert not staging_dir.exists()
+
+    [record] = _stage(capture, raw_dir, staging_dir, proposals[0])
+    with pytest.raises(StructuringError, match="collision"):
+        _stage(capture, raw_dir, staging_dir, proposals[0], proposals[1])
+    assert [p.name for p in staging_dir.iterdir()] == [f"{record['id']}.json"]
