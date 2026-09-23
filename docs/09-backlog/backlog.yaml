@@ -2825,7 +2825,8 @@ items:
   - sys-capture
   - sys-portfolio
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 1
   session_budget: 1
   depends_on:
@@ -2851,6 +2852,7 @@ items:
   - tools/review.py
   - test/test_capture_review.py
   - test/test_capture_promotion.py
+  - schemas/correction.schema.json
   next_action: Build promotion first, then the review presentation that feeds it.
 - id: phase-cap-07
   title: Project the expanded entity model into DuckDB
