@@ -724,3 +724,24 @@ with the phase it describes rather than riding in this fixes branch.
 stage composition without being visible from either phase's own diff in isolation — an agent reaching
 `phase-idg-01`, `phase-idg-14`, `phase-irs-11` or `phase-irs-14` needs the reasoning, not just the
 amended entries.
+
+## The multi-session merge gate adds ruff, mypy and the dirty-integration check — 2026-09-23
+
+The owner ruled two additions to the merge gate in
+[GOV-017](GOV-017-multi-session-coordination-protocol.md), carried into the shared contract in
+[PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md):
+
+1. **`uv run ruff check src/ test/` and `uv run mypy src/` are gate checks**, alongside
+   `governance` and `pytest`. A session's `READY` carries the tail of all four post-rebase runs, the
+   Session Manager re-runs all four on the branch tip, and a session re-runs all four if `dev` moved
+   before its fast-forward. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so the gate is a
+   clean run of each.
+2. **`uv run python tools/git-hooks/refuse_dirty_integration.py` exits 0 in the primary checkout
+   before any fast-forward.** `AGENTS.md` step 9 already requires this; `GOV-017`'s merge gate and
+   the contract's item 4 did not mention it, so a session following only the contract would skip it.
+
+Neither departs from `AGENTS.md`: the first adds checks to step 6's post-rebase run, the second
+restates step 9.
+
+**Why recorded here:** the first changes what a branch must pass before it may integrate. An agent
+reading only `AGENTS.md` step 6 would send `READY` with `governance` and `pytest` alone.

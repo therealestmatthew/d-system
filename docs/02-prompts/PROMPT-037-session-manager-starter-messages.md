@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-23'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -23,7 +23,9 @@ Each starter message is the **shared contract** followed by that session's **rol
 texts below are the versions the owner approved on 2026-09-22, revised the same night after an
 independent review to state the owner's later rulings: no tests in the primary checkout (item 9),
 one test run at a time per worktree with a catalog check (item 10), the relayed merge approval and
-the post-merge completion edit (item 4), and the `_working/` report exemption (item 3).
+the post-merge completion edit (item 4), and the `_working/` report exemption (item 3). Item 4 was
+revised again on 2026-09-23 to add the owner's rulings that the merge gate includes `ruff` and
+`mypy` and that the dirty-integration check runs before every fast-forward.
 
 ## Kickoff for the Session Manager
 
@@ -71,11 +73,14 @@ Roster
 3. Everything else runs in a worktree: ../d-system-worktrees/<id> on branch agent/<id>.
    Exception: reports under _working/session-manager/ (gitignored) need no turn.
 4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
-   explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance` and
-   `uv run pytest` runs. The owner approves every merge; I relay, and a GRANTED merge from me is the
-   owner's approval. Merge only after GRANTED merge. Inside that turn: if dev moved, rebase, re-run
-   both, report the new tip and wait for my go; then ff-merge, make the completion edit on dev
-   (governance only, no pytest), and send TURN DONE <sha(s)>.
+   explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance`,
+   `uv run pytest`, `uv run ruff check src/ test/` and `uv run mypy src/` runs (dev's
+   baseline is 0 ruff findings, 0 mypy errors; the gate is clean). The owner approves every
+   merge; I relay, and a GRANTED merge from me is the owner's approval. Merge only after
+   GRANTED merge. Inside that turn: if dev moved, rebase, re-run all four, report the new tip
+   and wait for my go; then run `uv run python tools/git-hooks/refuse_dirty_integration.py`
+   in the primary checkout and continue only if it exits 0 (AGENTS.md step 9); then ff-merge,
+   make the completion edit on dev (governance only, no pytest), and send TURN DONE <sha(s)>.
 5. After any merge onto dev I send REBASE. Rebase onto dev at your next safe point.
 6. BLOCKED <reason> when stuck outside your worktree. FREE when you have no assignment.
 7. IDEAS that come up: send "IDEA <the bare idea>" to "Ideation", one message per idea, 1-2 lines, plus your

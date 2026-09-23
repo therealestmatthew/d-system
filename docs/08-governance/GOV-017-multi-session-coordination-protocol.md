@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-23'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-adr-multi-agent-concurrency, doc-coordinator-protocol, doc-build-coordinator, doc-backlog-decisions, doc-conversation-guidelines, doc-governance-operations]
 ---
@@ -144,24 +144,35 @@ lock. All three rules in this section are owner rulings of 2026-09-22.
 A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. Approval is relayed:
 
 1. The session sends `READY` with the phase's own review verdict — every finding either fixed or
-   explicitly accepted — and the tail of its post-rebase `governance` and `pytest` runs.
-2. The Session Manager re-runs `governance` and `pytest` on the branch tip in a detached temporary
+   explicitly accepted — and the tail of its post-rebase runs of the four gate checks:
+   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/` and
+   `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so the gate is a clean
+   run of each, not a count no worse than before.
+2. The Session Manager re-runs the four gate checks on the branch tip in a detached temporary
    worktree (`git worktree add --detach ../d-system-worktrees/verify-<phase-id> <branch>`, removed
    afterwards), so it touches neither the primary checkout nor the session's worktree.
 3. The Session Manager brings the merge to the owner with both results and
    `git diff --stat dev..<branch>`.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
-   since step 2, the session rebases and re-runs both checks while holding the lock, and reports the
-   new tip; the Session Manager re-runs step 2 on that tip before the session fast-forwards. Nothing
-   else can land on `dev` while the session holds the lock.
-5. Inside the same turn the session fast-forwards `dev` and makes the completion edit — one small
+   since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
+   reports the new tip; the Session Manager re-runs step 2 on that tip before the session
+   fast-forwards. Nothing else can land on `dev` while the session holds the lock.
+5. Before the fast-forward, the session runs
+   `uv run python tools/git-hooks/refuse_dirty_integration.py` in the primary checkout and continues
+   only if it exits 0. This is `AGENTS.md` step 9's check (see `OPS-001`), restated here because the
+   merge turn is where it runs under this protocol.
+6. Inside the same turn the session fast-forwards `dev` and makes the completion edit — one small
    commit on `dev` immediately after the integration, as `GOV-003` sanctions (entry "Coordinator completion replaces
    owner-invoked /session-close, repository-wide") — with `governance` run on `dev` and no `pytest`. Then it
    sends `TURN DONE`.
-6. After the merge lands, the Session Manager sends `REBASE` to every session with an open branch.
+7. After the merge lands, the Session Manager sends `REBASE` to every session with an open branch.
 
 **Owner ruling, 2026-09-22:** a `GRANTED merge` relayed by the Session Manager is the owner's
 approval, as a standing rule for every session.
+
+**Owner ruling, 2026-09-23:** the gate checks include `ruff` and `mypy` alongside `governance` and
+`pytest` (steps 1, 2 and 4), and the dirty-integration check runs before every fast-forward
+(step 5). Both are recorded in `GOV-003`.
 
 ## Ideas
 
@@ -181,7 +192,7 @@ sent to the name `Session Manager`.
 | Message | From | Meaning |
 |---|---|---|
 | `ACK <session> <state>` | any | Orientation received; states phase, branch and worktree, or none |
-| `TURN? <claim\|idea\|batch\|dryrun> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines; `dryrun` runs a merged skill or workflow in the primary checkout for a phase's acceptance evidence, writing only gitignored paths and committing nothing (owner ruling, 2026-09-22, first used by `phase-part-03`); as `PROMPT-036` sets it when it opens or closes a batch; merges go through `READY` |
+| `TURN? <claim\|idea\|batch\|dryrun> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines, as `PROMPT-036` sets them when it opens or closes a batch; `dryrun` runs a merged skill or workflow in the primary checkout for a phase's acceptance evidence, writing only gitignored paths and committing nothing (owner ruling, 2026-09-22, first used by `phase-part-03`); merges go through `READY` |
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
 | `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean |
