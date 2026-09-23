@@ -2824,7 +2824,7 @@ items:
   - sys-capture
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 1
   session_budget: 1
@@ -2863,11 +2863,18 @@ items:
   - test/test_capture_review.py
   - test/test_capture_promotion.py
   - docs/03-sessions/SESS-2026-09-23-02-capture-review-promotion.md
-  result: Built; four independent reviews with three fix cycles. The last review, of the final fix
-    commit, found no HIGH or MEDIUM and all three acceptance criteria met; five LOW findings accepted
-    with reasons in SESS-2026-09-23-02. Post-rebase on dev be1d78e, governance OK, ruff and mypy
-    clean, pytest 968 passed and 1 skipped.
-  next_action: READY sent per GOV-017. On GRANTED merge, ff-merge and make the completion edit on dev.
+  result: 'Capture review and promotion: bulk promotion of clean records only, one-record promotion
+    with owner-stated values, identity creation (capture-derived tags held per idea 000343), discard, and
+    corrections logged append-only to corrections.jsonl before the record changes; tools/review.py with
+    OPS-024 and schemas/correction.schema.json. Four independent reviews: the first before any fix, then
+    three of the fixes. Three fix cycles in all: dddebf2 before the overnight pause, then two overnight
+    within the overnight authority''s budget of two. The final review, of the last fix commit, found no
+    HIGH or MEDIUM and all three acceptance criteria met; five LOW findings accepted with reasons in
+    SESS-2026-09-23-02. Merged on GOV-017 GRANTED merge at 44dce1a. Post-rebase verification on dev
+    32db922: "Governance OK: 35 systems, 334 documents, 31 memories, 293 backlog phases"; pytest "968
+    passed, 1 skipped"; ruff "All checks passed!"; mypy "no issues found in 44 source files".'
+  next_action: None; complete. Follow-up candidates are the five accepted LOW findings in
+    SESS-2026-09-23-02 and the private tag file (idea 000343).
 - id: phase-cap-07
   title: Project the expanded entity model into DuckDB
   plan: doc-capture-build
