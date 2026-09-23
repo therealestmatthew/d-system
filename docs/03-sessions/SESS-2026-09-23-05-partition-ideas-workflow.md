@@ -230,6 +230,23 @@ Owner rulings from this session. Each changed what was built.
   worktree. The skill stops before A2 and asks the owner. Recorded as idea `000339`.
 - **The structured record and same-day naming are verified by fixture**, by running the skill's own
   step-5 snippets on a hand-made partition. The GATE-1 dry run never reaches synthesis.
+- **R1's self-written output: option C (morning of 2026-09-23).** Move R1's output aside, stop
+  analysts writing files, re-run R1, then complete. This adds scope, which the owner approved.
+- **How analysts are stopped: a read-only agent type (option A of the follow-up question).**
+  `R1` and `R4` go to a new `.claude/agents/partition-analyst.md` whose only tools are Read, Grep
+  and Glob. `PROMPT-034` is unchanged; the skill states its departure from the pack's
+  "general-purpose agent" line. `partition-adversary` is out of scope. The owner approved a one-off
+  primary-checkout turn to add the agent file to this phase's deliverables.
+- **The analyst's context window is 1M, settled from the Claude Code docs.** R1's corpus is
+  1,343,696 bytes, about 340k tokens, and without a shell the analyst must read it whole (last
+  night R1 condensed it through Bash first). The agent file says `model: sonnet`. The model
+  configuration page (code.claude.com/docs/en/model-config) says that on the Anthropic API the
+  `sonnet` alias resolves to Sonnet 5, and: "On the Anthropic API, Sonnet 5 always runs with the 1M
+  context window. There is no 200K variant, no `[1m]` suffix to select". No `ANTHROPIC_*` model
+  variable or subagent model override is set here, so the provider is the Anthropic API. The
+  GitHub issues about a stripped `[1m]` suffix for subagents (#39047, #45169) concern the 4.6
+  models, which reach 1M only through that suffix. The R1 re-run is the practical check: a report
+  that covers every corpus id shows the whole file was read.
 
 ## Corrections
 
