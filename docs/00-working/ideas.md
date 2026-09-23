@@ -18316,13 +18316,29 @@ PROPOSED LINK: 000367 --relates_to--> 000085 (sibling building-block library und
 
 ## 000368 · A running log of branches, worktrees and their assigned agents, independent of git status
 
-**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:10-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
 "need to keep a running log of branches and worktrees and associated agents assigned to them plus status and other notes - independent of git branch/status - and based on actual work we are doing. Then we have an authoritative source for managing and cleaning up the branches and worktrees and don't need to rework analysis during cleanup (also to support state management)."
 
 (From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:00-04:00): Read on dev: nothing records branches and worktrees apart from git itself. GOV-017 gives the Scout a read-only "worktree and branch audit" (roster table, line 68), which reports every worktree and agent/* branch with its last commit date, merge state and claim state. That is a snapshot built again from git each time, which is the rework the owner wants to avoid. _tmpagent/claims.jsonl records claims on shared files, not worktrees. The backlog records phase claims (session and branch), but not worktree paths, cleanup state or unassigned branches.
+
+The Prompt Planner's draft design for moving the Session Manager to LangGraph (_working/overnight-sprint/planning/session-manager-on-langgraph.md, "P3", draft 4, ungoverned) has no worktree or branch registry among its proposed new phases N0-N12. It has a primary-checkout lease (N1) and a run ledger. A scout claimed P3 section 10 / N11 designs this registry. That is wrong: N11 is the generated morning run report.
+
+000390 is the Session Manager's field-level expansion of this ask: path, tips, pushed state, owning session, gitignored contents, merge and cleanup state. Earlier asks: 000152 (a registry agents register worktrees in), 000168 (worktree lifecycle and per-worktree queues), 000280 (worktrees across machines).
+
+PROPOSED LINK: 000390 --extends--> 000368 (000390 gives the owner's ask its fields and cases)
+
+</details>
 
 **Links**
 
@@ -18335,13 +18351,31 @@ The owner's words, as given:
 
 ## 000369 · A durable append-only log of every coordination message, so the Session Manager's board is rebuilt from it
 
-**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:10-04:00 · Status: `triaged`**
 
 A durable, append-only log of every coordination message (TURN?, GRANTED, READY, TURN DONE, rulings and so on), so that the Session Manager's board can be rebuilt from the log and is no longer maintained by hand.
 
 Relates to the 000347 gap "a durable message log" and to 000359 (multi-provider coordination).
 
 (From the Session Manager, captured at the owner's request, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:00-04:00): Read on dev: coordination messages (TURN?, GRANTED, READY, TURN DONE, rulings) are not logged anywhere durable. GOV-017 (line 214) puts the Session Manager's board at _working/session-manager/board.md, which is gitignored and hand-edited.
+
+Code already has append-only logs for the automated orchestrator: tools/append_run.py (OPS-022, the run ledger, schemas/run.schema.json) and tools/append_decision.py (OPS-023, gate decisions), read by src/orchestrator/ledger.py and decisions.py (phase-irs-04, complete). No _data/runs.jsonl exists on dev yet, so no run has been recorded. These logs hold orchestrator run events, not session-to-session messages. A scout suggested they already answer this idea. They do not today.
+
+P3 (the Prompt Planner's ungoverned draft, _working/overnight-sprint/planning/session-manager-on-langgraph.md, section 6) proposes that once the Session Manager runs on the orchestrator, "the ledger is the log": grants, dispatches, results, gates, decisions and parks become ledger events. That would deliver this idea, but it depends on the migration (000370) and on P3's owner decision points.
+
+A manual step available before that: log each message as the Session Manager sends it, in a tracked or gitignored JSONL file. 000391 lists which records the log needs.
+
+PROPOSED LINK: 000391 --relates_to--> 000369 (the same board-from-log design; 000391 lists what it must record)
+
+</details>
 
 **Links**
 
@@ -18355,7 +18389,7 @@ Relates to the 000347 gap "a durable message log" and to 000359 (multi-provider 
 
 ## 000370 · A governed protocol for the Session Manager's board and state, and its migration onto LangChain/LangGraph
 
-**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:10-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
@@ -18364,6 +18398,24 @@ The owner's words, as given:
 As relayed by the Session Manager: a governed protocol for the Session Manager's board and state management, plus the migration path onto LangChain/LangGraph. Relates to P3 (session-manager-on-langgraph.md) and 000359.
 
 (From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:00-04:00): Read on dev: the board and state protocol today is GOV-017 (roster, primary-checkout lock, claim slots, merge relay, message types) plus PROMPT-037's starter texts. The board file itself is ungoverned and hand-kept (GOV-017:214).
+
+For the migration: ADR-018 (accepted) chooses LangGraph with the Claude Agent SDK and states that plain LangChain chains are not used. The owner's word "langchain" maps to that decision. PLAN-039.01 (draft) is the orchestrator design. phase-irs-04 (graph skeleton) and phase-irs-16 (daemon, lock and process model) are complete. phase-irs-13 (gate queue) is queued.
+
+The Session Manager migration itself is only in P3, the Prompt Planner's ungoverned draft (_working/overnight-sprint/planning/session-manager-on-langgraph.md, draft 4, 2026-09-23). It maps every GOV-017 element (section 6), proposes a primary-checkout lease, per-task workers instead of long-lived role sessions, 13 new phases N0-N12 (section 10) and owner decision points (section 12). It is not a plan or a governed protocol. Promoting it would mean a PLAN (or PLAN-039 sub-plan) and a GOV-017 revision (N10). The owner's decision points come first.
+
+Related: 000334 (carry GOV-017 into LangGraph), 000386 (whether it is one orchestrator or several), 000393 (coordination as code), 000368, 000369, 000389-000391 (the records it needs).
+
+PROPOSED LINK: 000370 --relates_to--> 000334 (both ask how GOV-017's coordination moves onto the LangGraph orchestrator)
+
+</details>
 
 **Links**
 
@@ -18377,79 +18429,9 @@ As relayed by the Session Manager: a governed protocol for the Session Manager's
 
 ## 000371 · A glossary protocol: who may add or retire a term, the entry test, and when the glossary is reviewed
 
-**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:11-04:00 · Status: `triaged`**
 
 None exists. PLAN-012 (still draft) states rules: a term enters when it appears undefined in 2 governed docs; retire rather than delete; one sentence of what it is, one of what it is not, plus a pointer; review with the systems review. Nothing enforces them or schedules the review.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000372 · A sanctioned writer for concept terms, like append_idea.py is for ideas
-
-**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
-
-Terms are edited by hand inside grouped brain/concepts/*.md files. Nothing checks the format (what it is / what it is not / pointer), duplicate headings across files, or the `updated` bump. Checked 2026-09-23: no such tool exists in tools/.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000373 · Glossary generator features: table of contents, acronym index, per-term anchors and cross-links, category grouping
-
-**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
-
-GLOSSARY.md is about 1,100 lines, with 11 sections and no contents list. Terms cannot be linked to individually, and acronyms (ADR, REQ, OPS, WBS, MDM, MCP…) have no index. The generator only supports --tag/--system filters.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000374 · Non-term headings render as glossary terms
-
-**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
-
-generate_glossary.py renders concept bodies verbatim, so every ### becomes a "term". Two cases: the six "### 1. Layout slot_id values — RENAME"… migration-ruling headings in terms-workbench-ui.md, and "### Advanced topics, named but not covered in depth" in terms-skills-and-agents-demo.md. Either move rulings out of concept memories, or give the generator a rule.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000375 · docs/00-working/demo-glossary.md has no drift test
-
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
-
-GLOSSARY.md is guarded by test/test_glossary.py. The --tag demo-glossary slice is committed too, but nothing fails when it goes stale after a concept edit.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000376 · Generate glossary entries from existing registries instead of restating them by hand
-
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
-
-Candidates: the codes.yaml series (9 document-code acronyms), the backlog README track-prefix table, systems.yaml domains/statuses, and schema enum vocabularies (idea status, capture route, phase status). Today the glossary restates some of these by hand, and they drift.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000377 · Governance docs still name `main` as the integration branch
-
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
-
-GOV-001:181-192, GOV-002:288 and :366-368, and OPS-001 ("git switch main") say main; AGENTS.md:57-59 says dev since 2026-09-09. GOV-005:86-90 says codes are permanent "once it reaches main". OPS-001 "Close a session" and session-close.md steps 2 and 8 still cite the primary-checkout exception that GOV-003:328-334 withdrew on 2026-09-12.
-
-(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
-
----
-
-## 000378 · Phase-completion authority contradicts itself across documents
-
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
-
-GOV-003:456-518 (2026-09-16) lets a coordinator mark a phase complete under 3 conditions. session-start.md:191-192 and :224, the orient SKILL (79-80), resume-lit-review.md:182, GOV-014:34/175/195 and AGENTS.md:179-180 still say only the owner, via /session-close. AGENTS.md:284 step 5 has the agent write status: complete, which session-start.md:166-169 assigns to /session-close.
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
@@ -18459,7 +18441,192 @@ GOV-003:456-518 (2026-09-16) lets a coordinator mark a phase complete under 3 co
 <details>
 <summary>1 finding(s)</summary>
 
+- **finding** by agent-ideation (2026-09-23T16:40:00-04:00): Confirmed on dev: PLAN-012 (terminology system) is still status: draft. It states the rules the idea lists (entry test, retire-not-delete, the what-it-is / what-it-is-not / pointer format, review with the systems review). phase-term-01 and phase-term-02 are complete. They delivered the scaffolding: the systems field on memories, the load_context system filter, and the first vocabulary in brain/concepts/ (11 files). GLOSSARY.md is generated by tools/generate_glossary.py and guarded by test/test_glossary.py (OPS-004).
+
+Gap, as the idea states: no governed document names who may add or retire a term, nothing checks the entry rules, and no review is scheduled. Because PLAN-012 is still a draft, its rules have no governed force. One path is to take PLAN-012 to accepted with an explicit authority rule. Another is a small GOV document for the glossary lifecycle.
+
+Cluster: this idea and 000372-000376 and 000382 all come from the Standby Builder's glossary scout on 2026-09-23 and would fit one terminology session. 000372 (a sanctioned term writer) is the enforcement half of this protocol.
+
+PROPOSED LINK: 000372 --relates_to--> 000371 (the writer would enforce the protocol's entry rules)
+
+</details>
+
+---
+
+## 000372 · A sanctioned writer for concept terms, like append_idea.py is for ideas
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `triaged`**
+
+Terms are edited by hand inside grouped brain/concepts/*.md files. Nothing checks the format (what it is / what it is not / pointer), duplicate headings across files, or the `updated` bump. Checked 2026-09-23: no such tool exists in tools/.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev: no tool in tools/ writes brain/concepts/ files. Terms are edited by hand in 11 grouped concept files. The generated GLOSSARY.md is protected against hand edits by test/test_glossary.py, but the source files are not checked for the PLAN-012 entry format, for duplicate headings across files, or for an `updated` bump.
+
+The model to copy is tools/append_idea.py (OPS-005): a single writer that validates before it writes. For terms, a lighter alternative is a validation test over brain/concepts/ (format, duplicates, dates) with hand editing kept. That covers most of the ask without a new writer, and it is a design choice for the planning session.
+
+Related: 000371 (the glossary protocol these checks would enforce), 000374 (non-term headings in concept files render as terms, which a format check would reject), 000376 (generating entries from registries, which reduces what the writer handles).
+
+</details>
+
+---
+
+## 000373 · Glossary generator features: table of contents, acronym index, per-term anchors and cross-links, category grouping
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `triaged`**
+
+GLOSSARY.md is about 1,100 lines, with 11 sections and no contents list. Terms cannot be linked to individually, and acronyms (ADR, REQ, OPS, WBS, MDM, MCP…) have no index. The generator only supports --tag/--system filters.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev: docs/08-governance/GLOSSARY.md has 1,109 lines. It has no contents list and 29 `## ` headings: the grouped concept memories plus structural headings from inside them (see 000374). tools/generate_glossary.py takes only --tag, --system, --out and --check. It has no table of contents, acronym index, anchors or grouping options. It renders each concept's content verbatim.
+
+No plan covers generator features. PLAN-012 (terminology system, draft) and OPS-004 define the current scope. phase-term-01 and phase-term-02 are complete.
+
+Order of work: 000374 (structural headings rendered as terms) has to be settled first, or a generated contents list or term index would list the migration-ruling headings as terms. An acronym index is the natural consumer of 000376's registries (codes.yaml's series). 000231 (the generator prints an unfiltered term count for a filtered glossary) is an existing defect in the same tool.
+
+PROPOSED LINK: 000373 --relates_to--> 000374 (a contents list or index needs term headings told apart from structural ones)
+
+</details>
+
+---
+
+## 000374 · Non-term headings render as glossary terms
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `triaged`**
+
+generate_glossary.py renders concept bodies verbatim, so every ### becomes a "term". Two cases: the six "### 1. Layout slot_id values — RENAME"… migration-ruling headings in terms-workbench-ui.md, and "### Advanced topics, named but not covered in depth" in terms-skills-and-agents-demo.md. Either move rulings out of concept memories, or give the generator a rule.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev: brain/concepts/terms-workbench-ui.md has term headings (`### Slot`, `### Panel` and so on, lines 36-126). It then has two structural sections, `## Slot naming rule` (135) and `## Migration ruling` (153), and six ruling headings `### 1. Layout slot_id values — RENAME` through `### 6. Test fixtures — RENAME` (158-226). brain/concepts/terms-skills-and-agents-demo.md:153 has `### Advanced topics, named but not covered in depth`. tools/generate_glossary.py renders content verbatim, so all of these appear in GLOSSARY.md alongside real terms.
+
+The idea's two options both still apply: move the rulings out of the concept memory, or give the generator a rule such as "only ### under the concept's own term list is a term". Moving them seems the cleaner option: the workbench migration ruling is a decision record, and a decision memory or an ADR is its natural home. That choice is the owner's.
+
+Related: 000372 (a term writer or format check would reject non-term headings), 000373 (contents and index features depend on this).
+
+</details>
+
+---
+
+## 000375 · docs/00-working/demo-glossary.md has no drift test
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
+
+GLOSSARY.md is guarded by test/test_glossary.py. The --tag demo-glossary slice is committed too, but nothing fails when it goes stale after a concept edit.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev: docs/00-working/demo-glossary.md exists and says it is generated. test/test_glossary.py guards only docs/08-governance/GLOSSARY.md, and no test in test/ mentions demo-glossary. The file is current today: `generate_glossary.py --tag demo-glossary --out docs/00-working/demo-glossary.md --check` reports "is current". So the gap is a missing guard, not present drift.
+
+The fix is small: the generator already has --check with --out, so one more test case (or a governance step) that runs it for the demo slice closes the gap. docs/00-working/ is ADR-010's ungoverned staging area. Whether a generated file there should be test-guarded, or moved to a governed location, is a question to settle alongside the fix.
+
+Related: 000373 and 000374 (the same generator), 000231.
+
+</details>
+
+---
+
+## 000376 · Generate glossary entries from existing registries instead of restating them by hand
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
+
+Candidates: the codes.yaml series (9 document-code acronyms), the backlog README track-prefix table, systems.yaml domains/statuses, and schema enum vocabularies (idea status, capture route, phase status). Today the glossary restates some of these by hand, and they drift.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev that each proposed registry exists: docs/08-governance/codes.yaml (the document-code series under `series:`), the track-prefix table in docs/09-backlog/README.md, docs/08-governance/systems.yaml, and the status enums in schemas/ (for example idea.schema.json). tools/generate_glossary.py filters only by --tag and --system. It renders concept memories and reads none of these registries.
+
+The drift is already visible: 000379 found six track prefixes missing from the README table, and 000380 found systems.yaml's schema count stale. A generated glossary section has the same weakness when its registry is stale. The README table is itself a hand-maintained restatement of backlog.yaml, so it may need generating first, or the glossary could read backlog.yaml plus a prefix-to-plan mapping.
+
+Related: 000373 (generator features: a table of contents and an acronym index would be built from the same codes.yaml data), 000379, 000380, 000371.
+
+PROPOSED LINK: 000376 --relates_to--> 000379 (the track table is one of the registries, and it is stale)
+
+</details>
+
+---
+
+## 000377 · Governance docs still name `main` as the integration branch
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
+
+GOV-001:181-192, GOV-002:288 and :366-368, and OPS-001 ("git switch main") say main; AGENTS.md:57-59 says dev since 2026-09-09. GOV-005:86-90 says codes are permanent "once it reaches main". OPS-001 "Close a session" and session-close.md steps 2 and 8 still cite the primary-checkout exception that GOV-003:328-334 withdrew on 2026-09-12.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Checked on dev at ec19ace. Still true: GOV-001:181 ("The catalog on `main` — the integration branch"); OPS-001:132 and :154 (`git switch main`); GOV-005:88 (codes are permanent "once it reaches `main`"). .claude/commands/session-close.md:79 and :165 still cite "the GOV-003 primary-checkout exception", which GOV-003:328-334 withdrew on 2026-09-12.
+
+Correction to the body: GOV-002 has 178 lines, so the cited :288 and :366-368 do not exist. The `main` references in GOV-002 are at :168 (the claim is committed to `main`) and :170 (rebase onto `main`). OPS-001 "Close a session" was not re-checked for the exception wording.
+
+No backlog phase covers this. 000066 (protect main, PRs from dev) is about the branch model, not this drift. This is a text fix across governed documents. It could be owner-directed claim-free work (000403 asks for the rule on that), or part of a documentation phase.
+
+Related: 000378 (another cross-document contradiction), 000402 (the check that would catch both).
+
+PROPOSED LINK: 000377 --relates_to--> 000402 (000402's check would catch this drift)
+
+</details>
+
+---
+
+## 000378 · Phase-completion authority contradicts itself across documents
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
+
+GOV-003:456-518 (2026-09-16) lets a coordinator mark a phase complete under 3 conditions. session-start.md:191-192 and :224, the orient SKILL (79-80), resume-lit-review.md:182, GOV-014:34/175/195 and AGENTS.md:179-180 still say only the owner, via /session-close. AGENTS.md:284 step 5 has the agent write status: complete, which session-start.md:166-169 assigns to /session-close.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
 - **finding** by agent-ideation (2026-09-23T14:32:13-04:00): Owner ruling, 2026-09-23, relayed by the Session Manager through Session 3 - Standby Builder: GOV-003 governs. A coordinator may mark a phase complete under GOV-003's three conditions. The documents that still say owner-only need updating: .claude/commands/session-start.md lines 191-192 and 224, the orient SKILL (lines 79-80), resume-lit-review.md line 182, and GOV-014 lines 34, 175 and 195. AGENTS.md lines 179-180 and 284 also contradict GOV-003, but changing them needs the owner's explicit approval under the AGENTS.md rule.
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Checked on dev at ec19ace: every location the idea cites still says what the idea reports. GOV-003:456-518 lets a coordinator mark a phase complete under three conditions. These still say owner-only: .claude/commands/session-start.md:191-192 and :224; .claude/skills/orient/SKILL.md:77-80 (the text is at 77-80, not 79-80); .claude/commands/resume-lit-review.md:182; GOV-014:34, :175 and :195; and AGENTS.md:179-180. AGENTS.md:284 (step 5) has the agent write status: complete itself. That contradicts AGENTS.md:179-180 as well as session-start.md.
+
+The owner's ruling (the agent-ideation finding already on this idea) settles which text is correct: GOV-003 governs. What is left is editing the documents. All of them except AGENTS.md can be edited as ordinary governed-document work. AGENTS.md needs the owner's explicit approval for the specific edit.
+
+Related: 000402 (consistency checks across governance documents) proposes the mechanical check that would have caught this. 000377 is the same kind of drift for the integration-branch name. 000153 (the hand-off protocol drifts across three places) is an earlier case.
+
+PROPOSED LINK: 000402 --relates_to--> 000378 (000378 is the case that motivates the proposed cross-document check)
 
 </details>
 
@@ -18467,17 +18634,31 @@ GOV-003:456-518 (2026-09-16) lets a coordinator mark a phase complete under 3 co
 
 ## 000379 · The backlog README track table is missing 6 prefixes
 
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
 
 docs/09-backlog/README.md has no rows for phase-irs-* (17 phases), phase-port-* (3), phase-fwt-* (5), phase-fwa-* (3), phase-kit-* (4) or phase-agnt-* (2), though all are in backlog.yaml. GOV-006 points agents to that table to gloss track prefixes.
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Confirmed on dev at ec19ace, by comparing the prefixes in docs/09-backlog/README.md with every `id: phase-<prefix>` in backlog.yaml. Exactly six prefixes have no row: phase-irs (17 phases), phase-fwt (5), phase-kit (4), phase-fwa (3), phase-port (3) and phase-agnt (2). The counts match the idea.
+
+GOV-006 tells agents to gloss track prefixes from this table, so an agent naming an irs phase has no gloss to use. The fix is six table rows and needs no plan. It could be done as owner-directed claim-free work (AGENTS.md, "Owner-directed work with no backlog phase").
+
+Related: 000376 proposes generating glossary entries from this table, and generating the table itself from backlog.yaml would prevent a recurrence. 000380 is the same scout's list of other stale facts.
+
+</details>
+
 ---
 
 ## 000380 · Small stale facts in governed docs, found during the glossary scout
 
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
 
 - GOV-005:55 still calls allocation a "pure function of committed state", which its own concurrent-agents section (92-96) contradicts.
 - OPS-002 says the rebuild recreates "all eight tables"; sql/001_schema.sql creates 16.
@@ -18488,11 +18669,33 @@ docs/09-backlog/README.md has no rows for phase-irs-* (17 phases), phase-port-* 
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:01-04:00): Each fact checked on dev at ec19ace:
+1. GOV-005:55 says each allocation "is a pure function of committed state". Still there, and GOV-005's concurrent-agents section explains why computing and taking must be one step. Holds.
+2. OPS-002:33 says the rebuild "recreates all eight tables"; sql/001_schema.sql has 16 CREATE TABLE statements. Holds.
+3. systems.yaml:19 (sys-contracts) says "Six JSON Schemas"; schemas/ now has 26 (the body said 24, and two were added since). Holds.
+4. ARCH-001:96 says "Full Tag Inventory (27 tags)"; _data/tags.json has 29. Holds.
+5. docs/09-backlog/README.md:39 says "nine-session"; resume-lit-review.md:9 says "seven phases" and :176 "seven sessions". Holds.
+6. The GOV-015 text is at :249, not :239. It attributes "up to four" to GOV-006, which has no such text. The rule is at .claude/commands/backlog.md:127. Holds.
+
+All six are one-line text fixes in governed documents. No phase covers them. Items 2-4 are counts that restate a registry and will drift again. 000376 (generate from registries) and phase-sch-01 (a CLAUDE.md drift check against schemas and DDL) are the durable fixes for that kind. Item 1 needs rewording, not just a new number.
+
+Related: 000379 (same scout), 000381 (the CLAUDE.md counterparts), 000402.
+
+PROPOSED LINK: 000380 --relates_to--> 000381 (the same stale counts, in CLAUDE.md, which only the owner may edit)
+
+</details>
+
 ---
 
 ## 000381 · CLAUDE.md has three stale lines; the owner must approve any edit
 
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
 
 - CLAUDE.md:144 "Tasks are embedded in commitment JSON … unpacked by rebuild" is wrong: tasks are separate files (schemas/task.schema.json, tools/rebuild_db.py:193-196). CLAUDE.md:123 is already correct.
 - CLAUDE.md:137 lists 4 schema files; schemas/ has 24.
@@ -18501,11 +18704,29 @@ Not edited, per the CLAUDE.md rule.
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Confirmed on dev at ec19ace: CLAUDE.md:144 says tasks are embedded in commitment JSON, which contradicts CLAUDE.md:123 and tools/rebuild_db.py. CLAUDE.md:137 names 4 schema files, and schemas/ has 26. CLAUDE.md:141 names 7 tables, and sql/001_schema.sql creates 16.
+
+This is already planned. phase-sch-01 (PLAN-035, queued: "Record 000024's real state, propose the CLAUDE.md text, and add the drift check") says in its scope: "Write the CLAUDE.md correction as proposed replacement text for the owner and stop". It notes the drift is wider than 000024 counted: the schema files, the tables and the Pydantic models. Its acceptance requires no CLAUDE.md edit in the diff and a check that fails when the DDL gains a table CLAUDE.md does not list. So this idea is a current instance of what phase-sch-01 delivers. Whether its proposed text covers line 144 (the tasks line) was not checked.
+
+The edit itself needs the owner's explicit approval under the CLAUDE.md rule, whichever route proposes it.
+
+Related: 000380 (the same stale counts in governed documents), 000024.
+
+PROPOSED LINK: 000381 --relates_to--> 000024 (phase-sch-01 is built around 000024 and covers these lines)
+
+</details>
+
 ---
 
 ## 000382 · Naming review for overloaded terms
 
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
 
 - "decision" has 4 senses: memory type, entity record, gate decision, broker Decision class.
 - "promoted/promote" has 3: idea status, capture promotion, next_up "promoted phases".
@@ -18517,31 +18738,73 @@ The glossary can disambiguate these, but renaming is a design choice for the own
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Spot-checked on dev: GOV-005:98-100 warns that "two different things are called a reservation". Gates are numbered two ways: G1-G5 in ARCH-006 and GOV-014, and GATE 1-3 in .claude/skills/partition-ideas/SKILL.md. The idea status enum in schemas/idea.schema.json includes `promoted`, which differs from capture promotion (phase-cap-06) and from the next_up sense. The other senses the idea lists (decision x4, claim, stage, kind, collision, execution session) were not each re-verified.
+
+No plan, requirement or ADR covers renaming. PLAN-012 (terminology, draft) provides for disambiguating entries (what it is / what it is not) but not for renames. The idea correctly leaves renaming to the owner. A rename touches schemas, code and governed text, so each term is a separate decision with its own blast radius. Disambiguating glossary entries is the low-cost first step.
+
+Related: 000371 (glossary protocol), 000376 (generated entries). Part of the Standby Builder's glossary cluster, 000371-000383.
+
+</details>
+
 ---
 
 ## 000383 · REQ-003 R11 describes a `triaging` idea status that PLAN-016 deliberately omitted
 
-**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:12-04:00 · Status: `triaged`**
 
 PLAN-016:104 says "`triaging` is deliberately omitted". REQ-003:46 (R11) says "Triage enters triaging". The idea schema has no triaging status.
 
 (From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Confirmed on dev: PLAN-016:104 says "`triaging` is deliberately omitted". REQ-003:46 (R11) says "Triage enters triaging, writes findings through the sanctioned writer, and ends at triaged". The idea status enum in schemas/idea.schema.json and src/db/ideas.py have no `triaging` state. The implementation follows PLAN-016.
+
+Since the code and the plan agree, the likely fix is to amend REQ-003 R11 to drop `triaging`. That is a requirement change, so it is the owner's call. The alternative is to reopen the design question PLAN-016 settled. The idea gives no reason to reopen it.
+
+Related: 000402 (consistency checks across governance documents) covers the general case of documents contradicting each other.
+
+</details>
+
 ---
 
 ## 000384 · The leak check's content check never runs in a worktree
 
-**Created 2026-09-23T14:32:13-04:00 · Status: `open`**
+**Created 2026-09-23T14:32:13-04:00 · Status: `triaged`**
 
 tools/check_no_private_content.py reads ROOT/_private/portfolio/projects (line 88). A worktree has no _private/, so in the worktrees where AGENTS.md puts all work, the check runs only its path check and passes. Let it take an absolute portfolio path, for example D_SYSTEM_DATA_ROOT. Found while amending phase-cap-08.
 
 (From Prompt Planner, relayed to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Confirmed on dev: tools/check_no_private_content.py sets ROOT = Path(__file__).parent.parent (line 48) and reads ROOT / "_private" / "portfolio" / "projects" (line 88). If that directory is missing it returns an empty set, and the tool prints "note: _private/portfolio/ not found — content check skipped" (line 144) and exits 0. The tool does not read D_SYSTEM_DATA_ROOT. OPS-009:38-39 documents the skip as expected on a fresh clone or in CI. It does not mention agent worktrees, which is where AGENTS.md puts all work.
+
+This duplicates two triaged ideas: 000150 (the private-content check silently does nothing in a worktree, because _private is gitignored) and 000195 (check_no_private_content passes without looking whenever it runs outside the primary checkout). The owner already has this three-way duplicate on the list to decide. This finding does not decide it. What 000384 adds: a concrete fix (accept an absolute portfolio path, for example through D_SYSTEM_DATA_ROOT, which phase-cap-08 now uses for the private data root), and a fresh occurrence found while amending phase-cap-08.
+
+PROPOSED LINK: 000384 --relates_to--> 000150 (the same defect, reported earlier)
+
+</details>
+
 ---
 
 ## 000385 · ANCHOR: Lifecycle integrity and multi-coordinator orchestration
 
-**Created 2026-09-23T14:34:41-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:41-04:00 · Status: `triaged`**
 
 An anchor idea, approved by the owner on 2026-09-23: the related asks below are linked to it so they surface together for one future session. It covers whether the planning and building lifecycle has kept its review discipline, how idea partitioning feeds autonomous delivery, splitting the single general-purpose coordination system into purpose-specific subsystems under one master coordinator, and the state, registry and tracking records that coordination needs.
 
@@ -18550,6 +18813,27 @@ Members: the owner's three questions (O1-O3), three owner-requested records with
 Linked to 000347 (the first-night multi-session review), 000359 (multi-provider coordination) and the three board/state ideas 000368, 000369 and 000370.
 
 (Recorded by Ideation from the Session Manager's owner-approved instructions, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): 000385 is an anchor. Its purpose is to group the asks linked to it so they surface together in one future session. It asks for nothing of its own, so the substantive findings are on its members, 000386-000406, and on the board/state ideas 000368-000370 it links to.
+
+Coverage check (fold, 2026-09-23): 21 ideas carry relates_to 000385. They are 000386-000404 (O1-O3, R1-R3, S1-S13) plus 000405 and 000406. 000407 is recorded standalone, not under this anchor.
+
+Grouping as found by triage, for whoever plans the session:
+- Orchestration shape: 000386 (per-purpose orchestrators under a master), 000392 (independent assurance subsystem), 000393 (mechanical coordination as code). ADR-018 (LangGraph orchestration) and PLAN-039.01 are the governed starting points.
+- Coordination records: 000389 (resume briefs, SAFE contract, restart file), 000390 (worktree and branch registry), 000391 (progress and coordination log). These overlap heavily with 000368, 000369 and 000370.
+- Review discipline: 000387 (owner's question), 000394, 000396, 000397, 000400, 000401, 000402.
+- Partition before planning: 000388 (owner's question) and 000395.
+- Integration safety: 000398, 000399, 000403, 000404, and the duplicate pair 000405/000406.
+
+The two owner questions, 000387 and 000388, need answers before the proposals that respond to them are planned.
+
+</details>
 
 **Links**
 
@@ -18579,12 +18863,15 @@ Linked to 000347 (the first-night multi-session review), 000359 (multi-provider 
 - relates_to ← `000404`
 - relates_to ← `000405`
 - relates_to ← `000406`
+- relates_to ← `000408`
+- relates_to ← `000409`
+- relates_to ← `000410`
 
 ---
 
 ## 000386 · Separate orchestrator systems per purpose, each with a lead coordinator, under one master coordinator
 
-**Created 2026-09-23T14:34:42-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:42-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
@@ -18594,6 +18881,22 @@ Overlapping ideas from fold: 000327 (role-based roster coordinated by a Session 
 
 (From the owner, 2026-09-23, relayed by Session Manager to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): The owner's question, with the current design for comparison. ADR-018 (accepted 2026-09-23) and PLAN-039.01 define one LangGraph orchestrator: one daemon, one lock and one scheduler hosting several run kinds (intake, batch, unit, realization). phase-irs-04 (graph skeleton) and phase-irs-16 (daemon process model) are complete, and the code is in src/orchestrator/. Interactive coordination runs separately under GOV-017, as role-separated sessions (Session Manager, Ideation, Prompt Planner, Builders, Scout) led by one Session Manager.
+
+So the repository has two coordination systems today: the automated orchestrator for the idea realization pipeline, and the human-in-the-loop session roster. Neither is split by purpose in the way the owner describes. GOV-017's roles come closest: Ideation and Prompt Planner are already purpose-specific, but they are single sessions, not subsystems with their own leads.
+
+What a decision needs: whether purpose-subsystems would be run kinds inside one orchestrator (as ADR-018 allows) or separate orchestrators, and how the master coordinator relates to the Session Manager. 000334 (carry GOV-017 into LangGraph) and 000370 (the Session Manager's migration to LangGraph) are the adjacent decisions. 000327 (role-based roster) is what GOV-017 implemented. 000392 (an independent assurance subsystem) is one concrete subsystem proposal.
+
+PROPOSED LINK: 000386 --relates_to--> 000334 (both decide how interactive coordination maps onto the LangGraph orchestrator)
+
+</details>
+
 **Links**
 
 - relates_to → `000385`
@@ -18602,7 +18905,7 @@ Overlapping ideas from fold: 000327 (role-based roster coordinated by a Session 
 
 ## 000387 · Have we deviated from the planned lifecycle's review discipline: adversarial validators on every plan and reviewers of what was built?
 
-**Created 2026-09-23T14:34:42-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:42-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
@@ -18612,6 +18915,26 @@ Overlapping ideas from fold: 000009 (independent transcript analysis with advers
 
 (From the owner, 2026-09-23, relayed by Session Manager to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): The owner's question. Evidence read on dev, for whoever answers it:
+
+Plans: GOV-018 (the three-altitude review procedure: breadth, minimalism, arbitration) exists and was run on PLAN-039, with its record in docs/08-governance/reviews/2026-09-23-plan-039.json. SESS-2026-09-23-07 records dispatching it on the partition-adversary type. No check requires a GOV-018 review before a plan or phase is queued. 000394 proposes one. GOV-010 (plan quality standard) and PROMPT-035 (queued-phase review) also exist. Whether every plan written since GOV-018 was adopted went through it was not checked.
+
+What was built: .claude/commands/session-close.md step 3 requires "a fresh, non-fork subagent" and names no agent type. Recent session records show general-purpose reviewers: SESS-2026-09-23-02 records four general-purpose sub-agent reviews, and SESS-2026-09-23-07 one. Dedicated read-only reviewer types (demo-adversary, demo-validator-code, partition-adversary) exist but are used only in the demo and partition tracks. The owner ruled on 2026-09-23 that READY reviews come from a validator or adversary type (relayed through the Session Manager). That ruling is not yet in a governed document.
+
+So the review steps happen, but on general-purpose agents with write tools, contrary to 000241 and the ruling. Plan review is not yet a mechanical requirement.
+
+Related: 000396 and 000394 are the proposed fixes, 000241 is the earlier report, and 000392 is the structural version.
+
+PROPOSED LINK: 000387 --relates_to--> 000241 (general-purpose reviewers holding write tools is the gap the question points at)
+
+</details>
+
 **Links**
 
 - relates_to → `000385`
@@ -18620,7 +18943,7 @@ Overlapping ideas from fold: 000009 (independent transcript analysis with advers
 
 ## 000388 · How is the idea partition logic used, and what checks are missing for accuracy during autonomous delivery?
 
-**Created 2026-09-23T14:34:43-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:43-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
@@ -18630,6 +18953,22 @@ Overlapping ideas from fold: 000243 (the partition's programme sizings contradic
 
 (From the owner, 2026-09-23, relayed by Session Manager to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): The owner's question. Evidence read on dev: PLAN-025 (repeatable idea partition) delivers PROMPT-034 (the reusable pack: two independent analysts plus adversarial audits) and the /partition-ideas skill, which stops at owner gates GATE 1-3. phase-part-01 and phase-part-02 are complete. phase-part-03 (the workflow and its dry run) is active. So the partition logic is used today only when someone invokes the skill. Nothing routes ideas into it, and a partition's output reaches planning only by hand.
+
+Accuracy checks that exist: two independent analysts, the partition-adversary audit, and the owner at each gate. Gaps already recorded: 000243 (programme sizings contradict their own group tables), 000244 (factual errors inherited by finalize phases), 000339 (an audit prompt reads a file only the coordinator has), 000354 (an analyst wrote its report through a shell command; fixed by moving R1 and R4 to partition-analyst). 000205 found that changing presentation order changed no answer, which is a positive robustness result.
+
+Missing for autonomous delivery, from these records: no check that a partition's facts are true against dev before a plan inherits them (000244), no arithmetic check (000243), and no rule for when partitioning is required (000395). PLAN-039's realization pipeline does not consume partition output. That link is also not built.
+
+PROPOSED LINK: 000388 --relates_to--> 000244 (the most direct recorded accuracy failure)
+
+</details>
+
 **Links**
 
 - relates_to → `000385`
@@ -18638,13 +18977,31 @@ Overlapping ideas from fold: 000243 (the partition's programme sizings contradic
 
 ## 000389 · Session state and resumability: a standard resume brief per session role, a SAFE message contract, and a generated restart file
 
-**Created 2026-09-23T14:34:43-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:43-04:00 · Status: `triaged`**
 
 Owner-requested; detail drafted by Session Manager. Every session role persists a standard resume brief, so a cleared session resumes without re-deriving anything. Contents: role, agent id, held claim/lock/worktree/branch with tips and pushed state, current step, the next step and its preconditions, pending owner questions, rulings received, and files that must survive a clear. Today the same information is spread over different formats: the tracker RESUME POINT, ideation-state.md, SESS records, the board, the morning report and the restart file. The SAFE handshake is ad hoc, the board was already stale when this morning's restart began, and gitignored state inside a worktree is lost when the worktree is removed. Include: a SAFE message contract (what a SAFE reply must contain), and a restart file generated from recorded state rather than written by hand.
 
 Overlapping ideas from fold: 000319 (investigate proper state capture and session resumability), 000340 (monitor context use and find safe points to clear), 000029 (durable run ledger with resumable steps), and the board/state ideas 000368, 000369 and 000370.
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Read on dev: resume state exists in several forms, as the body says. Session records have a fixed skeleton that the checkpoint skill fills (.claude/skills/checkpoint/SKILL.md). GOV-017 defines the board (line 214) and the message types (REBASE and others, around line 201). PROMPT-037 carries each role's starter text. Ideation's own resume brief (_working/overnight-sprint/ideation-state.md) is a hand-written example of the brief this idea proposes, and it worked for this session's restart.
+
+Not found on dev: a SAFE message type or contract (GOV-017 and PROMPT-037 mention only "safe point" in the REBASE rule), a standard resume-brief format per role, and a generated restart file.
+
+P3 (the Prompt Planner's ungoverned draft, _working/overnight-sprint/planning/session-manager-on-langgraph.md) touches this in section 7 (controlled clear and compaction, 000340), section 7.2 (the state each role keeps on disk) and N5/N6 (the resume brief and controlled restart). Under P3's per-task workers most long-lived resume briefs would disappear. That is a design choice the owner should make before standardising briefs for the current roster.
+
+Related: 000319 (state capture and resumability), 000340 (safe points to clear), 000029 (durable run ledger), 000391 (the tracking log a restart file would be generated from).
+
+PROPOSED LINK: 000389 --relates_to--> 000319 (the same resumability ask, now with a concrete format)
+
+</details>
 
 **Links**
 
@@ -18654,7 +19011,7 @@ Overlapping ideas from fold: 000319 (investigate proper state capture and sessio
 
 ## 000390 · Worktree and branch registry: an authoritative running record per worktree and branch, independent of git
 
-**Created 2026-09-23T14:34:43-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:43-04:00 · Status: `triaged`**
 
 Owner-requested; detail drafted by Session Manager. An authoritative running record per worktree and branch, independent of git and based on the actual work. Fields:
  - path, branch, base commit and tip;
@@ -18670,6 +19027,24 @@ Overlapping ideas from fold: 000368 (the owner's running log of branches, worktr
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Read on dev: no registry of worktrees or branches exists. The nearest things are the Scout's read-only worktree and branch audit in GOV-017's roster (line 68), which is rebuilt from git each time; phase claims in backlog.yaml; and PLAN-015's rule that _working/ content is never deleted without the owner's approval. PLAN-026 (concurrency and git safety) does not include a registry. P3 (the Prompt Planner's ungoverned draft) proposes none among N0-N12.
+
+The fields listed here match lessons already recorded: gitignored content lost when a worktree is removed (memory note on _private/ copies, and the irs-06 _working case in the body), and remote deletion being owner-only (the relay error in 000404).
+
+Design note: a registry "independent of git" still has to be reconciled with git, or it drifts like the hand-kept board (000391). One approach is a registry that records intent and ownership, plus a check that compares it with `git worktree list` and the remote branches and reports differences.
+
+This idea is the detailed form of the owner's ask in 000368. Earlier asks: 000152, 000168, 000280.
+
+PROPOSED LINK: 000390 --relates_to--> 000152 (an earlier ask for a worktree registry agents register in)
+
+</details>
+
 **Links**
 
 - relates_to → `000385`
@@ -18678,13 +19053,31 @@ Overlapping ideas from fold: 000368 (the owner's running log of branches, worktr
 
 ## 000391 · Progress and coordination tracking: per-session step and liveness, lock and queue history, questions, rulings, incidents and merges, with the board generated from it
 
-**Created 2026-09-23T14:34:43-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:43-04:00 · Status: `triaged`**
 
 Owner-requested; detail drafted by Session Manager. For each session: its current step, its last event and a liveness signal (the Session Manager noticed Builder A's slow first grant only by chance). A lock and queue history. Pending owner questions: who asked, when, and who is blocked. A rulings log. An incident log. Merges with their check results. The board becomes a view generated from this log, not a hand-maintained file; the Session Manager edits it today by line substitution, which can fail silently.
 
 Overlapping ideas from fold: 000369 (append-only log of every coordination message, with the board rebuilt from it), 000370 (protocol for the board and state), 000328 (question-relay session), 000029 (durable run ledger), 000010 (ideation dashboard).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Read on dev: the Session Manager's board is _working/session-manager/board.md (GOV-017:214), gitignored and hand-edited. It lists the roster, slots, lock holder, queue, pending merges, incidents and open items. The durable record is backlog.yaml's claims on dev. No log records session steps, liveness, lock and queue history, owner questions, rulings or incidents.
+
+The orchestrator's run ledger (OPS-022, tools/append_run.py) and gate-decision inbox (OPS-023, tools/append_decision.py) are append-only records of the same kind. Their event types are orchestrator runs and gates, not session coordination. P3 (the Prompt Planner's ungoverned draft) proposes session liveness through a lease heartbeat (section 4.3) and a generated morning report (N11). It does not specify a question log, a rulings log or an incident log. Owner rulings are handled in P3 section 8.3 as delegated-authority memory.
+
+Existing partial records: rulings relayed to Ideation are written as idea findings that name the relay chain (for example 000343, 000378). Incidents have the concurrency-collision ledger (the log-anti-patterns skill).
+
+This idea and 000369 describe one system: 000369 is the message log, and this idea lists what it has to record and what is generated from it.
+
+PROPOSED LINK: 000391 --relates_to--> 000328 (pending owner questions are what a question-relay session would hold)
+
+</details>
 
 **Links**
 
@@ -18694,13 +19087,29 @@ Overlapping ideas from fold: 000369 (append-only log of every coordination messa
 
 ## 000392 · An assurance subsystem independent of the delivery subsystem's lead
 
-**Created 2026-09-23T14:34:43-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:43-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: An assurance subsystem (validators, adversaries, realization checks) independent of the delivery subsystem's lead.
 
 Overlapping ideas from fold: 000009 (independent adversarial session review), 000073, 000074 and 000075 (the breadth, minimalist and arbiter agent trio).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): What exists (read on dev): GOV-018 defines the three-altitude review procedure and its review records under docs/08-governance/reviews/. GOV-017 gives review work to the Standby Builder (queued-phase review with PROMPT-035) and requires a review verdict before READY. Dedicated read-only reviewer types exist: partition-adversary, demo-adversary, demo-validator-code, demo-validator-check, demo-validator-web.
+
+What does not exist is the independence the idea asks for. Every review is dispatched by the session or coordinator whose work it reviews, and the verdict goes back to that same lead. In the phase-completion gate, .claude/commands/session-close.md step 3 asks for a fresh non-fork subagent without naming a type. SESS-2026-09-23-02 records four general-purpose reviews.
+
+Related: 000396 (dedicated reviewer types) and 000397 (a different model for reviewers) are narrower steps toward the same independence. 000009 (independent transcript review) and 000073-000075 (the breadth, minimalist and arbiter trio, which GOV-018 now implements) are earlier work. 000386 (subsystems per purpose) would host this as one subsystem.
+
+PROPOSED LINK: 000392 --relates_to--> 000386 (assurance is one of the purpose-subsystems 000386 proposes)
+
+</details>
 
 **Links**
 
@@ -18710,13 +19119,29 @@ Overlapping ideas from fold: 000009 (independent adversarial session review), 00
 
 ## 000393 · Mechanical coordination as code, with models used only for judgement
 
-**Created 2026-09-23T14:34:44-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:44-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Mechanical coordination (locks, queues, slots, check gates) implemented as code; models only for judgement.
 
 Overlapping ideas from fold: 000165 (the enforcement harness), 000320 (an always-on broker for conflicting action requests), 000156 (a version-control request queue), 000352 (the orchestrator's unit graph).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Partly delivered, for the automated pipeline only. ADR-018 and PLAN-039.01 put the idea realization pipeline into a LangGraph state graph with interrupt gates and a thin-state rule. phase-irs-04 (graph skeleton) and phase-irs-16 (daemon, lock, start/stop/status) are complete, and the code is in src/orchestrator/ (daemon.py, gates.py, ledger.py, graphs/intake.py).
+
+The interactive multi-session coordination this idea comes from is not delivered. GOV-017's primary-checkout lock, the TURN?/GRANTED queue, claim slots and the merge gate are run by the Session Manager model through messages and a hand-edited board. Code enforces only tools/git-hooks/refuse_dirty_integration.py and the governance check. A scout proposed promoting this idea to PLAN-039.01. It is not proposed here, because that plan does not cover the session-level mechanics.
+
+Related: 000370 (the Session Manager's migration to LangGraph) and 000334 (GOV-017 in LangGraph) would deliver this for the interactive side. 000369 and 000391 (coordination logs) supply the records. 000165 (enforcement harness), 000320 (broker), 000156 (version-control request queue) are earlier forms.
+
+PROPOSED LINK: 000393 --relates_to--> 000370 (moving the board and state into code is how this idea would be delivered for the interactive side)
+
+</details>
 
 **Links**
 
@@ -18726,13 +19151,29 @@ Overlapping ideas from fold: 000165 (the enforcement harness), 000320 (an always
 
 ## 000394 · Governance refuses a phase entering next_up without a GOV-018 review record whose findings all have dispositions
 
-**Created 2026-09-23T14:34:44-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:44-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Governance refuses a phase entering next_up without a GOV-018 review record whose findings all have dispositions.
 
 Overlapping ideas from fold: 000251 (queued phases a phase review found defective but could not touch).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Confirmed on dev: src/governance/backlog.py:170-175 checks each next_up entry only for existence and for not being complete or cancelled. GOV-018 defines review records at docs/08-governance/reviews/<review_id>.json. A record reaches `status: dispositioned` only when every finding has a disposition (GOV-018:204), and the schema then rejects an undispositioned finding. Two records exist today: 2026-09-23-plan-039 and the sample nonconforming draft.
+
+Design question for planning: GOV-018 reviews plans, while next_up holds phases. The check needs a rule for which record covers a phase: the parent plan's record, or a per-phase record from PROMPT-035's queued-phase review. It also needs a rule for the many phases already queued without any record, either grandfathered or refused. 000251 (queued phases a review found defective but could not touch) is the failure this prevents.
+
+Related: 000387 (the owner's question about review discipline), 000402.
+
+PROPOSED LINK: 000394 --relates_to--> 000251 (the check would stop defective phases from being queued)
+
+</details>
 
 **Links**
 
@@ -18742,13 +19183,29 @@ Overlapping ideas from fold: 000251 (queued phases a phase review found defectiv
 
 ## 000395 · Idea clusters above a threshold go through the partition-ideas workflow before planning
 
-**Created 2026-09-23T14:34:44-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:44-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Idea clusters above a threshold go through the partition-ideas workflow before planning.
 
 Overlapping ideas from fold: 000125 (holistic triage of the accumulated batch), 000243 and 000244 (partition errors inherited by finalize phases).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Read on dev: neither PLAN-025, the partition-ideas skill nor PROMPT-034 sets a threshold or makes partitioning a required step before planning. The sweep runs when someone decides to run it. The current case is the owner's ruling, relayed by the Session Manager, that a fresh sweep follows this triage batch.
+
+To plan this, the owner needs to decide what counts as a cluster (linked ideas, an anchor's members, a scout's grouping), what the threshold measures, and which document or check enforces it: GOV-002 backlog protocol, GOV-018's entry check, or a governance rule like 000394's.
+
+Related: 000125 (holistic triage of the accumulated batch into plans) is the earlier ask for batch-level analysis. 000388 is the owner's question this answers in part. 000243 and 000244 show that a partition carries its own errors, so a mandatory sweep also needs the accuracy checks 000388 discusses.
+
+PROPOSED LINK: 000395 --relates_to--> 000125 (both put batch-level analysis ahead of planning)
+
+</details>
 
 **Links**
 
@@ -18758,13 +19215,29 @@ Overlapping ideas from fold: 000125 (holistic triage of the accumulated batch), 
 
 ## 000396 · Build validation by dedicated validator and adversary agent types, not general-purpose reviewers
 
-**Created 2026-09-23T14:34:44-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:44-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Build validation by dedicated validator/adversary agent types, not general-purpose reviewers.
 
 Overlapping ideas from fold: 000241 (review agents dispatched with write tools they are told not to use), 000126 (audit of commands, skills and agents).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Read on dev: .claude/agents/ holds dedicated reviewer types: partition-adversary, demo-adversary, demo-validator-code and demo-validator-web (sonnet), and demo-validator-check (haiku). All are read-and-run only. The general gate does not require them. .claude/commands/session-close.md:85 asks for "a fresh, non-fork subagent" with no type. SESS-2026-09-23-02 records four general-purpose reviews in one phase. The demo types are scoped to the live-demo and workbench tracks by their descriptions, and partition-adversary to partitions, so none of them is a general build reviewer.
+
+The owner ruled on 2026-09-23, relayed through the Session Manager, that READY reviews come from a validator or adversary type, never general-purpose. The ruling is not yet in GOV-017, GOV-003 or session-close.md.
+
+What delivery needs: a general-purpose-free reviewer type for build review (or broader descriptions on the existing ones), and a named type in session-close.md step 3 and GOV-017's READY step. Related: 000241 (reviewers dispatched with write tools), 000126 (audit of commands, skills and agents), 000387 (the owner's question this answers), 000397.
+
+PROPOSED LINK: 000396 --relates_to--> 000241 (000241 reported the risk this fixes)
+
+</details>
 
 **Links**
 
@@ -18774,13 +19247,29 @@ Overlapping ideas from fold: 000241 (review agents dispatched with write tools t
 
 ## 000397 · Validators and adversaries run on a different model or provider from the creator
 
-**Created 2026-09-23T14:34:45-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:45-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Validators and adversaries on a different model or provider from the creator.
 
 Overlapping ideas from fold: 000215 (nothing records which model actually ran), 000359 (multi-provider coordination).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:03-04:00): Read on dev: every agent definition in .claude/agents/ declares a model, and all are Anthropic models (sonnet for judgement, haiku for mechanical checks). GOV-008 ("Cost protocols", about line 135) sets that split. So reviewers and creators today are usually the same model family and often the same model. No document requires a reviewer to differ from the creator.
+
+Two dependencies. 000215 (nothing records which model actually ran) means the rule could not be verified after the fact until runs record their model. 000359 (multi-provider coordination) covers the other-provider option. The Codex worktree mentioned in 000390 shows a second provider already in use. The orchestrator's run ledger (src/orchestrator/ledger.py) would be the natural place to record the model per dispatch. Not checked: whether it already does.
+
+Related: 000396 (dedicated reviewer types; a reviewer type can pin a different model in its frontmatter), 000392.
+
+PROPOSED LINK: 000397 --relates_to--> 000215 (the rule cannot be verified until the model that ran is recorded)
+
+</details>
 
 **Links**
 
@@ -18790,13 +19279,29 @@ Overlapping ideas from fold: 000215 (nothing records which model actually ran), 
 
 ## 000398 · A commit-time check that a branch's diff stays inside its declared deliverables
 
-**Created 2026-09-23T14:34:45-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:45-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: A commit-time check that a branch's diff stays inside its declared deliverables.
 
 Overlapping ideas from fold: 000027 (no mechanical check that a completed phase's diff stayed inside its deliverables), 000242 (a scope naming a file its deliverables omit), 000245 (what a deliverables entry means), 000336 (glob deliverables treated as literal filenames).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Read on dev: src/governance/backlog.py has path_conflict() (line 86) and collisions() (line 105). They compare declared deliverables between phases before a claim. Nothing compares a branch's actual diff with its phase's declared deliverables at commit or merge time. tools/git-hooks/refuse_dirty_integration.py checks for uncommitted work, not for scope. PLAN-038 (status-regression guard) checks status monotonicity, not scope.
+
+The existing ideas already define most of the problem: 000027 (no mechanical check that a completed phase's diff stayed inside its deliverables) is the same ask made at completion rather than at commit. 000242 (scope names a file the deliverables omit), 000245 (what a deliverables entry means) and 000336 (glob deliverables treated as literal filenames) are the definitional problems the check depends on. Without a settled meaning for globs and directories, a diff check gives false passes or false failures.
+
+Also note that completion edits on dev and claim-free fix branches (000403) change files outside any phase's deliverables by design, so the check needs an exemption rule.
+
+PROPOSED LINK: 000398 --extends--> 000027 (moves 000027's completion-time check to commit time)
+
+</details>
 
 **Links**
 
@@ -18806,13 +19311,31 @@ Overlapping ideas from fold: 000027 (no mechanical check that a completed phase'
 
 ## 000399 · An automatic full test run after every write to dev
 
-**Created 2026-09-23T14:34:45-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:45-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: An automatic full test run after every write to dev. Per Session Manager: dev failed tests after 024443c and f6216e9 on 2026-09-23 (both confirmed by SM test runs).
 
 Overlapping ideas from fold: 000155 (append_idea.py leaves the tree red until the generator runs), 000012 (skip the test preflight when the tree is provably clean).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Checked on dev: git show f6216e9 changed only backlog.yaml (completing phase-irs-06). b928817 changed only catalog.md, a one-line regeneration. That supports the Session Manager's account of one red-dev incident. The other, after 024443c, is recorded in Ideation's own state as a commit that left out the regenerated docs/00-working/ideas.md. Both failures were generated files left stale by a write that ran governance but not the test suite.
+
+Nothing on dev runs tests automatically after a write to dev. tools/git-hooks/ holds refuse_dirty_integration.py, which checks for uncommitted peer work. The contract's rule 9 keeps pytest out of the primary checkout because test/test_codes.py rewrites the tracked catalog.md while it runs. So an automatic run has to happen somewhere else: a throwaway worktree at the new tip, or CI on push. The Session Manager's current practice of a full suite on dev between turns is a manual version.
+
+A narrower alternative covers both recorded incidents: generator --check calls (generate_ideas_md.py --check, and a catalog staleness check) in the governance run that every dev write already does. 000198 (the governance check passes with a stale catalog) asks for the catalog half of that.
+
+Related: 000405 and 000406 (the f6216e9 incident), 000155 (append_idea.py leaves the tree red until the generator runs), 000012 (skipping preflight when the tree is provably clean).
+
+PROPOSED LINK: 000399 --relates_to--> 000198 (a catalog staleness check in governance covers the same incidents more cheaply)
+
+</details>
 
 **Links**
 
@@ -18823,13 +19346,29 @@ Overlapping ideas from fold: 000155 (append_idea.py leaves the tree red until th
 
 ## 000400 · Executable acceptance criteria, with mutation checks on the tests that guard acceptance
 
-**Created 2026-09-23T14:34:45-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:45-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Executable acceptance criteria, with mutation checks on the tests that guard acceptance.
 
 Overlapping ideas from fold: 000035 (contract compiler and mutation-driven fixture suite), 000214 (a gate reported PASS after checking 4 of 43 fields), 000219 (a gate that silently drops unexpected tokens).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Read on dev: GOV-014's evidence rule (restating REQ-022 R23, GOV-014:198) requires every validator verdict to trace to executed tests and repository checks. So acceptance is meant to be executable in the realization pipeline. Backlog phases state acceptance in prose. No test checks that an acceptance line has a corresponding test, and no mutation testing exists in the repository. PLAN-035 (schema consistency) leaves 000035 (contract compiler and mutation-driven fixture suite) as a later decision.
+
+The two recorded failures show why test coverage is not enough: 000214 (a gate reported PASS after checking 4 of 43 fields) and 000219 (a gate silently drops unexpected tokens). Both had tests that passed. A mutation check on the guarding tests would have exposed both.
+
+Planning note: mutation testing across the whole suite is slow. Limiting it to the tests an acceptance criterion names keeps the cost bounded.
+
+PROPOSED LINK: 000400 --relates_to--> 000035 (the same mutation method, applied to acceptance tests)
+
+</details>
 
 **Links**
 
@@ -18839,13 +19378,29 @@ Overlapping ideas from fold: 000035 (contract compiler and mutation-driven fixtu
 
 ## 000401 · Evidence tracing for numbers in reports, generalising demo-agent-evidence-checker
 
-**Created 2026-09-23T14:34:46-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:46-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Evidence tracing for numbers in reports (generalise demo-agent-evidence-checker).
 
 Overlapping ideas from fold: 000191 (demo kit AGT-03 evidence-checker), 000032 (evidence-backed provenance graph), 000231 (a glossary count useless as evidence).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Read on dev: .claude/agents/demo-agent-evidence-checker.md exists (sonnet, Read/Grep/Glob). It traces every number in a draft back to a source and reports unsupported numbers first, keeping contradicted and unsourced numbers separate. It shipped with PLAN-024 (consultant demo kit, AGT-03). Its description ties it to the demo kit, and no gate dispatches it for repository reports: session records, READY reports, morning reports or partition reports.
+
+The idea is to generalise it. That could be as small as a second agent definition with a repository-report description, plus a rule for which reports must pass it. Candidates from today: the Session Manager's reports, whose relayed figures are the subject of 000404, and partition reports (000243 and 000244 are number and fact errors).
+
+Related: 000191 (the demo-kit ask the checker came from), 000032 (evidence-backed provenance graph), 000231 (a glossary count that was useless as evidence).
+
+PROPOSED LINK: 000401 --extends--> 000191 (applies the demo kit's evidence checker to repository reports)
+
+</details>
 
 **Links**
 
@@ -18855,13 +19410,29 @@ Overlapping ideas from fold: 000191 (demo kit AGT-03 evidence-checker), 000032 (
 
 ## 000402 · Consistency checks across governance documents
 
-**Created 2026-09-23T14:34:46-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:46-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Consistency checks across governance documents. Per the Standby Builder's glossary audit, phase-completion authority is stated differently in GOV-003, session-start.md, the orient skill, GOV-014 and AGENTS.md:179.
 
 Overlapping ideas from fold: 000378 (phase-completion authority contradicts itself across documents), 000377 (governance docs still name main as the integration branch), 000153 (the hand-off protocol drifts across three places), 000052 (schema-driven consistency).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Current state (read on dev): src/governance checks document references, frontmatter, schemas, dependency cycles, dates and backlog structure. It does not compare what different documents say about the same rule. test/ has no test that compares policy text across documents. PLAN-030 (document and backlog governance, phase-dgov-*) covers staleness and retired documents. PLAN-035 (schema consistency, phase-sch-*) covers schema, DDL and model drift. Neither plan covers conflicting policy statements.
+
+Known cases that such a check would target: 000378 (phase-completion authority, still contradicted in six files and within AGENTS.md itself), 000377 (`main` vs `dev` as the integration branch), 000153 (hand-off protocol stated in three places) and 000358 (the merge gate spelled out in GOV-017 but not in session-start.md).
+
+Design note for whoever plans it: most of these contradictions are between prose statements, not structured fields. A mechanical check needs either a single source that the other documents reference instead of restating (the approach CLAUDE.md's "What belongs in this file" section takes), or a register of canonical rule statements that the check searches for. 000052 (schema-driven consistency) is the structured-data version of the same aim.
+
+PROPOSED LINK: 000402 --relates_to--> 000153 (an earlier instance of the drift this check targets)
+
+</details>
 
 **Links**
 
@@ -18871,13 +19442,27 @@ Overlapping ideas from fold: 000378 (phase-completion authority contradicts itse
 
 ## 000403 · A rule for when work needs a backlog phase versus a claim-free fix branch
 
-**Created 2026-09-23T14:34:46-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:46-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: A rule for when work needs a backlog phase versus a claim-free fix branch.
 
 No overlapping idea found in fold.
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Read on dev: AGENTS.md:212-216 covers "Owner-directed work with no backlog phase — a one-off document, a fix asked for directly": no claim, a branch named agent/<slug>, and a statement that the session runs unclaimed. It also says "Do not manufacture a backlog phase to have something to claim." GOV-017 gives the Standby Builder claim-free review work. PROMPT-037:152 has REVIEW <phase-ids> for waiting sessions.
+
+What is missing is the test the idea asks for: the size, risk or kind of change above which work needs a phase (with scope, deliverables, acceptance and a review), and who decides. Today the only criterion is that the owner asked directly. Fixes found by agents, such as 000379's six README rows or 000405's procedure line, have no stated route.
+
+No overlapping idea found. 000398 (diff inside declared deliverables) would not apply to claim-free branches, which have no declared deliverables, so the two rules need to fit together.
+
+</details>
 
 **Links**
 
@@ -18887,13 +19472,29 @@ No overlapping idea found in fold.
 
 ## 000404 · Relay integrity for coordinator instructions
 
-**Created 2026-09-23T14:34:46-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:46-04:00 · Status: `triaged`**
 
 Proposed by Session Manager, not the owner: Relay integrity for coordinator instructions. Per Session Manager: two relay errors on 2026-09-23 (the queue order, and an instruction to delete a remote branch without authority), both corrected.
 
 Overlapping ideas from fold: 000328 (a question-relay session).
 
 (Relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Read on dev: GOV-017 makes the Session Manager the relay for merge approval (lines 45 and 144). The owner's ruling at line 170 makes a relayed GRANTED merge equal to the owner's approval. GOV-017 and PROMPT-037 define the message types. Neither defines how to check a relay: no quoting of the owner's exact words, no source or time stamp, and no rule that an instruction beyond the relayer's authority (such as deleting a remote branch, which is owner-only) is refused on receipt.
+
+The two incidents in the body (a wrong queue order, and a remote-branch deletion sent without authority) were not re-verified here. The Session Manager reported them.
+
+Related: 000328 (a question-relay session). 000369 and 000391 (a durable coordination message log) would let a relay be checked against the owner's original message. A standing Ideation practice already records a relayed ruling as a finding naming the relay chain (examples: 000343, 000378). That is a manual form of what this idea asks for.
+
+PROPOSED LINK: 000404 --relates_to--> 000369 (a durable message log makes relays checkable)
+
+</details>
 
 **Links**
 
@@ -18903,13 +19504,29 @@ Overlapping ideas from fold: 000328 (a question-relay session).
 
 ## 000405 · A completion edit on dev runs governance only, which misses a stale catalog.md, so dev goes red
 
-**Created 2026-09-23T14:34:47-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:47-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, passed on by the Session Manager at the owner's request, 2026-09-23.
 
 As given: a completion edit on dev runs "governance only", and the governance check doesn't catch a stale catalog.md. The phase status change alters the catalog's per-plan counts, so test_codes.py fails on dev (f6216e9, fixed in b928817). Proposed: a brain/procedures/ entry and/or a GOV-017 step 4 / PROMPT-037 line saying the completion edit runs `uv run python -m src.governance --catalog`, checks with `git diff --exit-code docs/08-governance/catalog.md`, and commits the regenerated catalog with the edit. Relates to S8 in the Part 1 batch.
 
 Overlapping ideas from fold: 000198 (the governance check passes with a stale catalog), 000208 (--catalog prints and never writes, so claim-forced regeneration leaves dev red), 000351 (regenerate the catalog only at merge time), and S8 of this batch (an automatic full test run after every write to dev).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Checked on dev: f6216e9 (completing phase-irs-06) changed only backlog.yaml. b928817 regenerated one line of catalog.md. GOV-017 step 6 (lines 164-167) still says the completion edit runs "governance ... and no pytest", and PROMPT-037's merge rule (4.iii) says "governance only, no pytest". Neither names --catalog. The general rule is already on dev in both documents: GOV-017:119-121 and PROMPT-037 rule 10 say a commit that changes the catalog regenerates it with --catalog. The completion step does not point to it. `--catalog` now writes the file (src/governance/__main__.py:552-554), so the 000208 defect is fixed. No brain/procedures entry covers it.
+
+The fix proposed in the body is a one-line addition to GOV-017 step 6 and PROMPT-037 4.iii: regenerate with --catalog and check with git diff --exit-code. 000198 (the governance check passes with a stale catalog) would make the check mechanical instead.
+
+000406 reports the same incident from Builder B. The owner has this pair on the list of duplicates to decide (merge or supersede). This finding does not decide it. 000351 (catalog generated only at merge time) is an alternative design that would remove the problem, and it would reverse phase-doc-02's design.
+
+PROPOSED LINK: 000405 --relates_to--> 000198 (a mechanical check for the same stale-catalog failure)
+
+</details>
 
 **Links**
 
@@ -18921,13 +19538,27 @@ Overlapping ideas from fold: 000198 (the governance check passes with a stale ca
 
 ## 000406 · The merge contract's governance-only completion edit never runs the catalog check, so a status change leaves dev red
 
-**Created 2026-09-23T14:34:47-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:47-04:00 · Status: `triaged`**
 
 From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
 
 As given: the merge contract's completion edit on dev is "governance only, no pytest", so it never runs the catalog check. On 2026-09-23, f6216e9 (completing phase-irs-06) changed backlog.yaml without regenerating catalog.md, and dev failed test_codes.py's two catalog tests until b928817 fixed it. The completion edit should run `--catalog` whenever it changes a phase's status, or run test_codes.py. Related to 000351.
 
 Overlapping ideas from fold: 000405 (the same f6216e9 incident reported by Builder A, with a procedure fix), 000198 (the governance check passes with a stale catalog), 000208 (--catalog prints and never writes), 000351 (regenerate the catalog only at merge time).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Same incident as 000405 (f6216e9, fixed by b928817), reported by Session 2 - Builder B. It is already linked relates_to 000405 and is on the owner's list of duplicates to decide. The dev evidence is in 000405's finding: GOV-017 step 6 and PROMPT-037 4.iii still say governance only and do not name --catalog, while the general --catalog rule is at GOV-017:119-121 and PROMPT-037 rule 10.
+
+What this report adds to 000405: an alternative fix, running test/test_codes.py as part of the completion edit. Under the contract's rule 9 that test cannot run in the primary checkout, because it rewrites catalog.md while it runs. So that option needs a worktree at the new dev tip, or it becomes 000399 (an automatic test run after writes to dev). The --catalog option works in the primary checkout.
+
+Related: 000198, 000208 (fixed: --catalog now writes), 000351.
+
+</details>
 
 **Links**
 
@@ -18938,10 +19569,68 @@ Overlapping ideas from fold: 000405 (the same f6216e9 incident reported by Build
 
 ## 000407 · PROMPT-034's R1 and R4 still dispatch to a general-purpose agent that writes its own report, which the partition-ideas skill no longer does
 
-**Created 2026-09-23T14:34:47-04:00 · Status: `open`**
+**Created 2026-09-23T14:34:47-04:00 · Status: `triaged`**
 
 From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
 
 As given: PROMPT-034's R1 and R4 sections still say "Dispatch to a general-purpose agent" and "Write your report to ...". Since 6807dcc, the partition-ideas skill sends both to the read-only partition-analyst, and the coordinator writes the reports. The pack was kept unchanged by the owner's ruling, so the pack and the skill now disagree, and the skill notes the departure. Reconcile the pack when it is next revised. Related to 000354 and 000206.
 
 Overlapping ideas from fold: 000354 (a partition analyst writes its report through a heredoc after the harness refuses its Write), 000206 (prompt packs cannot instruct a subagent to write its report to a file), 000339 (the partition pack's A2 prompt reads a staging document only the coordinator's worktree has).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:40:05-04:00): Confirmed on dev: PROMPT-034:114 and :185 say "Dispatch to a general-purpose agent, model sonnet", and :176 and :249 say "Write your report to _working/idea-corpus/report-R1.md" (R4 similarly). PROMPT-034:75 also says "Analysts are general-purpose agents." .claude/skills/partition-ideas/SKILL.md (about lines 28-36) sends R1 and R4 to partition-analyst (Read, Grep and Glob only). The coordinator writes the reports, and the skill records this as a departure made by the owner's ruling. Commit 6807dcc records the review of that change.
+
+So the disagreement is known and documented on the skill side. The pack does not mention it, so a reader of PROMPT-034 alone would dispatch the old way. Under GOV-008 the pack changes only in a revision. When it is next revised, line 75 needs the same change as lines 114, 176, 185 and 249.
+
+Related: 000354 (the incident that caused the change), 000206 (subagents cannot be instructed to write report files), 000339 (another PROMPT-034 defect from the same dry run). A scout proposed "supersedes 000354". That is not proposed here: 000354 reports the incident, and this idea reports the drift that followed.
+
+PROPOSED LINK: 000407 --relates_to--> 000354 (the incident that caused the pack and the skill to diverge)
+
+</details>
+
+---
+
+## 000408 · A deterministic diff check that refuses new type-ignore comments, cast(Any, ...) and bare except-pass
+
+**Created 2026-09-23T16:39:59-04:00 · Status: `open`**
+
+From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
+
+As given: a deterministic diff check that refuses new `# type: ignore` (other than import-untyped), `cast(Any, ...)` and bare `except: pass`. Logic-level ignores are already on dev at src/orchestrator/graphs/intake.py:90 and tools/generate_ideas_md.py:73-135. Source: owner's agentic-sdlc design §7; relates to 000385.
+
+**Links**
+
+- relates_to → `000385`
+
+---
+
+## 000409 · A test-count baseline guard that refuses a branch whose passed count drops or whose skips rise
+
+**Created 2026-09-23T16:40:00-04:00 · Status: `open`**
+
+From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
+
+As given: a test-count baseline guard: record passed/skipped counts on dev, and refuse a branch whose count drops or whose skips rise, unless the owner signs off. Nothing catches a deleted or skipped test today. Source: owner's agentic-sdlc design §7; relates to 000385 and 000400.
+
+**Links**
+
+- relates_to → `000385`
+
+---
+
+## 000410 · The lifecycle has no security review: no plan-time threat surface, no diff-time security pass, no rule for dependency changes
+
+**Created 2026-09-23T16:40:00-04:00 · Status: `open`**
+
+From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
+
+As given: the lifecycle has no security review. ARCH-006, GOV-014 and REQ-022 have no plan-time threat-surface section and no diff-time security pass, and no rule governs dependency/lockfile changes. Source: owner's agentic-sdlc design §3.14; relates to 000385.
+
+**Links**
+
+- relates_to → `000385`
