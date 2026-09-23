@@ -17555,7 +17555,7 @@ Related-ideas sweep: in the same turn as this finding, Ideation linked further i
 
 ## 000348 · The orchestrator's _resume_gate records gate_decided before it invokes the graph, so a dispatch that raises leaves a run with a decision but no dispatched or terminal event
 
-**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+**Created 2026-09-23T01:32:56-04:00 · Status: `triaged`**
 
 Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
 
@@ -17571,11 +17571,29 @@ What it would touch: src/orchestrator/tick.py (_resume_gate), possibly a new led
 
 Unresolved: reorder the two calls (record the decision only once the graph returns), or keep the order and add a failure event; and what the next tick should do with a run whose last event is gate_decided.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:34:20-04:00): Triage finding for 000348 (resume gate records gate_decided before invoking the graph), by Ideation, 2026-09-23.
+
+The ledger schema (schemas/run.schema.json) has no event for a failed dispatch. Its events are started, position, dispatched, dispatch_result, gate_reached, gate_decided, parked, abandoned and terminal. So the "record the failure" option in this idea needs a schema change as well as a code change. Reordering the calls needs no schema change.
+
+Nearest planned work: phase-irs-11 (run budgets, hard caps and the kill switch, claimed tonight by Session 5) adds a check on the dispatch path immediately before every dispatch. Its acceptance includes "a parked run resumes cleanly ... with its ledger intact". A halt raised at that point would leave the same orphaned gate_decided if it fires inside graph.invoke. So irs-11 is the phase most likely to meet this defect first, and the right place to rule on it. PLAN-039.01 section 5 defines the ledger events; section 7 defines gate decisions.
+
+Related ideas: 000350 (no phase builds the real Agent SDK dispatcher). The stub it describes is why the exception is certain today. 000029 (durable run ledger with resumable steps) asks for resumption without repeating side effects, which depends on the ledger recording an attempt's outcome.
+
+PROPOSED LINK: 000348 --relates_to--> 000350 (the unimplemented dispatcher is what raises inside the resumed gate today)
+
+</details>
+
 ---
 
 ## 000349 · Rule which run ledger is canonical: the one phase-irs-04 delivered, or the one phase-auto-04 plans, before either is extended
 
-**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+**Created 2026-09-23T01:32:56-04:00 · Status: `triaged`**
 
 Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
 
@@ -17591,11 +17609,29 @@ What it would touch: PLAN-032, PLAN-039.01, REQ-017, phase-auto-04's scope and d
 
 Unresolved: whether phase-auto-04 extends the irs-04 ledger, replaces it, or is narrowed to what irs-04 does not cover (the provenance fields and exactly-once resume).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:34:20-04:00): Triage finding for 000349 (which run ledger is canonical, irs-04's or auto-04's), by Ideation, 2026-09-23.
+
+Governing material: PLAN-039.01 section 5 (the owner's round-4 ruling makes _data/runs.jsonl, with schemas/run.schema.json and a sanctioned writer, the durable ledger, and names 000250's remote MCP-mediated home as its future); PLAN-032 and REQ-017 R08-R10 (phase-auto-04's ledger, 000029's field list, exactly-once resume, provider-neutral schema); ADR-022 (broker-first autonomous operations), which orders the auto-* phases. phase-auto-04 is queued behind phase-auto-01's design ruling, so the question can be settled there before any code is written.
+
+Neither plan cites the other's ledger. PLAN-039.01 section 5 does not mention phase-auto-04, and phase-auto-04's scope does not mention _data/runs.jsonl. The two declare different systems (sys-realization and sys-auto-ledger) and different paths (src/orchestrator/ledger.py and _data/runs.jsonl, against src/ledger/, sql/ and schemas/run-record.schema.json). The claim validator would therefore let both run at once.
+
+Related ideas: 000029 (durable agent workflow run ledger, the source of phase-auto-04's field list); 000250 (orchestrator state behind a remote MCP server); 000319 (state capture and session resumability). All three are in the 000347 cluster.
+
+PROPOSED LINK: 000349 --relates_to--> 000029 (000029 is the field list phase-auto-04 implements)
+
+</details>
+
 ---
 
 ## 000350 · No backlog phase builds the real Claude Agent SDK Dispatcher that the orchestrator's stub stands in for
 
-**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+**Created 2026-09-23T01:32:56-04:00 · Status: `triaged`**
 
 Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
 
@@ -17610,6 +17646,22 @@ Why it matters: until a real dispatcher exists, the orchestrator cannot run any 
 What it would touch: src/orchestrator/dispatch.py, the role contracts in GOV-014 (per-dispatch budget ceilings), phase-irs-11 (run budgets and the kill switch, which checks just before each dispatch), phase-irs-08, and PLAN-039.01. Related: 000334 (carry GOV-017 into the LangGraph and Agent SDK system) and 000347 (the anchor for the morning session on the multi-session system).
 
 Unresolved: a new phase, or a scope widening of irs-08 or irs-11; which plan owns it (PLAN-039 or PLAN-032); and whether it must wait for the phase-auto-01 design ruling.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:34:20-04:00): Triage finding for 000350 (no phase builds the real Agent SDK dispatcher), by Ideation, 2026-09-23.
+
+Confirmed by reading the backlog: no phase names src/orchestrator/dispatch.py or an Agent SDK adapter as a deliverable. The nearest phases are phase-irs-08 (execution loop harness), which falls back to "plain Agent SDK dispatch" if phase-auto-01 descopes the supervised worker; phase-auto-05 (supervised worker, watchdog and abandoned-run review); and phase-irs-11 (run budgets and the kill switch), which enforces a check before every dispatch but does not build the dispatch. GOV-014 (role contracts) sets the per-dispatch token ceilings a real dispatcher would have to enforce. ADR-018 (LangGraph orchestration) and PLAN-039.01 section 10 name the stub dispatcher as the testing surface only.
+
+This is where the Claude Agent SDK enters the orchestrator. It is also an input to the overnight planning file _working/overnight-sprint/planning/agent-sdk-capabilities.md (sprint item P1) and to the roadmap (P4). This idea is linked to anchor 000347.
+
+Related ideas: 000334 (carry GOV-017 into the LangGraph and Agent SDK system); 000069 (whether Claude Code stays a dependency); 000348 (the orphaned gate decision this stub causes today).
+
+</details>
 
 **Links**
 
