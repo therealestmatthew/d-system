@@ -13058,8 +13058,9 @@ items:
   - docs/00-working/framework/05-schemas/protocol.schema.json
   - docs/00-working/framework/05-schemas/examples
   - docs/00-working/framework/05-schemas/check_schemas.py
-  next_action: Draft governance.template.md first; the protocol template is easier to bound once the
-    governance shape's incident/rationale section is settled.
+  next_action: All acceptance conditions are met on agent/phase-fwt-01; waiting for the
+    owner-approved merge onto dev, after which session-close completes the phase.
+  session: doc-session-governance-protocol-templates
 
 - id: phase-fwt-02
   title: Standalone backlog phase template and schema
