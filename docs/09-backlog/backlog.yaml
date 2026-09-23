@@ -11,7 +11,6 @@ next_up:
 - phase-dgov-01
 - phase-idg-12
 - phase-irs-05
-- phase-irs-06
 - phase-irs-07
 - phase-irs-13
 - phase-irs-08
@@ -12742,7 +12741,7 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 2
   session_budget: 1
@@ -12769,8 +12768,8 @@ items:
   - docs/02-prompts/
   - schemas/adversarial-finding.schema.json
   - test/test_adversarial_finding_schema.py
-  next_action: Acceptance met and verified; awaiting the owner-approved merge through the Session
-    Manager (GOV-017), then completion.
+  next_action: None. Merged to dev at 72cb59a with the owner's approval; the six escalated-g3
+    findings on PLAN-039 go to the owner at the 000347 session.
   session: doc-session-three-altitude-review-park
   completion_evidence:
   - docs/08-governance/GOV-018-three-altitude-review-procedure.md
@@ -12785,7 +12784,9 @@ items:
     GOV-018 review ran against PLAN-039 and REQ-022 at all three altitudes: 8 findings (7 major, 1
     minor), all dispositioned by the planner stand-in (6 escalated-g3, 2 accepted-no-change). A
     sample draft missing five GOV-010 sections was returned at the entry check with no adversary
-    dispatched; a conforming control passed.'
+    dispatched; a conforming control passed. Merged to dev at 72cb59a with the owner''s approval
+    (GOV-017), after a post-rebase gate on ed2c5b2: governance OK, pytest 1030 passed, ruff and mypy
+    clean.'
 - id: phase-irs-07
   title: Dependency-mapping agent and the Gate 3 ratification flow
   plan: doc-idea-realization-system-plan
