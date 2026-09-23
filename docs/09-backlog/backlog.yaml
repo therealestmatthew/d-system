@@ -10140,7 +10140,7 @@ items:
   - templates/governance/document.md
   - docs/03-sessions/SESS-2026-09-22-09-plan-quality-standard.md
   result: GOV-010 written from an audit of docs/01-plans/ and docs/06-requirements/; governance OK; independent
-    review ran, its findings were fixed in the branch and are recorded in SESS-2026-09-22-09.
+    reviews ran twice, the second on the first's fixes; all findings fixed and recorded in SESS-2026-09-22-09.
   next_action: Review findings fixed. Awaiting a relayed GRANTED merge; the completion edit follows on dev,
     per GOV-017 and GOV-003's coordinator-completion rule.
 - id: phase-idg-11

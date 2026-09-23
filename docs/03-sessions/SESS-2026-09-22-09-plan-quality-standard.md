@@ -25,10 +25,11 @@ $ uv run python -m src.governance
 Governance OK: 35 systems, 323 documents, 30 memories, 293 backlog phases
 ```
 
-Run in the worktree `/code/d-system-worktrees/phase-idg-10` after rebasing onto `dev` at `6339ba0`.
+Run in the worktree `/code/d-system-worktrees/phase-idg-10` after rebasing onto `dev` at `ce732f1`.
 
 The standard's mechanical plan check was also run by hand, from a scratch script implementing the
-heading rule as `GOV-010` states it, against eleven existing plans:
+heading rule as `GOV-010` states it, against eleven existing plans. The second review
+reproduced this table with its own implementation of the rule:
 
 ```
 PLAN-001-agent-memory-system.md missing: ['Context', 'Design', 'Work', 'Verification', 'Boundaries', 'Open questions']
@@ -51,19 +52,23 @@ against the corpus.
 ## Acceptance
 
 - `REQ-014 R17 holds: every judgement names plans from the corpus on both sides.` — **Met** after
-  the review's corrections. Judgements P1–P11, Q1–Q5, T1–T2, the Length section and each of the
-  four optional sections name corpus documents on both sides. P8's positive side is met by three
-  documents, one per part, and says so.
+  both reviews' corrections. Judgements P1–P11, Q1–Q5, T1–T2, the Length section and each of the
+  four optional sections name corpus documents on both sides. P8 has no document meeting all three
+  parts; it cites one per part and says so, and the introduction states that exception. Q1–Q5 cite
+  requirement documents, under the owner's ruling that the requirement half uses the same rule.
 - `The standard names a section list a later plan can be checked against mechanically.` — **Met.**
-  Accepted-heading tables, a match rule that excludes fenced lines, a grep form, and a requirement
-  row check that is part of conformance.
+  Accepted-heading tables, a match rule that excludes fenced lines, a shell form that also
+  excludes them, and a requirement row check, requiring at least one row, that is part of
+  conformance.
 - `It is written so phase-idg-12 can measure a draft against it, which is what R20 requires of it.`
-  — **Met.** Every conditional row can now be evaluated from the draft itself: `depends_on` kind,
-  or the number of phases its Work section lists. The one judgement-based row, Accepted decisions,
-  was made optional and taken out of conformance.
+  — **Met.** The Concurrency condition is evaluated from the draft alone, by counting distinct
+  `phase-` ids. The Requirement coverage condition needs one lookup outside the draft, resolving
+  each `depends_on` id to its document's `kind`, and GOV-010 says so. The one judgement-based row,
+  Accepted decisions, was made optional and taken out of conformance.
 - `The two bullets above … are judged by the session-close independent review, not by a mechanical
-  command.` — **Met.** See `## Review`. The review found the first bullet partly met; the gaps it
-  named were fixed in `77e078c`.
+  command.` — **Met** on the two reviews in `## Review`. The first found condition 1 partly met;
+  its gaps were fixed in `ec23709`. The second, run on those fixes, found one false citation and
+  three rule gaps; they were fixed in `936a061`. No third review has run on `936a061`.
 
 ## Backlog
 
@@ -78,7 +83,10 @@ relayed `GRANTED merge`, after which the completion edit follows on `dev`, per `
 
 ## Review
 
-An independent general-purpose sub-agent reviewed `dev...HEAD` at `bed29cd`, before the fixes.
+### First review
+
+An independent general-purpose sub-agent reviewed the branch at the commit now rebased as
+`b942f36`, before any fixes. SHAs in this section are the current, post-rebase ones.
 It re-ran governance and checked every citation in GOV-010 against its source. Its findings,
 condition by condition, as reported:
 
@@ -127,8 +135,37 @@ The review found no mannered prose, no out-of-scope file and no problem with the
 or the `codes.yaml` reservation removal. It confirmed, verbatim or in substance, the P1, P2 and P4
 citations it checked, and every requirement quote under Q1–Q5.
 
-No second review was run after the fixes. The fixes narrow or correct citations and add examples.
-Each new citation was checked against its source before commit, and none reverses a judgement.
+### Second review
+
+At the owner's ruling, relayed by the Session Manager, a second, fresh independent sub-agent
+reviewed the fixes in `ec23709`. It had the diff, the acceptance list and the table above, and not
+the author's rationale. It re-ran governance and got the same result. Its verdict per condition:
+condition 1 partly met, condition 2 met with one contradiction, condition 3 mostly met, and
+condition 4 not met on the record as then committed.
+
+It found 15 of the 19 table rows fixed. Rows 1, 10 and 15 were partly fixed, and so was the
+unnumbered mechanical row. The formatting row was not fully fixed. It also found ten new
+discrepancies. All are fixed in `936a061`:
+
+| # | Finding | Disposition |
+|---|---|---|
+| 1 | Key references: `PLAN-034`'s first entry, "The requirement", has no note, so "each entry says why" was false. The claim that every new citation had been checked did not hold for this one | Fixed: cites only the `ADR-009` and `AGENTS.md` entries, and names the bare one |
+| 2 | Row check passes a requirement with zero rows | Fixed: at least one row is required |
+| 3 | The shell form counted fenced lines, contradicting the new rule | Fixed: the form now drops fenced lines with `awk` first |
+| 4 | "Lists two or more phases" did not say what counts; the Requirement coverage condition needs a lookup outside the draft | Fixed: count distinct `phase-` ids; the lookup is stated |
+| 5 | The Deliverables criterion was changed to fit its example, and recorded only as "restated" | Fixed and recorded: the criterion is now "lists what the work produces, each with what it is for, and not the plan itself". The example says eight of `PLAN-016`'s nine entries meet it, and why the ninth is covered. This is a deliberate change from the first draft's "only when no backlog phase lists the files yet", which had no example that could be verified |
+| 6 | Sizing: `PLAN-037` does not merely repeat its counts | Fixed: reworded as a section with no difference to explain |
+| 7 | Session record cited pre-rebase SHAs, a stale base and "Met" before any post-fix review; P9 and P10 kept failing documents under "Meets it" | Fixed: SHAs and base updated. P9 now cites `PLAN-015` alone as meeting it. P10 now cites `PLAN-010` and `PLAN-019` as meeting it. `PLAN-016`, `PLAN-038`, `PLAN-026` and `PLAN-029` moved to the failing side |
+| 8 | P8: `PLAN-001`'s question 6 has its own deadline | Fixed |
+| 9 | The introduction overstated P8 | Fixed: the introduction states the per-part exception |
+| 10 | P11: the dependency is stated in `PLAN-002`'s Composition Map | Fixed: says it appears only there, not where the work is ordered |
+| — | Line length and ragged wraps | Fixed: prose reflowed to 100 columns |
+
+It found no mannered prose, and confirmed the P11, Known facts, Key references (`PLAN-026`),
+Sizing (`PLAN-026`) and P7 citations it checked.
+
+The two new passing examples for P10, `PLAN-010` and `PLAN-019`, were checked by the author
+against their text: every label in each resolves to a document code, a phase id or an idea id.
 
 ## Decisions
 
@@ -157,7 +194,10 @@ Each new citation was checked against its source before commit, and none reverse
   body also states. Both corrected before commit.
 - The session record and backlog said the review was done before it had run. The review caught
   this, and it is fixed above.
-- The seventeen citation and rule findings in `## Review`.
+- The seventeen citation and rule findings of the first review, and the ten of the second, in
+  `## Review`.
+- The record said every new citation had been checked before commit. The second review found one
+  that had not: the Key references example.
 
 ## Left undone
 
