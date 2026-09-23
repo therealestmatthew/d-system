@@ -17549,3 +17549,68 @@ Related-ideas sweep: in the same turn as this finding, Ideation linked further i
 - relates_to ← `000333`
 - relates_to ← `000334`
 - relates_to ← `000340`
+- relates_to ← `000350`
+
+---
+
+## 000348 · The orchestrator's _resume_gate records gate_decided before it invokes the graph, so a dispatch that raises leaves a run with a decision but no dispatched or terminal event
+
+**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+
+Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
+
+As given: the orchestrator's _resume_gate (src/orchestrator/tick.py, around lines 152-153) records gate_decided before it invokes the graph. The CLI passes no dispatcher, so `tick --dispatch` with an approve waiting would raise NotImplementedError and leave a run with a decision but no dispatched or terminal event. Reorder the two steps, or record the failure, before a real dispatcher lands.
+
+What the code shows (read on dev at e8538da): _resume_gate calls ledger.record(run_id, "gate_decided", ...) and then graph.invoke(gates.resume_command(decision), ...). The events "dispatched", "dispatch_result" and "terminal" are recorded only after invoke returns. tick() defaults its dispatcher to unimplemented_dispatcher (src/orchestrator/dispatch.py), which raises NotImplementedError. src/orchestrator/__main__.py does not pass one. So an exception inside invoke leaves the ledger's last event for the run as gate_decided, with nothing to show that the dispatch was attempted and failed.
+
+Caveat, from the Scout's follow-up note: the orphaned-decision outcome was found by reading the code, not by running it. Ideation's own check of the code was also reading only.
+
+Why it matters: the run ledger (_data/runs.jsonl, PLAN-039.01 section 5) is meant to reconstruct what happened to each run. A decision recorded without its outcome looks like a dispatch still in flight. Whether the next tick re-asks, retries or skips such a run depends on how the ledger is folded. The idea did not check this.
+
+What it would touch: src/orchestrator/tick.py (_resume_gate), possibly a new ledger event for a failed dispatch in schemas/run.schema.json and tools/append_run.py, and the tests for the orchestrator. It bears on phase-irs-11 (run budgets, hard caps and the kill switch), which adds a check just before each dispatch, and on whichever phase builds the real Agent SDK dispatcher.
+
+Unresolved: reorder the two calls (record the decision only once the graph returns), or keep the order and add a failure event; and what the next tick should do with a run whose last event is gate_decided.
+
+---
+
+## 000349 · Rule which run ledger is canonical: the one phase-irs-04 delivered, or the one phase-auto-04 plans, before either is extended
+
+**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+
+Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
+
+As given: phase-auto-04 (build the durable run ledger with resumable steps, in docs/09-backlog/backlog.yaml around line 11124) plans a run ledger with checkpoints and resumable steps. phase-irs-04 already delivered one: src/orchestrator/ledger.py, _data/runs.jsonl, and SQLite checkpoints. Rule which one is canonical before either is extended.
+
+What the two are (read on dev at e8538da):
+- phase-irs-04's ledger follows PLAN-039.01 section 5 (the owner's round-4 ruling). It is an append-only _data/runs.jsonl with schemas/run.schema.json and a sanctioned writer, and its events cover run started, dispatch, dispatch result, gate reached, gate decided, park and terminal. LangGraph's checkpoint store under data/orchestrator/ holds the resumable graph state.
+- phase-auto-04 (PLAN-032, sys-auto-ledger, queued) declares src/ledger/, sql/, schemas/run-record.schema.json and test/test_run_ledger.py. Its scope is 000029's field list: correlation id, payload hash, model and tool versions, context-pack hash, budget, timeout, retries, checkpoints, artifacts and disposition. It adds exactly-once side effects on resume and a run schema that does not depend on the provider (REQ-017 R08-R10).
+
+Why it matters: two ledgers under two plans and two systems (sys-realization and sys-auto-ledger) would split the record of what agents ran. The concurrency check would not see the overlap, because the declared paths differ.
+
+What it would touch: PLAN-032, PLAN-039.01, REQ-017, phase-auto-04's scope and deliverables, and possibly phase-auto-05 (supervised worker and watchdog), which would read the ledger. Related ideas: 000029 (durable run ledger with resumable steps) and 000250 (moving orchestrator state behind a remote MCP server).
+
+Unresolved: whether phase-auto-04 extends the irs-04 ledger, replaces it, or is narrowed to what irs-04 does not cover (the provenance fields and exactly-once resume).
+
+---
+
+## 000350 · No backlog phase builds the real Claude Agent SDK Dispatcher that the orchestrator's stub stands in for
+
+**Created 2026-09-23T01:32:56-04:00 · Status: `open`**
+
+Sent to Ideation by Session 4 - Scout on 2026-09-23, during the overnight sprint.
+
+As given: no backlog phase is scoped to build the real Agent SDK Dispatcher. src/orchestrator/dispatch.py (around lines 54-66) is a stub that raises NotImplementedError. phase-irs-08 and every automated role depend on it. Consider a dedicated phase.
+
+What the code shows (read on dev at e8538da): dispatch.py defines a Dispatcher protocol (run_id, role, refs, budget_cap, returning a DispatchResult). The default, unimplemented_dispatcher, raises NotImplementedError. Its docstring says that binding the Claude Agent SDK's role contracts and budget accounting is outside phase-irs-04's scope. tick() uses that default, and the CLI supplies nothing else. Only tests pass a stub.
+
+What the backlog shows: phase-irs-08 (execution loop harness for developer and validator dispatch) dispatches agents into worktrees. If phase-auto-01 descopes the supervised worker, it falls back to "plain Agent SDK dispatch". Neither irs-08 nor any other phase names the adapter itself as a deliverable. The Scout's claim that every automated role depends on it was not checked phase by phase.
+
+Why it matters: until a real dispatcher exists, the orchestrator cannot run any role unattended. This is also the point where the Agent SDK, which the 000347 anchor wants to evaluate, would enter the system.
+
+What it would touch: src/orchestrator/dispatch.py, the role contracts in GOV-014 (per-dispatch budget ceilings), phase-irs-11 (run budgets and the kill switch, which checks just before each dispatch), phase-irs-08, and PLAN-039.01. Related: 000334 (carry GOV-017 into the LangGraph and Agent SDK system) and 000347 (the anchor for the morning session on the multi-session system).
+
+Unresolved: a new phase, or a scope widening of irs-08 or irs-11; which plan owns it (PLAN-039 or PLAN-032); and whether it must wait for the phase-auto-01 design ruling.
+
+**Links**
+
+- relates_to → `000347`
