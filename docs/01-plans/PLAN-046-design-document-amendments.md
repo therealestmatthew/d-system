@@ -25,22 +25,23 @@ or the owner's rulings of 2026-09-23, each with its source. An agent that reads 
 enforces G4, that one revision cycle is allowed and that the owner spot-audits validations. None of
 those is the current rule.
 
-The owner's rulings, given in the owner's session and relayed by the Session Manager (recorded on
-its gitignored board, `_working/session-manager/board.md`):
+The owner's rulings, given in the owner's session and relayed by the Session Manager, are recorded
+on its board (`_working/session-manager/board.md`, gitignored). Most answer the numbered list "Owner
+decisions needed" in the Scout's report `_working/session-manager/scout/orchestration-1-evidence.md`
+(items 1-9, each with lettered options), cited below as "Scout-1 item N (x)". The board records the
+answers unnumbered, so each is given here with the board's words and the item it answers:
 
-- Scout-1 decision 1 (a): "one docs phase now", with `AGENTS.md` changed only on "line-by-line
-  approval".
-- Mapping Q5: "Test Author in unit graph now (amend GOV-014)". Mapping Q6: "two cycles, amend
-  ARCH-006 stage 8 + GOV-018".
-- Scout O-3 (a): "builders self-merge until P3 N2".
-- Scout-1 decisions 3 (c), 4 (a) and 9 (c): agent ideas "labelled agent-proposed"; the
-  "session-close reviewer gets no session record"; the "spot-audit replaced by sampled independent
-  re-review".
-- Protocol Q8 and Q15: "owner approval for every worktree removal"; "remote branch deletion
-  OWNER-ONLY (standing; needs GOV-003 entry on a docs branch)".
-- `CLAUDE.md`: "stale lines APPROVED as proposed (~144 tasks are separate files; ~137/141 replace
-  counts with pointers to schemas/ and sql/001_schema.sql)".
-- Idea `000378`: "GOV-003 governs" for phase completion.
+| Ruling as the board records it | Answers |
+|---|---|
+| "OWNER Scout-1 rulings: docs amendments = one docs phase now (AGENTS.md line-by-line approval)" | Scout-1 item 1 (a) |
+| "agent ideas labelled agent-proposed" (same line) | Scout-1 item 3 (c) |
+| "session-close reviewer gets no session record" (same line) | Scout-1 item 4 (a) |
+| "OWNER rulings: ... spot-audit replaced by sampled independent re-review" (a separate board line) | Scout-1 item 9 (c) |
+| "OWNER mapping rulings: ... Q5 Test Author in unit graph now (amend GOV-014); Q6 two cycles, amend ARCH-006 stage 8 + GOV-018" | Builder A's mapping (`reports/owner-design-mapping.md`), section 8, Q5 and Q6 |
+| "OWNER Scout rulings: ... O-3 builders self-merge until P3 N2" | `orchestration-3-architecture.md`, "Owner decisions", O-3 (a) |
+| "OWNER protocol rulings: Q8 owner approval for every worktree removal" and "Q15 remote branch deletion OWNER-ONLY (standing; needs GOV-003 entry on a docs branch)" | The board/state protocol draft's questions Q8 and Q15 |
+| "CLAUDE.md stale lines APPROVED as proposed (~144 tasks are separate files; ~137/141 replace counts with pointers to schemas/ and sql/001_schema.sql)" | The restart file's open owner item on `CLAUDE.md` |
+| Idea `000378`'s annotation: "Owner ruling, 2026-09-23 ... GOV-003 governs" | Phase-completion authority |
 
 Ideas covered: `000378` (completion authority contradicts itself), `000402` in the one instance
 `000378` describes (not the general consistency check `000402` proposes), and the owner's rulings
@@ -49,10 +50,16 @@ kind of drift but was not in the task statement; OQ1 asks whether to include it.
 
 ## Decisions
 
-**D1. One phase, as ruled.** The phase edits about ten files, all text, plus one regeneration. The
-owner named one docs phase; splitting it by document was not considered further, because every
-file here depends on the same set of rulings and a split would put half-amended contradictions on
-`dev` between merges.
+**D1. One phase, as ruled, judged to fit one session.** The phase edits about ten files. It fits
+one session because none of the work is design: every ruling is settled, the exact
+`AGENTS.md` and `CLAUDE.md` text is fixed below, the Test Author's placement is fixed in D7, and the
+one new contract (the Test Author) follows the shape of the nine existing ones in `GOV-014`. There
+is no code; the verification is greps, a regeneration and the test suite. Splitting by document was
+rejected because every file depends on the same rulings, and a split would put half-amended
+contradictions on `dev` between merges (for example, `GOV-014` saying ten roles while `ARCH-006`
+still names two at stage 8). If the session nevertheless runs short, `GOV-002`'s rule applies: the
+remaining edits become new phase ids, with the half-done state recorded, rather than an oversized
+phase left labelled as one session.
 
 **D2. Stage 5 changes with stage 8.** Q6 names `ARCH-006` stage 8 and `GOV-018`. `GOV-018` step 5
 says "`ARCH-006` stage 5 allows one revision cycle"; it implements stage 5, not stage 8. Changing
@@ -72,11 +79,14 @@ confirm.
 
 **D4. One `GOV-003` entry per standing ruling, plus one for the document changes.** The task
 statement lists three `GOV-003` entries (Q15, Q8, the agent-proposed label). This plan adds a
-fourth, recording that Q5, Q6, O-3, and Scout-1 decisions 4 (a) and 9 (c) changed `ARCH-006`,
+fourth, recording that Q5, Q6, O-3, and Scout-1 items 4 (a) and 9 (c) changed `ARCH-006`,
 `GOV-014`, `GOV-018` and `REQ-022`. `GOV-003` is where an agent looks for "accepted choices that
 resolve older plan conflicts" (`AGENTS.md`, Session backlog), and each of those rulings reverses a
-rule a document still states. The cost is one more entry to keep true. The fourth entry records
-rulings the owner made; it adds no rule.
+rule a document still states. The alternative, only the three entries named in the task, would
+leave a reader of `GOV-003` with no record of why `ARCH-006`, `GOV-014` and `GOV-018` changed, and
+the next session that finds the old text in a session record or a plan would not know which is
+current. The cost is one more entry to keep true. The fourth entry records rulings the owner made;
+it adds no rule.
 
 **D5. `AGENTS.md` and `CLAUDE.md` changes are proposals the executing session puts to the owner.**
 `CLAUDE.md` and `AGENTS.md` each forbid editing either without the owner's explicit approval of the
@@ -122,7 +132,19 @@ Tables: see `sql/001_schema.sql` for the current set.
 **D6. The orient skill is changed at its source.** `.claude/skills/orient/SKILL.md` and
 `.agents/skills/orient/SKILL.md` are generated from `agent-workflows/orient.md` by
 `tools/generate_agent_workflows.py` and carry a "do not edit" notice. The phase edits the source and
-regenerates both.
+regenerates both. Editing the generated files directly was rejected: the next regeneration would
+overwrite the change, and `generate_agent_workflows.py --check` would fail until it did.
+
+**D7. Where the Test Author sits in stage 8.** Q5 adds the role to the `unit` graph; `ARCH-006`'s
+stage table says a stage with no failure path is a defect, so stage 8 must name the role and its
+failure path, not only `GOV-014`. Proposed text, taken from the owner's design (section 3.6, "Runs
+**before** the Task Dev agent and commits red tests"), which mapping Q1 made an input to the `unit`
+graph: the Test Author writes failing tests from the phase's acceptance before the Developer starts;
+the Developer may not change them; a Developer who holds that a test is wrong records a finding,
+the Validator rules on it, and only the Test Author changes the test; this follows the stage's
+two-cycle path and then parks the unit, like any other finding. The alternative, leaving stage 8
+unchanged until the `unit` graph is built, would leave `GOV-014` and `ARCH-006` disagreeing about
+who works in stage 8. The owner confirms this text at G3 (OQ7).
 
 ## Implementation phases
 
@@ -147,14 +169,14 @@ Every requirement maps to the one phase.
 
 ## Execution order and real concurrency
 
-`phase-dam-01` declares `sys-gov-docs` and `sys-realization`. It does not collide with
-`phase-part-03`, which is active and declares `sys-governance` only, so it can be claimed while
-`phase-part-03` runs, if its deliverables do not overlap (checked by `--ready` when claimed). It
-collides with `phase-grd-01` (`PLAN-045`): both list `AGENTS.md` and `docs/08-governance/`. The
-proposed order is `phase-grd-01` first, then `phase-dam-01`, because `phase-grd-01`'s governance
-check will then catch a stale catalog in `phase-dam-01`'s own completion edit. If `phase-grd-01`
-cannot start (it waits for `phase-part-03`), `phase-dam-01` can go first; the order is the owner's
-at G3 (`PLAN-045`, OQ1).
+`phase-dam-01` declares `sys-governance`, `sys-gov-docs` and `sys-realization`. `sys-governance`
+is declared because no system registers `.claude/`, `agent-workflows/`, `AGENTS.md` or `CLAUDE.md`,
+and every phase that edits them declares it (for example `phase-ses-02`, `phase-idea-06`,
+`phase-part-03`). So `phase-dam-01` cannot be claimed while `phase-part-03` is active: both change
+the agent-workflow sources. It also collides with every `PLAN-045` phase through `sys-governance`,
+and with `phase-grd-01` on `AGENTS.md` and `docs/08-governance/`. The proposed order is
+`phase-grd-01`, `phase-grd-02`, `phase-dam-01`, so the staleness check from `phase-grd-01` catches a
+stale catalog in `phase-dam-01`'s own commits; the order is the owner's at G3 (`PLAN-045`, OQ1).
 
 ## Out of scope
 
@@ -175,7 +197,7 @@ at G3 (`PLAN-045`, OQ1).
   (`GOV-001:181`, `GOV-002:168` and `:170`, `OPS-001:132` and `:154`, `GOV-005:88`), and
   `session-close.md:79` and `:165` cite a withdrawn exception. Who: the owner, at G3. Leaning:
   include it; the edits are one line each, and `phase-dam-01` already edits `session-close.md`.
-- **OQ2. The agent-proposed label's form.** Scout-1 decision 3 (c) says "a labelled
+- **OQ2. The agent-proposed label's form.** Scout-1 item 3 (c) says "a labelled
   'agent-proposed' state". A new idea status or field is a schema and writer change. Who: the owner,
   at G3. Leaning: `GOV-003` records the ruling now, and the idea bodies' existing first line
   ("Proposed by <session>, not the owner") serves as the label until a separate idea-system phase
@@ -188,3 +210,5 @@ at G3 (`PLAN-045`, OQ1).
   the reviewer contract (Scout step 2), because both change what a reviewer is given and records.
 - **OQ6. Partition reconciliation.** As in `PLAN-045` OQ6: reconciled with the `phase-part-03`
   sweep's accepted result before G3.
+- **OQ7. The Test Author's stage 8 text** (D7). Who: the owner, at G3. Leaning: as proposed, since
+  it is the owner's own design applied to the existing failure path.

@@ -1,0 +1,198 @@
+{
+  "review_id": "2026-09-23-plan-046",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-046",
+    "requirement": "REQ-029",
+    "phases": [
+      "phase-dam-01"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-046-design-document-amendments.md at 61b47e4: exit 0, no missing sections. Re-run after the revision: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "altitude": "plan",
+      "subject": "PLAN-046",
+      "severity": "blocker",
+      "title": "The plan cites a \"Scout-1 decision N (letter)\" numbering scheme that does not exist anywhere in the named source (board.md/scout/), and misattributes one ruling to \"Scout-1\" that the board records under a plain, unlabeled \"OWNER rulings\" line",
+      "evidence": "Plan text (Context and scope): 'Scout-1 decision 1 (a): \"one docs phase now\"...' and 'Scout-1 decisions 3 (c), 4 (a) and 9 (c): agent ideas \"labelled agent-proposed\"; the \"session-close reviewer gets no session record\"; the \"spot-audit replaced by sampled independent re-review\".' `grep -rln \"Scout-1\" /code/d-system/_working/` returns only `board.md`, and there only once: 'OWNER Scout-1 rulings: docs amendments = one docs phase now (AGENTS.md line-by-line approval); agent ideas labelled agent-proposed; session-close reviewer gets no session record; S3 next_up rule refuses, grandfathers current 19.' -- four items, no numbers, no letters. The spot-audit ruling the plan attributes to 'Scout-1 decision 9 (c)' actually appears on a separate, later board line with no Scout-1 label at all: 'OWNER rulings: corpus keeps the 121 with explicit carry-over marks; HOLD phase-irs-02 until partition coverage/isolation checks exist; spot-audit replaced by sampled independent re-review; irs-11 budgets from measured baselines only.' No file anywhere under `_working/` (checked exhaustively) contains a decision list numbered 1-9 with lettered sub-options matching this scheme.",
+      "consequence": "D4 and R08 direct the executing session to add GOV-003 entries that quote these rulings; if the fabricated 'decision N(letter)' identifiers are carried into GOV-003 as if they were the owner's own citation apparatus, a governing document permanently records a provenance that cannot be traced to any actual source -- exactly the 'rule not given by the owner' pattern CLAUDE.md forbids inventing. A reader who goes looking for 'Scout-1 decision 9(c)' in the sources this plan itself names will not find it.",
+      "minimal_fix": "In D2-D4 and R08's GOV-003 entries, cite the board's actual unnumbered prose lines verbatim (or quote the ruling text alone without inventing a decision/letter index), and drop the 'Scout-1' label from the spot-audit ruling since the board does not apply it there.",
+      "slug": "fabricated-source-citation",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Partly wrong, fixed anyway. The numbered list does exist: _working/session-manager/scout/orchestration-1-evidence.md, section 'Owner decisions needed' (line 394), items 1-9 with lettered options, including item 9 'Owner spot-audit' option (c) 'Replace it with sampled independent re-review'. The finding is right that the plan did not name that file and that the board records the answers unnumbered, the spot-audit one on a separate line. PLAN-046 Context and scope now has a table giving each ruling in the board's own words, the board line it is on, and the report item it answers, with the report's path; REQ-029 names the report for each ruling."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F01"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-046",
+      "severity": "major",
+      "title": "Adding a Test Author to GOV-014's unit graph (R05) leaves it with no position or failure path in ARCH-006's stage 8 row, which the document itself says a stage must never lack",
+      "evidence": "ARCH-006's stage table preamble: 'Each row names the stage, the agent role that performs it, what existing work it rides on, and its failure path. A stage with no failure path is a defect -- the adversarial pass of 2026-09-15 found exactly that in the draft's stages 7 and 8, and this table is the correction.' Stage 8's current Role column: 'Developer agents in worktrees per `ADR-003`; validator agents (the demo build's code/check pattern) verify each diff against acceptance...'; Failure path: 'Validator rejection: one revise cycle per finding class; second rejection parks the unit `blocked`...'. Neither backlog.yaml's phase-dam-01 scope list nor PLAN-046's own scope touches stage 8's Role or Failure-path text for Test Author -- the only stage-8 edit named is the revision-cycle count (R04/D2) and the G4 row (R03). REQ-029 R05's verification is 'Read the contract; grep -n \"nine\" in GOV-014 returns no count of roles' -- it never checks ARCH-006.",
+      "consequence": "After the phase, GOV-014 names ten roles including Test Author with write scope test/, but ARCH-006 stage 8 -- the document that this plan's own contracts document says is authoritative for 'the agent role that performs' each stage and that explicitly treats a missing failure path as a defect -- still names only Developer and Validator, with no stated dispatch order (before/with/after Developer) and no stated failure path for a Test Author/Developer disagreement.",
+      "minimal_fix": "Add a scope item updating ARCH-006 stage 8's Role and Failure-path text to name Test Author and state its order and failure interaction with Developer/Validator, or explicitly defer this to a named future phase and say so in Out of scope.",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "PLAN-046 D7 states the stage 8 text (order from the owner's design section 3.6; the dispute path through the Validator and the existing two-cycle path), put to the owner as OQ7. REQ-029 R05 and phase-dam-01's scope and acceptance include ARCH-006 stage 8."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F02"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-046",
+      "severity": "major",
+      "title": "Decision D4 (a fourth GOV-003 entry) does not name the alternative it rejected or that alternative's cost, as GOV-010 P2 requires",
+      "evidence": "GOV-010 P2: 'Each decision names the alternative it rejected and what that alternative would have cost... \"Chosen because it is good\" is not a reason. The reason is what the rejected option would have cost here.' D4's full text: 'The task statement lists three GOV-003 entries... This plan adds a fourth, recording that Q5, Q6, O-3, and Scout-1 decisions 4 (a) and 9 (c) changed ARCH-006, GOV-014, GOV-018 and REQ-022... The cost is one more entry to keep true. The fourth entry records rulings the owner made; it adds no rule.' This states the cost of the chosen option (one more entry) but never names a rejected alternative (e.g. leaving Q5/Q6/O-3 undocumented in GOV-003, or folding them into the three existing entries) nor what that alternative would have cost.",
+      "consequence": "A reviewer at G3 cannot tell whether a fourth GOV-003 entry was actually necessary or is scope creep beyond the task statement's three named entries, since no rejected alternative is on record to weigh it against.",
+      "minimal_fix": "Add one sentence naming the rejected alternative (e.g. 'fold Q5/Q6/O-3 into the three named entries' or 'omit a fourth entry') and its cost (e.g. a reader would not find why ARCH-006 stage 8 changed).",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D4 now names the rejected alternative (only the three named entries) and its cost (no GOV-003 record of why ARCH-006, GOV-014 and GOV-018 changed)."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F03"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-046",
+      "severity": "minor",
+      "title": "Decision D6 (editing the orient skill at its source) also names no rejected alternative or cost per GOV-010 P2",
+      "evidence": "D6's full text: 'The orient skill is changed at its source. `.claude/skills/orient/SKILL.md` and `.agents/skills/orient/SKILL.md` are generated from `agent-workflows/orient.md` by `tools/generate_agent_workflows.py` and carry a \"do not edit\" notice. The phase edits the source and regenerates both.' No alternative is stated as considered and rejected, nor its cost.",
+      "consequence": "Minor under GOV-010 P2's letter, though the reasoning is close to self-evident (the generated files carry a 'do not edit' notice, confirmed at `.claude/skills/orient/SKILL.md:6`) so the practical risk is low.",
+      "minimal_fix": "Add one clause naming the rejected alternative ('edit the generated files directly') and its cost (silently overwritten by the next regeneration, or governance drift undetected until `--check` runs).",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D6 now names the rejected alternative (editing the generated files) and its cost."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F04"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-dam-01",
+      "severity": "major",
+      "title": "R03's verification grep is case-sensitive and already returns 0 today, so it cannot detect whether the G4 row was actually rewritten.",
+      "evidence": "REQ-029 R03 verification: `grep -c \"enforced at the tool boundary\"` in ARCH-006 is 0. Run today, before any edit: `grep -c \"enforced at the tool boundary\" docs/07-architecture/ARCH-006-idea-realization-system.md` -> 0. The actual text at ARCH-006:67 is `... Enforced at the tool boundary by P5's capability broker ...` (capital E, sentence-initial in the G4 table cell): `grep -c -i \"enforced at the tool boundary\" docs/07-architecture/ARCH-006-idea-realization-system.md` -> 1.",
+      "consequence": "An executing session that runs R03's verification exactly as REQ-029 specifies it will see the check pass whether or not it rewrote the G4 row, because the case-sensitive grep never matched the real (capitalized) text in the first place. R03 and the matching backlog acceptance line (\"ARCH-006 no longer contains 'enforced at the tool boundary'\") give false assurance.",
+      "minimal_fix": "Add `-i` to the grep in REQ-029 R03's verification column (and to the mirrored acceptance line in phase-dam-01), or match the actual capitalized phrase.",
+      "slug": "vacuous-verification-check",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "REQ-029 R03 and phase-dam-01's acceptance use grep -c -i and state that it returns 1 before the edit."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F05"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-dam-01",
+      "severity": "major",
+      "title": "The scope's ten distinct edit sites plus new contract design plus an interactive owner-confirmation step sit uneasily with the repository's fixed one-session budget and its split mandate for oversized phases.",
+      "evidence": "docs/08-governance/GOV-002-backlog-protocol.md:40 - `session_budget` | Exactly `1`; a review promise about scope, not an automatic timing guarantee. GOV-002:170 - \"If the outcome exceeds one session, split remaining outcomes into new IDs ... Do not leave an oversized phase permanently labeled as one session.\" AGENTS.md:169 - \"Each backlog item is one phase that fits one session.\" phase-dam-01's scope spans ARCH-006 (three separate passages), GOV-014 (new Test Author contract with inputs/outputs/never-do/ceiling, a Developer write-scope exclusion, a role-count-to-ten sweep, a spot-audit-to-re-review rewrite), GOV-018 step 5 (a one-cycle-to-two-cycle change to the escalation flow at docs/08-governance/GOV-018-three-altitude-review-procedure.md:200, a 235-line procedure), REQ-022 R23, three session commands, the orient skill's source plus regeneration of two generated copies, four new dated GOV-003 entries, and an in-session interactive negotiation of exact AGENTS.md/CLAUDE.md text with the owner - then the full verification chain (generate_agent_workflows --check, governance, catalog diff, pytest).",
+      "consequence": "PLAN-046's D1 argues against splitting by document, but never argues the aggregate scope fits a single session; if it does not, GOV-002's own rule requires splitting into new phase IDs regardless of the owner's \"one docs phase\" framing, and the session is at risk of running out of budget mid-edit across ten interdependent files with several open owner confirmations pending.",
+      "minimal_fix": "PLAN-046 states explicitly, at G3, why this aggregate scope is judged to fit one session despite GOV-002's split mandate, or phase-dam-01 is split into new phase IDs per that rule (a split can still honor \"one docs phase now\" as one coordinated wave of phases sharing the same rulings, rather than one session).",
+      "slug": "oversized-single-session-phase",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D1 now argues the fit (no design left: rulings settled, exact AGENTS.md/CLAUDE.md text and the Test Author text fixed in the plan, no code) and states the GOV-002 fallback if the session runs short. Kept as one phase, as the owner ruled."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F06"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-dam-01",
+      "severity": "major",
+      "title": "Declared systems omit sys-governance despite editing exactly the file class that five sibling phases tag sys-governance for.",
+      "evidence": "phase-dam-01 declares `systems: [sys-gov-docs, sys-realization]`. sys-gov-docs's registered paths (docs/08-governance/systems.yaml:444-445) are `docs/08-governance/` only; sys-realization's (systems.yaml:486-491) are ARCH-006, REQ-022, PLAN-039, PLAN-039.01 and ADR-018. Neither covers AGENTS.md, CLAUDE.md, `.claude/commands/`, `.claude/skills/`, `.agents/skills/` or `agent-workflows/` - exactly the deliverables phase-dam-01 lists beyond docs/08-governance/. Every other backlog phase touching this same file class declares sys-governance: phase-ses-02, phase-ses-03, phase-ses-05, phase-idea-06 and phase-grd-01 (the last pairs sys-governance with sys-gov-docs for the same reason phase-dam-01 would need to).",
+      "consequence": "The `systems` field is the mechanism `collisions()` (src/governance/backlog.py:105) uses to flag concurrent phases that touch the same domain even when their declared deliverable paths do not literally overlap. Without sys-governance, a future phase claimed while phase-dam-01 is active that edits a different file under `.claude/` or `agent-workflows/` (no literal path conflict, but the same governance-protocol domain) will not be flagged as colliding, even though GOV-003's own precedent (\"A conflict in src/, ts/, schemas/ or sql/ means the safety rule was bypassed ... the phases' declared systems or deliverables were wrong\") treats exactly this kind of miscategorization as a defect to fix once it surfaces. No live collision is missed today - `uv run python -m src.governance --ready` shows phase-dam-01 ready and correctly unblocked by the one currently active phase, phase-part-03 - so the gap is latent, not yet manifest.",
+      "minimal_fix": "Add sys-governance to phase-dam-01's `systems` list, matching phase-grd-01's pairing of sys-governance with sys-gov-docs.",
+      "slug": "incomplete-system-declaration",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "sys-governance added. Checked: no system in systems.yaml registers .claude/, agent-workflows/, AGENTS.md or CLAUDE.md, and phase-part-03 (active, sys-governance) edits agent-workflows files. With it declared, phase-dam-01 now waits for phase-part-03; PLAN-046's Execution order and PLAN-045's are corrected, and the earlier claim that phase-dam-01 could run beside phase-part-03 is withdrawn."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F07"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-dam-01",
+      "severity": "minor",
+      "title": "The verification list checks the catalog is current but never states the command that regenerates it.",
+      "evidence": "phase-dam-01's `verification` in backlog.yaml: `uv run python tools/generate_agent_workflows.py --check`, `uv run python -m src.governance`, `git diff --exit-code docs/08-governance/catalog.md`, `uv run pytest`. REQ-029 R11's verification column says \"`git diff --exit-code docs/08-governance/catalog.md` after `--catalog`\" - the write step is named there but not carried into the phase's own verification list; the scope line only says \"regenerate the catalog\" in prose.",
+      "consequence": "An executing session reading only the backlog verification list (without cross-referencing REQ-029's evidence column) could run the diff check without first running `uv run python -m src.governance --catalog`, and the check would pass vacuously if the catalog was already current for unrelated reasons - or fail confusingly if it wasn't regenerated at all.",
+      "minimal_fix": "Add `uv run python -m src.governance --catalog` (or the exact regeneration invocation) as its own line in phase-dam-01's verification list, before the diff check.",
+      "slug": "verification-missing-write-step",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "--catalog added to phase-dam-01's verification before the diff; the same line added to all three guards phases."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F08"
+    }
+  ],
+  "notes": "Reviewed at 61b47e4 on agent/plan-guards-docs. One dispatch per altitude, on partition-adversary with PROMPT-038 as GOV-018 step 3 names; the Session Manager's instruction named demo-adversary, and the governed procedure's engine was used instead, both being dedicated read-only adversary types. The plan-altitude dispatch reached its turn limit and was asked to return only findings it had verified. No later-added altitude. The revised plan was not re-reviewed; GOV-018 defines no second review. Findings are recorded as reported; the dispatcher added only id, engine and author. Dispositions by the Prompt Planner session as planner."
+}

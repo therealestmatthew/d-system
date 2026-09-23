@@ -1,0 +1,226 @@
+{
+  "review_id": "2026-09-23-plan-045",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-045",
+    "requirement": "REQ-028",
+    "phases": [
+      "phase-grd-01",
+      "phase-grd-02"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-045-deterministic-guards.md at 61b47e4: exit 0, no missing sections. Re-run after the revision: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "altitude": "plan",
+      "subject": "PLAN-045 (D1, D2, Context and scope)",
+      "severity": "blocker",
+      "title": "The quoted \"Session Manager's task statement... nine items (a)-(i)\" and the quote \"phase-dgov-06: move it or merge it in\" do not exist anywhere on disk, undermining the two decisions (D1, D2) that cite them.",
+      "evidence": "PLAN-045's Context and scope section frames all four bullets, including this one, as sourced from `_working/session-manager/board.md`: \"recorded them on its board... each is quoted where it decides something.\" I read the full 172-line board.md (via Read tool) and grepped it for `dgov-06`, `task statement`, `nine items`, `(a)-(i)`, and `move it or merge`: zero matches anywhere. I then grepped all of `_working/` and `docs/03-sessions/2026-09-23*`: the only matching source is `_working/session-manager/scout/orchestration-3-architecture.md:338`, a Scout report (not a Session Manager task statement), whose item 1 lists sub-items (a) through (g) only — seven, not nine — and phrases the deliverables-diff point as prose (\"by moving phase-dgov-06 earlier or merging it into this phase\"), never as the compact quoted form PLAN-045 gives. D1 also assigns items 'a, b, c, d, i' to phase-grd-01 and 'e, f, h' to phase-grd-02 — 8 letters, omitting 'g' (the deliverables-diff item) entirely, and inventing 'h' and 'i' that appear in no located source.",
+      "consequence": "D1 (why the work splits into exactly two phases along this item boundary) and D2 (why phase-dgov-06 is moved rather than merged, resting on a directly quoted Session Manager instruction) are argued from a citation that cannot be verified and appears to be a paraphrase inflated past its source. GOV-010 P2 requires a decision to name the alternative and its cost from real evidence; an unverifiable primary citation is not evidence a reviewer or later reader can check.",
+      "minimal_fix": "Re-source D1/D2 to the actual document (orchestration-3-architecture.md item 1, sub-items a-g) with an accurate item count, or locate and cite the real Session Manager task statement if one exists outside board.md and the Scout reports.",
+      "slug": "unverifiable-primary-citation",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "The nine items came from the Session Manager's cross-session message to the Prompt Planner, which is not on disk, so the finding is right that the plan cited an unverifiable source. PLAN-045 Context and scope now cites the Scout's section F step 1 items (a)-(g) verbatim, names the two further items with their on-disk sources (O-4 board line; ideas 000405/000406), and says the message is not on disk. D1 now names (g) as handled by D2. Board quotes are now given verbatim with the line they come from."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F01"
+    },
+    {
+      "altitude": "plan",
+      "subject": "REQ-028 R08 / R10, PLAN-045 phase-grd-02",
+      "severity": "blocker",
+      "title": "R08 (the diff-pattern check for added type-ignore/cast(Any,/except-pass) has no defined consequence on failure — only R07's failure path is specified.",
+      "evidence": "REQ-028 R10: \"a READY carries the output of R07's and R08's checks, and a nonzero R07 result proceeds only with the owner's recorded sign-off for the named tests.\" PLAN-045's phase-grd-02 scope repeats the same asymmetry verbatim: \"Make READY... carry both tools' output, with a nonzero baseline result proceeding only on the owner's recorded sign-off for the named tests.\" Neither R10 nor the phase scope states what happens when R08 (not R07) is nonzero.",
+      "consequence": "R08 exists specifically to close REQ-028 problem 6 (\"Silenced type errors enter unreviewed\"), the second headline failure this whole plan is built to fix. As specified, a branch can add a new bare `except: pass` or `# type: ignore[arg-type]`, have it surface in READY's output, and merge anyway — nothing blocks or requires sign-off on it. The check becomes observational rather than enforcing, defeating its own stated purpose.",
+      "minimal_fix": "Add to R10 (and phase-grd-02's scope) the same proceed-only-with-sign-off rule for a nonzero R08 result, or state explicitly why R08 is intentionally advisory-only.",
+      "slug": "missing-failure-path",
+      "aliases": [
+        "check-with-no-consequence"
+      ],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "REQ-028 R10 now applies the owner-sign-off rule to a nonzero result from either check; PLAN-045 adds D9 stating why (000408 and 000409 both ask to refuse); phase-grd-03 (formerly phase-grd-02) scope and acceptance carry it."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F02"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-045 phase-grd-01 / Execution order and real concurrency",
+      "severity": "major",
+      "title": "The plan's concurrency analysis omits phase-conc-08 (PLAN-026), which is already queued to write the same catalog-staleness enforcement-placement decision phase-grd-01 makes unilaterally, and which shares both `sys-governance` and the `docs/08-governance/` deliverable with phase-grd-01.",
+      "evidence": "`docs/09-backlog/backlog.yaml` line 9700, `phase-conc-08` (plan `doc-concurrency-git-safety` / PLAN-026, status queued): scope says \"Apply it [the enforcement-placement rule] to the rules already in force: the governance check, catalog staleness, the private-content gate, and _private/ reads,\" systems `[sys-governance, sys-delivery]`, deliverables `[docs/08-governance/, .claude/settings.json]`. PLAN-026 R13 (docs/01-plans/PLAN-026-concurrency-git-safety.md:258) names the same. PLAN-045's D3/D5 independently decide catalog-staleness placement (inside `governance` and inside the pre-commit hook) with no mention of PLAN-026 or phase-conc-08 anywhere in the plan. The \"Execution order and real concurrency\" section explicitly models collisions for phase-dam-01, phase-gov-01 and phase-dgov-06 (all queued, same detection method: shared systems/deliverables) but never mentions phase-conc-08, despite it meeting the identical criteria (shared `sys-governance`, shared `docs/08-governance/` deliverable).",
+      "consequence": "Two different plans independently decide where the same rule (\"catalog staleness\") is enforced. If phase-conc-08's placement rule, once written, concludes something different from D3/D5's choice, phase-grd-01's work is contradicted or must be redone, and the plan gives no dependency or reconciliation path for that. The stated concurrency methodology is also demonstrably incomplete by its own criteria.",
+      "minimal_fix": "Add phase-conc-08 to the concurrency table, and either sequence phase-grd-01 after phase-conc-08's placement rule or state why the two decisions do not need reconciling.",
+      "slug": "unmodeled-phase-collision",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "PLAN-045 Execution order now lists phase-conc-08 and its collisions. D3 states that the owner ruled the placements (items (c) and (d)) directly, so phase-conc-08 takes them as given, and a later disagreement from its rule is a finding for the owner rather than a reason to sequence phase-grd-01 after it."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F03"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-045 Requirement coverage table, row for phase-gov-01/phase-dgov-06",
+      "severity": "minor",
+      "title": "The coverage table attributes \"REQ-015 R12-R13\" to phase-gov-01 as well as phase-dgov-06, but phase-gov-01 has nothing to do with REQ-015.",
+      "evidence": "PLAN-045's Implementation phases table: \"`phase-gov-01`, `phase-dgov-06` | Existing phases, moved in `next_up` (D2) | `REQ-015` R12-R13 | as registered\". `docs/09-backlog/backlog.yaml` line 3026: phase-gov-01's title is \"Reject backlog deliverables claiming an unreserved code,\" plan `doc-code-reservation-enforcement`, sources `[doc-backlog-decisions]` — no REQ-015 reference anywhere. D2 itself explains phase-gov-01 is included only because it collides on file with phase-dgov-06, not because it delivers REQ-015 R12-R13.",
+      "consequence": "A reader scanning the coverage table alone would believe phase-gov-01 satisfies REQ-015 R12-R13, which it does not; only phase-dgov-06 does.",
+      "minimal_fix": "Split the row, or annotate that R12-R13 apply only to phase-dgov-06 and phase-gov-01 is listed solely as its file-collision dependency.",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "The row is removed from the phase table; a paragraph below it names phase-gov-01 (PLAN-010) and phase-dgov-06 (PLAN-030, REQ-015 R12-R13) separately and says phase-gov-01 is listed only as phase-dgov-06's dependency."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F04"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-045 D4",
+      "severity": "minor",
+      "title": "D4 names an alternative (deleting the CI catalog step) but, unlike every sibling decision, never states what that alternative would have cost.",
+      "evidence": "D4: \"Two ways to fix it: run `--catalog` and then `git diff --exit-code`... or delete the step because D3 makes the governance step fail first. The phase keeps a separate named step using `git diff --exit-code`, because a CI failure that names the catalog is faster to act on than a governance error inside a longer log. The cost is one duplicated check.\" The stated \"cost\" is the cost of the *chosen* option, not the rejected one. Compare D1, D2, D5, D6, D7, which each state an explicit cost of the option not taken (per GOV-010 P2, `docs/08-governance/GOV-010*.md:140-151`).",
+      "consequence": "Minor inconsistency against the plan's own documented decision-writing standard; the reasoning is inferable but not stated the way GOV-010 P2 requires.",
+      "minimal_fix": "Add one clause: deleting the step would leave the only signal buried inside a longer governance log, which is the cost being avoided.",
+      "slug": "decision-missing-alternative-cost",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D4 rewritten: it states the rejected alternative's cost (a stale catalog reported as one error among the governance output) and, with the phase-altitude finding on step order, moves the catalog step ahead of the governance step."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F05"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-grd-01",
+      "severity": "major",
+      "title": "R04's acceptance ('with the hook active, a stale-catalog commit is refused') cannot be exercised through a normal commit in the phase's own worktree, because core.hooksPath is a shared, primary-checkout-anchored path that every worktree reads unmodified.",
+      "evidence": "In the worktree: `git config --get core.hooksPath` -> `/code/d-system/tools/git-hooks` (absolute path into the primary checkout). `git config --local --list | grep hook` -> `core.hookspath=/code/d-system/tools/git-hooks`, a shared (non-worktree-scoped) setting. `git config --worktree core.hooksPath` -> exit 1 (no per-worktree override exists), even though `extensions.worktreeConfig=true` is already set, so a worktree-scoped override is technically possible but unused and undocumented. `tools/git-hooks/pre-commit` does `cd \"$(git rev-parse --show-toplevel)\"` then runs the check against whatever worktree is committing, but the hook *script content itself* is always sourced from the primary checkout's absolute path, so a commit made inside the phase's own worktree during development runs the OLD (private-content-only) hook, not the new governance-aware one the phase is building.",
+      "consequence": "The builder session cannot verify R04's stated acceptance case (stale-catalog commit refused, regenerated commit accepted, private-identifier fixture still refused) by simply staging and committing in its own worktree — it will exercise the unmodified primary-checkout hook and produce misleading pass/fail results, or the builder discovers this mid-session with no documented workaround.",
+      "minimal_fix": "Name in scope/verification how the phase tests the new hook locally — e.g. a temporary worktree-scoped `git config --worktree core.hooksPath tools/git-hooks` override (reverted before merge), or invoking `sh tools/git-hooks/pre-commit` directly against staged changes instead of through `git commit`.",
+      "slug": "hookspath-shared-across-worktrees",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D5, REQ-028 R04's verification and phase-grd-01's scope and acceptance now test the hook by running sh tools/git-hooks/pre-commit directly against staged changes; no git configuration is changed."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F06"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-grd-01",
+      "severity": "major",
+      "title": "R05's scope names only GOV-017 step 6 and PROMPT-037 item 4(iii), but PROMPT-037 restates the same 'governance only' completion-edit instruction a second time in the Builder A/B role script, which the scope does not name.",
+      "evidence": "`grep -n \"governance only\" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md` returns two lines: line 84 (contract item 4(iii)): 'dev (governance only, no pytest), and send TURN DONE <sha(s)>.' and line 142 (the Session 1/2 Builder role script, step 5): 'then the completion edit on dev as GOV-003 sanctions, governance only. Send TURN DONE...'. The scope and R05's deliverable only mention 'PROMPT-037 item 4(iii)'.",
+      "consequence": "A Builder session reads its own role script (the text at line 142), not the general contract item — if only item 4(iii) is edited, the actual instruction a builder acts on at completion still omits --catalog, reproducing exactly the failure REQ-028 problem 3 documents (024443c, f6216e9), while R05's own verification ('read both passages') would appear satisfied.",
+      "minimal_fix": "Extend the R05 scope line to also name PROMPT-037's Builder A/B role script (line ~142), not just contract item 4(iii).",
+      "slug": "duplicate-instruction-not-fully-scoped",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "REQ-028 R05 and phase-grd-01's scope name the builder role script step as well; R05's verification and the phase acceptance add a grep for 'governance only' in PROMPT-037 that must return no completion-edit line."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F07"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-grd-01",
+      "severity": "major",
+      "title": "D1's rationale for not splitting phase-grd-01 further only justifies bundling items a-c (staleness check, CI step, pre-commit hook), not item i (R06, tools/check_dev_ci.py), which is an independent tool the scope still bundles in.",
+      "evidence": "PLAN-045 D1: 'Splitting further, one phase per tool, was rejected: the three trunk checks share one test fixture (a stale catalog) ...'. 'The three trunk checks' are items a-c; item i is check_dev_ci.py, which uses mocked `gh run list` JSON fixtures (R06's five test cases), shares no fixture, code path or test data with the staleness/CI/hook cluster, and additionally needs its own OPS document plus its own GOV-017/PROMPT-037 wording ('require a 0 before any GRANTED'). D1 never argues that the five-item bundle (a,b,c,d,i) itself fits one session — only that further per-tool splitting is rejected for a-c.",
+      "consequence": "phase-grd-01, as scoped, combines two functionally independent deliverables (a staleness engine wired into three surfaces, and a separate gh-querying CLI tool with its own OPS doc and test suite) plus a conditional AGENTS.md text negotiation with the owner, under session_budget: 1 with no size justification for that specific combination — a real risk of an over-budget session that gets redone or split mid-flight.",
+      "minimal_fix": "Split R06 (tools/check_dev_ci.py, its OPS document, its tests, and its GOV-017/PROMPT-037 grant-gate wording) into its own phase; D1's shared-fixture defense does not require it to stay with a-d.",
+      "slug": "session-bundle-unjustified-by-own-rationale",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Split as proposed. R06 is now its own phase, phase-grd-02 (green dev CI before each grant); the branch guards formerly registered as phase-grd-02 are now phase-grd-03. D1, the phase table, the coverage table and next_up are updated."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F08"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-grd-01",
+      "severity": "minor",
+      "title": "D4's justification for keeping a separate CI catalog step ('a CI failure that names the catalog is faster to act on than a governance error inside a longer log') does not hold under the existing step order, where the governance step runs and fails first.",
+      "evidence": ".github/workflows/ci.yaml: `- run: uv run python -m src.governance` (line 18) precedes the `Catalog is current` step (lines 19-22). Once R01 makes the governance step itself fail on a stale catalog (D3), the job stops at the governance step for the exact case D4 describes, so the catalog step is unreachable in that scenario and never produces the faster, more prominent failure D4 claims. R03's acceptance bullet ('exit nonzero before pytest') is still technically satisfied, but not via the mechanism D4 describes.",
+      "consequence": "The catalog step ships as effectively dead code for its stated purpose; a future reader trusting D4's rationale will be confused when the catalog step never actually fires.",
+      "minimal_fix": "Either reorder ci.yaml so the catalog-diff step runs before the governance step, or amend D4 to say the catalog step is a backstop rather than the faster-failing path.",
+      "slug": "redundant-check-ordering",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D4 and phase-grd-01's scope now move the catalog step ahead of the governance step; the acceptance line says the local CI run fails at the catalog step."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "id": "F09"
+    }
+  ],
+  "notes": "Reviewed at 61b47e4 on agent/plan-guards-docs. One dispatch per altitude, on partition-adversary with PROMPT-038 as GOV-018 step 3 names; the Session Manager's instruction named demo-adversary, and the governed procedure's engine was used instead, both being dedicated read-only adversary types. No later-added altitude: every phase of the plan was registered in the same commit. Phase altitude reviewed phase-grd-01 and phase-grd-02 as registered at 61b47e4. After F08 the phases were renumbered: phase-grd-01 kept items (b), (c), (d) and the completion edit; R06 moved to a new phase-grd-02; the branch guards reviewed as phase-grd-02 are now phase-grd-03. The revised phases were not re-reviewed; GOV-018 defines no second review, and ARCH-006 allows one revision cycle before G3. Findings are recorded as the adversary reported them, except that the subject field of F01-F05 names the plan section as reported. The dispatcher added only id, engine and author. Dispositions by the Prompt Planner session as planner."
+}

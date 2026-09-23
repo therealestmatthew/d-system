@@ -4,8 +4,9 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-grd-01
-- phase-dam-01
 - phase-grd-02
+- phase-dam-01
+- phase-grd-03
 - phase-gov-01
 - phase-dgov-06
 - phase-cap-08
@@ -13681,8 +13682,8 @@ items:
     building the governance write-path interrupt (000294), are both planning work needing a
     requirement and plan first.
 - id: phase-grd-01
-  title: 'Trunk integrity checks: staleness in governance, the CI catalog step, governance in pre-commit,
-    and green dev CI before each grant'
+  title: 'Stale generated files fail loudly: catalog and ideas.md checks in governance, the CI catalog
+    step, governance in pre-commit, and the completion edit'
   plan: doc-deterministic-guards
   sources:
   - doc-deterministic-guards-requirements
@@ -13699,14 +13700,13 @@ items:
   - Make uv run python -m src.governance fail, naming the file, when docs/08-governance/catalog.md or
     docs/00-working/ideas.md differs from its rendering, without writing either file (REQ-028 R01,
     R02; PLAN-045 D3).
-  - Replace ci.yaml's catalog step with one that compares the committed file against a rendering that
-    did not overwrite it (R03; D4).
-  - Add the governance check to tools/git-hooks/pre-commit, keeping the private-content check (R04;
-    D5).
-  - Name --catalog in the completion edit in GOV-017 merge-gate step 6 and PROMPT-037 item 4(iii)
-    (R05).
-  - Build tools/check_dev_ci.py with exit codes 0, 1 and 2, its OPS document and tests, and require a
-    0 before any GRANTED in GOV-017 and PROMPT-037 (R06; D6).
+  - Move ci.yaml's catalog step ahead of the governance step and make it run --catalog then git diff
+    --exit-code on the catalog (R03; D4).
+  - Add the governance check to tools/git-hooks/pre-commit, keeping the private-content check, and test
+    it by running sh tools/git-hooks/pre-commit directly against staged changes, because core.hooksPath
+    is shared and a commit in this worktree runs the primary checkout's old hook (R04; D5).
+  - Name --catalog in the completion edit in GOV-017 merge-gate step 6, PROMPT-037 contract item 4(iii)
+    and PROMPT-037's builder role script step 5 (R05).
   - Put the AGENTS.md lines 155-156 correction to the owner as exact old and new text, and apply it
     only on the owner's approval of that change (R11).
   acceptance:
@@ -13714,38 +13714,36 @@ items:
     naming catalog.md; after --catalog it passes; the plain check leaves git status empty.
   - A scratch idea appended without regenerating ideas.md fails governance naming ideas.md; after
     regeneration it passes.
-  - The CI job's Python steps, run locally on a stale-catalog commit, exit nonzero before pytest; on
-    dev they exit 0.
-  - With the hook active, a stale-catalog commit is refused with the governance error shown, a
-    regenerated one is accepted, and a staged private-identifier fixture is still refused.
-  - check_dev_ci.py's unit tests cover success at head (0), failure at head (1), in progress (2), a
-    run only for an older commit (2) and a gh error (2).
+  - The CI job's Python steps, run locally on a stale-catalog commit, fail at the catalog step; on dev
+    they exit 0.
+  - Run directly, the new hook exits nonzero on a staged stale catalog with the governance error shown,
+    exits 0 once regenerated, and still exits nonzero on a staged private-identifier fixture.
+  - grep -n "governance only" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md returns no
+    completion-edit line.
   - The added governance run time and the hook run time are measured and recorded in the session
     record.
   - AGENTS.md shows the owner-approved text, or the session record states that approval was not given
     and the lines are unchanged.
   verification:
-  - uv run pytest test/test_governance_staleness.py test/test_check_dev_ci.py
+  - uv run pytest test/test_governance_staleness.py
+  - uv run python -m src.governance --catalog
   - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
   - uv run ruff check src/ test/
   - uv run mypy src/
-  - git diff --exit-code docs/08-governance/catalog.md
   deliverables:
   - src/governance/__main__.py
   - src/governance/staleness.py
   - test/test_governance_staleness.py
   - .github/workflows/ci.yaml
   - tools/git-hooks/pre-commit
-  - tools/check_dev_ci.py
-  - test/test_check_dev_ci.py
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - AGENTS.md
   next_action: Waits for phase-part-03 to complete (shared sys-governance). Start with the governance
     staleness check, since the hook and CI steps call it.
 - id: phase-grd-02
-  title: 'Branch diff guards: the test-count baseline, the diff-pattern check and the plan-versus-registered
-    check'
+  title: Green dev CI before each primary-checkout grant
   plan: doc-deterministic-guards
   sources:
   - doc-deterministic-guards-requirements
@@ -13760,6 +13758,48 @@ items:
   depends_on:
   - phase-grd-01
   scope:
+  - Build tools/check_dev_ci.py, which asks gh for the latest completed CI run for dev's head commit and
+    exits 0 on success, 1 naming the run URL on failure, and 2 when no completed run exists for that
+    commit or gh fails (REQ-028 R06; PLAN-045 D6).
+  - Write its OPS document and tests.
+  - Require a 0 before any GRANTED in GOV-017's primary-checkout lock section and PROMPT-037's contract
+    item 1, with exit 2 meaning no grant until the result is known or the owner rules for that grant.
+  acceptance:
+  - 'Unit tests over recorded gh run list JSON: success at head (0), failure at head (1), in progress
+    (2), a run only for an older commit (2), gh error (2).'
+  - Run against the live repository, the tool's output is recorded in the session record.
+  - The GOV-017 and PROMPT-037 diffs show the grant rule and the meaning of exit 2.
+  verification:
+  - uv run pytest test/test_check_dev_ci.py
+  - uv run python tools/check_dev_ci.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  - uv run ruff check src/ test/
+  deliverables:
+  - tools/check_dev_ci.py
+  - test/test_check_dev_ci.py
+  - docs/08-governance/
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  next_action: Waits for phase-grd-01. Record real gh run list JSON for the fixtures before writing the
+    tool.
+- id: phase-grd-03
+  title: 'Branch diff guards: the test-count baseline, the diff-pattern check and the plan-versus-registered
+    check'
+  plan: doc-deterministic-guards
+  sources:
+  - doc-deterministic-guards-requirements
+  - doc-deterministic-guards
+  systems:
+  - sys-governance
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-grd-02
+  scope:
   - Build a test-baseline tool that compares a base and a branch JUnit XML report and exits 1 listing
     tests that passed in the base and are missing or skipped in the branch (REQ-028 R07; PLAN-045 D7).
   - Build a diff-pattern tool over <base>..<head> that exits 1 naming file and line for each added
@@ -13768,7 +13808,8 @@ items:
   - Add the plan-versus-registered check to the governance command, in both directions, with the
     first direction limited to plans created on or after 2026-09-22 (R09; D8).
   - Make READY in GOV-017's merge gate and PROMPT-037 item 4 carry both tools' output, with a nonzero
-    baseline result proceeding only on the owner's recorded sign-off for the named tests (R10).
+    result from either proceeding only on the owner's recorded sign-off naming what it accepts (R10;
+    D9).
   - Write an OPS document for each new tool.
   acceptance:
   - 'Baseline tool: removed test (1), newly skipped test (1), added test (0), unchanged run (0), test
@@ -13779,13 +13820,14 @@ items:
   - 'Plan check: a fixture plan dated 2026-09-23 with an unnamed registered phase fails naming both;
     the same dated 2026-09-21 passes; a plan naming phase-zzz-99 fails; the repository passes with the
     counts recorded.'
-  - The GOV-017 and PROMPT-037 diffs show both tools in READY and the sign-off rule.
+  - The GOV-017 and PROMPT-037 diffs show both tools in READY and the sign-off rule for each.
   verification:
   - uv run pytest test/test_check_test_baseline.py test/test_check_diff_patterns.py test/test_plan_phases.py
+  - uv run python -m src.governance --catalog
   - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
   - uv run ruff check src/ test/
   - uv run mypy src/
-  - git diff --exit-code docs/08-governance/catalog.md
   deliverables:
   - tools/check_test_baseline.py
   - test/test_check_test_baseline.py
@@ -13796,7 +13838,7 @@ items:
   - test/test_plan_phases.py
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
-  next_action: Waits for phase-grd-01. Start with the plan-versus-registered check, the one that reads
+  next_action: Waits for phase-grd-02. Start with the plan-versus-registered check, the one that reads
     only repository files.
 - id: phase-dam-01
   title: Amend ARCH-006, GOV-014, GOV-018, REQ-022 and the session commands to the 2026-09-23 rulings
@@ -13805,6 +13847,7 @@ items:
   - doc-design-document-amendments-requirements
   - doc-design-document-amendments
   systems:
+  - sys-governance
   - sys-gov-docs
   - sys-realization
   owner: repository-owner
@@ -13819,7 +13862,8 @@ items:
   - Rewrite ARCH-006's G4 row per Scout O-3 (R03).
   - Allow two revision cycles in ARCH-006 stages 5 and 8 and GOV-018 step 5 (R04; PLAN-046 D2).
   - Add a Test Author contract to GOV-014 with write scope test/ only, exclude test/ from the
-    Developer, and make every role count say ten (R05).
+    Developer, and make every role count say ten; name the Test Author in ARCH-006 stage 8's Role and
+    Failure path columns as PLAN-046 D7 states (R05).
   - Replace the owner spot-audit with sampled independent re-review in GOV-014, ARCH-006 and REQ-022
     R23 (R06; D3).
   - Remove the session record from /session-close step 3's reviewer inputs and bind the close review
@@ -13833,9 +13877,10 @@ items:
   - The completion grep over REQ-029 problem 1's files returns no owner-only completion statement
     outside AGENTS.md.
   - The two owner-reserved lists diff empty.
-  - ARCH-006 no longer contains "enforced at the tool boundary".
+  - grep -c -i "enforced at the tool boundary" on ARCH-006 returns 0 (it returns 1 before the edit).
   - The revision-cycle grep returns only ARCH-006 stage 3.
-  - GOV-014 has a Test Author contract and no count of nine roles.
+  - GOV-014 has a Test Author contract and no count of nine roles, and ARCH-006 stage 8 names the Test
+    Author with its order and failure path.
   - No line in GOV-014, ARCH-006 or REQ-022 requires the owner to spot-audit.
   - session-close.md step 3 mentions the session record only to exclude it.
   - GOV-003 has the four entries.
@@ -13843,6 +13888,7 @@ items:
     confirmation was not given and the lines are unchanged.
   verification:
   - uv run python tools/generate_agent_workflows.py --check
+  - uv run python -m src.governance --catalog
   - uv run python -m src.governance
   - git diff --exit-code docs/08-governance/catalog.md
   - uv run pytest
@@ -13858,6 +13904,5 @@ items:
   - .agents/skills/orient/SKILL.md
   - AGENTS.md
   - CLAUDE.md
-  next_action: Claimable while phase-part-03 runs; not at the same time as phase-grd-01 (both list
-    AGENTS.md and docs/08-governance/). Put the AGENTS.md and CLAUDE.md text to the owner first, so
-    the answer is in hand before the edits.
+  next_action: Waits for phase-part-03 (shared sys-governance); not at the same time as phase-grd-01.
+    Put the AGENTS.md and CLAUDE.md text to the owner first, so the answer is in hand before the edits.

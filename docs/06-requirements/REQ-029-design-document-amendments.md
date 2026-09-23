@@ -44,16 +44,17 @@ The governing documents contradict each other and the owner's rulings. Each case
 5. **Spot-audit.** `GOV-014`'s Validator contract, `ARCH-006`'s cost and safety controls and
    `REQ-022` R23 require the owner to spot-audit one in ten passed validations at each G5 sitting.
    No session record of 2026-09-22 or 2026-09-23 shows one (Scout report, control 28). The owner
-   ruled on 2026-09-23 to replace it with sampled independent re-review (Scout-1 decision 9 (c)).
+   ruled on 2026-09-23 to replace it with sampled independent re-review (the same report's item 9,
+   option (c)).
 6. **The close reviewer sees the developer's rationale.** `/session-close` step 3 gives the review
    sub-agent "the session record's current path and content"
    (`.claude/commands/session-close.md`, step 3), while `GOV-014` says a validator sees the
    requirement and the diff, never the developer's rationale. The owner ruled on 2026-09-23 that the
-   close reviewer gets no session record (Scout-1 decision 4 (a)).
+   close reviewer gets no session record (the same report's item 4, option (a)).
 7. **Standing rulings with no durable record.** The owner ruled on 2026-09-23 that remote branch
    deletion is owner-only (protocol Q15), that every worktree removal needs the owner's approval
-   (protocol Q8), and that agent-originated ideas carry an "agent-proposed" label (Scout-1
-   decision 3 (c)). They exist only on the Session Manager's gitignored board.
+   (protocol Q8), and that agent-originated ideas carry an "agent-proposed" label (Scout report
+   `orchestration-1-evidence.md`, "Owner decisions needed", item 3, option (c)). They exist only on the Session Manager's gitignored board.
 8. **`CLAUDE.md` is stale.** Line 137 lists four schema files (`schemas/` holds 26 files); line
    141 lists seven tables (`sql/001_schema.sql` creates 16); line 144 says tasks are embedded in
    commitment JSON, while `tools/rebuild_db.py` reads them from `_data/tasks/` as first-class
@@ -65,9 +66,9 @@ The governing documents contradict each other and the owner's rulings. Each case
 |---|---|---|
 | R01 | No document in problem 1's list, other than `AGENTS.md`, states that phase completion is owner-only; each states the `GOV-003` rule or points to it | `grep -n -i -E "owner-invoked|owner-only|owner-reserved via"` over the listed files returns no line about phase completion; each file's changed passage names `GOV-003` |
 | R02 | `ARCH-006`'s owner-reserved list and `GOV-014`'s verbatim quote of it are identical after the change, and the completion item reads as `GOV-003` allows | `diff` of the two quoted lists is empty |
-| R03 | `ARCH-006`'s G4 row states that the owner approves every integration, that until P3's merge-gate nodes exist the builder session performs the fast-forward under `GOV-017`, and that tool-boundary enforcement is not yet built | Read the row; `grep -c "enforced at the tool boundary"` in `ARCH-006` is 0 |
+| R03 | `ARCH-006`'s G4 row states that the owner approves every integration, that until P3's merge-gate nodes exist the builder session performs the fast-forward under `GOV-017`, and that tool-boundary enforcement is not yet built | Read the row; `grep -c -i "enforced at the tool boundary"` in `ARCH-006` is 0 (it is 1 before the change: the text is capitalised, "Enforced at the tool boundary") |
 | R04 | `ARCH-006` stages 5 and 8 and `GOV-018` step 5 allow two revision cycles before escalation | Read the three passages; `grep -n "one revision cycle\|one revise cycle"` in both files returns only stage 3 (partition), which this change leaves alone |
-| R05 | `GOV-014` has a Test Author contract with inputs, outputs, never-do and a per-dispatch ceiling; its write scope is `test/` only; the Developer contract excludes `test/`; every count of the roles says ten | Read the contract; `grep -n "nine"` in `GOV-014` returns no count of roles |
+| R05 | `GOV-014` has a Test Author contract with inputs, outputs, never-do and a per-dispatch ceiling; its write scope is `test/` only; the Developer contract excludes `test/`; every count of the roles says ten; `ARCH-006` stage 8's Role and Failure path columns name the Test Author, its order relative to the Developer, and what happens when a Developer disputes one of its tests | Read the contract and the stage 8 row; `grep -n "nine"` in `GOV-014` returns no count of roles |
 | R06 | The spot-audit is replaced in `GOV-014`, `ARCH-006` and `REQ-022` R23 by a sampled independent re-review with a stated sampling rule, reviewer type and inputs | `grep -n -i "spot-audit"` over the three files returns no line requiring the owner to spot-audit; the new rule is readable in `GOV-014`'s Validator contract |
 | R07 | `/session-close` step 3 does not give the reviewer the session record, and says why; `GOV-014` states that the close review is bound by the Validator's input rule | Read step 3; the only mention of the session record in step 3 is the prohibition |
 | R08 | `GOV-003` has a dated entry for each ruling in problem 7, quoting the ruling, stating it is standing, and naming what it changes | Read the three entries |
