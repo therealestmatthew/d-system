@@ -100,12 +100,29 @@ and the report path; hash `_data/ideas.jsonl` before and after; diff `dispatch-R
 pack; re-invoke after abandoning at GATE 1 and confirm it reports the existing report and
 dispatches nothing already done.
 
+**Dry run, attempt 1 (2026-09-23T05:52Z, `dryrun` turn granted at dev `2bdbf83`) — stopped at the
+open-set gate.** `/partition-ideas` was listed and invoked in the primary checkout. Preflight:
+`Governance OK: 35 systems, 334 documents, 31 memories, 293 backlog phases`. Step 1 printed:
+
+```text
+open ideas: 2
+  000351 | Regenerate docs/08-governance/catalog.md only at merge time, not on every claim and completion commit, so open branches stop conflicting on it
+  000352 | No backlog phase builds the orchestrator's unit graph, which runs backlog phases through claim, build and integration
+```
+
+The skill stopped there, as step 1 requires, to ask the owner whether to triage first or partition
+without those ideas. The owner was asleep and the ruling is theirs, so the item was **PARKed**.
+Nothing was built, moved or dispatched: `_working/idea-corpus/` still holds the 2026-09-13 set
+unmoved, `sha256sum -c` on `_data/ideas.jsonl` printed `OK`, and `git status` in the primary
+checkout was clean at `2bdbf83`. This run is the evidence for the open-set halt condition. The
+GATE-1 conditions still need a second run once the open set is empty or the owner has ruled.
+
 ## Acceptance
 
 - Listed as a skill and runs to GATE 1 against the live corpus — **Not met yet.** Needs the
   post-merge dry run.
-- With at least one open idea, prints the ids and halts before the first dispatch — **Not met
-  yet.** Step 1 is written to do this; the dry run will show it.
+- With at least one open idea, prints the ids and halts before the first dispatch — **Met** by dry
+  run attempt 1: it printed `000351` and `000352` and halted, with nothing built or dispatched.
 - Every dispatch matches its PROMPT-034 section character for character — **Met on the branch**
   for the extraction (R1 and R4 diffs empty). The dry run confirms the dispatched text.
 - One analyst report at `_working/idea-corpus/`, written by the coordinator — **Not met yet.**
