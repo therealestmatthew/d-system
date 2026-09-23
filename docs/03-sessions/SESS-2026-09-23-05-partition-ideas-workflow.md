@@ -202,9 +202,57 @@ yet fixed**. As reported:
 - Areas that held: no quoted brief, no idea-log or backlog write, and no scope creep. R4 is R1's
   block with the findings references removed and nothing added. Idea `000339` exists as cited.
 
-**Next:** fix HIGH, MEDIUM-1, MEDIUM-2 and MEDIUM-3 in `agent-workflows/partition-ideas.md`,
-regenerate, and re-run the fixtures with a case for each finding. Decide the two LOWs (fix or
-accept), then record the outcomes here.
+### Outcomes (fix cycle 1, overnight sprint, 2026-09-23, commit `e52f820`)
+
+All in `agent-workflows/partition-ideas.md`, with both `SKILL.md` files regenerated
+(`16 workflow adapter(s) current`, the two files byte-identical).
+
+- **HIGH — fixed.** Step 2 reads each partition record inside `try`, and a record it cannot read
+  (bad JSON, no `manifest` key, wrong shape) is printed as `UNREADABLE (ignored)` and skipped.
+- **MEDIUM-1 — fixed.** Step 5's check now fails a decline candidate that is in no group and not
+  unbatched (which covers one outside the corpus), one missing from the markdown, and one listed
+  in both tiers or twice in one.
+- **MEDIUM-2 — fixed.** The markdown now starts with the run stamp, and step 5's check requires it.
+  The naming command treats a document carrying this sweep's stamp, or a record carrying this
+  manifest's seed, as this sweep's own draft: it prints `CONTINUE` and reuses that name instead of
+  taking a suffix. To make a crash after the record was written resumable, a sweep now counts as
+  finished in step 2 only when its record's `state` is `accepted`; a `proposed` record for the
+  current manifest means RESUME.
+- **MEDIUM-3 — fixed.** The move-aside is no longer a separate command. Step 2's classification
+  command moves earlier files only after it has classified the invocation NEW, and exits before
+  the move on RESUME.
+- **LOW (unused manifest rebuilt) — accepted.** A manifest with no stamped output cannot be told
+  apart from one an abandoned earlier sweep left behind. Rebuilding costs one corpus build, and the
+  old manifest is moved aside, not lost.
+- **LOW (nested fence) — fixed.** The extraction command exits with an error when a section has no
+  fenced block or when the extracted text contains a fence line, instead of printing a shortened
+  prompt.
+
+Fixtures, run from the scratchpad with each snippet taken from the regenerated `SKILL.md`:
+
+```text
+step2 a  no manifest                                  -> NEW: no manifest
+step2 b  earlier unstamped set                        -> NEW, 3 files moved to previous-2026-09-23/
+step2 c  HIGH: 3 bad records + stamped report         -> 3 x UNREADABLE (KeyError, JSONDecodeError,
+                                                         TypeError), RESUME, nothing moved
+step2 d  MEDIUM-3: stamped report + proposed record   -> RESUME, record listed, nothing moved
+step2 e  stamped report + accepted record             -> NEW, moved
+name  f  nothing present                              -> idea-partition-2026-09-23
+name  g  earlier sweep's pair at the date             -> -2
+name  h  MEDIUM-2: this sweep's orphaned .md          -> CONTINUE, same name
+name  i  earlier at base, own record at -2            -> CONTINUE -2
+name  j  unreadable record alone at base              -> -2, no crash
+check k  valid pair with a decline candidate          -> 0 problem(s), exit 0
+check l  MEDIUM-1: candidate 000999, unplaced         -> FAIL not in a group or unbatched,
+                                                         FAIL not in the markdown, exit 1
+check m  candidate in both tiers                      -> FAIL decline candidate listed twice, exit 1
+check n  markdown without the run stamp               -> FAIL, exit 1
+extract o  R1, R4 against PROMPT-034 117-178, 193-251 -> identical, exit 0
+extract p  LOW: missing section                       -> "no fenced block found", exit 1
+extract q  LOW: nested fence                          -> "holds a nested fence", exit 1
+```
+
+The fixture script is `run.py` in the session scratchpad; it is not tracked.
 
 ## Resume state (overnight safe point, 2026-09-23)
 
