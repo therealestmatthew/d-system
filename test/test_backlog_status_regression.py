@@ -402,3 +402,55 @@ def test_main_reports_a_status_regression_through_the_real_entry_point(
     assert target["id"] in output
     assert "status-regression" in output
     assert "complete ->" in output
+
+
+def test_dev_relative_warning_goes_to_stderr_and_keeps_catalog_stdout_clean(
+    monkeypatch: Any, capsys: Any
+) -> None:
+    """Idea 000335: on a branch behind a dev completion edit, `--catalog` must still print only
+    the catalog on stdout, byte-identical to the file it writes; the dev-relative warning goes
+    to stderr. Runs the real `main()` with only the `dev` copy of `backlog.yaml` faked."""
+    errors, _, result = audit_docs(ROOT)
+    assert errors == []
+    backlog_errors, live_catalog = audit_backlog(ROOT, result)
+    assert backlog_errors == []
+    target = next(item for item in live_catalog["items"] if item["status"] != "complete")
+
+    fabricated_dev = yaml.safe_dump(
+        {
+            "items": [
+                {
+                    "id": target["id"],
+                    "status": "complete",
+                    "session": "SESS-2026-09-01-01",
+                    "completion_evidence": ["schemas/backlog.schema.json"],
+                    "result": "fabricated for this test",
+                }
+            ]
+        }
+    )
+    real_read_text_at = regression.read_text_at
+
+    def fake_read_text_at(root: Path, ref: str, path: str) -> str | None:
+        if ref == "dev" and path == regression.DECISIONS_PATH:
+            return ""  # no GOV-003 entry names the target on dev
+        if ref == "dev" and path == regression.BACKLOG_PATH:
+            return fabricated_dev
+        return real_read_text_at(root, ref, path)
+
+    catalog_path = ROOT / "docs/08-governance/catalog.md"
+    original = catalog_path.read_text(encoding="utf-8")
+    monkeypatch.setattr(regression, "read_text_at", fake_read_text_at)
+    monkeypatch.setattr("sys.argv", ["governance", "--catalog"])
+    try:
+        exit_code = main()
+        written = catalog_path.read_text(encoding="utf-8")
+    finally:
+        catalog_path.write_text(original, encoding="utf-8")
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "WARNING" not in captured.out
+    assert captured.out.rstrip("\n") == written.rstrip("\n")
+    assert target["id"] in captured.err
+    assert "complete ->" in captured.err

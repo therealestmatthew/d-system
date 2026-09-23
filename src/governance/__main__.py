@@ -9,6 +9,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 import tempfile
 from datetime import date
 from pathlib import Path
@@ -510,6 +511,7 @@ def main() -> int:
         parser.error("--parent only applies to --next-code")
     errors, warnings, result = audit(ROOT)
     catalog: dict[str, Any] = {}
+    regression_warnings: list[str] = []
     if not errors:
         backlog_errors, catalog = audit_backlog(ROOT, result)
         errors.extend(backlog_errors)
@@ -517,9 +519,12 @@ def main() -> int:
     if catalog:
         regression_errors, regression_warnings = audit_status_regression(ROOT, catalog)
         errors.extend(regression_errors)
-        warnings.extend(regression_warnings)
     for warning in warnings:
         print(f"WARNING {warning}")
+    # stderr, so `--catalog` stdout stays byte-identical to the catalog file on a branch
+    # behind a dev completion edit (owner ruling on idea 000335, 2026-09-22).
+    for warning in regression_warnings:
+        print(f"WARNING {warning}", file=sys.stderr)
     for error in errors:
         print(f"ERROR {error}")
     if errors:
