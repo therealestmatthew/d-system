@@ -15990,6 +15990,7 @@ The incident is documented, the affected tests are identified and accessible, re
 **Links**
 
 - relates_to ← `000325`
+- relates_to ← `000335`
 
 ---
 
@@ -16037,6 +16038,7 @@ The idea is a targeted fix for a documented failure mode. Implementation require
 **Links**
 
 - relates_to → `000324`
+- relates_to ← `000335`
 
 ---
 
@@ -16490,7 +16492,7 @@ PROPOSED LINK: idea 000332 --relates_to--> 000319 (both aim to make decisions an
 
 ## 000333 · Decide which capabilities the broker denies first, and investigate before any denial is wired into .claude/settings.json
 
-**Created 2026-09-22T22:53:21-04:00 · Status: `open`**
+**Created 2026-09-22T22:53:21-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-22 and forwarded by the Session Manager.
 
@@ -16510,6 +16512,52 @@ Unresolved:
 
 Related: 000326 (the PLAN-032/REQ-017 R02 and R04 coverage mismatch) and 000031 (the capability and approval broker for agent actions).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T23:01:08-04:00): # Triage finding for idea 000333
+
+**Idea 000333** asks to decide which capabilities the autonomous-operations broker should deny first, and investigate that decision before any denial is wired into `.claude/settings.json`, surfacing a real tension between the session-hook denial pattern (which blanket-denies WebFetch and WebSearch across all sessions) and `CLAUDE.md`'s standing rule that sessions must search before claiming ignorance.
+
+## Directly related governed documents
+
+The idea touches work already scoped and partially decided:
+
+1. **ADR-022** (`doc-broker-first-autonomous-operations`) — the broker-first design decision. It explicitly chooses to ship the broker as an "enforcement point with a permissive default" rather than a full-policy broker. The decision records this exact choice: "Building the broker first does not mean designing its full capability taxonomy first... the only real precedent for scoped capability enforcement in this repository — the 2026-09-15 unattended run described above — was a person writing situational grants for that one run... With the gateway and ledger both deferred, there is no second source of real capability requests to check a named taxonomy against before it ships." This defers the taxonomy question exactly as the idea asks to revisit.
+
+2. **REQ-017** (`doc-autonomous-agent-operations-requirements`) — requirements for autonomous operations. R02 (narrow, named capability sets per run) and R04 (approvals carry scope, reason, expiry and immutable decision) are explicitly named as open questions in the requirement's own discussion: "R01 does not require a complete policy... `R02` and `R04` are what require real capability sets and approvals, and a design that ships the permissive shape leaves those two open until there are real requests to write them against."
+
+3. **PLAN-032** (`doc-autonomous-agent-operations`) — the plan's two possible shapes for the broker. It discusses both directions: "A full policy broker — the capability set, the approval path and the decision record all specified up front, if the design can name the capabilities from what already exists" versus "An enforcement point with a permissive default — the tool-boundary mechanism and the refusal path built and wired, with a policy that denies nothing until real requests exist to write it against." ADR-022 chose the second shape.
+
+4. **phase-auto-02** (Build the capability and approval broker) in `docs/09-backlog/backlog.yaml` — the active backlog phase. Its scope is explicitly conditional: "If phase-auto-01's design ships the full-policy shape, give every agent run an explicit, narrow capability set of named actions... If it ships the enforcement-point-with-permissive-default shape, build the enforcement mechanism and refusal path only." The phase's acceptance criteria record the same conditioning: R02 and R04 are only required to hold "if phase-auto-01 chose the full-policy shape. Otherwise this row is recorded open per REQ-017 lines 92-96, not claimed by this phase."
+
+5. **GOV-015** (`doc-agent-surface-audit`) — audit of `.claude/settings.json`. It describes the file as currently containing "a permission denylist protecting `AGENTS.md`, `CLAUDE.md`, `_private/`, `.agents/`, `.codex/` and `_data/ideas.jsonl` from `Edit`/`Write`" — it is an edit permission configuration, not a capability taxonomy or denial list. The idea appears to assume denials would be written into this file, but that is not what the governed documents currently name it for.
+
+## Where the question stands
+
+phase-auto-01 is complete on dev (agent-coord), and ADR-022 is its output: it chose the enforcement-point-with-permissive-default shape. So R02 and R04 stay open, and phase-auto-02 (active on dev at the time of this triage) builds the enforcement mechanism and refusal path only. No governed document yet says which capabilities to deny first, or when. That makes this idea the open follow-up that ADR-022 left: a decision for the owner, or for a later phase, once real capability requests exist.
+
+[Driver correction, Ideation, 2026-09-22: the scout's text here said phase-auto-01 had not yet shipped. The backlog on dev at f401cb6 shows it complete, so this paragraph was rewritten before recording.]
+
+The tension the idea surfaces — that a blanket denial across all interactive sessions (as the Session 5 hook example did) contradicts `CLAUDE.md`'s "Verify before claiming ignorance" rule — is a real one, and it is correctly flagged as a precondition to any denial being made. It is not, however, something the triage role can resolve: it is the architect's or the owner's decision whether denials apply to chat sessions at all, or only to unattended runs the broker is meant to gate, or apply differently to each.
+
+## Related ideas
+
+The idea already carries appropriate links to:
+- **000326** (PLAN-032's coverage table mismatch) — documents the open-vs-unconditional inconsistency between ADR-022 and PLAN-032's coverage table
+- **000031** (Capability and approval broker for agent actions) — the idea being planned
+
+No additional links are warranted beyond these.
+
+## No promotion identified
+
+The idea's content is not yet delivered by any governed document — it is a decision that is still open after phase-auto-01's permissive-default ruling in ADR-022. The existing documents defer this exact question rather than answering it.
+
+</details>
+
 **Links**
 
 - relates_to → `000326`
@@ -16519,7 +16567,7 @@ Related: 000326 (the PLAN-032/REQ-017 R02 and R04 coverage mismatch) and 000031 
 
 ## 000334 · Carry the Session Manager system (GOV-017) into the automated agency delivery system built on LangGraph and the Claude Agent SDK
 
-**Created 2026-09-22T22:53:22-04:00 · Status: `open`**
+**Created 2026-09-22T22:53:22-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-22 and forwarded by the Session Manager.
 
@@ -16548,8 +16596,68 @@ Unresolved:
 
 Related: 000327 (the session roster), 000328 (the question-relay session), 000320 (the always-on action-request broker).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T23:01:08-04:00): # Triage finding: 000334 (Carry the Session Manager system into the automated agency delivery system)
+
+**Idea:** 000334 — Carry the Session Manager system (GOV-017) into the automated agency delivery system built on LangGraph and the Claude Agent SDK
+
+**Status:** All referenced governing documents exist and define the work 000334 scopes. The idea poses open design questions for phase-irs-04 and phase-irs-16.
+
+## Governing documents found
+
+- **GOV-017** (Multi-session coordination protocol): Documents the existing interactive multi-session coordination system the idea asks to be carried into the automated agency. Published 2026-09-22; defines roles, the primary-checkout lock, claim slots, the merge gate, and the message contract.
+- **PROMPT-037** (Session Manager starter messages): Carries the text of PROMPT-037 into effect; published 2026-09-22.
+- **ADR-018** (Orchestrate with LangGraph over Claude Agent SDK): Decides the orchestration approach (LangGraph + Agent SDK). Status: draft; will be accepted when the first working graph from phase-irs-04 ships.
+- **PLAN-039** (Idea realization system master plan): Defines the overall pipeline. Specifies:
+  - **phase-irs-04** (LangGraph orchestrator skeleton): Status queued; depends on phase-irs-03 and phase-auto-02. Will fix the orchestrator's shape that 000334 asks about.
+  - **phase-irs-16** (Daemon process model): Status queued; depends on phase-irs-04. The idea explicitly asks how its "propose, then observe" model compares with Session Manager's granted-turn model.
+
+All three major unresolved questions in 000334 — which option (inject/adapt/recreate), whether a decision is needed before phase-irs-04 starts, and how the daemon's model compares with Session Manager — directly concern phase-irs-04 and phase-irs-16's design, which will be fixed during those phases.
+
+## Related idea
+
+000247 (Formalize the idea realization system into an automated multi-agent pipeline) is the umbrella idea for automating the pipeline 000334 is investigating for. 000334 asks a specific design question about Session Manager integration that sits within the broader question 000247 frames: how to automate the entire informal process into a formal multi-agent system. The dependency ordering differs — 000247 defines the overall pipeline, while 000334 investigates Session Manager's place in it — but both are core to PLAN-039's execution.
+
+Already linked (correctly): 000327 (session roster), 000328 (question-relay session), 000320 (always-on action-request broker).
+
+## Assessment
+
+000334 is correctly scoped to phase-irs-04 and phase-irs-16, where the outlined questions must be decided. No existing plan, requirement, ADR or backlog phase has yet answered those unresolved questions. The work is planned but not yet built; no promotion to existing document is warranted.
+
+PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into the automated pipeline is a core design question within the umbrella automation effort)
+
+</details>
+
 **Links**
 
 - relates_to → `000327`
 - relates_to → `000328`
 - relates_to → `000320`
+
+---
+
+## 000335 · src.governance --catalog prints the status-regression WARNING to stdout, so the catalog test fails on any branch behind a dev completion edit
+
+**Created 2026-09-22T23:01:08-04:00 · Status: `open`**
+
+From the Session Manager, 2026-09-22.
+
+What was observed: `uv run python -m src.governance --catalog` prints the status-regression warning from phase-gov-05's guard to stdout, before the catalog itself. test/test_codes.py::test_catalog_flag_writes_committed_file requires stdout to match the written catalog byte for byte. So the test fails on any branch that is behind a completion edit on dev. It was seen on 2026-09-22 with phase-idg-10, which printed: "WARNING status-regression (dev): phase-idg-10 complete -> active".
+
+Why it matters: the failure has nothing to do with the branch's own work. A builder rebasing or running tests before its merge gets a red test for a reason outside its phase. The stdout contract matters beyond the test too: the test's own comment says the `--catalog > catalog.md` and `diff <(--catalog) catalog.md` forms are used elsewhere in the repository. A warning on stdout would be written into catalog.md by the redirect form.
+
+The ask, as given: send the warning to stderr, or make the test ignore it.
+
+Unresolved: which of the two. Sending diagnostics to stderr keeps the stdout contract for every consumer, while changing the test only fixes the test. Also whether other governance warnings share the same path to stdout.
+
+Related: 000324 and 000325, which concern the same two catalog tests in test/test_codes.py.
+
+**Links**
+
+- relates_to → `000324`
+- relates_to → `000325`
