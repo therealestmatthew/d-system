@@ -131,3 +131,57 @@ dispatches nothing already done.
 - The dry run's evidence, listed above.
 - A2 cannot read the synthesis draft as the pack is written; the skill stops before A2 by the
   owner's ruling. Recorded as idea `000339`.
+
+## Decisions
+
+Owner rulings from this session. Each changed what was built.
+
+- **Declarations (at assignment):** the skill is generated through `agent-workflows/` by
+  `tools/generate_agent_workflows.py`, for both the `claude` and `open-agent-skills` hosts. The
+  deliverables are `workflows.yaml`, `partition-ideas.md`, both generated `SKILL.md` files and the
+  schema. This follows the owner's approval, although PLAN-025 leaves porting to other hosts to
+  PLAN-020.
+- **Files from earlier sweeps — stamp and move aside.** The pack's prompts name fixed paths, and
+  `_working/idea-corpus/` still holds the 2026-09-13 sweep's reports at those paths. The coordinator
+  stamps every file it writes there with the manifest's seed, corpus size and status. A new sweep
+  moves every earlier corpus, report, audit and dispatch file into
+  `previous-<file modification date>/`, and never deletes one. Resume counts only files stamped for
+  the current manifest.
+- **The corpus date is `manifest.json`'s modification date**, because the manifest records no
+  build date and the corpus builder is outside this phase.
+- **Merge first, then the dry run.** The skill is only listed once it is on dev, and its subagents
+  run in the primary checkout. The dry run to GATE 1 therefore happens after the merge, in a
+  `dryrun` turn, and the completion edit waits for its evidence.
+- **Stop before A2.** A2's verbatim prompt reads a draft that exists only in the coordinator's
+  worktree. The skill stops before A2 and asks the owner. Recorded as idea `000339`.
+- **The structured record and same-day naming are verified by fixture**, by running the skill's own
+  step-5 snippets on a hand-made partition. The GATE-1 dry run never reaches synthesis.
+
+## Corrections
+
+- **Heredoc terminator collision (2026-09-23).** A skill edit passed through `python3 - <<'EOF'`
+  contained the skill's own `<<'EOF' ... EOF` example. The heredoc ended early, and bash ran the
+  remaining text, including a backtick fragment that built a corpus with `--out ""` into the
+  worktree root. Five untracked files were written there and then removed. Nothing tracked, the
+  primary checkout and `_data/ideas.jsonl` were unaffected. The edit was redone with the
+  file-editing tool, and the skill's build and move commands gained a `${CORPUS:?}` guard. Recorded
+  at the owner's direction as a brain procedure (branch `agent/heredoc-procedure`) and as a guard
+  idea sent to Ideation.
+- The move-aside snippet first sat inside a numbered list, so its lines carried the list's indent.
+  An agent pasting the raw text would get an `IndentationError`. It was moved out of the list
+  before commit.
+- The first corpus-id pattern in the step-5 check matched any heading containing six digits,
+  including finding bodies (178 matches against a corpus of 152). It now matches only the builder's
+  entry heading, `## <id> — `.
+
+## Resume state (overnight safe point, 2026-09-23)
+
+- Branch `agent/phase-part-03` is pushed. The build is in `d8428df`, and this record and the
+  backlog checkpoint are in the commits after it.
+- An independent `demo-adversary` review of `dev...HEAD` was dispatched before the safe point, and
+  its result had not returned when this was written. **Next step on resume:** if its report is in
+  the session, fix or accept each finding and record it here under `## Review`. If the session was
+  cleared, dispatch a fresh review of `dev...agent/phase-part-03` with the same brief. Then rebase,
+  re-run governance and pytest in the worktree, and send READY. After the owner-approved merge,
+  request `TURN? dryrun phase-part-03` and run the dry run listed under Verification.
+- Separately, `agent/heredoc-procedure` (`e2ad13a`) is owner-approved and queued third for merge.
