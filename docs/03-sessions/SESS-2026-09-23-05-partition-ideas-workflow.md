@@ -254,6 +254,26 @@ extract q  LOW: nested fence                          -> "holds a nested fence",
 
 The fixture script is `run.py` in the session scratchpad; it is not tracked.
 
+### Review of fix cycle 1, and fix cycle 2
+
+A fresh `demo-adversary` review of `e52f820` judged HIGH, MEDIUM-1, MEDIUM-2, MEDIUM-3 and the
+nested-fence LOW **fixed**, and the accepted LOW correctly accepted. It re-ran R1 and R4 against the
+pack (identical), and confirmed the generator check and that the two `SKILL.md` files are identical.
+It raised one new finding:
+
+- **MEDIUM (new) — fixed in cycle 2.** Step 5's `ours()` ignored the record's `state`, so a pair
+  already `accepted` at GATE 3 for the same seed was reported as `CONTINUE` and would be rewritten
+  if step 5 were re-entered without step 2. `ours()` now returns false for any pair whose record is
+  `accepted`, and the text says an accepted pair is never continued. Fixtures added, with all
+  earlier cases re-run unchanged:
+
+  ```text
+  name r  accepted pair for this seed, stamped .md      -> -2, no CONTINUE
+  name s  accepted pair at base, own draft at -2        -> CONTINUE -2
+  ```
+
+This was the second of the two fix cycles the overnight authority allows.
+
 ## Resume state (overnight safe point, 2026-09-23)
 
 - Branch `agent/phase-part-03` is pushed. The build is in `d8428df`, and this record and the
