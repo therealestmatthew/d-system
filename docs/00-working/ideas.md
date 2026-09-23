@@ -15622,6 +15622,7 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 
 - relates_to → `000319`
 - relates_to ← `000319`
+- relates_to ← `000327`
 
 ---
 
@@ -15640,6 +15641,16 @@ What it would touch: the conflict computation behind `src.governance --ready`, a
 Unresolved: whether the fix belongs in the check (compare paths) or in the system registry (no two systems may cover the same path). Until one of these is done, the Scout's standing advice is to never run phase-arch-02 at the same time as any wbf-* UI phase.
 
 Related: the deliverable-overlap miss between phase-wbf-01 and phase-wbf-02, recorded as a separate idea from the same report.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-22T21:52:45-04:00): CORRECTION from Session 4 - Scout, 2026-09-22. The premise of this idea is wrong. src/governance/backlog.py collisions() (line 105) compares deliverable paths across different system ids, including containment through path_conflict(), so a different system id does not hide a shared declared path. The real gap is different, and Ideation confirmed both parts in the code: (1) the --ready Conflicts column compares each candidate only against phases that are already active (backlog.py line 151). It never compares two ready candidates with each other, so two phases can both show an empty Conflicts column and still collide once both are claimed. (2) The column only sees declared deliverables. Edits a phase makes outside its deliverables list, such as tests or codes.yaml, are invisible to it. The arch-02 and wbf-* case is still a real hazard for picking phases together, but the cause is the candidate-against-candidate gap, not the difference in system ids. Related: 000242 (a phase whose scope names a file its deliverables omit).
+
+</details>
 
 **Links**
 
@@ -15660,6 +15671,16 @@ Why it matters: two sessions could claim both phases at once and edit the same f
 Unresolved: why the deliverable-overlap check missed it has not been explained. Possible causes to check: the two phases write the path differently (a directory versus a file, or a different prefix); the overlap check only compares system ids; or deliverable overlap is not compared between phases of the same system. Nobody has confirmed which.
 
 Related: the separate idea from the same report about system ids that differ but cover the same paths (phase-arch-02 against the wbf-* phases). The two may have a common cause.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-22T21:52:46-04:00): CORRECTION from Session 4 - Scout, 2026-09-22. This is explained, and the overlap check did not miss it. collisions() in src/governance/backlog.py compares deliverable paths, including containment, so phase-wbf-01 and phase-wbf-02 will be flagged as conflicting as soon as one of them is active. The --ready Conflicts column showed nothing because it compares each candidate only against already-active phases (backlog.py line 151), and neither phase was active. The underlying gap is the same as in 000321's correction: two ready candidates are never compared with each other. That leaves this idea as a special case of 000321 as corrected.
+
+</details>
 
 **Links**
 
@@ -15718,3 +15739,101 @@ Overlap: this is the same hazard as the catalog-corruption idea Ideation recorde
 **Links**
 
 - relates_to → `000324`
+
+---
+
+## 000326 · PLAN-032's coverage table still maps REQ-017 R02 and R04 to phase-auto-02 unconditionally, while ADR-022 records them as open
+
+**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+
+From Session 5 - Batch Runner, as adversary finding F1 on phase-auto-01. The Session Manager forwarded it on 2026-09-22, with the owner's approval to capture it.
+
+What was observed: the requirement coverage table in docs/01-plans/PLAN-032-autonomous-agent-operations.md (around lines 199-202) maps REQ-017 R02 (narrow, named capability sets per run) and R04 (approvals carry scope, reason, expiry and an immutable decision) to phase-auto-02 with no condition. ADR-022 records R02 and R04 as open. ADR-022 was written on the agent/phase-auto-01 branch (commits 5671b1f and be65ef6). It reached dev as docs/04-decisions/ADR-022-broker-first-autonomous-operations.md before this idea was recorded.
+
+Why it matters: the plan claims coverage that the decision record says has not been settled. A session claiming phase-auto-02 would read the plan and treat both requirements as fully in scope and settled.
+
+The ask: amend PLAN-032's coverage table and REQ-017 so they match what ADR-022 records.
+
+Unresolved: whether the right amendment is to mark R02 and R04 as conditional on an ADR-022 follow-up, to move them to a later phase, or to change REQ-017 itself. Amending a governed plan and requirement needs a phase or the owner's direction.
+
+---
+
+## 000327 · A roster of role-based parallel interactive sessions coordinated by a Session Manager through cross-session messages
+
+**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-22. The owner set this system up and ran it that same day, before it was recorded as an idea. This entry records the concept after the fact, as the owner asked.
+
+What it is: several long-lived interactive Claude Code sessions run in parallel on one machine. Each has one named role, and they coordinate by sending each other messages rather than each session acting alone. The roster as run on 2026-09-22:
+
+- Session Manager: holds the primary-checkout lock, allocates the claim slots (max_active 3), and relays merge approvals between the owner and the sessions. It keeps a gitignored board at _working/session-manager/board.md.
+- Ideation: records ideas through tools/append_idea.py, and builds nothing. Other sessions send it bare ideas, it records them in a granted turn, and it sends the ids back.
+- Prompt Planner: writes prompts.
+- Session 1 - Builder A and Session 2 - Builder B: each builds one claimed phase in its own worktree.
+- Session 3 - Standby Builder: holds no claim slot until it is assigned one.
+- Session 4 - Scout: never claims. It surveys the ready queue for conflict-free phases and hazards.
+- Session 5 - Batch Runner: runs a batch through the build coordinator pack (PROMPT-036).
+
+The contract the Session Manager sent to every session:
+1. The primary checkout (/code/d-system on dev) is locked. Reading there is allowed. Writing, committing, merging or switching branches there needs a turn: TURN? <claim|catalog|merge|idea> <subject>, then GRANTED or QUEUED <n>, then only the stated action, then TURN DONE <sha> with git status clean.
+2. max_active is 3. A session claims only a phase the Session Manager assigned, and only inside a granted turn.
+3. All other work happens in a worktree at ../d-system-worktrees/<id> on branch agent/<id>.
+4. A merge request is READY <branch> with the review verdict and the tail of the post-rebase governance and pytest runs. The owner approves every merge and the Session Manager relays the approval.
+5. After each merge onto dev, the Session Manager sends REBASE.
+6. A session sends BLOCKED <reason> when it is stuck, and FREE when it has no assignment.
+7. Ideas go to Ideation, one message per idea, and are never recorded by the session that found them.
+8. The first line of every message states its type and subject.
+The contract was later amended during the day to forbid pytest in the primary checkout (see 000324).
+
+Why it came up: it serializes writes to dev without relying on each agent to check the lock table and hope. It separates capture, planning, scouting and building so that no one session carries all of them. It also puts owner approvals in one place.
+
+What it showed on its first day: the lock turns kept dev clean between writers. The Scout found conflict-check gaps (000321, 000322, 000323). Two builders running pytest at the same time in the primary checkout corrupted the tracked catalog (000324), which is how the pytest rule got added.
+
+What it would touch: AGENTS.md's concurrent-agent sections and /session-start, which today assume each agent works independently; the backlog lock table (ADR-003); and GOV-017 (the multi-session coordination protocol), which the Session Manager wrote and merged onto dev on 2026-09-22 (20fd4cf). GOV-017 now governs the arrangement. This idea records the concept and its open questions; GOV-017 is the working rule.
+
+Unresolved:
+- Whether GOV-017 is enough as the permanent home for the contract, or whether AGENTS.md and /session-start also need to change. Changing AGENTS.md needs the owner's approval.
+- How far this overlaps 000320 (an always-on broker that orders conflicting action requests). The Session Manager is in effect a human-mediated broker made of a live session. Also 000168 (expanding the claim system and orchestrator handoff) and 000248 (hosting always-on agents in the orchestrator daemon).
+- What happens when the Session Manager session dies mid-turn, which is the 000319 question (state capture and session resumability) applied to this setup.
+- Whether the roles are fixed or should be definable per day.
+- The cost of running eight or more sessions at once.
+
+The question-relay session is recorded as its own idea, linked to this one.
+
+**Links**
+
+- relates_to → `000320`
+- extended_by ← `000328`
+
+---
+
+## 000328 · A question-relay session that fields every other session's questions for the owner, queued in arrival order and asked in batches
+
+**Created 2026-09-22T21:52:40-04:00 · Status: `open`**
+
+Raised by the owner on 2026-09-22, as an addition to the role-based session roster (the linked idea).
+
+What it is: one more parallel session whose only job is to handle questions for the owner. The other sessions do not use the AskUserQuestion tool. Instead each one sends its question to the question-relay session as a cross-session message. The relay session queues the questions in the order they arrive, asks the owner in batches using AskUserQuestion, and sends each answer back to the session that asked.
+
+Why: with five or more working sessions, the owner has to move between sessions to answer questions one at a time, each in a different place. With this, the owner answers everything in one session and the answers go back to the right sessions automatically.
+
+As the owner described it:
+- Every session forwards its questions to this session instead of asking the owner itself.
+- This session asks the owner the questions in batches.
+- Questions are queued in the order they are received.
+- Each answer is relayed back to the session that asked.
+
+What it would touch: the coordination contract, now GOV-017 (the multi-session coordination protocol), which would need a message type for a question and one for its answer, and a rule that sessions stop asking the owner directly. CLAUDE.md and the saved preferences currently tell every session to ask through AskUserQuestion, so this changes where that tool is used. Changing either CLAUDE.md or AGENTS.md needs the owner's explicit approval.
+
+Unresolved:
+- Whether the Session Manager's merge-approval relay moves to this session, or stays with the Session Manager as a separate channel.
+- What a waiting session does while its question sits in the queue: stop, or keep working on something else. GOV-006 says to ask only when the answer changes what gets built, and otherwise to state the assumption and continue.
+- Whether urgent questions can go ahead of arrival order, for example when a session is blocked or holds the primary-checkout lock.
+- How a question carries enough context to be answered without opening the asking session: the session name, the phase, and the options with a recommendation.
+- AskUserQuestion takes at most four questions per call, so a larger batch has to be split.
+- Remote Control on mobile does not render AskUserQuestion previews, so any draft text has to go in the question text itself.
+- What happens to queued questions if the relay session dies.
+
+**Links**
+
+- extends → `000327`
