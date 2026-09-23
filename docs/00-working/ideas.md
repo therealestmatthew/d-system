@@ -17673,7 +17673,7 @@ Related ideas: 000334 (carry GOV-017 into the LangGraph and Agent SDK system); 0
 
 ## 000351 · Regenerate docs/08-governance/catalog.md only at merge time, not on every claim and completion commit, so open branches stop conflicting on it
 
-**Created 2026-09-23T01:51:24-04:00 · Status: `open`**
+**Created 2026-09-23T01:51:24-04:00 · Status: `triaged`**
 
 Sent to Ideation by Prompt Planner on 2026-09-23, during the overnight sprint.
 
@@ -17689,6 +17689,24 @@ Related, as named by the sender: 000324 (catalog tests overwrite the tracked cat
 
 Unresolved: whether the catalog should be tracked at all, or generated on demand; what the governance check does with a catalog that is intentionally behind between merges; and whether a merge-time regeneration needs its own commit or rides with the completion edit.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:53:17-04:00): Triage finding for 000351 (regenerate the catalog only at merge time), by Ideation, 2026-09-23.
+
+The committed catalog was a deliberate design. phase-doc-02 (add deterministic allocation and the committed documentation catalog, complete) says to "commit the catalog as a generated file and add a CI step that fails when it drifts", and its acceptance is that "a committed catalog that no longer matches regenerated output fails CI". Generating the catalog only at merge time would reverse that acceptance for the time between merges, so it would need an owner ruling, not just a tool change. The catalog joins document front matter with backlog phase state. That is why a claim (status: active) or a completion (status: complete) changes it, even though neither adds a document.
+
+Other options the owner may want set beside this one: stop tracking the catalog and generate it on demand; leave phase state out of the catalog, so that only document changes alter it; or keep today's design and accept the rebases. The first night's workaround was freezing dev before the final rebase (findings-2026-09-22.md item 1).
+
+Related ideas: 000324 and 000325 (catalog tests overwrite the tracked file), 000198 and 000208 (--catalog printed instead of writing, and the check passed with a stale catalog). The sender named all of these except 000325. 000335 (the --catalog status-regression WARNING goes to stdout, so the catalog test fails on any branch behind a dev completion edit) is another cost of the same coupling between the catalog and phase state.
+
+PROPOSED LINK: 000351 --relates_to--> 000335 (both come from the catalog carrying phase state that changes on dev)
+
+</details>
+
 **Links**
 
 - relates_to → `000347`
@@ -17697,7 +17715,7 @@ Unresolved: whether the catalog should be tracked at all, or generated on demand
 
 ## 000352 · No backlog phase builds the orchestrator's unit graph, which runs backlog phases through claim, build and integration
 
-**Created 2026-09-23T01:51:24-04:00 · Status: `open`**
+**Created 2026-09-23T01:51:24-04:00 · Status: `triaged`**
 
 Sent to Ideation by Prompt Planner on 2026-09-23, during the overnight sprint.
 
@@ -17712,6 +17730,22 @@ What it would touch: PLAN-039.01 section 12 (the phase list), a new phase or a s
 Related, as named by the sender: 000350 (no phase builds the real Agent SDK dispatcher) and 000334. Anchor: 000347.
 
 Unresolved: a new phase or a widening of irs-08; whether phase-irs-04's scope was deliberately narrowed to intake only (if so, where that was recorded); and the order relative to irs-14 and irs-15.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:53:17-04:00): Triage finding for 000352 (no phase builds the orchestrator's unit graph), by Ideation, 2026-09-23.
+
+The narrowing of phase-irs-04 was deliberate and is recorded. SESS-2026-09-23-01 (the irs-04 session record), section "Scope reading", says that phase-irs-04's scope and PLAN-039.01 section 12 both read as "intake graph only". It names batch as phase-irs-14 and realization as phase-irs-15, and calls the unit graph "a later backlog-phase deliverable". The adversary confirmed that reading independently. src/orchestrator/state.py has IMPLEMENTED_KINDS = frozenset({"intake"}), and derive_position() raises NotImplementedError for the other three kinds. So irs-04 did not drop the unit graph by mistake. The gap is that the "later backlog-phase deliverable" was never written into the backlog, and PLAN-039.01 section 12 lists no phase for it.
+
+Nearest phases: phase-irs-08 (execution loop harness), which dispatches developer and validator agents under the unchanged ADR-003 claim protocol but does not name the graph; phase-irs-15 (realization graph), which starts from a completed unit run; phase-irs-12 (end-to-end trace), which depends on irs-14 and irs-15 and would need unit runs too. PLAN-039.01 section 6 (capacity and claim proposals, where the daemon proposes and a human commits the claim) is the part that overlaps GOV-017's claim slots.
+
+Related ideas: 000350 (no phase builds the real Agent SDK dispatcher) is the same kind of gap. 000334 (carry GOV-017 into LangGraph) would put the Session Manager's slot allocation in this graph. 000168 (per-worktree agent queues and orchestrator handoff) touches the same claim handoff.
+
+</details>
 
 **Links**
 
