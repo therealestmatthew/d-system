@@ -12722,8 +12722,9 @@ items:
   - Build the agent that writes depends_on and systems locks for an approved plan's phases,
     validator-checked, and proposes a next_up ordering it never writes itself.
   acceptance:
-  - 'REQ-022 R05 holds as far as this phase: one plan traces to a proposed ordering ready for a decision.
-    Ratification through phase-irs-04''s `gate` verb is tested in phase-irs-13.'
+  - 'REQ-022 R05 holds as far as this phase: one plan traces to a proposed ordering ready for a decision,
+    with no standalone ratification mechanism. Ratification through phase-irs-04''s `gate` verb is tested
+    in phase-irs-13.'
   - The agent has no write path to next_up.
   verification:
   - uv run python -m src.governance
