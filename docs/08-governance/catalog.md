@@ -380,7 +380,7 @@ CI regenerates it and fails on any difference.
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 12 | 0 | 2 | agent-build |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 8 | 0 | 2 | agent-build |
-| PLAN-040 | doc-portable-framework-document-templates | draft | 5 | 0 | 0 | — |
+| PLAN-040 | doc-portable-framework-document-templates | draft | 4 | 1 | 0 | agent-builder-b |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
