@@ -2942,23 +2942,33 @@ items:
   - phase-cap-06
   - phase-cap-07
   scope:
-  - Run real captures end to end through intake, structuring, review and promotion.
+  - Run real captures end to end through intake, structuring, review and promotion, with
+    D_SYSTEM_DATA_ROOT=_private/portfolio set for every step, so promotion writes the real
+    records under the private data root (ADR-009) and nothing under the tracked _data/.
   - Confirm no project has regained a retired cadence value. The owner reassigned
     the original three during phase-cap-02; see GOV-003.
-  - Respect the structure/content boundary; captured content stays private until promoted.
+  - Respect the structure/content boundary; captured content stays private until promoted,
+    and promoted content stays private.
+  - Record the row counts, and no record content or names, in the session record.
   acceptance:
-  - commitments, interactions and tasks are non-empty after a rebuild.
+  - With D_SYSTEM_DATA_ROOT=_private/portfolio, a rebuild reports non-empty commitments,
+    interactions and tasks. The default rebuild does not count, because the fictional
+    example set under _data/ is already non-empty (phase-priv-03).
   - No project carries a retired review_cadence value.
   - Every promoted record traces back to a raw capture.
+  - Nothing under _data/ changed, and the leak check passes.
   verification:
-  - uv run python tools/rebuild_db.py
+  - D_SYSTEM_DATA_ROOT=_private/portfolio uv run python tools/rebuild_db.py
+  - D_SYSTEM_DATA_ROOT=_private/portfolio uv run python -m src.governance
+  - git status --short _data/
+  - uv run python tools/check_no_private_content.py
   - uv run pytest
   deliverables:
-  - _data/commitments
-  - _data/tasks
-  - _data/interactions
+  - docs/03-sessions/
   next_action: Capture a real working period through the full pipeline rather than
-    authoring records by hand.
+    authoring records by hand. The real records are gitignored under _private/portfolio/,
+    so the tracked deliverable is the session record carrying the row counts. Amended
+    2026-09-23 on the owner's ruling to point the outputs at the private data root.
 - id: phase-cap-09
   title: Confirm the signal and synthesis tracks are unblocked
   plan: doc-capture-build
