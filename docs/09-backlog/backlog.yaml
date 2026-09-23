@@ -10,7 +10,6 @@ next_up:
 - phase-irs-14
 - phase-irs-11
 - phase-idg-01
-- phase-idg-10
 - phase-idg-11
 - phase-dgov-01
 - phase-idg-12
@@ -10105,7 +10104,7 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 2
   session_budget: 1
@@ -10139,10 +10138,10 @@ items:
   - docs/08-governance/GOV-010-plan-quality-standard.md
   - templates/governance/document.md
   - docs/03-sessions/SESS-2026-09-22-09-plan-quality-standard.md
-  result: GOV-010 written from an audit of docs/01-plans/ and docs/06-requirements/; governance OK; independent
-    reviews ran twice, the second on the first's fixes; all findings fixed and recorded in SESS-2026-09-22-09.
-  next_action: Review findings fixed. Awaiting a relayed GRANTED merge; the completion edit follows on dev,
-    per GOV-017 and GOV-003's coordinator-completion rule.
+  result: GOV-010 written from an audit of docs/01-plans/ and docs/06-requirements/. Two independent reviews
+    and a narrow fix check ran; every finding was fixed or recorded as an idea (000329-000331). Governance
+    OK and pytest 840 passed post-rebase; integrated onto dev with the owner's relayed approval.
+  next_action: Complete. Ideas 000329-000331 carry three GOV-010 wording fixes noticed out of scope.
 - id: phase-idg-11
   title: Define where a promoted plan lives before it earns a code
   plan: doc-idea-graph-lifecycle
