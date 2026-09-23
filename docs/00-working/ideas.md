@@ -17550,6 +17550,8 @@ Related-ideas sweep: in the same turn as this finding, Ideation linked further i
 - relates_to ← `000334`
 - relates_to ← `000340`
 - relates_to ← `000350`
+- relates_to ← `000351`
+- relates_to ← `000352`
 
 ---
 
@@ -17662,6 +17664,54 @@ This is where the Claude Agent SDK enters the orchestrator. It is also an input 
 Related ideas: 000334 (carry GOV-017 into the LangGraph and Agent SDK system); 000069 (whether Claude Code stays a dependency); 000348 (the orphaned gate decision this stub causes today).
 
 </details>
+
+**Links**
+
+- relates_to → `000347`
+
+---
+
+## 000351 · Regenerate docs/08-governance/catalog.md only at merge time, not on every claim and completion commit, so open branches stop conflicting on it
+
+**Created 2026-09-23T01:51:24-04:00 · Status: `open`**
+
+Sent to Ideation by Prompt Planner on 2026-09-23, during the overnight sprint.
+
+As given: generate docs/08-governance/catalog.md at merge time only, instead of on every claim, completion and idea commit. Each of those commits regenerates the catalog today, so every open branch conflicts on it and has to rebase. Source: _working/session-manager/findings-2026-09-22.md, item 1 ("Catalog churn drives rebases"), where phase-auto-02 rebased three times in one merge cycle. The workaround used on the first night was to freeze dev by granting the lock before the final rebase.
+
+A check by Ideation, on dev at 79414a5: the claim and completion commits do touch the catalog. For example, ef9a2a0 (the phase-irs-16 claim) and a7170ba (the phase-irs-04 completion) both change it. Idea commits do not: Ideation's three idea commits tonight (e8538da, e435ced, 79414a5) changed only _data/ideas.jsonl and docs/00-working/ideas.md. So the churn comes from claims and completions, not from idea capture.
+
+Why it matters: every claim or completion on dev makes every other open branch conflict on one generated file. The rebases this causes also move the merge gate's frozen-dev window later.
+
+What it would touch: the catalog generator (uv run python -m src.governance --catalog), the governance check that fails on a stale catalog, AGENTS.md's claim step (which forces the regeneration today; changing AGENTS.md needs the owner's approval), /session-start and /session-close, PROMPT-036, GOV-017 and PROMPT-037 (the catalog regeneration that travels with a claim turn), and test/test_codes.py.
+
+Related, as named by the sender: 000324 (catalog tests overwrite the tracked catalog), 000198 (the governance check passes with a stale catalog, and --catalog prints instead of writing), 000208 (the claim-forced regeneration silently does nothing). Anchor: 000347.
+
+Unresolved: whether the catalog should be tracked at all, or generated on demand; what the governance check does with a catalog that is intentionally behind between merges; and whether a merge-time regeneration needs its own commit or rides with the completion edit.
+
+**Links**
+
+- relates_to → `000347`
+
+---
+
+## 000352 · No backlog phase builds the orchestrator's unit graph, which runs backlog phases through claim, build and integration
+
+**Created 2026-09-23T01:51:24-04:00 · Status: `open`**
+
+Sent to Ideation by Prompt Planner on 2026-09-23, during the overnight sprint.
+
+As given: no backlog phase builds the orchestrator's unit graph (src/orchestrator/graphs/unit.py). That graph covers re-deriving each unit's state, the unit starts made during reconcile, claim proposals and capacity, per PLAN-039.01 sections 1, 3 and 6. phase-irs-08's scope is only the dispatch loop. PLAN-039.01 section 12 added phases for the batch and realization graphs (phase-irs-14 and phase-irs-15) but none for unit. This is the same kind of gap as 000350.
+
+A check by Ideation, on dev at 79414a5: src/orchestrator/graphs/ holds only intake.py. PLAN-039.01 section 1 defines a unit run as one backlog phase from a startable claim through gates G4 and G5 to integration and the completion review. Its planned module layout lists intake.py, batch.py, unit.py and realization.py. phase-irs-04's scope says "the four-run-kind graph skeleton", but it delivered only the intake graph. No phase in docs/09-backlog/backlog.yaml names graphs/unit.py or the unit graph as a deliverable. I did not check whether a completion note on phase-irs-04 records this narrowing.
+
+Why it matters: the unit graph is the part of the orchestrator that would do the Session Manager's job for execution sessions. It allocates capacity (claim slots), proposes claims, and moves a phase through its gates to integration. It is therefore central to 000334 (carry GOV-017 into the LangGraph and Agent SDK system) and to the design in sprint item P3. phase-irs-15 (the realization graph) starts from a completed unit run, so it cannot run end to end without one.
+
+What it would touch: PLAN-039.01 section 12 (the phase list), a new phase or a scope change to phase-irs-08, phase-irs-12 (end-to-end trace, which depends on irs-14 and irs-15), phase-irs-15, and GOV-017.
+
+Related, as named by the sender: 000350 (no phase builds the real Agent SDK dispatcher) and 000334. Anchor: 000347.
+
+Unresolved: a new phase or a widening of irs-08; whether phase-irs-04's scope was deliberately narrowed to intake only (if so, where that was recorded); and the order relative to irs-14 and irs-15.
 
 **Links**
 
