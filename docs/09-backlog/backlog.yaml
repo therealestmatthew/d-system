@@ -3,7 +3,6 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-conc-02
 - phase-auto-01
 - phase-auto-02
 - phase-irs-04
@@ -9364,7 +9363,7 @@ items:
   - sys-governance
   - sys-delivery
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 1
   session_budget: 1
@@ -9391,6 +9390,20 @@ items:
   - docs/08-governance/OPS-001-operations.md
   next_action: Read the 000041 incident report before designing the guard. The session-code half of that
     incident is phase-conc-03, not this phase - do not fold them together.
+  session: doc-session-refuse-dirty-integration
+  completion_evidence:
+  - tools/git-hooks/refuse_dirty_integration.py
+  - test/test_refuse_dirty_integration.py
+  - docs/08-governance/OPS-001-operations.md
+  - docs/03-sessions/SESS-2026-09-22-06-refuse-dirty-integration.md
+  result: 'Pre-merge guard added at tools/git-hooks/refuse_dirty_integration.py; refuses integration
+    while the primary checkout has working-tree changes (naming them) or any stash entry, always
+    inspecting the primary via --git-common-dir. Post-rebase verification: "Governance OK: 35 systems,
+    315 documents, 30 memories, 293 backlog phases" and "767 passed, 2 warnings in 67.39s". Validator
+    PASS on all three acceptance conditions; adversary raised three MEDIUM findings (linked-worktree
+    bypass, stale-stash refusal, OPS-001 overstating its wiring), all resolved in one fix cycle and
+    confirmed SOUND on re-attack. Nothing invokes the guard automatically yet; the AGENTS.md wiring is
+    an open owner decision.'
 - id: phase-conc-03
   title: Make document-code allocation collision-proof across concurrent sessions
   plan: doc-concurrency-git-safety
