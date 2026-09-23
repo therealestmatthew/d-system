@@ -41,6 +41,7 @@ from src.capture.promote import (  # noqa: E402
     promote_one,
 )
 from src.capture.review import build_review, format_review  # noqa: E402
+from src.capture.structure import StructuringError  # noqa: E402
 
 
 def _value(text: str) -> Any:
@@ -78,8 +79,8 @@ def _parser() -> argparse.ArgumentParser:
         "--keep-names", action="store_true", help="promote: keep *_names values as plain text"
     )
 
-    create = commands.add_parser("create", help="create the person, project or tag held")
-    create.add_argument("staged_id", help="create: the held person, project or tag record")
+    create = commands.add_parser("create", help="create the person or project held")
+    create.add_argument("staged_id", help="create: the held person or project record")
     create.add_argument(
         "--set", action="append", metavar="FIELD=VALUE", help="create: state a field value"
     )
@@ -138,7 +139,7 @@ def _run(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None) -> int:
     try:
         return _run(_parser().parse_args(argv))
-    except PromotionError as exc:
+    except (PromotionError, StructuringError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

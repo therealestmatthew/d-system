@@ -74,6 +74,7 @@ CLEAN_TASK = {
     "entity_type": "task",
     "fields": {
         "description": explicit("book the venue", "book the venue"),
+        "status": explicit("open", "Task:"),
         "created": explicit("2026-09-20", "2026-09-20"),
     },
 }
@@ -144,6 +145,26 @@ def test_clean_items_are_listed_by_id_only(
     assert clean["id"] not in {i.staged_id for i in review.items}
 
 
+def test_a_clean_record_promotion_would_leave_staged_is_reported_with_its_reason(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    no_status = {
+        "entity_type": "task",
+        "fields": {"description": explicit("book the venue", "book the venue")},
+    }
+    note = {"entity_type": "note", "fields": {"text": explicit("book the venue", "book the venue")}}
+    ready, incomplete, kept_note = stage(capture, raw_dir, paths, CLEAN_TASK, no_status, note)
+    review = build_review(paths, raw_dir=raw_dir)
+    assert review.clean == [ready["id"]]
+    reasons = dict(review.blocked)
+    assert set(reasons) == {incomplete["id"], kept_note["id"]}
+    assert "status" in reasons[incomplete["id"]]
+    assert "no entity schema for 'note'" in reasons[kept_note["id"]]
+    text = format_review(review)
+    assert "1 clean, ready to promote in bulk:" in text
+    assert "2 clean but left staged by promotion:" in text
+
+
 def test_each_flagged_item_shows_raw_text_proposal_and_every_assumed_field(
     capture: dict[str, Any], raw_dir: Path, paths: Paths
 ) -> None:
@@ -200,7 +221,9 @@ def test_a_held_new_tag_raises_an_alert(
     }
     stage(capture, raw_dir, paths, tag)
     [item] = build_review(paths, raw_dir=raw_dir).items
-    assert item.alerts == ["NEW TAG 'hiring' in category 'domain'"]
+    [alert] = item.alerts
+    assert alert.startswith("NEW TAG 'hiring' in category 'domain'")
+    assert "stays held" in alert and "000343" in alert
 
 
 def test_a_record_naming_an_unknown_tag_raises_an_alert(

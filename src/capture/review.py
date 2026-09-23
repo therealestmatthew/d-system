@@ -16,13 +16,20 @@ Nothing here writes anything.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from src.capture.promote import Paths, known_identities, load_staged
+from src.capture.promote import (
+    Paths,
+    PromotionError,
+    candidate,
+    known_identities,
+    load_staged,
+)
 from src.capture.raw import RAW_DIR
 from src.capture.routing import stakes_for
 from src.capture.structure import KnownIdentities, unresolved_references
@@ -58,8 +65,11 @@ class ReviewItem:
 
 @dataclass(frozen=True)
 class Review:
+    """`clean` promotes as staged; `blocked` is clean by route but would be left staged."""
+
     items: list[ReviewItem]
     clean: list[str]
+    blocked: list[tuple[str, str]] = field(default_factory=list)
 
 
 def _raw_text(capture_id: str, raw_dir: Path) -> str | None:
@@ -92,7 +102,10 @@ def _alerts(record: Mapping[str, Any], unresolved: Iterable[str]) -> list[str]:
     entity_type = record["entity_type"]
     alerts = []
     if entity_type == "tag":
-        alerts.append(f"NEW TAG {entity.get('id')!r} in category {entity.get('category')!r}")
+        alerts.append(
+            f"NEW TAG {entity.get('id')!r} in category {entity.get('category')!r}: stays held; "
+            "capture-derived tags go under the private data root (idea 000343)"
+        )
     elif entity_type == "tag-category":
         alerts.append(
             f"PROPOSED NEW TAG CATEGORY {entity.get('id') or entity.get('name')!r}: needs a "
@@ -120,9 +133,17 @@ def build_review(
     identities = known if known is not None else known_identities(where)
     items: list[ReviewItem] = []
     clean: list[str] = []
+    blocked: list[tuple[str, str]] = []
     for record in load_staged(where.staging):
         if record.get("route") == "clean":
-            clean.append(record["id"])
+            # The same check bulk promotion makes, without writing, so review never calls a
+            # record ready that promotion would leave staged.
+            try:
+                candidate(record, {}, where, dt.date.today(), set(), keep_names=False)
+            except PromotionError as exc:
+                blocked.append((record["id"], str(exc)))
+            else:
+                clean.append(record["id"])
             continue
         entity: dict[str, Any] = record.get("entity") or {}
         unresolved = unresolved_references(entity, identities)
@@ -141,7 +162,7 @@ def build_review(
         )
     # A stable sort: within one stakes level, staging order is kept.
     items.sort(key=lambda item: -STAKES_ORDER[item.stakes])
-    return Review(items=items, clean=clean)
+    return Review(items=items, clean=clean, blocked=blocked)
 
 
 def format_review(review: Review) -> str:
@@ -150,6 +171,10 @@ def format_review(review: Review) -> str:
     if review.clean:
         lines.append(f"{len(review.clean)} clean, ready to promote in bulk:")
         lines += [f"  {staged_id}" for staged_id in review.clean]
+        lines.append("")
+    if review.blocked:
+        lines.append(f"{len(review.blocked)} clean but left staged by promotion:")
+        lines += [f"  {staged_id}: {reason}" for staged_id, reason in review.blocked]
         lines.append("")
     if not review.items:
         lines.append("Nothing flagged or held.")

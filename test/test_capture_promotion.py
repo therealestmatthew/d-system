@@ -214,6 +214,105 @@ def test_a_clean_record_that_does_not_validate_stays_staged_with_the_reason(
     }
 
 
+# --- promotion never overwrites, never duplicates, never leaves the data root -----------
+
+
+def _with_id(task_id: str) -> dict[str, Any]:
+    return {
+        "entity_type": "task",
+        "fields": {**CLEAN_TASK["fields"], "id": explicit(task_id, "Task:")},
+    }
+
+
+def test_a_proposal_carrying_its_own_id_is_refused_not_written_over_a_record(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    before = tree_digest(paths.data)
+    [staged] = stage(capture, raw_dir, paths, _with_id("t-3"))
+    result = promote.promote_clean(paths, today=TODAY)
+    assert result.promoted == []
+    assert "promotion assigns the id" in dict(result.skipped)[staged["id"]]
+    assert tree_digest(paths.data) == before
+    assert staged_ids(paths) == {staged["id"]}
+
+
+def test_the_owner_cannot_set_an_id_either(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    [staged] = stage(capture, raw_dir, paths, FLAGGED_COMMITMENT)
+    with pytest.raises(PromotionError, match="promotion assigns the id"):
+        promote.promote_one(staged["id"], {"id": "c-1"}, paths=paths, today=TODAY)
+
+
+def test_duplicate_supplied_ids_in_one_batch_lose_nothing(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    first, second = stage(capture, raw_dir, paths, _with_id("t-10"), _with_id("t-10"))
+    result = promote.promote_clean(paths, today=TODAY)
+    assert result.promoted == []
+    assert staged_ids(paths) == {first["id"], second["id"]}
+
+
+def test_an_id_that_would_escape_the_data_root_is_refused(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths, tmp_path: Path
+) -> None:
+    stage(capture, raw_dir, paths, _with_id("t-9/../../../ESCAPED"))
+    promote.promote_clean(paths, today=TODAY)
+    assert not list(tmp_path.rglob("ESCAPED*"))
+
+
+def test_the_record_writer_refuses_an_existing_file(paths: Paths) -> None:
+    existing = paths.data / "tasks" / "t-3.json"
+    before = existing.read_bytes()
+    with pytest.raises(PromotionError, match="already exists"):
+        promote._create_json(existing, {"id": "t-3"})
+    assert existing.read_bytes() == before
+
+
+def test_a_failure_mid_batch_skips_that_record_and_writes_nothing_for_it(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    [clean] = stage(capture, raw_dir, paths, CLEAN_TASK)
+    paths.promoted.parent.mkdir(parents=True, exist_ok=True)
+    paths.promoted.write_text("not a directory", encoding="utf-8")
+    before = tree_digest(paths.data)
+
+    result = promote.promote_clean(paths, today=TODAY)
+
+    assert result.promoted == [] and [s for s, _ in result.skipped] == [clean["id"]]
+    assert tree_digest(paths.data) == before
+    assert staged_ids(paths) == {clean["id"]}
+
+
+def test_an_interrupted_promotion_is_finished_not_repeated(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    [clean] = stage(capture, raw_dir, paths, CLEAN_TASK)
+    staged_copy = (paths.staging / f"{clean['id']}.json").read_bytes()
+    promote.promote_clean(paths, today=TODAY)
+    # Simulate a crash after the record was written but before the staged copy was removed.
+    (paths.staging / f"{clean['id']}.json").write_bytes(staged_copy)
+
+    result = promote.promote_clean(paths, today=TODAY)
+
+    assert result.promoted == [(clean["id"], str(paths.data / "tasks" / "t-4.json"))]
+    assert sorted(p.stem for p in (paths.data / "tasks").glob("*.json")) == ["t-3", "t-4"]
+    assert staged_ids(paths) == set()
+
+
+def test_an_archive_entry_with_no_record_is_promoted_afresh(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    [clean] = stage(capture, raw_dir, paths, CLEAN_TASK)
+    paths.promoted.mkdir(parents=True)
+    (paths.promoted / f"{clean['id']}.json").write_text(
+        json.dumps({"target": str(paths.data / "tasks" / "t-4.json")}), encoding="utf-8"
+    )
+    result = promote.promote_clean(paths, today=TODAY)
+    assert [s for s, _ in result.promoted] == [clean["id"]]
+    assert (paths.data / "tasks" / "t-4.json").exists()
+
+
 # --- flagged and held records: one owner decision each ----------------------------------
 
 
@@ -293,9 +392,11 @@ def test_creating_a_held_person_writes_the_person_and_unblocks_references(
     assert staged_ids(paths) == set()
 
 
-def test_a_new_tag_in_an_existing_category_is_created_on_approval(
+def test_a_new_tag_from_a_capture_stays_held(
     capture: dict[str, Any], raw_dir: Path, paths: Paths
 ) -> None:
+    # Owner ruling (idea 000343): capture-derived tags go under the private data root, and
+    # nothing reads a private tag file yet, so the tracked tags file is never written here.
     tag = {
         "entity_type": "tag",
         "fields": {
@@ -304,28 +405,12 @@ def test_a_new_tag_in_an_existing_category_is_created_on_approval(
             "category": inferred("domain", "hiring"),
         },
     }
-    [held] = stage(capture, raw_dir, paths, tag)
-    promote.create_identity(held["id"], paths=paths, today=TODAY)
-    ids = [t["id"] for t in json.loads(paths.tags.read_text(encoding="utf-8"))]
-    assert ids == ["ai-tools", "hiring"]
-
-
-def test_a_tag_outside_the_existing_categories_is_refused(
-    capture: dict[str, Any], raw_dir: Path, paths: Paths
-) -> None:
-    tag = {
-        "entity_type": "tag",
-        "fields": {
-            "id": explicit("hiring", "hiring"),
-            "label": explicit("Hiring", "hiring"),
-            "category": inferred("people-ops", "hiring"),
-        },
-    }
     before = paths.tags.read_bytes()
     [held] = stage(capture, raw_dir, paths, tag)
-    with pytest.raises(PromotionError, match="category"):
+    with pytest.raises(PromotionError, match="000343"):
         promote.create_identity(held["id"], paths=paths, today=TODAY)
     assert paths.tags.read_bytes() == before
+    assert staged_ids(paths) == {held["id"]}
 
 
 def test_a_new_tag_category_stays_held(
@@ -364,6 +449,8 @@ def test_no_capture_path_other_than_promotion_writes_to_the_data_root(
     capture = capture_raw.write_raw_capture(CONTENT, channel="cli", raw_dir=raw_dir)
     stage(capture, raw_dir, paths, CLEAN_TASK, FLAGGED_COMMITMENT, HELD_COMMITMENT)
     review.format_review(review.build_review(paths, raw_dir=raw_dir))
+    [held] = [r["id"] for r in promote.load_staged(paths.staging) if r["route"] == "held"]
+    promote.discard(held, paths=paths, today=TODAY)
 
     assert tree_digest(paths.data) == before
     assert paths.tags.read_bytes() == tags_before
@@ -450,6 +537,38 @@ def test_a_correction_leaves_the_raw_capture_untouched(
     assert tree_digest(raw_dir) == before
 
 
+def test_a_correction_may_not_name_an_unknown_person_or_tag(
+    promoted_commitment: Path, paths: Paths
+) -> None:
+    before = tree_digest(paths.data)
+    with pytest.raises(PromotionError, match="promised_to='nobody'"):
+        promote.correct("commitment", "c-1", "promised_to", "nobody", paths=paths, today=TODAY)
+    with pytest.raises(PromotionError, match="tags='no-such-tag'"):
+        promote.correct("commitment", "c-1", "tags", ["no-such-tag"], paths=paths, today=TODAY)
+    assert tree_digest(paths.data) == before
+
+
+def test_correcting_an_absent_field_says_it_was_absent(
+    promoted_commitment: Path, paths: Paths
+) -> None:
+    entry = promote.correct("commitment", "c-1", "notes", "called ahead", paths=paths, today=TODAY)
+    assert entry["previous"] is None and entry["previous_absent"] is True
+    second = promote.correct("commitment", "c-1", "completed", None, paths=paths, today=TODAY)
+    assert second["previous_absent"] is True
+    third = promote.correct("commitment", "c-1", "due_date", None, paths=paths, today=TODAY)
+    assert "previous_absent" not in third
+
+
+def test_a_correction_that_cannot_be_logged_leaves_the_record_unchanged(
+    promoted_commitment: Path, paths: Paths
+) -> None:
+    (paths.data / promote.CORRECTIONS_FILE).mkdir()
+    before = promoted_commitment.read_bytes()
+    with pytest.raises(PromotionError, match="could not record the correction"):
+        promote.correct("commitment", "c-1", "priority", "high", paths=paths, today=TODAY)
+    assert promoted_commitment.read_bytes() == before
+
+
 # --- the CLI ---------------------------------------------------------------------------
 
 
@@ -499,6 +618,37 @@ def test_cli_refuses_ambiguous_promotion_and_exits_non_zero(
     assert review_cli.main(["promote", "--clean", "--keep-names"]) == 1
     assert review_cli.main(["promote", "staged-00000000T000000Z-000000"]) == 1
     assert "error:" in capsys.readouterr().err
+
+
+def test_cli_reports_a_malformed_value_as_an_error_not_a_traceback(
+    capture: dict[str, Any],
+    raw_dir: Path,
+    cli_paths: Paths,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    [flagged] = stage(capture, raw_dir, cli_paths, FLAGGED_COMMITMENT)
+    assert review_cli.main(["promote", flagged["id"], "--set", "tags=hiring"]) == 1
+    err = capsys.readouterr().err
+    assert err.startswith("error: ") and "field 'tags' must be a list of strings" in err
+
+
+def test_cli_refuses_to_create_a_tag(
+    capture: dict[str, Any],
+    raw_dir: Path,
+    cli_paths: Paths,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    tag = {
+        "entity_type": "tag",
+        "fields": {
+            "id": explicit("hiring", "hiring"),
+            "label": explicit("Hiring", "hiring"),
+            "category": explicit("domain", "hiring"),
+        },
+    }
+    [held] = stage(capture, raw_dir, cli_paths, tag)
+    assert review_cli.main(["create", held["id"]]) == 1
+    assert "000343" in capsys.readouterr().err
 
 
 def test_cli_set_reads_json_when_it_parses() -> None:

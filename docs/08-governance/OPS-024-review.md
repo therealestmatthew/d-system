@@ -35,7 +35,7 @@ uv run python tools/review.py promote --clean
 uv run python tools/review.py promote staged-20260923T101500Z-a1b2c3 --set due_date=2026-10-01
 uv run python tools/review.py promote staged-20260923T101500Z-a1b2c3 --keep-names
 
-# The identity call for a held person, project or tag.
+# The identity call for a held person or project.
 uv run python tools/review.py create staged-20260923T101500Z-d4e5f6 --set id=sam-lee
 
 # Drop a staged record without promoting it.
@@ -54,20 +54,26 @@ text rather than becoming person records.
 
 - **show** writes nothing. For each flagged or held item it prints the raw capture, the
   proposed record, and each assumed field with its level, supporting quote and reason
-  (REQ-002 R14). A new tag prints as an `ALERT`. A new tag category prints as a proposal that
-  this tool cannot approve (idea `000337` covers the approval path).
+  (REQ-002 R14). A new tag prints as an `ALERT` and stays held. A new tag category prints as a
+  proposal that this tool cannot approve (idea `000337` covers the approval path). A clean
+  record that promotion would leave staged is listed separately, with the reason.
 - **promote** writes each record to `<data root>/<type>/<id>.json` with the next free id of
-  its type, for example `c-5`. The data root is `D_SYSTEM_DATA_ROOT` when set, otherwise
+  its type, for example `c-5`. Promotion assigns every id itself: a proposal or `--set` that
+  supplies one is refused, and an existing file is never overwritten. The data root is `D_SYSTEM_DATA_ROOT` when set, otherwise
   `_data/` (ADR-009). The record keeps a `capture` block naming its raw capture, the fields
   that were still assumed, and the promotion date. The staged record moves to
   `_capture/promoted/`.
-- **create** writes a person or project to the data root, or appends a tag to the tracked
-  `_data/tags.json`. The staged record moves to `_capture/promoted/`.
+- **create** writes a person or project to the data root. The staged record moves to
+  `_capture/promoted/`. A tag is refused and stays held: the owner ruled that capture-derived
+  tags belong under the private data root (idea `000343`), and nothing reads a private tag
+  file yet. Nothing here writes the tracked `_data/tags.json`.
 - **discard** moves the staged record to `_capture/discarded/`.
 - **correct** edits the record in place and appends one line to
   `<data root>/corrections.jsonl`, naming the record, the field, the previous value, the new
-  value and the date (`schemas/correction.schema.json`). The log is never rewritten, so every
-  earlier value stays readable. The raw capture is never touched.
+  value and the date (`schemas/correction.schema.json`). The entry is written and synced
+  before the record changes, and the log is never rewritten, so every earlier value stays
+  readable. A correction may not name a person, project or tag that does not exist. The raw
+  capture is never touched.
 
 ## Failure and recovery
 
@@ -114,7 +120,7 @@ root (`D_SYSTEM_DATA_ROOT`, else `_data/`); see `docs/08-governance/OPS-024-revi
 | `--clean` | promote: every clean record |  |  |  |
 | `--set` | promote: state a field value |  |  |  |
 | `--keep-names` | promote: keep *_names values as plain text |  |  |  |
-| `staged_id` | create: the held person, project or tag record |  |  |  |
+| `staged_id` | create: the held person or project record |  |  |  |
 | `--set` | create: state a field value |  |  |  |
 | `staged_id` | discard: the staged record to drop |  |  |  |
 | `record_type` | correct: the record's schema, e.g. commitment |  |  |  |

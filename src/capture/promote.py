@@ -7,17 +7,17 @@ Staged records become real only through an owner action here. There are four:
 - **bulk promotion** of every `clean` staged record, and nothing else (R13);
 - **promoting one** flagged or held record, with any field values the owner states. A
   value the owner sets is the owner's word, so it no longer counts as assumed;
-- **creating an identity** — a person, project or tag — from a held record. A new tag must
-  sit in one of the existing categories; a new category stays held, because the categories
-  are an enum in `schemas/tag.schema.json` and changing it is a schema change, not a review
-  decision;
+- **creating an identity** — a person or project — from a held record. A new tag stays
+  held: the owner ruled that capture-derived tags belong under the private data root (idea
+  `000343`), and nothing reads a private tag file yet. A new tag category stays held too;
 - **correcting** a promoted record: the record is edited in place and a dated entry naming
   the field, the previous value and the new one is appended to `corrections.jsonl` (R15).
 
-Entity records go to the data root (`D_SYSTEM_DATA_ROOT`, else `_data/`, per ADR-009). A new
-tag goes to the tracked `_data/tags.json`, which is shared vocabulary rather than portfolio
-content. Nothing here fills in a missing value: a staged record that does not validate
-against its entity schema stays staged, and the reason is reported. A promoted or discarded
+Entity records go to the data root (`D_SYSTEM_DATA_ROOT`, else `_data/`, per ADR-009). Nothing
+here writes the tracked `_data/tags.json`. Nothing here overwrites an existing record, and
+promotion assigns every id itself, so a record can never be written over another or outside
+the data root. Nothing here fills in a missing value either: a staged record that does not
+validate against its entity schema stays staged, and the reason is reported. A promoted or discarded
 staged record moves out of staging into `_capture/promoted/` or `_capture/discarded/`, so
 the decision stays on disk; the raw capture is never touched (R2).
 """
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
@@ -39,6 +40,7 @@ from src.capture.structure import (
     STAGING_DIR,
     UNRESOLVED_NAME_FIELDS,
     KnownIdentities,
+    StructuringError,
     unresolved_references,
 )
 from src.db.source_validation import data_root
@@ -121,9 +123,48 @@ def _errors(validator: Draft7Validator, record: Mapping[str, Any]) -> str:
     )
 
 
-def _write_json(path: Path, record: Mapping[str, Any]) -> None:
+def _tmp_file(path: Path, text: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    return tmp
+
+
+def _dump(record: Any) -> str:
+    return json.dumps(record, ensure_ascii=False, indent=2) + "\n"
+
+
+def _write_json(path: Path, record: Any) -> None:
+    """Replace `path` atomically: a reader sees the old file or the new one, never half."""
+    os.replace(_tmp_file(path, _dump(record)), path)
+
+
+def _create_json(path: Path, record: Mapping[str, Any]) -> None:
+    """Write a new file atomically, refusing if `path` already exists."""
+    tmp = _tmp_file(path, _dump(record))
+    try:
+        os.link(tmp, path)
+    except FileExistsError:
+        raise PromotionError(f"{path} already exists; refusing to overwrite it") from None
+    finally:
+        tmp.unlink()
+
+
+def _inside(base: Path, path: Path) -> Path:
+    """Refuse a target that would land outside `base`, whatever the record's id says."""
+    if not path.resolve().is_relative_to(base.resolve()):
+        raise PromotionError(f"{path} is outside {base}; refusing to write it")
+    return path
+
+
+def _unresolved(entity: Mapping[str, Any], paths: Paths, keep_names: bool) -> list[str]:
+    try:
+        found = unresolved_references(entity, known_identities(paths))
+    except StructuringError as exc:
+        raise PromotionError(str(exc)) from None
+    if keep_names:
+        found = [u for u in found if u.split("=", 1)[0] not in UNRESOLVED_NAME_FIELDS]
+    return found
 
 
 def load_staged(staging: Path = STAGING_DIR) -> list[dict[str, Any]]:
@@ -175,7 +216,7 @@ def _assumed(staged: Mapping[str, Any], owner_set: Iterable[str]) -> list[str]:
     )
 
 
-def _candidate(
+def candidate(
     staged: Mapping[str, Any],
     overrides: Mapping[str, Any],
     paths: Paths,
@@ -192,9 +233,12 @@ def _candidate(
         raise PromotionError(f"no entity schema for {entity_type!r}; it stays staged")
 
     entity = {**staged.get("entity", {}), **overrides}
-    unresolved = unresolved_references(entity, known_identities(paths))
-    if keep_names:
-        unresolved = [u for u in unresolved if u.split("=", 1)[0] not in UNRESOLVED_NAME_FIELDS]
+    if "id" in entity:
+        raise PromotionError(
+            "promotion assigns the id; a proposal or --set may not supply one "
+            f"(got {entity['id']!r})"
+        )
+    unresolved = _unresolved(entity, paths, keep_names)
     if unresolved:
         raise PromotionError("unresolved reference(s): " + ", ".join(unresolved))
 
@@ -218,6 +262,25 @@ def _archive(staged: Mapping[str, Any], outcome: Mapping[str, Any], directory: P
     _write_json(directory / f"{staged['id']}.json", {"staged": staged, **outcome})
 
 
+def _finish_earlier_attempt(staged: Mapping[str, Any], paths: Paths) -> str | None:
+    """Settle a staged record whose promotion was interrupted part-way.
+
+    The archive entry is written before the record, so an entry whose record exists means
+    the record was promoted and only the staged copy is left: remove it and report the
+    record. An entry whose record does not exist means the write never happened: drop the
+    entry so the record is promoted afresh. Either way nothing is promoted twice.
+    """
+    archive = paths.promoted / f"{staged['id']}.json"
+    if not archive.is_file():
+        return None
+    target = Path(json.loads(archive.read_text(encoding="utf-8"))["target"])
+    if target.is_file():
+        (paths.staging / f"{staged['id']}.json").unlink(missing_ok=True)
+        return str(target)
+    archive.unlink()
+    return None
+
+
 def _promote(
     records: Iterable[Mapping[str, Any]],
     paths: Paths,
@@ -225,23 +288,42 @@ def _promote(
     overrides: Mapping[str, Any] | None = None,
     keep_names: bool = False,
 ) -> PromotionResult:
+    """Promote each record in turn. A failure skips that record and the batch continues.
+
+    Order per record: the archive entry, then the record (created, never overwritten), then
+    the staged copy is removed. See `_finish_earlier_attempt` for recovery.
+    """
     result = PromotionResult()
     taken: set[str] = set()
     for staged in records:
         try:
-            kind, record = _candidate(staged, overrides or {}, paths, today, taken, keep_names)
-        except PromotionError as exc:
+            finished = _finish_earlier_attempt(staged, paths)
+            if finished is not None:
+                result.promoted.append((staged["id"], finished))
+                continue
+            kind, record = candidate(staged, overrides or {}, paths, today, taken, keep_names)
+            target = _inside(paths.data, paths.data / kind.directory / f"{record['id']}.json")
+            archive = paths.promoted / f"{staged['id']}.json"
+            _archive(
+                staged,
+                {
+                    "action": "promoted",
+                    "record_id": record["id"],
+                    "target": str(target),
+                    "on": today.isoformat(),
+                },
+                paths.promoted,
+            )
+            try:
+                _create_json(target, record)
+            except BaseException:
+                archive.unlink(missing_ok=True)
+                raise
+            taken.add(record["id"])
+            (paths.staging / f"{staged['id']}.json").unlink()
+        except (PromotionError, OSError) as exc:
             result.skipped.append((staged["id"], str(exc)))
             continue
-        target = paths.data / kind.directory / f"{record['id']}.json"
-        _write_json(target, record)
-        taken.add(record["id"])
-        _archive(
-            staged,
-            {"action": "promoted", "record_id": record["id"], "on": today.isoformat()},
-            paths.promoted,
-        )
-        (paths.staging / f"{staged['id']}.json").unlink()
         result.promoted.append((staged["id"], str(target)))
     return result
 
@@ -289,26 +371,24 @@ def create_identity(
         )
     if entity_type not in IDENTITY_TYPES:
         raise PromotionError(f"{entity_type!r} is not an identity; use promote")
+    if entity_type == "tag":
+        raise PromotionError(
+            "a tag from a capture belongs under the private data root, not the tracked "
+            "_data/tags.json (owner ruling, idea 000343); nothing reads a private tag file "
+            "yet, so the tag stays held"
+        )
 
     record = {**staged.get("entity", {}), **(overrides or {})}
     problems = _errors(_validator(where.schemas, entity_type), record)
     if problems:
         raise PromotionError(f"does not validate as a {entity_type}: {problems}")
 
-    if entity_type == "tag":
-        tags = json.loads(where.tags.read_text(encoding="utf-8")) if where.tags.exists() else []
-        if any(tag["id"] == record["id"] for tag in tags):
-            raise PromotionError(f"tag {record['id']!r} already exists")
-        where.tags.write_text(
-            json.dumps([*tags, record], ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
-        target = where.tags
-    else:
+    try:
         kind = KINDS[entity_type]
-        target = where.data / kind.directory / f"{record['id']}.json"
-        if target.exists():
-            raise PromotionError(f"{entity_type} {record['id']!r} already exists")
-        _write_json(target, record)
+        target = _inside(where.data, where.data / kind.directory / f"{record['id']}.json")
+        _create_json(target, record)
+    except OSError as exc:
+        raise PromotionError(f"could not write the {entity_type}: {exc}") from exc
 
     _archive(
         staged,
@@ -346,9 +426,10 @@ def correct(
 ) -> dict[str, Any]:
     """Edit one field of a promoted record and append the dated correction (REQ-002 R15).
 
-    The corrected record must still validate; `id` and `capture` cannot be corrected. The
-    record is written before the entry is appended, and both are checked first, so a refused
-    correction changes neither. Returns the correction entry.
+    The corrected record must still validate, and may not name a person, project or tag that
+    does not exist; `id` and `capture` cannot be corrected. Both are checked before anything
+    is written. The entry is then appended and fsynced before the record is replaced, so the
+    previous value is on disk before it leaves the record. Returns the correction entry.
     """
     where = paths or Paths()
     kind = CORRECTABLE.get(record_type)
@@ -364,12 +445,17 @@ def correct(
 
     record: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     previous = record.get(field_name)
-    if previous == value:
+    if field_name in record and previous == value:
         raise PromotionError(f"{field_name!r} already holds {value!r}")
     corrected = {**record, field_name: value}
     problems = _errors(_validator(where.schemas, kind.schema), corrected)
     if problems:
         raise PromotionError(f"the corrected record would not validate: {problems}")
+    # A correction may not name a person, project or tag that does not exist, any more than
+    # a promotion may (REQ-002 R10). Plain names in *_names fields are the owner's word.
+    unresolved = [u for u in _unresolved(corrected, where, keep_names=True)]
+    if unresolved:
+        raise PromotionError("unresolved reference(s): " + ", ".join(unresolved))
 
     entry = {
         "record_type": record_type,
@@ -380,13 +466,22 @@ def correct(
         "corrected": (today or dt.date.today()).isoformat(),
         "reason": reason,
     }
+    if field_name not in record:
+        entry["previous_absent"] = True
     problems = _errors(_validator(where.schemas, "correction"), entry)
     if problems:
         raise PromotionError(f"refusing an invalid correction entry: {problems}")
 
-    _write_json(path, corrected)
-    with (where.data / CORRECTIONS_FILE).open("a", encoding="utf-8") as log:
-        log.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    # The entry is appended first. If writing the record then fails, the log holds a value
+    # the record does not, which is visible; the other order could lose the previous value.
+    try:
+        with (where.data / CORRECTIONS_FILE).open("a", encoding="utf-8") as log:
+            log.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            log.flush()
+            os.fsync(log.fileno())
+        _write_json(path, corrected)
+    except OSError as exc:
+        raise PromotionError(f"could not record the correction: {exc}") from exc
     return entry
 
 

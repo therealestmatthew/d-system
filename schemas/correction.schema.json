@@ -32,7 +32,11 @@
       "description": "The top-level field that changed."
     },
     "previous": {
-      "description": "The field's value before the correction, of any JSON type. Null when the field was absent or null."
+      "description": "The field's value before the correction, of any JSON type. Null when the field was null, or when it was absent, in which case `previous_absent` is true."
+    },
+    "previous_absent": {
+      "type": "boolean",
+      "description": "True when the field did not exist on the record before the correction, so a null `previous` means absent rather than null. Omitted otherwise."
     },
     "new": {
       "description": "The field's value after the correction, of any JSON type."
