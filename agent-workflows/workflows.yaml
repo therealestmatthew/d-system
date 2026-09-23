@@ -213,3 +213,38 @@ workflows:
       unsupported_limits:
       - Claude's 30-turn maxTurns cap has no Codex equivalent; Codex enforces no per-agent turn
         or token budget, so this role runs unbounded unless the host session itself is capped.
+- id: partition-ideas
+  name: partition-ideas
+  description: >-
+    Run a repeat partition sweep over the idea log: build the corpus, dispatch the reusable
+    partition pack's sections verbatim, synthesize one partition, and stop for the owner at every
+    gate. Moves no idea status and marks nothing complete.
+  authority: agent-invocable
+  source: agent-workflows/partition-ideas.md
+  requires:
+  - read_files
+  - write_files
+  - run_commands
+  - dispatch_role
+  - ask_user
+  targets:
+  - host: claude
+    kind: skill
+    path: .claude/skills/partition-ideas/SKILL.md
+    capabilities:
+      read_files: Read
+      write_files: Write
+      run_commands: Bash
+      dispatch_role: Task
+      ask_user: AskUserQuestion
+    unsupported: []
+  - host: open-agent-skills
+    kind: skill
+    path: .agents/skills/partition-ideas/SKILL.md
+    capabilities:
+      read_files: filesystem
+      write_files: filesystem
+      run_commands: shell
+      dispatch_role: subagent-invocation
+      ask_user: structured-user-input
+    unsupported: []

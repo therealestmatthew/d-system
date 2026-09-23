@@ -1,0 +1,325 @@
+# partition-ideas
+
+Runs a repeat partition sweep over the idea log: builds the corpus, dispatches the reusable partition
+pack's sections, synthesizes one partition, and stops for the owner at every gate.
+
+This workflow is a runner, not an author. Every prompt it dispatches is a fenced block from
+[`PROMPT-034`](../docs/02-prompts/PROMPT-034-reusable-partition-pack.md), extracted by command and
+sent **verbatim**; nothing below is a brief. The requirement is `REQ-009`, the plan `PLAN-025`, and
+the phase that built this runner `phase-part-03`.
+
+**What this workflow never does.** It writes nothing to `_data/ideas.jsonl` — no status event, no
+annotation, no link, including for a decline candidate. It marks no backlog phase complete. It
+reaches no owner decision on its own: the partition, and every decline candidate, is ruled on by the
+owner at a gate, and the workflow stops at each gate rather than proceeding on a default.
+
+## Where things live — two harness constraints
+
+Both are fixed by the harness and are built around, not worked around (`REQ-009`, idea `000206`).
+
+- **Subagents cannot write report files.** Each analyst and audit returns its report as text, and
+  **the coordinator writes it** to the corpus directory. The pack's own words "write your report
+  to ..." are satisfied by the coordinator, never by asking the subagent to try.
+- **Subagents run in the primary checkout, whatever the coordinator's worktree.** So the corpus and
+  every report live in the **primary checkout's** gitignored `_working/idea-corpus/`, which is where
+  the pack's relative paths resolve for the agents reading them. Resolve it once:
+
+  ```bash
+  PRIMARY=$(git worktree list --porcelain | sed -n '1s/^worktree //p')
+  CORPUS="$PRIMARY/_working/idea-corpus"
+  echo "$CORPUS"
+  ```
+
+  That directory never travels to a worktree, and neither a merge nor `git worktree remove` carries
+  it. Anything from it that must survive the sweep is copied out by hand.
+
+Writing into the primary checkout is limited to that gitignored directory. When a coordination
+protocol is in force for the primary checkout (`GOV-017`), hold the turn it requires before writing
+there, and leave `git status` in the primary checkout clean.
+
+**Every file the coordinator writes into `$CORPUS` starts with a run stamp** naming the corpus it
+belongs to, taken from `manifest.json`:
+
+```text
+<!-- partition-ideas: seed=<shuffle_seed> corpus_size=<corpus_size> status=<status, comma-joined> -->
+```
+
+The stamp is how a later invocation tells this sweep's output from an earlier sweep's file at the
+same path. A report without a matching stamp is not this sweep's report.
+
+## 0. Preflight, worktree and estimate
+
+Work in a worktree, per `AGENTS.md`. Then:
+
+```bash
+uv run python -m src.governance
+date -u +%Y-%m-%dT%H:%M:%SZ
+```
+
+Stop if governance fails. Record the start time, and **state a wall-clock estimate for the sweep
+before dispatching anything** — the closing spend posture reports against it.
+
+Keep a running count from here on: dispatches run, dispatches resumed after truncation, and any
+dispatch that ran on a model above sonnet.
+
+## 1. The open-set gate
+
+Before anything else is built or dispatched:
+
+```bash
+uv run python -c "
+from src.db.ideas import load_events, fold
+state = fold(load_events())
+open_ids = sorted(i for i, s in state.items() if s.get('status') == 'open')
+print('open ideas:', len(open_ids))
+for i in open_ids:
+    print(' ', i, '|', state[i].get('title'))
+"
+```
+
+Print the whole output to the owner.
+
+- **Count is zero:** say so in one line — "the open set was empty" — and continue.
+- **Count is not zero:** **stop.** Ask the owner whether to run the triage sweep first (the sweep
+  ends here) or to partition without those ideas (continue). Do not choose for them. Record the
+  ruling and the ids for the closing report.
+
+## 2. Resume or start, then the corpus
+
+Decide by inspection whether this invocation resumes a sweep or starts one. Run:
+
+```bash
+uv run python - "$CORPUS" <<'EOF'
+import datetime as dt, glob, json, pathlib, re, sys
+corpus = pathlib.Path(sys.argv[1])
+manifest = corpus / "manifest.json"
+if not manifest.exists():
+    print("NEW: no manifest")
+    sys.exit()
+m = json.loads(manifest.read_text(encoding="utf-8"))
+stamp = (f"<!-- partition-ideas: seed={m['shuffle_seed']} corpus_size={m['corpus_size']} "
+         f"status={','.join(m.get('status', ['triaged']))} -->")
+done = [p.name for p in sorted(corpus.glob("*.md"))
+        if p.read_text(encoding="utf-8").startswith(stamp)]
+finished = [f for f in glob.glob("docs/00-working/idea-partition-*.json")
+            if json.loads(open(f, encoding="utf-8").read())["manifest"]["shuffle_seed"] == m["shuffle_seed"]]
+built = dt.date.fromtimestamp(manifest.stat().st_mtime).isoformat()
+if done and not finished:
+    print(f"RESUME: corpus built {built}, size {m['corpus_size']}, seed {m['shuffle_seed']}")
+    print("already done:", ", ".join(done))
+else:
+    reason = f"finished in {finished[0]}" if finished else "no stamped output"
+    print(f"NEW: the manifest in place ({reason}) belongs to an earlier sweep")
+EOF
+```
+
+**RESUME** — do not rebuild the corpus; rebuilding would replace the manifest and orphan every
+stamped report. Report the files already done to the owner, then carry on from the first step whose
+output is missing. Each step below also checks for its own output before dispatching.
+
+**NEW** — first move the earlier sweep's files aside, then build.
+
+Move every earlier file in `$CORPUS` — `manifest.json`, `corpus-*.md`, `report-*.md`, `audit-*.md`,
+`dispatch-*.txt` — into `$CORPUS/previous-<that file's modification date>/`. **Move, never
+delete**, and never overwrite a file already in the target directory:
+
+```bash
+uv run python - "${CORPUS:?resolve CORPUS first}" <<'EOF'
+import datetime as dt, pathlib, sys
+corpus = pathlib.Path(sys.argv[1])
+patterns = ("manifest.json", "corpus-*.md", "report-*.md", "audit-*.md", "dispatch-*.txt")
+for pattern in patterns:
+    for path in sorted(corpus.glob(pattern)):
+        day = dt.date.fromtimestamp(path.stat().st_mtime).isoformat()
+        target_dir = corpus / f"previous-{day}"
+        target_dir.mkdir(exist_ok=True)
+        target, n = target_dir / path.name, 2
+        while target.exists():
+            target, n = target_dir / f"{path.stem}-{n}{path.suffix}", n + 1
+        path.rename(target)
+        print(f"moved {path.name} -> {target.relative_to(corpus)}")
+EOF
+```
+
+Then build the corpus into the primary checkout's directory. The status filter defaults to
+`triaged`; pass `--status` only when the invocation names another selection. The `:?` guard stops
+the command if `$CORPUS` was never resolved, which would otherwise build into the current directory:
+
+```bash
+uv run python tools/build_idea_corpus.py --out "${CORPUS:?resolve CORPUS first}"
+```
+
+Then, in either case, **read the manifest** for the real corpus size, status selection and seed, and
+take the corpus date from the manifest's modification date. The pack names no size of its own, and
+neither does this workflow:
+
+```bash
+uv run python - "$CORPUS" <<'EOF'
+import datetime as dt, json, pathlib, sys
+manifest = pathlib.Path(sys.argv[1]) / "manifest.json"
+m = json.loads(manifest.read_text(encoding="utf-8"))
+print("corpus_size:", m["corpus_size"], "| status:", ",".join(m.get("status", ["triaged"])),
+      "| seed:", m["shuffle_seed"], "| corpus date:",
+      dt.date.fromtimestamp(manifest.stat().st_mtime).isoformat())
+EOF
+```
+
+## How every dispatch below is made
+
+1. **Check for this step's output first.** If its report exists in `$CORPUS` with this sweep's
+   stamp, report that it already exists and dispatch nothing.
+2. **Extract the block** — never retype it. `<SECTION>` is the pack's section letter (`R1`, `R4`,
+   `A1`, `S`, `A2`, `G`):
+
+   ```bash
+   uv run python - <SECTION> <<'EOF'
+   import pathlib, re, sys
+   pack = pathlib.Path("docs/02-prompts/PROMPT-034-reusable-partition-pack.md").read_text(encoding="utf-8")
+   match = re.search(rf"^### {re.escape(sys.argv[1])} .*?^```\n(.*?)\n^```$", pack, re.S | re.M)
+   sys.stdout.write(match.group(1) + "\n")
+   EOF
+   ```
+
+3. **Save exactly what you send** to `$CORPUS/dispatch-<SECTION>.txt` — the extracted text, with no
+   stamp and nothing added — so the dispatch can be diffed against the pack afterwards.
+4. **Dispatch that text, and only that text, as the whole prompt**, to the agent and model the pack
+   names for the section: `R1` and `R4` to a general-purpose agent, `A1` and `A2` to
+   `partition-adversary`; model sonnet for all four. Never escalate the model on your own.
+5. **Truncation.** If the returned report is cut off — it stops mid-section or lacks a section its
+   block requires — resume that same agent and ask it to continue from where it stopped. Never
+   re-run it from scratch (idea `000077`). Count the resume.
+6. **Write the report.** Write the run stamp as the first line, then the agent's returned text
+   verbatim, to the file the pack names: `report-R1.md`, `report-R4.md`, `audit-1-findings.md`,
+   `audit-2-findings.md`.
+
+## 3. The analysts — `R1` and `R4`, concurrently
+
+Dispatch `R1` (the finding-reading analyst) and `R4` (the control) **in the same turn**, so they run
+concurrently. Neither sees the other's output. `R4` is sent its own block exactly as extracted:
+it is never told it is a control, that findings exist, or that another analyst is running.
+
+## GATE 1 — after the analyst reports land
+
+**Stop.** Report to the owner: the corpus size, status selection and seed from the manifest; the
+open-set ruling from step 1; each report's path and size; and which reports were written now and
+which already existed. Ask whether to continue to audit 1. Do not continue without the owner's yes.
+
+## 4. Audit 1 — `A1`
+
+Dispatch `A1` to `partition-adversary`, model sonnet, as in *How every dispatch below is made*, and
+write `audit-1-findings.md`.
+
+## GATE 2 — after audit 1 returns
+
+**Stop.** Show the owner audit 1's ranked findings and ask whether to proceed to synthesis. Do not
+continue without the owner's yes.
+
+## 5. Synthesis — `S`, in this session
+
+`S` is not a dispatch. Extract it with the same command and follow it yourself, in this session, as
+written. Its output is the staging document — in **this worktree**, where tracked files belong — and
+its structured record beside it.
+
+**Name the output from the corpus date, and never overwrite.** The date is the corpus date from step
+2, not today's date. If a partition document or record already holds that date, suffix rather than
+overwrite; an earlier partition document is never edited:
+
+```bash
+uv run python - <CORPUS DATE> <<'EOF'
+import pathlib, sys
+base, n = f"docs/00-working/idea-partition-{sys.argv[1]}", 2
+stem = base
+while pathlib.Path(stem + ".md").exists() or pathlib.Path(stem + ".json").exists():
+    stem, n = f"{base}-{n}", n + 1
+print(stem + ".md")
+print(stem + ".json")
+EOF
+```
+
+**The markdown** carries what `S` requires — both levels, the six-field batch record for every
+group, the unbatched section, the two decline tiers and the completeness arithmetic — and records its
+corpus size, its status filter and its manifest seed near the top. Name each track (programme) and
+each fine group exactly as the record names it.
+
+**The record** is the same partition as JSON, validated against
+`schemas/idea-partition-record.schema.json`: `corpus_date`, the markdown's path, the manifest's
+`corpus_size`, `status` and `shuffle_seed`, `state: proposed`, every track with its fine groups and
+member ids, the unbatched ideas with reasons, and both decline tiers. A track's `disposition` stays
+`null` unless the owner rules one; the pack asks for none.
+
+**Check the pair before going on.** This validates the record, checks it against the manifest's
+corpus arithmetically, and checks that the markdown carries the same tracks, groups and ids:
+
+```bash
+uv run python - <PARTITION .md> <PARTITION .json> "$CORPUS" <<'EOF'
+import json, pathlib, re, sys
+from jsonschema import Draft7Validator
+md_path, json_path, corpus = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3])
+record = json.loads(json_path.read_text(encoding="utf-8"))
+markdown = md_path.read_text(encoding="utf-8")
+schema = json.loads(pathlib.Path("schemas/idea-partition-record.schema.json").read_text(encoding="utf-8"))
+problems = [f"schema: {'/'.join(map(str, e.absolute_path)) or 'record'}: {e.message}"
+            for e in Draft7Validator(schema).iter_errors(record)]
+if not problems:
+    corpus_text = (corpus / "corpus-R1.md").read_text(encoding="utf-8")
+    corpus_ids = set(re.findall(r"^## (\d{6}) — ", corpus_text, re.M))  # one per idea entry
+    placed = [i for t in record["tracks"] for g in t["groups"] for i in g["ideas"]]
+    placed += [u["id"] for u in record["unbatched"]]
+    manifest = json.loads((corpus / "manifest.json").read_text(encoding="utf-8"))
+    if len(corpus_ids) != manifest["corpus_size"]:
+        problems.append(f"corpus-R1.md lists {len(corpus_ids)} ids, manifest says {manifest['corpus_size']}")
+    duplicates = sorted({i for i in placed if placed.count(i) > 1})
+    problems += [f"in two places: {i}" for i in duplicates]
+    problems += [f"missing from the record: {i}" for i in sorted(corpus_ids - set(placed))]
+    problems += [f"not in the corpus: {i}" for i in sorted(set(placed) - corpus_ids)]
+    md_ids = set(re.findall(r"\b(\d{6})\b", markdown)) & corpus_ids
+    problems += [f"in the record, not the markdown: {i}" for i in sorted(set(placed) - md_ids)]
+    problems += [f"in the markdown, not the record: {i}" for i in sorted(md_ids - set(placed))]
+    names = [t["name"] for t in record["tracks"]] + [g["name"] for t in record["tracks"] for g in t["groups"]]
+    problems += [f"name not in the markdown: {n!r}" for n in names if n not in markdown]
+    if record["markdown"] != md_path.as_posix():
+        problems.append(f"record names {record['markdown']}, not {md_path.as_posix()}")
+for p in problems:
+    print("FAIL", p)
+print(f"{len(problems)} problem(s)")
+sys.exit(1 if problems else 0)
+EOF
+```
+
+A failure is fixed in the document or the record, and the check re-run. Do not go on with it red.
+
+## 6. Audit 2 — `A2`: stop here until the owner rules
+
+`A2`'s block tells the adversary to read "the merged staging document in docs/00-working/". The
+adversary runs in the primary checkout, and the draft is in this worktree, so as the pack stands the
+adversary cannot see it. **The owner ruled on 2026-09-23 that this workflow stops here** until that
+is resolved; it does not copy the draft into the primary checkout on its own.
+
+**Stop.** Tell the owner the draft and its record are written and checked, name both paths, and ask
+how audit 2 should read the draft. Only once the owner has ruled: dispatch `A2` to
+`partition-adversary`, model sonnet, as in *How every dispatch below is made*, and write
+`audit-2-findings.md`.
+
+## 7. The gate checklist — `G`
+
+Extract `G` and run its checklist yourself, recording real output. The coverage item is the check in
+step 5, run again; the idea-log item is a comparison of `_data/ideas.jsonl` against its state at the
+start of the sweep (`git diff --quiet -- _data/ideas.jsonl` against the commit you started from).
+
+## GATE 3 — the owner's ruling
+
+**Stop.** Present the partition, audit 2's findings and the checklist. The owner accepts or corrects
+the partition, and rules on **every decline candidate individually**. Apply their corrections to
+both the markdown and the record, and re-run the step 5 check. Set the record's `state` to
+`accepted` only on the owner's explicit acceptance. A decline ruling changes no idea's status here;
+recording it in the idea log is a separate, owner-directed action.
+
+## Closing — the spend posture
+
+Every time this workflow stops — at a gate, at the open-set gate, at step 6, or at the end — close
+with the spend posture:
+
+- dispatches run;
+- dispatches resumed after truncation;
+- any dispatch that ran above sonnet (there should be none);
+- wall-clock so far against the estimate stated in step 0.

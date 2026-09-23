@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "idea-partition-record.schema.json",
+  "title": "Idea partition record",
+  "description": "The machine-readable twin of one partition sweep's staging document (REQ-009, PLAN-025, phase-part-03). Written by /partition-ideas next to docs/00-working/idea-partition-<YYYY-MM-DD>.md, with the same basename and a .json extension, carrying the same tracks, member ids and manifest seed as the markdown, so a downstream consumer - phase-irs-14's G2 gate and its amend-as-re-key flow, per GOV-014's Partition role contract - reads this record rather than parsing prose. A track is one level-2 programme: one prospective governed plan. The record is a proposal until the owner accepts it at GATE 3; `state` says which. Ungoverned staging per ADR-010, like the markdown it accompanies.",
+  "type": "object",
+  "required": ["schema_version", "corpus_date", "markdown", "manifest", "state", "tracks", "unbatched", "decline_candidates"],
+  "additionalProperties": false,
+  "definitions": {
+    "idea_id": {
+      "type": "string",
+      "pattern": "^[0-9]{6}$",
+      "description": "A six-digit idea id from _data/ideas.jsonl."
+    },
+    "idea_ids": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/idea_id" },
+      "uniqueItems": true
+    },
+    "reasoned_id": {
+      "type": "object",
+      "required": ["id", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/definitions/idea_id" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "group": {
+      "type": "object",
+      "required": ["name", "ideas"],
+      "additionalProperties": false,
+      "description": "One level-1 fine group: a set the partition criterion says must be implemented together.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "ideas": { "allOf": [{ "$ref": "#/definitions/idea_ids" }, { "minItems": 1 }] }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "const": 1 },
+    "corpus_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "The corpus's build date - the modification date of _working/idea-corpus/manifest.json, since the manifest records none of its own. The markdown's filename carries the same date."
+    },
+    "markdown": {
+      "type": "string",
+      "pattern": "^docs/00-working/idea-partition-[0-9]{4}-[0-9]{2}-[0-9]{2}(-[0-9]+)?\\.md$",
+      "description": "Repository-relative path of the staging document this record accompanies. A numeric suffix appears only when an earlier partition document already holds the same corpus date."
+    },
+    "manifest": {
+      "type": "object",
+      "required": ["corpus_size", "status", "shuffle_seed"],
+      "additionalProperties": false,
+      "description": "The corpus the partition was built from, copied from manifest.json so the record traces to its slice (REQ-009 R04, R06).",
+      "properties": {
+        "corpus_size": { "type": "integer", "minimum": 1 },
+        "status": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "description": "The idea statuses the corpus was selected by (build_idea_corpus.py --status)."
+        },
+        "shuffle_seed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "state": {
+      "enum": ["proposed", "accepted"],
+      "description": "proposed=written at synthesis, before the owner has ruled | accepted=the owner accepted the partition at GATE 3. Only the owner's acceptance moves it; the workflow never writes accepted on its own judgement (REQ-009 R14)."
+    },
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The level-2 programmes, each with its level-1 fine groups underneath.",
+      "items": {
+        "type": "object",
+        "required": ["name", "groups"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "groups": { "type": "array", "items": { "$ref": "#/definitions/group" }, "minItems": 1 },
+          "disposition": {
+            "type": ["object", "null"],
+            "default": null,
+            "description": "GOV-014's new-plan-vs-amendment ruling for this track, when one has been proposed. Null until then: the reusable partition pack asks for none, so a sweep leaves it empty rather than inventing one.",
+            "required": ["kind"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "enum": ["new-plan", "amendment"] },
+              "plan": {
+                "type": ["string", "null"],
+                "description": "For an amendment, the document id or code of the plan being amended."
+              }
+            }
+          }
+        }
+      }
+    },
+    "unbatched": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/reasoned_id" },
+      "description": "Ideas with no confident home, each with its reason. Every corpus idea is in exactly one track group or here."
+    },
+    "decline_candidates": {
+      "type": "object",
+      "required": ["nominated_by_both", "nominated_by_one"],
+      "additionalProperties": false,
+      "description": "The two decline tiers from the synthesis protocol. A nomination only - nothing here changes an idea's status; the owner rules on each at GATE 3. A decline candidate still appears in a group or in unbatched.",
+      "properties": {
+        "nominated_by_both": { "type": "array", "items": { "$ref": "#/definitions/reasoned_id" } },
+        "nominated_by_one": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "reason", "nominated_by"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "$ref": "#/definitions/idea_id" },
+              "reason": { "type": "string", "minLength": 1 },
+              "nominated_by": { "enum": ["R1", "R4"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}
