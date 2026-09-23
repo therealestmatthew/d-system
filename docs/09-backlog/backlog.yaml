@@ -2863,10 +2863,11 @@ items:
   - test/test_capture_review.py
   - test/test_capture_promotion.py
   - docs/03-sessions/SESS-2026-09-23-02-capture-review-promotion.md
-  result: Built and reviewed once; the first review's defects are fixed in the branch. Phase test files
-    12 and 37 passed, full suite 954 passed post-rebase. A review of the fixes is still to run.
-  next_action: Paused overnight at a safe point. On resume, rebase, dispatch a fresh review of the fixes
-    against SESS-2026-09-23-02's defect table, fix what it finds, then send READY per GOV-017.
+  result: Built; four independent reviews with three fix cycles. The last review, of the final fix
+    commit, found no HIGH or MEDIUM and all three acceptance criteria met; five LOW findings accepted
+    with reasons in SESS-2026-09-23-02. Post-rebase on dev be1d78e, governance OK, ruff and mypy
+    clean, pytest 968 passed and 1 skipped.
+  next_action: READY sent per GOV-017. On GRANTED merge, ff-merge and make the completion edit on dev.
 - id: phase-cap-07
   title: Project the expanded entity model into DuckDB
   plan: doc-capture-build
