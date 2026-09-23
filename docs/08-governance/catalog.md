@@ -399,7 +399,7 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
-| PLAN-039 | doc-idea-realization-system-plan | draft | 11 | 0 | 3 | agent-build, agent-coord |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 10 | 1 | 3 | agent-build, agent-builder-a, agent-coord |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 6 | 0 | 4 | agent-build, agent-coord |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 4 | 0 | 1 | agent-builder-b |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
