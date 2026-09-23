@@ -15622,3 +15622,61 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 
 - relates_to → `000319`
 - relates_to ← `000319`
+
+---
+
+## 000321 · The --ready conflict check misses shared file paths between phases whose system ids differ
+
+**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+
+Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md (a run of `uv run python -m src.governance --ready` on dev at 178ae3a).
+
+What was observed: phase-arch-02 (the identifier migration, systems sys-wb-*) edits files in ts/src/stage/. The phases phase-wbf-01, phase-wbf-02, phase-wbf-06 and phase-wbf-10 (system sys-ui) edit files in the same directory: HtmlViewerRegion.tsx, NotesStripRegion.tsx and InjectionDropdowns.tsx. The Conflicts column of --ready shows no conflict between them.
+
+Why it happens, as the Scout reads it: the lock check compares system ids, and sys-ui and sys-wb-* are different ids that cover overlapping files. phase-arch-18 retires sys-ui, which would remove this particular case, but not the general gap: any two system ids that cover the same paths will not be reported as conflicting.
+
+What it would touch: the conflict computation behind `src.governance --ready`, and possibly the system-to-path mapping it relies on. One option is to also compare the phases' file paths or directories, not only their system ids.
+
+Unresolved: whether the fix belongs in the check (compare paths) or in the system registry (no two systems may cover the same path). Until one of these is done, the Scout's standing advice is to never run phase-arch-02 at the same time as any wbf-* UI phase.
+
+Related: the deliverable-overlap miss between phase-wbf-01 and phase-wbf-02, recorded as a separate idea from the same report.
+
+**Links**
+
+- relates_to ← `000322`
+
+---
+
+## 000322 · phase-wbf-01 and phase-wbf-02 share a deliverable file (HtmlViewerRegion.tsx) but are not flagged as conflicting
+
+**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+
+Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md (a run of `uv run python -m src.governance --ready` on dev at 178ae3a).
+
+What was observed: phase-wbf-01 and phase-wbf-02 both list HtmlViewerRegion.tsx (in ts/src/stage/) as a deliverable, yet the Conflicts column of --ready does not report a conflict between them.
+
+Why it matters: two sessions could claim both phases at once and edit the same file in parallel. That is the collision the conflict check exists to prevent.
+
+Unresolved: why the deliverable-overlap check missed it has not been explained. Possible causes to check: the two phases write the path differently (a directory versus a file, or a different prefix); the overlap check only compares system ids; or deliverable overlap is not compared between phases of the same system. Nobody has confirmed which.
+
+Related: the separate idea from the same report about system ids that differ but cover the same paths (phase-arch-02 against the wbf-* phases). The two may have a common cause.
+
+**Links**
+
+- relates_to → `000321`
+
+---
+
+## 000323 · phase-mem-01 lists a deliverable path that does not exist: docs/04-decisions/008-memory-workflow.md
+
+**Created 2026-09-22T20:51:44-04:00 · Status: `open`**
+
+Reported by Session 4 (Scout), forwarded by the Session Manager, on 2026-09-22. Source: _working/session-manager/scout/candidates-2026-09-22.md.
+
+What was observed: the backlog entry for phase-mem-01 (systems sys-memory-agents, sys-brain) names docs/04-decisions/008-memory-workflow.md as a deliverable. No such file exists. The only 008 document in docs/04-decisions/ is ADR-008-record-types.md, which covers a different subject. The Scout listed phase-mem-01 as an otherwise conflict-free alternate.
+
+Why it matters: a session that claims the phase would be working to a stale or wrong deliverable. It might create a file that clashes with ADR numbering, or edit ADR-008 by mistake.
+
+The ask: fix the backlog entry in docs/09-backlog/backlog.yaml before anyone claims phase-mem-01.
+
+Unresolved: what the correct deliverable is. It could be a new ADR with a newly allocated number, an existing document under another name, or the intent may have changed. This needs the owner's decision or a document-code allocation. A second question is whether the governance check should reject a deliverable path in docs/ that does not follow the ADR-NNN naming pattern.
