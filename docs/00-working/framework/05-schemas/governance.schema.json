@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "governance.schema.json",
+  "title": "Governance-rule document",
+  "description": "Validates a governance document after check_schemas.py has converted it to {front_matter, sections}: front_matter is the parsed YAML front matter, sections is the list of level-2 heading texts in document order. A governance document states one standing rule, the problem it solves, and the incident or rationale behind it.",
+  "type": "object",
+  "required": ["front_matter", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "front_matter": {
+      "type": "object",
+      "required": ["code", "title", "kind", "status", "created"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z]+-[0-9]{3}$"},
+        "title": {"type": "string", "minLength": 1},
+        "kind": {"const": "governance"},
+        "status": {"enum": ["draft", "active", "deprecated", "superseded"]},
+        "created": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"const": "Rule"}},
+        {"contains": {"const": "Problem"}},
+        {"contains": {"const": "Incident and rationale"}}
+      ]
+    }
+  }
+}

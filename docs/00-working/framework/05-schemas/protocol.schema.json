@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "protocol.schema.json",
+  "title": "Protocol document",
+  "description": "Validates a protocol document after check_schemas.py has converted it to {front_matter, sections}: front_matter is the parsed YAML front matter, sections is the list of level-2 heading texts in document order. A protocol document states the condition that triggers a procedure, its ordered steps, how to confirm it finished, and what to do when a step fails. The schema checks that each section exists, not that Steps is a numbered list.",
+  "type": "object",
+  "required": ["front_matter", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "front_matter": {
+      "type": "object",
+      "required": ["code", "title", "kind", "status", "created"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z]+-[0-9]{3}$"},
+        "title": {"type": "string", "minLength": 1},
+        "kind": {"const": "protocol"},
+        "status": {"enum": ["draft", "active", "deprecated", "superseded"]},
+        "created": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"const": "Trigger"}},
+        {"contains": {"const": "Steps"}},
+        {"contains": {"const": "Exit criteria"}},
+        {"contains": {"const": "Failure handling"}}
+      ]
+    }
+  }
+}
