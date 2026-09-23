@@ -66,7 +66,7 @@ class Approval:
 
 
 def _now() -> datetime.datetime:
-    return datetime.datetime.now(datetime.timezone.utc)
+    return datetime.datetime.now(datetime.UTC)
 
 
 def _now_iso() -> str:
@@ -79,7 +79,7 @@ def _parse_expiry(expires_at: str) -> datetime.datetime:
     except (TypeError, ValueError) as exc:
         raise ApprovalError(f"expires_at must be an ISO 8601 timestamp: {expires_at!r}") from exc
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=datetime.timezone.utc)
+        parsed = parsed.replace(tzinfo=datetime.UTC)
     return parsed
 
 

@@ -64,7 +64,7 @@ def _fold(log: Path) -> dict[str, dict[str, Any]]:
 def _triaging_dispatch_fn(log: Path, calls: list[str]):
     """A stub that behaves like a *successful* real dispatch: writes a finding and triages."""
 
-    def _dispatch(idea: str, title: str, body: str) -> "idea_dispatch.DispatchResult":
+    def _dispatch(idea: str, title: str, body: str) -> idea_dispatch.DispatchResult:
         calls.append(idea)
         append_idea.annotate(
             idea, "agent-idea-triage", "finding", f"scouted {title!r}", log=log
@@ -77,7 +77,7 @@ def _triaging_dispatch_fn(log: Path, calls: list[str]):
 def _killed_dispatch_fn(calls: list[str]):
     """A stub that behaves like a dispatch killed mid-run: reports failure, writes nothing."""
 
-    def _dispatch(idea: str, title: str, body: str) -> "idea_dispatch.DispatchResult":
+    def _dispatch(idea: str, title: str, body: str) -> idea_dispatch.DispatchResult:
         calls.append(idea)
         return idea_dispatch.DispatchResult(idea, False, "killed mid-run")
     return _dispatch
@@ -262,7 +262,7 @@ def test_sweep_ignores_an_idea_already_triaged(
     log: Path, state_file: Path, halt_flag: Path, claims_dir: Path
 ) -> None:
     idea_dispatch.install(log, state_file)
-    idea_id = append_idea.add("Test idea", "Body", log)["idea"]
+    append_idea.add("Test idea", "Body", log)
     calls: list[str] = []
     idea_dispatch.dispatch(
         log=log, state_file=state_file, halt_flag=halt_flag, claims_dir=claims_dir,
@@ -395,7 +395,11 @@ def test_dispatch_self_installs_when_never_explicitly_installed(
 
 
 def test_dispatch_self_install_warns_about_excluded_open_ideas(
-    log: Path, state_file: Path, halt_flag: Path, claims_dir: Path, capsys: pytest.CaptureFixture[str]
+    log: Path,
+    state_file: Path,
+    halt_flag: Path,
+    claims_dir: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Cycle-2 fix: silently excluding pre-existing open ideas from both dispatch and sweep is a
     permanent, invisible loss unless something says so. A first `dispatch` with no prior explicit
@@ -413,7 +417,11 @@ def test_dispatch_self_install_warns_about_excluded_open_ideas(
 
 
 def test_poll_once_self_install_also_warns(
-    log: Path, state_file: Path, halt_flag: Path, claims_dir: Path, capsys: pytest.CaptureFixture[str]
+    log: Path,
+    state_file: Path,
+    halt_flag: Path,
+    claims_dir: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     pre_existing = append_idea.add("Pre-existing", "Body", log)["idea"]
 
@@ -440,7 +448,11 @@ def test_explicit_install_does_not_warn(
 
 
 def test_self_install_with_no_open_ideas_prints_nothing(
-    log: Path, state_file: Path, halt_flag: Path, claims_dir: Path, capsys: pytest.CaptureFixture[str]
+    log: Path,
+    state_file: Path,
+    halt_flag: Path,
+    claims_dir: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """An empty log has nothing to exclude — no warning is warranted."""
     idea_dispatch.dispatch(

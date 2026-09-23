@@ -36,8 +36,9 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 #: Default location for the audit log when no caller-supplied directory is given. Gitignored
 #: (`_working/` — see the repository .gitignore) so no run of this module writes a tracked file.
@@ -64,7 +65,7 @@ class Decision:
 
 
 def _now() -> str:
-    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+    return datetime.datetime.now(datetime.UTC).isoformat()
 
 
 def audit_log_path(state_dir: Path) -> Path:

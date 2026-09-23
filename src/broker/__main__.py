@@ -148,7 +148,14 @@ def _cmd_check(args: argparse.Namespace) -> int:
             raise ValueError("tool-call payload on stdin must be a JSON object")
         payload = parsed
 
-        capability = args.capability or payload.get("capability")
+        capability = args.capability
+        if not capability:
+            payload_capability = payload.get("capability")
+            if isinstance(payload_capability, str):
+                capability = payload_capability
+            elif payload_capability:
+                reason = "malformed-payload"
+                raise ValueError("the 'capability' field on stdin must be a string")
         if not capability:
             reason = "no-capability"
             raise ValueError(

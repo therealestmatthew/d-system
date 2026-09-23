@@ -177,6 +177,18 @@ def test_cli_check_fails_closed_on_non_object_stdin(tmp_path: Path) -> None:
     assert "malformed-payload" in result.stderr
 
 
+def test_cli_check_fails_closed_on_non_string_capability(tmp_path: Path) -> None:
+    """A 'capability' field that is not a string cannot be evaluated, so it blocks."""
+    result = _run_broker("check", stdin=json.dumps({"capability": 5}), state_dir=tmp_path)
+
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "malformed-payload" in result.stderr
+
+    [record] = enforcement.read_audit_log(tmp_path)
+    assert record["allowed"] is False
+    assert "malformed-payload" in record["reason"]
+
+
 @pytest.mark.skipif(
     hasattr(__import__("os"), "geteuid") and __import__("os").geteuid() == 0,
     reason="root bypasses the permission bits this test relies on",
@@ -394,7 +406,7 @@ def _future(hours: int = 1) -> str:
     import datetime
 
     return (
-        datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=hours)
+        datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=hours)
     ).isoformat()
 
 
@@ -402,7 +414,7 @@ def _past(hours: int = 1) -> str:
     import datetime
 
     return (
-        datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)
+        datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=hours)
     ).isoformat()
 
 

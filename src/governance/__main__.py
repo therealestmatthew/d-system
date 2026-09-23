@@ -432,7 +432,9 @@ def git_claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[st
             continue
         evidence[phase_id] = {
             "days_since_commit": (today - date.fromisoformat(commit_date)).days,
-            "worktree_exists": (branch in worktree_branches) if worktree_listing_available else None,
+            "worktree_exists": (
+                (branch in worktree_branches) if worktree_listing_available else None
+            ),
         }
     return evidence
 

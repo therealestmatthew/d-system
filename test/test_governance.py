@@ -4,15 +4,21 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-import subprocess
-
-from src.governance.__main__ import ROOT, audit, git_claim_evidence, inventory, parse_frontmatter, public_path
+from src.governance.__main__ import (
+    ROOT,
+    audit,
+    git_claim_evidence,
+    inventory,
+    parse_frontmatter,
+    public_path,
+)
 from src.governance.backlog import claim_report_state
 
 TODAY = date(2026, 9, 5)
@@ -249,7 +255,10 @@ def test_git_log_failure_yields_no_evidence(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr(subprocess, "run", faulty_run)
     evidence = git_claim_evidence(ROOT, ["phase-conc-01"], date(2026, 9, 19))
     assert evidence["phase-conc-01"] == {"days_since_commit": None, "worktree_exists": None}
-    assert claim_report_state(evidence["phase-conc-01"]) == "no evidence: no agent/<phase-id> branch found"
+    assert (
+        claim_report_state(evidence["phase-conc-01"])
+        == "no evidence: no agent/<phase-id> branch found"
+    )
 
 
 def test_worktree_list_failure_does_not_report_stale(
