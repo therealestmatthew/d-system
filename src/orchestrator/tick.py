@@ -33,7 +33,6 @@ never trusts a checkpoint's own idea of where it is. Two situations follow that 
 
 from __future__ import annotations
 
-import datetime as dt
 import sqlite3
 from pathlib import Path
 from typing import Any
@@ -46,7 +45,7 @@ from src.orchestrator import decisions as decisions_mod
 from src.orchestrator import gates, ledger
 from src.orchestrator import state as state_mod
 from src.orchestrator.dispatch import Dispatcher, unimplemented_dispatcher
-from src.orchestrator.graphs.intake import GATE_NAME, DEFAULT_BUDGET_CAP
+from src.orchestrator.graphs.intake import DEFAULT_BUDGET_CAP, GATE_NAME
 from src.orchestrator.graphs.intake import build_graph as build_intake_graph
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -79,7 +78,8 @@ def open_checkpoint_store(path: Path) -> SqliteSaver:
     except sqlite3.DatabaseError:
         conn.close()
         stamp = ledger.now().replace(":", "")
-        for candidate in (path, path.with_name(path.name + "-wal"), path.with_name(path.name + "-shm")):
+        side_files = (path.name + "-wal", path.name + "-shm")
+        for candidate in (path, *(path.with_name(name) for name in side_files)):
             if candidate.exists():
                 candidate.rename(candidate.with_name(f"{candidate.name}.corrupt-{stamp}"))
         conn = sqlite3.connect(str(path), check_same_thread=False)
@@ -235,7 +235,10 @@ def tick(
                 run_id, "abandoned", run_log,
                 reason="idea left open outside this run's own resume path",
             )
-            ledger.record(run_id, "terminal", run_log, outcome="idea-left-open-externally", position="done")
+            ledger.record(
+                run_id, "terminal", run_log,
+                outcome="idea-left-open-externally", position="done",
+            )
             result["rekeyed"].append(run_id)
             continue
 

@@ -84,8 +84,12 @@ def _stub_dispatcher(outcome: str = "ok", input_tokens: int = 10, output_tokens:
     calls: list[dict[str, Any]] = []
 
     def dispatcher(*, run_id: str, role: str, refs: dict[str, str], budget_cap: int):
-        calls.append({"run_id": run_id, "role": role, "refs": dict(refs), "budget_cap": budget_cap})
-        return DispatchResult(outcome=outcome, input_tokens=input_tokens, output_tokens=output_tokens)
+        calls.append(
+            {"run_id": run_id, "role": role, "refs": dict(refs), "budget_cap": budget_cap}
+        )
+        return DispatchResult(
+            outcome=outcome, input_tokens=input_tokens, output_tokens=output_tokens
+        )
 
     dispatcher.calls = calls  # type: ignore[attr-defined]
     return dispatcher
@@ -259,10 +263,11 @@ def test_reconcile_does_not_double_start_an_already_active_run(tmp_path: Path) -
     result = tick_mod.tick(**env, checkpointer=make())
 
     assert result["started"] == []
-    assert len(ledger.load_events(env["run_log"])) == 2  # started + gate_reached, still just one run
+    # started + gate_reached, still just one run
+    assert len(ledger.load_events(env["run_log"])) == 2
 
 
-# --- the owner-initiated dispatch flag -------------------------------------------------------------
+# --- the owner-initiated dispatch flag -----------------------------------------------------
 
 
 def test_no_dispatch_without_the_owner_flag(tmp_path: Path) -> None:
@@ -399,7 +404,7 @@ def test_r16_checkpoint_corruption_rekeys_thread_at_rederived_position(tmp_path:
     assert len(started_events) == 1
 
 
-# --- REQ-022 R17: a killed run resumes at its gate -------------------------------------------------
+# --- REQ-022 R17: a killed run resumes at its gate -----------------------------------------
 
 
 def test_r17_killed_run_resumes_at_its_gate(tmp_path: Path) -> None:
@@ -425,7 +430,7 @@ def test_r17_killed_run_resumes_at_its_gate(tmp_path: Path) -> None:
     assert summary["status"] == "terminal" and summary["outcome"] == "complete"
 
 
-# --- REQ-022 R18: reconstruct one run from ledger entries alone ------------------------------------
+# --- REQ-022 R18: reconstruct one run from ledger entries alone ----------------------------
 
 
 def test_r18_run_reconstructible_from_ledger_alone(tmp_path: Path) -> None:
@@ -458,7 +463,7 @@ def test_r18_run_reconstructible_from_ledger_alone(tmp_path: Path) -> None:
     assert ledger.fold(events)[run_id] == summary
 
 
-# --- REQ-022 R19: no claim-recovery logic in this package ------------------------------------------
+# --- REQ-022 R19: no claim-recovery logic in this package ----------------------------------
 
 
 def test_r19_orchestrator_package_defines_no_claim_recovery_logic() -> None:

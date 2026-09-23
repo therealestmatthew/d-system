@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft7Validator
+from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = ROOT / "schemas" / "run.schema.json"
@@ -59,7 +59,8 @@ def now() -> str:
 
 
 def _schema() -> dict[str, Any]:
-    return json.loads(SCHEMA.read_text(encoding="utf-8"))
+    schema: dict[str, Any] = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    return schema
 
 
 def _validator() -> Draft7Validator:

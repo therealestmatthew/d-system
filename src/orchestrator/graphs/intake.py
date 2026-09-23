@@ -23,9 +23,11 @@ re-deriving the position, matching the re-keying rule (ADR-018, `state.py`).
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from src.orchestrator import gates
 from src.orchestrator.dispatch import Dispatcher, DispatchResult, unimplemented_dispatcher
@@ -44,11 +46,10 @@ def _assemble(state: RunState) -> dict[str, Any]:
 
 
 def _route_after_gate(state: RunState) -> str:
-    decision = state["refs"].get("last_decision") or {}
-    return "triage" if decision.get("decision") == "approve" else "done"
+    return "triage" if state["refs"].get("last_decision") == "approve" else "done"
 
 
-def _make_triage(dispatcher: Dispatcher):
+def _make_triage(dispatcher: Dispatcher) -> Callable[[RunState], dict[str, Any]]:
     def triage(state: RunState) -> dict[str, Any]:
         result: DispatchResult = dispatcher(
             run_id=state["run_id"],
@@ -72,12 +73,21 @@ def _done(state: RunState) -> dict[str, Any]:
     return {"refs": {**state["refs"], "position": "done"}}
 
 
-def build_graph(checkpointer: Any, dispatcher: Dispatcher = unimplemented_dispatcher):
+def build_graph(
+    checkpointer: Any, dispatcher: Dispatcher = unimplemented_dispatcher
+) -> CompiledStateGraph[RunState, Any, RunState, RunState]:
     """Compile the intake graph against `checkpointer`, calling `dispatcher` on approval."""
     graph = StateGraph(RunState)
     graph.add_node("assemble", _assemble)
     graph.add_node("dispatch_gate", gates.gate_node)
-    graph.add_node("triage", _make_triage(dispatcher))
+    # `add_node`'s overloads resolve NodeInputT precisely against a literal function
+    # reference (see `_assemble`/`gate_node`/`_done` below, all unannotated here), but not
+    # against a closure returned from a call expression with the identical signature --
+    # `Callable[[RunState], dict[str, Any]]` -- which falls through to the union of concrete
+    # `_Node[Never]` overloads and is rejected. `_make_triage`'s return type is correct and
+    # runtime behavior is identical to the other three nodes; this is an overload-resolution
+    # gap in langgraph's stub, not an error in this call.
+    graph.add_node("triage", _make_triage(dispatcher))  # type: ignore[arg-type]
     graph.add_node("done", _done)
 
     graph.add_edge(START, "assemble")

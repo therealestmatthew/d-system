@@ -16,28 +16,35 @@ from typing import Any
 
 from langgraph.types import Command, interrupt
 
+from src.orchestrator.state import RunState
 
-def gate_node(state: dict[str, Any]) -> dict[str, Any]:
+
+def gate_node(state: RunState) -> dict[str, Any]:
     """The entire body of a gate node.
 
     `state["refs"]` is surfaced as the interrupt's payload alongside the gate's name, so
     `status`/`gate` rendering (outside this phase's scope) has enough to show the owner what
-    is waiting. The decision that resumes the interrupt is folded into `refs` under
-    `last_decision`, becoming part of the state the next node sees -- never persisted
-    anywhere else, per the thin-state rule; the ledger entry recording the decision is a
-    separate write (`tools/append_decision.py`, `ledger.py`), not this function's job.
+    is waiting. Only the decision's own verb (`approve`/`reject`/`amend`) is folded back into
+    `refs` under `last_decision`, becoming part of the state the next node sees -- `refs` is
+    declared `dict[str, str]` (ADR-018's thin-state rule), so the whole decision payload
+    (which may carry `notes`, `decided_by`, etc.) is never stored, only the one field a
+    routing function needs. The ledger entry recording the full decision is a separate write
+    (`tools/append_decision.py`, `ledger.py`), not this function's job.
     """
     payload = {"gate": state["refs"].get("gate"), "refs": state["refs"]}
     decision = interrupt(payload)
-    return {"refs": {**state["refs"], "last_decision": decision}}
+    verb = decision["decision"] if isinstance(decision, dict) else str(decision)
+    return {"refs": {**state["refs"], "last_decision": verb}}
 
 
-def resume_command(decision: dict[str, Any]) -> Command:
+def resume_command(decision: dict[str, Any]) -> Command[str]:
     """Build the `Command` that resumes a thread interrupted at a gate with `decision`.
 
     `decision` is a gate-decision event's own shape (`schemas/gate-decision.schema.json`)
     minus its ledger bookkeeping fields -- at minimum `{"decision": "approve"|"reject"|
     "amend"}`. `tick.py`'s `advance()` is the only caller in this package; nothing else
-    constructs a resume directly.
+    constructs a resume directly. `Command`'s type argument is the node-name type its `goto`
+    would carry; this call never sets `goto`, so `str` (matching every node name in this
+    package's graphs) is a concrete, correct choice rather than a workaround.
     """
     return Command(resume=decision)
