@@ -52,6 +52,11 @@ DISCARDED_DIR = ROOT / "_capture" / "discarded"
 TAGS_FILE = ROOT / "_data" / "tags.json"
 CORRECTIONS_FILE = "corrections.jsonl"
 
+#: A staged id, as `structure._new_id` makes it (schemas/staged-record.schema.json).
+STAGED_ID = re.compile(r"^staged-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}$")
+#: A promoted record's id: a plain file stem, never a path.
+RECORD_ID = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+
 
 @dataclass(frozen=True)
 class EntityKind:
@@ -176,6 +181,8 @@ def load_staged(staging: Path = STAGING_DIR) -> list[dict[str, Any]]:
 
 
 def _staged(staged_id: str, paths: Paths) -> dict[str, Any]:
+    if not STAGED_ID.match(staged_id):
+        raise PromotionError(f"{staged_id!r} is not a staged id")
     path = paths.staging / f"{staged_id}.json"
     if not path.is_file():
         raise PromotionError(f"no staged record {staged_id!r}")
@@ -265,20 +272,44 @@ def _archive(staged: Mapping[str, Any], outcome: Mapping[str, Any], directory: P
 def _finish_earlier_attempt(staged: Mapping[str, Any], paths: Paths) -> str | None:
     """Settle a staged record whose promotion was interrupted part-way.
 
-    The archive entry is written before the record, so an entry whose record exists means
-    the record was promoted and only the staged copy is left: remove it and report the
-    record. An entry whose record does not exist means the write never happened: drop the
-    entry so the record is promoted afresh. Either way nothing is promoted twice.
+    The archive entry is written before the record, so an entry whose record exists and
+    came from this capture means the record was promoted and only the staged copy is left:
+    remove it and report the record. Otherwise the write never happened — the file is
+    missing, or another record has since taken that id — so drop the entry and the record
+    is promoted afresh under a new id. Either way nothing is promoted twice or lost.
+
+    The target is rebuilt from the entry's `record_id` under the current data root, not
+    read from the stored absolute path, so a moved data root cannot misdirect it.
     """
     archive = paths.promoted / f"{staged['id']}.json"
     if not archive.is_file():
         return None
-    target = Path(json.loads(archive.read_text(encoding="utf-8"))["target"])
-    if target.is_file():
-        (paths.staging / f"{staged['id']}.json").unlink(missing_ok=True)
-        return str(target)
+    entry = json.loads(archive.read_text(encoding="utf-8"))
+    kind = KINDS.get(staged["entity_type"])
+    record_id = entry.get("record_id", "")
+    if kind is not None and RECORD_ID.match(record_id):
+        target = _inside(paths.data, paths.data / kind.directory / f"{record_id}.json")
+        if _promoted_from(target, record_id, staged["capture_id"]):
+            (paths.staging / f"{staged['id']}.json").unlink(missing_ok=True)
+            return str(target)
     archive.unlink()
     return None
+
+
+def _promoted_from(target: Path, record_id: str, capture_id: str) -> bool:
+    """Whether `target` is the record promoted from `capture_id`, not another one."""
+    if not target.is_file():
+        return False
+    try:
+        record = json.loads(target.read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    capture = record.get("capture") if isinstance(record, dict) else None
+    return (
+        record.get("id") == record_id
+        and isinstance(capture, dict)
+        and capture.get("capture_id") == capture_id
+    )
 
 
 def _promote(
@@ -321,8 +352,11 @@ def _promote(
                 raise
             taken.add(record["id"])
             (paths.staging / f"{staged['id']}.json").unlink()
-        except (PromotionError, OSError) as exc:
-            result.skipped.append((staged["id"], str(exc)))
+        except (ValueError, KeyError, OSError) as exc:
+            # ValueError covers PromotionError and a corrupt JSON file; KeyError a staged
+            # record missing a required field. Either skips this record only.
+            why = str(exc) if isinstance(exc, PromotionError) else f"{type(exc).__name__}: {exc}"
+            result.skipped.append((staged.get("id", "?"), why))
             continue
         result.promoted.append((staged["id"], str(target)))
     return result
@@ -439,7 +473,9 @@ def correct(
         )
     if field_name in {"id", "capture"}:
         raise PromotionError(f"{field_name!r} cannot be corrected")
-    path = where.data / kind.directory / f"{record_id}.json"
+    if not RECORD_ID.match(record_id):
+        raise PromotionError(f"{record_id!r} is not a record id")
+    path = _inside(where.data, where.data / kind.directory / f"{record_id}.json")
     if not path.is_file():
         raise PromotionError(f"no {record_type} {record_id!r} in {where.data}")
 
@@ -474,9 +510,17 @@ def correct(
 
     # The entry is appended first. If writing the record then fails, the log holds a value
     # the record does not, which is visible; the other order could lose the previous value.
+    # A crash part-way through an earlier append can leave a last line with no newline; start
+    # this entry on a fresh line so it is not joined onto the torn one.
     try:
-        with (where.data / CORRECTIONS_FILE).open("a", encoding="utf-8") as log:
-            log.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        with (where.data / CORRECTIONS_FILE).open("a+b") as log:
+            log.seek(0, os.SEEK_END)
+            torn = False
+            if log.tell() > 0:
+                log.seek(-1, os.SEEK_END)
+                torn = log.read(1) != b"\n"
+            line = json.dumps(entry, ensure_ascii=False) + "\n"
+            log.write((("\n" if torn else "") + line).encode("utf-8"))
             log.flush()
             os.fsync(log.fileno())
         _write_json(path, corrected)
@@ -488,10 +532,26 @@ def correct(
 def corrections(
     record_type: str, record_id: str, paths: Paths | None = None
 ) -> list[dict[str, Any]]:
-    """Every correction to one record, oldest first."""
+    """Every correction to one record, oldest first.
+
+    A line that does not parse is a torn append from a crash. The entry is written before
+    the record, so a torn entry was never applied; it is skipped rather than hiding every
+    other entry behind a parse error.
+    """
     where = paths or Paths()
     log = where.data / CORRECTIONS_FILE
     if not log.exists():
         return []
-    entries = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines() if line]
-    return [e for e in entries if e["record_type"] == record_type and e["record_id"] == record_id]
+    entries = []
+    for line in log.read_text(encoding="utf-8").splitlines():
+        try:
+            entry = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(entry, dict):
+            entries.append(entry)
+    return [
+        e
+        for e in entries
+        if e.get("record_type") == record_type and e.get("record_id") == record_id
+    ]

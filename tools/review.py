@@ -139,7 +139,7 @@ def _run(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None) -> int:
     try:
         return _run(_parser().parse_args(argv))
-    except (PromotionError, StructuringError, OSError) as exc:
+    except (PromotionError, StructuringError, OSError, ValueError, KeyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

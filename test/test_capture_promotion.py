@@ -313,6 +313,61 @@ def test_an_archive_entry_with_no_record_is_promoted_afresh(
     assert (paths.data / "tasks" / "t-4.json").exists()
 
 
+def test_an_interrupted_promotion_never_settles_on_another_records_file(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    first, second = stage(capture, raw_dir, paths, CLEAN_TASK, FLAGGED_COMMITMENT)
+    # A crash left `first` with an archive entry for t-4 but no record ...
+    paths.promoted.mkdir(parents=True)
+    (paths.promoted / f"{first['id']}.json").write_text(
+        json.dumps(
+            {
+                "action": "promoted",
+                "record_id": "t-4",
+                "target": str(paths.data / "tasks" / "t-4.json"),
+            }
+        ),
+        encoding="utf-8",
+    )
+    # ... and another record has since been promoted as t-4.
+    (paths.data / "tasks" / "t-4.json").write_text(
+        json.dumps(
+            {
+                "id": "t-4",
+                "description": "someone else",
+                "status": "open",
+                "created": "2026-09-22",
+                "capture": {"capture_id": "cap-other", "assumed_fields": [], "promoted": "x"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = promote.promote_clean(paths, today=TODAY)
+
+    assert result.promoted == [(first["id"], str(paths.data / "tasks" / "t-5.json"))]
+    record = json.loads((paths.data / "tasks" / "t-5.json").read_text(encoding="utf-8"))
+    assert record["capture"]["capture_id"] == first["capture_id"]
+    other = json.loads((paths.data / "tasks" / "t-4.json").read_text(encoding="utf-8"))
+    assert other["description"] == "someone else"
+
+
+@pytest.mark.parametrize("action", ["promote", "create", "discard"])
+def test_a_staged_id_that_is_a_path_is_refused(
+    action: str, capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    before = tree_digest(paths.data)
+    traversal = "../data/people/jordan-rivera"
+    with pytest.raises(PromotionError, match="is not a staged id"):
+        if action == "promote":
+            promote.promote_one(traversal, paths=paths, today=TODAY)
+        elif action == "create":
+            promote.create_identity(traversal, paths=paths, today=TODAY)
+        else:
+            promote.discard(traversal, paths=paths, today=TODAY)
+    assert tree_digest(paths.data) == before
+
+
 # --- flagged and held records: one owner decision each ----------------------------------
 
 
@@ -567,6 +622,37 @@ def test_a_correction_that_cannot_be_logged_leaves_the_record_unchanged(
     with pytest.raises(PromotionError, match="could not record the correction"):
         promote.correct("commitment", "c-1", "priority", "high", paths=paths, today=TODAY)
     assert promoted_commitment.read_bytes() == before
+
+
+@pytest.mark.parametrize("record_id", ["../people/jordan-rivera", "../../outside/c-1", "C-1"])
+def test_a_correction_to_a_path_rather_than_a_record_id_is_refused(
+    promoted_commitment: Path, paths: Paths, tmp_path: Path, record_id: str
+) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "c-1.json").write_bytes(promoted_commitment.read_bytes())
+    before = tree_digest(tmp_path)
+    with pytest.raises(PromotionError, match="is not a record id"):
+        promote.correct("commitment", record_id, "priority", "high", paths=paths, today=TODAY)
+    assert tree_digest(tmp_path) == before
+
+
+def test_a_torn_log_line_does_not_swallow_the_next_correction(
+    promoted_commitment: Path, paths: Paths
+) -> None:
+    promote.correct("commitment", "c-1", "due_date", "2026-09-30", paths=paths, today=TODAY)
+    log = paths.data / promote.CORRECTIONS_FILE
+    # A crash part-way through an append leaves a last line with no newline.
+    with log.open("a", encoding="utf-8") as handle:
+        handle.write('{"record_type": "commitment", "record_id": "c-1", "fi')
+
+    promote.correct("commitment", "c-1", "priority", "high", paths=paths, today=TODAY)
+
+    history = promote.corrections("commitment", "c-1", paths)
+    assert [(e["field"], e["previous"], e["new"]) for e in history] == [
+        ("due_date", "2026-09-25", "2026-09-30"),
+        ("priority", "medium", "high"),
+    ]
 
 
 # --- the CLI ---------------------------------------------------------------------------
