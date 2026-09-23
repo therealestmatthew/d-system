@@ -9364,7 +9364,8 @@ items:
   - sys-governance
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 1
   session_budget: 1
   depends_on: []
@@ -9385,6 +9386,7 @@ items:
   - uv run pytest
   deliverables:
   - tools/git-hooks/
+  - tools/
   - docs/08-governance/OPS-001-operations.md
   next_action: Read the 000041 incident report before designing the guard. The session-code half of that
     incident is phase-conc-03, not this phase - do not fold them together.
