@@ -25,6 +25,7 @@ CI regenerates it and fails on any difference.
 | ADR-018 | adr | draft | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
 | ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ADR-021 | adr | accepted | repository-owner | docs/04-decisions/ADR-021-claude-code-dependency.md |
+| ADR-022 | adr | accepted | repository-owner | docs/04-decisions/ADR-022-broker-first-autonomous-operations.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -35,6 +36,7 @@ CI regenerates it and fails on any difference.
 | ARCH-008 | architecture | draft | repository-owner | docs/07-architecture/ARCH-008-schema-catalog.md |
 | ARCH-009 | architecture | draft | repository-owner | docs/07-architecture/ARCH-009-schema-architecture-review.md |
 | ARCH-010 | architecture | draft | repository-owner | docs/07-architecture/ARCH-010-schema-decision-reconciliation.md |
+| ARCH-011 | architecture | draft | repository-owner | docs/07-architecture/ARCH-011-autonomous-operations-architecture.md |
 | GOV-001 | governance | active | repository-owner | docs/08-governance/GOV-001-protocol.md |
 | GOV-002 | governance | active | repository-owner | docs/08-governance/GOV-002-backlog-protocol.md |
 | GOV-003 | governance | active | repository-owner | docs/08-governance/GOV-003-backlog-decisions.md |
@@ -399,4 +401,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-316 documents — adr: 18, architecture: 10, governance: 13, operation: 18, plan: 58, prompt: 36, requirement: 27, session: 136.
+318 documents — adr: 19, architecture: 11, governance: 13, operation: 18, plan: 58, prompt: 36, requirement: 27, session: 136.
