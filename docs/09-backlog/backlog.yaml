@@ -9387,6 +9387,7 @@ items:
   deliverables:
   - tools/git-hooks/
   - tools/
+  - test/
   - docs/08-governance/OPS-001-operations.md
   next_action: Read the 000041 incident report before designing the guard. The session-code half of that
     incident is phase-conc-03, not this phase - do not fold them together.
