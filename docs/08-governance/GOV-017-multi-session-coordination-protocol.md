@@ -181,7 +181,7 @@ sent to the name `Session Manager`.
 | Message | From | Meaning |
 |---|---|---|
 | `ACK <session> <state>` | any | Orientation received; states phase, branch and worktree, or none |
-| `TURN? <claim\|idea\|batch> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines, as `PROMPT-036` sets it when it opens or closes a batch; merges go through `READY` |
+| `TURN? <claim\|idea\|batch\|dryrun> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines; `dryrun` runs a merged skill or workflow in the primary checkout for a phase's acceptance evidence, writing only gitignored paths and committing nothing (owner ruling, 2026-09-22, first used by `phase-part-03`); as `PROMPT-036` sets it when it opens or closes a batch; merges go through `READY` |
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
 | `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean |
