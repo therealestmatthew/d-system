@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-22'
 systems: [sys-api, sys-delivery, sys-governance]
 depends_on: [doc-adr-multi-agent-concurrency, doc-prompt-pack-protocol]
 ---
@@ -94,6 +94,10 @@ and denies nothing by default satisfies it, because the gate is the refusal path
 rules it carries. `R02` and `R04` are what require real capability sets and approvals, and a design
 that ships the permissive shape leaves those two open until there are real requests to write them
 against — which must then be recorded as open rather than claimed.
+That is the shape chosen:
+[ADR-022](../04-decisions/ADR-022-broker-first-autonomous-operations.md) defers the capability
+taxonomy and has `phase-auto-02` build a permissive-default broker, so `R02` and `R04` are open. No
+phase satisfies them yet.
 
 **R03 is the whole of `000031`'s value.** A capability model that describes denials in a prompt is a
 longer prompt. The row asks for enforcement at the tool boundary because that is the only version an

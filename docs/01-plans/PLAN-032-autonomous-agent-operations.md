@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-15'
+updated: '2026-09-22'
 systems: [sys-api, sys-delivery, sys-governance]
 depends_on: [doc-autonomous-agent-operations-requirements, doc-adr-multi-agent-concurrency]
 ---
@@ -192,14 +192,19 @@ bear directly on what a run ledger needs to record. Building the ledger first me
 
 ## Requirement coverage
 
-Every row of `REQ-017` maps to at least one phase, and every phase carries at least one row.
+Every row of `REQ-017` maps to at least one phase except `R02` and `R04`, and every phase carries at
+least one row. `phase-auto-01`'s design chose the permissive-default broker and deferred the
+capability taxonomy, so
+[ADR-022](../04-decisions/ADR-022-broker-first-autonomous-operations.md) records `R02` and `R04` as
+open rather than covered by `phase-auto-02`. They stay open until real capability requests exist to
+design a named taxonomy and an approval path against.
 
 | Requirement | Phases |
 |---|---|
 | R01 The broker gates before anything runs unattended | `phase-auto-01`, `phase-auto-02` |
-| R02 Narrow, named capability sets per run | `phase-auto-02` |
+| R02 Narrow, named capability sets per run | Open — see `ADR-022` |
 | R03 Denials enforced at the tool boundary | `phase-auto-02` |
-| R04 Approvals carry scope, reason, expiry, immutable decision | `phase-auto-02` |
+| R04 Approvals carry scope, reason, expiry, immutable decision | Open — see `ADR-022` |
 | R05 Four trigger sources normalised to one event shape | `phase-auto-03` |
 | R06 A duplicate trigger produces one run | `phase-auto-03` |
 | R07 The gateway is provider-neutral | `phase-auto-03` |
