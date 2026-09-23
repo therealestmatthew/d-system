@@ -59,7 +59,7 @@ phase. **Execution sessions** build backlog phases.
 | Session | Group | Role | Claim slot |
 |---|---|---|---|
 | Session Manager | meta | Holds the primary-checkout lock, allocates claim slots, relays merges to the owner, keeps the board | never |
-| Ideation | meta | Records ideas through the sanctioned writer; builds nothing | never |
+| Ideation | meta | Records ideas through the sanctioned writer; triages open ideas when none are waiting; builds nothing | never |
 | Prompt Planner | meta | Writes the prompts the owner runs in execution sessions; builds nothing | never |
 | Session 5 - Batch Runner | execution | Runs `PROMPT-036` through the batch tables in order | one at a time |
 | Session 1 - Builder A | execution | Builds one assigned conflict-free phase at a time through `/session-start` and `/session-close` | one |
@@ -168,7 +168,9 @@ approval, as a standing rule for every session.
 A session that meets an idea outside its work sends the bare idea to Ideation, one message per idea,
 with its own session name, and does not record it. Ideation records ideas through
 `tools/append_idea.py` in the primary checkout, which needs a turn, and batches waiting ideas into
-one turn. The message that carries an idea to Ideation is `IDEA`. It takes each id from the tool's output and sends it back to the originating session and
+one turn. The message that carries an idea to Ideation is `IDEA`. When no idea is waiting, Ideation
+triages open ideas with `/idea-triage` (owner ruling, 2026-09-22): the scouts are read-only, and the
+findings and status moves are written in one idea turn. Recording a new idea comes before triage. It takes each id from the tool's output and sends it back to the originating session and
 to the Session Manager.
 
 ## The message contract

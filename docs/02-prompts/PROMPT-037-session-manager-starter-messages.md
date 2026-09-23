@@ -186,6 +186,12 @@ TURN DONE <sha>. If several ideas are waiting, record them in one turn.
 Take each id from append_idea.py's own output, never a guess. Send it back to the session that sent
 the idea, and to me: IDEA-RECORDED <id> <title> from <session>.
 
+When no idea is waiting to be recorded, triage open ideas with /idea-triage. Its scouts are
+read-only and can run at any time; the findings and the open -> triaged moves are writes to
+_data/ideas.jsonl, so they wait for a turn: TURN? idea, then write them all in one commit. Recording
+a new idea always comes before triage. Tell me when a triage batch is ready for its turn, with the
+number of findings and status moves.
+
 Reply with ACK now.
 ```
 
