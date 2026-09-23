@@ -3,7 +3,6 @@ updated: '2026-09-23'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-irs-16
 - phase-part-03
 - phase-irs-14
 - phase-irs-11
@@ -13112,7 +13111,7 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 2
   session_budget: 1
@@ -13138,6 +13137,23 @@ items:
   - test/test_daemon.py
   next_action: Read phase-irs-04's flock usage before writing the daemon wrapper - the lock file path
     and acquisition semantics must match exactly.
+  session: doc-session-daemon-process-model
+  completion_evidence:
+  - src/orchestrator/daemon.py
+  - src/orchestrator/__main__.py
+  - test/test_daemon.py
+  - docs/03-sessions/SESS-2026-09-23-06-daemon-process-model.md
+  result: 'Daemon process model in src/orchestrator/daemon.py: exclusive non-blocking flock on
+    data/orchestrator/lock shared by the daemon and a manual tick (a tick against a live daemon exits 1
+    "daemon holds the lock"), SIGTERM/SIGINT graceful shutdown after the current tick, start/stop/status
+    verbs, start refuses in a linked worktree with no CLI bypass, stale-lock recovery through kernel
+    release of the flock, and stop signals only a pid whose lock is actually held. Tests: lock contention
+    and forced-SIGKILL recovery on real processes (14 in test/test_daemon.py). Post-rebase verification:
+    "Governance OK: 35 systems, 335 documents, 31 memories, 293 backlog phases"; pytest "982 passed, 1
+    skipped"; ruff "All checks passed!"; mypy "no issues found in 45 source files". Validator PASS;
+    adversary one MEDIUM (stop trusted a reused pid) fixed in cycle 1, residual race LOW accepted. The
+    inject/adapt/recreate decision routed here by the 000334 ruling was not made in this phase (parked
+    for the owner).'
 - id: phase-fwt-01
   title: Governance and protocol document templates and schemas
   plan: doc-portable-framework-document-templates
