@@ -17569,6 +17569,9 @@ Related-ideas sweep: in the same turn as this finding, Ideation linked further i
 - relates_to ← `000352`
 - relates_to ← `000355`
 - relates_to ← `000356`
+- relates_to ← `000368`
+- relates_to ← `000369`
+- relates_to ← `000370`
 
 ---
 
@@ -17934,43 +17937,117 @@ PROPOSED LINK: 000356 --relates_to--> 000320 (both concern ordering concurrent w
 
 ## 000357 · Review-overdue warnings still go to governance stdout, so --catalog will break again from 2026-12-06
 
-**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+**Created 2026-09-23T10:40:28-04:00 · Status: `triaged`**
 
 src/governance/__main__.py:190/523: "review overdue since ..." warnings still print to stdout. ARCH-002 and GOV-001 have review_after 2026-12-05, so from 2026-12-06 --catalog stdout gets WARNING lines and test_catalog_flag_writes_committed_file fails on every branch. Relates to 000335. The owner decides whether all warnings go to stderr.
 
 (From Session 3 - Standby Builder, relayed to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): Verified on dev: src/governance/__main__.py:190 appends "review overdue since ..." to warnings, and line 523 prints every warning to stdout. Commit b2f5be0 moved only the status-regression WARNING to stderr, under the owner's 2026-09-22 ruling on 000335, and its comment gives the reason: --catalog stdout must stay byte-identical to the catalog file. The review-overdue warnings take the older stdout path, so the fix is partial. Once ARCH-002 and GOV-001 pass their review_after date of 2026-12-05, --catalog stdout gains WARNING lines on every branch.
+
+Related: 000335 (the original report and ruling), 000353 (the same failure recurring on 2026-09-23, now fixed by b2f5be0), 000198 and 000208 (--catalog printing instead of writing), 000324 and 000325 (catalog tests overwriting the tracked catalog), and 000351 (regenerate the catalog only at merge time). No phase carries the rest of the fix.
+
+The owner has to decide whether 000335's ruling covers every warning. If it does, sending all warnings to stderr is a small fix with no design question. Nothing argues against it, and the deadline is 2026-12-06.
+
+PROPOSED LINK: 000357 --relates_to--> 000335 (same stdout contamination, a different warning class)
+
+</details>
+
 ---
 
 ## 000358 · Align /session-start and PROMPT-036 merge steps with the GOV-017 gate
 
-**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+**Created 2026-09-23T10:40:28-04:00 · Status: `triaged`**
 
 .claude/commands/session-start.md §8-9 and PROMPT-036 step 9 leave out the ruff/mypy gate checks and the refuse_dirty_integration.py check before ff-merge, which GOV-017 and PROMPT-037 now require (branch agent/docs-gov017-amendments).
 
 (From Prompt Planner, relayed to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): Verified on dev: GOV-017 already carries the full merge gate (bc700b8, on dev). Before a fast-forward it requires governance, pytest, ruff check src/ test/ and mypy src/, all clean, then tools/git-hooks/refuse_dirty_integration.py in the primary checkout (GOV-017 lines 148-173, owner ruling 2026-09-23). The body's reference to the unmerged branch agent/docs-gov017-amendments is out of date: the GOV-017 text is on dev. What is still missing is in the procedure documents. .claude/commands/session-start.md mentions ruff and mypy only in its worktree-isolation note (line 105), not in the merge steps (sections 8-9), and does not name refuse_dirty_integration.py. PROMPT-036 step 9 also does not spell out the four checks. Not checked: whether PROMPT-037 is updated.
+
+Related: 000153 (the session hand-off protocol is described in three places and drifts between them). This is a live instance of that drift. PLAN-026 / phase-conc-* includes the guard that refuses integration over a peer's uncommitted work, whose tool refuse_dirty_integration.py now is. Unverified: whether any queued phase-conc phase rewrites session-start.md. No phase found assigned.
+
+Against a phase: this is a small documentation alignment, which could be a single edit in an idea turn once the owner approves. session-start.md is a governed command, and the Session Manager contract already overrides it on pytest location.
+
+PROPOSED LINK: 000358 --relates_to--> 000153 (a concrete case of hand-off protocol drift)
+
+</details>
+
 ---
 
 ## 000359 · Coordinate agent sessions from other providers (Gemini, Codex) under the multi-session protocol
 
-**Created 2026-09-23T10:40:28-04:00 · Status: `open`**
+**Created 2026-09-23T10:40:28-04:00 · Status: `triaged`**
 
 Support coordinating agent sessions from other providers (Gemini, Codex) under the multi-session protocol, not just Claude Code sessions. This includes whether the coordination can be adapted onto LangChain/LangGraph with multi-provider model support. Likely relates to 000347 (the Session Manager automation cluster) and P3 (session-manager-on-langgraph.md).
 
 (From the owner, relayed by Session Manager to Ideation.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): 000359 asks for Gemini and Codex sessions to be coordinated under the multi-session protocol, possibly on LangChain/LangGraph with multi-provider models.
+
+Related: session-manager-on-langgraph.md (P3, draft 4, under _working/overnight-sprint/planning/, ungoverned) designs the LangGraph and Agent SDK layer for the multi-session system. It proposes moving GOV-017's rules into deterministic code (the orchestrator tick) and replacing long-lived role sessions with short-lived Agent SDK dispatches. It builds on PLAN-039 and PLAN-039.01 (the idea realization system and its LangGraph orchestrator), REQ-022, PLAN-020 (portable agent workflows, whose .codex/agents copies already exist) and GOV-017. The Agent SDK is Claude-specific, so multi-provider support is a design axis that P3, as described, does not cover. That makes it the new part of 000359.
+
+Overlap: 000334 (carry the Session Manager system into the LangGraph and Agent SDK delivery system) is the Claude-only form. 000327 (a role-based session roster) is the system being generalised. 000069 (should Claude Code remain a dependency) and 000067 (portable workflows) bear on provider independence. 000306 (nothing binds .codex/agents to .claude/agents) is a concrete two-provider gap already recorded. 000020 (MCP-mediated coordination) is an alternative transport.
+
+Against a phase now: P3 is a draft and not governed, and 000334 is itself unplanned. Multi-provider support is best set as a requirement on that plan, not a separate phase.
+
+PROPOSED LINK: 000359 --extends--> 000334 (multi-provider generalisation of carrying GOV-017 onto LangGraph)
+PROPOSED LINK: 000359 --relates_to--> 000306 (an existing Claude/Codex definition-sync gap)
+
+</details>
+
+**Links**
+
+- relates_to ← `000369`
+- relates_to ← `000370`
+
 ---
 
 ## 000360 · API routes and ts/ UI views for projects, people, commitments and tasks
 
-**Created 2026-09-23T13:27:24-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:24-04:00 · Status: `triaged`**
 
 Add API routes and ts/ UI views for projects, people, commitments and tasks.
 
 Source: gap 4.2 of the productivity-system inventory (_working/session-manager/reports/productivity-system-inventory.md, 2026-09-23). src/api/routes/ holds only demo_stage.py, demo_terminal.py and workbench.py, so no route serves any of the four core entities, and ts/ has no view of them.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): 000360 asks for API routes and ts/ UI views for projects, people, commitments and tasks. src/api/routes/ serves only the demo stage, demo terminal and workbench, even though CLAUDE.md describes one route file per domain.
+
+Related: ADR-015 (the workbench API surface) and PLAN-022 set the rules existing routes follow: repository-bounded paths, server-side validation, read-only except for named actions, and gated mounting. Entity routes would follow them. PLAN-004's phase-rel-07 (unify database paths and application access helpers) is the natural predecessor, because routes would read DuckDB through that helper. PLAN-003 / phase-html-04 serves page configuration through FastAPI, and phase-des-01 audits whether PLAN-003 still stands. PLAN-002's phase-sig-* and phase-syn-* produce the signals a view would display. The schemas and DuckDB tables for all four entities already exist, so nothing blocks read-only routes.
+
+Overlap: 000022 names the data gap this would expose. No other idea proposes entity routes or views. 000361 (quick-entry writer) is the write side. Any write route would face the same capture-boundary question (ADR-007).
+
+Against a phase now: people, commitments and tasks have no real records until phase-cap-08 runs, so early views would show only the tracked fictional example set. Real records live under the private data root (ADR-009), so the API must read D_SYSTEM_DATA_ROOT and must never expose private content in tracked output. phase-rel-07 should precede it so the routes do not add another database-path variant.
+
+PROPOSED LINK: 000360 --relates_to--> 000361 (read and write sides of the same entity surface)
+
+</details>
 
 **Links**
 
@@ -17980,13 +18057,33 @@ Source: gap 4.2 of the productivity-system inventory (_working/session-manager/r
 
 ## 000361 · A quick-entry writer for people, commitments and tasks, similar to append_idea.py
 
-**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:25-04:00 · Status: `triaged`**
 
 A quick-entry writer for people, commitments and tasks, similar to tools/append_idea.py.
 
 Source: gap 4.3 of the productivity-system inventory (2026-09-23). Today these records can be added only through the full capture pipeline or by editing JSON by hand. 000022's second hypothesis, that friction prevents records being created, points at this gap.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): 000361 asks for a quick-entry writer for people, commitments and tasks, like tools/append_idea.py, to remove the friction 000022's second hypothesis names.
+
+Related: the capture system (PLAN-007, PLAN-009, REQ-002, ADR-007, ADR-008). phase-cap-04 (raw intake), phase-cap-05 (structuring and routing), phase-cap-06 (review and promotion) and phase-cap-07 (projection) are complete. phase-cap-08 (seed the portfolio through the pipeline) is queued. ADR-007 makes staging the write boundary: agents write to staging, and promotion into the data root is an explicit owner action. ADR-009 puts real records under _private/portfolio via D_SYSTEM_DATA_ROOT.
+
+The tension: a direct writer would skip capture's evidence scoring, its clean, flagged and held routing, and owner promotion. ADR-008 relies on that step for referenced identities, such as promised_to staying a string until a person is confirmed, and for optional parents like task.project_id. A quick writer would have to either write into staging (a faster front end to capture) or write validated records straight to the data root (a bypass that needs an ADR).
+
+Overlap: 000022 (friction hypothesis) and 000179 (demo-kit notes-to-commitments, which extracts from notes rather than entering records directly). No other idea proposes an entity writer.
+
+Against a phase now: phase-cap-08 has not run, so nobody has yet measured whether capture's friction is the barrier. The owner's call is whether that friction is intended protection or the adoption blocker. Running phase-cap-08 first would produce the evidence for that decision.
+
+PROPOSED LINK: 000361 --relates_to--> 000179 (both lower the cost of getting commitments recorded)
+
+</details>
 
 **Links**
 
@@ -17996,13 +18093,32 @@ Source: gap 4.3 of the productivity-system inventory (2026-09-23). Today these r
 
 ## 000362 · Reminders and due-date surfacing: notify the owner when a commitment falls due or goes overdue
 
-**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:25-04:00 · Status: `triaged`**
 
 Reminders and due-date surfacing: notify the owner when a commitment falls due or goes overdue.
 
 Source: gap 4.4 of the productivity-system inventory (2026-09-23). The planned Stale Radar (phase-sig-02) and session briefing (phase-syn-02) are pull-based. Nothing notifies the owner on its own initiative.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): 000362 asks for push reminders when a commitment falls due or goes overdue. Everything planned so far is pull-based.
+
+Related: PLAN-002's phase-sig-03 (Accountability Ledger) is the signal that holds commitments sorted by due date. It is the data a reminder would read. phase-sig-02 (Stale Radar) and phase-syn-02 (session briefing) surface staleness and due items when the owner asks. PLAN-032 / REQ-017 supply what a push would need: phase-auto-03 (external trigger gateway, queued) and phase-auto-05 (supervised worker and watchdog, queued) would run a periodic or event-driven check. phase-auto-02 (the capability and approval broker, complete) would gate what a notifying agent may do.
+
+Overlap: 000028 (trigger gateway), 000030 (always-on worker) and 000249 (watch external events) are the general infrastructure. 000362 is the first portfolio use of it. No other idea asks for due-date notification.
+
+Against a phase now: there are no real commitment records (000022), so there is nothing to remind about. phase-sig-03, which a reminder would build on, is queued behind phase-sig-01, phase-rel-04 and phase-cap-08. The push mechanism waits on phase-auto-03 and phase-auto-05. A pull version already comes with phase-syn-02. So this is a follow-on to phase-sig-03 plus the auto phases, not a first-wave phase.
+
+PROPOSED LINK: 000362 --relates_to--> 000028 (a push reminder would be delivered through the trigger gateway)
+PROPOSED LINK: 000362 --relates_to--> 000030 (the supervised worker would run the periodic due-date check)
+
+</details>
 
 **Links**
 
@@ -18012,13 +18128,33 @@ Source: gap 4.4 of the productivity-system inventory (2026-09-23). The planned S
 
 ## 000363 · External intake: capture from email, calendar and meeting transcripts
 
-**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:25-04:00 · Status: `triaged`**
 
 External intake: capture from email, calendar and meeting transcripts.
 
 Source: gap 4.5 of the productivity-system inventory (2026-09-23). Capture currently starts from notes the owner writes. The external trigger gateway (000028) is agent plumbing and does not target portfolio intake.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:14-04:00): 000363 asks for capture from email, calendar and meeting transcripts. Capture today starts only from what the owner writes: conversation, the inbox directory or the CLI quick-capture (ADR-007).
+
+Related: PLAN-007, PLAN-009, REQ-002 and ADR-007 define capture. phase-cap-04 to phase-cap-07 (intake, structuring and routing, review and promotion, projection) are complete, and phase-cap-08 (seeding) is queued. External sources would enter as new raw-intake channels and flow through the same scoring, routing and owner promotion. REQ-002 specifies owner-written sources only. The interaction schema already has an email type. phase-fwa-02 (session-record decision and commitment extraction) is the closest existing extractor, working from a different source. PLAN-032's phase-auto-03 (trigger gateway) normalises events that start workflows. It could schedule a pull, but it does not capture portfolio data.
+
+Confidentiality: mail, calendar and transcript content is client content. ADR-009 and PLAN-006 require it to stay under the private data root. Any design has to name how raw external data is stored (gitignored), what staging keeps, and what promotion may write.
+
+Overlap: 000179 (demo-kit notes-to-commitments) extracts commitments from pasted notes, a narrow manual form of the transcript case. 000028 and 000249 cover external events as triggers, not intake. No duplicate.
+
+Against a phase now: no requirement covers external sources, and each source needs its own access and credential decisions (OAuth, local export or a transcript folder). phase-cap-08 has not yet shown whether owner-written capture works on real material. That argues for capture-first seeding, then a requirement for external channels.
+
+PROPOSED LINK: 000363 --relates_to--> 000179 (transcript intake generalises extracting commitments from meeting notes)
+
+</details>
 
 **Links**
 
@@ -18028,13 +18164,32 @@ Source: gap 4.5 of the productivity-system inventory (2026-09-23). Capture curre
 
 ## 000364 · Model the opportunity entity (a potential engagement) named in ARCH-010
 
-**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:25-04:00 · Status: `triaged`**
 
 An idea for the opportunity entity, meaning a potential engagement, named in ARCH-010.
 
 Source: gap 4.9 of the productivity-system inventory (2026-09-23). ARCH-010's Opportunity row describes it: "Potential engagement; prospect denotes the party and prospecting the activity; role-bearing participants and staged transition history; one opportunity can yield multiple engagements through explicit links". It marks the entity "expanded scope, no separate idea yet". Related: 000262 (engagements) and 000267.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:14-04:00): 000364 is the idea ARCH-010 said was missing. Its accepted-decisions table (line 30) names Opportunity, "Potential engagement; prospect denotes the party and prospecting the activity; role-bearing participants and staged transition history; one opportunity can yield multiple engagements through explicit links", with lineage to 000262 and 000267 and the note "expanded scope, no separate idea yet". Recording 000364 closes part of ARCH-010's Idea lineage gate (line 113).
+
+Related: ARCH-007 (organisational and WBS data model), whose Commercial engagement model section (from line 94) starts an engagement at qualified mutual intent, so earlier prospect activity falls to Opportunity. ARCH-010's remaining-work gates that apply: Commercial lifecycle (line 118), meaning exact opportunity states, transition guards and won/converted/mutual intent, before lifecycle implementation; and Relationships (line 121), meaning opportunity-to-engagement conversion storage, before relation contracts. ARCH-010 states it records decisions, not delivered schemas. No plan, requirement or phase exists.
+
+Overlap: 000262 (engagements) is the downstream entity, and 000267 (schema governance) is the governing frame. Not a duplicate of either. 000365 (plan for the ARCH-010 model) is the delivery path this would ride.
+
+Against a phase of its own: it should be delivered inside 000365's plan once the Commercial lifecycle and Relationships gates are decided. The consulting pipeline stage it models (prospects before a signed engagement) has no data yet, since 000022 still holds.
+
+PROPOSED LINK: 000364 --relates_to--> 000262 (an opportunity converts into one or more engagements)
+PROPOSED LINK: 000364 --relates_to--> 000365 (delivered through the ARCH-010 plan)
+
+</details>
 
 **Links**
 
@@ -18044,13 +18199,36 @@ Source: gap 4.9 of the productivity-system inventory (2026-09-23). ARCH-010's Op
 
 ## 000365 · A plan (requirements, plan, backlog phases) for the ARCH-010 organisational model
 
-**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:26-04:00 · Status: `triaged`**
 
 Write the requirements, plan and backlog phases for the ARCH-010 organisational model.
 
 Source: gap 4.1 of the productivity-system inventory (2026-09-23). ARCH-010 (draft) records accepted design decisions for the organisational data model in ideas 000255-000267: companies, affiliations, aliases, project parties, roles, engagements, WBS and schema governance. Its "Delivery" row says governed requirements, a plan and backlog phases come next, before implementation. No backlog phase references ARCH-009 or ARCH-010.
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:14-04:00): 000365 asks for the delivery path (requirements, plan, backlog phases) for ARCH-010's organisational model. It duplicates none of 000255-000267. It is the request to plan them.
+
+Related: ARCH-010 (draft) holds the accepted decisions and the "Remaining work and gates" table. ARCH-009 is the schema review behind it. ADR-008 and REQ-002 define the current entity model, and PLAN-009 / phase-cap-* build the capture that will feed it. PLAN-004's phase-rel-03 (source references and global identities) and phase-rel-04 (project stakeholders as the membership authority) touch project parties and identity. PLAN-035 / phase-sch-* covers schema-DDL drift. No backlog phase references ARCH-009 or ARCH-010.
+
+Against a phase now: ARCH-010's own gates are open. Party contracts (PartyRef, affiliation validation), identity (UUID/ULID, allocation, aliases), roles and aliases, the commercial lifecycle, WBS invariants, registry coverage and projection integrity each gate a later step. Its Delivery row puts governed requirements, plan and phases after these. A plan written now would have to either resolve the gates first, as a design phase, or defer them into implementation. So the first phase is likely a design pass that closes the gates, not a build.
+
+State of the cluster:
+- 000255 (MDM) and 000256 (MDM stewardship agent): ARCH-010 marks both future work, parked.
+- 000257 (companies), 000258 (affiliations), 000259 (aliases), 000260 (project parties), 000261 (roles), 000262 (engagements), 000263 (WBS elements), 000264 (WBS baselines), 000265 (counterparties), 000266 (vocabulary) and 000267 (schema governance): ARCH-010 records an accepted design decision for each, with no plan. Each waits on the gate named above that matches its area.
+- 000260 also bears on phase-rel-04's membership authority, and 000264 relates to the append-only ledgers in REQ-022 / PLAN-039.
+- 000364 (opportunity) adds the one entity ARCH-010 names without an idea.
+
+PROPOSED LINK: 000365 --relates_to--> 000255 (000365 is the delivery path for the 000255-000267 cluster)
+PROPOSED LINK: 000365 --relates_to--> 000364 (the opportunity entity belongs to the same model)
+
+</details>
 
 **Links**
 
@@ -18060,13 +18238,32 @@ Source: gap 4.1 of the productivity-system inventory (2026-09-23). ARCH-010 (dra
 
 ## 000366 · Tag ideas with the projects they belong to, so one idea log serves many projects
 
-**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:26-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
 "We should add another idea for the ideas log to include additional tagging to associate ideas with projects so they can be quickly filtered. That way the same system can be used to support multiple projects without clogging the context but it also exists as a comprehensive log across all projects. Then, other projects can reference the larger list to pull in already useful ideas that are transferable."
 
 (From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:14-04:00): 000366 asks to tag ideas with the projects they belong to, so one log serves many projects, can be filtered per project, and lets other projects pull in transferable ideas.
+
+Related: PLAN-029 / REQ-014 (the idea-graph programme, P1). phase-idg-04, "Build the tagging registry and retroactive tag assignment" (queued, depends on phase-idg-01), delivers registry-backed, controlled-vocabulary idea tags assignable retroactively through tools/append_idea.py (REQ-014 R10), on the pattern of _data/tags.json. ARCH-005 keeps tags as the "what is this about" axis, separate from its three classification axes. Project association is one use of that registry. Whether "project" is a tag category or a separate field is a design choice inside phase-idg-04. The portable framework (PLAN-040, PLAN-041) is about carrying governance to other repositories, not filtering one log across projects, so it does not cover this. The cross-project half ("other projects pull in transferable ideas") echoes 000086 (repo tracker and multi-repo memory) and 000164 (memory buckets by repo and project).
+
+Overlap: 000018 (tagging and plan-mapping for ideas) is the general form. 000337 and 000343 concern who approves tag categories and where tags live, which matters because project names can be client names (ADR-009).
+
+Against a new phase: phase-idg-04 already builds the mechanism. This belongs to the idea-graph programme rather than the productivity-core plan, and is best put to phase-idg-04 as a requirement. The confidentiality question (project tags naming clients) needs the same ruling as 000343.
+
+PROPOSED LINK: 000366 --extends--> 000018 (project association is a specialisation of general idea tagging)
+PROPOSED LINK: 000366 --relates_to--> 000343 (a project tag can name a client, so it needs the same private-root rule)
+
+</details>
 
 **Links**
 
@@ -18076,7 +18273,7 @@ The owner's words, as given:
 
 ## 000367 · Link ideas to templates, the reusable building blocks
 
-**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+**Created 2026-09-23T13:27:26-04:00 · Status: `triaged`**
 
 The owner's words, as given:
 
@@ -18086,8 +18283,251 @@ Linked to the existing building-block ideas 000083 (template library with determ
 
 (From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:14-04:00): Idea 000367 asks to link ideas to templates, the reusable building blocks. It is already linked to 000083 (template library) and 000084 (HTML component library). Both are core assets of PLAN-036 / REQ-021, the HTML generation and design system (programme P9).
+
+Related: PLAN-036 and REQ-021 cover three asset layers and an extraction agent: 000083 (template library), 000084 (component library), 000085 (colour palette library) and 000092 (HTML Designer agent). The six phase-des-* phases deliver them, and phase-des-03 scopes the template layer as "a growing library" (REQ-021 R05-R06). PLAN-040 and ideas 000269-000279 are governance-document templates, not code or asset templates. ARCH-010's template rows concern business and engagement templates (with 000267), not HTML.
+
+The linking half: PLAN-029 / REQ-014 R04 with ARCH-005 lets an idea link to a governed document code. A link from an idea to a template asset is a new link target of the same kind. That makes the linking ask idea-graph work (phase-idg-*, with 000053) rather than PLAN-036 work.
+
+Overlap: 000085 and 000092 are siblings of 000083 and 000084 within PLAN-036. No other idea describes itself as a reusable building block.
+
+Against a new phase: the libraries themselves are already phased under PLAN-036. The new part is only the idea-to-template link, which fits PLAN-029's link-target work, so this probably needs no phase of its own.
+
+PROPOSED LINK: 000367 --relates_to--> 000053 (ideas linking directly to plan and document ids; templates would be another link target)
+PROPOSED LINK: 000367 --relates_to--> 000085 (sibling building-block library under PLAN-036)
+
+</details>
+
 **Links**
 
 - relates_to → `000022`
 - relates_to → `000083`
 - relates_to → `000084`
+
+---
+
+## 000368 · A running log of branches, worktrees and their assigned agents, independent of git status
+
+**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+
+The owner's words, as given:
+
+"need to keep a running log of branches and worktrees and associated agents assigned to them plus status and other notes - independent of git branch/status - and based on actual work we are doing. Then we have an authoritative source for managing and cleaning up the branches and worktrees and don't need to rework analysis during cleanup (also to support state management)."
+
+(From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Links**
+
+- relates_to → `000347`
+- relates_to ← `000369`
+- relates_to ← `000370`
+
+---
+
+## 000369 · A durable append-only log of every coordination message, so the Session Manager's board is rebuilt from it
+
+**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+
+A durable, append-only log of every coordination message (TURN?, GRANTED, READY, TURN DONE, rulings and so on), so that the Session Manager's board can be rebuilt from the log and is no longer maintained by hand.
+
+Relates to the 000347 gap "a durable message log" and to 000359 (multi-provider coordination).
+
+(From the Session Manager, captured at the owner's request, relayed to Ideation, 2026-09-23.)
+
+**Links**
+
+- relates_to → `000347`
+- relates_to → `000368`
+- relates_to → `000359`
+- relates_to ← `000370`
+
+---
+
+## 000370 · A governed protocol for the Session Manager's board and state, and its migration onto LangChain/LangGraph
+
+**Created 2026-09-23T14:32:10-04:00 · Status: `open`**
+
+The owner's words, as given:
+
+"Need a protocol defined for how you manage the board/state plus how we will transition all that to the langchain framework."
+
+As relayed by the Session Manager: a governed protocol for the Session Manager's board and state management, plus the migration path onto LangChain/LangGraph. Relates to P3 (session-manager-on-langgraph.md) and 000359.
+
+(From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Links**
+
+- relates_to → `000347`
+- relates_to → `000368`
+- relates_to → `000369`
+- relates_to → `000359`
+
+---
+
+## 000371 · A glossary protocol: who may add or retire a term, the entry test, and when the glossary is reviewed
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
+
+None exists. PLAN-012 (still draft) states rules: a term enters when it appears undefined in 2 governed docs; retire rather than delete; one sentence of what it is, one of what it is not, plus a pointer; review with the systems review. Nothing enforces them or schedules the review.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000372 · A sanctioned writer for concept terms, like append_idea.py is for ideas
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
+
+Terms are edited by hand inside grouped brain/concepts/*.md files. Nothing checks the format (what it is / what it is not / pointer), duplicate headings across files, or the `updated` bump. Checked 2026-09-23: no such tool exists in tools/.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000373 · Glossary generator features: table of contents, acronym index, per-term anchors and cross-links, category grouping
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
+
+GLOSSARY.md is about 1,100 lines, with 11 sections and no contents list. Terms cannot be linked to individually, and acronyms (ADR, REQ, OPS, WBS, MDM, MCP…) have no index. The generator only supports --tag/--system filters.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000374 · Non-term headings render as glossary terms
+
+**Created 2026-09-23T14:32:11-04:00 · Status: `open`**
+
+generate_glossary.py renders concept bodies verbatim, so every ### becomes a "term". Two cases: the six "### 1. Layout slot_id values — RENAME"… migration-ruling headings in terms-workbench-ui.md, and "### Advanced topics, named but not covered in depth" in terms-skills-and-agents-demo.md. Either move rulings out of concept memories, or give the generator a rule.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000375 · docs/00-working/demo-glossary.md has no drift test
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+GLOSSARY.md is guarded by test/test_glossary.py. The --tag demo-glossary slice is committed too, but nothing fails when it goes stale after a concept edit.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000376 · Generate glossary entries from existing registries instead of restating them by hand
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+Candidates: the codes.yaml series (9 document-code acronyms), the backlog README track-prefix table, systems.yaml domains/statuses, and schema enum vocabularies (idea status, capture route, phase status). Today the glossary restates some of these by hand, and they drift.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000377 · Governance docs still name `main` as the integration branch
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+GOV-001:181-192, GOV-002:288 and :366-368, and OPS-001 ("git switch main") say main; AGENTS.md:57-59 says dev since 2026-09-09. GOV-005:86-90 says codes are permanent "once it reaches main". OPS-001 "Close a session" and session-close.md steps 2 and 8 still cite the primary-checkout exception that GOV-003:328-334 withdrew on 2026-09-12.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000378 · Phase-completion authority contradicts itself across documents
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+GOV-003:456-518 (2026-09-16) lets a coordinator mark a phase complete under 3 conditions. session-start.md:191-192 and :224, the orient SKILL (79-80), resume-lit-review.md:182, GOV-014:34/175/195 and AGENTS.md:179-180 still say only the owner, via /session-close. AGENTS.md:284 step 5 has the agent write status: complete, which session-start.md:166-169 assigns to /session-close.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T14:32:13-04:00): Owner ruling, 2026-09-23, relayed by the Session Manager through Session 3 - Standby Builder: GOV-003 governs. A coordinator may mark a phase complete under GOV-003's three conditions. The documents that still say owner-only need updating: .claude/commands/session-start.md lines 191-192 and 224, the orient SKILL (lines 79-80), resume-lit-review.md line 182, and GOV-014 lines 34, 175 and 195. AGENTS.md lines 179-180 and 284 also contradict GOV-003, but changing them needs the owner's explicit approval under the AGENTS.md rule.
+
+</details>
+
+---
+
+## 000379 · The backlog README track table is missing 6 prefixes
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+docs/09-backlog/README.md has no rows for phase-irs-* (17 phases), phase-port-* (3), phase-fwt-* (5), phase-fwa-* (3), phase-kit-* (4) or phase-agnt-* (2), though all are in backlog.yaml. GOV-006 points agents to that table to gloss track prefixes.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000380 · Small stale facts in governed docs, found during the glossary scout
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+- GOV-005:55 still calls allocation a "pure function of committed state", which its own concurrent-agents section (92-96) contradicts.
+- OPS-002 says the rebuild recreates "all eight tables"; sql/001_schema.sql creates 16.
+- systems.yaml sys-contracts says six schemas; there are 24.
+- ARCH-001:96 says 27 tags; there are 29.
+- The lit campaign is "nine-session" in the backlog README but "seven phases" in resume-lit-review.md:9 and :176.
+- GOV-015:239 attributes "up to four" questions per batch to GOV-006, but the text is in .claude/commands/backlog.md:127.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000381 · CLAUDE.md has three stale lines; the owner must approve any edit
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+- CLAUDE.md:144 "Tasks are embedded in commitment JSON … unpacked by rebuild" is wrong: tasks are separate files (schemas/task.schema.json, tools/rebuild_db.py:193-196). CLAUDE.md:123 is already correct.
+- CLAUDE.md:137 lists 4 schema files; schemas/ has 24.
+- CLAUDE.md:141 lists 7 tables; sql/001_schema.sql creates 16.
+Not edited, per the CLAUDE.md rule.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000382 · Naming review for overloaded terms
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+- "decision" has 4 senses: memory type, entity record, gate decision, broker Decision class.
+- "promoted/promote" has 3: idea status, capture promotion, next_up "promoted phases".
+- "reservation" has 2 (GOV-005 itself warns about this).
+- "claim" has 2+: phase claim, _tmpagent claim, idea-dispatch in-flight claim.
+- Gates are numbered two ways: G1–G5 (ARCH-006/GOV-014) and GATE 1–3 (partition-ideas).
+- "stage", "kind", "collision" and "execution session" each carry several meanings.
+The glossary can disambiguate these, but renaming is a design choice for the owner.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000383 · REQ-003 R11 describes a `triaging` idea status that PLAN-016 deliberately omitted
+
+**Created 2026-09-23T14:32:12-04:00 · Status: `open`**
+
+PLAN-016:104 says "`triaging` is deliberately omitted". REQ-003:46 (R11) says "Triage enters triaging". The idea schema has no triaging status.
+
+(From Session 3 - Standby Builder, relayed to Ideation, 2026-09-23.)
+
+---
+
+## 000384 · The leak check's content check never runs in a worktree
+
+**Created 2026-09-23T14:32:13-04:00 · Status: `open`**
+
+tools/check_no_private_content.py reads ROOT/_private/portfolio/projects (line 88). A worktree has no _private/, so in the worktrees where AGENTS.md puts all work, the check runs only its path check and passes. Let it take an absolute portfolio path, for example D_SYSTEM_DATA_ROOT. Found while amending phase-cap-08.
+
+(From Prompt Planner, relayed to Ideation, 2026-09-23.)
