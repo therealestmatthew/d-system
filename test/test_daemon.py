@@ -200,6 +200,47 @@ def test_stop_daemon_reports_when_nothing_holds_the_lock(tmp_path: Path) -> None
     assert result == {"stopped": False, "reason": "no daemon holds the lock"}
 
 
+def test_stop_daemon_never_signals_a_live_unrelated_process_named_by_a_stale_lock(
+    tmp_path: Path,
+) -> None:
+    """A lock *file* naming a live pid, with nobody actually holding the `flock`, must not
+    be signaled -- this is the fix-cycle-1 finding (MEDIUM): pid reuse after a killed
+    daemon must never cause `stop` to signal an unrelated live process. `sleep` stands in
+    for that unrelated process; its pid is written into the lock file exactly as a real
+    daemon's would be, but the file's flock is never taken, matching a killed daemon's
+    file left behind by the kernel-released lock.
+    """
+    lock_path = tmp_path / "lock"
+    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        lock_path.write_text(
+            json.dumps({"pid": sleeper.pid, "started_at": ledger.now()}), encoding="utf-8"
+        )
+
+        result = daemon_mod.stop_daemon(lock_path)
+
+        assert result == {"stopped": False, "reason": "no daemon holds the lock"}
+        assert sleeper.poll() is None  # never signaled -- still alive
+    finally:
+        sleeper.kill()
+        sleeper.wait(timeout=10)
+
+
+def test_stop_daemon_still_signals_the_real_holder_gracefully(tmp_path: Path) -> None:
+    """The fix must not regress the ordinary case: a live daemon that genuinely holds the
+    lock is still found and signaled. Process-level companion to the stale-lock test above.
+    """
+    paths = _paths(tmp_path)
+    daemon_proc = _spawn(_daemon_argv(paths))
+    _wait_daemon_holds_lock(paths, daemon_proc)
+
+    result = daemon_mod.stop_daemon(paths["lock"])
+
+    assert result == {"stopped": True, "pid": daemon_proc.pid}
+    assert daemon_proc.wait(timeout=10) == 0
+    assert daemon_mod.probe_lock(paths["lock"])["running"] is False
+
+
 def test_probe_lock_reports_free_then_held(tmp_path: Path) -> None:
     paths = _paths(tmp_path)
     assert daemon_mod.probe_lock(paths["lock"])["running"] is False

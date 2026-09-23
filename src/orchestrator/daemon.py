@@ -159,25 +159,54 @@ def stop_daemon(
 
     Graceful: the daemon's own signal handler finishes its current tick and releases the
     lock (PLAN-039.01 section 2: "`stop` signals the daemon (SIGTERM), which finishes the
-    current tick and releases the lock"). Idempotent against a lock that is not held, or
-    whose recorded pid is already gone (a stale record from a killed daemon) -- both are
-    reported rather than raised, since there is nothing left to stop.
+    current tick and releases the lock").
+
+    **The pid recorded in the file is never signaled on its own say-so.** This function
+    first attempts the same non-blocking `flock` `acquire_lock`/`probe_lock` use: if it
+    succeeds, nobody holds the lock right now, so there is no daemon to stop -- the lock is
+    released again immediately and the recorded pid (if any) is reported only as stale,
+    informational context, never signaled. A pid a killed daemon left behind can already
+    belong to an unrelated live process by the time anyone reads it (pid reuse); trusting
+    it without first confirming the lock is actually held would risk signaling that
+    unrelated process. Only when the `flock` attempt itself fails -- meaning some process
+    genuinely holds the lock at that instant -- is the recorded pid read and signaled.
+
+    This still leaves one narrow, undefended window, documented rather than closed: between
+    that failed `flock` attempt and the `os.kill()` call a few lines later, the actual
+    holder could exit and its pid be reused before the signal is sent -- the same inherent
+    limitation as any pid-file-based `kill $(cat pidfile)` tool, since a liveness check and
+    a signal can never be one atomic syscall. Idempotent against a lock that is not held, or
+    whose recorded pid is already gone by the time `os.kill()` runs -- both are reported
+    rather than raised, since there is nothing left to stop.
     """
-    info = probe_lock(lock_path)
-    if not info["running"]:
-        return {"stopped": False, "reason": "no daemon holds the lock"}
-    holder = info["holder"]
-    if not holder or "pid" not in holder:
-        return {"stopped": False, "reason": "lock is held but no pid was recorded"}
-    pid = int(holder["pid"])
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR, 0o644)
     try:
-        os.kill(pid, sig)
-    except ProcessLookupError:
-        return {
-            "stopped": False,
-            "reason": f"pid {pid} is not running (stale lock; the next start recovers it)",
-        }
-    return {"stopped": True, "pid": pid}
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                raise
+            holder = _read_holder(lock_path)
+            if not holder or "pid" not in holder:
+                return {"stopped": False, "reason": "lock is held but no pid was recorded"}
+            pid = int(holder["pid"])
+            try:
+                os.kill(pid, sig)
+            except ProcessLookupError:
+                return {
+                    "stopped": False,
+                    "reason": f"pid {pid} is not running (stale lock; the next start recovers it)",
+                }
+            return {"stopped": True, "pid": pid}
+        else:
+            # Nobody held the lock -- release it again and signal no one. A pid recorded
+            # here is a stale leftover from a daemon that already died; it names nothing
+            # this function may act on.
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            return {"stopped": False, "reason": "no daemon holds the lock"}
+    finally:
+        os.close(fd)
 
 
 def is_linked_worktree(root: Path = ROOT) -> bool:
@@ -233,6 +262,11 @@ def run_daemon(
     ticks and during its poll wait. `stop_event` defaults to a fresh `threading.Event` but
     is a parameter so a caller (a test in the same process) could drive shutdown without a
     real signal; the process-level tests in `test/test_daemon.py` use real signals.
+
+    `signal.signal()` installs a process-global handler table, not a per-call one: this
+    function assumes it is the only thing in its process managing `SIGTERM`/`SIGINT`, i.e.
+    one `run_daemon()` loop per process. Running two concurrently in the same process (two
+    threads, say) would have the second installation silently replace the first's handlers.
     """
     if worktree_check():
         raise LinkedWorktreeError(
