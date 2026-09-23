@@ -15452,3 +15452,173 @@ finding whose evidence-gathering triggered this.
 **Links**
 
 - relates_to → `000312`
+
+---
+
+## 000319 · Investigate proper state capture and session resumability
+
+**Created 2026-09-22T19:49:59-04:00 · Status: `open`**
+
+What state must a long-running coordinated session capture so that it resumes cleanly after death, and where does that state have to live to be useful to someone other than the session that wrote it?
+
+Raised by the owner on 2026-09-22 while the build coordinator (PROMPT-036) was running batch-002.
+
+The run today splits its state four ways: the batch table's `status` field and the phase's own lines in `backlog.yaml`, both tracked on `dev`; the git graph, which holds work already built; `_working/build-<table-id>/` holding `tracker.md`, `decisions.md` and one evidence file per phase; and the dispatched subagents themselves, which the pack resumes rather than re-runs.
+
+What to investigate:
+
+- Everything in `_working/` is gitignored. It survives a dead session but not a lost machine, and it is invisible to a coordinator working from a different checkout or a different machine. The design accepts this consciously — the tracked table status plus `backlog.yaml` are meant to be enough to reconstruct where a batch stands, and `_working/` only makes the resume cheap rather than possible. Is that division still the right one, and is it actually true that the tracked half suffices?
+- A claim held by a session that stopped is recorded in `backlog.yaml` as an `active` phase with no visible reason. The coordinator pack requires the agent to say so in its report so the owner can release it — a human hand-off, not a recorded one. phase-conc-04 (write the claim-recovery procedure) is adjacent and should be read before anything is designed here.
+- Gitignored evidence is destroyed by `git worktree remove`, so the pack requires copying it out by hand first. A procedural step that, if forgotten, silently loses the record.
+- Owner decisions accumulated mid-run (`decisions.md`) exist only in the gitignored half. A resumed session that lost them would re-ask questions the owner already answered.
+- Whether resumability should be a capability the system provides rather than a protocol each prompt pack restates. PROMPT-036 carries its own resume rule; so do other packs.
+
+Do not assume the answer is "track more". Some of this state is deliberately ephemeral, and writing run state into the repository has its own cost.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-coord (2026-09-22T19:50:37-04:00): Linked to 000320 (always-on broker ordering concurrent agents' action requests) at the owner's direction, 2026-09-22. The connection: both concern state that multiple concurrent agents share but no single component owns. 000319 asks what a dying session must record so another can pick it up; 000320 asks what should arbitrate between sessions while they are all still alive. A broker that ordered requests would also be a natural place for run state to live — a hypothesis to test, not a conclusion.
+- **finding** by agent-idea-triage (2026-09-22T19:52:02-04:00): Scouted the coordinator/batch-orchestration documents this idea names, plus the backlog for existing
+work on the same question.
+
+The tracked/ephemeral split this idea asks about is not undecided — it is already the accepted
+design, written down in three places. GOV-016 (batch orchestration protocol), "Status is run state,
+and it lives on the trunk" (lines 136-149): batch-table `status` plus `backlog.yaml` are the only
+state a coordinator needs to select and resume a batch; a worktree-local tracker is invisible to the
+next coordinator and explicitly "not state" for that purpose. GOV-013 (coordinator protocol) states
+the same rule generally ("State lives in a tracker file... the coordinator re-reads it instead of
+remembering"). PROMPT-036 (build coordinator) implements both: `tracker.md`/`decisions.md` under
+`_working/build-<table-id>/` are the cheap-resume layer, gitignored by design per PLAN-015
+(ephemeral working plans), while the trunk-tracked half is treated as sufficient to reconstruct
+batch state from cold. None of the three re-examines whether the tracked half actually suffices in
+practice (e.g. `decisions.md` loss) - that remains open, matching the idea's framing.
+
+phase-conc-04 (write the claim-recovery procedure, in GOV-003) is queued, not built - the idea's
+citation is accurate; the abandoned-claim gap it names is still a human hand-off today, exactly as
+GOV-013 line 215 and PROMPT-036 describe (an agent that stops silently must say so in its report;
+nothing detects it automatically).
+
+A different corner of the backlog addresses a structurally similar question for a different
+pipeline: phase-auto-04 ("Build the durable run ledger with resumable steps", plan
+doc-autonomous-agent-operations, likely PLAN-032) and ADR-018 (langgraph-orchestration) adopt a
+"thin state, repo wins" rule - checkpoints cover process death only, gitignored and disposable, while
+repository state (ledger, documents) is the only source of truth. That is the same shape of answer
+this idea is reaching for, but for the autonomous-agent-operations run ledger, not the coordinator/
+batch pack `_working/` state this idea is actually about. phase-auto-04 is queued, not built - not a
+promotion candidate, but directly relevant precedent worth reading before designing anything here.
+
+ADR-003 (multi-agent concurrency) and GOV-003 (backlog decisions) cover claim serialization via
+`backlog.yaml` as the lock table but do not address gitignored mid-run state loss. The `_tmpagent/`
+contract (`_tmpagent/AGENTS.md`) is a related but distinct case: tracked, cross-worktree state with
+its own claim ledger (`claims.jsonl`) - a model for making ephemeral-looking state durable and
+shared, that this idea's investigation may want to compare against for `_working/`.
+
+No existing plan or requirement doc is titled or scoped as "session state capture / resumability"
+for the coordinator/batch context specifically - this idea's ask is not yet covered end to end, only
+adjacent to it in the three places above.
+
+Sibling idea 000320 is already linked relates_to in both directions; not re-proposed here.
+
+No PROPOSED LINK or PROPOSED PROMOTION - no undiscovered idea overlap found, and no governed document
+already delivers this idea's actual ask.
+
+</details>
+
+**Links**
+
+- relates_to → `000320`
+- relates_to ← `000320`
+
+---
+
+## 000320 · An always-on broker that orders and routes conflicting action requests from concurrent agents
+
+**Created 2026-09-22T19:50:18-04:00 · Status: `open`**
+
+A long-lived agent or service that receives action requests from every agent working in the repository, routes them, and orders the ones that could conflict — rather than each agent independently checking a lock table and hoping.
+
+Raised by the owner on 2026-09-22 alongside the state-capture idea, while the build coordinator was running batch-002.
+
+Today concurrency is handled by convention plus a validator: `backlog.yaml` on `dev` is the lock table, `uv run python -m src.governance` is the lock check, each agent claims its own phase, checks a Conflicts column, and is trusted to re-check after a peer claims between its check and its push. That works, but it is advisory and racy by construction, and it only governs phase claims — not the many other actions agents take that can collide.
+
+What this would address, observed in real runs:
+
+- The claim check and the claim commit are separate steps. AGENTS.md already documents the race and tells the agent to re-check after a rejected push.
+- Collisions that the phase-level lock cannot see: during batch-002 alone, a peer merged `phase-lrr-02` onto `dev` mid-run, and the primary checkout carried another peer's uncommitted `_data/ideas.jsonl` and `docs/00-working/ideas.md`. Neither is a phase claim; neither is visible to the lock table.
+- Two phases in the same batch declaring identical directory-level deliverables (`src/`, `test/` — phase-irs-04 and phase-irs-16), so nothing machine-separates their file ownership. Ordering is currently enforced by a human-authored stage boundary in the batch table, not by anything that would refuse a simultaneous write.
+- `_tmpagent/claims.jsonl` is a second, separate claim mechanism with its own release discipline, and a claim nobody closed blocks a file's deletion indefinitely with no check to catch it.
+- Merges onto `dev` are serialized only by the owner answering one at a time.
+
+Questions for the investigation, not answers:
+
+- Is a broker the right shape, or is this better served by making the existing lock table transactional?
+- What is the request vocabulary — claim, merge, write-path, document-code allocation, worktree creation?
+- Ordering versus refusal: does the broker queue a conflicting request or reject it? The current design deliberately rejects and tells the agent to pick something else rather than wait.
+- What happens when the broker is down, and does an always-on component fit a repository whose other machinery is on-demand scripts?
+- Relationship to the autonomous-operations broker being built in phase-auto-01 and phase-auto-02, which brokers capability and approval at the tool boundary. That is a different broker for a different purpose, and whether these converge or must stay separate is itself part of the question.
+- Relationship to document-code allocation, where `--next-code` already reserves a code against every worktree on the machine — an existing, narrower solution to the same class of problem.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-coord (2026-09-22T19:50:38-04:00): Linked to 000319 (investigate proper state capture and session resumability) at the owner's direction, 2026-09-22. Same connection: 000319 is the dead-session half of the problem, 000320 the live-contention half. Both were raised while the build coordinator ran batch-002, and both cite observed evidence from that run rather than hypothetical collisions.
+- **finding** by agent-idea-triage (2026-09-22T19:52:16-04:00): Scouted for 000320 (always-on broker for ordering/routing conflicting agent action requests).
+
+Existing advisory mechanism this idea questions: ADR-003 (worktree-isolated concurrent agents) makes
+backlog.yaml on dev the lock table and `uv run python -m src.governance` the lock check, enforced by
+src/governance/backlog.py's disjoint-systems/deliverables/depends_on rule. ADR-003 explicitly
+considered and rejected "a lock file separate from the backlog" as an alternative, on the grounds of
+a second state authority to keep synchronized — directly bears on whether a broker is the right shape.
+The idea's phase-irs-04/phase-irs-16 example (both declaring src/, test/ as deliverables) is real:
+confirmed both phases carry those exact deliverables paths in backlog.yaml.
+
+Strong prior-art overlap: idea 000020 (MCP-mediated multi-agent coordination with a Librarian context
+service, status triaged) already proposes an MCP server as "the authoritative interface for
+documentation, file/phase claims, and worktree checkouts" - materially the same shape as 000320's
+broker, just wider in scope (also covers docs/context, not only action ordering). The owner already
+ruled on it in PLAN-032: kept but sequenced behind idea 000128, to build only if the lighter
+_tmpagent/ mechanism (phase-agx-07) proves insufficient. PLAN-032's REQ-017 R16 explicitly guards
+against exactly this idea's risk: "two authorities that can disagree is the failure mode" if a broker
+replaces backlog.yaml/governance as the lock table. 000320 should be read against that standing
+ruling, not as a fresh proposal.
+
+phase-auto-01/phase-auto-02 (PLAN-032, REQ-017): building a capability-and-approval broker at the
+tool boundary - a different broker (authorization, not action ordering), per the idea's own framing.
+PLAN-032 leaves phase-auto-01 free to choose a full-policy or permissive-default shape; convergence
+with 000320's broker is unresolved by design, not by omission.
+
+phase-irs-04/phase-irs-16 (PLAN-039.01, "Orchestrator design (daemon and watcher)"): builds the
+always-on daemon this idea's "always-on" framing would need - single flock lock at
+data/orchestrator/lock, and critically "the daemon never commits ... propose, then observe": the
+daemon proposes only claims the governance validator would accept and re-checks after each dev
+change, never asserting a lock unilaterally. This is an existing, working answer to 000320's "queue
+vs refuse" and "component down" questions for one specific request type (phase claims); it does not
+generalize to the broader action vocabulary 000320 asks about.
+
+_tmpagent/claims.jsonl (_tmpagent/AGENTS.md): a second, separate claim mechanism, enforced by
+convention only - "no test reads claims.jsonl and no validator fails on it" - confirming the idea's
+observation that an unclosed claim blocks deletion indefinitely with nothing to catch it.
+
+GOV-005's `--next-code`: an existing narrower transactional solution to the same class of problem,
+using O_CREAT|O_EXCL pre-merge reservation files in the git common directory rather than a broker -
+relevant precedent for "transactional lock table" as an alternative to a broker.
+
+No document proposes exactly 000320's scope (ordering/routing arbitrary conflicting agent actions
+generally, not just phase claims or tool-boundary capability). 000319 sibling link already recorded;
+not re-proposed here.
+
+PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordination-broker/MCP server for claims, docs and worktrees, materially overlapping 000320's ask, and carries an owner ruling in PLAN-032 to build it only if the lighter _tmpagent/ mechanism proves insufficient)
+
+</details>
+
+**Links**
+
+- relates_to → `000319`
+- relates_to ← `000319`
