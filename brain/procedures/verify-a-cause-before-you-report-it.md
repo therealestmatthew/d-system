@@ -28,16 +28,16 @@ The same session made this slip twice.
 
 1. **An inferred cause stated as observed.** After a rebase, two catalog tests failed. The branch
    did not touch the backlog or the catalog, and dev's newest commit had changed the backlog
-   without regenerating the catalog. The session told the coordinator that "the same two tests
-   fail on dev without my changes" before it had run them on dev. The claim was true. A throwaway
-   worktree at dev's tip gave `2 failed, 59 passed`. But the claim went out first, and the
-   session had to send a second message to say it was now verified.
+   without regenerating the catalog. The session's merge request to the Session Manager said "The
+   same two tests fail on dev without my changes." It had not run them on dev. The claim was true:
+   a throwaway worktree at dev's tip then gave `2 failed, 59 passed`. But the claim went out first,
+   and the session had to send a second message to say it was now verified.
 2. **One observation generalised into a rule of the platform.** Right after a new agent type was
    merged, one dispatch to it failed with "Agent type ... not found". The session reported that the
    tool loads agent types only at session start, sent BLOCKED, and asked for a restart. A few
    minutes later the harness listed the new type as available in the same session. The failure was
-   real, but the stated cause was wrong: the type was picked up after a delay. The coordinator had
-   started organising a restart on the strength of that claim.
+   real, but the stated cause was wrong: the type was picked up after a delay. A restart had been
+   asked for on the strength of that claim.
 
 In both cases the evidence was one step away. The first needed a test run in a throwaway
 worktree. The second needed a wait and a second attempt, or a documentation lookup.
