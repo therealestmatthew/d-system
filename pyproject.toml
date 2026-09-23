@@ -19,6 +19,8 @@ dependencies = [
     # Windows-only: this marker keeps Linux/macOS installs from ever pulling it.
     "pywinpty>=2.0.14; sys_platform == 'win32'",
     "markdown-it-py>=4.2.0",
+    "langgraph>=1.2.12",
+    "langgraph-checkpoint-sqlite>=3.1.1",
 ]
 
 [project.optional-dependencies]
