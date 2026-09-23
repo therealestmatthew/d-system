@@ -77,10 +77,11 @@ Roster
    `uv run pytest`, `uv run ruff check src/ test/` and `uv run mypy src/` runs (dev's
    baseline is 0 ruff findings, 0 mypy errors; the gate is clean). The owner approves every
    merge; I relay, and a GRANTED merge from me is the owner's approval. Merge only after
-   GRANTED merge. Inside that turn: if dev moved, rebase, re-run all four, report the new tip
-   and wait for my go; then run `uv run python tools/git-hooks/refuse_dirty_integration.py`
-   in the primary checkout and continue only if it exits 0 (AGENTS.md step 9); then ff-merge,
-   make the completion edit on dev (governance only, no pytest), and send TURN DONE <sha(s)>.
+   GRANTED merge. Inside that turn: (i) if dev moved, rebase, re-run all four, report the new
+   tip and wait for my go; (ii) in every case, run
+   `uv run python tools/git-hooks/refuse_dirty_integration.py` in the primary checkout and
+   continue only if it exits 0 (AGENTS.md step 9); (iii) ff-merge, make the completion edit on
+   dev (governance only, no pytest), and send TURN DONE <sha(s)>.
 5. After any merge onto dev I send REBASE. Rebase onto dev at your next safe point.
 6. BLOCKED <reason> when stuck outside your worktree. FREE when you have no assignment.
 7. IDEAS that come up: send "IDEA <the bare idea>" to "Ideation", one message per idea, 1-2 lines, plus your
@@ -114,6 +115,8 @@ Changes to how PROMPT-036 runs:
 - Before you open the next batch, send NEXT-BATCH <batch-id> so I can check slots against the
   Builders first.
 - The batch table's status commit (open or close) goes through TURN? batch <batch-id>.
+- Its post-rebase run and merge follow contract item 4: all four gate checks, and the
+  dirty-integration check before the ff-merge.
 
 In your ACK include: your agent id, the phase you hold, its worktree, and the step you are on.
 ```
@@ -135,8 +138,8 @@ On ASSIGN:
 3. Build and verify in the worktree.
 4. Run /session-close up to and including its independent review, fix or accept every finding, and
    send READY. The phase stays active: /session-close cannot complete it before the merge.
-5. On GRANTED merge, follow contract item 4: ff-merge, then the completion edit on dev as GOV-003
-   sanctions, governance only. Send TURN DONE, remove your worktree and branch, then send FREE.
+5. On GRANTED merge, follow contract item 4: dirty-integration check, ff-merge, then the
+   completion edit on dev as GOV-003 sanctions, governance only. Send TURN DONE, remove your worktree and branch, then send FREE.
 
 Reply with ACK now. Your first assignment follows after owner approval.
 ```

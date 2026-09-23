@@ -146,13 +146,13 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
 1. The session sends `READY` with the phase's own review verdict — every finding either fixed or
    explicitly accepted — and the tail of its post-rebase runs of the four gate checks:
    `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/` and
-   `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so the gate is a clean
-   run of each, not a count no worse than before.
+   `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
+   zero findings; matching the previous count is not enough.
 2. The Session Manager re-runs the four gate checks on the branch tip in a detached temporary
    worktree (`git worktree add --detach ../d-system-worktrees/verify-<phase-id> <branch>`, removed
    afterwards), so it touches neither the primary checkout nor the session's worktree.
-3. The Session Manager brings the merge to the owner with both results and
-   `git diff --stat dev..<branch>`.
+3. The Session Manager brings the merge to the owner with the session's and its own results for the
+   four gate checks and `git diff --stat dev..<branch>`.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
    since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
    reports the new tip; the Session Manager re-runs step 2 on that tip before the session
