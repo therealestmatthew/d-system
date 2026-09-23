@@ -2941,27 +2941,48 @@ items:
   - phase-cap-06
   - phase-cap-07
   scope:
-  - Run real captures end to end through intake, structuring, review and promotion, with
-    D_SYSTEM_DATA_ROOT=_private/portfolio set for every step, so promotion writes the real
-    records under the private data root (ADR-009) and nothing under the tracked _data/.
+  - Run real captures end to end through intake, structuring, review and promotion, so
+    promotion writes the real records under the private data root (ADR-009) and no entity
+    record under the tracked _data/.
+  - Set D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio, an absolute path to the primary
+    checkout's private root, per command for the capture, promotion, rebuild and governance
+    steps; never export it for the session. A relative path resolves inside the worktree,
+    where _private/ does not exist, and promotion would create a new root there that worktree
+    removal deletes (owner ruling, 2026-09-23).
+  - _capture/ (raw captures, staging, promoted and discarded) is anchored to the checkout the
+    commands run in, so it lands in the worktree. Copy it back to the primary checkout's
+    _capture/ before the worktree is removed; it is gitignored, so no merge carries it. uv run pytest and the leak check run with it
+    unset, because the tests assume the fictional example set (GOV-001).
   - Confirm no project has regained a retired cadence value. The owner reassigned
     the original three during phase-cap-02; see GOV-003.
   - Respect the structure/content boundary; captured content stays private until promoted,
     and promoted content stays private.
   - Record the row counts, and no record content or names, in the session record.
   acceptance:
-  - With D_SYSTEM_DATA_ROOT=_private/portfolio, a rebuild reports non-empty commitments,
-    interactions and tasks. The default rebuild does not count, because the fictional
-    example set under _data/ is already non-empty (phase-priv-03).
-  - No project carries a retired review_cadence value.
-  - Every promoted record traces back to a raw capture.
-  - Nothing under _data/ changed, and the leak check passes.
+  - With D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio, a rebuild reports non-empty
+    commitments, interactions and tasks. The default rebuild does not count, because the
+    fictional example set under _data/ is already non-empty (phase-priv-03).
+  - No project carries a retired review_cadence value. The private-root rebuild validates
+    every project against schemas/project.schema.json, which allows only current values.
+  - Every promoted record traces back to a raw capture. Each entry in _capture/promoted/
+    names a capture_id that resolves to a file in _capture/raw/.
+  - No entity record under _data/ and no _data/tags.json changed. _data/ideas.jsonl is
+    excluded, since ideas recorded during the session are written there by design (GOV-006).
+    Both git commands in verification print nothing.
+  - _capture/ has been copied back to the primary checkout, and the promoted and raw entry
+    counts there match the worktree's before the worktree is removed.
+  - The leak check passes with the session record staged. In the worktree it runs only its
+    path check, because its content check reads the checkout's own _private/portfolio/, which
+    a worktree does not have (000150). So the session record is also read by hand for project and
+    person names before it is committed.
   verification:
-  - D_SYSTEM_DATA_ROOT=_private/portfolio uv run python tools/rebuild_db.py
-  - D_SYSTEM_DATA_ROOT=_private/portfolio uv run python -m src.governance
-  - git status --short _data/
-  - uv run python tools/check_no_private_content.py
-  - uv run pytest
+  - D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio uv run python tools/rebuild_db.py
+  - D_SYSTEM_DATA_ROOT=/code/d-system/_private/portfolio uv run python -m src.governance
+  - git diff --name-only dev...HEAD -- _data/ ':!_data/ideas.jsonl'
+  - git status --short -- _data/ ':!_data/ideas.jsonl'
+  - List _capture/promoted/ and confirm each entry's capture_id resolves in _capture/raw/.
+  - uv run python tools/check_no_private_content.py (with the session record staged)
+  - uv run pytest (with D_SYSTEM_DATA_ROOT unset)
   deliverables:
   - docs/03-sessions/
   next_action: Capture a real working period through the full pipeline rather than
