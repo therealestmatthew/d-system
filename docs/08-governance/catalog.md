@@ -337,6 +337,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-22-11 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-11-capability-and-approval-broker.md |
 | SESS-2026-09-22-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-22-13-r02-r04-open-and-tmpagent-cleanup.md |
 | SESS-2026-09-23-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-01-langgraph-orchestrator-skeleton.md |
+| SESS-2026-09-23-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-02-capture-review-promotion.md |
 | SESS-2026-09-23-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-03-prompt-planner-batch-opening-packs.md |
 | SESS-2026-09-23-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-04-dev-lint-and-type-fixes.md |
 | SESS-2026-09-23-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-05-partition-ideas-workflow.md |
