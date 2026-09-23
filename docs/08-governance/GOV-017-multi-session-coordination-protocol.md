@@ -19,9 +19,9 @@ one session coordinating the rest. It covers the session roles, how access to th
 is serialized, how claim slots are allocated, how merges reach the owner, and the exact messages
 sessions exchange.
 
-`AGENTS.md` governs what each agent may do; this document does not change any of it. It governs how
-several sessions, each following `AGENTS.md`, take turns at the parts of the work that cannot run in
-parallel. `GOV-013` and `PROMPT-036` govern a single coordinator that dispatches subagents; this
+`AGENTS.md` governs what each agent may do. This document governs how several sessions take turns at
+the parts of the work that cannot run in parallel. Where it departs from `AGENTS.md`, the departure is
+an owner ruling, listed under *Departures from AGENTS.md* below and recorded in `GOV-003`. `GOV-013` and `PROMPT-036` govern a single coordinator that dispatches subagents; this
 governs several top-level sessions, one of which may be running `PROMPT-036`.
 
 The starter messages that put this protocol into effect are in
@@ -29,6 +29,25 @@ The starter messages that put this protocol into effect are in
 the rules are and why; that one carries the text sent to each session.
 
 It was written on 2026-09-22, from the owner's rulings in the first session that ran this way.
+
+## Departures from AGENTS.md
+
+Each of these is an owner ruling of 2026-09-22, recorded in
+[GOV-003](GOV-003-backlog-decisions.md). They apply only while sessions run under this protocol.
+
+1. **Ideation commits ideas in the primary checkout**, inside a granted turn. `AGENTS.md` limits the
+   primary checkout to claim commits and the catalog regeneration they force.
+2. **Report files under `_working/session-manager/` are written in the primary checkout** by the
+   Session Manager, the Scout and the Standby Builder, without a turn. The path is gitignored and
+   never committed, so it cannot collide with a claim, a merge or an idea commit.
+3. **Builders build the phase the Session Manager assigns**, not the first ready phase in the
+   rendered order. The Session Manager assigns in rendered queue order among conflict-free phases.
+4. **Merge approval is relayed.** `AGENTS.md` step 8 says to ask the owner before integrating. Under
+   this protocol a `GRANTED merge` from the Session Manager is the owner's approval, for every
+   session, including where `/session-start` or `PROMPT-036` says to ask the owner in the session.
+5. **Preflight tests run in the worktree.** `/session-start` step 1 (via `/backlog`) and `PROMPT-036`
+   preflight step 2 run `uv run pytest` in the primary checkout. Under this protocol that run happens
+   in the session's worktree, after it is created.
 
 ## The sessions
 
@@ -48,7 +67,7 @@ phase. **Execution sessions** build backlog phases.
 
 ### Why these roles
 
-- **The claim limit binds less than system overlap does.** `max_active` stays at 3. On 2026-09-22,
+- **System overlap blocks more phases than the claim limit does.** `max_active` stays at 3. On 2026-09-22,
   46 of 74 ready phases were blocked by a single active claim because they shared its system. More
   slots help only where that many mutually disjoint phases exist, and every extra claim adds rebases
   and merge approvals. The Batch Runner's batches run one phase at a time, so it needs one slot; the
@@ -67,8 +86,9 @@ phase. **Execution sessions** build backlog phases.
 ## Session names
 
 Sessions address each other by their **registered name**, which is the name `ListAgents` shows. It
-is set with `/rename <name>` inside the session, in the terminal. On 2026-09-22 a rename made from
-the Remote Control mobile client changed only the name shown on that device; the registered name
+is set with `/rename <name>` inside the session, in the terminal. On 2026-09-22, as the owner
+reported, a rename made from the Remote Control mobile client changed only the name shown on that
+device; the registered name
 stayed the auto-generated title, and the Session Manager could not tell which session was meant.
 
 A session's `[ref]` in `ListAgents` does not change when it is renamed, and every received message
@@ -81,7 +101,8 @@ The primary checkout (`/code/d-system` on `dev`) is where claims, the catalog re
 force, integrations and idea records are committed. Only one session writes there at a time.
 
 - Any session may **read** there, including `uv run python -m src.governance` and `--ready`.
-- To **write** — commit, merge, regenerate, or switch anything — a session asks for a turn, does
+- To **write** — commit, merge, regenerate, or switch anything — a session asks for a turn
+  (reports under `_working/session-manager/` excepted; see *Departures*), does
   only the purpose it stated, leaves `git status` clean, and reports the resulting commit.
 - Before granting a turn, the Session Manager checks that the checkout is on `dev` and clean. After
   the holder reports, it checks that the commit landed and nothing else changed.
@@ -89,7 +110,8 @@ force, integrations and idea records are committed. Only one session writes ther
   `test/test_codes.py` overwrites the tracked `docs/08-governance/catalog.md` while it runs and
   restores it afterwards. On 2026-09-22 two `/session-start` preflight runs overlapped there and
   left the catalog holding only `CORRUPTED` (ideas `000324`, `000325`). Tests run in the session's
-  own worktree.
+  own worktree, including the preflight that `/session-start` and `PROMPT-036` would otherwise run
+  in the primary checkout.
 - **One `pytest` run at a time per worktree**, for the same reason: the tests resolve the catalog
   path to whichever checkout they run in, so two overlapping runs corrupt that worktree's catalog.
   Before a commit that is not meant to change the catalog, `git diff --exit-code
@@ -100,37 +122,50 @@ force, integrations and idea records are committed. Only one session writes ther
 
 The Session Manager allocates the three slots. Builders do not pick from `--ready` themselves; they
 wait for an assignment. Before assigning, the Session Manager checks that the phase's Conflicts
-column is empty against every active claim, and the owner approves each assignment. `/session-start`'s
+column is empty against every active claim, and takes the earliest such phase in the rendered queue
+order (`next_up` first). **The owner approves each assignment** before it is sent. `/session-start`'s
 own claim-approval question still goes to the owner as written.
 
 The Conflicts column can miss real overlap: phases that edit the same directory under different
 system ids are not flagged (ideas `000321`, `000322`). The Scout's candidate reports name such
-hazards, and the Session Manager does not run two phases together that a report flags.
+hazards, and **two phases a Scout report flags as overlapping never run at the same time**, even
+when the Conflicts column is empty.
+
+Two notices keep slot allocation ahead of new work: the Batch Runner sends `NEXT-BATCH` before it
+opens another batch, and Prompt Planner sends `PROMPT-FOR` before the owner pastes a prompt into an
+execution session, so the Session Manager can check it against that session's role, slot and the
+lock. All three rules in this section are owner rulings of 2026-09-22.
 
 ## The merge gate
 
 A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. Approval is relayed:
 
-1. The session sends `READY` with the phase's own review verdict and the tail of its post-rebase
-   `governance` and `pytest` runs.
-2. The Session Manager re-runs `governance` and `pytest` on the branch in a separate temporary
-   worktree, so it touches neither the primary checkout nor the session's worktree.
-3. The Session Manager brings the merge to the owner with both results.
+1. The session sends `READY` with the phase's own review verdict — every finding either fixed or
+   explicitly accepted — and the tail of its post-rebase `governance` and `pytest` runs.
+2. The Session Manager re-runs `governance` and `pytest` on the branch tip in a detached temporary
+   worktree (`git worktree add --detach ../d-system-worktrees/verify-<phase-id> <branch>`, removed
+   afterwards), so it touches neither the primary checkout nor the session's worktree.
+3. The Session Manager brings the merge to the owner with both results and
+   `git diff --stat dev..<branch>`.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
-   since the run, the session rebases and re-runs both checks while holding the lock, so nothing can
-   land between that run and the fast-forward. The completion edit is made in the same turn.
-5. After the merge lands, the Session Manager sends `REBASE` to every session with an open branch.
+   since step 2, the session rebases and re-runs both checks while holding the lock, and reports the
+   new tip; the Session Manager re-runs step 2 on that tip before the session fast-forwards. Nothing
+   else can land on `dev` while the session holds the lock.
+5. Inside the same turn the session fast-forwards `dev` and makes the completion edit — one small
+   commit on `dev` immediately after the integration, as `GOV-003` sanctions (entry "Coordinator completion replaces
+   owner-invoked /session-close, repository-wide") — with `governance` run on `dev` and no `pytest`. Then it
+   sends `TURN DONE`.
+6. After the merge lands, the Session Manager sends `REBASE` to every session with an open branch.
 
-**Owner ruling, 2026-09-22:** a `GRANTED merge` relayed by the Session Manager counts as the owner's
-approval. A session whose own instructions require the owner's direct word may ask the owner once in
-its own session to confirm this.
+**Owner ruling, 2026-09-22:** a `GRANTED merge` relayed by the Session Manager is the owner's
+approval, as a standing rule for every session.
 
 ## Ideas
 
 A session that meets an idea outside its work sends the bare idea to Ideation, one message per idea,
 with its own session name, and does not record it. Ideation records ideas through
 `tools/append_idea.py` in the primary checkout, which needs a turn, and batches waiting ideas into
-one turn. It takes each id from the tool's output and sends it back to the originating session and
+one turn. The message that carries an idea to Ideation is `IDEA`. It takes each id from the tool's output and sends it back to the originating session and
 to the Session Manager.
 
 ## The message contract
@@ -141,12 +176,12 @@ sent to the name `Session Manager`.
 | Message | From | Meaning |
 |---|---|---|
 | `ACK <session> <state>` | any | Orientation received; states phase, branch and worktree, or none |
-| `TURN? <claim\|catalog\|merge\|idea> <phase or branch>` | any | Asks for the primary-checkout lock for one stated purpose |
+| `TURN? <claim\|idea> <phase>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; merges go through `READY` |
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
 | `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean |
-| `READY <branch>` | builder, batch runner | Ready to integrate, with review verdict and post-rebase output |
-| `GRANTED merge` | Session Manager | The owner approved; the recipient holds the lock for the merge and completion edit |
+| `READY <branch>` | builder, batch runner | Ready to integrate, with the review findings resolved and post-rebase output |
+| `GRANTED merge` | Session Manager | The owner approved; the recipient holds the lock for the merge and completion edit, and ends the turn with `TURN DONE` |
 | `REBASE` | Session Manager | `dev` moved; rebase at the next safe point |
 | `ASSIGN <phase-id>` | Session Manager | An owner-approved phase to build |
 | `REVIEW <phase-ids>` | Session Manager | Claim-free review work for the standby builder |
@@ -161,8 +196,9 @@ sent to the name `Session Manager`.
 ## State and resumption
 
 The Session Manager keeps a board at `_working/session-manager/board.md`: roster, claim slots, lock
-holder and queue, pending merges, incidents and open items. Scout and standby reports go under
-`_working/session-manager/scout/` and `_working/session-manager/reviews/`. All of it is gitignored
+holder and queue, pending merges, incidents and open items. Scout reports go under
+`_working/session-manager/scout/`, and Standby Builder reviews under
+`_working/session-manager/reviews/<phase-id>.md` rather than where `PROMPT-035` would put them. All of it is gitignored
 and ephemeral; the backlog on `dev` stays the lock table, and this document is the durable record of
 the protocol.
 

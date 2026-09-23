@@ -20,9 +20,10 @@ the owner pastes into the Session Manager session, and the starter messages the 
 to every other session once the owner approves them.
 
 Each starter message is the **shared contract** followed by that session's **role section**. The
-texts below are the versions the owner approved on 2026-09-22, with the two amendments approved later
-that night folded into the contract: no tests in the primary checkout (item 9), and one test run at a
-time per worktree with a catalog check before each commit (item 10).
+texts below are the versions the owner approved on 2026-09-22, revised the same night after an
+independent review to state the owner's later rulings: no tests in the primary checkout (item 9),
+one test run at a time per worktree with a catalog check (item 10), the relayed merge approval and
+the post-merge completion edit (item 4), and the `_working/` report exemption (item 3).
 
 ## Kickoff for the Session Manager
 
@@ -59,22 +60,28 @@ Roster
 
 1. PRIMARY CHECKOUT (/code/d-system on dev) is locked.
    Reading there is fine. Never write, commit, merge or switch branches there without a grant.
-     send  TURN? <claim|catalog|merge|idea> <phase or branch>
+     send  TURN? <claim|idea> <phase>   (a claim carries its catalog regen;
+                                        merges go through READY below)
      wait  GRANTED (or QUEUED <n>)
      do    only the stated purpose; leave `git status` clean
      send  TURN DONE <sha>
 2. CLAIMS: max_active is 3. Claim only a phase I assigned, and only inside a granted turn.
 3. Everything else runs in a worktree: ../d-system-worktrees/<id> on branch agent/<id>.
-4. MERGE: send READY <branch> with (a) the phase's review verdict and (b) the tail of the
-   post-rebase `uv run python -m src.governance` and `uv run pytest` runs. The owner approves every
-   merge; I relay. Merge only after GRANTED merge.
+   Exception: reports under _working/session-manager/ (gitignored) need no turn.
+4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
+   explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance` and
+   `uv run pytest` runs. The owner approves every merge; I relay, and a GRANTED merge from me is the
+   owner's approval. Merge only after GRANTED merge. Inside that turn: if dev moved, rebase, re-run
+   both, report the new tip and wait for my go; then ff-merge, make the completion edit on dev
+   (governance only, no pytest), and send TURN DONE <sha(s)>.
 5. After any merge onto dev I send REBASE. Rebase onto dev at your next safe point.
 6. BLOCKED <reason> when stuck outside your worktree. FREE when you have no assignment.
-7. IDEAS that come up: send the bare idea to "Ideation", one message per idea, 1-2 lines, plus your
+7. IDEAS that come up: send "IDEA <the bare idea>" to "Ideation", one message per idea, 1-2 lines, plus your
    session name. Do not record it yourself.
 8. The first line of every message is its type and subject.
 9. Never run pytest, rebuilds or any test in the primary checkout. test/test_codes.py overwrites the
-   tracked catalog.md while it runs. Run them in your worktree only.
+   tracked catalog.md while it runs. Run them in your worktree only. This overrides the preflight
+   pytest in /session-start (via /backlog) and PROMPT-036: run it in the worktree once it exists.
 10. One pytest run at a time per worktree, for the same reason, and run
     `git diff --exit-code docs/08-governance/catalog.md` before each commit that is not meant to
     change the catalog. When a commit does change it, regenerate it with --catalog instead.
@@ -94,6 +101,7 @@ one slot.
 
 Changes to how PROMPT-036 runs:
 - Its claim, catalog and ff-merge steps in the primary checkout go through TURN? / TURN DONE.
+- Its preflight pytest runs in the phase worktree, never the primary checkout (contract item 9).
 - Its "ask the owner before integrating" step goes through READY to me. I relay to the owner and
   return GRANTED merge. The owner ruled that a relayed GRANTED merge is their approval.
 - Before you open the next batch, send NEXT-BATCH <batch-id> so I can check slots against the
@@ -113,11 +121,14 @@ Do not pick work from --ready yourself. Wait for ASSIGN <phase-id> from me.
 
 On ASSIGN:
 1. Run /session-start for that phase. Its owner-approval question before the claim still goes to
-   the owner, as written.
+   the owner, as written. Skip its preflight pytest in the primary checkout (contract item 9); run
+   it in the worktree once created.
 2. Make the claim commit (plus catalog regen) only inside a granted turn: TURN? claim <phase-id>.
 3. Build and verify in the worktree.
-4. Close with /session-close. Its independent review is the review verdict for READY.
-5. Send READY. After the merge lands, send FREE.
+4. Run /session-close up to and including its independent review, fix or accept every finding, and
+   send READY. The phase stays active: /session-close cannot complete it before the merge.
+5. On GRANTED merge, follow contract item 4: ff-merge, then the completion edit on dev as GOV-003
+   sanctions, governance only. Send TURN DONE, remove your worktree and branch, then send FREE.
 
 Reply with ACK now. Your first assignment follows after owner approval.
 ```
@@ -128,8 +139,9 @@ Reply with ACK now. Your first assignment follows after owner approval.
 ROLE: Session 3 - Standby Builder. No claim slot until I send ASSIGN.
 
 While you wait: review queued phases I name in REVIEW <phase-ids>, using PROMPT-035 (queued-phase
-review pack). Follow PROMPT-035's own rules for where its output goes; anything that would reach
-dev goes through a worktree and READY.
+review pack), pass 1 only. Write each review to _working/session-manager/reviews/<phase-id>.md
+instead of PROMPT-035's own output path, and run no tests in the primary checkout (contract item 9).
+Anything that would reach dev goes through a worktree and READY.
 
 On ASSIGN <phase-id>: stop the review at a clean point, then work exactly as a Builder:
 /session-start, claim inside a granted turn, build in the worktree, /session-close, READY, then FREE.

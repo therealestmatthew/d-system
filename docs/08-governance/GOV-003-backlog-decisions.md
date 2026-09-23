@@ -647,3 +647,31 @@ one, and that an unratified close stops nothing.
 **Why recorded here:** four rulings that change a schema, a transition table and a backfill policy,
 none of which is visible from the phase line that now carries them. An agent reaching `phase-idg-01`
 or `phase-irs-09` needs the reasoning, not just the amended scope.
+
+## Parallel sessions run under a Session Manager, with five departures from AGENTS.md — 2026-09-22
+
+The owner ran eight interactive sessions against the repository at once: three meta sessions (a
+Session Manager, Ideation, Prompt Planner) and five execution sessions (a batch runner, two builders,
+a standby builder, a scout). [GOV-017](GOV-017-multi-session-coordination-protocol.md) records the
+protocol; [PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md) carries its
+starter messages. The owner ruled the following, each of which departs from `AGENTS.md` while
+sessions run under `GOV-017`:
+
+1. **Ideation commits ideas in the primary checkout**, inside a turn granted by the Session Manager.
+2. **Reports under the gitignored `_working/session-manager/` are written in the primary checkout**
+   without a turn.
+3. **Builders build the phase the Session Manager assigns**, taken in rendered queue order among
+   conflict-free phases and approved by the owner, rather than taking the first ready phase themselves.
+4. **A `GRANTED merge` relayed by the Session Manager is the owner's approval** under `AGENTS.md`
+   step 8, for every session.
+5. **Preflight `pytest` runs in the worktree, never the primary checkout.** On 2026-09-22 two
+   `/session-start` preflight runs overlapped in the primary checkout, and `test/test_codes.py`, which
+   overwrites the tracked catalog while it runs, left it holding only `CORRUPTED` (ideas `000324`,
+   `000325`).
+
+`max_active` stays at 3. System overlap, not the claim limit, is what bounds parallel work: on
+2026-09-22 one active claim blocked 46 of 74 ready phases.
+
+**Why recorded here:** these rulings change who may write in the primary checkout and how an
+integration is approved. An agent reading only `AGENTS.md` would treat an Ideation commit or a relayed
+approval as a violation.
