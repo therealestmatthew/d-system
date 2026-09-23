@@ -12767,6 +12767,7 @@ items:
   - docs/08-governance/
   - docs/02-prompts/
   - schemas/adversarial-finding.schema.json
+  - test/test_adversarial_finding_schema.py
   next_action: Generalize the prompt used for the 2026-09-15 pass on ARCH-006's draft, which already
     exercised the top altitude.
 - id: phase-irs-07
