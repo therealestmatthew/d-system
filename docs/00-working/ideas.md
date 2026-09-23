@@ -1092,6 +1092,17 @@ No related idea found by title overlap.
 
 </details>
 
+**Links**
+
+- relates_to ← `000360`
+- relates_to ← `000361`
+- relates_to ← `000362`
+- relates_to ← `000363`
+- relates_to ← `000364`
+- relates_to ← `000365`
+- relates_to ← `000366`
+- relates_to ← `000367`
+
 ---
 
 ## 000023 · _tmpagent/'s claim protocol has no entry in the systems.yaml maturity registry
@@ -4594,6 +4605,7 @@ The template library idea is not formally linked to PLAN-003 yet, though it clea
 
 - relates_to ← `000084`
 - relates_to ← `000092`
+- relates_to ← `000367`
 
 ---
 
@@ -4633,6 +4645,7 @@ PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building b
 - relates_to ← `000085`
 - relates_to ← `000092`
 - relates_to ← `000132`
+- relates_to ← `000367`
 
 ---
 
@@ -17225,7 +17238,7 @@ Unresolved: which option; whether the same question applies to categories under 
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T00:50:47-04:00): Owner ruling, 2026-09-23 (asked by Ideation): tags promoted from a capture go under the private, gitignored data root (_private/portfolio/ for real records). The tracked _data/tags.json keeps only the shared, non-confidential taxonomy, so nothing a capture produces can be committed by accident. Chosen over splitting the tag file, over keeping one tracked file with a confidentiality check, and over deciding later.
 - **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Triage Finding: 000343
@@ -17272,6 +17285,7 @@ The distinction is driven by the ruling on 000337: once tag categories move into
 ## No Unaddressed Overlap
 
 The linked idea 000337 is the only other idea touching this decision. No other idea proposes an overlapping approach to capture-derived tags or related data-root placement. Ideas that mention tags broadly (000018, 000004, etc.) address different concerns (idea tagging, search, RAG) and do not propose a capture integration path.
+- **finding** by agent-ideation (2026-09-23T13:27:37-04:00): Needs a phase. The owner asked on 2026-09-23 (via Session Manager) for this to be noted, from gap 4.7 of the productivity-system inventory. The ruling (capture-promoted tags go under the private data root) has no implementing phase, and phase-cap-06 still writes them to the tracked tags.json with a warning.
 
 </details>
 
@@ -17378,7 +17392,7 @@ Unresolved:
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-23T01:11:41-04:00): # 000345: project.repository has no column in the DuckDB database, so the rebuild drops it without warning
 
@@ -17413,6 +17427,7 @@ The JSON is the source of truth (ADR-009). A field that passes schema validation
 3. **Examine the unmerged review** on agent/schema-review-01 to surface any other fields suffering the same loss that the integrated ARCH-009 review may not have named explicitly.
 
 No existing open idea overlaps with the specific `project.repository` field issue. Idea 000024 covers the broader schema/DDL mismatch category but focuses on missing tables, not missing columns.
+- **finding** by agent-ideation (2026-09-23T13:27:37-04:00): Needs a phase. The owner asked on 2026-09-23 (via Session Manager) for this to be noted, from gap 4.6 of the productivity-system inventory. No backlog phase fixes the dropped repository field. phase-rel-03 checks references, not unprojected fields, and ARCH-010's projection-integrity gate names the class of problem without a phase.
 
 </details>
 
@@ -17944,3 +17959,135 @@ src/governance/__main__.py:190/523: "review overdue since ..." warnings still pr
 Support coordinating agent sessions from other providers (Gemini, Codex) under the multi-session protocol, not just Claude Code sessions. This includes whether the coordination can be adapted onto LangChain/LangGraph with multi-provider model support. Likely relates to 000347 (the Session Manager automation cluster) and P3 (session-manager-on-langgraph.md).
 
 (From the owner, relayed by Session Manager to Ideation.)
+
+---
+
+## 000360 · API routes and ts/ UI views for projects, people, commitments and tasks
+
+**Created 2026-09-23T13:27:24-04:00 · Status: `open`**
+
+Add API routes and ts/ UI views for projects, people, commitments and tasks.
+
+Source: gap 4.2 of the productivity-system inventory (_working/session-manager/reports/productivity-system-inventory.md, 2026-09-23). src/api/routes/ holds only demo_stage.py, demo_terminal.py and workbench.py, so no route serves any of the four core entities, and ts/ has no view of them.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000361 · A quick-entry writer for people, commitments and tasks, similar to append_idea.py
+
+**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+
+A quick-entry writer for people, commitments and tasks, similar to tools/append_idea.py.
+
+Source: gap 4.3 of the productivity-system inventory (2026-09-23). Today these records can be added only through the full capture pipeline or by editing JSON by hand. 000022's second hypothesis, that friction prevents records being created, points at this gap.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000362 · Reminders and due-date surfacing: notify the owner when a commitment falls due or goes overdue
+
+**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+
+Reminders and due-date surfacing: notify the owner when a commitment falls due or goes overdue.
+
+Source: gap 4.4 of the productivity-system inventory (2026-09-23). The planned Stale Radar (phase-sig-02) and session briefing (phase-syn-02) are pull-based. Nothing notifies the owner on its own initiative.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000363 · External intake: capture from email, calendar and meeting transcripts
+
+**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+
+External intake: capture from email, calendar and meeting transcripts.
+
+Source: gap 4.5 of the productivity-system inventory (2026-09-23). Capture currently starts from notes the owner writes. The external trigger gateway (000028) is agent plumbing and does not target portfolio intake.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000364 · Model the opportunity entity (a potential engagement) named in ARCH-010
+
+**Created 2026-09-23T13:27:25-04:00 · Status: `open`**
+
+An idea for the opportunity entity, meaning a potential engagement, named in ARCH-010.
+
+Source: gap 4.9 of the productivity-system inventory (2026-09-23). ARCH-010's Opportunity row describes it: "Potential engagement; prospect denotes the party and prospecting the activity; role-bearing participants and staged transition history; one opportunity can yield multiple engagements through explicit links". It marks the entity "expanded scope, no separate idea yet". Related: 000262 (engagements) and 000267.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000365 · A plan (requirements, plan, backlog phases) for the ARCH-010 organisational model
+
+**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+
+Write the requirements, plan and backlog phases for the ARCH-010 organisational model.
+
+Source: gap 4.1 of the productivity-system inventory (2026-09-23). ARCH-010 (draft) records accepted design decisions for the organisational data model in ideas 000255-000267: companies, affiliations, aliases, project parties, roles, engagements, WBS and schema governance. Its "Delivery" row says governed requirements, a plan and backlog phases come next, before implementation. No backlog phase references ARCH-009 or ARCH-010.
+
+(From the owner, relayed by Session Manager to Ideation.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000366 · Tag ideas with the projects they belong to, so one idea log serves many projects
+
+**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+
+The owner's words, as given:
+
+"We should add another idea for the ideas log to include additional tagging to associate ideas with projects so they can be quickly filtered. That way the same system can be used to support multiple projects without clogging the context but it also exists as a comprehensive log across all projects. Then, other projects can reference the larger list to pull in already useful ideas that are transferable."
+
+(From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Links**
+
+- relates_to → `000022`
+
+---
+
+## 000367 · Link ideas to templates, the reusable building blocks
+
+**Created 2026-09-23T13:27:26-04:00 · Status: `open`**
+
+The owner's words, as given:
+
+"Also need to link ideas to templates (reusable building blocks - link to the existing software building blocks idea(s))"
+
+Linked to the existing building-block ideas 000083 (template library with deterministic or AI population) and 000084 (HTML component library, which calls itself "the building blocks" of HTML generation).
+
+(From the owner, relayed by Session Manager to Ideation, 2026-09-23.)
+
+**Links**
+
+- relates_to → `000022`
+- relates_to → `000083`
+- relates_to → `000084`
