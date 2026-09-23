@@ -93,47 +93,44 @@ Print the whole output to the owner.
 
 ## 2. Resume or start, then the corpus
 
-Decide by inspection whether this invocation resumes a sweep or starts one. Run:
-
-```bash
-uv run python - "$CORPUS" <<'EOF'
-import datetime as dt, glob, json, pathlib, re, sys
-corpus = pathlib.Path(sys.argv[1])
-manifest = corpus / "manifest.json"
-if not manifest.exists():
-    print("NEW: no manifest")
-    sys.exit()
-m = json.loads(manifest.read_text(encoding="utf-8"))
-stamp = (f"<!-- partition-ideas: seed={m['shuffle_seed']} corpus_size={m['corpus_size']} "
-         f"status={','.join(m.get('status', ['triaged']))} -->")
-done = [p.name for p in sorted(corpus.glob("*.md"))
-        if p.read_text(encoding="utf-8").startswith(stamp)]
-finished = [f for f in glob.glob("docs/00-working/idea-partition-*.json")
-            if json.loads(open(f, encoding="utf-8").read())["manifest"]["shuffle_seed"] == m["shuffle_seed"]]
-built = dt.date.fromtimestamp(manifest.stat().st_mtime).isoformat()
-if done and not finished:
-    print(f"RESUME: corpus built {built}, size {m['corpus_size']}, seed {m['shuffle_seed']}")
-    print("already done:", ", ".join(done))
-else:
-    reason = f"finished in {finished[0]}" if finished else "no stamped output"
-    print(f"NEW: the manifest in place ({reason}) belongs to an earlier sweep")
-EOF
-```
-
-**RESUME** — do not rebuild the corpus; rebuilding would replace the manifest and orphan every
-stamped report. Report the files already done to the owner, then carry on from the first step whose
-output is missing. Each step below also checks for its own output before dispatching.
-
-**NEW** — first move the earlier sweep's files aside, then build.
-
-Move every earlier file in `$CORPUS` — `manifest.json`, `corpus-*.md`, `report-*.md`, `audit-*.md`,
-`dispatch-*.txt` — into `$CORPUS/previous-<that file's modification date>/`. **Move, never
-delete**, and never overwrite a file already in the target directory:
+Decide by inspection whether this invocation resumes a sweep or starts one. The same command moves
+an earlier sweep's files aside, and it does so **only** when it has classified the invocation NEW,
+so a sweep in progress is never moved:
 
 ```bash
 uv run python - "${CORPUS:?resolve CORPUS first}" <<'EOF'
-import datetime as dt, pathlib, sys
+import datetime as dt, glob, json, pathlib, sys
 corpus = pathlib.Path(sys.argv[1])
+manifest = corpus / "manifest.json"
+m = json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else None
+done, records = [], []
+if m is not None:
+    stamp = (f"<!-- partition-ideas: seed={m['shuffle_seed']} corpus_size={m['corpus_size']} "
+             f"status={','.join(m.get('status', ['triaged']))} -->")
+    done = [p.name for p in sorted(corpus.glob("*.md"))
+            if p.read_text(encoding="utf-8").startswith(stamp)]
+    for f in sorted(glob.glob("docs/00-working/idea-partition-*.json")):
+        try:
+            record = json.loads(pathlib.Path(f).read_text(encoding="utf-8"))
+            seed = record["manifest"]["shuffle_seed"]
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            print(f"UNREADABLE (ignored): {f}: {type(exc).__name__}: {exc}")
+            continue
+        if seed == m["shuffle_seed"]:
+            records.append((f, record.get("state")))
+accepted = [f for f, state in records if state == "accepted"]
+if done and not accepted:
+    built = dt.date.fromtimestamp(manifest.stat().st_mtime).isoformat()
+    print(f"RESUME: corpus built {built}, size {m['corpus_size']}, seed {m['shuffle_seed']}")
+    print("already done:", ", ".join(done))
+    for f, state in records:
+        print(f"this sweep's record: {f} (state: {state})")
+    sys.exit()
+if m is None:
+    print("NEW: no manifest")
+else:
+    reason = f"accepted in {accepted[0]}" if accepted else "no stamped output"
+    print(f"NEW: the manifest in place ({reason}) belongs to an earlier sweep")
 patterns = ("manifest.json", "corpus-*.md", "report-*.md", "audit-*.md", "dispatch-*.txt")
 for pattern in patterns:
     for path in sorted(corpus.glob(pattern)):
@@ -147,6 +144,21 @@ for pattern in patterns:
         print(f"moved {path.name} -> {target.relative_to(corpus)}")
 EOF
 ```
+
+A partition record that cannot be read is listed as `UNREADABLE` and ignored; show those lines to
+the owner. A sweep counts as finished only once its record's `state` is `accepted` (GATE 3). A
+record for this manifest that is still `proposed` means the sweep stopped at step 6 or GATE 3, so
+the invocation resumes it.
+
+**RESUME** — do not rebuild the corpus; rebuilding would replace the manifest and orphan every
+stamped report. Nothing was moved. Report the files already done, and any record of this sweep, to
+the owner, then carry on from the first step whose output is missing. Each step below also checks
+for its own output before dispatching.
+
+**NEW** — the command has already moved every earlier file in `$CORPUS` — `manifest.json`,
+`corpus-*.md`, `report-*.md`, `audit-*.md`, `dispatch-*.txt` — into
+`$CORPUS/previous-<that file's modification date>/`. It moves and never deletes, and never
+overwrites a file already in the target directory. Report the moves to the owner.
 
 Then build the corpus into the primary checkout's directory. The status filter defaults to
 `triaged`; pass `--status` only when the invocation names another selection. The `:?` guard stops
@@ -183,6 +195,10 @@ EOF
    import pathlib, re, sys
    pack = pathlib.Path("docs/02-prompts/PROMPT-034-reusable-partition-pack.md").read_text(encoding="utf-8")
    match = re.search(rf"^### {re.escape(sys.argv[1])} .*?^```\n(.*?)\n^```$", pack, re.S | re.M)
+   if match is None:
+       sys.exit(f"no fenced block found for section {sys.argv[1]}")
+   if re.search(r"^```", match.group(1), re.M):
+       sys.exit(f"section {sys.argv[1]} holds a nested fence; the extraction would cut it short")
    sys.stdout.write(match.group(1) + "\n")
    EOF
    ```
@@ -227,25 +243,46 @@ continue without the owner's yes.
 written. Its output is the staging document — in **this worktree**, where tracked files belong — and
 its structured record beside it.
 
-**Name the output from the corpus date, and never overwrite.** The date is the corpus date from step
-2, not today's date. If a partition document or record already holds that date, suffix rather than
-overwrite; an earlier partition document is never edited:
+**Name the output from the corpus date, and never overwrite an earlier sweep's.** The date is the
+corpus date from step 2, not today's date. If a partition document or record already holds that
+date, suffix rather than overwrite; an earlier partition document is never edited. A document or
+record that belongs to **this** sweep — the markdown carries this sweep's run stamp, or the record
+carries this manifest's seed — is this sweep's own draft, left by an interrupted synthesis, and is
+continued under the same name rather than orphaned:
 
 ```bash
-uv run python - <CORPUS DATE> <<'EOF'
-import pathlib, sys
+uv run python - <CORPUS DATE> "$CORPUS" <<'EOF'
+import json, pathlib, sys
+m = json.loads((pathlib.Path(sys.argv[2]) / "manifest.json").read_text(encoding="utf-8"))
+stamp = (f"<!-- partition-ideas: seed={m['shuffle_seed']} corpus_size={m['corpus_size']} "
+         f"status={','.join(m.get('status', ['triaged']))} -->")
+def ours(stem):
+    md, js = pathlib.Path(stem + ".md"), pathlib.Path(stem + ".json")
+    if md.exists() and md.read_text(encoding="utf-8").startswith(stamp):
+        return True
+    try:
+        return json.loads(js.read_text(encoding="utf-8"))["manifest"]["shuffle_seed"] == m["shuffle_seed"]
+    except (OSError, ValueError, TypeError, KeyError):
+        return False
 base, n = f"docs/00-working/idea-partition-{sys.argv[1]}", 2
 stem = base
 while pathlib.Path(stem + ".md").exists() or pathlib.Path(stem + ".json").exists():
+    if ours(stem):
+        print(f"CONTINUE: {stem} is this sweep's own draft")
+        break
     stem, n = f"{base}-{n}", n + 1
 print(stem + ".md")
 print(stem + ".json")
 EOF
 ```
 
-**The markdown** carries what `S` requires — both levels, the six-field batch record for every
-group, the unbatched section, the two decline tiers and the completeness arithmetic — and records its
-corpus size, its status filter and its manifest seed near the top. Name each track (programme) and
+On `CONTINUE`, tell the owner, then rewrite that draft and its record in full; they are this
+sweep's, not an earlier partition.
+
+**The markdown** starts with the run stamp as its first line, then carries what `S` requires — both
+levels, the six-field batch record for every group, the unbatched section, the two decline tiers and
+the completeness arithmetic — and records its corpus size, its status filter and its manifest seed
+near the top. Name each track (programme) and
 each fine group exactly as the record names it.
 
 **The record** is the same partition as JSON, validated against
@@ -273,6 +310,10 @@ if not problems:
     placed = [i for t in record["tracks"] for g in t["groups"] for i in g["ideas"]]
     placed += [u["id"] for u in record["unbatched"]]
     manifest = json.loads((corpus / "manifest.json").read_text(encoding="utf-8"))
+    stamp = (f"<!-- partition-ideas: seed={manifest['shuffle_seed']} corpus_size={manifest['corpus_size']} "
+             f"status={','.join(manifest.get('status', ['triaged']))} -->")
+    if not markdown.startswith(stamp):
+        problems.append("the markdown does not start with this sweep's run stamp")
     if len(corpus_ids) != manifest["corpus_size"]:
         problems.append(f"corpus-R1.md lists {len(corpus_ids)} ids, manifest says {manifest['corpus_size']}")
     duplicates = sorted({i for i in placed if placed.count(i) > 1})
@@ -282,6 +323,12 @@ if not problems:
     md_ids = set(re.findall(r"\b(\d{6})\b", markdown)) & corpus_ids
     problems += [f"in the record, not the markdown: {i}" for i in sorted(set(placed) - md_ids)]
     problems += [f"in the markdown, not the record: {i}" for i in sorted(md_ids - set(placed))]
+    tiers = record["decline_candidates"]
+    both = [c["id"] for c in tiers["nominated_by_both"]]
+    one = [c["id"] for c in tiers["nominated_by_one"]]
+    problems += [f"decline candidate listed twice: {i}" for i in sorted({i for i in both + one if (both + one).count(i) > 1})]
+    problems += [f"decline candidate not in a group or unbatched: {i}" for i in sorted(set(both + one) - set(placed))]
+    problems += [f"decline candidate not in the markdown: {i}" for i in sorted(set(both + one) - md_ids)]
     names = [t["name"] for t in record["tracks"]] + [g["name"] for t in record["tracks"] for g in t["groups"]]
     problems += [f"name not in the markdown: {n!r}" for n in names if n not in markdown]
     if record["markdown"] != md_path.as_posix():
