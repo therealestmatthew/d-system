@@ -19323,7 +19323,7 @@ Overlapping ideas from fold: 000155 (append_idea.py leaves the tree red until th
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Checked on dev: git show f6216e9 changed only backlog.yaml (completing phase-irs-06). b928817 changed only catalog.md, a one-line regeneration. That supports the Session Manager's account of one red-dev incident. The other, after 024443c, is recorded in Ideation's own state as a commit that left out the regenerated docs/00-working/ideas.md. Both failures were generated files left stale by a write that ran governance but not the test suite.
 
@@ -19334,6 +19334,11 @@ A narrower alternative covers both recorded incidents: generator --check calls (
 Related: 000405 and 000406 (the f6216e9 incident), 000155 (append_idea.py leaves the tree red until the generator runs), 000012 (skipping preflight when the tree is provably clean).
 
 PROPOSED LINK: 000399 --relates_to--> 000198 (a catalog staleness check in governance covers the same incidents more cheaply)
+- **finding** by agent-ideation (2026-09-23T16:42:42-04:00): Correction to Ideation's earlier finding on this idea (18c39c1), which said nothing runs tests automatically after a write to dev. That was wrong. .github/workflows/ci.yaml runs on every push to dev and main: the private-content check, governance, ruff, mypy and the full pytest suite, plus the frontend build.
+
+What `gh run list --branch dev` shows (checked 2026-09-23): the CI run for 024443c failed, so CI caught that incident. The run for f6216e9 is recorded as a success, although the Session Manager's test run found test_codes.py failing at that commit. Why they disagree was not investigated. Between 2026-09-23T00:57Z and 04:51Z, 23 consecutive CI runs on dev failed, and the sessions writing to dev did not respond to them.
+
+So the gap is not a missing test run. It is that no session reads or acts on the CI result: nothing reports a red run to the Session Manager, and nothing holds the next turn until the run passes. The idea can be restated as "gate the next dev write on the previous CI result". That uses the existing workflow and needs no pytest run in the primary checkout.
 
 </details>
 
@@ -19597,11 +19602,27 @@ PROPOSED LINK: 000407 --relates_to--> 000354 (the incident that caused the pack 
 
 ## 000408 · A deterministic diff check that refuses new type-ignore comments, cast(Any, ...) and bare except-pass
 
-**Created 2026-09-23T16:39:59-04:00 · Status: `open`**
+**Created 2026-09-23T16:39:59-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
 
 As given: a deterministic diff check that refuses new `# type: ignore` (other than import-untyped), `cast(Any, ...)` and bare `except: pass`. Logic-level ignores are already on dev at src/orchestrator/graphs/intake.py:90 and tools/generate_ideas_md.py:73-135. Source: owner's agentic-sdlc design §7; relates to 000385.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:42:42-04:00): Confirmed on dev at 18c39c1: src/orchestrator/graphs/intake.py:90 has `# type: ignore[arg-type]` (explained in the comment above it as a gap in langgraph's stub). tools/generate_ideas_md.py:73-135 has six ignores (union-attr, arg-type, index). Across src/, tools/ and test/ there are 25 `type: ignore` comments that are not import-untyped. No `cast(Any, ...)` exists. `except ...:` followed by `pass` occurs in src/broker/__main__.py (lines 89, 113, 115), src/api/routes/demo_terminal.py:338, src/demo/windows.py:77 and src/demo/posix.py:83. Whether those are bare `except:` or typed exceptions was not checked line by line.
+
+Current checks: pyproject.toml sets mypy strict = true (strict includes warn_unused_ignores), and ruff selects only E, F, I and UP. Ruff has built-in rules for part of this ask: PGH003 (a type-ignore without a code), and E722 and S110 or BLE001 for bare-except and except-pass. They are not enabled. A diff-only check (new occurrences only) avoids having to fix the 25 existing ignores first.
+
+Related: 000398 (a commit-time diff check of scope), 000400, 000409 (the same design source), 000051 (agent harness and guardrails).
+
+PROPOSED LINK: 000408 --relates_to--> 000409 (both are diff-time guards from the owner's agentic-sdlc design section 7)
+
+</details>
 
 **Links**
 
@@ -19611,11 +19632,27 @@ As given: a deterministic diff check that refuses new `# type: ignore` (other th
 
 ## 000409 · A test-count baseline guard that refuses a branch whose passed count drops or whose skips rise
 
-**Created 2026-09-23T16:40:00-04:00 · Status: `open`**
+**Created 2026-09-23T16:40:00-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
 
 As given: a test-count baseline guard: record passed/skipped counts on dev, and refuse a branch whose count drops or whose skips rise, unless the owner signs off. Nothing catches a deleted or skipped test today. Source: owner's agentic-sdlc design §7; relates to 000385 and 000400.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:42:42-04:00): Checked on dev at 18c39c1: no stored baseline of passed or skipped test counts exists, and neither GOV-017's merge gate nor .github/workflows/ci.yaml compares counts between dev and a branch. READY reports include the tail of the pytest run, so the counts are visible to the Session Manager but not compared mechanically. Three test files use skip markers or pytest.skip: test/test_broker.py, test/test_ideas.py and test/test_build_idea_corpus.py.
+
+Design notes: legitimate changes also lower the count, such as deleting obsolete tests, so the sign-off route the idea names is necessary. A per-test comparison (which test ids disappeared or became skipped) is more informative than a raw count. That can be produced with `pytest --junitxml` or the `-rs` summary.
+
+Related: 000400 (executable acceptance and mutation checks, named in the body), 000399 (automatic test run and CI gating), 000408 (the same design source), 000214 (a gate that passed while checking 4 of 43 fields).
+
+PROPOSED LINK: 000409 --relates_to--> 000400 (both check that the tests guarding acceptance still exist and still bite)
+
+</details>
 
 **Links**
 
@@ -19625,11 +19662,29 @@ As given: a test-count baseline guard: record passed/skipped counts on dev, and 
 
 ## 000410 · The lifecycle has no security review: no plan-time threat surface, no diff-time security pass, no rule for dependency changes
 
-**Created 2026-09-23T16:40:00-04:00 · Status: `open`**
+**Created 2026-09-23T16:40:00-04:00 · Status: `triaged`**
 
 From Session 1 - Builder A, relayed to Ideation, 2026-09-23.
 
 As given: the lifecycle has no security review. ARCH-006, GOV-014 and REQ-022 have no plan-time threat-surface section and no diff-time security pass, and no rule governs dependency/lockfile changes. Source: owner's agentic-sdlc design §3.14; relates to 000385.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T16:42:42-04:00): Confirmed on dev at 18c39c1: ARCH-006, GOV-014 and REQ-022 contain no mention of security or threats. AGENTS.md and the GOV documents have no rule on uv.lock or dependency changes. No repository command or skill does a security review. Claude Code's built-in /security-review command exists outside the repository, and no governed procedure calls it.
+
+Security-adjacent controls that exist: the private-content check (tools/check_no_private_content.py, OPS-009, in CI and before commits; see 000150/000195/000384 for its worktree gap), the capability and approval broker (phase-auto-02, src/broker), and ADR-009's structure-content boundary. These protect confidentiality and agent permissions, not the code's attack surface.
+
+Relevant surface for a threat section: the FastAPI app, including the terminal websocket route (src/api/routes/demo_terminal.py), which runs a shell. Also relevant: the orchestrator's Agent SDK dispatch and dependency updates.
+
+Related: 000160 (the MCP tool surface: read-only access, writes through a chokepoint), 000051 (agent harness and guardrails), 000014 (hooks and settings.json audit).
+
+PROPOSED LINK: 000410 --relates_to--> 000160 (the tool-surface design is one part of the threat surface)
+
+</details>
 
 **Links**
 
