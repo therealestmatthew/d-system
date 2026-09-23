@@ -70,7 +70,11 @@ need "Verification"   "Acceptance and verification|Requirement coverage"
 need "Boundaries"     "Out of scope|What this plan does not do"
 need "Open questions" "Open questions|Open question|Open decisions"
 # Requirement coverage: when depends_on names a document of kind requirement.
-deps=$(sed -n '2,/^---$/p' "$draft" | grep -m1 '^depends_on:' | tr -d '[]' | cut -d: -f2 | tr ',' ' ')
+# depends_on may be an inline list ([a, b]) or a block list (one "- a" line each).
+deps=$(sed -n '2,/^---$/p' "$draft" | awk '
+  /^depends_on:/ { sub(/^depends_on:[ ]*/, ""); gsub(/[][,]/, " "); print; block=1; next }
+  block && /^[ ]*- / { sub(/^[ ]*- /, ""); print; next }
+  { block=0 }')
 for dep in $deps; do
   if grep -lx "id: $dep" docs/*/*.md | xargs -r grep -qx "kind: requirement"; then
     need "Requirement coverage" "Requirement coverage"; break
@@ -191,7 +195,8 @@ is appended to the finding's `dispositions` list. The last entry is the current 
 
 - The planner (`by: planner`) may write any of the four values.
 - The owner (`by: owner`) writes a disposition only for a finding the planner escalated, and never
-  writes `escalated-g3`. The schema rejects it.
+  writes `escalated-g3`. The schema rejects both an owner's `escalated-g3` and an owner's entry on a
+  finding with no planner `escalated-g3` entry.
 - `ARCH-006` stage 5 allows one revision cycle. A blocker that is still unresolved after it is
   dispositioned `escalated-g3`.
 - The adversary writes no disposition.

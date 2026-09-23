@@ -12781,7 +12781,7 @@ items:
   - docs/08-governance/reviews/2026-09-23-sample-nonconforming-draft.json
   - docs/03-sessions/SESS-2026-09-23-07-three-altitude-review-park.md
   result: 'In the worktree, rebased on dev a81ca3f: Governance OK (35 systems, 338 documents, 31
-    memories, 294 backlog phases); pytest 1025 passed, 1 skipped; ruff and mypy clean. The first
+    memories, 294 backlog phases); pytest 1028 passed, 1 skipped; ruff and mypy clean. Independent close review: both acceptance conditions Met, 4 minor defects, 3 fixed and 1 accepted. The first
     GOV-018 review ran against PLAN-039 and REQ-022 at all three altitudes: 8 findings (7 major, 1
     minor), all dispositioned by the planner stand-in (6 escalated-g3, 2 accepted-no-change). A
     sample draft missing five GOV-010 sections was returned at the entry check with no adversary

@@ -4,7 +4,8 @@
 that holds findings at `definitions/review`. The structural rules are asserted here against a
 fixture and deliberately broken copies of it. Two rules JSON Schema cannot express are asserted
 directly against every record under `docs/08-governance/reviews/`: a record's `review_id` is its
-filename, and finding ids are unique within a record and name only phases the record lists.
+filename, and finding ids are unique within a record, name only phases the record lists, and
+come only from altitudes the record says were run.
 """
 
 from __future__ import annotations
@@ -157,6 +158,13 @@ def test_owner_cannot_escalate_to_g3() -> None:
     )
 
 
+def test_owner_writes_only_on_a_finding_the_planner_escalated() -> None:
+    owner_only = [disposition(value="fixed", by="owner", recorded_by="repository-owner")]
+    assert finding_errors(finding(dispositions=owner_only))
+    after_acceptance = [disposition(), *owner_only]
+    assert finding_errors(finding(dispositions=after_acceptance))
+
+
 def test_escalated_finding_carries_the_owners_later_disposition() -> None:
     history = [
         disposition(value="escalated-g3", reason="Needs the owner's ruling on scope."),
@@ -285,6 +293,15 @@ def test_committed_review_findings_name_listed_phases(path: Path) -> None:
                 f"{item['id']} names {item['subject']}, which the record does not list "
                 f"at the {item['altitude']} altitude"
             )
+
+
+@pytest.mark.parametrize("path", REVIEW_FILES, ids=[path.name for path in REVIEW_FILES])
+def test_committed_review_findings_come_from_altitudes_run(path: Path) -> None:
+    record = json.loads(path.read_text(encoding="utf-8"))
+    for item in record["findings"]:
+        assert item["altitude"] in record["altitudes_run"], (
+            f"{item['id']} is at the {item['altitude']} altitude, which altitudes_run omits"
+        )
 
 
 def test_broken_copy_of_a_committed_review_fails() -> None:

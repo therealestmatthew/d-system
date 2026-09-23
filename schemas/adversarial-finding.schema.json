@@ -82,6 +82,15 @@
     {
       "if": {"properties": {"altitude": {"enum": ["phase", "later-added-phase"]}}},
       "then": {"properties": {"subject": {"pattern": "^phase-[a-z0-9]+-[0-9]+$"}}}
+    },
+    {
+      "if": {
+        "required": ["dispositions"],
+        "properties": {"dispositions": {"contains": {"required": ["by"], "properties": {"by": {"const": "owner"}}}}}
+      },
+      "then": {
+        "properties": {"dispositions": {"contains": {"required": ["by", "value"], "properties": {"by": {"const": "planner"}, "value": {"const": "escalated-g3"}}}}}
+      }
     }
   ],
   "definitions": {

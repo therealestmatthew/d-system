@@ -182,7 +182,7 @@
           "by": "planner",
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
-          "reason": "Verified against the files. Resolving it needs an edit to phase-irs-17's scope, verification and next_action. Confirmed: all three refer to 'the traced run' of phase-irs-12, which completes end to end. Whether the drill re-runs the scenario per stage class or uses fixtures is a scope decision for the owner."
+          "reason": "Resolving it needs an edit to phase-irs-17's scope, verification and next_action. Confirmed: all three refer to 'the traced run' of phase-irs-12, which completes end to end. One citation in the evidence is wrong: the quote 'phase-irs-17 additionally depends on phase-irs-12, whose traced run its own verification text presumes' is in docs/03-sessions/SESS-2026-09-16-05-phase-review-remaining-decisions.md lines 69-70, not GOV-003 line 69. The finding is kept as the adversary reported it (GOV-018 step 4); the substance stands. Whether the drill re-runs the scenario per stage class or uses fixtures is a scope decision for the owner."
         }
       ]
     },
