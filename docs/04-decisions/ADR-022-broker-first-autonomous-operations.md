@@ -73,14 +73,45 @@ there is nothing yet for it to authorize. It will look like over-engineering for
 of the programme is unbuilt. That is the correct shape for a component whose entire purpose is to
 deny by default before anything exists to trust.
 
-### This is not a decision to ship a complete policy first
+### The broker ships as an enforcement point with a permissive default
 
-Building the broker first does not mean designing its full capability taxonomy first. A capability
-taxonomy needs real capability requests to be named against, and the gateway and ledger — not yet
-built — are what would generate them. Designing the taxonomy now means guessing at what a run
-actually needs to ask for. See the architecture document
-([ARCH-011](../07-architecture/ARCH-011-autonomous-operations-architecture.md)) for the shape this
-phase rules the broker ships in as a result, and for the ruling on the other three components.
+Building the broker first does not mean designing its full capability taxonomy first. `REQ-017`
+allows either shape to satisfy `R01` — a full-policy broker (capability set, approval path and
+decision record specified now) or an enforcement point with a permissive default (the tool-boundary
+mechanism and refusal path built and wired, policy deferred). **This design finds it is guessing at
+the capability taxonomy, and ships the permissive-default shape.** The only real precedent for scoped
+capability enforcement in this repository — the 2026-09-15 unattended run described above — was a
+person writing situational grants for that one run ("merge locally but never push", "write these ten
+phases complete and no others", "never touch `ts/` or `src/`"), not a set drawn from a pre-declared,
+general-purpose taxonomy. With the gateway and ledger both deferred (see
+[ARCH-011](../07-architecture/ARCH-011-autonomous-operations-architecture.md)), there is no second
+source of real capability requests to check a named taxonomy against before it ships.
+
+`phase-auto-02` therefore builds the tool-boundary enforcement mechanism, wires it into every agent
+action, defaults to denying nothing, and audits every call it sees. This satisfies `REQ-017` `R01`
+(the ordering) and `R03` (enforcement at the tool boundary). It does **not** satisfy `R02` (every
+agent run carries an explicit, narrow, named capability set) or `R04` (anything sensitive routes
+through an approval request carrying scope, reason, expiry and an immutable decision record) — per
+`REQ-017`'s own qualification that a design shipping the permissive shape leaves those two open until
+real capability requests exist to write them against. **`R02` and `R04` are recorded here as open,
+not claimed.** They are answered once the gateway, the ledger, or continued direct use of the broker
+inside chat sessions produces real requests to design a named taxonomy and an approval path against.
+`REQ-017` itself is not edited to reflect this — it is not a declared deliverable of this phase — so
+this decision states the fact in place of that edit.
+[ARCH-011](../07-architecture/ARCH-011-autonomous-operations-architecture.md) carries the fuller
+reasoning for this ruling and the per-component build/defer ruling on the gateway, ledger and worker;
+it does not contradict this decision.
+
+### Nothing here becomes a second authority over phase claims
+
+`REQ-017` `R16` requires that nothing in this programme duplicate the claim protocol that already
+works. This decision introduces no lock table, no claim mechanism and no coordination surface of its
+own. `docs/09-backlog/backlog.yaml` remains the lock table for phase claims, and the governance
+validator (`uv run python -m src.governance`) remains the lock check — the protocol
+[ADR-003](ADR-003-multi-agent-concurrency.md) established. The broker built under this decision
+governs what an agent may *do* once it is running a task; it has no bearing on, and makes no claim
+over, which agent is entitled to *run* a given phase, which stays exactly where `ADR-003` and
+`backlog.yaml` put it.
 
 ## Consequences
 
@@ -93,6 +124,6 @@ phase rules the broker ships in as a result, and for the ruling on the other thr
 - No unattended run is safe to authorize until `phase-auto-02` ships, regardless of what order the
   other three land in afterward. Any future phase that proposes running agent work unattended before
   the broker exists contradicts this decision and needs a new one to override it, not a scope note.
-- This decision does not resolve the broker's shape (full policy vs. enforcement point with a
-  permissive default) — that ruling, and the build/defer ruling on the gateway, ledger and worker,
-  is recorded in [ARCH-011](../07-architecture/ARCH-011-autonomous-operations-architecture.md).
+- The build/defer ruling on the gateway, ledger and worker themselves — as opposed to the ordering
+  decided here — is recorded in
+  [ARCH-011](../07-architecture/ARCH-011-autonomous-operations-architecture.md).
