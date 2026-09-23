@@ -15680,3 +15680,41 @@ Why it matters: a session that claims the phase would be working to a stale or w
 The ask: fix the backlog entry in docs/09-backlog/backlog.yaml before anyone claims phase-mem-01.
 
 Unresolved: what the correct deliverable is. It could be a new ADR with a newly allocated number, an existing document under another name, or the intent may have changed. This needs the owner's decision or a document-code allocation. A second question is whether the governance check should reject a deliverable path in docs/ that does not follow the ADR-NNN naming pattern.
+
+---
+
+## 000324 · Catalog tests in test/test_codes.py overwrite the real tracked catalog.md, so concurrent or interrupted pytest runs corrupt it
+
+**Created 2026-09-22T21:00:08-04:00 · Status: `open`**
+
+Observed by Ideation on 2026-09-22, cause confirmed by the Session Manager.
+
+What happened: after commit 8ee4c55 on dev, docs/08-governance/catalog.md in the primary checkout held only the line "CORRUPTED". Two tests in test/test_codes.py produce that content: test_catalog_flag_writes_committed_file (around line 216) and test_catalog_flag_writes_nothing_when_audit_fails (around line 243). Each one writes "CORRUPTED" into the real tracked catalog at ROOT, runs the governance CLI, and restores the original in a finally block. The Session Manager confirmed the cause: Session 1 and Session 2 were both running pytest in the primary checkout at the same time, as part of their /session-start preflight. With two runs interleaved, one run can read "CORRUPTED" as its "original" and then restore that. An interrupted run leaves the file corrupted as well.
+
+Recovery used: `uv run python -m src.governance --catalog` regenerated the file, and it matched HEAD again.
+
+Why it matters: any checkout where pytest runs while another pytest run is going, or where a run is killed, can end up with a corrupted tracked file. A later `git add -A` or `git commit -a` could commit it. The Session Manager has since made its coordination contract forbid pytest in the primary checkout. That only covers the primary checkout and this one set of sessions, not the test itself.
+
+What it would touch: test/test_codes.py. One option is to have the tests work on a temporary copy of the repository, or to point the governance CLI at a tmp_path root, so they never write tracked files. A related check: do other tests in test/ also write to paths under ROOT?
+
+Unresolved: whether the governance CLI can take a root argument for the tests to use, and whether a general guard should stop tests from writing under ROOT.
+
+**Links**
+
+- relates_to ← `000325`
+
+---
+
+## 000325 · Point the --catalog tests in test/test_codes.py at a tmp_path copy instead of the tracked catalog.md
+
+**Created 2026-09-22T21:00:08-04:00 · Status: `open`**
+
+Sent to Ideation by Prompt Planner on 2026-09-22.
+
+As given: test/test_codes.py's two --catalog tests overwrite the real docs/08-governance/catalog.md with "CORRUPTED" and restore it afterwards, so overlapping runs leave it corrupted. They could point the target at a tmp_path copy instead.
+
+Overlap: this is the same hazard as the catalog-corruption idea Ideation recorded in the same turn (the two are linked). That idea records the incident and its confirmed cause: Session 1 and Session 2 ran pytest in the primary checkout at the same time. This one proposes a specific fix: give the tests a tmp_path copy of the catalog to write to. Both are recorded as given, per ADR-010. Triage can decide whether one should supersede the other.
+
+**Links**
+
+- relates_to → `000324`
