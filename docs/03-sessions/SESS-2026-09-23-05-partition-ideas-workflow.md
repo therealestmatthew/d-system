@@ -396,22 +396,33 @@ Two notes, accepted without change: the fix is built but not yet exercised end t
 the R1 re-run's job; and the commit message's "option A" means the follow-up question's option,
 not the `## Unresolved` question's option A. The Decisions section above names both.
 
-## Resume state (overnight sprint safe point, 2026-09-23, after the dry run)
+## Resume state (2026-09-23, after the read-only analyst merge)
 
-- **Merged:** the build and both fix cycles reached dev at `32db922` through a delegated
-  `GRANTED merge`. The claim is still active, held by `agent-builder-b`, and the phase is not
-  complete.
-- **Branch:** `agent/phase-part-03` is pushed with the dry-run evidence and the PARK question in
-  the commits after `32db922`. None of it is on dev yet. Worktree:
-  `/code/d-system-worktrees/phase-part-03`.
-- **Primary checkout `_working/idea-corpus/`** (gitignored): this sweep's corpus (seed
-  `656057328`, 325 ideas), `dispatch-R1.txt`, `dispatch-R4.txt`, the stamped `report-R4.md`, R1's
-  self-written `report-R1.md` and `condensed.md` (untouched), and `previous-2026-09-13/` holding the
-  ten earlier files.
-- **Parked** by the Session Manager's ruling: the completion edit waits for the owner's A/B/C
-  choice under `## Unresolved`.
-- **Next step once the owner rules:** carry out the chosen option. B and C run in a `dryrun` turn.
-  Record the outcome here. Send the branch's record commits through READY, never by checking out
-  files onto dev. After `GRANTED merge`, make the completion edit, then remove the worktree and
-  branch.
-- R4, the phase-fit procedure and agent (`phase-irs-05`), cannot start while this claim is held.
+- **Merged:** option C's fix reached dev at `6807dcc` through an owner-approved `GRANTED merge`:
+  `.claude/agents/partition-analyst.md` (Read, Grep, Glob) and the skill dispatching R1 and R4 to
+  it. The claim is still active, held by `agent-builder-b`; the phase is not complete.
+- **Blocked:** the session that built the fix cannot dispatch `partition-analyst`. Claude Code loads
+  agent types when a session starts, and a probe dispatch returned "Agent type 'partition-analyst'
+  not found". The re-run needs a session started after `6807dcc`. Never fall back to a
+  general-purpose agent: that is the dispatch the ruling replaced.
+- **Open-set gate:** 11 ideas are open (`000357`-`000367`). The skill stops at step 1 for the owner.
+  This invocation is a RESUME, and its corpus (built 01:54, 325 triaged ideas, seed `656057328`)
+  excludes them whichever way the owner rules. Asked through the Session Manager; the answer is
+  still pending.
+- **Primary checkout `_working/idea-corpus/`** (gitignored): this sweep's corpus, manifest,
+  `dispatch-R1.txt`, `dispatch-R4.txt`, the stamped `report-R4.md` (it opens with R4's own note
+  that its Write was refused; R4 returned text and did not go around the refusal), R1's
+  self-written `report-R1.md` and `condensed.md` (untouched), and `previous-2026-09-13/`.
+- **Next steps**, in a fresh session, inside a granted `TURN? dryrun phase-part-03`:
+  1. Move `report-R1.md` and `condensed.md` into `_working/idea-corpus/previous-2026-09-23-r1-self-written/`
+     (move, never delete).
+  2. Invoke `/partition-ideas`. Step 1: apply the owner's open-set ruling. Step 2 should print
+     RESUME with `report-R4.md` already done. Dispatch R1 alone to `partition-analyst`, save
+     `dispatch-R1.txt`, diff it against `PROMPT-034` lines 117-178, and write the returned report
+     with the run stamp. Stop at GATE 1.
+  3. Record here: the dispatch diff, R1's report size, whether every corpus id is placed (the
+     practical check on the 1M window), and that R1 wrote no file (list the directory before and
+     after; hash `_data/ideas.jsonl` before and after).
+  4. Run `/session-close` through its independent review, send READY for the record and the
+     completion edit, then copy any gitignored evidence out, remove the worktree, and send SAFE.
+- `phase-irs-05` and the batch-002 close-out wait for this phase to complete.
