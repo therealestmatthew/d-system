@@ -16643,7 +16643,7 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 
 ## 000335 · src.governance --catalog prints the status-regression WARNING to stdout, so the catalog test fails on any branch behind a dev completion edit
 
-**Created 2026-09-22T23:01:08-04:00 · Status: `open`**
+**Created 2026-09-22T23:01:08-04:00 · Status: `triaged`**
 
 From the Session Manager, 2026-09-22.
 
@@ -16656,6 +16656,41 @@ The ask, as given: send the warning to stderr, or make the test ignore it.
 Unresolved: which of the two. Sending diagnostics to stderr keeps the stdout contract for every consumer, while changing the test only fixes the test. Also whether other governance warnings share the same path to stdout.
 
 Related: 000324 and 000325, which concern the same two catalog tests in test/test_codes.py.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T23:03:21-04:00): # Triage: 000335 (status-regression WARNING breaks --catalog stdout contract)
+
+000335 identifies a real conflict between two governance outputs: the status-regression guard warnings printed by phase-gov-05 (required by REQ-010) and the `--catalog` flag's byte-for-byte stdout/file contract used by test_catalog_flag_writes_committed_file.
+
+## What I found
+
+**The conflict is real and reproduced.** When `uv run python -m src.governance --catalog` runs on a branch behind a dev completion edit (e.g. phase-idg-10 complete), src/governance/__main__.py lines 519-522 print all governance warnings to stdout:
+
+```python
+for warning in warnings:
+    print(f"WARNING {warning}")
+```
+
+The status-regression check (phase-gov-05, implemented by PLAN-038) reports dev-relative regressions as warnings per REQ-010 R6. The warnings print before the catalog itself (lines 545-548), so `captured.out` no longer matches the file byte-for-byte. The test assertion `assert captured.out.rstrip("\n") == restored.rstrip("\n")` fails.
+
+**REQ-010 specifies "reports" but not where.** The requirement and its implementation plan (PLAN-038, lines 44-45) specify that dev-relative findings are "WARNINGS that never change the exit code", but neither document specifies output stream (stdout vs stderr). The idea's "ask, as given" correctly identifies the two options: send the warning to stderr, or make the test ignore it.
+
+**Related open issues already linked.** Ideas 000324 ("Catalog tests in test/test_codes.py overwrite the real tracked catalog.md") and 000325 ("Point the --catalog tests in test/test_codes.py at a tmp_path copy") address a separate file-corruption issue in the same test, but are distinct from this stdout-routing problem.
+
+## Related documents
+
+- REQ-010 (Backlog status-regression guard requirements) — R6 specifies warnings but not their output stream
+- PLAN-038 (Backlog status-regression guard) — implements REQ-010, specifies dev warnings but not their stream
+- phase-gov-05 in docs/09-backlog/backlog.yaml — the implementation phase that added the status-regression check
+
+The unresolved choice (stderr vs test change) is exactly what the idea names, and it is a genuine design point: REQ-010 was written before the `--catalog` stdout contract was at risk, so the requirement does not anticipate this conflict.
+
+</details>
 
 **Links**
 
