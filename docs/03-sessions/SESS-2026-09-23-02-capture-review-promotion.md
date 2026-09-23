@@ -62,19 +62,18 @@ Acceptance 2 and 3 were found not met by the second and third reviews and fixed;
 
 ## Backlog
 
-`status: active`, held by `agent-builder-a`. `next_action`: an independent review of the
-second fix cycle, then READY per `GOV-017`. A HIGH or MEDIUM finding from it means PARK: the
-overnight authority allows two fix cycles.
+`status: active`, held by `agent-builder-a`. `next_action`: READY per `GOV-017`; the fourth
+review found no HIGH or MEDIUM finding.
 
 ## Unresolved
 
-- The review of the second fix cycle (see `## Where this stands`).
+- The fourth review's five LOW findings, accepted (see `### Fourth review`).
 
 ## Where this stands
 
 Resumed on 2026-09-23 in the overnight sprint (Session 1 - Builder A, item B1). The claim was
-already held and is pre-approved by the owner's overnight authority. Two further reviews ran;
-both fix cycles the authority allows are used.
+already held and is pre-approved by the owner's overnight authority. Three further reviews ran,
+with the two fix cycles the authority allows between them. The last found no HIGH or MEDIUM.
 
 **Done.** The phase is built:
 
@@ -87,8 +86,7 @@ both fix cycles the authority allows are used.
 
 One independent review has run, and its defects are fixed.
 
-**Next.** An independent review of the second fix cycle. Clean: READY. A HIGH or MEDIUM
-finding: PARK, with the branch pushed and the claim kept.
+**Next.** READY, then on `GRANTED merge` the ff-merge and the completion edit on `dev`.
 
 ## Review
 
@@ -145,8 +143,24 @@ new test failing against the earlier code. Fix cycle 2 is the commit that adds t
 | LOW | One corrupt staged file stops the whole batch at load | Accepted: nothing is written, and the error names the file for the owner |
 | LOW | A crafted archive entry raised `TypeError` or `AttributeError` | Fixed: an entry that is not a well-formed promotion entry is dropped and the record is promoted afresh |
 | LOW | Skipping unparseable lines also hides corruption mid-file | Accepted: after the fresh-line fix a torn entry can legitimately sit mid-file, and a torn entry was never applied, because the log is written before the record |
-| LOW | `$` matched before a trailing newline | Fixed: both id patterns use `fullmatch` |
+| LOW | `$` matched before a trailing newline | Fixed for `promote.py`'s own patterns, which use `fullmatch`. An id `create_identity` accepts through the entity schema can still end in a newline; see the fourth review |
 | LOW | `RECORD_ID` rejected a leading hyphen that person and project ids allow | Fixed: `RECORD_ID` is now `[a-z0-9-]+`, matching those schemas. Ids the numbered schemas allow only because their patterns are unanchored (`c-1_x`) stay refused |
+
+### Fourth review
+
+A fresh, non-fork general-purpose sub-agent reviewed `ba30f49`, the tip after the second fix
+cycle, rebased onto `dev` at `be1d78e`. It found A, C and D fixed, all three acceptance
+criteria met, and **no HIGH or MEDIUM finding**. Each new test fails against the earlier code.
+Its five LOW findings are accepted rather than fixed, because a fix would be a third fix
+cycle, which the overnight authority treats as PARK. Each is a follow-up candidate.
+
+| Finding | Why it is accepted |
+|---|---|
+| No test covers the check that a staged file's id equals its filename; both test cases are refused earlier by the id pattern | The check is present and correct; only its regression test is missing |
+| `create_identity` checks the new id only through the entity schema, whose `$` lets `"sam\n"` through, creating `people/sam\n.json` | The file stays inside the data root and overwrites nothing; it needs the owner to type a newline into an id |
+| A crash in `create_identity` after its archive entry and before the staged copy is removed, then `promote_one` on that record, drops the archive entry | Nothing is overwritten or lost from the data root; a second `create` refuses because the file exists, and the owner can `discard` |
+| `discard` does not check `promoted/`, so discarding a record whose staged copy survived a promotion (finding H) leaves both archive entries | The data-root record is correct; only the archive holds two entries for one staged record |
+| If `_create_json` fails after `os.link` succeeds (an interrupt, or failing to remove the temporary file), the archive entry is removed and the next run promotes the record again under a new id | A duplicate, not a loss, in a window of two system calls |
 
 ## Decisions
 
@@ -179,7 +193,7 @@ new test failing against the earlier code. Fix cycle 2 is the commit that adds t
 
 ## Left undone
 
-- The review of the second fix cycle, and READY (see `## Where this stands`).
+- The fourth review's LOW findings, as follow-up candidates (see `### Fourth review`).
 - Ideas sent to Ideation for work outside this phase:
   - `000341`: the `sys-capture` registry paths.
   - `000342`: REQ-002's status note.
