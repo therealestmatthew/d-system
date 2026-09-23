@@ -7462,7 +7462,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-b
   priority: 1
   session_budget: 1
   depends_on:
@@ -7523,7 +7524,10 @@ items:
     and dispatches nothing already done.
   - uv run python -m src.governance exits 0.
   deliverables:
-  - .claude/skills/partition-ideas/
+  - agent-workflows/workflows.yaml
+  - agent-workflows/partition-ideas.md
+  - .claude/skills/partition-ideas/SKILL.md
+  - .agents/skills/partition-ideas/SKILL.md
   - schemas/idea-partition-record.schema.json
   next_action: Write the open-set gate first and run it against the live log, which has
     had a non-empty open set every time it has been checked since the first sweep, so the
