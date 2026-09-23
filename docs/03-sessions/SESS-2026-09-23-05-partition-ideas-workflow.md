@@ -274,6 +274,13 @@ It raised one new finding:
 
 This was the second of the two fix cycles the overnight authority allows.
 
+A second fresh `demo-adversary` review of `9b5165b` judged the new MEDIUM **fixed**. It ran the
+extracted naming snippet against eight fixtures, including an accepted pair for the current seed
+(suffixed to `-2`), an accepted pair beside this sweep's own draft (`CONTINUE -2`), and a record
+that is a JSON list or string (no crash). It found step 2, step 5 and GATE 3 consistent on what
+`accepted` means, the adapters current and identical, and the diff inside the declared
+deliverables. **No finding survived.**
+
 ## Resume state (overnight safe point, 2026-09-23)
 
 - Branch `agent/phase-part-03` is pushed. The build is in `d8428df`, and this record and the
