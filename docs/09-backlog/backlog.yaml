@@ -3,7 +3,6 @@ updated: '2026-09-22'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-auto-02
 - phase-irs-04
 - phase-irs-16
 - phase-part-03
@@ -11027,7 +11026,7 @@ items:
   - sys-api
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
   priority: 2
   session_budget: 1
@@ -11063,6 +11062,23 @@ items:
   - test/test_broker.py
   next_action: Build this before anything else in the programme. It will look like over-engineering while
     nothing runs unattended, which is the correct shape for a safety gate.
+  session: doc-session-capability-and-approval-broker
+  completion_evidence:
+  - src/broker/__init__.py
+  - src/broker/__main__.py
+  - src/broker/enforcement.py
+  - src/broker/approvals.py
+  - test/test_broker.py
+  - docs/03-sessions/SESS-2026-09-22-11-capability-and-approval-broker.md
+  result: 'Permissive-default enforcement point built in src/broker/: `python -m src.broker check` exits
+    0 to allow and 2 to deny, fails closed on every error path (missing capability, malformed payload,
+    unwritable state, broken stdout, SIGTERM, KeyboardInterrupt), and compares capability names after
+    strip and casefold. Approval records (scope, reason, expiry, immutable decision) with request,
+    list-pending and decide. REQ-017 R02 and R04 recorded open under ADR-022''s permissive shape; R03
+    shown by subprocess tests. Post-rebase verification: "Governance OK: 35 systems, 325 documents, 30
+    memories, 293 backlog phases"; pytest "871 passed, 1 skipped" (the skip is the data-dependent
+    idea-corpus test). Validator PASS; adversary raised five HIGH findings and one MEDIUM, all fixed in
+    two cycles. Nothing invokes the broker until the owner adds a PreToolUse hook.'
 - id: phase-auto-03
   title: Build the external trigger gateway with deduplicated events
   plan: doc-autonomous-agent-operations

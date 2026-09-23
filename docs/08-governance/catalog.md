@@ -382,7 +382,7 @@ CI regenerates it and fails on any difference.
 | PLAN-029 | doc-idea-graph-lifecycle | active | 12 | 0 | 2 | agent-builder-a, agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 7 | 0 | 1 | agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
-| PLAN-032 | doc-autonomous-agent-operations | active | 4 | 1 | 2 | agent-coord, agent-night |
+| PLAN-032 | doc-autonomous-agent-operations | active | 4 | 0 | 3 | agent-coord, agent-night |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
