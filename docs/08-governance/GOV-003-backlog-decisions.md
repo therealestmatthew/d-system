@@ -648,7 +648,7 @@ one, and that an unratified close stops nothing.
 none of which is visible from the phase line that now carries them. An agent reaching `phase-idg-01`
 or `phase-irs-09` needs the reasoning, not just the amended scope.
 
-## Parallel sessions run under a Session Manager, with five departures from AGENTS.md — 2026-09-22
+## Parallel sessions run under a Session Manager, with six departures from AGENTS.md — 2026-09-22
 
 The owner ran eight interactive sessions against the repository at once: three meta sessions (a
 Session Manager, Ideation, Prompt Planner) and five execution sessions (a batch runner, two builders,
@@ -664,7 +664,10 @@ sessions run under `GOV-017`:
    conflict-free phases and approved by the owner, rather than taking the first ready phase themselves.
 4. **A `GRANTED merge` relayed by the Session Manager is the owner's approval** under `AGENTS.md`
    step 8, for every session.
-5. **Preflight `pytest` runs in the worktree, never the primary checkout.** On 2026-09-22 two
+5. **A batch table's `status` line is committed in the primary checkout** inside a `batch` turn
+   (ruled later the same night, when Prompt Planner found that `PROMPT-036`'s batch-open commit had
+   no turn purpose).
+6. **Preflight `pytest` runs in the worktree, never the primary checkout.** On 2026-09-22 two
    `/session-start` preflight runs overlapped in the primary checkout, and `test/test_codes.py`, which
    overwrites the tracked catalog while it runs, left it holding only `CORRUPTED` (ideas `000324`,
    `000325`).

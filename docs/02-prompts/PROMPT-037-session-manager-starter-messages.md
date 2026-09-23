@@ -60,8 +60,9 @@ Roster
 
 1. PRIMARY CHECKOUT (/code/d-system on dev) is locked.
    Reading there is fine. Never write, commit, merge or switch branches there without a grant.
-     send  TURN? <claim|idea> <phase>   (a claim carries its catalog regen;
-                                        merges go through READY below)
+     send  TURN? <claim|idea|batch> <phase or batch-id>
+           (a claim carries its catalog regen; batch = a batch table's status
+           line only; merges go through READY below)
      wait  GRANTED (or QUEUED <n>)
      do    only the stated purpose; leave `git status` clean
      send  TURN DONE <sha>
@@ -106,6 +107,7 @@ Changes to how PROMPT-036 runs:
   return GRANTED merge. The owner ruled that a relayed GRANTED merge is their approval.
 - Before you open the next batch, send NEXT-BATCH <batch-id> so I can check slots against the
   Builders first.
+- The batch table's status commit (open or close) goes through TURN? batch <batch-id>.
 
 In your ACK include: your agent id, the phase you hold, its worktree, and the step you are on.
 ```
