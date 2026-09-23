@@ -1,0 +1,216 @@
+{
+  "review_id": "2026-09-23-plan-039",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-039",
+    "requirement": "REQ-022",
+    "phases": [
+      "phase-irs-02",
+      "phase-irs-05",
+      "phase-irs-07",
+      "phase-irs-08",
+      "phase-irs-09",
+      "phase-irs-10",
+      "phase-irs-11",
+      "phase-irs-12",
+      "phase-irs-13"
+    ],
+    "later_added_phases": [
+      "phase-irs-17"
+    ]
+  },
+  "entry_check": {
+    "result": "exempt",
+    "standard": "GOV-010",
+    "detail": "PLAN-039 was created on 2026-09-15; GOV-010 applies only to plans written after 2026-09-22 (its Scope section). For the record, the GOV-018 step 1 script run on it prints missing: Context, Design, Verification, Boundaries, Open questions, Requirement coverage."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase",
+    "later-added-phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "id": "F01",
+      "altitude": "plan",
+      "subject": "PLAN-039",
+      "severity": "major",
+      "title": "The phase table omits phase-irs-14's actual dependency on phase-irs-11, and next_up queues irs-14 ahead of it",
+      "evidence": "PLAN-039 line 80: '`phase-irs-14` | ... | `phase-irs-04`, `phase-part-03` | R05, R08'. Actual backlog entry (docs/09-backlog/backlog.yaml lines 13079-13095) reads: '- id: phase-irs-14 ... depends_on: - phase-irs-04 - phase-part-03 - phase-irs-11'. The queue (backlog.yaml next_up, lines 6-8) lists '- phase-irs-14' then '- phase-irs-11' immediately after -- irs-14 is placed ahead of a phase it depends on.",
+      "consequence": "The plan's 'Execution order' section (which enumerates what phase-irs-04 unblocks and claims the queue is 'dependency-ordered') is wrong for this pair: a reader relying on the plan's table, not the backlog, would misjudge when phase-irs-14 becomes startable and would not know it needs phase-irs-11 (the kill switch/budget phase) first. The governance readiness check (src/governance/backlog.py's `readiness()`) independently marks a queued phase 'waiting' unless every depends_on entry is complete, so no phase can actually be claimed out of order -- the risk is to plan-level understanding and to the 'dependency-ordered' claim, not to the pipeline itself.",
+      "minimal_fix": "Add phase-irs-11 to phase-irs-14's row in PLAN-039's phase table, and reorder next_up so phase-irs-11 precedes phase-irs-14.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "plan-table-depends-on-drift",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to PLAN-039's phase table and to next_up, which the owner ranks; neither is inside phase-irs-06's deliverables. Confirmed: backlog.yaml phase-irs-14 depends_on lists phase-irs-11; PLAN-039 line 80 omits it; next_up lines 7-8 order irs-14 before irs-11."
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "altitude": "plan",
+      "subject": "PLAN-039",
+      "severity": "major",
+      "title": "Three of the seventeen phases the plan claims as its own are registered under a different plan id in the backlog, and requirements R01/R16-R19 depend exclusively on one of them",
+      "evidence": "PLAN-039 says (line 58): 'Seventeen phases under `phase-irs-*`, registered in the backlog'. But `grep -n 'plan:' docs/09-backlog/backlog.yaml` for the phase-irs-* block shows phase-irs-04, phase-irs-14 and phase-irs-15 each carry `plan: doc-irs-orchestrator-design` (PLAN-039.01, a child plan with `parent: doc-idea-realization-system-plan`), not `plan: doc-idea-realization-system-plan` (PLAN-039 itself) that the other 14 phases carry. Requirements R01, R16, R17, R18 and R19 map only to phase-irs-04 in the plan's own coverage table (line 70), and phase-irs-04 is not registered under PLAN-039's own plan id.",
+      "consequence": "Any tooling or reviewer that enumerates 'PLAN-039's phases' by filtering backlog.yaml on `plan: doc-idea-realization-system-plan` (the mechanism this repository otherwise uses to tie phases to their governing plan) gets 14 phases, not 17, and silently loses R01/R16-R19 coverage along with the orchestrator skeleton, batch graph and realization graph. The plan's own coverage claim ('every REQ-022 row maps to a phase above ... every phase carries at least one row') is true only if child-plan phases are counted as this plan's phases, which the plan text never states explicitly.",
+      "minimal_fix": "State explicitly in PLAN-039's 'Implementation phases' section that phase-irs-04, -14 and -15 are registered under the child plan PLAN-039.01 and are counted toward this plan's requirement coverage for that reason.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "child-plan-phase-attribution",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to PLAN-039's Implementation phases section. Confirmed: phase-irs-04, -14 and -15 carry plan: doc-irs-orchestrator-design. GOV-018 step 2 already treats a child plan as its own review target, so this review's phase altitude excluded them."
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "altitude": "plan",
+      "subject": "PLAN-039",
+      "severity": "minor",
+      "title": "Four of the five rows in the de-duplication boundaries table name the rejected alternative but not its cost",
+      "evidence": "PLAN-039's 'De-duplication boundaries' table (lines 48-54): row 1 (run-level recovery vs phase-conc-04) says only 'The orchestrator consumes phase-conc-04's procedures and defines none of its own'; row 2 (phase-fit vs phase-idg-05) says only 'Different object, different artifact; neither invokes the other'; row 3 (review procedure vs the agx-11/12 engine) and row 4 (stopgap vs phase-auto-03) likewise state the boundary but not what the rejected alternative (building duplicate recovery logic, conflating the two decomposition objects, waiting for the trio, building the general gateway now) would have cost. Only row 5 (execution harness vs phase-auto-05) states a cost: the Agent SDK fallback is 'slower, equally safe.'",
+      "consequence": "A reviewer cannot judge whether the boundary was the cheaper choice for four of the five de-duplication decisions, since only the chosen side of each boundary is described.",
+      "minimal_fix": "Add a one-clause cost statement to rows 1-4, matching row 5's pattern.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "decision-missing-rejected-cost",
+      "dispositions": [
+        {
+          "value": "accepted-no-change",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "The finding is correct, but PLAN-039 was written on 2026-09-15 and GOV-010 (P2) applies only to plans written after 2026-09-22. The rows' boundaries stand and the missing cost clauses do not change what any phase builds."
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "altitude": "phase",
+      "subject": "phase-irs-05",
+      "severity": "major",
+      "title": "The acceptance criterion demands a fit heuristic derived from historical session-length data that does not exist in this repository.",
+      "evidence": "docs/09-backlog/backlog.yaml line ~12724: \"The fit heuristic is derived from historical session-length data across completed phases, not from an invented size standard.\" `grep -c \"session_budget: 1\" docs/09-backlog/backlog.yaml` -> 294, matching the total item count exactly (294 backlog phases per the governance report) -- every phase without exception carries session_budget: 1. GOV-002 (docs/08-governance/GOV-002-backlog-protocol.md line 40) states: \"session_budget | Exactly `1`; a review promise about scope, not an automatic timing guarantee\". The phase's own next_action repeats the same false premise: \"Derive the fit test from the session_budget field's actual meaning in completed phases\".",
+      "consequence": "There is no varying numeric field anywhere in the backlog that records actual session length or duration; the field the phase is told to mine is constant across all 294 phases by design. As scoped, the phase-fit agent cannot satisfy its own acceptance criterion and will either stall on non-existent data or the reviewer will have to invent a proxy metric at execution time -- exactly the 'invented size standard' the acceptance line forbids.",
+      "minimal_fix": "Rewrite the acceptance line and next_action to name an actual available proxy (e.g. scope-line count, deliverable-path count, or the qualitative 'scope roughly doubled' judgment GOV-003 already used for phase-idg-13's split) instead of a nonexistent session-length metric.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "acceptance-rests-on-nonexistent-data",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to phase-irs-05's acceptance and next_action, which only its own claimant or the owner may edit (AGENTS.md). Confirmed: every phase carries session_budget: 1 (GOV-002: 'Exactly 1'), so no session-length data exists to derive the heuristic from. The owner decides which proxy the phase uses."
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "altitude": "phase",
+      "subject": "phase-irs-09",
+      "severity": "major",
+      "title": "Acceptance never tests the unverifiable-capability failure path the scope explicitly requires the realization agent to build.",
+      "evidence": "docs/09-backlog/backlog.yaml line 12869: scope requires \"An unverifiable capability is recorded as a finding on the idea and surfaced at Gate 5, never silently closed.\" The two acceptance lines (12871-12874) are: 'REQ-022 R15 holds: one idea traces from merge to delivered with evidence...' and 'The status change lands as append-only events; git diff shows no rewritten line...' -- neither exercises or checks the unverifiable-capability/finding path.",
+      "consequence": "The one behavior in this phase's scope that is a genuine reject/fail case (the realization check declining to certify delivery) ships with no acceptance line or verification command to confirm it exists, so a build that silently omits it would still pass review. Sibling phase-irs-08 does test its analogous failure paths (R14 double-rejection park, R22 confidentiality block) directly in its own acceptance, so this is an inconsistency with the repo's own convention, not a deliberate deferral.",
+      "minimal_fix": "Add an acceptance line and verification step exercising an idea whose delivered capability cannot be verified against its text, confirming a finding is recorded and no terminal delivered status is written.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "missing-failure-path-acceptance",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to phase-irs-09's acceptance and verification. Confirmed: its scope requires the unverifiable-capability path and neither acceptance line exercises it."
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "altitude": "phase",
+      "subject": "phase-irs-07",
+      "severity": "major",
+      "title": "phase-irs-07's acceptance points to phase-irs-13 for R05's ratification test, but PLAN-039's own coverage table assigns R05 to phase-irs-14, and phase-irs-13 claims neither R05 nor any ratification check.",
+      "evidence": "docs/09-backlog/backlog.yaml line 12793-12796: \"REQ-022 R05 holds as far as this phase: ... with no standalone ratification mechanism. Ratification through phase-irs-04's `gate` verb is tested in phase-irs-13.\" PLAN-039's phase table (docs/01-plans/PLAN-039-idea-realization-system.md lines 73/80/83): `phase-irs-07` carries only `R05`; `phase-irs-14` carries `R05, R08`; `phase-irs-13` carries only `R02, R04`. phase-irs-13's own acceptance (backlog.yaml 13064-13067) never mentions R05, a dependency-mapping proposal, or a ratify/amend/reject decision.",
+      "consequence": "Whoever builds or reviews phase-irs-07 will look to phase-irs-13 for proof that the mapping agent's proposed ordering is actually ratified, amended or rejected at G3 with the decision recorded (the second half of R05) and will not find it there, since phase-irs-13's scope is about generic gate-queue presentation and G5 batching, not the mapping agent's own ratification. The requirement is not actually orphaned (phase-irs-14 legitimately covers it per the master table), but the stale cross-reference will misdirect verification effort and could let R05's ratification half go unchecked if phase-irs-14's own review doesn't explicitly attribute it back to R05.",
+      "minimal_fix": "Correct phase-irs-07's acceptance line to cite phase-irs-14 instead of phase-irs-13, matching PLAN-039's own coverage table.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "stale-cross-phase-pointer",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to phase-irs-07's acceptance line. Confirmed: it says ratification 'is tested in phase-irs-13', and phase-irs-13's entry contains no mention of ratification, R05 or mapping (grep exit 1); PLAN-039's table gives R05 to phase-irs-14."
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "altitude": "later-added-phase",
+      "subject": "phase-irs-17",
+      "severity": "major",
+      "title": "The phase's scope and verification presume forcing nine stage-class failures into the single already-completed run phase-irs-12 traced, which is incoherent for a run that already succeeded through every later stage.",
+      "evidence": "backlog.yaml:13018-13020 scope: 'Force one failure per stage class across the nine-stage pipeline traced by phase-irs-12 - nine forced failures'; :13030-13031 verification: 'Force one failure per stage class in the traced run'; :13035-13037 next_action: 'Run the drill against the run phase-irs-12 traced, in the order the pipeline stages execute, so each forced failure is diagnosed against real prior state rather than a synthetic fixture.' GOV-003's own record of the split (docs/08-governance/GOV-003-backlog-decisions.md:69: 'phase-irs-17 additionally depends on phase-irs-12, whose traced run its own verification text presumes') confirms the design intent is to reuse that one concrete traced run, not to re-execute the pipeline nine times. But phase-irs-12's own acceptance (backlog.yaml:12986) requires the trace to record 'every gate decision reached along the way' end to end -- i.e. the idea it traces already reaches stage 9 successfully. Forcing a failure at, say, stage 2 or stage 5 of that same already-completed, already-delivered run contradicts the recorded fact that it already passed those stages. REQ-022 R12's own method column (docs/06-requirements/REQ-022-idea-realization-system.md:42) says 'force one failure per stage class in a test run,' not 'in the real end-to-end trace already recorded' -- the phase's language departs from that without resolving the conflict.",
+      "consequence": "Whoever picks up phase-irs-17 either re-injects failures into artifacts that already carry a 'delivered' outcome (corrupting or contradicting recorded state), or has to invent nine fresh drill executions on the spot -- a materially different scope than 'the traced run' as literally written, discovered mid-session rather than at plan review.",
+      "minimal_fix": "Reword scope/verification/next_action to specify nine separate drill passes (fresh pipeline execution per stage-class failure, in stage order) using the same idea/scenario phase-irs-12 traced, rather than reusing 'the traced run' as a singular already-completed artifact.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "reused-completed-run-for-incompatible-forced-failures",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Verified against the files. Resolving it needs an edit to phase-irs-17's scope, verification and next_action. Confirmed: all three refer to 'the traced run' of phase-irs-12, which completes end to end. Whether the drill re-runs the scenario per stage class or uses fixtures is a scope decision for the owner."
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "altitude": "later-added-phase",
+      "subject": "phase-irs-17",
+      "severity": "major",
+      "title": "depends_on omits phase-irs-01, the only phase that builds the stage-2 (Triage) mechanism the drill must force a failure in.",
+      "evidence": "ARCH-006's stage table (docs/07-architecture/ARCH-006-idea-realization-system.md:82) names phase-irs-01 as the sole owner of stage 2 ('stopgap dispatch (phase-irs-01) until/unless P5's gateway exists'). phase-irs-17's depends_on (backlog.yaml:13008-13017) lists phase-irs-05, -06, -07, -08, -14, -15, part-03, -10, -12 -- phase-irs-01 is absent, and none of those nine transitively depend on it either (checked phase-irs-03, -04, part-03, -05 through -15's own depends_on lines; phase-irs-01 has depends_on: [] per backlog.yaml:12461 and is depended on by nothing in the whole file, confirmed by `grep -n \"phase-irs-01$\" docs/09-backlog/backlog.yaml` returning only its own id: line). A repo-wide check (parsing backlog.yaml with PyYAML) found 129 depends_on edges elsewhere that do name already-status:complete phases as prerequisites, so declaring a shipped phase as a dependency is the repository's own convention here, not something the phase can skip because the work is already done.",
+      "consequence": "The dependency graph does not record that the forced-failure drill's stage-2 case relies on phase-irs-01's output; a future edit to next_up ordering or to phase-irs-01 itself has no edge forcing re-verification of phase-irs-17. Low live risk only because phase-irs-01 already shows status: complete in this snapshot (backlog.yaml:12471).",
+      "minimal_fix": "Add phase-irs-01 to phase-irs-17's depends_on list.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "omitted-stage-owning-dependency",
+      "aliases": [
+        "missing-transitive-dependency-on-shipped-phase"
+      ],
+      "dispositions": [
+        {
+          "value": "accepted-no-change",
+          "by": "planner",
+          "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
+          "date": "2026-09-23",
+          "reason": "Confirmed that phase-irs-01 is absent from phase-irs-17's depends_on and is status complete. An edge to a complete phase changes neither readiness nor order, and phase-irs-12's end-to-end trace, which phase-irs-17 depends on, already passes through stage 2. No change."
+        }
+      ]
+    }
+  ],
+  "notes": "The first review under GOV-018, run by phase-irs-06 on 2026-09-23 with one dispatch per altitude. Phase altitude: the nine queued phases whose plan is PLAN-039 and that were in its original set (ce7c21f). phase-irs-01, -03 and -16 are complete and phase-irs-06 is active, so they were not reviewed. phase-irs-04, -14 and -15 belong to the child plan PLAN-039.01, which is its own target. Later-added altitude: phase-irs-17, first registered in 4d2412d on 2026-09-16. No planner agent exists yet (phase-idg-12), so the builder wrote the dispositions as the stage-4 planner stand-in, without editing the plan (owner ruling, 2026-09-23). The six escalated-g3 findings go to the owner. No finding was changed or dropped; the dispatcher added only id, engine and author."
+}
