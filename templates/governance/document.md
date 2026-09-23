@@ -33,3 +33,7 @@ paths to `completion_evidence`, record actual results here, and update status/da
 
 Record decisions still needed. Adapt these sections to the document kind; ADRs need
 context, decision, alternatives, consequences and a revisit trigger.
+
+Plans and requirements are also checked against the plan and requirement quality standard,
+`docs/08-governance/GOV-010-plan-quality-standard.md`, which names the sections each must carry
+and the headings they may use.
