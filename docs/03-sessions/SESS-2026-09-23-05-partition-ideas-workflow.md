@@ -403,10 +403,12 @@ not the `## Unresolved` question's option A. The Decisions section above names b
 - **Merged:** option C's fix reached dev at `6807dcc` through an owner-approved `GRANTED merge`:
   `.claude/agents/partition-analyst.md` (Read, Grep, Glob) and the skill dispatching R1 and R4 to
   it. The claim is still active, held by `agent-builder-b`; the phase is not complete.
-- **Blocked:** the session that built the fix cannot dispatch `partition-analyst`. Claude Code loads
-  agent types when a session starts, and a probe dispatch returned "Agent type 'partition-analyst'
-  not found". The re-run needs a session started after `6807dcc`. Never fall back to a
-  general-purpose agent: that is the dispatch the ruling replaced.
+- **Agent type loading.** Right after the merge, a probe dispatch from the session that built the
+  fix returned "Agent type 'partition-analyst' not found". A few minutes later the harness listed
+  `partition-analyst` as available in that same session, so the type is picked up after it lands
+  in the primary checkout, with a delay, not only at session start. Before dispatching, confirm
+  `partition-analyst` is in the available agent types. Never fall back to a general-purpose agent:
+  that is the dispatch the ruling replaced.
 - **Open-set gate, ruled by the owner: a fresh sweep, not the resume.** 11 ideas were open
   (`000357`-`000367`), with about 37 more being recorded. The owner ruled that they are triaged
   first and a new sweep runs on a fresh corpus, with both analysts on `partition-analyst`. The
@@ -416,7 +418,7 @@ not the `## Unresolved` question's option A. The Decisions section above names b
   `dispatch-R4.txt`, the stamped `report-R4.md` (it opens with R4's own note that its Write was
   refused; R4 returned text and did not go around the refusal), R1's self-written `report-R1.md`
   and `condensed.md`, and `previous-2026-09-13/`.
-- **Next steps**, in a session started after `6807dcc`:
+- **Next steps**, after the restart the owner ordered for the wind-down:
   1. **Triage first.** Ideation triages every open idea, so the open-set gate prints `open ideas: 0`.
      Do not start until it does.
   2. **Move last night's sweep aside by hand**, inside a granted `TURN? dryrun phase-part-03`: every
