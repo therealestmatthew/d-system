@@ -91,3 +91,60 @@ completes the phase.
   text.
 - The framework `README.md` and `INDEX.md` still list the schemas as "to create". Neither file is
   a deliverable of this phase, so this session did not change them.
+
+## Review
+
+Independent adversarial review (a fresh `demo-adversary` subagent) of `dev...agent/phase-fwt-01`
+at commits `05a084f` and `d11c4aa`. The reviewer ran both verification commands itself. Its
+findings, condition by condition:
+
+- **REQ-024 R01 — Holds.** `governance.no-incident.md` differs from `governance.valid.md` only by
+  the removed `## Incident and rationale` section. A heading changed only in case
+  (`## Incident and Rationale`) also fails, so the negative check catches that typo too.
+- **REQ-024 R02 — Holds.** Each relabelled fixture differs from its original only in the `kind:`
+  line, yet it still fails on missing sections, so the rejection comes from structure, not the
+  label.
+- **Converter edge cases:** headings in code fences and HTML comments are ignored; `###` headings
+  are excluded; missing or empty front matter fails validation; trailing whitespace is stripped;
+  CRLF files parse correctly when read the way the script reads them.
+- **Scope:** the diff touches only the declared deliverables, the session record, the catalog and
+  phase-fwt-01's own backlog entry.
+- **Findings:** none blocking or major. One observation, not a finding: as the owner decided,
+  `## Steps` is enforced as a required heading only, so an empty or prose Steps section still
+  validates. "No discrepancies found" between the record and the diff or runs.
+
+## Decisions
+
+- **The schemas validate front matter and level-2 headings.** JSON Schema cannot read Markdown
+  directly, and the phase did not say what the schemas should validate. The owner chose to convert
+  each document to `{front_matter, sections}` over two alternatives: front matter only, or headings
+  plus section bodies.
+- **The fixtures and the check script are committed deliverables.** The phase listed only the four
+  template and schema files. The owner approved adding `05-schemas/examples/` and
+  `05-schemas/check_schemas.py` to the deliverables in the claim commit. A test under `test/` was
+  not used because `test/` was claimed by phase-conc-02 and lies outside `sys-fw-templates`.
+- **Governance documents have no required Status section.** Idea `000269` mentions status, but
+  REQ-024 R01 requires only the rule, the problem and the incident or rationale. The front-matter
+  `status` field already records the state, so a Status section would duplicate it.
+- **Both templates use the code placeholder `GOV-NNN`.** In d-system, protocols carry GOV codes too
+  (GOV-001 is the documentation protocol). The schemas accept any `PREFIX-NNN`, so this phase does
+  not fix a code prefix for the portable framework.
+- **The check script also confirms that each template's headings satisfy its schema.** This keeps a
+  template and its schema from drifting apart.
+
+## Corrections
+
+- The first protocol template draft used a `PROT-NNN` code prefix, and the first governance
+  template draft required a fourth section, Status. Both were conventions the owner had not asked
+  for, and both were removed before the first commit.
+- An early pytest run in the primary checkout overlapped with another session's run. The Session
+  Manager reported that `test/test_codes.py` temporarily rewrites the tracked catalog. The run had
+  already finished and the catalog was intact. Every later check ran in the worktree.
+
+## Left undone
+
+- The framework `README.md` and `INDEX.md` still describe these schemas as "to create". They are
+  not deliverables of this phase.
+- phase-fwt-02 to phase-fwt-04 can add their cases to `check_schemas.py`'s `CASES` and `TEMPLATES`
+  lists instead of writing new scripts.
+- Completion waits on the owner-approved merge. After it, session-close sets `status: complete`.
