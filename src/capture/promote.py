@@ -53,9 +53,9 @@ TAGS_FILE = ROOT / "_data" / "tags.json"
 CORRECTIONS_FILE = "corrections.jsonl"
 
 #: A staged id, as `structure._new_id` makes it (schemas/staged-record.schema.json).
-STAGED_ID = re.compile(r"^staged-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}$")
-#: A promoted record's id: a plain file stem, never a path.
-RECORD_ID = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+STAGED_ID = re.compile(r"staged-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{6}")
+#: A promoted record's id: a plain file stem, never a path. Both are used with `fullmatch`.
+RECORD_ID = re.compile(r"[a-z0-9-]+")
 
 
 @dataclass(frozen=True)
@@ -173,21 +173,34 @@ def _unresolved(entity: Mapping[str, Any], paths: Paths, keep_names: bool) -> li
 
 
 def load_staged(staging: Path = STAGING_DIR) -> list[dict[str, Any]]:
-    """Every staged record, oldest first."""
+    """Every staged record, oldest first.
+
+    Refuses the whole set if any file's id is not a staged id matching its filename: every
+    path promotion builds comes from that id, so a bad one must never reach a path.
+    """
     if not staging.is_dir():
         return []
-    records = [json.loads(p.read_text(encoding="utf-8")) for p in staging.glob("*.json")]
+    records = [_read_staged(p) for p in staging.glob("*.json")]
     return sorted(records, key=lambda r: (r.get("staged_at", ""), r["id"]))
 
 
+def _read_staged(path: Path) -> dict[str, Any]:
+    record: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    staged_id = record.get("id") if isinstance(record, dict) else None
+    if not isinstance(staged_id, str) or not STAGED_ID.fullmatch(staged_id):
+        raise PromotionError(f"{path} does not hold a staged record with a valid id")
+    if staged_id != path.stem:
+        raise PromotionError(f"{path} holds {staged_id!r}, not {path.stem!r}")
+    return record
+
+
 def _staged(staged_id: str, paths: Paths) -> dict[str, Any]:
-    if not STAGED_ID.match(staged_id):
+    if not STAGED_ID.fullmatch(staged_id):
         raise PromotionError(f"{staged_id!r} is not a staged id")
     path = paths.staging / f"{staged_id}.json"
     if not path.is_file():
         raise PromotionError(f"no staged record {staged_id!r}")
-    record: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-    return record
+    return _read_staged(path)
 
 
 def _next_number(directory: Path, prefix: str, taken: set[str]) -> str:
@@ -269,6 +282,26 @@ def _archive(staged: Mapping[str, Any], outcome: Mapping[str, Any], directory: P
     _write_json(directory / f"{staged['id']}.json", {"staged": staged, **outcome})
 
 
+def _reserved(paths: Paths) -> set[str]:
+    """Record ids named by promotion archive entries, so a pending one is never reassigned.
+
+    An entry is written before its record. Until an interrupted promotion is settled, its id
+    must not go to another record, or recovery could not tell the two apart: records staged
+    from one capture share a `capture_id`.
+    """
+    reserved: set[str] = set()
+    if not paths.promoted.is_dir():
+        return reserved
+    for archive in paths.promoted.glob("*.json"):
+        try:
+            entry = json.loads(archive.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        if isinstance(entry, dict) and isinstance(entry.get("record_id"), str):
+            reserved.add(entry["record_id"])
+    return reserved
+
+
 def _finish_earlier_attempt(staged: Mapping[str, Any], paths: Paths) -> str | None:
     """Settle a staged record whose promotion was interrupted part-way.
 
@@ -284,10 +317,13 @@ def _finish_earlier_attempt(staged: Mapping[str, Any], paths: Paths) -> str | No
     archive = paths.promoted / f"{staged['id']}.json"
     if not archive.is_file():
         return None
-    entry = json.loads(archive.read_text(encoding="utf-8"))
+    try:
+        entry = json.loads(archive.read_text(encoding="utf-8"))
+    except ValueError:
+        entry = None
+    record_id = entry.get("record_id") if isinstance(entry, dict) else None
     kind = KINDS.get(staged["entity_type"])
-    record_id = entry.get("record_id", "")
-    if kind is not None and RECORD_ID.match(record_id):
+    if kind is not None and isinstance(record_id, str) and RECORD_ID.fullmatch(record_id):
         target = _inside(paths.data, paths.data / kind.directory / f"{record_id}.json")
         if _promoted_from(target, record_id, staged["capture_id"]):
             (paths.staging / f"{staged['id']}.json").unlink(missing_ok=True)
@@ -325,7 +361,7 @@ def _promote(
     the staged copy is removed. See `_finish_earlier_attempt` for recovery.
     """
     result = PromotionResult()
-    taken: set[str] = set()
+    taken = _reserved(paths)
     for staged in records:
         try:
             finished = _finish_earlier_attempt(staged, paths)
@@ -473,7 +509,7 @@ def correct(
         )
     if field_name in {"id", "capture"}:
         raise PromotionError(f"{field_name!r} cannot be corrected")
-    if not RECORD_ID.match(record_id):
+    if not RECORD_ID.fullmatch(record_id):
         raise PromotionError(f"{record_id!r} is not a record id")
     path = _inside(where.data, where.data / kind.directory / f"{record_id}.json")
     if not path.is_file():
@@ -543,10 +579,10 @@ def corrections(
     if not log.exists():
         return []
     entries = []
-    for line in log.read_text(encoding="utf-8").splitlines():
+    for line in log.read_bytes().splitlines():
         try:
-            entry = json.loads(line)
-        except ValueError:
+            entry = json.loads(line.decode("utf-8"))
+        except ValueError:  # includes UnicodeDecodeError: a tear inside a character
             continue
         if isinstance(entry, dict):
             entries.append(entry)

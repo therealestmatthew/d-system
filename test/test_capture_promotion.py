@@ -352,6 +352,68 @@ def test_an_interrupted_promotion_never_settles_on_another_records_file(
     assert other["description"] == "someone else"
 
 
+def test_a_pending_promotion_reserves_its_id_from_a_record_of_the_same_capture(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths
+) -> None:
+    first, second = stage(capture, raw_dir, paths, CLEAN_TASK, FLAGGED_COMMITMENT)
+    assert first["capture_id"] == second["capture_id"]
+    task_two = {**CLEAN_TASK, "fields": {**CLEAN_TASK["fields"]}}
+    task_two["fields"]["description"] = explicit("book the venue", "book the venue")
+    [third] = stage(capture, raw_dir, paths, task_two)
+    # A crash left `first` with an archive entry for t-4 but no record.
+    paths.promoted.mkdir(parents=True)
+    (paths.promoted / f"{first['id']}.json").write_text(
+        json.dumps(
+            {
+                "action": "promoted",
+                "record_id": "t-4",
+                "target": str(paths.data / "tasks" / "t-4.json"),
+            }
+        ),
+        encoding="utf-8",
+    )
+    # A record from the same capture, promoted meanwhile, must not take t-4.
+    promote.promote_one(third["id"], paths=paths, today=TODAY)
+    assert not (paths.data / "tasks" / "t-4.json").exists()
+
+    result = promote.promote_clean(paths, today=TODAY)
+
+    assert first["id"] in {s for s, _ in result.promoted}
+    descriptions = sorted(
+        json.loads(p.read_text(encoding="utf-8"))["description"]
+        for p in (paths.data / "tasks").glob("*.json")
+    )
+    assert descriptions == ["book the venue", "book the venue for the offsite", "existing"]
+    assert first["id"] not in staged_ids(paths)
+
+
+@pytest.mark.parametrize("entry", ["[1, 2]", '{"record_id": 4}', "{torn"])
+def test_a_malformed_archive_entry_is_dropped_and_the_record_promoted_afresh(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths, entry: str
+) -> None:
+    [clean] = stage(capture, raw_dir, paths, CLEAN_TASK)
+    paths.promoted.mkdir(parents=True)
+    (paths.promoted / f"{clean['id']}.json").write_text(entry, encoding="utf-8")
+    result = promote.promote_clean(paths, today=TODAY)
+    assert [s for s, _ in result.promoted] == [clean["id"]]
+
+
+@pytest.mark.parametrize("bad_id", ["../data/people/jordan-rivera", "staged-other"])
+def test_a_staged_file_whose_id_is_not_its_own_is_refused_before_any_write(
+    capture: dict[str, Any], raw_dir: Path, paths: Paths, bad_id: str
+) -> None:
+    [clean] = stage(capture, raw_dir, paths, CLEAN_TASK)
+    staged_file = paths.staging / f"{clean['id']}.json"
+    staged_file.write_text(json.dumps({**clean, "id": bad_id}), encoding="utf-8")
+    before = tree_digest(paths.data)
+    with pytest.raises(PromotionError):
+        promote.promote_clean(paths, today=TODAY)
+    with pytest.raises(PromotionError):
+        promote.discard(clean["id"], paths=paths, today=TODAY)
+    assert tree_digest(paths.data) == before
+    assert staged_file.exists()
+
+
 @pytest.mark.parametrize("action", ["promote", "create", "discard"])
 def test_a_staged_id_that_is_a_path_is_refused(
     action: str, capture: dict[str, Any], raw_dir: Path, paths: Paths
@@ -653,6 +715,20 @@ def test_a_torn_log_line_does_not_swallow_the_next_correction(
         ("due_date", "2026-09-25", "2026-09-30"),
         ("priority", "medium", "high"),
     ]
+
+
+def test_a_tear_inside_a_multibyte_character_does_not_hide_other_corrections(
+    promoted_commitment: Path, paths: Paths
+) -> None:
+    promote.correct("commitment", "c-1", "due_date", "2026-09-30", paths=paths, today=TODAY)
+    log = paths.data / promote.CORRECTIONS_FILE
+    with log.open("ab") as handle:
+        handle.write('{"record_type": "commitment", "reason": "café'.encode()[:-1])
+
+    promote.correct("commitment", "c-1", "priority", "high", paths=paths, today=TODAY)
+
+    history = promote.corrections("commitment", "c-1", paths)
+    assert [e["field"] for e in history] == ["due_date", "priority"]
 
 
 # --- the CLI ---------------------------------------------------------------------------
