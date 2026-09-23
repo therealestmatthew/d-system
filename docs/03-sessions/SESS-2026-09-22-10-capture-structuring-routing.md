@@ -56,9 +56,10 @@ Success: no issues found in 28 source files
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-b`, `session: doc-session-capture-structuring-routing`.
-`next_action`: All acceptance conditions are met on agent/phase-cap-05; waiting for the
-owner-approved merge onto dev, after which the completion edit is made.
+`status: complete`, `agent: agent-builder-b`, `session: doc-session-capture-structuring-routing`.
+`completion_evidence` lists `structure.py`, `routing.py`, `test_capture_routing.py` and this
+record. The phase was not in `next_up`. It was completed after the owner-approved fast-forward
+merge onto dev at `e5bf2da`.
 
 ## Unresolved
 

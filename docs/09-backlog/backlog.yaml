@@ -2777,7 +2777,7 @@ items:
   systems:
   - sys-capture
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 1
   session_budget: 1
@@ -2801,9 +2801,22 @@ items:
   - src/capture/structure.py
   - src/capture/routing.py
   - test/test_capture_routing.py
-  next_action: All acceptance conditions are met on agent/phase-cap-05; waiting for the
-    owner-approved merge onto dev, after which the completion edit is made.
+  next_action: None - complete.
   session: doc-session-capture-structuring-routing
+  completion_evidence:
+  - src/capture/structure.py
+  - src/capture/routing.py
+  - test/test_capture_routing.py
+  - docs/03-sessions/SESS-2026-09-22-10-capture-structuring-routing.md
+  result: 'Structuring validates an agent proposal against its raw capture (verbatim quotes with
+    offsets, never-invent rules including completion statuses, unknown people/projects/tags held
+    as written) and routes on ADR-007 stakes by evidence. Verification: "73 passed, 2 warnings"
+    and mypy "Success: no issues found in 28 source files". Post-rebase on dev 32c55d0: "Governance
+    OK: 35 systems, 322 documents, 30 memories, 293 backlog phases" and "840 passed, 2 warnings".
+    Independent adversarial review: all four acceptance conditions hold; one HIGH, two MEDIUM and
+    one coverage finding fixed, one LOW accepted. Merged onto dev at e5bf2da with the owner''s
+    approval. New tags are held in all cases (owner ruling); REQ-002 R11 alert path left to
+    phase-cap-06.'
 - id: phase-cap-06
   title: Build review and promotion into the source of truth
   plan: doc-capture-build
