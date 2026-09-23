@@ -51,24 +51,25 @@ against the corpus.
 
 ## Acceptance
 
-- `REQ-014 R17 holds: every judgement names plans from the corpus on both sides.` — **Met** after
-  both reviews' corrections. Judgements P1–P11, Q1–Q5, T1–T2, the Length section and each of the
-  four optional sections name corpus documents on both sides. P8 has no document meeting all three
-  parts; it cites one per part and says so, and the introduction states that exception. Q1–Q5 cite
-  requirement documents, under the owner's ruling that the requirement half uses the same rule.
+- `REQ-014 R17 holds: every judgement names plans from the corpus on both sides.` — **Met.** Judgements
+  P1–P11, Q1–Q5, T1–T2, the Length section and each of the four optional sections name corpus
+  documents on both sides. P8 has no document meeting all three parts; it cites one per part and
+  says so, and the introduction states that exception. Q1–Q5 cite requirement documents, under the
+  owner's ruling that the requirement half uses the same rule. The fix verification below confirmed
+  the round-2 corrections behind this verdict (items A, E, F, G, I, K).
 - `The standard names a section list a later plan can be checked against mechanically.` — **Met.**
-  Accepted-heading tables, a match rule that excludes fenced lines, a shell form that also
-  excludes them, and a requirement row check, requiring at least one row, that is part of
-  conformance.
+  Accepted-heading tables, a match rule that excludes fenced lines, a shell form that also excludes
+  them, and a requirement row check, requiring at least one row, that is part of conformance. The
+  fix verification confirmed items B, C and N.
 - `It is written so phase-idg-12 can measure a draft against it, which is what R20 requires of it.`
   — **Met.** The Concurrency condition is evaluated from the draft alone, by counting distinct
   `phase-` ids. The Requirement coverage condition needs one lookup outside the draft, resolving
   each `depends_on` id to its document's `kind`, and GOV-010 says so. The one judgement-based row,
-  Accepted decisions, was made optional and taken out of conformance.
+  Accepted decisions, is optional and outside conformance. The fix verification confirmed item D.
 - `The two bullets above … are judged by the session-close independent review, not by a mechanical
-  command.` — **Met** on the two reviews in `## Review`. The first found condition 1 partly met;
-  its gaps were fixed in `ec23709`. The second, run on those fixes, found one false citation and
-  three rule gaps; they were fixed in `936a061`. No third review has run on `936a061`.
+  command.` — **Met.** The first review found condition 1 partly met, and its gaps were fixed in
+  `ec23709`. The second review, run on those fixes, found further gaps, fixed in `936a061`. A third,
+  narrow check confirmed each of those fixes item by item. All three are recorded in `## Review`.
 
 ## Backlog
 
@@ -166,6 +167,29 @@ Sizing (`PLAN-026`) and P7 citations it checked.
 
 The two new passing examples for P10, `PLAN-010` and `PLAN-019`, were checked by the author
 against their text: every label in each resolves to a document code, a phase id or an idea id.
+
+### Fix verification
+
+At the owner's ruling, relayed by the Session Manager, a third fresh sub-agent verified only the
+round-2 fixes in `936a061`. It was not a full review. It covered the ten new discrepancies (A–J),
+the four partly-fixed dispositions (K–N) and the not-fully-fixed formatting row (O). It answered
+each item fixed or not, quoting the current files and checking each attributed quote against its
+source.
+
+It found 14 of the 15 items fixed. The remaining item, G, was partly fixed: the SHAs, the base and
+P9/P10 were fixed, but this record still marked the acceptance conditions `Met` on reviews that had
+not examined the latest corrections. The `## Acceptance` section was rewritten to rest each verdict
+on the review or check that actually confirmed it.
+
+It noticed three things outside its scope. They were sent to the Ideation session to be recorded
+as ideas, not fixed here:
+
+- P9 says `PLAN-038` does not say when its supersession was made, but the ruling that replaced the
+  old text is dated elsewhere in the plan: "(owner ruling, 2026-09-14, `REQ-010` R6)".
+- The requirement row pattern wraps across two source lines inside inline code, so copying it from
+  the source gives a newline where the pattern needs a space.
+- P9 says `PLAN-015` places "each" amendment in a dated block naming the owner and the session. Its
+  second dated block, an answer rather than an amendment, names no session.
 
 ## Decisions
 
