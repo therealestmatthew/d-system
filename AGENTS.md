@@ -295,7 +295,8 @@ Perform these in order. Do not mark a phase complete before the post-rebase vali
    to. If they decline or are not present, leave the branch unmerged and report that it is ready for
    review, naming the command that shows it: `git diff dev..agent/<phase-id>`.
 9. On their yes, and only if `dev` is clean, integrate (fast-forward after the rebase), then clean
-   up:
+   up. Before the merge, run `uv run python tools/git-hooks/refuse_dirty_integration.py` in the
+   primary checkout and confirm it exits 0 — see `OPS-001`.
 
    ```bash
    git -C <primary checkout> merge --ff-only agent/<phase-id>

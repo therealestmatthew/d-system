@@ -173,14 +173,9 @@ uv run python tools/git-hooks/refuse_dirty_integration.py
 ```
 
 **What is, and is not, wired up.** `AGENTS.md`'s *Concurrent agents: complete and hand off*
-step 9 performs the merge itself, and that document is unmodified by this phase — no agent may
-edit `AGENTS.md` without the owner's explicit approval, and none was sought here. Nothing today
-calls this script automatically: not step 9, not a git hook, not CI. It is discoverable only by
-an agent who reads this section and chooses to run it before the merge, exactly as the command
-above shows; an agent following `AGENTS.md`'s literal steps would not encounter it. A one-line
-addition to step 9 that would close this gap is proposed, for the owner to decide, on this
-phase's build evidence (`_working/build-batch-002/phase-conc-02-build.md`) — not here, because
-`AGENTS.md` cannot be edited in this session.
+step 9 tells the integrating agent to run this script before the merge and confirm it exits 0; the
+owner approved that line on 2026-09-22. Nothing calls the script automatically: not a git hook, not
+CI. It runs because step 9 says to run it.
 
 **Placement and reason.** Git has no event that fires on `git stash` — there is no stash hook to
 attach a guard to, so a rule against stashing would be unenforceable prose, exactly what this
