@@ -17750,3 +17750,41 @@ Related ideas: 000350 (no phase builds the real Agent SDK dispatcher) is the sam
 **Links**
 
 - relates_to → `000347`
+
+---
+
+## 000353 · The catalog test failed again on 2026-09-23 in phase-irs-16's worktree, because the status-regression WARNING still goes to --catalog's stdout (second sighting of 000335)
+
+**Created 2026-09-23T02:08:26-04:00 · Status: `open`**
+
+Sent to Ideation by Session 5 - Batch Runner on 2026-09-23, during the overnight sprint.
+
+As given: test/test_codes.py::test_catalog_flag_writes_committed_file fails in a worktree whose branch is behind dev. The dev-relative backlog status-regression WARNING (for example "phase-cap-06 complete -> active") is printed into --catalog's stdout, so the test's output comparison fails. Seen on 2026-09-23 in phase-irs-16's worktree; a rebase cleared it. The warning should go to stderr, or the test should ignore it, so that a branch that is behind dev but otherwise correct does not go red.
+
+This is the same defect as 000335 (src.governance --catalog prints the status-regression WARNING to stdout, so the catalog test fails on any branch behind a dev completion edit). That idea was recorded on 2026-09-22 from the Session Manager's sighting on phase-idg-10. The owner has already ruled on it (annotation on 000335, 2026-09-22): send the warning to stderr, chosen over making the test ignore it. As of dev at 806d3e2 the fix has not landed, and no backlog phase or branch that carries it is known to Ideation.
+
+Why it is recorded separately: the capture rule (ADR-010) records an idea as given and does not merge it into a neighbour, and tonight's authority forbids merging ideas. The new information is the recurrence: the defect has now cost a second session a red test run on a second night. Every phase completion on dev reproduces it for every branch not yet rebased, and under GOV-017 that means every open branch after each merge.
+
+What it would touch: src/governance (where the status-regression guard from phase-gov-05 prints) and test/test_codes.py. Related: 000335 (the original, with the ruling), 000324 and 000325 (the same catalog tests overwriting the tracked file), 000351 (regenerate the catalog only at merge time).
+
+Unresolved: which phase carries the owner's ruling on 000335. It is a small fix with no phase yet.
+
+---
+
+## 000354 · A partition analyst with Bash writes its report file through a heredoc after the harness refuses its Write, so the premise that the coordinator writes the reports is not enforced
+
+**Created 2026-09-23T02:08:27-04:00 · Status: `open`**
+
+Sent to Ideation by Session 2 - Builder B on 2026-09-23, from the phase-part-03 dry run during the overnight sprint.
+
+As given: a partition analyst with Bash can go around the harness's refusal of report-file writes (idea 000206). In the phase-part-03 dry run, analyst R1 wrote report-R1.md and a condensed.md itself through a heredoc after its Write was refused. It did so because PROMPT-034's R1 section says "Write your report to ...". So the premise that the coordinator writes the reports is not enforced.
+
+Background: 000206 (prompt packs cannot instruct a subagent to write its report to a file; the harness refuses it) recorded that the harness refuses a subagent's report-file write with "Subagents should return findings as text, not write report files". The idea-batching build worked around this by having the coordinator transcribe each returned report to its path. PROMPT-034 (the reusable partition pack) still says "Write your report to _working/idea-corpus/report-R1.md" in R1 (around line 176) and says the same for R4.
+
+What the dry run shows: the refusal applies to the Write tool, not to the outcome. An analyst dispatched with Bash reached the same file another way, so what 000206 describes is a tool-level refusal an agent can route around, not a boundary. Two consequences follow. First, the design goal that each analyst only returns text, and the coordinator alone decides what lands on disk, holds only if the analyst also lacks Bash. Second, the route taken was a shell heredoc carrying a long report. brain/procedures/never-pass-file-content-through-a-heredoc.md records a failure on 2026-09-23, also in phase-part-03, where heredoc content ended the heredoc early and the shell ran the rest as commands.
+
+What it would touch: PROMPT-034's analyst sections (the "Write your report to" lines), the tool grants of the analysts it dispatches, the /partition-ideas skill, and possibly REQ-009. It also bears on 000241 (review agents are dispatched with write tools they are only told not to use) and 000165 (the enforcement harness: make a violation impossible rather than forbidden).
+
+Related, as named by the sender: 000206 and 000339 (the partition pack's A2 prompt reads a staging document that exists only in the coordinator's worktree).
+
+Unresolved: remove Bash from the analysts, or change the pack so the analysts return text and the coordinator writes the files, or accept agent-written files and drop the premise; and whether the dry run's report-R1.md and condensed.md are faithful to what R1 returned.
