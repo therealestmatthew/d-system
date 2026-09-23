@@ -13081,7 +13081,8 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 2
   session_budget: 1
   depends_on:
@@ -13101,8 +13102,9 @@ items:
   - uv run python -m src.governance
   - uv run pytest
   deliverables:
-  - src/
-  - test/
+  - src/orchestrator/daemon.py
+  - src/orchestrator/__main__.py
+  - test/test_daemon.py
   next_action: Read phase-irs-04's flock usage before writing the daemon wrapper - the lock file path
     and acquisition semantics must match exactly.
 - id: phase-fwt-01
