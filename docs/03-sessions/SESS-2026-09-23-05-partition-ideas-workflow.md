@@ -181,7 +181,9 @@ GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` 
 
 ## Unresolved
 
-- **PARKED for the owner (Session Manager ruling, 2026-09-23 overnight): how to treat R1's
+- **Ruled: option C (owner, morning of 2026-09-23; see `## Decisions`). The fix is merged; the R1
+  re-run is pending.** Originally PARKED for the owner (Session Manager ruling, 2026-09-23
+  overnight): how to treat R1's
   self-written output.** In dry run attempt 2, R1 went around the harness refusal of its report
   write through Bash. It left `report-R1.md` (unstamped) and `condensed.md` in
   `_working/idea-corpus/`, and both are untouched. Under the overnight authority (§3), a block that
