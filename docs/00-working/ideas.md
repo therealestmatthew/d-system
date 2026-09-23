@@ -1010,6 +1010,7 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 
 **Links**
 
+- relates_to → `000347`
 - relates_to ← `000028`
 - relates_to ← `000031`
 - relates_to ← `000128`
@@ -1188,6 +1189,7 @@ No existing plan, requirement, or phase currently covers claim recovery. PLAN-01
 
 **Links**
 
+- relates_to → `000347`
 - relates_to ← `000041`
 - relates_to ← `000059`
 - relates_to ← `000082`
@@ -1332,6 +1334,7 @@ PROPOSED LINK: 000029 --relates_to--> 000030 (third piece of trilogy for supervi
 
 - relates_to → `000028`
 - relates_to → `000030`
+- relates_to → `000347`
 - relates_to ← `000028`
 - relates_to ← `000030`
 
@@ -1373,6 +1376,7 @@ PROPOSED LINK: 000030 --relates_to--> 000029 (part of supervised agent workflow 
 
 - relates_to → `000028`
 - relates_to → `000029`
+- relates_to → `000347`
 - relates_to ← `000029`
 - relates_to ← `000248`
 
@@ -1408,6 +1412,7 @@ The idea itself explicitly names two related initiatives: 000020 (MCP-mediated m
 
 - relates_to → `000028`
 - relates_to → `000020`
+- relates_to → `000347`
 - relates_to ← `000165`
 - relates_to ← `000241`
 - relates_to ← `000333`
@@ -2248,6 +2253,10 @@ No PROPOSED LINK: the relationships found (000007, phase-idea-01, idea.md) are s
 
 </details>
 
+**Links**
+
+- relates_to → `000347`
+
 ---
 
 ## 000049 · Define where a promoted plan or requirement document lives before it earns a code
@@ -2816,6 +2825,7 @@ The idea would likely benefit from position relative to PLAN-001: clarify whethe
 **Links**
 
 - relates_to → `000032`
+- relates_to → `000347`
 - relates_to ← `000061`
 
 ---
@@ -3638,6 +3648,7 @@ Bearing on this idea's question: the evidence says the repository does NOT need 
 
 - relates_to → `000067`
 - relates_to → `000072`
+- relates_to → `000347`
 - relates_to ← `000076`
 
 ---
@@ -4123,6 +4134,7 @@ PROPOSED LINK: 000077 --relates_to--> 000080 (both address agent truncation; 080
 - relates_to → `000070`
 - relates_to → `000071`
 - relates_to → `000080`
+- relates_to → `000347`
 - relates_to ← `000080`
 - relates_to ← `000082`
 - relates_to ← `000128`
@@ -4542,6 +4554,7 @@ PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents 
 - relates_to → `000072`
 - relates_to → `000025`
 - relates_to → `000077`
+- relates_to → `000347`
 - relates_to ← `000128`
 - relates_to ← `000248`
 - relates_to ← `000252`
@@ -6289,6 +6302,7 @@ No related plan, phase, or requirement document found that specifically covers t
 **Links**
 
 - relates_to → `000126`
+- relates_to → `000347`
 - relates_to ← `000169`
 
 ---
@@ -6334,6 +6348,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 - relates_to → `000077`
 - relates_to → `000020`
 - relates_to → `000023`
+- relates_to → `000347`
 - relates_to ← `000138`
 - relates_to ← `000169`
 
@@ -7437,6 +7452,7 @@ No related plan or requirement document found that covers the claim-system revis
 
 - relates_to → `000020`
 - relates_to → `000025`
+- relates_to → `000347`
 - relates_to ← `000152`
 - relates_to ← `000168`
 - relates_to ← `000280`
@@ -7711,6 +7727,7 @@ No related plan, requirement, or decision document implements the queue itself �
 
 - relates_to → `000154`
 - relates_to → `000066`
+- relates_to → `000347`
 - relates_to ← `000160`
 - relates_to ← `000168`
 
@@ -8539,6 +8556,7 @@ The links are already correct and complete; 000168 is the survey layer that unif
 - relates_to → `000152`
 - relates_to → `000156`
 - relates_to → `000169`
+- relates_to → `000347`
 - relates_to ← `000164`
 - relates_to ← `000327`
 
@@ -8611,6 +8629,7 @@ PROPOSED LINK: 000169 --relates_to--> 000168 (both address agent lifecycle; 0001
 - relates_to → `000127`
 - relates_to → `000128`
 - relates_to → `000165`
+- relates_to → `000347`
 - relates_to ← `000168`
 
 ---
@@ -12060,6 +12079,7 @@ PROPOSED PROMOTION: 000237 -> PLAN-020 (Portable Agent Workflows owns the checkp
 **Links**
 
 - relates_to → `000235`
+- relates_to → `000347`
 - relates_to ← `000276`
 
 ---
@@ -12549,6 +12569,7 @@ PROPOSED LINK: 000247 --relates_to--> 000082 (orchestration is the central compo
 
 **Links**
 
+- relates_to → `000347`
 - extended_by ← `000248`
 - relates_to ← `000249`
 - relates_to ← `000250`
@@ -12596,6 +12617,7 @@ PROPOSED LINK: 000248 --relates_to--> 000082 (both address multi-agent orchestra
 - extends → `000247`
 - relates_to → `000030`
 - relates_to → `000082`
+- relates_to → `000347`
 - relates_to ← `000249`
 - relates_to ← `000327`
 
@@ -12676,6 +12698,7 @@ PROPOSED LINK: 000250 --relates_to--> 000160 (000250 is a consumer of the MCP to
 - relates_to → `000020`
 - relates_to → `000159`
 - relates_to → `000160`
+- relates_to → `000347`
 
 ---
 
@@ -12768,6 +12791,7 @@ PROPOSED LINK: 000252 --relates_to--> 000082 (phase-agx-09's own scope cites ide
 
 - relates_to → `000251`
 - relates_to → `000082`
+- relates_to → `000347`
 
 ---
 
@@ -15862,6 +15886,7 @@ PROPOSED LINK: 000321 --relates_to--> 000322 (000322 records a concrete example 
 **Links**
 
 - relates_to → `000242`
+- relates_to → `000347`
 - relates_to ← `000322`
 - relates_to ← `000336`
 
@@ -16006,6 +16031,7 @@ The incident is documented, the affected tests are identified and accessible, re
 
 **Links**
 
+- relates_to → `000347`
 - relates_to ← `000325`
 - relates_to ← `000335`
 
@@ -16595,6 +16621,7 @@ The idea's content is not yet delivered by any governed document — it is a dec
 
 - relates_to → `000326`
 - relates_to → `000031`
+- relates_to → `000347`
 
 ---
 
@@ -17441,7 +17468,7 @@ PROPOSED LINK: idea 000346 --relates_to--> 000051 (both address agent harness an
 
 ## 000347 · ANCHOR: a morning session to capture what the multi-session system showed on its first night, and how to optimize and improve it
 
-**Created 2026-09-23T01:11:38-04:00 · Status: `open`**
+**Created 2026-09-23T01:11:38-04:00 · Status: `triaged`**
 
 Raised by the owner on 2026-09-23 and forwarded by the Session Manager. This is an anchor idea: the related asks below are linked to it so they surface together for one future session.
 
@@ -17466,12 +17493,59 @@ Evidence to read first: the Session Manager's working files in _working/session-
 
 Unresolved: whether the morning session produces a plan, a requirement, an update to GOV-017, or a set of new ideas; and which of the four focus areas comes first.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T01:31:04-04:00): Triage finding for 000347 (anchor: morning session on the multi-session system), written by Ideation on 2026-09-23 during the overnight sprint.
+
+Governed material that already covers the four focus areas:
+- The multi-session system itself: GOV-017 (multi-session coordination protocol) and PROMPT-037 (Session Manager starter messages), both on dev since 2026-09-22.
+- LangGraph and the Agent SDK: ADR-018 (LangGraph orchestration), PLAN-039 (idea realization system) and PLAN-039.01 (orchestrator design). phase-irs-04 (LangGraph orchestrator skeleton) is complete; phase-irs-16 (daemon process model) and phase-irs-11 (run budgets and the kill switch) are in tonight's build lane; phase-irs-12 (trace and metrics baselines), phase-irs-13 (gate queue and decision-ready presentation) and phase-irs-17 (forced-failure drill) are queued.
+- Autonomy: PLAN-032 (autonomous agent operations) and ADR-022 (broker-first autonomous operations), delivered through phase-auto-01 to phase-auto-06 (broker, trigger gateway, run ledger, supervised worker and watchdog).
+- State, memory and context: PLAN-001 (agent memory system, phase-mem-01 to phase-mem-19); phase-agx-07 (shared state model over _tmpagent); phase-agx-01 (subagent truncation); phase-conc-01 and phase-conc-04 (stale-claim signal and claim recovery); phase-conc-07 (backup posture for non-git state).
+- New roles: phase-agx-10 to phase-agx-13 (lifecycle agent roster, expander, minimalist, arbiter, and independent transcript review, which is close to the Documenter in 000332).
+
+Nothing governed yet covers controlled clearing and compaction of long-lived sessions, or how a GOV-017 role maps onto an Agent SDK worker. Those are the parts of this anchor with no home.
+
+The overnight sprint of 2026-09-23 is producing the planning inputs this session needs, under _working/overnight-sprint/planning/ (gitignored): agent-sdk-capabilities.md, orchestrator-surface.md, session-manager-on-langgraph.md, roadmap-to-autonomy.md, and idea-cluster-000347.md, which lists every idea in this cluster, the links written, the links proposed but not written, overlaps, and gaps. The night's own record is in _working/overnight-sprint/ and _working/session-manager/ (morning-report.md, board.md). All of it is gitignored and exists only in the primary checkout on this machine.
+
+Related-ideas sweep: in the same turn as this finding, Ideation linked further ideas to this anchor (relates_to 000347) beyond the seven original members. idea-cluster-000347.md gives the reason for each.
+
+</details>
+
 **Links**
 
+- relates_to ← `000020`
+- relates_to ← `000025`
+- relates_to ← `000029`
+- relates_to ← `000030`
+- relates_to ← `000031`
+- relates_to ← `000048`
+- relates_to ← `000060`
+- relates_to ← `000069`
+- relates_to ← `000077`
+- relates_to ← `000082`
+- relates_to ← `000127`
+- relates_to ← `000128`
+- relates_to ← `000151`
+- relates_to ← `000156`
+- relates_to ← `000168`
+- relates_to ← `000169`
+- relates_to ← `000237`
+- relates_to ← `000247`
+- relates_to ← `000248`
+- relates_to ← `000250`
+- relates_to ← `000252`
 - relates_to ← `000319`
 - relates_to ← `000320`
+- relates_to ← `000321`
+- relates_to ← `000324`
 - relates_to ← `000327`
 - relates_to ← `000328`
 - relates_to ← `000332`
+- relates_to ← `000333`
 - relates_to ← `000334`
 - relates_to ← `000340`
