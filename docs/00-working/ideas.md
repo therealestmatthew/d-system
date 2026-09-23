@@ -16696,3 +16696,114 @@ The unresolved choice (stderr vs test change) is exactly what the idea names, an
 
 - relates_to → `000324`
 - relates_to → `000325`
+
+---
+
+## 000336 · The backlog lock treats glob deliverables as literal filenames, so a declared pattern like test/test_orchestrator*.py protects nothing
+
+**Created 2026-09-22T23:42:01-04:00 · Status: `triaged`**
+
+From Session 5 - Batch Runner, 2026-09-22.
+
+As given: path_conflict in src/governance/backlog.py (line 86) compares whole path segments and does not expand globs. A declared deliverable such as test/test_orchestrator*.py is locked as a literal filename, so it silently protects nothing. The validator should reject or expand glob deliverables, and existing backlog entries should be checked for any that already declare globs.
+
+Confirmed by Ideation when recording: path_conflict builds PurePosixPath(...).parts for each side and reports a conflict only when one tuple is a prefix of the other. A segment like test_orchestrator*.py only matches another path with that exact segment, so a peer phase that declares test/test_orchestrator_graph.py would not collide with it. A scan of docs/09-backlog/backlog.yaml on dev at 6297a22 found no deliverables entry containing *, ? or [. The example given may come from a branch or a proposed entry that is not on dev yet.
+
+Why it matters: the lock check, the --ready Conflicts column and concurrency_errors all rely on path_conflict. A glob deliverable looks declared but locks nothing, and nothing warns about it.
+
+Options named: reject glob characters in deliverables in the governance check, or expand globs against the working tree. Expanding has a gap: a deliverable that is meant to be created does not exist yet, so it matches nothing. Matching glob against glob could cover that.
+
+Related: 000321 and 000322 (other gaps in what the conflict check can see), and 000242 (a phase whose scope names a file its deliverables omit).
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T23:42:01-04:00): idea 000336 reports that the `path_conflict()` function in `src/governance/backlog.py` (line 86-89) does not expand glob patterns in declared deliverables. A pattern like `test/test_orchestrator*.py` is treated as a literal filename and will not match other paths it should protect against, such as `test/test_orchestrator_graph.py`.
+
+**Related findings:**
+
+This is one of several existing gaps in the conflict check:
+- 000321: The --ready conflict check misses shared file paths between phases whose system ids differ
+- 000322: phase-wbf-01 and phase-wbf-02 share a deliverable file (HtmlViewerRegion.tsx) but are not flagged as conflicting (relates_to 000321)
+- 000242: A phase whose scope names a file its deliverables omit is a lock that does not cover the work
+
+**Related plans and governance:**
+
+The conflict check is specified in GOV-002 (Session backlog planning and execution protocol), which documents the disjointness rule for concurrent phases: "A declared path in one equals or contains a declared path in the other." PLAN-030 (Document and backlog governance) discusses the backlog infrastructure including this check, and decision 6 audits how `path_conflict()` is applied.
+
+A scan of docs/09-backlog/backlog.yaml on dev (commit 6297a22) found no existing deliverables containing glob characters (`*`, `?`, or `[`), so this is a latent defect rather than a current breaking case. However, the idea correctly identifies that once a phase declares a glob pattern, the lock silently provides no protection.
+
+**Options noted:**
+
+The idea names two approaches: reject glob characters in deliverables via the governance check, or expand globs against the working tree. The second approach has a gap: a deliverable that is meant to be created does not exist yet, so glob expansion would match nothing. Matching glob-against-glob could cover that case.
+
+PROPOSED LINK: idea 000336 --relates_to--> 000321 (both identify gaps where the conflict check misses deliverables it should detect)
+PROPOSED LINK: idea 000336 --relates_to--> 000322 (same conflict-check gap, concrete example)
+PROPOSED LINK: idea 000336 --relates_to--> 000242 (related class of deliverable-lock defect)
+- **finding** by agent-ideation (2026-09-22T23:42:02-04:00): Evidence from Session 4 - Scout, relayed by the Session Manager on 2026-09-22 (source: _working/session-manager/scout/glob-deliverables-audit.md, gitignored). Confirmed that path_conflict compares literal path segments and does not expand globs. Correction to the idea's wording: a glob deliverable still collides with an enclosing directory (for example test/), so it misses sibling files rather than protecting nothing. No phase on any branch or worktree declares a glob deliverable today. Session 5 has already switched phase-irs-04 to the concrete test/test_orchestrator.py. Neither public_path nor the backlog schema rejects glob characters. Suggested guard, for the owner to decide: reject the characters * ? [ in deliverables.
+
+</details>
+
+---
+
+## 000337 · A path for the owner to approve a proposed new tag category without locking all of schemas/
+
+**Created 2026-09-22T23:42:01-04:00 · Status: `triaged`**
+
+From Session 1 - Builder A, 2026-09-22. It was the owner's ask during the orientation for phase-cap-06.
+
+As given: give the owner a way to approve a proposed new tag category. Today the categories are an enum in schemas/tag.schema.json, and phase-cap-06's review holds any item that needs a new category and only presents it as a proposal. Approving one should apply the schema change without locking all of schemas/ for the phase that does it.
+
+Why it matters: while categories live in a schema enum, adding one is a schema edit. A phase that might make that edit has to declare it as a deliverable. Declaring the whole schemas/ directory would block every other phase that touches any schema, because the backlog lock compares paths by containment (ADR-003).
+
+What it would touch: schemas/tag.schema.json, _data/tags.json (the tag reference list), phase-cap-06's review of held proposals, and the backlog deliverables declared by whichever phase applies an approval.
+
+Unresolved:
+- Whether the approval path should be a narrow deliverable (declaring schemas/tag.schema.json only, not schemas/), a separate small owner-run step outside any phase, or moving categories out of the schema enum into data such as _data/tags.json, so that approving one is a data write rather than a schema change.
+- Who applies the change once the owner approves: the phase, a tool, or the owner.
+- How a held item is released once its category exists.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-22T23:42:02-04:00): ## Triage Finding: Tag Category Approval Path
+
+### What idea 000337 addresses
+idea 000337 proposes a workflow for the owner to approve proposed new tag categories without locking the entire `schemas/` directory during phase execution. The problem is that tag categories currently live as an enum in `schemas/tag.schema.json`, and adding a new one requires a schema edit — but declaring `schemas/` as a deliverable would block every other phase that touches any schema file.
+
+### Related documents found
+
+**ADR-007 (Capture routing)** establishes the context: new tag categories are held items requiring owner approval (section 9, lines 124-129). The capture routing system currently marks any new tag category as a held item that the owner must explicitly approve during phase-cap-06's review step.
+
+**PLAN-009 (Capture build, phase-cap-06)** specifies that phase-cap-06 handles "the identity decision for held people, projects, tags and tag categories" (line 2837 of backlog.yaml), but does not specify the implementation path for *applying* the category once approved.
+
+**REQ-002 (Capture requirements)** references held tag categories (line 106 and 92) but defers the approval mechanics to phase-cap-06.
+
+**schemas/tag.schema.json** shows the current implementation: `category` is an enum with six values (client, platform, tech, domain, methodology, context). Approving a new category means editing this schema file.
+
+### Design tensions idea 000337 resolves
+
+The core tension is between two governance rules:
+- (1) New durable identities must be approved by the owner (ADR-007)
+- (2) Backlog paths are locked by containment — declaring `schemas/` as a deliverable blocks every phase that touches any schema (ADR-003, backlog collision detection)
+
+The idea presents three unresolved alternatives:
+- Narrow the deliverable to `schemas/tag.schema.json` only (not `schemas/`)
+- Move the approval step outside any phase (owner-run step between phases)
+- Move categories out of the schema enum into `_data/tags.json`, making approval a data write rather than a schema change
+
+### No related ideas found
+
+No other idea proposes this specific workflow. Ideas 000024 (entity schema validation) and 000267 (governing every object with authoritative schema) address schema governance broadly but not this specific approval-path constraint.
+
+### Not yet delivered
+
+Phase-cap-06 is queued but not yet complete; the identity call for new categories is in scope but the approval-to-application path is unresolved design work.
+
+</details>
