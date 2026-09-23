@@ -6,7 +6,7 @@ tags: [frameworks, knowledge-base]
 source_model: anthropic/claude-sonnet-4-6
 project: d-system
 created: 2026-09-05
-updated: 2026-09-05
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-json-sot]
 scope: global
@@ -20,7 +20,7 @@ Tags are the primary cross-cutting classification axis. Projects have one `categ
 
 | Category | Describes | Examples |
 |---|---|---|
-| `client` | A specific organization | `google` |
+| `client` | A specific organization | `client-a` |
 | `platform` | A named external service | `anaplan`, `aws`, `claude` |
 | `tech` | A language or library | `python`, `react`, `selenium` |
 | `domain` | A knowledge area | `data-science`, `security`, `wellness` |
@@ -37,7 +37,7 @@ Tags are the primary cross-cutting classification axis. Projects have one `categ
 
 ## Source of Truth
 
-`_data/tags.json` — 28 tags as of 2026-09-05. Full documentation in `docs/07-architecture/ARCH-001-tagging-system.md`.
+`_data/tags.json` — 29 tags as of 2026-09-23. Full documentation in `docs/07-architecture/ARCH-001-tagging-system.md`.
 
 ## DuckDB Queries
 

@@ -7,7 +7,7 @@ systems: [sys-backlog, sys-governance]
 source_model: anthropic/claude-sonnet-5
 project: d-system
 created: 2026-09-07
-updated: 2026-09-07
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-documents-and-governance]
 scope: global
@@ -18,7 +18,7 @@ Each term: what it is, what it is not, where it is governed.
 
 ### Governed plan
 
-A document under `docs/01-plans/` (or `plans/`) describing how the system should work, that outlives
+A document under `docs/01-plans/` describing how the system should work, that outlives
 the task that produced it. Not a checklist for one task — a document that would be deleted rather
 than rewritten once its subject leaves the repository was never a plan. See
 `docs/01-plans/PLAN-015-ephemeral-working-plans.md`.

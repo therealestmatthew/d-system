@@ -7,7 +7,7 @@ systems: [sys-contracts, sys-portfolio, sys-governance, sys-brain]
 source_model: openai/gpt-5
 project: d-system
 created: 2026-09-17
-updated: 2026-09-18
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-data-and-storage, mem-concept-terms-plans-and-work]
 scope: global
@@ -56,8 +56,8 @@ engagement. It is not a data contract or programming contract.
 ### Data contract
 
 A machine-readable agreement describing a data object's shape, required properties, validation,
-ownership, compatibility, and versioning. It is governed by the schema registry, not by the
-business-contract schema.
+ownership, compatibility, and versioning. It is to be governed by the schema registry (planned, not
+yet built), not by the business-contract schema.
 
 ### Programming contract
 
@@ -153,8 +153,10 @@ individual records; mappings must define the property's meaning and compatibilit
 
 ### Tag assignment
 
-A governed relationship connecting an object to a tag, with provenance. The shared
-`tag-assignment` schema supplies the assignment authority across object types.
+A governed relationship connecting an object to a tag, with provenance. A shared `tag-assignment`
+schema is planned to supply the assignment authority across object types; it does not exist yet (see
+`docs/07-architecture/ARCH-008-schema-catalog.md`). Today a project's tags are a plain
+`tags` array.
 
 ### Effective time and recorded time
 

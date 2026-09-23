@@ -33,9 +33,9 @@ data/d_system.duckdb           ← query here, never write directly
 ## Rules
 
 - **Edit JSON, then rebuild.** Never INSERT directly into DuckDB — the next rebuild will overwrite it.
-- **DuckDB is gitignored.** The `data/` directory is in `.gitignore`, same as `_private/`. Only `_data/` and `brain/` are committed.
+- **DuckDB is gitignored.** The `data/` directory is in `.gitignore`, same as `_private/`. The database is never committed; its sources are.
 - **Rebuild is idempotent.** Drop all tables, recreate from SQL schema, reload all files. Safe to run anytime.
-- **One file per entity.** Each project, commitment, and task gets its own JSON file — tasks point back to their commitment by ID rather than being embedded (ADR-008). Tags are the exception — all tags live in a single `_data/tags.json` array.
+- **One file per entity.** Each entity record (project, person, commitment, task, interaction, decision, waiting-on, development event) gets its own JSON file — a task points to its commitment and/or project by optional ID rather than being embedded (ADR-008). Tags and ideas are the exceptions — all tags live in a single `_data/tags.json` array, and all idea events in the append-only `_data/ideas.jsonl`.
 - **Real content never goes in `_data/`.** Writing an entity file with real names, clients or personal content into the tracked `_data/` reintroduces exactly what ADR-009 relocated. Write it under the resolved data root instead.
 
 ## Why This Matters for AI Workflows
@@ -58,7 +58,7 @@ Or use `tools/load_context.py` for AI-ready formatted output.
 
 ## Summary
 
-Ten derived systems that act on the project/commitment/task/person/tag data to surface awareness, diagnose health, and synthesize actionable output. Organized in three tiers.
+A proposed set of ten derived systems that would act on the project/commitment/task/person/tag data to surface awareness, diagnose health, and synthesize actionable output, organized in three tiers. **Proposed, not built:** `sys-signals` and `sys-synthesis` are `status: planned` in `docs/08-governance/systems.yaml`; none of the Tier 2 views or Tier 3 generators below exists yet. The only DuckDB views today are the capture views in `sql/003_capture_views.sql`.
 
 ## Tier Architecture
 
@@ -115,7 +115,7 @@ Tags are the primary cross-cutting classification axis. Projects have one `categ
 
 | Category | Describes | Examples |
 |---|---|---|
-| `client` | A specific organization | `google` |
+| `client` | A specific organization | `client-a` |
 | `platform` | A named external service | `anaplan`, `aws`, `claude` |
 | `tech` | A language or library | `python`, `react`, `selenium` |
 | `domain` | A knowledge area | `data-science`, `security`, `wellness` |
@@ -132,7 +132,7 @@ Tags are the primary cross-cutting classification axis. Projects have one `categ
 
 ## Source of Truth
 
-`_data/tags.json` — 28 tags as of 2026-09-05. Full documentation in `docs/07-architecture/ARCH-001-tagging-system.md`.
+`_data/tags.json` — 29 tags as of 2026-09-23. Full documentation in `docs/07-architecture/ARCH-001-tagging-system.md`.
 
 ## DuckDB Queries
 
@@ -156,42 +156,50 @@ Grouped definitions per [PROMPT-004](../../docs/02-prompts/PROMPT-004-terminolog
 
 ### Source of truth
 
-The one location authoritative for a given fact — human-readable JSON under `_data/` for business
-data, Markdown under `brain/` for durable memory. Not something that can drift from its own derived
-copy: nothing is ever written back into it from a derived layer, so the direction of truth only ever
-flows one way.
+The one location authoritative for a given fact — human-readable JSON under the data root for
+business data (`D_SYSTEM_DATA_ROOT` if set, else the tracked `_data/`), the tracked `_data/tags.json`
+and `_data/ideas.jsonl` for shared taxonomy and the idea log, and Markdown under `brain/` for durable
+memory. Not something that can drift from its own derived copy: nothing is ever written back into it
+from a derived layer, so the direction of truth only ever flows one way. See
+`docs/04-decisions/ADR-009-structure-content-boundary.md`.
 
 ### Projection
 
-The mechanical build step, `tools/rebuild_db.py`, that drops and recreates every DuckDB table from
-`_data/` JSON and `brain/` Markdown. Not a store in its own right — it holds nothing that is not
+The mechanical build step, `tools/rebuild_db.py`, that validates every source file and then drops
+and recreates every DuckDB table from the data root's entity JSON, the tracked `tags.json` and
+`ideas.jsonl`, and `brain/` Markdown. Not a store in its own right — it holds nothing that is not
 already in the source of truth, so rerunning it is always safe and never lossy.
 
 ### Derived layer
 
-Any read-optimized copy built from the source of truth rather than written to directly. DuckDB is the
-current, and so far only, instance. Not editable — a change always goes to `_data/` or `brain/`, then
-a rebuild, never the other direction.
+Any read-optimized or rendered copy built from the source of truth rather than written to directly:
+the DuckDB database, and the generated files `docs/08-governance/catalog.md`,
+`docs/08-governance/GLOSSARY.md`, `docs/00-working/ideas.md` and `_public/overview/index.html`. Not
+editable — a change always goes to the source, then a rebuild or regeneration, never the other
+direction.
 
 ### `_data/`
 
-The tracked default data root: one JSON file per project, commitment and person, plus `tags.json` and
-`ideas.jsonl`. Not the owner's actual portfolio by design — the tracked tree is meant to hold a
-fictional exercise of every schema, and real records move to `D_SYSTEM_DATA_ROOT` once
-`phase-priv-03` completes. As of this writing that move has not happened, so the tracked `_data/`
-still holds real records. See `docs/04-decisions/ADR-009-structure-content-boundary.md`.
+The tracked default data root: a fictional example set with one JSON file per record under
+`projects/`, `people/`, `commitments/` and `tasks/`, plus workbench layouts under `workbench/`, the
+shared `tags.json`, and the append-only idea log `ideas.jsonl`. Not the owner's actual portfolio —
+real records live under `_private/portfolio/` and are read when `D_SYSTEM_DATA_ROOT` points there;
+`tags.json` and `ideas.jsonl` are always read from here regardless. See
+`docs/04-decisions/ADR-009-structure-content-boundary.md`.
 
 ### `_public/`
 
-Named in the directory reference as the location for shareable generated outputs. Not built yet — the
-directory does not exist on disk today, and no tooling writes to it; this is an aspirational term,
-recorded because it appears in `CLAUDE.md`.
+Tracked home for shareable generated outputs — HTML pages such as the overview page
+(`_public/overview/index.html`, written by `tools/generate_overview.py`) and the SVG diagrams under
+`_public/images/`. Not a source of truth: a page here is rendered from data or templates elsewhere and
+is regenerated rather than edited.
 
 ### `_private/`
 
-Gitignored storage for credentials, raw dumps and personal notes. Not scanned by the governance check
-and not written to automatically by any tool — an agent reads or writes it only when the owner
-directs it.
+Gitignored storage for the owner's real portfolio records (`_private/portfolio/`), credentials, raw
+dumps and personal notes. Not scanned for documents by the governance check, but its portfolio
+records are read and validated when `D_SYSTEM_DATA_ROOT` points at them; no tool writes to it
+unless the owner directs it. See `docs/04-decisions/ADR-009-structure-content-boundary.md`.
 
 ### `_working/`
 
@@ -201,16 +209,19 @@ from doing so mechanically. See `docs/01-plans/PLAN-015-ephemeral-working-plans.
 
 ### Portfolio
 
-The collection of the owner's real project, commitment and person records — the content the system
-exists to track. Not the same as `_data/`, which is presently their tracked location but is, by
-decision, tracked *structure* rather than the portfolio's *content*. See
-`docs/04-decisions/ADR-009-structure-content-boundary.md`.
+The collection of the owner's real records — projects, people, commitments, tasks and the other
+entity types — that the system exists to track, kept under `_private/portfolio/`. Not the same as
+`_data/`, which is tracked *structure* and a fictional example set rather than the portfolio's
+*content*. See `docs/04-decisions/ADR-009-structure-content-boundary.md`.
 
 ### Entity (data sense)
 
-One domain record type validated by a JSON Schema under `schemas/` — project, commitment, person,
-tag, idea — one file per instance under `_data/`. Not the same as a memory `entity`, the `brain/`
-memory type holding facts about a thing; see Memory and Retrieval for that sense.
+One domain record type validated by a JSON Schema under `schemas/` — project, person, commitment,
+task, interaction, decision, waiting-on and development event, one JSON file per record under the
+data root (the list is `ENTITY_DIRECTORIES` in `src/db/source_validation.py`). Not the same as a
+memory `entity`, the `brain/` memory type holding facts about a thing; see Memory and Retrieval for
+that sense. Tags and ideas are also schema-validated but are not entities: each lives in one shared
+tracked file.
 
 ---
 
@@ -254,9 +265,12 @@ and a fresh regeneration, the same pattern the generated glossary follows.
 ### Reserved code
 
 A code claimed for a document that does not exist yet, typically because a backlog phase names it as
-a future deliverable, recorded under `reserved` in `codes.yaml`. Not a document — `--next-code` skips
-it, and using the number fails until the reservation is removed in the same change that adds the
-document.
+a future deliverable, recorded under `reserved` in `codes.yaml` (a *register reservation*). Not a
+document — `--next-code` skips it, and using the number fails until the reservation is removed in the
+same change that adds the document. Not the same as a *pre-merge reservation*: the untracked file
+under `<git common dir>/code-reservations/` that `--next-code` writes automatically so two worktrees
+cannot be handed the same code, which expires after 14 days and is dropped with `--release-code`. See
+`docs/08-governance/GOV-005-document-codes.md`.
 
 ### Retired code
 
@@ -274,8 +288,9 @@ verify that a plan's claims are actually true. See `docs/08-governance/GOV-001-p
 ### Document code allocation
 
 Running `uv run python -m src.governance --next-code <kind>` (with `--parent <doc-id>` for a child
-plan) to obtain the next free code before creating a document. Not a guess or a directory listing — a
-pure function of committed state, so two agents on the same commit compute the same answer. See
+plan) to obtain the next free code before creating a document. Not a guess or a directory listing, and not
+a pure read of committed state — it also *takes* the code by writing a pre-merge reservation (see
+Reserved code), so two worktrees on the same commit are not handed the same answer. See
 `docs/08-governance/GOV-005-document-codes.md`.
 
 ---
@@ -304,8 +319,8 @@ rationale for a choice; a rationale is a `decision` memory.
 ### Entity (memory sense)
 
 A memory holding facts about a specific thing, e.g. `mem-entity-d-system`. Not a domain-data entity
-(see Data and Storage) and not itself validated as a schema-governed record — it is a fact *about* the
-system, not a row *in* it.
+(see Data and Storage): like every memory it is validated against `schemas/memory.schema.json`, but it
+is a fact *about* the system, not a record *in* it.
 
 ### Procedure (memory type)
 
@@ -388,8 +403,8 @@ engagement. It is not a data contract or programming contract.
 ### Data contract
 
 A machine-readable agreement describing a data object's shape, required properties, validation,
-ownership, compatibility, and versioning. It is governed by the schema registry, not by the
-business-contract schema.
+ownership, compatibility, and versioning. It is to be governed by the schema registry (planned, not
+yet built), not by the business-contract schema.
 
 ### Programming contract
 
@@ -485,8 +500,10 @@ individual records; mappings must define the property's meaning and compatibilit
 
 ### Tag assignment
 
-A governed relationship connecting an object to a tag, with provenance. The shared
-`tag-assignment` schema supplies the assignment authority across object types.
+A governed relationship connecting an object to a tag, with provenance. A shared `tag-assignment`
+schema is planned to supply the assignment authority across object types; it does not exist yet (see
+`docs/07-architecture/ARCH-008-schema-catalog.md`). Today a project's tags are a plain
+`tags` array.
 
 ### Effective time and recorded time
 
@@ -622,7 +639,7 @@ Each term: what it is, what it is not, where it is governed.
 
 ### Governed plan
 
-A document under `docs/01-plans/` (or `plans/`) describing how the system should work, that outlives
+A document under `docs/01-plans/` describing how the system should work, that outlives
 the task that produced it. Not a checklist for one task — a document that would be deleted rather
 than rewritten once its subject leaves the repository was never a plan. See
 `docs/01-plans/PLAN-015-ephemeral-working-plans.md`.
@@ -749,8 +766,9 @@ which is why a tool that returns a large output is expensive even when the answe
 A model in a loop with tools and a goal, where the model decides which tool to call next and when it
 is finished. What separates an agent from a single model call is not the model but the loop and the
 tools around it. Not autonomy in the sense of unsupervised — the surrounding program still decides
-what is permitted, and in this repository `.claude/settings.json` denies edits to `AGENTS.md`,
-`CLAUDE.md`, `_private/**` and `_data/ideas.jsonl` outright.
+what is permitted, and in this repository `.claude/settings.json` denies edits to `_private/**`,
+`_data/ideas.jsonl`, `.agents/**` and `.codex/**` outright, and to `AGENTS.md` and `CLAUDE.md` inside
+worktrees.
 
 ### Agentic loop
 
@@ -764,7 +782,7 @@ can recover from a failed command: the failure is just another result to read.
 A second agent started by the first, with its own context window, its own tool set and its own loop,
 which reports one result back to the caller. The point is context isolation: the sub-agent's
 intermediate tool output never enters the caller's context, only its final report does. In this
-repository `.claude/agents/` holds twelve definitions — a Markdown file whose front matter sets
+repository `.claude/agents/` holds fourteen definitions — a Markdown file whose front matter sets
 `name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
 instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
 
@@ -781,8 +799,9 @@ every sub-agent starting without the caller's context.
 
 A folder of instructions the model loads when a task calls for it: `SKILL.md` with YAML front matter
 giving a `name` and a `description`, a Markdown body containing the procedure, and optionally
-supporting files the body points to. This repository has four under `.claude/skills/` — `orient`,
-`checkpoint`, `d-system-overview` and `log-anti-patterns`. A skill is instructions, not code:
+supporting files the body points to. This repository has eleven under `.claude/skills/` — among them `orient`,
+`checkpoint`, `d-system-overview`, `log-anti-patterns` and `partition-ideas`, plus six `demo-skill-*`
+skills used in the training session. A skill is instructions, not code:
 `d-system-overview` tells
 the agent to run `tools/generate_overview.py` and report what it printed; the determinism lives in
 the tool, not in the skill.
@@ -799,7 +818,8 @@ use the skill rather than to summarise it.
 A named prompt the user triggers by typing `/<name>` — a **slash command** — defined in this
 repository as a Markdown file
 under `.claude/commands/` with `description` and `argument-hint` front matter. `/backlog`, `/idea`,
-`/idea-triage`, `/session-start`, `/session-close` and `/resume-lit-review` are the six here.
+`/idea-triage`, `/session-start`, `/session-close` and `/resume-lit-review` are the working six here,
+alongside six `demo-cmd-*` commands used in the training session.
 A command is invoked by the person; a skill is
 loaded by the model when it judges the task matches; a tool is called by the model as a step. That is
 the whole distinction between the three — who initiates.
@@ -827,19 +847,21 @@ shell behind a websocket. Governed phases are budgeted in sessions — one phase
 ### Memory
 
 Anything deliberately written down so a later session can read it, since the context does not survive
-the conversation. Three kinds here: `brain/` holds model-agnostic Markdown entries — this file is one
-— `docs/05-memories/` holds governed cross-session context, and `CLAUDE.md` is loaded automatically
-every session. Not recall by the model: memory is a file that something chooses to read back.
+the conversation. Two kinds here: `brain/` holds model-agnostic Markdown entries — this file is one
+— and `CLAUDE.md` is loaded automatically every session. `docs/05-memories/` is only a navigation
+pointer to `brain/`, not a second store. Not recall by the model: memory is a file that something chooses to read back.
 
 ### Advanced topics, named but not covered in depth
 
 - **Hooks** — shell commands the harness runs automatically at fixed points in the loop, configured
   in `settings.json`. None are configured in this repository; the equivalent guarantees here come
-  from `permissions.deny` and the governance check.
+  from `permissions.deny`, the governance check, and an opt-in git `pre-commit` hook
+  (`tools/git-hooks/pre-commit`) that runs the private-content check — a git hook, not a harness
+  hook.
 - **Agent permissions** — the allow and deny rules deciding which tool calls run, prompt for
-  approval, or are refused. `.claude/settings.json` here denies writes to `AGENTS.md`, `CLAUDE.md`,
-  `_private/**` and `_data/ideas.jsonl`, enforcing in the harness what the working agreement states
-  in prose.
+  approval, or are refused. `.claude/settings.json` here denies writes to `_private/**`,
+  `_data/ideas.jsonl`, `.agents/**` and `.codex/**`, and to `AGENTS.md` and `CLAUDE.md` inside
+  worktrees, enforcing in the harness what the working agreement states in prose.
 - **Observability** — recording what an agent did (tool calls, tokens, cost, outcome) so a run can be
   audited afterwards rather than reconstructed from its output.
 - **Agent SDK** — the library for building agents of your own on the same loop, tool and sub-agent
@@ -979,9 +1001,11 @@ the full overload.
 ### Template family
 
 A set of HTML partials plus one stylesheet under a shared name prefix, filled by one generator with
-`{{TOKEN}}` substitution. Two exist: the overview family (`templates/html/overview-*.html` with
-`templates/styles/overview.css`, filled by `tools/generate_overview.py`) and the atlas family
-(`templates/html/atlas-*.html` with `templates/styles/atlas.css`). A family is the unit a new
+`{{TOKEN}}` substitution. Three exist: the overview family (`templates/html/overview-*.html` with
+`templates/styles/overview.css`, filled by `tools/generate_overview.py`), the literature-review report
+family (`templates/html/lit-report-*.html` with `templates/styles/lit-report.css`, filled by
+`tools/lit_report_render.py`), and the atlas family (`templates/html/atlas-*.html` with
+`templates/styles/atlas.css`), for which no generator exists yet. A family is the unit a new
 generated page is built from; adding a page to an existing family is not a new family.
 
 ### Generated page

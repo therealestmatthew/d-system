@@ -7,7 +7,7 @@ systems: [sys-wb-layout]
 source_model: anthropic/claude-opus-5
 project: d-system
 created: 2026-09-14
-updated: 2026-09-14
+updated: 2026-09-23
 confidence: high
 related: [mem-concept-terms-systems-vocabulary, mem-concept-terms-skills-and-agents-demo]
 scope: global
@@ -111,9 +111,11 @@ the full overload.
 ### Template family
 
 A set of HTML partials plus one stylesheet under a shared name prefix, filled by one generator with
-`{{TOKEN}}` substitution. Two exist: the overview family (`templates/html/overview-*.html` with
-`templates/styles/overview.css`, filled by `tools/generate_overview.py`) and the atlas family
-(`templates/html/atlas-*.html` with `templates/styles/atlas.css`). A family is the unit a new
+`{{TOKEN}}` substitution. Three exist: the overview family (`templates/html/overview-*.html` with
+`templates/styles/overview.css`, filled by `tools/generate_overview.py`), the literature-review report
+family (`templates/html/lit-report-*.html` with `templates/styles/lit-report.css`, filled by
+`tools/lit_report_render.py`), and the atlas family (`templates/html/atlas-*.html` with
+`templates/styles/atlas.css`), for which no generator exists yet. A family is the unit a new
 generated page is built from; adding a page to an existing family is not a new family.
 
 ### Generated page
