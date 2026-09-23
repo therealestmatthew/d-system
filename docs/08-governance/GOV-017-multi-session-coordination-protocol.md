@@ -90,6 +90,11 @@ force, integrations and idea records are committed. Only one session writes ther
   restores it afterwards. On 2026-09-22 two `/session-start` preflight runs overlapped there and
   left the catalog holding only `CORRUPTED` (ideas `000324`, `000325`). Tests run in the session's
   own worktree.
+- **One `pytest` run at a time per worktree**, for the same reason: the tests resolve the catalog
+  path to whichever checkout they run in, so two overlapping runs corrupt that worktree's catalog.
+  Before a commit that is not meant to change the catalog, `git diff --exit-code
+  docs/08-governance/catalog.md` confirms a test run did not leave it altered. A commit that does
+  change it regenerates it with `--catalog` rather than keeping whatever is on disk.
 
 ## Claim slots
 

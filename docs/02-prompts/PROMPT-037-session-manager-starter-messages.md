@@ -20,8 +20,9 @@ the owner pastes into the Session Manager session, and the starter messages the 
 to every other session once the owner approves them.
 
 Each starter message is the **shared contract** followed by that session's **role section**. The
-texts below are the versions the owner approved on 2026-09-22, with the amendment approved later
-that night — no tests in the primary checkout — folded into the contract as item 9.
+texts below are the versions the owner approved on 2026-09-22, with the two amendments approved later
+that night folded into the contract: no tests in the primary checkout (item 9), and one test run at a
+time per worktree with a catalog check before each commit (item 10).
 
 ## Kickoff for the Session Manager
 
@@ -74,6 +75,9 @@ Roster
 8. The first line of every message is its type and subject.
 9. Never run pytest, rebuilds or any test in the primary checkout. test/test_codes.py overwrites the
    tracked catalog.md while it runs. Run them in your worktree only.
+10. One pytest run at a time per worktree, for the same reason, and run
+    `git diff --exit-code docs/08-governance/catalog.md` before each commit that is not meant to
+    change the catalog. When a commit does change it, regenerate it with --catalog instead.
 
 Reply now to "Session Manager": ACK <your session name> <state: phase/branch/worktree, or none>
 ```
