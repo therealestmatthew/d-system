@@ -449,3 +449,38 @@ not the `## Unresolved` question's option A. The Decisions section above names b
      completion edit, then copy any gitignored evidence out, remove the worktree, and send SAFE.
 - **Claim:** `agent-builder-b` keeps the `phase-part-03` claim across the restart.
 - `phase-irs-05` and the batch-002 close-out wait for this phase to complete.
+
+## Fresh sweep to GATE 1 (2026-09-23, dry run at dev `f1b891d`)
+
+Run by `agent-builder-b` inside a granted `TURN? dryrun phase-part-03`, after Ideation's triage
+turns `18c39c1` and `f1b891d`. Gitignored writes only; no commit in the primary checkout, and its
+`git status` was clean at the end. Start 20:46:55Z, GATE 1 reached 21:12:10Z, against a stated
+estimate of 20 minutes.
+
+- **Step 2 of the resume state, by hand.** Last night's ten files (`manifest.json`,
+  `corpus-R1.md`..`corpus-R4.md`, `dispatch-R1.txt`, `dispatch-R4.txt`, `report-R1.md`,
+  `report-R4.md`, `condensed.md`) moved into
+  `_working/idea-corpus/previous-2026-09-23-seed-656057328/`. Nothing deleted.
+- **Open-set gate:** `open ideas: 0`.
+- **Classifier:** `NEW: no manifest`. Nothing moved by the skill.
+- **Manifest:** `corpus_size: 383 | status: triaged | seed: 1370316527 | corpus date: 2026-09-23`
+  (the builder printed `corpus size: 383 (of 389 triaged)`, 6 excluded by the fast lane, 61 with
+  layered evidence).
+- **Dispatch diffs:** `dispatch-R1.txt` against `PROMPT-034` lines 117-178 and `dispatch-R4.txt`
+  against lines 193-251 both exit 0 with no output. Both went to `partition-analyst`, model sonnet,
+  in the same turn.
+- **Reports:** `report-R1.md` 23,125 bytes and `report-R4.md` 57,064 bytes, both written by the
+  coordinator with the run stamp, from the text each analyst handed back. Neither was truncated.
+- **Every corpus id placed?** R4 names all 383 corpus ids and states 383 placed, 0 unbatched. R1
+  does not. It read the pack's "do only what is missing" line as licence to carry forward the
+  2026-09-13 partition, citing 121 ideas by reference to `idea-batching-partition.md` and 53 more
+  as already governed, so it partitioned 209 ideas fresh. Its own arithmetic totals 384 against 383, and it
+  names that overage without finding it. With ranges expanded, R1 never names 98 corpus ids: 97
+  are the cited carryover, and `000398` is missing outright. This is for the owner at GATE 1.
+- **No analyst wrote a file.** The `_working/idea-corpus/` listing before the dispatches and after
+  GATE 1 differs only by `report-R1.md` and `report-R4.md`, both written by the coordinator.
+- **Idea log unchanged:** `_data/ideas.jsonl` sha256 `3b9d0ce0b6a96a7387397b3803807a127918b7f5718ae0df466a43a5a043487c`
+  after triage and again after GATE 1.
+- **Spend:** 2 dispatches, 0 resumed after truncation, 0 above sonnet.
+
+The sweep stopped at GATE 1. The owner decides whether audit 1 proceeds.
