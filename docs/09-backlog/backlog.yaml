@@ -12556,7 +12556,8 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 2
   session_budget: 1
   depends_on:
@@ -12588,12 +12589,15 @@ items:
   - uv run pytest
   - grep -rn "claim" src/orchestrator/ tools/append_run.py tools/append_decision.py
   deliverables:
-  - src/
-  - test/
-  - schemas/
-  - tools/
-  - docs/08-governance/
+  - src/orchestrator/
+  - test/test_orchestrator.py
+  - schemas/run.schema.json
+  - schemas/gate-decision.schema.json
+  - tools/append_run.py
+  - tools/append_decision.py
   - docs/04-decisions/ADR-018-langgraph-orchestration.md
+  - pyproject.toml
+  - uv.lock
   next_action: Pin the LangGraph dependency and confine its import surface to src/orchestrator/ (graphs/,
     tick, state, gates) before writing the first node.
 - id: phase-irs-05
