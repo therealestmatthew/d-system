@@ -12769,8 +12769,23 @@ items:
   - docs/02-prompts/
   - schemas/adversarial-finding.schema.json
   - test/test_adversarial_finding_schema.py
-  next_action: Generalize the prompt used for the 2026-09-15 pass on ARCH-006's draft, which already
-    exercised the top altitude.
+  next_action: Acceptance met and verified; awaiting the owner-approved merge through the Session
+    Manager (GOV-017), then completion.
+  session: doc-session-three-altitude-review-park
+  completion_evidence:
+  - docs/08-governance/GOV-018-three-altitude-review-procedure.md
+  - docs/02-prompts/PROMPT-038-single-adversary-engine.md
+  - schemas/adversarial-finding.schema.json
+  - test/test_adversarial_finding_schema.py
+  - docs/08-governance/reviews/2026-09-23-plan-039.json
+  - docs/08-governance/reviews/2026-09-23-sample-nonconforming-draft.json
+  - docs/03-sessions/SESS-2026-09-23-07-three-altitude-review-park.md
+  result: 'In the worktree, rebased on dev a81ca3f: Governance OK (35 systems, 338 documents, 31
+    memories, 294 backlog phases); pytest 1025 passed, 1 skipped; ruff and mypy clean. The first
+    GOV-018 review ran against PLAN-039 and REQ-022 at all three altitudes: 8 findings (7 major, 1
+    minor), all dispositioned by the planner stand-in (6 escalated-g3, 2 accepted-no-change). A
+    sample draft missing five GOV-010 sections was returned at the entry check with no adversary
+    dispatched; a conforming control passed.'
 - id: phase-irs-07
   title: Dependency-mapping agent and the Gate 3 ratification flow
   plan: doc-idea-realization-system-plan
