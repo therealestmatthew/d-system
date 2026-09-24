@@ -413,7 +413,7 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
-| PLAN-045 | doc-deterministic-guards | approved | 4 | 0 | 0 | — |
+| PLAN-045 | doc-deterministic-guards | approved | 3 | 1 | 0 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 
 ## Held codes

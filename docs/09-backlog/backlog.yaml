@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-23'
+updated: '2026-09-24'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
@@ -13730,7 +13730,8 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 1
   session_budget: 1
   depends_on: []
@@ -13781,8 +13782,7 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - AGENTS.md
-  next_action: Waits for phase-part-03 to complete (shared sys-governance). Start with the governance
-    staleness check, since the hook and CI steps call it.
+  next_action: Start with the governance staleness check, since the hook and CI steps call it.
 - id: phase-grd-02
   title: Green dev CI before each primary-checkout grant
   plan: doc-deterministic-guards
