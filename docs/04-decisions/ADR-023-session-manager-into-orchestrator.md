@@ -186,6 +186,25 @@ These were not chosen. Each is described as its source gives it.
 - **A `langgraph-supervisor` agent.** The Scout's report §7.1 cites the documentation saying the
   package is deprecated. A router is a single classification step, which is what D3-3 chose.
 
+The options not chosen for sections 3 to 5, as the decision pack lists them:
+
+| Decision | Not chosen |
+|---|---|
+| D5 who commits | (c) an LLM worker runs the git commands under a narrow allow rule |
+| D4 worker lifetime | (a) one fresh SDK session per task; (b) a long-lived session per role, resumed by id |
+| D6 mobile surface | (b) the workbench page only, waiting for it; (c) notifications plus artifact pages |
+| D7 worker questions | (b) workers block and wait; (c) separate queues for merges and for questions |
+| D8 Documenter | (a) proposes only; (c) writes directly to `dev` |
+| D9 thresholds | (b) soft 60%, hard 85%; (c) measure and report only |
+| D10 delegated authority | (b) a gitignored authority file per night; (c) no delegation |
+| D11 first dispatch | (b) Documenter; (c) Builder, through `phase-irs-08`, skipping M4 |
+| D12 the lease | (b) ledger events only; (c) kept in Session Manager messages |
+| D13 run ledger | (b) `phase-auto-04` builds the general ledger; (c) keep both |
+| R1 milestones | (b) the pipeline first; (c) both at once, split across lanes |
+| R2 `next_up` | (b) interleave N-phases after each batch; (c) append them at the end |
+| R3 `sys-realization` | (b) keep one serial lane; (c) decide after A1 |
+| R4 the A1 phase | (b) a code phase; (c) a phase in the realization lane |
+
 ## Consequences
 
 - **What the follow-on session produces.** It writes the requirement, the plan and the phases
