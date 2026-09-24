@@ -51,6 +51,13 @@
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
           "reason": "Verified against the files. Resolving it needs an edit to PLAN-039's phase table and to next_up, which the owner ranks; neither is inside phase-irs-06's deliverables. Confirmed: backlog.yaml phase-irs-14 depends_on lists phase-irs-11; PLAN-039 line 80 omits it; next_up lines 7-8 order irs-14 before irs-11."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "agent-builder-a (Session 1 - Builder A), from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-24",
+          "reason": "Owner ruling relayed by the Session Manager, 2026-09-24 (rulings-000347 entry 19): \"APPLY the fix: add irs-11 to irs-14's row; next_up puts irs-11 before irs-14 (owner-ranked).\" Applied: PLAN-039's phase table lists phase-irs-11 in phase-irs-14's Depends on column, and next_up now orders phase-irs-11 before phase-irs-14."
         }
       ]
     },
@@ -73,6 +80,13 @@
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
           "reason": "Verified against the files. Resolving it needs an edit to PLAN-039's Implementation phases section. Confirmed: phase-irs-04, -14 and -15 carry plan: doc-irs-orchestrator-design. GOV-018 step 2 already treats a child plan as its own review target, so this review's phase altitude excluded them."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "agent-builder-a (Session 1 - Builder A), from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-24",
+          "reason": "Owner ruling relayed by the Session Manager, 2026-09-24 (rulings-000347 entry 20): \"APPLY the fix: PLAN-039 'Implementation phases' states irs-04/-14/-15 are registered under PLAN-039.01 and count toward its coverage.\" Applied as a paragraph in that section."
         }
       ]
     },
@@ -139,6 +153,13 @@
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
           "reason": "Verified against the files. Resolving it needs an edit to phase-irs-09's acceptance and verification. Confirmed: its scope requires the unverifiable-capability path and neither acceptance line exercises it."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "agent-builder-a (Session 1 - Builder A), from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-24",
+          "reason": "Owner ruling relayed by the Session Manager, 2026-09-24 (rulings-000347 entry 22): \"APPLY the fix: acceptance line + verification step for an unverifiable delivered capability (finding recorded, no terminal delivered status).\" Applied to phase-irs-09's acceptance and verification."
         }
       ]
     },
@@ -161,6 +182,13 @@
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
           "reason": "Verified against the files. Resolving it needs an edit to phase-irs-07's acceptance line. Confirmed: it says ratification 'is tested in phase-irs-13', and phase-irs-13's entry contains no mention of ratification, R05 or mapping (grep exit 1); PLAN-039's table gives R05 to phase-irs-14."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "agent-builder-a (Session 1 - Builder A), from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-24",
+          "reason": "Owner ruling relayed by the Session Manager, 2026-09-24 (rulings-000347 entry 23): \"APPLY the fix: cite phase-irs-14 for R05's ratification.\" Applied to phase-irs-07's first acceptance line."
         }
       ]
     },
@@ -183,6 +211,13 @@
           "recorded_by": "agent-builder-a (planner stand-in, phase-irs-06)",
           "date": "2026-09-23",
           "reason": "Resolving it needs an edit to phase-irs-17's scope, verification and next_action. Confirmed: all three refer to 'the traced run' of phase-irs-12, which completes end to end. One citation in the evidence is wrong: the quote 'phase-irs-17 additionally depends on phase-irs-12, whose traced run its own verification text presumes' is in docs/03-sessions/SESS-2026-09-16-05-phase-review-remaining-decisions.md lines 69-70, not GOV-003 line 69. The finding is kept as the adversary reported it (GOV-018 step 4); the substance stands. Whether the drill re-runs the scenario per stage class or uses fixtures is a scope decision for the owner."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "agent-builder-a (Session 1 - Builder A), from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-24",
+          "reason": "Owner ruling relayed by the Session Manager, 2026-09-24 (rulings-000347 entry 24): \"HYBRID: fixtures captured from irs-12's real trace at each stage boundary, each stage replayed with its failure injected (runs in CI), plus one real end-to-end forced failure in a sandbox data root. Rewrite irs-17's scope, verification and next_action accordingly.\" Applied to phase-irs-17's scope, verification and next_action."
         }
       ]
     },

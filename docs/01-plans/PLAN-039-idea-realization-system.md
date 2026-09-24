@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-16'
+updated: '2026-09-24'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-idea-graph-lifecycle, doc-agent-engineering-delegation, doc-autonomous-agent-operations, doc-repeatable-idea-partition]
 ---
@@ -62,6 +62,12 @@ The owner queued the full track into `next_up` on 2026-09-16, dependency-ordered
 standing entries and woven with the external gate phases it needs, superseding this plan's
 original none-enters-`next_up` posture; ordering changes remain the owner's alone.
 
+`phase-irs-04`, `-14` and `-15` are registered in the backlog under the child plan `PLAN-039.01`
+(`plan: doc-irs-orchestrator-design`), not under this plan. They are listed here and counted toward
+this plan's requirement coverage below, so a filter on this plan's id alone finds fourteen of the
+seventeen phases and misses R01 and R16–R19 (owner ruling, 2026-09-24, on the 2026-09-23 review's
+F02).
+
 | Phase | Title | Depends on | Requirements |
 |---|---|---|---|
 | `phase-irs-01` | Stopgap triage dispatch on append, with the reconciling sweep | — | R06, R07 |
@@ -77,7 +83,7 @@ original none-enters-`next_up` posture; ordering changes remain the owner's alon
 | `phase-irs-11` | Run budgets, hard caps and the kill switch | `phase-irs-04` | R20, R21 |
 | `phase-irs-12` | End-to-end trace and metrics baselines | `phase-irs-05`–`08`, `-10`, `-14`, `-15`, `phase-part-03` | R24 |
 | `phase-irs-17` | Forced-failure drill across the assembled pipeline | `phase-irs-05`–`08`, `-10`, `-12`, `-14`, `-15`, `phase-part-03` | R12 |
-| `phase-irs-14` | Batch graph: per-track fan-out, per-plan G3 interrupts, amend-as-re-key, the plan→ideas trace | `phase-irs-04`, `phase-part-03` | R05, R08 |
+| `phase-irs-14` | Batch graph: per-track fan-out, per-plan G3 interrupts, amend-as-re-key, the plan→ideas trace | `phase-irs-04`, `phase-part-03`, `phase-irs-11` | R05, R08 |
 | `phase-irs-15` | Realization graph against the delivered-state ruling | `phase-irs-04`, `phase-irs-09`, `phase-irs-14` | R15 |
 | `phase-irs-16` | Daemon process model: lock, signal handling and start/stop/status | `phase-irs-04` | R17 |
 | `phase-irs-13` | Gate queue and decision-ready presentation, including batched completion review | `phase-irs-04`, `phase-irs-11`, `phase-irs-06`, `phase-irs-07` | R02, R04 |

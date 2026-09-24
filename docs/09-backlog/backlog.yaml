@@ -15,8 +15,8 @@ next_up:
 - phase-asr-04
 - phase-asr-05
 - phase-cap-08
-- phase-irs-14
 - phase-irs-11
+- phase-irs-14
 - phase-idg-01
 - phase-idg-11
 - phase-dgov-01
@@ -12904,7 +12904,7 @@ items:
   acceptance:
   - 'REQ-022 R05 holds as far as this phase: one plan traces to a proposed ordering ready for a decision,
     with no standalone ratification mechanism. Ratification through phase-irs-04''s `gate` verb is tested
-    in phase-irs-13.'
+    in phase-irs-14.'
   - The agent has no write path to next_up.
   verification:
   - uv run python -m src.governance
@@ -12983,9 +12983,13 @@ items:
   - 'REQ-022 R15 holds: one idea traces from merge to delivered with evidence, through an owner
     Gate 5 decision.'
   - The status change lands as append-only events; git diff shows no rewritten line in _data/ideas.jsonl.
+  - An idea whose delivered capability cannot be verified against its text gets a finding recorded on
+    the idea and surfaced at Gate 5, and no terminal delivered status is written for it.
   verification:
   - uv run python -m src.governance
   - uv run pytest
+  - Run the realization check on an idea whose delivered capability cannot be verified against its
+    text; confirm a finding is recorded on the idea and the fold shows no terminal delivered status.
   deliverables:
   - schemas/
   - tools/
@@ -13127,8 +13131,12 @@ items:
   - phase-irs-10
   - phase-irs-12
   scope:
-  - Force one failure per stage class across the nine-stage pipeline traced by phase-irs-12 - nine
-    forced failures - and confirm each stage's written failure path engages, per REQ-022 R12.
+  - Capture fixtures from phase-irs-12's real end-to-end trace at each of the nine stage boundaries -
+    the state each stage receives - so the drill starts from real prior state, not invented state.
+  - Replay each stage from its fixture with that stage class's failure injected - nine forced failures
+    - as tests that run in CI, and confirm each stage's written failure path engages, per REQ-022 R12.
+  - Run one real end-to-end forced failure through the assembled pipeline in a sandbox data root,
+    never the repository's real data or the traced run's recorded artifacts.
   - Record each forced failure and the failure path it exercised, so no stage's failure leaves a run
     wedged silently.
   acceptance:
@@ -13138,14 +13146,17 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
-  - Force one failure per stage class in the traced run and confirm each stage's written failure path
-    engages.
+  - The nine stage-replay tests, each injecting one stage class's failure into a fixture captured from
+    phase-irs-12's trace, pass under uv run pytest and in CI, and each confirms that stage's written
+    failure path engages.
+  - Run one end-to-end forced failure in a sandbox data root and confirm its failure path engages and
+    the repository's real data root is unchanged (git status shows no change under _data/).
   deliverables:
   - test/
   - docs/08-governance/
-  next_action: Run the drill against the run phase-irs-12 traced, in the order the pipeline stages
-    execute, so each forced failure is diagnosed against real prior state rather than a synthetic
-    fixture.
+  next_action: Capture the stage-boundary fixtures from phase-irs-12's trace first, then write the nine
+    stage-replay tests in pipeline order, then choose which failure the one sandbox end-to-end run
+    forces (owner ruling, 2026-09-24, hybrid drill).
 - id: phase-irs-13
   title: Gate queue and decision-ready presentation with batched completion review
   plan: doc-idea-realization-system-plan
