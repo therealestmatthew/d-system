@@ -77,7 +77,7 @@ the backlog substrate's capacity, the containment check, and the missing registr
 | R09 | Reading the working backlog file costs materially less context than before the split, stated as a measurement. | Report the file's size and phase count before and after. A split that leaves the working file the same size has not solved `000037`'s problem. |
 | R10 | A backlog review and re-prioritisation procedure exists, naming what triggers it, how `next_up` is rebuilt and by whom. | Read the procedure for all three. Confirm it answers what un-defers a phase whose gate cannot be met by waiting — `phase-mem-15` through `-19` gate on recorded retrieval failures that nothing currently records, which is the case that proves the procedure is needed. |
 | R11 | The procedure states whether it is a session type or a command, and is reachable that way. | Invoke it as whatever it claims to be and confirm it runs. A procedure that exists only as prose in a governance document is not reachable. |
-| R12 | A phase's actual change set is diffed against its declared `systems` and `deliverables`, and files outside the declaration are named. For a completed phase, the change set is the files touched on `dev`'s first-parent history between the phase's claim commit and its completion commit, by commits whose message names the phase. For an active phase, it is `dev...agent/<phase-id>`. Writes the protocol requires of every phase (its own status lines, the catalog, its session record, idea captures) are not findings. | Run the check against a phase whose diff is known to include an undeclared path, in both modes; confirm it names the phase and the file. Run it against the repository as it stands and record the result — a check whose first run reports zero findings across every completed phase is more likely broken than vindicated. |
+| R12 | A phase's actual change set is diffed against its declared `systems` and `deliverables`, and files outside the declaration are named. For a completed phase, the change set is the files touched on `dev`'s first-parent history between the phase's claim commit and its completion commit, by every commit in that range except those whose message names a different phase id. For an active phase, it is `dev...agent/<phase-id>`. Writes the protocol requires of every phase (its own status lines, the catalog, its session record, idea captures) are not findings. | Run the check against a phase whose diff is known to include an undeclared path, in both modes; confirm it names the phase and the file. Run it against the repository as it stands and record the result — a check whose first run reports zero findings across every completed phase is more likely broken than vindicated. |
 | R13 | The containment check reports rather than blocks, and its output distinguishes a declaration that was too narrow from work that genuinely strayed. | Read the output for that distinction. Confirm nothing in the check writes to `backlog.yaml` or reopens a completed phase — judging which of the two a finding is belongs to a person. |
 | R14 | `_tmpagent/`'s claim protocol has an entry in `docs/08-governance/systems.yaml` with a maturity, and `--inventory` reports it. | Run `uv run python -m src.governance --inventory` and confirm the entry appears with a maturity level. Confirm the maturity is justified by what the mechanism actually does rather than asserted. |
 
@@ -90,6 +90,13 @@ output. The exemption for protocol-mandated writes comes from the Standby Builde
 Manager's instruction. R12 before the amendment read: "A completed phase's actual change set is
 diffed against its declared `systems` and `deliverables`, and files outside the declaration are
 named." Its verification said "70-plus completed phases"; 108 were complete at `f1b891d`.
+
+**Second amendment, 2026-09-23.** The owner superseded the message filter in the amendment above:
+the first version kept only commits whose message names the phase, which drops a phase's own
+registering commits (`3da1295` for `phase-prog-04`, `744d4c8` for `phase-prog-05`; `GOV-018` review
+`2026-09-23-plan-030`, F01). The owner's ruling, relayed by the Session Manager: "INVERT the filter.
+Keep every commit in the claim..completion first-parent range, except those naming a different phase
+id." R12 above states the inverted rule.
 
 ## What each requirement is not
 

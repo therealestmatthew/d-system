@@ -111,13 +111,19 @@ clean corpus.
 **Amendment, 2026-09-23** (owner rulings relayed by the Session Manager, applied through
 `PLAN-045`'s branch): the check has two modes. For a completed phase, the change set is the files
 touched on `dev`'s first-parent history between the phase's claim and completion commits, by
-commits whose message names the phase; no other record bounds a phase, because merges are
+commits whose message names the phase (superseded the same day; see below); no other record bounds a phase, because merges are
 fast-forward and branches are deleted. For an active phase it diffs `dev...agent/<phase-id>`, so
 `READY` can carry the report (the owner's ruling that `READY` carries this check's output). Writes the
 protocol requires of every phase (its own status lines, the catalog, its session record, idea
 captures) are exempt; a `backlog.yaml` edit counts only when it touches another phase's entry, which
 is what keeps the `phase-prog-*` case visible. The check runs from its own command and exits 0 on
 findings. `REQ-015` R12 is amended to match.
+
+**Second amendment, 2026-09-23** (owner ruling on `PLAN-045` OQ9, after `GOV-018` review
+`2026-09-23-plan-030` F01 showed the message filter drops a phase's own registering commits, such as
+`3da1295` for `phase-prog-04`): the filter is inverted. The change set keeps every commit in the
+claim-to-completion range on `dev`'s first-parent history except those whose message names a
+different phase id.
 
 ### 6. `G07` is sequenced behind `phase-gov-01`, which the scope required checking
 

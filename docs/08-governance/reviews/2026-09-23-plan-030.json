@@ -33,6 +33,13 @@
           "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
           "date": "2026-09-23",
           "reason": "Verified: 3da1295 lies between 9a3f273 (claim phase-prog-04) and 7aad923 (close phase-prog-04) on dev's first-parent history (git merge-base --is-ancestor both ways), and neither 3da1295 nor 744d4c8 names its phase. The attribution method is the owner's ruling of 2026-09-23, so the planner cannot change it. PLAN-045 OQ9 asks the owner to decide, recommending that the filter be inverted: keep every commit in the claim-to-completion range except those naming a different phase id."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Prompt Planner session, from the owner's ruling relayed by the Session Manager",
+          "date": "2026-09-23",
+          "reason": "Owner ruling on PLAN-045 OQ9, 2026-09-23: \"INVERT the filter. Keep every commit in the claim..completion first-parent range, except those naming a different phase id. This supersedes the earlier message-filter ruling.\" Applied to REQ-015 R12, PLAN-030 section 5 and phase-dgov-06's scope; the acceptance now names 3da1295 and 744d4c8."
         }
       ],
       "id": "F01",

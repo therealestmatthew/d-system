@@ -3070,7 +3070,7 @@ items:
   next_action: Check coded deliverables against existing documents and codes.yaml
     reservations. Revised 2026-09-23 from the Standby Builder's review
     (_working/session-manager/reviews/phase-gov-01.md) under PLAN-045. Deliverables that are directories
-    carry no code and are not checked; that gap is not ruled.
+    carry no code and are not checked; the owner ruled that gap out of scope on 2026-09-23.
 - id: phase-ses-01
   title: Define the session type taxonomy and per-type context
   plan: doc-session-lifecycle
@@ -10557,8 +10557,9 @@ items:
   - Build the check that diffs a phase's actual change set against its declared systems and
     deliverables, naming files outside the declaration.
   - 'Completed-phase mode: the change set is the files touched on dev''s first-parent history between
-    the phase''s claim commit and its completion commit, by commits whose message names the phase (owner
-    ruling, 2026-09-23; REQ-015 R12 as amended).'
+    the phase''s claim commit and its completion commit, by every commit in that range except those whose
+    message names a different phase id (owner ruling, 2026-09-23, superseding a message-name filter;
+    REQ-015 R12 as amended).'
   - 'Active-branch mode: diff dev...agent/<phase-id> against the claimed phase''s declaration, so READY
     can carry the output (owner ruling, 2026-09-23; REQ-015 R12 as amended).'
   - Exempt the writes the protocol requires of every phase - its own backlog.yaml status lines, the
@@ -10577,7 +10578,8 @@ items:
   - 'REQ-015 R13 holds: the output distinguishes a too-narrow declaration from genuine strays, and nothing
     in the check writes to backlog.yaml.'
   - The known phase-prog-* case - each registers other phases in backlog.yaml without declaring it -
-    appears in the first run's findings, while a phase's own status edits do not.
+    appears in the first run's findings, including phase-prog-04 (3da1295) and phase-prog-05 (744d4c8),
+    while a phase's own status edits do not.
   - Run in active-branch mode against a scratch branch with one undeclared file, it names that file.
   verification:
   - uv run pytest test/test_containment.py
@@ -10588,7 +10590,8 @@ items:
   - src/governance/__main__.py
   - test/test_containment.py
   next_action: Build the completed-phase change-set extraction first (claim and completion commits on
-    dev's first-parent history, message filter), then the active-branch mode on the same classifier.
+    dev's first-parent history, dropping commits that name a different phase), then the active-branch
+    mode on the same classifier.
     Revised 2026-09-23 from the Standby Builder's review (_working/session-manager/reviews/phase-dgov-06.md)
     and the owner's rulings, under PLAN-045.
 - id: phase-dgov-07
