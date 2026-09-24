@@ -13787,7 +13787,11 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - AGENTS.md
-  next_action: Start with the governance staleness check, since the hook and CI steps call it.
+  session: doc-session-stale-generated-files
+  next_action: Governance staleness check, tests and CI step are done. Next, add governance to
+    tools/git-hooks/pre-commit and test it directly; write the no-bypass rule in GOV-017 and the
+    hook's operations document; name --catalog in GOV-017 merge-gate step 6 and PROMPT-037 item
+    4(iii) and builder step 5.
 - id: phase-grd-02
   title: Green dev CI before each primary-checkout grant
   plan: doc-deterministic-guards
