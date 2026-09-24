@@ -1,0 +1,67 @@
+{
+  "review_id": "2026-09-23-plan-010",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-010",
+    "phases": [
+      "phase-gov-01"
+    ]
+  },
+  "entry_check": {
+    "result": "exempt",
+    "standard": "GOV-010",
+    "detail": "PLAN-010 was created before 2026-09-22; GOV-010 applies only to plans written after that date (its Scope section)."
+  },
+  "altitudes_run": [
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "subject": "phase-gov-01",
+      "severity": "major",
+      "title": "Scope directs the agent to derive code-pattern and reservation logic from scratch instead of naming the already-tested functions in codes.py that do this exact job.",
+      "evidence": "src/governance/codes.py:15-16 defines COUNTER/DATED regexes and parse_code() (line 21), tested against dated codes including sub-second-precision cases at test/test_codes.py:71 (`SESS-2026-09-05-02`). codes.py:49-54 defines held_codes(register) returning {code: \"retired\"|\"reserved\"}. backlog.py imports nothing from codes.py today (head -20 src/governance/backlog.py). backlog.yaml:3044-3047 (scope) says only 'Derive the code patterns from the codes.yaml series...' with no reference to these functions. The review that produced this scope documents hitting exactly this bug in its own ad hoc dry run: 'my first dry run made exactly this error and reported 8 false failures' (_working/session-manager/reviews/phase-gov-01.md, finding 3).",
+      "consequence": "An executing agent following the scope literally reimplements pattern matching and reservation lookup from a description rather than reusing codes.py's tested primitives, risking the same dated-code misparse the reviewer already hit and documented (mis-reading SESS-2026-09-06-04 as SESS-202), consuming session budget on rediscovering a solved problem.",
+      "minimal_fix": "Add to scope: reuse src/governance/codes.py's parse_code() for pattern matching and held_codes() for the reserved/retired lookup, rather than deriving new logic.",
+      "slug": "scope-omits-existing-reusable-utility",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "phase-gov-01's scope now names parse_code() and held_codes(register) in src/governance/codes.py and says not to write new patterns."
+        }
+      ],
+      "id": "F01",
+      "altitude": "phase",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038"
+    },
+    {
+      "subject": "phase-gov-01",
+      "severity": "minor",
+      "title": "Scope does not mention that the shared backlog_repo test fixture must gain a register key once audit_backlog reads result[\"register\"], though it will break 18 dependent tests otherwise.",
+      "evidence": "test/test_backlog.py:45-64 constructs `result = {\"documents\": ..., \"systems\": ..., \"owners\": ...}` with no `register` key. `grep -c \"backlog_repo: Any\" test/test_backlog.py` → 18 test functions consume this fixture (some parametrized, e.g. test_invalid_phase_fails). No shared register fixture exists in test/conftest.py (only one unrelated fixture there).",
+      "consequence": "Implementing the scope's 'pass the code register... into the backlog audit' bullet the direct way (reading result[\"register\"] inside inspect_backlog) breaks all 18 backlog_repo-based tests until the fixture is updated; unmentioned in scope or acceptance, though the file itself (test/test_backlog.py) is already a declared deliverable so no declaration gap exists.",
+      "minimal_fix": "Add a scope line noting the backlog_repo fixture needs a register (with reserved/retired lists) added to its result dict.",
+      "slug": "shared-fixture-missing-new-dependency",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "The register scope line now says to add a register with reserved and retired lists to the backlog_repo fixture, which 18 tests share."
+        }
+      ],
+      "id": "F02",
+      "altitude": "phase",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038"
+    }
+  ],
+  "notes": "Phase altitude only, for phase-gov-01, at the owner's ruling of 2026-09-23 that phase-gov-01 and phase-dgov-06 are reviewed before phase-grd-04 lands (PLAN-045 OQ7). Other PLAN-010 phases were not in scope. Reviewed at 94280d8 on agent/plan-guards-docs, after the entry was revised from the Standby Builder's PROMPT-035 review (_working/session-manager/reviews/phase-gov-01.md). PLAN-010 has no requirement document. Findings recorded as reported; the dispatcher added only id, altitude, engine and author. Dispositions by the Prompt Planner session as planner."
+}

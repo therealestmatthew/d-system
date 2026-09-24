@@ -269,3 +269,13 @@ Still open:
   `phase-part-03` sweep covers these ideas. Who: the planner, when the sweep's result is accepted and
   before G3. If the sweep puts any of these ideas in a different track, this plan is revised or the
   difference is put to the owner.
+- **OQ9. How `phase-dgov-06` attributes commits to a completed phase.** The owner ruled on
+  2026-09-23 that a completed phase's change set runs from its claim commit to its completion commit
+  on `dev`'s first-parent history, keeping commits whose message names the phase. The `GOV-018` review
+  of `phase-dgov-06` (`2026-09-23-plan-030`, F01) found that this drops the commits the phase's own
+  acceptance must catch: `3da1295` ("register the phase-idg-* track") lies between `phase-prog-04`'s
+  claim `9a3f273` and completion `7aad923` but does not name `phase-prog-04`; `744d4c8` is the same
+  case for `phase-prog-05`. Who: the owner, at G3. Leaning: keep the bounds, and invert the filter —
+  keep every commit in the range except those whose message names a *different* phase id. That still
+  separates interleaved named phases, and unnamed commits by other sessions are mostly idea captures,
+  which are already exempt.

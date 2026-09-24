@@ -196,7 +196,14 @@ for that pair. Measured, not inferred.
 
 No `depends_on` edge is added for it. The edge on `phase-dgov-06` exists because that phase is
 *functionally* sequenced behind `phase-gov-01` — it extends the same check — whereas `phase-dgov-04`
-merely touches the same files and has no ordering requirement against either. The collision is
+merely touches the same files and has no ordering requirement against either.
+
+**Correction, 2026-09-23** (from a `GOV-018` review of `phase-dgov-06`): the sentence above
+contradicts decision 6, which rules that neither check subsumes the other. The edge on
+`phase-dgov-06` rests on the shared file alone (decision 6; since the 2026-09-23 amendment,
+`src/governance/__main__.py`), the same kind of overlap `phase-dgov-04` has without an edge. The
+edge is kept: `next_up` already orders `phase-gov-01` first, so it costs nothing, and removing a
+decision this plan made is not needed to correct its stated reason. The collision is
 therefore real but inert: the programme is already serialised by `sys-governance`, and
 `concurrency_errors` rejects a bad concurrent claim regardless of whether this plan predicted it.
 Recorded here because decision 6 established the methodology of auditing file-level collisions and

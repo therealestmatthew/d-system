@@ -3044,9 +3044,12 @@ items:
   - Count register reservations only (codes.yaml reserved:); ignore the pre-merge reservation store
     under the git common directory, so the result is the same on every clone (GOV-005, "Two different
     things are called a reservation").
-  - Derive the code patterns from the codes.yaml series, including sub-codes (PLAN-039.01) and dated
-    codes (SESS-2026-09-06-04, WALK-...), so a dated code is never read as a counter code.
-  - Pass the code register from src/governance/__main__.py into the backlog audit.
+  - Recognise codes with src/governance/codes.py's parse_code(), which already handles counter codes,
+    sub-codes (PLAN-039.01) and dated codes (SESS-2026-09-06-04), and look up reserved and retired
+    codes with its held_codes(register); do not write new patterns.
+  - Pass the code register from src/governance/__main__.py into the backlog audit, and add a register
+    (with reserved and retired lists) to the backlog_repo fixture in test/test_backlog.py, which 18 tests
+    share.
   - Fail with the phase, the code and the file named, and say to reserve it in codes.yaml.
   - For a deliverable naming a retired code, fail with a separate message saying the code is retired
     and a new one comes from --next-code, because a retired code cannot be reserved.
@@ -10561,7 +10564,7 @@ items:
   - Exempt the writes the protocol requires of every phase - its own backlog.yaml status lines, the
     catalog regeneration, its session record under docs/03-sessions/, and idea-log captures
     (_data/ideas.jsonl, docs/00-working/ideas.md). A backlog.yaml edit counts only when it touches
-    another phase's entry or the registry's structure.
+    another phase's entry.
   - Make it report rather than block, and distinguish a declaration that was too narrow from work that
     genuinely strayed - only a person can tell those apart.
   - Give it its own command that exits 0 when it reports findings, since it must not fail the default

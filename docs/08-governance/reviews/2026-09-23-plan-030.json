@@ -1,0 +1,87 @@
+{
+  "review_id": "2026-09-23-plan-030",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-030",
+    "phases": [
+      "phase-dgov-06"
+    ],
+    "requirement": "REQ-015"
+  },
+  "entry_check": {
+    "result": "exempt",
+    "standard": "GOV-010",
+    "detail": "PLAN-030 was created before 2026-09-22; GOV-010 applies only to plans written after that date (its Scope section)."
+  },
+  "altitudes_run": [
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "subject": "phase-dgov-06",
+      "severity": "blocker",
+      "title": "The completed-phase change-set method the scope specifies (\"commits whose message names the phase\") misses the exact backlog.yaml-registration commits the acceptance criteria require it to find.",
+      "evidence": "phase-prog-04's claim/completion range is `9a3f273`..`7aad923` on `dev --first-parent`. The commit that registers the phase-idg-* track into backlog.yaml (417 lines added) is `3da1295` \"Finalize PLAN-029, write REQ-014 and register the phase-idg-* track\"; `git show -s --format=\"%B\" 3da1295 | grep -i phase-prog-04` returns nothing (exit 1). Same pattern for phase-prog-05: range `b576ad2`..`534a8a9`; the backlog-registering commit is `744d4c8` \"Finalize PLAN-030, write REQ-015 and register the phase-dgov-* track\" (242 lines added to backlog.yaml), and `git show -s --format=\"%B\" 744d4c8 | grep -in phase-prog-05` also returns nothing. Both commits are the phase's own completion work — not stray or mis-attributed commits — but neither names the phase in its message.",
+      "consequence": "phase-dgov-06's own acceptance line requires: \"The known phase-prog-* case - each registers other phases in backlog.yaml without declaring it - appears in the first run's findings.\" Built exactly as scoped, the message filter drops the very commit that contains that violation for at least two of the phase-prog-* phases checked, so the check's first run will not surface the case PLAN-030 §5 predicts and REQ-015's amendment text treats as diagnostic (\"a first run reporting zero findings ... is more likely broken than vindicated\") — except here the check would report *some* findings while still missing the specific evidence its own acceptance names, which is a subtler and easier-to-miss failure than the zero-finding case the plan already guards against. The executing agent will hit this during the session (the same discovery review finding 1 already made once) and have to redesign the attribution method the review's own \"fix\" supplied, which is a real risk to the one-session budget.",
+      "minimal_fix": "Either widen completed-phase attribution beyond commit-message text (e.g. also match the phase id against the diff of files under docs/09-backlog/ for commits between claim and completion, or require every phase-registering commit to name the registering phase in its trailer going forward), or rule explicitly that this known gap is acceptable and adjust the acceptance line so it does not promise a case the built method cannot reach.",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Verified: 3da1295 lies between 9a3f273 (claim phase-prog-04) and 7aad923 (close phase-prog-04) on dev's first-parent history (git merge-base --is-ancestor both ways), and neither 3da1295 nor 744d4c8 names its phase. The attribution method is the owner's ruling of 2026-09-23, so the planner cannot change it. PLAN-045 OQ9 asks the owner to decide, recommending that the filter be inverted: keep every commit in the claim-to-completion range except those naming a different phase id."
+        }
+      ],
+      "id": "F01",
+      "altitude": "phase",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038"
+    },
+    {
+      "subject": "phase-dgov-06",
+      "severity": "major",
+      "title": "The depends_on edge on phase-gov-01 rests on two justifications, one contradicted by the plan's own decision 6 text and the other treated as insufficient for an edge elsewhere in the same plan.",
+      "evidence": "PLAN-030 \"Execution order and real concurrency\" section says the edge exists because phase-dgov-06 \"is functionally sequenced behind phase-gov-01 — it extends the same check\" — but decision 6 (same document, §6) explicitly rules \"Neither subsumes the other\" for the same pair. The amendment to §6 (added in 94280d8) instead grounds the edge purely on the shared `src/governance/__main__.py` deliverable. But the same \"Execution order\" section applies the opposite rule to the structurally identical case of phase-dgov-04 vs phase-gov-01/phase-dgov-06, which also share files (`src/governance/`, `test/test_backlog.py` collide per `path_conflict()`): \"No depends_on edge is added for it ... The collision is therefore real but inert: the programme is already serialised by sys-governance.\" `src/governance/backlog.py:271` (`if all(items[dependency][\"status\"] == \"complete\" for dependency in item[\"depends_on\"])`) shows depends_on gates *readiness*, not merely concurrent-claim rejection — a materially stronger effect than the \"inert\" collision the plan waves off for phase-dgov-04.",
+      "consequence": "As written, the plan gives two different treatments to the same fact pattern (shared system + shared file, no functional read of one phase's output by the other) without reconciling them, and the one place it states a reason for phase-dgov-06's edge specifically (\"extends the same check\") is false by the plan's own decision 6. If the edge is unnecessary, phase-dgov-06 is blocked from even reaching ready status until phase-gov-01 completes for no defensible reason; if it is necessary, the plan needs to say why on grounds that also distinguish it from phase-dgov-04, which it currently does not.",
+      "minimal_fix": "Either remove the depends_on edge (consistent with the phase-dgov-04 precedent, relying on shared-systems collision alone) or replace the \"Execution order\" section's \"extends the same check\" sentence with the true, sufficient reason and explain why the same reasoning does not also require an edge on phase-dgov-04.",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "PLAN-030's Execution order section now carries a dated correction: the stated reason contradicted decision 6; the edge rests on the shared file alone, the same overlap phase-dgov-04 has without an edge; the edge is kept because next_up already orders phase-gov-01 first, so it gates nothing in practice."
+        }
+      ],
+      "id": "F02",
+      "altitude": "phase",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038"
+    },
+    {
+      "subject": "phase-dgov-06",
+      "severity": "minor",
+      "title": "The scope's exemption clause carves out an extra, undefined case (\"or the registry's structure\") not present in REQ-015 R12 or PLAN-030's amendment.",
+      "evidence": "backlog.yaml:10549-10550 (phase-dgov-06 scope): \"A backlog.yaml edit counts only when it touches another phase's entry or the registry's structure.\" REQ-015's R12 amendment (REQ-015:84-92) and PLAN-030's amendment (added in 94280d8) both say only \"a backlog.yaml edit counts only when it touches another phase's entry\" — neither defines or mentions \"the registry's structure.\"",
+      "consequence": "The executing agent has to invent what \"the registry's structure\" means (index headers, `next_up`, YAML anchors?) with no requirement-level text to check it against, risking a classifier that is either too strict (flags a phase's own harmless edits) or too loose (misses a structural edit a reviewer would expect caught).",
+      "minimal_fix": "Either drop the \"or the registry's structure\" clause to match REQ-015/PLAN-030 exactly, or add one sentence to REQ-015 R12 or PLAN-030 §5 defining it.",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "The clause is dropped from phase-dgov-06's scope, matching REQ-015 R12 and PLAN-030's amendment."
+        }
+      ],
+      "id": "F03",
+      "altitude": "phase",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038"
+    }
+  ],
+  "notes": "Phase altitude only, for phase-dgov-06, at the owner's ruling of 2026-09-23 that phase-gov-01 and phase-dgov-06 are reviewed before phase-grd-04 lands (PLAN-045 OQ7). Other PLAN-030 phases were not in scope. Reviewed at 94280d8 on agent/plan-guards-docs, after the entry, REQ-015 R12 and PLAN-030 sections 5-6 were revised from the Standby Builder's PROMPT-035 review and two owner rulings. Findings recorded as reported; the dispatcher added only id, altitude, engine and author. Dispositions by the Prompt Planner session as planner. F01 is escalated to the owner at G3 (PLAN-045 OQ9)."
+}
