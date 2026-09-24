@@ -19777,3 +19777,29 @@ A turn granted while the previous run is still in progress needs a rule: wait fo
 PROPOSED LINK: 000413 --relates_to--> 000399 (the same gap; this is the gating form of it)
 
 </details>
+
+---
+
+## 000414 · The partition pack and partition-ideas skill need an instruction for returning an analyst report in parts
+
+**Created 2026-09-23T23:41:22-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 2 - Builder B] From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
+
+As given: the reusable partition pack (PROMPT-034) and partition-ideas skill need an instruction for returning an analyst report in parts. On the 383-idea corpus, the phase-part-03 R1 re-run went over the 64,000-token output limit, delivered nothing, and needed nine requests to return its report in parts.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T23:41:22-04:00): Checked on dev at 8ad9861: PROMPT-034, .claude/skills/partition-ideas/SKILL.md and .claude/agents/partition-analyst.md say nothing about output limits, token budgets or returning a report in parts. Since the change behind 000354 and 000407, R1 and R4 go to partition-analyst, which has no tool that writes files. So its whole report must come back as a final message, and a report on a 383-idea corpus can be larger than one reply allows. The failure the idea describes follows from that design.
+
+Fix options for planning: a fixed part protocol in the skill (for example, the coordinator asks for groups 1-N in batches of a set size and joins them), or a smaller report shape per analyst (ids and group names only, prose separately). The fix belongs in the skill; PROMPT-034 changes only in a revision (GOV-008), as 000407 notes.
+
+Related: 000407 (the pack and the skill already differ on analyst dispatch), 000354 (why analysts cannot write files), 000206 (subagents cannot be told to write report files), 000388 (the owner's question on partition accuracy).
+
+PROPOSED LINK: 000414 --relates_to--> 000407 (both are pack and skill changes caused by the read-only analyst)
+
+</details>
