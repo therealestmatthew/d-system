@@ -17318,7 +17318,7 @@ Related: 000315 (the literature campaign's recommendations have no consuming pha
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-23T01:11:40-04:00): # Triage finding for idea 000344
 
@@ -17362,6 +17362,7 @@ PLAN-039 on dev is now allocated to the orchestrator design (PLAN-039-idea-reali
 3. Decision whether to salvage the draft as-is or let phase-arc-01 re-scopes it
 
 No related plan or requirement document on dev currently addresses source archival. The already-linked idea (000315) is related but distinct — it covers recommendations consumption, not source archival.
+- **finding** by agent-ideation (2026-09-23T20:29:03-04:00): The draft plans on agent/research-article@9b87614 (PLAN-039 source archival, PLAN-040 article) were salvaged to _working/salvage-research-article/ (gitignored) by owner ruling 2026-09-23, relayed by Session Manager. The branch is deleted. The salvage question stays open for planning.
 
 </details>
 
@@ -18866,6 +18867,7 @@ The two owner questions, 000387 and 000388, need answers before the proposals th
 - relates_to ← `000408`
 - relates_to ← `000409`
 - relates_to ← `000410`
+- relates_to ← `000411`
 
 ---
 
@@ -19689,3 +19691,89 @@ PROPOSED LINK: 000410 --relates_to--> 000160 (the tool-surface design is one par
 **Links**
 
 - relates_to → `000385`
+
+---
+
+## 000411 · Two things are being designed in parallel: agents with defined contracts, and the orchestration systems that manage them as one system
+
+**Created 2026-09-23T20:29:03-04:00 · Status: `triaged`**
+
+The owner's words, as given:
+
+"And I would add that we are really designing 2 things in parallel. The first is a set of agents who exist with certain properties conditions input output contracts, etc. The second thing is the set of orchestration systems that manage those agents as a cohesive system"
+
+(From the owner, typed in the Session Manager's session and relayed to Ideation, 2026-09-23.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T20:29:03-04:00): Where each half stands on dev (read 2026-09-23):
+
+Agents with contracts: GOV-014 (idea realization pipeline role contracts, active) binds each pipeline role's inputs, outputs and token budget. .claude/agents/ holds the agent definitions, generated for idea-triage by tools/generate_agent_workflows.py (OPS-010). PLAN-031 (agent engineering and delegation, P4, active) is the plan for this half. The contracts are specified for the realization pipeline's roles. The interactive roster's roles (Session Manager, Ideation, builders) are defined only in GOV-017 and PROMPT-037 prose.
+
+Orchestration: ADR-018 and PLAN-039.01 define the LangGraph orchestrator (src/orchestrator/, phase-irs-04 and phase-irs-16 complete). GOV-017 is the manual multi-session protocol. P3, the Prompt Planner's ungoverned draft (_working/overnight-sprint/planning/session-manager-on-langgraph.md), maps one onto the other.
+
+The owner's framing is a way to divide the 000385 cluster. 000396, 000397, 000401 and 000408 concern agent properties. 000386, 000389-000391 and 000393 concern orchestration. 000392 (an assurance subsystem) sits in both. It also bears on the partition sweep, which could use these two halves as a top-level split.
+
+PROPOSED LINK: 000411 --relates_to--> 000386 (000386 is the owner's proposal for the orchestration half)
+
+</details>
+
+**Links**
+
+- relates_to → `000385`
+
+---
+
+## 000412 · CI's catalog check cannot fail, because --catalog writes catalog.md before the diff compares it with itself
+
+**Created 2026-09-23T20:29:03-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 4 - Scout] From Session 4 - Scout, relayed to Ideation, 2026-09-23.
+
+As given: CI's catalog check cannot fail: `--catalog` writes catalog.md before printing (src/governance/__main__.py:552-554), so ci.yaml:19-22 diffs the file against itself and a stale committed catalog passes (f6216e9 was green in CI while the board recorded it red). AGENTS.md:155-156 says CI fails when the catalog is stale, which is false.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T20:29:04-04:00): Confirmed on dev: .github/workflows/ci.yaml's "Catalog is current" step runs `uv run python -m src.governance --catalog > /tmp/catalog.md` and then `diff -u docs/08-governance/catalog.md /tmp/catalog.md`. Since 0bee788 ("Make --catalog write docs/08-governance/catalog.md, not just print it"), --catalog calls write_catalog before printing (src/governance/__main__.py:552-554). So the checked-out catalog is overwritten with the regenerated text before the diff runs, and the diff always matches. AGENTS.md:155-156 still says "CI diffs it and fails when it is stale".
+
+This explains a discrepancy Ideation's correction finding on 000399 left open: CI recorded f6216e9 as a success while test_codes.py failed there. The catalog tests in test/test_codes.py also run in CI, after this step has already rewritten the file, so they cannot catch it either.
+
+Fix candidates: use `generate`-style `--check` semantics (compare without writing), run the diff against `git show HEAD:docs/08-governance/catalog.md`, or add `git diff --exit-code docs/08-governance/catalog.md` after the step. The 0bee788 change fixed 000208 and introduced this. 000198 (the governance check passes with a stale catalog) is the same failure in the local check.
+
+PROPOSED LINK: 000412 --relates_to--> 000208 (the fix for 000208 caused this)
+
+</details>
+
+---
+
+## 000413 · Nothing reads dev's CI result: check that the last dev CI run is green before granting each primary-checkout turn
+
+**Created 2026-09-23T20:29:03-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 4 - Scout] From Session 4 - Scout, relayed to Ideation, 2026-09-23.
+
+As given: nothing reads dev's CI result: dev CI failed 30 consecutive pushes (77cbbd9, 2026-09-16, to d34850a, 2026-09-23), and no gate or session noticed. Proposal: the Session Manager (and later the orchestrator) checks the last dev CI run is green before granting each primary-checkout turn. Relates to 000399.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-23T20:29:04-04:00): Confirmed with `gh run list --branch dev`: every CI run from 77cbbd9 (2026-09-16) to d34850a (2026-09-23) failed, 30 in all. GOV-017's grant and merge steps and PROMPT-037 do not mention CI. The Session Manager said on 2026-09-23 that it will now read `gh run list --branch dev` alongside its own suite runs. That practice is not written into GOV-017 yet.
+
+This is the concrete proposal behind Ideation's correction finding on 000399, which restated 000399 as "gate the next dev write on the previous CI result". It differs from 000399's original ask (run the tests automatically) because the automatic run already exists. Note 000412: CI's catalog step cannot fail, so a green run does not yet prove the catalog is current.
+
+A turn granted while the previous run is still in progress needs a rule: wait for it, or grant against the last completed run. CI takes about two minutes.
+
+PROPOSED LINK: 000413 --relates_to--> 000399 (the same gap; this is the gating form of it)
+
+</details>
