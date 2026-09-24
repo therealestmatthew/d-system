@@ -32,7 +32,9 @@ next_up:
 # Held from 2026-09-12, each slid down one.
 - '000157'
 - '000158'
-- '000195'
+# 000150 replaced 000195 here on 2026-09-24: the 000347 session's entry 37 discarded 000195 as
+# superseded by 000150 (the same defect), and the owner put 000150 in its place.
+- '000150'
 # Added 2026-09-21. Gates 000302 and 000304, which are annotated as held behind it.
 - '000303'
 # Repo-hygiene defects that bite agents rather than users, added 2026-09-21.

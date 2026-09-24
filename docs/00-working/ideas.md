@@ -38,7 +38,7 @@ Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority
 1. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
 2. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
 3. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
-4. `000195` — check_no_private_content passes without looking whenever it runs outside the primary checkout
+4. `000150` — The private-content check silently does nothing in a worktree, because _private is gitignored
 5. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
 6. `000241` — Review agents are dispatched with write tools they are only told not to use
 7. `000284` — Decompose sys-governance, which currently functions as a global mutex
@@ -495,6 +495,10 @@ Related existing work: phase-ses-05 (session-close command) already implements t
 No related plan, requirement or phase documents transcript-as-independent-source analysis as a standing practice. The idea's design (deterministic extraction, diff-against-previous for incremental analysis) is unbuilt; its justification is concrete and grounded in this repository's own experience.
 
 </details>
+
+**Links**
+
+- relates_to → `000332`
 
 ---
 
@@ -1165,6 +1169,7 @@ What's unresolved: whether to treat this as "wait for PLAN-007/009 to land the D
 
 - extends → `000052`
 - relates_to ← `000035`
+- relates_to ← `000381`
 
 ---
 
@@ -1201,6 +1206,7 @@ No existing plan, requirement, or phase currently covers claim recovery. PLAN-01
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000252`
 - relates_to ← `000041`
 - relates_to ← `000059`
 - relates_to ← `000082`
@@ -1266,6 +1272,10 @@ What's unresolved: whether this belongs in the human/agent-judgment review step 
 - **finding** by agent-idea-triage (2026-09-09T00:05:22-04:00): Collision checking for declared deliverables paths exists in src/governance/backlog.py (ADR-003) for detecting overlaps *before* work starts; session-close command (PLAN-008, .claude/commands/session-close.md) runs third-party review of a phase's diff against its acceptance conditions. Manual deliverables containment checks are already performed during some session-close reviews (SESS-2026-09-08-04 validated that all changed files stayed within declared scope), but no mechanical validator currently enforces this post-completion. The idea proposes either adding containment validation to session-close's checklist or as an automated governance check. ADR-003 notes the collision detection rule ("Disjoint deliverables paths") and the need for rules to handle legitimate incidental touches (e.g., catalog.md). No other idea directly proposes this check. Not yet delivered.
 
 </details>
+
+**Links**
+
+- extended_by ← `000398`
 
 ---
 
@@ -1348,6 +1358,7 @@ PROPOSED LINK: 000029 --relates_to--> 000030 (third piece of trilogy for supervi
 - relates_to → `000347`
 - relates_to ← `000028`
 - relates_to ← `000030`
+- relates_to ← `000349`
 
 ---
 
@@ -1579,6 +1590,7 @@ PROPOSED LINK: 000035 --extends--> 000024 (proposes automation to fix the schema
 - relates_to → `000024`
 - extends → `000052`
 - relates_to ← `000057`
+- relates_to ← `000400`
 
 ---
 
@@ -2267,6 +2279,8 @@ No PROPOSED LINK: the relationships found (000007, phase-idea-01, idea.md) are s
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000127`
+- relates_to ← `000433`
 
 ---
 
@@ -2838,6 +2852,7 @@ The idea would likely benefit from position relative to PLAN-001: clarify whethe
 - relates_to → `000032`
 - relates_to → `000347`
 - relates_to ← `000061`
+- relates_to ← `000216`
 
 ---
 
@@ -6247,6 +6262,7 @@ PROPOSED LINK: 000125 --relates_to--> 000046 (idea planner agent will take the o
 **Links**
 
 - relates_to → `000046`
+- relates_to ← `000395`
 
 ---
 
@@ -6322,7 +6338,9 @@ No related plan, phase, or requirement document found that specifically covers t
 
 - relates_to → `000126`
 - relates_to → `000347`
+- relates_to ← `000048`
 - relates_to ← `000169`
+- relates_to ← `000433`
 
 ---
 
@@ -6368,6 +6386,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 - relates_to → `000020`
 - relates_to → `000023`
 - relates_to → `000347`
+- relates_to → `000319`
 - relates_to ← `000138`
 - relates_to ← `000169`
 
@@ -7399,7 +7418,7 @@ Found by the coordinator of phase-lit-01, the first real execution of the resear
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-lit (2026-09-12T11:11:09-04:00): Sharpened by peer session d-system-ff on 2026-09-12. The defect is that the tool fails silently rather than loudly: the only signal separating a real run from a vacuous one is the identifier count inside its own OK line, which is easy to read past, and the exit code is 0 either way. A worktree run is the common case rather than the exception, because AGENTS.md requires a worktree whenever any peer holds an active claim. So the fix belongs in the tool rather than in every caller's vigilance - a check that cannot verify should exit non-zero and say so instead of printing OK. Correction to how this finding was first reported: the coordinator of phase-lit-01 told that peer its close review had recorded a worktree run as a passing verification. That was false. SESS-2026-09-12-04 line 47 records 31 identifiers checked from the primary checkout, and the coordinator had already read that line before asserting otherwise.
 - **finding** by agent-idea-triage (2026-09-13T19:35:25-04:00): Verified issue raised during phase-lit-01's first real execution of the research protocol (GOV-009). The content check in `tools/check_no_private_content.py` has two independent checks: a path check (always runs) and a content check (runs only when `_private/portfolio/` exists). Since `_private/` is gitignored, it exists in the primary checkout but never in a worktree.
@@ -7416,12 +7435,15 @@ Related documents:
 The owner ruled on 2026-09-12 to accept the gap for the current campaign and rely on integration-time checking; this idea proposes three durable fixes, none yet implemented: (1) add `--root` or `--identifiers-from` argument to point the tool at the primary checkout's identifier list, (2) make the skipped check non-silent (exit non-zero or print an unforgettable warning), or (3) document in AGENTS.md that worktree runs are not a verification.
 
 Idea 000147 (literature-review evidence contract identifier format) is already linked as relates_to and addresses a separate issue surfaced in the same phase.
+- **finding** by agent-ideation (2026-09-24T09:27:02-04:00): Owner ruling, entry 37 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: 000150 is kept as the one live record of this defect. 000195 and 000384 are superseded by it and discarded, and this finding carries their additions. From 000195: mandatory worktrees made the skip the common case, not an edge case. Every run of the check in a worktree reports OK while checking 0 identifiers. Three sessions (phase-wb-10, phase-lit-01, phase-tax-02) worked around it by symlinking _private/ or _private/portfolio into the worktree. On 2026-09-20, with that precedent in front of them, the owner ruled that the ruling against the symlink workaround stands: _private/ stays reserved to the owner's direction, and the tool is what must change. From 000384: the concrete fix. tools/check_no_private_content.py reads ROOT/_private/portfolio/projects; let it take an absolute portfolio path, for example D_SYSTEM_DATA_ROOT, so a worktree can check against the real root without a symlink (000195 proposed the same route).
 
 </details>
 
 **Links**
 
 - relates_to → `000147`
+- supersedes → `000195`
+- supersedes → `000384`
 
 ---
 
@@ -7535,6 +7557,7 @@ No governed plan or backlog phase exists for building this registry. The _tmpage
 - relates_to → `000025`
 - relates_to ← `000168`
 - relates_to ← `000285`
+- relates_to ← `000390`
 
 ---
 
@@ -7584,6 +7607,7 @@ The duplication is real, the document locations are as named, and the drift is d
 **Links**
 
 - relates_to ← `000154`
+- relates_to ← `000402`
 
 ---
 
@@ -7750,6 +7774,8 @@ No related plan, requirement, or decision document implements the queue itself �
 - relates_to → `000154`
 - relates_to → `000066`
 - relates_to → `000347`
+- relates_to → `000327`
+- relates_to → `000320`
 - relates_to ← `000160`
 - relates_to ← `000168`
 
@@ -8001,6 +8027,7 @@ PROPOSED LINK: 000160 --relates_to--> 000159 (foundational question about direct
 - relates_to → `000165`
 - relates_to ← `000159`
 - relates_to ← `000250`
+- relates_to ← `000410`
 
 ---
 
@@ -8652,6 +8679,7 @@ PROPOSED LINK: 000169 --relates_to--> 000168 (both address agent lifecycle; 0001
 - relates_to → `000128`
 - relates_to → `000165`
 - relates_to → `000347`
+- relates_to → `000340`
 - relates_to ← `000168`
 
 ---
@@ -9592,6 +9620,7 @@ justify its place in a fifteen-minute run or be cut with the reason recorded.
 
 - extends → `000170`
 - relates_to ← `000194`
+- extended_by ← `000401`
 
 ---
 
@@ -9749,7 +9778,7 @@ Related documents: PLAN-024 (Consultant demo kit build), REQ-008 (Consultant dem
 
 ## 000195 · check_no_private_content passes without looking whenever it runs outside the primary checkout
 
-**Created 2026-09-13T07:26:56-04:00 · Status: `triaged`**
+**Created 2026-09-13T07:26:56-04:00 · Status: `discarded`**
 
 Found 2026-09-12 across SESS-2026-09-12-06. Every single invocation of tools/check_no_private_content.py that session reported success while checking nothing:
 
@@ -9770,7 +9799,7 @@ Worth deciding alongside 000152 (a registry of active worktrees) and 000158 (ide
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-13T19:40:36-04:00): ## Duplicate of 000150 with distinct framing
 
@@ -9798,12 +9827,14 @@ Ideas 000152 (worktree registry) and 000158 (idea ID collisions) are related pro
 
 PROPOSED LINK: 000195 --supersedes--> 000150 (both report the identical issue found 2026-09-12; 000150 has owner's ruling and campaign context; 000195 emphasizes worktree mandate commits and session detail)
 - **finding** by agent-tax (2026-09-20T21:42:08-04:00): Third recorded instance, 2026-09-20, in phase-tax-02. The agent executing the Part 2 taxonomy prompt hit the same wall this idea describes - check_no_private_content reporting OK with 0 identifiers checked in a worktree - and reached for the same workaround the phase-wb-10 and phase-lit-01 sessions reached for: it temporarily symlinked _private/portfolio into the worktree, ran the check to get a real 31-identifier pass, then removed the symlink. The symlink is gone and _private/ in that worktree held only analysis/ afterwards. Owner ruling, same day, with this idea's precedent in front of them: the ruling against the symlink STANDS. Three agents independently reaching for the same workaround is evidence the tool is broken, not that the authorisation boundary moved - AGENTS.md reserves _private/ to the owner's direction, and this idea already calls the step one that nothing requires or verifies. The sanctioned behaviour is the one phase-tax-01 and phase-tax-02's coordinating session both used: report that the check ran at half strength, decline to call it a pass, and let the primary-checkout run at integration settle it. Recorded as brain/procedures/report-the-limitation-do-not-widen-your-access.md so the rule reaches the next agent rather than being rediscovered as a fourth instance.
+- **finding** by agent-ideation (2026-09-24T09:27:02-04:00): Owner ruling, entry 37 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: superseded by 000150 and discarded. Its additions (the worktree framing and the owner's 2026-09-20 ruling against the symlink workaround) are carried onto 000150 in a finding.
 
 </details>
 
 **Links**
 
 - relates_to → `000158`
+- superseded_by ← `000150`
 
 ---
 
@@ -10013,6 +10044,12 @@ These are distinct issues but reflect the same class of failure.
 - **finding** by agent-idea-batching (2026-09-13T19:45:02-04:00): Correction to the triage finding immediately above: the fix is NOT delivered on dev. Commit 803af92 (Make --catalog write docs/08-governance/catalog.md, not just print it) exists only on the unmerged branch agent/catalog-writer. git merge-base --is-ancestor 803af92 dev returns false, and src/governance/__main__.py on dev has no commit after 9e86d17 (an unrelated import sort). Confirmed empirically on 2026-09-13: running uv run python -m src.governance --catalog on dev printed the catalog to stdout and wrote nothing, so this session had to redirect the output to the file by hand. The idea therefore remains open work from dev's point of view until that branch integrates. Recording this because a finding asserting a fix is delivered, when the fix sits on an unmerged branch, is the same defect the idea itself describes - a check or a claim that looks satisfied without being satisfied - and because idea 000204 exists precisely to stop resolved-looking-but-not-resolved state from misleading the next reader. Related: the peer branch agent/lit-campaign independently captured this same defect as its own idea 000208, so 000198 and 000208 are duplicates and the owner should keep one.
 
 </details>
+
+**Links**
+
+- relates_to ← `000351`
+- relates_to ← `000399`
+- relates_to ← `000405`
 
 ---
 
@@ -10539,6 +10576,8 @@ Propose no links or promotions: this is unique discovery needing owner judgement
 
 - relates_to → `000201`
 - relates_to ← `000216`
+- relates_to ← `000351`
+- relates_to ← `000412`
 
 ---
 
@@ -10919,6 +10958,7 @@ PROPOSED LINK: 000215 --relates_to--> 000032 (both concern provenance and eviden
 - relates_to → `000214`
 - relates_to → `000139`
 - relates_to → `000032`
+- relates_to ← `000397`
 
 ---
 
@@ -10962,6 +11002,7 @@ No existing plan explicitly covers procedure discovery as a routing problem in t
 **Links**
 
 - relates_to → `000208`
+- relates_to → `000060`
 
 ---
 
@@ -12102,6 +12143,7 @@ PROPOSED PROMOTION: 000237 -> PLAN-020 (Portable Agent Workflows owns the checkp
 
 - relates_to → `000235`
 - relates_to → `000347`
+- relates_to → `000340`
 - relates_to ← `000276`
 
 ---
@@ -12287,6 +12329,8 @@ PROPOSED LINK: 000241 --relates_to--> 000079 (Agent engineering: Guides; where s
 - relates_to → `000031`
 - relates_to → `000165`
 - relates_to → `000079`
+- relates_to ← `000387`
+- relates_to ← `000396`
 
 ---
 
@@ -12414,6 +12458,7 @@ The finalization phases operated as a correction control: they didn't inherit th
 **Links**
 
 - relates_to ← `000243`
+- relates_to ← `000388`
 
 ---
 
@@ -12640,6 +12685,7 @@ PROPOSED LINK: 000248 --relates_to--> 000082 (both address multi-agent orchestra
 - relates_to → `000030`
 - relates_to → `000082`
 - relates_to → `000347`
+- relates_to → `000334`
 - relates_to ← `000249`
 - relates_to ← `000327`
 
@@ -12770,6 +12816,7 @@ Summary: Defects 2 and 3 (phase-auto-03/-04) have been corrected via system id r
 - relates_to ← `000252`
 - relates_to ← `000253`
 - relates_to ← `000254`
+- relates_to ← `000394`
 
 ---
 
@@ -12814,6 +12861,7 @@ PROPOSED LINK: 000252 --relates_to--> 000082 (phase-agx-09's own scope cites ide
 - relates_to → `000251`
 - relates_to → `000082`
 - relates_to → `000347`
+- relates_to ← `000025`
 
 ---
 
@@ -13362,6 +13410,7 @@ PROPOSED PROMOTION: 000275 -> PLAN-041 (formalized as phase-fwa-02, queued in ba
 
 - relates_to → `000281`
 - relates_to → `000276`
+- relates_to → `000332`
 
 ---
 
@@ -13396,6 +13445,7 @@ PROPOSED LINK: 000276 --relates_to--> 000237 (both address session-record comple
 
 - relates_to → `000281`
 - relates_to → `000237`
+- relates_to → `000332`
 - relates_to ← `000275`
 
 ---
@@ -13437,6 +13487,7 @@ Define a template and an authoritative schema for session documentation (checkpo
 **Links**
 
 - relates_to → `000281`
+- relates_to → `000332`
 
 ---
 
@@ -15736,10 +15787,12 @@ already delivers this idea's actual ask.
 
 - relates_to → `000320`
 - relates_to → `000347`
+- relates_to ← `000128`
 - relates_to ← `000320`
 - relates_to ← `000327`
 - relates_to ← `000332`
 - relates_to ← `000340`
+- relates_to ← `000389`
 
 ---
 
@@ -15830,9 +15883,11 @@ PROPOSED LINK: 000320 --relates_to--> 000020 (000020 already proposes a coordina
 
 - relates_to → `000319`
 - relates_to → `000347`
+- relates_to ← `000156`
 - relates_to ← `000319`
 - relates_to ← `000327`
 - relates_to ← `000334`
+- relates_to ← `000356`
 
 ---
 
@@ -16059,6 +16114,7 @@ The incident is documented, the affected tests are identified and accessible, re
 - relates_to → `000347`
 - relates_to ← `000325`
 - relates_to ← `000335`
+- relates_to ← `000351`
 
 ---
 
@@ -16256,6 +16312,7 @@ PROPOSED LINK: 000327 --relates_to--> 000319 (Session Manager setup raises the s
 - relates_to → `000248`
 - relates_to → `000319`
 - relates_to → `000347`
+- relates_to ← `000156`
 - extended_by ← `000328`
 - extended_by ← `000332`
 - relates_to ← `000334`
@@ -16334,6 +16391,7 @@ No related plan, phase or document found beyond the two governance documents and
 - extends → `000327`
 - relates_to → `000347`
 - relates_to ← `000334`
+- relates_to ← `000391`
 
 ---
 
@@ -16570,6 +16628,10 @@ PROPOSED LINK: idea 000332 --relates_to--> 000319 (both aim to make decisions an
 - extends → `000327`
 - relates_to → `000319`
 - relates_to → `000347`
+- relates_to ← `000009`
+- relates_to ← `000275`
+- relates_to ← `000276`
+- relates_to ← `000277`
 
 ---
 
@@ -16726,7 +16788,11 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to → `000320`
 - relates_to → `000247`
 - relates_to → `000347`
+- relates_to ← `000248`
 - relates_to ← `000340`
+- relates_to ← `000352`
+- relates_to ← `000370`
+- relates_to ← `000386`
 
 ---
 
@@ -16786,6 +16852,7 @@ The unresolved choice (stderr vs test change) is exactly what the idea names, an
 
 - relates_to → `000324`
 - relates_to → `000325`
+- relates_to ← `000357`
 
 ---
 
@@ -17107,6 +17174,8 @@ The idea asks for monitoring mechanisms and safe-point detection within the exis
 - relates_to → `000334`
 - relates_to → `000327`
 - relates_to → `000347`
+- relates_to ← `000169`
+- relates_to ← `000237`
 
 ---
 
@@ -17625,6 +17694,11 @@ PROPOSED LINK: 000348 --relates_to--> 000350 (the unimplemented dispatcher is wh
 
 </details>
 
+**Links**
+
+- relates_to → `000350`
+- relates_to ← `000355`
+
 ---
 
 ## 000349 · Rule which run ledger is canonical: the one phase-irs-04 delivered, or the one phase-auto-04 plans, before either is extended
@@ -17662,6 +17736,10 @@ Related ideas: 000029 (durable agent workflow run ledger, the source of phase-au
 PROPOSED LINK: 000349 --relates_to--> 000029 (000029 is the field list phase-auto-04 implements)
 
 </details>
+
+**Links**
+
+- relates_to → `000029`
 
 ---
 
@@ -17702,6 +17780,8 @@ Related ideas: 000334 (carry GOV-017 into the LangGraph and Agent SDK system); 0
 **Links**
 
 - relates_to → `000347`
+- relates_to ← `000348`
+- relates_to ← `000352`
 
 ---
 
@@ -17744,6 +17824,9 @@ PROPOSED LINK: 000351 --relates_to--> 000335 (both come from the catalog carryin
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000324`
+- relates_to → `000198`
+- relates_to → `000208`
 
 ---
 
@@ -17784,6 +17867,8 @@ Related ideas: 000350 (no phase builds the real Agent SDK dispatcher) is the sam
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000334`
+- relates_to → `000350`
 
 ---
 
@@ -17861,6 +17946,10 @@ PROPOSED LINK: 000354 --extends--> 000206 (the dry run shows the refusal 000206 
 
 </details>
 
+**Links**
+
+- relates_to ← `000407`
+
 ---
 
 ## 000355 · The orchestrator daemon's loop has no exception boundary around tick(), so one failed tick ends the daemon and nothing restarts it
@@ -17904,6 +17993,7 @@ PROPOSED LINK: 000355 --relates_to--> 000348 (the orphaned gate decision is the 
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000348`
 
 ---
 
@@ -17946,6 +18036,7 @@ PROPOSED LINK: 000356 --relates_to--> 000320 (both concern ordering concurrent w
 **Links**
 
 - relates_to → `000347`
+- relates_to → `000320`
 
 ---
 
@@ -17961,7 +18052,7 @@ src/governance/__main__.py:190/523: "review overdue since ..." warnings still pr
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T14:32:13-04:00): Verified on dev: src/governance/__main__.py:190 appends "review overdue since ..." to warnings, and line 523 prints every warning to stdout. Commit b2f5be0 moved only the status-regression WARNING to stderr, under the owner's 2026-09-22 ruling on 000335, and its comment gives the reason: --catalog stdout must stay byte-identical to the catalog file. The review-overdue warnings take the older stdout path, so the fix is partial. Once ARCH-002 and GOV-001 pass their review_after date of 2026-12-05, --catalog stdout gains WARNING lines on every branch.
 
@@ -17970,8 +18061,13 @@ Related: 000335 (the original report and ruling), 000353 (the same failure recur
 The owner has to decide whether 000335's ruling covers every warning. If it does, sending all warnings to stderr is a small fix with no design question. Nothing argues against it, and the deadline is 2026-12-06.
 
 PROPOSED LINK: 000357 --relates_to--> 000335 (same stdout contamination, a different warning class)
+- **finding** by agent-ideation (2026-09-24T09:27:02-04:00): Owner ruling, entry 38 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: 000357 relates_to 000335 (written in this turn); it is not a duplicate. Rule: every governance warning goes to stderr, so the owner's 000335 ruling covers all warning classes, including the review-overdue warnings here. 000357 is a small fix, due before 2026-12-06, when ARCH-002 and GOV-001 pass their review date and the catalog test would start to fail on every branch.
 
 </details>
+
+**Links**
+
+- relates_to → `000335`
 
 ---
 
@@ -18359,6 +18455,7 @@ PROPOSED LINK: 000390 --extends--> 000368 (000390 gives the owner's ask its fiel
 - relates_to ← `000369`
 - relates_to ← `000370`
 - relates_to ← `000385`
+- extended_by ← `000390`
 
 ---
 
@@ -18397,6 +18494,8 @@ PROPOSED LINK: 000391 --relates_to--> 000369 (the same board-from-log design; 00
 - relates_to → `000359`
 - relates_to ← `000370`
 - relates_to ← `000385`
+- relates_to ← `000391`
+- relates_to ← `000404`
 
 ---
 
@@ -18436,7 +18535,9 @@ PROPOSED LINK: 000370 --relates_to--> 000334 (both ask how GOV-017's coordinatio
 - relates_to → `000368`
 - relates_to → `000369`
 - relates_to → `000359`
+- relates_to → `000334`
 - relates_to ← `000385`
+- relates_to ← `000393`
 
 ---
 
@@ -18464,6 +18565,10 @@ PROPOSED LINK: 000372 --relates_to--> 000371 (the writer would enforce the proto
 
 </details>
 
+**Links**
+
+- relates_to ← `000372`
+
 ---
 
 ## 000372 · A sanctioned writer for concept terms, like append_idea.py is for ideas
@@ -18487,6 +18592,10 @@ The model to copy is tools/append_idea.py (OPS-005): a single writer that valida
 Related: 000371 (the glossary protocol these checks would enforce), 000374 (non-term headings in concept files render as terms, which a format check would reject), 000376 (generating entries from registries, which reduces what the writer handles).
 
 </details>
+
+**Links**
+
+- relates_to → `000371`
 
 ---
 
@@ -18514,6 +18623,10 @@ PROPOSED LINK: 000373 --relates_to--> 000374 (a contents list or index needs ter
 
 </details>
 
+**Links**
+
+- relates_to → `000374`
+
 ---
 
 ## 000374 · Non-term headings render as glossary terms
@@ -18537,6 +18650,10 @@ The idea's two options both still apply: move the rulings out of the concept mem
 Related: 000372 (a term writer or format check would reject non-term headings), 000373 (contents and index features depend on this).
 
 </details>
+
+**Links**
+
+- relates_to ← `000373`
 
 ---
 
@@ -18588,6 +18705,10 @@ PROPOSED LINK: 000376 --relates_to--> 000379 (the track table is one of the regi
 
 </details>
 
+**Links**
+
+- relates_to → `000379`
+
 ---
 
 ## 000377 · Governance docs still name `main` as the integration branch
@@ -18616,6 +18737,10 @@ PROPOSED LINK: 000377 --relates_to--> 000402 (000402's check would catch this dr
 
 </details>
 
+**Links**
+
+- relates_to → `000402`
+
 ---
 
 ## 000378 · Phase-completion authority contradicts itself across documents
@@ -18643,6 +18768,10 @@ PROPOSED LINK: 000402 --relates_to--> 000378 (000378 is the case that motivates 
 
 </details>
 
+**Links**
+
+- relates_to ← `000402`
+
 ---
 
 ## 000379 · The backlog README track table is missing 6 prefixes
@@ -18666,6 +18795,10 @@ GOV-006 tells agents to gloss track prefixes from this table, so an agent naming
 Related: 000376 proposes generating glossary entries from this table, and generating the table itself from backlog.yaml would prevent a recurrence. 000380 is the same scout's list of other stale facts.
 
 </details>
+
+**Links**
+
+- relates_to ← `000376`
 
 ---
 
@@ -18704,6 +18837,10 @@ PROPOSED LINK: 000380 --relates_to--> 000381 (the same stale counts, in CLAUDE.m
 
 </details>
 
+**Links**
+
+- relates_to → `000381`
+
 ---
 
 ## 000381 · CLAUDE.md has three stale lines; the owner must approve any edit
@@ -18734,6 +18871,11 @@ Related: 000380 (the same stale counts in governed documents), 000024.
 PROPOSED LINK: 000381 --relates_to--> 000024 (phase-sch-01 is built around 000024 and covers these lines)
 
 </details>
+
+**Links**
+
+- relates_to → `000024`
+- relates_to ← `000380`
 
 ---
 
@@ -18793,7 +18935,7 @@ Related: 000402 (consistency checks across governance documents) covers the gene
 
 ## 000384 · The leak check's content check never runs in a worktree
 
-**Created 2026-09-23T14:32:13-04:00 · Status: `triaged`**
+**Created 2026-09-23T14:32:13-04:00 · Status: `discarded`**
 
 tools/check_no_private_content.py reads ROOT/_private/portfolio/projects (line 88). A worktree has no _private/, so in the worktrees where AGENTS.md puts all work, the check runs only its path check and passes. Let it take an absolute portfolio path, for example D_SYSTEM_DATA_ROOT. Found while amending phase-cap-08.
 
@@ -18803,7 +18945,7 @@ tools/check_no_private_content.py reads ROOT/_private/portfolio/projects (line 8
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Confirmed on dev: tools/check_no_private_content.py sets ROOT = Path(__file__).parent.parent (line 48) and reads ROOT / "_private" / "portfolio" / "projects" (line 88). If that directory is missing it returns an empty set, and the tool prints "note: _private/portfolio/ not found — content check skipped" (line 144) and exits 0. The tool does not read D_SYSTEM_DATA_ROOT. OPS-009:38-39 documents the skip as expected on a fresh clone or in CI. It does not mention agent worktrees, which is where AGENTS.md puts all work.
 
@@ -18811,8 +18953,13 @@ This duplicates two triaged ideas: 000150 (the private-content check silently do
 
 PROPOSED LINK: 000384 --relates_to--> 000150 (the same defect, reported earlier)
 - **finding** by agent-ideation (2026-09-24T04:46:55-04:00): Seen again by Session 1 - Builder A during phase-grd-01 (relayed to Ideation 2026-09-24): in every worktree the script reports "0 identifiers checked", so the pre-commit hook there runs only the path check. Same defect as this idea; recorded here instead of as a duplicate.
+- **finding** by agent-ideation (2026-09-24T09:27:02-04:00): Owner ruling, entry 37 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: superseded by 000150 and discarded. Its addition (take the portfolio path from D_SYSTEM_DATA_ROOT or another absolute path) is carried onto 000150 in a finding.
 
 </details>
+
+**Links**
+
+- superseded_by ← `000150`
 
 ---
 
@@ -18915,6 +19062,9 @@ PROPOSED LINK: 000386 --relates_to--> 000334 (both decide how interactive coordi
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000334`
+- relates_to ← `000392`
+- relates_to ← `000411`
 
 ---
 
@@ -18953,6 +19103,7 @@ PROPOSED LINK: 000387 --relates_to--> 000241 (general-purpose reviewers holding 
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000241`
 
 ---
 
@@ -18987,6 +19138,8 @@ PROPOSED LINK: 000388 --relates_to--> 000244 (the most direct recorded accuracy 
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000244`
+- relates_to ← `000416`
 
 ---
 
@@ -19021,6 +19174,7 @@ PROPOSED LINK: 000389 --relates_to--> 000319 (the same resumability ask, now wit
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000319`
 
 ---
 
@@ -19063,6 +19217,8 @@ PROPOSED LINK: 000390 --relates_to--> 000152 (an earlier ask for a worktree regi
 **Links**
 
 - relates_to → `000385`
+- extends → `000368`
+- relates_to → `000152`
 
 ---
 
@@ -19097,6 +19253,8 @@ PROPOSED LINK: 000391 --relates_to--> 000328 (pending owner questions are what a
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000369`
+- relates_to → `000328`
 
 ---
 
@@ -19129,6 +19287,7 @@ PROPOSED LINK: 000392 --relates_to--> 000386 (assurance is one of the purpose-su
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000386`
 
 ---
 
@@ -19161,6 +19320,7 @@ PROPOSED LINK: 000393 --relates_to--> 000370 (moving the board and state into co
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000370`
 
 ---
 
@@ -19193,6 +19353,7 @@ PROPOSED LINK: 000394 --relates_to--> 000251 (the check would stop defective pha
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000251`
 
 ---
 
@@ -19225,6 +19386,7 @@ PROPOSED LINK: 000395 --relates_to--> 000125 (both put batch-level analysis ahea
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000125`
 
 ---
 
@@ -19257,6 +19419,7 @@ PROPOSED LINK: 000396 --relates_to--> 000241 (000241 reported the risk this fixe
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000241`
 
 ---
 
@@ -19289,6 +19452,7 @@ PROPOSED LINK: 000397 --relates_to--> 000215 (the rule cannot be verified until 
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000215`
 
 ---
 
@@ -19321,6 +19485,7 @@ PROPOSED LINK: 000398 --extends--> 000027 (moves 000027's completion-time check 
 **Links**
 
 - relates_to → `000385`
+- extends → `000027`
 
 ---
 
@@ -19360,7 +19525,9 @@ So the gap is not a missing test run. It is that no session reads or acts on the
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000198`
 - relates_to ← `000405`
+- relates_to ← `000413`
 
 ---
 
@@ -19393,6 +19560,8 @@ PROPOSED LINK: 000400 --relates_to--> 000035 (the same mutation method, applied 
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000035`
+- relates_to ← `000409`
 
 ---
 
@@ -19425,6 +19594,7 @@ PROPOSED LINK: 000401 --extends--> 000191 (applies the demo kit's evidence check
 **Links**
 
 - relates_to → `000385`
+- extends → `000191`
 
 ---
 
@@ -19457,6 +19627,9 @@ PROPOSED LINK: 000402 --relates_to--> 000153 (an earlier instance of the drift t
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000378`
+- relates_to → `000153`
+- relates_to ← `000377`
 
 ---
 
@@ -19519,12 +19692,13 @@ PROPOSED LINK: 000404 --relates_to--> 000369 (a durable message log makes relays
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000369`
 
 ---
 
 ## 000405 · A completion edit on dev runs governance only, which misses a stale catalog.md, so dev goes red
 
-**Created 2026-09-23T14:34:47-04:00 · Status: `triaged`**
+**Created 2026-09-23T14:34:47-04:00 · Status: `promoted` · became PLAN-045**
 
 From Session 1 - Builder A, passed on by the Session Manager at the owner's request, 2026-09-23.
 
@@ -19536,7 +19710,7 @@ Overlapping ideas from fold: 000198 (the governance check passes with a stale ca
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Checked on dev: f6216e9 (completing phase-irs-06) changed only backlog.yaml. b928817 regenerated one line of catalog.md. GOV-017 step 6 (lines 164-167) still says the completion edit runs "governance ... and no pytest", and PROMPT-037's merge rule (4.iii) says "governance only, no pytest". Neither names --catalog. The general rule is already on dev in both documents: GOV-017:119-121 and PROMPT-037 rule 10 say a commit that changes the catalog regenerates it with --catalog. The completion step does not point to it. `--catalog` now writes the file (src/governance/__main__.py:552-554), so the 000208 defect is fixed. No brain/procedures entry covers it.
 
@@ -19545,6 +19719,7 @@ The fix proposed in the body is a one-line addition to GOV-017 step 6 and PROMPT
 000406 reports the same incident from Builder B. The owner has this pair on the list of duplicates to decide (merge or supersede). This finding does not decide it. 000351 (catalog generated only at merge time) is an alternative design that would remove the problem, and it would reverse phase-doc-02's design.
 
 PROPOSED LINK: 000405 --relates_to--> 000198 (a mechanical check for the same stale-catalog failure)
+- **finding** by agent-ideation (2026-09-24T09:27:01-04:00): Owner ruling, entry 36 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: keep 000405 and 000406, linked as they are, and promote both to PLAN-045 (deterministic guards), which cites both and assigned them to phase-grd-01. phase-grd-01 is complete (51dd9e6). Promoted in this turn.
 
 </details>
 
@@ -19552,13 +19727,14 @@ PROPOSED LINK: 000405 --relates_to--> 000198 (a mechanical check for the same st
 
 - relates_to → `000385`
 - relates_to → `000399`
+- relates_to → `000198`
 - relates_to ← `000406`
 
 ---
 
 ## 000406 · The merge contract's governance-only completion edit never runs the catalog check, so a status change leaves dev red
 
-**Created 2026-09-23T14:34:47-04:00 · Status: `triaged`**
+**Created 2026-09-23T14:34:47-04:00 · Status: `promoted` · became PLAN-045**
 
 From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
 
@@ -19570,13 +19746,14 @@ Overlapping ideas from fold: 000405 (the same f6216e9 incident reported by Build
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:04-04:00): Same incident as 000405 (f6216e9, fixed by b928817), reported by Session 2 - Builder B. It is already linked relates_to 000405 and is on the owner's list of duplicates to decide. The dev evidence is in 000405's finding: GOV-017 step 6 and PROMPT-037 4.iii still say governance only and do not name --catalog, while the general --catalog rule is at GOV-017:119-121 and PROMPT-037 rule 10.
 
 What this report adds to 000405: an alternative fix, running test/test_codes.py as part of the completion edit. Under the contract's rule 9 that test cannot run in the primary checkout, because it rewrites catalog.md while it runs. So that option needs a worktree at the new dev tip, or it becomes 000399 (an automatic test run after writes to dev). The --catalog option works in the primary checkout.
 
 Related: 000198, 000208 (fixed: --catalog now writes), 000351.
+- **finding** by agent-ideation (2026-09-24T09:27:01-04:00): Owner ruling, entry 36 of the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation: keep 000405 and 000406, linked as they are, and promote both to PLAN-045 (deterministic guards), which cites both and assigned them to phase-grd-01. phase-grd-01 is complete (51dd9e6). Promoted in this turn.
 
 </details>
 
@@ -19613,6 +19790,11 @@ PROPOSED LINK: 000407 --relates_to--> 000354 (the incident that caused the pack 
 
 </details>
 
+**Links**
+
+- relates_to → `000354`
+- relates_to ← `000414`
+
 ---
 
 ## 000408 · A deterministic diff check that refuses new type-ignore comments, cast(Any, ...) and bare except-pass
@@ -19642,6 +19824,7 @@ PROPOSED LINK: 000408 --relates_to--> 000409 (both are diff-time guards from the
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000409`
 
 ---
 
@@ -19672,6 +19855,8 @@ PROPOSED LINK: 000409 --relates_to--> 000400 (both check that the tests guarding
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000400`
+- relates_to ← `000408`
 
 ---
 
@@ -19704,6 +19889,7 @@ PROPOSED LINK: 000410 --relates_to--> 000160 (the tool-surface design is one par
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000160`
 
 ---
 
@@ -19738,6 +19924,7 @@ PROPOSED LINK: 000411 --relates_to--> 000386 (000386 is the owner's proposal for
 **Links**
 
 - relates_to → `000385`
+- relates_to → `000386`
 
 ---
 
@@ -19765,6 +19952,10 @@ PROPOSED LINK: 000412 --relates_to--> 000208 (the fix for 000208 caused this)
 
 </details>
 
+**Links**
+
+- relates_to → `000208`
+
 ---
 
 ## 000413 · Nothing reads dev's CI result: check that the last dev CI run is green before granting each primary-checkout turn
@@ -19790,6 +19981,10 @@ A turn granted while the previous run is still in progress needs a rule: wait fo
 PROPOSED LINK: 000413 --relates_to--> 000399 (the same gap; this is the gating form of it)
 
 </details>
+
+**Links**
+
+- relates_to → `000399`
 
 ---
 
@@ -19817,6 +20012,11 @@ PROPOSED LINK: 000414 --relates_to--> 000407 (both are pack and skill changes ca
 
 </details>
 
+**Links**
+
+- relates_to → `000407`
+- relates_to ← `000415`
+
 ---
 
 ## 000415 · PROMPT-034's "do only what is missing; report what already existed" line led an analyst to carry an old partition forward instead of partitioning
@@ -19842,6 +20042,10 @@ Related: 000414 and 000407 (other changes to the pack and skill found in the sam
 PROPOSED LINK: 000415 --relates_to--> 000414 (both come from phase-part-03's R1 run and both change the analyst blocks)
 
 </details>
+
+**Links**
+
+- relates_to → `000414`
 
 ---
 
@@ -19871,6 +20075,10 @@ PROPOSED LINK: 000416 --relates_to--> 000388 (a specific answer to the owner's q
 
 </details>
 
+**Links**
+
+- relates_to → `000388`
+
 ---
 
 ## 000417 · The partition workflow and record schema have no field for an owner ruling that holds an idea out without declining it
@@ -19899,6 +20107,10 @@ PROPOSED LINK: 000417 --relates_to--> 000418 (both come from the owner's GATE 3 
 
 </details>
 
+**Links**
+
+- relates_to → `000418`
+
 ---
 
 ## 000418 · Owner-facing gate questions should not use "parked" to mean "not declined"
@@ -19924,6 +20136,10 @@ For planning: fixed GATE 3 question text in the skill that names the outcomes (d
 Related: 000417, 000388.
 
 </details>
+
+**Links**
+
+- relates_to ← `000417`
 
 ---
 
@@ -20297,5 +20513,57 @@ PROPOSED LINK: this idea --relates_to--> 000430 (same direction; named by the re
 PROPOSED LINK: this idea --relates_to--> 000359 (named by the relay)
 PROPOSED LINK: this idea --relates_to--> 000397 (the auditor example)
 PROPOSED LINK: this idea --relates_to--> 000431 (split from the same owner message)
+
+</details>
+
+---
+
+## 000433 · Clarify how skills, agents, and skills that delegate to a subagent differ, where each is defined, and what goes in a skill versus an agent system prompt
+
+**Created 2026-09-24T09:26:53-04:00 · Status: `triaged`**
+
+"Skills and agents and skills that instruct an agent to delegate to a sub-agent are genuinely different things. Need to clarify where the skills and agents are defined and what goes in the skill vs agent system prompt and so on"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:27:02-04:00): Relay record. The owner raised this in the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation, at entry 50, while ruling that 000048 relates_to 000127 with both kept. The body is the owner's words verbatim as relayed; the title is Ideation's statement of them. The owner allowed either an annotation or a new idea, and Session Manager chose a new idea linked to both 000048 and 000127. Those two links are written in this turn at the relay's instruction.
+- **finding** by agent-ideation (2026-09-24T09:27:03-04:00): Triage (checked on dev 80d7da7). No backlog phase covers this. Related material:
+- 000048 (an idea scribe agent) and 000127 (the idea skill delegates capture to a subagent): the pair whose ruling raised this. 000048 is framed as an agent and 000127 as a skill that delegates, which is the distinction the owner names.
+- GOV-015 (agent surface audit: commands, skills, agents and prompts judged against their job), active, and 000126 (a thorough audit of the repository's commands, skills and agents).
+- Where they are defined today: agent-workflows/workflows.yaml is the manifest from which tools/generate_agent_workflows.py (OPS-010) renders some skills, commands and agents for Claude and Codex. Other files in .claude/skills/, .claude/commands/ and .claude/agents/ are hand-written, so there is no single place that lists them all (of the 15 tracked files in .claude/agents/, only idea-triage.md is a manifest target).
+- 000079 (agent engineering guides: system prompts, AGENTS.md files, constraint documents).
+PROPOSED LINK: this idea --relates_to--> 000126 (the audit that would answer where each is defined)
+PROPOSED LINK: this idea --relates_to--> 000079 (what goes in a system prompt)
+
+</details>
+
+**Links**
+
+- relates_to → `000048`
+- relates_to → `000127`
+
+---
+
+## 000434 · Investigate what other metrics we capture about agent runs (tool calls and so on)
+
+**Created 2026-09-24T09:26:53-04:00 · Status: `triaged`**
+
+"Also investigate what other metrics we capture about agent runs (tool calls etc.)"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:27:03-04:00): Relay record. The owner raised this in the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's statement of them. Context as relayed: the run ledger _data/runs.jsonl (phase-irs-04) is canonical under today's D13 ruling; phase-auto-04 is re-scoped to add model and tool versions, a context-pack hash and a payload hash; 000215 notes that nothing records which model ran.
+- **finding** by agent-ideation (2026-09-24T09:27:03-04:00): Triage (checked on dev 80d7da7). What a run records today: src/orchestrator/ledger.py is the write path to _data/runs.jsonl, which does not exist yet on dev (no run has been recorded). A dispatch result (DispatchResult in src/orchestrator/dispatch.py) carries only outcome, input_tokens and output_tokens. Nothing records tool calls, the model, wall time, turns or cost. phase-auto-04 (build the durable run ledger with resumable steps), queued, lists 000029's fields: correlation id, payload hash, model and tool versions, context-pack hash, budget, timeout, retry count, checkpoints, produced artifacts and final disposition. Tool calls are not among them, so this idea would extend that list. Related: 000215 (nothing records which model ran), 000029 (the run ledger's field list), 000054 (observability and telemetry), 000429 (look into LangSmith, whose tracing records tool calls per run).
+PROPOSED LINK: this idea --relates_to--> 000215 (named in the relay's context)
+PROPOSED LINK: this idea --relates_to--> 000029 (the ledger field list this would extend)
+PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
 
 </details>
