@@ -1,0 +1,136 @@
+{
+  "review_id": "2026-09-23-plan-045-later-added",
+  "procedure": "GOV-018",
+  "date": "2026-09-23",
+  "target": {
+    "plan": "PLAN-045",
+    "requirement": "REQ-028",
+    "later_added_phases": [
+      "phase-grd-02",
+      "phase-grd-03",
+      "phase-grd-04"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-045-deterministic-guards.md at ee235ba: exit 0."
+  },
+  "altitudes_run": [
+    "later-added-phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "subject": "phase-grd-04",
+      "severity": "blocker",
+      "title": "R12's id-based review-record match, which phase-grd-04 implements verbatim, is already defeated by id reuse within this very plan: the current phase-grd-02 (the green-CI tool) is falsely covered by a review that examined different content under that id.",
+      "evidence": "REQ-028 R12 and phase-grd-04's scope (docs/09-backlog/backlog.yaml:13850-13853) define the check purely by id membership: a phase in next_up passes if some review record \"lists it in target.phases or target.later_added_phases\" and is dispositioned with no escalated-g3 finding -- no commit or content binding. `docs/08-governance/reviews/2026-09-23-plan-045.json` line 10 still lists \"phase-grd-02\" literally in target.phases; its own notes (line 225) confirm this reviewed the *original* phase-grd-02 (branch diff guards), which after the F08 split is now registered as phase-grd-03, while the id phase-grd-02 was reassigned to the new green-CI-before-grant tool, never reviewed under that id. I ran GOV-018's own documented detection recipe: `git log --format='%h %ad %s' --date=short -S \"id: phase-grd-02\" --reverse -- docs/09-backlog/backlog.yaml` returns only `61b47e4` (the plan's original commit, same as phase-grd-01), because the id line itself never disappeared across the cd25c36 rename -- only the content below it changed. By GOV-018 step 2's own rule (\"the original set is the phases first registered in the same commit as the plan's earliest phases\"), an automated future run of this procedure would classify current phase-grd-02 as part of the *original* set, not later-added, so it would never even be routed to a later-added-phase review. Meanwhile pickaxing \"id: phase-grd-03\" and \"id: phase-grd-04\" correctly return cd25c36 and ee235ba.",
+      "consequence": "Once phase-grd-04 lands, its governance check will treat phase-grd-02's actual current content (tools/check_dev_ci.py and the grant rule) as already adversarially reviewed, purely because a stale review record happens to contain the string \"phase-grd-02\" against unrelated content -- exactly the failure phase-grd-04 exists to prevent (D11, owner ruling on idea 000394), demonstrated with real evidence rather than a hypothetical.",
+      "minimal_fix": "Either bind review-record matching to the commit/content that was actually reviewed (not just the id string), or require GOV-018 step 2's later-added detection to also flag an id whose title/scope changed since its last recorded review, and require this dispatch's own findings to be filed as a new review record with phase-grd-02, phase-grd-03 and phase-grd-04 in target.later_added_phases before phase-grd-04 is built.",
+      "slug": "id-reuse-defeats-review-completeness-check",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Correct, and caused by the planner reusing phase-grd-02 in cd25c36. The instance is resolved: this record lists phase-grd-02, phase-grd-03 and phase-grd-04 in later_added_phases, so the new phase-grd-02 now has a review that saw it. The general gap needs a standing rule, which is the owner's: PLAN-045 OQ8 recommends that a phase id is never reused for different content (as GOV-005 rules for document codes) and records why content binding was rejected (GOV-018's fix-without-re-review would void every record whose findings were fixed). Owner must decide whether to adopt that rule and where it is recorded."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "altitude": "later-added-phase",
+      "id": "F01"
+    },
+    {
+      "subject": "phase-grd-03",
+      "severity": "major",
+      "title": "phase-grd-03 bundles three independent tools (test-baseline, diff-pattern, plan-versus-registered check) plus per-tool OPS docs and two documents' worth of READY text into one session_budget:1 phase, with no argument that the bundle fits one session -- the exact defect (F08) already found and fixed on its sibling phase-grd-01, not reapplied here.",
+      "evidence": "docs/09-backlog/backlog.yaml:13776-13832 (phase-grd-03 scope/deliverables): builds tools/check_test_baseline.py, tools/check_diff_patterns.py, and src/governance/plan_phases.py, each with its own test file, plus \"an OPS document for each new tool,\" plus GOV-017 and PROMPT-037 READY-text edits. PLAN-045 D7 (\"Test baseline and diff patterns are diff-scoped tools, not repository-wide lint\") only argues design tradeoffs (why not ruff, why not a baseline file) -- it never argues the three-tool-plus-docs bundle fits one session. Compare finding F08 in `2026-09-23-plan-045.json` (id F08, session-bundle-unjustified-by-own-rationale), which found precisely this pattern in the original phase-grd-01/02 bundle and was fixed by splitting out check_dev_ci.py into its own phase (now phase-grd-02). phase-grd-03 is that same split's other half, renamed from the old phase-grd-02, and carries an equally disjoint bundle (JUnit-XML diffing, git-diff regex/AST scanning, and a governance-command addition) with no shared-fixture or shared-code-path defense like the one D1 gives for phase-grd-01's a-c cluster.",
+      "consequence": "A real risk of an over-budget session that gets redone or split mid-flight, the same risk F08 named for the sibling phase -- and it was never re-checked against this phase after the renumbering.",
+      "minimal_fix": "Split the plan-versus-registered check (governance-only, no separate tool) from the two standalone CLI tools (test-baseline, diff-pattern), or state explicitly why all three plus two OPS docs and two documents' worth of READY text fit one session.",
+      "slug": "session-bundle-unjustified-by-own-rationale",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "PLAN-045 D1 now states why phase-grd-03 is judged to fit one session (each check compares two known inputs, calls no network service, changes no state, and has its fixture table already written in REQ-028) and the GOV-002 fallback if it does not. Not split: a split would need a new phase id and another later-added review, for three checks the planner judges small."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "altitude": "later-added-phase",
+      "id": "F02"
+    },
+    {
+      "subject": "phase-grd-02",
+      "severity": "major",
+      "title": "The verification commands for phase-grd-02 and phase-grd-03 omit tools/, so the new Python deliverables they create under tools/ are never linted (both phases) or type-checked (phase-grd-03) by the phase's own verification list.",
+      "evidence": "phase-grd-02 (backlog.yaml:13762-13773): deliverables include `tools/check_dev_ci.py`; verification is `uv run pytest test/test_check_dev_ci.py`, `uv run python tools/check_dev_ci.py`, `uv run python -m src.governance --catalog`, `uv run python -m src.governance`, `git diff --exit-code docs/08-governance/catalog.md`, `uv run ruff check src/ test/` -- no mypy command at all, and ruff's path list excludes tools/. phase-grd-03 (backlog.yaml:13814-13820): deliverables include `tools/check_test_baseline.py` and `tools/check_diff_patterns.py`; verification's `uv run ruff check src/ test/` and `uv run mypy src/` both exclude tools/. pyproject.toml confirms ruff's lint select (`[\"E\",\"F\",\"I\",\"UP\"]`) and mypy strict mode are global config, not restricted to src/test/, so `uv run ruff check tools/` and `uv run mypy tools/` would work if invoked -- they simply are not. PLAN-045 D7 itself demonstrates the intended scope by running `uv run ruff check --select S110,PGH003,BLE001 src tools test --statistics` (including tools), which the phases' own verification commands do not match.",
+      "consequence": "The new guard tools ship without the lint (and, for phase-grd-03's two tools, type) checking every other deliverable in this plan gets, silently exempting exactly the kind of code this plan exists to hold to a higher bar.",
+      "minimal_fix": "Add `tools` to the ruff and mypy verification commands in phase-grd-02 and phase-grd-03 (e.g. `uv run ruff check src/ tools/ test/`, `uv run mypy src/ tools/`), and add a mypy command to phase-grd-02.",
+      "slug": "verification-command-omits-declared-deliverable-path",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Both phases' ruff and mypy commands now name each new tool file; phase-grd-02 gains a mypy command. Whole-directory commands were not used: on this branch `uv run ruff check tools/` reports 1 error and `uv run mypy tools/` 22 errors in 8 files, all pre-existing, so they would fail for reasons outside the phases."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "altitude": "later-added-phase",
+      "id": "F03"
+    },
+    {
+      "subject": "phase-grd-03",
+      "severity": "major",
+      "title": "The verification commands for phase-grd-02 and phase-grd-03 omit tools/, so the new Python deliverables they create under tools/ are never linted (both phases) or type-checked (phase-grd-03) by the phase's own verification list.",
+      "evidence": "phase-grd-02 (backlog.yaml:13762-13773): deliverables include `tools/check_dev_ci.py`; verification is `uv run pytest test/test_check_dev_ci.py`, `uv run python tools/check_dev_ci.py`, `uv run python -m src.governance --catalog`, `uv run python -m src.governance`, `git diff --exit-code docs/08-governance/catalog.md`, `uv run ruff check src/ test/` -- no mypy command at all, and ruff's path list excludes tools/. phase-grd-03 (backlog.yaml:13814-13820): deliverables include `tools/check_test_baseline.py` and `tools/check_diff_patterns.py`; verification's `uv run ruff check src/ test/` and `uv run mypy src/` both exclude tools/. pyproject.toml confirms ruff's lint select (`[\"E\",\"F\",\"I\",\"UP\"]`) and mypy strict mode are global config, not restricted to src/test/, so `uv run ruff check tools/` and `uv run mypy tools/` would work if invoked -- they simply are not. PLAN-045 D7 itself demonstrates the intended scope by running `uv run ruff check --select S110,PGH003,BLE001 src tools test --statistics` (including tools), which the phases' own verification commands do not match.",
+      "consequence": "The new guard tools ship without the lint (and, for phase-grd-03's two tools, type) checking every other deliverable in this plan gets, silently exempting exactly the kind of code this plan exists to hold to a higher bar.",
+      "minimal_fix": "Add `tools` to the ruff and mypy verification commands in phase-grd-02 and phase-grd-03 (e.g. `uv run ruff check src/ tools/ test/`, `uv run mypy src/ tools/`), and add a mypy command to phase-grd-02.",
+      "slug": "verification-command-omits-declared-deliverable-path",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "Both phases' ruff and mypy commands now name each new tool file; phase-grd-02 gains a mypy command. Whole-directory commands were not used: on this branch `uv run ruff check tools/` reports 1 error and `uv run mypy tools/` 22 errors in 8 files, all pre-existing, so they would fail for reasons outside the phases."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "altitude": "later-added-phase",
+      "id": "F04"
+    },
+    {
+      "subject": "phase-grd-03",
+      "severity": "minor",
+      "title": "D10's ordering guarantee -- that phase-grd-03 writes the READY rule naming phase-dgov-06's future report before phase-dgov-06 builds the check -- is not backed by a depends_on edge, so nothing structurally stops phase-dgov-06 from being claimed first in a concurrent multi-session run.",
+      "evidence": "PLAN-045 D10: \"phase-grd-03 writes the READY rule in GOV-017 and PROMPT-037 before phase-dgov-06 builds the check, so the rule names the check and applies from the day it exists.\" docs/09-backlog/backlog.yaml phase-dgov-06 (line 10524-10525): `depends_on: [phase-gov-01]` only -- phase-grd-03 is not named. next_up (backlog.yaml:5-14) places phase-grd-03 and phase-grd-04 before phase-gov-01 and phase-dgov-06, which relies on queue-order convention (GOV-002: \"the first ready phase in the rendered list\") rather than a hard dependency; phase-gov-01 has no dependency on any grd- phase, so phase-dgov-06 could become claimable via its depends_on alone once phase-gov-01 completes, independent of whether phase-grd-03 has landed, in a repository that documents running multiple concurrent worktree sessions.",
+      "consequence": "If phase-dgov-06 is claimed by a concurrent session before phase-grd-03 lands, D10's stated guarantee (the READY rule already names the check when phase-dgov-06 exists) is not actually enforced by the backlog graph.",
+      "minimal_fix": "Add phase-grd-03 to phase-dgov-06's depends_on (a change to a phase this plan does not own, so it is a note for PLAN-030/phase-dgov-06's own owner, not a fix this plan can make directly).",
+      "slug": "ordering-claim-without-depends-on-edge",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
+          "date": "2026-09-23",
+          "reason": "D10 no longer claims an order guarantee. It states that either landing order gives the same end state (the READY rule applies once both exist), so no depends_on edge on a phase another plan owns is needed."
+        }
+      ],
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "altitude": "later-added-phase",
+      "id": "F05"
+    }
+  ],
+  "notes": "Reviewed at ee235ba on agent/plan-guards-docs, one dispatch on partition-adversary with PROMPT-038. The three phases are later-added in content: phase-grd-03 was first registered in cd25c36 and phase-grd-04 in ee235ba. The id phase-grd-02 was first registered in 61b47e4 but was reused in cd25c36 for a different phase (the green-CI grant tool); the content that 2026-09-23-plan-045 reviewed as phase-grd-02 is now phase-grd-03. It is listed here as later-added for that reason (finding F01). Findings recorded as reported; the dispatcher added only id, engine and author, and set altitude, which the adversary reported. The adversary reported one finding with subject \"phase-grd-02, phase-grd-03\"; the schema allows one phase id per subject at this altitude, so it is recorded twice, as F03 and F04, with its text otherwise unchanged. Dispositions by the Prompt Planner session as planner. F01 is escalated to the owner at G3."
+}

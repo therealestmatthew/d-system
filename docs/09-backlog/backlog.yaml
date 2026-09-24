@@ -13779,7 +13779,8 @@ items:
   - uv run python -m src.governance --catalog
   - uv run python -m src.governance
   - git diff --exit-code docs/08-governance/catalog.md
-  - uv run ruff check src/ test/
+  - uv run ruff check src/ test/ tools/check_dev_ci.py
+  - uv run mypy src/ tools/check_dev_ci.py
   deliverables:
   - tools/check_dev_ci.py
   - test/test_check_dev_ci.py
@@ -13830,8 +13831,8 @@ items:
   - uv run python -m src.governance --catalog
   - uv run python -m src.governance
   - git diff --exit-code docs/08-governance/catalog.md
-  - uv run ruff check src/ test/
-  - uv run mypy src/
+  - uv run ruff check src/ test/ tools/check_test_baseline.py tools/check_diff_patterns.py
+  - uv run mypy src/ tools/check_test_baseline.py tools/check_diff_patterns.py
   deliverables:
   - tools/check_test_baseline.py
   - test/test_check_test_baseline.py

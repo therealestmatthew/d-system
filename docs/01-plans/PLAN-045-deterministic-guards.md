@@ -68,7 +68,12 @@ That does not fit one session. The split follows what each check protects:
 - `phase-grd-02` is (a), `tools/check_dev_ci.py` and the grant rule. It shares no fixture or code
   with `phase-grd-01`; it queries `gh` and has its own operations document and tests.
 - `phase-grd-03` checks what a branch brings: (e), (f) and the plan-versus-registered check, plus
-  the merge-gate text that uses them.
+  the merge-gate text that uses them. It is judged to fit one session because each of the three
+  compares two known inputs and prints a difference: two JUnit reports, the added lines of one diff,
+  and plan text against `backlog.yaml`. None calls a network service or changes state, and the
+  acceptance for each is a short fixture table already written in `REQ-028`. If the session runs
+  short, `GOV-002`'s rule applies: the unbuilt check becomes a new phase id rather than the phase
+  staying labelled as one session.
 
 (g) is `phase-dgov-06`, moved rather than merged (D2). `phase-grd-04`, the S3 `next_up` rule, was
 added after review by the owner's ruling (D11). One phase per tool was rejected: the three
@@ -146,8 +151,10 @@ a documented ignore can still merge.
 
 **D10. `READY` carries the deliverables diff once it exists.** Ruled by the owner on 2026-09-23
 (answer to OQ3): "dgov-06 stays report-only, and READY carries its output". `phase-grd-03` writes the
-`READY` rule in `GOV-017` and `PROMPT-037` before `phase-dgov-06` builds the check, so the rule names
-the check and applies from the day it exists. The alternative, adding the text to `phase-dgov-06`,
+`READY` rule in `GOV-017` and `PROMPT-037`, naming `phase-dgov-06`'s check and applying once that
+check exists. The queue puts `phase-grd-03` first, but nothing in `depends_on` enforces it: if
+`phase-dgov-06` lands first, the rule applies from the day `phase-grd-03` lands instead. Either order
+gives the same end state. The alternative, adding the text to `phase-dgov-06`,
 would change the scope and deliverables of a phase another plan owns (`PLAN-030`), which the owner's
 ruling did not ask for.
 
@@ -158,7 +165,8 @@ the review records `GOV-018` writes. A phase in `next_up` needs a record that li
 `dispositioned`, and has no finding whose last disposition is `escalated-g3`. The exempt set is the
 19 phases in `next_up` on `dev` at `f1b891d`, listed in `REQ-028` R12. Folding the rule into
 `phase-grd-03` was rejected: the owner asked for its own phase, and `phase-grd-03` already carries two
-tools and a governance check. OQ7 asks about the two phases the exemption does not cover.
+tools and a governance check. OQ7 asks about the two phases the exemption does not cover. The check matches by phase id, so it
+relies on an id never being reused for different content; this plan broke that once (OQ8).
 
 ## Implementation phases
 
@@ -256,3 +264,13 @@ Still open:
   under `GOV-018` before `phase-grd-04` lands, rather than widen the exempt list the owner fixed at
   "current 19". Both plans (`PLAN-010`, `PLAN-030`) predate `GOV-010`, so the entry check is exempt
   and only the phase altitude runs.
+- **OQ8. Reused phase ids.** Correction: when this plan split its phases after the first review, it
+  reused the id `phase-grd-02` for a different phase (the green-CI tool). The first review record
+  lists `phase-grd-02` for content that is now `phase-grd-03`, so an id-based check would count the
+  new `phase-grd-02` as reviewed by a review that never saw it. For this plan the later-added review
+  (`2026-09-23-plan-045-later-added`) covers the new `phase-grd-02`. The general gap remains: nothing
+  stops an id from being reused. Who: the owner, at G3. Leaning: a standing rule that a phase id is
+  never reused for different content once registered, as `GOV-005` already rules for document codes;
+  a split takes new ids. Binding records to content instead was considered and rejected: `GOV-018`
+  fixes findings without a second review, so every fixed finding would change the phase and void its
+  own record.
