@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-22'
+updated: '2026-09-24'
 # Ideas that jump the queue, in order. Everything else falls back to status then ID
 # (open before triaged; lower ID first within a status). Hand-edited, like backlog.yaml's
 # next_up — reordering is an operational decision, not a fact logged in _data/ideas.jsonl.
@@ -9,7 +9,11 @@ updated: '2026-09-22'
 # 2026-09-12: three breakages in a day is a stronger claim on attention than work that has
 # waited ten days without incident.
 next_up:
-# Front of the queue, 2026-09-22 by owner ruling.
+# owner ruling 2026-09-24: position 1, then immediate triage, then planning, then implementation.
+# Relayed by Session Manager. Already covered by PLAN-029's phase-idg-01 (queued, in backlog.yaml
+# next_up); see 000452's triage finding.
+- '000452'
+# Front of the queue, 2026-09-22 by owner ruling; position 2 from 2026-09-24.
 #
 # NOTHING CAN BE CLAIMED FOR THIS IDEA YET. It has no requirement, no plan and no backlog
 # phase — only the idea. The next step is a planning pass that turns it into governed

@@ -35,22 +35,23 @@ kept.
 
 Ideas that jump the queue, in order — see [ideas-priority.yaml](ideas-priority.yaml).
 
-1. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
-2. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
-3. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
-4. `000150` — The private-content check silently does nothing in a worktree, because _private is gitignored
-5. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
-6. `000241` — Review agents are dispatched with write tools they are only told not to use
-7. `000284` — Decompose sys-governance, which currently functions as a global mutex
-8. `000283` — Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
-9. `000214` — A gate reported PASS on "blank required fields" after checking 4 of the contract's 43 required fields
-10. `000219` — A gate that silently drops tokens it did not expect cannot tell contract-correct data from a typo
-11. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
-12. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
-13. `000038` — Formalize the requirements-vs-plans process and design
-14. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
-15. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
-16. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
+1. `000452` — Update the idea schema, the sanctioned writer and related code and processes to enable the three-axis classification
+2. `000240` — yaml.safe_dump writes anchors into backlog.yaml, and the second append breaks the file
+3. `000157` — Close out the idea-batching pack: GOV-008 stage 5, then the two hygiene items
+4. `000158` — Idea ids collide across branches exactly like document codes, but nothing catches it
+5. `000150` — The private-content check silently does nothing in a worktree, because _private is gitignored
+6. `000303` — Investigate the relationships between ideas, backlog phases, prompts and plans
+7. `000241` — Review agents are dispatched with write tools they are only told not to use
+8. `000284` — Decompose sys-governance, which currently functions as a global mutex
+9. `000283` — Session codes cannot collide-proof through codes.yaml because the allocator derives them from documents on disk
+10. `000214` — A gate reported PASS on "blank required fields" after checking 4 of the contract's 43 required fields
+11. `000219` — A gate that silently drops tokens it did not expect cannot tell contract-correct data from a typo
+12. `000066` — Protect main and require PRs from dev, with a multi-agent developer protocol to match
+13. `000041` — Refine the multi-agent development workflow to prevent one agent from clobbering another's uncommitted work
+14. `000038` — Formalize the requirements-vs-plans process and design
+15. `000037` — Split backlog.yaml into active and archive files before it clogs agent context
+16. `000040` — Research deterministic search algorithms across ideas, backlog, memories and decisions
+17. `000091` — Rewrite the AGENTS.md push rule so its general/exception structure is legible
 
 ---
 
@@ -8259,6 +8260,7 @@ PROPOSED LINK: 000163 --relates_to--> 000061 (both propose orthogonal ontologica
 - relates_to → `000004`
 - relates_to ← `000162`
 - relates_to ← `000164`
+- relates_to ← `000452`
 
 ---
 
@@ -20870,10 +20872,11 @@ A general review of every system tag (sys-*) in systems.yaml: granularity, split
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T10:30:33-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is Session Manager's statement of the idea, followed by the owner's question verbatim as relayed. Session Manager found no existing idea for it. By owner ruling, this idea takes over entry 33 of the 000347 decision session (subdomains in systems.yaml, and moving test/ out of sys-delivery), which moves off phase-conc-08. It is linked relates_to 000441 at the relay's instruction.
 - **finding** by agent-ideation (2026-09-24T10:30:34-04:00): Triage (checked on dev 921ccd1). docs/08-governance/systems.yaml declares 35 systems, each with the paths it owns. Documents name their systems in front matter, and backlog phases declare them for concurrency checks. Two splits are already in motion: sys-realization (entry 16 of the 000347 session, P4 R3: a separate system id for the coordination code) and entry 33 (subdomains, and test/ out of sys-delivery), which this idea now carries. phase-conc-08 (write the enforcement-placement rule, apply it, and audit .claude/ settings) no longer carries entry 33 by owner ruling; its backlog text is not changed by this record. Related: 000441 (portability of tagging and classification), 000253 (phase-auto-03 and phase-auto-04 both declare sys-api, which ADR-003 would reject as concurrent).
+- **finding** by agent-ideation (2026-09-24T11:56:36-04:00): Finding relayed by Session Manager from the Scout's ECC report (_working/session-manager/scout/ext-ecc.md, section 9 Q5, gitignored), checked by Ideation on dev 9edd219: no system in docs/08-governance/systems.yaml declares a path that includes tools/generate_agent_workflows.py, agent-workflows/, .claude/ or .codex/. The only mention of .claude/ in the file is in one system's description (lines 557-558), not in its paths. So the agent and skill generator and its outputs carry no system tag. Neither the Scout nor Ideation checked whether another mechanism covers them.
 
 </details>
 
@@ -20901,3 +20904,171 @@ A general review of every system tag (sys-*) in systems.yaml: granularity, split
 PROPOSED LINK: this idea --relates_to--> 000434 (the run metrics the heuristic would use)
 
 </details>
+
+---
+
+## 000446 · PLAN-039's "Execution order" section is stale: it omits phase-irs-16 from the phases irs-04 unblocks, and does not reflect irs-14's dependency on irs-11
+
+**Created 2026-09-24T11:56:34-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 1 - Builder A]
+PLAN-039's "Execution order" section is stale: "04 unblocking five phases (08, 11, 13, 14, 15)" omits phase-irs-16, and the section doesn't reflect irs-14's new dependency on irs-11. Found by the demo-adversary review of agent/plan-039-owner-rulings. The omission predates that branch, and none of the 2026-09-24 rulings covered it.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:34-04:00): Relay record. Session 1 - Builder A sent this to Ideation on 2026-09-24. The body is Builder A's wording, with the agent label.
+- **finding** by agent-ideation (2026-09-24T11:56:34-04:00): Triage (checked on dev 9edd219). Confirmed on dev. docs/01-plans/PLAN-039-idea-realization-system.md, "Execution order" (line 99), says 04 unblocks five phases (08, 11, 13, 14, 15). In backlog.yaml, phase-irs-16 (daemon process model) depends on phase-irs-04, so 04 unblocks six. phase-irs-14 depends on phase-irs-04, phase-part-03 and phase-irs-11, and the section's prose does not mention the dependency on irs-11 (the phase table gained it in 9edd219). The fix is a prose edit to PLAN-039. Whether it rides on agent/plan-039-owner-rulings or on a later change is for the branch's owner and the owner. No phase covers it.
+
+</details>
+
+---
+
+## 000447 · Investigate observability, logging, provenance and tracking of agents in more detail
+
+**Created 2026-09-24T11:56:34-04:00 · Status: `triaged`**
+
+"Investigate in more detail observability, logging, provenance, tracking of agents"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them. Sent together with 000448.
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Triage (checked on dev 9edd219). No phase covers it. It overlaps 000054 (observability and telemetry: structured logging, metrics and tracing across the backend, agent runs and tooling), triaged. Whether this is a duplicate of 000054 or the agent-specific part of it is for the owner. Related material:
+- The Scout's inventory _working/session-manager/scout/agent-run-metrics.md (2026-09-24, gitignored), written for 000434, found that the run ledger _data/runs.jsonl holds no data yet (no real dispatch has run, and its schema holds only input and output tokens per dispatch). Almost everything measured today is in Claude Code's own local transcripts, which the repository does not read, and nothing is configured to export it (no hooks, no OpenTelemetry settings).
+- Provenance: 000215 (nothing records which model ran) and 000032 (evidence-backed provenance graph for memories, reports and recommendations).
+- Related: 000434 (agent-run metrics), 000429 (look into LangSmith), 000435 (capture every owner decision), 000080 (agent engineering: sensors and live monitoring).
+PROPOSED LINK: this idea --relates_to--> 000054 (the observability umbrella; possible duplicate)
+PROPOSED LINK: this idea --relates_to--> 000434 (agent-run metrics)
+PROPOSED LINK: this idea --relates_to--> 000215 (model provenance)
+
+</details>
+
+---
+
+## 000448 · A System Monitor agent, with deterministic tools, that tracks what agents do and decide and keeps a real-time status dashboard
+
+**Created 2026-09-24T11:56:34-04:00 · Status: `triaged`**
+
+"Agent (+deterministic tools) who monitors the whole agent system, captures what they are doing, decisions, etc. And builds/updates the real-time status dashboard showing what agents are doing, what is done, what's next. Maybe call it the System Monitor agent. Maybe some additional functionality not decided yet."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them. Sent together with 000447.
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Triage (checked on dev 9edd219). No phase covers it. A manual version exists: on 2026-09-24 the owner asked for a status page, and Session Manager built one by hand, _working/session-manager/reports/round-status.html (gitignored), published as a private Artifact. Sources the monitor would read: 000368 (a running log of branches, worktrees and their agents), 000369 (a durable log of every coordination message, with the board rebuilt from it) and 000391 (per-session progress, liveness, lock and queue history), all triaged; and the run ledger (000434). Decision capture is 000435. Related: 000340 (monitor each parallel session's context use), 000332 (a Documenter session in the roster), 000010 (ideation dashboard), 000080 (live monitoring).
+PROPOSED LINK: this idea --relates_to--> 000391 (the progress tracking it would display)
+PROPOSED LINK: this idea --relates_to--> 000369 (the coordination log it would read)
+PROPOSED LINK: this idea --relates_to--> 000435 (the decisions it would capture)
+
+</details>
+
+---
+
+## 000449 · Find the published deterministic system that extracts key items from agent context by action keywords and parses out the essential data for agents
+
+**Created 2026-09-24T11:56:34-04:00 · Status: `triaged`**
+
+"Another idea - search for this website/X post/github repo where someone created a deterministic system for extracting key items from agent context using keywords that define action or other meaning + entirely deterministic algorithm to parse out the essential set of data to be processed by agents."
+
+**Annotations**
+
+
+<details>
+<summary>3 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them.
+- **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Triage (checked on dev 9edd219). No phase covers it. The first step is to find the source the owner remembers; Session Manager ran a web search; its candidates are in the next finding. Related material in this repository: 000340 (monitor each parallel session's context use), 000060 (memory and context management), 000319 (state capture and session resumability), 000040 (deterministic search across ideas, backlog, memories and decisions), 000081 (context pipelines: metadata graphs, RAG, semantic layers), and 000447 and 000448 (observability and the System Monitor agent, recorded in the same turn).
+PROPOSED LINK: this idea --relates_to--> 000060 (memory and context management)
+PROPOSED LINK: this idea --relates_to--> 000340 (context use)
+- **finding** by agent-ideation (2026-09-24T11:56:36-04:00): Candidates from Session Manager's web search on 2026-09-24, relayed to Ideation. The owner, relayed by Session Manager: "I don't recall the name but please capture all of those URLs in the idea." So none is confirmed as the one the owner saw, and all four are kept. Ideation has not opened the links.
+- dCompress, https://github.com/TomaszGonczar/dCompress: a deterministic, rule-based transcript-to-context tool for coding agents, with no model in the extraction path. It turns a raw JSONL transcript into a fact pack (files touched, commands run, errors raised and fixed, decisions). Work in progress. Session Manager's closest match.
+- context-agent, https://github.com/mstckn/context-agent: a deterministic, model-free context engine and MCP server for coding agents (retrieval, project memory, routing).
+- context-compression, https://github.com/saminkhan1/context-compression: a deterministic, lossless structured-context selector for several agent runtimes.
+- A survey list: https://github.com/YerbaPage/Awesome-Agent-Context-Compression.
+Not checked: X posts, which the search does not index reliably.
+
+</details>
+
+---
+
+## 000450 · Investigate ECC, a tool that installs agents and skills into a codebase, and integrate its key concepts instead of recreating them
+
+**Created 2026-09-24T11:56:34-04:00 · Status: `triaged`**
+
+"we need to investigate this tool I just found that does like our one idea spoke of (installing agents and skills into a codebase). Maybe we can steal/integrate some of those key concepts from all of the above so we don't recreate the wheel. https://github.com/affaan-m/ECC https://ecc.tools"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:36-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them.
+- **finding** by agent-ideation (2026-09-24T11:56:36-04:00): Triage (checked on dev 9edd219). No phase covers it. Session Manager's reading of the owner's references, relayed for triage: "our one idea" is most likely 000439 (install features from this repository into a target repository deterministically), part of the multi-repository batch anchored on 000436; "all of the above" covers today's investigate-before-building ideas, 000427 (existing routing solutions), 000429 (LangSmith) and 000449 (the deterministic context-extraction system, with its four candidate URLs). The URLs, in full: https://github.com/affaan-m/ECC and https://ecc.tools. Ideation has not opened them. The nearest mechanism in this repository is tools/generate_agent_workflows.py (OPS-010), which renders skills, commands and agents from one manifest into per-host files; 000442 notes that only one of 15 agent files goes through it. The Scout's report on ECC is _working/session-manager/scout/ext-ecc.md (gitignored).
+PROPOSED LINK: this idea --relates_to--> 000439 (the install-features idea it most likely refers to)
+PROPOSED LINK: this idea --relates_to--> 000427 (investigate before building)
+PROPOSED LINK: this idea --relates_to--> 000449 (investigate before building)
+
+</details>
+
+---
+
+## 000451 · Iterate through the deep research findings to extract usable elements to build this repository
+
+**Created 2026-09-24T11:56:36-04:00 · Status: `triaged`**
+
+"Another idea is to iterate through the deep research findings to extract usable elements to build this repository."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:56:36-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is the same words. The owner has not named which findings.
+- **finding** by agent-ideation (2026-09-24T11:56:37-04:00): Triage (checked on dev 9edd219). This overlaps existing work closely; whether it is a duplicate or a wider scope is for the owner.
+- 000068 (Scout research/ for application ideas and enhancements not yet captured), triaged, is planned in PLAN-037 as phase-expl-03 (Scout research/ for uncaptured ideas), queued, priority 4, one session. Its scope: read research/, record one idea per finding through append_idea.py, edit no file under research/, and cover the twelve adversarial codebase-review reports specifically.
+- 000287 and 000315: the literature campaign's reuse recommendations and architecture implications (research/literature-review/09_reuse_recommendations.md, 10_architecture_implications.md) have no consuming phase. The owner ruled on 2026-09-22 (recorded on 000315) to plan a phase that turns the accepted ones into ideas or backlog work. No backlog phase depends on either file yet.
+- 000163 and 000167: the knowledge-architecture design that waits on the campaign's outputs.
+Candidate sources, as relayed by Session Manager: research/literature-review/ (deliverables 00-13 of the phase-lit campaign, phase-lit-01 to phase-lit-09, all complete), research/evidence/, research/hypotheses/, research/architecture/, research/adversarial-codebase-review/10_adversarial_findings.md, and research/pre-literature-baseline.md. phase-expl-03's stated scope is research/ as a whole, so it already includes all of these; the literature-review deliverables postdate its 10,700-line estimate.
+PROPOSED LINK: this idea --relates_to--> 000068 (the planned research scouting, phase-expl-03)
+PROPOSED LINK: this idea --relates_to--> 000315 (the ruled but unplanned consumer of the literature findings)
+
+</details>
+
+---
+
+## 000452 · Update the idea schema, the sanctioned writer and related code and processes to enable the three-axis classification
+
+**Created 2026-09-24T11:58:06-04:00 · Status: `triaged`**
+
+"update idea schema and sanctioned writer and related code/processes to enable the three-axis classification."
+
+The owner marked this high priority.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T11:58:06-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The quoted line of the body is the owner's words verbatim as relayed; the title is Ideation's short form of them. "High priority" is the owner's word, relayed by Session Manager. Owner ruling 2026-09-24, relayed by Session Manager: position 1 of docs/00-working/ideas-priority.yaml next_up, ahead of 000240, "then immediate triage, then planning, then implementation". Written in the same commit. The owner's underlying question (do ideas already carry fields for the three axes?) is answered no and is not recorded as its own idea, per Session Manager; the three-axis task report carries it.
+- **finding** by agent-ideation (2026-09-24T11:58:06-04:00): Triage (checked on dev 9edd219). Already planned and queued. PLAN-029 (idea graph lifecycle), group G01 "ARCH-005 schema bundle", covers it: phase-idg-01 "Ship the idea schema bundle and record the scope-fork decision" (queued, priority 1, already in backlog.yaml next_up) adds "the three ARCH-005 classification axes as distinct schema fields" in schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py, together with the component_of link type, the lineage annotation kind, document-code link targets and the new terminal statuses, and moves ARCH-005 (docs/07-architecture/ARCH-005-idea-node-classification.md, Idea node classification, draft) to accepted. phase-idg-02 builds the pure classification agent; phase-idg-03 backfills classification across the corpus and reports coverage. PLAN-029 section 2 already rules each axis optional, with a blank axis carrying a reason. So the owner's "then planning" step is done; the next step is executing phase-idg-01. Session Manager was told before this was recorded; the ranking was written as ruled. Earlier ideas on the same subject: 000061 (the owner's 2026-09-09 framing of the three axes, which PLAN-029 cites), 000062 (the classification agent) and 000268 (finalize the classification ontology). schemas/idea.schema.json has no axis fields today: its properties are idea, event, at, title, body, from, to, promoted_to, eid, amends, author, kind, text, type and target. The idea status lifecycle (open, triaged, reviewing, promoted, discarded) is a process state and is not the framework's lifecycle axis. The three axes and their values are defined in research/architecture/architecture.md section 2 (2.1 ontological, 2.2 epistemic, 2.3 lifecycle) and shown in _public/d-system-architecture.html section 02. Ideation is classifying every existing idea against them (owner's request, 2026-09-24); the output, _working/ideation/three-axis/classification.jsonl and report.md (gitignored), is shaped for appending once the schema exists: one row per idea with exact value names, per-axis confidence and reason, outlier markers, and the idea's latest eid at classification time, so an idea that changed afterwards can be detected. The report's outliers bear on which values the schema should allow (for example none, not applicable, or two values on one axis). Related: 000163 (knowledge classification axes: ontological, epistemic, temporal, and the weighting that drives retrieval) and 000167 (that design waits on the literature review, which has since closed). Code a change would touch: schemas/idea.schema.json, tools/append_idea.py, src/db/ideas.py (fold), tools/generate_ideas_md.py and their tests. Written link: relates_to 000163, at Session Manager's direction.
+PROPOSED LINK: this idea --relates_to--> 000061 (the three-axis framing phase-idg-01 implements)
+PROPOSED LINK: this idea --relates_to--> 000444 (review every sys-* tag). Weak fit: 000444 is about system tags on repository paths in systems.yaml, not about classifying ideas; left as proposed rather than written.
+
+</details>
+
+**Links**
+
+- relates_to → `000163`
