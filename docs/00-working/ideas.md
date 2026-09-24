@@ -16852,6 +16852,7 @@ The unresolved choice (stderr vs test change) is exactly what the idea names, an
 
 - relates_to → `000324`
 - relates_to → `000325`
+- supersedes → `000353`
 - relates_to ← `000357`
 
 ---
@@ -17874,7 +17875,7 @@ Related ideas: 000350 (no phase builds the real Agent SDK dispatcher) is the sam
 
 ## 000353 · The catalog test failed again on 2026-09-23 in phase-irs-16's worktree, because the status-regression WARNING still goes to --catalog's stdout (second sighting of 000335)
 
-**Created 2026-09-23T02:08:26-04:00 · Status: `triaged`**
+**Created 2026-09-23T02:08:26-04:00 · Status: `discarded`**
 
 Sent to Ideation by Session 5 - Batch Runner on 2026-09-23, during the overnight sprint.
 
@@ -17892,7 +17893,7 @@ Unresolved: which phase carries the owner's ruling on 000335. It is a small fix 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T02:09:33-04:00): Triage finding for 000353 (second sighting of the status-regression WARNING on --catalog stdout), by Ideation, 2026-09-23.
 
@@ -17903,8 +17904,13 @@ Under GOV-017 every merge onto dev is followed by a REBASE to every open branch.
 Related ideas: 000335 (the original, with the ruling); 000351 (regenerate the catalog only at merge time), which would remove the phase-state churn that causes the warning; 000324 and 000325 (the same catalog tests overwrite the tracked file).
 
 PROPOSED LINK: 000353 --relates_to--> 000335 (same defect; 000335 carries the owner's ruling). Tonight's authority forbids merging, so the owner decides whether this idea is merged into 000335 or superseded by it.
+- **finding** by agent-ideation (2026-09-24T09:59:38-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation (the owner's word: "Supersede"): 000353 is superseded by 000335 and discarded. It recorded a recurrence on 2026-09-23 of the failure 000335 describes (the status-regression warning on --catalog stdout failing the catalog test). The 000347 session's entry 38 rule, that every governance warning goes to stderr, is recorded on 000357.
 
 </details>
+
+**Links**
+
+- superseded_by ← `000335`
 
 ---
 
@@ -20565,5 +20571,205 @@ PROPOSED LINK: this idea --relates_to--> 000079 (what goes in a system prompt)
 PROPOSED LINK: this idea --relates_to--> 000215 (named in the relay's context)
 PROPOSED LINK: this idea --relates_to--> 000029 (the ledger field list this would extend)
 PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
+
+</details>
+
+---
+
+## 000435 · Capture every decision required from the owner in a file: pending ones updated when resolved, immediate ones captured in full
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"every decision required from me must be properly captured (written to file). If they are pending, then later update with details when resolved. If immediately resolved, capture the full decision"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 1 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: today's decisions live in gitignored files (the Session Manager's board and reports/rulings-000347.md) and in session conversations; GOV-003 records only standing rulings.
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Triage (checked on dev bdda45c). No backlog phase covers owner decisions made in sessions. What exists:
+- tools/append_decision.py (OPS-023) is the sanctioned writer for _data/gate-decisions.jsonl, but it covers only orchestrator gate decisions, keyed by run id and gate. Owner decisions made in sessions (AskUserQuestion answers, rulings relayed by the Session Manager) have no tracked writer (Session Manager's addendum, confirmed against the tool's docstring). _data/gate-decisions.jsonl is a model for the pending-then-resolved shape: an append-only log where a later line resolves an earlier one.
+- GOV-003 (accepted-decisions record) holds standing rulings only. ADRs hold architecture decisions.
+- Today these decisions sit in _working/session-manager/board.md and reports/rulings-000347.md (gitignored, so a fresh clone loses them) and in idea findings, where an owner ruling relayed by a peer is written as a finding naming the relay chain.
+- 000275 (a subagent per session record to extract decisions and outstanding items), promoted; 000276 (analyse how decision records are written and propose session-protocol enhancements), triaged; 000417 (the partition record has no field for an owner ruling that holds an idea out); 000040 (deterministic search across ideas, backlog, memories and decisions).
+PROPOSED LINK: this idea --relates_to--> 000276 (how decision records are written)
+PROPOSED LINK: this idea --relates_to--> 000275 (extracting decisions from session records)
+
+</details>
+
+---
+
+## 000436 · Identify which systems in this repository can be generalised to other repositories, and track multiple repositories as one markdown file per repository
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"Identify what systems from this repo can be generalized and applied to other repositories (plus tracking and managing multiple repository- thinking simple markdown per repo in a dedicated folder with YAML frontmatter name/description and body with local path and GitHub URL + minimal details about its functionality)"
+
+**Annotations**
+
+
+<details>
+<summary>3 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 2 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006).
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Triage (checked on dev bdda45c). Batch anchor for the multi-repository ideas 000437 to 000441. No backlog phase covers any of them. Related material:
+- 000086 (repo tracker and multi-repo memory agent) was declined by the owner at /partition-ideas GATE 3 on 2026-09-23 and is discarded. The stated reason: speculative cross-repository tooling, with no repos domain in the schema. This idea overlaps its tracking half: a list of the owner's repositories. The difference is that this one specifies a simple per-repository markdown file and couples tracking to generalising this repository's systems. Whether this reopens 000086 (append_idea.py revisit, permitted once) or stands as a separate idea is the owner's call. This record does not assume either.
+- The candidate systems to generalise are listed in docs/08-governance/systems.yaml (35 systems, each with declared paths). 000067 (portable agent workflows from a single source of truth, promoted) is one system already made portable across hosts, though not across repositories.
+- The per-repository file with YAML front matter follows the pattern of the tracked documents here (front matter plus body, checked by src.governance).
+PROPOSED LINK: this idea --relates_to--> 000086 (the declined repo tracker; see above)
+PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
+- **finding** by agent-ideation (2026-09-24T09:59:37-04:00): Batch anchor. At the relay's instruction, 000437, 000438, 000439, 000440 and 000441 are linked relates_to this idea as one batch on multiple repositories, from the owner's seven-bullet message of 2026-09-24. 000435 (decision capture) is from the same message but stands alone. Within the batch, 000439 and 000440 are alternatives, 000438 is the definition the rest would implement, and 000441 is the tagging and classification part.
+
+</details>
+
+**Links**
+
+- relates_to ← `000437`
+- relates_to ← `000438`
+- relates_to ← `000439`
+- relates_to ← `000440`
+- relates_to ← `000441`
+
+---
+
+## 000437 · Links, relationships and tags to and between repositories, including supersedes
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"Crafting links and relationships and tags to/between repos (including supersedes since we are rapidly developing and advancing)."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 3 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006).
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Triage (checked on dev bdda45c). No phase covers it. The nearest existing model is the idea log's typed edges: append_idea.py link writes extends, supersedes and relates_to, and governance already checks one consistency rule for supersedes (a superseded idea should be discarded, the warning 000308 shows). Tags have a reference list, _data/tags.json, validated by schemas/tag.schema.json. See 000441 for the portability of tagging. Part of the 000436 batch.
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+
+---
+
+## 000438 · Define how we track and manage multiple repositories
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"Defining how we track and manage multiple repos"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 4 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006).
+- **finding** by agent-ideation (2026-09-24T09:59:35-04:00): Triage (checked on dev bdda45c). No phase covers it. It is the definition that 000436's per-repository files and 000437's links would implement, and that 000439 and 000440 would act on. 000086 (the declined repo tracker, discarded at GATE 3 on 2026-09-23) is the earlier form of the tracking half; see the finding on 000436. Part of the 000436 batch.
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+
+---
+
+## 000439 · Install features from this repository into a target repository deterministically
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"Possibility of "installing" features from this repository into target repo deterministically."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 5 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: this idea and 000440 are alternatives to each other.
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). No phase covers it. The nearest existing mechanism is tools/generate_agent_workflows.py (OPS-010): it renders skills, commands and agents from one manifest (agent-workflows/workflows.yaml) into per-host files, deterministically, with a --check mode. That is installation into this repository for several hosts, not into another repository. 000067 (portable agent workflows, promoted) is the idea behind it. Which systems are candidates depends on 000436.
+PROPOSED LINK: this idea --relates_to--> 000440 (the relay calls them alternatives)
+PROPOSED LINK: this idea --relates_to--> 000067 (the existing deterministic generator)
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+
+---
+
+## 000440 · Use this repository as an orchestrator that manages multiple repositories without installing features in them
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"alternate possibility of using this repo as orchestrator for managing multiple repos without installing features in them"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 6 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: this idea and 000439 are alternatives to each other.
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). No phase covers it. The orchestrator today (src/orchestrator/, ADR-018, PLAN-039.01) works on this repository only: PLAN-039.01 scopes the daemon's watchers to events inside the repository. 000248 (expand the orchestrator daemon into a host for other always-on agents) and 000249 (watch for external events beyond the repository) are the nearest ideas that widen its reach. Part of the 000436 batch.
+PROPOSED LINK: this idea --relates_to--> 000439 (the relay calls them alternatives)
+PROPOSED LINK: this idea --relates_to--> 000248 (widening the daemon's reach)
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+
+---
+
+## 000441 · Portability of the tagging and classification systems, including how claims and tag-linked groups of files such as sys-governance are structured
+
+**Created 2026-09-24T09:59:34-04:00 · Status: `triaged`**
+
+"portability of tagging and classification systems (specifically how we structure claims and groups of files linked by tag such as 'sys-governance' which I believe we did or are in process of or considering splitting)."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 7 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: today's P4 R3 ruling splits sys-realization (a separate system id for the coordination code, with narrow declared paths); Scout entry 33 (domains in systems.yaml, and splitting test/ out of sys-delivery) went to phase-conc-08.
+- **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). A correction to the owner's example: the split ruled today (000347 session, entry 16, P4 R3) is of sys-realization, not sys-governance. Session Manager's context says the same. The structures in question: docs/08-governance/systems.yaml (35 systems, each declaring the paths it owns, and each document names its systems in front matter), _data/tags.json (the tag reference list, schemas/tag.schema.json), and the idea log's typed links. phase-conc-08 (write the enforcement-placement rule, apply it, and audit .claude/ settings), queued, carries the systems.yaml domains and the test/ split from sys-delivery. 000061 (classify idea nodes by ontological, epistemic and lifecycle type) is the classification idea for ideas. Part of the 000436 batch; relevant to 000437's tags between repositories.
+PROPOSED LINK: this idea --relates_to--> 000061 (classification of ideas)
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+
+---
+
+## 000442 · Only 1 of 15 tracked .claude/agents/*.md files has an agent-workflows manifest entry, and nothing checks the others
+
+**Created 2026-09-24T09:59:38-04:00 · Status: `triaged`**
+
+[agent-proposed by Ideation]
+Only idea-triage.md, of the 15 tracked files in .claude/agents/, is a target in agent-workflows/workflows.yaml. The other 14 are hand-written, so tools/generate_agent_workflows.py and its --check (which pytest runs as test_committed_adapters_match_canonical_sources) never see them, and nothing checks whether an agent file should have a manifest entry or a Codex adapter. Found on 2026-09-24 while checking Session Manager's withdrawn idea about a missing .codex/agents/partition-analyst.toml.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T09:59:38-04:00): Relay record. Ideation observed this on 2026-09-24 and passed it to Session Manager as an observation. Session Manager relayed that the owner approved recording it as an idea, labelled as agent-proposed.
+- **finding** by agent-ideation (2026-09-24T09:59:38-04:00): Triage (checked on dev bdda45c). No phase covers it. Related: 000306 (nothing binds .codex/agents/*.toml to the .claude/agents/*.md definitions they copy), triaged, which is the adapter half of the same gap. 000067 (portable agent workflows from a single source of truth), promoted, is the design the manifest implements. GOV-015 (agent surface audit) and OPS-010 (the generator's runbook) describe the generated adapters. The 12 demo-*.toml Codex files are excluded only through .git/info/exclude, a local file, not through .gitignore. 000433 (where skills and agents are defined) is the owner's broader question.
+PROPOSED LINK: this idea --relates_to--> 000306 (the adapter half of the same gap)
+PROPOSED LINK: this idea --relates_to--> 000433 (where agents are defined)
 
 </details>
