@@ -4,7 +4,7 @@ id: doc-adr-session-manager-into-orchestrator
 code: ADR-023
 title: Carry the Session Manager system into the LangGraph and Agent SDK orchestrator by the split
 kind: adr
-status: draft
+status: accepted
 owner: repository-owner
 created: '2026-09-24'
 updated: '2026-09-24'
@@ -16,9 +16,10 @@ depends_on: [doc-adr-langgraph-orchestration, doc-multi-session-coordination-pro
 
 ## Status
 
-Draft. It records the owner's rulings from the 000347 decision session of 2026-09-24. It becomes
-`accepted` only when the owner accepts this text. A separate session then writes the requirement,
-the plan and the backlog phases from it (owner ruling, entry 1).
+Accepted 2026-09-24. The owner approved this text and its merge as `accepted` in the Prompt
+Planner session. It records the owner's rulings from the 000347 decision session of 2026-09-24. A
+separate session writes the requirement, the plan and the backlog phases from it (owner ruling,
+entry 1).
 
 ## How rulings are cited
 
@@ -140,7 +141,7 @@ Owner rulings:
 | D4 worker lifetime | (c) Mixed: long-lived meta roles, per-task builders. P3 had recommended (a) | 4 |
 | D6 mobile approval surface | The Owner Desk (this session, evolved) on Remote Control now; the workbench page when `phase-irs-13` builds it | 6 |
 | D7 how workers ask | Never directly: a decision-ready gate item, then the worker continues or parks. One queue for questions, merges, parks and permissions | 7 |
-| D8 Documenter authority | Writes on its own branch through G4. New ADRs stay "proposed" until the owner accepts them. Proposal: the validator allows an ADR only `draft`, `accepted`, `deprecated` or `superseded`, so "proposed" is read as `draft` | 8 |
+| D8 Documenter authority | Writes on its own branch through G4. New ADRs stay "proposed" until the owner accepts them. The validator allows an ADR only `draft`, `accepted`, `deprecated` or `superseded`. The owner ruled on 2026-09-24 that a separate `proposed` status be added, for finished ADRs waiting on acceptance: idea 000443 (draft, then proposed, then accepted). Until it lands, Documenter ADRs carry `draft` | 8 |
 | D9 context thresholds | Soft 50% (finish and restart), hard 75% (park) | 9 |
 | D10 delegated authority | Grant records in a tracked file, evaluated in code at G4 and cited in each decision | 10 |
 | D11 first role moved to a dispatch (M4) | Scout | 11 |

@@ -26,7 +26,7 @@ CI regenerates it and fails on any difference.
 | ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ADR-021 | adr | accepted | repository-owner | docs/04-decisions/ADR-021-claude-code-dependency.md |
 | ADR-022 | adr | accepted | repository-owner | docs/04-decisions/ADR-022-broker-first-autonomous-operations.md |
-| ADR-023 | adr | draft | repository-owner | docs/04-decisions/ADR-023-session-manager-into-orchestrator.md |
+| ADR-023 | adr | accepted | repository-owner | docs/04-decisions/ADR-023-session-manager-into-orchestrator.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
