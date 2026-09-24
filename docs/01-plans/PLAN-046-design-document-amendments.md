@@ -41,6 +41,7 @@ answers unnumbered, so each is given here with the board's words and the item it
 | "OWNER Scout rulings: ... O-3 builders self-merge until P3 N2" | `orchestration-3-architecture.md`, "Owner decisions", O-3 (a) |
 | "OWNER protocol rulings: Q8 owner approval for every worktree removal" and "Q15 remote branch deletion OWNER-ONLY (standing; needs GOV-003 entry on a docs branch)" | The board/state protocol draft's questions Q8 and Q15 |
 | "CLAUDE.md stale lines APPROVED as proposed (~144 tasks are separate files; ~137/141 replace counts with pointers to schemas/ and sql/001_schema.sql)" | The restart file's open owner item on `CLAUDE.md` |
+| "OWNER: ... OQ8 STANDING rule: never reuse a phase id for different content (GOV-003 via dam-01)" | `PLAN-045` OQ8 |
 | Idea `000378`'s annotation: "Owner ruling, 2026-09-23 ... GOV-003 governs" | Phase-completion authority |
 
 Ideas covered: `000378` (completion authority contradicts itself), `000402` in the one instance
@@ -79,14 +80,15 @@ existing text already says the rate changes "once G5 sittings give real data". R
 2026-09-23 (answer to OQ3): "re-review 1 in 10, plus every once-rejected unit".
 
 **D4. One `GOV-003` entry per standing ruling, plus one for the document changes.** The task
-statement lists three `GOV-003` entries (Q15, Q8, the agent-proposed label). This plan adds a
-fourth, recording that Q5, Q6, O-3, and Scout-1 items 4 (a) and 9 (c) changed `ARCH-006`,
+statement lists three `GOV-003` entries (Q15, Q8, the agent-proposed label). The owner added a
+fourth standing ruling on 2026-09-23, answering `PLAN-045` OQ8: "a STANDING rule that a phase id is
+never reused for different content, recorded in GOV-003 through dam-01". This plan adds a fifth, recording that Q5, Q6, O-3, and Scout-1 items 4 (a) and 9 (c) changed `ARCH-006`,
 `GOV-014`, `GOV-018` and `REQ-022`. `GOV-003` is where an agent looks for "accepted choices that
 resolve older plan conflicts" (`AGENTS.md`, Session backlog), and each of those rulings reverses a
 rule a document still states. The alternative, only the three entries named in the task, would
 leave a reader of `GOV-003` with no record of why `ARCH-006`, `GOV-014` and `GOV-018` changed, and
 the next session that finds the old text in a session record or a plan would not know which is
-current. The cost is one more entry to keep true. The fourth entry records rulings the owner made;
+current. The cost is one more entry to keep true. The fifth entry records rulings the owner made;
 it adds no rule. The agent-proposed entry records the form the owner ruled on 2026-09-23 (answer to
 OQ2): "GOV-003 records the ruling, and the body's first line is the label until an idea-system field
 exists".
@@ -171,7 +173,7 @@ who works in stage 8. Ruled by the owner on 2026-09-23 (answer to OQ7): "Test Au
 
 | Phase | What | Requirements | Depends on |
 |---|---|---|---|
-| `phase-dam-01` | Amend `ARCH-006`, `GOV-014`, `GOV-018`, `REQ-022` R23, `/session-start`, `/session-close` step 3, `/resume-lit-review`, the orient skill's source, and the `main`-branch passages from `000377`; add four `GOV-003` entries; put the `AGENTS.md` and `CLAUDE.md` text to the owner and apply what is confirmed; regenerate the orient skill and the catalog | R01-R12 | none |
+| `phase-dam-01` | Amend `ARCH-006`, `GOV-014`, `GOV-018`, `REQ-022` R23, `/session-start`, `/session-close` step 3, `/resume-lit-review`, the orient skill's source, and the `main`-branch passages from `000377`; add five `GOV-003` entries; put the `AGENTS.md` and `CLAUDE.md` text to the owner and apply what is confirmed; regenerate the orient skill and the catalog | R01-R12 | none |
 
 ## Requirement coverage
 
@@ -182,7 +184,7 @@ who works in stage 8. Ruled by the owner on 2026-09-23 (answer to OQ7): "Test Au
 | R05 | The Test Author contract and the `nine` grep |
 | R06 | The `spot-audit` grep over three files |
 | R07 | `session-close.md` step 3 diff |
-| R08 | The four `GOV-003` entries |
+| R08 | The five `GOV-003` entries |
 | R09, R10 | `git diff` of `CLAUDE.md` and `AGENTS.md`, and the owner's confirmation or its absence, recorded |
 | R11 | `generate_agent_workflows.py --check`, governance, catalog diff |
 | R12 | The `main` grep, with each remaining line explained |

@@ -13873,8 +13873,9 @@ items:
   - 'Fixtures: a next_up phase with no record (1); with a dispositioned record (0); with a record whose
     finding''s last disposition is escalated-g3 (1); with an open record (1); a grandfathered phase
     with no record (0).'
-  - The repository's result is recorded; any phase it refuses is named in the session record and put to
-    the owner rather than exempted in code (PLAN-045 OQ7).
+  - Review records for phase-gov-01 and phase-dgov-06 exist before this phase merges (owner ruling on
+    PLAN-045 OQ7), and the repository passes the new check; any phase it refuses is named in the
+    session record and put to the owner rather than exempted in code.
   verification:
   - uv run pytest test/test_review_gate.py
   - uv run python -m src.governance --catalog
@@ -13887,8 +13888,8 @@ items:
   - src/governance/__main__.py
   - test/test_review_gate.py
   - docs/08-governance/
-  next_action: Waits for phase-grd-03. Before claiming, check whether phase-gov-01 and phase-dgov-06 have
-    review records (PLAN-045 OQ7); without them the repository fails the new check.
+  next_action: Waits for phase-grd-03. Before claiming, confirm the Standby Builder's GOV-018 reviews of
+    phase-gov-01 and phase-dgov-06 are recorded (owner ruling on PLAN-045 OQ7).
 - id: phase-dam-01
   title: Amend ARCH-006, GOV-014, GOV-018, REQ-022 and the session commands to the 2026-09-23 rulings
   plan: doc-design-document-amendments
@@ -13917,8 +13918,8 @@ items:
     R23 (R06; D3).
   - Remove the session record from /session-close step 3's reviewer inputs and bind the close review
     to the Validator's input rule in GOV-014 (R07).
-  - Add four dated GOV-003 entries (Q15, Q8, the agent-proposed label, and the document changes)
-    (R08; D4).
+  - Add five dated GOV-003 entries (Q15, Q8, the agent-proposed label, phase-id reuse, and the document
+    changes) (R08; D4).
   - Put the exact AGENTS.md 179-180 and 284-286 and CLAUDE.md 137, 141 and 144 text from PLAN-046 D5
     to the owner in this session, and apply only what the owner confirms (R09, R10).
   - Correct the passages in REQ-029 problem 9 that name main as the integration branch or cite the
@@ -13934,7 +13935,7 @@ items:
     Author with its order and failure path.
   - No line in GOV-014, ARCH-006 or REQ-022 requires the owner to spot-audit.
   - session-close.md step 3 mentions the session record only to exclude it.
-  - GOV-003 has the four entries.
+  - GOV-003 has the five entries.
   - CLAUDE.md and AGENTS.md show the owner-confirmed text, or the session record states that
     confirmation was not given and the lines are unchanged, for each of the three changes.
   - git grep -n -w main over GOV-001, GOV-002, GOV-005, OPS-001 and session-close.md lists each

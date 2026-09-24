@@ -36,6 +36,13 @@
           "recorded_by": "Prompt Planner session (planner, agent/plan-guards-docs)",
           "date": "2026-09-23",
           "reason": "Correct, and caused by the planner reusing phase-grd-02 in cd25c36. The instance is resolved: this record lists phase-grd-02, phase-grd-03 and phase-grd-04 in later_added_phases, so the new phase-grd-02 now has a review that saw it. The general gap needs a standing rule, which is the owner's: PLAN-045 OQ8 recommends that a phase id is never reused for different content (as GOV-005 rules for document codes) and records why content binding was rejected (GOV-018's fix-without-re-review would void every record whose findings were fixed). Owner must decide whether to adopt that rule and where it is recorded."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Prompt Planner session, from the owner's answer relayed by the Session Manager",
+          "date": "2026-09-23",
+          "reason": "Owner ruling, 2026-09-23 (answer to PLAN-045 OQ8): a standing rule that a phase id is never reused for different content, recorded in GOV-003 through phase-dam-01. The instance is covered by this record; the rule closes the general gap once phase-dam-01 lands."
         }
       ],
       "engine": "single-adversary",

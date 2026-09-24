@@ -54,7 +54,9 @@ The governing documents contradict each other and the owner's rulings. Each case
    close reviewer gets no session record (the same report's item 4, option (a)).
 7. **Standing rulings with no durable record.** The owner ruled on 2026-09-23 that remote branch
    deletion is owner-only (protocol Q15), that every worktree removal needs the owner's approval
-   (protocol Q8), and that agent-originated ideas carry an "agent-proposed" label (Scout report
+   (protocol Q8), that a backlog phase id is never reused for different content once registered
+   (answer to `PLAN-045` OQ8, after `PLAN-045` reused `phase-grd-02`), and that agent-originated
+   ideas carry an "agent-proposed" label (Scout report
    `orchestration-1-evidence.md`, "Owner decisions needed", item 3, option (c)). They exist only on the Session Manager's gitignored board.
 8. **`CLAUDE.md` is stale.** Line 137 lists four schema files (`schemas/` holds 26 files); line
    141 lists seven tables (`sql/001_schema.sql` creates 16); line 144 says tasks are embedded in
@@ -79,7 +81,7 @@ The governing documents contradict each other and the owner's rulings. Each case
 | R05 | `GOV-014` has a Test Author contract with inputs, outputs, never-do and a per-dispatch ceiling; its write scope is `test/` only; the Developer contract excludes `test/`; every count of the roles says ten; `ARCH-006` stage 8's Role and Failure path columns name the Test Author, its order relative to the Developer, and what happens when a Developer disputes one of its tests | Read the contract and the stage 8 row; `grep -n "nine"` in `GOV-014` returns no count of roles |
 | R06 | The spot-audit is replaced in `GOV-014`, `ARCH-006` and `REQ-022` R23 by a sampled independent re-review with a stated sampling rule, reviewer type and inputs | `grep -n -i "spot-audit"` over the three files returns no line requiring the owner to spot-audit; the new rule is readable in `GOV-014`'s Validator contract |
 | R07 | `/session-close` step 3 does not give the reviewer the session record, and says why; `GOV-014` states that the close review is bound by the Validator's input rule | Read step 3; the only mention of the session record in step 3 is the prohibition |
-| R08 | `GOV-003` has a dated entry for each ruling in problem 7, quoting the ruling, stating it is standing, and naming what it changes. The agent-proposed entry states that the label is the idea body's first line (for example "Proposed by <session>, not the owner") until the idea system has a field for it | Read the three entries |
+| R08 | `GOV-003` has a dated entry for each ruling in problem 7, quoting the ruling, stating it is standing, and naming what it changes. The agent-proposed entry states that the label is the idea body's first line (for example "Proposed by <session>, not the owner") until the idea system has a field for it | Read the four entries |
 | R09 | `CLAUDE.md` lines 137, 141 and 144 read exactly as the text the owner confirmed in the executing session; if the owner has not confirmed it there, the lines are unchanged and the session record says so | `git diff CLAUDE.md` shows either the confirmed text or nothing |
 | R10 | `AGENTS.md` lines 179-180 and 284-286 each change only with the owner's approval of that change's exact old and new text, put to the owner in the same session; otherwise they are unchanged and the session record says so | `git diff AGENTS.md` shows the approved text, or nothing, for each |
 | R11 | The generated orient skill matches its source, and governance and the catalog are current | `uv run python tools/generate_agent_workflows.py --check` exits 0; `uv run python -m src.governance` exits 0; `git diff --exit-code docs/08-governance/catalog.md` after `--catalog` |

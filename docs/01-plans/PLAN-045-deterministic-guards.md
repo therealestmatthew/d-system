@@ -165,8 +165,8 @@ the review records `GOV-018` writes. A phase in `next_up` needs a record that li
 `dispositioned`, and has no finding whose last disposition is `escalated-g3`. The exempt set is the
 19 phases in `next_up` on `dev` at `f1b891d`, listed in `REQ-028` R12. Folding the rule into
 `phase-grd-03` was rejected: the owner asked for its own phase, and `phase-grd-03` already carries two
-tools and a governance check. OQ7 asks about the two phases the exemption does not cover. The check matches by phase id, so it
-relies on an id never being reused for different content; this plan broke that once (OQ8).
+tools and a governance check. The two phases the exemption does not cover are reviewed before it lands (OQ7). The check matches by
+phase id, which the owner's standing rule on id reuse makes safe (OQ8).
 
 ## Implementation phases
 
@@ -249,6 +249,16 @@ Answered by the owner on 2026-09-23, relayed by the Session Manager:
   carries its output." Applied in D10, `REQ-028` R10 and `phase-grd-03`.
 - **OQ4. The S3 `next_up` rule.** Ruled: "the S3 next_up rule is its own guards phase, after grd-03."
   Applied as `phase-grd-04` (D11, `REQ-028` R12).
+- **OQ7. `phase-gov-01` and `phase-dgov-06` under the S3 rule.** Neither is among the 19 exempt
+  phases nor reviewed. Ruled: "review gov-01 and dgov-06 before grd-04 lands"; the Session Manager
+  assigns those reviews to the Standby Builder. Applied: `phase-grd-04`'s next action and acceptance
+  check for the two records.
+- **OQ8. Reused phase ids.** Correction recorded here: when this plan split its phases after the first
+  review, it reused the id `phase-grd-02` for a different phase, and the first review record lists
+  `phase-grd-02` for content that is now `phase-grd-03`. Ruled: "a STANDING rule that a phase id is
+  never reused for different content, recorded in GOV-003 through dam-01". Applied: `PLAN-046` D4
+  and `REQ-029` R08. The later-added review (`2026-09-23-plan-045-later-added`) covers the instance;
+  its finding F01 carries the owner's disposition.
 
 Still open:
 
@@ -258,19 +268,3 @@ Still open:
   `phase-part-03` sweep covers these ideas. Who: the planner, when the sweep's result is accepted and
   before G3. If the sweep puts any of these ideas in a different track, this plan is revised or the
   difference is put to the owner.
-- **OQ7. `phase-gov-01` and `phase-dgov-06` under the S3 rule.** The owner placed both in `next_up`
-  (OQ1), but neither is among the 19 exempt phases and neither has a review record. When
-  `phase-grd-04` lands, governance would refuse them. Who: the owner, at G3. Leaning: review both
-  under `GOV-018` before `phase-grd-04` lands, rather than widen the exempt list the owner fixed at
-  "current 19". Both plans (`PLAN-010`, `PLAN-030`) predate `GOV-010`, so the entry check is exempt
-  and only the phase altitude runs.
-- **OQ8. Reused phase ids.** Correction: when this plan split its phases after the first review, it
-  reused the id `phase-grd-02` for a different phase (the green-CI tool). The first review record
-  lists `phase-grd-02` for content that is now `phase-grd-03`, so an id-based check would count the
-  new `phase-grd-02` as reviewed by a review that never saw it. For this plan the later-added review
-  (`2026-09-23-plan-045-later-added`) covers the new `phase-grd-02`. The general gap remains: nothing
-  stops an id from being reused. Who: the owner, at G3. Leaning: a standing rule that a phase id is
-  never reused for different content once registered, as `GOV-005` already rules for document codes;
-  a split takes new ids. Binding records to content instead was considered and rejected: `GOV-018`
-  fixes findings without a second review, so every fixed finding would change the phase and void its
-  own record.
