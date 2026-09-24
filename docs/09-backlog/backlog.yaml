@@ -3,7 +3,6 @@ updated: '2026-09-23'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-part-03
 - phase-cap-08
 - phase-irs-14
 - phase-irs-11
@@ -7515,7 +7514,7 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 1
   session_budget: 1
@@ -7583,10 +7582,24 @@ items:
   - .agents/skills/partition-ideas/SKILL.md
   - schemas/idea-partition-record.schema.json
   - .claude/agents/partition-analyst.md
-  next_action: Dry run and full sweep done, evidence in SESS-2026-09-23-05. Waiting for the
-    owner-approved merge of the session record and the accepted partition, then the completion
-    edit on dev.
+  next_action: None; the phase is complete.
   session: doc-session-partition-ideas-workflow
+  completion_evidence:
+  - .claude/skills/partition-ideas/SKILL.md
+  - .claude/agents/partition-analyst.md
+  - schemas/idea-partition-record.schema.json
+  - docs/00-working/idea-partition-2026-09-23.md
+  - docs/00-working/idea-partition-2026-09-23.json
+  - docs/03-sessions/SESS-2026-09-23-05-partition-ideas-workflow.md
+  result: 'Dry run attempt 1 halted at the open-set gate on two open ideas; attempt 2 reached GATE
+    1 on 325 ideas. The fresh sweep ran through all three gates on 383 triaged ideas (seed
+    1370316527), R1 and R4 on the read-only partition-analyst. The owner ordered one R1 re-run and
+    one A2 path paragraph, both recorded as deviations. Every other dispatch diffs empty against
+    PROMPT-034. No analyst or auditor wrote a file, and no sweep agent wrote _data/ideas.jsonl. The
+    owner accepted the partition at GATE 3: 371 ideas in 87 groups under 12 tracks, 12 unbatched,
+    4 declined. Step 5 check 0 problems. The independent close review (demo-adversary) found all
+    nine acceptance conditions Met and two record errors, both fixed. At merge: Governance OK,
+    pytest 1029 passed and 1 skipped, ruff and mypy clean.'
 - id: phase-prog-01
   title: Finalize the concurrency, git safety and enforcement plan (P3)
   plan: doc-concurrency-git-safety
