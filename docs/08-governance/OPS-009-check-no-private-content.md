@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-08'
-updated: '2026-09-08'
+updated: '2026-09-24'
 systems: [sys-delivery]
 depends_on: [doc-governance-operations, doc-confidentiality-sweep]
 ---
@@ -53,6 +53,27 @@ A failure prints each violation as `<file>: matches confidential identifier '<id
 (move it under `_private/portfolio/`, or generalize the tracked doc) rather than adding an
 exemption — an exemption is for a verified false positive or an explicitly deferred, named
 exception, not a way to make the check pass.
+
+## The pre-commit hook also runs governance
+
+Since `phase-grd-01` (`REQ-028` R04), `tools/git-hooks/pre-commit` runs this check and then
+`uv run python -m src.governance`, so a commit is refused when governance fails, including when
+`docs/08-governance/catalog.md` or `docs/00-working/ideas.md` differs from its rendering. The
+private-content check runs first and still refuses on its own. Measured on 2026-09-24 in a
+worktree, the hook's median run time went from 0.05 s to 2.24 s, nearly all of it the governance
+run.
+
+- **Never bypass a failing hook with `--no-verify`** (owner ruling, 2026-09-23). Commit the fix:
+  regenerate with `uv run python -m src.governance --catalog` or
+  `uv run python tools/generate_ideas_md.py`, stage the result, and commit again. If the check
+  itself is wrong, stop and report it rather than committing around it.
+- **The governance run reads the working tree, not the staged index.** An unstaged stale file,
+  including a peer's uncommitted work in the primary checkout, can refuse a commit that stages
+  nothing stale, and an unstaged fix can let a commit through whose staged files are stale. Keep
+  the tree clean around a commit.
+- **`core.hooksPath` is shared.** It points at the primary checkout's `tools/git-hooks/`, so every
+  worktree runs the primary checkout's copy. A branch that changes the hook is tested by running
+  `sh tools/git-hooks/pre-commit` directly in its worktree, not through `git commit`.
 
 <!-- generated:tool-reference:start -->
 

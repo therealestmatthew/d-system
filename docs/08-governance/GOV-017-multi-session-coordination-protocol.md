@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-23'
+updated: '2026-09-24'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-adr-multi-agent-concurrency, doc-coordinator-protocol, doc-build-coordinator, doc-backlog-decisions, doc-conversation-guidelines, doc-governance-operations]
 ---
@@ -163,8 +163,11 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    merge turn is where it runs under this protocol.
 6. Inside the same turn the session fast-forwards `dev` and makes the completion edit — one small
    commit on `dev` immediately after the integration, as `GOV-003` sanctions (entry "Coordinator completion replaces
-   owner-invoked /session-close, repository-wide") — with `governance` run on `dev` and no `pytest`. Then it
-   sends `TURN DONE`.
+   owner-invoked /session-close, repository-wide"). The edit moves the phase's status, so the session
+   regenerates the catalog with `uv run python -m src.governance --catalog` and commits it in the same
+   commit, then runs `governance` on `dev`; no `pytest`. Then it sends `TURN DONE`. A completion edit
+   that skipped the regeneration left `dev` red on 2026-09-23 (`f6216e9`, ideas `000405`, `000406`);
+   since `phase-grd-01` the governance check and the pre-commit hook both refuse a stale catalog.
 7. After the merge lands, the Session Manager sends `REBASE` to every session with an open branch.
 
 **Owner ruling, 2026-09-22:** a `GRANTED merge` relayed by the Session Manager is the owner's
@@ -173,6 +176,12 @@ approval, as a standing rule for every session.
 **Owner ruling, 2026-09-23:** the gate checks include `ruff` and `mypy` alongside `governance` and
 `pytest` (steps 1, 2 and 4), and the dirty-integration check runs before every fast-forward
 (step 5). Both are recorded in `GOV-003`.
+
+**Owner ruling, 2026-09-23:** a failing pre-commit hook is never bypassed with `--no-verify`. The
+session commits the fix; if the check itself is wrong, it stops and reports to the Session Manager
+and the owner. The hook (`tools/git-hooks/pre-commit`, `OPS-009`) runs the private-content check
+and the governance check, so a stale `catalog.md` or `ideas.md` refuses the commit (`REQ-028` R04,
+R13). `core.hooksPath` is shared, so every worktree runs the primary checkout's copy of the hook.
 
 ## Ideas
 
