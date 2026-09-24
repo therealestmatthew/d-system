@@ -256,6 +256,7 @@ Every row of `REQ-014` maps to at least one phase, and every phase carries at le
 | R20 A drafted plan is conformant to the standard | `phase-idg-12` |
 | R21 Shipped ideas backfilled into terminal states, `000099`/`000129` reversed | `phase-idg-13`, `phase-idg-15`, `phase-idg-16`, `phase-idg-17`, `phase-idg-18` |
 | R22 Agent-written closes marked, verified and ratified | `phase-idg-14` |
+| R23 An idea can be set aside at a partition without being discarded | `phase-idg-01` |
 
 ## Key references
 

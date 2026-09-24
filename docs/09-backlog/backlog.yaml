@@ -9839,6 +9839,13 @@ items:
   - 'The reversal of 000099 and 000129 from discarded to resolved is a revisited event followed by a
     status event: the existing one-time revisit (discarded -> reviewing), then a status move from reviewing
     to resolved. discarded stays never-a-from; no schema exception is added (owner ruling 2026-09-24).'
+  - 'Fold in 000417 (owner ruling 2026-09-24): add a non-terminal status for an idea the owner holds
+    out of a partition without discarding it, reachable from triaged and able to return to triaged or
+    reviewing. Its name is a placeholder until Ideation records the terminology idea for it; the owner
+    wants three plain outcomes for an idea at a partition - discard, set aside, or include in a partition.'
+  - Add a hold-out field to schemas/idea-partition-record.schema.json so an owner hold-out is recorded
+    as such rather than as an unbatched reason, and update the partition-ideas workflow's GATE 3 to
+    write it. The workflow still writes nothing to _data/ideas.jsonl.
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -9847,6 +9854,11 @@ items:
   - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
   - delivered, resolved and absorbed are legal statuses, each rejected by the writer when no pointer is
     given, and promoted accepts a later transition to delivered.
+  - The set-aside status (placeholder name) is legal from triaged, is not terminal, and accepts a later
+    transition to triaged or to reviewing; the writer rejects it from any other status.
+  - A partition record carrying an owner hold-out in the new field validates against
+    schemas/idea-partition-record.schema.json, and the accepted 2026-09-23 partition record still
+    validates unchanged.
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -9858,6 +9870,10 @@ items:
   - docs/07-architecture/ARCH-005-idea-node-classification.md
   - test/
   - src/governance/
+  - schemas/idea-partition-record.schema.json
+  - agent-workflows/partition-ideas.md
+  - .claude/skills/partition-ideas/SKILL.md
+  - .agents/skills/partition-ideas/SKILL.md
   next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
     terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
     pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
