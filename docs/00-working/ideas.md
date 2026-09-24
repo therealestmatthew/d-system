@@ -1359,6 +1359,7 @@ PROPOSED LINK: 000029 --relates_to--> 000030 (third piece of trilogy for supervi
 - relates_to ← `000028`
 - relates_to ← `000030`
 - relates_to ← `000349`
+- relates_to ← `000434`
 
 ---
 
@@ -2549,6 +2550,8 @@ The scope questions named in 000054's body — what to instrument first, where t
 **Links**
 
 - relates_to ← `000080`
+- relates_to ← `000429`
+- relates_to ← `000434`
 
 ---
 
@@ -4340,6 +4343,7 @@ PROPOSED LINK: 000079 --relates_to--> 000051 (Agent harness and guardrails: enfo
 - relates_to → `000067`
 - relates_to → `000051`
 - relates_to ← `000241`
+- relates_to ← `000433`
 
 ---
 
@@ -4584,6 +4588,7 @@ PROPOSED LINK: 000082 --relates_to--> 000077 (both address recovery when agents 
 - relates_to ← `000128`
 - relates_to ← `000248`
 - relates_to ← `000252`
+- relates_to ← `000427`
 
 ---
 
@@ -4716,7 +4721,7 @@ PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable librari
 
 ## 000086 · Repo tracker and multi-repo memory agent
 
-**Created 2026-09-10T05:57:16-04:00 · Status: `discarded`**
+**Created 2026-09-10T05:57:16-04:00 · Status: `reviewing` · revisited 1×**
 
 A tracked list of all of the owner's repositories — both personally created repos and external repos the owner has starred or marked for future reference — paired with a multi-repo memory and awareness agent whose purpose is connecting the dots across them: knowing what exists where, and pointing someone at the right existing repo when they need something so nothing gets rebuilt that already exists ("don't rebuild the wheel"). The owner specifically notes the autoclaude-api repo, which scouts repositories for Claude skills, and says these should tie in together somehow — the repo tracker's list is plausibly the corpus that agent (and autoclaude-api's scouting) operates over. It would touch the data layer (a new tracked entity or list — repos are not currently a d-system entity), possibly a new schema in schemas/, and an agentic workflow for the awareness agent, which fits the system's stated purpose as a platform for agentic workflow triggering. Unresolved: whether the tracker and the agent are one effort or two (recorded here as one idea because the owner presented them together — triage may split them), where the repo list lives (tracked _data/ entity vs. pulled live from GitHub stars/API), what "marked for future reference" means mechanically, exactly how the autoclaude-api tie-in works, and what memory the awareness agent keeps versus derives on demand.
 
@@ -4724,7 +4729,7 @@ A tracked list of all of the owner's repositories — both personally created re
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T06:46:13-04:00): **Repo Tracker and Multi-Repo Memory Agent (000086) — Triage Finding**
 
@@ -4742,8 +4747,13 @@ A tracked list of all of the owner's repositories — both personally created re
 - **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
 
 Decline candidate nominated by one analyst (R1) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_one). Reason given there: Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema.
+- **finding** by agent-ideation (2026-09-24T10:30:34-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: REOPEN. This idea was declined at /partition-ideas GATE 3 on 2026-09-23 (recorded as discarded; reason given: speculative cross-repository tooling, with no repos domain in the schema). The owner reopened it today, after recording the multi-repository batch anchored on 000436, which overlaps this idea's tracking half. Linked relates_to 000436 in the same turn. Reopened with the writer's one permitted revisit, which returns it to reviewing (the owner is actively considering it); the writer has no path from discarded back to triaged.
 
 </details>
+
+**Links**
+
+- relates_to → `000436`
 
 ---
 
@@ -6305,6 +6315,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 - relates_to ← `000136`
 - relates_to ← `000139`
 - relates_to ← `000170`
+- relates_to ← `000433`
 
 ---
 
@@ -10959,6 +10970,8 @@ PROPOSED LINK: 000215 --relates_to--> 000032 (both concern provenance and eviden
 - relates_to → `000139`
 - relates_to → `000032`
 - relates_to ← `000397`
+- relates_to ← `000430`
+- relates_to ← `000434`
 
 ---
 
@@ -12723,6 +12736,7 @@ Idea is exploratory as stated and addresses the "what external sources matter an
 - relates_to → `000247`
 - relates_to → `000028`
 - relates_to → `000248`
+- relates_to ← `000428`
 
 ---
 
@@ -16793,6 +16807,8 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to ← `000352`
 - relates_to ← `000370`
 - relates_to ← `000386`
+- relates_to ← `000427`
+- relates_to ← `000428`
 
 ---
 
@@ -18135,6 +18151,8 @@ PROPOSED LINK: 000359 --relates_to--> 000306 (an existing Claude/Codex definitio
 - relates_to ← `000369`
 - relates_to ← `000370`
 - relates_to ← `000385`
+- relates_to ← `000430`
+- relates_to ← `000432`
 
 ---
 
@@ -19459,6 +19477,8 @@ PROPOSED LINK: 000397 --relates_to--> 000215 (the rule cannot be verified until 
 
 - relates_to → `000385`
 - relates_to → `000215`
+- relates_to ← `000430`
+- relates_to ← `000432`
 
 ---
 
@@ -20389,6 +20409,12 @@ PROPOSED LINK: this idea --relates_to--> 000082 (the same topic, at the discipli
 
 </details>
 
+**Links**
+
+- relates_to → `000334`
+- relates_to → `000082`
+- relates_to ← `000429`
+
 ---
 
 ## 000428 · Investigate an injection hook that injects new gate items (daemon events) into the interactive Session Manager / Owner Desk session
@@ -20413,6 +20439,11 @@ PROPOSED LINK: this idea --relates_to--> 000334 (the session the hook would inje
 PROPOSED LINK: this idea --relates_to--> 000249 (event surfaces of the orchestrator, opposite direction)
 
 </details>
+
+**Links**
+
+- relates_to → `000334`
+- relates_to → `000249`
 
 ---
 
@@ -20440,6 +20471,11 @@ PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
 
 </details>
 
+**Links**
+
+- relates_to → `000427`
+- relates_to → `000054`
+
 ---
 
 ## 000430 · Use second-provider models (Codex, Gemini) as planners and in ideation, not only as reviewers
@@ -20466,6 +20502,13 @@ PROPOSED LINK: this idea --relates_to--> 000215 (named by the relay; recording t
 
 </details>
 
+**Links**
+
+- relates_to → `000359`
+- relates_to → `000397`
+- relates_to → `000215`
+- relates_to ← `000432`
+
 ---
 
 ## 000431 · Is an API key necessary for using LangGraph?
@@ -20486,6 +20529,10 @@ PROPOSED LINK: this idea --relates_to--> 000429 (the LangSmith key is the only k
 PROPOSED LINK: this idea --relates_to--> 000432 (split from the same owner message)
 
 </details>
+
+**Links**
+
+- relates_to ← `000432`
 
 ---
 
@@ -20522,6 +20569,13 @@ PROPOSED LINK: this idea --relates_to--> 000431 (split from the same owner messa
 
 </details>
 
+**Links**
+
+- relates_to → `000430`
+- relates_to → `000359`
+- relates_to → `000397`
+- relates_to → `000431`
+
 ---
 
 ## 000433 · Clarify how skills, agents, and skills that delegate to a subagent differ, where each is defined, and what goes in a skill versus an agent system prompt
@@ -20551,6 +20605,8 @@ PROPOSED LINK: this idea --relates_to--> 000079 (what goes in a system prompt)
 
 - relates_to → `000048`
 - relates_to → `000127`
+- relates_to → `000126`
+- relates_to → `000079`
 
 ---
 
@@ -20573,6 +20629,12 @@ PROPOSED LINK: this idea --relates_to--> 000029 (the ledger field list this woul
 PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
 
 </details>
+
+**Links**
+
+- relates_to → `000215`
+- relates_to → `000029`
+- relates_to → `000054`
 
 ---
 
@@ -20626,6 +20688,7 @@ PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
 
 **Links**
 
+- relates_to ← `000086`
 - relates_to ← `000437`
 - relates_to ← `000438`
 - relates_to ← `000439`
@@ -20740,17 +20803,19 @@ PROPOSED LINK: this idea --relates_to--> 000248 (widening the daemon's reach)
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 7 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: today's P4 R3 ruling splits sys-realization (a separate system id for the coordination code, with narrow declared paths); Scout entry 33 (domains in systems.yaml, and splitting test/ out of sys-delivery) went to phase-conc-08.
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). A correction to the owner's example: the split ruled today (000347 session, entry 16, P4 R3) is of sys-realization, not sys-governance. Session Manager's context says the same. The structures in question: docs/08-governance/systems.yaml (35 systems, each declaring the paths it owns, and each document names its systems in front matter), _data/tags.json (the tag reference list, schemas/tag.schema.json), and the idea log's typed links. phase-conc-08 (write the enforcement-placement rule, apply it, and audit .claude/ settings), queued, carries the systems.yaml domains and the test/ split from sys-delivery. 000061 (classify idea nodes by ontological, epistemic and lifecycle type) is the classification idea for ideas. Part of the 000436 batch; relevant to 000437's tags between repositories.
 PROPOSED LINK: this idea --relates_to--> 000061 (classification of ideas)
+- **finding** by agent-ideation (2026-09-24T10:30:34-04:00): Owner's reply, 2026-09-24, relayed by Session Manager to Ideation: the sys-governance mention in this idea was only an example. The owner asked whether an idea exists to examine all system tags in general. Session Manager found none, and the owner approved a new idea for it, 000444, linked relates_to this one.
 
 </details>
 
 **Links**
 
 - relates_to → `000436`
+- relates_to ← `000444`
 
 ---
 
@@ -20771,5 +20836,68 @@ Only idea-triage.md, of the 15 tracked files in .claude/agents/, is a target in 
 - **finding** by agent-ideation (2026-09-24T09:59:38-04:00): Triage (checked on dev bdda45c). No phase covers it. Related: 000306 (nothing binds .codex/agents/*.toml to the .claude/agents/*.md definitions they copy), triaged, which is the adapter half of the same gap. 000067 (portable agent workflows from a single source of truth), promoted, is the design the manifest implements. GOV-015 (agent surface audit) and OPS-010 (the generator's runbook) describe the generated adapters. The 12 demo-*.toml Codex files are excluded only through .git/info/exclude, a local file, not through .gitignore. 000433 (where skills and agents are defined) is the owner's broader question.
 PROPOSED LINK: this idea --relates_to--> 000306 (the adapter half of the same gap)
 PROPOSED LINK: this idea --relates_to--> 000433 (where agents are defined)
+
+</details>
+
+---
+
+## 000443 · Add a "proposed" status for ADRs: draft, then proposed, then accepted
+
+**Created 2026-09-24T10:30:33-04:00 · Status: `triaged`**
+
+Finished ADRs waiting on the owner's acceptance should carry "proposed", separate from "draft" (still being written).
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T10:30:33-04:00): Relay record. From an owner ruling on 2026-09-24, relayed by Prompt Planner to Ideation. The body is Prompt Planner's wording of the ruling, not the owner's verbatim words. The owner confirmed in Ideation's session that it is recorded as the owner's idea, with no agent label. Context as relayed: the D8 Documenter ruling, recorded in ADR-023, says new ADRs stay "proposed" until the owner accepts them. Prompt Planner will cite this idea's id in ADR-023.
+- **finding** by agent-ideation (2026-09-24T10:30:33-04:00): Triage (checked on dev 921ccd1). Today an ADR may only be draft, accepted, deprecated or superseded: src/governance/__main__.py (the states set for kind adr, around line 266) rejects any other status, and GOV-001's lifecycle diagram has no proposed state. So an ADR marked "proposed" fails governance until both change. No backlog phase covers it. The change touches GOV-001 (the document lifecycle), the governance check, and any test that fixes the status set. Plans already have a separate owner-acceptance status (draft, then approved), which is the nearest precedent.
+
+</details>
+
+---
+
+## 000444 · Review every system tag (sys-*) in systems.yaml: granularity, splits and declared paths
+
+**Created 2026-09-24T10:30:33-04:00 · Status: `triaged`**
+
+A general review of every system tag (sys-*) in systems.yaml: granularity, splits and declared paths. The owner asked: "don't we have an idea to generally examine all of those tags? Not just sys-realization and sys-governance?"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T10:30:33-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is Session Manager's statement of the idea, followed by the owner's question verbatim as relayed. Session Manager found no existing idea for it. By owner ruling, this idea takes over entry 33 of the 000347 decision session (subdomains in systems.yaml, and moving test/ out of sys-delivery), which moves off phase-conc-08. It is linked relates_to 000441 at the relay's instruction.
+- **finding** by agent-ideation (2026-09-24T10:30:34-04:00): Triage (checked on dev 921ccd1). docs/08-governance/systems.yaml declares 35 systems, each with the paths it owns. Documents name their systems in front matter, and backlog phases declare them for concurrency checks. Two splits are already in motion: sys-realization (entry 16 of the 000347 session, P4 R3: a separate system id for the coordination code) and entry 33 (subdomains, and test/ out of sys-delivery), which this idea now carries. phase-conc-08 (write the enforcement-placement rule, apply it, and audit .claude/ settings) no longer carries entry 33 by owner ruling; its backlog text is not changed by this record. Related: 000441 (portability of tagging and classification), 000253 (phase-auto-03 and phase-auto-04 both declare sys-api, which ADR-003 would reject as concurrent).
+
+</details>
+
+**Links**
+
+- relates_to → `000441`
+
+---
+
+## 000445 · Resolve phase-irs-05's phase-fit heuristic in a planning session before irs-05 is rescoped
+
+**Created 2026-09-24T10:30:37-04:00 · Status: `triaged`**
+
+"Shouldn't we resolve the Heuristics question first rather than a bandaid only to go back and re-process?"
+
+**Annotations**
+
+
+<details>
+<summary>3 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T10:30:37-04:00): Relay record. The owner said this on 2026-09-24 about PLAN-039 review finding F04, and Session 1 - Builder A relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Builder A's statement of the idea. The owner confirmed in Ideation's session that it is recorded as the owner's idea, with no agent label. Context as relayed: there is no session-length data yet (every phase has session_budget: 1). The run ledger _data/runs.jsonl (PLAN-039.01 section 5) is built by phase-irs-04. F04 stays escalated until this is planned.
+- **finding** by agent-ideation (2026-09-24T10:30:37-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: Prompt Planner plans the heuristic after ADR-023 and after the fix plan for 000324 and 000325 (the catalog tests overwrite the tracked catalog.md). PLAN-039's review finding F04 stays escalated-g3 until then.
+- **finding** by agent-ideation (2026-09-24T10:30:37-04:00): Triage (checked on dev 921ccd1). phase-irs-05 (phase-fit procedure and agent) is queued. The heuristic needs session-length data that does not exist yet: every phase has session_budget: 1, and _data/runs.jsonl does not exist on dev (src/orchestrator/ledger.py is its write path, and no run has been recorded). Related: 000434 (what metrics we capture about agent runs), since the heuristic would read them; 000242 (a phase whose scope names a file its deliverables omit), another phase-fit defect.
+PROPOSED LINK: this idea --relates_to--> 000434 (the run metrics the heuristic would use)
 
 </details>
