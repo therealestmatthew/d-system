@@ -11,7 +11,7 @@ Ungoverned staging per `ADR-010`. Nothing here is recorded in `_data/ideas.jsonl
 
 ## How disagreements were ruled
 
-R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each divergence was ruled by the corpus links (`extends` and `supersedes` edges between ideas), `docs/08-governance/systems.yaml`, the documents the ideas name, and audit 1's per-divergence argument. Each group's **Basis** line says which. The rulings on audit 1's findings:
+R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchanged here, and the other 5 were changed by the rulings their groups state (235 with 316, 346 into the harness group, 124 into slot and panel). Everywhere else, each divergence was ruled by the corpus links (`extends` and `supersedes` edges between ideas), `docs/08-governance/systems.yaml`, the documents the ideas name, and audit 1's per-divergence argument. Each group's **Basis** line says which. The rulings on audit 1's findings:
 
 - **Finding A (000166 depends on 000020).** Placed together in *MCP-mediated access, enforcement harness and migration*.
 - **Finding B (HTML generation merged with the workbench).** Split into two tracks, matching `sys-html` versus the `sys-wb-*` systems in `systems.yaml`.
@@ -19,6 +19,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Divergence 1 (one coordination programme or three).** Held as three tracks, as R1 had them, matching the separate `sys-backlog`, `sys-auto-gateway`/`sys-auto-ledger` and `sys-realization` registrations. The 000385 anchor's mechanical gates go to governance checks, where they land in code; its design questions stay with realization.
 - **Divergence 3 (000122).** Kept in the one-nominator decline tier with both readings, since the audit could not tell.
 - **R1's in-document duplicates and miscounts.** Every id below appears once; R1's own corrections were applied before comparing.
+- **Audit 2** (`_working/idea-corpus/audit-2-findings.md`) found no blocker and confirmed coverage and the decline tiers. Its two major and four minor findings were Basis lines that misstated which analyst held a group; every Basis line was then checked mechanically against both reports and corrected. No placement changed.
 
 ## Completeness arithmetic
 
@@ -124,7 +125,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Classification here is for the whole knowledge base; the ontology group's is idea-specific.
 - **Precedes:** The literature review (complete).
 - **Size:** 3 sessions.
-- **Basis:** agree
+- **Basis:** R4's set; R1's group also held 032, 036 and 166
 
 #### T1.9 Provenance graph and recommendation calibration
 
@@ -213,7 +214,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Ships with nothing else here.
 - **Precedes:** None.
 - **Size:** 1 session.
-- **Basis:** agree
+- **Basis:** R4's singleton; R1 paired it with 054
 
 #### T2.6 Observability and telemetry
 
@@ -311,7 +312,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** R4 folded 031 into the MCP group; the broker is registered work under PLAN-032 and needs no MCP surface.
 - **Precedes:** None.
 - **Size:** 1-2 sessions.
-- **Basis:** R1's grouping
+- **Basis:** ruling: neither analyst held these three together; R1 had 031 alone and 326 with 333, R4 put 031 in its MCP group. Joined on subject: 326 and 333 are about the broker 031 is
 
 #### T3.3 Trigger gateway, run ledger and worker host
 
@@ -355,7 +356,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Patches code this track produced.
 - **Precedes:** None (the code has landed).
 - **Size:** 2-3 sessions.
-- **Basis:** agree, less 349
+- **Basis:** R4's set. R1 held 349 here and 338 alone; 349 is ruled to the run-ledger group, and 338 (PLAN-039.01's wording against the shipped dispatch gate) was found in the same code reading
 
 #### T4.4 Session Manager roster, state and messaging
 
@@ -462,7 +463,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Edits systems.yaml, not the collision code.
 - **Precedes:** None.
 - **Size:** 2 sessions.
-- **Basis:** agree (R1's F39)
+- **Basis:** R1's pair; R4 held it inside its lock-check group
 
 #### T5.9 Backlog file shape and write safety
 
@@ -486,10 +487,10 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 
 - **Ideas (1):** 000403
 - **Why together:** Singleton rule.
-- **Independence:** A claim-protocol rule; R4 placed it with delivery gates, R1 here.
+- **Independence:** A claim-protocol rule. R4 placed it with delivery gates and called the choice close; R1 here. Its own finding relates it to 000385 and says it must fit together with 000398, which is in this track's lock-check group.
 - **Precedes:** None.
 - **Size:** 1 session.
-- **Basis:** R1's placement
+- **Basis:** R1's placement; a close call, listed in the residual
 
 #### T5.12 Branch protection and push-rule wording
 
@@ -560,7 +561,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** One tool and one rule.
 - **Precedes:** None.
 - **Size:** 1 session.
-- **Basis:** agree, less 157
+- **Basis:** R4's set; R1's group also held 157
 
 #### T6.4 Schema, DDL and model drift
 
@@ -587,7 +588,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** One document.
 - **Precedes:** None.
 - **Size:** Under 1 session.
-- **Basis:** agree
+- **Basis:** R1's group; R4 held the trio inside a nine-member stale-reference group
 
 #### T6.7 Glossary protocol and terminology tooling
 
@@ -641,7 +642,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Test infrastructure only.
 - **Precedes:** None.
 - **Size:** 1-2 sessions.
-- **Basis:** agree
+- **Basis:** R4's pair; R1's group also held 056
 
 #### T6.13 Tag-category approval and confidential tags
 
@@ -704,7 +705,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Output is copied into other repositories; changes nothing here.
 - **Precedes:** The component phases before assembly (314).
 - **Size:** 4-6 sessions.
-- **Basis:** agree, less 069
+- **Basis:** R1's group; R4 added 069
 
 ### T7. HTML generation and design system
 
@@ -756,7 +757,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** 118 and 119 depend on 110.
 - **Precedes:** 110 before 118 and 119.
 - **Size:** 3 sessions.
-- **Basis:** agree, less 100 and 111
+- **Basis:** the core both hold; R4 added 100, R1 added 111 and 120
 
 #### T8.4 Bookmark categories and the panel bridge
 
@@ -845,7 +846,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** All in PROMPT-029's gate logic.
 - **Precedes:** None.
 - **Size:** 1-2 sessions.
-- **Basis:** R1's grouping
+- **Basis:** R1's grouping, less 199 and 202 (moved to the contract amendments)
 
 #### T9.3 Pre-synthesis check-in rulings
 
@@ -872,7 +873,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** One phase's deliverables.
 - **Precedes:** None.
 - **Size:** Under 1 session each.
-- **Basis:** agree (R1's F95)
+- **Basis:** R1's group; R4 split it across three groups
 
 #### T9.6 Post-campaign follow-through
 
@@ -898,7 +899,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups. Everywhere else, each di
 - **Independence:** Every member extends 170; cutting one shrinks this plan rather than creating another.
 - **Precedes:** None.
 - **Size:** Delivered.
-- **Basis:** agree
+- **Basis:** R4's set; R1 held 207 apart
 
 ### T11. Organisational data model and portfolio productivity
 
@@ -996,4 +997,5 @@ Nominations only. The owner rules on each one individually at GATE 3; nothing he
 
 - **000157** — its items are the batching pack's close-out and the private-content bug (000150's family). Placed with the partition process by its title; the bug item is already tracked in *Private-content check silent pass*.
 - **000216** — placed in retrieval, where neither analyst put it, because the fix lands in session context loading.
+- **000403** — R4 called its placement close; placed with claims on its own finding's tie to 000398.
 - **000346**, **000069** and **000306**, **000168**, **000100** — each ruled between the analysts on a shared file or the corpus links, as their Basis lines say; a planner could reasonably move any of them.

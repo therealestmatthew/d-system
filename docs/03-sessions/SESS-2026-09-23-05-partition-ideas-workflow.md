@@ -533,3 +533,53 @@ did in both sessions: "Re-run R1, then audit 1" stands. Run inside a granted
   for parts, 0 above sonnet. About 72 minutes.
 
 The sweep stopped at GATE 2. The owner decides whether synthesis proceeds.
+
+## Synthesis, audit 2 and the gate checklist, to GATE 3 (2026-09-24)
+
+At GATE 2 the owner answered "Proceed to synthesis" in this session.
+
+- **Synthesis (`S`), in this worktree.** Written at `docs/00-working/idea-partition-2026-09-23.md`
+  with its record `idea-partition-2026-09-23.json`; the naming check printed that stem with no
+  earlier file at it. 383 ideas: 381 in 91 fine groups under 12 tracks, 2 unbatched (`000013`,
+  `000068`). Decline tiers: 2 nominated by both, 12 by one. `state: proposed`. Divergences were
+  ruled on the corpus's `extends`/`supersedes` links, `systems.yaml`, the documents the ideas name
+  (`REQ-021` was read for audit 1's Finding C), and audit 1's per-divergence argument. Each group
+  carries a Basis line. Both files were generated from one spec so they cannot disagree. The
+  step 5 check: `0 problem(s)`.
+- **Step 6, by the owner's ruling.** Asked how audit 2 should read a draft that exists only in
+  this worktree, the owner chose "Add worktree path". A2's block was sent unchanged with this
+  paragraph appended, the only difference `diff` shows:
+
+  ```text
+  ADDED FOR THIS SWEEP (owner ruling, 2026-09-24). The merged staging document is not on dev yet.
+  Read it at /code/d-system-worktrees/phase-part-03/docs/00-working/idea-partition-2026-09-23.md,
+  with its record beside it at the same path ending .json.
+  ```
+
+  Dispatched to `partition-adversary`, model sonnet, inside a granted `TURN? dryrun` at
+  `8ad9861`. `audit-2-findings.md`, 5,164 bytes.
+- **Audit 2's findings.** No blocker. It verified coverage (383 of 383, none twice) and that the
+  decline tiers are the exact union of the two reports' nominations, and held audit 1's A, B and
+  C and Divergence 1 as correctly applied. Two major and four minor findings, all Basis lines
+  misstating which analyst held a group (capability broker, orchestrator defects, and several
+  "agree" labels). Fixed: every Basis line was checked mechanically against both parsed reports
+  and corrected; no placement changed. The document records this under "How disagreements were
+  ruled".
+- **Gate checklist (`G`), real output, after the fixes:**
+  1. Coverage: step 5 check `0 problem(s)`; 381 in groups plus 2 unbatched is 383.
+  2. `12 tracks, 91 groups`: inside 8-12.
+  3. `103 group records checked (tracks + fine groups); missing fields: []`.
+  4. `unbatched 2 all reasoned True`; the size is reported in the document.
+  5. `both ['000102', '000282'] one 12`, each with its reason; audit 2 confirmed nothing filtered.
+  6. Audit 2 returned; no blocker; its findings are fixed as above.
+  7. `Governance OK: 35 systems, 338 documents, 32 memories, 294 backlog phases`, exit 0.
+  8. No agent in this sweep wrote to `_data/ideas.jsonl`. Its sha256 is `b3e94944…` from the start
+     of the R1 re-run turn to now. The change from GATE 1's `3b9d0ce0…` came from Ideation's
+     triage turns on dev, not from this sweep.
+  9. Spend, whole sweep: 4 dispatches in total (R1 and R4 at GATE 1, then the R1 re-run and A1),
+     plus A2, so 5, all on sonnet. The R1 re-run was resumed after truncation once, then asked
+     for its report part by part (seven more requests). Wall clock is about 3 hours 20 minutes of
+     agent time against a stated 20-minute estimate to GATE 1. The overrun came from the R1
+     re-run, from the synthesis, and from waiting for turns.
+
+The sweep stopped at GATE 3 for the owner's ruling on the partition and on each decline candidate.
