@@ -576,8 +576,8 @@ At GATE 2 the owner answered "Proceed to synthesis" in this session.
   8. No agent in this sweep wrote to `_data/ideas.jsonl`. Its sha256 is `b3e94944…` from the start
      of the R1 re-run turn to now. The change from GATE 1's `3b9d0ce0…` came from Ideation's
      triage turns on dev, not from this sweep.
-  9. Spend, whole sweep: 4 dispatches in total (R1 and R4 at GATE 1, then the R1 re-run and A1),
-     plus A2, so 5, all on sonnet. The R1 re-run was resumed after truncation once, then asked
+  9. Spend, whole sweep: 5 dispatches (R1 and R4 before GATE 1, the R1 re-run, A1 and A2), all
+     on sonnet. The R1 re-run was resumed after truncation once, then asked
      for its report part by part (seven more requests). Wall clock is about 3 hours 20 minutes of
      agent time against a stated 20-minute estimate to GATE 1. The overrun came from the R1
      re-run, from the synthesis, and from waiting for turns.
