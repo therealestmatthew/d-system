@@ -19941,7 +19941,7 @@ Context from the Session Manager: each write to dev makes the next primary-check
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T03:01:08-04:00): Checked on dev at 973196b. .github/workflows/ci.yaml runs on every push to dev and main, with no path filter. It has two jobs in parallel:
 - "Python lint & test": uv sync, the private-content check, governance, the catalog diff, ruff, mypy and the full pytest suite.
@@ -19961,6 +19961,7 @@ Options for planning, none checked beyond the points above:
 Related: 000413 and 000399 (a full test run after every write to dev, where CI is that run), 000012 (skip the test preflight when the tree is provably clean), 000324 and 000325 (catalog tests overwrite the tracked catalog), 000026 (CI only builds the frontend).
 
 PROPOSED LINK: 000419 --relates_to--> 000413 (the gating CI run whose duration this idea would shorten)
+- **finding** by agent-ideation (2026-09-24T07:43:27-04:00): Correction to this idea's triage finding. It glosses "000413 and 000399" as "a full test run after every write to dev, where CI is that run". That describes 000399 only. 000413 is "Nothing reads dev's CI result: check that the last dev CI run is green before granting each primary-checkout turn", which is a gate on grants, not a test run. The PROPOSED LINK 000419 --relates_to--> 000413 stands: a shorter CI run shortens the wait at that gate.
 
 </details>
 
@@ -20140,3 +20141,28 @@ As given: "A third potential idea is an agent dedicated or multiple agents speci
 **Links**
 
 - relates_to → `000424`
+
+---
+
+## 000427 · Investigate pre-existing routing solutions that we might be able to integrate
+
+**Created 2026-09-24T07:43:19-04:00 · Status: `triaged`**
+
+"We're not recreating the wheel. We need to investigate pre-existing routing solutions ... have an idea to investigate pre existing routing solutions that we might be able to integrate"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T07:43:26-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words exactly as relayed, including the relay's "...". Context as relayed: when ruling on D3-3, the owner accepted the Scout's recommendation for now: a LangGraph router node with typed Literal output, run in shadow before it may route (langgraph-supervisor is deprecated). The owner asked for this idea so that existing routing solutions are investigated before one is built. The relay names these as related: 000334, and the 000347 session rulings (_working/session-manager/reports/rulings-000347.md, gitignored).
+- **finding** by agent-ideation (2026-09-24T07:43:26-04:00): Triage (checked on dev 4881427). No backlog phase covers this. The "router" entries in backlog.yaml are about the frontend's ts/src/router.tsx and are unrelated. Related material:
+- 000334 (carry the Session Manager system, GOV-017, into the LangGraph and Claude Agent SDK delivery system), triaged. Its ruling in the 000347 session says a new ADR will supersede phase-irs-16's routing (phase-irs-16 is the daemon process model).
+- ADR-018 (orchestrate the idea realization pipeline with LangGraph over the Claude Agent SDK), PLAN-039 and PLAN-039.01 (the idea realization system and its orchestrator design), ARCH-006, and SESS-2026-09-23-01 (the LangGraph orchestrator skeleton). These fix the framework this investigation would integrate with.
+- Gitignored, so not citable from a governed document: _working/session-manager/scout/d3-supervisor-vs-sm-session.md is the Scout's D3 comparison behind the D3-3 recommendation. Its section 7.1 cites https://docs.langchain.com/oss/python/migrate/langgraph-supervisor for the deprecation of langgraph-supervisor. _working/session-manager/scout/orchestration-2-external.md (Scout, 2026-09-23) already surveys external evidence, including LangChain's five multi-agent patterns (subagents, handoffs, skills, router, custom workflow) with model-call and token figures. That report's own note says its pages were read through a summarising tool, and every figure must be re-read at its URL before it is quoted. It is a starting point for this investigation, not a finished one: it covers LangChain's patterns, not a comparison of integrable routing libraries.
+- 000082 (agent engineering: orchestration, routing, multi-agent coordination and recovery paths), triaged. It covers the same topic at the level of a discipline.
+PROPOSED LINK: this idea --relates_to--> 000334 (the relay names it; the router node is part of carrying the Session Manager system into the orchestrator)
+PROPOSED LINK: this idea --relates_to--> 000082 (the same topic, at the discipline level)
+
+</details>
