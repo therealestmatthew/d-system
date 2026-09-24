@@ -15,7 +15,7 @@ readability; the backlog is authoritative when the two disagree.
 | Table | Status | Seq | What it builds |
 |---|---|---|---|
 | `batch-001` | complete | 1 | Partition close, portfolio move, session lifecycle, first two realization foundations |
-| `batch-002` | queued | 2 | Two governance guards, the autonomous-operations broker, the orchestrator skeleton |
+| `batch-002` | complete | 2 | Two governance guards, the autonomous-operations broker, the orchestrator skeleton |
 | `batch-003` | queued | 3 | Batch graph and run budgets, idea schema bundle, plan-quality standard |
 | `batch-004` | queued | 4 | Mandatory-requirement ruling, idea planner agent, first three pipeline phases |
 | `batch-005` | queued | 5 | Gate queue, execution-loop harness, delivered status, anti-pattern store |
