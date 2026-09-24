@@ -4,10 +4,10 @@ schema_version: 1
 id: batch-002
 title: Two governance guards, then the autonomous-operations broker and the orchestrator skeleton
   it gates
-status: in_progress
+status: complete
 sequence: 2
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-24'
 coordinator: PROMPT-036
 provenance: 'Composed 2026-09-22 at the owner''s direction: next_up''s first seven entries, which
   are PROMPT-036''s original batch 2 with the two newly ranked guards ahead of it. Replaces that batch.
