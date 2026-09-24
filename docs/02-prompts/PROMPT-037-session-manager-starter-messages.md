@@ -27,7 +27,9 @@ the post-merge completion edit (item 4), and the `_working/` report exemption (i
 revised again on 2026-09-23 to add the owner's rulings that the merge gate includes `ruff` and
 `mypy` and that the dirty-integration check runs before every fast-forward. Item 4(iii) and the
 builder roles' step 5 were revised on 2026-09-24 (`phase-grd-01`, `REQ-028` R05) to name the
-catalog regeneration in the completion edit.
+catalog regeneration in the completion edit. Item 1 was revised on 2026-09-24 (`phase-grd-02`,
+`REQ-028` R06) to require the push of `dev` before `TURN DONE` and to state the green-CI grant
+rule.
 
 ## Kickoff for the Session Manager
 
@@ -70,7 +72,12 @@ Roster
            gitignored writes only, no commit; merges go through READY below)
      wait  GRANTED (or QUEUED <n>)
      do    only the stated purpose; leave `git status` clean
+     push  dev to origin (if the push is blocked: send BLOCKED, keep the turn, ask the owner)
      send  TURN DONE <sha>
+   I grant claim, dryrun and merge only when `tools/check_dev_ci.py` says dev's CI is green
+   (exit 0). Red (exit 1): only the fix the owner names is granted. Unknown (exit 2, CI still
+   running or dev not pushed): no grant until it is known or the owner rules for that grant.
+   idea and batch turns are not gated.
 2. CLAIMS: max_active is 3. Claim only a phase I assigned, and only inside a granted turn.
 3. Everything else runs in a worktree: ../d-system-worktrees/<id> on branch agent/<id>.
    Exception: reports under _working/session-manager/ (gitignored) need no turn.
