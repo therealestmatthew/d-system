@@ -3,7 +3,7 @@
 # Idea partition, 2026-09-23 corpus
 
 - **Corpus:** 383 ideas, status filter `triaged`, manifest seed `1370316527`, corpus date 2026-09-23 (`_working/idea-corpus/manifest.json`).
-- **State:** proposed. The owner accepts or corrects it at GATE 3 and rules on each decline candidate.
+- **State:** accepted by the owner at GATE 3, 2026-09-24, with the rulings recorded under *GATE 3 rulings*.
 - **Built from:** `report-R1.md` (the owner-ordered re-run, which read the triage findings), `report-R4.md` (the control, which did not) and `audit-1-findings.md`, following `PROMPT-034` section S.
 - **Record:** `docs/00-working/idea-partition-2026-09-23.json` carries the same tracks, groups and ids.
 
@@ -24,32 +24,32 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 ## Completeness arithmetic
 
 - Corpus in: **383** (`manifest.json`; `corpus-R1.md` lists the same ids).
-- Placed in fine groups: **381**, in 91 groups under 12 tracks.
-- Unbatched: **2**.
-- 381 + 2 = **383**. No id is in two places; every decline candidate is also in a group.
+- Placed in fine groups: **371**, in 87 groups under 12 tracks.
+- Unbatched: **12**.
+- 371 + 12 = **383**. No id is in two places; every decline candidate is in a group or in the unbatched section.
 
 ## Level 2: the tracks
 
 | Track | Ideas | Fine groups | Rough size |
 |---|---|---|---|
-| Idea system and knowledge retrieval | 60 | 12 | Large: roughly 12-16 sessions across its groups. |
+| Idea system and knowledge retrieval | 59 | 12 | Large: roughly 12-16 sessions across its groups. |
 | Agent engineering and review | 30 | 13 | Large: roughly 12-16 sessions. |
 | MCP mediation and autonomous operations | 14 | 3 | Large: roughly 10-15 sessions. |
 | Idea realization and multi-session coordination | 37 | 6 | Very large: roughly 20-30 sessions. |
 | Concurrency, claims, backlog and git safety | 37 | 15 | Large: roughly 15-20 sessions. |
-| Governance checks, document hygiene and the portable framework | 71 | 19 | Large: roughly 25-30 sessions, most of them small. |
+| Governance checks, document hygiene and the portable framework | 70 | 18 | Large: roughly 25-30 sessions, most of them small. |
 | HTML generation and design system | 6 | 1 | 3 sessions. |
-| Workbench and demo stage | 35 | 10 | Large: roughly 15-20 sessions. |
-| Literature-review campaign follow-ups | 39 | 6 | Medium: roughly 5-7 sessions. |
+| Workbench and demo stage | 33 | 9 | Large: roughly 15-20 sessions. |
+| Literature-review campaign follow-ups | 38 | 6 | Medium: roughly 5-7 sessions. |
 | Consultant demo kit | 28 | 1 | Delivered. |
-| Organisational data model and portfolio productivity | 20 | 3 | Large: roughly 10-15 sessions. |
-| Standalone items | 4 | 2 | Small. |
+| Organisational data model and portfolio productivity | 18 | 2 | Large: roughly 10-15 sessions. |
+| Standalone items | 1 | 1 | Small. |
 
 ## Level 1: the fine groups, by track
 
 ### T1. Idea system and knowledge retrieval
 
-- **Members (60):** 000018, 000053, 000055, 000061, 000062, 000064, 000065, 000204, 000236, 000268, 000313, 000366, 000367, 000008, 000010, 000050, 000071, 000127, 000038, 000046, 000047, 000048, 000049, 000125, 000157, 000205, 000206, 000243, 000244, 000339, 000354, 000388, 000395, 000407, 000042, 000299, 000300, 000301, 000302, 000303, 000304, 000305, 000002, 000004, 000005, 000040, 000043, 000044, 000045, 000060, 000161, 000162, 000163, 000164, 000167, 000032, 000036, 000033, 000034, 000216
+- **Members (59):** 000018, 000053, 000055, 000061, 000062, 000064, 000065, 000204, 000236, 000268, 000313, 000366, 000367, 000008, 000010, 000050, 000071, 000127, 000038, 000046, 000047, 000048, 000049, 000125, 000157, 000206, 000243, 000244, 000339, 000354, 000388, 000395, 000407, 000042, 000299, 000300, 000301, 000302, 000303, 000304, 000305, 000002, 000004, 000005, 000040, 000043, 000044, 000045, 000060, 000161, 000162, 000163, 000164, 000167, 000032, 000036, 000033, 000034, 000216
 - **Why together:** Everything about the idea log itself (its schema, tooling, agents and the partition process run over it) and the knowledge layer agents search. R4 held these as one programme; R1 as two. Level 2 is readability's call, and one track keeps the count at twelve while the fine groups stay separate underneath.
 - **Independence:** Against agent engineering: the planner and scribe agents here are idea-log roles, not general agent construction. Against idea realization: this track owns the idea log's schema and the partition workflow; the realization pipeline reads them and changes neither. Against HTML generation: the explorer-page group depends one way on its assets (see that group). One line elsewhere: no shared file.
 - **Precedes:** None as a whole.
@@ -84,12 +84,12 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 #### T1.4 Partition process: pack reliability, harness constraints and thresholds
 
-- **Ideas (11):** 000125, 000157, 000205, 000206, 000243, 000244, 000339, 000354, 000388, 000395, 000407
-- **Why together:** The partition pack's own defect and method trail: the 2026-09-13 partition's errors (243, 244), the presentation-order result (205), the subagent write constraint (206, 339, 354, 407), the close-out of the batching pack (157), and when a cluster must go through partition-ideas (388, 395).
+- **Ideas (10):** 000125, 000157, 000206, 000243, 000244, 000339, 000354, 000388, 000395, 000407
+- **Why together:** The partition pack's own defect and method trail: the 2026-09-13 partition's errors (243, 244), the subagent write constraint (206, 339, 354, 407), the close-out of the batching pack (157), and when a cluster must go through partition-ideas (388, 395).
 - **Independence:** Self-contained to PROMPT-034, the partition-ideas skill and tools/build_idea_corpus.py. 388 and 395 sit under the 000385 anchor, but their subject is this workflow, not the Session Manager.
 - **Precedes:** None.
 - **Size:** 1-2 sessions.
-- **Basis:** R4's grouping; 388 and 395 moved from R1's 385-anchor groups on subject
+- **Basis:** R4's grouping; 388 and 395 moved from R1's 385-anchor groups on subject; 205 held out at GATE 3
 
 #### T1.5 Explorer pages decision and build
 
@@ -530,7 +530,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 ### T6. Governance checks, document hygiene and the portable framework
 
-- **Members (71):** 000155, 000198, 000208, 000324, 000325, 000335, 000351, 000353, 000357, 000405, 000406, 000106, 000231, 000150, 000195, 000384, 000024, 000035, 000052, 000345, 000023, 000341, 000342, 000329, 000330, 000331, 000371, 000372, 000373, 000374, 000375, 000376, 000382, 000298, 000377, 000378, 000381, 000383, 000379, 000380, 000394, 000399, 000400, 000401, 000402, 000408, 000409, 000410, 000056, 000026, 000057, 000337, 000343, 000006, 000145, 000146, 000237, 000291, 000292, 000293, 000294, 000270, 000271, 000272, 000273, 000276, 000277, 000278, 000279, 000281, 000314
+- **Members (70):** 000155, 000198, 000208, 000324, 000325, 000335, 000351, 000353, 000357, 000405, 000406, 000106, 000231, 000150, 000195, 000384, 000024, 000035, 000052, 000345, 000023, 000341, 000342, 000329, 000330, 000331, 000371, 000372, 000373, 000374, 000375, 000376, 000382, 000298, 000377, 000378, 000381, 000383, 000379, 000380, 000394, 000399, 000400, 000401, 000402, 000408, 000409, 000410, 000056, 000026, 000057, 000337, 000343, 000006, 000145, 000237, 000291, 000292, 000293, 000294, 000270, 000271, 000272, 000273, 000276, 000277, 000278, 000279, 000281, 000314
 - **Why together:** Keeping the repository's own governed documents true and its checks honest (the catalog family, drift, glossary, private-content check, delivery gates), plus the portable framework and the session-taxonomy tooling that generalise the same documents. R1 held these as one programme; R4 split the framework out. One track keeps the count at twelve; the fine groups keep them apart.
 - **Independence:** Against concurrency and claims: different files (catalog, glossary, governed prose versus backlog.py and backlog.yaml). Against the literature-campaign follow-ups: those edit research/literature-review and PLAN-023.03, which nothing here touches. The portable framework (sys-fw-*) produces documents for other repositories and changes no check here.
 - **Precedes:** None.
@@ -671,16 +671,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** 1 session.
 - **Basis:** R4's placement
 
-#### T6.16 Session-record correction convention
-
-- **Ideas (1):** 000146
-- **Why together:** Singleton: one misstated hand-off note, and whether a closed session record may be corrected.
-- **Independence:** The lasting question is a governance convention; R4 placed it with the campaign.
-- **Precedes:** None.
-- **Size:** Under 1 session.
-- **Basis:** R1's placement
-
-#### T6.17 Checkpoint and session-close for unclaimed sessions
+#### T6.16 Checkpoint and session-close for unclaimed sessions
 
 - **Ideas (1):** 000237
 - **Why together:** Singleton, delivered (99a0f5e).
@@ -689,7 +680,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** Delivered.
 - **Basis:** agree
 
-#### T6.18 Session-taxonomy investigation tooling
+#### T6.17 Session-taxonomy investigation tooling
 
 - **Ideas (4):** 000291, 000292, 000293, 000294
 - **Why together:** One investigation's four follow-ons (PLAN-042).
@@ -698,7 +689,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** 2-3 sessions.
 - **Basis:** agree
 
-#### T6.19 Portable-framework templates, schemas and starter kit
+#### T6.18 Portable-framework templates, schemas and starter kit
 
 - **Ideas (10):** 000270, 000271, 000272, 000273, 000276, 000277, 000278, 000279, 000281, 000314
 - **Why together:** The 2026-09-19 framework batch, rolling up to the starter kit (281) and its assembly gap (314); PLAN-040 and PLAN-041.
@@ -726,7 +717,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 ### T8. Workbench and demo stage
 
-- **Members (35):** 000087, 000095, 000096, 000100, 000137, 000140, 000246, 000113, 000114, 000121, 000109, 000110, 000118, 000119, 000232, 000238, 000111, 000120, 000124, 000133, 000134, 000135, 000141, 000233, 000115, 000116, 000123, 000131, 000132, 000142, 000143, 000144, 000122, 000089, 000102
+- **Members (33):** 000087, 000095, 000096, 000100, 000137, 000140, 000246, 000113, 000114, 000121, 000109, 000110, 000118, 000119, 000232, 000238, 000111, 000120, 000124, 000133, 000134, 000135, 000141, 000233, 000115, 000116, 000123, 000131, 000132, 000142, 000143, 000144, 000102
 - **Why together:** Features, audits and defects in the workbench and demo stage (sys-wb-*, sys-demo-stage): the terminal, the HTML Viewer, the slot and panel system, and the owner-commissioned audits.
 - **Independence:** Against HTML generation: see that track. One line elsewhere: ts/src/stage and src/api/routes for the workbench are unique to this track.
 - **Precedes:** None.
@@ -804,27 +795,18 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** 2-3 sessions.
 - **Basis:** R1's placement
 
-#### T8.9 Non-web rebuild evaluation
+#### T8.9 Demo-stage residuals
 
-- **Ideas (1):** 000122
-- **Why together:** Singleton comparison exercise.
-- **Independence:** Research only.
-- **Precedes:** None.
-- **Size:** 1-2 sessions.
-- **Basis:** agree
-
-#### T8.10 Demo-stage residuals
-
-- **Ideas (2):** 000089, 000102
-- **Why together:** The seeded fallback idea and a rehearsal-only suggestion; both record demo artifacts rather than ask for builds.
-- **Independence:** R4 put 089 with idea tooling; its subject is tools/demo_reset.py.
+- **Ideas (1):** 000102
+- **Why together:** A rehearsal-only suggestion that records a demo artifact rather than asking for a build.
+- **Independence:** No shared file with the other groups.
 - **Precedes:** None.
 - **Size:** Under 1 session.
-- **Basis:** R1's pairing
+- **Basis:** R1's pairing; 089 held out at GATE 3
 
 ### T9. Literature-review campaign follow-ups
 
-- **Members (39):** 000147, 000148, 000149, 000197, 000199, 000200, 000202, 000211, 000212, 000213, 000221, 000289, 000295, 000307, 000201, 000214, 000218, 000219, 000220, 000227, 000228, 000290, 000297, 000225, 000226, 000229, 000230, 000203, 000209, 000210, 000296, 000308, 000309, 000310, 000311, 000312, 000287, 000315, 000344
+- **Members (38):** 000147, 000148, 000149, 000197, 000199, 000200, 000202, 000211, 000212, 000213, 000221, 000289, 000295, 000307, 000201, 000214, 000218, 000219, 000220, 000227, 000228, 000297, 000225, 000226, 000229, 000230, 000203, 000209, 000210, 000296, 000308, 000309, 000310, 000311, 000312, 000287, 000315, 000344
 - **Why together:** Defects and follow-through from the closed PLAN-023 campaign: the evidence contract, the gate, its deliverables, and the recommendations with no consumer.
 - **Independence:** Self-contained to research/literature-review/, PLAN-023.03 and PROMPT-029. The two analysts agree on the boundary. Against governance checks: nothing here touches a governance tool.
 - **Precedes:** None; the campaign is complete.
@@ -841,12 +823,12 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 #### T9.2 Gate-method defects and the deterministic-gate proposal
 
-- **Ideas (9):** 000201, 000214, 000218, 000219, 000220, 000227, 000228, 000290, 000297
-- **Why together:** The gate measured the wrong population and reported PASS or FAIL on it; 290 proposes replacing the gate with a script, and 297 is the gate contract's own undercount.
+- **Ideas (8):** 000201, 000214, 000218, 000219, 000220, 000227, 000228, 000297
+- **Why together:** The gate measured the wrong population and reported PASS or FAIL on it; 297 is the gate contract's own undercount.
 - **Independence:** All in PROMPT-029's gate logic.
 - **Precedes:** None.
 - **Size:** 1-2 sessions.
-- **Basis:** R1's grouping, less 199 and 202 (moved to the contract amendments)
+- **Basis:** R1's grouping, less 199 and 202 (moved to the contract amendments); 290 held out at GATE 3
 
 #### T9.3 Pre-synthesis check-in rulings
 
@@ -903,22 +885,13 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 ### T11. Organisational data model and portfolio productivity
 
-- **Members (20):** 000255, 000256, 000257, 000258, 000259, 000260, 000261, 000262, 000263, 000264, 000265, 000266, 000267, 000364, 000365, 000022, 000360, 000361, 000362, 000363
+- **Members (18):** 000257, 000258, 000259, 000260, 000261, 000262, 000263, 000264, 000265, 000266, 000267, 000364, 000365, 000022, 000360, 000361, 000362, 000363
 - **Why together:** The owner's consulting data: the ARCH-010 organisational model and the productivity gaps caused by having no real records.
 - **Independence:** No schema, file or code path shared with any other track; audit 1 confirmed the boundary (20 of 20 in both reports).
 - **Precedes:** None as a whole.
 - **Size:** Large: roughly 10-15 sessions.
 
-#### T11.1 Master data management and stewardship
-
-- **Ideas (2):** 000255, 000256
-- **Why together:** The MDM system and its stewardship agent, paired by the owner.
-- **Independence:** MDM's relationship to the JSON and DuckDB model is unresolved in its own text, so it does not require the entity model first.
-- **Precedes:** None formally.
-- **Size:** 3 sessions.
-- **Basis:** R4's split
-
-#### T11.2 Organisational entity model and its plan
+#### T11.1 Organisational entity model and its plan
 
 - **Ideas (13):** 000257, 000258, 000259, 000260, 000261, 000262, 000263, 000264, 000265, 000266, 000267, 000364, 000365
 - **Why together:** ARCH-010's accepted batch, the opportunity entity it names (364), and the plan that would deliver it (365).
@@ -927,7 +900,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** 6-8 sessions.
 - **Basis:** ruling: R4's own flag on 365
 
-#### T11.3 Portfolio core-entity productivity gaps
+#### T11.2 Portfolio core-entity productivity gaps
 
 - **Ideas (5):** 000022, 000360, 000361, 000362, 000363
 - **Why together:** 022's zero-records finding and the four gaps it exposed: API and UI, quick entry, reminders, external intake. Each links to 022.
@@ -938,22 +911,13 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 ### T12. Standalone items
 
-- **Members (4):** 000015, 000016, 000017, 000282
+- **Members (1):** 000282
 - **Why together:** Small items with no build system, plan or consumer in common with any other track or with each other. Grouped at level 2 for readability only.
 - **Independence:** Each group is independent of every other track by construction.
 - **Precedes:** None.
 - **Size:** Small.
 
-#### T12.1 Public presence and content automation
-
-- **Ideas (3):** 000015, 000016, 000017
-- **Why together:** An X content series, its multi-platform extension, and the pipeline for both.
-- **Independence:** No shared file, system or consumer with anything else.
-- **Precedes:** None.
-- **Size:** 2-4 sessions if pursued.
-- **Basis:** agree
-
-#### T12.2 External reference link
+#### T12.1 External reference link
 
 - **Ideas (1):** 000282
 - **Why together:** Singleton saved link.
@@ -962,12 +926,29 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Size:** Under 1 session.
 - **Basis:** agree
 
+## GATE 3 rulings
+
+The owner accepted the partition on 2026-09-24 and ruled on every decline candidate:
+
+- **Declined:** 000102, 000282, 000086, 000140. They stay in their groups here; recording the decline in `_data/ideas.jsonl` is a separate, owner-directed step.
+- **Held out of this partition, not declined:** 000015, 000016, 000017, 000089, 000122, 000146, 000205, 000255, 000256, 000290. Each moved to the unbatched section; groups left empty were removed (master data management, public presence, the non-web rebuild evaluation, the session-record correction convention).
+
 ## Unbatched
 
-2 of 383. Both came through as R1's unbatched pair, each with a reason; R4 placed each as a singleton. The section is small, and each entry is a genuine two-way pull, not a catch-all.
+12 of 383. Two came through as R1's unbatched pair, each with a reason (R4 placed each as a singleton); the other ten are held out by the owner's GATE 3 ruling and are not declined.
 
 - **000013** — R1: could land in agent engineering (command boundary), governance process, or standalone, with no argument for one strong enough to state. R4 placed it as a singleton. It is carried forward unbatched: it belongs with whichever track picks it up.
 - **000068** — R1: its action (mine research/ for new ideas) is idea-system work and its motivation (feed the knowledge-architecture set) is retrieval work. R4 placed it as a standalone singleton. Carried forward unbatched for whichever group claims it.
+- **000015** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000016** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000017** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000089** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000122** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000146** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000205** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000255** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000256** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000290** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
 
 ## Decline candidates
 
@@ -975,23 +956,23 @@ Nominations only. The owner rules on each one individually at GATE 3; nothing he
 
 ### Nominated by both
 
-- **000102** — R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build.
-- **000282** — R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note.
+- **000102** — R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build. Owner ruling at GATE 3: declined.
+- **000282** — R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note. Owner ruling at GATE 3: declined.
 
 ### Nominated by one
 
-- **000086** (R1) — Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema.
-- **000140** (R1) — The owner's own learning project, not a system deliverable; better served outside the backlog.
-- **000255** (R1) — ARCH-010 marks the MDM system future work, parked; premature while the entities it would steward have no records.
-- **000256** (R1) — A stewardship agent for a system (000255) and data that do not exist yet.
-- **000290** (R1) — Soft decline: the campaign that motivated it is closed; a general gate-runner would be a different, unscoped idea.
-- **000089** (R4) — The seeded content is live and will not be reverted; resolved in substance.
-- **000205** (R4) — A measured result already folded into practice; nothing to build.
-- **000015** (R4) — No follow-up across the corpus. Audit 1: R4 lacked the owner's 2026-09-13 ruling that dormancy is not deadness for this trio, which R1 cited in declining to nominate it.
-- **000016** (R4) — As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.
-- **000017** (R4) — As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.
-- **000122** (R4) — Speculative, no trigger named, and the stack has been built on since. R1 declined to nominate it as strategic due diligence that is early, not stale.
-- **000146** (R4) — The ruling it depends on is made; what remains is a one-sentence correction whose own text asks whether it should be made.
+- **000086** (R1) — Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema. Owner ruling at GATE 3: declined.
+- **000140** (R1) — The owner's own learning project, not a system deliverable; better served outside the backlog. Owner ruling at GATE 3: declined.
+- **000255** (R1) — ARCH-010 marks the MDM system future work, parked; premature while the entities it would steward have no records. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000256** (R1) — A stewardship agent for a system (000255) and data that do not exist yet. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000290** (R1) — Soft decline: the campaign that motivated it is closed; a general gate-runner would be a different, unscoped idea. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000089** (R4) — The seeded content is live and will not be reverted; resolved in substance. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000205** (R4) — A measured result already folded into practice; nothing to build. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000015** (R4) — No follow-up across the corpus. Audit 1: R4 lacked the owner's 2026-09-13 ruling that dormancy is not deadness for this trio, which R1 cited in declining to nominate it. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000016** (R4) — As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000017** (R4) — As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000122** (R4) — Speculative, no trigger named, and the stack has been built on since. R1 declined to nominate it as strategic due diligence that is early, not stale. Owner ruling at GATE 3: held out of this partition, not declined.
+- **000146** (R4) — The ruling it depends on is made; what remains is a one-sentence correction whose own text asks whether it should be made. Owner ruling at GATE 3: held out of this partition, not declined.
 
 ## Residual: placements made with less confidence
 

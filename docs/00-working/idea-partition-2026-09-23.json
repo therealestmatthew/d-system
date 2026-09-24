@@ -9,7 +9,7 @@
     ],
     "shuffle_seed": 1370316527
   },
-  "state": "proposed",
+  "state": "accepted",
   "tracks": [
     {
       "name": "Idea system and knowledge retrieval",
@@ -57,7 +57,6 @@
           "ideas": [
             "000125",
             "000157",
-            "000205",
             "000206",
             "000243",
             "000244",
@@ -598,12 +597,6 @@
           ]
         },
         {
-          "name": "Session-record correction convention",
-          "ideas": [
-            "000146"
-          ]
-        },
-        {
           "name": "Checkpoint and session-close for unclaimed sessions",
           "ideas": [
             "000237"
@@ -729,15 +722,8 @@
           ]
         },
         {
-          "name": "Non-web rebuild evaluation",
-          "ideas": [
-            "000122"
-          ]
-        },
-        {
           "name": "Demo-stage residuals",
           "ideas": [
-            "000089",
             "000102"
           ]
         }
@@ -776,7 +762,6 @@
             "000220",
             "000227",
             "000228",
-            "000290",
             "000297"
           ]
         },
@@ -862,13 +847,6 @@
       "name": "Organisational data model and portfolio productivity",
       "groups": [
         {
-          "name": "Master data management and stewardship",
-          "ideas": [
-            "000255",
-            "000256"
-          ]
-        },
-        {
           "name": "Organisational entity model and its plan",
           "ideas": [
             "000257",
@@ -903,14 +881,6 @@
       "name": "Standalone items",
       "groups": [
         {
-          "name": "Public presence and content automation",
-          "ideas": [
-            "000015",
-            "000016",
-            "000017"
-          ]
-        },
-        {
           "name": "External reference link",
           "ideas": [
             "000282"
@@ -928,78 +898,118 @@
     {
       "id": "000068",
       "reason": "R1: its action (mine research/ for new ideas) is idea-system work and its motivation (feed the knowledge-architecture set) is retrieval work. R4 placed it as a standalone singleton. Carried forward unbatched for whichever group claims it."
+    },
+    {
+      "id": "000015",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000016",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000017",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000089",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000122",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000146",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000205",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000255",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000256",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
+    },
+    {
+      "id": "000290",
+      "reason": "Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged."
     }
   ],
   "decline_candidates": {
     "nominated_by_both": [
       {
         "id": "000102",
-        "reason": "R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build."
+        "reason": "R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build. Owner ruling at GATE 3: declined."
       },
       {
         "id": "000282",
-        "reason": "R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note."
+        "reason": "R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note. Owner ruling at GATE 3: declined."
       }
     ],
     "nominated_by_one": [
       {
         "id": "000086",
-        "reason": "Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema.",
+        "reason": "Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema. Owner ruling at GATE 3: declined.",
         "nominated_by": "R1"
       },
       {
         "id": "000140",
-        "reason": "The owner's own learning project, not a system deliverable; better served outside the backlog.",
+        "reason": "The owner's own learning project, not a system deliverable; better served outside the backlog. Owner ruling at GATE 3: declined.",
         "nominated_by": "R1"
       },
       {
         "id": "000255",
-        "reason": "ARCH-010 marks the MDM system future work, parked; premature while the entities it would steward have no records.",
+        "reason": "ARCH-010 marks the MDM system future work, parked; premature while the entities it would steward have no records. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R1"
       },
       {
         "id": "000256",
-        "reason": "A stewardship agent for a system (000255) and data that do not exist yet.",
+        "reason": "A stewardship agent for a system (000255) and data that do not exist yet. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R1"
       },
       {
         "id": "000290",
-        "reason": "Soft decline: the campaign that motivated it is closed; a general gate-runner would be a different, unscoped idea.",
+        "reason": "Soft decline: the campaign that motivated it is closed; a general gate-runner would be a different, unscoped idea. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R1"
       },
       {
         "id": "000089",
-        "reason": "The seeded content is live and will not be reverted; resolved in substance.",
+        "reason": "The seeded content is live and will not be reverted; resolved in substance. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000205",
-        "reason": "A measured result already folded into practice; nothing to build.",
+        "reason": "A measured result already folded into practice; nothing to build. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000015",
-        "reason": "No follow-up across the corpus. Audit 1: R4 lacked the owner's 2026-09-13 ruling that dormancy is not deadness for this trio, which R1 cited in declining to nominate it.",
+        "reason": "No follow-up across the corpus. Audit 1: R4 lacked the owner's 2026-09-13 ruling that dormancy is not deadness for this trio, which R1 cited in declining to nominate it. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000016",
-        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.",
+        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000017",
-        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.",
+        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000122",
-        "reason": "Speculative, no trigger named, and the stack has been built on since. R1 declined to nominate it as strategic due diligence that is early, not stale.",
+        "reason": "Speculative, no trigger named, and the stack has been built on since. R1 declined to nominate it as strategic due diligence that is early, not stale. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       },
       {
         "id": "000146",
-        "reason": "The ruling it depends on is made; what remains is a one-sentence correction whose own text asks whether it should be made.",
+        "reason": "The ruling it depends on is made; what remains is a one-sentence correction whose own text asks whether it should be made. Owner ruling at GATE 3: held out of this partition, not declined.",
         "nominated_by": "R4"
       }
     ]

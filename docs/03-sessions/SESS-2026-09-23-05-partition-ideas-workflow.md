@@ -583,3 +583,20 @@ At GATE 2 the owner answered "Proceed to synthesis" in this session.
      re-run, from the synthesis, and from waiting for turns.
 
 The sweep stopped at GATE 3 for the owner's ruling on the partition and on each decline candidate.
+
+## GATE 3 (2026-09-24)
+
+Asked in this session with AskUserQuestion. The owner answered "Accept as proposed" and declined
+`000102`, `000282`, `000086` and `000140`. The other eight candidates came back as "No
+preference", so the agent asked again rather than reading that as a ruling. The owner asked what
+"parked" meant. The agent's wording had used it to mean "not declined, stays in its group", and
+the owner's intention was that those ideas not be included in this analysis. With the difference
+explained, the owner ruled that `000015`, `000016`, `000017`, `000089`, `000205`, `000255`,
+`000256` and `000290`, and then `000122` and `000146`, are **held out of this partition, not
+declined**.
+
+Applied to both files: the ten moved to the unbatched section with that reason, and four groups
+left empty were removed. Each decline candidate's reason now carries the owner's ruling, and the
+record's `state` is `accepted`. Result: 371 ideas in 87 groups under 12 tracks, 12 unbatched. The
+step 5 check was re-run: `0 problem(s)`. No idea's status changed in `_data/ideas.jsonl`.
+Recording the four declines there is a separate, owner-directed step.
