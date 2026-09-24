@@ -219,6 +219,7 @@ Owner rulings from this session. Each changed what was built.
 - **Observations sent to Ideation as ideas, not fixed here.**
   - The R1 re-run went over the 64,000-token output limit on a 383-idea corpus and needed nine
     requests to return its report. The pack has no instruction for returning a report in parts.
+    Recorded as `000414`; the other four were waiting for Ideation's next turn at close.
   - `PROMPT-034`'s opening line, "do only what is missing; report what already existed", led the
     first R1 to carry an earlier partition forward instead of partitioning.
   - Step 5's check does not test that a group's Basis claim matches the reports. That was audit
