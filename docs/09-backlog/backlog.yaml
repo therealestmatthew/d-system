@@ -13788,8 +13788,8 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - AGENTS.md
   session: doc-session-stale-generated-files
-  next_action: All acceptance conditions are met on the branch. Next, the /session-close independent
-    review, then rebase, the four gate checks and READY.
+  next_action: Review done (all 8 Met; F1 fixed in 799f1c3, F2 and F3 accepted). Next, rebase onto
+    dev, run the four gate checks and send READY.
 - id: phase-grd-02
   title: Green dev CI before each primary-checkout grant
   plan: doc-deterministic-guards
