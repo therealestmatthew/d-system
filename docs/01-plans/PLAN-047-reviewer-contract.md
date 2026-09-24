@@ -76,11 +76,15 @@ point of the ruling, and a judge that needs another command says so in its verdi
 **D2. The runner executes only what the backlog already declares.** It takes a phase id and a
 commit, and runs that phase's `verification` list and the four gate checks (`GOV-017` merge gate
 step 1) in a detached temporary worktree, the way the Session Manager's merge-gate re-run already
-does (`GOV-017` step 2). Accepting commands from its caller was rejected: that would make the runner
+does (`GOV-017` step 2); the runner's manifest becomes that step's re-run, rather than running beside
+it. Accepting commands from its caller was rejected: that would make the runner
 a shell with extra steps. Running in the builder's worktree was rejected: the builder's uncommitted
 state would reach the evidence.
 
 **D3. The coordinator dispatches every build review; the builder only asks.** As ruled (O-6, R24).
+The rule is written in `GOV-017`, which governs the coordinator for every phase. `GOV-014` was
+rejected as its home: it covers the idea-realization pipeline's roles, which has not yet run, so a
+rule there could be read as not binding today's reviews.
 Today the coordinator is the Session Manager; later it is P3's tick. The building session sends a
 review request and waits; the coordinator runs the runner, dispatches the reviewers with the brief
 `REQ-030` R03 names, and returns the verdict record. When the owner runs `/session-close` in their
@@ -88,7 +92,7 @@ own session, that session is not the builder, so it may dispatch directly under 
 The alternative, the builder dispatching a reviewer with a stripped brief, was rejected: the builder
 would still choose what goes in the brief.
 
-**D4. Verdicts are JSON records beside the plan reviews, committed on the phase branch.** Each
+**D4. Verdicts are JSON records beside the plan reviews, committed on the phase branch (proposed; the owner confirms at G3, OQ1).** Each
 build review produces one file under `docs/08-governance/reviews/verdicts/`, validated by a new
 `schemas/review-verdict.schema.json`. The coordinator writes it from the reviewer's reply without
 changing a finding, keeps the raw reply as an evidence file with its sha256 (as the owner ruled for
@@ -98,25 +102,31 @@ overturned it at G4 or G5, a defect it passed was found on `dev`, a sampled re-r
 appended to the file's `outcomes` list, as `GOV-018` records append dispositions. Two alternatives
 were rejected. An append-only ledger under `_data/` written by the coordinator: every verdict would
 be a write to the primary checkout, needing a turn per review. A gitignored ledger under `_working/`:
-the calibration data the owner asked for (Q7) would not survive a lost machine. OQ1 asks the owner to
-confirm.
+the calibration data the owner asked for (Q7) would not survive a lost machine. If the committed
+record's sha256 differs from the one the coordinator recorded, the merge gate refuses the branch and
+the difference goes to the owner as a finding (`REQ-030` R10).
 
 **D5. The judge starts in shadow; today's reviewers keep gating.** As ruled (Q7: "new reviewer types
 start in shadow"). Until the owner promotes it, every build review runs the gating reviewer
 (`demo-adversary` or `demo-validator-code`, as today) and the judge side by side on the same brief.
-Both verdicts are recorded; only the gating one decides. The cost is two dispatches per review
-during shadow. Promotion is the owner's decision, recorded in `GOV-003`; OQ2 asks what evidence the
+Both verdicts are recorded; only the gating one decides. The alternative, letting the judge gate from
+its first review, was rejected by the ruling and would let an uncalibrated reviewer decide merges
+with no record of how often it agrees with the reviewers it replaces. The cost of shadow is two
+dispatches per review for as long as it lasts. Promotion is the owner's decision, recorded in `GOV-003`; OQ2 asks what evidence the
 owner wants before deciding.
 
 **D6. The re-review sampler draws by recorded seed.** As ruled ("re-review 1 in 10 + every
 once-rejected"). `tools/draw_rereview_sample.py` reads the verdict records since the last draw and
 prints the sample and the seed, and the coordinator dispatches each re-review with a dedicated type
 other than the one that passed the phase. The seed makes the draw repeatable, so the owner can check
-that the sample was not chosen (the Scout's partition adversary, D.6 F6: the coordinator, not
+that the sample was not chosen. Two alternatives were rejected: the coordinator or the owner picking
+the sample by judgement, which can leave the weakest phases out without anyone noticing; and an
+unseeded random draw, which nobody can re-run to confirm (the Scout's partition adversary, D.6 F6: the coordinator, not
 Assurance, draws the sample).
 
 **D7. The second docs phase is this plan's last phase.** The owner ruled that the Q7/Q9 docs phase
-comes after the reviewer contract. It is registered here as `phase-asr-05` rather than as a new plan:
+comes after the reviewer contract. It is registered here as `phase-asr-05` rather than as a new plan, which would need its own
+requirement, review and G3 for three passages of text:
 it documents Q7 as this plan builds it, and Q9's diff-time review is a `READY` step that
 `phase-asr-04` writes the frame for. The security review itself is dispatched like any other review
 (D3), with the type OQ3 settles.
@@ -125,25 +135,26 @@ it documents Q7 as this plan builds it, and Q9's diff-time review is a `READY` s
 
 | Phase | What | Requirements | Depends on |
 |---|---|---|---|
-| `phase-asr-01` | The reviewer-judge agent type and its `GOV-014` contract: tools, inputs, never-do, shadow status, and the assurance dispatch rule | R01, R03, R06 | `phase-dam-01` (it rewrites the same `GOV-014` contracts) |
+| `phase-asr-01` | The reviewer-judge agent type (tools, inputs, never-do, shadow status in its description) and a test that its tools stay `Read, Grep, Glob` | R01, R06 | none |
 | `phase-asr-02` | `tools/run_review_checks.py`, its operations document and tests | R02 | none |
 | `phase-asr-03` | `schemas/review-verdict.schema.json`, `tools/draw_rereview_sample.py`, their operations documents and tests | R05, R07 | none |
-| `phase-asr-04` | Wiring: `/session-close` step 3, `PROMPT-036` step 6 and its templates, `GOV-017`'s merge gate and messages, `PROMPT-037` | R04 | `phase-asr-01`, `phase-asr-02`, `phase-asr-03`, `phase-grd-03` and `phase-dam-01` (they edit the same passages) |
+| `phase-asr-04` | Wiring: the assurance dispatch rule and the verdict-record check in `GOV-017`, its merge gate and messages; `/session-close` step 3; `PROMPT-036` step 6 and its templates; `PROMPT-037` | R03, R04, R06, R10 | `phase-asr-01`, `phase-asr-02`, `phase-asr-03`, `phase-grd-03` and `phase-dam-01` (they edit the same passages) |
 | `phase-asr-05` | The second docs phase: `GOV-010` threat surfaces, the `READY` security review, and `GOV-003` entries for O-5, O-6 and Q7 | R08, R09 | `phase-asr-04` |
 
 ## Requirement coverage
 
 | Requirement | Phase | Acceptance evidence |
 |---|---|---|
-| R01 | `phase-asr-01` | The agent file's tools; a fixture with `Bash` fails |
+| R01 | `phase-asr-01` | The tool-list test passes on the agent file and fails on a fixture with `Bash` |
 | R02 | `phase-asr-02` | Four runner fixtures; the worktree is gone afterwards |
-| R03 | `phase-asr-01` | The `GOV-014` passage |
-| R04 | `phase-asr-04` | The three greps in `REQ-030` R04 |
+| R03 | `phase-asr-04` | The `GOV-017` passage |
+| R04 | `phase-asr-04` | The three checks in `REQ-030` R04 |
 | R05 | `phase-asr-03` | Three schema fixtures |
-| R06 | `phase-asr-01` (contract), `phase-asr-04` (first recorded shadow verdict) | The contract text; the first judge verdict record |
+| R06 | `phase-asr-01` (agent description), `phase-asr-04` (`GOV-017` and the first recorded shadow verdict) | The description; the `GOV-017` text; the first judge verdict record |
 | R07 | `phase-asr-03` | Three sampler fixtures |
 | R08 | `phase-asr-05` | The `GOV-010` and `GOV-017` passages |
 | R09 | `phase-asr-05` | The `GOV-003` entries |
+| R10 | `phase-asr-04` | The `GOV-017` text and the one demonstrated refusal |
 
 Every row maps to a phase, and every phase carries a row.
 
@@ -154,14 +165,15 @@ Every row maps to a phase, and every phase carries a row.
   those documents, so they collide with each other and with `phase-grd-*` and `phase-dam-01`.
   Checked with `uv run python -m src.governance --ready` on this branch: both are `ready` and both show
   the active `phase-grd-01` as a conflict, so each waits for it.
-- `phase-asr-01` waits for `phase-dam-01`, which rewrites `GOV-014`'s Validator contract (the
-  close-reviewer rule and the re-review) and adds the Test Author contract.
+- `phase-asr-01` depends on no phase. It declares `sys-governance`, as every phase that edits
+  `.claude/` does, so it waits for the active `phase-grd-01`.
 - `phase-asr-04` waits for everything above and for `phase-grd-03`, which edits `GOV-017`'s merge
   gate and `PROMPT-037` item 4.
 - `phase-asr-05` waits for `phase-asr-04`.
 
 Proposed `next_up` placement: after `phase-dgov-06` and before `phase-cap-08`, in the order
-`phase-asr-02`, `phase-asr-03`, `phase-asr-01`, `phase-asr-04`, `phase-asr-05` (OQ4).
+`phase-asr-02`, `phase-asr-03`, `phase-asr-01`, `phase-asr-04`, `phase-asr-05` (OQ4). The order on this
+branch is a proposal until G3; `phase-asr-05` also needs the owner's answer to OQ3 before it starts.
 
 ## Out of scope
 

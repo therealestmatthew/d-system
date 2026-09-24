@@ -14011,7 +14011,7 @@ items:
   next_action: Waits for phase-part-03 (shared sys-governance); not at the same time as phase-grd-01.
     Put the AGENTS.md and CLAUDE.md text to the owner first, so the answer is in hand before the edits.
 - id: phase-asr-01
-  title: The reviewer-judge agent type and its GOV-014 contract, in shadow, with the assurance dispatch rule
+  title: The reviewer-judge agent type, in shadow, with a test that its tools stay read-only
   plan: doc-reviewer-contract
   sources:
   - doc-reviewer-contract-requirements
@@ -14019,39 +14019,35 @@ items:
   - doc-realization-role-contracts
   systems:
   - sys-governance
-  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 1
   session_budget: 1
-  depends_on:
-  - phase-dam-01
+  depends_on: []
   scope:
-  - Write .claude/agents/review-judge.md with tools exactly Read, Grep, Glob, a charter to judge a phase's
-    diff against its scope, acceptance and verification using only the runner's evidence files, and a
-    never-do that bars reading the builder's session record or report (REQ-030 R01; PLAN-047 D1).
-  - Add the reviewer-judge contract to GOV-014 (inputs, outputs, never-do, per-dispatch ceiling), state
-    that it runs in shadow until the owner promotes it (R06; D5), and state the assurance dispatch rule
-    - the coordinator dispatches and briefs every build review, never the building session, and the
-    brief holds only scope, acceptance, verification, the commit range and the runner manifest (R03;
-    D3).
-  - Update GOV-014's role count and any statement that the Validator or Adversary is dispatched by the
-    developer.
+  - Write .claude/agents/review-judge.md with tools exactly Read, Grep, Glob; a charter to judge a phase's
+    diff against its scope, acceptance and verification using only the runner's evidence files; a
+    description that says it runs in shadow until the owner promotes it; and a never-do that bars reading
+    the builder's session record or report (REQ-030 R01, R06; PLAN-047 D1, D5).
+  - Write test/test_agent_tools.py, which reads the agent file's front matter and asserts its tools are
+    exactly Read, Grep and Glob, and which fails on a fixture copy that adds Bash (R01).
   acceptance:
-  - The agent file declares tools Read, Grep, Glob and nothing else; a scratch copy that adds Bash is
-    rejected by the phase's own check on the file.
-  - GOV-014 has the reviewer-judge contract, the shadow status and the dispatch rule, and names what the
-    brief may not contain.
-  - grep -n "session record" in the agent file returns only the never-do line.
+  - uv run pytest test/test_agent_tools.py passes on the agent file, and the same assertion fails on a
+    fixture copy that adds Bash.
+  - The agent's description says it runs in shadow and does not decide a merge.
+  - grep -n "session record" .claude/agents/review-judge.md returns only the never-do line.
   verification:
+  - uv run pytest test/test_agent_tools.py
+  - grep -n "session record" .claude/agents/review-judge.md
+  - uv run ruff check src/ test/
   - uv run python -m src.governance --catalog
   - uv run python -m src.governance
   - git diff --exit-code docs/08-governance/catalog.md
   deliverables:
   - .claude/agents/review-judge.md
-  - docs/08-governance/
-  next_action: Waits for phase-dam-01, which rewrites GOV-014's Validator contract. Start from
-    partition-analyst.md, the one existing agent type without Bash.
+  - test/test_agent_tools.py
+  next_action: Start from partition-analyst.md, the one existing agent type without Bash. New agent types
+    appear in running sessions after a delay; check the type is listed before its first dispatch.
 - id: phase-asr-02
   title: A fixed command runner for build reviews
   plan: doc-reviewer-contract
@@ -14144,6 +14140,7 @@ items:
   - doc-reviewer-contract-requirements
   - doc-reviewer-contract
   - doc-multi-session-coordination-protocol
+  - doc-realization-role-contracts
   systems:
   - sys-governance
   - sys-gov-docs
@@ -14158,6 +14155,12 @@ items:
   - phase-grd-03
   - phase-dam-01
   scope:
+  - 'Write the assurance dispatch rule into GOV-017: the coordinator dispatches and briefs every build
+    review, never the building session, and the brief holds only scope, acceptance, verification, the
+    commit range and the runner manifest (REQ-030 R03; PLAN-047 D3).'
+  - Make the runner's manifest merge-gate step 2's re-run, replacing the separate detached-worktree
+    checks (D2), and add the verdict-record check - the coordinator records each record's sha256 when
+    it hands it over and refuses a branch whose committed record differs (R10; D4).
   - Change /session-close step 3 so a building session sends a review request and waits for the
     coordinator's verdict record, and an owner-run close may dispatch under the same brief rule (REQ-030
     R04; PLAN-047 D3).
@@ -14169,11 +14172,19 @@ items:
     to match; update PROMPT-037's role texts.
   - Record every build review from this phase on, gating and shadow, as a verdict record (R05, R06).
   acceptance:
-  - grep -n "general-purpose" in PROMPT-036 returns no reviewer template line.
+  - In PROMPT-036 the Validator and Adversary template paragraphs name a dedicated reviewer type and do
+    not inherit the shared intro's general-purpose charter; the Creator and Blocker resolver templates
+    are unchanged.
+  - GOV-017 states the dispatch rule and names what the brief may not contain.
+  - Demonstrated once - an unchanged verdict record's sha256sum matches the recorded value; a copy with
+    one finding edited does not, and the merge-gate procedure refuses it, naming the file.
   - session-close.md step 3 lists no input the building session wrote.
   - GOV-017's message table has the two new messages, and its merge gate names the runner, the gating
     reviewer and the shadow judge.
-  - This phase's own review produces a gating verdict record and a shadow judge verdict record.
+  - 'This phase''s own review produces a gating verdict record and a shadow judge verdict record. The
+    coordinator applies the new procedure to this review by hand: the runner, the judge type and the
+    record schema are merged dependencies (phase-asr-01..03), and only this phase''s GOV-017 text is not
+    yet on dev.'
   verification:
   - uv run pytest test/test_review_verdict.py
   - uv run python -m src.governance --catalog
@@ -14185,7 +14196,7 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/08-governance/
   next_action: Waits for asr-01..03, phase-grd-03 and phase-dam-01. Read their merged GOV-017,
-    PROMPT-037 and session-close.md text before editing.
+    PROMPT-037, session-close.md and GOV-014 (Validator inputs) text before editing.
 - id: phase-asr-05
   title: 'Second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries for
     O-5, O-6 and Q7'
@@ -14211,7 +14222,10 @@ items:
   - Add dated GOV-003 entries for O-5, O-6 and Q7, quoting each ruling and naming it standing (R09).
   acceptance:
   - GOV-010 has the threat-surface requirement and says how its absence is judged.
-  - GOV-017's READY names the security review and its trigger.
+  - GOV-017's READY names the security review, its trigger, and the reviewer the owner ruled on in
+    PLAN-047 OQ3.
+  - GOV-010 gives, as a non-conformant example, a plan whose phase edits src/api/routes/demo_terminal.py
+    (a websocket route that runs a shell) without naming a network or authentication surface.
   - GOV-003 has the three entries.
   verification:
   - uv run python -m src.governance --catalog

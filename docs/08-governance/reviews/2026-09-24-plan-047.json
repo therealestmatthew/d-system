@@ -1,0 +1,320 @@
+{
+  "review_id": "2026-09-24-plan-047",
+  "procedure": "GOV-018",
+  "date": "2026-09-24",
+  "target": {
+    "plan": "PLAN-047",
+    "requirement": "REQ-030",
+    "phases": [
+      "phase-asr-01",
+      "phase-asr-02",
+      "phase-asr-03",
+      "phase-asr-04",
+      "phase-asr-05"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-047-reviewer-contract.md at 65325a5: exit 0. Re-run after the revision: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "altitude": "plan",
+      "subject": "PLAN-047 D5, D6",
+      "severity": "blocker",
+      "title": "Decisions D5 (judge starts in shadow) and D6 (seeded re-review sampler) name no rejected alternative and no cost, failing GOV-010 P2.",
+      "evidence": "docs/01-plans/PLAN-047-reviewer-contract.md:104-116. D5: 'As ruled (Q7...) Until the owner promotes it... Both verdicts are recorded; only the gating one decides. The cost is two dispatches per review during shadow.' — states only the cost of the chosen option, no alternative. D6: 'As ruled (\"re-review 1 in 10...\")... The seed makes the draw repeatable...' — no alternative at all. Compare GOV-010 P2 (docs/08-governance/GOV-010*.md:140-143): 'Each decision names the alternative it rejected and what that alternative would have cost... \"Chosen because it is good\" is not a reason.' D1, D2, D3 and D4 in the same plan each do name and cost a rejected alternative, so the gap is not a house style choice.",
+      "consequence": "The plan cannot pass a GOV-010 quality check as written; two of seven decisions are bare assertions of what was ruled, with no evidence the alternative (e.g. skip shadow and gate immediately, or draw the sample by some other means) was actually weighed.",
+      "minimal_fix": "Add one sentence to each naming the alternative considered (e.g. D5: gate the judge immediately; D6: sample by some non-seeded or owner-picked method) and its cost.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "D5 now names gating from the first review and its cost (an uncalibrated reviewer deciding merges with no agreement record). D6 now names sampling by judgement and an unseeded draw, and their costs."
+        }
+      ],
+      "slug": "decision-missing-rejected-alternative",
+      "id": "F01"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-047 D4",
+      "severity": "blocker",
+      "title": "D4's sha256 integrity check at the merge gate has no requirement row, no phase scope or acceptance criterion, and no stated failure path.",
+      "evidence": "D4 (docs/01-plans/PLAN-047-reviewer-contract.md:91-102): 'keeps the raw reply as an evidence file with its sha256 ... hands it to the builder, who commits it unchanged; the coordinator checks the sha256 at its merge-gate re-run.' REQ-030's requirement table (docs/06-requirements/REQ-030-reviewer-contract.md:65, R05) lists only 'the sha256 of its agent definition' as a recorded field — no requirement covers recording or checking the raw reply's sha256. phase-asr-03's scope (docs/09-backlog/backlog.yaml:14111-14119) does add 'sha256 of the raw reply' to the schema, but phase-asr-04's scope and acceptance (docs/09-backlog/backlog.yaml:14140-14177), which is where the merge-gate wiring lives, never mentions checking it, and nowhere does the plan say what happens on a mismatch.",
+      "consequence": "The one mechanism in this plan that would actually catch a builder silently editing a finding before committing the verdict record has no phase tasked with building it, no test verifying it runs, and no defined behaviour if it ever fails — so it is likely to ship as a decision-document claim that nothing implements or enforces.",
+      "minimal_fix": "Add an R05 (or new R) row and a phase-asr-04 acceptance line for the sha256 re-check, stating what a mismatch does (e.g. refuse READY, escalate as a finding).",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "New REQ-030 R10: the coordinator records each handed-over record's sha256 and refuses a branch whose committed record differs, reporting it to the owner as a finding. D4 states the failure path; phase-asr-04's scope writes the check into GOV-017 and its acceptance demonstrates one refusal on an edited copy."
+        }
+      ],
+      "slug": "gate-with-no-failure-path",
+      "id": "F02"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-047 D7",
+      "severity": "major",
+      "title": "D7 names a rejected alternative (a separate plan) but states no cost for it, partially failing GOV-010 P2.",
+      "evidence": "docs/01-plans/PLAN-047-reviewer-contract.md:118-122: 'It is registered here as phase-asr-05 rather than as a new plan: it documents Q7 as this plan builds it...' — no sentence says what a separate plan would have cost (extra G1-G3 cycle, duplicate requirement text, etc).",
+      "consequence": "Same GOV-010 P2 gap as D5/D6 but partial: the alternative is at least named, so the fix is smaller.",
+      "minimal_fix": "Add one clause stating the cost of a separate plan (e.g. a second full G1-G5 cycle for two paragraphs of documentation).",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "D7 now states the cost: a separate plan would need its own requirement, review and G3 for three passages of text."
+        }
+      ],
+      "slug": "decision-missing-rejected-alternative",
+      "aliases": [
+        "decision-cost-not-stated"
+      ],
+      "id": "F03"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-047 D4 / OQ1",
+      "severity": "minor",
+      "title": "D4 presents the verdict-record storage location as a settled decision with two rejected alternatives, then OQ1 reopens the identical question to the owner as unconfirmed.",
+      "evidence": "D4 (line 91-102) states the location and rejects two alternatives with costs, in decision form. OQ1 (line 178-180): 'Where verdict records live (D4). Who: the owner, at G3. Leaning: JSON files under docs/08-governance/reviews/verdicts/...' — restates D4's already-decided answer as a 'leaning' still needing confirmation.",
+      "consequence": "A reader cannot tell whether D4 is final (as its own prose implies) or provisional pending G3 (as OQ1 implies), which is exactly the kind of ambiguity CLAUDE.md's 'do not assume, ask' rule exists to prevent.",
+      "minimal_fix": "Either drop OQ1 (if D4 is final) or reword D4 to say it is provisional pending OQ1.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "D4's heading now says the choice is proposed and confirmed by the owner at G3 (OQ1)."
+        }
+      ],
+      "slug": "decision-reopened-as-open-question",
+      "id": "F04"
+    },
+    {
+      "altitude": "plan",
+      "subject": "REQ-030 R04",
+      "severity": "minor",
+      "title": "R04's verification grep ('general-purpose' returns no reviewer template line) is ambiguous because the current 'general-purpose' mention is one shared line covering all four dispatch templates, not a reviewer-specific line.",
+      "evidence": "docs/02-prompts/PROMPT-036-build-coordinator.md:296-298: 'Every dispatch opens with the idempotency sentence ... names the general-purpose charter, runs on Sonnet ... and carries absolute paths only.' This single sentence is the intro to Creator, Validator, Adversary and Blocker-resolver templates alike (lines 296-327), so the fix must reword the shared intro rather than delete a reviewer-only line, and the acceptance grep as stated does not distinguish the two.",
+      "consequence": "A phase implementer could satisfy the letter of the grep (no match at all) by deleting 'general-purpose' from the shared line, which also silently changes the Creator template's charter — an unintended side effect the acceptance criterion would not catch.",
+      "minimal_fix": "Reword R04's verification to check that the Validator/Adversary template paragraphs no longer inherit 'general-purpose' (e.g. grep within those paragraphs specifically), and confirm the Creator/Blocker-resolver templates are unchanged.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "REQ-030 R04 and phase-asr-04's acceptance now check that the Validator and Adversary paragraphs name a dedicated type and do not inherit the shared intro's charter, and that the Creator and Blocker resolver templates are unchanged."
+        }
+      ],
+      "id": "F05"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-01",
+      "severity": "blocker",
+      "title": "Acceptance line 1 of R01 names a check that exists nowhere in the repository and is not scoped to be built by this phase.",
+      "evidence": "`grep -n \"tools:\" src/governance/*.py` and a search of `src/governance/` and `test/` for any validation of `.claude/agents/*.md` tool declarations returns nothing — no code anywhere checks an agent file's declared `tools:` field. The phase's own `verification` list is only `uv run python -m src.governance --catalog`, `uv run python -m src.governance`, and `git diff --exit-code docs/08-governance/catalog.md` — none of which reads `.claude/agents/review-judge.md` or its `tools:` line. Yet acceptance line 1 reads: \"a scratch copy that adds Bash is rejected by the phase's own check on the file\" (backlog.yaml:14041-14042), and acceptance line 3, \"grep -n \\\"session record\\\" in the agent file returns only the never-do line\" (line 14045), is likewise absent from `verification`. `grep -n \"scratch copy\\|the phase's own check\\|fixture copy\" docs/09-backlog/backlog.yaml` returns only this one phase — no precedent elsewhere in the backlog for this pattern actually working.",
+      "consequence": "A session closing this phase has no command to run that would satisfy R01's own verification column (REQ-030: \"a fixture copy that adds Bash fails the phase's check on the agent file\") or acceptance line 3. Either the phase gets marked complete on an unverified claim, or the closing session invents a check the plan never scoped — a redo either way.",
+      "minimal_fix": "Add a scope bullet and a deliverable/test that actually implement the Bash-rejection check (e.g. a small fixture test asserting the agent file's front matter tools list), and add the corresponding grep/test commands to `verification`.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "phase-asr-01 now builds test/test_agent_tools.py (declared deliverable), which asserts the agent file's tools are exactly Read, Grep, Glob and fails on a fixture copy with Bash; the test and the session-record grep are in verification. REQ-030 R01's verification says the same."
+        }
+      ],
+      "id": "F06"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-01",
+      "severity": "major",
+      "title": "The reviewer-judge contract and the assurance dispatch rule are placed in GOV-014, whose own text scopes it to the idea-realization pipeline, a pipeline the same document says has never run.",
+      "evidence": "GOV-014's opening line: \"One written contract per agent role in the idea-realization pipeline mapped by ARCH-006's stage table\" (GOV-014-realization-role-contracts.md:14-16), with `depends_on: [doc-idea-realization-system, ...]` in its own frontmatter. Its ceiling section states \"no role's actual dispatch cost has been measured yet — the pipeline has not run\" (line 64). ARCH-006's stage table (`docs/07-architecture/ARCH-006-idea-realization-system.md` lines 81-89) has nine stages (Capture through Realization check, soon ten with phase-dam-01's Test Author); none is a general \"build review every backlog phase\" stage. But the assurance dispatch rule phase-asr-01 adds — \"the coordinator dispatches and briefs every build review, never the building session\" (backlog.yaml:14033-14037) — must govern every backlog-phase review under GOV-017's Session Manager protocol (confirmed by reading GOV-017: `ASSIGN <phase-id>`, `REVIEW <phase-ids>`, the merge gate — all general, not idea-realization-pipeline-specific), which runs today, for phases like phase-asr-02/03 themselves. Neither REQ-030 nor PLAN-047 nor the phase's sources list `doc-idea-realization-system` (ARCH-006) at all, despite GOV-014 itself depending on it.",
+      "consequence": "A reader of GOV-014 (including an agent dispatched under it, per its own established pattern of pipeline-scoped ceilings/never-dos with the general charter living in the agent's own file) has genuine grounds to read the new dispatch rule as scoped to a pipeline that has not run yet, not as binding today's ordinary session-based build review — defeating the point of the O-6 ruling this phase is supposed to encode.",
+      "minimal_fix": "Either widen GOV-014's opening scope statement to explicitly cover general build-review dispatch (and add ARCH-006 to phase-asr-01's sources so that widening is checked against the stage table), or move the assurance dispatch rule to GOV-017 (which already governs the Session Manager/coordinator generally) and leave only the reviewer-judge role's pipeline-specific ceiling/never-do supplement in GOV-014.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "The dispatch rule moves to GOV-017 (REQ-030 R03; PLAN-047 D3 states why GOV-014 was rejected), written by phase-asr-04, which already edits GOV-017. phase-asr-01 no longer edits GOV-014: it builds the agent file and its test, and no longer depends on phase-dam-01."
+        }
+      ],
+      "id": "F07"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-04",
+      "severity": "blocker",
+      "title": "Acceptance line 4 cannot be satisfied by the phase's own execution: it requires a live review mechanism that is simultaneously the artifact the phase is building.",
+      "evidence": "backlog.yaml:14176 — \"This phase's own review produces a gating verdict record and a shadow judge verdict record.\" The only place a build-review verdict gets recorded is the GOV-017 merge gate this very phase rewrites (backlog.yaml:14166-14169, editing GOV-017's message contract and merge gate), and the shadow-judge dispatch rule this very phase is meant to wire in (D3/D5 in PLAN-047). Before phase-asr-04 merges, no standing mechanism exists that would produce a shadow-judge verdict record for its own review — the coordinator reviewing this phase's diff would have to already treat the uncommitted diff as governing its own review process, a bootstrap the phase names nowhere.",
+      "consequence": "The builder session cannot demonstrate this acceptance condition from inside its own worktree before merge, and whoever performs the review has no stated procedure for reviewing a phase that changes the review procedure used to review it. Left unresolved, the phase either merges without this condition ever actually being checked, or the merge is stalled indefinitely waiting for a self-referential precondition.",
+      "minimal_fix": "State explicitly, in the phase's next_action or scope, how this phase's own review is conducted (e.g., by hand-applying the new GOV-017 text to the in-flight diff, or by deferring the self-test to a follow-up phase's first ordinary build review) rather than leaving it as an unqualified acceptance line.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "The acceptance line now states the bootstrap: the coordinator applies the new procedure to this review by hand, because the runner, the judge type and the record schema are merged dependencies (phase-asr-01..03); only this phase's GOV-017 text is not yet on dev."
+        }
+      ],
+      "slug": "circular-acceptance-condition",
+      "id": "F08"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-04",
+      "severity": "major",
+      "title": "None of the four acceptance lines names an input that must be rejected, violating GOV-010 P6.",
+      "evidence": "backlog.yaml:14172-14176 — all four lines are positive greps/observations (\"grep ... returns no reviewer template line\", \"lists no input the building session wrote\", \"message table has the two new messages\", \"produces a gating verdict record and a shadow judge verdict record\"). GOV-010 (docs/08-governance/GOV-010-plan-quality-standard.md:196-199): \"Acceptance names the command or observation, the expected result, and at least one input that must be rejected.\" Compare phase-asr-01 in the same plan, which does include a reject case: backlog.yaml:14041-14042, \"a scratch copy that adds Bash is rejected by the phase's own check on the file.\"",
+      "consequence": "A builder implementing the new REQUEST/VERDICT message contract, the shadow double-dispatch, and the coordinator-only dispatch rule has no defined negative case (e.g., a builder session attempting to dispatch a reviewer directly should be refused, or a verdict record missing a required field should be refused) to build or verify against. Wrong behavior in the actual gating logic can pass every acceptance line.",
+      "minimal_fix": "Add a fixture-style line naming at least one case the new wiring must refuse, e.g. a builder-dispatched (non-coordinator) review request, or a merge attempted without a recorded verdict.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "phase-asr-04's acceptance now demonstrates a refusal: a verdict record with one finding edited fails the sha256 check and the merge-gate procedure refuses it, naming the file (REQ-030 R10)."
+        }
+      ],
+      "slug": "missing-reject-case",
+      "aliases": [
+        "gov-010-p6-gap"
+      ],
+      "id": "F09"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-05",
+      "severity": "major",
+      "title": "Scope depends on the owner's unresolved answer to PLAN-047 OQ3, yet the phase already sits in `next_up` ahead of phase-cap-08, and acceptance never checks which reviewer was actually wired in.",
+      "evidence": "PLAN-047 scope: \"Add to GOV-017's READY a diff-time security review for a phase whose diff touches those surfaces, dispatched by the coordinator and recorded as a verdict, with the reviewer the owner ruled on (PLAN-047 OQ3)\" (backlog.yaml:14208-14210). PLAN-047's own Open Questions section: \"OQ3. Which reviewer does the diff-time security review ... Who: the owner, at G3\" — unresolved as of this plan's `status: draft`. Confirmed no ruling recorded: `grep -n -i \"O-5\\|O-6\\|Q7\" docs/08-governance/GOV-003-backlog-decisions.md` returned nothing. Confirmed the phase is already staged: `docs/09-backlog/backlog.yaml`'s `next_up` block lists `phase-asr-02, phase-asr-03, phase-asr-01, phase-asr-04, phase-asr-05, phase-cap-08` in that order — the exact placement PLAN-047 lists as \"Proposed\" under still-open OQ4. Acceptance for phase-asr-05 (backlog.yaml:14212-14215) only checks that GOV-017's READY \"names the security review and its trigger\", not which reviewer type is named.",
+      "consequence": "A builder could pick up phase-asr-05 from `next_up` before the owner has ruled on OQ3, wire in an arbitrary reviewer (e.g. the built-in /security-review command, one of PLAN-047's own leanings) that the owner then overturns at G3, and the phase would still pass every acceptance line as written — the work gets redone.",
+      "minimal_fix": "Either pull phase-asr-04/05 out of `next_up` until PLAN-047 reaches G3, or add an acceptance line naming the specific reviewer OQ3 resolved to, once it is answered.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "phase-asr-05's acceptance now requires READY to name the reviewer the owner ruled on in OQ3. The next_up order exists only on this planning branch, which merges only after G3, and PLAN-047 now says the order is a proposal until G3 and that phase-asr-05 needs the OQ3 answer before it starts."
+        }
+      ],
+      "slug": "premature-queue-placement",
+      "aliases": [
+        "scope-depends-on-unresolved-open-question"
+      ],
+      "id": "F10"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-04",
+      "severity": "minor",
+      "title": "Sources omit GOV-014 (doc-realization-role-contracts), whose new assurance-dispatch brief rule directly governs what this phase must build.",
+      "evidence": "backlog.yaml:14143-14146 lists sources doc-reviewer-contract-requirements, doc-reviewer-contract, doc-multi-session-coordination-protocol — no doc-realization-role-contracts. phase-asr-01's scope (backlog.yaml:14033-14037) puts the assurance dispatch rule and the exact statement of \"what the brief may not contain\" into GOV-014, and R03 (REQ-030) says the brief \"holds the phase's scope, acceptance and verification, the commit range and the runner's manifest, and nothing the builder wrote\" — the precise content phase-asr-04's new REQUEST/VERDICT messages must match. phase-asr-04's next_action (backlog.yaml:14187-14188) tells the builder to read the merged GOV-017, PROMPT-037 and session-close.md text, but never mentions GOV-014.",
+      "consequence": "A builder following the phase's own pointers could write the message contract without re-reading GOV-014's brief-contents rule and reproduce a divergent definition of the brief in two places.",
+      "minimal_fix": "Add doc-realization-role-contracts to sources, or add it to next_action's reading list.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "doc-realization-role-contracts added to phase-asr-04's sources and GOV-014's Validator inputs to its next_action. (The brief rule itself now lives in GOV-017, written by this phase.)"
+        }
+      ],
+      "slug": "sources-gap",
+      "id": "F11"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-05",
+      "severity": "minor",
+      "title": "None of the three acceptance lines names an input that must be rejected, violating GOV-010 P6.",
+      "evidence": "backlog.yaml:14212-14215 — all three lines are positive observations (GOV-010 has the requirement, READY names the review, GOV-003 has the three entries). GOV-010 P6 (docs/08-governance/GOV-010-plan-quality-standard.md:196-199) requires \"at least one input that must be rejected.\"",
+      "consequence": "Weaker than the phase-asr-04 instance since this phase is pure prose addition with narrower behavioral surface, but the same standard gap: nothing defines what a plan that fails to name its threat surfaces looks like when the reviewer judges it, even though scope bullet 1 explicitly promises \"how a reviewer judges it.\"",
+      "minimal_fix": "Add a line naming a plan that omits a threat surface it touches and how that failure is judged/caught.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "phase-asr-05's acceptance now requires GOV-010 to give a non-conformant example: a plan whose phase edits src/api/routes/demo_terminal.py (a websocket route that runs a shell) without naming a network or authentication surface."
+        }
+      ],
+      "slug": "missing-reject-case",
+      "id": "F12"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-asr-04",
+      "severity": "minor",
+      "title": "Scope does not say whether the runner replaces or duplicates GOV-017 merge-gate step 2's existing detached-worktree four-check rerun.",
+      "evidence": "Current GOV-017 step 2 (docs/08-governance/GOV-017-multi-session-coordination-protocol.md): \"The Session Manager re-runs the four gate checks on the branch tip in a detached temporary worktree ... so it touches neither the primary checkout nor the session's worktree.\" phase-asr-02's runner (backlog.yaml:14070-14073) independently \"creates a detached temporary worktree at that commit, runs the phase's verification list and the four GOV-017 gate checks there.\" phase-asr-04's scope only says \"make the merge gate run the runner and both reviewers during shadow\" (backlog.yaml:14167) without stating whether this replaces step 2's own rerun or runs alongside it.",
+      "consequence": "Left ambiguous, the builder could implement both paths, running two separate detached worktrees for the same four checks on every merge — wasted work and a second place the two could disagree.",
+      "minimal_fix": "State explicitly that the runner's manifest becomes step 2's rerun, replacing the Session Manager's separate detached-worktree checks.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Prompt Planner session (planner, agent/plan-reviewer-contract)",
+          "date": "2026-09-24",
+          "reason": "PLAN-047 D2 and phase-asr-04's scope now say the runner's manifest becomes merge-gate step 2's re-run, replacing the separate detached-worktree checks."
+        }
+      ],
+      "id": "F13"
+    }
+  ],
+  "notes": "Reviewed at 65325a5 on agent/plan-reviewer-contract, three dispatches on partition-adversary with PROMPT-038: the plan altitude; the phase altitude for phase-asr-01..03; the phase altitude for phase-asr-04..05. phase-asr-02 and phase-asr-03 drew no findings. No later-added altitude: every phase was registered in the plan's first commit. Findings recorded as reported; the dispatcher added only id, engine and author. Dispositions by the Prompt Planner session as planner; none escalated. The revised plan was not re-reviewed; GOV-018 defines no second review."
+}
