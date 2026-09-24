@@ -3044,7 +3044,7 @@ No promotion or existing delivery found.
 
 ## 000063 · Two more idea link types: abstraction (atomic to general) and forking (compound to split parts)
 
-**Created 2026-09-09T03:58:13-04:00 · Status: `discarded`**
+**Created 2026-09-09T03:58:13-04:00 · Status: `reviewing` · revisited 1×**
 
 The owner's proposal (2026-09-09), raised while discussing ARCH-005's classification taxonomy:
 extend the three existing link types (extends/supersedes/relates_to, schemas/idea.schema.json)
@@ -3129,7 +3129,7 @@ and idea 000065 (a decomposition procedure for compound ideas that don't form a 
 emergent whole).
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T06:23:58-04:00): **State of the idea as of 2026-09-09:**
 
@@ -3160,6 +3160,7 @@ No governing plan (PLAN) or requirement (REQ) yet exists for the schema changes 
 **Assessment:**
 The forking half of 000063 is effectively superseded by the resolved design captured in 000064 and 000065. The abstraction half remains genuinely open and unresolved. This idea's own assessment annotation serves as the resolution record, making further promotion of 000063 itself premature until the abstraction semantics question is settled (either a new link type or a tightened reading of extends).
 - **finding** by agent-idea-batching (2026-09-13T15:55:38-04:00): Closed as originally scoped; owner ruling 2026-09-13 during the idea-batching partition, where R3 nominated it as a partial decline. The forking half is superseded by 000064's lineage annotation plus a component_of link type, per this idea's own assessment. The surviving abstraction question is not lost: it sits inside the ARCH-005 bundle, partition group G01, and can be recaptured as its own idea if it needs separate tracking.
+- **finding** by agent-ideation (2026-09-24T12:38:37-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -3685,7 +3686,7 @@ Bearing on this idea's question: the evidence says the repository does NOT need 
 
 ## 000070 · Build a demo of the idea system for the skills-and-agents training session
 
-**Created 2026-09-10T03:33:13-04:00 · Status: `discarded`**
+**Created 2026-09-10T03:33:13-04:00 · Status: `reviewing` · revisited 1×**
 
 The owner is facilitating a training session on skills and agents and needs a worked, live example
 rather than slides. This repository's idea system is a good candidate: it is small enough to explain
@@ -3726,11 +3727,12 @@ Raised by the owner on 2026-09-10.
 
 
 <details>
-<summary>3 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T03:48:26-04:00): Scouted 2026-09-10. Every mechanism the demo needs already exists and works: the orient skill, the idea and idea-triage commands backed by a subagent, the sanctioned writer append_idea.py, and 76 real ideas across 289 events as of today. PROMPT-006 through PROMPT-009 are the reusable path the demo walks, and PLAN-016 delivered the append-only log and schema underneath it. Step 4 depends on 000071, which was raised in the same conversation and proposes the metrics command that does not yet exist. The gap worth knowing before planning: the distinction between a skill, a command, a subagent and a tool — the point the demo exists to land — is implicit in PLAN-020's capability mapping and authority declarations but has no dedicated teaching document anywhere, so the demo would have to write that explanatory material rather than point at it. The idea's own two unresolved questions stand: real data versus a seeded fixture set, and whether to end at a plan or carry through to an executed phase.
 - **finding** by agent-demo-factory (2026-09-10T05:27:15-04:00): Realized by the live-demo pack recorded 2026-09-10: the live demo requirements (REQ-006), the live demo plan (PLAN-021), the demo terminal decision (ADR-013) and the five phase-demo-* backlog phases now govern the build, queued at the front of next_up. The demo prompt pack (PROMPT-010 through PROMPT-017) drives the factory and build sessions.
 - **finding** by agent-idea-batching (2026-09-13T15:55:38-04:00): Closed as delivered; owner ruling 2026-09-13 during the idea-batching partition, where R2 nominated it. Realized by the live-demo pack - REQ-006, PLAN-021, ADR-013 and phase-demo-01 through -06 - per this idea's own second finding. Discarded as delivered rather than as unwanted. The small remainder, a command wrapper, lives on in 000071 in partition group G03.
+- **finding** by agent-ideation (2026-09-24T12:38:37-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -4037,7 +4039,7 @@ Raised by the owner on 2026-09-10, as the arbiter of the trio.
 
 ## 000076 · Should we delete Claude Code?
 
-**Created 2026-09-10T03:39:39-04:00 · Status: `discarded`**
+**Created 2026-09-10T03:39:39-04:00 · Status: `reviewing` · revisited 1×**
 
 The question stated point-blank, without qualification: should this repository stop using Claude Code?
 
@@ -4062,6 +4064,13 @@ scratch later.
 **Annotations**
 
 - **assessment** by repository-owner (2026-09-10T03:39:48-04:00): Discarding this framing, not the question. The owner is not willing to discard the question as phrased at 000069 — the always-on orchestration framing makes it more worth answering — but is willing to discard 'should we delete Claude Code' asked point-blank. A question with no gate and a presumed answer is a worse instrument than the same question tied to the evidence that would settle it. 000069 carries it forward.
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T12:38:37-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
+
+</details>
 
 **Links**
 
@@ -5088,7 +5097,7 @@ PROPOSED LINK: 000093 --relates_to--> 000092 (governance page would consume the 
 
 ## 000094 · Investigate and clean up the unaccounted Codex worktree at ~/.codex/worktrees/511d/d-system
 
-**Created 2026-09-10T19:12:42-04:00 · Status: `discarded`**
+**Created 2026-09-10T19:12:42-04:00 · Status: `reviewing` · revisited 1×**
 
 `git worktree list` from the primary checkout reports four worktrees, and one of them is not accounted for by any process this repository documents:
 
@@ -5113,7 +5122,7 @@ Found on 2026-09-10 during the close of SESS-2026-09-10-10, while checking wheth
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-readme-audit (2026-09-11T00:04:10-04:00): Resolved on 2026-09-11. Both halves of this idea are done, and the worktree is gone.
 
@@ -5130,6 +5139,7 @@ The same pass also removed /code/d-system-worktrees/phase-port-01 and deleted th
 THE OPEN QUESTION THIS IDEA RAISED IS NOT ANSWERED. Whether the Codex harness creating worktrees under ~/.codex/worktrees/ is expected behaviour that ADR-003 should acknowledge, or a misconfiguration that should point at ../d-system-worktrees/, was not decided — this instance was cleaned up without settling the general case. ADR-003 was written for the sanctioned agent flow and still does not mention other harnesses. If a second such worktree appears, that is the signal to decide it properly rather than clean up again.
 
 Discarded rather than promoted: it was resolved directly and became no document, so there is nothing to name in --promoted-to.
+- **finding** by agent-ideation (2026-09-24T12:38:38-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -5256,7 +5266,7 @@ Status deliberately unchanged by this annotation. Whether the capture half is en
 
 ## 000098 · Ship the layout-schema test ADR-016 promised
 
-**Created 2026-09-10T22:18:33-04:00 · Status: `discarded`**
+**Created 2026-09-10T22:18:33-04:00 · Status: `reviewing` · revisited 1×**
 
 ADR-016 (workbench layout persistence) states the layout JSON schema is asserted by a test so a malformed layout file fails before it ships. phase-wb-02 built the engine but no such test exists — no schemas/*layout* definition, no test/ reference — and no later phase claims it. The invariants REQ-007 W06 depends on (every grid.areas token names a real slot; every panel type admitted by exactly one slot per layout) are enforced by neither test nor runtime code; the two shipped files are simply hand-authored correctly. Surfaced by the W02-A adversarial review (minor finding 3); left unbuilt in-phase because a test/ file sits outside the phase's declared deliverable paths. Candidate: a JSON Schema in schemas/ plus a pytest asserting both shipped layouts validate and the W06 invariants hold.
 
@@ -5264,7 +5274,7 @@ ADR-016 (workbench layout persistence) states the layout JSON schema is asserted
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:39:45-04:00): Idea 000098 asks to ship the layout JSON schema and validation test that ADR-016 promised.
 
@@ -5280,6 +5290,7 @@ ADR-016 (workbench layout persistence) states the layout JSON schema is asserted
 
 No existing plan, requirement, decision or other idea fully covers the concrete ask to ship the layout schema and its validation test.
 - **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Verified resolved; discarded by owner ruling 2026-09-13. schemas/workbench-layout.schema.json and test/test_workbench_layout_schema.py exist and assert every invariant this idea asked for plus several more; 21 tests pass. Surfaced during the idea-batching partition, where three of four analysts carried this as open work on a finding predating the fix.
+- **finding** by agent-ideation (2026-09-24T12:38:38-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -5287,7 +5298,7 @@ No existing plan, requirement, decision or other idea fully covers the concrete 
 
 ## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
 
-**Created 2026-09-11T00:11:20-04:00 · Status: `discarded`**
+**Created 2026-09-11T00:11:20-04:00 · Status: `reviewing` · revisited 1×**
 
 `uv run pytest` on dev reports `3 failed, 546 passed` as of 2026-09-11. All three failures are in test/test_demo_terminal.py:
 
@@ -5321,7 +5332,7 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 
 
 <details>
-<summary>3 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-workbench-coordinator (2026-09-11T00:19:35-04:00): Coordinator finding (workbench build session, 2026-09-11): the suspect commit is cleared by timeline evidence. (1) The three failures were already present on dev at 0b3f899, BEFORE phase-wb-01 (and thus the suspected session-registry commit) merged — the phase orchestrator ran that baseline explicitly: 3 failed, 37 passed on test_demo_terminal.py. (2) After the owner removed the stale ~/.pyenv/shims/.pyenv-shim lock, the full terminal file passed 46/46 on dev WITH the suspect commit merged. (3) The lock was later recreated under concurrent agent load and the same three tests fail again while it exists. The alive-stays-True symptom is consistent: with the lock present, pyenv rehash noise/delay in spawned PTY shells stalls shell exit past the 5s deadline and pollutes assertion output. Root cause is host-level pyenv rehash contention (tracked as idea 000097), not src/demo/posix.py. Durable fix is on the owner's shell init, not in code.
 - **finding** by agent-idea-triage (2026-09-11T20:42:18-04:00): The three failing PTY tests in test_demo_terminal.py have been thoroughly investigated and documented. 
@@ -5336,6 +5347,7 @@ Found on 2026-09-11 while running the full suite during an unrelated session's f
 
 PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the parent for environmental anti-patterns like pyenv lock contention)
 - **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Superseded and resolved; discarded by owner ruling 2026-09-13. The coordinator finding root-caused the failure to host-level pyenv contention rather than a code regression, which completed this idea's purpose, and the action item moved to 000129. test/test_demo_terminal.py now passes 46 tests and the full suite is green on dev.
+- **finding** by agent-ideation (2026-09-24T12:38:38-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -6406,7 +6418,7 @@ PROPOSED LINK: 000128 --relates_to--> 000023 (_tmpagent is a candidate location 
 
 ## 000129 · Fix the three pre-existing environmental PTY test failures so the suite runs green
 
-**Created 2026-09-11T20:31:54-04:00 · Status: `discarded`**
+**Created 2026-09-11T20:31:54-04:00 · Status: `reviewing` · revisited 1×**
 
 Owner request, 2026-09-11. The full pytest suite has carried the same three failures through every wb-08/wb-09 verification run: test_posix_adapter_reports_alive_then_not_alive, test_resize_text_frame_applies_to_pty_window_size and test_two_concurrent_websocket_sessions_are_independent_shells in test/test_demo_terminal.py, all with the pyenv "cannot rehash: couldn't acquire lock" / ".pyenv-shim: cannot overwrite existing file" signature already recorded as environmental in ideas 000097 and 000099. Every gate and audit now has to carry the caveat "3 failed, known environmental" - a standing hole in the evidence that a genuinely new PTY regression could hide inside. Fix them for real: either make the tests robust to the pyenv shim environment (e.g. spawn the PTY shell with a clean environment or an absolute shell path that bypasses shim rehashing), fix the host-level pyenv lock contention, or isolate the tests from the shim mechanism - whichever the investigation supports. Done means the full suite passes with zero expected failures on this machine, and the "known environmental" caveat disappears from gate checklists.
 
@@ -6414,7 +6426,7 @@ Owner request, 2026-09-11. The full pytest suite has carried the same three fail
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:53:18-04:00): ## Finding
 
@@ -6426,6 +6438,7 @@ This idea asks for concrete work to fix three recurring pytest failures in test_
 
 **Assessment:** The idea is currently unstarted work. The existing links to 000097 and 000099 correctly surface the problem statement and environmental diagnosis. No new overlaps or proposed links emerge from the search.
 - **finding** by agent-idea-batching (2026-09-13T15:52:48-04:00): Verified resolved; discarded by owner ruling 2026-09-13. The three named PTY tests pass and the full suite is 578 passed on dev. Whatever fixed it landed without a status event on this idea, which is the concrete instance behind 000204.
+- **finding** by agent-ideation (2026-09-24T12:38:38-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -6898,7 +6911,7 @@ PROPOSED LINK: 000139 --extends--> 000138 (both define the anti-pattern tracking
 
 ## 000140 · Learn websockets: an owner-education deep dive grounded in this repository's terminal stack
 
-**Created 2026-09-11T22:49:41-04:00 · Status: `discarded`**
+**Created 2026-09-11T22:49:41-04:00 · Status: `reviewing` · revisited 1×**
 
 Owner idea, 2026-09-11, for their own education - not a build item. Investigate how websockets actually work, using the D-System terminal stack as the concrete study material since it exercises the full lifecycle end to end: the browser's WebSocket API and its open/close/error events (the lifecycle traces from the 2026-09-11 gate work are real worked examples), the HTTP upgrade handshake and what a pre-accept rejection looks like on the wire (idea 000137's 403-vs-close-frame distinction), FastAPI/uvicorn's server-side accept/close semantics, close codes (1006 vs 4000+ application codes) and why reasons sometimes cannot reach the client, per-connection state and the six-session registry, and how React component lifecycles interact with socket lifetimes (the portal remount lesson from phase-wb-09). Output could be a personal explainer document or annotated walkthrough of src/api/routes/demo_terminal.py and ts/src/stage/TerminalRegion.tsx - whatever teaches best.
 
@@ -6906,7 +6919,7 @@ Owner idea, 2026-09-11, for their own education - not a build item. Investigate 
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T23:05:37-04:00): Idea 000140 proposes an owner-education deep dive on websockets using the D-System terminal stack as concrete study material. This is not a build item but a personal learning project grounded in working code.
 
@@ -6938,6 +6951,7 @@ No related plan, requirement, or ADR is missing. The governance documents provid
 - **finding** by agent-ideation (2026-09-24T02:14:16-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
 
 Decline candidate nominated by one analyst (R1) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_one). Reason given there: The owner's own learning project, not a system deliverable; better served outside the backlog.
+- **finding** by agent-ideation (2026-09-24T12:38:39-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -8261,6 +8275,7 @@ PROPOSED LINK: 000163 --relates_to--> 000061 (both propose orthogonal ontologica
 - relates_to ← `000162`
 - relates_to ← `000164`
 - relates_to ← `000452`
+- relates_to ← `000454`
 
 ---
 
@@ -13643,7 +13658,7 @@ PROPOSED PROMOTION: No promotion is justified; the preconditions exist but the k
 
 ## 000282 · Reference: r/ClaudeAI index of ongoing megathreads
 
-**Created 2026-09-19T12:06:08-04:00 · Status: `discarded`**
+**Created 2026-09-19T12:06:08-04:00 · Status: `reviewing` · revisited 1×**
 
 https://www.reddit.com/r/ClaudeAI/s/iKsL6ra2DL
 
@@ -13655,7 +13670,7 @@ Saved on 2026-09-19 during the framework-generalization session. Useful as a rou
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T13:13:32-04:00): Idea 000282 is a reference capture — a specific external resource (r/ClaudeAI's megathreads index linking to community reporting on model behavior, limits, and a project showcase thread relevant to this repository's work).
 
@@ -13672,6 +13687,7 @@ No existing idea proposes a dedicated system for systematically collecting, tagg
 - **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
 
 Decline candidate nominated by both analysts (R1 and R4) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_both). Reason given there: R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note.
+- **finding** by agent-ideation (2026-09-24T12:38:39-04:00): Owner ruling, 2026-09-24, relayed by Session Manager to Ideation: revisit every discarded idea except the four rehearsal entries (000088, 000090, 000102, 000103 stay discarded; "the demo long since finished"). This idea is moved discarded -> reviewing with its one revisit. The owner's words: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially." The terminology ask is recorded as its own idea in the same commit (000453). A second owner ruling the same day, relayed by Session Manager, keeps 000195, 000384 and 000353 discarded as superseded duplicates. Checked on dev 82da81c.
 
 </details>
 
@@ -20138,6 +20154,7 @@ PROPOSED LINK: 000417 --relates_to--> 000418 (both come from the owner's GATE 3 
 **Links**
 
 - relates_to → `000418`
+- relates_to ← `000453`
 
 ---
 
@@ -20168,6 +20185,7 @@ Related: 000417, 000388.
 **Links**
 
 - relates_to ← `000417`
+- relates_to ← `000453`
 
 ---
 
@@ -21071,4 +21089,55 @@ PROPOSED LINK: this idea --relates_to--> 000444 (review every sys-* tag). Weak f
 
 **Links**
 
+- relates_to → `000163`
+- relates_to ← `000454`
+
+---
+
+## 000453 · Clear, unambiguous terminology for idea dispositions in partitioning and triage: discard, set aside or include in a partition, and how each is managed
+
+**Created 2026-09-24T12:38:14-04:00 · Status: `triaged`**
+
+Exactly three outcomes for an idea in partitioning and triage: "discard", "set aside" or "include in a partition", and how each is managed.
+
+The owner's words, as relayed: "Ideation agent was very confusing in it's wording with talking about declining them and parking them or maybe it was declining to discard vs declining to hold... we really need clear and unambiguous terminology for these and how to manage them. We discard them or we set them aside or we include them in the partitions. Should be very simple - so let's revisit all that were discarded initially."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T12:38:14-04:00): Relay record. The owner raised this on 2026-09-24 in the Session Manager session; Session Manager relayed it to Ideation. The first paragraph of the body is Session Manager's statement of the ask; the quoted paragraph is the owner's words verbatim as relayed, which also drive the revisit of nine discarded ideas in the same commit.
+- **finding** by agent-ideation (2026-09-24T12:38:14-04:00): Triage (checked on dev 82da81c). No phase covers it. Today's vocabulary, for comparison: tools/append_idea.py status accepts discarded, promoted, reviewing and triaged, and has no "set aside" status. The partition workflow (.claude/skills/partition-ideas/SKILL.md, PROMPT-034 the reusable partition pack, schemas/idea-partition-record.schema.json) speaks of "decline candidates" in two tiers, of groups and of "unbatched" ideas, and has no field for an owner hold-out. Directly related: 000417 (no field for an owner ruling that holds an idea out without declining it) and 000418 (do not use "parked" to mean "not declined"), both written at the owner's direction. The discard-versus-supersede distinction bears on it: the three-axis classification report (_working/ideation/three-axis/report.md, gitignored, section 5.F) found that the log's discarded status mixes superseded, falsified and withdrawn.
+
+</details>
+
+**Links**
+
+- relates_to → `000417`
+- relates_to → `000418`
+
+---
+
+## 000454 · Not all knowledge has an epistemic classification: decide whether the axes need additional values for items such as artifacts, and leave E blank when none aligns
+
+**Created 2026-09-24T12:38:14-04:00 · Status: `triaged`**
+
+"Not all knowledge or 'ideas' have an epistemic classification (artifacts for example - can a GitHub repo and it's link be true? Maybe not, but we should integrate it because it may have valuable context would be a hypothesis or assumption... this is what we were searching for, do we need additional items along these axes to account for these kind of situations? Maybe, park that as an idea to drill deeper into but leave it blank right now if none align."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T12:38:15-04:00): Relay record. The owner raised this on 2026-09-24 in the Session Manager session, after the three-axis classification report; Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them. The owner's interim ruling, applied to the classification re-run: leave E blank with a reason where no value fits, per PLAN-029 section 2.
+- **finding** by agent-ideation (2026-09-24T12:38:15-04:00): Triage (checked on dev 82da81c). No phase covers the question; phase-idg-01 (PLAN-029) adds the axis fields, and PLAN-029 section 2 already rules each axis optional with a reason for a blank. ARCH-005's open questions ask the same thing ("Does every idea need a value on every axis? An Event may not have a meaningful epistemic status"). Evidence from the three-axis classification of 445 ideas (_working/ideation/three-axis/report.md, gitignored, sections 5.A and 8): 96 ideas had no applicable E (requests, questions, directives), and the classifiers split on whether a proposal's E is Hypothesis or blank. Related: 000452 (schema fields for the three axes) and 000163 (knowledge classification axes: ontological, epistemic, temporal).
+
+</details>
+
+**Links**
+
+- relates_to → `000452`
 - relates_to → `000163`
