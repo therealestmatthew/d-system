@@ -19923,3 +19923,42 @@ For planning: fixed GATE 3 question text in the skill that names the outcomes (d
 Related: 000417, 000388.
 
 </details>
+
+---
+
+## 000419 · Investigate whether there is room for optimization of the CI
+
+**Created 2026-09-24T03:01:08-04:00 · Status: `triaged`**
+
+From the owner, typed in the Session Manager's session and relayed to Ideation, 2026-09-24.
+
+As given: "Investigate whether there is room for optimization of the CI"
+
+Context from the Session Manager: each write to dev makes the next primary-checkout grant wait about 2m45s for CI, under phase-grd-02.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T03:01:08-04:00): Checked on dev at 973196b. .github/workflows/ci.yaml runs on every push to dev and main, with no path filter. It has two jobs in parallel:
+- "Python lint & test": uv sync, the private-content check, governance, the catalog diff, ruff, mypy and the full pytest suite.
+- "TypeScript build check": npm ci and the build.
+
+Timing from gh (run 35965777418, 973196b): the Python job took 159 s, and pytest alone took 133 s of it. The other steps took 1-9 s each; mypy was the longest at 9 s. The TypeScript job took 15 s. The last eight dev runs took 93-165 s, all successful.
+
+phase-grd-02 (Green dev CI before each primary-checkout grant) is queued, not built. Its tools/check_dev_ci.py would require a completed, successful run at dev's head before any GRANTED, and exit 2 while a run is in progress. So the CI's duration becomes the minimum gap between grants. The Session Manager is already waiting for CI by hand.
+
+Options for planning, none checked beyond the points above:
+- Parallelise pytest: pytest-xdist is not in pyproject.toml's dependencies, and test/test_codes.py rewrites the tracked catalog while it runs (000324, 000325), so it would need isolating first.
+- Find the slowest tests with `pytest --durations`, run in a worktree.
+- Split the job so governance, the catalog diff, ruff and mypy report in about 20 s while pytest runs separately.
+- Path-filter or narrow the suite for commits that touch only _data/ideas.jsonl and docs/00-working/ideas.md, the Ideation turns' commits.
+- Let phase-grd-02 grant on the last green run for a commit whose diff cannot affect the tests. That changes REQ-028 R06 and needs an owner ruling.
+
+Related: 000413 and 000399 (a full test run after every write to dev, where CI is that run), 000012 (skip the test preflight when the tree is provably clean), 000324 and 000325 (catalog tests overwrite the tracked catalog), 000026 (CI only builds the frontend).
+
+PROPOSED LINK: 000419 --relates_to--> 000413 (the gating CI run whose duration this idea would shorten)
+
+</details>
