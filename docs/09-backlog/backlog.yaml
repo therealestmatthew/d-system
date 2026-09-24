@@ -9838,8 +9838,10 @@ items:
     in flight, not finished, and reaches delivered when that plan''s work ships. The already-promoted
     ideas are unaffected until their work ships; this phase backfills no transition onto them.'
   - 'The reversal of 000099 and 000129 from discarded to resolved is a revisited event followed by a
-    status event: the existing one-time revisit (discarded -> reviewing), then a status move from reviewing
-    to resolved. discarded stays never-a-from; no schema exception is added (owner ruling 2026-09-24).'
+    status event. The revisit is done: both were revisited on 2026-09-24 (discarded -> reviewing, dev
+    f7f743b), using each idea''s one revisit. What remains is a status move from reviewing to resolved,
+    which the transition table must allow. discarded stays never-a-from; no schema exception is added
+    (owner ruling 2026-09-24).'
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -9896,7 +9898,8 @@ items:
     demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
     or absorbed - with the pointer each state requires. Ideas created outside that window belong to
     another backfill batch.
-  - 'Move 000099 and 000129 from discarded to resolved. Read the GOV-003 entry before doing it: this
+  - 'Move 000099 and 000129 to resolved. The revisit is done: both were revisited on 2026-09-24 and now
+    sit at reviewing, so this is a status move only (reviewing -> resolved). Read the GOV-003 entry before doing it: this
     reverses an owner ruling of 2026-09-13, made deliberately when no state fitted, and is not the
     correction of an oversight. Both carry annotations saying they were discarded by that ruling. Both
     were created on 2026-09-11; the reversal is named here rather than found by a batch sweep.'
@@ -10166,8 +10169,9 @@ items:
   - 'Idea 000417 (owner ruling 2026-09-24): add a non-terminal status for an idea the owner holds
     out of a partition without discarding it, reachable from triaged and able to return to triaged or
     reviewing. Reachable from triaged is read as reachable from triaged only - the builder''s reading,
-    accepted by the Session Manager, not an owner ruling. Its name is a placeholder until Ideation records the terminology idea for it; the owner
-    wants three plain outcomes for an idea at a partition - discard, set aside, or include in a partition.'
+    accepted by the Session Manager, not an owner ruling. Its name is a placeholder until idea 000453
+    (terminology for idea dispositions) is ruled on; the owner wants three plain outcomes for an idea at a
+    partition - discard, set aside, or include in a partition.'
   - Add a hold-out field to schemas/idea-partition-record.schema.json so an owner hold-out is recorded
     as such rather than as an unbatched reason, and update the partition-ideas workflow's GATE 3 to
     write it. The workflow still writes nothing to _data/ideas.jsonl.
