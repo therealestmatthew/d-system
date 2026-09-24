@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-15'
+updated: '2026-09-23'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-document-backlog-governance-requirements, doc-governance-protocol, doc-backlog-protocol]
 ---
@@ -108,6 +108,17 @@ the three that produced this plan. A first run reporting zero findings across 70
 phases would contradict evidence already in hand, and should be read as a broken check rather than a
 clean corpus.
 
+**Amendment, 2026-09-23** (owner rulings relayed by the Session Manager, applied through
+`PLAN-045`'s branch): the check has two modes. For a completed phase, the change set is the files
+touched on `dev`'s first-parent history between the phase's claim and completion commits, by
+commits whose message names the phase; no other record bounds a phase, because merges are
+fast-forward and branches are deleted. For an active phase it diffs `dev...agent/<phase-id>`, so
+`READY` can carry the report (the owner's ruling that `READY` carries this check's output). Writes the
+protocol requires of every phase (its own status lines, the catalog, its session record, idea
+captures) are exempt; a `backlog.yaml` edit counts only when it touches another phase's entry, which
+is what keeps the `phase-prog-*` case visible. The check runs from its own command and exits 0 on
+findings. `REQ-015` R12 is amended to match.
+
 ### 6. `G07` is sequenced behind `phase-gov-01`, which the scope required checking
 
 The phase's acceptance requires stating the overlap with `phase-gov-01`, a ready phase queued outside
@@ -122,6 +133,11 @@ run concurrently. `phase-dgov-06` therefore declares `depends_on: [phase-gov-01]
 merged: `phase-gov-01` belongs to `PLAN-010` and is already queued and ready, and pulling a ready
 phase out of another plan into this programme to avoid a sequencing edge trades a small ordering
 constraint for a governance tangle.
+
+**Amendment, 2026-09-23:** after the Standby Builder's review, `phase-dgov-06` builds its check in a
+new module (`src/governance/containment.py`) and no longer declares `backlog.py`. Both phases now
+declare `src/governance/__main__.py`, so the collision and the `depends_on` edge remain, on that
+file.
 
 ### 7. `G08` gets its own phase, and it is honestly under-sized
 

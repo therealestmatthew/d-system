@@ -84,8 +84,10 @@ agent planning it, not put to the owner; the judgement is reported here and at G
 **D2. Move `phase-dgov-06`; do not merge it in.** `phase-dgov-06` already specifies the
 deliverables-diff check against `REQ-015` R12-R13 under `PLAN-030`, with acceptance that includes a
 known failing case (the `phase-prog-*` phases that rewrite `backlog.yaml` without declaring it).
-Merging it into `phase-grd-03` would mean cancelling a phase another plan owns, amending `PLAN-030`
-and `REQ-015`, and re-deriving acceptance that already exists, with no change to what gets built.
+Merging it into `phase-grd-03` would mean cancelling a phase another plan owns and re-deriving
+acceptance that already exists, with no change to what gets built. (`PLAN-030` and `REQ-015` were
+later amended on this branch for a different reason: the owner's rulings on the check's change set
+and its active-branch mode, D10.)
 The cost of moving it is only a queue position: `phase-gov-01` (its dependency, which it collides
 with on file) and `phase-dgov-06` go in `next_up` after the guards phases, in the order the owner
 ruled (OQ1). `phase-dgov-06` reports rather than blocks (`REQ-015` R13), although idea `000398`
@@ -150,13 +152,12 @@ on is not read. The owner's sign-off names the tests or lines it accepts, so a j
 a documented ignore can still merge.
 
 **D10. `READY` carries the deliverables diff once it exists.** Ruled by the owner on 2026-09-23
-(answer to OQ3): "dgov-06 stays report-only, and READY carries its output". `phase-grd-03` writes the
-`READY` rule in `GOV-017` and `PROMPT-037`, naming `phase-dgov-06`'s check and applying once that
-check exists. The queue puts `phase-grd-03` first, but nothing in `depends_on` enforces it: if
-`phase-dgov-06` lands first, the rule applies from the day `phase-grd-03` lands instead. Either order
-gives the same end state. The alternative, adding the text to `phase-dgov-06`,
-would change the scope and deliverables of a phase another plan owns (`PLAN-030`), which the owner's
-ruling did not ask for.
+(answer to OQ3): "dgov-06 stays report-only, and READY carries its output". A `READY` is sent while
+a phase is still active, so the owner also ruled that `phase-dgov-06` gains an active-branch mode
+(`dev...agent/<phase-id>`), with `PLAN-030` and `REQ-015` R12 amended to cover it; those amendments
+and the revised `phase-dgov-06` entry are made on this plan's branch. `phase-grd-03` writes the `READY`
+rule in `GOV-017` and `PROMPT-037`, naming that mode and applying once it exists. The queue puts
+`phase-grd-03` first, but either landing order gives the same end state.
 
 **D11. The S3 `next_up` rule is its own phase, `phase-grd-04`.** Ruled by the owner on 2026-09-23
 (answer to OQ4): "the S3 next_up rule is its own guards phase, after grd-03". The rule is the owner's

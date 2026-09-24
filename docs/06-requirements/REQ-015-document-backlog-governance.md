@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-23'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-governance-protocol, doc-backlog-protocol, doc-document-code-protocol]
 ---
@@ -77,9 +77,19 @@ the backlog substrate's capacity, the containment check, and the missing registr
 | R09 | Reading the working backlog file costs materially less context than before the split, stated as a measurement. | Report the file's size and phase count before and after. A split that leaves the working file the same size has not solved `000037`'s problem. |
 | R10 | A backlog review and re-prioritisation procedure exists, naming what triggers it, how `next_up` is rebuilt and by whom. | Read the procedure for all three. Confirm it answers what un-defers a phase whose gate cannot be met by waiting — `phase-mem-15` through `-19` gate on recorded retrieval failures that nothing currently records, which is the case that proves the procedure is needed. |
 | R11 | The procedure states whether it is a session type or a command, and is reachable that way. | Invoke it as whatever it claims to be and confirm it runs. A procedure that exists only as prose in a governance document is not reachable. |
-| R12 | A completed phase's actual change set is diffed against its declared `systems` and `deliverables`, and files outside the declaration are named. | Run the check against a phase whose diff is known to include an undeclared path; confirm it names the phase and the file. Run it against the repository as it stands and record the result — a check whose first run reports zero findings across 70-plus completed phases is more likely broken than vindicated. |
+| R12 | A phase's actual change set is diffed against its declared `systems` and `deliverables`, and files outside the declaration are named. For a completed phase, the change set is the files touched on `dev`'s first-parent history between the phase's claim commit and its completion commit, by commits whose message names the phase. For an active phase, it is `dev...agent/<phase-id>`. Writes the protocol requires of every phase (its own status lines, the catalog, its session record, idea captures) are not findings. | Run the check against a phase whose diff is known to include an undeclared path, in both modes; confirm it names the phase and the file. Run it against the repository as it stands and record the result — a check whose first run reports zero findings across every completed phase is more likely broken than vindicated. |
 | R13 | The containment check reports rather than blocks, and its output distinguishes a declaration that was too narrow from work that genuinely strayed. | Read the output for that distinction. Confirm nothing in the check writes to `backlog.yaml` or reopens a completed phase — judging which of the two a finding is belongs to a person. |
 | R14 | `_tmpagent/`'s claim protocol has an entry in `docs/08-governance/systems.yaml` with a maturity, and `--inventory` reports it. | Run `uv run python -m src.governance --inventory` and confirm the entry appears with a maturity level. Confirm the maturity is justified by what the mechanism actually does rather than asserted. |
+
+**Amendment, 2026-09-23.** R12 was widened by the owner's rulings of 2026-09-23, relayed by the
+Session Manager to the planner of `PLAN-045`: the completed-phase change set is bounded by the
+phase's claim and completion commits on `dev`'s first-parent history, keeping commits whose message
+names the phase; and the check gains an active-branch mode so a merge request (`READY`) can carry its
+output. The exemption for protocol-mandated writes comes from the Standby Builder's review of
+`phase-dgov-06` (`_working/session-manager/reviews/phase-dgov-06.md`, fix 2), applied at the Session
+Manager's instruction. R12 before the amendment read: "A completed phase's actual change set is
+diffed against its declared `systems` and `deliverables`, and files outside the declaration are
+named." Its verification said "70-plus completed phases"; 108 were complete at `f1b891d`.
 
 ## What each requirement is not
 

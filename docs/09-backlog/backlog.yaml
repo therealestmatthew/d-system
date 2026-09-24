@@ -3029,6 +3029,7 @@ items:
   plan: doc-code-reservation-enforcement
   sources:
   - doc-backlog-decisions
+  - doc-document-code-protocol
   systems:
   - sys-governance
   - sys-backlog
@@ -3040,21 +3041,33 @@ items:
   scope:
   - Check every backlog deliverable whose filename carries a code against existing
     documents and the codes.yaml reservations.
+  - Count register reservations only (codes.yaml reserved:); ignore the pre-merge reservation store
+    under the git common directory, so the result is the same on every clone (GOV-005, "Two different
+    things are called a reservation").
+  - Derive the code patterns from the codes.yaml series, including sub-codes (PLAN-039.01) and dated
+    codes (SESS-2026-09-06-04, WALK-...), so a dated code is never read as a counter code.
+  - Pass the code register from src/governance/__main__.py into the backlog audit.
   - Fail with the phase, the code and the file named, and say to reserve it in codes.yaml.
+  - For a deliverable naming a retired code, fail with a separate message saying the code is retired
+    and a new one comes from --next-code, because a retired code cannot be reserved.
   acceptance:
   - A fixture phase naming an unreserved code fails with the phase and code named.
-  - A deliverable naming an existing document passes.
+  - A fixture phase naming a retired code fails with the retired-code message.
+  - A deliverable naming an existing document passes, including a sub-code and a dated session code.
   - A deliverable carrying no code, such as AGENTS.md, passes.
-  - The current repository passes unchanged, including the reserved ADR-004 and ADR-005
-    claims.
+  - The current repository passes unchanged, including every deliverable that passes only by a register
+    reservation (five at f1b891d).
   verification:
   - uv run pytest test/test_backlog.py
   - uv run python -m src.governance
   deliverables:
   - src/governance/backlog.py
+  - src/governance/__main__.py
   - test/test_backlog.py
   next_action: Check coded deliverables against existing documents and codes.yaml
-    reservations.
+    reservations. Revised 2026-09-23 from the Standby Builder's review
+    (_working/session-manager/reviews/phase-gov-01.md) under PLAN-045. Deliverables that are directories
+    carry no code and are not checked; that gap is not ruled.
 - id: phase-ses-01
   title: Define the session type taxonomy and per-type context
   plan: doc-session-lifecycle
@@ -10523,7 +10536,7 @@ items:
     is not close to empty. Confirm with the owner that the need is now real before building the command
     half.
 - id: phase-dgov-06
-  title: Diff a completed phase's change set against its declared paths
+  title: Diff a phase's change set against its declared paths, for completed phases and active branches
   plan: doc-document-backlog-governance
   sources:
   - doc-document-backlog-governance-requirements
@@ -10538,27 +10551,43 @@ items:
   depends_on:
   - phase-gov-01
   scope:
-  - Build the check that diffs a completed phase's actual change set against its declared systems and
+  - Build the check that diffs a phase's actual change set against its declared systems and
     deliverables, naming files outside the declaration.
+  - 'Completed-phase mode: the change set is the files touched on dev''s first-parent history between
+    the phase''s claim commit and its completion commit, by commits whose message names the phase (owner
+    ruling, 2026-09-23; REQ-015 R12 as amended).'
+  - 'Active-branch mode: diff dev...agent/<phase-id> against the claimed phase''s declaration, so READY
+    can carry the output (owner ruling, 2026-09-23; REQ-015 R12 as amended).'
+  - Exempt the writes the protocol requires of every phase - its own backlog.yaml status lines, the
+    catalog regeneration, its session record under docs/03-sessions/, and idea-log captures
+    (_data/ideas.jsonl, docs/00-working/ideas.md). A backlog.yaml edit counts only when it touches
+    another phase's entry or the registry's structure.
   - Make it report rather than block, and distinguish a declaration that was too narrow from work that
     genuinely strayed - only a person can tell those apart.
+  - Give it its own command that exits 0 when it reports findings, since it must not fail the default
+    governance run (REQ-015 R13).
   - Write nothing to backlog.yaml and reopen no completed phase.
   acceptance:
   - 'REQ-015 R12 holds: run against a phase with a known undeclared path, the check names the phase and
-    the file. Run against the repository as it stands, the result is recorded - zero findings across 70-plus
-    completed phases indicates a broken check, not a clean corpus.'
+    the file, in both modes. Run against every completed phase (108 at f1b891d), the result is recorded
+    - zero findings indicates a broken check, not a clean corpus.'
   - 'REQ-015 R13 holds: the output distinguishes a too-narrow declaration from genuine strays, and nothing
     in the check writes to backlog.yaml.'
-  - The known phase-prog-* case - every one rewrites backlog.yaml without declaring it - appears in the
-    first run's findings.
+  - The known phase-prog-* case - each registers other phases in backlog.yaml without declaring it -
+    appears in the first run's findings, while a phase's own status edits do not.
+  - Run in active-branch mode against a scratch branch with one undeclared file, it names that file.
   verification:
-  - uv run pytest test/test_backlog.py
+  - uv run pytest test/test_containment.py
+  - uv run python -m src.governance --containment
   - uv run python -m src.governance
   deliverables:
-  - src/governance/backlog.py
-  - test/test_backlog.py
-  next_action: Collides with phase-gov-01 on both deliverables. That phase is ready and small; take it
-    first rather than queueing a claim the validator will reject.
+  - src/governance/containment.py
+  - src/governance/__main__.py
+  - test/test_containment.py
+  next_action: Build the completed-phase change-set extraction first (claim and completion commits on
+    dev's first-parent history, message filter), then the active-branch mode on the same classifier.
+    Revised 2026-09-23 from the Standby Builder's review (_working/session-manager/reviews/phase-dgov-06.md)
+    and the owner's rulings, under PLAN-045.
 - id: phase-dgov-07
   title: Register _tmpagent in the systems maturity registry
   plan: doc-document-backlog-governance
