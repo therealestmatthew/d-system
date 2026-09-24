@@ -26,6 +26,7 @@ CI regenerates it and fails on any difference.
 | ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ADR-021 | adr | accepted | repository-owner | docs/04-decisions/ADR-021-claude-code-dependency.md |
 | ADR-022 | adr | accepted | repository-owner | docs/04-decisions/ADR-022-broker-first-autonomous-operations.md |
+| ADR-023 | adr | draft | repository-owner | docs/04-decisions/ADR-023-session-manager-into-orchestrator.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -431,4 +432,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-346 documents — adr: 19, architecture: 11, governance: 16, operation: 21, plan: 61, prompt: 38, requirement: 30, session: 150.
+347 documents — adr: 20, architecture: 11, governance: 16, operation: 21, plan: 61, prompt: 38, requirement: 30, session: 150.
