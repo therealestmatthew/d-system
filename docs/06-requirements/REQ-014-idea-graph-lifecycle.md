@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-24'
 systems: [sys-portfolio, sys-projection, sys-governance]
 depends_on: [doc-idea-node-classification, doc-idea-record-system, doc-idea-staging]
 ---
@@ -90,6 +90,8 @@ The boundary is that `P1` produces the structure and `P6` queries it.
 | R18 | Where a promoted plan or requirement lives before it earns a code is defined, and the definition is reachable from `ADR-010`, which currently stops at promotion. | Read the definition for the location, and for what happens if the draft is abandoned. Confirm `ADR-010` or its successor points at it. |
 | R19 | A planner agent drafts a governed plan from a promoted idea, and the draft carries what triage already found rather than rediscovering it. | Run it against a promoted idea with existing findings and links. Confirm the draft cites them. Confirm the agent drafts and does not decide — it allocates no code and marks nothing promoted, mirroring the triage agent's boundary. |
 | R20 | A plan drafted by R19's agent is measurably conformant to R17's standard. | Check the draft against the standard's own named sections. A standard nothing is checked against is prose; this row is what makes R17 load-bearing. |
+| R21 | Ideas whose work demonstrably shipped are closed into `delivered`, `resolved` or `absorbed` by appending events, each close carrying a pointer that resolves, and `000099` and `000129` move from `discarded` to `resolved` through a revisit followed by a status move. | Fold the log and confirm every close written by the backfill carries a pointer to an existing document code, backlog phase id or commit hash. Confirm a close citing a pointer that does not resolve is rejected. Confirm `000099` and `000129` fold to `resolved` through a `revisited` event and then a `status` event, and that `_data/ideas.jsonl`'s existing lines are byte-identical. Scope and reasoning: `GOV-003`, 2026-09-22 lifecycle ruling. |
+| R22 | An agent-written terminal-state close is distinguishable from an owner-ratified one through a `proposed_by` field, is verified by a second agent before it counts as ratified, and blocks no downstream work while it waits. | Write an agent-proposed close and read it back through `fold()`. Confirm it is marked as agent-written and pending ratification, and that the pending set is derivable from the log alone. Confirm a close missing the verification step stays marked as agent-written. Scope and reasoning: `GOV-003`, 2026-09-22 lifecycle ruling and the 2026-09-23 batch-003 entry. |
 
 ## What each requirement is not
 

@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-16'
+updated: '2026-09-24'
 systems: [sys-portfolio, sys-projection, sys-governance]
 depends_on: [doc-idea-graph-lifecycle-requirements, doc-idea-node-classification]
 ---
@@ -154,7 +154,9 @@ repository's own plan-before-code rule.
 
 ## Implementation phases
 
-Twelve phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
+Fourteen phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
+`phase-idg-13` and `phase-idg-14` were split out of `phase-idg-01` after this plan was written, on
+2026-09-22 and 2026-09-23 (`GOV-003`), and belong to no partition group.
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
@@ -170,6 +172,8 @@ Twelve phases under `phase-idg-*`, registered in [the backlog index](../09-backl
 | `phase-idg-10` | Audit the plan corpus and write the plan-quality standard | `G04` | — |
 | `phase-idg-11` | Define where a promoted plan lives before it earns a code | `G04` | — |
 | `phase-idg-12` | Build the idea planner agent and check it against the standard | `G04` | `10`, `11` |
+| `phase-idg-13` | Backfill the idea log into the new terminal states | — | `01`, `14` |
+| `phase-idg-14` | Build the terminal-state authority process - propose, verify, ratify | — | `01` |
 
 ### Sizing against the partition
 
@@ -184,6 +188,11 @@ range, and the internal distribution is where the interest is.
 - `G02` lands at two rather than three, because `000048` and `000127` are one ask.
 - `G04` lands at three, one per idea, which its own dependency chain forces.
 
+The two later splits take the plan to **fourteen**, above the partition-time range. Neither adds a
+partition idea: both carry the owner's 2026-09-22 lifecycle ruling on idea `000236`, which arrived
+after the partition and was first folded into `phase-idg-01`, then split out because it doubled that
+phase's scope while its `session_budget` stayed at one.
+
 ## Execution order and real concurrency
 
 `phase-idg-01` is a genuine bottleneck: five phases depend on it directly or transitively, and it is
@@ -193,16 +202,19 @@ Five phases declare `depends_on: []`, but not all five clear each other. `phase-
 `phase-idg-10` and `phase-idg-11` all declare `sys-gov-docs` and collide with each other on that
 shared system; `phase-idg-08`'s bare `.claude/commands/` deliverable also collides with
 `phase-idg-06`'s `.claude/commands/idea.md`; and `phase-idg-01`'s bare `docs/04-decisions/`
-deliverable collides with `phase-idg-11`'s `docs/04-decisions/ADR-019-promoted-plan-staging.md`. The
-one mutually disjoint set among the five is `phase-idg-01`, `phase-idg-06` and `phase-idg-10` —
-**that trio is the widest genuinely parallel front in this programme, reached at the start rather
-than in the middle.** `phase-idg-08` clears only `phase-idg-01` of the other four, and
-`phase-idg-11` clears only `phase-idg-06`; neither can join the trio as a fourth. A coordinator
-should open with `phase-idg-01`, `phase-idg-06` and `phase-idg-10` together; `phase-idg-08` can run
-only in place of `phase-idg-06`, and `phase-idg-11` only in place of `phase-idg-01`.
+deliverable collides with `phase-idg-11`'s `docs/04-decisions/ADR-019-promoted-plan-staging.md`.
+
+**Corrected 2026-09-24: `phase-idg-01` and `phase-idg-06` collide.** This section first named
+`phase-idg-01`, `phase-idg-06` and `phase-idg-10` as a mutually disjoint trio. That was true only
+because `phase-idg-01` under-declared its systems: its `src/governance/` deliverable, added on
+2026-09-23, belongs to `sys-governance`, which `phase-idg-06` also declares. With `sys-governance`
+now declared on `phase-idg-01`, no three of the five clear each other. The disjoint pairs are
+`phase-idg-01` with `phase-idg-08` or `phase-idg-10`, and `phase-idg-06` with `phase-idg-10` or
+`phase-idg-11`. `phase-idg-10` is complete, so of the four still queued the widest parallel front is
+two: `phase-idg-01` with `phase-idg-08`, or `phase-idg-06` with `phase-idg-11`.
 
 After `phase-idg-01` lands, `G01` serialises hard: `-02` before `-03`, `-02` before `-05`, and `-04`
-before `-07`. The critical path is four deep: `01` → `02` → `03`, with `01` → `04` → `07` the same
+before `-07`, and `-14` before `-13`. The critical path is four deep: `01` → `02` → `03`, with `01` → `04` → `07` the same
 length.
 
 ## Requirement coverage
@@ -231,6 +243,8 @@ Every row of `REQ-014` maps to at least one phase, and every phase carries at le
 | R18 Where a promoted draft lives before it earns a code | `phase-idg-11` |
 | R19 A planner agent that drafts and does not decide | `phase-idg-12` |
 | R20 A drafted plan is conformant to the standard | `phase-idg-12` |
+| R21 Shipped ideas backfilled into terminal states, `000099`/`000129` reversed | `phase-idg-13` |
+| R22 Agent-written closes marked, verified and ratified | `phase-idg-14` |
 
 ## Key references
 

@@ -4,6 +4,7 @@ decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
 - phase-grd-02
+- phase-idg-01
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
@@ -17,7 +18,6 @@ next_up:
 - phase-cap-08
 - phase-irs-11
 - phase-irs-14
-- phase-idg-01
 - phase-idg-11
 - phase-dgov-01
 - phase-idg-12
@@ -9814,6 +9814,7 @@ items:
   systems:
   - sys-contracts
   - sys-portfolio
+  - sys-governance
   owner: repository-owner
   status: queued
   priority: 1
@@ -9833,8 +9834,11 @@ items:
     another document that now carries it. Each requires a pointer as promoted does - a document code,
     phase id or commit hash recording where the delivery happened.'
   - 'Make promoted non-terminal in the same change, per the same ruling: an idea that became a plan is
-    in flight, not finished, and reaches delivered when that plan''s work ships. The seven already-promoted
+    in flight, not finished, and reaches delivered when that plan''s work ships. The already-promoted
     ideas are unaffected until their work ships; this phase backfills no transition onto them.'
+  - 'The reversal of 000099 and 000129 from discarded to resolved is a revisited event followed by a
+    status event: the existing one-time revisit (discarded -> reviewing), then a status move from reviewing
+    to resolved. discarded stays never-a-from; no schema exception is added (owner ruling 2026-09-24).'
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -9885,6 +9889,7 @@ items:
   session_budget: 1
   depends_on:
   - phase-idg-01
+  - phase-idg-14
   scope:
   - Sweep the idea log for ideas whose work demonstrably shipped and close each into the state its own
     finding evidences - delivered, resolved or absorbed - with the pointer each state requires.
@@ -9899,6 +9904,9 @@ items:
   acceptance:
   - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
     phase id in the backlog, or a commit hash in this repository's history.
+  - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
+    through phase-idg-14's process.
+  - A close citing a pointer that does not resolve is rejected by the writer.
   - 'The seven ideas named in scope are closed or explicitly deferred with a reason; a silent omission
     is a failure of this phase, not a smaller result.'
   - 000099 and 000129 are resolved rather than discarded, and the reversal is legible from the log
@@ -9959,6 +9967,7 @@ items:
   - tools/append_idea.py
   - src/db/ideas.py
   - test/
+  - .claude/agents/
   next_action: 'Split out of phase-idg-01 on 2026-09-23 by owner ruling (batch-003 Q4) - the schema
     change and the authority process are two different failure modes, the same reasoning that split
     phase-idg-13 out on 2026-09-22. Do not start before phase-idg-01 ships the terminal statuses and
@@ -9967,7 +9976,10 @@ items:
     a status change in the log by reading it - this requirement lives here as a next_action rather
     than in acceptance because no test can read an agent''s report text (batch-003 Q5). Neither the
     existing status event nor a linked event carries an author field, which is why the proposed_by
-    field is being added rather than reused (batch-003 Q6).'
+    field is being added rather than reused (batch-003 Q6). One delivered, two paths into it:
+    phase-irs-09 plans a second path into delivered, written after the realization pipeline''s own
+    verification, and whoever builds either phase reads the other first (GOV-003, 2026-09-22 lifecycle
+    ruling).'
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle
