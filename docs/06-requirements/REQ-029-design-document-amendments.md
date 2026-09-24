@@ -61,7 +61,8 @@ The governing documents contradict each other and the owner's rulings. Each case
 8. **`CLAUDE.md` is stale.** Line 137 lists four schema files (`schemas/` holds 26 files); line
    141 lists seven tables (`sql/001_schema.sql` creates 16); line 144 says tasks are embedded in
    commitment JSON, while `tools/rebuild_db.py` reads them from `_data/tasks/` as first-class
-   records. The owner approved correcting these on 2026-09-23, relayed by the Session Manager.
+   records (idea `000381`). The owner approved correcting these on 2026-09-23, relayed by the Session
+   Manager.
 9. **Governing documents still name `main` as the integration branch.** `dev` has been the
    integration branch since 2026-09-09 (`AGENTS.md`). Still saying `main`: `GOV-001` line 181,
    `GOV-002` lines 168 and 170, `OPS-001` lines 132 and 154 (`git switch main`), and `GOV-005` line

@@ -44,13 +44,24 @@ answers unnumbered, so each is given here with the board's words and the item it
 | "OWNER: ... OQ8 STANDING rule: never reuse a phase id for different content (GOV-003 via dam-01)" | `PLAN-045` OQ8 |
 | Idea `000378`'s annotation: "Owner ruling, 2026-09-23 ... GOV-003 governs" | Phase-completion authority |
 
-Ideas covered: `000378` (completion authority contradicts itself), `000402` in the one instance
+Ideas covered: `000378` (completion authority contradicts itself), `000381` (`CLAUDE.md`'s three
+stale lines), `000402` in the one instance
 `000378` describes (not the general consistency check `000402` proposes), and the owner's rulings
 above, and `000377` (governance documents still name `main` as the integration branch), included by
 the owner's ruling of 2026-09-23 (answer to OQ1). The work sits under the owner's framing in
 `000411`: agents with defined contracts, and the orchestration systems that manage them, are
 designed in parallel; the Test Author contract and the Validator and close-reviewer input rules here
 are agent-contract changes.
+
+**Partition placement.** In the partition the owner accepted at GATE 3 on 2026-09-23
+(`docs/00-working/idea-partition-2026-09-23.md`, on `agent/phase-part-03` at `6051dad`), this
+plan's ideas sit in the track "Governance checks, document hygiene and the portable framework":
+`000377` and `000378` in the group "Cross-document textual drift", and `000402` in "Delivery-safety
+gates in governance and CI". `000411` postdates the corpus. The drift group also holds `000381`
+(`CLAUDE.md` has three stale lines; the owner must approve any edit), which is the `CLAUDE.md`
+correction in D5 and is covered by this plan; `000298` (`PLAN-005` states a retired workaround as
+live) and `000383` (`REQ-003` R11 names an idea status that does not exist) are in the same group
+and not covered (OQ8). None of this plan's ideas is declined or held out.
 
 ## Decisions
 
@@ -163,7 +174,8 @@ overwrite the change, and `generate_agent_workflows.py --check` would fail until
 
 **D7. Where the Test Author sits in stage 8.** Q5 adds the role to the `unit` graph; `ARCH-006`'s
 stage table says a stage with no failure path is a defect, so stage 8 must name the role and its
-failure path, not only `GOV-014`. Proposed text, taken from the owner's design (section 3.6, "Runs
+failure path, not only `GOV-014`. Proposed text, taken from the owner's design (`docs/00-working/agentic-sdlc-2026-09/agentic-sdlc-design.md`,
+section 3.6, "Runs
 **before** the Task Dev agent and commits red tests"), which mapping Q1 made an input to the `unit`
 graph: the Test Author writes failing tests from the phase's acceptance before the Developer starts;
 the Developer may not change them; a Developer who holds that a test is wrong records a finding,
@@ -217,7 +229,8 @@ stale catalog in `phase-dam-01`'s own commits; the order is the owner's at G3 (`
 
 ## Open questions
 
-Answered by the owner on 2026-09-23, relayed by the Session Manager:
+Closed on 2026-09-23: owner rulings relayed by the Session Manager, and items the planner resolved
+(OQ5 by Ideation's records, OQ6 against the accepted partition):
 
 - **OQ1. Include `000377`?** Ruled: "include 000377". Applied: `REQ-029` problem 9 and R12.
 - **OQ2. The agent-proposed label's form.** Ruled: "GOV-003 records the ruling, and the body's first
@@ -231,7 +244,11 @@ Answered by the owner on 2026-09-23, relayed by the Session Manager:
 - **OQ7. The Test Author's stage 8 text.** Ruled: "Test Author stage-8 text as proposed". Applied:
   D7.
 
+- **OQ6. Partition reconciliation.** Done against the accepted partition (`6051dad`); see
+  "Partition placement" in Context and scope.
+
 Still open:
 
-- **OQ6. Partition reconciliation.** As in `PLAN-045` OQ6: reconciled with the `phase-part-03`
-  sweep's accepted result before G3.
+- **OQ8. The rest of the drift group.** `000298` and `000383` are one-passage text corrections of the
+  same kind as `000377`. Who: the owner, at G3. Leaning: add both to `phase-dam-01`, since the
+  partition grouped them with work this phase already does and each is a single passage.

@@ -32,7 +32,8 @@ gitignored). The rulings answer decision lists in the Scout's reports, also giti
 `_working/session-manager/scout/`. Each ruling is quoted from the board as written there:
 
 - "OWNER mapping rulings: ... Q8 guards (000408/000409/S7) as own phase now" (answering Builder A's
-  mapping of the owner's agentic-SDLC design, `reports/owner-design-mapping.md` section 8, Q8).
+  mapping of the owner's agentic-SDLC design, `reports/owner-design-mapping.md` section 8, Q8; the
+  design is tracked at `docs/00-working/agentic-sdlc-2026-09/`).
 - "OWNER Scout rulings: ... O-2 widen guards phase" (answering `orchestration-3-architecture.md`,
   "Owner decisions", O-2: "Widen the ruled guards phase with CI-green-before-grant and the ci.yaml
   fix").
@@ -57,6 +58,37 @@ baseline), `000398` and `000027` (diff inside declared deliverables, through `ph
 result before a grant; `phase-grd-02`). The work sits under the owner's framing in `000411`: agents
 with defined contracts and the orchestration systems that manage them are designed in parallel;
 these guards are orchestration-side checks that hold whichever agent does the work.
+
+**Partition placement.** The owner accepted the `phase-part-03` partition at GATE 3 on 2026-09-23
+(`docs/00-working/idea-partition-2026-09-23.md` and `.json`, on `agent/phase-part-03` at `6051dad`):
+371 ideas in 87 groups under 12 tracks, plus 12 unbatched. This plan's ideas sit as follows:
+
+| Idea | Track | Group | Covered by |
+|---|---|---|---|
+| `000399`, `000408`, `000409`, `000394` | Governance checks, document hygiene and the portable framework | Delivery-safety gates in governance and CI | `phase-grd-01`-`04` |
+| `000405`, `000406`, `000198` | Governance checks, document hygiene and the portable framework | Catalog print-versus-write and stdout contamination | `phase-grd-01` |
+| `000398`, `000027` | Concurrency, claims, backlog and git safety | Lock-check blind spots and declared-path enforcement | `phase-dgov-06` (`PLAN-030`) |
+| `000411`, `000412`, `000413` | not in the partition | recorded at `99bf868`, after the corpus of 383 was built | `000412` `phase-grd-01`, `000413` `phase-grd-02` |
+
+None of this plan's ideas is among the four the owner declined or the ten held out. Where the
+partition differs from this plan:
+
+- **The rest of the delivery-safety group.** The group also holds `000400` (mutation checks) and
+  `000410` (security review), which this plan leaves out by the owner's rulings (mapping Q8 and Q9),
+  `000402` (consistency checks), which `PLAN-046` covers for one instance only, and `000401`
+  (evidence tracing for numbers), which no plan here covers.
+- **The rest of the catalog group.** `000208` duplicates `000198` and is fixed on `dev` (`--catalog`
+  writes the file). `000324`, `000325`, `000335`, `000353` and `000357` are about the catalog tests
+  and warnings on stdout; this plan's checks do not use `--catalog`'s stdout, so they neither fix nor
+  depend on them. `000155` (the idea writer leaves `ideas.md` stale) becomes a governance failure
+  under `phase-grd-01`, which reports it without fixing its cause. `000351` (regenerate the catalog
+  only at merge time) points the other way from this plan, which makes the committed catalog
+  stricter (OQ10).
+- **The deliverables diff is in a different track.** The partition puts `000398` and `000027` under
+  concurrency, with `000242`, `000245` and `000336` on what a deliverables entry means and how globs
+  are read. `phase-dgov-06` stays under `PLAN-030` by the owner's ruling to move it rather than
+  merge it (OQ1, D2), but its classifier reads declared deliverables, so it inherits the glob and
+  directory questions those ideas raise (OQ10).
 
 ## Decisions
 
@@ -241,7 +273,8 @@ check catches a stale catalog in every later phase's own commits.
 
 ## Open questions
 
-Answered by the owner on 2026-09-23, relayed by the Session Manager (OQ5 resolved by Ideation's records):
+Closed on 2026-09-23: owner rulings relayed by the Session Manager, and items the planner resolved
+(OQ5 by Ideation's records, OQ6 against the accepted partition):
 
 - **OQ1. Queue position.** Ruled: "queue after part-03 is grd-01, grd-02, dam-01, grd-03, gov-01,
   dgov-06, then cap-08, as proposed." Applied in `next_up`, with `phase-grd-04` after `phase-grd-03`
@@ -274,9 +307,17 @@ Answered by the owner on 2026-09-23, relayed by the Session Manager (OQ5 resolve
   supersedes the earlier message-filter ruling." Applied: `REQ-015` R12, `PLAN-030` section 5,
   `phase-dgov-06`.
 
-Still open:
+- **OQ6. Partition reconciliation.** Done against the accepted partition (`6051dad`); see
+  "Partition placement" in Context and scope. The two differences that need the owner are OQ10.
 
-- **OQ6. Partition reconciliation.** The owner's partition-before-planning rule applies, and the
-  `phase-part-03` sweep covers these ideas. Who: the planner, when the sweep's result is accepted and
-  before G3. If the sweep puts any of these ideas in a different track, this plan is revised or the
-  difference is put to the owner.
+Still open:
+- **OQ10. Two partition differences.** (a) `000351` asks to regenerate the catalog only at merge
+  time; `phase-grd-01` makes a stale committed catalog fail governance, CI and the hook, which
+  entrenches the committed catalog `000351` would drop. Who: the owner, at G3. Leaning: proceed with
+  `phase-grd-01`; `000351`'s triage finding already notes that dropping the committed catalog would
+  reverse `phase-doc-02`'s accepted design and needs its own ruling. (b) `phase-dgov-06` compares a
+  change set against declared deliverables, and the partition groups it with `000336` (globs read as
+  literal filenames) and `000245` (what a deliverables entry means). Who: the owner, at G3. Leaning:
+  add one scope line to `phase-dgov-06` that it matches directory deliverables by prefix and glob
+  deliverables by pattern (`path_conflict` in `src/governance/backlog.py` already matches directories
+  by prefix), and leave `000336`'s fix to the lock itself to its own track.
