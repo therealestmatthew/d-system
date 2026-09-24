@@ -134,7 +134,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | plan | approved | repository-owner | docs/01-plans/PLAN-043-literature-review-report-page.md |
 | PLAN-045 | plan | approved | repository-owner | docs/01-plans/PLAN-045-deterministic-guards.md |
 | PLAN-046 | plan | approved | repository-owner | docs/01-plans/PLAN-046-design-document-amendments.md |
-| PLAN-047 | plan | draft | repository-owner | docs/01-plans/PLAN-047-reviewer-contract.md |
+| PLAN-047 | plan | approved | repository-owner | docs/01-plans/PLAN-047-reviewer-contract.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -417,7 +417,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 1 | 0 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
-| PLAN-047 | doc-reviewer-contract | draft | 5 | 0 | 0 | — |
+| PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
 
 ## Held codes
 

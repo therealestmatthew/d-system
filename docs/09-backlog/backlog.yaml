@@ -14170,7 +14170,9 @@ items:
     which assigns standby work), make the merge gate run the runner and both reviewers during shadow,
     and have READY carry the verdict record; revise GOV-017's "No dedicated reviewer session" rationale
     to match; update PROMPT-037's role texts.
-  - Record every build review from this phase on, gating and shadow, as a verdict record (R05, R06).
+  - Record every build review from this phase on, gating and shadow, as a verdict record (R05, R06), and
+    state in GOV-017 that the judge leaves shadow when the owner decides on a comparison table from the
+    verdict records after at least ten reviewed phases (owner ruling at G3, 2026-09-24).
   acceptance:
   - In PROMPT-036 the Validator and Adversary template paragraphs name a dedicated reviewer type and do
     not inherit the shared intro's general-purpose charter; the Creator and Blocker resolver templates
@@ -14217,13 +14219,13 @@ items:
   - Add to GOV-010 the requirement that a plan names the threat surfaces it touches (authentication,
     network exposure, secrets, dependencies), with how a reviewer judges it (REQ-030 R08).
   - Add to GOV-017's READY a diff-time security review for a phase whose diff touches those surfaces,
-    dispatched by the coordinator and recorded as a verdict, with the reviewer the owner ruled on
-    (PLAN-047 OQ3).
+    run by the coordinator as the built-in /security-review command and recorded as a verdict (owner
+    ruling at G3 on PLAN-047 OQ3, 2026-09-24).
   - Add dated GOV-003 entries for O-5, O-6 and Q7, quoting each ruling and naming it standing (R09).
   acceptance:
   - GOV-010 has the threat-surface requirement and says how its absence is judged.
-  - GOV-017's READY names the security review, its trigger, and the reviewer the owner ruled on in
-    PLAN-047 OQ3.
+  - GOV-017's READY names /security-review, its trigger, and that the coordinator runs it and records
+    the verdict.
   - GOV-010 gives, as a non-conformant example, a plan whose phase edits src/api/routes/demo_terminal.py
     (a websocket route that runs a shell) without naming a network or authentication surface.
   - GOV-003 has the three entries.
@@ -14233,5 +14235,5 @@ items:
   - git diff --exit-code docs/08-governance/catalog.md
   deliverables:
   - docs/08-governance/
-  next_action: Waits for phase-asr-04. Confirm the owner's answer to PLAN-047 OQ3 before writing the
-    READY step.
+  next_action: Waits for phase-asr-04. The reviewer is ruled - the built-in /security-review run by the
+    coordinator.

@@ -4,7 +4,7 @@ id: doc-reviewer-contract
 code: PLAN-047
 title: Reviewer contract — a shell-less judge, a fixed command runner, coordinator dispatch and recorded verdicts
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-24'
 updated: '2026-09-24'
@@ -15,6 +15,10 @@ depends_on: [doc-reviewer-contract-requirements, doc-realization-role-contracts,
 # Reviewer contract
 
 Delivers [REQ-030](../06-requirements/REQ-030-reviewer-contract.md).
+
+**Approved at G3 by the owner on 2026-09-24**, relayed by the Session Manager, with `phase-asr-01` to
+`phase-asr-05` queued after `phase-dgov-06` and before `phase-cap-08`. Review record:
+`2026-09-24-plan-047`, dispositioned.
 
 ## Context and scope
 
@@ -92,7 +96,7 @@ own session, that session is not the builder, so it may dispatch directly under 
 The alternative, the builder dispatching a reviewer with a stripped brief, was rejected: the builder
 would still choose what goes in the brief.
 
-**D4. Verdicts are JSON records beside the plan reviews, committed on the phase branch (proposed; the owner confirms at G3, OQ1).** Each
+**D4. Verdicts are JSON records beside the plan reviews, committed on the phase branch (ruled at G3, OQ1).** Each
 build review produces one file under `docs/08-governance/reviews/verdicts/`, validated by a new
 `schemas/review-verdict.schema.json`. The coordinator writes it from the reviewer's reply without
 changing a finding, keeps the raw reply as an evidence file with its sha256 (as the owner ruled for
@@ -112,8 +116,8 @@ start in shadow"). Until the owner promotes it, every build review runs the gati
 Both verdicts are recorded; only the gating one decides. The alternative, letting the judge gate from
 its first review, was rejected by the ruling and would let an uncalibrated reviewer decide merges
 with no record of how often it agrees with the reviewers it replaces. The cost of shadow is two
-dispatches per review for as long as it lasts. Promotion is the owner's decision, recorded in `GOV-003`; OQ2 asks what evidence the
-owner wants before deciding.
+dispatches per review for as long as it lasts. Promotion is the owner's decision, recorded in `GOV-003`, made on a comparison table
+from the verdict records after at least ten reviewed phases (OQ2, ruled at G3).
 
 **D6. The re-review sampler draws by recorded seed.** As ruled ("re-review 1 in 10 + every
 once-rejected"). `tools/draw_rereview_sample.py` reads the verdict records since the last draw and
@@ -128,8 +132,8 @@ Assurance, draws the sample).
 comes after the reviewer contract. It is registered here as `phase-asr-05` rather than as a new plan, which would need its own
 requirement, review and G3 for three passages of text:
 it documents Q7 as this plan builds it, and Q9's diff-time review is a `READY` step that
-`phase-asr-04` writes the frame for. The security review itself is dispatched like any other review
-(D3), with the type OQ3 settles.
+`phase-asr-04` writes the frame for. The security review itself is the built-in `/security-review` command, run by the
+coordinator on qualifying phases and recorded as a verdict (OQ3, ruled at G3).
 
 ## Implementation phases
 
@@ -171,9 +175,8 @@ Every row maps to a phase, and every phase carries a row.
   gate and `PROMPT-037` item 4.
 - `phase-asr-05` waits for `phase-asr-04`.
 
-Proposed `next_up` placement: after `phase-dgov-06` and before `phase-cap-08`, in the order
-`phase-asr-02`, `phase-asr-03`, `phase-asr-01`, `phase-asr-04`, `phase-asr-05` (OQ4). The order on this
-branch is a proposal until G3; `phase-asr-05` also needs the owner's answer to OQ3 before it starts.
+`next_up` placement: after `phase-dgov-06` and before `phase-cap-08`, in the order
+`phase-asr-02`, `phase-asr-03`, `phase-asr-01`, `phase-asr-04`, `phase-asr-05`, as ruled at G3 (OQ4).
 
 ## Out of scope
 
@@ -187,16 +190,17 @@ branch is a proposal until G3; `phase-asr-05` also needs the owner's answer to O
 
 ## Open questions
 
-- **OQ1. Where verdict records live** (D4). Who: the owner, at G3. Leaning: JSON files under
-  `docs/08-governance/reviews/verdicts/`, committed on the phase branch unchanged and checked by
-  sha256 at the merge gate.
-- **OQ2. The evidence for promoting the judge.** Who: the owner, when the shadow period ends.
-  Leaning: after at least ten reviewed phases, a table from the verdict records comparing the
-  judge's verdicts with the gating reviewer's and with the owner's overturns, put to the owner as a
-  gate item.
-- **OQ3. Which reviewer does the diff-time security review** (Q9, `phase-asr-05`). Who: the owner, at
-  G3. Leaning: the built-in `/security-review` command, run by the coordinator on the phase's diff
-  and recorded as a verdict like any other review; a dedicated security agent type only if its
-  shadow results show a need.
-- **OQ4. Queue position.** Who: the owner, at G3. Leaning: after `phase-dgov-06`, with the two code
-  phases first because they depend on nothing.
+Answered by the owner at G3 on 2026-09-24, relayed by the Session Manager:
+
+- **OQ1. Where verdict records live** (D4). Ruled: "verdict records are JSON on the phase branch,
+  sha256-checked at the merge gate". Applied as D4 states.
+- **OQ2. The evidence for promoting the judge.** Ruled: "the judge leaves shadow on a comparison
+  table after 10 or more reviewed phases, and the owner decides". Applied to D5; `phase-asr-04`
+  writes it into `GOV-017`.
+- **OQ3. Which reviewer does the diff-time security review.** Ruled: "the coordinator runs the
+  built-in /security-review on qualifying phases, recorded as a verdict". Applied to
+  `phase-asr-05`.
+- **OQ4. Queue position.** Ruled: `phase-asr-01` to `phase-asr-05` after `phase-dgov-06` and before
+  `phase-cap-08`.
+
+Nothing is still open.
