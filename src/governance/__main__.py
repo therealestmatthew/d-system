@@ -18,7 +18,7 @@ from typing import Any
 import yaml  # type: ignore[import-untyped]
 from jsonschema import Draft7Validator, FormatChecker  # type: ignore[import-untyped]
 
-from src.db.ideas import fold, load_events
+from src.db.ideas import IdeaError, fold, load_events
 from src.db.source_validation import data_root
 from src.governance import reservations
 from src.governance.backlog import inspect_backlog, render_backlog
@@ -534,7 +534,7 @@ def main() -> int:
     if plain:
         try:
             errors.extend(ideas_md_errors(ROOT))
-        except (OSError, ValueError, KeyError, ImportError, yaml.YAMLError) as exc:
+        except (OSError, ValueError, KeyError, ImportError, IdeaError, yaml.YAMLError) as exc:
             errors.append(f"ideas.md inputs: {exc}")
     for warning in warnings:
         print(f"WARNING {warning}")
