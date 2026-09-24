@@ -4701,7 +4701,7 @@ PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable librari
 
 ## 000086 · Repo tracker and multi-repo memory agent
 
-**Created 2026-09-10T05:57:16-04:00 · Status: `triaged`**
+**Created 2026-09-10T05:57:16-04:00 · Status: `discarded`**
 
 A tracked list of all of the owner's repositories — both personally created repos and external repos the owner has starred or marked for future reference — paired with a multi-repo memory and awareness agent whose purpose is connecting the dots across them: knowing what exists where, and pointing someone at the right existing repo when they need something so nothing gets rebuilt that already exists ("don't rebuild the wheel"). The owner specifically notes the autoclaude-api repo, which scouts repositories for Claude skills, and says these should tie in together somehow — the repo tracker's list is plausibly the corpus that agent (and autoclaude-api's scouting) operates over. It would touch the data layer (a new tracked entity or list — repos are not currently a d-system entity), possibly a new schema in schemas/, and an agentic workflow for the awareness agent, which fits the system's stated purpose as a platform for agentic workflow triggering. Unresolved: whether the tracker and the agent are one effort or two (recorded here as one idea because the owner presented them together — triage may split them), where the repo list lives (tracked _data/ entity vs. pulled live from GitHub stars/API), what "marked for future reference" means mechanically, exactly how the autoclaude-api tie-in works, and what memory the awareness agent keeps versus derives on demand.
 
@@ -4709,7 +4709,7 @@ A tracked list of all of the owner's repositories — both personally created re
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-10T06:46:13-04:00): **Repo Tracker and Multi-Repo Memory Agent (000086) — Triage Finding**
 
@@ -4724,6 +4724,9 @@ A tracked list of all of the owner's repositories — both personally created re
 **Key unresolved questions from the body remain:** The idea correctly flags that tracker and agent may be two efforts; where repo metadata lives (pulled live vs. tracked _data/); what "marked for future reference" means mechanically; how autoclaude-api ties in; and whether the memory agent computes or caches. These are open for the owner's decision, not addressed by existing work.
 
 **Summary:** This is a greenfield feature touching a new data domain (repos), requiring new schema, new entity in _data/, and a novel agentic pattern. No existing document, phase, or idea covers repo-as-entity tracking or multi-repo awareness. The owner's reference to autoclaude-api appears to be context on an external tool that might *consume* the repo tracker's list, not an existing system in this repository to integrate with.
+- **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
+
+Decline candidate nominated by one analyst (R1) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_one). Reason given there: Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema.
 
 </details>
 
@@ -5385,7 +5388,7 @@ PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass thi
 
 ## 000102 · Rehearsal idea from demo-validator-web dry-run
 
-**Created 2026-09-11T04:10:22-04:00 · Status: `triaged`**
+**Created 2026-09-11T04:10:22-04:00 · Status: `discarded`**
 
 Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
 
@@ -5393,7 +5396,7 @@ Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent p
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:42:01-04:00): Rehearsal idea from the demo-validator-web agent's dry-run pass, recorded during phase-wb-07 timing exercises. Marked as a rehearsal entry, not a production feature request.
 
@@ -5402,6 +5405,9 @@ The suggestion is to add a "last refreshed" timestamp badge to the HTML Viewer's
 Examined related work: The HTML Viewer already ships a refresh button per W07. No related requirement, plan or prior idea documents this UI enhancement. The broader workbench build is complete; this is a polish suggestion for the rehearsal/demo context specifically.
 
 No related ideas found. This suggestion does not overlap with other open ideas or existing governed work.
+- **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
+
+Decline candidate nominated by both analysts (R1 and R4) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_both). Reason given there: R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build.
 
 </details>
 
@@ -6861,7 +6867,7 @@ PROPOSED LINK: 000139 --extends--> 000138 (both define the anti-pattern tracking
 
 ## 000140 · Learn websockets: an owner-education deep dive grounded in this repository's terminal stack
 
-**Created 2026-09-11T22:49:41-04:00 · Status: `triaged`**
+**Created 2026-09-11T22:49:41-04:00 · Status: `discarded`**
 
 Owner idea, 2026-09-11, for their own education - not a build item. Investigate how websockets actually work, using the D-System terminal stack as the concrete study material since it exercises the full lifecycle end to end: the browser's WebSocket API and its open/close/error events (the lifecycle traces from the 2026-09-11 gate work are real worked examples), the HTTP upgrade handshake and what a pre-accept rejection looks like on the wire (idea 000137's 403-vs-close-frame distinction), FastAPI/uvicorn's server-side accept/close semantics, close codes (1006 vs 4000+ application codes) and why reasons sometimes cannot reach the client, per-connection state and the six-session registry, and how React component lifecycles interact with socket lifetimes (the portal remount lesson from phase-wb-09). Output could be a personal explainer document or annotated walkthrough of src/api/routes/demo_terminal.py and ts/src/stage/TerminalRegion.tsx - whatever teaches best.
 
@@ -6869,7 +6875,7 @@ Owner idea, 2026-09-11, for their own education - not a build item. Investigate 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T23:05:37-04:00): Idea 000140 proposes an owner-education deep dive on websockets using the D-System terminal stack as concrete study material. This is not a build item but a personal learning project grounded in working code.
 
@@ -6898,6 +6904,9 @@ The repository's websocket implementation and supporting material are well-docum
 The study material exists in production: src/api/routes/demo_terminal.py (websocket route, registry, cap enforcement, close codes) and ts/src/stage/TerminalRegion.tsx (plus related components in phase-wb-09's fixes). The owner's exploration will likely find real examples of the HTTP upgrade handshake, per-connection state management, React lifecycle interactions, and the structural communication gap between pre-accept closures and client-side events that idea 000137 addresses.
 
 No related plan, requirement, or ADR is missing. The governance documents provide enough context to ground the learning project.
+- **finding** by agent-ideation (2026-09-24T02:14:16-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
+
+Decline candidate nominated by one analyst (R1) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_one). Reason given there: The owner's own learning project, not a system deliverable; better served outside the backlog.
 
 </details>
 
@@ -13567,7 +13576,7 @@ PROPOSED PROMOTION: No promotion is justified; the preconditions exist but the k
 
 ## 000282 · Reference: r/ClaudeAI index of ongoing megathreads
 
-**Created 2026-09-19T12:06:08-04:00 · Status: `triaged`**
+**Created 2026-09-19T12:06:08-04:00 · Status: `discarded`**
 
 https://www.reddit.com/r/ClaudeAI/s/iKsL6ra2DL
 
@@ -13579,7 +13588,7 @@ Saved on 2026-09-19 during the framework-generalization session. Useful as a rou
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T13:13:32-04:00): Idea 000282 is a reference capture — a specific external resource (r/ClaudeAI's megathreads index linking to community reporting on model behavior, limits, and a project showcase thread relevant to this repository's work).
 
@@ -13593,6 +13602,9 @@ Related infrastructure exists:
 - Idea 000032: Evidence-backed provenance graph for memories, reports and recommendations (lineage tracking, not reference collection)
 
 No existing idea proposes a dedicated system for systematically collecting, tagging, and organizing external reference material (URLs, articles, forums, indexed resources). The infrastructure to hold such content exists (brain/entities/), but no discovery or curation workflow covers capturing external references the way the idea system itself is captured via tools/append_idea.py.
+- **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
+
+Decline candidate nominated by both analysts (R1 and R4) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_both). Reason given there: R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note.
 
 </details>
 
@@ -19801,5 +19813,113 @@ Fix options for planning: a fixed part protocol in the skill (for example, the c
 Related: 000407 (the pack and the skill already differ on analyst dispatch), 000354 (why analysts cannot write files), 000206 (subagents cannot be told to write report files), 000388 (the owner's question on partition accuracy).
 
 PROPOSED LINK: 000414 --relates_to--> 000407 (both are pack and skill changes caused by the read-only analyst)
+
+</details>
+
+---
+
+## 000415 · PROMPT-034's "do only what is missing; report what already existed" line led an analyst to carry an old partition forward instead of partitioning
+
+**Created 2026-09-24T02:14:16-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 2 - Builder B] From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
+
+As given: PROMPT-034's shared opening line "do only what is missing; report what already existed" led phase-part-03's first R1 to carry the 2026-09-13 partition forward for 121 ideas instead of partitioning them. The owner ordered a re-run with an added instruction. The analyst blocks may need that line removed or qualified.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T02:14:16-04:00): Checked on dev at a7c177f: the line is PROMPT-034's idempotency convention (Conventions, line 68-69: every dispatch opens with "Assess the current state of the repository against the deliverables below; do only what is missing; report what already existed."). It appears verbatim at the head of R1 (line 118), R4 (194), A1 (262), S (376) and A2 (420). The partition-ideas skill tells the coordinator to move earlier sweep files aside into `previous-<date>/` and to count only files stamped for the current manifest (SESS-2026-09-23-05, "Files from earlier sweeps"), but the dispatched analyst text still carries the line. SESS-2026-09-23-05's left-undone list records the failure.
+
+For planning: the line cannot be dropped from only one block without also changing the pack's idempotency convention, and PROMPT-034 changes only through a revision (GOV-008), as 000407 notes. One option is to qualify it for the analysts ("a partition from an earlier corpus is not an existing deliverable").
+
+Related: 000414 and 000407 (other changes to the pack and skill found in the same sweep), 000388 (the owner's question on partition accuracy).
+
+PROPOSED LINK: 000415 --relates_to--> 000414 (both come from phase-part-03's R1 run and both change the analyst blocks)
+
+</details>
+
+---
+
+## 000416 · The partition-ideas step 5 check does not verify that each group's stated origin matches the analyst reports
+
+**Created 2026-09-24T02:14:16-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 2 - Builder B] From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
+
+As given: the partition-ideas step 5 check verifies coverage and markdown/record agreement but not whether each group's stated origin (which analyst proposed it, or "agree") matches the reports. Audit 2's two major findings in the 2026-09-23 sweep were exactly that. It could be checked mechanically.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T02:14:17-04:00): Checked on dev at a7c177f: the step 5 check in .claude/skills/partition-ideas/SKILL.md checks the ideas placed twice, corpus coverage both ways, record and markdown agreement both ways, the decline candidates (listed twice, not placed, not in the markdown) and group names present in the markdown. It checks nothing about a group's Basis line or the analyst it credits. schemas/idea-partition-record.schema.json has no origin field: a group is only `name` and `ideas`, so the claim exists only in the markdown's Basis prose. SESS-2026-09-23-05 records the audit 2 findings and says every Basis line was then checked mechanically against both parsed reports, which was done ad hoc, not by the skill.
+
+The phase's close review (SESS-2026-09-23-05, Review) counts audit 2 at 2 major and 3 minor findings, and notes that one minor finding (T5.11, 000403) was about placement reasoning, not origin, so a mechanical origin check would not have caught it.
+
+For planning: a mechanical check needs either an origin field in the record schema or a parseable Basis line format. Both change the skill and the schema together.
+
+Related: 000388 (checks missing for partition accuracy), 000414, 000407.
+
+PROPOSED LINK: 000416 --relates_to--> 000388 (a specific answer to the owner's question on missing accuracy checks)
+
+</details>
+
+---
+
+## 000417 · The partition workflow and record schema have no field for an owner ruling that holds an idea out without declining it
+
+**Created 2026-09-24T02:14:16-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 2 - Builder B] From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
+
+As given: the partition-ideas workflow and schemas/idea-partition-record.schema.json have no field for an owner ruling that holds an idea out of a partition without declining it. At GATE 3 on 2026-09-24 the owner held ten ideas out that way, and it could only be recorded as an unbatched reason.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T02:14:17-04:00): Checked on dev at a7c177f: schemas/idea-partition-record.schema.json requires `tracks`, `unbatched` and `decline_candidates`. `unbatched` items are only `id` and `reason`, and nothing else can mark an owner hold-out. docs/00-working/idea-partition-2026-09-23.json (state accepted) carries the ten held-out ideas (000015-000017, 000089, 000122, 000146, 000205, 000255, 000256, 000290) in `unbatched` with the reason "Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: ...". The skill's GATE 3 section covers accepting or correcting the partition and ruling on each decline candidate, and nothing else.
+
+Date correction: the idea says GATE 3 was on 2026-09-24. The record's reasons and SESS-2026-09-23-05 both date it 2026-09-23.
+
+For planning: a `held_out` list of reasoned ids (or a `kind` on unbatched entries) plus a matching GATE 3 step and step 5 coverage rule. The four owner declines from the same gate were recorded separately as idea-log discards on 2026-09-24.
+
+Related: 000388, 000414; 000418 (same GATE 3 ruling).
+
+PROPOSED LINK: 000417 --relates_to--> 000418 (both come from the owner's GATE 3 hold-out ruling)
+
+</details>
+
+---
+
+## 000418 · Owner-facing gate questions should not use "parked" to mean "not declined"
+
+**Created 2026-09-24T02:14:16-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 2 - Builder B] From Session 2 - Builder B, relayed to Ideation, 2026-09-23.
+
+As given: owner-facing gate questions should not use "parked" to mean "not declined". ADR-010 already calls every captured idea parked, and at GATE 3 on 2026-09-24 the owner read "stays parked" as "left out of this analysis". The partition-ideas GATE 3 text could name the outcomes explicitly.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T02:14:17-04:00): Checked on dev at a7c177f: ADR-010 treats every staged idea as parked, and PROMPT-034's R1 and R4 open with "a corpus of parked ideas". The skill's GATE 3 section does not use "parked", and it gives no text for the question. The wording came from the coordinator at run time. SESS-2026-09-23-05's Corrections section records it: the agent wrote "unticked stays parked" to mean "not declined, stays in its group"; the owner read it as "left out of this analysis"; the agent explained and asked again, and the owner ruled that ten ideas are held out. Nothing was applied from the first reading.
+
+Date correction: the idea says GATE 3 was on 2026-09-24. SESS-2026-09-23-05 and the partition record date it 2026-09-23.
+
+For planning: fixed GATE 3 question text in the skill that names the outcomes (declined, kept in its group, held out of the partition), which also depends on 000417 giving "held out" a place in the record.
+
+Related: 000417, 000388.
 
 </details>
