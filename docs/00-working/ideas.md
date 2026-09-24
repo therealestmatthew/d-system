@@ -18803,13 +18803,14 @@ tools/check_no_private_content.py reads ROOT/_private/portfolio/projects (line 8
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Confirmed on dev: tools/check_no_private_content.py sets ROOT = Path(__file__).parent.parent (line 48) and reads ROOT / "_private" / "portfolio" / "projects" (line 88). If that directory is missing it returns an empty set, and the tool prints "note: _private/portfolio/ not found — content check skipped" (line 144) and exits 0. The tool does not read D_SYSTEM_DATA_ROOT. OPS-009:38-39 documents the skip as expected on a fresh clone or in CI. It does not mention agent worktrees, which is where AGENTS.md puts all work.
 
 This duplicates two triaged ideas: 000150 (the private-content check silently does nothing in a worktree, because _private is gitignored) and 000195 (check_no_private_content passes without looking whenever it runs outside the primary checkout). The owner already has this three-way duplicate on the list to decide. This finding does not decide it. What 000384 adds: a concrete fix (accept an absolute portfolio path, for example through D_SYSTEM_DATA_ROOT, which phase-cap-08 now uses for the private data root), and a fresh occurrence found while amending phase-cap-08.
 
 PROPOSED LINK: 000384 --relates_to--> 000150 (the same defect, reported earlier)
+- **finding** by agent-ideation (2026-09-24T04:46:55-04:00): Seen again by Session 1 - Builder A during phase-grd-01 (relayed to Ideation 2026-09-24): in every worktree the script reports "0 identifiers checked", so the pre-commit hook there runs only the path check. Same defect as this idea; recorded here instead of as a duplicate.
 
 </details>
 
@@ -19962,3 +19963,180 @@ Related: 000413 and 000399 (a full test run after every write to dev, where CI i
 PROPOSED LINK: 000419 --relates_to--> 000413 (the gating CI run whose duration this idea would shorten)
 
 </details>
+
+---
+
+## 000420 · HTML style extraction agent: turn existing pages into reusable templates
+
+**Created 2026-09-24T04:21:04-04:00 · Status: `triaged`**
+
+An agent that takes existing HTML pages and extracts their style and structure into reusable templates, so that new pages in a similar form can be created quickly.
+
+Source: the owner's ask, relayed by Session 1 - Builder A on 2026-09-24, for after the reset.
+
+Pairs with the HTML generation agent idea recorded alongside it: this agent produces the templates and styles, that one builds new pages from them.
+
+Possible overlap, recorded as given (ADR-010): 000092 (HTML Designer agent: extract page designs into template families), 000084 (HTML component library), 000083 (template library). Whether this is the same idea as 000092 is for triage to decide.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:20-04:00): Checked on dev at 0565410: this is close to 000092 (HTML Designer agent), which already proposes extracting a page's tokens, type scale and component patterns into named template families under templates/styles/ and templates/html/. Those directories hold three families today (atlas, lit-report, overview). The difference is emphasis: 000420 targets fast creation of new pages, 000092 an inventory of families. Also related: 000083, 000084. No plan or phase covers it.
+
+</details>
+
+**Links**
+
+- relates_to → `000424`
+- relates_to ← `000421`
+
+---
+
+## 000421 · HTML generation agent: build new pages from extracted templates and styles
+
+**Created 2026-09-24T04:21:04-04:00 · Status: `triaged`**
+
+An agent that takes the reusable templates and styles produced by the HTML style extraction agent and builds new pages from them.
+
+Source: the owner's ask, relayed by Session 1 - Builder A on 2026-09-24, for after the reset.
+
+Pairs with the HTML style extraction agent idea recorded alongside it; the two are linked.
+
+Related, recorded as given (ADR-010): 000083 (template library with deterministic or AI population), 000084 (HTML component library), 000085 (palette library).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:20-04:00): Checked on dev at 0565410: the generation half of 000420. The nearest existing idea is 000083 (template library with deterministic or AI population). tools/generate_overview.py already fills the overview family, which is a deterministic example of this pattern. Palette selection would draw on 000085. No plan or phase covers an agent that does this.
+
+</details>
+
+**Links**
+
+- relates_to → `000420`
+- relates_to → `000424`
+
+---
+
+## 000422 · The pre-commit hook's governance run reads the working tree, not the staged index
+
+**Created 2026-09-24T04:46:47-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 1 - Builder A] From Session 1 - Builder A, relayed to Ideation, 2026-09-24. The owner asked for it to be recorded.
+
+As given: the pre-commit hook's governance run (added by phase-grd-01) reads the working tree, not the staged index. An unstaged stale file, including a peer's uncommitted work in the primary checkout, can refuse a commit that stages nothing stale. An unstaged fix can let a stale staged commit through.
+
+Builder A recorded this as a known limitation in OPS-009 on agent/phase-grd-01.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:21-04:00): Checked at 0565410: already recorded as a known limitation in docs/08-governance/OPS-009-check-no-private-content.md lines 70-72 on agent/phase-grd-01, which is not yet merged. A fix would run governance against the staged index, for example on a git stash --keep-index or a checkout-index copy. Related: 000014 (hooks audit). No phase covers the fix.
+
+</details>
+
+---
+
+## 000423 · The status-regression audit's dev-relative comparison probably never runs in CI
+
+**Created 2026-09-24T04:46:48-04:00 · Status: `triaged`**
+
+[agent-proposed by Session 1 - Builder A] From Session 1 - Builder A, relayed to Ideation, 2026-09-24. The owner asked for it to be recorded.
+
+As given: the status-regression audit (src/governance/regression.py) prints "WARNING status-regression: dev is unreadable, skipping the dev-relative comparison" in a fresh clone. CI's actions/checkout has no local dev branch, so the dev-relative comparison probably never runs in CI.
+
+Seen in a scratch clone during phase-grd-01. Not yet confirmed in a CI log.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:21-04:00): Checked on dev at 0565410: src/governance/regression.py line 50 compares against HEAD (error) and dev (warning), and line 167 prints the skip warning when a ref is unreadable. .github/workflows/ci.yaml uses actions/checkout@v4 with no fetch-depth and no fetch of dev, so on a push the local dev ref does not exist. This supports the claim structurally; a CI log has not been checked. A likely fix is fetch-depth: 0 or reading origin/dev. Related: 000419 (CI optimization).
+
+</details>
+
+---
+
+## 000424 · An explorable HTML representation of what has been built, as a cohesive system
+
+**Created 2026-09-24T04:46:48-04:00 · Status: `triaged`**
+
+From the owner, typed in the Session Manager's session and relayed to Ideation, 2026-09-24. Anchor for two related owner ideas recorded with it (the protocol to keep it current, and agents to grow it).
+
+As given: "Great, please make a note as well that I would like some better way to visualize the progression of work that we have done over the last 2 days and over the coming days to be maybe an HTML page or multiple pages but not just to show the plans and phases that were completed. We do want the plan phase idea, backlog explorers and priority cues, but we also want something that represents what was built-in a way that makes sense as a cohesive system that can be explored. To understand what it is, we will need to backfill. What has already been built?"
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:21-04:00): Checked on dev at 0565410: the nearest existing work is 000299 (regeneratable explorer pages and the relationship graph between document families), 000093 (governance atlas page), 000033 (as-of snapshots over time) and phase-wb-06 (idea and backlog explorer panels). They show ideas, plans and backlog. None of them represents what was built as a system, which is the new part of this idea. 000425, 000426, 000420 and 000421 relate to it.
+
+</details>
+
+**Links**
+
+- relates_to ← `000420`
+- relates_to ← `000421`
+- relates_to ← `000425`
+- relates_to ← `000426`
+
+---
+
+## 000425 · Build the continual update of the HTML system-representation library into the working protocols
+
+**Created 2026-09-24T04:46:48-04:00 · Status: `triaged`**
+
+From the owner, typed in the Session Manager's session and relayed to Ideation, 2026-09-24. Relates to the anchor idea (an explorable HTML representation of what has been built).
+
+As given: "That's one idea for a second idea. We need to build into the protocols of what we are doing, the continual enhancement and update of that growing library. So it does not fall out of date."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:21-04:00): Checked on dev at 0565410: depends on 000424 existing first. The natural hook is the session-close procedure (.claude/commands/session-close.md) or the completion gate in GOV-003, where a finished phase would update the library. 000299 made the same request for the explorer pages: that they be regeneratable, not one-off.
+
+</details>
+
+**Links**
+
+- relates_to → `000424`
+
+---
+
+## 000426 · One or more agents dedicated to growing the HTML system-representation library
+
+**Created 2026-09-24T04:46:48-04:00 · Status: `triaged`**
+
+From the owner, typed in the Session Manager's session and relayed to Ideation, 2026-09-24. Relates to the anchor idea (an explorable HTML representation of what has been built).
+
+As given: "A third potential idea is an agent dedicated or multiple agents specifically to growing this h t m l architecture system representation library thingy."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T04:47:21-04:00): Checked on dev at 0565410: .claude/agents/ has no agent for this. 000092 (HTML Designer agent) and 000332 (dedicated Documenter session) are the nearest precedents for a single-purpose agent that maintains a document set. Depends on 000424.
+
+</details>
+
+**Links**
+
+- relates_to → `000424`
