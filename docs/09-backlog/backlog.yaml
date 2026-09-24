@@ -3,7 +3,6 @@ updated: '2026-09-24'
 decision_record: doc-backlog-decisions
 max_active: 3
 next_up:
-- phase-grd-01
 - phase-grd-02
 - phase-dam-01
 - phase-grd-03
@@ -13735,7 +13734,7 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 1
   session_budget: 1
@@ -13788,8 +13787,20 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - AGENTS.md
   session: doc-session-stale-generated-files
-  next_action: Review done (all 8 Met; F1 fixed in 799f1c3, F2 and F3 accepted). Next, rebase onto
-    dev, run the four gate checks and send READY.
+  completion_evidence:
+  - src/governance/staleness.py
+  - test/test_governance_staleness.py
+  - docs/03-sessions/SESS-2026-09-24-02-stale-generated-files.md
+  result: 'Merged to dev by fast-forward at 5ed9f48 on the owner''s approval relayed by the Session
+    Manager, 2026-09-24. Governance now fails, naming the file, when catalog.md or ideas.md is stale,
+    without writing either; --catalog still repairs. CI runs the catalog step first (--catalog then git
+    diff --exit-code); the pre-commit hook runs the governance check after the private-content check.
+    --catalog is named in GOV-017 step 6 and PROMPT-037; GOV-017 and OPS-009 state the no-bypass rule.
+    AGENTS.md lines 155-156 unchanged: the owner answered "No change". demo-adversary review: all 8
+    acceptance criteria met; F1 fixed (bfa1d29), F2 accepted (000155), F3 accepted as designed. Post-rebase
+    gates in the worktree: Governance OK (35 systems, 346 documents, 32 memories, 304 backlog phases);
+    pytest 1069 passed, 1 skipped; ruff clean; mypy clean; catalog unchanged.'
+  next_action: None - phase complete.
 - id: phase-grd-02
   title: Green dev CI before each primary-checkout grant
   plan: doc-deterministic-guards
