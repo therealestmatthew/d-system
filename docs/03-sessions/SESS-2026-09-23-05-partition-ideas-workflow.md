@@ -484,3 +484,52 @@ estimate of 20 minutes.
 - **Spend:** 2 dispatches, 0 resumed after truncation, 0 above sonnet.
 
 The sweep stopped at GATE 1. The owner decides whether audit 1 proceeds.
+
+## R1 re-run and audit 1, to GATE 2 (2026-09-24, dry run at dev `99bf868`)
+
+At GATE 1 the owner first answered "Stop the sweep here" in this session, and the Session Manager
+relayed "re-run R1" from its own session. Nothing was done until the owner settled it, which they
+did in both sessions: "Re-run R1, then audit 1" stands. Run inside a granted
+`TURN? dryrun phase-part-03` at `99bf868`. Start 00:45:38Z, GATE 2 reached 01:57:13Z.
+
+- **Open-set gate:** `open ideas: 0`. **Classifier:** `RESUME: corpus built 2026-09-23, size 383,
+  seed 1370316527`, with `report-R1.md` and `report-R4.md` already done. The corpus was not rebuilt.
+- **Moved aside, nothing deleted:** the first `report-R1.md` and its `dispatch-R1.txt` went into
+  `_working/idea-corpus/superseded-R1-2026-09-23-carryforward/`.
+- **Deviation from `PROMPT-034`, by the owner's ruling.** R1's block was sent unchanged with this
+  paragraph appended. `diff` against lines 117-178 shows only these added lines:
+
+  ```text
+  ADDED FOR THIS RE-RUN (owner ruling, 2026-09-23). Partition all 383 ideas in the corpus
+  yourself. Carry nothing forward from the 2026-09-13 partition or any earlier partition, and never
+  cite one in place of placing an idea. An idea that an existing plan or requirement already governs
+  is still placed in a group: note that it is already governed, but never exclude it for that
+  reason. Name every corpus id exactly once, across the groups and the unbatched section.
+  ```
+
+- **Truncation.** The first attempt went over the 64,000-token output limit and delivered nothing.
+  It wrote no file. The same agent was resumed and asked to return the report in parts. It
+  returned eight parts. One hand-back repeated part 7 in shorter wording; the first version was
+  kept and the repeat discarded. The coordinator joined the parts in order under the run stamp.
+- **Report:** `report-R1.md`, 61,526 bytes, 12 programmes, 381 ideas in fine groups and 2 unbatched
+  (`000068`, `000013`). With ranges expanded, every one of the 383 corpus ids is named. The report
+  lists some ids in two groups and resolves them only in its own "Correction to Parts 1 and 2" and
+  withdrawal notes.
+- **Audit 1:** `dispatch-A1.txt` is identical to the pack's A1 block. It went to `partition-adversary`, model sonnet;
+  `audit-1-findings.md`, 16,858 bytes. Five major and two minor findings. Against R1: nine ids
+  listed in two groups before corrections that come later in the report, three programme counts
+  that disagree with their own lists, the `000166`-on-`000020` dependency left unargued across
+  programmes, HTML generation merged with the workbench against `systems.yaml`, `REQ-021` cited
+  against its own text, and no per-idea residual list. Against R4: it re-nominates
+  `000015`-`000017` for decline without the 2026-09-13 ruling, which lives only in findings. The
+  audit found both reports cover 383 of 383 once R1's corrections are applied.
+- **No analyst or auditor wrote a file.** Across the turn, the only new entries in
+  `_working/idea-corpus/` are `report-R1.md`, `dispatch-A1.txt` and `audit-1-findings.md`, all
+  written by the coordinator, plus the superseded-R1 directory it made.
+- **Idea log:** `_data/ideas.jsonl` sha256
+  `b3e94944474aa2d4ab6507dde17ab27d53ceef2b3acfc7d02a5290b4809e5563` at the start of the turn and at
+  GATE 2. It differs from the GATE 1 hash because Ideation's turns landed in between.
+- **Spend this turn:** 2 dispatches (R1, A1), 1 resumed after truncation plus 7 follow-up requests
+  for parts, 0 above sonnet. About 72 minutes.
+
+The sweep stopped at GATE 2. The owner decides whether synthesis proceeds.
