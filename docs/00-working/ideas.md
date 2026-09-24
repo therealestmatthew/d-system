@@ -20217,3 +20217,85 @@ PROPOSED LINK: this idea --relates_to--> 000427 (named by the relay)
 PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
 
 </details>
+
+---
+
+## 000430 · Use second-provider models (Codex, Gemini) as planners and in ideation, not only as reviewers
+
+**Created 2026-09-24T08:30:11-04:00 · Status: `triaged`**
+
+"Reviewers only to start, then potentially explore other options. Maybe planners and reviewers - I think the variety of models would greatly benefit the ideation/planning process."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T08:30:11-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, entry 32 (on 000359), and Session Manager relayed it to Ideation. The body is the owner's words exactly as relayed; the title is the relay's statement of the idea. Context as relayed: the ruling in that entry is that second-provider workers under 000359 start as reviewers only. This idea is the later step: use second-provider models (Codex, Gemini) as planners and in ideation as well, because a variety of models would benefit ideation and planning. The relay names 000359 and 000215 as related.
+- **finding** by agent-ideation (2026-09-24T08:30:11-04:00): Triage (checked on dev 9f8a5d5). No backlog phase covers second-provider planners or ideation. Related material:
+- 000359 (coordinate agent sessions from other providers, Gemini and Codex, under the multi-session protocol), triaged, named by the relay. Its ruling today (reviewers only to start) is the first step; this idea is the step after it.
+- 000397 (validators and adversaries run on a different model or provider from the creator), triaged, agent-proposed. It is the reviewer half of the same direction. PLAN-047 (the reviewer contract) puts 000397 out of scope: the owner ruled (O-8) that it comes after the ledger records which model ran, which PLAN-047 builds.
+- 000215 (nothing records which model actually ran), triaged, named by the relay. The same precondition applies here: a planner's model has to be recorded before a mix of models can be compared.
+- 000067 (portable agent workflows from a single source of truth), promoted, and 000306 (nothing binds .codex/agents/*.toml to the .claude/agents/*.md definitions). The generated Codex adapters (tools/generate_agent_workflows.py, OPS-010) are the existing route by which one role definition runs on a second provider. Today only idea-triage has one.
+PROPOSED LINK: this idea --relates_to--> 000359 (named by the relay; the ruling this extends)
+PROPOSED LINK: this idea --relates_to--> 000397 (the reviewer half of the same direction)
+PROPOSED LINK: this idea --relates_to--> 000215 (named by the relay; recording the model is the precondition)
+
+</details>
+
+---
+
+## 000431 · Is an API key necessary for using LangGraph?
+
+**Created 2026-09-24T08:30:11-04:00 · Status: `triaged`**
+
+"Is an API key necessary for using LangGraph?"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T08:30:11-04:00): Relay record. The owner raised this in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The owner's full message, verbatim as relayed: "Another question - maybe multiple to capture as ideas. - Is an API key necessary for using LangGraph? - Are other models supported out of the box if I have API keys for, say, Gemini or OpenAI? Investigate what adaptations would be needed and where it would make most sense to introduce different models into the agentic workflows (configurable for any model ideally for when some providers are unavailable and depending on the environment but maybe Gemini agents specifically for validating plans and OpenAI for auditing what was built - flexible based on what we uncover)". The relay split it into two ideas. This one holds the first question, and 000432 holds the rest.
+- **finding** by agent-ideation (2026-09-24T08:30:11-04:00): Triage (checked on dev 9f8a5d5). Session Manager's first answer, relayed for this finding and not yet re-read at the URLs by Ideation: the open-source langgraph library needs no API key. LangSmith tracing is optional and needs a LangSmith key. The LangGraph API server and platform deployment need a LangSmith key or a license. Sources as given: https://langchain-ai.github.io/langgraph/troubleshooting/errors/INVALID_LICENSE/ and https://docs.langchain.com/langsmith/cli. Checked in the repository: pyproject.toml depends on langgraph and langgraph-checkpoint-sqlite, and uv.lock pins langgraph 1.2.12. The orchestrator uses it as a library (src/orchestrator/graphs/intake.py, tick.py, gates.py), with no server or platform deployment, so on that answer no key is needed today. The model calls the graph makes are a separate matter: they need the model provider's own credentials, which is the subject of 000432. Related: 000429 (look into LangSmith), where the key question arises if tracing is turned on.
+PROPOSED LINK: this idea --relates_to--> 000429 (the LangSmith key is the only key this answer names)
+PROPOSED LINK: this idea --relates_to--> 000432 (split from the same owner message)
+
+</details>
+
+---
+
+## 000432 · Investigate introducing other providers' models (Gemini, OpenAI) into the agentic workflows, configurable per role, provider availability and environment
+
+**Created 2026-09-24T08:30:11-04:00 · Status: `triaged`**
+
+"Are other models supported out of the box if I have API keys for, say, Gemini or OpenAI? Investigate what adaptations would be needed and where it would make most sense to introduce different models into the agentic workflows (configurable for any model ideally for when some providers are unavailable and depending on the environment but maybe Gemini agents specifically for validating plans and OpenAI for auditing what was built - flexible based on what we uncover)"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T08:30:12-04:00): Relay record. The owner raised this in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation, split from the same owner message as 000431 (whose relay record quotes the whole message). The body is the owner's words for this part, verbatim as relayed. The relay's statement of the idea: investigate the adaptations needed and where different models fit best. Model choice should be configurable per role, with fallback when a provider is unavailable and per environment. The owner's examples are Gemini agents validating plans and OpenAI auditing what was built. The relay names 000359, 000427, 000429 and 000430 as related.
+- **finding** by agent-ideation (2026-09-24T08:30:12-04:00): Triage (checked on dev 9f8a5d5). No backlog phase covers this.
+Session Manager's notes, relayed for this finding: LangChain's init_chat_model gives one interface across providers (https://docs.langchain.com/oss/python/langchain/models), and the workers run on the Claude Agent SDK, which serves Claude models only (the Session Manager's understanding, marked by it as unverified). So other providers would enter through LangGraph nodes or through the Codex or Gemini command-line tools.
+Checked in the repository, with corrections:
+- Dependencies: pyproject.toml lists langgraph and langgraph-checkpoint-sqlite. uv.lock has langchain-core and langchain-protocol, but no langchain package and no per-provider package (langchain-openai, langchain-google-genai, langchain-anthropic). init_chat_model lives in the langchain package, so using it means adding that package and one per provider.
+- The Claude Agent SDK is not a dependency either. src/orchestrator/dispatch.py says the real Claude Agent SDK adapter is not built: dispatch goes through a Dispatcher that must be supplied. That seam is a natural point for choosing a provider per role. The one live dispatch path today is tools/idea_dispatch.py, which runs the claude CLI (claude -p /idea-triage).
+- The generated Codex adapters (tools/generate_agent_workflows.py, OPS-010) already express one role for two hosts. Only idea-triage has one.
+Related:
+- 000430 (second-provider models as planners and in ideation): the owner's same direction from entry 32.
+- 000359 (other providers' sessions under the multi-session protocol).
+- 000397 (validators on a different model or provider): matches the owner's "OpenAI for auditing what was built". PLAN-047 defers it until the ledger records the model (O-8).
+- 000215 (nothing records which model ran).
+- 000427 (existing routing solutions) and 000429 (LangSmith).
+- ADR-018 fixes LangGraph over the Claude Agent SDK. A second provider inside the orchestrator would need that decision revisited or extended.
+PROPOSED LINK: this idea --relates_to--> 000430 (same direction; named by the relay)
+PROPOSED LINK: this idea --relates_to--> 000359 (named by the relay)
+PROPOSED LINK: this idea --relates_to--> 000397 (the auditor example)
+PROPOSED LINK: this idea --relates_to--> 000431 (split from the same owner message)
+
+</details>
