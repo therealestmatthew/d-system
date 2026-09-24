@@ -47,7 +47,10 @@ answers unnumbered, so each is given here with the board's words and the item it
 Ideas covered: `000378` (completion authority contradicts itself), `000402` in the one instance
 `000378` describes (not the general consistency check `000402` proposes), and the owner's rulings
 above, and `000377` (governance documents still name `main` as the integration branch), included by
-the owner's ruling of 2026-09-23 (answer to OQ1).
+the owner's ruling of 2026-09-23 (answer to OQ1). The work sits under the owner's framing in
+`000411`: agents with defined contracts, and the orchestration systems that manage them, are
+designed in parallel; the Test Author contract and the Validator and close-reviewer input rules here
+are agent-contract changes.
 
 ## Decisions
 

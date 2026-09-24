@@ -52,9 +52,11 @@ above instead.
 Ideas covered: `000399` (a full test run after every write to `dev`; the finding that nobody reads
 CI), `000405` and `000406` (the completion edit leaves the catalog stale), `000198` (governance
 passes with a stale catalog), `000408` (type-ignore, `cast(Any`, except-pass), `000409` (test-count
-baseline), `000398` and `000027` (diff inside declared deliverables, through `phase-dgov-06`). The
-Scout's two CI ideas were not yet recorded when this plan was written; their ids are added before
-G3 (OQ5).
+baseline), `000398` and `000027` (diff inside declared deliverables, through `phase-dgov-06`),
+`000412` (CI's catalog check cannot fail; `phase-grd-01`) and `000413` (nothing reads `dev`'s CI
+result before a grant; `phase-grd-02`). The work sits under the owner's framing in `000411`: agents
+with defined contracts and the orchestration systems that manage them are designed in parallel;
+these guards are orchestration-side checks that hold whichever agent does the work.
 
 ## Decisions
 
@@ -239,7 +241,7 @@ check catches a stale catalog in every later phase's own commits.
 
 ## Open questions
 
-Answered by the owner on 2026-09-23, relayed by the Session Manager:
+Answered by the owner on 2026-09-23, relayed by the Session Manager (OQ5 resolved by Ideation's records):
 
 - **OQ1. Queue position.** Ruled: "queue after part-03 is grd-01, grd-02, dam-01, grd-03, gov-01,
   dgov-06, then cap-08, as proposed." Applied in `next_up`, with `phase-grd-04` after `phase-grd-03`
@@ -261,10 +263,11 @@ Answered by the owner on 2026-09-23, relayed by the Session Manager:
   and `REQ-029` R08. The later-added review (`2026-09-23-plan-045-later-added`) covers the instance;
   its finding F01 carries the owner's disposition.
 
+- **OQ5. The Scout's two CI ideas.** Resolved: recorded as `000412` and `000413` at `99bf868` and
+  cited in Context and scope.
+
 Still open:
 
-- **OQ5. The Scout's two CI ideas.** Their ids are pending from Ideation's next turn. Who: the
-  planner, before G3; this plan's idea list and the partition reconciliation (OQ6) cite them.
 - **OQ6. Partition reconciliation.** The owner's partition-before-planning rule applies, and the
   `phase-part-03` sweep covers these ideas. Who: the planner, when the sweep's result is accepted and
   before G3. If the sweep puts any of these ideas in a different track, this plan is revised or the
