@@ -206,6 +206,11 @@ Owner rulings from this session. Each changed what was built.
   2026-09-23. The one exception is A2's added paragraph, quoted above exactly as it was sent. Times
   written with a `Z` are UTC.
 
+- **Audit 2's findings miscounted (2026-09-23).** The record, the partition document and a STATUS
+  message said audit 2 raised four minor findings, all Basis labels. It raised three minor, and one
+  of the five findings was an undisclosed close call (`000403`), not a label. The close review found
+  this, and the record and the document were corrected.
+
 ## Left undone
 
 - **The completion edit.** It waits for the owner-approved merge, per GOV-003.
@@ -353,6 +358,67 @@ blocker, major or minor finding**:
 Two notes, accepted without change: the fix is built but not yet exercised end to end, which is
 the R1 re-run's job; and the commit message's "option A" means the follow-up question's option,
 not the `## Unresolved` question's option A. The Decisions section above names both.
+
+
+### Close review after the sweep (2026-09-23, `demo-adversary`, sonnet)
+
+Range reviewed: `dev...HEAD` on `agent/phase-part-03` at `e7ef477`, plus the skill's files already on dev. The reviewer's report, verbatim:
+
+Independent close review of `phase-part-03` ("Build the partition-ideas workflow"), branch `agent/phase-part-03` (`e7ef477`), worktree `/code/d-system-worktrees/phase-part-03`. Code for the skill itself is already on dev (verified via `git log dev -- ...`); this branch's diff is scoped to `docs/00-working/idea-partition-2026-09-23.{md,json}`, `docs/03-sessions/SESS-2026-09-23-05-partition-ideas-workflow.md`, and a `next_action` edit in `docs/09-backlog/backlog.yaml`.
+
+#### Acceptance conditions
+
+1. **Skill listed, runs to GATE 1** — Met. `.claude/skills/partition-ideas/SKILL.md` and `.agents/skills/partition-ideas/SKILL.md` are byte-identical (`diff` exit 0), `uv run python tools/generate_agent_workflows.py --check` → `16 workflow adapter(s) current`. GATE-1 evidence (manifest, dispatch files, reports) in `_working/idea-corpus/` is internally consistent with the record.
+
+2. **Open-set gate halts with ≥1 open idea** — Met (evidenced, not re-run — re-running was disallowed). Attempt 1's `open ideas: 2 (000351, 000352)` halt is asserted only in the record; I could not independently confirm that specific historical run, but I ran the same `fold()`-based step-1 snippet against the live repo and got `open ideas: 0`, consistent with "triaged first" for the fresh sweep. Step 1's code correctly uses `fold(load_events())`, the sanctioned read path.
+
+3. **Every dispatch matches PROMPT-034 character for character** — Met, independently re-verified. I ran the exact diffs myself:
+   - `diff <(sed -n '117,178p' PROMPT-034...) superseded-R1-2026-09-23-carryforward/dispatch-R1.txt` → exit 0, empty.
+   - R4 (lines 193-251), A1 (lines 261-311) → exit 0, empty.
+   - R1 re-run's `dispatch-R1.txt` and A2's `dispatch-A2.txt` differ from the pack only by the owner-appended paragraphs (`62a63,68` and `35a36,39` respectively) — matches the record's claimed diffs exactly, byte for byte.
+
+4. **One analyst report exists, written by the coordinator** — Met, and exceeded (two: `report-R1.md` 61,526 bytes, `report-R4.md` 57,064 bytes — sizes match the record exactly). `.claude/agents/partition-analyst.md` has `tools: Read, Grep, Glob` only, no write route — confirmed by reading the file.
+
+5. **Moves no idea status, marks no phase complete, stops at all three gates** — Met. `backlog.yaml`'s diff is a 5-line `next_action` edit only; `status: active` is unchanged, no other phase touched.
+
+6. **`_data/ideas.jsonl` unchanged by the dry run** — Met for the tracked diff (empty `git diff dev...HEAD -- _data/ideas.jsonl`). The specific before/after hashes quoted in the record (`3b9d0ce0…`, `b3e94944…`) are historical claims I cannot re-produce (current hash is `d225f348…`, reflecting later Ideation commits on dev) — Cannot verify the exact historical hashes, but the current sha and the empty branch-diff are consistent with the claim.
+
+7. **R06/R11/R13/R05-empty/R14-halts not required here** — Met as stated, and the record is honest that the fresh sweep exceeded the phase's own bar (R05's empty-branch and both GATE 2/3 halts were in fact exercised) — disclosed, not hidden.
+
+8. **Structured record validates and agrees with markdown** — Met, independently re-run. I executed step 5's exact check script against `docs/00-working/idea-partition-2026-09-23.{md,json}`: `0 problem(s)`, exit 0.
+
+9. **Same-day re-invocation refuses/suffixes** — Met by fixture, and I did not just take the record's word for it: I built a synthetic fixture (two prior accepted partitions at the 2026-09-23 base and `-2` names) and ran the actual naming snippet from `agent-workflows/partition-ideas.md` against it — it correctly produced `idea-partition-2026-09-23-3.{md,json}`, confirming the `-2`, then `-3` sequential-suffix behavior the record claims.
+
+#### Independently re-run verification commands
+
+- `uv run python -m src.governance` → `Governance OK: 35 systems, 338 documents, 32 memories, 294 backlog phases`, exit 0 — matches record exactly.
+- `uv run ruff check src/ test/` → `All checks passed!` — matches.
+- `uv run mypy src/` → `Success: no issues found in 45 source files` — matches.
+- `uv run pytest -q` → `1029 passed, 1 skipped, 1 warning` — matches.
+- `uv run python tools/generate_agent_workflows.py --check` → `16 workflow adapter(s) current` — matches.
+- Manifest numbers cross-checked directly against `_working/idea-corpus/manifest.json`: `corpus_size: 383`, `triaged: 389`, `excluded_by_fast_lane`: 6 ids, `layered_evidence`: 61 ids — all match the record's "383 (of 389 triaged), 6 excluded, 61 layered" exactly.
+- R1's self-reported "384 against 383" overage and 98-id gap, cited in the record's fresh-sweep account, is corroborated by the superseded `report-R1.md`'s own text ("This does not balance — 384 against a stated corpus of 383, an overage of 1").
+
+No stray files outside the four declared paths; no secrets, no `_private/` content, no `AGENTS.md`/`CLAUDE.md`/`.agents/`/`_tmpagent/` edits in the diff.
+
+#### Findings
+
+**Major — the session record misstates audit 2's finding count and mischaracterizes one finding.** `docs/03-sessions/SESS-2026-09-23-05-partition-ideas-workflow.md:510-511` says: "Two major and four minor findings, all Basis lines misstating which analyst held a group." I read `_working/idea-corpus/audit-2-findings.md` directly: it contains exactly **2 MAJOR + 3 MINOR = 5** findings (`grep -c "^MAJOR\|^MINOR\|^BLOCKER"` → 5), not the claimed 2+4=6. More substantively, the third MINOR finding (T5.11, `000403`, "drops a disclosed uncertainty rather than resolving it") is **not** a Basis-provenance mislabeling — I checked the fix commit (`9646b3a`) and the pre-fix Basis line for T5.11 was already correctly attributed ("R1's placement"), unchanged in provenance; what actually changed was an added caveat ("a close call, listed in the residual") plus a new entry in the document's Residual section. The record's blanket characterization papers over a distinct, substantive audit finding (weak/undischarged independence reasoning) as if it were the same class of clerical error as the other two. Consequence: a reader trusting the session record's summary would believe every audit-2 finding was a bookkeeping slip already mechanically swept up, when one was a live judgment call about placement confidence that got its own remedial content change. This doesn't invalidate the accepted partition (the underlying fix was in fact applied, and step 5 still reports `0 problem(s)`), but it is exactly the kind of number-and-characterization overstatement this review exists to catch.
+
+**Minor — wall-clock total is not fully traceable.** The record's explicit timestamps (`20:46:55Z`–`21:12:10Z` for the fresh sweep to GATE 1, `~25 min`; `00:45:38Z`–`01:57:13Z` for R1 re-run + audit 1 to GATE 2, `~72 min`) sum to roughly 97 minutes, but the closing spend posture claims "about 3 hours 20 minutes" (200 min) total. No timestamps are given for synthesis, audit 2, or the gate checklist, so the remaining ~100 minutes is unverifiable — not contradicted, just not evidenced. Cannot verify.
+
+**Areas that held, attacked and found solid:**
+- Every dispatch-vs-pack diff (R1 original, R1 re-run, R4, A1, A2) — reproduced myself, byte-identical to the record's claims.
+- Step 5's schema/coverage/decline-tier check — reproduced myself against the accepted files, `0 problem(s)`.
+- Same-day suffix behavior — reproduced with an independent fixture, not just trusted from the record.
+- No idea-log write, no other phase touched, no stray/private files in the tracked diff.
+- The `partition-analyst` read-only agent type genuinely has no write route (tools list confirmed).
+- The HIGH `KeyError: 'manifest'` fix from the cited earlier adversary review is present and correct in the current `agent-workflows/partition-ideas.md` (try/except around record parsing, `UNREADABLE (ignored)` handling).
+- Governance, ruff, mypy, pytest, and the workflow-adapter check all reproduce the record's exact output.
+
+Overall: the phase's mechanical acceptance conditions hold under independent re-verification, including several I reproduced from scratch rather than trusting the record (the step-5 check, the dispatch diffs, and the same-day-suffix fixture). The one real defect is a factual overstatement in the session record's own account of audit 2's findings — a miscount (5 reported as 6) and a mischaracterization (calling a substantive residual-reasoning finding a "Basis line" provenance error) — which should be corrected in the record before this is treated as an accurate account of what audit 2 found, even though it does not change the accepted partition's validity.
+
+**Disposition.** Major (audit 2's count and characterisation): fixed. The record and the partition document now say two major and three minor, and name the fifth finding as `000403`'s undisclosed close call. Minor (untraceable wall clock): fixed. The record gives only the two timed spans and withdraws the three-hour estimate. Acceptance conditions: all nine Met in the reviewer's own re-runs, with the historical hashes marked Cannot verify. Those are consistent with the empty branch diff of `_data/ideas.jsonl`.
 
 ## Resume state (2026-09-23, after the read-only analyst merge)
 
@@ -507,10 +573,13 @@ At GATE 2 the owner answered "Proceed to synthesis" in this session.
   `8ad9861`. `audit-2-findings.md`, 5,164 bytes.
 - **Audit 2's findings.** No blocker. It verified coverage (383 of 383, none twice) and that the
   decline tiers are the exact union of the two reports' nominations, and held audit 1's A, B and
-  C and Divergence 1 as correctly applied. Two major and four minor findings, all Basis lines
-  misstating which analyst held a group (capability broker, orchestrator defects, and several
-  "agree" labels). Fixed: every Basis line was checked mechanically against both parsed reports
-  and corrected; no placement changed. The document records this under "How disagreements were
+  C and Divergence 1 as correctly applied. Two major and three minor findings. Four were Basis
+  lines misstating which analyst held a group (capability broker, orchestrator defects, several
+  "agree" labels, and the gate-method group's missing qualifier). The fifth was that `000403`'s close
+  call, which R4 flagged, went undisclosed. Fixed: every Basis line was checked mechanically
+  against both parsed reports and corrected, and `000403` was added to the residual list with its
+  own finding's tie to `000398`. No placement changed. (The agent's STATUS message to the
+  Session Manager at the time said "4 minor"; the close review caught the miscount.) The document records this under "How disagreements were
   ruled".
 - **Gate checklist (`G`), real output, after the fixes:**
   1. Coverage: step 5 check `0 problem(s)`; 381 in groups plus 2 unbatched is 383.
@@ -518,16 +587,18 @@ At GATE 2 the owner answered "Proceed to synthesis" in this session.
   3. `103 group records checked (tracks + fine groups); missing fields: []`.
   4. `unbatched 2 all reasoned True`; the size is reported in the document.
   5. `both ['000102', '000282'] one 12`, each with its reason; audit 2 confirmed nothing filtered.
-  6. Audit 2 returned; no blocker; its findings are fixed as above.
+  6. Audit 2 returned; no blocker; its five findings are fixed as above.
   7. `Governance OK: 35 systems, 338 documents, 32 memories, 294 backlog phases`, exit 0.
   8. No agent in this sweep wrote to `_data/ideas.jsonl`. Its sha256 is `b3e94944…` from the start
      of the R1 re-run turn to now. The change from GATE 1's `3b9d0ce0…` came from Ideation's
      triage turns on dev, not from this sweep.
   9. Spend, whole sweep: 5 dispatches (R1 and R4 before GATE 1, the R1 re-run, A1 and A2), all
      on sonnet. The R1 re-run was resumed after truncation once, then asked
-     for its report part by part (seven more requests). Wall clock is about 3 hours 20 minutes of
-     agent time against a stated 20-minute estimate to GATE 1. The overrun came from the R1
-     re-run, from the synthesis, and from waiting for turns.
+     for its report part by part (seven more requests). Timed wall clock is 25 minutes to GATE 1
+     (20:46:55Z to 21:12:10Z), against a stated 20-minute estimate, and 72 minutes for the R1
+     re-run and audit 1 (00:45:38Z to 01:57:13Z). The synthesis, audit 2 and GATE 3 were not
+     timed. The agent's earlier figure of "about 3 hours 20 minutes" was an estimate and is
+     withdrawn.
 
 The sweep stopped at GATE 3 for the owner's ruling on the partition and on each decline candidate.
 

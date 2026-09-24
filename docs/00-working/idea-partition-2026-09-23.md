@@ -19,7 +19,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 - **Divergence 1 (one coordination programme or three).** Held as three tracks, as R1 had them, matching the separate `sys-backlog`, `sys-auto-gateway`/`sys-auto-ledger` and `sys-realization` registrations. The 000385 anchor's mechanical gates go to governance checks, where they land in code; its design questions stay with realization.
 - **Divergence 3 (000122).** Kept in the one-nominator decline tier with both readings, since the audit could not tell.
 - **R1's in-document duplicates and miscounts.** Every id below appears once; R1's own corrections were applied before comparing.
-- **Audit 2** (`_working/idea-corpus/audit-2-findings.md`) found no blocker and confirmed coverage and the decline tiers. Its two major and four minor findings were Basis lines that misstated which analyst held a group; every Basis line was then checked mechanically against both reports and corrected. No placement changed.
+- **Audit 2** (`_working/idea-corpus/audit-2-findings.md`) found no blocker and confirmed coverage and the decline tiers. It raised two major and three minor findings. Four were Basis lines that misstated which analyst held a group; every Basis line was then checked mechanically against both reports and corrected. The fifth was that 000403's close call went undisclosed; it is now in the residual list. No placement changed.
 
 ## Completeness arithmetic
 
