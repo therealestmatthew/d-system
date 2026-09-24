@@ -9876,7 +9876,7 @@ items:
     rather than re-scanning docs/ independently inside tools/append_idea.py - a second, independent
     scanner drifts from the governance check's own source of truth for what documents exist.
 - id: phase-idg-13
-  title: Backfill the idea log into the new terminal states
+  title: Backfill the idea log into the new terminal states - ideas created 2026-09-06 to 2026-09-10
   plan: doc-idea-graph-lifecycle
   sources:
   - doc-idea-graph-lifecycle-requirements
@@ -9891,14 +9891,14 @@ items:
   - phase-idg-01
   - phase-idg-14
   scope:
-  - Sweep the idea log for ideas whose work demonstrably shipped and close each into the state its own
-    finding evidences - delivered, resolved or absorbed - with the pointer each state requires.
-  - 'Seven closes are already evidenced by triage findings written 2026-09-22 and are the starting set,
-    not the whole job: 000222, 000225, 000226, 000232, 000234, 000237 and 000278. The sweep looks for
-    the rest rather than stopping at the known ones.'
+  - Sweep the ideas created from 2026-09-06 to 2026-09-10 inclusive, by the date of each idea's created event, for ideas whose work
+    demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
+    or absorbed - with the pointer each state requires. Ideas created outside that window belong to
+    another backfill batch.
   - 'Move 000099 and 000129 from discarded to resolved. Read the GOV-003 entry before doing it: this
     reverses an owner ruling of 2026-09-13, made deliberately when no state fitted, and is not the
-    correction of an oversight. Both carry annotations saying they were discarded by that ruling.'
+    correction of an oversight. Both carry annotations saying they were discarded by that ruling. Both
+    were created on 2026-09-11; the reversal is named here rather than found by a batch sweep.'
   - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
     is removed or edited.
   acceptance:
@@ -9907,8 +9907,6 @@ items:
   - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
     through phase-idg-14's process.
   - A close citing a pointer that does not resolve is rejected by the writer.
-  - 'The seven ideas named in scope are closed or explicitly deferred with a reason; a silent omission
-    is a failure of this phase, not a smaller result.'
   - 000099 and 000129 are resolved rather than discarded, and the reversal is legible from the log
     without reading this phase.
   - Every pre-change idea not touched by this phase folds to identical derived state.
@@ -9920,9 +9918,12 @@ items:
   - docs/00-working/ideas.md
   next_action: Split out of phase-idg-01 on 2026-09-22 by owner ruling, because sweeping the whole log
     is a different job from adding the states with a different failure mode - a missed idea is silent,
-    where a broken schema is loud. Do not start before phase-idg-01 ships the states; there is nothing
-    to close into until then. The sweep is a read of every idea's findings, so budget for reading 300+
-    annotations rather than for a mechanical pass.
+    where a broken schema is loud. On 2026-09-24 the sweep was split again into five dated batches
+    (phase-idg-13, -15, -16, -17, -18) by owner ruling on review finding F11
+    (docs/08-governance/reviews/2026-09-24-plan-029-idg-split.json), so each holds about 100 ideas inside
+    session_budget 1. The batches share _data/ideas.jsonl, so they run one at a time, in any order. Do
+    not start before phase-idg-01 ships the states and phase-idg-14 ships the authority process; every
+    close this batch writes goes through that process.
 - id: phase-idg-14
   title: Build the terminal-state authority process - propose, verify, ratify
   plan: doc-idea-graph-lifecycle
@@ -9980,6 +9981,171 @@ items:
     phase-irs-09 plans a second path into delivered, written after the realization pipeline''s own
     verification, and whoever builds either phase reads the other first (GOV-003, 2026-09-22 lifecycle
     ruling).'
+- id: phase-idg-15
+  title: Backfill the idea log into the new terminal states - ideas created 2026-09-11 to 2026-09-12
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-14
+  scope:
+  - Sweep the ideas created from 2026-09-11 to 2026-09-12 inclusive, by the date of each idea's created event, for ideas whose work
+    demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
+    or absorbed - with the pointer each state requires. Ideas created outside that window belong to
+    another backfill batch.
+  - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
+    is removed or edited.
+  acceptance:
+  - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
+    phase id in the backlog, or a commit hash in this repository's history.
+  - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
+    through phase-idg-14's process.
+  - A close citing a pointer that does not resolve is rejected by the writer.
+  - Every pre-change idea not touched by this phase folds to identical derived state.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  next_action: One of five dated backfill batches (phase-idg-13, -15, -16, -17, -18), split on 2026-09-24
+    by owner ruling on review finding F11 (docs/08-governance/reviews/2026-09-24-plan-029-idg-split.json)
+    so each holds about 100 ideas inside session_budget 1. The batches share _data/ideas.jsonl, so they
+    run one at a time, in any order. Do not start before phase-idg-01 ships the states and phase-idg-14
+    ships the authority process; every close this batch writes goes through that process.
+- id: phase-idg-16
+  title: Backfill the idea log into the new terminal states - ideas created 2026-09-13 to 2026-09-21
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-14
+  scope:
+  - Sweep the ideas created from 2026-09-13 to 2026-09-21 inclusive, by the date of each idea's created event, for ideas whose work
+    demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
+    or absorbed - with the pointer each state requires. Ideas created outside that window belong to
+    another backfill batch.
+  - 'Seven closes are already evidenced by triage findings written 2026-09-22 and are the starting set,
+    not the whole job: 000222, 000225, 000226, 000232, 000234, 000237 and 000278. All seven were created
+    in this window. The sweep looks for the rest rather than stopping at the known ones.'
+  - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
+    is removed or edited.
+  acceptance:
+  - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
+    phase id in the backlog, or a commit hash in this repository's history.
+  - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
+    through phase-idg-14's process.
+  - A close citing a pointer that does not resolve is rejected by the writer.
+  - 'The seven ideas named in scope are closed or explicitly deferred with a reason; a silent omission
+    is a failure of this phase, not a smaller result.'
+  - Every pre-change idea not touched by this phase folds to identical derived state.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  next_action: One of five dated backfill batches (phase-idg-13, -15, -16, -17, -18), split on 2026-09-24
+    by owner ruling on review finding F11 (docs/08-governance/reviews/2026-09-24-plan-029-idg-split.json)
+    so each holds about 100 ideas inside session_budget 1. The batches share _data/ideas.jsonl, so they
+    run one at a time, in any order. Do not start before phase-idg-01 ships the states and phase-idg-14
+    ships the authority process; every close this batch writes goes through that process.
+- id: phase-idg-17
+  title: Backfill the idea log into the new terminal states - ideas created 2026-09-22 to 2026-09-23
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-14
+  scope:
+  - Sweep the ideas created from 2026-09-22 to 2026-09-23 inclusive, by the date of each idea's created event, for ideas whose work
+    demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
+    or absorbed - with the pointer each state requires. Ideas created outside that window belong to
+    another backfill batch.
+  - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
+    is removed or edited.
+  acceptance:
+  - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
+    phase id in the backlog, or a commit hash in this repository's history.
+  - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
+    through phase-idg-14's process.
+  - A close citing a pointer that does not resolve is rejected by the writer.
+  - Every pre-change idea not touched by this phase folds to identical derived state.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  next_action: One of five dated backfill batches (phase-idg-13, -15, -16, -17, -18), split on 2026-09-24
+    by owner ruling on review finding F11 (docs/08-governance/reviews/2026-09-24-plan-029-idg-split.json)
+    so each holds about 100 ideas inside session_budget 1. The batches share _data/ideas.jsonl, so they
+    run one at a time, in any order. Do not start before phase-idg-01 ships the states and phase-idg-14
+    ships the authority process; every close this batch writes goes through that process.
+- id: phase-idg-18
+  title: Backfill the idea log into the new terminal states - ideas created 2026-09-24 onward
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  - phase-idg-14
+  scope:
+  - Sweep the ideas created from 2026-09-24 up to and including the date phase-idg-01 merges onto dev, by the date of each idea's created event, for ideas whose work
+    demonstrably shipped, and close each into the state its own finding evidences - delivered, resolved
+    or absorbed - with the pointer each state requires. Ideas created outside that window belong to
+    another backfill batch.
+  - Correction is by appending events. No line of _data/ideas.jsonl is rewritten, and no earlier event
+    is removed or edited.
+  acceptance:
+  - Every idea closed by this phase carries a pointer that resolves - a document code that exists, a
+    phase id in the backlog, or a commit hash in this repository's history.
+  - Every close written by this phase carries proposed_by and stays pending the owner's ratification,
+    through phase-idg-14's process.
+  - A close citing a pointer that does not resolve is rejected by the writer.
+  - Every pre-change idea not touched by this phase folds to identical derived state.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - _data/ideas.jsonl
+  - docs/00-working/ideas.md
+  next_action: One of five dated backfill batches (phase-idg-13, -15, -16, -17, -18), split on 2026-09-24
+    by owner ruling on review finding F11 (docs/08-governance/reviews/2026-09-24-plan-029-idg-split.json)
+    so each holds about 100 ideas inside session_budget 1. The batches share _data/ideas.jsonl, so they
+    run one at a time, in any order. Do not start before phase-idg-01 ships the states and phase-idg-14
+    ships the authority process; every close this batch writes goes through that process. Ideas created after phase-idg-01 merges are not backfilled; they reach a terminal state through phase-idg-14's process as their work ships.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle

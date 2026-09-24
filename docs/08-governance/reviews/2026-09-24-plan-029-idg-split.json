@@ -1,0 +1,411 @@
+{
+  "review_id": "2026-09-24-plan-029-idg-split",
+  "procedure": "GOV-018",
+  "date": "2026-09-24",
+  "target": {
+    "plan": "PLAN-029",
+    "requirement": "REQ-014",
+    "phases": [
+      "phase-idg-01",
+      "phase-idg-13",
+      "phase-idg-14"
+    ],
+    "later_added_phases": [
+      "phase-idg-13",
+      "phase-idg-14"
+    ]
+  },
+  "entry_check": {
+    "result": "exempt",
+    "standard": "GOV-010",
+    "detail": "PLAN-029 created 2026-09-14, before GOV-010's 2026-09-22 scope date."
+  },
+  "altitudes_run": [
+    "phase",
+    "later-added-phase"
+  ],
+  "status": "dispositioned",
+  "notes": "Stage-5 re-entry at the phase altitude required by ARCH-006 stage 6 after the owner's split rulings of 2026-09-22 (phase-idg-13) and 2026-09-23 (phase-idg-14), GOV-003 lines 614-725. Reviewed read-only in the primary checkout at dev 9f8a5d5, two dispatches on partition-adversary with PROMPT-038, both on the dispatcher's model (Opus), not a Sonnet default. Dispatch 1 (later-added-phase: phase-idg-13, phase-idg-14, with phase-idg-01 as the parent) is F01-F05. Dispatch 2 (phase: phase-idg-01, phase-idg-13, phase-idg-14) is F06-F13; it hit its 50-turn limit and was told to return the findings it already had evidence for, so its coverage of phase-idg-14 (size, acceptance, verification) may be incomplete. phase-idg-01 is in the plan's original set (3da1295); phase-idg-13 was first registered in 7ceb37b and phase-idg-14 in 37b605f. Both dispatches were told not to run pytest or anything that writes (Session Manager contract item 9). The dispatcher added id, engine and author only. Dispatch 1 reported one finding with subject 'phase-idg-13, phase-idg-14'; it is recorded twice, as F03 and F04, with its text otherwise unchanged (precedent: 2026-09-23-plan-045-later-added). Overlaps between dispatches, kept as reported: F01~F10 (idg-13 missing depends_on idg-14), F03/F04~F06/F07 (PLAN-029 and REQ-014 not updated). Dispatcher spot checks: GOV-003 lines 598-601 and 630-633 say what F01 and F02 quote; schemas/idea.schema.json line 155 (not 292) carries the 'never a from' text F09 quotes; systems.yaml assigns src/governance to sys-governance and phase-idg-06 declares sys-governance (F08). Not committed. Dispositions: every finding carries a planner escalated-g3 entry recording that the Session Manager sent it straight to the owner, then an owner disposition dated 2026-09-24, from the owner's rulings relayed by the Session Manager, written by Session 1 - Builder A on agent/idg-split-review-rulings, which commits this record and the fixes together.",
+  "findings": [
+    {
+      "altitude": "later-added-phase",
+      "subject": "phase-idg-13",
+      "severity": "blocker",
+      "title": "phase-idg-13's backfill writes agent-authored terminal-state closes for the whole corpus without depending on phase-idg-14, the phase that builds the required propose/verify/ratify mechanism and proposed_by provenance field.",
+      "evidence": "GOV-003 (2026-09-22 entry, ~line 622): 'the owner accepted the agent-writable terminal transition, with one condition: an agent-written terminal state announces itself as awaiting review... phase-idg-01 builds it that way or not at all.' GOV-003 (2026-09-23 entry, ~line 696): the authority process (propose/verify/ratify, proposed_by field) split out of phase-idg-01 into phase-idg-14. phase-idg-13's backlog.yaml entry has `depends_on: [phase-idg-01]` only -- no phase-idg-14 -- and its scope has an agent sweep the whole idea log and 'close each into the state its own finding evidences,' with acceptance criteria ('Every idea closed by this phase carries a pointer that resolves', 'The seven ideas named in scope are closed...') that never mention proposed_by or a ratification step.",
+      "consequence": "If phase-idg-13 runs once phase-idg-01 ships (its only declared dependency), it will write terminal-state closes for potentially the full corpus as unilateral agent writes -- exactly the 'or not at all' case the owner ruled out. Because the idea log is append-only, fixing this after the fact means appending correction events over every close the backfill wrote, not editing them.",
+      "minimal_fix": "Add phase-idg-14 to phase-idg-13's depends_on, and add an acceptance line requiring each backfilled close to carry proposed_by and be marked pending ratification.",
+      "slug": "split-phase-missing-authority-dependency",
+      "id": "F01",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Owner ruling: phase-idg-13 depends on phase-idg-14. backlog.yaml: phase-idg-14 added to phase-idg-13's depends_on, and an acceptance line added that every close the phase writes carries proposed_by and stays pending the owner's ratification through phase-idg-14's process. Same fix as F10."
+        }
+      ]
+    },
+    {
+      "altitude": "later-added-phase",
+      "subject": "phase-idg-14",
+      "severity": "major",
+      "title": "The GOV-003 coordination note pairing the idea-log terminal-state mechanism with phase-irs-09's separate 'delivered' path is attached only to phase-idg-01's next_action, not to phase-idg-14, which is now the phase that actually builds that mechanism.",
+      "evidence": "GOV-003 (~line 597-600): 'One delivered, two paths into it... The pipeline implements a second path into it rather than inventing a parallel one. Whoever builds either phase reads the other first.' phase-idg-01's next_action in backlog.yaml quotes this note; phase-idg-14's next_action (added 2026-09-23, batch-003 Q4) only points at the batch-003 entry (~line 696-725) and never mentions phase-irs-09 or the 'two paths into delivered' reasoning anywhere in its scope, acceptance or next_action.",
+      "consequence": "An agent building phase-idg-14 following only its own next_action will not be pointed at phase-irs-09's parallel Gate-5 sign-off path into `delivered`, risking two inconsistent mechanisms (one with proposed_by provenance, one without) writing the same terminal status.",
+      "minimal_fix": "Copy the 'reads the other first' cross-reference to phase-irs-09 into phase-idg-14's next_action, since phase-idg-14 -- not phase-idg-01 -- now owns the mechanism the note is about.",
+      "slug": "coordination-note-lost-in-split",
+      "id": "F02",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied: phase-idg-14's next_action now carries the 'one delivered, two paths into it' cross-reference to phase-irs-09 and the 'reads the other first' instruction, citing GOV-003's 2026-09-22 lifecycle ruling."
+        }
+      ]
+    },
+    {
+      "altitude": "later-added-phase",
+      "subject": "phase-idg-13",
+      "severity": "major",
+      "title": "PLAN-029's phase table, phase count and requirement-coverage table were never updated to include phase-idg-13 or phase-idg-14, and REQ-014 carries no row for the terminal-state/backfill/authority scope they cover.",
+      "evidence": "`grep -c` count of backlog.yaml entries with `plan: doc-idea-graph-lifecycle` under `phase-idg-*` returns 14 ids (01-14), but PLAN-029 line 156-157 states 'Twelve phases under phase-idg-*' and lists only phase-idg-01 through phase-idg-12 in its phase table (lines 161-172) and requirement-coverage table (lines 214-233); `grep -n 'idg-13\\|idg-14'` against PLAN-029-idea-graph-lifecycle.md and REQ-014-idea-graph-lifecycle.md both return zero matches. The 'Sizing against the partition' section (lines 174-186) still claims the plan lands inside the partition-time 10-13 range at twelve, which is now false against the 14 phase-idg-* phases actually registered under this plan.",
+      "consequence": "A reader who reads only the plan document (as the plan's own front matter and this dispatch's altitude both intend) has no way to discover phase-idg-13 or phase-idg-14 exist, what requirement they satisfy, or that the sizing claim is stale; the plan's own stated invariant 'every phase carries at least one row' (line 210) is false for these two phases since no REQ-014 row covers the 2026-09-22 terminal-state ruling at all.",
+      "minimal_fix": "Add phase-idg-13 and phase-idg-14 to PLAN-029's phase table and update the phase count/sizing section; add a REQ-014 row (or an explicit note that this scope is governed by the GOV-003 ruling rather than a REQ-014 row) and reference it from both phases' requirement coverage.",
+      "slug": "plan-document-not-updated-for-later-added-phase",
+      "id": "F03",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied, same change as F04, F06 and F07: PLAN-029's phase table lists phase-idg-13 and phase-idg-14, the phase count and the sizing section state the new total and why it exceeds the partition-time range, and the requirement-coverage table maps new REQ-014 rows R21 (backfill and the 000099/000129 reversal) to phase-idg-13 and R22 (the authority process) to phase-idg-14."
+        }
+      ]
+    },
+    {
+      "altitude": "later-added-phase",
+      "subject": "phase-idg-14",
+      "severity": "major",
+      "title": "PLAN-029's phase table, phase count and requirement-coverage table were never updated to include phase-idg-13 or phase-idg-14, and REQ-014 carries no row for the terminal-state/backfill/authority scope they cover.",
+      "evidence": "`grep -c` count of backlog.yaml entries with `plan: doc-idea-graph-lifecycle` under `phase-idg-*` returns 14 ids (01-14), but PLAN-029 line 156-157 states 'Twelve phases under phase-idg-*' and lists only phase-idg-01 through phase-idg-12 in its phase table (lines 161-172) and requirement-coverage table (lines 214-233); `grep -n 'idg-13\\|idg-14'` against PLAN-029-idea-graph-lifecycle.md and REQ-014-idea-graph-lifecycle.md both return zero matches. The 'Sizing against the partition' section (lines 174-186) still claims the plan lands inside the partition-time 10-13 range at twelve, which is now false against the 14 phase-idg-* phases actually registered under this plan.",
+      "consequence": "A reader who reads only the plan document (as the plan's own front matter and this dispatch's altitude both intend) has no way to discover phase-idg-13 or phase-idg-14 exist, what requirement they satisfy, or that the sizing claim is stale; the plan's own stated invariant 'every phase carries at least one row' (line 210) is false for these two phases since no REQ-014 row covers the 2026-09-22 terminal-state ruling at all.",
+      "minimal_fix": "Add phase-idg-13 and phase-idg-14 to PLAN-029's phase table and update the phase count/sizing section; add a REQ-014 row (or an explicit note that this scope is governed by the GOV-003 ruling rather than a REQ-014 row) and reference it from both phases' requirement coverage.",
+      "slug": "plan-document-not-updated-for-later-added-phase",
+      "id": "F04",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied, same change as F03, F06 and F07: PLAN-029's phase table lists phase-idg-13 and phase-idg-14, the phase count and the sizing section state the new total and why it exceeds the partition-time range, and the requirement-coverage table maps new REQ-014 rows R21 (backfill and the 000099/000129 reversal) to phase-idg-13 and R22 (the authority process) to phase-idg-14."
+        }
+      ]
+    },
+    {
+      "altitude": "later-added-phase",
+      "subject": "phase-idg-14",
+      "severity": "major",
+      "title": "phase-idg-14's deliverables omit .claude/agents/, even though its scope requires building two new agents (a proposer and a verifier) that do not exist in the repository today.",
+      "evidence": "phase-idg-14 scope: 'Build the two-agent authority process for reaching a terminal state... an agent proposes the close with its evidence... a second agent verifies the pointer resolves.' Its deliverables list is `schemas/idea.schema.json`, `tools/append_idea.py`, `src/db/ideas.py`, `test/` -- no `.claude/agents/`. `grep -l -i 'propose\\|verify\\|ratify\\|terminal' .claude/agents/*.md` finds no existing agent implementing this (the only idea-related agent, idea-triage.md, explicitly states 'Never advances an idea past triaged, never merges or declines one'). By contrast, phase-irs-09, a comparably-scoped 'build the realization agent' phase, does list `.claude/agents/` in its deliverables.",
+      "consequence": "The phase's most concrete build artifact is undeclared, so the governance conflicts check cannot flag a collision if another concurrent phase also touches `.claude/agents/`, and a builder scoping the phase from `deliverables` alone would miss that new agent definition files are required.",
+      "minimal_fix": "Add `.claude/agents/` to phase-idg-14's deliverables.",
+      "slug": "deliverables-missing-scope-files",
+      "id": "F05",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied: .claude/agents/ added to phase-idg-14's deliverables."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-13",
+      "severity": "blocker",
+      "title": "PLAN-029 and REQ-014 were never updated after the 2026-09-22 split, so phase-idg-13 has no requirement row and no plan-table entry.",
+      "evidence": "grep -c 'idg-13|idg-14' docs/01-plans/PLAN-029-idea-graph-lifecycle.md returns 0 — the phase table (lines 159-172), the execution-order section (187-206) and the requirement-coverage table (208-234) list only phase-idg-01 through -12. docs/06-requirements/REQ-014-idea-graph-lifecycle.md's R01-R20 (lines 73-92) contain zero rows about backfilling, terminal states, delivered/resolved/absorbed, or a discarded->resolved reversal (grep for those terms only matches prose in the problem statement, not a requirement row).",
+      "consequence": "GOV-010 P6 requires every requirement row map to a phase and every phase to a row; phase-idg-13's entire scope (the backfill, the 000099/000129 reversal) is accountable to no governed requirement and invisible to anyone reading PLAN-029's own tables — exactly the seam ARCH-006 stage 6's re-entry-at-phase-altitude rule exists to catch.",
+      "minimal_fix": "Add a REQ-014 row for the backfill/reversal requirement and a phase-idg-13 row to PLAN-029's phase table and requirement-coverage table.",
+      "slug": "plan-doc-not-updated-after-split",
+      "aliases": [
+        "requirement-coverage-gap"
+      ],
+      "id": "F06",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied, same change as F03, F04 and F07: PLAN-029's phase table lists phase-idg-13 and phase-idg-14, the phase count and the sizing section state the new total and why it exceeds the partition-time range, and the requirement-coverage table maps new REQ-014 rows R21 (backfill and the 000099/000129 reversal) to phase-idg-13 and R22 (the authority process) to phase-idg-14."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-14",
+      "severity": "blocker",
+      "title": "PLAN-029 and REQ-014 were never updated after the 2026-09-23 split, so phase-idg-14 has no requirement row and no plan-table entry.",
+      "evidence": "Same grep as phase-idg-13's finding: 0 mentions of idg-14 anywhere in PLAN-029. REQ-014 R01-R20 have no row for the two-agent propose/verify/ratify authority process or the proposed_by provenance field that phase-idg-14 builds — the ruling that created it lives only in GOV-003 lines 696-709 (batch-003 Q4/Q5/Q6).",
+      "consequence": "The entire authority-process build — the mechanism the owner specifically required so an agent-written terminal state never 'passes silently into the log as though ratified' — is ungoverned by REQ-014 and absent from PLAN-029's own accounting, so nothing checks phase-idg-14's acceptance against a stated requirement.",
+      "minimal_fix": "Add a REQ-014 row for the authority process and a phase-idg-14 row to PLAN-029's phase table and requirement-coverage table.",
+      "slug": "plan-doc-not-updated-after-split",
+      "id": "F07",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied, same change as F03, F04 and F06: PLAN-029's phase table lists phase-idg-13 and phase-idg-14, the phase count and the sizing section state the new total and why it exceeds the partition-time range, and the requirement-coverage table maps new REQ-014 rows R21 (backfill and the 000099/000129 reversal) to phase-idg-13 and R22 (the authority process) to phase-idg-14."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-01",
+      "severity": "blocker",
+      "title": "Declared systems omit sys-governance despite a deliverable (src/governance/) that only that system covers, and correcting it breaks the plan's own claimed disjoint-parallel-front.",
+      "evidence": "backlog.yaml lines 9814-9816: phase-idg-01 declares systems: [sys-contracts, sys-portfolio]. Its deliverables (line 9856) include src/governance/, which docs/08-governance/systems.yaml lines 343-350 assigns to sys-governance, not sys-contracts or sys-portfolio (that deliverable was added by the 2026-09-23 batch-003 Q8 fix per GOV-003 line 715). Meanwhile phase-idg-06 (backlog.yaml line 10111-10112) already declares systems: [sys-governance]. PLAN-029 lines 192-202 names phase-idg-01 + phase-idg-06 + phase-idg-10 as 'the one mutually disjoint set' and 'the widest genuinely parallel front... reached at the start' — a claim GOV-010 P7 cites by name as this plan's exemplar of correct collision accounting.",
+      "consequence": "As declared today, a real collision on the governance-check internals between phase-idg-01 and phase-idg-06 is invisible to src/governance/backlog.py's collision detector (concurrency_errors only compares declared systems and deliverable paths). Declaring it correctly, the minimal fix, makes phase-idg-01 and phase-idg-06 collide on sys-governance and falsifies the plan's own stated disjoint trio and its execution-order recommendation.",
+      "minimal_fix": "Add sys-governance to phase-idg-01's systems, and correct PLAN-029's execution-order section to state that phase-idg-01 and phase-idg-06 in fact collide.",
+      "slug": "systems-declaration-undercount",
+      "id": "F08",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Owner ruling: sys-governance added to phase-idg-01's systems. PLAN-029's execution-order section now records that phase-idg-01 and phase-idg-06 collide on sys-governance, that no three of the five dependency-free phases clear each other, and that the widest front among the four still queued is two. next_up: phase-idg-01 moved to directly after phase-grd-02, ahead of phase-dam-01 (owner-ranked reorder)."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-01",
+      "severity": "blocker",
+      "title": "No document names the schema transition edge phase-idg-13 needs (discarded -> resolved), and it conflicts with the schema's own stated design.",
+      "evidence": "schemas/idea.schema.json line 292's description: 'discarded is reachable from every working state but is never a from — the one way out of it is a revisited event' (which returns the idea to reviewing, per line ~456's description, not to any terminal state directly). phase-idg-13's scope (backlog.yaml line 9894) literally requires: 'Move 000099 and 000129 from discarded to resolved.' A direct fold-in of status(from: discarded, to: resolved) would violate the stated design; going through revisited lands the idea in reviewing first. Confirmed via _data/ideas.jsonl: both 000099 and 000129 currently sit at a single triaged->discarded status event with zero prior revisited events, so no existing mechanism gets them to resolved. Neither phase-idg-01's scope (which builds the schema) nor GOV-003's entry (lines 607-612) states which mechanism is intended.",
+      "consequence": "Built literally as scoped, phase-idg-01 may not produce a schema phase-idg-13 can satisfy without someone deciding, unrecorded, whether discarded becomes a sanctioned from-state for the new terminal statuses (breaking the documented invariant) or whether the reversal goes through revisited (leaving a reviewing hop the scope text never mentions).",
+      "minimal_fix": "Add one line to phase-idg-01's scope naming the exact event sequence for the discarded->resolved reversal, and state whether it is a general exception or a revisited+status pair.",
+      "slug": "cross-phase-transition-gap",
+      "id": "F09",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Owner ruling: the reversal is a revisited event followed by a status event - the existing one-time revisit (discarded -> reviewing), then a status move from reviewing to resolved. No schema exception; discarded stays never-a-from. One line naming this added to phase-idg-01's scope. Owner, on the original discard: \"I did not intend to discard those ideas at all - my intention was just to ignore them during partitioning but leave them triaged and pending some future state (well some of them I considered discarding...)\""
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-13",
+      "severity": "major",
+      "title": "depends_on omits phase-idg-14, though phase-idg-13's writes are the first exercise of the agent-writable terminal-state rule phase-idg-14 builds.",
+      "evidence": "backlog.yaml line 9886-9887: phase-idg-13 depends_on: [phase-idg-01] only. GOV-003 lines 626-630 (2026-09-22, before the 9-23 split that created phase-idg-14): 'an agent proposes the close with its evidence, a second agent verifies the pointer resolves, and the owner ratifies... This is the first agent-writable terminal transition in the idea log,' with the marking mechanism (proposed_by) later assigned specifically to phase-idg-14 (GOV-003 lines 696-709). phase-idg-13's own next_action (line 9916) frames the sweep as agent work ('budget for reading 300+ annotations').",
+      "consequence": "If phase-idg-13 is built and run before phase-idg-14 ships (its depends_on permits this), its terminal-state closes would have no proposed_by field to mark them as agent-written-and-unratified — precisely the failure GOV-003 says the mechanism exists to prevent: 'a close never passes silently into the log as though it had been ratified.'",
+      "minimal_fix": "Add phase-idg-14 to phase-idg-13's depends_on, or state explicitly in scope that this sweep's closes are owner-written and so the authority process does not apply.",
+      "slug": "missing-cross-phase-dependency",
+      "id": "F10",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Owner ruling, same fix as F01: phase-idg-14 added to phase-idg-13's depends_on, with the proposed_by and pending-ratification acceptance line."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-13",
+      "severity": "major",
+      "title": "The phase's own next_action and acceptance describe a full-corpus scope that session_budget: 1 cannot obviously hold, reproducing the exact failure mode that split it out of phase-idg-01 in the first place.",
+      "evidence": "backlog.yaml line 9916: 'The sweep is a read of every idea's findings, so budget for reading 300+ annotations rather than for a mechanical pass.' Acceptance line 2 (line 9902-9903): 'The seven ideas named in scope are closed or explicitly deferred with a reason; a silent omission is a failure of this phase, not a smaller result' — i.e. the acceptance demands a complete sweep of the corpus (432 ideas per my own fold of _data/ideas.jsonl), not just the seven named. GOV-003 line 615-616 gives the reason phase-idg-13 was split out at all: 'the phase's scope had roughly doubled while its session_budget stayed at one.'",
+      "consequence": "A single-session builder reading 300+ annotations across 400+ ideas and writing individually pointer-verified closes for an unbounded 'rest' risks the same overrun that triggered this phase's own creation, most likely producing an incomplete sweep that acceptance line 2 then calls a failure rather than a partial result.",
+      "minimal_fix": "Bound the sweep explicitly (e.g. a named batch or a idea-count/date cutoff) rather than 'the rest', or split the backfill into dated batches.",
+      "slug": "session-budget-scope-mismatch",
+      "id": "F11",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Owner ruling: split the backfill into dated batches. The Session Manager approved the batch count as a sizing call: five batches of about 100 ideas each, by the date of each idea's created event (fold at dev 82da81c: 422 triaged ideas). phase-idg-13 keeps 2026-09-06 to 2026-09-10 plus the 000099/000129 reversal. New phases (ids never used before): phase-idg-15 (2026-09-11 to 09-12), phase-idg-16 (2026-09-13 to 09-21, holding all seven named closes), phase-idg-17 (2026-09-22 to 09-23) and phase-idg-18 (2026-09-24 through the date phase-idg-01 merges). Each has session_budget 1 and depends on phase-idg-01 and phase-idg-14. PLAN-029's phase table, sizing, execution order and R21 coverage row list all five."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-01",
+      "severity": "minor",
+      "title": "Scope text's 'seven already-promoted ideas' is stale against the current idea log, which shows eleven.",
+      "evidence": "backlog.yaml line 9836: 'The seven already-promoted ideas are unaffected until their work ships.' Folding _data/ideas.jsonl's status events for promoted ideas gives 11: 000039, 000007, 000003, 000019, 000067, 000104, 000112 (all by 2026-09-11) plus 000269, 000274, 000275 and 000317 (promoted 2026-09-22, apparently after the scope text was written).",
+      "consequence": "Does not change what the phase does (it makes promoted non-terminal for all promoted ideas, not a fixed set), but an agent verifying the scope text against the log will find a mismatch and may wonder whether something else drifted.",
+      "minimal_fix": "Drop the specific count or update it to match the log at build time.",
+      "slug": "stale-fact-in-scope-text",
+      "id": "F12",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied: the count is dropped from phase-idg-01's scope ('The already-promoted ideas'), since the log held 13 promoted ideas at dev 82da81c and the number keeps moving."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-idg-13",
+      "severity": "minor",
+      "title": "No acceptance line names an input that must be rejected, unlike its sibling phases.",
+      "evidence": "backlog.yaml lines 9899-9906, all four acceptance lines are positive observations (pointer resolves, seven closed, 000099/000129 resolved, pre-change ideas unaffected) with no line of the shape phase-idg-01 has twice (line 9843: 'An agent author attempting a lineage annotation is rejected...'; line 9844-9845: 'each rejected by the writer when no pointer is given').",
+      "consequence": "Minor per GOV-010 P6 ('at least one input that must be rejected'); the underlying reject case (an unresolvable pointer) is presumably enforced by phase-idg-01's writer validation, but phase-idg-13's own acceptance never says so.",
+      "minimal_fix": "Add a line: 'A close citing a pointer that does not resolve is rejected by the writer.'",
+      "slug": "acceptance-missing-reject-case",
+      "id": "F13",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager, recorded by Session 1 - Builder A",
+          "date": "2026-09-24",
+          "reason": "Not dispositioned at stage 4: the Session Manager sent all 13 findings of this review straight to the owner for ruling (_working/session-manager/reports/rulings-000347.md, idg split review rulings), so the owner's entry below is the disposition."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session 1 - Builder A, from the owner's rulings relayed by the Session Manager (_working/session-manager/reports/rulings-000347.md, idg split review rulings)",
+          "date": "2026-09-24",
+          "reason": "Reviewer's minimal fix applied: phase-idg-13 gains the acceptance line 'A close citing a pointer that does not resolve is rejected by the writer.'"
+        }
+      ]
+    }
+  ]
+}

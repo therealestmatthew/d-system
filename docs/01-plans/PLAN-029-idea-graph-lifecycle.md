@@ -31,7 +31,8 @@ Both are `discarded` on the log. Seventeen remain.
 | `G03` Idea and backlog reporting | `000008`, `000010`, `000042`, `000050`, `000071` | Largely delivered — see the verification below |
 | `G04` Idea-to-plan drafting | `000046`, `000047`, `000049` | `000046` names `000047` its own prerequisite; `000049` surfaced from triaging `000046` and blocks its design |
 
-Partition-time sizing was 10–13 phases if built in full. This plan lands **twelve**.
+Partition-time sizing was 10–13 phases if built in full. This plan landed **twelve**; later splits
+took it to eighteen (see the phase table).
 
 ## What `G03` already ships, verified in code
 
@@ -154,9 +155,12 @@ repository's own plan-before-code rule.
 
 ## Implementation phases
 
-Fourteen phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
+Eighteen phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
 `phase-idg-13` and `phase-idg-14` were split out of `phase-idg-01` after this plan was written, on
-2026-09-22 and 2026-09-23 (`GOV-003`), and belong to no partition group.
+2026-09-22 and 2026-09-23 (`GOV-003`), and belong to no partition group. On 2026-09-24 the backfill
+in `phase-idg-13` was split again into five batches by the date each idea was created, `phase-idg-13`
+and `phase-idg-15` through `phase-idg-18`, so each holds about 100 ideas inside `session_budget: 1`
+(review finding F11, [the review record](../08-governance/reviews/2026-09-24-plan-029-idg-split.json)).
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
@@ -172,8 +176,12 @@ Fourteen phases under `phase-idg-*`, registered in [the backlog index](../09-bac
 | `phase-idg-10` | Audit the plan corpus and write the plan-quality standard | `G04` | — |
 | `phase-idg-11` | Define where a promoted plan lives before it earns a code | `G04` | — |
 | `phase-idg-12` | Build the idea planner agent and check it against the standard | `G04` | `10`, `11` |
-| `phase-idg-13` | Backfill the idea log into the new terminal states | — | `01`, `14` |
+| `phase-idg-13` | Backfill the idea log into the new terminal states - ideas created 2026-09-06 to 2026-09-10 | — | `01`, `14` |
 | `phase-idg-14` | Build the terminal-state authority process - propose, verify, ratify | — | `01` |
+| `phase-idg-15` | Backfill the idea log into the new terminal states - ideas created 2026-09-11 to 2026-09-12 | — | `01`, `14` |
+| `phase-idg-16` | Backfill the idea log into the new terminal states - ideas created 2026-09-13 to 2026-09-21 | — | `01`, `14` |
+| `phase-idg-17` | Backfill the idea log into the new terminal states - ideas created 2026-09-22 to 2026-09-23 | — | `01`, `14` |
+| `phase-idg-18` | Backfill the idea log into the new terminal states - ideas created 2026-09-24 onward | — | `01`, `14` |
 
 ### Sizing against the partition
 
@@ -188,15 +196,17 @@ range, and the internal distribution is where the interest is.
 - `G02` lands at two rather than three, because `000048` and `000127` are one ask.
 - `G04` lands at three, one per idea, which its own dependency chain forces.
 
-The two later splits take the plan to **fourteen**, above the partition-time range. Neither adds a
-partition idea: both carry the owner's 2026-09-22 lifecycle ruling on idea `000236`, which arrived
+The later splits take the plan to **eighteen**, above the partition-time range. None adds a
+partition idea: `phase-idg-13` to `phase-idg-18` carry the owner's 2026-09-22 lifecycle ruling on idea `000236`, which arrived
 after the partition and was first folded into `phase-idg-01`, then split out because it doubled that
-phase's scope while its `session_budget` stayed at one.
+phase's scope while its `session_budget` stayed at one. Five of the six are the backfill, divided
+by date because one session cannot read the findings of roughly 420 ideas.
 
 ## Execution order and real concurrency
 
-`phase-idg-01` is a genuine bottleneck: five phases depend on it directly or transitively, and it is
-the only phase touching `schemas/idea.schema.json`. Nothing in `G01` can start beside it.
+`phase-idg-01` is a genuine bottleneck: eleven phases depend on it directly or transitively, and
+every other phase touching `schemas/idea.schema.json` (`phase-idg-04`, `phase-idg-14`) depends on it.
+Nothing in `G01` can start beside it.
 
 Five phases declare `depends_on: []`, but not all five clear each other. `phase-idg-08`,
 `phase-idg-10` and `phase-idg-11` all declare `sys-gov-docs` and collide with each other on that
@@ -214,8 +224,9 @@ now declared on `phase-idg-01`, no three of the five clear each other. The disjo
 two: `phase-idg-01` with `phase-idg-08`, or `phase-idg-06` with `phase-idg-11`.
 
 After `phase-idg-01` lands, `G01` serialises hard: `-02` before `-03`, `-02` before `-05`, and `-04`
-before `-07`, and `-14` before `-13`. The critical path is four deep: `01` → `02` → `03`, with `01` → `04` → `07` the same
-length.
+before `-07`, and `-14` before each backfill batch (`-13`, `-15` to `-18`). The five batches share
+`_data/ideas.jsonl`, so they run one at a time, in any order. The critical path is four deep: `01` →
+`02` → `03`, with `01` → `04` → `07` the same length.
 
 ## Requirement coverage
 
@@ -243,7 +254,7 @@ Every row of `REQ-014` maps to at least one phase, and every phase carries at le
 | R18 Where a promoted draft lives before it earns a code | `phase-idg-11` |
 | R19 A planner agent that drafts and does not decide | `phase-idg-12` |
 | R20 A drafted plan is conformant to the standard | `phase-idg-12` |
-| R21 Shipped ideas backfilled into terminal states, `000099`/`000129` reversed | `phase-idg-13` |
+| R21 Shipped ideas backfilled into terminal states, `000099`/`000129` reversed | `phase-idg-13`, `phase-idg-15`, `phase-idg-16`, `phase-idg-17`, `phase-idg-18` |
 | R22 Agent-written closes marked, verified and ratified | `phase-idg-14` |
 
 ## Key references
