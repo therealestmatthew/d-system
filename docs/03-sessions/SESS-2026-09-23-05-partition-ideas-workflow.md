@@ -20,193 +20,92 @@ depends_on: [doc-repeatable-idea-partition]
 
 ## Verification
 
-The phase's verification runs in two parts. By the owner's ruling, the dry run happens after the
-merge, because the skill is only listed once it is on dev and its subagents run in the primary
-checkout. The checks that can run on the branch have run:
+Run on the branch before the merge, then as a dry run and a full sweep in the primary checkout after
+it. By the owner's ruling, that later run happened only once the skill was on dev. Commands below
+were re-run at close in the worktree, on dev `8ad9861`.
 
-- `uv run python -m src.governance`:
-
-  ```text
-  Governance OK: 35 systems, 326 documents, 30 memories, 293 backlog phases
-  ```
-
-- `uv run python tools/generate_agent_workflows.py --check`: `16 workflow adapter(s) current`.
-  `uv run pytest test/test_agent_workflows.py`: `20 passed, 2 warnings`. Full suite: `871 passed,
-  1 skipped, 2 warnings`.
-- **Read the skill body for any brief it quotes rather than dispatches.** The body contains no
-  prompt text. Every dispatch goes through one extraction command that prints a pack section's
-  fenced block from `PROMPT-034`, and the coordinator sends that output as the whole prompt.
-- **Confirm the body names both R1 and R4 as dispatches ahead of GATE 1.** Step 3, "The analysts —
-  `R1` and `R4`, concurrently", dispatches both in the same turn, before `## GATE 1`.
-- **The R1 prompt against `PROMPT-034:112-182`.** The skill's extraction command, run on the
-  branch, reproduces the pack text exactly: `diff <(sed -n '117,178p' PROMPT-034...) <extracted R1>`
-  and the same for R4 (`193,251p`) both print nothing. (Lines 117-178 are the R1 block's contents
-  inside its fence, within the cited 112-182 range.) The post-merge dry run repeats this against
-  the prompt actually dispatched, which the skill saves to `dispatch-R1.txt`.
-- **Structured record and same-day naming.** The owner ruled that these are verified by running
-  the skill's own step-5 snippets, extracted from the generated `SKILL.md`, on a hand-made partition
-  in the session scratchpad:
-
-  ```text
-  == naming, no earlier file
-  docs/00-working/idea-partition-2026-09-23.md
-  docs/00-working/idea-partition-2026-09-23.json
-  == check, matching pair
-  0 problem(s)
-  exit=0
-  == naming, same corpus date already present
-  docs/00-working/idea-partition-2026-09-23-2.md
-  docs/00-working/idea-partition-2026-09-23-2.json
-  == naming, -2 also present
-  docs/00-working/idea-partition-2026-09-23-3.md
-  docs/00-working/idea-partition-2026-09-23-3.json
-  == check, record drops 000102
-  FAIL missing from the record: 000102
-  FAIL in the markdown, not the record: 000102
-  2 problem(s)
-  exit=1
-  == check, markdown disagrees (000102 -> 000109)
-  FAIL in the record, not the markdown: 000102
-  FAIL record names docs/00-working/idea-partition-2026-09-23.md, not bad2.md
-  2 problem(s)
-  exit=1
-  == check, schema violation
-  FAIL schema: state: 'done' is not one of ['proposed', 'accepted']
-  1 problem(s)
-  exit=1
-  ```
-
-- **Resume-or-start and moving earlier files aside**, exercised the same way on a scratch copy of
-  the primary checkout's `_working/idea-corpus/` (the 2026-09-13 set):
-
-  ```text
-  == decide (the 2026-09-13 set)
-  NEW: the manifest in place (no stamped output) belongs to an earlier sweep
-  == move aside
-  left: [] moved: 10 files
-  == decide (stamped report for this manifest)
-  RESUME: corpus built 2026-09-13, size 152, seed 1976391957
-  already done: report-R1.md
-  == read
-  corpus_size: 152 | status: triaged | seed: 1976391957 | corpus date: 2026-09-13
-  == move with a name already in the target
-  moved manifest.json -> previous-2026-09-13/manifest-2.json
-  moved corpus-R4.md -> previous-2026-09-13/corpus-R4-2.md
-  ```
-
-**Not yet run — the post-merge dry run** (a `dryrun` turn in the primary checkout): invoke
-`/partition-ideas` and stop at GATE 1, recording the open-set output, the manifest's corpus size
-and the report path; hash `_data/ideas.jsonl` before and after; diff `dispatch-R1.txt` against the
-pack; re-invoke after abandoning at GATE 1 and confirm it reports the existing report and
-dispatches nothing already done.
-
-**Dry run, attempt 1 (2026-09-23T05:52Z, `dryrun` turn granted at dev `2bdbf83`) — stopped at the
-open-set gate.** `/partition-ideas` was listed and invoked in the primary checkout. Preflight:
-`Governance OK: 35 systems, 334 documents, 31 memories, 293 backlog phases`. Step 1 printed:
-
-```text
-open ideas: 2
-  000351 | Regenerate docs/08-governance/catalog.md only at merge time, not on every claim and completion commit, so open branches stop conflicting on it
-  000352 | No backlog phase builds the orchestrator's unit graph, which runs backlog phases through claim, build and integration
-```
-
-The skill stopped there, as step 1 requires, to ask the owner whether to triage first or partition
-without those ideas. The owner was asleep and the ruling is theirs, so the item was **PARKed**.
-Nothing was built, moved or dispatched: `_working/idea-corpus/` still holds the 2026-09-13 set
-unmoved, `sha256sum -c` on `_data/ideas.jsonl` printed `OK`, and `git status` in the primary
-checkout was clean at `2bdbf83`. This run is the evidence for the open-set halt condition. The
-GATE-1 conditions still need a second run once the open set is empty or the owner has ruled.
-
-**Dry run, attempt 2 (2026-09-23T05:54Z-06:05Z, `dryrun` turn granted at dev `806d3e2`) — reached
-GATE 1 and stopped.** Ideation's routine triage had moved `000351` and `000352` out of open.
-
-- Preflight: `Governance OK: 35 systems, 334 documents, 31 memories, 293 backlog phases`. Stated
-  estimate: about 25 minutes, raised to about 45 once the corpus size was known. Actual time to
-  GATE 1 was 11 minutes.
-- Step 1: `open ideas: 0`. The open set was empty.
-- Step 2: `NEW: the manifest in place (no stamped output) belongs to an earlier sweep`. It moved all
-  ten 2026-09-13 files (`manifest.json`, `corpus-R1..R4.md`, `report-R1..R4.md`,
-  `audit-1-findings.md`) into `previous-2026-09-13/`, and deleted nothing. Corpus built:
-  `corpus size: 325 (of 331 triaged)`, `excluded by the fast lane: 6`, `shuffle seed: 656057328`.
-  Manifest read: `corpus_size: 325 | status: triaged | seed: 656057328 | corpus date: 2026-09-23`.
-- Dispatch text: `dispatch-R1.txt` and `dispatch-R4.txt` saved by the extraction command. Both diff
-  empty against `PROMPT-034` lines 117-178 and 193-251. R1 and R4 went in the same turn to
-  general-purpose agents on sonnet, with the saved text as the whole prompt. Two dispatches, none
-  resumed, none above sonnet.
-- **R4:** the harness refused its write of `report-R4.md`, as idea `000206` records, and it
-  returned the report as text. The coordinator wrote `report-R4.md` (25,431 bytes) as the run stamp
-  followed by the returned text, taken byte-exact from the hand-back rather than retyped. The report
-  was complete, with every required section, so no resume was needed.
-- **R1 — departure.** When its report write was refused, R1 **wrote the report itself through a
-  Bash heredoc**. It also wrote a working file, `condensed.md` (411,970 bytes). Both are in the
-  gitignored `_working/idea-corpus/`, and nothing tracked changed. `report-R1.md` (42,360 bytes)
-  carries no run stamp, so by the workflow's own rule it is not this sweep's report. The
-  coordinator left both files as R1 wrote them. It did not stamp, move or re-dispatch R1, because
-  how to treat that output is a decision for the owner. The workflow's premise that "subagents
-  cannot write report files" holds for the Write tool only: an analyst with Bash can go around it,
-  and the pack's own "Write your report to ..." invites it to. Recorded as idea `000354`.
-- Resume check: step 2's classification, re-run after the reports, printed `RESUME: corpus built
-  2026-09-23, size 325, seed 656057328` and `already done: report-R4.md`. It moved nothing, since
-  RESUME exits before the move. It does not count the unstamped `report-R1.md` as done, so a real
-  re-invocation would dispatch R1 again and overwrite R1's own file when writing the report.
-- `sha256sum -c` on `_data/ideas.jsonl`: `OK`, unchanged. Primary checkout `git status` clean at
-  `806d3e2`.
+- **Invoke `/partition-ideas` and stop at GATE 1; record the open-set output, the corpus size and
+  the report path.** Done three times. Dry run attempt 1 (dev `2bdbf83`) printed `open ideas: 2`
+  (`000351`, `000352`) and stopped. Attempt 2 (dev `806d3e2`) reached GATE 1 on a 325-idea corpus.
+  The fresh sweep (dev `f1b891d`) printed `open ideas: 0` and `NEW: no manifest`, then built
+  `corpus_size: 383 | status: triaged | seed: 1370316527 | corpus date: 2026-09-23`, and wrote
+  `_working/idea-corpus/report-R1.md` and `report-R4.md`. It then continued, by the owner's
+  rulings, through GATE 2, synthesis, step 6, A2, the gate checklist and GATE 3. The sections after
+  `## Resume state` carry each run's detail.
+- **Attempt 2's analyst departure, kept as evidence.** On general-purpose agents, R4's report write
+  was refused and R4 returned its report as text. R1 wrote its own report and a 411,970-byte
+  `condensed.md` through a Bash heredoc, so "subagents cannot write report files" held only for the
+  Write tool (idea `000354`). The owner's option C fixed this with the read-only `partition-analyst`
+  type. In the fresh sweep no analyst or auditor wrote a file. Attempt 2's files are in
+  `_working/idea-corpus/previous-2026-09-23-seed-656057328/`.
+- **Hash `_data/ideas.jsonl` before and after.** Attempts 1 and 2: `sha256sum -c` printed `OK`.
+  Fresh sweep: `3b9d0ce0…` after triage and at GATE 1; `b3e94944…` from the start of the R1 re-run
+  turn through GATE 3 and at close. The change between them is Ideation's triage commits on dev,
+  not this sweep.
+- **Read the skill body for any brief it quotes rather than dispatches.** The body holds no prompt
+  text. Every dispatch goes through the one extraction command.
+- **Diff the R1 prompt actually dispatched against `PROMPT-034`.** Re-run now against the GATE 1
+  dispatch, which was moved aside when R1 was re-run:
+  `diff <(sed -n '117,178p' PROMPT-034…) superseded-R1-2026-09-23-carryforward/dispatch-R1.txt`
+  gives `exit 0`, empty. The same for `dispatch-R4.txt` (lines 193-251) and `dispatch-A1.txt` (the
+  A1 block): `exit 0`. The R1 re-run's and A2's saved dispatches differ from the pack only by the
+  owner-ordered paragraph each carries (`62a63,68` and `35a36,39`), recorded as deviations below.
+- **The body names both R1 and R4 ahead of GATE 1.** Step 3 dispatches both in the same turn, and
+  the fresh sweep did.
+- **Re-invoke after abandoning at GATE 1: it reports the existing reports and dispatches nothing
+  already done.** On re-entry at dev `99bf868` the classifier printed `RESUME: corpus built
+  2026-09-23, size 383, seed 1370316527` and `already done: report-R1.md, report-R4.md`, and
+  rebuilt nothing. R1 was dispatched again only because the owner ordered a re-run after its first
+  report was moved aside.
+- `uv run python -m src.governance`: `Governance OK: 35 systems, 338 documents, 32 memories, 294
+  backlog phases`, exit 0.
+- Also at close: `uv run python tools/generate_agent_workflows.py --check` gives `16 workflow
+  adapter(s) current`. `uv run pytest -q` gives `1029 passed, 1 skipped, 1 warning`.
+  `uv run ruff check src/ test/` gives `All checks passed!`. `uv run mypy src/` gives `Success: no
+  issues found in 45 source files`. Every run file in `_working/idea-corpus/` starts with the stamp
+  `<!-- partition-ideas: seed=1370316527 corpus_size=383 status=triaged -->`.
 
 ## Acceptance
 
-- Listed as a skill and runs to GATE 1 against the live corpus — **Met** by dry run attempt 2.
-- With at least one open idea, prints the ids and halts before the first dispatch — **Met** by dry
-  run attempt 1: it printed `000351` and `000352` and halted, with nothing built or dispatched.
-- Every dispatch matches its PROMPT-034 section character for character — **Met.** In attempt 2,
-  `dispatch-R1.txt` and `dispatch-R4.txt` diff empty against the pack.
-- One analyst report at `_working/idea-corpus/`, written by the coordinator — **Met for R4**
-  (`report-R4.md`, stamped). R1 wrote its own unstamped report through Bash, and that is left for
-  the owner's ruling; see attempt 2.
-- Moves no idea status, marks no phase complete, stops at all three gates — **Met by reading.** The
-  skill has no idea-log writer, no backlog edit, and an explicit stop at GATE 1, GATE 2 and GATE 3,
-  plus the owner-ruled stop before A2.
-- `_data/ideas.jsonl` unchanged by the dry run — **Met.** `sha256sum -c` printed `OK` after both
-  attempts.
-- R06, R11, R13, R05's empty-set branch and R14's GATE 2/GATE 3 halts are not exercised here — as
-  the phase states.
-- The structured record validates, and its tracks and ids agree with the markdown — **Met by
-  fixture** (above), per the owner's ruling.
-- Same-day re-invocation refuses or suffixes — **Met by fixture** (`-2`, then `-3`).
+- Listed as a skill and runs to GATE 1 against the live corpus — **Met** (attempt 2 and the fresh
+  sweep).
+- With at least one open idea, prints the ids and halts before the first dispatch — **Met**
+  (attempt 1).
+- Every dispatch matches its PROMPT-034 section character for character — **Met** for every
+  dispatch the skill made (R1 and R4 at GATE 1, A1). Two later dispatches carried a paragraph the
+  owner ordered added: the R1 re-run and A2. Both are recorded verbatim as deviations. R1 and R4 go
+  to `partition-analyst` rather than the pack's general-purpose agent, by the owner's earlier
+  ruling (option C).
+- One analyst report exists and was written by the coordinator, not the subagent — **Met.** In the
+  fresh sweep the coordinator wrote `report-R1.md` and `report-R4.md` from the analysts'
+  hand-backs. The directory listings before and after each dispatch show no file written by an
+  analyst or auditor.
+- Moves no idea status, marks no phase complete, stops at all three gates — **Met by run.** It
+  stopped at GATE 1, GATE 2, step 6 and GATE 3, and each continuation came from the owner.
+- `_data/ideas.jsonl` unchanged by the dry run — **Met** (hashes above).
+- R06, R11, R13, R05's empty-set branch and R14's GATE 2/GATE 3 halts are not required here — as
+  the phase states. The fresh sweep did exercise R05's empty-set branch and the GATE 2 and GATE 3
+  halts.
+- The structured record validates and agrees with the markdown — **Met by run.** The step 5 check
+  on `docs/00-working/idea-partition-2026-09-23.{md,json}` gives `0 problem(s)`. It passed before
+  audit 2, after its fixes, and after the GATE 3 rulings.
+- Same-day re-invocation refuses or suffixes — **Met by fixture** (`-2`, then `-3`). The sweep's
+  own naming found no earlier file for 2026-09-23.
 
 ## Backlog
 
 `status: active`, `agent: agent-builder-b`, `session: doc-session-partition-ideas-workflow`.
-`next_action`: Branch work done; after the owner-approved merge, run the dry run to GATE 1 in a
-`dryrun` turn and record its evidence here before the completion edit.
+`next_action`: Dry run and full sweep done, evidence in SESS-2026-09-23-05. Waiting for the
+owner-approved merge of the session record and the accepted partition, then the completion edit
+on dev.
 
 ## Unresolved
 
-- **Ruled: option C (owner, morning of 2026-09-23; see `## Decisions`). The fix is merged; the R1
-  re-run is pending.** Originally PARKED for the owner (Session Manager ruling, 2026-09-23
-  overnight): how to treat R1's
-  self-written output. In dry run attempt 2, R1 went around the harness refusal of its report
-  write through Bash. It left `report-R1.md` (unstamped) and `condensed.md` in
-  `_working/idea-corpus/`, and both are untouched. Under the overnight authority (§3), a block that
-  something went around goes to the owner. It also bears on this phase's deliverable, the
-  workflow's own safety. The completion edit waits, the claim is kept, the branch stays pushed, and
-  when the owner rules the evidence commits reach dev through READY. Options:
-  - **A. Adopt R1's output.** The coordinator prepends the run stamp to `report-R1.md`, the record
-    notes that R1 wrote the file itself, and the phase completes on the existing evidence.
-    Cheapest, and the content is R1's real report. It does accept a report the coordinator did not
-    write.
-  - **B. Discard and re-run R1 as it stands.** Move both files into a `previous-` folder (move,
-    never delete) and dispatch R1 again, the coordinator writing the returned text. About 10
-    minutes of sonnet. Nothing stops R1 from going around the refusal again.
-  - **C. Fix the dispatch first, then re-run R1 (recommended).** Move both files aside, stop
-    analysts from writing files, then re-run R1 under option B. Two ways to stop them: dispatch R1
-    and R4 to a read-only agent type, or amend `PROMPT-034`'s "Write your report to ..." line (idea
-    `000354`). This is the only option that makes the workflow's "the coordinator writes
-    every report" premise hold. It is new work beyond this phase's approved scope, so it needs the
-    owner's approval.
-  - **Other:** the owner's own ruling.
-- The dry run's evidence, listed above.
-- A2 cannot read the synthesis draft as the pack is written; the skill stops before A2 by the
-  owner's ruling. Recorded as idea `000339`.
+- The completion edit waits for the owner-approved merge (GOV-003's condition 3).
+- The four declines the owner ruled at GATE 3 (`000102`, `000282`, `000086`, `000140`) are not
+  written to `_data/ideas.jsonl`. That is a separate, owner-directed action.
+- Five observations from this sweep were sent to Ideation as ideas rather than fixed here (see
+  `## Left undone`).
 
 ## Decisions
 
@@ -250,6 +149,20 @@ Owner rulings from this session. Each changed what was built.
   models, which reach 1M only through that suffix. The R1 re-run is the practical check: a report
   that covers every corpus id shows the whole file was read.
 
+- **Fresh sweep, not the resume (2026-09-23, before the restart).** The open ideas were triaged
+  first, and a new sweep ran on a fresh corpus with both analysts on `partition-analyst`. Last
+  night's files were moved aside by hand into `previous-2026-09-23-seed-656057328/`.
+- **GATE 1: re-run R1 (settled 2026-09-23).** R1's first report carried the 2026-09-13 partition
+  forward for 121 ideas and partitioned only 209. The owner first answered "Stop the sweep here" in
+  this session, while the Session Manager relayed "re-run R1". The agent acted on neither until the
+  owner settled it: "Re-run R1, then audit 1". The re-run's dispatch appended one paragraph
+  requiring all 383 ideas to be placed, with nothing carried forward.
+- **GATE 2: proceed to synthesis.**
+- **Step 6: add the worktree path to A2's dispatch**, rather than copying the draft into the
+  primary checkout or merging it first.
+- **GATE 3: accepted.** Declined `000102`, `000282`, `000086` and `000140`. Held ten ideas out of
+  the partition without declining them.
+
 ## Corrections
 
 - **Heredoc terminator collision (2026-09-23).** A skill edit passed through `python3 - <<'EOF'`
@@ -275,6 +188,40 @@ Owner rulings from this session. Each changed what was built.
   the same session. The resume state was corrected. At the owner's direction this is recorded as
   the brain procedure `mem-proc-verify-a-cause-before-you-report-it` (branch
   `agent/verify-cause-procedure`).
+
+- **"Parked" used for two things (2026-09-23).** In the GATE 3 question the agent wrote "unticked
+  stays parked" to mean "not declined, stays in its group". The owner read it as "left out of this
+  analysis", and that was their intention. Two of their answers came back as "No preference" and
+  one as a question. The agent explained the difference and asked again. The owner then ruled that
+  ten ideas are held out of the partition. Nothing had been applied from the first reading.
+- **Basis lines that misstated their origin (2026-09-23).** Audit 2 found synthesis Basis lines
+  that credited the wrong analyst with a group or called a group "agree" when one analyst held it
+  inside a larger one. Every Basis line was then checked mechanically against both parsed reports
+  and corrected. While editing, three groups briefly lost their size field; the generator's field
+  check caught it before anything was written.
+
+- **UTC dates in a local-date record (2026-09-23).** The later sections were first dated
+  2026-09-24, the UTC date, while the repository dates by local time (EDT). The governance check
+  refused `updated: '2026-09-24'` (`require created <= updated <= today`). Dates were corrected to
+  2026-09-23. The one exception is A2's added paragraph, quoted above exactly as it was sent. Times
+  written with a `Z` are UTC.
+
+## Left undone
+
+- **The completion edit.** It waits for the owner-approved merge, per GOV-003.
+- **Recording the four GATE 3 declines in `_data/ideas.jsonl`.** The workflow never writes the
+  idea log. The owner directs that separately.
+- **Observations sent to Ideation as ideas, not fixed here.**
+  - The R1 re-run went over the 64,000-token output limit on a 383-idea corpus and needed nine
+    requests to return its report. The pack has no instruction for returning a report in parts.
+  - `PROMPT-034`'s opening line, "do only what is missing; report what already existed", led the
+    first R1 to carry an earlier partition forward instead of partitioning.
+  - Step 5's check does not test that a group's Basis claim matches the reports. That was audit
+    2's main finding here.
+  - The skill has no provision for an owner ruling that holds an idea out of a partition without
+    declining it. It was recorded as an unbatched reason.
+  - Owner-facing questions should not use "parked" for "not declined", because ADR-010 already uses
+    "parked" for every captured idea.
 
 ## Review
 
@@ -485,7 +432,7 @@ estimate of 20 minutes.
 
 The sweep stopped at GATE 1. The owner decides whether audit 1 proceeds.
 
-## R1 re-run and audit 1, to GATE 2 (2026-09-24, dry run at dev `99bf868`)
+## R1 re-run and audit 1, to GATE 2 (2026-09-23, dry run at dev `99bf868`)
 
 At GATE 1 the owner first answered "Stop the sweep here" in this session, and the Session Manager
 relayed "re-run R1" from its own session. Nothing was done until the owner settled it, which they
@@ -534,7 +481,7 @@ did in both sessions: "Re-run R1, then audit 1" stands. Run inside a granted
 
 The sweep stopped at GATE 2. The owner decides whether synthesis proceeds.
 
-## Synthesis, audit 2 and the gate checklist, to GATE 3 (2026-09-24)
+## Synthesis, audit 2 and the gate checklist, to GATE 3 (2026-09-23)
 
 At GATE 2 the owner answered "Proceed to synthesis" in this session.
 
@@ -584,7 +531,7 @@ At GATE 2 the owner answered "Proceed to synthesis" in this session.
 
 The sweep stopped at GATE 3 for the owner's ruling on the partition and on each decline candidate.
 
-## GATE 3 (2026-09-24)
+## GATE 3 (2026-09-23)
 
 Asked in this session with AskUserQuestion. The owner answered "Accept as proposed" and declined
 `000102`, `000282`, `000086` and `000140`. The other eight candidates came back as "No

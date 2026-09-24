@@ -3,7 +3,7 @@
 # Idea partition, 2026-09-23 corpus
 
 - **Corpus:** 383 ideas, status filter `triaged`, manifest seed `1370316527`, corpus date 2026-09-23 (`_working/idea-corpus/manifest.json`).
-- **State:** accepted by the owner at GATE 3, 2026-09-24, with the rulings recorded under *GATE 3 rulings*.
+- **State:** accepted by the owner at GATE 3, 2026-09-23, with the rulings recorded under *GATE 3 rulings*.
 - **Built from:** `report-R1.md` (the owner-ordered re-run, which read the triage findings), `report-R4.md` (the control, which did not) and `audit-1-findings.md`, following `PROMPT-034` section S.
 - **Record:** `docs/00-working/idea-partition-2026-09-23.json` carries the same tracks, groups and ids.
 
@@ -928,7 +928,7 @@ R1 and R4 hold the same set of ideas in 23 fine groups; 18 of them stand unchang
 
 ## GATE 3 rulings
 
-The owner accepted the partition on 2026-09-24 and ruled on every decline candidate:
+The owner accepted the partition on 2026-09-23 and ruled on every decline candidate:
 
 - **Declined:** 000102, 000282, 000086, 000140. They stay in their groups here; recording the decline in `_data/ideas.jsonl` is a separate, owner-directed step.
 - **Held out of this partition, not declined:** 000015, 000016, 000017, 000089, 000122, 000146, 000205, 000255, 000256, 000290. Each moved to the unbatched section; groups left empty were removed (master data management, public presence, the non-web rebuild evaluation, the session-record correction convention).
@@ -939,16 +939,16 @@ The owner accepted the partition on 2026-09-24 and ruled on every decline candid
 
 - **000013** — R1: could land in agent engineering (command boundary), governance process, or standalone, with no argument for one strong enough to state. R4 placed it as a singleton. It is carried forward unbatched: it belongs with whichever track picks it up.
 - **000068** — R1: its action (mine research/ for new ideas) is idea-system work and its motivation (feed the knowledge-architecture set) is retrieval work. R4 placed it as a standalone singleton. Carried forward unbatched for whichever group claims it.
-- **000015** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000016** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000017** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000089** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000122** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000146** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000205** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000255** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000256** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
-- **000290** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-24. Not declined: its idea-log status is unchanged.
+- **000015** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000016** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000017** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000089** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000122** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000146** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000205** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000255** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000256** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
+- **000290** — Held out of this partition by the owner's GATE 3 ruling, 2026-09-23. Not declined: its idea-log status is unchanged.
 
 ## Decline candidates
 

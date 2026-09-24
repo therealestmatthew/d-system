@@ -7583,8 +7583,9 @@ items:
   - .agents/skills/partition-ideas/SKILL.md
   - schemas/idea-partition-record.schema.json
   - .claude/agents/partition-analyst.md
-  next_action: Branch work done; after the owner-approved merge, run the dry run to GATE 1
-    in a dryrun turn and record its evidence in SESS-2026-09-23-05 before the completion edit.
+  next_action: Dry run and full sweep done, evidence in SESS-2026-09-23-05. Waiting for the
+    owner-approved merge of the session record and the accepted partition, then the completion
+    edit on dev.
   session: doc-session-partition-ideas-workflow
 - id: phase-prog-01
   title: Finalize the concurrency, git safety and enforcement plan (P3)
