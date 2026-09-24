@@ -1,0 +1,1007 @@
+{
+  "schema_version": 1,
+  "corpus_date": "2026-09-23",
+  "markdown": "docs/00-working/idea-partition-2026-09-23.md",
+  "manifest": {
+    "corpus_size": 383,
+    "status": [
+      "triaged"
+    ],
+    "shuffle_seed": 1370316527
+  },
+  "state": "proposed",
+  "tracks": [
+    {
+      "name": "Idea system and knowledge retrieval",
+      "groups": [
+        {
+          "name": "Idea ontology, tags, link vocabulary and lifecycle status",
+          "ideas": [
+            "000018",
+            "000053",
+            "000055",
+            "000061",
+            "000062",
+            "000064",
+            "000065",
+            "000204",
+            "000236",
+            "000268",
+            "000313",
+            "000366",
+            "000367"
+          ]
+        },
+        {
+          "name": "Idea management umbrella, metrics and capture delegation",
+          "ideas": [
+            "000008",
+            "000010",
+            "000050",
+            "000071",
+            "000127"
+          ]
+        },
+        {
+          "name": "Idea planner and scribe agents, and the requirements-versus-plans process",
+          "ideas": [
+            "000038",
+            "000046",
+            "000047",
+            "000048",
+            "000049"
+          ]
+        },
+        {
+          "name": "Partition process: pack reliability, harness constraints and thresholds",
+          "ideas": [
+            "000125",
+            "000157",
+            "000205",
+            "000206",
+            "000243",
+            "000244",
+            "000339",
+            "000354",
+            "000388",
+            "000395",
+            "000407"
+          ]
+        },
+        {
+          "name": "Explorer pages decision and build",
+          "ideas": [
+            "000042",
+            "000299",
+            "000300",
+            "000301",
+            "000302",
+            "000303",
+            "000304"
+          ]
+        },
+        {
+          "name": "The /idea workflow's unnamed temp-file location",
+          "ideas": [
+            "000305"
+          ]
+        },
+        {
+          "name": "Retrieval mechanisms",
+          "ideas": [
+            "000002",
+            "000004",
+            "000005",
+            "000040",
+            "000043",
+            "000044",
+            "000045"
+          ]
+        },
+        {
+          "name": "Knowledge-base architecture",
+          "ideas": [
+            "000060",
+            "000161",
+            "000162",
+            "000163",
+            "000164",
+            "000167"
+          ]
+        },
+        {
+          "name": "Provenance graph and recommendation calibration",
+          "ideas": [
+            "000032",
+            "000036"
+          ]
+        },
+        {
+          "name": "Temporal projection explorer",
+          "ideas": [
+            "000033"
+          ]
+        },
+        {
+          "name": "Portfolio scenario simulator",
+          "ideas": [
+            "000034"
+          ]
+        },
+        {
+          "name": "Routing brain procedures into the sessions that need them",
+          "ideas": [
+            "000216"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Agent engineering and review",
+      "groups": [
+        {
+          "name": "Agent-engineering framework",
+          "ideas": [
+            "000078",
+            "000079",
+            "000080",
+            "000081",
+            "000082"
+          ]
+        },
+        {
+          "name": "Lifecycle agent roster and deliberation trio",
+          "ideas": [
+            "000072",
+            "000073",
+            "000074",
+            "000075"
+          ]
+        },
+        {
+          "name": "Anti-pattern tracking and delegation scoping",
+          "ideas": [
+            "000097",
+            "000136",
+            "000138",
+            "000139"
+          ]
+        },
+        {
+          "name": "Ephemeral purpose-built agents",
+          "ideas": [
+            "000169"
+          ]
+        },
+        {
+          "name": "Subagent truncation handling",
+          "ideas": [
+            "000077"
+          ]
+        },
+        {
+          "name": "Observability and telemetry",
+          "ideas": [
+            "000054"
+          ]
+        },
+        {
+          "name": "Review independence and model assignment",
+          "ideas": [
+            "000215",
+            "000241",
+            "000396",
+            "000397"
+          ]
+        },
+        {
+          "name": "Independent adversarial session review",
+          "ideas": [
+            "000009"
+          ]
+        },
+        {
+          "name": "Harness guardrails: hooks, settings and preflight",
+          "ideas": [
+            "000012",
+            "000014",
+            "000051",
+            "000346"
+          ]
+        },
+        {
+          "name": "Background-dispatch worktree hang",
+          "ideas": [
+            "000196"
+          ]
+        },
+        {
+          "name": "Commands, skills and agents audit",
+          "ideas": [
+            "000126"
+          ]
+        },
+        {
+          "name": "Provider portability of agent definitions",
+          "ideas": [
+            "000069",
+            "000306"
+          ]
+        },
+        {
+          "name": "Repo tracker and multi-repo memory agent",
+          "ideas": [
+            "000086"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "MCP mediation and autonomous operations",
+      "groups": [
+        {
+          "name": "MCP-mediated access, enforcement harness and migration",
+          "ideas": [
+            "000020",
+            "000151",
+            "000156",
+            "000159",
+            "000160",
+            "000165",
+            "000166"
+          ]
+        },
+        {
+          "name": "Capability broker and its denial taxonomy",
+          "ideas": [
+            "000031",
+            "000326",
+            "000333"
+          ]
+        },
+        {
+          "name": "Trigger gateway, run ledger and worker host",
+          "ideas": [
+            "000028",
+            "000029",
+            "000030",
+            "000349"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Idea realization and multi-session coordination",
+      "groups": [
+        {
+          "name": "Realization system formalization and daemon reach",
+          "ideas": [
+            "000247",
+            "000248",
+            "000249",
+            "000250"
+          ]
+        },
+        {
+          "name": "Queued-phase review defects",
+          "ideas": [
+            "000251",
+            "000252",
+            "000253",
+            "000254"
+          ]
+        },
+        {
+          "name": "Orchestrator code defects",
+          "ideas": [
+            "000338",
+            "000348",
+            "000350",
+            "000352",
+            "000355",
+            "000356"
+          ]
+        },
+        {
+          "name": "Session Manager roster, state and messaging",
+          "ideas": [
+            "000128",
+            "000319",
+            "000320",
+            "000327",
+            "000328",
+            "000332",
+            "000334",
+            "000340",
+            "000347",
+            "000358",
+            "000359",
+            "000369",
+            "000370",
+            "000389",
+            "000391",
+            "000404"
+          ]
+        },
+        {
+          "name": "Orchestration shape and assurance: the 000385 anchor's design questions",
+          "ideas": [
+            "000385",
+            "000386",
+            "000387",
+            "000392",
+            "000393"
+          ]
+        },
+        {
+          "name": "Batch and wave coordination packs",
+          "ideas": [
+            "000235",
+            "000316"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Concurrency, claims, backlog and git safety",
+      "groups": [
+        {
+          "name": "Abandoned-claim recovery and clobbering prevention",
+          "ideas": [
+            "000025",
+            "000041"
+          ]
+        },
+        {
+          "name": "Worktree registry and responsibility inventory",
+          "ideas": [
+            "000152",
+            "000168",
+            "000368",
+            "000390"
+          ]
+        },
+        {
+          "name": "Hand-off protocol drift",
+          "ideas": [
+            "000153",
+            "000154"
+          ]
+        },
+        {
+          "name": "Identifier-allocation collisions",
+          "ideas": [
+            "000158",
+            "000283",
+            "000318"
+          ]
+        },
+        {
+          "name": "Multi-machine and multi-developer claims",
+          "ideas": [
+            "000280",
+            "000288"
+          ]
+        },
+        {
+          "name": "Long-lived shared branches versus the claim protocol",
+          "ideas": [
+            "000217",
+            "000285"
+          ]
+        },
+        {
+          "name": "Lock-check blind spots and declared-path enforcement",
+          "ideas": [
+            "000027",
+            "000239",
+            "000242",
+            "000245",
+            "000321",
+            "000322",
+            "000336",
+            "000398"
+          ]
+        },
+        {
+          "name": "System decomposition for false mutexes",
+          "ideas": [
+            "000234",
+            "000284"
+          ]
+        },
+        {
+          "name": "Backlog file shape and write safety",
+          "ideas": [
+            "000037",
+            "000224",
+            "000240"
+          ]
+        },
+        {
+          "name": "Backlog review and re-prioritisation recipe",
+          "ideas": [
+            "000011"
+          ]
+        },
+        {
+          "name": "Phase versus claim-free fix branch rule",
+          "ideas": [
+            "000403"
+          ]
+        },
+        {
+          "name": "Branch protection and push-rule wording",
+          "ideas": [
+            "000066",
+            "000091"
+          ]
+        },
+        {
+          "name": "Repository resilience and git tooling",
+          "ideas": [
+            "000021",
+            "000058",
+            "000059"
+          ]
+        },
+        {
+          "name": "Accepted follow-ups from the 2026-09-19 reviews",
+          "ideas": [
+            "000286"
+          ]
+        },
+        {
+          "name": "phase-mem-01's missing deliverable path",
+          "ideas": [
+            "000323"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Governance checks, document hygiene and the portable framework",
+      "groups": [
+        {
+          "name": "Catalog print-versus-write and stdout contamination",
+          "ideas": [
+            "000155",
+            "000198",
+            "000208",
+            "000324",
+            "000325",
+            "000335",
+            "000351",
+            "000353",
+            "000357",
+            "000405",
+            "000406"
+          ]
+        },
+        {
+          "name": "Generated artifacts with no drift test",
+          "ideas": [
+            "000106",
+            "000231"
+          ]
+        },
+        {
+          "name": "Private-content check silent pass",
+          "ideas": [
+            "000150",
+            "000195",
+            "000384"
+          ]
+        },
+        {
+          "name": "Schema, DDL and model drift",
+          "ideas": [
+            "000024",
+            "000035",
+            "000052",
+            "000345"
+          ]
+        },
+        {
+          "name": "Registry and requirement freshness",
+          "ideas": [
+            "000023",
+            "000341",
+            "000342"
+          ]
+        },
+        {
+          "name": "GOV-010 wording corrections",
+          "ideas": [
+            "000329",
+            "000330",
+            "000331"
+          ]
+        },
+        {
+          "name": "Glossary protocol and terminology tooling",
+          "ideas": [
+            "000371",
+            "000372",
+            "000373",
+            "000374",
+            "000375",
+            "000376",
+            "000382"
+          ]
+        },
+        {
+          "name": "Cross-document textual drift",
+          "ideas": [
+            "000298",
+            "000377",
+            "000378",
+            "000381",
+            "000383"
+          ]
+        },
+        {
+          "name": "Backlog README track-table gaps",
+          "ideas": [
+            "000379",
+            "000380"
+          ]
+        },
+        {
+          "name": "Delivery-safety gates in governance and CI",
+          "ideas": [
+            "000394",
+            "000399",
+            "000400",
+            "000401",
+            "000402",
+            "000408",
+            "000409",
+            "000410"
+          ]
+        },
+        {
+          "name": "Documentation-governance umbrella",
+          "ideas": [
+            "000056"
+          ]
+        },
+        {
+          "name": "Testing strategy and the frontend test gap",
+          "ideas": [
+            "000026",
+            "000057"
+          ]
+        },
+        {
+          "name": "Tag-category approval and confidential tags",
+          "ideas": [
+            "000337",
+            "000343"
+          ]
+        },
+        {
+          "name": "Document-code index widths",
+          "ideas": [
+            "000006"
+          ]
+        },
+        {
+          "name": "A lighter planning-methodology tier",
+          "ideas": [
+            "000145"
+          ]
+        },
+        {
+          "name": "Session-record correction convention",
+          "ideas": [
+            "000146"
+          ]
+        },
+        {
+          "name": "Checkpoint and session-close for unclaimed sessions",
+          "ideas": [
+            "000237"
+          ]
+        },
+        {
+          "name": "Session-taxonomy investigation tooling",
+          "ideas": [
+            "000291",
+            "000292",
+            "000293",
+            "000294"
+          ]
+        },
+        {
+          "name": "Portable-framework templates, schemas and starter kit",
+          "ideas": [
+            "000270",
+            "000271",
+            "000272",
+            "000273",
+            "000276",
+            "000277",
+            "000278",
+            "000279",
+            "000281",
+            "000314"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "HTML generation and design system",
+      "groups": [
+        {
+          "name": "Template, component and palette library",
+          "ideas": [
+            "000001",
+            "000083",
+            "000084",
+            "000085",
+            "000092",
+            "000093"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Workbench and demo stage",
+      "groups": [
+        {
+          "name": "Terminal stability and flag-off noise",
+          "ideas": [
+            "000087",
+            "000095",
+            "000096",
+            "000100",
+            "000137",
+            "000140",
+            "000246"
+          ]
+        },
+        {
+          "name": "Terminal persistence and performance audits",
+          "ideas": [
+            "000113",
+            "000114",
+            "000121"
+          ]
+        },
+        {
+          "name": "HTML Viewer features",
+          "ideas": [
+            "000109",
+            "000110",
+            "000118",
+            "000119",
+            "000232",
+            "000238"
+          ]
+        },
+        {
+          "name": "Bookmark categories and the panel bridge",
+          "ideas": [
+            "000111",
+            "000120"
+          ]
+        },
+        {
+          "name": "Slot and panel architecture",
+          "ideas": [
+            "000124",
+            "000133",
+            "000134",
+            "000135",
+            "000141",
+            "000233"
+          ]
+        },
+        {
+          "name": "Workbench audits: duplication, structure and plan reconciliation",
+          "ideas": [
+            "000115",
+            "000116",
+            "000123"
+          ]
+        },
+        {
+          "name": "Rotator variants",
+          "ideas": [
+            "000131",
+            "000132"
+          ]
+        },
+        {
+          "name": "Ports and processes tooling",
+          "ideas": [
+            "000142",
+            "000143",
+            "000144"
+          ]
+        },
+        {
+          "name": "Non-web rebuild evaluation",
+          "ideas": [
+            "000122"
+          ]
+        },
+        {
+          "name": "Demo-stage residuals",
+          "ideas": [
+            "000089",
+            "000102"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Literature-review campaign follow-ups",
+      "groups": [
+        {
+          "name": "Evidence-contract amendments",
+          "ideas": [
+            "000147",
+            "000148",
+            "000149",
+            "000197",
+            "000199",
+            "000200",
+            "000202",
+            "000211",
+            "000212",
+            "000213",
+            "000221",
+            "000289",
+            "000295",
+            "000307"
+          ]
+        },
+        {
+          "name": "Gate-method defects and the deterministic-gate proposal",
+          "ideas": [
+            "000201",
+            "000214",
+            "000218",
+            "000219",
+            "000220",
+            "000227",
+            "000228",
+            "000290",
+            "000297"
+          ]
+        },
+        {
+          "name": "Pre-synthesis check-in rulings",
+          "ideas": [
+            "000225",
+            "000226",
+            "000229",
+            "000230"
+          ]
+        },
+        {
+          "name": "Source identity and inventory corrections",
+          "ideas": [
+            "000203",
+            "000209",
+            "000210",
+            "000296",
+            "000308"
+          ]
+        },
+        {
+          "name": "Report-phase deliverable defects",
+          "ideas": [
+            "000309",
+            "000310",
+            "000311",
+            "000312"
+          ]
+        },
+        {
+          "name": "Post-campaign follow-through",
+          "ideas": [
+            "000287",
+            "000315",
+            "000344"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Consultant demo kit",
+      "groups": [
+        {
+          "name": "Demo-kit anchor, components, fixture and rosters",
+          "ideas": [
+            "000170",
+            "000171",
+            "000172",
+            "000173",
+            "000174",
+            "000175",
+            "000176",
+            "000177",
+            "000178",
+            "000179",
+            "000180",
+            "000181",
+            "000182",
+            "000183",
+            "000184",
+            "000185",
+            "000186",
+            "000187",
+            "000188",
+            "000189",
+            "000190",
+            "000191",
+            "000192",
+            "000193",
+            "000194",
+            "000207",
+            "000222",
+            "000223"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Organisational data model and portfolio productivity",
+      "groups": [
+        {
+          "name": "Master data management and stewardship",
+          "ideas": [
+            "000255",
+            "000256"
+          ]
+        },
+        {
+          "name": "Organisational entity model and its plan",
+          "ideas": [
+            "000257",
+            "000258",
+            "000259",
+            "000260",
+            "000261",
+            "000262",
+            "000263",
+            "000264",
+            "000265",
+            "000266",
+            "000267",
+            "000364",
+            "000365"
+          ]
+        },
+        {
+          "name": "Portfolio core-entity productivity gaps",
+          "ideas": [
+            "000022",
+            "000360",
+            "000361",
+            "000362",
+            "000363"
+          ]
+        }
+      ],
+      "disposition": null
+    },
+    {
+      "name": "Standalone items",
+      "groups": [
+        {
+          "name": "Public presence and content automation",
+          "ideas": [
+            "000015",
+            "000016",
+            "000017"
+          ]
+        },
+        {
+          "name": "External reference link",
+          "ideas": [
+            "000282"
+          ]
+        }
+      ],
+      "disposition": null
+    }
+  ],
+  "unbatched": [
+    {
+      "id": "000013",
+      "reason": "R1: could land in agent engineering (command boundary), governance process, or standalone, with no argument for one strong enough to state. R4 placed it as a singleton. It is carried forward unbatched: it belongs with whichever track picks it up."
+    },
+    {
+      "id": "000068",
+      "reason": "R1: its action (mine research/ for new ideas) is idea-system work and its motivation (feed the knowledge-architecture set) is retrieval work. R4 placed it as a standalone singleton. Carried forward unbatched for whichever group claims it."
+    }
+  ],
+  "decline_candidates": {
+    "nominated_by_both": [
+      {
+        "id": "000102",
+        "reason": "R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build."
+      },
+      {
+        "id": "000282",
+        "reason": "R1: a saved external link, not a proposal; brain/entities/ could hold it. R4: no proposed system change; close as a reference note."
+      }
+    ],
+    "nominated_by_one": [
+      {
+        "id": "000086",
+        "reason": "Speculative cross-repository tooling; its triage found no internal reference to the tool it names and no repos domain in the schema.",
+        "nominated_by": "R1"
+      },
+      {
+        "id": "000140",
+        "reason": "The owner's own learning project, not a system deliverable; better served outside the backlog.",
+        "nominated_by": "R1"
+      },
+      {
+        "id": "000255",
+        "reason": "ARCH-010 marks the MDM system future work, parked; premature while the entities it would steward have no records.",
+        "nominated_by": "R1"
+      },
+      {
+        "id": "000256",
+        "reason": "A stewardship agent for a system (000255) and data that do not exist yet.",
+        "nominated_by": "R1"
+      },
+      {
+        "id": "000290",
+        "reason": "Soft decline: the campaign that motivated it is closed; a general gate-runner would be a different, unscoped idea.",
+        "nominated_by": "R1"
+      },
+      {
+        "id": "000089",
+        "reason": "The seeded content is live and will not be reverted; resolved in substance.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000205",
+        "reason": "A measured result already folded into practice; nothing to build.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000015",
+        "reason": "No follow-up across the corpus. Audit 1: R4 lacked the owner's 2026-09-13 ruling that dormancy is not deadness for this trio, which R1 cited in declining to nominate it.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000016",
+        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000017",
+        "reason": "As 000015: nominated for an explicit ruling. Audit 1 notes the 2026-09-13 ruling R4 could not see.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000122",
+        "reason": "Speculative, no trigger named, and the stack has been built on since. R1 declined to nominate it as strategic due diligence that is early, not stale.",
+        "nominated_by": "R4"
+      },
+      {
+        "id": "000146",
+        "reason": "The ruling it depends on is made; what remains is a one-sentence correction whose own text asks whether it should be made.",
+        "nominated_by": "R4"
+      }
+    ]
+  }
+}
