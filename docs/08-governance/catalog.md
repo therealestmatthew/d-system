@@ -134,6 +134,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | plan | approved | repository-owner | docs/01-plans/PLAN-043-literature-review-report-page.md |
 | PLAN-045 | plan | approved | repository-owner | docs/01-plans/PLAN-045-deterministic-guards.md |
 | PLAN-046 | plan | approved | repository-owner | docs/01-plans/PLAN-046-design-document-amendments.md |
+| PLAN-047 | plan | draft | repository-owner | docs/01-plans/PLAN-047-reviewer-contract.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -201,6 +202,7 @@ CI regenerates it and fails on any difference.
 | REQ-027 | requirement | draft | repository-owner | docs/06-requirements/REQ-027-literature-review-report-page.md |
 | REQ-028 | requirement | draft | repository-owner | docs/06-requirements/REQ-028-deterministic-guards.md |
 | REQ-029 | requirement | draft | repository-owner | docs/06-requirements/REQ-029-design-document-amendments.md |
+| REQ-030 | requirement | draft | repository-owner | docs/06-requirements/REQ-030-reviewer-contract.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -415,6 +417,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 1 | 0 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
+| PLAN-047 | doc-reviewer-contract | draft | 5 | 0 | 0 | — |
 
 ## Held codes
 
@@ -427,4 +430,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-343 documents — adr: 19, architecture: 11, governance: 16, operation: 21, plan: 60, prompt: 38, requirement: 29, session: 149.
+345 documents — adr: 19, architecture: 11, governance: 16, operation: 21, plan: 61, prompt: 38, requirement: 30, session: 149.

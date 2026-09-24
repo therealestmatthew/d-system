@@ -10,6 +10,11 @@ next_up:
 - phase-grd-04
 - phase-gov-01
 - phase-dgov-06
+- phase-asr-02
+- phase-asr-03
+- phase-asr-01
+- phase-asr-04
+- phase-asr-05
 - phase-cap-08
 - phase-irs-14
 - phase-irs-11
@@ -14005,3 +14010,214 @@ items:
   - docs/06-requirements/REQ-003-idea-plan-lifecycle.md
   next_action: Waits for phase-part-03 (shared sys-governance); not at the same time as phase-grd-01.
     Put the AGENTS.md and CLAUDE.md text to the owner first, so the answer is in hand before the edits.
+- id: phase-asr-01
+  title: The reviewer-judge agent type and its GOV-014 contract, in shadow, with the assurance dispatch rule
+  plan: doc-reviewer-contract
+  sources:
+  - doc-reviewer-contract-requirements
+  - doc-reviewer-contract
+  - doc-realization-role-contracts
+  systems:
+  - sys-governance
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-dam-01
+  scope:
+  - Write .claude/agents/review-judge.md with tools exactly Read, Grep, Glob, a charter to judge a phase's
+    diff against its scope, acceptance and verification using only the runner's evidence files, and a
+    never-do that bars reading the builder's session record or report (REQ-030 R01; PLAN-047 D1).
+  - Add the reviewer-judge contract to GOV-014 (inputs, outputs, never-do, per-dispatch ceiling), state
+    that it runs in shadow until the owner promotes it (R06; D5), and state the assurance dispatch rule
+    - the coordinator dispatches and briefs every build review, never the building session, and the
+    brief holds only scope, acceptance, verification, the commit range and the runner manifest (R03;
+    D3).
+  - Update GOV-014's role count and any statement that the Validator or Adversary is dispatched by the
+    developer.
+  acceptance:
+  - The agent file declares tools Read, Grep, Glob and nothing else; a scratch copy that adds Bash is
+    rejected by the phase's own check on the file.
+  - GOV-014 has the reviewer-judge contract, the shadow status and the dispatch rule, and names what the
+    brief may not contain.
+  - grep -n "session record" in the agent file returns only the never-do line.
+  verification:
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  deliverables:
+  - .claude/agents/review-judge.md
+  - docs/08-governance/
+  next_action: Waits for phase-dam-01, which rewrites GOV-014's Validator contract. Start from
+    partition-analyst.md, the one existing agent type without Bash.
+- id: phase-asr-02
+  title: A fixed command runner for build reviews
+  plan: doc-reviewer-contract
+  sources:
+  - doc-reviewer-contract-requirements
+  - doc-reviewer-contract
+  - doc-multi-session-coordination-protocol
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Build tools/run_review_checks.py, which takes only a phase id and a commit, creates a detached
+    temporary worktree at that commit, runs the phase's verification list and the four GOV-017 gate
+    checks there, writes each command's output to an evidence file, prints a manifest (command, exit
+    code, file path, sha256), and removes the worktree (REQ-030 R02; PLAN-047 D2).
+  - Refuse an unknown phase id and any extra argument; record a failing command's exit code without
+    retrying it.
+  - Write its OPS document and tests.
+  acceptance:
+  - 'Fixtures: a phase whose commands run (manifest lists each with its exit code); a failing command
+    (recorded, not retried); an unknown phase id (refused); an extra command argument (refused).'
+  - After each run, git worktree list shows no worktree left behind.
+  - Run for one completed phase against its completion commit, the manifest is recorded in the session
+    record.
+  verification:
+  - uv run pytest test/test_run_review_checks.py
+  - uv run ruff check src/ test/ tools/run_review_checks.py
+  - uv run mypy src/ tools/run_review_checks.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  deliverables:
+  - tools/run_review_checks.py
+  - test/test_run_review_checks.py
+  - docs/08-governance/
+  next_action: Reuse the detached-worktree pattern of GOV-017 merge-gate step 2. Never run pytest in the
+    primary checkout; the runner's own worktree is where the phase's commands run.
+- id: phase-asr-03
+  title: Build-review verdict records and the seeded re-review sampler
+  plan: doc-reviewer-contract
+  sources:
+  - doc-reviewer-contract-requirements
+  - doc-reviewer-contract
+  - doc-three-altitude-review-procedure
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write schemas/review-verdict.schema.json for one build review per file under
+    docs/08-governance/reviews/verdicts/ - reviewer type, sha256 of its agent definition, model, phase,
+    reviewed commit, verdict, findings, gating or shadow, sha256 of the raw reply, and an appendable
+    outcomes list (owner overturned; defect later found on dev; sampled re-review) (REQ-030 R05;
+    PLAN-047 D4).
+  - Build tools/draw_rereview_sample.py, which reads the verdict records since the last draw and prints,
+    with a recorded seed, one in ten passed build reviews plus every phase rejected once before it
+    passed, and for each the reviewer types that may not re-review it (R07; D6).
+  - Write the OPS document for the sampler and tests for both.
+  acceptance:
+  - 'Schema fixtures: a valid record passes; one without model fails; one with an outcome appended
+    passes.'
+  - 'Sampler fixtures: the same seed gives the same sample; a once-rejected phase is always included;
+    the original reviewer type is excluded as re-reviewer.'
+  verification:
+  - uv run pytest test/test_review_verdict.py test/test_draw_rereview_sample.py
+  - uv run ruff check src/ test/ tools/draw_rereview_sample.py
+  - uv run mypy src/ tools/draw_rereview_sample.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  deliverables:
+  - schemas/review-verdict.schema.json
+  - tools/draw_rereview_sample.py
+  - test/test_review_verdict.py
+  - test/test_draw_rereview_sample.py
+  - docs/08-governance/
+  next_action: Model the schema on schemas/adversarial-finding.schema.json's review definition, so plan
+    reviews and build reviews read alike.
+- id: phase-asr-04
+  title: Coordinator-dispatched build review wired into session-close, PROMPT-036, GOV-017 and PROMPT-037
+  plan: doc-reviewer-contract
+  sources:
+  - doc-reviewer-contract-requirements
+  - doc-reviewer-contract
+  - doc-multi-session-coordination-protocol
+  systems:
+  - sys-governance
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-asr-01
+  - phase-asr-02
+  - phase-asr-03
+  - phase-grd-03
+  - phase-dam-01
+  scope:
+  - Change /session-close step 3 so a building session sends a review request and waits for the
+    coordinator's verdict record, and an owner-run close may dispatch under the same brief rule (REQ-030
+    R04; PLAN-047 D3).
+  - Change PROMPT-036 step 6 and its validator and adversary templates to name dedicated reviewer types
+    and the coordinator brief, not the general-purpose charter.
+  - Add review-request and verdict messages to GOV-017's message contract (not the existing REVIEW,
+    which assigns standby work), make the merge gate run the runner and both reviewers during shadow,
+    and have READY carry the verdict record; revise GOV-017's "No dedicated reviewer session" rationale
+    to match; update PROMPT-037's role texts.
+  - Record every build review from this phase on, gating and shadow, as a verdict record (R05, R06).
+  acceptance:
+  - grep -n "general-purpose" in PROMPT-036 returns no reviewer template line.
+  - session-close.md step 3 lists no input the building session wrote.
+  - GOV-017's message table has the two new messages, and its merge gate names the runner, the gating
+    reviewer and the shadow judge.
+  - This phase's own review produces a gating verdict record and a shadow judge verdict record.
+  verification:
+  - uv run pytest test/test_review_verdict.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  deliverables:
+  - .claude/commands/session-close.md
+  - docs/02-prompts/PROMPT-036-build-coordinator.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/08-governance/
+  next_action: Waits for asr-01..03, phase-grd-03 and phase-dam-01. Read their merged GOV-017,
+    PROMPT-037 and session-close.md text before editing.
+- id: phase-asr-05
+  title: 'Second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries for
+    O-5, O-6 and Q7'
+  plan: doc-reviewer-contract
+  sources:
+  - doc-reviewer-contract-requirements
+  - doc-reviewer-contract
+  - doc-plan-quality-standard
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-asr-04
+  scope:
+  - Add to GOV-010 the requirement that a plan names the threat surfaces it touches (authentication,
+    network exposure, secrets, dependencies), with how a reviewer judges it (REQ-030 R08).
+  - Add to GOV-017's READY a diff-time security review for a phase whose diff touches those surfaces,
+    dispatched by the coordinator and recorded as a verdict, with the reviewer the owner ruled on
+    (PLAN-047 OQ3).
+  - Add dated GOV-003 entries for O-5, O-6 and Q7, quoting each ruling and naming it standing (R09).
+  acceptance:
+  - GOV-010 has the threat-surface requirement and says how its absence is judged.
+  - GOV-017's READY names the security review and its trigger.
+  - GOV-003 has the three entries.
+  verification:
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  - git diff --exit-code docs/08-governance/catalog.md
+  deliverables:
+  - docs/08-governance/
+  next_action: Waits for phase-asr-04. Confirm the owner's answer to PLAN-047 OQ3 before writing the
+    READY step.
