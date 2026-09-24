@@ -25,6 +25,7 @@ from src.governance.backlog import inspect_backlog, render_backlog
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
 from src.governance.regression import audit as audit_status_regression
+from src.governance.staleness import catalog_errors, ideas_md_errors
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -519,6 +520,22 @@ def main() -> int:
     if catalog:
         regression_errors, regression_warnings = audit_status_regression(ROOT, catalog)
         errors.extend(regression_errors)
+    # Only the plain check compares generated files: `--catalog` is the fix for a stale catalog,
+    # and the query modes are run mid-edit, before regeneration (REQ-028 R01, R02).
+    plain = not any(
+        (args.inventory, args.backlog, args.ready, args.catalog, args.next_code, args.release_code)
+    )
+    if plain and catalog and not errors:
+        errors.extend(
+            catalog_errors(
+                ROOT, render_catalog(result["register"], result["documents"], catalog["items"])
+            )
+        )
+    if plain:
+        try:
+            errors.extend(ideas_md_errors(ROOT))
+        except (OSError, ValueError, KeyError, ImportError, yaml.YAMLError) as exc:
+            errors.append(f"ideas.md inputs: {exc}")
     for warning in warnings:
         print(f"WARNING {warning}")
     # stderr, so `--catalog` stdout stays byte-identical to the catalog file on a branch
