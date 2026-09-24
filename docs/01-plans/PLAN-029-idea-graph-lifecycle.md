@@ -32,7 +32,7 @@ Both are `discarded` on the log. Seventeen remain.
 | `G04` Idea-to-plan drafting | `000046`, `000047`, `000049` | `000046` names `000047` its own prerequisite; `000049` surfaced from triaging `000046` and blocks its design |
 
 Partition-time sizing was 10–13 phases if built in full. This plan landed **twelve**; later splits
-took it to eighteen (see the phase table).
+took it to nineteen (see the phase table).
 
 ## What `G03` already ships, verified in code
 
@@ -155,12 +155,14 @@ repository's own plan-before-code rule.
 
 ## Implementation phases
 
-Eighteen phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
+Nineteen phases under `phase-idg-*`, registered in [the backlog index](../09-backlog/README.md).
 `phase-idg-13` and `phase-idg-14` were split out of `phase-idg-01` after this plan was written, on
 2026-09-22 and 2026-09-23 (`GOV-003`), and belong to no partition group. On 2026-09-24 the backfill
 in `phase-idg-13` was split again into five batches by the date each idea was created, `phase-idg-13`
 and `phase-idg-15` through `phase-idg-18`, so each holds about 100 ideas inside `session_budget: 1`
 (review finding F11, [the review record](../08-governance/reviews/2026-09-24-plan-029-idg-split.json)).
+`phase-idg-19` was split out of `phase-idg-01` the same day, after idea `000417` was folded into it
+and took it past one session.
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
@@ -182,6 +184,7 @@ and `phase-idg-15` through `phase-idg-18`, so each holds about 100 ideas inside 
 | `phase-idg-16` | Backfill the idea log into the new terminal states - ideas created 2026-09-13 to 2026-09-21 | — | `01`, `14` |
 | `phase-idg-17` | Backfill the idea log into the new terminal states - ideas created 2026-09-22 to 2026-09-23 | — | `01`, `14` |
 | `phase-idg-18` | Backfill the idea log into the new terminal states - ideas created 2026-09-24 onward | — | `01`, `14` |
+| `phase-idg-19` | Add the set-aside status and the partition hold-out field | — | `01` |
 
 ### Sizing against the partition
 
@@ -196,16 +199,17 @@ range, and the internal distribution is where the interest is.
 - `G02` lands at two rather than three, because `000048` and `000127` are one ask.
 - `G04` lands at three, one per idea, which its own dependency chain forces.
 
-The later splits take the plan to **eighteen**, above the partition-time range. None adds a
+The later splits take the plan to **nineteen**, above the partition-time range. None adds a
 partition idea: `phase-idg-13` to `phase-idg-18` carry the owner's 2026-09-22 lifecycle ruling on idea `000236`, which arrived
 after the partition and was first folded into `phase-idg-01`, then split out because it doubled that
 phase's scope while its `session_budget` stayed at one. Five of the six are the backfill, divided
-by date because one session cannot read the findings of roughly 420 ideas.
+by date because one session cannot read the findings of roughly 420 ideas. `phase-idg-19` carries
+idea `000417`, folded in by owner ruling on 2026-09-24 and split out for the same sizing reason.
 
 ## Execution order and real concurrency
 
-`phase-idg-01` is a genuine bottleneck: eleven phases depend on it directly or transitively, and
-every other phase touching `schemas/idea.schema.json` (`phase-idg-04`, `phase-idg-14`) depends on it.
+`phase-idg-01` is a genuine bottleneck: twelve phases depend on it directly or transitively, and
+every other phase touching `schemas/idea.schema.json` (`phase-idg-04`, `phase-idg-14`, `phase-idg-19`) depends on it.
 Nothing in `G01` can start beside it.
 
 Five phases declare `depends_on: []`, but not all five clear each other. `phase-idg-08`,
@@ -256,7 +260,7 @@ Every row of `REQ-014` maps to at least one phase, and every phase carries at le
 | R20 A drafted plan is conformant to the standard | `phase-idg-12` |
 | R21 Shipped ideas backfilled into terminal states, `000099`/`000129` reversed | `phase-idg-13`, `phase-idg-15`, `phase-idg-16`, `phase-idg-17`, `phase-idg-18` |
 | R22 Agent-written closes marked, verified and ratified | `phase-idg-14` |
-| R23 An idea can be set aside at a partition without being discarded | `phase-idg-01` |
+| R23 An idea can be set aside at a partition without being discarded | `phase-idg-19` |
 
 ## Key references
 

@@ -5,6 +5,7 @@ max_active: 3
 next_up:
 - phase-grd-02
 - phase-idg-01
+- phase-idg-19
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
@@ -9839,13 +9840,6 @@ items:
   - 'The reversal of 000099 and 000129 from discarded to resolved is a revisited event followed by a
     status event: the existing one-time revisit (discarded -> reviewing), then a status move from reviewing
     to resolved. discarded stays never-a-from; no schema exception is added (owner ruling 2026-09-24).'
-  - 'Fold in 000417 (owner ruling 2026-09-24): add a non-terminal status for an idea the owner holds
-    out of a partition without discarding it, reachable from triaged and able to return to triaged or
-    reviewing. Its name is a placeholder until Ideation records the terminology idea for it; the owner
-    wants three plain outcomes for an idea at a partition - discard, set aside, or include in a partition.'
-  - Add a hold-out field to schemas/idea-partition-record.schema.json so an owner hold-out is recorded
-    as such rather than as an unbatched reason, and update the partition-ideas workflow's GATE 3 to
-    write it. The workflow still writes nothing to _data/ideas.jsonl.
   acceptance:
   - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
@@ -9854,11 +9848,6 @@ items:
   - An agent author attempting a lineage annotation is rejected by the writer's existing author rule.
   - delivered, resolved and absorbed are legal statuses, each rejected by the writer when no pointer is
     given, and promoted accepts a later transition to delivered.
-  - The set-aside status (placeholder name) is legal from triaged, is not terminal, and accepts a later
-    transition to triaged or to reviewing; the writer rejects it from any other status.
-  - A partition record carrying an owner hold-out in the new field validates against
-    schemas/idea-partition-record.schema.json, and the accepted 2026-09-23 partition record still
-    validates unchanged.
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -9870,10 +9859,6 @@ items:
   - docs/07-architecture/ARCH-005-idea-node-classification.md
   - test/
   - src/governance/
-  - schemas/idea-partition-record.schema.json
-  - agent-workflows/partition-ideas.md
-  - .claude/skills/partition-ideas/SKILL.md
-  - .agents/skills/partition-ideas/SKILL.md
   next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
     terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
     pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
@@ -10162,6 +10147,53 @@ items:
     so each holds about 100 ideas inside session_budget 1. The batches share _data/ideas.jsonl, so they
     run one at a time, in any order. Do not start before phase-idg-01 ships the states and phase-idg-14
     ships the authority process; every close this batch writes goes through that process. Ideas created after phase-idg-01 merges are not backfilled; they reach a terminal state through phase-idg-14's process as their work ships.
+- id: phase-idg-19
+  title: Add the set-aside status and the partition hold-out field
+  plan: doc-idea-graph-lifecycle
+  sources:
+  - doc-idea-graph-lifecycle-requirements
+  - doc-idea-graph-lifecycle
+  systems:
+  - sys-contracts
+  - sys-portfolio
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-idg-01
+  scope:
+  - 'Idea 000417 (owner ruling 2026-09-24): add a non-terminal status for an idea the owner holds
+    out of a partition without discarding it, reachable from triaged and able to return to triaged or
+    reviewing. Reachable from triaged is read as reachable from triaged only - the builder''s reading,
+    accepted by the Session Manager, not an owner ruling. Its name is a placeholder until Ideation records the terminology idea for it; the owner
+    wants three plain outcomes for an idea at a partition - discard, set aside, or include in a partition.'
+  - Add a hold-out field to schemas/idea-partition-record.schema.json so an owner hold-out is recorded
+    as such rather than as an unbatched reason, and update the partition-ideas workflow's GATE 3 to
+    write it. The workflow still writes nothing to _data/ideas.jsonl.
+  acceptance:
+  - The set-aside status (placeholder name) is legal from triaged, is not terminal, and accepts a later
+    transition to triaged or to reviewing; the writer rejects it from any other status.
+  - A partition record carrying an owner hold-out in the new field validates against
+    schemas/idea-partition-record.schema.json, and the accepted 2026-09-23 partition record still
+    validates unchanged.
+  verification:
+  - uv run pytest
+  - uv run python -m src.governance
+  deliverables:
+  - schemas/idea.schema.json
+  - tools/append_idea.py
+  - src/db/ideas.py
+  - test/
+  - schemas/idea-partition-record.schema.json
+  - agent-workflows/partition-ideas.md
+  - .claude/skills/partition-ideas/SKILL.md
+  - .agents/skills/partition-ideas/SKILL.md
+  next_action: Split out of phase-idg-01 on 2026-09-24 (Session Manager sizing call, owner ruling (b) on
+    000417), because folding the status and the partition field into phase-idg-01 took it past
+    session_budget 1. Do not start before phase-idg-01 ships; this phase adds a status to the same
+    transition table. phase-irs-02 also lists .claude/skills/partition-ideas/SKILL.md, so the two
+    collide on that file.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle
