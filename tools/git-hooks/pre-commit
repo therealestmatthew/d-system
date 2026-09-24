@@ -1,6 +1,10 @@
 #!/bin/sh
-# Blocks a commit that leaks private portfolio content or paths — see phase-priv-04 and
-# docs/08-governance/OPS-009-check-no-private-content.md.
+# Blocks a commit that leaks private portfolio content or paths (phase-priv-04), or that leaves the
+# governance check failing, including a stale catalog.md or ideas.md (phase-grd-01, REQ-028 R04).
+# See docs/08-governance/OPS-009-check-no-private-content.md.
+#
+# Never bypass a failure with --no-verify: commit the fix, or, if the check itself is wrong, stop
+# and report it.
 #
 # Install once:
 #   git config core.hooksPath tools/git-hooks
@@ -10,3 +14,4 @@
 set -e
 cd "$(git rev-parse --show-toplevel)"
 uv run python tools/check_no_private_content.py
+uv run python -m src.governance
