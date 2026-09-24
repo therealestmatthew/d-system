@@ -13811,7 +13811,8 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-b
   priority: 1
   session_budget: 1
   depends_on:
@@ -13841,6 +13842,7 @@ items:
   - test/test_check_dev_ci.py
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/06-requirements/REQ-028-deterministic-guards.md
   next_action: Waits for phase-grd-01. Record real gh run list JSON for the fixtures before writing the
     tool.
 - id: phase-grd-03
