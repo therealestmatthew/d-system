@@ -47,13 +47,12 @@ Acceptance runs (behavioural checks, each reverted afterwards with `git checkout
 
 - **Stale catalog.** `phase-sch-06` changed from `deferred` to `queued` in `backlog.yaml`, catalog
   not regenerated. Plain check: `ERROR docs/08-governance/catalog.md: differs from the rendered
-  catalog; regenerate it with ``uv run python -m src.governance --catalog`` and commit the result`,
-  exit 1. `--catalog`: exit 0. Plain check afterwards: `Governance OK`, exit 0. Plain check on the
+  catalog`, followed by the `--catalog` regeneration instruction, exit 1. `--catalog`: exit 0. Plain check afterwards: `Governance OK`, exit 0. Plain check on the
   restored clean tree: exit 0, `git status --porcelain` empty.
 - **Stale ideas.md.** One idea appended to the worktree's log with `tools/append_idea.py add`
   (the writer assigned `000419` in that scratch log; never committed). Plain check: `ERROR
-  docs/00-working/ideas.md: differs from the rendered idea log; regenerate it with ``uv run python
-  tools/generate_ideas_md.py`` and commit the result`, exit 1. After `tools/generate_ideas_md.py`:
+  docs/00-working/ideas.md: differs from the rendered idea log`, followed by the
+  `tools/generate_ideas_md.py` regeneration instruction, exit 1. After `tools/generate_ideas_md.py`:
   `Governance OK`, exit 0.
 - **CI steps.** The python job's steps from `.github/workflows/ci.yaml`, run in order by a local
   script that stops at the first failure. On a scratch clone with a committed stale catalog
