@@ -20166,3 +20166,54 @@ PROPOSED LINK: this idea --relates_to--> 000334 (the relay names it; the router 
 PROPOSED LINK: this idea --relates_to--> 000082 (the same topic, at the discipline level)
 
 </details>
+
+---
+
+## 000428 · Investigate an injection hook that injects new gate items (daemon events) into the interactive Session Manager / Owner Desk session
+
+**Created 2026-09-24T07:57:07-04:00 · Status: `triaged`**
+
+Investigate an injection hook: a hook that injects new gate items (daemon events) into the interactive Session Manager / Owner Desk session.
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T07:57:07-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The body is the relay's wording; the relay did not give it as the owner's verbatim words. Context as relayed: D3-5 ruled, for now, "poll the gate queue and `orchestrator status` on a timer or file watcher, spike before A1". The owner asked for the injection hook to be parked as an idea to investigate. The Scout's report (_working/session-manager/scout/d3-supervisor-vs-sm-session.md, section 6 item 5, option c; gitignored) notes that such a hook is not verified to exist.
+- **finding** by agent-ideation (2026-09-24T07:57:07-04:00): Triage (checked on dev 87c236b). No backlog phase covers this. The gate queue the hook would read is phase-irs-13 (gate queue and decision-ready presentation with batched completion review), which is queued and has no hook in its scope. Related material:
+- 000334 (carry the Session Manager system into the LangGraph and Claude Agent SDK delivery system): the Session Manager / Owner Desk session this hook would feed.
+- 000249 (watch for external events beyond the repository as pipeline triggers): the opposite direction, events arriving at the daemon rather than leaving it.
+- PLAN-039.01 (orchestrator design) scopes the daemon's watchers to events inside the repository.
+- Gitignored: the Scout's D3 comparison, section 7, records Claude Code hook facts from https://code.claude.com/docs/en/hooks (a PreToolUse hook can defer a call in -p/SDK mode, and the evaluation order of hooks and permission rules). It names no hook that pushes outside events into a running interactive session. Whether a hook can add context at a turn boundary (for example on prompt submit) is the open question the investigation would settle against the current hooks documentation.
+PROPOSED LINK: this idea --relates_to--> 000334 (the session the hook would inject into)
+PROPOSED LINK: this idea --relates_to--> 000249 (event surfaces of the orchestrator, opposite direction)
+
+</details>
+
+---
+
+## 000429 · Look into LangSmith
+
+**Created 2026-09-24T07:57:07-04:00 · Status: `triaged`**
+
+"please capture langsmith to look into"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-24T07:57:08-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words exactly as relayed; the title is Ideation's short form of them. Context as relayed: the LangGraph and Agent SDK orchestrator is the first focus area of the 000347 session. The relay names 000427 as related.
+- **finding** by agent-ideation (2026-09-24T07:57:08-04:00): Triage (checked on dev 87c236b). No backlog phase, plan or governed document mentions LangSmith. The only tracked mention is uv.lock: langsmith 0.14.0 is already installed as a dependency of langchain-core, which langgraph pulls in (pyproject.toml lists langgraph and langgraph-checkpoint-sqlite, not langsmith). So the client library is present, and the investigation is about whether to turn on its tracing and use the hosted service, not about adding a package. Related material:
+- 000427 (investigate pre-existing routing solutions to integrate), named by the relay: the same "use what exists" direction for the orchestrator.
+- 000054 (observability and telemetry): the umbrella idea for tracing across agent runs. LangSmith is one candidate for its agent-run part.
+- ADR-018 (LangGraph over the Claude Agent SDK) and PLAN-039.01 (orchestrator design) fix the framework LangSmith would trace.
+- Gitignored: the Scout's D3 comparison, section 7.1, cites https://docs.langchain.com/langsmith/configure-ttl. On the hosted platform, an opt-in thread TTL with the delete strategy would also remove a thread waiting at an interrupt. That matters if the investigation considers LangSmith's hosted deployment, not only its tracing.
+- A point for the investigation: tracing sends run content to an external service, so what may leave the machine is governed by the private-content rules (ADR-009).
+PROPOSED LINK: this idea --relates_to--> 000427 (named by the relay)
+PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
+
+</details>
