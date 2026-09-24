@@ -15,11 +15,14 @@ jobs:
       - run: uv sync --extra dev
       - name: No private content leaked into the tracked tree
         run: uv run python tools/check_no_private_content.py
-      - run: uv run python -m src.governance
+      # Before the governance step, so a stale catalog fails a step named for it. --catalog
+      # rewrites the file in the checkout; git diff then compares it with the committed copy
+      # (REQ-028 R03, PLAN-045 D4).
       - name: Catalog is current
         run: |
-          uv run python -m src.governance --catalog > /tmp/catalog.md
-          diff -u docs/08-governance/catalog.md /tmp/catalog.md
+          uv run python -m src.governance --catalog > /dev/null
+          git diff --exit-code docs/08-governance/catalog.md
+      - run: uv run python -m src.governance
       - run: uv run ruff check src/ test/
       - run: uv run mypy src/
       - run: uv run pytest
