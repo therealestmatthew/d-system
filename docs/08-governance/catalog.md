@@ -132,8 +132,8 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | plan | draft | repository-owner | docs/01-plans/PLAN-041-portable-framework-content-extraction.md |
 | PLAN-042 | plan | draft | repository-owner | docs/01-plans/PLAN-042-session-taxonomy-investigation.md |
 | PLAN-043 | plan | approved | repository-owner | docs/01-plans/PLAN-043-literature-review-report-page.md |
-| PLAN-045 | plan | draft | repository-owner | docs/01-plans/PLAN-045-deterministic-guards.md |
-| PLAN-046 | plan | draft | repository-owner | docs/01-plans/PLAN-046-design-document-amendments.md |
+| PLAN-045 | plan | approved | repository-owner | docs/01-plans/PLAN-045-deterministic-guards.md |
+| PLAN-046 | plan | approved | repository-owner | docs/01-plans/PLAN-046-design-document-amendments.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -412,8 +412,8 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
-| PLAN-045 | doc-deterministic-guards | draft | 4 | 0 | 0 | — |
-| PLAN-046 | doc-design-document-amendments | draft | 1 | 0 | 0 | — |
+| PLAN-045 | doc-deterministic-guards | approved | 4 | 0 | 0 | — |
+| PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 
 ## Held codes
 

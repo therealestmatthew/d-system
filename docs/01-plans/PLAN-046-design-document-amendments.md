@@ -4,7 +4,7 @@ id: doc-design-document-amendments
 code: PLAN-046
 title: Design-document amendments — the 2026-09-23 rulings applied to the realization design, role contracts, review procedure and session commands
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-23'
 updated: '2026-09-23'
@@ -16,6 +16,9 @@ depends_on: [doc-design-document-amendments-requirements, doc-idea-realization-s
 
 Delivers [REQ-029](../06-requirements/REQ-029-design-document-amendments.md) in one phase,
 `phase-dam-01`.
+
+**Approved at G3 by the owner on 2026-09-23**, relayed by the Session Manager. Review record:
+`2026-09-23-plan-046`, dispositioned.
 
 ## Context and scope
 
@@ -44,7 +47,7 @@ answers unnumbered, so each is given here with the board's words and the item it
 | "OWNER: ... OQ8 STANDING rule: never reuse a phase id for different content (GOV-003 via dam-01)" | `PLAN-045` OQ8 |
 | Idea `000378`'s annotation: "Owner ruling, 2026-09-23 ... GOV-003 governs" | Phase-completion authority |
 
-Ideas covered: `000378` (completion authority contradicts itself), `000381` (`CLAUDE.md`'s three
+Ideas covered: `000298` and `000383` (added at G3), `000378` (completion authority contradicts itself), `000381` (`CLAUDE.md`'s three
 stale lines), `000402` in the one instance
 `000378` describes (not the general consistency check `000402` proposes), and the owner's rulings
 above, and `000377` (governance documents still name `main` as the integration branch), included by
@@ -247,8 +250,10 @@ Closed on 2026-09-23: owner rulings relayed by the Session Manager, and items th
 - **OQ6. Partition reconciliation.** Done against the accepted partition (`6051dad`); see
   "Partition placement" in Context and scope.
 
-Still open:
+- **OQ8. The rest of the drift group.** Ruled at G3: "add 000298 and 000383 to dam-01". Applied:
+  `REQ-029` problem 10 and R13, `phase-dam-01`. `000298`'s triage notes that `phase-conc-06` owns the
+  general question of completed plans whose mechanism was later replaced (`REQ-013` R10), so
+  `phase-dam-01` marks the one passage in `PLAN-005` as superseded, with a dated note and the old
+  text kept, and does not settle that question.
 
-- **OQ8. The rest of the drift group.** `000298` and `000383` are one-passage text corrections of the
-  same kind as `000377`. Who: the owner, at G3. Leaning: add both to `phase-dam-01`, since the
-  partition grouped them with work this phase already does and each is a single passage.
+Nothing is still open.

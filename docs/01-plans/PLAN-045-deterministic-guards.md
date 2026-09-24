@@ -4,7 +4,7 @@ id: doc-deterministic-guards
 code: PLAN-045
 title: Deterministic guards — trunk integrity checks, green CI before each grant, and branch diff guards
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-23'
 updated: '2026-09-23'
@@ -16,6 +16,12 @@ depends_on: [doc-deterministic-guards-requirements, doc-multi-session-coordinati
 
 Delivers [REQ-028](../06-requirements/REQ-028-deterministic-guards.md): checks that run as code
 and refuse, instead of rules a session has to remember.
+
+**Approved at G3 by the owner on 2026-09-23**, relayed by the Session Manager, with the queue
+`phase-part-03`, `phase-grd-01`, `phase-grd-02`, `phase-dam-01`, `phase-grd-03`, `phase-grd-04`,
+`phase-gov-01`, `phase-dgov-06`, `phase-cap-08`. Review records: `2026-09-23-plan-045`,
+`2026-09-23-plan-045-later-added`, `2026-09-23-plan-010` and `2026-09-23-plan-030`, all
+dispositioned.
 
 ## Context and scope
 
@@ -310,14 +316,10 @@ Closed on 2026-09-23: owner rulings relayed by the Session Manager, and items th
 - **OQ6. Partition reconciliation.** Done against the accepted partition (`6051dad`); see
   "Partition placement" in Context and scope. The two differences that need the owner are OQ10.
 
-Still open:
-- **OQ10. Two partition differences.** (a) `000351` asks to regenerate the catalog only at merge
-  time; `phase-grd-01` makes a stale committed catalog fail governance, CI and the hook, which
-  entrenches the committed catalog `000351` would drop. Who: the owner, at G3. Leaning: proceed with
-  `phase-grd-01`; `000351`'s triage finding already notes that dropping the committed catalog would
-  reverse `phase-doc-02`'s accepted design and needs its own ruling. (b) `phase-dgov-06` compares a
-  change set against declared deliverables, and the partition groups it with `000336` (globs read as
-  literal filenames) and `000245` (what a deliverables entry means). Who: the owner, at G3. Leaning:
-  add one scope line to `phase-dgov-06` that it matches directory deliverables by prefix and glob
-  deliverables by pattern (`path_conflict` in `src/governance/backlog.py` already matches directories
-  by prefix), and leave `000336`'s fix to the lock itself to its own track.
+- **OQ10. Two partition differences.** (a) `000351` (regenerate the catalog only at merge time)
+  points against `phase-grd-01`'s stricter committed catalog. Ruled at G3: "proceed with grd-01;
+  000351 gets its own ruling later." (b) `phase-dgov-06` is grouped with `000336` and `000245` on
+  what a declared deliverable means. Ruled at G3: "add the dgov-06 scope line (directory deliverables
+  match by prefix, globs by pattern)". Applied to `phase-dgov-06`.
+
+Nothing is still open.

@@ -10566,6 +10566,8 @@ items:
     catalog regeneration, its session record under docs/03-sessions/, and idea-log captures
     (_data/ideas.jsonl, docs/00-working/ideas.md). A backlog.yaml edit counts only when it touches
     another phase's entry.
+  - Match directory deliverables by prefix and glob deliverables by pattern (owner ruling at G3,
+    2026-09-23, on PLAN-045 OQ10b; ideas 000336 and 000245).
   - Make it report rather than block, and distinguish a declaration that was too narrow from work that
     genuinely strayed - only a person can tell those apart.
   - Give it its own command that exits 0 when it reports findings, since it must not fail the default
@@ -13959,6 +13961,9 @@ items:
     to the owner in this session, and apply only what the owner confirms (R09, R10).
   - Correct the passages in REQ-029 problem 9 that name main as the integration branch or cite the
     withdrawn primary-checkout exception (idea 000377, included by the owner's ruling; R12).
+  - Mark PLAN-005's manual code-reservation passage as superseded by phase-conc-03, with a dated note and
+    the old text kept, and drop the triaging status from REQ-003 R11 (ideas 000298 and 000383, added
+    at G3; R13). phase-conc-06 keeps the general question of completed plans (REQ-013 R10).
   - Edit agent-workflows/orient.md and regenerate the orient skill; regenerate the catalog (R11; D6).
   acceptance:
   - The completion grep over REQ-029 problem 1's files returns no owner-only completion statement
@@ -13976,6 +13981,8 @@ items:
   - git grep -n -w main over GOV-001, GOV-002, GOV-005, OPS-001 and session-close.md lists each
     remaining main with its reason, and session-close.md no longer presents the primary-checkout
     exception as current.
+  - PLAN-005's passage carries the superseded note, and grep -n triaging in REQ-003 finds no status
+    that triage enters.
   verification:
   - uv run python tools/generate_agent_workflows.py --check
   - uv run python -m src.governance --catalog
@@ -13994,5 +14001,7 @@ items:
   - .agents/skills/orient/SKILL.md
   - AGENTS.md
   - CLAUDE.md
+  - docs/01-plans/PLAN-005-document-code-system.md
+  - docs/06-requirements/REQ-003-idea-plan-lifecycle.md
   next_action: Waits for phase-part-03 (shared sys-governance); not at the same time as phase-grd-01.
     Put the AGENTS.md and CLAUDE.md text to the owner first, so the answer is in hand before the edits.

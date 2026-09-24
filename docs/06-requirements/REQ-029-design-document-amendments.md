@@ -70,6 +70,12 @@ The governing documents contradict each other and the owner's rulings. Each case
    and 165 cite "the GOV-003 primary-checkout exception", which `GOV-003` withdrew on 2026-09-12
    (idea `000377`, with its triage finding's line corrections). The owner ruled on 2026-09-23 to
    include it in this phase.
+10. **Two more single-passage contradictions.** `PLAN-005` lines 86-88 state the manual
+   code-reservation step ("An agent that knows it will write a document reserves its code in the same
+   small commit as its backlog claim") as current, though `phase-conc-03` retired it on 2026-09-21
+   (idea `000298`). `REQ-003` R11 says "Triage enters triaging", while `PLAN-016` line 104 says
+   "`triaging` is deliberately omitted" and the idea schema has no such status (idea `000383`). The
+   owner ruled at G3 on 2026-09-23 to include both.
 
 ## Observable requirements and verification
 
@@ -87,6 +93,7 @@ The governing documents contradict each other and the owner's rulings. Each case
 | R10 | `AGENTS.md` lines 179-180 and 284-286 each change only with the owner's approval of that change's exact old and new text, put to the owner in the same session; otherwise they are unchanged and the session record says so | `git diff AGENTS.md` shows the approved text, or nothing, for each |
 | R11 | The generated orient skill matches its source, and governance and the catalog are current | `uv run python tools/generate_agent_workflows.py --check` exits 0; `uv run python -m src.governance` exits 0; `git diff --exit-code docs/08-governance/catalog.md` after `--catalog` |
 | R12 | None of the passages in problem 9 names `main` as the integration branch or cites the withdrawn primary-checkout exception as current | `git grep -n -w main` over the five files lists each remaining `main` with the reason it stays (for example, a reference to the `main` branch itself); `grep -n "primary-checkout exception"` in `session-close.md` returns no line presenting it as current |
+| R13 | `PLAN-005`'s passage carries a dated note that `phase-conc-03` superseded it, with its text kept readable; `REQ-003` R11 no longer names a `triaging` status | Read the `PLAN-005` passage; `grep -n "triaging"` in `REQ-003` returns no line stating it as a status triage enters |
 
 ## What each requirement is not
 
