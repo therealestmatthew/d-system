@@ -22,6 +22,7 @@ import yaml  # type: ignore[import-untyped]
 
 from src.db.ideas import fold, load_events
 
+REPOSITORY = Path(__file__).resolve().parents[2]
 CATALOG = "docs/08-governance/catalog.md"
 IDEAS_MD = "docs/00-working/ideas.md"
 IDEAS_LOG = "_data/ideas.jsonl"
@@ -49,23 +50,31 @@ def catalog_errors(root: Path, rendered: str) -> list[str]:
     ]
 
 
-def _ideas_renderer(root: Path) -> ModuleType:
-    """Import `tools/generate_ideas_md.py` by path — `tools/` is not a package."""
+def _ideas_renderer() -> ModuleType:
+    """Import `tools/generate_ideas_md.py` by path — `tools/` is not a package.
+
+    Loaded from the repository holding this code, not from the root being checked, so a fixture
+    root needs only the data files.
+    """
     name = "generate_ideas_md"
     if name in sys.modules:
         return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(name, root / "tools" / f"{name}.py")
+    spec = importlib.util.spec_from_file_location(name, REPOSITORY / "tools" / f"{name}.py")
     if spec is None or spec.loader is None:
         raise ImportError(f"cannot load tools/{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        del sys.modules[name]
+        raise
     return module
 
 
 def render_ideas_md(root: Path, renderer: ModuleType | None = None) -> str:
     """What `tools/generate_ideas_md.py` would write, from `root`'s log and priority queue."""
-    renderer = renderer or _ideas_renderer(root)
+    renderer = renderer or _ideas_renderer()
     state = fold(load_events(root / IDEAS_LOG))
     priority: dict[str, Any] = {}
     text = _read(root / IDEAS_PRIORITY)
