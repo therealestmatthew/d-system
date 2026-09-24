@@ -107,7 +107,20 @@ force, integrations, idea records and batch-table status changes are committed. 
   (reports under `_working/session-manager/` excepted; see *Departures*), does
   only the purpose it stated, leaves `git status` clean, and reports the resulting commit.
 - Before granting a turn, the Session Manager checks that the checkout is on `dev` and clean. After
-  the holder reports, it checks that the commit landed and nothing else changed.
+  the holder reports, it checks that the commit landed, that `origin/dev` equals `dev`, and that
+  nothing else changed.
+- **The lock holder pushes `dev` to `origin` before sending `TURN DONE`.** CI runs on a push, so an
+  unpushed commit has no CI result and the next grant cannot be checked. If the push is refused or
+  blocked, the holder sends `BLOCKED`, keeps the turn, and asks the owner.
+- **`dev` must be green before a `claim`, `dryrun` or `merge` grant.** Before sending any of these
+  `GRANTED` messages, the Session Manager runs `uv run python tools/check_dev_ci.py --wait 600`
+  ([OPS-025](OPS-025-check-dev-ci.md)) and grants only on exit 0. Exit 1 means the latest CI run for
+  `dev`'s head failed: the only grant allowed is the turn or merge the owner names as the fix, and
+  the owner's ruling and the run URL the tool prints are recorded on the board. Exit 2 means the
+  result is still not known after the wait (CI still running, a cancelled run, `dev` not pushed, or
+  `gh` failed): no grant until the result is known, or until the owner rules for that grant. `idea`
+  and `batch` turns are not gated. They cannot spread a red build, and an `idea` turn is how a red
+  build gets recorded. These are owner rulings of 2026-09-24 (`REQ-028` R06, `PLAN-045` D6).
 - **No tests, rebuilds or `pytest` in the primary checkout, by any session.**
   `test/test_codes.py` overwrites the tracked `docs/08-governance/catalog.md` while it runs and
   restores it afterwards. On 2026-09-22 two `/session-start` preflight runs overlapped there and
@@ -204,7 +217,7 @@ sent to the name `Session Manager`.
 | `TURN? <claim\|idea\|batch\|dryrun> <phase or batch-id>` | any | Asks for the primary-checkout lock for one stated purpose. The catalog regeneration travels with the claim; `batch` covers only a batch table's `status` and `updated` lines, as `PROMPT-036` sets them when it opens or closes a batch; `dryrun` runs a merged skill or workflow in the primary checkout for a phase's acceptance evidence, writing only gitignored paths and committing nothing (owner ruling, 2026-09-22, first used by `phase-part-03`); merges go through `READY` |
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
-| `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean |
+| `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean and `dev` is pushed to `origin` |
 | `READY <branch>` | builder, batch runner | Ready to integrate, with the review findings resolved and post-rebase output |
 | `GRANTED merge` | Session Manager | The owner approved; the recipient holds the lock for the merge and completion edit, and ends the turn with `TURN DONE` |
 | `REBASE` | Session Manager | `dev` moved; rebase at the next safe point |

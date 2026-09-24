@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-23'
-updated: '2026-09-23'
+updated: '2026-09-24'
 systems: [sys-governance, sys-backlog, sys-gov-docs]
 depends_on: [doc-multi-session-coordination-protocol, doc-backlog-decisions]
 ---
@@ -78,7 +78,7 @@ R12-R13 and is not restated here (`PLAN-045`, Decisions).
 | R03 | CI fails on a commit whose committed catalog is stale, at a step that compares the committed file with a rendering that did not overwrite it | Run the CI job's Python steps locally on a scratch commit with a stale catalog: a nonzero exit before pytest starts. The same steps on `dev` exit 0 |
 | R04 | The pre-commit hook refuses a commit when the governance check fails, and still runs the private-content check | In a scratch worktree, stage a stale-catalog change and run `sh tools/git-hooks/pre-commit` directly (a plain `git commit` there runs the primary checkout's copy of the hook, because `core.hooksPath` is shared): exit nonzero, with the governance error printed. Regenerate and run it again: exit 0. A staged private identifier fixture still makes it exit nonzero |
 | R05 | The completion-edit instructions name the catalog regeneration: `GOV-017` merge-gate step 6, `PROMPT-037` contract item 4(iii) and `PROMPT-037`'s builder role script (the step that says "the completion edit on dev as GOV-003 sanctions") all say to run `--catalog` and commit the result with the edit | Read the three passages; `grep -n "governance only"` in `PROMPT-037` returns no completion-edit line. A completion edit made without the regeneration fails R01's check before it can be committed (R04) |
-| R06 | `tools/check_dev_ci.py` exits 0 only when the most recent completed CI run for `dev`'s current head commit succeeded; exits 1, naming the run's URL, when that run failed; and exits 2 when no completed run exists for that commit or the `gh` query fails. `GOV-017` and `PROMPT-037` require a 0 before any `GRANTED` | Unit tests with recorded `gh run list` JSON for five cases: success at head (0), failure at head (1), in progress (2), a run only for an older commit (2), `gh` error (2). Read the two passages |
+| R06 | `tools/check_dev_ci.py` exits 0 only when the most recent completed CI run for `dev`'s current head commit succeeded; exits 1, naming the run's URL, when that run failed; and exits 2 when no completed run exists for that commit or the `gh` query fails. `GOV-017` and `PROMPT-037` require a 0 before a `claim`, `dryrun` or `merge` `GRANTED`; `idea` and `batch` turns are not gated. On exit 1 the only grant is the turn or merge the owner names as the fix, with the owner's ruling and the run URL recorded (owner rulings, 2026-09-24) | Unit tests with recorded `gh run list` JSON for five cases: success at head (0), failure at head (1), in progress (2), a run only for an older commit (2), `gh` error (2). Read the two passages |
 | R07 | A test-baseline check compares a base run and a branch run of the suite and exits 1, listing the test ids, when a test that passed in the base is missing from the branch run or is skipped there. Added tests and tests that were already skipped do not fail it | Unit tests over pairs of JUnit XML fixtures: one removed test (1), one newly skipped test (1), one added test (0), an unchanged run (0), a test skipped in both (0) |
 | R08 | A diff-pattern check over `<base>..<head>` exits 1, naming file and line, for each **added** line containing a `# type: ignore` whose code list is not exactly `[import-untyped]`, a `cast(Any,` call, or an `except` clause that is bare or catches `Exception` or `BaseException` and whose body is only `pass`. Unchanged and removed lines are never reported, and an `except` naming a specific exception type with a `pass` body is not reported | Unit tests over fixture diffs for each pattern (1), for `# type: ignore[import-untyped]` (0), for `except FileNotFoundError: pass` (0), for an unchanged existing ignore in context lines (0), and for a removed ignore (0). Run against `dev~20..dev`: its output is recorded, whatever it is |
 | R09 | The governance check exits 1 when a phase registered with `plan: <id>` is not named by id anywhere in that plan's text, for plans whose `created` date is on or after 2026-09-22; and when any plan names a `phase-…` id that is registered nowhere, for every plan | A fixture plan dated 2026-09-23 with an unnamed registered phase: exit 1 naming both. The same plan dated 2026-09-21: exit 0. A fixture plan naming `phase-zzz-99`: exit 1. The repository as it stands: exit 0, with the counts recorded |
@@ -94,8 +94,9 @@ R12-R13 and is not restated here (`PLAN-045`, Decisions).
 - **R03 does not require a new CI job.** Correcting the existing step satisfies it.
 - **R04 is not a pre-push or merge hook.** It fires on commits in whichever checkout makes them.
   `refuse_dirty_integration.py` keeps its own placement (`OPS-001`).
-- **R06 does not decide what happens while CI is running.** Exit 2 means "not yet known"; the
-  Session Manager waits or asks the owner. It is not a rule that a grant is refused forever.
+- **R06 does not decide what happens while CI is running.** Exit 2 means "not yet known". The owner
+  ruled on 2026-09-24 that the Session Manager polls for about 10 minutes (`--wait 600`) and then
+  asks the owner. It is not a rule that a grant is refused forever.
 - **R07 is not a coverage or test-count target.** It compares one run against another and says
   nothing about how many tests a phase should add.
 - **R08 does not ban the patterns in existing code.** Only added lines are checked. Cleaning up the
