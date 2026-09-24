@@ -107,3 +107,35 @@ def test_plain_check_writes_neither_generated_file(relative: str) -> None:
         [sys.executable, "-m", "src.governance"], cwd=ROOT, capture_output=True, check=False
     )
     assert _digest(ROOT / relative) == before
+
+
+def _run_main(monkeypatch: pytest.MonkeyPatch, *argv: str) -> tuple[int, list[str]]:
+    """Run the governance entry point with both generated files reported stale."""
+    import src.governance.__main__ as governance
+
+    written: list[str] = []
+    monkeypatch.setattr(governance, "catalog_errors", lambda root, rendered: [f"{CATALOG}: stale"])
+    monkeypatch.setattr(governance, "ideas_md_errors", lambda root: [f"{IDEAS_MD}: stale"])
+    monkeypatch.setattr(
+        governance, "write_catalog", lambda root, rendered: written.append(rendered)
+    )
+    monkeypatch.setattr(sys, "argv", ["governance", *argv])
+    return governance.main(), written
+
+
+def test_plain_check_fails_on_stale_generated_files(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    code, written = _run_main(monkeypatch)
+    out = capsys.readouterr().out
+    assert code == 1
+    assert f"ERROR {CATALOG}: stale" in out
+    assert f"ERROR {IDEAS_MD}: stale" in out
+    assert written == []
+
+
+def test_catalog_flag_still_repairs_a_stale_catalog(monkeypatch: pytest.MonkeyPatch) -> None:
+    # A staleness error in --catalog mode would block the only command that fixes it.
+    code, written = _run_main(monkeypatch, "--catalog")
+    assert code == 0
+    assert len(written) == 1
