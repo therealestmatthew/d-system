@@ -82,10 +82,10 @@ The verification list is not all green: the plugin suite has the one failure abo
 ## Backlog
 
 `status: active`, `agent: agent-builder-b`. `next_action`: rebase onto the integration branch once
-`phase-plug-02` lands the portable-test fix, re-run the plugin suite, then run the independent
-review and send READY. `session: doc-session-plugin-backlog-sessions`; `completion_evidence` cites
+`phase-plug-02` lands the portable-test fix, re-run the plugin suite and send READY; the review is
+done and dispositioned. `session: doc-session-plugin-backlog-sessions`; `completion_evidence` cites
 the backlog script, check module, regression script, schema, the two test files and this record;
-`result` records the suite's one outside failure.
+`result` records the suite's one outside failure and the review outcome.
 
 ## Unresolved
 
