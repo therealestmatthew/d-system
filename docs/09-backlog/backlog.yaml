@@ -1,10 +1,19 @@
 schema_version: 1
 updated: '2026-09-25'
 decision_record: doc-backlog-decisions
-max_active: 3
+max_active: 4
 next_up:
 - phase-grd-02
 - phase-idg-01
+- phase-plug-01
+- phase-plug-05
+- phase-plug-02
+- phase-plug-04
+- phase-plug-06
+- phase-plug-03
+- phase-plug-07
+- phase-plug-09
+- phase-plug-08
 - phase-idg-19
 - phase-dam-01
 - phase-grd-03
@@ -14515,10 +14524,11 @@ items:
     backlog path, document root, integration branch, worktree directory, triage search list, exempt
     files, staging directory), the component directories, a README stub, and a pytest suite that
     runs from the plugin directory (REQ-031 R01, R03, R21).
-  - Write .claude-plugin/marketplace.json at this repository's root naming the one plugin with a
-    relative source, since the CLI installs persistently only from a marketplace; verify the
-    install path end to end (marketplace add by local path, plugin install, the skills listed in a
-    new session) before fixing the manifest shape, and record the commands in the README.
+  - Verify, before fixing the manifest shape, that the plugin loads with claude --plugin-dir
+    plugins/idea-realization in a new session (the skills listed, a script runnable through
+    ${CLAUDE_PLUGIN_ROOT}); record the command in the README, with a note that a persistent
+    install comes from adding the plugin to a marketplace of the owner's choosing later, which
+    this repository does not carry.
   - Write scripts/paths.py, the one place every script resolves a data path (flag, then environment
     variable, then userConfig, then the documented default), and the PEP 723 header every script
     carries (jsonschema, pyyaml only).
@@ -14533,13 +14543,11 @@ items:
     .gitignore (R05, R06); write scripts/doctor.py (R07).
   - Write test/test_no_source_references.py, the R02 check, run in the suite from this phase on.
   acceptance:
-  - claude plugin validate plugins/idea-realization --strict exits 0 and claude plugin validate
-    .claude-plugin/marketplace.json exits 0; a fixture manifest with a license field or an unknown
-    top-level key fails --strict.
-  - claude plugin marketplace add <this repository's path> followed by claude plugin install
-    idea-realization@<marketplace name> succeeds on this machine and the plugin's skills appear in a
-    new session; the checkpoint records the real output. If no persistent local install exists, the
-    phase stops and reports it rather than proceeding.
+  - claude plugin validate plugins/idea-realization --strict exits 0; a fixture manifest with a
+    license field or an unknown top-level key fails --strict.
+  - claude --plugin-dir plugins/idea-realization lists the plugin's skills in a new session and
+    ${CLAUDE_PLUGIN_ROOT} resolves inside one; the checkpoint records the real output. If the
+    plugin does not load, the phase stops and reports it rather than proceeding.
   - The scaffold tests show a record with one hash per created file, a second run that creates
     nothing and reports every path skipped, a pre-existing backlog.yaml left byte-identical, and a
     dry run that writes nothing.
@@ -14555,7 +14563,6 @@ items:
   - uv run python -m src.governance
   deliverables:
   - plugins/idea-realization/
-  - .claude-plugin/marketplace.json
   next_action: Read the plugin manifest reference at code.claude.com/docs/en/plugins/manifest-reference.md
     for the userConfig shape before writing plugin.json; the analysis at
     _working/session-manager/plugin-analysis/06-install-model.md lists what the scaffold creates.
@@ -14886,8 +14893,8 @@ items:
   - phase-plug-03
   - phase-plug-09
   scope:
-  - Install the plugin from this repository's marketplace into a fresh scratch repository, cut a
-    worktree of the scratch repository and run the whole path from that worktree, so the partition
+  - Load the plugin with --plugin-dir in a fresh scratch repository, cut a worktree of the scratch
+    repository and run the whole path from that worktree, so the partition
     sweep's primary-checkout staging path differs from the working directory
     (prerequisites, scaffold, idea recorded, folded, rendered, triaged, one partition sweep, a
     requirement and plan written and plan-checked, a phase registered and claimed, a code allocated,

@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-idea-system
 code: PLAN-048.02
 title: Idea-realization plugin — the idea system
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'

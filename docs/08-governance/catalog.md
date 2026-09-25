@@ -136,16 +136,16 @@ CI regenerates it and fails on any difference.
 | PLAN-045 | plan | approved | repository-owner | docs/01-plans/PLAN-045-deterministic-guards.md |
 | PLAN-046 | plan | approved | repository-owner | docs/01-plans/PLAN-046-design-document-amendments.md |
 | PLAN-047 | plan | approved | repository-owner | docs/01-plans/PLAN-047-reviewer-contract.md |
-| PLAN-048 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048-overview.md |
-| PLAN-048.01 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.01-skeleton-install.md |
-| PLAN-048.02 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.02-idea-system.md |
-| PLAN-048.03 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.03-partition.md |
-| PLAN-048.04 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.04-backlog-sessions.md |
-| PLAN-048.05 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.05-document-governance.md |
-| PLAN-048.06 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.06-generators-layout.md |
-| PLAN-048.07 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md |
-| PLAN-048.08 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
-| PLAN-048.09 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
+| PLAN-048 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048-overview.md |
+| PLAN-048.01 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.01-skeleton-install.md |
+| PLAN-048.02 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.02-idea-system.md |
+| PLAN-048.03 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.03-partition.md |
+| PLAN-048.04 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.04-backlog-sessions.md |
+| PLAN-048.05 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.05-document-governance.md |
+| PLAN-048.06 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.06-generators-layout.md |
+| PLAN-048.07 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md |
+| PLAN-048.08 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
+| PLAN-048.09 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -432,16 +432,16 @@ CI regenerates it and fails on any difference.
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 0 | 1 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 | PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
-| PLAN-048 | doc-idea-realization-plugin | draft | 9 | 0 | 0 | — |
-| PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | draft | 1 | 0 | 0 | — |
-| PLAN-048.02 | doc-idea-realization-plugin-idea-system | draft | 1 | 0 | 0 | — |
-| PLAN-048.03 | doc-idea-realization-plugin-partition | draft | 1 | 0 | 0 | — |
-| PLAN-048.04 | doc-idea-realization-plugin-backlog-sessions | draft | 1 | 0 | 0 | — |
-| PLAN-048.05 | doc-idea-realization-plugin-document-governance | draft | 1 | 0 | 0 | — |
-| PLAN-048.06 | doc-idea-realization-plugin-generators-layout | draft | 1 | 0 | 0 | — |
-| PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | draft | 1 | 0 | 0 | — |
-| PLAN-048.08 | doc-idea-realization-plugin-end-to-end | draft | 1 | 0 | 0 | — |
-| PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | draft | 1 | 0 | 0 | — |
+| PLAN-048 | doc-idea-realization-plugin | approved | 9 | 0 | 0 | — |
+| PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 1 | 0 | 0 | — |
+| PLAN-048.02 | doc-idea-realization-plugin-idea-system | approved | 1 | 0 | 0 | — |
+| PLAN-048.03 | doc-idea-realization-plugin-partition | approved | 1 | 0 | 0 | — |
+| PLAN-048.04 | doc-idea-realization-plugin-backlog-sessions | approved | 1 | 0 | 0 | — |
+| PLAN-048.05 | doc-idea-realization-plugin-document-governance | approved | 1 | 0 | 0 | — |
+| PLAN-048.06 | doc-idea-realization-plugin-generators-layout | approved | 1 | 0 | 0 | — |
+| PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | approved | 1 | 0 | 0 | — |
+| PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
+| PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 1 | 0 | 0 | — |
 
 ## Held codes
 

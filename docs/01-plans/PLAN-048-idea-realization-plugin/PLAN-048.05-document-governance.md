@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-document-governance
 code: PLAN-048.05
 title: Idea-realization plugin — the document-governance engine
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'

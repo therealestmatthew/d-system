@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-backlog-sessions
 code: PLAN-048.04
 title: Idea-realization plugin — backlog check, ready report and the session skills
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'

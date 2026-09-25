@@ -46,6 +46,13 @@
           "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
           "date": "2026-09-25",
           "reason": "The plan is revised as the finding's fix requires: D2 now carries a private marketplace file at the repository root, phase-plug-01's first step is the install check with a stop-and-report failure path, and REQ-031 R01's boundary and accepted decisions record the change. The escalation is because the fix reverses the owner's 'no marketplace file' answer; the owner confirms or overrules at G3 (overview Q5)."
+        },
+        {
+          "value": "fixed",
+          "by": "owner",
+          "recorded_by": "Session Manager session, relaying the owner's G3 answer",
+          "date": "2026-09-25",
+          "reason": "The owner ruled: no marketplace file in this repository; the plugin will be included in a different marketplace later. The plan now loads the plugin with --plugin-dir during the build, phase-plug-01 verifies that loading first with a stop-and-report failure path, and D2, PLAN-048.01, PLAN-048.08 and REQ-031 R01 say so."
         }
       ]
     },
@@ -294,5 +301,5 @@
       ]
     }
   ],
-  "notes": "Reviewed at fa44a92 on agent/plugin-plan, two dispatches on partition-adversary with PROMPT-038: the plan altitude (the overview with its eight child plans and REQ-031) and the phase altitude for phase-plug-01..08. The plan-altitude adversary hit its turn limit and was asked to report what it had verified; its summary lines were not delivered, only the array. No later-added altitude: every phase was registered in the plan's first commit. phase-plug-09 was created by the revision (the split F05 asked for) and is therefore later-added relative to this record; it is reviewed at G3 by the owner with the record and gets its later-added dispatch if the owner asks. Findings recorded as reported; the dispatcher added only id, engine, author and the planner's dispositions. The owner's ruling on F01 is awaited at G3."
+  "notes": "Reviewed at fa44a92 on agent/plugin-plan, two dispatches on partition-adversary with PROMPT-038: the plan altitude (the overview with its eight child plans and REQ-031) and the phase altitude for phase-plug-01..08. The plan-altitude adversary hit its turn limit and was asked to report what it had verified; its summary lines were not delivered, only the array. No later-added altitude: every phase was registered in the plan's first commit. phase-plug-09 was created by the revision (the split F05 asked for) and is therefore later-added relative to this record; it is reviewed at G3 by the owner with the record and gets its later-added dispatch if the owner asks. Findings recorded as reported; the dispatcher added only id, engine, author and the planner's dispositions. The owner's ruling on F01 is awaited at G3. At G3 on 2026-09-25 the owner approved the plan, ruled on F01, queued the nine phases after phase-idg-01 in wave order and raised max_active to 4."
 }

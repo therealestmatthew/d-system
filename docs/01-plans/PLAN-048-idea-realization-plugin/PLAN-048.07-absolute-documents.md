@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-absolute-documents
 code: PLAN-048.07
 title: Idea-realization plugin — the governance documents as absolutes, part one
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'

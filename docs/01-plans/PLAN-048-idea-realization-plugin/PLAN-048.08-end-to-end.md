@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-end-to-end
 code: PLAN-048.08
 title: Idea-realization plugin — the end-to-end exercise and handover
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
@@ -27,8 +27,8 @@ installed and exercised once in a scratch repository, with the output shown to t
 ## Decisions
 
 - **The scratch repository is created outside this repository and its worktrees**, empty, with
-  `git init`, and the plugin is installed from this repository's marketplace by local path, the
-  mechanism `phase-plug-01` verified. **The exercise runs from a worktree of the scratch
+  `git init`, and the plugin is loaded with `--plugin-dir`, the mechanism `phase-plug-01`
+  verified; a persistent install waits for the external marketplace the owner named at G3. **The exercise runs from a worktree of the scratch
   repository**, so the partition sweep's primary-checkout staging path differs from the working
   directory and the second-audit fix is exercised against the divergence it exists for. Rejected:
   exercising inside a worktree of this repository (the R02 and R21 checks would not be exercised

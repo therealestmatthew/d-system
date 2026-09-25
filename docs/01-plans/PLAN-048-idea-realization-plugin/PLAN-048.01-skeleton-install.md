@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-skeleton-install
 code: PLAN-048.01
 title: Idea-realization plugin — skeleton, prerequisites, scaffold and doctor
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
@@ -44,24 +44,22 @@ consent ruling for settings and hooks is in `_working/session-manager/reports/ru
   plugin version, the time, one entry per file (path, SHA-256, feature) and a `consent` list.
   Rejected: `${CLAUDE_PLUGIN_DATA}` (per machine, not per repository; a clone would not know what
   was installed). Cost: one dot-directory in the target.
-- **A marketplace file at this repository's root, `.claude-plugin/marketplace.json`, names the
-  plugin with a relative source.** The adversary verified with the live CLI that
-  `claude plugin marketplace add <dir>` fails without one and that `--plugin-dir` loads a plugin
-  for one session only; a persistent install needs a marketplace. This revises the owner's "no
-  marketplace file" answer, whose reason was privacy: the marketplace stays private because it is
-  added by local path and never published. The owner rules on this at G3. Rejected: verifying the
-  install path in the last phase (every earlier phase would build on an unverified manifest
-  shape). Cost: one more file, and this phase's first step is the install check, before the
-  manifest is fixed.
+- **The plugin is loaded with `--plugin-dir` during the build; no marketplace file here.** The
+  adversary verified with the live CLI that a persistent install needs a marketplace and that
+  `--plugin-dir` loads a plugin per session; the owner ruled at G3 that the plugin joins a
+  marketplace elsewhere later. Rejected: verifying the loading path in the last phase (every
+  earlier phase would build on an unverified manifest shape). Cost: this phase's first step is the
+  loading check, before the manifest is fixed, and every session that uses the plugin during the
+  build passes `--plugin-dir`.
 - **Scaffold features are selectable** (`--feature ideas|partition|backlog|documents|all`) so a
   target that wants only the idea log gets only its files. This is the workflow-sized install the
   `000439` ruling asked for, inside the single plugin.
 
 ## Work and dependencies
 
-1. The install check: marketplace file, `claude plugin marketplace add`, `claude plugin install`,
-   skills visible in a new session. If it fails, stop and report; nothing else in this phase is
-   built on a shape that does not install.
+1. The loading check: `claude --plugin-dir plugins/idea-realization`, skills visible in a new
+   session, `${CLAUDE_PLUGIN_ROOT}` resolving. If it fails, stop and report; nothing else in this
+   phase is built on a shape that does not load.
 2. `plugin.json`, directories, README stub, `pyproject`-free pytest configuration (`conftest.py`
    sets the scripts path), the PEP 723 header, `scripts/check.py` and `scripts/cli.py` as
    dispatchers over `scripts/checks/`. Verify with `claude plugin validate --strict`.

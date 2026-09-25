@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-partition
 code: PLAN-048.03
 title: Idea-realization plugin — the partition sweep
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'

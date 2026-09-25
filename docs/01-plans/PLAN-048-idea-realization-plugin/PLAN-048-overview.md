@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin
 code: PLAN-048
 title: Idea-realization plugin — overview
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
@@ -14,7 +14,13 @@ depends_on: [doc-idea-realization-plugin-requirements, doc-realization-role-cont
 
 # Idea-realization plugin
 
-Delivers [REQ-031](../../06-requirements/REQ-031-idea-realization-plugin.md). One plugin,
+Delivers [REQ-031](../../06-requirements/REQ-031-idea-realization-plugin.md).
+
+**Approved at G3 by the owner on 2026-09-25**, in the Session Manager session, with the nine
+phases queued after `phase-idg-01` in wave order and `max_active` raised to 4. Review record:
+`2026-09-25-plan-048`, dispositioned; the owner ruled on F01 (no marketplace file here).
+
+One plugin,
 `plugins/idea-realization/`, carrying the whole idea-realization pipeline and its governance for
 private installation into the owner's other repositories. Nine phases, `phase-plug-01` to
 `phase-plug-09`, one per child plan in this folder.
@@ -45,13 +51,14 @@ and to G3.
   Cost of the rejected option: a marketplace file, inter-plugin dependency declarations, and a
   target that installs the backlog without the document governance it needs. The owner chose one
   plugin knowing the departure; `REQ-031`'s accepted decisions record it.
-- **D2. Private use, installed by local path, no licence; a marketplace file at this
-  repository's root.** The owner's answer was "no marketplace file"; the adversary then verified
-  with the live CLI that a persistent install exists only from a marketplace (`--plugin-dir` is
-  per session). The file stays private because the marketplace is added by local path and never
-  published, which was the reason for the answer. **The owner confirms or overrules this at G3.**
-  Rejected: a new public repository (publication work and a licence decision for something only
-  the owner installs) and per-session loading with `--plugin-dir` (every session re-adds it).
+- **D2. Private use, no licence, no marketplace file in this repository.** The adversary
+  verified with the live CLI that a persistent install exists only from a marketplace and that
+  `--plugin-dir` loads a plugin per session. The owner ruled at G3 that the plugin will be
+  included in a marketplace elsewhere later, so this repository carries none: during the build
+  and the end-to-end exercise the plugin is loaded with `--plugin-dir`, and `phase-plug-01`
+  verifies that loading first. Rejected: a private marketplace file here (a second place to
+  maintain the plugin's listing once it joins the external marketplace) and a new public
+  repository now (publication work before the plugin exists).
 - **D3. `uv run` with PEP 723 inline dependencies.** Rejected: stdlib-only scripts (a second
   validation implementation to keep in sync with the schema) and a pip-installed package with a
   SessionStart install hook (a hook the owner's consent ruling would gate, and a persistent
@@ -145,8 +152,8 @@ backlog entries: no two phases in the same wave share a system or a deliverable 
 validator admits them together. `phase-plug-01` and `phase-plug-08` declare the whole plugin tree
 and therefore run alone among plugin phases. The waves:
 
-1. `phase-idg-01` (locks `sys-governance`) and `phase-plug-01` (locks `sys-plugin-core`,
-   `plugins/idea-realization/`, `.claude-plugin/marketplace.json`) — two sessions.
+1. `phase-idg-01` (locks `sys-governance`) and `phase-plug-01` (locks `sys-plugin-core` and
+   `plugins/idea-realization/`) — two sessions.
 2. `phase-plug-02` (ideas; after 01 and idg-01) and `phase-plug-05` (documents; after 01) — two
    sessions.
 3. `phase-plug-03` (partition; after 02), `phase-plug-04` (backlog; after 05), `phase-plug-06`
@@ -155,11 +162,9 @@ and therefore run alone among plugin phases. The waves:
 5. `phase-plug-09` (absolutes part two; after 07).
 6. `phase-plug-08` (end to end; after 03 and 09) — alone.
 
-Wave 3 needs `max_active` of at least 3 (the current value); a fourth concurrent session would
-need `max_active: 4`, the schema's maximum, which the owner decides at G3 (Q4). The owner ranks
-`next_up`; the planner proposes, at G3, that the nine phases follow `phase-idg-01` at the front of
-the queue in wave order, since the owner ruled that the coordination work stays paused until the
-plugin ships. The Session Manager dispatches each wave to the available sessions with the
+`max_active` is 4 (owner, G3), so wave 3's three phases and one re-claim of `phase-grd-02` fit
+at once. The owner ranked `next_up` at G3: the nine phases follow `phase-idg-01` at the front of
+the queue in wave order, and the coordination work stays paused until the plugin ships. The Session Manager dispatches each wave to the available sessions with the
 `session-start` procedure and holds the integration turn per `GOV-017`.
 
 Failure paths: a phase whose verification fails stays `active` with the failure in its checkpoint
@@ -185,16 +190,12 @@ backlog entries and restated in each child plan.
 
 ## Open questions
 
-- **Q1. `next_up` placement.** Owner, at G3. The planner leans to the order in Execution order,
-  directly after `phase-idg-01`.
+- **Q1. Settled at G3.** The nine phases follow `phase-idg-01` in wave order.
 - **Q2. Settled.** The adversary found the single absolute-documents phase too large; it is split
   into `phase-plug-07` and `phase-plug-09` (D13).
 - **Q3. The `claude` CLI as a prerequisite.** Planner, in `phase-plug-01`. Triage and partition
   dispatch subagents through the harness, not the CLI; the planner leans to listing `claude` as
   required only for the workflows that shell to it, which today is none in the plugin.
-- **Q4. `max_active`.** Owner, at G3. Wave 3 has three phases and `phase-grd-02`'s re-claim may
-  want a fourth slot; the planner leans to leaving it at 3 and letting wave 3 absorb the
-  re-claim's timing, since raising it is a one-line change the owner can make when a fourth
-  session is actually free.
-- **Q5. The marketplace file (D2).** Owner, at G3: confirm the private marketplace file, or name
-  another install mechanism the planner did not find.
+- **Q4. Settled at G3.** `max_active` is 4.
+- **Q5. Settled at G3.** No marketplace file here; `--plugin-dir` during the build, an external
+  marketplace later (D2).

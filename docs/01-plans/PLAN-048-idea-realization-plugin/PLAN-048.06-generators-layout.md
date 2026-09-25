@@ -4,7 +4,7 @@ id: doc-idea-realization-plugin-generators-layout
 code: PLAN-048.06
 title: Idea-realization plugin — generators, layout reference and the agreement templates
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
