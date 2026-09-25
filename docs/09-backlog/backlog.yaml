@@ -14746,7 +14746,7 @@ items:
   - plugins/idea-realization/test/test_backlog.py
   - plugins/idea-realization/test/test_regression.py
   next_action: Rebase once phase-plug-02 lands its fix to test_scripts_portable.py (copying schemas/),
-    re-run the plugin suite, run the independent review, then send READY.
+    re-run the plugin suite and send READY; the independent review is done and dispositioned.
   session: doc-session-plugin-backlog-sessions
   completion_evidence:
   - plugins/idea-realization/scripts/backlog.py
@@ -14759,7 +14759,8 @@ items:
   result: Backlog check, ready command, status regression, schema and the backlog, session-start,
     checkpoint and session-close skills built on agent/phase-plug-04; plugin suite 285 passed and 1
     failed (test_scripts_portable.py, outside this phase, fixed by phase-plug-02); strict validation
-    passed. Not yet reviewed or merged.
+    passed. The demo-adversary review found all five Met; two minor findings accepted by the owner.
+    Not yet merged.
 - id: phase-plug-05
   title: Document-governance engine — check, next-code with reservations, catalog, plan-check
   plan: doc-idea-realization-plugin
