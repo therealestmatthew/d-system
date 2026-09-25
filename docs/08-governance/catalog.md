@@ -174,6 +174,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-036 | prompt | active | repository-owner | docs/02-prompts/PROMPT-036-build-coordinator.md |
 | PROMPT-037 | prompt | active | repository-owner | docs/02-prompts/PROMPT-037-session-manager-starter-messages.md |
 | PROMPT-038 | prompt | active | repository-owner | docs/02-prompts/PROMPT-038-single-adversary-engine.md |
+| PROMPT-040 | prompt | active | repository-owner | docs/02-prompts/PROMPT-040-gemini-review-sequence.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -432,4 +433,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-347 documents — adr: 20, architecture: 11, governance: 16, operation: 21, plan: 61, prompt: 38, requirement: 30, session: 150.
+348 documents — adr: 20, architecture: 11, governance: 16, operation: 21, plan: 61, prompt: 39, requirement: 30, session: 150.

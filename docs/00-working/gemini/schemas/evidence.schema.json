@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "evidence.schema.json",
+  "title": "One citation: a tracked file and line range at the provenance dev_sha, or a public URL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["quote"],
+  "oneOf": [{"required": ["path", "line"]}, {"required": ["url", "accessed"]}],
+  "properties": {
+    "path": {"type": "string", "pattern": "^[^/].*", "description": "Repository-relative path of a tracked file"},
+    "line": {"type": "string", "pattern": "^\\d+(-\\d+)?$", "description": "A line number or an inclusive range, e.g. 42 or 42-47"},
+    "url": {"type": "string", "pattern": "^https://"},
+    "accessed": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "quote": {"type": "string", "minLength": 1, "description": "The exact text at that location, or a short exact excerpt of it"}
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "provenance.schema.json",
+  "title": "Provenance block carried by every Gemini output file (PROMPT-040)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["model", "date", "prompt", "dev_sha", "branch"],
+  "properties": {
+    "model": {"type": "string", "minLength": 1, "description": "The model name and version, as the model reports it"},
+    "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "prompt": {"type": "string", "enum": ["PROMPT-040 G1", "PROMPT-040 G2", "PROMPT-040 G3"]},
+    "dev_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$", "description": "Full sha of dev that the worktree was cut from"},
+    "branch": {"type": "string", "pattern": "^agent/gemini-[a-z0-9-]+$"}
+  }
+}
