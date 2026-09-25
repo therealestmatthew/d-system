@@ -1,0 +1,73 @@
+{
+  "name": "idea-realization",
+  "version": "0.1.0",
+  "description": "Take an idea from capture through triage, partition, planning, phases and backlog to governed documents, in any git repository.",
+  "author": {
+    "name": "idea-realization maintainers"
+  },
+  "keywords": ["ideas", "backlog", "planning", "governance"],
+  "userConfig": {
+    "ideas_path": {
+      "type": "string",
+      "title": "Idea log",
+      "description": "Append-only idea event log, relative to the repository root.",
+      "default": "ideas/ideas.jsonl"
+    },
+    "ideas_view_path": {
+      "type": "string",
+      "title": "Rendered idea view",
+      "description": "Generated Markdown view of the idea log, relative to the repository root.",
+      "default": "ideas/ideas.md"
+    },
+    "priority_path": {
+      "type": "string",
+      "title": "Idea priority queue",
+      "description": "Hand-ordered list of idea ids that jump the queue, relative to the repository root.",
+      "default": "ideas/priority.yaml"
+    },
+    "backlog_path": {
+      "type": "string",
+      "title": "Backlog",
+      "description": "Phase catalog, relative to the repository root.",
+      "default": "backlog/backlog.yaml"
+    },
+    "docs_root": {
+      "type": "string",
+      "title": "Document root",
+      "description": "Directory holding governed documents, the code register and the systems registry, relative to the repository root.",
+      "default": "docs"
+    },
+    "integration_branch": {
+      "type": "string",
+      "title": "Integration branch",
+      "description": "Branch that finished work merges into.",
+      "default": "main"
+    },
+    "worktree_dir": {
+      "type": "string",
+      "title": "Worktree directory",
+      "description": "Directory that holds one worktree per session, relative to the repository root. <repository> is replaced by the repository directory's name.",
+      "default": "../<repository>-worktrees"
+    },
+    "triage_search": {
+      "type": "string",
+      "title": "Triage search list",
+      "description": "Directories and files the triage agent searches for related material, relative to the repository root.",
+      "multiple": true,
+      "default": ["docs"]
+    },
+    "exempt_files": {
+      "type": "string",
+      "title": "Exempt files",
+      "description": "Markdown files under the document root that carry no front matter, relative to the repository root.",
+      "multiple": true,
+      "default": []
+    },
+    "staging_dir": {
+      "type": "string",
+      "title": "Staging directory",
+      "description": "Gitignored directory for partition drafts and corpora, relative to the repository root.",
+      "default": ".idea-realization/staging"
+    }
+  }
+}
