@@ -63,9 +63,9 @@ Also run, as the Session Manager's merge gate requires: `uv run ruff check src/ 
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-a`, `session: doc-session-idea-schema-bundle`.
-`next_action`: every acceptance condition is met on `agent/phase-idg-01`; awaiting the independent
-review's findings and the owner's merge approval, after which the completion edit is made on dev.
+`status: complete`, `agent: agent-builder-a`, `session: doc-session-idea-schema-bundle`, set on dev
+after the owner-approved fast-forward of `agent/phase-idg-01` (`0008788`). `completion_evidence`
+names this record, ADR-024, the three bundle files and the new test file.
 
 ## Unresolved
 
@@ -119,8 +119,8 @@ phase ids match), or the pointer resolvers.
 **Disposition.** Finding 2 is fixed: the type restriction now applies whenever `target_code` is
 present (`if`/`then` in the `linked` branch), and `test_only_extends_and_relates_to_may_point_at_a_document`
 covers both targets together on `supersedes` and `component_of`; full gates re-run green after the
-rebase onto `6903db8`. Finding 1 is accepted as outside this phase, for the owner to confirm at the
-merge: the scope bullet says what remains "is a status move from reviewing to resolved, which the
+rebase onto `6903db8`. Finding 1 is accepted as outside this phase, and the owner confirmed that
+acceptance when approving the merge on 2026-09-25; the move stays with `phase-idg-13`. The reasoning: the scope bullet says what remains "is a status move from reviewing to resolved, which the
 transition table must allow". This phase makes the table allow it (`reviewing → resolved`, tested by
 `test_a_revisited_idea_moves_from_reviewing_to_resolved`). `phase-idg-13`'s scope names the move itself
 ("Move 000099 and 000129 to resolved"), its deliverables are `_data/ideas.jsonl`, and its acceptance

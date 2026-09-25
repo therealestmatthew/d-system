@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-idg-01
 - phase-plug-01
 - phase-plug-05
 - phase-plug-02
@@ -9826,7 +9825,7 @@ items:
   - sys-portfolio
   - sys-governance
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   session: doc-session-idea-schema-bundle
   priority: 1
@@ -9874,9 +9873,19 @@ items:
   - test/
   - src/governance/
   - docs/08-governance/OPS-005-append-idea.md
-  next_action: Every acceptance condition is met on agent/phase-idg-01 (SESS-2026-09-25-01); awaiting
-    the independent review's findings and the owner's merge approval, after which the completion edit
-    is made on dev.
+  next_action: Complete. The 000099/000129 move to resolved stays with phase-idg-13 (owner ruling on review
+    finding F1, 2026-09-25).
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-25-01-idea-schema-bundle.md
+  - docs/04-decisions/ADR-024-idea-classification-as-schema-fields.md
+  - schemas/idea.schema.json
+  - src/db/ideas.py
+  - tools/append_idea.py
+  - test/test_idea_classification.py
+  result: 'uv run pytest: 1115 passed; uv run python -m src.governance: OK; ruff and mypy src/ clean, after
+    rebase on dev 6903db8 and re-run independently by the Session Manager. Independent demo-adversary review
+    found all four acceptance conditions met; F2 (target_code type hole) fixed in b45a7e4, F1 (000099/000129
+    close) accepted by the owner as phase-idg-13 scope.'
 - id: phase-idg-13
   title: Backfill the idea log into the new terminal states - ideas created 2026-09-06 to 2026-09-10
   plan: doc-idea-graph-lifecycle
