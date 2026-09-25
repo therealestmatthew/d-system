@@ -381,6 +381,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-25-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md |
 | SESS-2026-09-25-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-03-plugin-idea-system.md |
 | SESS-2026-09-25-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-04-plugin-document-governance.md |
+| SESS-2026-09-25-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-05-plugin-backlog-sessions.md |
 | SESS-2026-09-26-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-01-system-boundary-study-plan.md |
 | SESS-2026-09-26-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-02-agentic-ai-planning-reference.md |
 | SESS-2026-09-26-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-03-system-boundary-inventory.md |
