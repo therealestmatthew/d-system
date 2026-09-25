@@ -179,3 +179,22 @@ def test_the_tools_skill_reads_only_the_reference() -> None:
     assert re.findall(r"[\w./${}-]+\.(?:md|py|yaml|json)", text) == [
         "${CLAUDE_PLUGIN_ROOT}/docs/tools.md"]
     assert "```" not in text, "the skill reads the reference; it runs no command"
+
+
+def test_the_command_in_the_reference_header_runs_as_written(tmp_path: Path) -> None:
+    """The header's command, run from a copy of the plugin, finds the committed file current."""
+    import shlex
+
+    copy = tmp_path / "plugin"
+    shutil.copytree(SCRIPTS, copy / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copytree(PLUGIN_ROOT / ".claude-plugin", copy / ".claude-plugin")
+    (copy / "docs").mkdir()
+    shutil.copy(PLUGIN_ROOT / "docs" / "tools.md", copy / "docs" / "tools.md")
+    header = (copy / "docs" / "tools.md").read_text().split("## Configuration")[0]
+    command = shlex.split(header.split("`")[1])
+    assert command[:3] == ["uv", "run", "scripts/generate_tool_docs.py"]
+    uv = shutil.which("uv")
+    runner = [uv, "run", "--quiet", "--no-project", "--script"] if uv else [sys.executable]
+    result = subprocess.run([*runner, *command[2:], "--check"], cwd=copy,
+                            capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr

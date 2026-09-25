@@ -187,13 +187,13 @@ def render_reference(tools: list[Path], title: str, invocation: str,
                      preamble: Path | None, command: str) -> str:
     """One document: a title, the preamble script's docstring, then one section per script.
 
-    ``command`` is the argument list that regenerates the document, with ``--root .`` whatever root
-    was given, stated in its header so a reader can reproduce it exactly from any checkout.
+    ``command`` is the full command that regenerates the document, with ``--root .`` whatever root
+    was given, stated in its header so a reader can run it as written from any checkout.
     """
     lines = [f"# {title}", "",
              "Generated from the scripts themselves. Never edit this file by hand. Regenerate it,",
              "from the directory its paths are relative to, with",
-             f"`generate_tool_docs.py {command}`;",
+             f"`{command}`;",
              "`--check` with the same arguments compares the committed file with a fresh render.",
              ""]
     if preamble is not None:
@@ -253,9 +253,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         if preamble is not None and not preamble.is_file():
             print(f"no preamble script {preamble}", file=sys.stderr)
             return 2
+        script = Path(__file__).name
+        if (tools_dir / script).is_file():
+            script = f"{args.tools.rstrip('/')}/{script}"
         command = shlex.join([
-            "--root", ".", "--tools", args.tools, "--reference", args.reference,
-            "--title", args.title,
+            "uv", "run", script, "--root", ".", "--tools", args.tools,
+            "--reference", args.reference, "--title", args.title,
             "--invocation", args.invocation,
             *(["--preamble-from", args.preamble_from] if args.preamble_from else []),
             *[item for name in args.exclude for item in ("--exclude", name)],

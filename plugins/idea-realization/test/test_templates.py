@@ -97,3 +97,14 @@ def test_configured_values_fill_the_two_with_a_default(tmp_path: Path) -> None:
 def test_a_malformed_set_is_a_usage_error(tmp_path: Path) -> None:
     result = run(str(TEMPLATES[0]), "--root", str(tmp_path), "--set", "nonsense", cwd=tmp_path)
     assert result.returncode == 2
+
+
+@pytest.mark.parametrize("template", TEMPLATES, ids=lambda p: p.name)
+def test_a_template_names_no_plugin_command_or_skill(template: Path) -> None:
+    """The templates state portable rules only, never what the plugin's commands do."""
+    import re
+
+    skills = {p.name for p in (PLUGIN_ROOT / "skills").iterdir() if p.is_dir()}
+    words = set(re.findall(r"`([a-z][a-z-]*)`", template.read_text()))
+    assert not words & (skills | {"check", "ready", "next-code", "release-code", "catalog"})
+    assert "lock" not in template.read_text().lower()
