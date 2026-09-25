@@ -25,7 +25,7 @@ Run in `../d-system-worktrees/phase-plug-01` on `agent/phase-plug-01`, Claude Co
 
 ```text
 $ cd plugins/idea-realization && uv run pytest
-63 passed
+64 passed
 
 $ claude plugin validate plugins/idea-realization --strict
 Validating plugin manifest: .../plugins/idea-realization/.claude-plugin/plugin.json
@@ -115,8 +115,101 @@ describes the build as not yet reviewed or merged.
     `--feature triage|partition|all`, as `REQ-031` R04 states, otherwise reported optional;
     `worktree_dir` defaults to `../<repository>-worktrees`, derived from the repository directory's
     name at resolve time.
-  - Seed files follow this repository's current schemas' required fields (priority:
-    `schema_version`, `updated`, `next_up`; backlog: `schema_version`, `updated`, `max_active`,
-    `next_up`, `items`, without `decision_record`). `phase-plug-02` and `phase-plug-04` own those
-    formats; if their schemas differ, the seeds need an edit in `scripts/scaffold.py`, which is
-    outside their declared deliverables.
+  - Seed files: the priority seed carries every field this repository's
+    `schemas/idea-priority.schema.json` requires (`schema_version`, `updated`, `next_up`). The
+    backlog seed does **not** match `schemas/backlog.schema.json`, which requires `decision_record`;
+    the seed omits it deliberately, because its value is a document id and a fresh target has no
+    decision record to name. `phase-plug-04` owns the plugin's backlog schema: it either drops
+    `decision_record` from the required list or needs a seed edit in `scripts/scaffold.py`, which
+    is outside its declared deliverables. Flagged to the Session Manager in READY.
+- **Scope wording also stale:** the backlog scope bullet still reads "consent-gated writes to
+  settings, hooks and .gitignore (R05, R06)"; under the owner's ruling this session it should read
+  "a consent-gated write to .gitignore (R06); no write to settings or hooks". `REQ-031` R06 still
+  names settings and hooks as consent-gated targets, which stays true as a rule for any later phase
+  that adds such a write.
+
+## Review
+
+Independent adversarial review by a `demo-adversary` agent, given the scope, acceptance and
+verification lists, the range `dev...HEAD` (6fb8913, 12ae04b, 2d8f3f2), this record, and the owner's
+rulings. It re-ran every verification command, the repository gates, the loading check headlessly
+from a scratch repository, the prerequisites check with a `PATH` holding only `git`, and the
+scaffold, second run, dry run and doctor by hand. Its report, condition by condition:
+
+1. `validate --strict` / unknown key / license — **Met.** "`claude plugin validate
+   plugins/idea-realization --strict` → `✔ Validation passed`, exit 0. Independently reproduced the
+   license-passes-strict fact the owner ruled on … confirms the acceptance wording is genuinely
+   unsatisfiable as written, and confirms the mitigation is real."
+2. Loading check — **Met.** "listed exactly `idea-realization:doctor`,
+   `idea-realization:prerequisites`, `idea-realization:scaffold` … running that literal command
+   against the scratch repo produced the documented `no install-state record … run the scaffold
+   first`, exit 2."
+3. Scaffold — **Met.** "dry-run wrote nothing … a second run reported every path `skipped …
+   (exists)` and changed nothing; `doctor` after edit-and-delete correctly reported
+   `drifted`/`missing`/`unchanged` and changed nothing."
+4. Prerequisites — **Met.** Exit 1, `missing  uv      not on PATH; install: curl -LsSf
+   https://astral.sh/uv/install.sh | sh`, "`keep.txt` in the working directory verified
+   byte-identical before/after."
+5. R02 — **Met.** "the only hit is the regex pattern's own source text in
+   `test_no_source_references.py:26` (`r"\bSESS-"`), which is the detector, not an instance …
+   Injected `phase-demo-99` into a copy's README … it correctly flagged" it.
+6. Portability — **Met.** "`test_scripts_portable.py` does this and passes; I independently grepped
+   the whole plugin tree for `parents[`, `from src`, `import src` and found nothing."
+
+Gates it re-ran: plugin suite `63 passed`; repository `uv run pytest` `1080 passed, 1 warning`;
+ruff clean; mypy `Success: no issues found in 46 source files`; governance OK; catalog unchanged.
+
+Findings, as reported, and their disposition:
+
+1. **should-fix** — `scripts/scaffold.py` backlog seed omits `decision_record`, "and the session
+   record's stated justification is false": `schemas/backlog.schema.json` requires it. **Fixed in
+   the record** (the claim was wrong; see Corrections). The omission itself is kept as a deliberate
+   choice and handed to `phase-plug-04` in Unresolved and in READY.
+2. **minor** — the exclusive-create write had no handling for `FileExistsError` when a file appears
+   between the existence check and the write; the run would abort with earlier files unrecorded.
+   **Fixed:** the scaffold now reports `skipped  <path> (appeared during this run)`, leaves the file
+   untouched and continues; `test_a_file_appearing_mid_run_is_skipped_not_overwritten` covers it.
+3. **minor** — the scope bullet's "settings, hooks and .gitignore" is stale against the owner's
+   ruling and nothing tracked it. **Accepted and tracked:** proposed wording added to Unresolved.
+
+"No other discrepancies survived the attack."
+
+## Decisions
+
+The loading check ran first, before any manifest shape was fixed, and passed on a minimal fixture.
+The same scratch fixtures settled four manifest facts from the live CLI rather than from memory:
+`license` passes `--strict`; an unknown top-level key fails it; `${user_config.KEY}` substitutes
+only a saved value; list options arrive comma-joined. The owner then made three rulings: enforce
+"no license" with the plugin's own test and correct the wording; put the registers under
+`docs_root` and the schemas under `.idea-realization/schemas/`; gate `.gitignore` only, never
+settings or hooks. The owner chose "gitignore only" over the recommended "mechanism only", so no
+settings or hook code exists to maintain until a phase needs it.
+
+The builder's own calls: skills pass options through single-quoted `CLAUDE_PLUGIN_OPTION_<KEY>`
+assignments, because `CLAUDE_PLUGIN_OPTION_*` never reaches the Bash tool and bash rejects the
+unsubstituted text in double quotes; `paths.py` reads the key list and defaults from the manifest,
+so the ten keys are declared once; the scaffold copies a plugin file when this version ships it and
+reports "not shipped" otherwise, so later phases' schemas and templates reach targets without an
+edit to `scaffold.py`; `claude` is required only for triage and partition, as R04 states; the R02
+check reads the repository name, remote owner and committer identity from git at test time, so no
+forbidden literal is written into the plugin.
+
+## Corrections
+
+- The scaffold skill first passed options as `env $OPTS` with a quoted string; word-splitting would
+  have kept the quotes inside each value. Replaced with inline assignments before any commit.
+- The inline assignments were first double-quoted; a direct bash test gave `bad substitution` for an
+  unset option. Switched to single quotes and added `test_skills.py` to hold that.
+- A stray `.mypy_cache` from a manual mypy run inside `scripts/` made the R02 scan fail on cached
+  text; the cache was deleted and tool caches added to the scan's skip list.
+- The record claimed the backlog seed followed this repository's required fields; it does not
+  (`decision_record`). Corrected after the review.
+
+## Left undone
+
+- The wording corrections in Unresolved (acceptance entry one, `REQ-031` R01, the scope bullet) are
+  proposals for the owner, not edits: they touch shared planning text outside this phase's
+  deliverables.
+- The seed/schema agreement for the backlog belongs to `phase-plug-04`; for the priority file to
+  `phase-plug-02`.
+- The phase stays `active` until the owner approves the merge; completion follows on `dev`.

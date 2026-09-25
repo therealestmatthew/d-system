@@ -14565,8 +14565,8 @@ items:
   - uv run python -m src.governance
   deliverables:
   - plugins/idea-realization/
-  next_action: Run /session-close up to its independent review, fix or accept every finding, then
-    send READY to the Session Manager; the phase completes only after the owner-approved merge. The
+  next_action: Review done and dispositioned; send READY to the Session Manager and merge on the
+    owner's approval; the phase completes only after the owner-approved merge. The
     first acceptance entry's license half cannot hold (license is a valid manifest field); the owner
     ruled to enforce it with the plugin's own test and to correct the wording, proposed in the session
     record's Unresolved section.
@@ -14579,8 +14579,9 @@ items:
   - plugins/idea-realization/test/test_no_source_references.py
   - docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md
   result: Plugin skeleton, paths resolver, dispatchers, prerequisites, scaffold with install-state
-    record, doctor and the R02 check built on agent/phase-plug-01; plugin suite 63 passed, strict
-    validation passed, loading check passed. Not yet independently reviewed or merged.
+    record, doctor and the R02 check built on agent/phase-plug-01; plugin suite 64 passed, strict
+    validation passed, loading check passed. The demo-adversary review found all six Met; three findings
+    fixed or accepted. Not yet merged.
 - id: phase-plug-02
   title: The idea system — writer, fold, render, priority queue, vocabulary, triage
   plan: doc-idea-realization-plugin

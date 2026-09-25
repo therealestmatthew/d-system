@@ -125,3 +125,23 @@ def test_gitignore_consent_is_recorded(tmp_path: Path) -> None:
 def test_cli_requires_a_feature(tmp_path: Path) -> None:
     assert scaffold.main(["--root", str(tmp_path)]) == 2
     assert list(tmp_path.iterdir()) == []
+
+
+def test_a_file_appearing_mid_run_is_skipped_not_overwritten(tmp_path: Path,
+                                                             monkeypatch: object) -> None:
+    target = tmp_path / "ideas" / "ideas.jsonl"
+    real_open = Path.open
+
+    def racing_open(self: Path, mode: str = "r", *args: object, **kwargs: object) -> object:
+        if self == target and mode == "xb":
+            self.write_bytes(b"theirs\n")
+        return real_open(self, mode, *args, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(Path, "open", racing_open)  # type: ignore[attr-defined]
+    lines = scaffold.scaffold(config(tmp_path), ["ideas"])
+    assert "skipped  ideas/ideas.jsonl (appeared during this run)" in lines
+    assert target.read_bytes() == b"theirs\n"
+    files = record(tmp_path)["files"]
+    assert isinstance(files, list)
+    assert "ideas/ideas.jsonl" not in [entry["path"] for entry in files]
+    assert "ideas/priority.yaml" in [entry["path"] for entry in files]

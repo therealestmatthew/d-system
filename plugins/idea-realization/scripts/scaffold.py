@@ -168,8 +168,12 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
         if dry_run:
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
-        with target.open("xb") as handle:  # "x": fail rather than overwrite, even in a race
-            handle.write(data)
+        try:
+            with target.open("xb") as handle:  # "x": never overwrite, even in a race
+                handle.write(data)
+        except FileExistsError:
+            lines[-1] = f"skipped  {name} (appeared during this run)"
+            continue
         remember(files, {"path": name, "sha256": sha256(target), "feature": seed.feature})
         written = True
 
