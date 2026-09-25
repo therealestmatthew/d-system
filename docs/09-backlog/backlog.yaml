@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-05
 - phase-plug-02
 - phase-plug-04
 - phase-plug-06
@@ -14757,7 +14756,7 @@ items:
   systems:
   - sys-plugin-documents
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   session: doc-session-plugin-document-governance
   priority: 1
@@ -14810,9 +14809,20 @@ items:
   - plugins/idea-realization/test/test_reservations.py
   - plugins/idea-realization/test/test_documents.py
   - plugins/idea-realization/test/test_plan_check.py
-  next_action: Every acceptance condition is met on agent/phase-plug-05 (SESS-2026-09-25-04); awaiting
-    the independent review's findings and the owner's merge approval, after which the completion edit
-    is made on dev.
+  next_action: Complete. phase-plug-04 builds on scripts/documents.py's scan contract, stated in its module
+    docstring.
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-25-04-plugin-document-governance.md
+  - plugins/idea-realization/scripts/documents.py
+  - plugins/idea-realization/scripts/codes.py
+  - plugins/idea-realization/scripts/reservations.py
+  - plugins/idea-realization/scripts/plan_check.py
+  - plugins/idea-realization/test/test_documents.py
+  - plugins/idea-realization/test/test_reservations.py
+  result: 'Plugin suite 200 passed; claude plugin validate --strict passed; check_no_private_content OK;
+    governance OK; repo 1115 passed, ruff and mypy src/ clean; re-run independently by the Session
+    Manager. Independent demo-adversary review found all four acceptance conditions met; F1 (record
+    overstated plugin mypy) corrected, F2 (skills no-other-write untested) fixed with a test.'
 - id: phase-plug-06
   title: Generators, repository-layout reference, and the working-agreement and orientation templates
   plan: doc-idea-realization-plugin
