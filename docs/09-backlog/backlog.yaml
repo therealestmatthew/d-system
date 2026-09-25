@@ -14565,10 +14565,22 @@ items:
   - uv run python -m src.governance
   deliverables:
   - plugins/idea-realization/
-  next_action: Read the plugin manifest reference at code.claude.com/docs/en/plugins/manifest-reference.md
-    for the userConfig shape before writing plugin.json; the analysis at
-    _working/session-manager/plugin-analysis/06-install-model.md lists what the scaffold creates.
-    Runs alone on the plugin tree; every later phase declares a subpath.
+  next_action: Run /session-close up to its independent review, fix or accept every finding, then
+    send READY to the Session Manager; the phase completes only after the owner-approved merge. The
+    first acceptance entry's license half cannot hold (license is a valid manifest field); the owner
+    ruled to enforce it with the plugin's own test and to correct the wording, proposed in the session
+    record's Unresolved section.
+  session: doc-session-plugin-skeleton
+  completion_evidence:
+  - plugins/idea-realization/.claude-plugin/plugin.json
+  - plugins/idea-realization/scripts/paths.py
+  - plugins/idea-realization/scripts/scaffold.py
+  - plugins/idea-realization/test/test_scaffold.py
+  - plugins/idea-realization/test/test_no_source_references.py
+  - docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md
+  result: Plugin skeleton, paths resolver, dispatchers, prerequisites, scaffold with install-state
+    record, doctor and the R02 check built on agent/phase-plug-01; plugin suite 63 passed, strict
+    validation passed, loading check passed. Not yet independently reviewed or merged.
 - id: phase-plug-02
   title: The idea system — writer, fold, render, priority queue, vocabulary, triage
   plan: doc-idea-realization-plugin
