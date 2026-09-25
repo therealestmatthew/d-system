@@ -1,0 +1,27 @@
+{
+  "provenance": {
+    "model": "Gemini 3.1 Pro",
+    "date": "2026-09-25",
+    "prompt": "PROMPT-040 G2",
+    "dev_sha": "5fb84334000aa86efffc7e6ac947aa3e7c744058",
+    "branch": "agent/gemini-g2-adr-023-parameters"
+  },
+  "findings": [
+    {
+      "id": "G2-F001",
+      "category": "design-gap",
+      "severity": "medium",
+      "title": "Polling frequency cost trade-off",
+      "statement": "The exact polling frequency impacts cost and responsiveness, no ideal number is ruled.",
+      "evidence": [
+        {
+          "path": "docs/04-decisions/ADR-023-session-manager-into-orchestrator.md",
+          "line": "229-233",
+          "quote": "D3-5's polling interval"
+        }
+      ],
+      "consequence": "Owner needs to specify the interval.",
+      "touches_owner_ruling": false
+    }
+  ]
+}
