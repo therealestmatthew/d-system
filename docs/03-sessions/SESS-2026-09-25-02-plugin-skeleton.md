@@ -88,7 +88,8 @@ a `multiple` option substitutes comma-joined (`docs/a b.md,x.md`).
 `status: active`, `agent: agent-builder-b`. `next_action`: run `/session-close` up to its
 independent review, then send READY to the Session Manager; the phase completes only after the
 owner-approved merge. `session: doc-session-plugin-skeleton`; `completion_evidence` cites
-`plugin.json`, `paths.py`, `scaffold.py`, the scaffold and R02 tests, and this record; `result` describes the build as not yet reviewed or merged.
+`plugin.json`, `paths.py`, `scaffold.py`, the scaffold and R02 tests, and this record; `result`
+describes the build as not yet reviewed or merged.
 
 ## Unresolved
 
