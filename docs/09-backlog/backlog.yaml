@@ -14745,8 +14745,21 @@ items:
   - plugins/idea-realization/skills/session-close/
   - plugins/idea-realization/test/test_backlog.py
   - plugins/idea-realization/test/test_regression.py
-  next_action: Waits for phase-plug-05. Read _working/session-manager/plugin-analysis/03-backlog.md
-    section 2 for the rules as facts. May run alongside phase-plug-03 and phase-plug-06.
+  next_action: Rebase once phase-plug-02 lands its fix to test_scripts_portable.py (copying schemas/),
+    re-run the plugin suite, run the independent review, then send READY.
+  session: doc-session-plugin-backlog-sessions
+  completion_evidence:
+  - plugins/idea-realization/scripts/backlog.py
+  - plugins/idea-realization/scripts/checks/backlog.py
+  - plugins/idea-realization/scripts/regression.py
+  - plugins/idea-realization/schemas/backlog.schema.json
+  - plugins/idea-realization/test/test_backlog.py
+  - plugins/idea-realization/test/test_regression.py
+  - docs/03-sessions/SESS-2026-09-25-05-plugin-backlog-sessions.md
+  result: Backlog check, ready command, status regression, schema and the backlog, session-start,
+    checkpoint and session-close skills built on agent/phase-plug-04; plugin suite 285 passed and 1
+    failed (test_scripts_portable.py, outside this phase, fixed by phase-plug-02); strict validation
+    passed. Not yet reviewed or merged.
 - id: phase-plug-05
   title: Document-governance engine — check, next-code with reservations, catalog, plan-check
   plan: doc-idea-realization-plugin
