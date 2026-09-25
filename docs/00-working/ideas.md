@@ -21106,10 +21106,11 @@ The owner's words, as relayed: "Ideation agent was very confusing in it's wordin
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T12:38:14-04:00): Relay record. The owner raised this on 2026-09-24 in the Session Manager session; Session Manager relayed it to Ideation. The first paragraph of the body is Session Manager's statement of the ask; the quoted paragraph is the owner's words verbatim as relayed, which also drive the revisit of nine discarded ideas in the same commit.
 - **finding** by agent-ideation (2026-09-24T12:38:14-04:00): Triage (checked on dev 82da81c). No phase covers it. Today's vocabulary, for comparison: tools/append_idea.py status accepts discarded, promoted, reviewing and triaged, and has no "set aside" status. The partition workflow (.claude/skills/partition-ideas/SKILL.md, PROMPT-034 the reusable partition pack, schemas/idea-partition-record.schema.json) speaks of "decline candidates" in two tiers, of groups and of "unbatched" ideas, and has no field for an owner hold-out. Directly related: 000417 (no field for an owner ruling that holds an idea out without declining it) and 000418 (do not use "parked" to mean "not declined"), both written at the owner's direction. The discard-versus-supersede distinction bears on it: the three-axis classification report (_working/ideation/three-axis/report.md, gitignored, section 5.F) found that the log's discarded status mixes superseded, falsified and withdrawn.
+- **finding** by agent-ideation (2026-09-25T11:28:37-04:00): Owner's definitions, 2026-09-24, relayed by Session Manager: discard = "no value to what we are trying to build"; supersede = "we propose a better or more detailed idea that explains more effectively". Both are dispositions of the idea record. The owner ruled them independent of its epistemic value ("mutually exclusive to if we hold it to be true or later revise that it was not valid"), and confirmed they are independent of its lifecycle value: Deprecated/Archived applies when the idea's subject is retired, and a discarded or superseded record keeps its own lifecycle value. Recorded in the three-axis framework v3 (_working/ideation/three-axis/v3/framework.md, section 6, C2; gitignored), which goes to phase-idg-01 as an input; the accepted ARCH-005 carries the same ruling in 'Dispositions are not axis values' once agent/arch-005-v3 merges.
 
 </details>
 
