@@ -37,6 +37,9 @@ three conditions (analysis 03 §2, "Completion is a separate, gated procedure").
 - **The session skills state the coordinator-completion rule as the current rule** and take the
   branch and worktree directory from `userConfig`. Rejected: the owner-only `/session-close`
   framing (superseded on 2026-09-16 here). Cost: none.
+- **`decision_record` is optional in the plugin's backlog schema** (owner, 2026-09-25): the
+  scaffold seeds no decisions document, and the regression check runs only when one is named.
+  Rejected: seeding a placeholder decisions document (a governed document with nothing in it).
 - **Phase ids stay a manual convention**, documented in the layout reference (`phase-plug-06`).
   Rejected: an allocator (new mechanism the source does not have).
 

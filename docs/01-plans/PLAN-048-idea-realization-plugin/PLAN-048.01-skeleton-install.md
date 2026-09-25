@@ -51,6 +51,10 @@ consent ruling for settings and hooks is in `_working/session-manager/reports/ru
   earlier phase would build on an unverified manifest shape). Cost: this phase's first step is the
   loading check, before the manifest is fixed, and every session that uses the plugin during the
   build passes `--plugin-dir`.
+- **Rulings made while building (owner, 2026-09-25).** The validator accepts a `license` field,
+  so the plugin's own test is what rejects one. The consent-gated write is `.gitignore` only;
+  settings and hooks are never written. Registers go to `<docs_root>/codes.yaml` and
+  `systems.yaml`, schemas to `.idea-realization/schemas/`. `doctor` has a skill of its own.
 - **Scaffold features are selectable** (`--feature ideas|partition|backlog|documents|all`) so a
   target that wants only the idea log gets only its files. This is the workflow-sized install the
   `000439` ruling asked for, inside the single plugin.

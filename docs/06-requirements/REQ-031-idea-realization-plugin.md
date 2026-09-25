@@ -71,12 +71,12 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 
 | Id | Requirement | Verification |
 |---|---|---|
-| R01 | The plugin is one directory, `plugins/idea-realization/`, with `.claude-plugin/plugin.json` naming it `idea-realization`, no `license` field, a `userConfig` block for every configurable path, and the component directories `skills/`, `agents/`, `scripts/`, `schemas/`, `templates/`, `docs/`. | `claude plugin validate plugins/idea-realization --strict` exits 0. A fixture copy with a `license` field or an unknown top-level key fails `--strict`. |
+| R01 | The plugin is one directory, `plugins/idea-realization/`, with `.claude-plugin/plugin.json` naming it `idea-realization`, no `license` field, a `userConfig` block for every configurable path, and the component directories `skills/`, `agents/`, `scripts/`, `schemas/`, `templates/`, `docs/`. | `claude plugin validate plugins/idea-realization --strict` exits 0; a fixture copy with an unknown top-level key fails `--strict`. `license` is a valid manifest field the validator accepts, so the plugin's own test suite is what rejects a manifest carrying one (owner, 2026-09-25). |
 | R02 | No file in the plugin names the source repository, its owner, any person, any idea id, any backlog phase id, any document code of this repository, any session record, any commit hash, or any dated incident. Only concepts that hold in any repository using the framework appear. | A check script in the plugin's test suite greps the plugin tree for the source repository's name, `_private`, `[0-9]{6}` idea ids, `phase-[a-z]+-[0-9]+`, `(PLAN\|REQ\|ADR\|GOV\|OPS\|PROMPT\|SESS\|ARCH)-[0-9]`, `SESS-`, seven-plus-hex commit hashes and calendar dates in prose, and returns nothing; the same script run on a fixture file containing a phase id fails. |
 | R03 | Every script runs with `uv run <script>` from any working directory, carries PEP 723 inline metadata naming only `jsonschema` and `pyyaml`, lives in a flat `scripts/` package that never imports a `src` package, and takes every data path from a CLI flag, an environment variable or the plugin's `userConfig`, in that precedence, never from its own location. | Each script's `--help` lists its path flags. A test copies the scripts to a temporary directory and runs each against a temporary data root; a test greps `scripts/` for `parents[` and `from src` and finds nothing. |
 | R04 | A `prerequisites` skill checks Python ≥ 3.12, `uv`, `git` and, for the partition and triage workflows, the `claude` CLI; reports each missing item with the exact install command; and runs an install only after the person answers yes. Its check mode changes nothing. | A test runs the check script with a `PATH` lacking `uv` and reads a report naming `uv` and its install command, with exit code 1 and no file or package changed; the same run with everything present exits 0. |
 | R05 | A `scaffold` skill creates, in the target repository, the directories and seed files each feature needs (the idea log, its rendered view, the priority file, the backlog file, the document tree, the code register, the systems registry, the schemas) and writes an install-state record with the plugin version and a SHA-256 per file written. It never overwrites a file that exists, reports every path created and every path skipped, and offers a dry run that writes nothing. | A test scaffolds into an empty temporary repository and reads the record with one entry per created file; a second run over the same repository creates nothing and reports every path as skipped; a run over a repository holding a pre-existing `backlog.yaml` leaves that file byte-identical and reports it skipped; `--dry-run` leaves the directory empty. |
-| R06 | The scaffold writes the target's `.claude/settings.json`, any hook, or `.gitignore` only when the person gives a separate consent for that write, and the consent is recorded in the install-state record. | A test runs the scaffold without consent and finds no settings, hook or gitignore change; with consent, the record's `consent` entry names the file written and the record's file hash matches the file. |
+| R06 | The scaffold never writes the target's `.claude/settings.json` or any hook. It appends to `.gitignore` only when the person gives a separate consent for that write, and the consent is recorded in the install-state record (owner, 2026-09-25: the consent-gated write is `.gitignore` only). | A test runs the scaffold without consent and finds no gitignore change and no settings or hook file; with consent, the record's `consent` entry names `.gitignore` and the record's file hash matches the file. |
 | R07 | A `doctor` script compares every file the install-state record names against the disk and reports each as unchanged, drifted (hash differs) or missing, and changes nothing. | A test edits one scaffolded file and deletes another; `doctor` names both with the right state, exits 1, and a directory listing before and after is identical. |
 | R08 | The idea writer supports `add`, `status`, `revisit`, `amend`, `annotate`, `amend-annotation`, `link` and `retract-link` over the configured log, generates ids and timestamps itself, exposes no way to supply a timestamp, and refuses every transition the schema does not list. | The existing writer's transition tests, ported to run against a temporary log through the plugin's script: an `open → promoted` without `--promoted-to` is refused; a second discard after the one revisit is refused; `--help` shows no time or date option. |
 | R09 | `fold` replays the log into effective state (amendments applied, links with derived inverses, annotations resolved), and `render` writes the Markdown view with the priority queue first; rendering twice produces identical output, and a `check` reports a stale rendered view. | A test folds a fixture log with an amend and reads the amended title; renders twice and diffs to nothing; edits the rendered file and reads the staleness error from `check`. |
@@ -107,7 +107,10 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 - R03 does not require the scripts to work without `uv`; the prerequisites skill (R04) is where a
   missing `uv` is reported.
 - R04 does not install anything without a yes, and does not run at session start.
-- R05 and R06 do not require an uninstall; `doctor` (R07) reports, it does not repair.
+- R05 and R06 do not require an uninstall; `doctor` (R07) reports, it does not repair. R06 gives
+  the scaffold no path to settings or hooks at all; a target that wants a hook installs it by hand.
+- R05's registers live at `<docs_root>/codes.yaml` and `<docs_root>/systems.yaml` and its schemas
+  at `.idea-realization/schemas/` in the target (owner, 2026-09-25); R16's templates match.
 - R08 to R11 do not project the log into a database; the derived query layer stays in this
   repository.
 - R12 does not automate triage across ideas (no dispatcher, no watcher); one idea per invocation.
@@ -120,6 +123,8 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 - R20 does not ship the orientation document or the surface audit of this repository, and does not
   keep the decision ledger as a document.
 - R21 does not require the source repository's tests to change.
+- R24's `doctor` has a skill of its own as built in `phase-plug-01` (owner, 2026-09-25), so the
+  skill set is thirteen.
 - R25 does not document `paths.py` (imported, not run) or the `checks/` modules (run through
   `check`); the reference covers scripts a person runs.
 - R24 does not add a skill for `doctor`, `render` or the generators; those are steps inside the
@@ -153,6 +158,11 @@ Owner, 2026-09-25, in the Session Manager session:
 - Nothing in the plugin references this repository, its people, its systems or its ideas; only
   concepts that hold in any repository.
 - The plugin is named `idea-realization`, with no licence stated.
+- Owner, 2026-09-25, during `phase-plug-01`: a `license` field is valid to the validator, so R01's
+  rejection lives in the plugin's tests; registers at `<docs_root>/codes.yaml` and
+  `systems.yaml`, schemas at `.idea-realization/schemas/`; the consent-gated write is `.gitignore`
+  only; the `doctor` skill stays; `phase-plug-04`'s backlog schema makes `decision_record`
+  optional so the scaffold's seed stands.
 - Owner, 2026-09-25, after G3: a generated tools reference and a `tools` skill that reads it (R25),
   amending `phase-plug-06`.
 - Owner, 2026-09-25, after G3: the hand-run commands (`backlog`, `next-code`, `catalog`,

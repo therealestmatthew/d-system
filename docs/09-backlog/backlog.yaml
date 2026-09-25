@@ -14538,12 +14538,15 @@ items:
   - Write the prerequisites skill and scripts/prerequisites.py (check mode and install on --yes
     only) (R04).
   - Write the scaffold skill and scripts/scaffold.py with selectable features, the install-state
-    record, the never-overwrite rule, dry run, and consent-gated writes to settings, hooks and
-    .gitignore (R05, R06); write scripts/doctor.py (R07).
+    record, the never-overwrite rule, dry run, and the consent-gated .gitignore append (R05, R06;
+    the owner ruled on 2026-09-25 that it is .gitignore only, never settings or hooks); write
+    scripts/doctor.py and its skill (R07).
   - Write test/test_no_source_references.py, the R02 check, run in the suite from this phase on.
   acceptance:
-  - claude plugin validate plugins/idea-realization --strict exits 0; a fixture manifest with a
-    license field or an unknown top-level key fails --strict.
+  - claude plugin validate plugins/idea-realization --strict exits 0; a fixture manifest with an
+    unknown top-level key fails --strict, and the plugin's own test rejects a manifest carrying a
+    license field (the owner ruled on 2026-09-25 that the validator accepts license, so the test is
+    the gate).
   - claude --plugin-dir plugins/idea-realization lists the plugin's skills in a new session and
     ${CLAUDE_PLUGIN_ROOT} resolves inside one; the checkpoint records the real output. If the
     plugin does not load, the phase stops and reports it rather than proceeding.
@@ -14691,7 +14694,9 @@ items:
   scope:
   - Port src/governance/backlog.py to scripts/backlog.py unchanged in logic; write
     scripts/checks/backlog.py and the ready subcommand, taking documents, systems and owners from
-    scripts/documents.py (phase-plug-05) (R14); copy the backlog schema.
+    scripts/documents.py (phase-plug-05) (R14); copy the backlog schema with decision_record
+    optional (the owner ruled on 2026-09-25 that a fresh target has no decisions document, and the
+    scaffold's seed omits it).
   - Port the status-regression check to scripts/regression.py with the decisions document resolved
     from the catalog's decision_record, not a literal filename.
   - Write skills/session-start, skills/checkpoint and skills/session-close from the sources with the
@@ -14702,7 +14707,9 @@ items:
   acceptance:
   - A fixture with two active phases sharing a system fails check naming both; the ported tests pass.
   - A fixture catalog whose decisions document is named differently is found through
-    decision_record; a catalog with no decision_record fails check.
+    decision_record; a catalog with no decision_record passes check and the regression check
+    reports that it did not run; a catalog naming a decision_record that resolves to no document
+    fails check.
   - The checkpoint skill contains status complete only in a prohibition; session-close states the
     three completion conditions; no skill contains the integration branch as a literal.
   - The backlog skill's text contains no claim command; a grep for the active-status line finds
@@ -14747,7 +14754,9 @@ items:
     scripts/checks/documents.py and the next-code, release-code and catalog subcommands, with the
     exempt-file list a userConfig value (R16).
   - Copy the document, codes and systems schemas; ship an empty code register and systems registry
-    as templates.
+    as templates, matching where phase-plug-01's scaffold places them in a target — registers at
+    <docs_root>/codes.yaml and <docs_root>/systems.yaml, schemas at .idea-realization/schemas/
+    (owner, 2026-09-25).
   - Write scripts/plan_check.py from the mechanical section check and the requirement and plan
     templates (R17).
   - Write skills/next-code/SKILL.md, skills/catalog/SKILL.md and skills/plan-check/SKILL.md, each a
