@@ -354,6 +354,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-23-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-07-three-altitude-review-park.md |
 | SESS-2026-09-24-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-01-batch-002-close-out.md |
 | SESS-2026-09-24-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-02-stale-generated-files.md |
+| SESS-2026-09-24-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-03-green-dev-ci-before-grants.md |
 
 ## Plans and their phases
 
@@ -432,4 +433,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-347 documents — adr: 19, architecture: 11, governance: 16, operation: 22, plan: 61, prompt: 38, requirement: 30, session: 150.
+348 documents — adr: 19, architecture: 11, governance: 16, operation: 22, plan: 61, prompt: 38, requirement: 30, session: 151.
