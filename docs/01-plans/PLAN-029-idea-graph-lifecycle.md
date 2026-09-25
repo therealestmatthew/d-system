@@ -26,7 +26,7 @@ Both are `discarded` on the log. Seventeen remain.
 
 | Group | Ideas | What it covers |
 |---|---|---|
-| `G01` `ARCH-005` schema bundle | `000018`, `000053`, `000061`, `000062`, `000064`, `000065` | Tagging, doc-code link targets, the three-axis classification, its agent, the lineage annotation and the decomposition procedure |
+| `G01` `ARCH-005` schema bundle | `000018`, `000053`, `000061`, `000062`, `000064`, `000065` | Tagging, doc-code link targets, the `ARCH-005` classification, its agent, the lineage annotation and the decomposition procedure |
 | `G02` Idea-system agents | `000048`, `000055`, `000127` | `000048` and `000127` are the same ask six days apart; `000055` maintains the link graph those writes create |
 | `G03` Idea and backlog reporting | `000008`, `000010`, `000042`, `000050`, `000071` | Largely delivered — see the verification below |
 | `G04` Idea-to-plan drafting | `000046`, `000047`, `000049` | `000046` names `000047` its own prerequisite; `000049` surfaced from triaging `000046` and blocks its design |

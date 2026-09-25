@@ -10219,12 +10219,14 @@ items:
   - 'It writes neither tags nor links - 000018 owns tagging and 000055 owns relationships. The isolation
     is the point: a classification biased by an idea''s neighbours reflects the graph rather than the
     idea.'
-  - Require it to record why it left an axis blank, so an unset axis is distinguishable from an unprocessed
-    idea.
+  - Require it to assign a value on each of the four axes to every knowledge record, using Not
+    Applicable / Agnostic on the epistemic axis when the record asserts no verifiable claim, to give
+    other records a record kind and no axis values, and to record a reason for each axis value.
   acceptance:
   - 'REQ-014 R08 holds: run against one idea, the events written contain no tag or link, and the agent
     did not read the idea''s neighbours.'
-  - 'REQ-014 R02 holds on its agent half: a blank axis carries a recorded reason.'
+  - 'REQ-014 R02 holds on its agent half: every knowledge record it classifies has a value and a reason
+    on each of the four axes, and no axis is left blank.'
   - The agent writes only through tools/append_idea.py and never edits _data/ideas.jsonl.
   verification:
   - uv run pytest

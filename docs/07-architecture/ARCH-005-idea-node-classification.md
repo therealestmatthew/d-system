@@ -81,7 +81,7 @@ subject is the thing the record's observation is about, or that its ask would ch
 | **Concept / Mental Model** | A theoretical construct, principle, paradigm or classification (e.g. "Observability," "Systems Thinking"). Acts as a gravitational center other nodes cluster around. |
 | **Artifact / Entity** | A concrete output or entity: a file, schema, tool, system, dataset or commit. |
 | **Process / Workflow** | A sequence of steps: how something is done, who does what, in what order. |
-| **Event** | A distinct occurrence in time, when the occurrence itself is the subject. |
+| **Event** | A distinct occurrence in time, as the subject itself. |
 | **Actor / Agent** | Who acts: a human role, stakeholder group or autonomous agent, with its remit and authority. Agent types (`.claude/agents/*.md`) are Actor / Agent, not Artifact. |
 | **Metric / Standard** | A quantitative measure or threshold that governs something: an SLA, KPI, benchmark, budget or cap. |
 
@@ -261,7 +261,7 @@ Deliberately unresolved here — this document defines the vocabulary, not the i
   *Superseded by [PLAN-029](../01-plans/PLAN-029-idea-graph-lifecycle.md) decision 1: fields on the
   idea schema, not a separate graph layer.*
 - **Who assigns it, and when?** The owner has proposed a dedicated classification agent whose
-  only job is interpreting an idea's essence into these three axes — explicitly not tagging,
+  only job is interpreting an idea's essence into these axes — explicitly not tagging,
   not relationship-building. That agent does not exist yet; this document defines what it would
   classify against.
 - **Backfill.** 61 ideas already exist unclassified as of this document's creation. A schema
