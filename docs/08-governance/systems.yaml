@@ -370,6 +370,83 @@ systems:
   description: The idea-realization pipeline, its governance engine, generators, layout templates and
     absolute governance documents packaged as one Claude Code plugin for private installation into
     other repositories. A copy adapted for a target repository; nothing here depends on it.
+- id: sys-plugin-core
+  name: Plugin core (manifest, paths, prerequisites, scaffold, doctor, check dispatcher)
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.01-skeleton-install.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-ideas
+  name: Plugin idea system
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.02-idea-system.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-partition
+  name: Plugin partition sweep
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.03-partition.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-backlog
+  name: Plugin backlog and session skills
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.04-backlog-sessions.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-documents
+  name: Plugin document-governance engine
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.05-document-governance.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-generators
+  name: Plugin generators, layout reference and agreement templates
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.06-generators-layout.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
+- id: sys-plugin-absolutes
+  name: Plugin governance documents as absolutes
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md
+  depends_on:
+  - sys-plugin
+  description: One feature area of the idea-realization plugin, registered separately so its phase
+    locks only its own files and peers build the other areas in parallel.
 - id: sys-demo-stage
   name: Demo stage page
   domain: application

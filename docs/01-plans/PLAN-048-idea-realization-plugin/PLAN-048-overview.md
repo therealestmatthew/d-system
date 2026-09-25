@@ -16,8 +16,8 @@ depends_on: [doc-idea-realization-plugin-requirements, doc-realization-role-cont
 
 Delivers [REQ-031](../../06-requirements/REQ-031-idea-realization-plugin.md). One plugin,
 `plugins/idea-realization/`, carrying the whole idea-realization pipeline and its governance for
-private installation into the owner's other repositories. Eight phases, `phase-plug-01` to
-`phase-plug-08`, one per child plan in this folder.
+private installation into the owner's other repositories. Nine phases, `phase-plug-01` to
+`phase-plug-09`, one per child plan in this folder.
 
 ## Context and scope
 
@@ -37,7 +37,7 @@ repository. This repository keeps its own `src/governance`, tools, workflows and
 ## Decisions
 
 Each decision names the alternative rejected and what it would have cost. The owner made D1 to D8
-on 2026-09-25 in the Session Manager session; D9 to D12 are the planner's, open to the adversary
+on 2026-09-25 in the Session Manager session; D9 to D13 are the planner's, open to the adversary
 and to G3.
 
 - **D1. One plugin.** Rejected: several plugins in one marketplace, one per workflow, which the
@@ -45,9 +45,13 @@ and to G3.
   Cost of the rejected option: a marketplace file, inter-plugin dependency declarations, and a
   target that installs the backlog without the document governance it needs. The owner chose one
   plugin knowing the departure; `REQ-031`'s accepted decisions record it.
-- **D2. Private use, installed by local path, no marketplace file, no licence.** Rejected: a
-  marketplace in this repository or a new public repository. Cost: publication work and a licence
-  decision for something only the owner installs.
+- **D2. Private use, installed by local path, no licence; a marketplace file at this
+  repository's root.** The owner's answer was "no marketplace file"; the adversary then verified
+  with the live CLI that a persistent install exists only from a marketplace (`--plugin-dir` is
+  per session). The file stays private because the marketplace is added by local path and never
+  published, which was the reason for the answer. **The owner confirms or overrules this at G3.**
+  Rejected: a new public repository (publication work and a licence decision for something only
+  the owner installs) and per-session loading with `--plugin-dir` (every session re-adds it).
 - **D3. `uv run` with PEP 723 inline dependencies.** Rejected: stdlib-only scripts (a second
   validation implementation to keep in sync with the schema) and a pip-installed package with a
   SessionStart install hook (a hook the owner's consent ruling would gate, and a persistent
@@ -64,7 +68,9 @@ and to G3.
   repository's paths as the default (`_data/`, `docs/00-working/`), which would carry its layout
   into every target. Cost: this repository, if it ever installs the plugin, sets the paths.
 - **D7. The orientation document and the surface audit are excluded.** Neither is a protocol.
-  Cost: none; the scaffold's README and the layout reference cover orientation.
+  Rejected: rewriting them as absolutes. Cost of the rejected option: the orientation document is
+  this repository's purpose and layout, so its absolute form would either violate R02 or duplicate
+  the layout reference; the surface audit is a dated verdict with no rule to extract.
 - **D8. The plugin's partition sweep resolves the second-audit block.** The draft is written to the
   primary checkout's staging directory and its absolute path is passed in the A2 dispatch.
   Rejected: shipping the gap (a sweep that stops short of its own procedure) and dropping the
@@ -77,13 +83,22 @@ and to G3.
 - **D10. The R02 check is a test in the plugin's own suite, run from `phase-plug-01` on.**
   Rejected: a one-time review at the end. Cost of the rejected option: every later phase could
   reintroduce a reference and nothing would say so until `phase-plug-08`.
-- **D11. Document governance before backlog.** `phase-plug-05` precedes `phase-plug-04` because
+- **D11. One sub-system per feature area, disjoint deliverable paths, a check module per
+  feature.** The owner has several sessions available and asked that the build run in parallel.
+  Seven `sys-plugin-*` sub-systems under `sys-plugin`, each phase declaring its own files, and
+  `scripts/check.py` and `scripts/cli.py` as dispatchers over `scripts/checks/<feature>.py` so no
+  two phases edit one file. Rejected: one system and one deliverable path (the validator would
+  serialize every phase; one build at a time across nine phases). Cost: seven registry entries and
+  a longer deliverables list per phase.
+- **D12. Document governance before backlog.** `phase-plug-05` precedes `phase-plug-04` because
   the backlog check needs the documents, systems and owners the document scan produces
   (`REQ-031` problem 3). Rejected: a backlog check with its own minimal registry (a second
   document scanner).
-- **D12. The absolute rewrite is dispatched per family and traced.** Six analyst dispatches, one
-  per family from analysis 05 §5, each returning one-line absolutes with source lines; the plugin
-  documents are written from those; a trace table in this repository maps each rule to its source.
+- **D13. The absolute rewrite is dispatched per family, traced, and split in two phases.** Six
+  analyst dispatches, one per family from analysis 05 §5, each returning one-line absolutes with
+  source lines; the plugin documents are written from those; a trace table in this repository
+  maps each rule to its source. Families A–C are `phase-plug-07`, D–F `phase-plug-09`, after the
+  adversary found one phase too large.
   Rejected: one session rewriting 3,800 lines by reading (no way to check completeness) and
   keeping the source documents with history stripped by hand (the same, slower).
 
@@ -97,10 +112,12 @@ and to G3.
 | `phase-plug-04` | [PLAN-048.04](PLAN-048.04-backlog-sessions.md) | Backlog check and ready report, status regression, session-start, checkpoint, session-close |
 | `phase-plug-05` | [PLAN-048.05](PLAN-048.05-document-governance.md) | Document check, next-code with reservations, catalog, plan-check, templates |
 | `phase-plug-06` | [PLAN-048.06](PLAN-048.06-generators-layout.md) | Two generators, layout reference, AGENTS.md and CLAUDE.md templates |
-| `phase-plug-07` | [PLAN-048.07](PLAN-048.07-absolute-documents.md) | The governance documents as absolutes, the trace table |
-| `phase-plug-08` | [PLAN-048.08](PLAN-048.08-end-to-end.md) | Scratch-repository exercise, README, session record, handover |
+| `phase-plug-07` | [PLAN-048.07](PLAN-048.07-absolute-documents.md) | Governance documents as absolutes, part one (core protocol, codes, reporting, ledger triage), trace table |
+| `phase-plug-09` | [PLAN-048.09](PLAN-048.09-absolute-documents-two.md) | Governance documents as absolutes, part two (methodology, role contracts and review, multi-session), trace table |
+| `phase-plug-08` | [PLAN-048.08](PLAN-048.08-end-to-end.md) | Scratch-repository exercise from a worktree, README, session record, handover |
 
-Prerequisites: `phase-idg-01` (queued, first in the ready order) must land before `phase-plug-02`.
+Prerequisites: `phase-idg-01` (queued, `depends_on: []`, second in `next_up` behind
+`phase-grd-02` at the time of writing) must land before `phase-plug-02`.
 Every phase runs in its own worktree on `agent/<phase-id>`; every phase's verification includes the
 plugin's pytest suite, `claude plugin validate --strict`, the staged private-content check and the
 governance check.
@@ -116,29 +133,34 @@ governance check.
 | R14, R15 | `phase-plug-04` |
 | R16, R17 | `phase-plug-05` |
 | R18, R19 | `phase-plug-06` |
-| R20 | `phase-plug-07` |
+| R20 | `phase-plug-07` (families A–C), `phase-plug-09` (families D–F) |
 | R22 | `phase-plug-08` |
 
 Every row maps to a phase and every phase to at least one row.
 
 ## Execution order and real concurrency
 
-All eight phases declare `sys-plugin` only and deliver under `plugins/idea-realization/` (plus one
-trace document under this plan folder and one session record), so the validator will not let two
-of them be active at once: they share a system and a deliverable path. The order is therefore the
-dependency order, run one at a time:
+Each phase declares one `sys-plugin-*` sub-system and its own files (D11), measured from the
+backlog entries: no two phases in the same wave share a system or a deliverable path, so the
+validator admits them together. `phase-plug-01` and `phase-plug-08` declare the whole plugin tree
+and therefore run alone among plugin phases. The waves:
 
-1. `phase-idg-01` (already registered; locks `sys-governance`, not `sys-plugin`, so it may run
-   alongside `phase-plug-01`).
-2. `phase-plug-01`.
-3. `phase-plug-05`, then `phase-plug-02` (after idg-01), in either order.
-4. `phase-plug-04` and `phase-plug-06` (both after 05), then `phase-plug-03` (after 02).
-5. `phase-plug-07` (after 04 and 06).
-6. `phase-plug-08` (after 03 and 07).
+1. `phase-idg-01` (locks `sys-governance`) and `phase-plug-01` (locks `sys-plugin-core`,
+   `plugins/idea-realization/`, `.claude-plugin/marketplace.json`) — two sessions.
+2. `phase-plug-02` (ideas; after 01 and idg-01) and `phase-plug-05` (documents; after 01) — two
+   sessions.
+3. `phase-plug-03` (partition; after 02), `phase-plug-04` (backlog; after 05), `phase-plug-06`
+   (generators; after 05) — three sessions.
+4. `phase-plug-07` (absolutes part one; after 04 and 06), with `phase-plug-03` if still open.
+5. `phase-plug-09` (absolutes part two; after 07).
+6. `phase-plug-08` (end to end; after 03 and 09) — alone.
 
-The owner ranks `next_up`; the planner proposes, at G3, that the eight phases follow
-`phase-idg-01` at the front of the queue in the order above, since the owner ruled that the
-coordination work stays paused until the plugin ships.
+Wave 3 needs `max_active` of at least 3 (the current value); a fourth concurrent session would
+need `max_active: 4`, the schema's maximum, which the owner decides at G3 (Q4). The owner ranks
+`next_up`; the planner proposes, at G3, that the nine phases follow `phase-idg-01` at the front of
+the queue in wave order, since the owner ruled that the coordination work stays paused until the
+plugin ships. The Session Manager dispatches each wave to the available sessions with the
+`session-start` procedure and holds the integration turn per `GOV-017`.
 
 Failure paths: a phase whose verification fails stays `active` with the failure in its checkpoint
 and is not integrated; a phase that finds `phase-idg-01`'s schema changed after it branched
@@ -147,7 +169,7 @@ exact `next_action` and the split is recorded in the decision ledger.
 
 ## Acceptance and verification
 
-The plan is complete when all eight phases are `complete`, `REQ-031` R22's session record exists,
+The plan is complete when all nine phases are `complete`, `REQ-031` R22's session record exists,
 and `cd plugins/idea-realization && uv run pytest` passes on `dev`. Per-phase acceptance is in the
 backlog entries and restated in each child plan.
 
@@ -165,10 +187,14 @@ backlog entries and restated in each child plan.
 
 - **Q1. `next_up` placement.** Owner, at G3. The planner leans to the order in Execution order,
   directly after `phase-idg-01`.
-- **Q2. Whether `phase-plug-07` fits one session.** Planner, decided at phase-fit after the
-  adversary's phase-altitude review. It dispatches six analysts and writes from their output; the
-  planner leans to one session because the extraction is parallel and the writing is
-  consolidation, and names the split (families A–C in one phase, D–F in another) if not.
+- **Q2. Settled.** The adversary found the single absolute-documents phase too large; it is split
+  into `phase-plug-07` and `phase-plug-09` (D13).
 - **Q3. The `claude` CLI as a prerequisite.** Planner, in `phase-plug-01`. Triage and partition
   dispatch subagents through the harness, not the CLI; the planner leans to listing `claude` as
   required only for the workflows that shell to it, which today is none in the plugin.
+- **Q4. `max_active`.** Owner, at G3. Wave 3 has three phases and `phase-grd-02`'s re-claim may
+  want a fourth slot; the planner leans to leaving it at 3 and letting wave 3 absorb the
+  re-claim's timing, since raising it is a one-line change the owner can make when a fourth
+  session is actually free.
+- **Q5. The marketplace file (D2).** Owner, at G3: confirm the private marketplace file, or name
+  another install mechanism the planner did not find.

@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-ideas]
 depends_on: [doc-idea-realization-plugin, doc-idea-node-classification]
 parent: doc-idea-realization-plugin
 ---
@@ -65,7 +65,7 @@ fails on a fixture document missing one status.
 
 ## Execution order
 
-Runs after phase-plug-01 and phase-idg-01, alone on sys-plugin; phase-plug-05 may precede or follow it. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs after phase-plug-01 and phase-idg-01, alongside phase-plug-05 (wave 2). Its deliverables are its own files under the plugin, and `scripts/checks/ideas.py` is its module of the check dispatcher, so it shares no path with a peer.
 
 ## Out of scope
 

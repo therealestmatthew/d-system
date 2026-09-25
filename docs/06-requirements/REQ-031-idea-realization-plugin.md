@@ -97,7 +97,9 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 
 ## What each requirement is not
 
-- R01 does not require a marketplace file, publication, or a version-bump procedure.
+- R01 does not require publication or a version-bump procedure. A marketplace file at this
+  repository's root, added by local path, is the install mechanism the CLI supports (PLAN-048 D2);
+  it is private because it is never published.
 - R02 does not forbid the framework's own concepts (idea, phase, plan, requirement, adversary,
   coordinator); it forbids instances — this repository's ids, codes, names and dates.
 - R03 does not require the scripts to work without `uv`; the prerequisites skill (R04) is where a
@@ -123,8 +125,9 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 
 Owner, 2026-09-25, in the Session Manager session:
 
-- The plugin lives in this repository, for private use, installed by local path. No marketplace
-  file in version 1.
+- The plugin lives in this repository, for private use, installed by local path. The owner's
+  answer was "no marketplace file"; the adversary verified the CLI installs persistently only from
+  a marketplace, so PLAN-048 D2 carries a private marketplace file for the owner's ruling at G3.
 - Version 1 is the whole pipeline: capture, fold, render, triage, priority queue, four-axis schema,
   partition, planning and phases, backlog and ordering, the full property vocabulary, document
   governance, generators, repository layout, the working agreement, and the governance and protocol

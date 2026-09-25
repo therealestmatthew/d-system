@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-core]
 depends_on: [doc-idea-realization-plugin]
 parent: doc-idea-realization-plugin
 ---
@@ -27,10 +27,13 @@ installed and exercised once in a scratch repository, with the output shown to t
 ## Decisions
 
 - **The scratch repository is created outside this repository and its worktrees**, empty, with
-  `git init`, and the plugin is added by local path (`/plugin marketplace add <path>` needs a
-  marketplace file; the documented alternative for a local plugin directory is checked in this
-  phase and the README records the one that works). Rejected: exercising inside a worktree of this
-  repository (the R02 and R21 checks would not be exercised against a foreign layout).
+  `git init`, and the plugin is installed from this repository's marketplace by local path, the
+  mechanism `phase-plug-01` verified. **The exercise runs from a worktree of the scratch
+  repository**, so the partition sweep's primary-checkout staging path differs from the working
+  directory and the second-audit fix is exercised against the divergence it exists for. Rejected:
+  exercising inside a worktree of this repository (the R02 and R21 checks would not be exercised
+  against a foreign layout) and running from the scratch repository's primary checkout (the
+  staging path would trivially equal the working directory).
 - **The exercise runs every feature once, in pipeline order**, and the record quotes real output.
   Rejected: a checklist of "ran, passed".
 - **Small defects are fixed in this phase with a test; the rest become ideas.** Rejected: fixing
@@ -38,14 +41,14 @@ installed and exercised once in a scratch repository, with the output shown to t
 
 ## Work and dependencies
 
-1. Scratch repository; install; prerequisites; scaffold `--feature all`; doctor.
+1. Scratch repository; install; a worktree of it; prerequisites; scaffold `--feature all`; doctor.
 2. Record, fold, render, triage an idea; run one partition sweep on a corpus of a few ideas
    (audit 2 must run); write a requirement and plan from the templates and `plan-check` them;
    register and claim a phase; allocate a code; render the catalog; doctor again.
 3. README install and use sections; session record (`--next-code session`); the handover note
    appended to `_working/session-manager/restart-2026-09-25.md` and the board line.
 
-Prerequisites: `phase-plug-03` and `phase-plug-07` (everything else is upstream of them).
+Prerequisites: `phase-plug-03` and `phase-plug-09` (everything else is upstream of them).
 
 ## Acceptance and verification
 
@@ -54,7 +57,7 @@ second run creating a file; audit 2 not running.
 
 ## Execution order
 
-Runs last, after phase-plug-03 and phase-plug-07, alone on sys-plugin. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs last, after phase-plug-03 and phase-plug-09, alone: its deliverable is the whole plugin tree, since it may fix any file the exercise finds wrong.
 
 ## Out of scope
 

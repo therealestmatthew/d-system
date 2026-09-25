@@ -145,6 +145,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.06 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.06-generators-layout.md |
 | PLAN-048.07 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md |
 | PLAN-048.08 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
+| PLAN-048.09 | plan | draft | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -431,7 +432,7 @@ CI regenerates it and fails on any difference.
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 0 | 1 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 | PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
-| PLAN-048 | doc-idea-realization-plugin | draft | 8 | 0 | 0 | — |
+| PLAN-048 | doc-idea-realization-plugin | draft | 9 | 0 | 0 | — |
 | PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | draft | 1 | 0 | 0 | — |
 | PLAN-048.02 | doc-idea-realization-plugin-idea-system | draft | 1 | 0 | 0 | — |
 | PLAN-048.03 | doc-idea-realization-plugin-partition | draft | 1 | 0 | 0 | — |
@@ -440,6 +441,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.06 | doc-idea-realization-plugin-generators-layout | draft | 1 | 0 | 0 | — |
 | PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | draft | 1 | 0 | 0 | — |
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | draft | 1 | 0 | 0 | — |
+| PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | draft | 1 | 0 | 0 | — |
 
 ## Held codes
 
@@ -452,4 +454,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-358 documents — adr: 20, architecture: 11, governance: 16, operation: 21, plan: 70, prompt: 39, requirement: 31, session: 150.
+359 documents — adr: 20, architecture: 11, governance: 16, operation: 21, plan: 71, prompt: 39, requirement: 31, session: 150.

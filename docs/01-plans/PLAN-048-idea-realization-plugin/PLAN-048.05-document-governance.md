@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-documents]
 depends_on: [doc-idea-realization-plugin, doc-governance-protocol, doc-document-code-protocol]
 parent: doc-idea-realization-plugin
 ---
@@ -42,9 +42,9 @@ it.
 
 ## Work and dependencies
 
-1. `scripts/codes.py`, `scripts/reservations.py`, `scripts/documents.py`; `check`'s document half,
-   `next-code`, `release-code`, `catalog` in `scripts/check.py` (or a `scripts/cli.py` that
-   `check` and the rest share — planner's call).
+1. `scripts/codes.py`, `scripts/reservations.py`, `scripts/documents.py`;
+   `scripts/checks/documents.py`; the `next-code`, `release-code` and `catalog` subcommands
+   registered with `scripts/cli.py` (phase-plug-01's dispatcher).
 2. Schemas: document, codes, systems; templates: `codes.yaml`, `systems.yaml`, requirement and
    plan documents.
 3. `scripts/plan_check.py`.
@@ -60,7 +60,7 @@ receiving the same code; a hand-edited catalog; a plan draft missing its boundar
 
 ## Execution order
 
-Runs after phase-plug-01, alone on sys-plugin; phase-plug-02 precedes or follows it. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs after phase-plug-01, alongside phase-plug-02 (wave 2), on its own sub-system and files.
 
 ## Out of scope
 

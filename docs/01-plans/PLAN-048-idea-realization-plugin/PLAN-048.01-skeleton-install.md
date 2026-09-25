@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-core]
 depends_on: [doc-idea-realization-plugin]
 parent: doc-idea-realization-plugin
 ---
@@ -34,8 +34,9 @@ consent ruling for settings and hooks is in `_working/session-manager/reports/ru
   `ideas_path` (`ideas/ideas.jsonl`), `ideas_view_path` (`ideas/ideas.md`), `priority_path`
   (`ideas/priority.yaml`), `backlog_path` (`backlog/backlog.yaml`), `docs_root` (`docs`),
   `integration_branch` (`main`), `worktree_dir` (`../<repository>-worktrees`),
-  `triage_search` (`docs`), `exempt_files` (empty). Rejected: an environment variable per path
-  only (nothing prompts for them). Cost: nine prompts on first use, once.
+  `triage_search` (`docs`), `exempt_files` (empty), `staging_dir` (`.idea-realization/staging`,
+  which must be gitignored — the partition skill checks). Rejected: an environment variable per
+  path only (nothing prompts for them). Cost: ten prompts on first use, once.
 - **`scripts/paths.py` is the only path resolver.** Precedence: flag, environment variable
   (`IDEA_REALIZATION_<KEY>`), `CLAUDE_PLUGIN_OPTION_<KEY>` (how the harness exports `userConfig`
   to processes), default. Rejected: per-script handling. Cost: one import in every script.
@@ -43,19 +44,32 @@ consent ruling for settings and hooks is in `_working/session-manager/reports/ru
   plugin version, the time, one entry per file (path, SHA-256, feature) and a `consent` list.
   Rejected: `${CLAUDE_PLUGIN_DATA}` (per machine, not per repository; a clone would not know what
   was installed). Cost: one dot-directory in the target.
+- **A marketplace file at this repository's root, `.claude-plugin/marketplace.json`, names the
+  plugin with a relative source.** The adversary verified with the live CLI that
+  `claude plugin marketplace add <dir>` fails without one and that `--plugin-dir` loads a plugin
+  for one session only; a persistent install needs a marketplace. This revises the owner's "no
+  marketplace file" answer, whose reason was privacy: the marketplace stays private because it is
+  added by local path and never published. The owner rules on this at G3. Rejected: verifying the
+  install path in the last phase (every earlier phase would build on an unverified manifest
+  shape). Cost: one more file, and this phase's first step is the install check, before the
+  manifest is fixed.
 - **Scaffold features are selectable** (`--feature ideas|partition|backlog|documents|all`) so a
   target that wants only the idea log gets only its files. This is the workflow-sized install the
   `000439` ruling asked for, inside the single plugin.
 
 ## Work and dependencies
 
-1. `plugin.json`, directories, README stub, `pyproject`-free pytest configuration (`conftest.py`
-   sets the scripts path), the PEP 723 header. Verify with `claude plugin validate --strict`.
-2. `scripts/paths.py` and its test (all four precedence levels).
-3. `scripts/prerequisites.py` (check; install on `--yes` only) and `skills/prerequisites/SKILL.md`.
-4. `scripts/scaffold.py` (features, dry run, never-overwrite, record, consent-gated settings,
+1. The install check: marketplace file, `claude plugin marketplace add`, `claude plugin install`,
+   skills visible in a new session. If it fails, stop and report; nothing else in this phase is
+   built on a shape that does not install.
+2. `plugin.json`, directories, README stub, `pyproject`-free pytest configuration (`conftest.py`
+   sets the scripts path), the PEP 723 header, `scripts/check.py` and `scripts/cli.py` as
+   dispatchers over `scripts/checks/`. Verify with `claude plugin validate --strict`.
+3. `scripts/paths.py` and its test (all four precedence levels).
+4. `scripts/prerequisites.py` (check; install on `--yes` only) and `skills/prerequisites/SKILL.md`.
+5. `scripts/scaffold.py` (features, dry run, never-overwrite, record, consent-gated settings,
    hooks and gitignore) and `skills/scaffold/SKILL.md`; `scripts/doctor.py`.
-5. `test/test_no_source_references.py`: the R02 grep list, run over the plugin tree.
+6. `test/test_no_source_references.py`: the R02 grep list, run over the plugin tree.
 
 Prerequisite: none. This phase can run beside `phase-idg-01`.
 
@@ -69,7 +83,7 @@ containing a phase id. The case that must fail: a scaffold run over a directory 
 
 ## Execution order
 
-Runs after phase-idg-01 may have started; both may be active at once (different systems). Nothing else in this plan runs before it. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs alone on the plugin tree (its deliverable is the whole directory); phase-idg-01 may be active at the same time on its own system. Every later phase declares a subpath and its own sub-system, so they run in parallel where their dependencies allow; the overview's Execution order section gives the waves.
 
 ## Out of scope
 

@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-partition]
 depends_on: [doc-idea-realization-plugin]
 parent: doc-idea-realization-plugin
 ---
@@ -30,9 +30,13 @@ checkout and the draft is in the coordinator's worktree.
 
 - **The synthesis draft is written to `<primary checkout>/<staging>/idea-partition-<date>.md`**,
   where the primary checkout comes from `git worktree list --porcelain` and the staging directory
-  from `userConfig`, and the A2 dispatch names that absolute path. Rejected: shipping the block
-  and dropping audit 2 (D8 in the overview). Cost: the draft exists in two trees until the sweep
-  closes; the gate-3 checklist copies the accepted version back to the worktree.
+  from `userConfig` (`staging_dir`), and the A2 dispatch names that absolute path. Three
+  conditions carry over from the source workflow: the skill writes there only if
+  `git check-ignore` accepts the directory, it leaves `git status` in the primary checkout
+  unchanged, and it says that any turn a target's coordination protocol requires for a
+  primary-checkout write is held first. Rejected: shipping the block and dropping audit 2 (D8 in
+  the overview). Cost: the draft exists in two trees until the sweep closes; the gate-3 checklist
+  copies the accepted version back to the worktree.
 - **The prompt pack becomes `docs/partition-pack.md` with the six fenced blocks unchanged in
   substance** and every citation of this repository's documents, phases and ideas removed
   (R02). Rejected: keeping the citations as "precedent" (they name things a target does not
@@ -58,7 +62,7 @@ schema test; the R02 check fails on a pack that still names a source document.
 
 ## Execution order
 
-Runs after phase-plug-02, alone on sys-plugin. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs after phase-plug-02, alongside phase-plug-04 and phase-plug-06 (wave 3), on its own sub-system and files.
 
 ## Out of scope
 

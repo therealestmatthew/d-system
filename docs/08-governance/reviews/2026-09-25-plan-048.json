@@ -1,0 +1,298 @@
+{
+  "review_id": "2026-09-25-plan-048",
+  "procedure": "GOV-018",
+  "date": "2026-09-25",
+  "target": {
+    "plan": "PLAN-048",
+    "requirement": "REQ-031",
+    "phases": [
+      "phase-plug-01",
+      "phase-plug-02",
+      "phase-plug-03",
+      "phase-plug-04",
+      "phase-plug-05",
+      "phase-plug-06",
+      "phase-plug-07",
+      "phase-plug-08"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on PLAN-048-overview.md and each child PLAN-048.01 to .08 at fa44a92: exit 0 for all nine. Re-run after the revision with PLAN-048.09 added: exit 0 for all ten."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "altitude": "plan",
+      "subject": "PLAN-048 (D2) / REQ-031 R01",
+      "severity": "blocker",
+      "title": "The owner's settled 'no marketplace file' decision (D2) appears infeasible for a persistent plugin install, and the plan defers checking this to the last phase.",
+      "evidence": "Empirical test with the live claude CLI (v2.1.280): `claude plugin marketplace add <dir-with-only-plugin.json>` returns 'Failed to add marketplace: Marketplace file not found at <dir>/.claude-plugin/marketplace.json' (exit 1). `claude --help` shows the only marketplace-free loading path is `--plugin-dir <path> ... for this session only`. The live install registries on this machine (`~/.claude/plugins/installed_plugins.json`, `~/.claude/settings.json`'s `enabledPlugins`) are both keyed `plugin@marketplace`. PLAN-048.08's own decision text concedes this is unverified and checks it only in the last phase.",
+      "consequence": "If a marketplace-free persistent install is not achievable, R01's manifest contract and every phase built on it may need a marketplace.json retrofitted after seven phases' work.",
+      "minimal_fix": "Verify the local-path persistent-install mechanism in phase-plug-01, before the manifest shape is fixed, not in phase-plug-08.",
+      "slug": "late-verified-foundational-assumption",
+      "id": "F01",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "The plan is revised as the finding's fix requires: D2 now carries a private marketplace file at the repository root, phase-plug-01's first step is the install check with a stop-and-report failure path, and REQ-031 R01's boundary and accepted decisions record the change. The escalation is because the fix reverses the owner's 'no marketplace file' answer; the owner confirms or overrules at G3 (overview Q5)."
+        }
+      ]
+    },
+    {
+      "altitude": "plan",
+      "subject": "phase-plug-03 / REQ-031 R13",
+      "severity": "major",
+      "title": "R13's fix for the partition sweep's second-audit block depends on a 'staging directory' userConfig value that no phase declares in the plugin manifest, and drops the source mechanism's stated safety conditions.",
+      "evidence": "PLAN-048.03's D8 says the draft is written to '<primary checkout>/<staging>/...' with the staging directory from userConfig. PLAN-048.01 enumerates nine userConfig keys with no staging key. The source workflow (agent-workflows/partition-ideas.md lines 17-40) requires writing into the primary checkout only inside a gitignored directory, while holding any coordination-protocol turn, leaving git status clean; none of these appear in PLAN-048.03.",
+      "consequence": "phase-plug-03 cannot be built as scoped, and an ad hoc staging path could default to a tracked location or collide with a concurrent session.",
+      "minimal_fix": "Add a staging_dir userConfig entry to phase-plug-01's scope, defaulted to a gitignored path, and restate the gitignore/clean-status/turn-holding conditions in phase-plug-03.",
+      "slug": "undeclared-config-dependency",
+      "id": "F02",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-01's userConfig list and PLAN-048.01 now include staging_dir (default .idea-realization/staging, must be gitignored); phase-plug-03's scope, acceptance and PLAN-048.03 state the three conditions: git check-ignore accepts the directory, git status in the primary checkout is unchanged, any coordination turn is held first."
+        }
+      ]
+    },
+    {
+      "altitude": "plan",
+      "subject": "phase-plug-08 / REQ-031 R22",
+      "severity": "major",
+      "title": "The only end-to-end proof that the second-audit fix works (R22) cannot exercise the actual failure mode it fixes, because the scratch repository has no worktree divergence.",
+      "evidence": "PLAN-048.08's scratch repository is 'created outside this repository and its worktrees, empty, with git init' - a single checkout. In a single-checkout repository git worktree list resolves to the coordinator's own directory, so the staging path trivially equals where the adversary already is. No acceptance describes running from a worktree of the scratch repository.",
+      "consequence": "R13's and R22's acceptance can pass even if the cross-worktree resolution is wrong.",
+      "minimal_fix": "Run phase-plug-08's partition-sweep exercise from a worktree of the scratch repository.",
+      "slug": "test-never-exercises-the-fixed-failure-mode",
+      "id": "F03",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-08's scope and PLAN-048.08 now run the exercise from a worktree of the scratch repository so the staging path differs from the working directory."
+        }
+      ]
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-048-overview.md D7",
+      "severity": "minor",
+      "title": "D7 (excluding the orientation document and the surface audit) does not name a cost for the rejected alternative, unlike the plan's other decisions.",
+      "evidence": "PLAN-048-overview.md D7: 'Neither is a protocol. Cost: none; the scaffold's README and the layout reference cover orientation.' No alternative is named as rejected, and the stated cost describes the chosen option.",
+      "consequence": "Low; inconsistent with GOV-010 P2 within one document.",
+      "minimal_fix": "State what including them as absolutes would have cost.",
+      "id": "F04",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "D7 now names the rejected alternative (rewriting both as absolutes) and its cost."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-07",
+      "severity": "major",
+      "title": "Scope very likely exceeds one session: six analyst dispatches over ~3,765 lines of governance-document source plus synthesis of thirteen new plugin documents and a source-line trace table.",
+      "evidence": "docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md decisions: 'Six analyst dispatches, one per family... Families: A core protocol and codes (GOV-001, 002, 005, AGENTS.md); B reporting (GOV-006); C ledger triage (GOV-003, 004...); D methodology (GOV-008, 009, 013, 016); E role contracts and review (GOV-014, 018, PROMPT-038); F multi-session coordination (GOV-017, PROMPT-037).' Analysis 05 (`_working/session-manager/plugin-analysis/05-governance-documents.md` \u00a75) gives per-family line totals: A ~898, B ~97, C ~835 ('the largest and most judgment-heavy assignment... should not be combined with any family that needs its extracted rules'), D ~862, E ~607, F ~466 \u2014 total ~3,765 lines read, feeding the writing of thirteen new plugin documents (`decisions` list, second bullet) plus a per-rule trace table checked by 'a reviewer reading both' (backlog.yaml acceptance line 3). This is judgment-heavy synthesis, not mechanical porting, and the plan's own Q2 already flags the uncertainty without resolving it.",
+      "consequence": "The phase claim will very likely stall mid-session or be returned to `queued` per the plan's own failure path ('a phase that cannot fit one session returns to queued... and the split is recorded'), consuming a session's budget on partial synthesis and forcing a re-plan.",
+      "minimal_fix": "Take the split the child plan itself already names: families A\u2013C in one phase, D\u2013F in another (PLAN-048.07's own Open Questions section).",
+      "slug": "phase-exceeds-session-budget",
+      "id": "F05",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-07 is split: families A-C stay in phase-plug-07, D-F are phase-plug-09 (PLAN-048.09), D13 in the overview; Q2 settled."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-07",
+      "severity": "major",
+      "title": "Backlog acceptance names no input that must fail or be rejected (GOV-010 P6).",
+      "evidence": "docs/09-backlog/backlog.yaml phase-plug-07 acceptance: 'The R02 check and the history-word grep pass over plugins/idea-realization/docs/.' / 'Every rule in the trace table's source column is present in the named plugin document, checked by a reviewer reading both.' / 'The ledger's ten still-standing rules named in the plan each appear in exactly one plugin document.' None states a case that must fail or be rejected. GOV-010 P6: 'Acceptance names the command or observation, the expected result, and at least one input that must be rejected.' The child plan (PLAN-048.07-absolute-documents.md, 'Acceptance and verification') claims 'As the backlog entry states. The case that must fail: the history-word grep over docs/ finds incident, until 20, was broken, replaces or precedent; a ledger still-standing rule missing from every plugin document' \u2014 but that sentence is not actually in the backlog entry it claims to restate.",
+      "consequence": "A developer or validator working from the authoritative backlog acceptance list (per GOV-002) has no rejection case to exercise; the negative test named only in child-plan prose can be silently dropped.",
+      "minimal_fix": "Copy the child plan's 'case that must fail' sentence into the backlog entry's acceptance list.",
+      "slug": "p6-missing-rejection-case",
+      "id": "F06",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-07's acceptance now names the failing cases: test_no_history.py fails on a fixture containing 'until 2026' or 'incident'; a still-standing rule missing from the documents."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-08",
+      "severity": "major",
+      "title": "Backlog acceptance names no input that must fail or be rejected (GOV-010 P6).",
+      "evidence": "docs/09-backlog/backlog.yaml phase-plug-08 acceptance: 'The session record names the scratch repository, quotes each command's real output, and lists the scaffold's created files.' / 'The partition sweep's second audit ran and its findings are in the record.' / 'Every defect found is either fixed with a test or recorded as an idea by id.' All three are positive observations; none is a rejection case. The child plan (PLAN-048.08-end-to-end.md, 'Acceptance and verification') states 'The case that must fail: a scaffold over the scratch repository's second run creating a file; audit 2 not running' \u2014 neither sentence appears in the backlog entry.",
+      "consequence": "Same as phase-plug-07: the negative cases (second scaffold run creating a file; audit 2 failing to run) exist only in child-plan prose, not in the acceptance a session is actually held to.",
+      "minimal_fix": "Add the child plan's 'case that must fail' sentence to the backlog entry's acceptance list.",
+      "slug": "p6-missing-rejection-case",
+      "aliases": [
+        "missing-negative-acceptance-case"
+      ],
+      "id": "F07",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-08's acceptance now states that a sweep whose second audit did not run fails the phase and that a second scaffold run creating a file is a defect fixed before completion."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-08",
+      "severity": "major",
+      "title": "Declared deliverables do not cover the open-ended plugin-file edits the scope authorizes.",
+      "evidence": "docs/09-backlog/backlog.yaml phase-plug-08 deliverables: ['plugins/idea-realization/README.md', 'docs/03-sessions/']. Its own scope line: 'Fix defects the exercise finds inside this phase when they are small; record the rest as ideas.' A defect found while exercising scripts/, skills/, schemas/ or agents/ (any component the end-to-end run exercises per R22) would require editing files under those directories, none of which is a declared deliverable path.",
+      "consequence": "A fix made during this phase falls outside its declared deliverables, which is exactly the signal the backlog's collision/concurrency machinery (`path_conflict`, analysis 03 \u00a73) relies on to know what a phase touches; an undeclared edit is invisible to that check even though the risk is moot here since sys-plugin already forces serialization.",
+      "minimal_fix": "Add 'plugins/idea-realization/' to phase-plug-08's deliverables (matching every other plug-* phase).",
+      "slug": "deliverables-undercount-open-ended-scope",
+      "id": "F08",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-08's deliverables now include plugins/idea-realization/; the overview's Execution order says it runs alone for that reason."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-02",
+      "severity": "major",
+      "title": "The overview's stated prerequisite fact for this phase is false against the current backlog: phase-idg-01 is not first in the ready order.",
+      "evidence": "PLAN-048-overview.md:103: 'Prerequisites: `phase-idg-01` (queued, first in the ready order) must land before `phase-plug-02`.' Actual `next_up` in docs/09-backlog/backlog.yaml: `['phase-grd-02', 'phase-idg-01', 'phase-idg-19', ...]` \u2014 phase-grd-02 is listed ahead of phase-idg-01. phase-grd-02's entry (backlog.yaml:14048) is `status: queued`, `depends_on: [phase-grd-01]`, and phase-grd-01 is `status: complete` (verified: `awk` on backlog.yaml prints `status: complete`), so phase-grd-02 is itself ready and ranked first, not phase-idg-01. phase-grd-02 also declares `systems: [sys-governance, sys-gov-docs]`, colliding with phase-idg-01's `sys-governance`, so the two cannot run concurrently either.",
+      "consequence": "The plan's D5/Q1 reasoning (place the eight plug-* phases 'directly after phase-idg-01' in next_up) is built on a premise about queue position that the repository's own data contradicts; the owner could rank next_up on a stale picture of what precedes phase-idg-01.",
+      "minimal_fix": "Re-check next_up immediately before G3 and state the actual phase ranked first, or drop the 'first in the ready order' claim and just say 'queued, depends_on: []'.",
+      "slug": "stale-backlog-premise",
+      "id": "F09",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "The overview now states phase-idg-01's actual position: depends_on [], second in next_up behind phase-grd-02 at the time of writing; Q1 asks the owner to rank."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-07",
+      "severity": "minor",
+      "title": "Deliverables omit the R02 check's test file, which this phase's own scope modifies.",
+      "evidence": "phase-plug-07 scope: 'Extend the R02 check with the history-word grep over the plugin's docs/.' The R02 check is `test/test_no_source_references.py`, written by phase-plug-01 under `plugins/idea-realization/` (phase-plug-01 scope line 5). phase-plug-07's declared deliverables are only `['plugins/idea-realization/docs/', 'docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-trace.md']` \u2014 no path under `plugins/idea-realization/test/`.",
+      "consequence": "The declared deliverable path does not name the file the phase edits; low practical risk since sys-plugin already serializes every plug-* phase, but it is inaccurate documentation of what the phase touches.",
+      "minimal_fix": "Broaden phase-plug-07's deliverables to `plugins/idea-realization/` like every other plug-* phase, or add the test path explicitly.",
+      "slug": "deliverables-undercount-open-ended-scope",
+      "id": "F10",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-07's deliverables now name plugins/idea-realization/test/test_no_history.py, a new file, instead of extending phase-plug-01's test; every phase's deliverables were redrawn as disjoint paths for the parallel build (D11)."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-07",
+      "severity": "minor",
+      "title": "Verification list omits `claude plugin validate --strict`, unlike every other plug-* phase.",
+      "evidence": "phase-plug-07 verification (backlog.yaml): `cd plugins/idea-realization && uv run pytest`, `uv run python tools/check_no_private_content.py`, `uv run python -m src.governance` \u2014 no `claude plugin validate plugins/idea-realization --strict`. Every other phase-plug-* entry (01\u201306, 08) includes it.",
+      "consequence": "A docs-only rewrite this large (thirteen documents) has no regression check confirming the manifest/skills/agents still validate after the change.",
+      "minimal_fix": "Add `claude plugin validate plugins/idea-realization --strict` to phase-plug-07's verification list.",
+      "slug": "verification-command-dropped",
+      "id": "F11",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "claude plugin validate --strict is in phase-plug-07's verification list, as in every other plug phase."
+        }
+      ]
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-plug-06",
+      "severity": "minor",
+      "title": "One of two acceptance lines states a detection outcome ('is reported'), not a required rejection, weakening its GOV-010 P6 case.",
+      "evidence": "backlog.yaml phase-plug-06 acceptance: 'Each generator run twice over a fixture produces identical output; a hand edit inside a generated block is reported.' The child plan (PLAN-048.06-generators-layout.md, 'Acceptance and verification') calls this 'The case that must fail', but the backlog wording only promises a report, not a failing exit code or rejection.",
+      "consequence": "Ambiguous wording risks the test being implemented as a warning that still exits 0, which would not satisfy P6's 'must be rejected' bar even though the phase's second acceptance line (no placeholder marker, passes R02) gives it a genuine negative case elsewhere, so this alone does not leave the phase without any failing case.",
+      "minimal_fix": "Change 'is reported' to 'fails' (or state the exit code) in the backlog acceptance line.",
+      "slug": "p6-missing-rejection-case",
+      "id": "F12",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager session (planner, agent/plugin-plan)",
+          "date": "2026-09-25",
+          "reason": "phase-plug-06's acceptance now reads 'makes the generator exit 1 naming the file' and adds a failing case for an unknown placeholder."
+        }
+      ]
+    }
+  ],
+  "notes": "Reviewed at fa44a92 on agent/plugin-plan, two dispatches on partition-adversary with PROMPT-038: the plan altitude (the overview with its eight child plans and REQ-031) and the phase altitude for phase-plug-01..08. The plan-altitude adversary hit its turn limit and was asked to report what it had verified; its summary lines were not delivered, only the array. No later-added altitude: every phase was registered in the plan's first commit. phase-plug-09 was created by the revision (the split F05 asked for) and is therefore later-added relative to this record; it is reviewed at G3 by the owner with the record and gets its later-added dispatch if the owner asks. Findings recorded as reported; the dispatcher added only id, engine, author and the planner's dispositions. The owner's ruling on F01 is awaited at G3."
+}

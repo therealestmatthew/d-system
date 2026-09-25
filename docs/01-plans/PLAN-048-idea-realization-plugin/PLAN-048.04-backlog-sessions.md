@@ -8,7 +8,7 @@ status: draft
 owner: repository-owner
 created: '2026-09-25'
 updated: '2026-09-25'
-systems: [sys-plugin]
+systems: [sys-plugin-backlog]
 depends_on: [doc-idea-realization-plugin]
 parent: doc-idea-realization-plugin
 ---
@@ -57,7 +57,7 @@ As the backlog entry states. The case that must fail: two active phases sharing 
 
 ## Execution order
 
-Runs after phase-plug-05, alone on sys-plugin; phase-plug-06 precedes or follows it. Every plugin phase shares `sys-plugin` and the `plugins/idea-realization/` deliverable path, so the validator allows one at a time; the overview's Execution order section gives the full sequence.
+Runs after phase-plug-05, alongside phase-plug-03 and phase-plug-06 (wave 3). `scripts/checks/backlog.py` is its module of the check dispatcher; it shares no path with a peer.
 
 ## Out of scope
 

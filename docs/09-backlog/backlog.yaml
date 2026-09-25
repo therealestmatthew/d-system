@@ -14503,7 +14503,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-skeleton-install
   systems:
-  - sys-plugin
+  - sys-plugin-core
   owner: repository-owner
   status: queued
   priority: 1
@@ -14512,36 +14512,54 @@ items:
   scope:
   - Create plugins/idea-realization/ with .claude-plugin/plugin.json (name idea-realization, no
     license field, userConfig entries for the ideas path, rendered-view path, priority-file path,
-    backlog path, document root, integration branch, worktree directory, triage search list), the
-    component directories, a README, and a pytest suite that runs from the plugin directory (REQ-031
-    R01, R03, R21).
+    backlog path, document root, integration branch, worktree directory, triage search list, exempt
+    files, staging directory), the component directories, a README stub, and a pytest suite that
+    runs from the plugin directory (REQ-031 R01, R03, R21).
+  - Write .claude-plugin/marketplace.json at this repository's root naming the one plugin with a
+    relative source, since the CLI installs persistently only from a marketplace; verify the
+    install path end to end (marketplace add by local path, plugin install, the skills listed in a
+    new session) before fixing the manifest shape, and record the commands in the README.
   - Write scripts/paths.py, the one place every script resolves a data path (flag, then environment
     variable, then userConfig, then the documented default), and the PEP 723 header every script
     carries (jsonschema, pyyaml only).
-  - Write the prerequisites skill and scripts/prerequisites.py (check mode and install-on-yes) (R04).
-  - Write the scaffold skill and scripts/scaffold.py with the install-state record, the
-    never-overwrite rule, dry run, and consent-gated writes to settings, hooks and .gitignore (R05,
-    R06); write scripts/doctor.py (R07).
-  - Write test/test_no_source_references.py, the R02 check, and run it in the suite from this phase
-    on.
+  - Write scripts/check.py as a dispatcher that imports one module per feature from
+    scripts/checks/ (ideas, backlog, documents), each registered when present, so later phases add
+    their check without editing this file; write scripts/cli.py the same way for next-code, catalog
+    and ready.
+  - Write the prerequisites skill and scripts/prerequisites.py (check mode and install on --yes
+    only) (R04).
+  - Write the scaffold skill and scripts/scaffold.py with selectable features, the install-state
+    record, the never-overwrite rule, dry run, and consent-gated writes to settings, hooks and
+    .gitignore (R05, R06); write scripts/doctor.py (R07).
+  - Write test/test_no_source_references.py, the R02 check, run in the suite from this phase on.
   acceptance:
-  - claude plugin validate plugins/idea-realization --strict exits 0; a fixture manifest with a
-    license field fails.
-  - The scaffold test suite shows a record with one hash per created file, a second run that creates
-    nothing, a pre-existing file left byte-identical, and a dry run that writes nothing.
+  - claude plugin validate plugins/idea-realization --strict exits 0 and claude plugin validate
+    .claude-plugin/marketplace.json exits 0; a fixture manifest with a license field or an unknown
+    top-level key fails --strict.
+  - claude plugin marketplace add <this repository's path> followed by claude plugin install
+    idea-realization@<marketplace name> succeeds on this machine and the plugin's skills appear in a
+    new session; the checkpoint records the real output. If no persistent local install exists, the
+    phase stops and reports it rather than proceeding.
+  - The scaffold tests show a record with one hash per created file, a second run that creates
+    nothing and reports every path skipped, a pre-existing backlog.yaml left byte-identical, and a
+    dry run that writes nothing.
   - The prerequisites check with uv removed from PATH exits 1 naming uv and its install command and
-    changes no file.
-  - The R02 check passes over the plugin tree and fails on a fixture containing a phase id.
+    changes no file; a run with --yes and uv missing is the only path that installs.
+  - The R02 check passes over the plugin tree and fails on a fixture file containing a phase id.
+  - A test copies scripts/ to a temporary directory and runs each script against a temporary data
+    root; a grep of scripts/ for parents[ and 'from src' finds nothing.
   verification:
-  - claude plugin validate plugins/idea-realization --strict
   - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
   - plugins/idea-realization/
+  - .claude-plugin/marketplace.json
   next_action: Read the plugin manifest reference at code.claude.com/docs/en/plugins/manifest-reference.md
     for the userConfig shape before writing plugin.json; the analysis at
     _working/session-manager/plugin-analysis/06-install-model.md lists what the scaffold creates.
+    Runs alone on the plugin tree; every later phase declares a subpath.
 - id: phase-plug-02
   title: The idea system — writer, fold, render, priority queue, vocabulary, triage
   plan: doc-idea-realization-plugin
@@ -14550,7 +14568,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-idea-system
   systems:
-  - sys-plugin
+  - sys-plugin-ideas
   owner: repository-owner
   status: queued
   priority: 1
@@ -14562,18 +14580,21 @@ items:
   - Port src/db/ideas.py, tools/append_idea.py and tools/generate_ideas_md.py into scripts/ideas.py,
     scripts/idea.py and scripts/render_ideas.py with paths from scripts/paths.py and no src import
     (R03, R08, R09); copy schemas/idea.schema.json as landed by phase-idg-01 (R23).
-  - Port the priority-queue validation into scripts/check.py's ideas half (R11) and the rendered-view
+  - Write scripts/checks/ideas.py, holding the priority-queue validation (R11) and the rendered-view
     staleness check (R09).
-  - Write docs/vocabulary.md and the test that compares its tables to the schema enums (R10).
+  - Write docs/vocabulary.md and test/test_vocabulary.py, which compares its tables to the schema
+    enums (R10).
   - Write skills/idea/SKILL.md, skills/idea-triage/SKILL.md and agents/idea-triage.md from the
     workflow sources, with the search surface from userConfig and every source-repository reference
     removed (R12, R02).
-  - Port the writer, fold, render and priority tests to temporary logs.
+  - Port the writer, fold, render and priority tests to temporary logs as test/test_ideas*.py.
   acceptance:
   - The ported transition tests pass through the plugin's script; an open -> promoted without a
-    pointer is refused; --help shows no time option.
+    pointer is refused; a second discard after the one revisit is refused; --help shows no time
+    option.
   - render twice over a fixture log diffs to nothing; an edited rendered file fails check.
   - The vocabulary test passes and fails on a fixture document missing one status.
+  - A fixture priority queue naming a promoted idea fails check naming the id.
   - The idea-triage agent's tools exclude Edit and Write; the R02 check passes.
   verification:
   - cd plugins/idea-realization && uv run pytest
@@ -14581,9 +14602,21 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/
+  - plugins/idea-realization/scripts/ideas.py
+  - plugins/idea-realization/scripts/idea.py
+  - plugins/idea-realization/scripts/render_ideas.py
+  - plugins/idea-realization/scripts/checks/ideas.py
+  - plugins/idea-realization/schemas/idea.schema.json
+  - plugins/idea-realization/docs/vocabulary.md
+  - plugins/idea-realization/skills/idea/
+  - plugins/idea-realization/skills/idea-triage/
+  - plugins/idea-realization/agents/idea-triage.md
+  - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/test/test_render_ideas.py
+  - plugins/idea-realization/test/test_vocabulary.py
   next_action: Waits for phase-plug-01 and phase-idg-01. Start from
-    _working/session-manager/plugin-analysis/01-idea-system.md section 2, the coupling list.
+    _working/session-manager/plugin-analysis/01-idea-system.md section 2, the coupling list. May
+    run alongside phase-plug-05.
 - id: phase-plug-03
   title: The partition sweep with its second audit unblocked
   plan: doc-idea-realization-plugin
@@ -14592,7 +14625,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-partition
   systems:
-  - sys-plugin
+  - sys-plugin-partition
   owner: repository-owner
   status: queued
   priority: 2
@@ -14605,24 +14638,35 @@ items:
   - Write skills/partition-ideas/SKILL.md, agents/partition-analyst.md and
     agents/partition-adversary.md from the sources; the prompt pack's six blocks become
     docs/partition-pack.md with every provenance citation removed (R02).
-  - Resolve the second audit by writing the synthesis draft to the primary checkout's staging
-    directory and passing that absolute path in the A2 dispatch (R13).
-  - Copy the partition-record schema and add a schema test over a fixture record.
+  - Resolve the second audit by writing the synthesis draft under the primary checkout's staging
+    directory (userConfig staging_dir) and passing that absolute path in the A2 dispatch (R13). The
+    skill refuses to write unless git check-ignore accepts the staging directory, leaves git status
+    in the primary checkout unchanged, and states that any coordination turn a target's protocol
+    requires for primary-checkout writes is held first.
+  - Copy the partition-record schema and add test/test_partition.py over a fixture record.
   acceptance:
   - The corpus builder test reads the manifest's status selection for --status open on a fixture log.
   - A fixture record validates; a record with a seven-digit id fails.
   - The skill's A2 step names an absolute path built from git worktree list, and no step stops for a
-    ruling that this repository's copy stops for.
-  - The R02 check passes.
+    ruling that this repository's copy stops for; a staging directory that is not gitignored makes
+    the skill stop before writing.
+  - The R02 check passes and fails on a pack that still names a source document.
   verification:
   - cd plugins/idea-realization && uv run pytest
   - claude plugin validate plugins/idea-realization --strict
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/
+  - plugins/idea-realization/scripts/idea_corpus.py
+  - plugins/idea-realization/skills/partition-ideas/
+  - plugins/idea-realization/agents/partition-analyst.md
+  - plugins/idea-realization/agents/partition-adversary.md
+  - plugins/idea-realization/docs/partition-pack.md
+  - plugins/idea-realization/schemas/idea-partition-record.schema.json
+  - plugins/idea-realization/test/test_partition.py
   next_action: Waits for phase-plug-02. Read _working/session-manager/plugin-analysis/02-partition.md
-    section 2 for the sequence and section 6 for the audit-2 block.
+    section 2 for the sequence and section 6 for the audit-2 block. May run alongside phase-plug-04
+    and phase-plug-06.
 - id: phase-plug-04
   title: Backlog check and ready report, plus the session-start, checkpoint and session-close skills
   plan: doc-idea-realization-plugin
@@ -14631,7 +14675,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-backlog-sessions
   systems:
-  - sys-plugin
+  - sys-plugin-backlog
   owner: repository-owner
   status: queued
   priority: 1
@@ -14639,17 +14683,19 @@ items:
   depends_on:
   - phase-plug-05
   scope:
-  - Port src/governance/backlog.py to scripts/backlog.py unchanged in logic, and add the backlog half
-    of scripts/check.py and the ready subcommand, taking documents, systems and owners from the
-    document-governance scan of phase-plug-05 (R14); copy the backlog schema.
-  - Port the status-regression check with the decisions document resolved from the catalog's
-    decision_record, not a literal filename.
+  - Port src/governance/backlog.py to scripts/backlog.py unchanged in logic; write
+    scripts/checks/backlog.py and the ready subcommand, taking documents, systems and owners from
+    scripts/documents.py (phase-plug-05) (R14); copy the backlog schema.
+  - Port the status-regression check to scripts/regression.py with the decisions document resolved
+    from the catalog's decision_record, not a literal filename.
   - Write skills/session-start, skills/checkpoint and skills/session-close from the sources with the
     integration branch and worktree directory from userConfig and the coordinator-completion rule
     stated as the current rule (R15).
-  - Port the backlog tests to fixture catalogs.
+  - Port the backlog tests to fixture catalogs as test/test_backlog*.py.
   acceptance:
   - A fixture with two active phases sharing a system fails check naming both; the ported tests pass.
+  - A fixture catalog whose decisions document is named differently is found through
+    decision_record; a catalog with no decision_record fails check.
   - The checkpoint skill contains status complete only in a prohibition; session-close states the
     three completion conditions; no skill contains the integration branch as a literal.
   - The R02 check passes.
@@ -14659,9 +14705,17 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/
+  - plugins/idea-realization/scripts/backlog.py
+  - plugins/idea-realization/scripts/regression.py
+  - plugins/idea-realization/scripts/checks/backlog.py
+  - plugins/idea-realization/schemas/backlog.schema.json
+  - plugins/idea-realization/skills/session-start/
+  - plugins/idea-realization/skills/checkpoint/
+  - plugins/idea-realization/skills/session-close/
+  - plugins/idea-realization/test/test_backlog.py
+  - plugins/idea-realization/test/test_regression.py
   next_action: Waits for phase-plug-05. Read _working/session-manager/plugin-analysis/03-backlog.md
-    section 2 for the rules as facts.
+    section 2 for the rules as facts. May run alongside phase-plug-03 and phase-plug-06.
 - id: phase-plug-05
   title: Document-governance engine — check, next-code with reservations, catalog, plan-check
   plan: doc-idea-realization-plugin
@@ -14670,7 +14724,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-document-governance
   systems:
-  - sys-plugin
+  - sys-plugin-documents
   owner: repository-owner
   status: queued
   priority: 1
@@ -14679,9 +14733,9 @@ items:
   - phase-plug-01
   scope:
   - Port src/governance/codes.py, reservations.py and the document-audit part of __main__.py into
-    scripts/codes.py, scripts/reservations.py and scripts/documents.py; write scripts/check.py's
-    document half, next-code, release-code and catalog subcommands, with the exempt-file list a
-    userConfig value (R16).
+    scripts/codes.py, scripts/reservations.py and scripts/documents.py; write
+    scripts/checks/documents.py and the next-code, release-code and catalog subcommands, with the
+    exempt-file list a userConfig value (R16).
   - Copy the document, codes and systems schemas; ship an empty code register and systems registry
     as templates.
   - Write scripts/plan_check.py from the mechanical section check and the requirement and plan
@@ -14698,9 +14752,25 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/
+  - plugins/idea-realization/scripts/codes.py
+  - plugins/idea-realization/scripts/reservations.py
+  - plugins/idea-realization/scripts/documents.py
+  - plugins/idea-realization/scripts/checks/documents.py
+  - plugins/idea-realization/scripts/plan_check.py
+  - plugins/idea-realization/schemas/document.schema.json
+  - plugins/idea-realization/schemas/codes.schema.json
+  - plugins/idea-realization/schemas/systems.schema.json
+  - plugins/idea-realization/templates/codes.yaml
+  - plugins/idea-realization/templates/systems.yaml
+  - plugins/idea-realization/templates/requirement.md
+  - plugins/idea-realization/templates/plan.md
+  - plugins/idea-realization/test/test_codes.py
+  - plugins/idea-realization/test/test_reservations.py
+  - plugins/idea-realization/test/test_documents.py
+  - plugins/idea-realization/test/test_plan_check.py
   next_action: Waits for phase-plug-01. Read
-    _working/session-manager/plugin-analysis/04-document-governance.md sections 2 and 7.
+    _working/session-manager/plugin-analysis/04-document-governance.md sections 2 and 7. May run
+    alongside phase-plug-02.
 - id: phase-plug-06
   title: Generators, repository-layout reference, and the working-agreement and orientation templates
   plan: doc-idea-realization-plugin
@@ -14709,7 +14779,7 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-generators-layout
   systems:
-  - sys-plugin
+  - sys-plugin-generators
   owner: repository-owner
   status: queued
   priority: 2
@@ -14722,31 +14792,42 @@ items:
     arguments; ship a manifest template (R18).
   - Write docs/repository-layout.md, templates/AGENTS.md and templates/CLAUDE.md with placeholders
     for the integration branch, worktree directory, data root and confidential directory, and no
-    other repository-specific content (R19).
-  - Port the generator tests; add the template-render test and run the R02 check over the rendered
-    output.
+    other repository-specific content (R19); write scripts/render_template.py.
+  - Port the generator tests; add test/test_templates.py, which renders both templates and runs the
+    R02 check over the output.
   acceptance:
   - Each generator run twice over a fixture produces identical output; a hand edit inside a generated
-    block is reported.
-  - The rendered templates contain no placeholder marker and pass the R02 check.
+    block makes the generator exit 1 naming the file.
+  - The rendered templates contain no placeholder marker and pass the R02 check; a template with an
+    unknown placeholder fails rendering.
   verification:
   - cd plugins/idea-realization && uv run pytest
   - claude plugin validate plugins/idea-realization --strict
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/
+  - plugins/idea-realization/scripts/generate_tool_docs.py
+  - plugins/idea-realization/scripts/generate_workflows.py
+  - plugins/idea-realization/scripts/render_template.py
+  - plugins/idea-realization/templates/workflows.yaml
+  - plugins/idea-realization/templates/AGENTS.md
+  - plugins/idea-realization/templates/CLAUDE.md
+  - plugins/idea-realization/docs/repository-layout.md
+  - plugins/idea-realization/test/test_generate_tool_docs.py
+  - plugins/idea-realization/test/test_generate_workflows.py
+  - plugins/idea-realization/test/test_templates.py
   next_action: Waits for phase-plug-05. Read
-    _working/session-manager/plugin-analysis/04-document-governance.md sections 3 to 5.
+    _working/session-manager/plugin-analysis/04-document-governance.md sections 3 to 5. May run
+    alongside phase-plug-03 and phase-plug-04.
 - id: phase-plug-07
-  title: The governance and protocol documents rewritten as absolutes, with a trace table
+  title: Governance documents as absolutes, part one — core protocol, codes, reporting, and the ledger triage
   plan: doc-idea-realization-plugin
   sources:
   - doc-idea-realization-plugin-requirements
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-absolute-documents
   systems:
-  - sys-plugin
+  - sys-plugin-absolutes
   owner: repository-owner
   status: queued
   priority: 2
@@ -14755,32 +14836,39 @@ items:
   - phase-plug-04
   - phase-plug-06
   scope:
-  - Dispatch one analyst per family (core protocol and codes; reporting; ledger triage; build and
-    research methodology; role contracts and review; multi-session coordination) to extract each
-    document's standing rules as one-line absolutes with source line references, then write the
-    plugin's docs/ set from those extractions (R20).
-  - Inline the ledger's still-standing rules into the documents they amend; drop every incident,
-    date, provenance and superseded passage; name the integration branch and directories by their
-    userConfig role, never literally.
-  - Write the trace table at docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-trace.md
-    mapping each plugin rule to its source passage, in this repository, not the plugin.
-  - Extend the R02 check with the history-word grep over the plugin's docs/.
+  - Dispatch the ledger-triage analyst (family C) first, then the core-protocol analyst (family A)
+    and the reporting analyst (family B), each returning one-line absolutes with source line
+    references (R20).
+  - Write docs/protocol.md, docs/backlog-protocol.md, docs/document-codes.md and docs/reporting.md
+    from the extractions, inlining the ledger's still-standing rules into the documents they amend
+    and naming the integration branch and directories by their userConfig role.
+  - Write the trace table PLAN-048.07-trace.md in this repository, one row per plugin rule with its
+    source passage, plus the ledger triage's classification (still-standing versus history) so
+    phase-plug-09 reads it rather than re-dispatching family C.
+  - Write test/test_no_history.py, the history-word grep over the plugin's docs/.
   acceptance:
-  - The R02 check and the history-word grep pass over plugins/idea-realization/docs/.
+  - The R02 check and test_no_history.py pass over plugins/idea-realization/docs/; test_no_history.py
+    fails on a fixture document containing 'until 2026' or 'incident'.
   - Every rule in the trace table's source column is present in the named plugin document, checked
-    by a reviewer reading both.
-  - The ledger's ten still-standing rules named in the plan each appear in exactly one plugin
-    document.
+    by a reviewer reading both; the trace table lists the ledger's still-standing rules and where
+    each was inlined.
+  - The ledger's still-standing rules that amend the core protocol, the backlog protocol or the
+    completion authority each appear in exactly one of the four documents.
   verification:
   - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/docs/
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/backlog-protocol.md
+  - plugins/idea-realization/docs/document-codes.md
+  - plugins/idea-realization/docs/reporting.md
+  - plugins/idea-realization/test/test_no_history.py
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-trace.md
   next_action: Waits for phase-plug-04 and phase-plug-06. Start from
-    _working/session-manager/plugin-analysis/05-governance-documents.md sections 1 and 5; the
-    family split there is the dispatch plan.
+    _working/session-manager/plugin-analysis/05-governance-documents.md sections 1 and 5; families
+    A, B and C are this phase.
 - id: phase-plug-08
   title: End-to-end exercise in a scratch repository, install documentation, and handover
   plan: doc-idea-realization-plugin
@@ -14789,16 +14877,18 @@ items:
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-end-to-end
   systems:
-  - sys-plugin
+  - sys-plugin-core
   owner: repository-owner
   status: queued
   priority: 2
   session_budget: 1
   depends_on:
   - phase-plug-03
-  - phase-plug-07
+  - phase-plug-09
   scope:
-  - Install the plugin by local path into a fresh scratch repository and run the whole path
+  - Install the plugin from this repository's marketplace into a fresh scratch repository, cut a
+    worktree of the scratch repository and run the whole path from that worktree, so the partition
+    sweep's primary-checkout staging path differs from the working directory
     (prerequisites, scaffold, idea recorded, folded, rendered, triaged, one partition sweep, a
     requirement and plan written and plan-checked, a phase registered and claimed, a code allocated,
     the catalog rendered, doctor) recording every command's real output (R22).
@@ -14808,7 +14898,10 @@ items:
   acceptance:
   - The session record names the scratch repository, quotes each command's real output, and lists
     the scaffold's created files.
-  - The partition sweep's second audit ran and its findings are in the record.
+  - The partition sweep's second audit ran and its findings are in the record; a sweep whose
+    second audit did not run fails this phase.
+  - A second scaffold run over the scratch repository creates no file; if it creates one, the
+    defect is fixed in this phase with a test before the phase completes.
   - Every defect found is either fixed with a test or recorded as an idea by id.
   verification:
   - cd plugins/idea-realization && uv run pytest
@@ -14816,7 +14909,56 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
-  - plugins/idea-realization/README.md
+  - plugins/idea-realization/
   - docs/03-sessions/
-  next_action: Waits for phase-plug-03 and phase-plug-07. Create the scratch repository outside this
-    repository and its worktrees.
+  next_action: Waits for phase-plug-03 and phase-plug-09. Runs alone on the plugin tree. Create the scratch
+    repository outside this repository and its worktrees.
+- id: phase-plug-09
+  title: Governance documents as absolutes, part two — methodology, role contracts and review, multi-session coordination
+  plan: doc-idea-realization-plugin
+  sources:
+  - doc-idea-realization-plugin-requirements
+  - doc-idea-realization-plugin
+  - doc-idea-realization-plugin-absolute-documents-two
+  systems:
+  - sys-plugin-absolutes
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-plug-07
+  scope:
+  - Dispatch the methodology analyst (family D), the role-contracts-and-review analyst (family E)
+    and the multi-session analyst (family F), each returning one-line absolutes with source line
+    references, with phase-plug-07's ledger classification attached to E (R20).
+  - Write docs/prompt-packs.md, docs/research-packs.md, docs/coordinator.md, docs/batches.md,
+    docs/role-contracts.md, docs/plan-review.md, docs/adversary-prompt.md, docs/multi-session.md
+    and docs/session-manager-messages.md from the extractions; worked examples bound to the source
+    repository's plans are dropped, not replaced.
+  - Write the trace table PLAN-048.09-trace.md in this repository.
+  acceptance:
+  - The R02 check and test_no_history.py pass over plugins/idea-realization/docs/ with the nine new
+    documents present; a document that names a source-repository prompt code fails the R02 check.
+  - Every rule in the trace table's source column is present in the named plugin document, checked
+    by a reviewer reading both.
+  - The ledger's still-standing rules that amend the role contracts or the review procedure each
+    appear in exactly one of the nine documents.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  deliverables:
+  - plugins/idea-realization/docs/prompt-packs.md
+  - plugins/idea-realization/docs/research-packs.md
+  - plugins/idea-realization/docs/coordinator.md
+  - plugins/idea-realization/docs/batches.md
+  - plugins/idea-realization/docs/role-contracts.md
+  - plugins/idea-realization/docs/plan-review.md
+  - plugins/idea-realization/docs/adversary-prompt.md
+  - plugins/idea-realization/docs/multi-session.md
+  - plugins/idea-realization/docs/session-manager-messages.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-trace.md
+  next_action: Waits for phase-plug-07, whose trace table carries the ledger classification this phase
+    reads. Families D, E and F are this phase.
