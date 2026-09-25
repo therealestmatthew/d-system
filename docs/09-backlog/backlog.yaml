@@ -9872,6 +9872,7 @@ items:
   - docs/04-decisions/
   - test/
   - src/governance/
+  - docs/08-governance/OPS-005-append-idea.md
   next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
     terminal statuses, makes promoted non-terminal, and unifies delivered with the realization
     pipeline's own planned delivered status, so phase-irs-09 implements a second path into that
