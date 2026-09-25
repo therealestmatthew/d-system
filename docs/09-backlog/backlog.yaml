@@ -14636,9 +14636,22 @@ items:
   - plugins/idea-realization/test/test_render_ideas.py
   - plugins/idea-realization/test/test_vocabulary.py
   - plugins/idea-realization/test/test_scripts_portable.py
-  next_action: Waits for phase-plug-01 and phase-idg-01. Start from
-    _working/session-manager/plugin-analysis/01-idea-system.md section 2, the coupling list. May
-    run alongside phase-plug-05.
+  next_action: Every acceptance condition met on agent/phase-plug-02; waits for the independent review
+    and the owner's merge approval, then the completion edit on dev.
+  session: doc-session-plugin-idea-system
+  completion_evidence:
+  - plugins/idea-realization/scripts/ideas.py
+  - plugins/idea-realization/scripts/idea.py
+  - plugins/idea-realization/scripts/render_ideas.py
+  - plugins/idea-realization/scripts/checks/ideas.py
+  - plugins/idea-realization/docs/vocabulary.md
+  - plugins/idea-realization/agents/idea-triage.md
+  - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/test/test_render_ideas.py
+  - plugins/idea-realization/test/test_vocabulary.py
+  - docs/03-sessions/SESS-2026-09-25-03-plugin-idea-system.md
+  result: 'Interim, before review: plugins/idea-realization pytest: 177 passed; claude plugin validate
+    --strict: passed; check_no_private_content: OK; uv run python -m src.governance: OK.'
 - id: phase-plug-03
   title: The partition sweep with its second audit unblocked
   plan: doc-idea-realization-plugin
