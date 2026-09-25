@@ -121,8 +121,9 @@ uv sync --frozen --extra dev                           # this worktree's own .ve
 
 - **Tracked files only**, at the worktree's commit. `git ls-files` lists them.
 - **Never read `_private/`.** It holds the owner's confidential records. Never read `_working/`. It
-  holds gitignored boards, reports and rulings that are not part of this work. Neither exists in a
-  fresh worktree; do not look for them in `/code/d-system` either.
+  holds gitignored boards, reports and rulings that are not part of this work. In a fresh worktree
+  `_private/` is absent and `_working/` holds only a tracked `.gitkeep`; do not look for either in
+  `/code/d-system`.
 - **Never read or write `_data/ideas.jsonl` directly.** Where a prompt needs an idea, its text is given
   in the prompt.
 - Public web documentation is allowed where a prompt says so. Cite each page by URL and the date you

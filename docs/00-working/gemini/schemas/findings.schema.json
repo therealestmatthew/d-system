@@ -4,31 +4,104 @@
   "title": "findings.json written by every PROMPT-040 prompt",
   "type": "object",
   "additionalProperties": false,
-  "required": ["provenance", "findings"],
+  "required": [
+    "provenance",
+    "findings"
+  ],
   "properties": {
-    "provenance": {"$ref": "provenance.schema.json"},
+    "provenance": {
+      "$ref": "provenance.schema.json"
+    },
     "findings": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "category", "severity", "title", "statement", "evidence", "consequence", "touches_owner_ruling"],
+        "required": [
+          "id",
+          "category",
+          "severity",
+          "title",
+          "statement",
+          "evidence",
+          "consequence",
+          "touches_owner_ruling"
+        ],
         "properties": {
-          "id": {"type": "string", "pattern": "^G[123]-F\\d{3}$"},
-          "category": {"type": "string", "enum": [
-            "unused-value", "axis-dependence", "decompose-rule", "record-kind", "alternative-schema", "terminology", "risk-in-ruling",
-            "design-gap", "ruling-conflict",
-            "contradiction", "duplication", "unenforced-rule", "terminology-drift",
-            "other"
-          ]},
-          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
-          "title": {"type": "string", "minLength": 1, "description": "One sentence stating the finding"},
-          "statement": {"type": "string", "minLength": 1},
-          "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "evidence.schema.json"}},
-          "consequence": {"type": "string", "minLength": 1},
-          "proposal": {"type": "string", "description": "Optional. The smallest change that would resolve it. A proposal, never a decision"},
-          "touches_owner_ruling": {"type": "boolean"},
-          "ruling_ref": {"type": "string", "description": "Required in practice when touches_owner_ruling is true: the ruling's label, e.g. C4 or D3-3"}
+          "id": {
+            "type": "string",
+            "pattern": "^G[123]-F\\d{3}$"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "unused-value",
+              "axis-dependence",
+              "decompose-rule",
+              "record-kind",
+              "alternative-schema",
+              "terminology",
+              "risk-in-ruling",
+              "design-gap",
+              "ruling-conflict",
+              "contradiction",
+              "duplication",
+              "unenforced-rule",
+              "terminology-drift",
+              "other"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "One sentence stating the finding"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "evidence.schema.json"
+            }
+          },
+          "consequence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "proposal": {
+            "type": "string",
+            "description": "Optional. The smallest change that would resolve it. A proposal, never a decision"
+          },
+          "touches_owner_ruling": {
+            "type": "boolean"
+          },
+          "ruling_ref": {
+            "type": "string",
+            "description": "Required when touches_owner_ruling is true: the ruling's label, e.g. C4 or D3-3"
+          }
+        },
+        "if": {
+          "properties": {
+            "touches_owner_ruling": {
+              "const": true
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "ruling_ref"
+          ]
         }
       }
     }
