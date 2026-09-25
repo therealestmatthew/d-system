@@ -1,0 +1,23 @@
+# The workflow manifest read by generate_workflows.py. It ships with no entries: add one per
+# workflow this repository wants rendered into host adapters. Every path is relative to the
+# repository root. An entry has this shape:
+#
+# - id: orient                        # unique
+#   name: orient                      # lowercase words joined by hyphens
+#   description: One sentence saying when to use it (at most 1024 characters).
+#   authority: read-only              # read-only | agent-invocable | owner-only
+#   source: agent-workflows/orient.md # the canonical Markdown body, inside the manifest's directory
+#   requires: [read_files, run_commands]
+#   targets:
+#   - host: claude                    # claude | open-agent-skills | codex
+#     kind: skill                     # skill | command | agent (codex: agent only)
+#     path: .claude/skills/orient/SKILL.md
+#     capabilities: {read_files: Read, run_commands: Bash}
+#     unsupported: []                 # required capabilities this host cannot provide
+#
+# An owner-only workflow cannot target a skill, command or agent: each is discoverable by an agent.
+# A claude agent target adds render: {tools, model, effort, max_turns}; a codex agent target adds
+# render: {model, model_reasoning_effort, sandbox_mode, unsupported_limits}; a command may add
+# render: {argument_hint}.
+schema_version: 1
+workflows: []
