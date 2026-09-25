@@ -343,3 +343,17 @@ def test_the_next_code_skill_names_the_register_only_to_forbid_editing_it() -> N
     paragraphs = [p for p in text.split("\n\n") if "codes.yaml" in p]
     assert len(paragraphs) == 1
     assert "never edited by hand" in paragraphs[0]
+
+
+@pytest.mark.parametrize("skill", ["next-code", "catalog", "plan-check"])
+def test_a_skill_runs_nothing_but_its_script(skill: str) -> None:
+    """Every command in the skill's code blocks, after option assignments, is its one script."""
+    text = (PLUGIN_ROOT / "skills" / skill / "SKILL.md").read_text()
+    blocks = text.split("```bash\n")[1:]
+    assert blocks
+    for block in blocks:
+        command = " ".join(block.split("```")[0].replace("\\\n", " ").split())
+        words = [w for w in command.split(" ") if not w.startswith("CLAUDE_PLUGIN_OPTION_")]
+        assert words[:2] == ["uv", "run"], command
+        assert words[2].startswith('"${CLAUDE_PLUGIN_ROOT}/scripts/'), command
+        assert not any(w in {">", ">>", "|", "&&", ";", "tee"} for w in words), command
