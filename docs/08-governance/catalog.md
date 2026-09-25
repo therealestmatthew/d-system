@@ -386,6 +386,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-23-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-23-07-three-altitude-review-park.md |
 | SESS-2026-09-24-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-01-batch-002-close-out.md |
 | SESS-2026-09-24-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-02-stale-generated-files.md |
+| SESS-2026-09-24-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-24-03-green-dev-ci-before-grants.md |
 | SESS-2026-09-25-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-01-idea-schema-bundle.md |
 | SESS-2026-09-25-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md |
 | SESS-2026-09-25-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-03-plugin-idea-system.md |
@@ -501,4 +502,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-396 documents — adr: 22, architecture: 12, governance: 17, operation: 22, plan: 81, prompt: 41, requirement: 34, session: 167.
+397 documents — adr: 22, architecture: 12, governance: 17, operation: 22, plan: 81, prompt: 41, requirement: 34, session: 168.
