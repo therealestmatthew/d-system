@@ -358,6 +358,18 @@ systems:
     allocation, and a derived live plan inventory; no DuckDB persistence. It does not verify that a
     plan's claims are actually true, run tests, rebuild the database, or check every business JSON
     file — those are separate commands and separate human judgment.
+- id: sys-plugin
+  name: Idea-realization plugin
+  domain: delivery
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048-overview.md
+  - docs/06-requirements/REQ-031-idea-realization-plugin.md
+  depends_on: []
+  description: The idea-realization pipeline, its governance engine, generators, layout templates and
+    absolute governance documents packaged as one Claude Code plugin for private installation into
+    other repositories. A copy adapted for a target repository; nothing here depends on it.
 - id: sys-demo-stage
   name: Demo stage page
   domain: application
