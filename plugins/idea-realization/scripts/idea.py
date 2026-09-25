@@ -621,7 +621,7 @@ def _parser() -> argparse.ArgumentParser:
 
     moved = command("status", "move an idea's status")
     moved.add_argument("idea", help="six-digit idea id")
-    moved.add_argument("to", help="the status to move to; the schema lists the legal moves")
+    moved.add_argument("to", choices=sorted({t for _, t in legal_transitions()}))
     moved.add_argument(
         "--promoted-to", nargs="+",
         help="one or more governed document codes, required when promoting",
