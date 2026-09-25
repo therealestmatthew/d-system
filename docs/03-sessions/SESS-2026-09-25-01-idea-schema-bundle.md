@@ -20,7 +20,7 @@ depends_on: [doc-idea-graph-lifecycle]
 
 ## Verification
 
-Run in `/code/d-system-worktrees/phase-idg-01` on `agent/phase-idg-01`, rebased onto dev `c33dc3b`.
+Run in `/code/d-system-worktrees/phase-idg-01` on `agent/phase-idg-01`, rebased onto dev `6903db8`.
 
 ```
 $ uv run pytest
@@ -75,7 +75,89 @@ review's findings and the owner's merge approval, after which the completion edi
 - The DuckDB projection stores the new events' common columns but has no columns for
   classification, `closes_with` or `target_code`, recorded as idea `000464`.
 - `tools/generate_ideas_md.py` renders a link as `` `{target}` ``, so a document link would render as
-  `None` in `docs/00-working/ideas.md` once one is written. None is written yet; the file is outside
-  this phase's deliverables.
+  `None` in `docs/00-working/ideas.md` once one is written, and renders neither classification nor
+  `closes_with`. None is written yet; the file is outside this phase's deliverables. Recorded as idea
+  `000465`.
 - OPS-005's hand-written prose predates annotate and link and does not mention the new commands;
   only its generated `--help` block was regenerated.
+
+## Review
+
+Independent adversarial review by a `demo-adversary` sub-agent (the owner chose the type, since no
+reviewer type is scoped to this track), over `dev...HEAD` at `d5e03f6`. It re-ran pytest (1115
+passed), governance, ruff and mypy, all matching the record, and probed the schema and the real log
+directly. Its verdicts and findings, as reported:
+
+- **R01 — Met.** `record_kind` and four separate enum fields; tag rejection reproduced directly.
+- **R04 — Met, with a schema-level gap (Finding 2).** `target_code` is distinct and checked against
+  `document_codes()`, reused rather than re-scanned.
+- **R05 — Met.** `component_of` with inverse `has_component`; `lineage` covered by the unchanged
+  author check at `tools/append_idea.py:408`.
+- **R06 — Met.** `8d00f7c` touches the three files together.
+- **R07 — Met.** The branch touches no line of `_data/ideas.jsonl`; the fold-identity and prefix
+  tests pass against the real corpus.
+- **Agent lineage rejected — Met.**
+- **Closes legal, pointer-required, promoted → delivered — Met**, confirmed by direct schema probes.
+
+1. **[Major] The 000099/000129 reversal was not written to the real log.** Both fold to `reviewing`.
+   The mechanism is shipped and tested against the exact case, but no status event was appended,
+   and the record's Unresolved section did not mention it. The reviewer asked for an explicit ruling
+   on whether that write is this phase's job.
+2. **[Should-fix] The `linked` branch's `oneOf` let a `supersedes` or `component_of` link carrying
+   both `target` and `target_code` validate**, contradicting the owner's ruling that only `extends`
+   and `relates_to` may point at a document. Not reachable through the writer, which checks
+   `DOCUMENT_LINK_TYPES` first, but `fold()` and the rebuild preflight would accept a hand-written line.
+3. **[Note] `generate_ideas_md.py` renders a document link as `None`.** Already disclosed; confirmed.
+4. **[Note] The hard-coded old statuses and the projection gap degrade gracefully.** `workbench.py`
+   sorts an unknown status last via `.get`, and `rebuild_db.py` omits the new columns; tracked as
+   `000463` and `000464`.
+5. **[Note] The `link_diagnostics()` filter change is necessary and correct.**
+
+No defect was found in ADR-024's claims, the pointer patterns (361/361 real codes and 318/318 real
+phase ids match), or the pointer resolvers.
+
+**Disposition.** Finding 2 is fixed: the type restriction now applies whenever `target_code` is
+present (`if`/`then` in the `linked` branch), and `test_only_extends_and_relates_to_may_point_at_a_document`
+covers both targets together on `supersedes` and `component_of`; full gates re-run green after the
+rebase onto `6903db8`. Finding 1 is accepted as outside this phase, for the owner to confirm at the
+merge: the scope bullet says what remains "is a status move from reviewing to resolved, which the
+transition table must allow". This phase makes the table allow it (`reviewing → resolved`, tested by
+`test_a_revisited_idea_moves_from_reviewing_to_resolved`). `phase-idg-13`'s scope names the move itself
+("Move 000099 and 000129 to resolved"), its deliverables are `_data/ideas.jsonl`, and its acceptance
+requires every close it writes to carry `proposed_by` through `phase-idg-14`, a field this phase must
+not add. This phase's deliverables exclude the log. Findings 3–5 need no action.
+
+## Decisions
+
+- **Classification is a `classified` event, not fields on `created`.** A `created` line is
+  permanent, and the backfill and the classification agent both have to append. Recorded in ADR-024.
+- **The owner ruled four shapes** when asked: pointers are a typed `closes_with` list resolved at
+  write time; the new closes are reachable from every working state, and from `promoted` only to
+  `delivered`; confidence is a 0 to 1 number per axis; document links use a separate `target_code`
+  field, only on `extends` and `relates_to`. Each was the recommended option.
+- **New fold keys appear only where the data does** (`closes_with`, `classification`, a link's
+  `target_code`). REQ-014 R07 asks for identical derived state, and always-present `None` keys
+  changed every legacy link and idea. Consumers read them with `.get()`.
+- **`document_codes()` lives in `src/governance/__main__.py`**, built on `audit`'s own walker and
+  front-matter parser, as the `next_action` required.
+- **OPS-005 was added to the deliverables on dev** (`c33dc3b`, through a Session Manager turn),
+  because the writer's new flags made its generated `--help` block stale.
+- **The reviewer type was `demo-adversary`**, chosen by the owner.
+
+## Corrections
+
+- The first fold change added `target_code: None` to every link, which broke an existing test and
+  R07's identical-state reading. Replaced with conditional keys.
+- The pointer rule first sat in its own `allOf` clause keyed on `event: status`, which the
+  transition-table test mistook for the status branch. It moved inside the status branch.
+- Review finding 2 was a real schema hole, fixed as above.
+
+## Left undone
+
+- **The 000099/000129 status move** belongs to `phase-idg-13`, per the review disposition above.
+- **The three knock-ons outside the lock** (`000463` status consumers, `000464` DuckDB projection,
+  `000465` renderer) are recorded as ideas for later phases, since each file is outside this phase's
+  deliverables.
+- **OPS-005's hand-written prose** still describes only `add`, `status`, `revisit` and `amend`; it
+  was already behind before this phase and only its generated block was in scope.
+
