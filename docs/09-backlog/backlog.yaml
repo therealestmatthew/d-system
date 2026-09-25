@@ -14590,7 +14590,8 @@ items:
   systems:
   - sys-plugin-ideas
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-builder
   priority: 1
   session_budget: 1
   depends_on:
