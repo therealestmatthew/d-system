@@ -14759,6 +14759,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-builder-a
+  session: doc-session-plugin-document-governance
   priority: 1
   session_budget: 1
   depends_on:
@@ -14809,9 +14810,9 @@ items:
   - plugins/idea-realization/test/test_reservations.py
   - plugins/idea-realization/test/test_documents.py
   - plugins/idea-realization/test/test_plan_check.py
-  next_action: Waits for phase-plug-01. Read
-    _working/session-manager/plugin-analysis/04-document-governance.md sections 2 and 7. May run
-    alongside phase-plug-02.
+  next_action: Every acceptance condition is met on agent/phase-plug-05 (SESS-2026-09-25-04); awaiting
+    the independent review's findings and the owner's merge approval, after which the completion edit
+    is made on dev.
 - id: phase-plug-06
   title: Generators, repository-layout reference, and the working-agreement and orientation templates
   plan: doc-idea-realization-plugin
