@@ -86,3 +86,12 @@ review's findings and the owner's merge approval, after which the completion edi
   to regenerating it, by design.
 - `paths.add_arguments` flags are listed by key name only; their help text lives in the plugin
   manifest and the Configuration section, not per script.
+
+## Decisions
+
+- **The private-content check is not ported** (owner ruling, asked at the claim). PLAN-048.06 left it
+  open, leaning to porting the path-prefix half with `confidential_dir` as the prefix. The owner
+  declined. The source check's identifier half derives what counts as confidential from this
+  repository's own portfolio layout, which a target does not share. Its path half is one prefix
+  test that a target can write for its own confidential directory, and the rendered `AGENTS.md`
+  already states the rule it would enforce. The phase's deliverables stay as declared.
