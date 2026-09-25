@@ -21142,3 +21142,15 @@ The owner's words, as relayed: "Ideation agent was very confusing in it's wordin
 
 - relates_to → `000452`
 - relates_to → `000163`
+
+---
+
+## 000455 · Package the idea capture and triage system as a shareable Claude Code plugin
+
+**Created 2026-09-25T12:09:36-04:00 · Status: `open`**
+
+Owner, 2026-09-25, in the Session Manager session. The owner asked: "What would be an impactful plugin we could create and share with what exists in this repository today?" The Session Manager recommended the idea capture and triage system, and the owner chose it: "Let's do the idea capture and triage." The owner wants it built next, before the active work resumes.
+
+Scope, as the Session Manager proposed it (to be settled in planning): the /idea skill; the sanctioned writer tools/append_idea.py over an append-only ideas.jsonl; fold() to read state and the ideas.md renderer; the idea schema; the idea-triage agent and the /idea-triage workflow; and the four-axis classification (ARCH-005, accepted 2026-09-25). The packaging work is making paths configurable, removing references specific to this repository (_private/, the backlog, governance documents), and writing documentation.
+
+Related: 000439 (install features into a target repository deterministically): a plugin is a ready-made install mechanism, and the owner's rulings of 2026-09-25 apply (the unit of installation is a workflow; settings and hooks are written only with recorded consent). Also 000436 (the multi-repository anchor), 000433 (skills vs agents), 000452 (the four-axis schema work) and 000127 (the idea skill delegates capture to a subagent).
