@@ -14628,6 +14628,7 @@ items:
   - plugins/idea-realization/scripts/render_ideas.py
   - plugins/idea-realization/scripts/checks/ideas.py
   - plugins/idea-realization/schemas/idea.schema.json
+  - plugins/idea-realization/schemas/idea-priority.schema.json
   - plugins/idea-realization/docs/vocabulary.md
   - plugins/idea-realization/skills/idea/
   - plugins/idea-realization/skills/idea-triage/
@@ -14635,6 +14636,7 @@ items:
   - plugins/idea-realization/test/test_ideas.py
   - plugins/idea-realization/test/test_render_ideas.py
   - plugins/idea-realization/test/test_vocabulary.py
+  - plugins/idea-realization/test/test_scripts_portable.py
   next_action: Waits for phase-plug-01 and phase-idg-01. Start from
     _working/session-manager/plugin-analysis/01-idea-system.md section 2, the coupling list. May
     run alongside phase-plug-05.
