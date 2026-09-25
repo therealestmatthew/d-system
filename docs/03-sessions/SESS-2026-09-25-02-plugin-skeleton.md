@@ -85,15 +85,16 @@ a `multiple` option substitutes comma-joined (`docs/a b.md,x.md`).
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-b`. `next_action`: run `/session-close` up to its
-independent review, then send READY to the Session Manager; the phase completes only after the
-owner-approved merge. `session: doc-session-plugin-skeleton`; `completion_evidence` cites
+`status: complete`, `agent: agent-builder-b`, completed on `dev` after the owner-approved
+fast-forward to b82ac34. `session: doc-session-plugin-skeleton`; `completion_evidence` cites
 `plugin.json`, `paths.py`, `scaffold.py`, the scaffold and R02 tests, and this record; `result`
-describes the build as not yet reviewed or merged.
+records the verification, the Session Manager's independent re-run and the review outcome.
+`phase-plug-01` removed from `next_up`.
 
 ## Unresolved
 
-- **Wording correction awaiting approval** (owner chose "own test + fix wording"). Proposed text:
+- **Wording corrections, since applied on `dev` by the PLAN-048 amendment at 7b8f0f5** (owner chose
+  "own test + fix wording"). As proposed here:
   - backlog acceptance, first entry: "claude plugin validate plugins/idea-realization --strict exits
     0; a fixture manifest with an unknown top-level key fails --strict; a test asserts plugin.json
     has no license key."

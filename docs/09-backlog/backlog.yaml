@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-01
 - phase-plug-05
 - phase-plug-02
 - phase-plug-04
@@ -14512,7 +14511,7 @@ items:
   systems:
   - sys-plugin-core
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 1
   session_budget: 1
@@ -14565,11 +14564,8 @@ items:
   - uv run python -m src.governance
   deliverables:
   - plugins/idea-realization/
-  next_action: Review done and dispositioned; send READY to the Session Manager and merge on the
-    owner's approval; the phase completes only after the owner-approved merge. The
-    first acceptance entry's license half cannot hold (license is a valid manifest field); the owner
-    ruled to enforce it with the plugin's own test and to correct the wording, proposed in the session
-    record's Unresolved section.
+  next_action: Complete. The wording corrections the session proposed (acceptance, scope, REQ-031 R01)
+    are on dev through the PLAN-048 amendment at 7b8f0f5.
   session: doc-session-plugin-skeleton
   completion_evidence:
   - plugins/idea-realization/.claude-plugin/plugin.json
@@ -14578,10 +14574,12 @@ items:
   - plugins/idea-realization/test/test_scaffold.py
   - plugins/idea-realization/test/test_no_source_references.py
   - docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md
-  result: Plugin skeleton, paths resolver, dispatchers, prerequisites, scaffold with install-state
-    record, doctor and the R02 check built on agent/phase-plug-01; plugin suite 64 passed, strict
-    validation passed, loading check passed. The demo-adversary review found all six Met; three findings
-    fixed or accepted. Not yet merged.
+  result: 'plugins/idea-realization pytest: 64 passed; claude plugin validate --strict: passed; uv run
+    pytest: 1115 passed; uv run python -m src.governance: OK; ruff and mypy src/ clean, after rebase on dev
+    7b8f0f5 and re-run independently by the Session Manager. Loading check with --plugin-dir passed.
+    Independent demo-adversary review found all six acceptance conditions met; the mid-run race fixed,
+    the record''s backlog-seed claim corrected (decision_record made optional by the owner for phase-plug-04),
+    the stale scope wording amended on dev.'
 - id: phase-plug-02
   title: The idea system — writer, fold, render, priority queue, vocabulary, triage
   plan: doc-idea-realization-plugin
