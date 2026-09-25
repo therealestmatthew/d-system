@@ -14836,6 +14836,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-builder-a
+  session: doc-session-plugin-generators-layout
   priority: 2
   session_budget: 1
   depends_on:
@@ -14879,9 +14880,9 @@ items:
   - plugins/idea-realization/test/test_generate_tool_docs.py
   - plugins/idea-realization/test/test_generate_workflows.py
   - plugins/idea-realization/test/test_templates.py
-  next_action: Waits for phase-plug-05. Read
-    _working/session-manager/plugin-analysis/04-document-governance.md sections 3 to 5. May run
-    alongside phase-plug-03 and phase-plug-04.
+  next_action: Every acceptance condition is met on agent/phase-plug-06 (SESS-2026-09-25-06); awaiting
+    the independent review's findings and the owner's merge approval, after which the completion edit
+    is made on dev.
 - id: phase-plug-07
   title: Governance documents as absolutes, part one — core protocol, codes, reporting, and the ledger triage
   plan: doc-idea-realization-plugin
