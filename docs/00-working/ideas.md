@@ -21266,3 +21266,23 @@ Raised 2026-09-25 by the Session Manager while planning the plugin (000455, 0004
 The question for a later planning session: does d-system install the plugin and delete its own copies (dogfooding, with the plugin becoming the single source), does it keep both with a drift check comparing the plugin's modules against this repository's, or does it accept the fork? The absolute-rewrite governance documents (000460) have the same question in document form: the source documents here keep their history, the plugin's copies are the present tense, and nothing yet detects when a rule changes in one and not the other.
 
 Not part of the plugin build; recorded so the fork is a decision rather than an accident.
+
+---
+
+## 000463 · Idea consumers outside phase-idg-01's lock do not know the new statuses
+
+**Created 2026-09-25T13:37:58-04:00 · Status: `open`**
+
+tools/overview_metrics.py STATUSES, src/api/routes/workbench.py status ranking, src/orchestrator/state.py:67 all hard-code the five old statuses and will miscount delivered/resolved/absorbed once written.
+
+Reported by Session 1 - Builder A.
+
+---
+
+## 000464 · The DuckDB idea projection has no columns for phase-idg-01's new event data
+
+**Created 2026-09-25T13:37:58-04:00 · Status: `open`**
+
+The DuckDB idea projection (sql/001_schema.sql, tools/rebuild_db.py) has no columns for phase-idg-01's classified events, closes_with pointers or document-code link targets (target_code), so ARCH-005's axis queries cannot run in DuckDB until sys-projection is extended.
+
+Reported by Session 1 - Builder A.
