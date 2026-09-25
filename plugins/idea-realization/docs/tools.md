@@ -2,7 +2,7 @@
 
 Generated from the scripts themselves. Never edit this file by hand. Regenerate it,
 from the directory its paths are relative to, with
-`generate_tool_docs.py --root . --tools scripts --reference docs/tools.md --title 'idea-realization tools' --invocation 'uv run "${CLAUDE_PLUGIN_ROOT}/scripts/{name}"' --preamble-from paths.py`;
+`uv run scripts/generate_tool_docs.py --root . --tools scripts --reference docs/tools.md --title 'idea-realization tools' --invocation 'uv run "${CLAUDE_PLUGIN_ROOT}/scripts/{name}"' --preamble-from paths.py`;
 `--check` with the same arguments compares the committed file with a fresh render.
 
 ## Configuration
