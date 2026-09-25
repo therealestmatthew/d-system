@@ -7,7 +7,7 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-24'
+updated: '2026-09-25'
 systems: [sys-portfolio, sys-projection, sys-governance]
 depends_on: [doc-idea-graph-lifecycle-requirements, doc-idea-node-classification]
 ---
@@ -84,16 +84,23 @@ that no graph library is needed.
 migration rather than a design already fitted to it. That is a real cost and it is the right one to
 take, because the migration is bounded and the blockage is not.
 
-### 2. Each axis is optional, and a blank axis must carry a reason
+### 2. Every knowledge record carries a value on every axis, with a reason for each
 
-`ARCH-005` asks whether every idea needs a value on every axis, and notes that forcing all three may
-produce meaningless values while making them optional may produce inconsistent coverage. **Ruled:
-optional, with the classification agent required to say why it left an axis blank.**
+**Amended 2026-09-25, superseding the 2026-09-14 ruling.** This decision first ruled each axis
+optional, with the classification agent required to say why it left an axis blank. The owner's
+2026-09-24 ruling on the revised `ARCH-005` replaced that:
 
-The failure this avoids is the one the open question names from the other side. An axis that is
-simply absent is indistinguishable from an idea the agent never processed, which makes coverage
-unmeasurable and makes `R03`'s number meaningless. A recorded reason separates "this `Event` has no
-meaningful epistemic status" from "nobody has looked at this yet."
+- The epistemic axis is never blank. Not Applicable / Agnostic replaces a blank on a record that
+  asserts no verifiable truth claim.
+- The ontological, lifecycle and temporal axes are required on every knowledge record.
+- Records that are not knowledge records (`collection`, `fixture`, `reference`) carry a record kind
+  instead of axis values.
+- A reason is kept for each axis value.
+
+The failure the first ruling guarded against still holds, and the amendment meets it without
+blanks. An absent axis is indistinguishable from an idea the agent never processed, which makes
+coverage unmeasurable and makes `R03`'s number meaningless. With no blanks allowed, an absent value
+on a knowledge record now always means an unprocessed record.
 
 ### 3. The schema additions ship as one phase, because they touch the same three files
 
@@ -148,10 +155,10 @@ by counting. That ruling stands, and this sequencing is what it implies.
   the schema and the agent's own contract, 3 and 4 in `REQ-014`'s rows, 5 in `phase-idg-06`'s scope,
   6 in this plan's phase table. `ARCH-005` already carries the vocabulary these reason from.
 
-`ARCH-005` itself stays `draft` until `phase-idg-01` lands, and moves to `accepted` in that same
-change. It was written as a vocabulary awaiting a governing requirement; `REQ-014` is that
-requirement, and accepting the architecture before its requirement existed would have inverted the
-repository's own plan-before-code rule.
+`ARCH-005` was accepted on 2026-09-25, before `phase-idg-01`, with the owner's revisions to the
+vocabulary. It was written as a vocabulary awaiting a governing requirement; `REQ-014` is that
+requirement and existed by then, so accepting it did not invert the repository's plan-before-code
+rule. `phase-idg-01` builds the schema, writer and code against the accepted vocabulary.
 
 ## Implementation phases
 

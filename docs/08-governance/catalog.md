@@ -31,7 +31,7 @@ CI regenerates it and fails on any difference.
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
 | ARCH-004 | architecture | active | repository-owner | docs/07-architecture/ARCH-004-architecture-overview.md |
-| ARCH-005 | architecture | draft | repository-owner | docs/07-architecture/ARCH-005-idea-node-classification.md |
+| ARCH-005 | architecture | active | repository-owner | docs/07-architecture/ARCH-005-idea-node-classification.md |
 | ARCH-006 | architecture | draft | repository-owner | docs/07-architecture/ARCH-006-idea-realization-system.md |
 | ARCH-007 | architecture | draft | repository-owner | docs/07-architecture/ARCH-007-organizational-and-wbs-data-model.md |
 | ARCH-008 | architecture | draft | repository-owner | docs/07-architecture/ARCH-008-schema-catalog.md |

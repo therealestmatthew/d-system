@@ -9822,12 +9822,14 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Add the three ARCH-005 classification axes as distinct schema fields, the component_of link type,
-    the lineage annotation kind, and document-code link targets - in one change, because all four touch
-    schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py together.
+  - Add the classification that the accepted ARCH-005 defines as distinct schema fields, the component_of
+    link type, the lineage annotation kind, and document-code link targets - in one change, because all
+    four touch schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py together. The
+    classification fields are a record kind, the four axes, a lifecycle remedy (Retrospective Insight
+    only), a decompose flag, a confidence and a reason per axis, the list of tie-break rules applied,
+    and provenance (who classified, and when); this phase chooses the field names.
   - 'Write the ADR recording the scope-fork ruling: fields on the idea schema rather than a separate typed-node
     graph layer, with the migration cost stated.'
-  - Move ARCH-005 from draft to accepted in the same change, now that its governing requirement exists.
   - Restrict lineage to the owner's voice, as note and assessment already are.
   - 'Add the three terminal statuses the owner ruled on 2026-09-22, raised by idea 000236: delivered,
     a working capability exists and was verified; resolved, the ask was satisfied without building
@@ -9858,7 +9860,6 @@ items:
   - src/db/ideas.py
   - tools/append_idea.py
   - docs/04-decisions/
-  - docs/07-architecture/ARCH-005-idea-node-classification.md
   - test/
   - src/governance/
   next_action: Read the 2026-09-22 lifecycle ruling in GOV-003 before scoping. It adds three
