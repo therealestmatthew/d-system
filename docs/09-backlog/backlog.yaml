@@ -9822,7 +9822,7 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Add the classification that the accepted ARCH-005 defines as distinct schema fields, the component_of
+  - Add the classification that the active ARCH-005 defines as distinct schema fields, the component_of
     link type, the lineage annotation kind, and document-code link targets - in one change, because all
     four touch schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py together. The
     classification fields are a record kind, the four axes, a lifecycle remedy (Retrospective Insight
@@ -9845,7 +9845,7 @@ items:
     which the transition table must allow. discarded stays never-a-from; no schema exception is added
     (owner ruling 2026-09-24).'
   acceptance:
-  - 'REQ-014 R01, R04, R05 and R06 hold: three axes as fields not tags, document-code link targets distinguishable
+  - 'REQ-014 R01, R04, R05 and R06 hold: the ARCH-005 axes as fields not tags, document-code link targets distinguishable
     without parsing, component_of and lineage present, and one commit touching all three files.'
   - 'REQ-014 R07 holds: every pre-change idea folds to identical derived state and _data/ideas.jsonl''s
     existing lines are byte-identical.'
@@ -9872,7 +9872,7 @@ items:
     process that reaches them. Links are unaffected - the owner approves every edge before it is written,
     so their provenance is a fact about the process rather than the record.
     Write the ADR first. The schema shape follows from the scope-fork ruling, and writing the
-    fields before recording why they are fields inverts the reasoning. Name the three fields and
+    fields before recording why they are fields inverts the reasoning. Name the ARCH-005 fields and
     their enum values in lowercase snake_case, one token per ARCH-005 type (e.g. concept, artifact,
     process, event / axiom, hypothesis, anti_pattern / generative_seed, strategic_directive,
     operational_task, retrospective_insight), matching the convention status and link type already
@@ -10214,7 +10214,7 @@ items:
   depends_on:
   - phase-idg-01
   scope:
-  - Build an agent that assigns values on the three axes for one idea at a time, reading that idea in
+  - Build an agent that assigns values on the ARCH-005 axes for one idea at a time, reading that idea in
     isolation.
   - 'It writes neither tags nor links - 000018 owns tagging and 000055 owns relationships. The isolation
     is the point: a classification biased by an idea''s neighbours reflects the graph rather than the
@@ -10232,7 +10232,7 @@ items:
   deliverables:
   - .claude/agents/
   - docs/08-governance/
-  next_action: Read ARCH-005's three axes before designing the prompt. The agent classifies against that
+  next_action: Read the ARCH-005 axes, record kinds and tie-break rules before designing the prompt. The agent classifies against that
     vocabulary and must not invent axis values of its own.
 - id: phase-idg-03
   title: Backfill classification across the corpus and report coverage

@@ -2,7 +2,7 @@
 schema_version: 1
 id: doc-idea-node-classification
 code: ARCH-005
-title: Idea node classification (ontological, epistemic, lifecycle)
+title: Idea node classification (ontological, epistemic, lifecycle, temporal)
 kind: architecture
 status: active
 owner: repository-owner
@@ -12,14 +12,14 @@ systems: [sys-contracts, sys-portfolio]
 depends_on: [doc-idea-record-system, doc-idea-plan-annotations-links, doc-tagging]
 ---
 
-# Idea node classification (ontological, epistemic, lifecycle)
+# Idea node classification (ontological, epistemic, lifecycle, temporal)
 
 Recorded from the owner's proposal (2026-09-09) as a durable reference for the classifications
 themselves. The originating idea is `000061` in `_data/ideas.jsonl` (recorded verbatim per
 [ADR-010](../04-decisions/ADR-010-idea-staging.md)); this document is the properly-structured
 counterpart the owner asked for once the idea itself was captured.
 
-**Accepted 2026-09-25.** This version is the vocabulary a classifier, the classification agent
+**Accepted by the owner 2026-09-25.** This version is the vocabulary a classifier, the classification agent
 (`phase-idg-02`) and the idea schema (`phase-idg-01`) work against. It was revised from the
 2026-09-09 draft by the owner's rulings of 2026-09-24 and 2026-09-25, relayed by the Session Manager:
 
@@ -258,6 +258,8 @@ Deliberately unresolved here — this document defines the vocabulary, not the i
 - **Where does this live?** Three new fields on `schemas/idea.schema.json`, a separate typed-node
   system that ideas participate in alongside a new memory/document graph (see `000060`, `000032`),
   or the seed of a distinct knowledge-graph layer that ideas are only one source feeding.
+  *Superseded by [PLAN-029](../01-plans/PLAN-029-idea-graph-lifecycle.md) decision 1: fields on the
+  idea schema, not a separate graph layer.*
 - **Who assigns it, and when?** The owner has proposed a dedicated classification agent whose
   only job is interpreting an idea's essence into these three axes — explicitly not tagging,
   not relationship-building. That agent does not exist yet; this document defines what it would
@@ -274,6 +276,9 @@ Deliberately unresolved here — this document defines the vocabulary, not the i
   corpus size.
 
 ## Recommended build order (2026-09-09)
+
+*Superseded by [PLAN-029](../01-plans/PLAN-029-idea-graph-lifecycle.md), whose phase table and
+execution order now govern this sequencing; this section is kept as the owner's 2026-09-09 assessment.*
 
 The owner's assessment of sequencing across every idea this document touches, given as of a
 65-idea corpus. Not a commitment — no REQ or PLAN exists yet (see item 2) — but the order this

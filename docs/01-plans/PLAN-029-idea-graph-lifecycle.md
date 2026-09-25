@@ -155,10 +155,11 @@ by counting. That ruling stands, and this sequencing is what it implies.
   the schema and the agent's own contract, 3 and 4 in `REQ-014`'s rows, 5 in `phase-idg-06`'s scope,
   6 in this plan's phase table. `ARCH-005` already carries the vocabulary these reason from.
 
-`ARCH-005` was accepted on 2026-09-25, before `phase-idg-01`, with the owner's revisions to the
-vocabulary. It was written as a vocabulary awaiting a governing requirement; `REQ-014` is that
+`ARCH-005` was accepted by the owner on 2026-09-25, before `phase-idg-01`, with the owner's revisions
+to the vocabulary, and carries `status: active`, the governed in-force state for an architecture
+document. It was written as a vocabulary awaiting a governing requirement; `REQ-014` is that
 requirement and existed by then, so accepting it did not invert the repository's plan-before-code
-rule. `phase-idg-01` builds the schema, writer and code against the accepted vocabulary.
+rule. `phase-idg-01` builds the schema, writer and code against the active vocabulary.
 
 ## Implementation phases
 
@@ -245,8 +246,8 @@ Every row of `REQ-014` maps to at least one phase, and every phase carries at le
 
 | Requirement | Phases |
 |---|---|
-| R01 Three classification axes as schema fields | `phase-idg-01` |
-| R02 Axes independently optional, blanks carry a reason | `phase-idg-01`, `phase-idg-02` |
+| R01 Record kind and four classification axes as schema fields | `phase-idg-01` |
+| R02 Every axis valued on a knowledge record, with a reason per axis | `phase-idg-01`, `phase-idg-02` |
 | R03 Coverage measurable per axis | `phase-idg-03` |
 | R04 Links may target a document code | `phase-idg-01` |
 | R05 `component_of` and `lineage` exist, writer-restricted | `phase-idg-01` |

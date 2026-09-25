@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-24'
+updated: '2026-09-25'
 systems: [sys-portfolio, sys-projection, sys-governance]
 depends_on: [doc-idea-node-classification, doc-idea-record-system, doc-idea-staging]
 ---
@@ -70,14 +70,14 @@ The boundary is that `P1` produces the structure and `P6` queries it.
 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
-| R01 | `schemas/idea.schema.json` carries the three classification axes from `ARCH-005` — ontological, epistemic, lifecycle — as distinct fields, not as tag values. | Read the schema for three named fields with enumerated values matching `ARCH-005`'s axes. Confirm a classification written as a tag is rejected by validation rather than silently accepted. |
-| R02 | Each axis is independently optional, and an idea carrying a value on one axis and none on another validates. | Validate an idea with one axis set and two absent. Confirm it passes. Confirm the classification agent records why an axis was left blank rather than omitting it silently — an absent value with no reason is indistinguishable from an unprocessed idea. |
+| R01 | `schemas/idea.schema.json` carries the classification from `ARCH-005` — a record kind and the four axes, ontological, epistemic, lifecycle and temporal — as distinct fields, not as tag values. | Read the schema for a record-kind field and four named axis fields with enumerated values matching `ARCH-005`. Confirm a classification written as a tag is rejected by validation rather than silently accepted. |
+| R02 | A classification of a knowledge record carries one value on each of the four axes, and the epistemic axis may be Not Applicable / Agnostic; a `collection`, `fixture` or `reference` record carries its record kind and no axis values; a reason is kept for each axis value (owner ruling C1, 2026-09-24, in `ARCH-005`). | Validate a knowledge-record classification with one axis absent and confirm it is rejected. Validate one with the epistemic axis set to Not Applicable and confirm it passes. Validate a `collection` record carrying an axis value and confirm it is rejected. Confirm every axis value carries a reason. |
 | R03 | Classification coverage across the corpus is measurable as a number, per axis. | Run the metrics tool and read a per-axis coverage figure. A taxonomy whose coverage cannot be stated cannot be known to be worth its cost. |
 | R04 | A link may target a governed document code as well as another idea, and the two target shapes are distinguishable without parsing the value. | Write a link targeting a `PLAN-` code through the sanctioned writer and read it back through `fold()`. Confirm the target shape is explicit in the record. Confirm a link to a document code that does not exist is rejected. |
 | R05 | The `component_of` link type and the `lineage` annotation kind both exist and are written only through `tools/append_idea.py`. | Write one of each and read both back through `fold()`. Confirm `lineage` is restricted to the owner's voice, as `note` and `assessment` already are — an agent author attempting it is rejected, per the writer's existing author rule. |
 | R06 | Every schema addition in R01, R04 and R05 lands in one change, and `fold()`, the writer and the schema stay consistent across it. | Confirm one commit touches `schemas/idea.schema.json`, `src/db/ideas.py` and `tools/append_idea.py` together. Run the full suite. `ARCH-005` bundles these precisely to avoid re-touching the same three files four times. |
 | R07 | Every idea written before the schema change is readable unchanged, and no existing event is rewritten. | Re-read the pre-change corpus through `fold()` after the change and confirm identical derived state for every idea. Confirm `_data/ideas.jsonl`'s existing lines are byte-identical — the log is append-only, and a backfill that edits history has broken it. |
-| R08 | A classification agent assigns values on the three axes for one idea at a time, reading that idea in isolation, and writes neither tags nor links. | Run it against one idea and inspect the events it wrote. Any tag or link event is a defect. Confirm it does not read the idea's neighbours — `000062` makes isolation the point, so a classification biased by what an idea sits next to fails this row. |
+| R08 | A classification agent assigns a record kind and values on the `ARCH-005` axes for one idea at a time, reading that idea in isolation, and writes neither tags nor links. | Run it against one idea and inspect the events it wrote. Any tag or link event is a defect. Confirm it does not read the idea's neighbours — `000062` makes isolation the point, so a classification biased by what an idea sits next to fails this row. |
 | R09 | The existing corpus is backfilled, and the proportion left unclassified is reported rather than assumed to be zero. | Run the backfill and read the coverage figure from R03 before and after. Confirm ideas the agent declined to classify are listed with reasons, not silently skipped. |
 | R10 | Tags exist as a registry with a controlled vocabulary, assignable retroactively through the sanctioned writer, and queryable. | Add a tag to an existing idea and query for it. Confirm the vocabulary is a registry file rather than free text, as `_data/tags.json` already is for projects. Confirm an unregistered tag is rejected. |
 | R11 | A connection-builder agent maintains links and tags across ideas of every status, including revisiting ideas already past `open`. | Run it and confirm it writes links to at least one `triaged` or `promoted` idea. An agent that only touches `open` ideas is the triage agent, which already exists; this row distinguishes them. |
@@ -96,9 +96,10 @@ The boundary is that `P1` produces the structure and `P6` queries it.
 
 ## What each requirement is not
 
-**R02 is not permission to leave the taxonomy sparse.** Optional axes are a concession to `ARCH-005`'s
-own open question — an `Event` may have no meaningful epistemic status — not a license to skip the
-work. R03 and R09 exist so that sparseness is a measured number rather than an impression.
+**R02's Not Applicable is not a default.** Not Applicable / Agnostic is for a record that asserts no
+verifiable truth claim, and is available on the epistemic axis only; it is not a value for a record
+nobody has examined. R03 and R09 exist so that coverage is a measured number rather than an
+impression.
 
 **R07 is not a general backfill rule.** It is specifically the append-only invariant: backfilling
 classification means appending classification events, never rewriting the lines already written. A
