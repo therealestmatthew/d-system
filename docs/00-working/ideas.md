@@ -21154,3 +21154,93 @@ Owner, 2026-09-25, in the Session Manager session. The owner asked: "What would 
 Scope, as the Session Manager proposed it (to be settled in planning): the /idea skill; the sanctioned writer tools/append_idea.py over an append-only ideas.jsonl; fold() to read state and the ideas.md renderer; the idea schema; the idea-triage agent and the /idea-triage workflow; and the four-axis classification (ARCH-005, accepted 2026-09-25). The packaging work is making paths configurable, removing references specific to this repository (_private/, the backlog, governance documents), and writing documentation.
 
 Related: 000439 (install features into a target repository deterministically): a plugin is a ready-made install mechanism, and the owner's rulings of 2026-09-25 apply (the unit of installation is a workflow; settings and hooks are written only with recorded consent). Also 000436 (the multi-repository anchor), 000433 (skills vs agents), 000452 (the four-axis schema work) and 000127 (the idea skill delegates capture to a subagent).
+
+**Links**
+
+- extended_by ← `000456`
+- extended_by ← `000457`
+- extended_by ← `000458`
+- extended_by ← `000459`
+- extended_by ← `000460`
+
+---
+
+## 000456 · Extend the plugin to the whole idea-realization pipeline: priority queue, four-axis schema, partition, planning and phases, backlog and its ordering
+
+**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+
+Owner, 2026-09-25, answering the Session Manager's scope question for 000455 (package the idea capture and triage system as a shareable Claude Code plugin). Asked whether version 1 should be capture + fold + render + triage only, the owner replied that it should include "capture + fold + render + triage + priority queue + four-axis schema. It should also include partition, planning + phases, backlog, backlog ordering. It should include all vocabulary related to idea properties (link types of relationships and so on)."
+
+What this touches in the repository today: the idea priority queue (src/governance/idea_priority.py, docs/00-working/ideas-priority.yaml, schemas/idea-priority.schema.json); the four-axis classification (ARCH-005, whose schema fields are phase-idg-01's unbuilt work); the partition sweep (the partition-ideas skill, the partition-analyst and partition-adversary agents, schemas/idea-partition-record.schema.json); planning documents and phases (docs/01-plans, GOV-001); the backlog and its ordering (docs/09-backlog/backlog.yaml, src/governance/backlog.py, next_up, the backlog skill).
+
+Unresolved: whether this ships as one plugin or several in one marketplace (000439 rules the unit of installation is a workflow); whether the four-axis fields are built here first (phase-idg-01) and then ported, or the plugin leads; sequencing against the coordination work that is paused for the plugin build.
+
+**Links**
+
+- extends → `000455`
+
+---
+
+## 000457 · Plugin content for code generation and management, document management, and repository structure
+
+**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+
+Owner, 2026-09-25, in the same answer that expanded 000455's scope: "We also need code generation and code management, document management and how to structure repository."
+
+Recorded as given. The owner's phrasing is broad and the Session Manager has not yet asked what each term means in practice. Candidate readings, to be settled with the owner: document management as the governance protocol (GOV-001), document codes and --next-code (GOV-005, src/governance/codes.py), the catalog generator and the governance check (src/governance); repository structure as the docs/00..09 layout, _data, _working, _tmpagent, schemas and agent-workflows conventions described in CLAUDE.md and AGENTS.md; code generation and management as the tool-docs generator (tools/generate_tool_docs.py), the agent-workflow adapter generator (tools/generate_agent_workflows.py), or something else the owner has in mind.
+
+Unresolved: which of these are meant, and whether they form one plugin or several.
+
+**Links**
+
+- extends → `000455`
+
+---
+
+## 000458 · A scaffold skill that creates the framework's folder structure in a new or existing repository
+
+**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+
+Owner, 2026-09-25, in the same answer that expanded 000455's scope: "Maybe include scaffold framework so if we start this in a new repo or existing it can quickly whip up the folder structure it needs."
+
+What it would be: a skill in the plugin (or a plugin of its own) that, run in a target repository, creates the directories and seed files the framework expects — the ideas log and rendered view, and whatever the settled scope of the plugin needs (docs layout, backlog file, schemas). It must be safe on an existing repository: never overwrite a file that exists, report what it created, and respect 000439's rulings (install deterministically; write settings or hooks only with recorded consent). The ECC scout report (_working/session-manager/scout/ext-ecc.md) describes an install-state record with a per-file hash, an ownership guard and a drift doctor, which apply directly.
+
+Unresolved: which structure exactly, and whether scaffolding is one command or per-workflow (000439's unit of installation).
+
+**Links**
+
+- extends → `000455`
+
+---
+
+## 000459 · A plugin skill that validates system requirements and installs prerequisites
+
+**Created 2026-09-25T12:24:18-04:00 · Status: `open`**
+
+Owner, 2026-09-25, answering the Session Manager's runtime question for 000455: the scripts run with uv and PEP 723 inline dependencies, but "we need to include a skill in the plugin that helps the user validate system requirements and to install any prerequisites or dependencies."
+
+What it would do: check for uv (and the Python version it needs), git, and anything else a workflow in the plugin depends on; report what is missing with the exact install step; and, when the user says yes, run the install. The check-and-report half is read-only; the install half changes the machine and should ask first, in the spirit of 000439's consent ruling. Claude Code's plugin docs describe a SessionStart hook that installs dependencies into ${CLAUDE_PLUGIN_DATA}; this skill is the explicit, user-invoked alternative, and the two could coexist.
+
+Unresolved: whether the check runs automatically at session start or only on invocation.
+
+**Links**
+
+- extends → `000455`
+
+---
+
+## 000460 · Ship the key governance and protocol documents in the plugin, rewritten as absolutes with no overridden history
+
+**Created 2026-09-25T12:26:46-04:00 · Status: `open`**
+
+Owner, 2026-09-25, while settling the plugin's scope (000455 and 000456-000459): "We also need to include key governance and protocol documents - but we must write these files as absolutes and facts - exclude any reference to decisions or old states that have been overridden. We will need to parse out responsibilities that we distribute to our agent crew for analysis and planning."
+
+Two parts. First, the plugin carries a governance and protocol document set (candidates: GOV-001 the documentation protocol, GOV-003's accepted rulings, GOV-005 document codes, GOV-006 reporting rules, GOV-014 role contracts, GOV-017/018 where they apply, the AGENTS.md working agreement) rewritten as current fact: every rule stated as it stands today, with no narrative of the decision that produced it, no incident history, no superseded state and no "until 2026-09-12" qualifiers. This repository's copies keep their history; the plugin's copies are the distilled present tense.
+
+Second, the work of deciding which documents qualify, extracting each one's standing rules and writing the absolute form is to be split among the agent crew for analysis and planning, rather than done by one session; the plan for the plugin build allocates those responsibilities per document or per document family.
+
+Unresolved: the exact document list; whether the rewritten set is one document or mirrors the source set; how drift between the source documents and the plugin's copies is detected after the fact.
+
+**Links**
+
+- extends → `000455`
