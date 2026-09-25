@@ -43,6 +43,7 @@ def copied(tmp_path: Path) -> Path:
     copy = tmp_path / "copy"
     shutil.copytree(SCRIPTS, copy / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
     shutil.copytree(PLUGIN_ROOT / ".claude-plugin", copy / ".claude-plugin")
+    shutil.copytree(PLUGIN_ROOT / "schemas", copy / "schemas")
     return copy / "scripts"
 
 
