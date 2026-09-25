@@ -21286,3 +21286,13 @@ Reported by Session 1 - Builder A.
 The DuckDB idea projection (sql/001_schema.sql, tools/rebuild_db.py) has no columns for phase-idg-01's classified events, closes_with pointers or document-code link targets (target_code), so ARCH-005's axis queries cannot run in DuckDB until sys-projection is extended.
 
 Reported by Session 1 - Builder A.
+
+---
+
+## 000465 · generate_ideas_md.py does not render phase-idg-01's document links, classification or closes_with
+
+**Created 2026-09-25T13:52:41-04:00 · Status: `open`**
+
+tools/generate_ideas_md.py renders every link as its `target`, so a phase-idg-01 document link (target_code, target null) would render as `None` in docs/00-working/ideas.md, and classification and closes_with are not rendered at all.
+
+Reported by Session 1 - Builder A.
