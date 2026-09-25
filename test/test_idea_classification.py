@@ -242,6 +242,8 @@ def test_only_extends_and_relates_to_may_point_at_a_document(log: Path) -> None:
            "type": "supersedes", "target_code": "PLAN-029"}
     assert _errors(bad)
     assert _errors({**bad, "type": "relates_to", "target": "000002"}), "both targets accepted"
+    for type_ in ("supersedes", "component_of"):
+        assert _errors({**bad, "type": type_, "target": "000002"}), f"{type_} + both accepted"
 
 
 def test_a_document_link_is_retracted_like_an_idea_link(log: Path) -> None:

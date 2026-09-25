@@ -367,11 +367,10 @@
         "required": ["type"],
         "oneOf": [
           { "required": ["target"] },
-          {
-            "required": ["target_code"],
-            "properties": { "type": { "enum": ["extends", "relates_to"] } }
-          }
+          { "required": ["target_code"] }
         ],
+        "if": { "required": ["target_code"] },
+        "then": { "properties": { "type": { "enum": ["extends", "relates_to"] } } },
         "properties": {
           "type": { "type": "string" },
           "target": { "type": "string" },
