@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "idea": {
+      "type": "string"
+    },
+    "record_kind": {
+      "type": "string",
+      "enum": [
+        "knowledge",
+        "collection",
+        "fixture",
+        "reference"
+      ]
+    },
+    "O": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "E": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "L": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "T": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "L_remedy": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decompose": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "O": {
+          "type": "string"
+        },
+        "E": {
+          "type": "string"
+        },
+        "L": {
+          "type": "string"
+        },
+        "T": {
+          "type": "string"
+        }
+      }
+    },
+    "reason": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "O": {
+          "type": "string"
+        },
+        "E": {
+          "type": "string"
+        },
+        "L": {
+          "type": "string"
+        },
+        "T": {
+          "type": "string"
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outlier": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "classified_at": {
+      "type": "string"
+    },
+    "classified_by": {
+      "type": "string"
+    },
+    "source_eid": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "idea",
+    "record_kind"
+  ]
+}

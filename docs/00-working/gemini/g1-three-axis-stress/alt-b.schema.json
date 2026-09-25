@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "idea": {
+      "type": "string"
+    },
+    "record_kind": {
+      "type": "string",
+      "enum": [
+        "knowledge",
+        "collection",
+        "fixture",
+        "reference"
+      ]
+    },
+    "O": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "E": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "derived_default": {
+          "type": "boolean"
+        }
+      }
+    },
+    "L": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "T": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "derived_default": {
+          "type": "boolean"
+        }
+      }
+    },
+    "L_remedy": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decompose": {
+      "type": "boolean"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outlier": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "classified_at": {
+      "type": "string"
+    },
+    "classified_by": {
+      "type": "string"
+    },
+    "source_eid": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "idea",
+    "record_kind"
+  ]
+}
