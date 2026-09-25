@@ -47,6 +47,9 @@ repository's stack, data model and history (analysis 04 §5 lists each rule and 
 2. `templates/workflows.yaml`, `templates/AGENTS.md`, `templates/CLAUDE.md`; `docs/repository-layout.md`.
 3. `scripts/render_template.py` (placeholder substitution) and the test that renders both templates
    and runs the R02 check over the output.
+4. `docs/tools.md`, generated from `scripts/` by this phase's own tool-docs generator, and
+   `skills/tools`, which reads it (owner amendment 2026-09-25, R25). The generator therefore runs
+   over the plugin itself as its first real input, which is also its acceptance test.
 
 Prerequisite: `phase-plug-05` (the operations-document convention the tool-docs generator pairs
 against).

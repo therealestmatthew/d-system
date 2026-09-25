@@ -14812,11 +14812,18 @@ items:
     other repository-specific content (R19); write scripts/render_template.py.
   - Port the generator tests; add test/test_templates.py, which renders both templates and runs the
     R02 check over the output.
+  - Generate docs/tools.md from scripts/ with scripts/generate_tool_docs.py (one section per script
+    from its docstring, arguments and exit codes, with the uv run ${CLAUDE_PLUGIN_ROOT} invocation
+    and the path-precedence rule stated once at the top) and write skills/tools/SKILL.md, which reads
+    that document to answer which script does what and how to run it (R25, owner 2026-09-25).
   acceptance:
   - Each generator run twice over a fixture produces identical output; a hand edit inside a generated
     block makes the generator exit 1 naming the file.
   - The rendered templates contain no placeholder marker and pass the R02 check; a template with an
     unknown placeholder fails rendering.
+  - docs/tools.md regenerated twice is identical and names every script under scripts/ except
+    paths.py and the checks/ modules; a test that adds a fixture script to a copy of scripts/ and
+    regenerates fails the committed-output comparison until the document is regenerated.
   verification:
   - cd plugins/idea-realization && uv run pytest
   - claude plugin validate plugins/idea-realization --strict
@@ -14830,6 +14837,8 @@ items:
   - plugins/idea-realization/templates/AGENTS.md
   - plugins/idea-realization/templates/CLAUDE.md
   - plugins/idea-realization/docs/repository-layout.md
+  - plugins/idea-realization/docs/tools.md
+  - plugins/idea-realization/skills/tools/
   - plugins/idea-realization/test/test_generate_tool_docs.py
   - plugins/idea-realization/test/test_generate_workflows.py
   - plugins/idea-realization/test/test_templates.py

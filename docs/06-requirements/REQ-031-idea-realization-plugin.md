@@ -94,6 +94,7 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 | R21 | The plugin's own pytest suite runs from the plugin directory against temporary fixtures only, reads no file of the source repository outside the plugin, and passes. | `cd plugins/idea-realization && uv run pytest` exits 0; a grep of the suite for `parents[2]`, `_data/` and `docs/09-backlog` finds nothing. |
 | R22 | The plugin has been installed by local path into a scratch repository and exercised once end to end: prerequisites checked, scaffold run, an idea recorded, folded and rendered, triaged, a partition sweep run, a requirement and plan written and checked, a phase registered and claimed, a document code allocated, the catalog rendered, `doctor` run. The transcript and outputs are recorded in a session record. | The session record names the scratch repository, quotes each command's real output, and lists the files the scaffold created. |
 | R24 | Every command a person runs by hand has a thin skill: `backlog` (runs `check` and `ready`, orients on one phase, never claims), `next-code`, `catalog` and `plan-check`, each running the one script and reporting its real output. | Each skill file names exactly one script; the `backlog` skill contains no claim command; the skills appear in `claude --plugin-dir` listing. |
+| R25 | A tools reference, `docs/tools.md`, is generated from `scripts/` by the plugin's own tool-docs generator — one section per script with its purpose, arguments, exit codes and the `uv run ${CLAUDE_PLUGIN_ROOT}/scripts/<name>.py` invocation — and a `tools` skill reads it to answer which script does what and how to run it. | Regenerating twice is identical; a fixture script added to a copy of `scripts/` makes the committed document stale until regenerated; the `tools` skill names `docs/tools.md` as its only source. |
 | R23 | The four-axis classification fields ship in the plugin's idea schema exactly as this repository's schema defines them after `phase-idg-01` lands. | A test asserts the plugin's `idea.schema.json` `enum` sets for record kind and each axis equal the source schema's at the commit the plugin phase branched from. |
 
 ## What each requirement is not
@@ -119,6 +120,8 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 - R20 does not ship the orientation document or the surface audit of this repository, and does not
   keep the decision ledger as a document.
 - R21 does not require the source repository's tests to change.
+- R25 does not document `paths.py` (imported, not run) or the `checks/` modules (run through
+  `check`); the reference covers scripts a person runs.
 - R24 does not add a skill for `doctor`, `render` or the generators; those are steps inside the
   scaffold, idea and layout skills.
 - R23 does not let the plugin define fields ahead of `phase-idg-01`; if that phase has not landed
@@ -150,6 +153,8 @@ Owner, 2026-09-25, in the Session Manager session:
 - Nothing in the plugin references this repository, its people, its systems or its ideas; only
   concepts that hold in any repository.
 - The plugin is named `idea-realization`, with no licence stated.
+- Owner, 2026-09-25, after G3: a generated tools reference and a `tools` skill that reads it (R25),
+  amending `phase-plug-06`.
 - Owner, 2026-09-25, after G3: the hand-run commands (`backlog`, `next-code`, `catalog`,
   `plan-check`) each get a thin skill (R24), amending `phase-plug-04` and `phase-plug-05`.
 - The analysis and planning work is distributed across the agent crew; the build phases dispatch
