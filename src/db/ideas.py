@@ -20,25 +20,58 @@ ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = ROOT / "schemas" / "idea.schema.json"
 LOG = ROOT / "_data" / "ideas.jsonl"
 
-#: Terminal states carry no outgoing status transition. `discarded` leaves this set only
-#: through a `revisited` event, which is what limits reopening to once.
+#: The states an idea is worked in before it is promoted or closed.
 WORKING_STATES = {"open", "triaged", "reviewing"}
+
+#: Closes that require a `closes_with` pointer: where the delivery happened (GOV-003,
+#: 2026-09-22). With `discarded` they are the terminal states — no outgoing status transition.
+#: `discarded` leaves that set only through a `revisited` event, which is what limits
+#: reopening to once. `promoted` is not terminal: it moves on to `delivered` when its work ships.
+CLOSING_STATES = ("delivered", "resolved", "absorbed")
+TERMINAL_STATES = {"discarded", *CLOSING_STATES}
 
 #: Fields an `amended` event may correct. `title`/`body` are required on every idea and
 #: `text` is required on every annotation, so none of the three can ever be cleared — see
 #: `field_shape` in the schema for where that is enforced structurally. `target` is the one
-#: clearable field: its only legal shape is `link_retraction`, which always clears (phase-idea-08).
-AMENDABLE_FIELDS = ("title", "body", "text", "target")
+#: clearable field, with `target_code` for a link to a document: their only legal shape is
+#: `link_retraction`, which always clears (phase-idea-08).
+AMENDABLE_FIELDS = ("title", "body", "text", "target", "target_code")
 
 #: Kinds an annotation may carry. Mirrors schemas/idea.schema.json's `kind` enum.
-ANNOTATION_KINDS = ("note", "finding", "assessment")
+ANNOTATION_KINDS = ("note", "finding", "assessment", "lineage")
 
 #: Relationship types a link may carry. Mirrors schemas/idea.schema.json's `type` enum.
-LINK_TYPES = ("extends", "supersedes", "relates_to")
+LINK_TYPES = ("extends", "supersedes", "relates_to", "component_of")
+
+#: Link types that may point at a governed document code through `target_code`.
+DOCUMENT_LINK_TYPES = ("extends", "relates_to")
 
 #: A link's derived inverse, shown alongside the forward edge when rendering the target idea.
 #: `relates_to` is symmetric by construction — its own inverse — so it is not listed here.
-INVERSE_LINK_TYPE = {"extends": "extended_by", "supersedes": "superseded_by"}
+INVERSE_LINK_TYPE = {
+    "extends": "extended_by",
+    "supersedes": "superseded_by",
+    "component_of": "has_component",
+}
+
+#: The fields a `classified` event may carry beyond its identity, time and author (ARCH-005,
+#: ADR-024). Folded as one unit: the latest `classified` event replaces the whole of the one
+#: before it, so an axis a reclassification leaves out is not inherited from an older one.
+CLASSIFICATION_FIELDS = (
+    "record_kind",
+    "ontological",
+    "epistemic",
+    "lifecycle",
+    "temporal",
+    "lifecycle_remedy",
+    "decompose",
+    "reasons",
+    "confidence",
+    "tie_breaks",
+)
+
+#: The four ARCH-005 axes a knowledge record carries a value on.
+AXES = ("ontological", "epistemic", "lifecycle", "temporal")
 
 
 class IdeaError(Exception):
@@ -240,8 +273,14 @@ def fold(events: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
     `amended` events never advance the machine themselves — they correct what a `created`,
     `status`, `revisited`, `annotated` or `linked` event resolves to (`_effective_event`), so
-    only those five kinds are replayed here. `annotated` and `linked` are permitted regardless
-    of status, terminal included (`PLAN-017.04`): they extend the record, not the state machine.
+    only the other kinds are replayed here. `annotated`, `linked` and `classified` are
+    permitted regardless of status, terminal included (`PLAN-017.04`): they extend the record,
+    not the state machine. The latest `classified` event is the idea's classification.
+
+    The keys added with ARCH-005's bundle (ADR-024) appear only where the data does — an idea's
+    `closes_with` once it is closed, its `classification` once classified, a link's
+    `target_code` when it points at a document — so every idea written before them folds to
+    exactly the state it did (REQ-014 R07). Read them with `.get()`.
     """
     transitions = legal_transitions()
     id_index = _identity_index(events)
@@ -285,6 +324,8 @@ def fold(events: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
             current["updated"] = event["at"]
             if target == "promoted":
                 current["promoted_to"] = _as_promoted_to(event.get("promoted_to"))
+            if target in CLOSING_STATES:
+                current["closes_with"] = [dict(pointer) for pointer in event["closes_with"]]
         elif kind == "revisited":
             if current["status"] != "discarded":
                 raise IdeaError(
@@ -307,13 +348,29 @@ def fold(events: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
             current["updated"] = event["at"]
         elif kind == "linked":
             target_idea = event.get("target")
-            current["links"].append({
+            target_code = event.get("target_code")
+            entry = {
                 "eid": identity(raw_event),
                 "type": event["type"],
                 "target": target_idea,
-                "retracted": target_idea is None,
+                "retracted": target_idea is None and target_code is None,
                 "at": event["at"],
-            })
+            }
+            if "target_code" in raw_event:
+                entry["target_code"] = target_code
+            current["links"].append(entry)
+            current["updated"] = event["at"]
+        elif kind == "classified":
+            classification = {
+                field: event[field] for field in CLASSIFICATION_FIELDS if field in event
+            }
+            classification.setdefault("tie_breaks", [])
+            if classification["record_kind"] == "knowledge":
+                classification.setdefault("decompose", False)
+            classification.update(
+                {"eid": identity(raw_event), "author": event["author"], "at": event["at"]}
+            )
+            current["classification"] = classification
             current["updated"] = event["at"]
     return state
 
@@ -334,7 +391,7 @@ def link_diagnostics(state: dict[str, dict[str, Any]]) -> dict[str, list[str]]:
     graph: dict[str, list[str]] = {
         idea: [
             link["target"] for link in entry["links"]
-            if link["type"] == "extends" and not link["retracted"]
+            if link["type"] == "extends" and link["target"] is not None
         ]
         for idea, entry in state.items()
     }
@@ -363,7 +420,7 @@ def link_diagnostics(state: dict[str, dict[str, Any]]) -> dict[str, list[str]]:
 
     for idea, entry in state.items():
         for link in entry["links"]:
-            if link["retracted"] or link["type"] != "supersedes":
+            if link["target"] is None or link["type"] != "supersedes":
                 continue
             target_entry = state.get(link["target"])
             if target_entry is not None and target_entry["status"] != "discarded":

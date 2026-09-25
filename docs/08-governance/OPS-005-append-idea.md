@@ -81,13 +81,17 @@ Usage:
     uv run python tools/append_idea.py add                   # same, but from stdin
     uv run python tools/append_idea.py status 000007 reviewing
     uv run python tools/append_idea.py status 000007 promoted --promoted-to PLAN-016
+    uv run python tools/append_idea.py status 000007 delivered --doc PLAN-016 --commit 0f142ce
+    uv run python tools/append_idea.py status 000007 resolved --phase phase-idg-01
     uv run python tools/append_idea.py revisit 000007
     uv run python tools/append_idea.py amend 000007 --title "corrected title"
     uv run python tools/append_idea.py amend 000007 --body "corrected body"
     uv run python tools/append_idea.py annotate 000007 --author repository-owner --kind note         --text "..."
     uv run python tools/append_idea.py amend-annotation 000007 <eid> --text "corrected text"
     uv run python tools/append_idea.py link 000007 --type relates_to --target 000003
+    uv run python tools/append_idea.py link 000007 --type relates_to --target-code PLAN-029
     uv run python tools/append_idea.py retract-link 000007 <eid>
+    uv run python tools/append_idea.py classify 000007 --author agent-x --file classification.json
 
 **`amend` corrects the idea's `created` event rather than rewriting it** — nothing in an
 append-only log can be rewritten. It always targets that idea's `created` event by identity,
@@ -97,17 +101,28 @@ survive (`src.db.ideas` merges a chain of amendments rather than keeping only th
 Title and body are the only amendable fields, and neither can be cleared — every idea must
 have both.
 
-**`annotate` adds a note, finding or assessment; it is permitted on every idea, terminal
-included** — it extends the record, not the state machine (`PLAN-017.04`). A non-owner
+**`status` into `delivered`, `resolved` or `absorbed` needs at least one pointer** — `--doc`,
+`--phase` or `--commit`, each repeatable — naming where the delivery happened. Each must
+resolve: a document code the governance registry holds, a phase id in the backlog, or a commit
+in this repository's history. `promoted` is not terminal; it moves on to `delivered`.
+
+**`annotate` adds a note, finding, assessment or lineage; it is permitted on every idea,
+terminal included** — it extends the record, not the state machine (`PLAN-017.04`). A non-owner
 `--author` (an agent) is restricted to `--kind finding`, so the owner's own voice in the log
 stays unambiguous. `amend-annotation` corrects one annotation's text by its own `eid`
 (printed when it was written); it never touches the others.
 
-**`link` asserts a typed, one-directional edge to another idea** — `extends`, `supersedes` or
-`relates_to` — and never mutates it afterward. `retract-link` is the one legal amendment: it
-clears the target by the link's own `eid`, so the retraction is recorded rather than the edge
-being silently repointed or deleted. An `extends` cycle or a `supersedes` edge whose target is
-not `discarded` is flagged to stderr, never refused — capture always wins.
+**`link` asserts a typed, one-directional edge to another idea** — `extends`, `supersedes`,
+`relates_to` or `component_of` — and never mutates it afterward. `--target-code` points an
+`extends` or `relates_to` edge at a governed document instead; the code must exist.
+`retract-link` is the one legal amendment: it clears the target by the link's own `eid`, so the
+retraction is recorded rather than the edge being silently repointed or deleted. An `extends`
+cycle or a `supersedes` edge whose target is not `discarded` is flagged to stderr, never
+refused — capture always wins.
+
+**`classify` records an idea's ARCH-005 record kind and axis values** (ADR-024), read as a JSON
+object from `--file` or stdin, so reasons never pass through a shell argument. The latest
+classification wins; an earlier one stays in the log. Any author may classify.
 
 **`--title`/`--body` pass prose through the calling shell as quoted arguments.** Prose
 containing a backtick or `$(` is not safe there — idea 000019 was corrupted exactly this
@@ -137,9 +152,13 @@ it for anything longer than a short, plain-text title.
 | `--text` | the corrected text |  |  | yes |
 | `idea` | six-digit idea id |  |  |  |
 | `--type` |  |  |  | yes |
-| `--target` | six-digit idea id this edge points to |  |  | yes |
+| `--target` | six-digit idea id this edge points to |  |  |  |
+| `--target-code` | governed document code this edge points to; extends and relates_to only |  |  |  |
 | `idea` | six-digit idea id |  |  |  |
 | `eid` | identity of the link to retract |  |  |  |
+| `idea` | six-digit idea id |  |  |  |
+| `--author` | repository-owner or an agent name |  |  | yes |
+| `--file` | a JSON object of classification fields; read from stdin when omitted |  |  |  |
 
 Exit codes found in source: 0, 1.
 

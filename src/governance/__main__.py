@@ -140,6 +140,24 @@ def markdown_paths(root: Path, folder: str) -> list[Path]:
     return sorted(result)
 
 
+def document_codes(root: Path = ROOT) -> set[str]:
+    """Every governed document code under docs/, read by the same walk and parser `audit` uses.
+
+    The idea writer checks a document-code link target or pointer against this, rather than
+    scanning docs/ itself, so the two cannot disagree about which documents exist. A file whose
+    front matter does not parse is skipped here; `audit` is what reports it.
+    """
+    codes: set[str] = set()
+    for path in markdown_paths(root, "docs"):
+        try:
+            meta = parse_frontmatter(path.read_text(encoding="utf-8"))
+        except (ValueError, yaml.YAMLError):
+            continue
+        if isinstance(meta.get("code"), str):
+            codes.add(meta["code"])
+    return codes
+
+
 def cycle_errors(graph: dict[str, list[str]], label: str) -> list[str]:
     visiting: set[str] = set()
     visited: set[str] = set()
