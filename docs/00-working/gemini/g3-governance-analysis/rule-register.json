@@ -1,0 +1,45 @@
+{
+  "provenance": {
+    "model": "Gemini 3.1 Pro",
+    "date": "2026-09-25",
+    "prompt": "PROMPT-040 G3",
+    "dev_sha": "5fb84334000aa86efffc7e6ac947aa3e7c744058",
+    "branch": "agent/gemini-g3-governance-analysis"
+  },
+  "rules": [
+    {
+      "id": "R-001",
+      "topic": "Phase Completion",
+      "canonical_statement": "The working agreement for every agent",
+      "stated_in": [
+        {
+          "path": "AGENTS.md",
+          "line": "1-5",
+          "quote": "The working agreement for every agent"
+        }
+      ],
+      "enforced_by": [],
+      "status": "contradicted",
+      "finding_ids": [
+        "G3-F001"
+      ]
+    },
+    {
+      "id": "R-002",
+      "topic": "File edits",
+      "canonical_statement": "No agent modifies `AGENTS.md` or `CLAUDE.md`",
+      "stated_in": [
+        {
+          "path": "AGENTS.md",
+          "line": "9-10",
+          "quote": "No agent modifies `AGENTS.md` or `CLAUDE.md`"
+        }
+      ],
+      "enforced_by": [],
+      "status": "duplicated",
+      "finding_ids": [
+        "G3-F002"
+      ]
+    }
+  ]
+}
