@@ -21244,3 +21244,25 @@ Unresolved: the exact document list; whether the rewritten set is one document o
 **Links**
 
 - extends → `000455`
+
+---
+
+## 000461 · GOV-001 and GOV-002 still name main as the integration branch and lock table
+
+**Created 2026-09-25T12:39:34-04:00 · Status: `open`**
+
+Found 2026-09-25 by the governance-documents analyst dispatched for the plugin planning (000460). AGENTS.md states the trunk moved from main to dev on 2026-09-09 and tells readers to reinterpret older references, but GOV-001's "Concurrent agent execution" section (lines 181 and 191) and GOV-002's "Selecting and running a session" section (lines 168 and 172) still say main literally, as the integration branch and the lock table. A reader-side reinterpretation rule is not a fix; the text should say dev.
+
+This is a d-system correction, separate from the plugin: the plugin's absolute rewrite of these documents will say dev (or, more likely, "the integration branch" with the name configured), but the source documents here stay wrong until someone edits them. Small, mechanical, and safe to fold into the next governance-document phase that touches either file.
+
+---
+
+## 000462 · Decide whether d-system consumes its own plugin instead of keeping parallel copies
+
+**Created 2026-09-25T12:39:34-04:00 · Status: `open`**
+
+Raised 2026-09-25 by the Session Manager while planning the plugin (000455, 000456-000460). The owner ruled that the plugin carries a new thin CLI over the portable modules (ideas, backlog, codes, priority, staleness) and that this repository's src/governance stays untouched. From that moment two copies of the same logic exist: the plugin's scripts and d-system's src/governance, tools/append_idea.py, tools/generate_ideas_md.py, agent-workflows and governance documents. Every later change to one must be ported to the other by hand, or the two drift.
+
+The question for a later planning session: does d-system install the plugin and delete its own copies (dogfooding, with the plugin becoming the single source), does it keep both with a drift check comparing the plugin's modules against this repository's, or does it accept the fork? The absolute-rewrite governance documents (000460) have the same question in document form: the source documents here keep their history, the plugin's copies are the present tense, and nothing yet detects when a rule changes in one and not the other.
+
+Not part of the plugin build; recorded so the fork is a decision rather than an accident.
