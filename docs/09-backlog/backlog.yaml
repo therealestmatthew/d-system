@@ -14834,7 +14834,8 @@ items:
   systems:
   - sys-plugin-generators
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 2
   session_budget: 1
   depends_on:
