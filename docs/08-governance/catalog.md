@@ -432,8 +432,8 @@ CI regenerates it and fails on any difference.
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 0 | 1 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 | PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
-| PLAN-048 | doc-idea-realization-plugin | approved | 9 | 0 | 0 | — |
-| PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 1 | 0 | 0 | — |
+| PLAN-048 | doc-idea-realization-plugin | approved | 8 | 1 | 0 | agent-builder-b |
+| PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 0 | 1 | 0 | agent-builder-b |
 | PLAN-048.02 | doc-idea-realization-plugin-idea-system | approved | 1 | 0 | 0 | — |
 | PLAN-048.03 | doc-idea-realization-plugin-partition | approved | 1 | 0 | 0 | — |
 | PLAN-048.04 | doc-idea-realization-plugin-backlog-sessions | approved | 1 | 0 | 0 | — |
