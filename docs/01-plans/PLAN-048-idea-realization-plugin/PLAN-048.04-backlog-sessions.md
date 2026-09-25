@@ -46,7 +46,8 @@ three conditions (analysis 03 §2, "Completion is a separate, gated procedure").
    `ready` subcommand; copy `backlog.schema.json`.
 2. Port `test/test_backlog.py` and `test_backlog_status_regression.py` to fixtures; drop the one
    test that reads this repository's backlog.
-3. `skills/session-start`, `skills/checkpoint`, `skills/session-close`.
+3. `skills/session-start`, `skills/checkpoint`, `skills/session-close`; `skills/backlog` (owner
+   amendment 2026-09-25, R24): runs `check` and `ready`, orients on one phase, never claims.
 
 Prerequisite: `phase-plug-05` (the document scan that supplies documents, systems and owners).
 

@@ -93,6 +93,7 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 | R20 | The governance documents ship rewritten as current rules with no history: the core protocol, backlog protocol and document codes; the reporting rules; the prompt-pack, research-pack, coordinator and batch protocols; the role contracts, the review procedure and the adversary dispatch prompt; the multi-session coordination protocol and its starter messages. Every still-standing rule of the source decision ledger is inlined into the document it amends, and a trace table in this repository maps each plugin rule to its source passage. | R02's check passes over `docs/`; a reviewer reads the trace table and finds each source rule listed present in the named plugin document; a grep of the plugin's `docs/` for `until 20`, `was broken`, `incident`, `replaces` and `precedent` finds nothing. |
 | R21 | The plugin's own pytest suite runs from the plugin directory against temporary fixtures only, reads no file of the source repository outside the plugin, and passes. | `cd plugins/idea-realization && uv run pytest` exits 0; a grep of the suite for `parents[2]`, `_data/` and `docs/09-backlog` finds nothing. |
 | R22 | The plugin has been installed by local path into a scratch repository and exercised once end to end: prerequisites checked, scaffold run, an idea recorded, folded and rendered, triaged, a partition sweep run, a requirement and plan written and checked, a phase registered and claimed, a document code allocated, the catalog rendered, `doctor` run. The transcript and outputs are recorded in a session record. | The session record names the scratch repository, quotes each command's real output, and lists the files the scaffold created. |
+| R24 | Every command a person runs by hand has a thin skill: `backlog` (runs `check` and `ready`, orients on one phase, never claims), `next-code`, `catalog` and `plan-check`, each running the one script and reporting its real output. | Each skill file names exactly one script; the `backlog` skill contains no claim command; the skills appear in `claude --plugin-dir` listing. |
 | R23 | The four-axis classification fields ship in the plugin's idea schema exactly as this repository's schema defines them after `phase-idg-01` lands. | A test asserts the plugin's `idea.schema.json` `enum` sets for record kind and each axis equal the source schema's at the commit the plugin phase branched from. |
 
 ## What each requirement is not
@@ -118,6 +119,8 @@ behaviour because of the plugin (idea `000462` records the later question of whe
 - R20 does not ship the orientation document or the surface audit of this repository, and does not
   keep the decision ledger as a document.
 - R21 does not require the source repository's tests to change.
+- R24 does not add a skill for `doctor`, `render` or the generators; those are steps inside the
+  scaffold, idea and layout skills.
 - R23 does not let the plugin define fields ahead of `phase-idg-01`; if that phase has not landed
   when the idea phase starts, the idea phase waits.
 
@@ -147,5 +150,7 @@ Owner, 2026-09-25, in the Session Manager session:
 - Nothing in the plugin references this repository, its people, its systems or its ideas; only
   concepts that hold in any repository.
 - The plugin is named `idea-realization`, with no licence stated.
+- Owner, 2026-09-25, after G3: the hand-run commands (`backlog`, `next-code`, `catalog`,
+  `plan-check`) each get a thin skill (R24), amending `phase-plug-04` and `phase-plug-05`.
 - The analysis and planning work is distributed across the agent crew; the build phases dispatch
   per-family work the same way.

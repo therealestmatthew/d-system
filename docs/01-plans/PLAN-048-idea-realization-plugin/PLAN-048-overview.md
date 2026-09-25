@@ -116,8 +116,8 @@ and to G3.
 | `phase-plug-01` | [PLAN-048.01](PLAN-048.01-skeleton-install.md) | Skeleton, `paths.py`, prerequisites, scaffold with install-state record, doctor, the R02 check |
 | `phase-plug-02` | [PLAN-048.02](PLAN-048.02-idea-system.md) | Writer, fold, render, priority queue, vocabulary, triage agent and skill |
 | `phase-plug-03` | [PLAN-048.03](PLAN-048.03-partition.md) | Corpus builder, partition pack, analyst and adversary agents, the sweep with audit 2 |
-| `phase-plug-04` | [PLAN-048.04](PLAN-048.04-backlog-sessions.md) | Backlog check and ready report, status regression, session-start, checkpoint, session-close |
-| `phase-plug-05` | [PLAN-048.05](PLAN-048.05-document-governance.md) | Document check, next-code with reservations, catalog, plan-check, templates |
+| `phase-plug-04` | [PLAN-048.04](PLAN-048.04-backlog-sessions.md) | Backlog check and ready report, status regression, session-start, checkpoint, session-close, backlog skill |
+| `phase-plug-05` | [PLAN-048.05](PLAN-048.05-document-governance.md) | Document check, next-code with reservations, catalog, plan-check, templates, and the next-code, catalog and plan-check skills |
 | `phase-plug-06` | [PLAN-048.06](PLAN-048.06-generators-layout.md) | Two generators, layout reference, AGENTS.md and CLAUDE.md templates |
 | `phase-plug-07` | [PLAN-048.07](PLAN-048.07-absolute-documents.md) | Governance documents as absolutes, part one (core protocol, codes, reporting, ledger triage), trace table |
 | `phase-plug-09` | [PLAN-048.09](PLAN-048.09-absolute-documents-two.md) | Governance documents as absolutes, part two (methodology, role contracts and review, multi-session), trace table |
@@ -142,6 +142,7 @@ governance check.
 | R18, R19 | `phase-plug-06` |
 | R20 | `phase-plug-07` (families A–C), `phase-plug-09` (families D–F) |
 | R22 | `phase-plug-08` |
+| R24 | `phase-plug-04` (`backlog`), `phase-plug-05` (`next-code`, `catalog`, `plan-check`) |
 
 Every row maps to a phase and every phase to at least one row.
 

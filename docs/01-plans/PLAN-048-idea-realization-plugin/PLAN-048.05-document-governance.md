@@ -47,7 +47,8 @@ it.
    registered with `scripts/cli.py` (phase-plug-01's dispatcher).
 2. Schemas: document, codes, systems; templates: `codes.yaml`, `systems.yaml`, requirement and
    plan documents.
-3. `scripts/plan_check.py`.
+3. `scripts/plan_check.py`; `skills/next-code`, `skills/catalog`, `skills/plan-check` (owner
+   amendment 2026-09-25, R24), each a thin wrapper over one script.
 4. Port `test_codes.py` (including the multi-worktree reservation tests), `test_governance.py`
    minus the tests that scan this repository, and add `plan_check` tests.
 

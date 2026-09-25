@@ -14700,7 +14700,8 @@ items:
     from the catalog's decision_record, not a literal filename.
   - Write skills/session-start, skills/checkpoint and skills/session-close from the sources with the
     integration branch and worktree directory from userConfig and the coordinator-completion rule
-    stated as the current rule (R15).
+    stated as the current rule (R15); write skills/backlog/SKILL.md, which runs check and ready and
+    orients on one phase without claiming it (R24, owner 2026-09-25).
   - Port the backlog tests to fixture catalogs as test/test_backlog*.py.
   acceptance:
   - A fixture with two active phases sharing a system fails check naming both; the ported tests pass.
@@ -14708,6 +14709,8 @@ items:
     decision_record; a catalog with no decision_record fails check.
   - The checkpoint skill contains status complete only in a prohibition; session-close states the
     three completion conditions; no skill contains the integration branch as a literal.
+  - The backlog skill's text contains no claim command; a grep for the active-status line finds
+    only a prohibition.
   - The R02 check passes.
   verification:
   - cd plugins/idea-realization && uv run pytest
@@ -14715,6 +14718,7 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
+  - plugins/idea-realization/skills/backlog/
   - plugins/idea-realization/scripts/backlog.py
   - plugins/idea-realization/scripts/regression.py
   - plugins/idea-realization/scripts/checks/backlog.py
@@ -14750,11 +14754,15 @@ items:
     as templates.
   - Write scripts/plan_check.py from the mechanical section check and the requirement and plan
     templates (R17).
+  - Write skills/next-code/SKILL.md, skills/catalog/SKILL.md and skills/plan-check/SKILL.md, each a
+    thin wrapper that runs the one command and reports its real output (R24, owner 2026-09-25).
   - Port the code, reservation and document-audit tests to fixture repositories.
   acceptance:
   - A fixture document with an unknown kind fails check; two next-code calls from two worktrees of a
     temporary repository return different codes; a hand-edited catalog fails check.
   - plan-check exits 0 on the plan template and 1 on a fixture missing the boundaries section.
+  - Each of the three skills names exactly one script and no other write; a grep of the next-code
+    skill for 'codes.yaml' finds only the statement that the register is never edited by hand.
   - The R02 check passes.
   verification:
   - cd plugins/idea-realization && uv run pytest
@@ -14762,6 +14770,9 @@ items:
   - uv run python tools/check_no_private_content.py
   - uv run python -m src.governance
   deliverables:
+  - plugins/idea-realization/skills/next-code/
+  - plugins/idea-realization/skills/catalog/
+  - plugins/idea-realization/skills/plan-check/
   - plugins/idea-realization/scripts/codes.py
   - plugins/idea-realization/scripts/reservations.py
   - plugins/idea-realization/scripts/documents.py
