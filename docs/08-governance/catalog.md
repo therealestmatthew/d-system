@@ -439,7 +439,7 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
-| PLAN-039 | doc-idea-realization-system-plan | draft | 10 | 1 | 4 | agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 10 | 0 | 5 | agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 6 | 0 | 4 | agent-build, agent-coord |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 4 | 0 | 1 | agent-builder-b |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
@@ -459,7 +459,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
 | PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 1 | 0 | 0 | — |
 | PLAN-050 | doc-system-boundary-study | draft | 1 | 0 | 0 | — |
-| PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 0 | 1 | 0 | agent-codex-boundary-study |
+| PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.02 | doc-system-boundary-study-prompt-rubric | draft | 2 | 0 | 0 | — |
 | PLAN-050.03 | doc-system-boundary-study-prompt-inventory | draft | 1 | 0 | 0 | — |
 | PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 1 | 0 | 0 | — |

@@ -15035,8 +15035,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-codex-boundary-study
+  session: doc-session-system-boundary-inventory
   priority: 2
   session_budget: 1
   depends_on: []
@@ -15054,7 +15055,12 @@ items:
   deliverables:
   - docs/00-working/boundary-study/system-interface-inventory.md
   - docs/00-working/boundary-study/current-boundary-map.md
-  next_action: Start from systems.yaml and the source-path inventory; do not inspect `_private/`.
+  completion_evidence:
+  - docs/00-working/boundary-study/system-interface-inventory.md
+  - docs/00-working/boundary-study/current-boundary-map.md
+  - docs/03-sessions/SESS-2026-09-26-03-system-boundary-inventory.md
+  result: 'Complete: governance passed; 1,115 tests passed; diff check passed; and the inventory reconciled 43 registry entries to 43 rows after rebase onto dev.'
+  next_action: Complete; phase-bnd-02 may begin its prompt-rubric pilot.
 - id: phase-bnd-02
   title: Classify the governed prompt corpus by role, reuse and default entry point
   plan: doc-system-boundary-study-prompt-rubric
