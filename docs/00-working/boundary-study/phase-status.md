@@ -6,7 +6,7 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 
 | Phase | Child plan | Backlog state | Study-log state | Branch / evidence | Verification or session | Next action |
 | --- | --- | --- | --- | --- | --- | --- |
-| phase-bnd-01 | PLAN-050.01 | active | ready for owner review | `agent/phase-bnd-01` | `SESS-2026-09-26-03`; governance and 43/43 reconciliation pass | Owner review, then owner-controlled integration/completion. |
+| phase-bnd-01 | PLAN-050.01 | active | ready for owner review | `agent/phase-bnd-01` at `269b9ca` | `SESS-2026-09-26-03`; governance and 43/43 reconciliation pass | Owner review, then owner-controlled integration/completion. |
 | phase-bnd-02 | PLAN-050.02 | queued | not started | — | — | Define and pilot the independent prompt taxonomy. |
 | phase-bnd-05 | PLAN-050.03 | queued | not started | — | — | Classify the full prompt corpus after the rubric is accepted. |
 | phase-bnd-03 | PLAN-050.04 | queued | not started | — | — | Review system health and backlog after prompt classification. |
