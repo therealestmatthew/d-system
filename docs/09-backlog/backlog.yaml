@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-25'
+updated: '2026-09-26'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -15025,3 +15025,104 @@ items:
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-trace.md
   next_action: Waits for phase-plug-07, whose trace table carries the ledger classification this phase
     reads. Families D, E and F are this phase.
+- id: phase-bnd-01
+  title: Inventory system ownership, data authority and interfaces for the boundary study
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-study-requirements
+  - doc-system-audit
+  - doc-idea-realization-system-plan
+  systems:
+  - sys-portfolio
+  - sys-capture
+  - sys-projection
+  - sys-retrieval
+  - sys-realization
+  - sys-plugin
+  - sys-wb-layout
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Read the tracked system registry, source paths, plans and architecture records without reading `_private/`.
+  - 'Record a system-by-system evidence inventory: candidate concern, source-of-truth data, writers, readers, interfaces, and unknowns.'
+  - Draw the current dependency and capability crossings among personal productivity, idea realization, workbench, and governance/framework.
+  acceptance:
+  - Every registered system has exactly one proposed concern or cross-cutting classification, with a source citation or an explicit unknown.
+  - The dependency map labels every inter-concern edge and names at least one prohibited ownership crossing per proposed boundary.
+  verification:
+  - uv run python -m src.governance
+  - Review the inventory against docs/08-governance/systems.yaml and confirm no system is omitted.
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/system-interface-inventory.md
+  - docs/00-working/boundary-study/current-boundary-map.md
+  next_action: Start from systems.yaml and the source-path inventory; do not inspect `_private/`.
+- id: phase-bnd-02
+  title: Classify the governed prompt corpus by role, reuse and default entry point
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-study-requirements
+  - doc-prompt-pack-protocol
+  - doc-prompt-pack-methodology
+  systems:
+  - sys-governance
+  - sys-realization
+  - sys-wb-layout
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Inventory every governed prompt document and classify it as an operating prompt, reusable template/protocol, campaign or build record, historical precedent, or review-needed material.
+  - Record the evidence for each classification, the intended operator, and the default entry point where one exists.
+  - Report counts and navigation ambiguities without changing prompt status or content.
+  acceptance:
+  - The inventory includes all 39 governed prompt documents and its category totals reconcile to that count.
+  - PROMPT-006, PROMPT-010, PROMPT-020 and PROMPT-040 each have a cited classification rationale.
+  verification:
+  - uv run python -m src.governance
+  - 'Count kind: prompt front matter and compare it with the inventory total.'
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/prompt-corpus-inventory.md
+  - docs/00-working/boundary-study/prompt-navigation-findings.md
+  next_action: Read GOV-008 and ADR-017 before classifying prompt-pack artifacts.
+- id: phase-bnd-03
+  title: Produce the owner-decision boundary report and conditional next actions
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-study-requirements
+  - doc-system-boundary-study
+  systems:
+  - sys-portfolio
+  - sys-realization
+  - sys-plugin
+  - sys-wb-layout
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-bnd-01
+  - phase-bnd-02
+  scope:
+  - Compare at least three repository-boundary options, including retaining one repository, against the completed evidence inventories.
+  - State a recommendation, rejected alternatives and costs, migration preconditions, extraction triggers, and reversible next action for each owner decision.
+  - Stop after writing the decision-ready report; do not change system ownership or implement an extraction.
+  acceptance:
+  - The report distinguishes data ownership, runtime interfaces, release cadence and audience for all three candidate systems and the cross-cutting framework.
+  - The options matrix includes the no-split option, at least two alternatives, and explicit costs and preconditions for each.
+  - Every owner question identifies the decider, decision point, recommended answer and consequence.
+  verification:
+  - uv run python -m src.governance
+  - Review every factual claim against a cited inventory row or tracked source.
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/boundary-decision-report.md
+  next_action: Read both completed inventories and prepare the decision report; stop for the owner after delivery.

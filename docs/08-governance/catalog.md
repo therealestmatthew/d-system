@@ -147,6 +147,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.07 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md |
 | PLAN-048.08 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
 | PLAN-048.09 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
+| PLAN-050 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -217,6 +218,7 @@ CI regenerates it and fails on any difference.
 | REQ-029 | requirement | draft | repository-owner | docs/06-requirements/REQ-029-design-document-amendments.md |
 | REQ-030 | requirement | draft | repository-owner | docs/06-requirements/REQ-030-reviewer-contract.md |
 | REQ-031 | requirement | draft | repository-owner | docs/06-requirements/REQ-031-idea-realization-plugin.md |
+| REQ-033 | requirement | draft | repository-owner | docs/06-requirements/REQ-033-system-boundary-study.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -370,6 +372,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-25-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-01-idea-schema-bundle.md |
 | SESS-2026-09-25-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md |
 | SESS-2026-09-25-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-04-plugin-document-governance.md |
+| SESS-2026-09-26-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-01-system-boundary-study-plan.md |
 
 ## Plans and their phases
 
@@ -427,7 +430,7 @@ CI regenerates it and fails on any difference.
 | PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
-| PLAN-039 | doc-idea-realization-system-plan | draft | 10 | 0 | 4 | agent-build, agent-builder-a, agent-coord |
+| PLAN-039 | doc-idea-realization-system-plan | draft | 11 | 0 | 4 | agent-build, agent-builder-a, agent-coord |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 6 | 0 | 4 | agent-build, agent-coord |
 | PLAN-040 | doc-portable-framework-document-templates | draft | 4 | 0 | 1 | agent-builder-b |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
@@ -446,6 +449,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | approved | 1 | 0 | 0 | — |
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
 | PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 1 | 0 | 0 | — |
+| PLAN-050 | doc-system-boundary-study | draft | 3 | 0 | 0 | — |
 
 ## Held codes
 
@@ -458,4 +462,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-363 documents — adr: 21, architecture: 11, governance: 16, operation: 21, plan: 71, prompt: 39, requirement: 31, session: 153.
+366 documents — adr: 21, architecture: 11, governance: 16, operation: 21, plan: 72, prompt: 39, requirement: 32, session: 154.
