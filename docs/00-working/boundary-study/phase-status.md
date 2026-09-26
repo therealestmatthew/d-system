@@ -8,7 +8,7 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | --- | --- | --- | --- | --- | --- | --- |
 | phase-bnd-01 | PLAN-050.01 | complete | complete | `agent/phase-bnd-01`, rebased on `dev` at `c389e03` | `SESS-2026-09-26-03`; governance, 1,115 tests, diff check and 43/43 reconciliation pass | Complete; phase-bnd-02 may begin after integration. |
 | phase-bnd-02 | PLAN-050.02 | complete | complete | `agent/phase-bnd-02` at `2fd80bc` | `SESS-2026-09-26-04`; governance, 1,115 tests, baseline count (40), and diff check pass | Complete; phase-bnd-05 may begin after integration. |
-| phase-bnd-05 | PLAN-050.03 | active | in progress | `agent/phase-bnd-05` at `7e3a067` | Claim validated by governance | Classify all 40 prompts against the accepted rubric and reconcile the baseline. |
+| phase-bnd-05 | PLAN-050.03 | active | ready for owner review | `agent/phase-bnd-05`; evidence `dda51e3` | `SESS-2026-09-26-05`; governance passed, 40/40 reconciliation, diff check, confidentiality check, and 1,115 tests passed | Owner review and owner-controlled completion; then phase-bnd-03 becomes eligible. |
 | phase-bnd-03 | PLAN-050.04 | queued | not started | — | — | Review system health and backlog after prompt classification. |
 | phase-bnd-04 | PLAN-050.05 | queued | not started | — | — | Produce the governed boundary decision report. |
 
@@ -23,3 +23,4 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | 2026-09-26 | `phase-bnd-02` handoff | Rubric and four-prompt pilot complete on `agent/phase-bnd-02`; backlog remains active pending owner review. |
 | 2026-09-26 | `phase-bnd-02` post-rebase verification | Branch current with `dev`; governance, 1,115 tests, and diff check passed. |
 | 2026-09-26 | `phase-bnd-02` completion | Owner approved integration; backlog lifecycle record completed before fast-forward merge. |
+| 2026-09-26 | `phase-bnd-05` handoff | Classified all 40 governed prompts at `7e3a067`; evidence is ready on `agent/phase-bnd-05`, while the authoritative backlog remains active pending owner review. |

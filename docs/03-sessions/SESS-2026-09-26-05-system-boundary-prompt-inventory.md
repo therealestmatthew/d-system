@@ -28,10 +28,12 @@ behaviour.
   measured prompts to 40 rows and includes a source citation for each row.
 - [Prompt navigation findings](../00-working/boundary-study/prompt-navigation-findings.md) records
   the non-exclusive field findings and their limits.
-- Required verification results are added after the final post-rebase run.
+- `uv run python -m src.governance`: pass — 43 systems, 377 documents, 32 memories, and 323 backlog phases.
+- The required prompt command returned 40; the inventory table contains 40 rows; `git diff --check` passed.
+- With the changed files staged, `uv run python tools/check_no_private_content.py` passed (982 tracked files); `uv run pytest` passed **1,115 tests**.
 
 ## Handoff
 
-The branch is ready for owner review only after final verification and the backlog handoff update.
-The next study phase is the system-and-backlog portfolio review (`phase-bnd-03`), which remains
-blocked until this phase is owner-completed.
+The branch is ready for owner review. The authoritative backlog remains **active** pending
+owner-controlled completion. The next study phase is the system-and-backlog portfolio review
+(`phase-bnd-03`), which remains blocked until this phase is owner-completed.
