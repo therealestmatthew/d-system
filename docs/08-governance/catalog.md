@@ -147,7 +147,12 @@ CI regenerates it and fails on any difference.
 | PLAN-048.07 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md |
 | PLAN-048.08 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
 | PLAN-048.09 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
-| PLAN-050 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study.md |
+| PLAN-050 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050-overview.md |
+| PLAN-050.01 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.01-system-inventory.md |
+| PLAN-050.02 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.02-prompt-classification-rubric.md |
+| PLAN-050.03 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.03-prompt-corpus-inventory.md |
+| PLAN-050.04 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.04-system-backlog-review.md |
+| PLAN-050.05 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.05-boundary-decision-report.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -449,7 +454,12 @@ CI regenerates it and fails on any difference.
 | PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | approved | 1 | 0 | 0 | — |
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
 | PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 1 | 0 | 0 | — |
-| PLAN-050 | doc-system-boundary-study | draft | 4 | 0 | 0 | — |
+| PLAN-050 | doc-system-boundary-study | draft | 1 | 0 | 0 | — |
+| PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 1 | 0 | 0 | — |
+| PLAN-050.02 | doc-system-boundary-study-prompt-rubric | draft | 2 | 0 | 0 | — |
+| PLAN-050.03 | doc-system-boundary-study-prompt-inventory | draft | 1 | 0 | 0 | — |
+| PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 1 | 0 | 0 | — |
+| PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 1 | 0 | 0 | — |
 
 ## Held codes
 
@@ -462,4 +472,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-366 documents — adr: 21, architecture: 11, governance: 16, operation: 21, plan: 72, prompt: 39, requirement: 32, session: 154.
+371 documents — adr: 21, architecture: 11, governance: 16, operation: 21, plan: 77, prompt: 39, requirement: 32, session: 154.

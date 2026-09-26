@@ -16,8 +16,8 @@ depends_on: [doc-system-boundary-study-requirements, doc-system-boundary-study]
 
 ## Outcome
 
-Created the system-boundary study package requested by the owner: `REQ-033`, `PLAN-050`, and four
-queued backlog phases (`phase-bnd-01` through `phase-bnd-04`). The package stops at an
+Created the system-boundary study package requested by the owner: `REQ-033`, a multi-file `PLAN-050`
+folder (one overview and five child plans), and five queued backlog phases. The package stops at an
 owner-decision report and authorises no repository extraction, private-data access, backlog
 reprioritisation, or behaviour change.
 
@@ -38,6 +38,9 @@ reprioritisation, or behaviour change.
   independent prompt-classification fields and whole-registry dispositions; the plan was revised to
   four serial phases, a general system-and-backlog review, source-revision reconciliation, and a
   governed draft architecture report in the final phase.
+- The owner then directed the plan to be split into focused child-plan files so execution phases do
+  not load the full roadmap. The prompt work was also split into rubric/pilot (`phase-bnd-02`) and
+  complete corpus application (`phase-bnd-05`), resulting in five serial phases.
 
 ## Scope boundary
 

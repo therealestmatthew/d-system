@@ -15027,7 +15027,7 @@ items:
     reads. Families D, E and F are this phase.
 - id: phase-bnd-01
   title: Inventory system ownership, data authority and interfaces for the boundary study
-  plan: doc-system-boundary-study
+  plan: doc-system-boundary-study-system-inventory
   sources:
   - doc-system-boundary-study-requirements
   - doc-system-audit
@@ -15056,7 +15056,7 @@ items:
   next_action: Start from systems.yaml and the source-path inventory; do not inspect `_private/`.
 - id: phase-bnd-02
   title: Classify the governed prompt corpus by role, reuse and default entry point
-  plan: doc-system-boundary-study
+  plan: doc-system-boundary-study-prompt-rubric
   sources:
   - doc-system-boundary-study-requirements
   - doc-prompt-pack-protocol
@@ -15071,23 +15071,22 @@ items:
   - phase-bnd-01
   scope:
   - 'Record the baseline revision and measured `kind: prompt` count before inventorying the corpus.'
-  - Define independent fields for operational role, reuse disposition, precedent status, review disposition, and default entry point; classify every prompt at the baseline.
-  - Record the evidence for each field assignment and the intended operator where one exists.
-  - Report counts and navigation ambiguities without changing prompt status or content.
+  - Define independent fields for operational role, reuse disposition, precedent status, review disposition, and default entry point.
+  - Pilot the rubric against PROMPT-006, PROMPT-010, PROMPT-020, and PROMPT-040; record the evidence and any ambiguity.
+  - Stop after the pilot; the complete corpus inventory is phase-bnd-05.
   acceptance:
-  - The inventory includes every governed prompt at the recorded baseline; the row count reconciles to the measured count without forcing independent-field values into exclusive totals.
+  - The rubric defines each field's allowed values and the pilot makes every field assignment independently.
   - PROMPT-006, PROMPT-010, PROMPT-020 and PROMPT-040 each have cited rationale for every independent field.
   verification:
   - uv run python -m src.governance
-  - 'Count kind: prompt front matter at the recorded revision and compare it with the inventory total.'
+  - 'Count kind: prompt front matter at the recorded revision and record the baseline for phase-bnd-05.'
   - git diff --check
   deliverables:
-  - docs/00-working/boundary-study/prompt-corpus-inventory.md
-  - docs/00-working/boundary-study/prompt-navigation-findings.md
-  next_action: Read GOV-008 and ADR-017 before classifying prompt-pack artifacts.
+  - docs/00-working/boundary-study/prompt-classification-rubric.md
+  next_action: Read GOV-008 and ADR-017, define the independent fields, and classify only the four pilot prompts.
 - id: phase-bnd-03
   title: Review the system registry and backlog portfolio without changing either
-  plan: doc-system-boundary-study
+  plan: doc-system-boundary-study-system-backlog-review
   sources:
   - doc-system-boundary-study-requirements
   - doc-system-audit
@@ -15099,8 +15098,7 @@ items:
   priority: 2
   session_budget: 1
   depends_on:
-  - phase-bnd-01
-  - phase-bnd-02
+  - phase-bnd-05
   scope:
   - Record a baseline revision and review registry maturity, plan/phase coverage, work-in-progress, dependency depth, active lock collisions, blocked work, and document retrieval signals.
   - Distinguish measured observations, limits of the analysis, and candidate questions for the final boundary report.
@@ -15117,7 +15115,7 @@ items:
   next_action: Start from the completed system and prompt inventories; report evidence and limits, not a reprioritisation.
 - id: phase-bnd-04
   title: Promote the evidence into a governed boundary architecture report and owner decision gate
-  plan: doc-system-boundary-study
+  plan: doc-system-boundary-study-decision-report
   sources:
   - doc-system-boundary-study-requirements
   - doc-system-boundary-study
@@ -15146,3 +15144,32 @@ items:
   deliverables:
   - docs/07-architecture/
   next_action: Rebase onto dev, reconcile the three inputs, allocate the architecture code, and stop for the owner's decision after the report is delivered.
+- id: phase-bnd-05
+  title: Apply the prompt rubric to the governed corpus and record navigation findings
+  plan: doc-system-boundary-study-prompt-inventory
+  sources:
+  - doc-system-boundary-study-requirements
+  - doc-system-boundary-study-prompt-rubric
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-bnd-02
+  scope:
+  - Apply the approved independent-field rubric to every governed prompt at its recorded baseline.
+  - Reconcile the prompt-row count to the baseline and record non-exclusive field findings and default-entry-point navigation findings.
+  - Report any rubric limitation without changing prompts or lifecycle status.
+  acceptance:
+  - Every prompt at the baseline has one inventory row, and the row count reconciles to the measured baseline count.
+  - The four pilot prompt rows remain consistent with phase-bnd-02's cited assignments.
+  verification:
+  - uv run python -m src.governance
+  - 'Count kind: prompt front matter at the recorded revision and compare it with the inventory total.'
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/prompt-corpus-inventory.md
+  - docs/00-working/boundary-study/prompt-navigation-findings.md
+  next_action: Read the phase-bnd-02 rubric and baseline before classifying the full corpus.
