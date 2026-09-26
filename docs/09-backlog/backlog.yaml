@@ -15071,8 +15071,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-codex-boundary-study
+  session: doc-session-system-boundary-prompt-rubric
   priority: 2
   session_budget: 1
   depends_on:
@@ -15091,7 +15092,11 @@ items:
   - git diff --check
   deliverables:
   - docs/00-working/boundary-study/prompt-classification-rubric.md
-  next_action: Read GOV-008 and ADR-017, define the independent fields, and classify only the four pilot prompts.
+  completion_evidence:
+  - docs/00-working/boundary-study/prompt-classification-rubric.md
+  - docs/03-sessions/SESS-2026-09-26-04-system-boundary-prompt-rubric.md
+  result: 'Complete: the 40-prompt baseline, five independent fields, and cited four-prompt pilot were recorded; governance and diff checks passed, and 1,115 tests passed after rebase.'
+  next_action: Complete; phase-bnd-05 may apply the approved rubric to the full corpus.
 - id: phase-bnd-03
   title: Review the system registry and backlog portfolio without changing either
   plan: doc-system-boundary-study-system-backlog-review
