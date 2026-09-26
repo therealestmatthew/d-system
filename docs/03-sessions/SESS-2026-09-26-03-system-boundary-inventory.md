@@ -26,6 +26,14 @@ Completed the evidence deliverables for the boundary-study system inventory phas
 - `uv run python -m src.governance`: pass — 43 systems, 372 documents, 32 memories, 323 backlog phases.
 - `git diff --check`: pass.
 
+## Post-handoff rebase verification
+
+On 2026-09-26, the evidence branch was rebased onto `dev` at `c389e03`. The generated catalog was
+refreshed after the rebase. The required checks then passed: `uv run python -m src.governance`
+(43 systems, 375 documents, 32 memories, 323 backlog phases); `uv run pytest` (1,115 passed); and
+`git diff --check`. A direct reconciliation again measured 43 registry entries and 43 inventory
+rows.
+
 ## Verification note
 
 The first governance run in the new worktree failed with `ModuleNotFoundError: No module named 'jsonschema'`. This was a setup gap: the worktree had been initialized without the required development extra. After `uv sync --extra dev`, the same governance command passed. No source change was made in response to that setup failure.
