@@ -41,6 +41,8 @@ reprioritisation, or behaviour change.
 - The owner then directed the plan to be split into focused child-plan files so execution phases do
   not load the full roadmap. The prompt work was also split into rubric/pilot (`phase-bnd-02`) and
   complete corpus application (`phase-bnd-05`), resulting in five serial phases.
+- Added `PROMPT-041` and a tracked working status log so each future session selects one eligible
+  phase, records actual handoff evidence, and does not mistake review readiness for completion.
 
 ## Scope boundary
 
@@ -50,6 +52,5 @@ it does not claim or perform any `phase-bnd-*` study work.
 
 ## Next action
 
-The owner may review the branch diff. If the plan is accepted and integrated, claim
-`phase-bnd-01` or `phase-bnd-02` according to the normal backlog protocol; they may run in parallel
-only if their then-current conflict checks permit it.
+The owner may review the branch diff. If the plan is accepted and integrated, use `PROMPT-041` to
+claim the earliest eligible study phase under the normal backlog protocol.
