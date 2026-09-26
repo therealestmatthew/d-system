@@ -9,6 +9,8 @@
 - [Catalog](catalog.md): generated index of every document, its code and its phases.
 - [ADR-001](../04-decisions/ADR-001-file-based-governance.md): design rationale.
 - [ADR-006](../04-decisions/ADR-006-document-codes.md): why codes sit alongside `doc-*` ids.
+- [Agentic AI planning reference](GOV-020-agentic-ai-planning-reference.md): the outcome, phases,
+  evidence, and handoffs that make a plan safe to implement across agents and sessions.
 
 Run `uv run python -m src.governance --inventory` for a derived inventory of open plans.
 

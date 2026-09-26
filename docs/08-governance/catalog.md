@@ -55,6 +55,7 @@ CI regenerates it and fails on any difference.
 | GOV-016 | governance | active | repository-owner | docs/08-governance/GOV-016-batch-orchestration-protocol.md |
 | GOV-017 | governance | active | repository-owner | docs/08-governance/GOV-017-multi-session-coordination-protocol.md |
 | GOV-018 | governance | active | repository-owner | docs/08-governance/GOV-018-three-altitude-review-procedure.md |
+| GOV-020 | governance | active | repository-owner | docs/08-governance/GOV-020-agentic-ai-planning-reference.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -379,6 +380,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-25-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-02-plugin-skeleton.md |
 | SESS-2026-09-25-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-25-04-plugin-document-governance.md |
 | SESS-2026-09-26-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-01-system-boundary-study-plan.md |
+| SESS-2026-09-26-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-02-agentic-ai-planning-reference.md |
 
 ## Plans and their phases
 
@@ -473,4 +475,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-372 documents — adr: 21, architecture: 11, governance: 16, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 154.
+374 documents — adr: 21, architecture: 11, governance: 17, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 155.
