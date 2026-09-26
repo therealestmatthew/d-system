@@ -465,7 +465,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.02 | doc-system-boundary-study-prompt-rubric | draft | 0 | 0 | 2 | agent-codex-boundary-study |
 | PLAN-050.03 | doc-system-boundary-study-prompt-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
-| PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 0 | 1 | 0 | agent-codex-boundary-study |
+| PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 1 | 0 | 0 | — |
 
 ## Held codes

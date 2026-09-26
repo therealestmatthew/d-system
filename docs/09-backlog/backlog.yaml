@@ -15107,8 +15107,9 @@ items:
   - sys-gov-docs
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-codex-boundary-study
+  session: doc-session-system-boundary-portfolio-review
   priority: 2
   session_budget: 1
   depends_on:
@@ -15126,7 +15127,11 @@ items:
   - git diff --check
   deliverables:
   - docs/00-working/boundary-study/system-backlog-review.md
-  next_action: Start from the completed system and prompt inventories; report evidence and limits, not a reprioritisation.
+  completion_evidence:
+  - docs/00-working/boundary-study/system-backlog-review.md
+  - docs/03-sessions/SESS-2026-09-26-06-system-boundary-portfolio-review.md
+  result: 'Complete: governance passed; 43 systems, 77 plans, and 323 phases were reviewed at the recorded baseline; diff and staged confidentiality checks passed; and 1,115 tests passed after rebase.'
+  next_action: Complete; phase-bnd-04 may begin the governed boundary decision report.
 - id: phase-bnd-04
   title: Promote the evidence into a governed boundary architecture report and owner decision gate
   plan: doc-system-boundary-study-decision-report
