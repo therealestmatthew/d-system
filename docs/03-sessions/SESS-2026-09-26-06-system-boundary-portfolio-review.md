@@ -37,5 +37,6 @@ lifecycle state.
 
 This work used tracked material only and did not read `_private/`, reprioritise the backlog, change
 registry entries, or alter runtime behaviour. The branch is ready for owner review after the
-required governance and diff checks. On owner-controlled completion, the next study phase is the
-governed boundary decision report (`phase-bnd-04`).
+required governance and diff checks. After rebase onto `dev`, governance passed (43 systems, 378
+documents, 32 memories, 323 phases) and the full suite passed (1,115 tests). On owner-controlled
+completion, the next study phase is the governed boundary decision report (`phase-bnd-04`).

@@ -9,7 +9,7 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | phase-bnd-01 | PLAN-050.01 | complete | complete | `agent/phase-bnd-01`, rebased on `dev` at `c389e03` | `SESS-2026-09-26-03`; governance, 1,115 tests, diff check and 43/43 reconciliation pass | Complete; phase-bnd-02 may begin after integration. |
 | phase-bnd-02 | PLAN-050.02 | complete | complete | `agent/phase-bnd-02` at `2fd80bc` | `SESS-2026-09-26-04`; governance, 1,115 tests, baseline count (40), and diff check pass | Complete; phase-bnd-05 may begin after integration. |
 | phase-bnd-05 | PLAN-050.03 | complete | complete | `dev` at `986d862` (handoff); implementation evidence `dda51e3` | `SESS-2026-09-26-05`; governance passed, 40/40 reconciliation, diff check, confidentiality check, and 1,115 tests passed | Complete; phase-bnd-03 may begin. |
-| phase-bnd-03 | PLAN-050.04 | active | ready for owner review | `agent/phase-bnd-03` at `4f3848e` | `SESS-2026-09-26-06`; portfolio baseline, evidence review, governance and diff checks | Owner-controlled completion; then phase-bnd-04 becomes eligible. |
+| phase-bnd-03 | PLAN-050.04 | active | ready for owner review | `agent/phase-bnd-03` at `6feb872` | `SESS-2026-09-26-06`; portfolio baseline, governance, diff check, and 1,115 tests passed after rebase | Owner-controlled completion; then phase-bnd-04 becomes eligible. |
 | phase-bnd-04 | PLAN-050.05 | queued | not started | — | — | Produce the governed boundary decision report. |
 
 ## History
@@ -25,4 +25,4 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | 2026-09-26 | `phase-bnd-02` completion | Owner approved integration; backlog lifecycle record completed before fast-forward merge. |
 | 2026-09-26 | `phase-bnd-05` handoff | Classified all 40 governed prompts; implementation evidence is `dda51e3` and the handoff is on `dev` at `986d862`, while the authoritative backlog remains active pending owner-controlled completion. |
 | 2026-09-26 | `phase-bnd-05` completion | Owner approved the already-integrated handoff; the backlog lifecycle record is complete, making phase-bnd-03 eligible. |
-| 2026-09-26 | `phase-bnd-03` handoff | Recorded the baseline-backed system-and-backlog review on `agent/phase-bnd-03`; backlog remains active pending owner-controlled completion. |
+| 2026-09-26 | `phase-bnd-03` handoff | Recorded the baseline-backed system-and-backlog review on `agent/phase-bnd-03`; post-rebase governance and 1,115 tests passed, while the backlog remains active pending owner-controlled completion. |
