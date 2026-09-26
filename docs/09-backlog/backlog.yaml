@@ -15166,8 +15166,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-codex-boundary-study
+  session: doc-session-system-boundary-prompt-inventory
   priority: 2
   session_budget: 1
   depends_on:
@@ -15186,4 +15187,9 @@ items:
   deliverables:
   - docs/00-working/boundary-study/prompt-corpus-inventory.md
   - docs/00-working/boundary-study/prompt-navigation-findings.md
-  next_action: Read the phase-bnd-02 rubric and baseline before classifying the full corpus.
+  completion_evidence:
+  - docs/00-working/boundary-study/prompt-corpus-inventory.md
+  - docs/00-working/boundary-study/prompt-navigation-findings.md
+  - docs/03-sessions/SESS-2026-09-26-05-system-boundary-prompt-inventory.md
+  result: 'Complete: governance passed; 40 prompts reconciled to 40 inventory rows; diff and staged confidentiality checks passed; and 1,115 tests passed.'
+  next_action: Complete; phase-bnd-03 may begin the system-and-backlog portfolio review.
