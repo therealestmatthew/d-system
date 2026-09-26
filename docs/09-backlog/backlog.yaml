@@ -15142,8 +15142,9 @@ items:
   - sys-gov-docs
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-boundary-study
+  session: doc-session-system-boundary-decision-report
   priority: 2
   session_budget: 1
   depends_on:
@@ -15163,7 +15164,11 @@ items:
   - git diff --check
   deliverables:
   - docs/07-architecture/
-  next_action: Rebase onto dev, reconcile the three inputs, allocate the architecture code, and stop for the owner's decision after the report is delivered.
+  completion_evidence:
+  - docs/07-architecture/ARCH-012-system-boundary-decision-report.md
+  - docs/03-sessions/SESS-2026-09-26-07-system-boundary-decision-report.md
+  result: 'Complete: ARCH-012 reconciled the study inputs on dev, presented three boundary options and owner decision gates; governance, staged confidentiality, diff checks, and 1,115 tests passed before owner-approved integration.'
+  next_action: Complete; the owner may choose a boundary direction from ARCH-012 before any follow-up work.
 - id: phase-bnd-05
   title: Apply the prompt rubric to the governed corpus and record navigation findings
   plan: doc-system-boundary-study-prompt-inventory

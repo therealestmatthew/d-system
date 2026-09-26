@@ -10,7 +10,7 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | phase-bnd-02 | PLAN-050.02 | complete | complete | `agent/phase-bnd-02` at `2fd80bc` | `SESS-2026-09-26-04`; governance, 1,115 tests, baseline count (40), and diff check pass | Complete; phase-bnd-05 may begin after integration. |
 | phase-bnd-05 | PLAN-050.03 | complete | complete | `dev` at `986d862` (handoff); implementation evidence `dda51e3` | `SESS-2026-09-26-05`; governance passed, 40/40 reconciliation, diff check, confidentiality check, and 1,115 tests passed | Complete; phase-bnd-03 may begin. |
 | phase-bnd-03 | PLAN-050.04 | complete | complete | `agent/phase-bnd-03` at `c620c6f` | `SESS-2026-09-26-06`; portfolio baseline, governance, diff check, and 1,115 tests passed after rebase | Complete; phase-bnd-04 may begin. |
-| phase-bnd-04 | PLAN-050.05 | active | ready for owner review | `agent/phase-bnd-04` at `1d8d005`; `ARCH-012` | `SESS-2026-09-26-07`; governance, staged confidentiality check, diff check, and 1,115 tests passed | Owner reviews the draft decision report; on approval, complete the backlog lifecycle record and authorize integration. |
+| phase-bnd-04 | PLAN-050.05 | complete | complete | `dev` at `13ea2fc`; `ARCH-012` | `SESS-2026-09-26-07`; governance, staged confidentiality check, diff check, and 1,115 tests passed | Complete; the owner may choose a boundary direction from `ARCH-012` before any follow-up work. |
 
 ## History
 
@@ -28,3 +28,4 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | 2026-09-26 | `phase-bnd-03` handoff | Recorded the baseline-backed system-and-backlog review on `agent/phase-bnd-03`; post-rebase governance and 1,115 tests passed, while the backlog remains active pending owner-controlled completion. |
 | 2026-09-26 | `phase-bnd-03` completion | Owner approved integration; the backlog lifecycle record is complete, making phase-bnd-04 eligible. |
 | 2026-09-26 | `phase-bnd-04` handoff | Draft `ARCH-012` reconciles the study inputs at `0c47c27`; the evidence branch is `agent/phase-bnd-04` at `1d8d005`, and the backlog remains active pending owner-controlled completion. |
+| 2026-09-26 | `phase-bnd-04` completion | Owner approved integration; the backlog lifecycle record is complete and `ARCH-012` is on `dev` at `13ea2fc`. |
