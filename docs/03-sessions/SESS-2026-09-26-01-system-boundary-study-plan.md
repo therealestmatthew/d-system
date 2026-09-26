@@ -16,10 +16,10 @@ depends_on: [doc-system-boundary-study-requirements, doc-system-boundary-study]
 
 ## Outcome
 
-Created the system-boundary study package requested by the owner: `REQ-033`, `PLAN-050`, and
-three queued backlog phases (`phase-bnd-01` through `phase-bnd-03`). The package stops at an
-owner-decision report and authorises no repository extraction, private-data access, or behaviour
-change.
+Created the system-boundary study package requested by the owner: `REQ-033`, `PLAN-050`, and four
+queued backlog phases (`phase-bnd-01` through `phase-bnd-04`). The package stops at an
+owner-decision report and authorises no repository extraction, private-data access, backlog
+reprioritisation, or behaviour change.
 
 ## Evidence
 
@@ -32,6 +32,12 @@ change.
   `backlog.yaml`. They were quoted, then catalog generation and governance completed successfully.
 - Final commands: `uv run python -m src.governance --catalog`,
   `uv run python -m src.governance`, and `git diff --check`.
+- An independent adversarial review found that the original evidence phases could not run in parallel
+  under the declared lock system, that the decision report needed a governed destination, and that
+  prompt classification and whole-registry scope needed clearer contracts. The owner ruled for
+  independent prompt-classification fields and whole-registry dispositions; the plan was revised to
+  four serial phases, a general system-and-backlog review, source-revision reconciliation, and a
+  governed draft architecture report in the final phase.
 
 ## Scope boundary
 

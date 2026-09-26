@@ -449,7 +449,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | approved | 1 | 0 | 0 | — |
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
 | PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 1 | 0 | 0 | — |
-| PLAN-050 | doc-system-boundary-study | draft | 3 | 0 | 0 | — |
+| PLAN-050 | doc-system-boundary-study | draft | 4 | 0 | 0 | — |
 
 ## Held codes
 

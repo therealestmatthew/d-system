@@ -15033,29 +15033,22 @@ items:
   - doc-system-audit
   - doc-idea-realization-system-plan
   systems:
-  - sys-portfolio
-  - sys-capture
-  - sys-projection
-  - sys-retrieval
-  - sys-realization
-  - sys-plugin
-  - sys-wb-layout
-  - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
   session_budget: 1
   depends_on: []
   scope:
-  - Read the tracked system registry, source paths, plans and architecture records without reading `_private/`.
-  - 'Record a system-by-system evidence inventory: candidate concern, source-of-truth data, writers, readers, interfaces, and unknowns.'
-  - Draw the current dependency and capability crossings among personal productivity, idea realization, workbench, and governance/framework.
+  - Read the tracked registry, source paths, plans and architecture records without reading `_private/`; record the baseline revision.
+  - 'Record a whole-registry evidence inventory: one disposition per system; candidate concern, source-of-truth data, writers, readers, interfaces, and unknowns.'
+  - Draw the current dependency and capability crossings among personal productivity, idea realization, workbench, governance/framework, and adjacent/shared systems.
   acceptance:
-  - Every registered system has exactly one proposed concern or cross-cutting classification, with a source citation or an explicit unknown.
+  - Every registered system has exactly one disposition, with a source citation or an explicit unknown.
   - The dependency map labels every inter-concern edge and names at least one prohibited ownership crossing per proposed boundary.
   verification:
   - uv run python -m src.governance
-  - Review the inventory against docs/08-governance/systems.yaml and confirm no system is omitted.
+  - Review the inventory against docs/08-governance/systems.yaml at the recorded revision and confirm no system is omitted.
   - git diff --check
   deliverables:
   - docs/00-working/boundary-study/system-interface-inventory.md
@@ -15069,41 +15062,38 @@ items:
   - doc-prompt-pack-protocol
   - doc-prompt-pack-methodology
   systems:
-  - sys-governance
-  - sys-realization
-  - sys-wb-layout
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-bnd-01
   scope:
-  - Inventory every governed prompt document and classify it as an operating prompt, reusable template/protocol, campaign or build record, historical precedent, or review-needed material.
-  - Record the evidence for each classification, the intended operator, and the default entry point where one exists.
+  - 'Record the baseline revision and measured `kind: prompt` count before inventorying the corpus.'
+  - Define independent fields for operational role, reuse disposition, precedent status, review disposition, and default entry point; classify every prompt at the baseline.
+  - Record the evidence for each field assignment and the intended operator where one exists.
   - Report counts and navigation ambiguities without changing prompt status or content.
   acceptance:
-  - The inventory includes all 39 governed prompt documents and its category totals reconcile to that count.
-  - PROMPT-006, PROMPT-010, PROMPT-020 and PROMPT-040 each have a cited classification rationale.
+  - The inventory includes every governed prompt at the recorded baseline; the row count reconciles to the measured count without forcing independent-field values into exclusive totals.
+  - PROMPT-006, PROMPT-010, PROMPT-020 and PROMPT-040 each have cited rationale for every independent field.
   verification:
   - uv run python -m src.governance
-  - 'Count kind: prompt front matter and compare it with the inventory total.'
+  - 'Count kind: prompt front matter at the recorded revision and compare it with the inventory total.'
   - git diff --check
   deliverables:
   - docs/00-working/boundary-study/prompt-corpus-inventory.md
   - docs/00-working/boundary-study/prompt-navigation-findings.md
   next_action: Read GOV-008 and ADR-017 before classifying prompt-pack artifacts.
 - id: phase-bnd-03
-  title: Produce the owner-decision boundary report and conditional next actions
+  title: Review the system registry and backlog portfolio without changing either
   plan: doc-system-boundary-study
   sources:
   - doc-system-boundary-study-requirements
-  - doc-system-boundary-study
+  - doc-system-audit
   systems:
-  - sys-portfolio
-  - sys-realization
-  - sys-plugin
-  - sys-wb-layout
-  - sys-governance
+  - sys-gov-docs
+  - sys-backlog
   owner: repository-owner
   status: queued
   priority: 2
@@ -15112,17 +15102,47 @@ items:
   - phase-bnd-01
   - phase-bnd-02
   scope:
-  - Compare at least three repository-boundary options, including retaining one repository, against the completed evidence inventories.
-  - State a recommendation, rejected alternatives and costs, migration preconditions, extraction triggers, and reversible next action for each owner decision.
-  - Stop after writing the decision-ready report; do not change system ownership or implement an extraction.
+  - Record a baseline revision and review registry maturity, plan/phase coverage, work-in-progress, dependency depth, active lock collisions, blocked work, and document retrieval signals.
+  - Distinguish measured observations, limits of the analysis, and candidate questions for the final boundary report.
+  - Do not reprioritise, claim, complete, or otherwise edit a backlog phase beyond this study phase's own record.
   acceptance:
-  - The report distinguishes data ownership, runtime interfaces, release cadence and audience for all three candidate systems and the cross-cutting framework.
-  - The options matrix includes the no-split option, at least two alternatives, and explicit costs and preconditions for each.
-  - Every owner question identifies the decider, decision point, recommended answer and consequence.
+  - The review reports baseline-backed measures for the systems registry and backlog portfolio and identifies any unavailable measure as a limit.
+  - The review distinguishes observations from recommendations and includes no change to existing phase state, priority, queue, or system registry.
   verification:
   - uv run python -m src.governance
-  - Review every factual claim against a cited inventory row or tracked source.
+  - Review every factual claim against a cited command result or tracked source at the recorded baseline.
   - git diff --check
   deliverables:
-  - docs/00-working/boundary-study/boundary-decision-report.md
-  next_action: Read both completed inventories and prepare the decision report; stop for the owner after delivery.
+  - docs/00-working/boundary-study/system-backlog-review.md
+  next_action: Start from the completed system and prompt inventories; report evidence and limits, not a reprioritisation.
+- id: phase-bnd-04
+  title: Promote the evidence into a governed boundary architecture report and owner decision gate
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-study-requirements
+  - doc-system-boundary-study
+  systems:
+  - sys-gov-docs
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-bnd-03
+  scope:
+  - Rebase onto current dev and reconcile the three study inputs to that revision, refreshing an inventory if material drift makes it unreliable.
+  - Allocate an architecture-document code and write a governed draft report that promotes the relied-upon evidence.
+  - Compare at least three repository-boundary options, including retaining one repository, and state recommendations, rejected alternatives, costs, preconditions, triggers, and conditional next actions.
+  - Stop for owner direction; do not implement an extraction, amend the registry, or alter prompt lifecycle status.
+  acceptance:
+  - The governed report distinguishes data ownership, runtime interfaces, release cadence and audience for all three candidate systems, the framework, and adjacent-system dispositions.
+  - The options matrix includes the no-split option, at least two alternatives, and explicit costs and preconditions for each.
+  - Every owner question identifies the decider, decision point, recommended answer and consequence; every factual claim cites a reconciled inventory row or tracked source.
+  verification:
+  - uv run python -m src.governance --next-code architecture
+  - uv run python -m src.governance
+  - git diff --check
+  deliverables:
+  - docs/07-architecture/
+  next_action: Rebase onto dev, reconcile the three inputs, allocate the architecture code, and stop for the owner's decision after the report is delivered.
