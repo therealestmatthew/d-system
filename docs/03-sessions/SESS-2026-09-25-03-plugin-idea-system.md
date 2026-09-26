@@ -95,3 +95,105 @@ recorded as interim evidence.
 - The merge onto `dev` and the completion edit wait for the owner's approval (contract item 4).
 - The repository's own test suite, ruff and mypy are run after the final rebase, for READY, not
   here.
+
+## Review
+
+One independent review ran to a report: a `demo-adversary` agent over `dev...HEAD` at `cffea3b`.
+It stopped at its turn limit and reported on request; its findings and verdicts, as given:
+
+- **Should-fix** — `scripts/idea.py`, the `status` subparser: the source constrained the `to`
+  positional with `choices=sorted({t for _, t in legal_transitions()})`; the port dropped it, so a
+  misspelled status was refused only after the log was loaded and folded, and `--help` no longer
+  listed the legal targets. "Minor UX regression, not a correctness or data-integrity regression."
+  **Fixed** in `7f87793`: an unknown target is now refused by argparse, naming the legal ones.
+- **Note** — `phase_ids()` and `document_codes()` return empty sets when the backlog file or the
+  document root is missing, where the source assumed they existed. "A deliberate, correct
+  adaptation … not a regression." **Accepted.**
+- "No other discrepancies found": `scripts/ideas.py` against `src/db/ideas.py` and `scripts/idea.py`
+  against `tools/append_idea.py` are logic-identical with comments stripped; both schemas are
+  structurally identical to the source with descriptions stripped; no R02 leak found; the triage
+  skill and agent issue no link or promotion command; every script runs from a copy against a
+  temporary root; an empty log renders to exactly the scaffold's seeded view. Plugin suite: 177
+  passed.
+- Acceptance verdicts: 1 **Met**, 2 **Met**, 3 **Met**, 4 **Met**, 5 **Met**.
+- Not checked by that reviewer: `claude plugin validate --strict`, the private-content check and the
+  governance check; a line-by-line comparison of `scripts/render_ideas.py` with
+  `tools/generate_ideas_md.py` and of `scripts/checks/ideas.py` with the source priority and
+  staleness code; `docs/vocabulary.md`'s prose (it relied on the drift test); this session record;
+  the `backlog.yaml` and `catalog.md` diff.
+
+A second review was dispatched for those items. It stalled for about five hours with no report and
+was stopped; a restart was then stopped too, when the owner directed the session to drop the
+remaining review and move on. The three verification commands were rerun by this session instead,
+after `7f87793`:
+
+```text
+$ claude plugin validate plugins/idea-realization --strict
+✔ Validation passed
+
+$ uv run python tools/check_no_private_content.py
+note: _private/portfolio/ not found — content check skipped (path check still ran; this is expected in CI / a fresh clone)
+check_no_private_content: OK (956 tracked files, 0 identifiers checked)
+
+$ uv run python -m src.governance
+Governance OK: 43 systems, 363 documents, 32 memories, 318 backlog phases
+```
+
+**Not independently reviewed, by the owner's direction:** the render and check comparisons with
+their sources, the vocabulary document's prose, this record's claims, and the backlog and catalog
+diff. The tests cover them (the render, staleness, priority and vocabulary tests pass), but no
+reviewer read them.
+
+## Decisions
+
+- **Claim and assignment.** The Session Manager assigned the phase; the owner approved the claim in
+  this session. Agent id `agent-standby-builder`.
+- **Where R23's test lives (owner).** REQ-031 R23 asks for the plugin schema's enums to equal this
+  repository's at the commit `phase-idg-01` landed; R21 bars the plugin suite from reading this
+  repository and R02 bars commit hashes in the plugin. The owner ruled the test carries the source
+  sets as literals, copied from the source schema at that commit, with no repository-side test.
+- **Widened deliverables (Session Manager turn).** `schemas/idea-priority.schema.json`, which the
+  `phase-plug-01` scaffold already seeds and no phase declared, and `test/test_scripts_portable.py`,
+  whose fixture now copies `schemas/` because the ideas check reads the plugin's own schemas.
+- **Schema descriptions rewritten, structure kept.** The source schema's descriptions cite this
+  repository's documents, ideas and dates, which R02 forbids; only `description` strings changed,
+  and a comparison with descriptions stripped shows the two schemas identical.
+- **The rendered view's header is the scaffold's seed text.** So an empty log renders to exactly
+  the file the scaffold creates, and a freshly scaffolded repository passes `check`.
+- **Rendering of the new event data.** Document links render their code, and the view shows the
+  latest classification and any `closes_with` pointers, so `000465` (generate_ideas_md.py does not
+  render document links, classification or closes_with) is not repeated in the plugin. PLAN-048.02's
+  open question — whether render shows the axis values — answered yes.
+- **Document codes resolve by front matter.** Pointers and document links check the `code:` field
+  of Markdown files under the document root, so the writer does not depend on the code register
+  `phase-plug-05` is defining in parallel.
+- **The owner author stays `repository-owner`**, as in the source; making it a plugin option would
+  have meant editing `plugin.json`, outside this phase.
+- **Triage is one idea per invocation**, per REQ-031 R12's "is not" clause, unlike the source
+  workflow's loop over every open idea.
+- **Additions to the writer:** read-only `list` and `show` commands, replacing the source skills'
+  inline `src` imports; `--file` for annotation text, so a finding never passes through a shell
+  argument; and the writer prints each event's `eid`, which the source's help said it did and it
+  did not.
+- **The remaining review was dropped (owner).** After the second review stalled, the owner
+  directed the session to drop it and move on; `## Review` lists what that left unreviewed.
+- **Test porting was delegated** to a general-purpose agent with the R02 rules spelled out; its list
+  of dropped source tests (committed-file, DuckDB projection and repository-tooling tests) is the
+  one PLAN-048.02 step 2 called for.
+
+## Corrections
+
+- The triage skill first wrote `<plugin root>` where `${CLAUDE_PLUGIN_ROOT}` belonged; the plugin's
+  skill test caught it and it was fixed before the first commit.
+- The first plugin-suite failure after the scripts landed was blamed on the new check needing
+  schemas; the cause was `phase-plug-01`'s portability fixture not copying `schemas/`, fixed through
+  the widen above.
+- Review 1's should-fix: the port had dropped the source's argparse `choices` on `status`'s target;
+  restored in `7f87793`.
+
+## Left undone
+
+- The merge onto `dev` and the completion edit, which wait for the owner's approval.
+- `000463` (idea consumers hard-code the five old statuses) and `000464` (the DuckDB projection
+  lacks the new columns) stay with this repository: the plugin has no projection and no
+  consumer that hard-codes statuses.
