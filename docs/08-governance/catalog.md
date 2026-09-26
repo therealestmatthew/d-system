@@ -39,6 +39,7 @@ CI regenerates it and fails on any difference.
 | ARCH-009 | architecture | draft | repository-owner | docs/07-architecture/ARCH-009-schema-architecture-review.md |
 | ARCH-010 | architecture | draft | repository-owner | docs/07-architecture/ARCH-010-schema-decision-reconciliation.md |
 | ARCH-011 | architecture | draft | repository-owner | docs/07-architecture/ARCH-011-autonomous-operations-architecture.md |
+| ARCH-012 | architecture | draft | repository-owner | docs/07-architecture/ARCH-012-system-boundary-decision-report.md |
 | GOV-001 | governance | active | repository-owner | docs/08-governance/GOV-001-protocol.md |
 | GOV-002 | governance | active | repository-owner | docs/08-governance/GOV-002-backlog-protocol.md |
 | GOV-003 | governance | active | repository-owner | docs/08-governance/GOV-003-backlog-decisions.md |
@@ -385,6 +386,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-26-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-04-system-boundary-prompt-rubric.md |
 | SESS-2026-09-26-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-05-system-boundary-prompt-inventory.md |
 | SESS-2026-09-26-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-06-system-boundary-portfolio-review.md |
+| SESS-2026-09-26-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-07-system-boundary-decision-report.md |
 
 ## Plans and their phases
 
@@ -479,4 +481,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-378 documents — adr: 21, architecture: 11, governance: 17, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 159.
+380 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 160.

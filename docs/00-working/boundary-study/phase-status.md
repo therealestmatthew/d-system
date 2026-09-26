@@ -10,7 +10,7 @@ Update the selected row after a valid claim and again at terminal handoff. Use c
 | phase-bnd-02 | PLAN-050.02 | complete | complete | `agent/phase-bnd-02` at `2fd80bc` | `SESS-2026-09-26-04`; governance, 1,115 tests, baseline count (40), and diff check pass | Complete; phase-bnd-05 may begin after integration. |
 | phase-bnd-05 | PLAN-050.03 | complete | complete | `dev` at `986d862` (handoff); implementation evidence `dda51e3` | `SESS-2026-09-26-05`; governance passed, 40/40 reconciliation, diff check, confidentiality check, and 1,115 tests passed | Complete; phase-bnd-03 may begin. |
 | phase-bnd-03 | PLAN-050.04 | complete | complete | `agent/phase-bnd-03` at `c620c6f` | `SESS-2026-09-26-06`; portfolio baseline, governance, diff check, and 1,115 tests passed after rebase | Complete; phase-bnd-04 may begin. |
-| phase-bnd-04 | PLAN-050.05 | queued | not started | — | — | Produce the governed boundary decision report. |
+| phase-bnd-04 | PLAN-050.05 | active | in progress | `agent/phase-bnd-04` at `0c47c27` | Claim validated; report and reconciliation pending | Reconcile study inputs to `dev`, allocate the architecture code, and write the decision report. |
 
 ## History
 
