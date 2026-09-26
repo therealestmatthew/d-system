@@ -15071,7 +15071,8 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-codex-boundary-study
   priority: 2
   session_budget: 1
   depends_on:
