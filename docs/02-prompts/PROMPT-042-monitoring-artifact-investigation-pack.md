@@ -22,7 +22,10 @@ tracks every artifact, and its maintenance protocol), `000494` (an agent that tr
 protocols, governance and documents) and `000495` (an agent that tracks paths and finds things).
 
 The pack investigates and synthesizes. It builds nothing: no generator, no page, no agent file, no
-governed requirement or plan. It ends at the owner's ruling on a design brief.
+governed requirement or plan. It ends at the owner's ruling on the audited design brief.
+
+Unlike `000497`, the batch ideas `000491`–`000495` are still `open`: none has had a triage pass.
+Treat what they say as the owner's asks as recorded, not as vetted findings.
 
 **Tests never run in the primary checkout** (`/code/d-system`). Every `pytest`, rebuild, `ruff`,
 `mypy` and governance run in this pack happens in the session's own worktree. `test/test_codes.py`
@@ -44,14 +47,15 @@ and so on." The reason they gave: "Things are evolving so rapidly that I am stru
 | Adversarial review of the prompt plan | Before this document merged; see *Review of this pack* at the end |
 | Investigate what is missing, how to derive it, how to display it | This pack, sections `S0`, `I1`–`I5` |
 | Synthesis, with a build priority across the batch | This pack, section `S` |
-| Adversarial audit of the synthesis, several facets | This pack, sections `A1`–`A3` |
+| Adversarial audit of the synthesis, several facets | This pack, sections `A1`–`A4` |
 | Expand into requirement, plan and backlog phases | **Not this pack.** A later planning session, from the brief this pack produces |
 | Build and iterate | **Not this pack** |
 
-The owner ruled on 2026-09-27 that this pack stops at the synthesis, that the audit uses several
-agents on different facets, that the artifact batch (`000491`–`000495`) is fully in scope — as
-inputs and for deciding what to build first — and that coordination data held only by the Session
-Manager is read as a source and reported as a gap.
+The owner ruled on 2026-09-27 that this pack stops at the synthesis (with its audit and the owner's
+ruling on it), that the audit uses several agents on different facets, that the artifact batch
+(`000491`–`000495`) is fully in scope — "first as inputs but also to prioritize what we need to
+build to achieve what we want" — and that coordination data held only by the Session Manager is
+read as a source and reported as a gap.
 
 ## What the owner wants tracked
 
@@ -69,7 +73,7 @@ it as a proposal, never merge it into the list.
 | `O5` | Active batches |
 | `O6` | The backlog |
 | `O7` | `next_up` |
-| `O8` | Other plans (not active) |
+| `O8` | Other plans (read as: plans that are not active — this reading is the pack's, not the owner's) |
 | `O9` | Plan metrics |
 | `O10` | Governance documents |
 | `O11` | Branches and worktrees, and their statuses |
@@ -80,10 +84,22 @@ it as a proposal, never merge it into the list.
 `O14` comes from the batch, not from `000497` itself. `000494` and `000495` are agents rather than
 things to display; they enter through `I5` and the build priority.
 
+One item is a **proposal**, not on the owner's list, and is labelled so everywhere it appears:
+
+| Item | Proposal | Why |
+|---|---|---|
+| `P1` | What changed since the owner last looked: new ideas and status moves, phases claimed, completed or merged, branches and worktrees opened or removed, documents added | The owner's stated reason for the whole artifact is "Things are evolving so rapidly that I am struggling to keep up." Every O-item is a state at one moment; none shows change. The coordinator raises `P1` at `G1` for the owner to accept or drop |
+
+**Who owns which item.** `I2` owns `O1`–`O10` and `O13`. `I3` owns `O11` and `O12`. `I1` owns
+`O14`'s facts about what exists and what keeps it in sync; `I5` uses the batch ideas for what to
+build, and where its account of what exists disagrees with `I1`'s, the synthesis names the
+disagreement and checks the files rather than picking one. `I2` owns `P1`'s data (what records a
+change and when); `I4` owns how change is shown.
+
 ## What this pack carries, and what it does not
 
 The work is an analysis. One coordinator session takes a snapshot, dispatches five read-only
-investigators in parallel, holds an owner gate, writes a synthesis, dispatches three read-only
+investigators in parallel, holds an owner gate, writes a synthesis, dispatches four read-only
 auditors in parallel, fixes what they find, and holds a second owner gate.
 
 It carries no build dispatches, no creator or validator roles, no port assignments and no browser
@@ -100,7 +116,10 @@ The coordinator never records it itself.
 This is owner-directed work with no backlog phase. There is nothing to claim. Say so in the first
 report: the session runs unclaimed and peers hold no lock against it.
 
-1. Send `ACK` to the Session Manager if you have not, and wait for the assignment of this pack.
+1. The assignment reaches you one way: the Prompt Planner sends the Session Manager
+   `PROMPT-FOR <session> PROMPT-042`, the Session Manager checks it against your role and the
+   primary-checkout lock, and the owner pastes the kickoff into your session. If you have not sent
+   the Session Manager `ACK` under the coordination contract (`GOV-017`), send it before you start.
 2. From the primary checkout, create the worktree — this is the only primary-checkout action this
    pack takes:
 
@@ -137,7 +156,7 @@ report: the session runs unclaimed and peers hold no lock against it.
 | `I1`–`I5` | The five investigators |
 | `G1` | Owner gate after the investigation |
 | `S` | The synthesis (coordinator procedure) |
-| `A1`–`A3` | The three auditors, one facet each |
+| `A1`–`A4` | The four auditors, one facet each |
 | `G2` | Owner gate on the audited brief |
 
 ## Conventions
@@ -167,7 +186,7 @@ report: the session runs unclaimed and peers hold no lock against it.
 | Gate | After | The owner reads | The owner rules on |
 |---|---|---|---|
 | `G1` | `I1`–`I5` have returned | A summary of at most one screen per report, in the message text, with the report paths | Corrections to scope, anything an investigator flagged as needing the owner, and whether to proceed to `S` |
-| `G2` | `A1`–`A3` have returned and the coordinator has fixed or answered every finding | The brief's summary and build priority, and each audit finding with its disposition | Accept the brief, correct it, or send it back. Acceptance ends the pack |
+| `G2` | `A1`–`A4` have returned and the coordinator has fixed or answered every finding | The brief's summary and build priority, and each audit finding with its disposition | Accept the brief, correct it, or send it back. Acceptance ends the pack |
 
 The coordinator records each question and ruling in
 `{WT}/docs/00-working/monitoring-artifact/gate-log.md`, dated, with the owner's words as given.
@@ -192,9 +211,13 @@ instead.
 | `worktrees.txt` | `git -C /code/d-system worktree list --porcelain` |
 | `branches.txt` | `git -C /code/d-system branch -a -vv` |
 | `ahead-behind.txt` | For each local `agent/*` branch: the branch name, `git -C /code/d-system rev-list --left-right --count dev...<branch>`, and the date of its last commit |
-| `dev-log.txt` | `git -C /code/d-system log --oneline -40 dev` |
-| `session-manager/` | A copy of `/code/d-system/_working/session-manager/reports/` (read only; never write there) |
-| `artifacts.txt` | The owner's published claude.ai Artifacts: title, URL, last updated, from the `Artifact` tool's `list` action. If the tool is not available in this session, write that sentence and nothing else |
+| `dev-log.txt` | `git -C /code/d-system log --format='%h %cI %s' -60 dev` (commit dates give `P1` a time axis) |
+| `session-manager/board.md` | A copy of `/code/d-system/_working/session-manager/board.md`: the Session Manager's roster, claim slots, lock and queue (`GOV-017`). Read only; never write there |
+| `session-manager/round-status.html` | A copy of `/code/d-system/_working/session-manager/reports/round-status.html`: the hand-built status page (`000448`'s triage). Read only |
+| `artifacts.txt` | The owner's published claude.ai Artifacts: title, URL, last updated, from the `Artifact` tool's `list` action (Claude Code sessions here have it). If the tool is not available in this session, write that sentence and nothing else |
+
+Copy only those two Session Manager files. The rest of that directory is one-off analysis, not
+state, and would spend the investigators' turn budget.
 
 Then commit nothing yet and dispatch `I1`–`I5` in parallel, in one message.
 
@@ -225,8 +248,11 @@ _public/overview/index.html), {WT}/docs/00-working/ideas.md, the governance repo
 snapshot/ready.txt, backlog.txt and inventory.txt, {WT}/docs/08-governance/catalog.md, the
 workbench explorers under {WT}/ts/, the generators in {WT}/tools/ (generate_overview.py,
 overview_metrics.py, overview_inventory.py, generate_ideas_md.py and any other), the Session
-Manager's reports in snapshot/session-manager/, and the published Artifacts in snapshot/artifacts.txt.
-Search for others; do not stop at this list.
+Manager's hand-built status page in snapshot/session-manager/round-status.html, and the published
+Artifacts in snapshot/artifacts.txt. Search for others; do not stop at this list.
+
+You own O14's facts: what artifacts exist and what keeps each in sync. Another investigator
+covers what to build next; do not rank or propose builds.
 
 For each surface report: its path; which O-items it covers, fully or partly; how it is produced
 (generator, command, by hand); how it is refreshed and how stale it is at snapshot time, with the
@@ -277,6 +303,15 @@ from the idea log, a batch table that holds no phase facts, a plan whose status 
 disagree. For O9, say which plan metrics already exist anywhere and which would be new, and do
 not invent metrics the owner did not ask for without labelling them as proposals.
 
+You also own the data for P1, a proposal (not on the owner's list): what changed since the owner
+last looked. Report which records carry a time for each kind of change — the fold's event and
+updated timestamps, the commit dates in snapshot/dev-log.txt, the backlog's and documents'
+updated fields — and how a "since last looked" view could be computed from them, including what
+would record when the owner last looked. Keep P1 labelled as a proposal throughout.
+
+backlog.yaml and ideas-fold.json are each over 15,000 lines. Grep them for the ids and fields you
+need; do not read either end to end.
+
 Cite a file and line, or a snapshot file, for every claim. Label anything you could not verify
 "unverified". End with "For the owner" and "Ideas outside this brief", one line each.
 ```
@@ -303,8 +338,8 @@ snapshot/ideas-fold.json. Ideas to read there: 000368, 000369, 000391, 000448, 0
 
 Sources, at least: snapshot/worktrees.txt, branches.txt, ahead-behind.txt, dev-log.txt,
 ready.txt; the agent and status fields in {WT}/docs/09-backlog/backlog.yaml; the batch tables in
-{WT}/docs/09-backlog/batches/; {WT}/_tmpagent/claims.jsonl; the Session Manager's reports copied
-into snapshot/session-manager/; the naming rules in {WT}/AGENTS.md (branch agent/<phase-id>,
+{WT}/docs/09-backlog/batches/; {WT}/_tmpagent/claims.jsonl; the Session Manager's board, copied to
+snapshot/session-manager/board.md (roster, claim slots, lock, queue); the naming rules in {WT}/AGENTS.md (branch agent/<phase-id>,
 worktree ../d-system-worktrees/<phase-id>, agent/<slug> for unclaimed work) and
 {WT}/docs/08-governance/GOV-017-multi-session-coordination-protocol.md.
 
@@ -316,6 +351,9 @@ Session Manager's board or reports — session roster, assignments, grants, queu
 work, which session holds which branch. For each of those, say that it is not recorded durably,
 where it lives today, and which of the ideas above would record it. The owner ruled that this
 data is used as a source and reported as a gap; do both.
+
+backlog.yaml and ideas-fold.json are each over 15,000 lines. Grep them for the ids and fields you
+need; do not read either end to end.
 
 Cite a file and line, or a snapshot file, for every claim. Label anything you could not verify
 "unverified". End with "For the owner" and "Ideas outside this brief", one line each.
@@ -341,8 +379,10 @@ whole report as your final message; the dispatcher writes it to
 
 Read the owner's checklist in {WT}/docs/02-prompts/PROMPT-042-monitoring-artifact-investigation-pack.md,
 section "What the owner wants tracked" (O1-O14). Read idea state only from
-snapshot/ideas-fold.json. Ideas to read there: 000497, 000491, 000493, 000300, 000301, 000042,
-000010, 000106, 000448.
+snapshot/ideas-fold.json. Ideas to read there: 000497, 000491, 000492, 000493, 000300, 000301,
+000042, 000010, 000106, 000448. 000492 asks directly to "align on structure and how they are
+presented, target audience, how to make them most effective and mantainable"; that is your
+question as much as 000497's.
 
 Material to examine, at least: the existing pages in {WT}/_public/ and _public/overview/; the
 Session Manager's hand-built status page in snapshot/session-manager/round-status.html; the
@@ -357,8 +397,11 @@ repository, a published claude.ai Artifact, a workbench panel, and a terminal re
 each: whether it can be read on a phone, how it gets refreshed (on demand, on commit, on a
 schedule, by an agent), what breaks when it goes stale and whether staleness is visible, what
 already exists to build it from, and its cost to keep in sync. Then describe, in text, how the
-O-items could be arranged so the owner sees what changed and what needs them first. Say how the
-answer to phase-idg-08's ruling on 000042 bears on this. Do not write HTML or mock-ups.
+O-items could be arranged so the owner sees what needs them first, and how P1 — a proposal, not on
+the owner's list: what changed since they last looked — could be shown. phase-idg-08 is the phase
+that rules whether a generated ideas-and-backlog page (000042) is wanted: if it has ruled when you
+read it, say how the ruling bears on this; if not, give its status and what each possible ruling
+would imply. Do not write HTML or mock-ups.
 
 Cite a file and line, or a snapshot file, for every claim. Label anything you could not verify
 "unverified". End with "For the owner" and "Ideas outside this brief", one line each.
@@ -391,7 +434,13 @@ agent definitions in {WT}/.claude/agents/ and the skills in {WT}/.claude/skills/
 {WT}/docs/ for existing reference documents on the areas 000492 names (governance docs, the Idea
 Realization Engine, the workbench, the HTML generator, the personal productivity system, protocol
 docs, the boundary study, the plan and build audit procedures, the planning procedure, the idea
-subsystems, the literature review protocol).
+subsystems — Idea Capture, Idea Fold, Idea Triage, Idea Partition, Idea Analytics — and the
+literature review protocol). For the boundary study, read idea 000490 first: its annotation already
+maps the documents.
+
+None of 000491-000495 has been triaged; they are still open. Say so where it matters, and do not
+treat their text as a vetted finding. Another investigator owns the facts about which artifacts
+exist and what keeps them in sync; report what you find, and the synthesis reconciles the two.
 
 Report: for each idea in the batch, what it needs, what already exists toward it (with paths),
 and which other ideas in the batch it depends on or duplicates; whether 000494 and 000495 overlap
@@ -411,8 +460,10 @@ Cite a file and line, or a snapshot file, for every claim. Label anything you co
 Write each report to its path exactly as returned. Then send the owner, in the message text, one
 screen per report at most: what it found, what it flagged for the owner, and its path. Ask the
 flagged questions with `AskUserQuestion`. Record questions and rulings in `gate-log.md`. Relay
-each "Ideas outside this brief" line to Ideation as `IDEA ...`. Commit the reports and the gate log
-on the branch. Proceed to `S` only on the owner's go.
+each "Ideas outside this brief" line to Ideation as `IDEA ...`. Ask the owner whether to keep `P1`
+(what changed since they last looked) in scope, with `I2`'s and `I4`'s findings on it; a dropped `P1`
+leaves the brief. Commit the reports and the gate log on the branch. Proceed to `S` only on the
+owner's go.
 
 ---
 
@@ -435,12 +486,13 @@ five reports and the `G1` rulings only. The brief has these sections, in this or
 7. **Inputs for the next stage** — what the planning session that expands this into a requirement,
    a plan and backlog phases will need. Write no requirement or plan here.
 
-The brief makes no claim the reports do not support. Where two reports disagree, it says so and
-names the one it follows and why. Commit it, then dispatch `A1`–`A3` in parallel, in one message.
+The brief makes no claim the reports do not support. Where two reports disagree — `I1` and `I5` on
+what artifacts exist is the expected case — it says so, checks the files, and names the answer and
+the evidence rather than picking a report. Commit it, then dispatch `A1`–`A4` in parallel, in one message.
 
 ---
 
-### A1–A3 — the audit, three facets
+### A1–A4 — the audit, four facets
 
 Each dispatches on `partition-adversary`, model sonnet, with the common text below followed by its
 facet paragraph. Write each reply unchanged to
@@ -477,18 +529,25 @@ Facet paragraphs:
 - **`A1` — coverage and fidelity** (`A1-coverage.md`). Every O-item and every phrase of the owner's
   recorded words on `000497` and the batch ideas is covered or explicitly marked out of scope;
   nothing the owner did not ask for is presented as asked; the batch is treated as fully in scope;
-  each report's claims are carried into the brief without being strengthened, weakened or
-  dropped; the brief stops at synthesis and plans no build.
+  the brief stops at synthesis and plans no build; `P1` appears only if the owner kept it at `G1`,
+  and is labelled as a proposal.
 - **`A2` — data correctness and feasibility** (`A2-data.md`). Each derivation in *Coverage* is
   right against the code and files it names; idea state comes from `fold()`; each named command
   and function exists and does what the brief says; each status label (`available`, `derivable`,
   `not recorded durably`, `missing`) is correct; nothing presented as derivable depends on the
-  Session Manager's gitignored reports.
+  Session Manager's gitignored board or reports; where `I1` and `I5` disagreed on `O14`, the brief's
+  answer matches the files.
 - **`A3` — usefulness, upkeep and priority** (`A3-usefulness.md`). The recommended display serves
   one place to reference everything, readable on a phone; it stays current without the owner or an
   agent doing it by hand, or the brief says who does it; staleness is visible; the build priority's
   dependencies hold; the first slice is the one that most reduces the owner's difficulty keeping up,
   and nothing earlier in the order depends on something later.
+- **`A4` — the synthesis against its sources** (`A4-synthesis.md`). The synthesis was written by the
+  coordinator alone, so this facet checks the coordinator. Each claim in the brief traces to a
+  report or a `G1` ruling; none is strengthened, weakened or dropped on the way; no conclusion
+  appears that no report reached; where reports disagreed, the brief says so rather than choosing
+  silently; and every "For the owner" item from the reports is either answered at `G1` or listed in
+  *Open questions*.
 
 ---
 
@@ -497,10 +556,12 @@ Facet paragraphs:
 For each finding, fix the brief or record why it stands, in a *Dispositions* table at the end of
 the brief: finding id, rank, `fixed` or `accepted`, and one line. A blocker is never accepted
 without the owner's ruling. Commit. Then send the owner, in the message text, the brief's summary,
-its build priority, and each finding with its disposition, and ask for the ruling with
-`AskUserQuestion`. Record it in `gate-log.md`.
+its build priority, and the findings grouped by rank — blockers and majors one line each with their
+disposition, minors as a count with the path to the table — in at most one screen, and ask for the
+ruling with `AskUserQuestion`. Record it in `gate-log.md`.
 
-On acceptance: commit, rebase onto `dev`, and run the four gate checks **in the worktree**:
+On acceptance: commit, rebase onto `dev`, and run the four gate checks and the catalog check
+**in the worktree** — never in the primary checkout:
 
 ```bash
 uv run python -m src.governance
@@ -521,18 +582,57 @@ expands the brief into a requirement, a plan and backlog phases.
 The owner may descope. The coordinator never does it on its own; if time or budget runs short it
 stops at the next gate and asks. The rungs, in the order to offer them:
 
-1. Merge `I5` into `S`: the coordinator derives the build priority from `I1`–`I4` and the batch
-   ideas itself.
-2. Merge `A3` into `A1`.
-3. Replace `A1`–`A3` with a single `partition-adversary` dispatch that covers all three facets.
+1. Drop "search for others" from `I1`: it inventories only the surfaces its brief names. Cheapest,
+   because `I4` and `I5` also read the main pages, so an unnamed surface is the only loss.
+2. Merge `A3` into `A2`. **This partly reverses the owner's ruling that the audit uses several
+   facets; say so when offering it.**
+3. Merge `I5` into `S`: the coordinator derives the build priority from `I1`–`I4` and the batch
+   ideas itself. Last, because the build priority is one of the two things the owner asked this pack
+   for, and without `I5` it has no dedicated, cited investigation behind it.
 
-Skipping `G1` or `G2` is not a rung.
+Skipping `G1` or `G2`, and dropping `A4`, are not rungs: `A4` is the only check on the coordinator's
+own synthesis.
+
+## Kickoff
+
+The paragraph the owner pastes into the execution session, after the Session Manager has checked
+the `PROMPT-FOR`:
+
+> Run the monitoring artifact investigation pack, `docs/02-prompts/PROMPT-042-monitoring-artifact-investigation-pack.md`
+> on `dev`. Read `AGENTS.md` and that document first and follow the document exactly: this is
+> unclaimed owner-directed work, in the worktree `/code/d-system-worktrees/monitoring-investigation`
+> on `agent/monitoring-investigation`. Take the snapshot, dispatch the five investigators, stop for
+> me at `G1`, write the synthesis, dispatch the four auditors, stop for me at `G2`. Build nothing.
+> Tests never run in the primary checkout. Ask me with `AskUserQuestion`, with all content in the
+> message text, not in previews.
 
 ## Review of this pack
 
-Recorded before this document merged: the adversarial review of the pack itself, its findings and
-their dispositions.
+Recorded before this document merged. The pack was reviewed on 2026-09-27 by three
+`partition-adversary` dispatches (model sonnet), one per facet, following the owner's ruling that
+audits use several facets: fidelity to the owner's asks (`F-FID`), whether it executes as written
+under the repository's rules (`F-EXE`), and the quality of the investigation design (`F-DES`). No
+blockers; eight majors; twelve minors.
 
-<!-- review:start -->
-Pending.
-<!-- review:end -->
+| Finding | Rank | Disposition | What changed |
+|---|---|---|---|
+| `F-DES-01` | major | fixed | Added `P1` (what changed since the owner last looked) as a labelled proposal, owned by `I2` for data and `I4` for display, raised at `G1`; `dev-log.txt` now carries commit dates |
+| `F-DES-02` | major | fixed | *Who owns which item*: `I1` owns `O14`'s facts; `S` reconciles `I1` against `I5` from the files; `A2` checks it |
+| `F-DES-03` | major | fixed | `S0` copies only `board.md` and `round-status.html`; `I1` and `I3` point at the one file each needs |
+| `F-DES-04` | major | fixed | Descope ladder reordered: merging `I5` into `S` is last, with the reason |
+| `F-FID-01` | major | fixed | `000492` added to `I4`'s reading list, with its presentation ask quoted |
+| `F-FID-02` | major | fixed | The rung that merges audit facets says it partly reverses the owner's ruling; the full collapse to one auditor is removed |
+| `F-EXE-01` | major | fixed | `S0` copies `/code/d-system/_working/session-manager/board.md`, which holds the roster, claim slots, lock and queue |
+| `F-EXE-02` | major | fixed | Session mechanics step 1 names the route: `PROMPT-FOR`, the Session Manager's check, the owner's paste of the *Kickoff* paragraph |
+| `F-DES-05` | minor | fixed | `G2`'s message capped at one screen, findings grouped by rank |
+| `F-DES-06` | minor | fixed | `I4`'s `phase-idg-08` question allows for no ruling yet |
+| `F-DES-07` | minor | fixed | New `A4` facet checks the coordinator's synthesis against its sources; not a descope rung |
+| `F-FID-03` | minor | fixed | Ruling (2) quoted verbatim in *Where this pack sits* |
+| `F-FID-04` | minor | fixed | `O8`'s "not active" marked as the pack's reading |
+| `F-FID-05` | minor | fixed | `I5` names the idea subsystems individually |
+| `F-FID-06` | minor | fixed | `I5` reads `000490` for the boundary study |
+| `F-FID-07` | minor | fixed | The ending is stated as the owner's ruling on the audited brief |
+| `F-FID-08` | minor | fixed | The pack and `I5` say `000491`–`000495` are untriaged |
+| `F-EXE-03` | minor | fixed | "Four gate checks and the catalog check" |
+| `F-EXE-04` | minor | fixed | `I2` and `I3` told to grep `backlog.yaml` and `ideas-fold.json` rather than read them end to end |
+| `F-EXE-05` | minor | accepted | The finding held that a Claude Code session has no `Artifact` `list` action. The session that wrote this pack has one, so the step stands; its fallback sentence covers a session without it |
