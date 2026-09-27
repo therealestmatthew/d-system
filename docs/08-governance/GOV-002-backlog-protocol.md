@@ -87,7 +87,7 @@ The optional top-level `max_active` bounds simultaneous claims; it defaults to `
 
 Each active phase names its `agent`, one active phase per agent, and a phase released back to `queued`, `deferred` or `cancelled` must drop that field. `active`, `blocked` and `complete` keep it: a blocked phase still owns a worktree, and a complete phase records who did the work. [ADR-003](../04-decisions/ADR-003-multi-agent-concurrency.md) states the model, and [AGENTS.md](../../AGENTS.md) carries the operational steps.
 
-Two things are deliberately not machine-checked. A phase that edits files outside its declared `systems` and `deliverables` defeats the disjointness rule entirely — the declarations are what the validator can see, and diff review is what confirms the work stayed inside them. Adjacency in the `systems.yaml` dependency graph is also unchecked: an agent working a system that `depends_on` a peer's active system must treat the upstream contract as frozen at the commit it branched from and build against merged `main`, never against a peer's branch.
+Two things are deliberately not machine-checked. A phase that edits files outside its declared `systems` and `deliverables` defeats the disjointness rule entirely — the declarations are what the validator can see, and diff review is what confirms the work stayed inside them. Adjacency in the `systems.yaml` dependency graph is also unchecked: an agent working a system that `depends_on` a peer's active system must treat the upstream contract as frozen at the commit it branched from and build against merged `dev`, never against a peer's branch.
 
 ### The stale-claim signal
 
