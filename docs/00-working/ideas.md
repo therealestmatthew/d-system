@@ -21707,3 +21707,21 @@ One of three ideas from phase-plug-07 batched for the planning after phase-plug-
 **Links**
 
 - relates_to → `000470`
+
+---
+
+## 000473 · The merge gate checks only a branch's tip, so a commit made with --no-verify leaves no trace
+
+**Created 2026-09-26T23:38:53-04:00 · Status: `open`**
+
+Raised by the Session Manager and approved for recording by the owner through /log-anti-patterns, 2026-09-26.
+
+The pre-commit hook (tools/git-hooks/pre-commit) runs tools/check_no_private_content.py and the governance check (python -m src.governance) on every commit, and its header says never to bypass a failure with --no-verify. Nothing enforces that after the fact. The merge gate (the Session Manager's re-run of governance, pytest, ruff and mypy, and tools/git-hooks/refuse_dirty_integration.py) runs against the branch tip only. An intermediate commit made with --no-verify that failed the hook passes the gate as long as a later commit fixes the tip, and it lands on dev with the failure preserved in history. A private-content leak in such a commit stays in history even when the tip is clean.
+
+Occurrence: 97d68b9 ("Add the trace table for the absolute documents (PLAN-048.10)") on agent/phase-plug-07, 2026-09-26.
+
+The ask: the gate (the Session Manager's re-run, refuse_dirty_integration.py, or both) should run the pre-commit hook's checks on every commit in dev..<branch>, not only the tip.
+
+What it would touch: refuse_dirty_integration.py or a new gate script, the Session Manager's READY/merge procedure (GOV-017 and the coordination contract), and AGENTS.md's merge step 9 if the check lives there.
+
+Unresolved: cost (the governance check on every commit of a long branch); whether a failing intermediate commit blocks the merge or requires the branch to be rewritten, which conflicts with not rewriting shared history; whether the private-content check alone should run per commit, since that is the failure history cannot undo, while governance runs only on the tip; and whether commits in dev..<branch> that were rebased from peers are exempt.
