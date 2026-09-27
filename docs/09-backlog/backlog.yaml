@@ -14089,17 +14089,18 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/06-requirements/REQ-028-deterministic-guards.md
-  next_action: All acceptance met in the worktree (SESS-2026-09-24-03). The independent /session-close review
-    was launched and had not returned at the 2026-09-25 reset; re-run it, fix or accept its findings, then
-    send READY and wait for the owner's merge approval.
+  next_action: Rebased onto dev 2026-09-27; independent review re-run (demo-adversary), both findings fixed;
+    READY sent. The merge is held by the owner until they are at the terminal and dev is pushed; then
+    GRANTED merge, ff-merge and the completion edit with --catalog.
   session: doc-session-green-dev-ci-before-grants
   completion_evidence:
   - tools/check_dev_ci.py
   - test/test_check_dev_ci.py
   - docs/08-governance/OPS-025-check-dev-ci.md
   - docs/03-sessions/SESS-2026-09-24-03-green-dev-ci-before-grants.md
-  result: Tool, 27 tests, OPS-025 and the GOV-017/PROMPT-037/REQ-028 edits are built; verification green in
-    the worktree (1096 passed, 1 skipped). Independent review pending.
+  result: Tool, 27 tests, OPS-025 and the GOV-017/PROMPT-037/REQ-028 edits are built; after the 2026-09-27
+    rebase, verification green in the worktree (1142 passed) with the live tool at exit 2 (dev not pushed)
+    and exit 1 on 024443c. Independent review 2026-09-27, no blockers; both findings fixed.
 - id: phase-grd-03
   title: 'Branch diff guards: the test-count baseline, the diff-pattern check and the plan-versus-registered
     check'
