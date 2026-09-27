@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-26'
+updated: '2026-09-27'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -15063,7 +15063,7 @@ items:
     docs/role-contracts.md, docs/plan-review.md, docs/adversary-prompt.md, docs/multi-session.md
     and docs/session-manager-messages.md from the extractions; worked examples bound to the source
     repository's plans are dropped, not replaced.
-  - Write the trace table PLAN-048.09-trace.md in this repository.
+  - Write the trace table PLAN-048.11-absolutes-two-trace.md in this repository.
   acceptance:
   - The R02 check and test_no_history.py pass over plugins/idea-realization/docs/ with the nine new
     documents present; a document that names a source-repository prompt code fails the R02 check.
@@ -15086,7 +15086,8 @@ items:
   - plugins/idea-realization/docs/adversary-prompt.md
   - plugins/idea-realization/docs/multi-session.md
   - plugins/idea-realization/docs/session-manager-messages.md
-  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-trace.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.11-absolutes-two-trace.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md
   next_action: Waits for phase-plug-07, whose trace table carries the ledger classification this phase
     reads. Families D, E and F are this phase.
 - id: phase-bnd-01
