@@ -16834,6 +16834,7 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to ← `000386`
 - relates_to ← `000427`
 - relates_to ← `000428`
+- relates_to ← `000508`
 
 ---
 
@@ -18591,6 +18592,7 @@ PROPOSED LINK: 000370 --relates_to--> 000334 (both ask how GOV-017's coordinatio
 - relates_to → `000334`
 - relates_to ← `000385`
 - relates_to ← `000393`
+- relates_to ← `000508`
 
 ---
 
@@ -20570,6 +20572,7 @@ PROPOSED LINK: this idea --relates_to--> 000432 (split from the same owner messa
 **Links**
 
 - relates_to ← `000432`
+- relates_to ← `000508`
 
 ---
 
@@ -22432,3 +22435,56 @@ Show me the contents of the files you'll create or change, then explain the whol
 
 - relates_to → `000497`
 - relates_to → `000491`
+
+---
+
+## 000508 · Investigate graph-engineering agent frameworks (LangGraph, CrewAI, AutoGen, ADK, Mastra and others) and the "fake-edge" test
+
+**Created 2026-09-27T18:32:30-04:00 · Status: `open`**
+
+Owner, 2026-09-27: "Steal this idea to investigate.  Another X post:"
+
+The post, as given:
+
+Graph Engineering became the default way every serious team builds agents now, and here's what people have already shipped with it
+
+if you want to actually draw the graph instead of guessing, copy this:
+
+LangGraph - the framework behind Uber, Replit, LinkedIn, and GitLab's own production agents. models every workflow as nodes and edges with conditional branching, the exact vocabulary that makes fake edges impossible to hide
+
+https://github.com/langchain-ai/langgraph
+
+CrewAI - role-based multi-agent teams with async execution. 47,000 stars, 5.2 million monthly downloads, no LangChain dependency since version 1.14
+
+https://github.com/crewAIInc/crewAI
+
+crewAI-examples - the self-evaluation loop flow example is the one to clone first: a working verifier pattern you can read end to end before you build your own and get it wrong the first time
+
+https://github.com/crewAIInc/crewAI-examples
+
+open-multi-agent - TypeScript-native, three runtime dependencies, nothing else. one runTeam() call decomposes a goal into a task DAG, resolves every dependency, and runs the independent pieces in parallel without you drawing a single node
+
+https://github.com/belinwu/open-multi-agent
+
+AutoGen - Microsoft's event-driven framework, merged with Semantic Kernel for production. the conversation-based model that taught half the industry exactly what a shared-context failure looks like, the expensive way
+
+https://github.com/microsoft/autogen
+
+Google ADK - modular agent dev kit with native Gemini and Vertex AI integration, built for teams that refuse to run the graph anywhere they don't already trust the infrastructure
+
+https://github.com/google/adk-python
+
+Mastra - the TypeScript entrant carving out ground the bigger frameworks ignored, built specifically for graph control without Python's weight sitting on top of it
+
+https://github.com/mastra-ai/mastra
+
+none of these frameworks fix a bad graph for you. they only make it visible the moment your worker and your verifier have been sharing the same context the entire time
+
+full build in the article, then run the fake-edge test before you wire up an eighth
+
+**Links**
+
+- relates_to → `000370`
+- relates_to → `000334`
+- relates_to → `000431`
+- relates_to → `None`
