@@ -699,3 +699,21 @@ def test_the_session_skills_read_branch_and_directory_from_the_options() -> None
         assert "CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}'" in text
         assert "CLAUDE_PLUGIN_OPTION_WORKTREE_DIR='${user_config.worktree_dir}'" in text
         assert "scripts/paths.py" in text
+
+
+def test_without_the_documents_feature_phases_resolve_against_nothing(tmp_path: Path) -> None:
+    """A backlog with no registers beside it: empty is clean, and a phase names what is unknown."""
+    import scaffold
+
+    root = tmp_path / "backlog-only"
+    root.mkdir()
+    only = paths.resolve({"root": str(root)}, env={})
+    scaffold.scaffold(only, ["backlog"])
+    notes: list[str] = []
+    assert feature.audit(only, note=notes.append) == []
+    assert any("documents feature is not set up" in line for line in notes)
+    (root / "backlog" / "backlog.yaml").write_text(json.dumps({
+        "schema_version": 1, "updated": TODAY.isoformat(), "items": [phase()]}))
+    errors = feature.audit(only, today=TODAY, note=notes.append)
+    assert any("unknown owner repository-owner" in error for error in errors), errors
+    assert any("primary plan must reference a plan document" in error for error in errors)

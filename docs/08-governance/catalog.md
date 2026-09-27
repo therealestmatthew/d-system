@@ -483,4 +483,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-381 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 161.
+382 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 77, prompt: 40, requirement: 32, session: 162.

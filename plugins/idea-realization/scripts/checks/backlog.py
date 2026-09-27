@@ -89,7 +89,16 @@ def audit(config: paths.Config, today: date | None = None,
     errors, catalog = load_catalog(config)
     if errors:
         return errors
-    scanned = documents.scan(config, today)
+    docs_root = config.path("docs_root")
+    if not (docs_root / documents.REGISTER).exists() and \
+            not (docs_root / documents.REGISTRY).exists():
+        # The documents feature was never set up, so nothing resolves: every phase's plan,
+        # systems and owner are reported unknown, and an empty backlog is clean.
+        note("the documents feature is not set up; phases' plans, systems and owners resolve "
+             "against nothing")
+        scanned = documents.Scan()
+    else:
+        scanned = documents.scan(config, today)
     if scanned.errors:
         return ["not checked: the document tree has errors (see the documents check); the "
                 "backlog resolves its plans, systems and owners through it"]

@@ -23,10 +23,11 @@ session-close skills (and, by the owner's amendment, the backlog skill).
 
 Run in `../d-system-worktrees/phase-plug-04` on `agent/phase-plug-04`, Claude Code 2.1.280.
 
+Final run, after rebasing onto the integration branch with `phase-plug-02` merged:
+
 ```text
 $ cd plugins/idea-realization && uv run pytest
-FAILED test/test_scripts_portable.py::test_scripts_run_against_a_temporary_root
-1 failed, 285 passed
+400 passed
 
 $ claude plugin validate plugins/idea-realization --strict
 ✔ Validation passed
@@ -38,7 +39,7 @@ $ uv run python -m src.governance
 Governance OK: 43 systems, 363 documents, 32 memories, 318 backlog phases
 ```
 
-The one failure is outside this phase's files: `test_scripts_portable.py` (from `phase-plug-01`)
+Before that rebase the suite had one failure, outside this phase's files: `test_scripts_portable.py` (from `phase-plug-01`)
 copies `scripts/` and `.claude-plugin/` but not `schemas/`, and the backlog check reads
 `schemas/backlog.schema.json`, so `check.py` exits 1 in the copy with "No such file or directory".
 The Session Manager reported that the fix, copying `schemas/`, lands with `phase-plug-02`; raised
@@ -77,7 +78,7 @@ unchanged except that the backlog path, the decisions path and the second base a
   Met (`test_the_backlog_skill_never_claims`).
 - The R02 check passes — Met (`test_plugin_names_no_source_instance` passes).
 
-The verification list is not all green: the plugin suite has the one failure above.
+The verification list is green after the final rebase.
 
 ## Backlog
 
@@ -177,10 +178,19 @@ stays green over its own tests.
   never switched; it now confirms the branch and stops if it is wrong.
 - A `SESS-` literal in a test fixture tripped the R02 check; now built at run time.
 
+- **After the review, one behaviour change.** With `phase-plug-02`'s fixture fix merged, the
+  portable test still failed: its fixture scaffolds every feature but copies no templates, so the
+  documents feature has no registers, and the backlog check reported "not checked: the document tree
+  has errors" while the documents check itself reported OK (it treats a tree with no registers as
+  never set up). The backlog check now matches that: with neither register present it runs every
+  rule against empty registries and notes that the documents feature is not set up, so an empty
+  backlog is clean and a phase is reported with its unknown plan, systems and owner. A registry
+  that exists but fails still stops the backlog check. New test:
+  `test_without_the_documents_feature_phases_resolve_against_nothing`. The review did not see this
+  change; reported to the Session Manager with READY.
+
 ## Left undone
 
-- The plugin suite's one failure waits on `phase-plug-02`'s fix to `test_scripts_portable.py`; the
-  Session Manager ruled this phase rebases after that merge.
 - R24's verification wording is the Session Manager's to amend.
 - The phase stays `active` until the owner approves the merge; completion follows on the
   integration branch.
