@@ -14099,7 +14099,7 @@ items:
   - docs/08-governance/OPS-025-check-dev-ci.md
   - docs/03-sessions/SESS-2026-09-24-03-green-dev-ci-before-grants.md
   result: Tool, 27 tests, OPS-025 and the GOV-017/PROMPT-037/REQ-028 edits are built; after the 2026-09-27
-    rebase, verification green in the worktree (1142 passed) with the live tool at exit 2 (dev not pushed)
+    rebase, verification green in the worktree (1147 passed) with the live tool at exit 2 (dev not pushed)
     and exit 1 on 024443c. Independent review 2026-09-27, no blockers; both findings fixed.
 - id: phase-grd-03
   title: 'Branch diff guards: the test-count baseline, the diff-pattern check and the plan-versus-registered
