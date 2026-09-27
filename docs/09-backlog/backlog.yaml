@@ -15106,8 +15106,9 @@ items:
   - plugins/idea-realization/docs/backlog-protocol.md
   - plugins/idea-realization/docs/protocol.md
   - plugins/idea-realization/docs/reporting.md
-  next_action: Waits for phase-plug-07, whose trace table carries the ledger classification this phase
-    reads. Families D, E and F are this phase.
+  next_action: Every acceptance condition is met and the independent reviews are recorded in
+    SESS-2026-09-27-01. Waits for the owner-approved merge, then the completion edit on the
+    integration branch.
 - id: phase-bnd-01
   title: Inventory system ownership, data authority and interfaces for the boundary study
   plan: doc-system-boundary-study-system-inventory

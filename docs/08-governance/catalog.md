@@ -394,6 +394,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-26-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-07-system-boundary-decision-report.md |
 | SESS-2026-09-26-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-08-plugin-partition-sweep.md |
 | SESS-2026-09-26-09 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-26-09-plugin-absolutes-part-one.md |
+| SESS-2026-09-27-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-27-01-plugin-absolutes-part-two.md |
 
 ## Plans and their phases
 
@@ -490,4 +491,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-387 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 79, prompt: 40, requirement: 32, session: 165.
+388 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 79, prompt: 40, requirement: 32, session: 166.
