@@ -22108,6 +22108,7 @@ Batch anchor for the owner's 2026-09-27 artifact asks: the artifact registry, th
 - relates_to ← `000494`
 - relates_to ← `000495`
 - relates_to ← `000497`
+- relates_to ← `000500`
 
 ---
 
@@ -22266,13 +22267,33 @@ The owner's rulings on it are recorded as findings on this idea. It is the first
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-27T16:12:55-04:00): Owner rulings given with the idea, 2026-09-27, relayed by the Session Manager, recorded as given: (1) the document states explicitly: requirement first, the owner gates (G2 partition acceptance, G3 plan approval and next_up ratification), and execution and after (validators, realization check, learning loop); (2) whether an investigation/prompt pack before the plan is a tracked step is NOT decided (the owner questioned its purpose); (3) the decompose -> audit loop stops by default when every phase fits one session by a measured heuristic (relates to 000445 and phase-irs-05); the exception, when the audit proposes no split but the heuristic says the phase does not fit, is to be designed; (4) home: a new short GOV document.
+- **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (1) An investigation/prompt pack before the plan is an OPTIONAL step, pointing to GOV-008's pre-plan package ("Prompt A"); tracked when it will be re-run, has owner gates, or needs its own review; otherwise docs/00-working. This settles ruling (2) of the earlier rulings finding, which left it undecided.
+- **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (2) The stop-rule exception (audit proposes no split, size heuristic says it does not fit one session) escalates at G3 with both results; the owner chooses split by hand, accept with a recorded reason, or adjust the heuristic. Owner: "We still need to figure out the Heuristics. Once that is finalized maybe we change this to audit wins or always split."
+- **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (3) Order: the next restart runs PROMPT-042 (monitoring investigation) and drafts the 000500 document in parallel; the dashboard build is planned in the restart after.
 
 </details>
 
 **Links**
 
 - relates_to → `000445`
+- relates_to → `None`
+- relates_to → `000492`
+- relates_to ← `000501`
+
+---
+
+## 000501 · Clean up and archive old plan files that are not reusable, and consolidate their ideas into configurable reusable prompts
+
+**Created 2026-09-27T16:23:22-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager, as given: "we need to go through and clean up/ archive old plan files that are not reusable and consolidate ideas from them into configurable reusable prompts. The goal is to not have governed prompts that are one time use."
+
+Recorded as given: the ask names old plan files, and its stated goal names governed prompts (docs/02-prompts/); which set the cleanup covers is for the owner to settle when this is planned. Related: 000500 (end-to-end planning protocol document) and GOV-008 (prompt pack protocol).
+
+**Links**
+
+- relates_to → `000500`
 - relates_to → `None`
