@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-02
 - phase-plug-04
 - phase-plug-06
 - phase-plug-03
@@ -14589,7 +14588,7 @@ items:
   systems:
   - sys-plugin-ideas
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-builder
   priority: 1
   session_budget: 1
@@ -14636,8 +14635,8 @@ items:
   - plugins/idea-realization/test/test_render_ideas.py
   - plugins/idea-realization/test/test_vocabulary.py
   - plugins/idea-realization/test/test_scripts_portable.py
-  next_action: Every acceptance condition met on agent/phase-plug-02; waits for the independent review
-    and the owner's merge approval, then the completion edit on dev.
+  next_action: Complete. Owner-directed partial review; the unreviewed items are listed in the
+    session record's Review section.
   session: doc-session-plugin-idea-system
   completion_evidence:
   - plugins/idea-realization/scripts/ideas.py
@@ -14650,8 +14649,11 @@ items:
   - plugins/idea-realization/test/test_render_ideas.py
   - plugins/idea-realization/test/test_vocabulary.py
   - docs/03-sessions/SESS-2026-09-25-03-plugin-idea-system.md
-  result: 'Interim, before review: plugins/idea-realization pytest: 177 passed; claude plugin validate
-    --strict: passed; check_no_private_content: OK; uv run python -m src.governance: OK.'
+  result: 'plugins/idea-realization pytest: 313 passed; claude plugin validate --strict: passed; uv run
+    pytest: 1115 passed; uv run python -m src.governance: OK; ruff and mypy src/ clean, after rebase on dev
+    2a99a34 and re-run independently by the Session Manager. Independent demo-adversary review found all
+    five acceptance conditions met; its should-fix fixed, its note accepted. The rest of the review was
+    dropped by the owner; the session record lists what went unreviewed. Merged with the owner''s approval.'
 - id: phase-plug-03
   title: The partition sweep with its second audit unblocked
   plan: doc-idea-realization-plugin
