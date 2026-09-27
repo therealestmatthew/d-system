@@ -371,7 +371,7 @@ The partition-ideas skill runs every step of a sweep through this script, so no 
 a command typed out by hand. The subcommands, in the order a sweep uses them:
 
     idea_corpus.py locate                       # where the sweep's files live; exit 1 if unsafe
-    idea_corpus.py start                        # resume a sweep in progress, or move an old one aside
+    idea_corpus.py start                        # resume a sweep, or move an earlier one aside
     idea_corpus.py build [--status open,triaged] [--seed N] [--exclude ids.txt] [--stats]
     idea_corpus.py prompt R1                    # one pack section, filled in, saved as sent
     idea_corpus.py report R1 --file reply.md    # write an agent's returned report, stamped
