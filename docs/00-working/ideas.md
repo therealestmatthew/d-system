@@ -1756,6 +1756,8 @@ PROPOSED LINK: 000038 --relates_to--> 000047 (both establish standards for requi
 **Links**
 
 - relates_to → `000047`
+- relates_to ← `000502`
+- relates_to ← `000503`
 
 ---
 
@@ -2969,6 +2971,7 @@ The body raises a backfill question for ~86 existing ideas. PLAN-016 (`phase-ide
 - relates_to → `000032`
 - extended_by ← `000062`
 - relates_to ← `000063`
+- relates_to ← `000504`
 
 ---
 
@@ -20363,6 +20366,7 @@ As given: "Great, please make a note as well that I would like some better way t
 - relates_to ← `000421`
 - relates_to ← `000425`
 - relates_to ← `000426`
+- relates_to ← `000503`
 
 ---
 
@@ -21116,6 +21120,7 @@ PROPOSED LINK: this idea --relates_to--> 000444 (review every sys-* tag). Weak f
 
 - relates_to → `000163`
 - relates_to ← `000454`
+- relates_to ← `000504`
 
 ---
 
@@ -22282,6 +22287,8 @@ The owner's rulings on it are recorded as findings on this idea. It is the first
 - relates_to → `None`
 - relates_to → `000492`
 - relates_to ← `000501`
+- relates_to ← `000502`
+- relates_to ← `000505`
 
 ---
 
@@ -22297,3 +22304,73 @@ Recorded as given: the ask names old plan files, and its stated goal names gover
 
 - relates_to → `000500`
 - relates_to → `None`
+- relates_to ← `000505`
+
+---
+
+## 000502 · Formalize the requirements generation process: are requirements created from ideas, or independently of any idea?
+
+**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager, as given: "We need to formalize the requirements generation process. Do we create requirements from ideas or can they be independently created without an associated idea?"
+
+Related: 000038 (formalize the requirements-vs-plans process and design), 000500 (end-to-end planning protocol document, whose rulings put the requirement first).
+
+**Links**
+
+- relates_to → `000038`
+- relates_to → `000500`
+- relates_to ← `000503`
+- relates_to ← `000504`
+- relates_to ← `000505`
+
+---
+
+## 000503 · Idea backfill: where else to backfill ideas from, what the process is, and whether to flag backfilled ideas
+
+**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager, as given: "We have discussed backfilling ideas from plans that existed prior to the idea system existing, but we maybe need to consider where else makes sense to backfill ideas from and what does that process look like? Do we include a flag to signify that ideas were backfilled instead of existing as a generative seed first? Maybe that gives us some insight into what was done without formally exploring the fundamental concepts underlying the build or plans or other docs."
+
+What Ideation found when recording (read-only): no idea in the log records the earlier discussion of backfilling ideas from pre-idea plans. The backfills that exist are different: PLAN-016's one-time migrator moved the old ideas.md entries into the log, and phase-idg-13 and phase-idg-15 to -18 (PLAN-029) backfill existing ideas into the new terminal states. Related: 000038 (which asks whether plans without requirements need backfilling) and 000424 (an explorable representation of what has been built).
+
+**Links**
+
+- relates_to → `000038`
+- relates_to → `000424`
+- relates_to → `000502`
+
+---
+
+## 000504 · Which types of ideas are eligible for which escalations, protocols and processes
+
+**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager, as given: "building on the idea classification, tagging, etc. We need to figure out which types of ideas are eligible for different kinds of escalation, protocols, processes that build upon them (like, some ideas are just a simple question that requires an answer. Others represent complex systems that need to be decomposed into smaller ideas and those may yield requirements, plans, actual build and so on.)"
+
+Related: ARCH-005 (idea node classification: record kinds and the axes), 000452 (update the schema, writer and processes for the three-axis classification), 000061 (classify idea nodes by type), 000500 (planning protocol).
+
+**Links**
+
+- relates_to → `None`
+- relates_to → `000452`
+- relates_to → `000061`
+- relates_to → `000502`
+
+---
+
+## 000505 · Re-investigate the anatomy of a plan and of a plan folder: decisions kept apart from the plan, every plan in a folder, and where prompt packs live
+
+**Created 2026-09-27T16:36:18-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager, as given: "we need to reinvestigate the anatomy of a plan that we created and look at the anatomy of a plan folder ... Should we have a separate document just to hold the decisions for the plan and should all plans be in a folder? No free form plan files or even if the plan is a single file to start, should it still be in a folder? The decision should be kept separate from the plan. So we can trace back to them, but the specific decisions and reasoning is only necessary for auditing, not for actually planning. We might need a separate file or folder for the various prompt packs. Do we put all of this in the plan folder? I think it's currently scattered throughout the repository. Maybe some more investigating to do here."
+
+State when recorded (read-only, dev): five plans are folders today (PLAN-003, PLAN-017, PLAN-023, PLAN-048, PLAN-050); the rest are single files in docs/01-plans/. phase-idg-11 (define where a promoted plan lives before it earns a code; PLAN-029) is queued, and its decision ADR-019 (promoted-plan staging) is reserved in the catalog, not yet written. Related: 000501 (archive one-time plans and prompts), 000500 (planning protocol document), GOV-008 (prompt pack protocol), GOV-010 (plan quality standard, which puts decisions in plans).
+
+**Links**
+
+- relates_to → `000501`
+- relates_to → `000500`
+- relates_to → `None`
+- relates_to → `None`
+- relates_to → `000502`
