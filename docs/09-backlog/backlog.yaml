@@ -14973,6 +14973,7 @@ items:
   - plugins/idea-realization/docs/reporting.md
   - plugins/idea-realization/test/test_no_history.py
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-trace.md
+  - plugins/idea-realization/docs/vocabulary.md
   next_action: Waits for phase-plug-04 and phase-plug-06. Start from
     _working/session-manager/plugin-analysis/05-governance-documents.md sections 1 and 5; families
     A, B and C are this phase.
