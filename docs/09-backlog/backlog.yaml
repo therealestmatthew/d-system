@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-03
 - phase-plug-09
 - phase-plug-08
 - phase-idg-19
@@ -14661,7 +14660,7 @@ items:
   systems:
   - sys-plugin-partition
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-builder
   priority: 2
   session_budget: 1
@@ -14704,9 +14703,21 @@ items:
   - plugins/idea-realization/README.md
   - plugins/idea-realization/test/test_paths.py
   - plugins/idea-realization/docs/repository-layout.md
-  next_action: Built on agent/phase-plug-03 and verified; every acceptance condition met at the
-    close checkpoint. Waits for the owner's merge approval, then the completion edit on dev.
+  next_action: Complete. phase-plug-08 runs a sweep end to end in the scratch repository.
   session: doc-session-plugin-partition-sweep
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-26-08-plugin-partition-sweep.md
+  - plugins/idea-realization/scripts/idea_corpus.py
+  - plugins/idea-realization/skills/partition-ideas/SKILL.md
+  - plugins/idea-realization/docs/partition-pack.md
+  - plugins/idea-realization/schemas/idea-partition-record.schema.json
+  - plugins/idea-realization/test/test_partition.py
+  result: 'Plugin suite 496 passed (after rebase onto plug-07 and plug-09 widen); claude plugin validate
+    --strict passed; test_no_history over the plugin docs passed; check_no_private_content OK; governance
+    OK; repo 1115 passed, ruff and mypy src/ clean; re-run independently by the Session Manager. The
+    independent demo-adversary review found one blocker (a staging directory outside any checkout passed
+    the gitignore guard), fixed in the branch and re-checked by the same reviewer; all four acceptance
+    conditions met. Merged with the owner''s approval.'
 - id: phase-plug-04
   title: Backlog check and ready report, plus the session-start, checkpoint and session-close skills
   plan: doc-idea-realization-plugin
