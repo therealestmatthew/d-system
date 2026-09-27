@@ -46,7 +46,7 @@ their length.
 
 1. Dispatch families D, E and F in parallel, E with part one's trace table attached.
 2. Write the nine documents named in the backlog entry.
-3. Write `PLAN-048.09-trace.md`.
+3. Write `PLAN-048.11-absolutes-two-trace.md`.
 
 Prerequisite: `phase-plug-07`.
 

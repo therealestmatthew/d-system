@@ -15057,6 +15057,7 @@ items:
   - doc-idea-realization-plugin-requirements
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-absolute-documents-two
+  - doc-idea-realization-plugin-absolutes-two-trace
   systems:
   - sys-plugin-absolutes
   owner: repository-owner

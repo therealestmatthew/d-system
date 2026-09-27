@@ -150,6 +150,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.08 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.08-end-to-end.md |
 | PLAN-048.09 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md |
 | PLAN-048.10 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.10-absolutes-trace.md |
+| PLAN-048.11 | plan | approved | repository-owner | docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.11-absolutes-two-trace.md |
 | PLAN-050 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050-overview.md |
 | PLAN-050.01 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.01-system-inventory.md |
 | PLAN-050.02 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.02-prompt-classification-rubric.md |
@@ -470,6 +471,7 @@ CI regenerates it and fails on any difference.
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
 | PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 0 | 1 | 0 | agent-builder-a |
 | PLAN-048.10 | doc-idea-realization-plugin-absolutes-trace | approved | 0 | 0 | 1 | agent-builder-a |
+| PLAN-048.11 | doc-idea-realization-plugin-absolutes-two-trace | approved | 0 | 1 | 0 | agent-builder-a |
 | PLAN-050 | doc-system-boundary-study | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.02 | doc-system-boundary-study-prompt-rubric | draft | 0 | 0 | 2 | agent-codex-boundary-study |
@@ -488,4 +490,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-386 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 78, prompt: 40, requirement: 32, session: 165.
+387 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 79, prompt: 40, requirement: 32, session: 165.
