@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-06
 - phase-plug-03
 - phase-plug-07
 - phase-plug-09
@@ -14862,7 +14861,7 @@ items:
   systems:
   - sys-plugin-generators
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   session: doc-session-plugin-generators-layout
   priority: 2
@@ -14908,9 +14907,22 @@ items:
   - plugins/idea-realization/test/test_generate_tool_docs.py
   - plugins/idea-realization/test/test_generate_workflows.py
   - plugins/idea-realization/test/test_templates.py
-  next_action: Every acceptance condition is met on agent/phase-plug-06 (SESS-2026-09-25-06); awaiting
-    the independent review's findings and the owner's merge approval, after which the completion edit
-    is made on dev.
+  next_action: Complete. Any later phase that adds a script under plugins/idea-realization/scripts/ regenerates
+    plugins/idea-realization/docs/tools.md with the command in its header.
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-25-06-plugin-generators-layout.md
+  - plugins/idea-realization/scripts/generate_tool_docs.py
+  - plugins/idea-realization/scripts/generate_workflows.py
+  - plugins/idea-realization/scripts/render_template.py
+  - plugins/idea-realization/docs/tools.md
+  - plugins/idea-realization/test/test_generate_tool_docs.py
+  - plugins/idea-realization/test/test_templates.py
+  result: 'Plugin suite 466 passed; claude plugin validate --strict passed; check_no_private_content OK;
+    governance OK; repo 1115 passed, ruff and mypy src/ clean; re-run independently by the Session
+    Manager at the rebased tip. Independent demo-adversary review found all three acceptance conditions
+    met; F1 (AGENTS template beyond the portable rules, claiming unbuilt behaviour) and F2 (header
+    regeneration command not runnable) fixed with tests. docs/tools.md regenerated after the peer
+    phases merged; it names all 17 scripts but paths.py.'
 - id: phase-plug-07
   title: Governance documents as absolutes, part one — core protocol, codes, reporting, and the ledger triage
   plan: doc-idea-realization-plugin
