@@ -5,7 +5,6 @@ max_active: 4
 next_up:
 - phase-grd-02
 - phase-plug-03
-- phase-plug-07
 - phase-plug-09
 - phase-plug-08
 - phase-idg-19
@@ -14940,8 +14939,9 @@ items:
   systems:
   - sys-plugin-absolutes
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
+  session: doc-session-plugin-absolutes-part-one
   priority: 2
   session_budget: 1
   depends_on:
@@ -14980,9 +14980,21 @@ items:
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.10-absolutes-trace.md
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md
   - plugins/idea-realization/docs/vocabulary.md
-  next_action: Every acceptance condition is met and the independent review is recorded in
-    SESS-2026-09-26-09. Waits for the owner-approved merge, then the completion edit on the
-    integration branch.
+  next_action: Complete. phase-plug-09 reads the ledger triage in PLAN-048.10 for families E and F
+    instead of re-dispatching family C.
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-26-09-plugin-absolutes-part-one.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.10-absolutes-trace.md
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/backlog-protocol.md
+  - plugins/idea-realization/docs/document-codes.md
+  - plugins/idea-realization/docs/reporting.md
+  - plugins/idea-realization/test/test_no_history.py
+  result: 'Plugin suite 472 passed; claude plugin validate --strict passed; check_no_private_content OK
+    (branch diff also scanned against the portfolio identifiers: 0 hits); governance OK; repo 1115 passed,
+    ruff and mypy src/ clean; re-run independently by the Session Manager. Two independent demo-adversary
+    reviews found all three acceptance conditions met; the one finding (catalog freshness masked by a
+    known governance error) fixed by the widen and rebase.'
 - id: phase-plug-08
   title: End-to-end exercise in a scratch repository, install documentation, and handover
   plan: doc-idea-realization-plugin
