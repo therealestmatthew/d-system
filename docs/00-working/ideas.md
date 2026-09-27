@@ -21296,3 +21296,17 @@ Reported by Session 1 - Builder A.
 tools/generate_ideas_md.py renders every link as its `target`, so a phase-idg-01 document link (target_code, target null) would render as `None` in docs/00-working/ideas.md, and classification and closes_with are not rendered at all.
 
 Reported by Session 1 - Builder A.
+
+---
+
+## 000466 · Make the sessions' level of autonomy configurable through a referenced autonomy configuration file
+
+**Created 2026-09-26T21:17:37-04:00 · Status: `open`**
+
+Owner, 2026-09-26, at the safe-point clear of the plugin build's Session Manager session: "make configurable the level of autonomy of these sessions. For example, the standard right now requires me to stop and answer questions and approve merges. But we have done overnight sessions where we front-load the questions and backlog the decisions for review when I'm available. So rather than having to explain that every time, we would need to make it configurable, and then reference that user-agent autonomy configuration file."
+
+What exists today: GOV-017's default is owner-in-the-loop — the owner approves every claim assignment, every merge (relayed as GRANTED merge), and answers AskUserQuestion at each decision point. The overnight mode has been run by hand: the owner front-loads answers and a batch is pre-authorized (the board's "Overnight authority" line, the batch opening packs), with decisions queued for review when the owner returns. Each time, the Session Manager and the sessions have to be told which mode applies, and the starters and briefs are edited by hand to say so. Conditional merge grants ("merge once rebased and fully green on the SM's re-run; anything else comes back to the owner") were used on 2026-09-25/26 as a middle setting, again stated case by case.
+
+What the idea asks for: one configuration file, owned by the owner and referenced by AGENTS.md or GOV-017 and by the Session Manager's kickoff, that states the autonomy level in force and what each level permits. Candidate axes: who approves a claim assignment (owner per phase, owner per batch, coordinator); who approves a merge (owner per merge, conditional grant on green gates, coordinator); how questions are handled (stop and ask, batch and continue on a stated default, decide and log for review); what is never delegated regardless of level (the owner-reserved list in GOV-014: AGENTS.md and CLAUDE.md edits, _private, deletions under _working, next_up ranking). Each setting names the record that captures a decision taken under it so the owner can review afterwards. Starters and briefs would cite the file instead of restating the mode; a change of level would be one edit, dated, rather than a re-explanation.
+
+Unresolved: whether this is a governance document (a GOV-* with the levels as absolutes) plus a small YAML the check validates, or a section in GOV-017; whether the Session Manager reads it at kickoff automatically; how a level change mid-run is communicated to sessions already oriented; whether the idea-realization plugin (PLAN-048) ships the same mechanism for target repositories, which would make it part of the absolute governance documents in phase-plug-07/09.
