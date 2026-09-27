@@ -26,7 +26,7 @@ commits past the original base.
 ## Verification
 
 Run in the worktree `../d-system-worktrees/phase-grd-02` on `agent/phase-grd-02`, after the review
-fix and the last 2026-09-27 rebase, onto `dev` at `16b3331`.
+fix and the last 2026-09-27 rebase, onto `dev` at `61bc946`.
 
 ```text
 $ uv run pytest test/test_check_dev_ci.py
@@ -57,9 +57,9 @@ exit 1
 
 ```text
 $ uv run python -m src.governance --catalog
-393 documents — adr: 21, architecture: 12, governance: 17, operation: 22, plan: 80, prompt: 40, requirement: 33, session: 168.
+397 documents — adr: 22, architecture: 12, governance: 17, operation: 22, plan: 81, prompt: 41, requirement: 34, session: 168.
 $ uv run python -m src.governance
-Governance OK: 43 systems, 393 documents, 34 memories, 326 backlog phases
+Governance OK: 43 systems, 397 documents, 34 memories, 332 backlog phases
 $ git diff --exit-code docs/08-governance/catalog.md
 exit 0
 $ uv run ruff check src/ test/ tools/check_dev_ci.py
@@ -76,7 +76,7 @@ Full suite, not in the verification list but run for the merge gate:
 
 ```text
 $ uv run pytest
-1147 passed, 1 warning
+1152 passed, 1 warning
 ```
 
 ## Acceptance
