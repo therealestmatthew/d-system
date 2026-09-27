@@ -13273,7 +13273,7 @@ items:
   systems:
   - sys-realization
   owner: repository-owner
-  status: queued
+  status: blocked
   priority: 2
   session_budget: 1
   depends_on:
@@ -13300,6 +13300,10 @@ items:
   next_action: 'The switch location is ruled in PLAN-039.01 SS9: _working/orchestrator-halt, outside
     regenerable data/, checked by the dispatch path immediately before every dispatch. Build the
     enforcement and its tests; the halt and resume-dispatch verbs ship with phase-irs-04.'
+  blocked_reason: Owner hold, in force when the owner split this phase out of batch-003 into
+    batch-007 on 2026-09-27. A separate owner ruling requires its budgets to come from measured
+    baselines only.
+  resume_when: The owner lifts the hold. Then return the phase to queued and open batch-007.
 - id: phase-irs-12
   title: End-to-end trace and metrics baselines
   plan: doc-idea-realization-system-plan

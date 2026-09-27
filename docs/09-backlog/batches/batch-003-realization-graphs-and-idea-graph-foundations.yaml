@@ -32,8 +32,9 @@ verified:
 stages:
 - stage: 1
   parallel: false
-  rationale: The only phase left after the 2026-09-27 split. It was cut into stage 2 by its collision
-    with phase-idg-10, which completed outside the batch.
+  rationale: The only phase and the only stage left after the 2026-09-27 split. Before the split it
+    sat in stage 2 because of its collision with phase-idg-10, which completed outside the batch and
+    is no longer a member.
   phases:
   - id: phase-idg-11
     title: Define where a promoted plan lives before it earns a code

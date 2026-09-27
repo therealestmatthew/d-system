@@ -6,16 +6,20 @@ title: The mandatory-requirement ruling, the idea planner agent, and the first t
 status: queued
 sequence: 4
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-09-27'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 4, unchanged in membership, carried over on 2026-09-22 and
   re-checked the same day: every phase still queued and unclaimed, no edge pointing later in the global
-  order.'
+  order. Re-checked on 2026-09-27 with batch-003''s split, membership unchanged: phase-irs-06 had been
+  completed outside the batch (see notes).'
 verified:
-  date: '2026-09-22'
-  method: 'Script over docs/09-backlog/backlog.yaml: every phase id resolved; every depends_on edge
-    resolved to an earlier-or-same position in the global batch order or to an external phase confirmed
-    complete; stage boundaries derived from shared systems and prefix-overlapping deliverables.'
+  date: '2026-09-27'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 21a4943, using collisions() from
+    src/governance/backlog.py: every phase id resolved; every in-batch depends_on edge points to an
+    earlier stage; every other edge resolves to a phase listed in external_depends_on. phase-idg-10
+    and phase-irs-03 are complete, and phase-idg-11 is queued in batch-003, which runs earlier
+    (sequence 3). Every stage holds one phase. phase-dgov-01, phase-idg-12, phase-irs-05 and
+    phase-irs-07 are queued and unclaimed; phase-irs-06 is complete (agent-builder-a).'
 external_depends_on:
 - id: phase-idg-10
   expected_status: complete
@@ -91,4 +95,8 @@ stages:
     - phase-idg-12
     - phase-irs-05
     - phase-irs-06
-notes: 'Fully serial: every phase either depends on its predecessor or collides with it on systems.'
+notes: 'Fully serial: every phase either depends on its predecessor or collides with it on systems.
+  phase-irs-06 (Three-altitude review procedure with the interim adversarial engine) was completed
+  outside this batch by agent-builder-a in f6216e9 on 2026-09-23. It stays in stage 4 because the
+  composition is unchanged; PROMPT-036 skips and reports it when the batch runs (recorded in prose
+  because the schema has no field for it; owner ruling 2026-09-27).'
