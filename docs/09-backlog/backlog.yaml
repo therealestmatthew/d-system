@@ -14701,6 +14701,10 @@ items:
   - plugins/idea-realization/schemas/idea-partition-record.schema.json
   - plugins/idea-realization/test/test_partition.py
   - plugins/idea-realization/docs/tools.md
+  - plugins/idea-realization/.claude-plugin/plugin.json
+  - plugins/idea-realization/README.md
+  - plugins/idea-realization/test/test_paths.py
+  - plugins/idea-realization/docs/repository-layout.md
   next_action: Waits for phase-plug-02. Read _working/session-manager/plugin-analysis/02-partition.md
     section 2 for the sequence and section 6 for the audit-2 block. May run alongside phase-plug-04
     and phase-plug-06.
