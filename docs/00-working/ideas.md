@@ -22097,6 +22097,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running l
 - relates_to → `000492`
 - relates_to → `000106`
 - relates_to ← `000497`
+- relates_to ← `000507`
 
 ---
 
@@ -22221,6 +22222,7 @@ PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated page
 - relates_to → `000495`
 - relates_to → `000300`
 - relates_to → `000301`
+- relates_to ← `000507`
 
 ---
 
@@ -22396,3 +22398,37 @@ Related: 000432 (other providers' models per role), 000430 (second-provider mode
 - relates_to → `000430`
 - relates_to → `000359`
 - relates_to → `None`
+
+---
+
+## 000507 · dashboard-builder subagent: a live HTML progress dashboard for every long agent task
+
+**Created 2026-09-27T18:14:06-04:00 · Status: `open`**
+
+Owner, 2026-09-27: "Steal this idea I found from an X post:"
+
+The post, as given:
+
+Every time you let Opus 5.5 run a long task on its own, have it vibe-code a quick HTML dashboard like this first.
+
+Then give it a subagent that only builds dashboards:
+→ Name it dashboard-builder, set its effort to medium, and preload a design skill
+→ The first time, it asks what style you like and saves it to memory. After that, every dashboard fits your taste and the task at hand
+→ Call it before every long task. It builds the dashboard in the background in about two minutes, and the main session keeps coding on high without stopping
+→ The dashboard shows four things: task progress, what's stuck, questions waiting on you, and what it'll do by default if you don't answer
+
+Send this prompt to Claude Code 👇
+
+"Set up a subagent that only builds progress dashboards:
+
+1. Create dashboard-builder in ~/.claude/agents: model: opus, effort: medium, memory: user. Preload the design skills I have installed (for example impeccable). It can only read and write the .dashboard/ folder and its own memory.
+2. The first time, it asks me what style I like: dark or light, dense or airy, and one accent color. It saves my answer to memory and follows it every time. Pick the panels for the current task; don't use a template.
+3. The dashboard is one HTML file showing tasks and their status, questions waiting for me with the default action, the latest deliverables, and anything stuck. Use the real clock for every time. It opens with a double-click and refreshes itself every 10 seconds.
+4. Add a rule to ~/.claude/CLAUDE.md: for any task with more than 5 steps or that should take longer than 30 minutes, have dashboard-builder set up the dashboard before starting; update it after every step; when you need a decision from me, add it to the questions list and keep going with the default.
+
+Show me the contents of the files you'll create or change, then explain the whole flow in words a 10-year-old could follow. Don't write anything until I confirm."
+
+**Links**
+
+- relates_to → `000497`
+- relates_to → `000491`
