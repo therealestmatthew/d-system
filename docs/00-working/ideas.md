@@ -21835,6 +21835,16 @@ Relayed by the Session Manager, 2026-09-27; the owner asked for new ideas to be 
 
 The question decides the severity of audit findings F1 (configured paths can write outside the repository) and F2 (a saved plugin option can inject shell commands). Both are rated Major because only the person's own saved options are shown to reach them; if a repository's committed project-scoped settings can set pluginConfigs, whoever can commit to a repository can set them, and both become Blockers. The validation could not settle it: a string search of the Claude Code 2.1.280 binary shows pluginConfigs in a settings key set together with enabledPlugins and extraKnownMarketplaces, which does not show whether project scope is honoured (§3 item 2).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-27T15:21:42-04:00): Answered by the Scout (Session 4), 2026-09-27, relayed by the Session Manager. A committed .claude/settings.json cannot set pluginConfigs: since Claude Code v2.1.207, pluginConfigs is read only from user settings (~/.claude/settings.json), the --settings flag and managed settings; project (.claude/settings.json) and local (.claude/settings.local.json) entries are ignored, trusted or not. The installed version is 2.1.280. Primary sources in the report: the settings reference's pluginConfigs entry (Scope: User or managed; "a cloned repository must not be able to supply them"), the settings page, the 2.1.207 changelog entry, and the plugin manifest reference. None of the plugin's 11 options is marked sensitive, so all go through pluginConfigs. Result: audit findings F1 (configured paths escape the repository) and F2 (a saved option injects shell) stay Major; both fixes are still needed. Adjacent vector: a committed settings env can set IDEA_REALIZATION_* after the workspace is trusted (or at startup in -p mode), which paths.py prefers over the plugin option; this reaches F1 only, and crosses no new boundary because trusting a folder also enables its hooks. F2 is not reachable that way, since env values reach the process environment, not the skill text. No blocking owner question; the report describes an optional live confirmation that needs a settings change. Source: _working/session-manager/scout/pluginconfigs-project-scope.md (gitignored). Status unchanged.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -22071,6 +22081,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running l
 
 - relates_to → `000492`
 - relates_to → `000106`
+- relates_to ← `000497`
 
 ---
 
@@ -22089,6 +22100,7 @@ Batch anchor for the owner's 2026-09-27 artifact asks: the artifact registry, th
 - relates_to ← `000493`
 - relates_to ← `000494`
 - relates_to ← `000495`
+- relates_to ← `000497`
 
 ---
 
@@ -22103,6 +22115,7 @@ Close to the running list of active HTML artifacts recorded in the same batch; k
 **Links**
 
 - relates_to → `000492`
+- relates_to ← `000497`
 
 ---
 
@@ -22115,6 +22128,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We maybe need a 
 **Links**
 
 - relates_to → `000492`
+- relates_to ← `000497`
 
 ---
 
@@ -22127,6 +22141,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Maybe another ag
 **Links**
 
 - relates_to → `000492`
+- relates_to ← `000497`
 
 ---
 
@@ -22143,3 +22158,69 @@ State when recorded: REQ-034 and PLAN-051 (session autonomy configuration, with 
 **Links**
 
 - extends → `000466`
+
+---
+
+## 000497 · A monitoring artifact: one place the owner can reference everything they need to know about the repository's state
+
+**Created 2026-09-27T15:21:35-04:00 · Status: `triaged`**
+
+Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "Things are evolving so rapidly that I am struggling to keep up ... focus on building a monitoring artifact to track everything. Things I need to track that we should include, but are not limited to: ideas (summary of state of ideas in the fold including triaged vs open metrics, idea priority queue, etc.), active plans/phases/batches, backlog, next_up, other plans, plan metrics, governance docs, maybe more."
+
+The process the owner wants, as relayed: triage it immediately, then prompt-plan it, then review it adversarially, then expand it, then iterate until it is a highly functional monitoring system; agents investigate what is missing and the best way to display the information. The owner: "likely related to the other 'artifact' ideas I recently created" (000492 and its batch).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-27T15:23:50-04:00): Idea 000497 asks for a unified monitoring artifact that consolidates repository state the owner needs to reference: idea metrics (triaged vs open, priority queue), active plans/phases/batches, backlog, next_up, other plans, plan metrics, and governance docs.
+
+Most of the pieces 000497 names already exist, but scattered across multiple surfaces:
+- **Idea metrics and priority queue:** The _public/overview/index.html page (generated by PLAN-021's phase-demo-04) displays idea funnel counts and rates by status. The priority queue is listed explicitly in docs/00-working/ideas.md, regenerated by `uv run python tools/generate_ideas_md.py`.
+- **Active plans/phases/batches and plan metrics:** The `uv run python -m src.governance --ready` command (per GOV-002) lists phases by status (active, ready, waiting, complete, deferred, blocked), with priority and queue position. The same command shows active plans.
+- **Backlog, next_up, other plans:** The governance --ready command shows next_up/queued-to-front; docs/00-working/ideas.md lists all ideas; docs/08-governance/catalog.md lists all governed documents (plans, requirements, ADRs, architecture, governance docs, operations); the workbench frontend provides explorers for ideas and backlog phases.
+- **Plan metrics:** The _public/overview/index.html shows cycle time between statuses, annotation coverage, link distribution, throughput by day, and age of open ideas, plus backlog phase counts by status (all via tools/overview_metrics.py).
+- **Governance docs:** docs/08-governance/catalog.md is the authoritative index (code, kind, status, owner, path) for all governed documents.
+
+Where 000497 adds value: these surfaces are consulted separately — one for idea status, another for the priority queue, another for plans, another for backlog/next_up. 000497 proposes consolidating them into one place the owner can reference to understand the whole repository state at once. The existing _public/overview/index.html page is a step toward this (it shows idea and backlog metrics), but does not yet include governance docs, priority queue as a ranked list, next_up, or active plans — only the backlog phase status breakdown, not which phases are active or next.
+
+Related: 000491 (running list of active HTML artifacts), 000492 (reference artifacts for major areas), 000493 (artifact tracking all artifacts and maintenance protocol) — all already linked and part of the same artifact-consolidation batch. 000300 (auto-regenerated idea log and priority queue page) and 000301 (auto-regenerated backlog and next_up page) are the closest architectural matches: they propose pages that consolidate exactly what 000497 names as needed (priority queue, backlog, next_up). The owner's request for a "monitoring artifact" is consistent with the artifact-batch intent, but 000300 and 000301 specifically address the page-generation side of what the owner is asking for.
+
+PLAN-021 (live demo stage and overview build) and PLAN-036 (HTML generation design system) provide the infrastructure (templates, generation tools, skills) that such an artifact would likely use. No existing plan covers consolidating all eight items the owner named into one reference. The System Monitor agent (000448) proposes an agent for real-time dashboard updates; 000497 is the monitoring artifact that agent might maintain.
+
+PROPOSED LINK: 000497 --relates_to--> 000300 (both ask for auto-regenerated pages that consolidate idea log state and priority queue)
+PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated pages that consolidate backlog and next_up)
+
+</details>
+
+**Links**
+
+- relates_to → `000492`
+- relates_to → `000491`
+- relates_to → `000493`
+- relates_to → `000494`
+- relates_to → `000495`
+
+---
+
+## 000498 · A conversational guidelines document for the rules on how agents output and present words to the owner
+
+**Created 2026-09-27T15:21:35-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "need to create conversational guidelines doc for rules in how you output and present words to me."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-27T15:21:42-04:00): Relay note from the Session Manager, recorded by Ideation: GOV-006 (How agents report to the owner, docs/08-governance/GOV-006-conversation-guidelines.md) exists and covers part of this: naming things before citing codes, showing output that carries information, not blocking on questions that can wait, capturing asks as ideas, and saying plainly when a correction is a correction. It is imported into every Claude Code session from CLAUDE.md and is kept short by design. Related, not merged. Other places that carry presentation rules today: CLAUDE.md's "Important Writing Style" section (no mannered prose), and the plugin's docs/reporting.md, the portable form of GOV-006 (see 000472, nothing loads it at session start in a target repository).
+
+</details>
+
+**Links**
+
+- relates_to → `None`
