@@ -68,7 +68,8 @@ the failure and nothing else.
 
 While sessions run under the plugin's `docs/multi-session.md`, the tests in this step run after
 step 4, in the new worktree, never in the primary checkout. If they fail there, hand the phase back
-as an interrupted phase: return it to queued with an exact `next_action`, and remove the worktree.
+as an interrupted phase: return it to queued with an exact `next_action`, inside a `claim` turn
+from the Session Manager, and remove the worktree.
 
 ## 2. Ask before the claim commit
 

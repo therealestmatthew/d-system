@@ -55,7 +55,7 @@ Roster
    Reading there is fine, including the plugin's check. Never write, commit, merge or switch
    branches there without a grant.
      send  TURN? <claim|idea|dryrun> <phase id>
-           (a claim or widening carries its catalog regeneration; dryrun = run a merged skill
+           (a claim, widening or release carries its catalog regeneration; dryrun = run a merged skill
            for evidence, ignored-path writes only, no commit; merges go through READY below)
      wait  GRANTED (or QUEUED <n>)
      do    only the stated purpose; leave `git status` clean
@@ -122,7 +122,8 @@ Do not pick work from the ready queue yourself. Wait for ASSIGN <phase-id> from 
 On ASSIGN:
 1. Run the session-start skill for that phase. Its owner-approval question before the claim still
    goes to the owner, as written. Skip its preflight tests in the primary checkout (contract item
-   9); run them in the worktree once created.
+   9); run them in the worktree once created. If they fail there, hand the phase back as
+   interrupted inside a TURN? claim.
 2. Make the claim commit (with its catalog regeneration) only inside a granted turn:
    TURN? claim <phase-id>.
 3. Build and verify in the worktree.
@@ -142,8 +143,8 @@ Reply with ACK now. Your first assignment follows after owner approval.
 ```text
 ROLE: <Standby Builder>. No claim slot until I send ASSIGN.
 
-While you wait: review the queued phases I name in REVIEW <phase-ids>, as the plugin's
-docs/plan-review.md section 4 describes. Write each review to
+While you wait: review the queued phases I name in REVIEW <phase-ids> at the phase altitude of
+the plugin's docs/plan-review.md section 3, with the backlog edits its section 4 allows. Write each review to
 <report directory>/reviews/<phase-id>.md instead of the review's own output path, and run no tests
 in the primary checkout (contract item 9). Anything that would reach <integration branch> goes
 through a worktree and READY.

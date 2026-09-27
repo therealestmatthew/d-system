@@ -27,7 +27,7 @@ phases.
 | Prompt Planner | meta | none | Writes the prompts the owner runs in execution sessions |
 | Batch Runner | execution | one at a time | Runs the coordinator through its batches one phase at a time (`coordinator.md`, `batches.md`) |
 | Builder | execution | one | Builds the phase the Session Manager assigns |
-| Standby Builder | execution | none until assigned | First in line for the next free slot; until then, reviews queued phases (`plan-review.md`, section 4) |
+| Standby Builder | execution | none until assigned | First in line for the next free slot; until then, reviews queued phases at the phase altitude (`plan-review.md`, section 3), with the backlog edits section 4 allows |
 | Scout | execution | none | Read-only: finds conflict-free candidate phases, reconnoitres batches, audits worktrees and branches |
 
 There is no reviewer session. Each build path's own independent review is the phase review
@@ -52,8 +52,8 @@ branch still passes after peers' merges.
 - Before granting a turn, the Session Manager confirms the checkout is on the integration branch
   and clean. After the holder reports, it confirms the commit landed and nothing else changed.
 - The turn purposes are the complete list of primary-checkout work while this protocol runs:
-  - `claim`: a claim, a widening of a phase's declarations, with the catalog regeneration each
-    forces;
+  - `claim`: a claim, a widening of a phase's declarations, or the release of a claim when a phase
+    is handed back as interrupted, with the catalog regeneration each forces;
   - `idea`: Ideation records waiting ideas, or the triage findings and moves for ideas the owner
     named, through the `idea` and `idea-triage` skills;
   - `dryrun`: a merged skill runs to gather a phase's acceptance evidence, writing only ignored
@@ -67,7 +67,8 @@ branch still passes after peers' merges.
 - While sessions run under this protocol, no session runs tests or rebuilds in the primary
   checkout. The preflight tests of the `backlog` and `session-start` skills, and a coordinator's,
   run in the session's worktree once it exists; a red preflight there hands the phase back as an
-  interrupted phase (`backlog-protocol.md`, section 11).
+  interrupted phase (`backlog-protocol.md`, section 11), inside a `claim` turn. The `backlog`
+  skill run on its own, with no worktree, skips the tests and says so.
 - One test run at a time per worktree.
 - The check is not a test run. It renders the catalog in memory and runs in the primary checkout,
   including after a completion edit.

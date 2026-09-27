@@ -373,7 +373,7 @@ G8, G9, G13, G16 and G3 abbreviate the four sources and the decision ledger. Rul
 3. **Ports.** G8:125 says "fixed ports", G13:107-108 says "explicitly chosen", and the plugin says "a free port chosen explicitly" (protocol.md §11). The plugin wording wins, by pointer.
 4. **C20 against the plugin.** P:skills/session-start/SKILL.md:69-80 says "Stop until the answer comes back" with no batch exception. coordinator.md states C20 as the named displacement. session-start does not mention it; a pointer there is outside this family.
 5. **Validator inputs against the session-close reviewer.** D24 forbids giving a validator the creator's rationale, but backlog-protocol.md §10 gives the completion reviewer "the record", which contains the session's Decisions. These are different roles, so D24 stays scoped to creator/validator pairs. The plugin's inconsistency is flagged, not resolved here.
-6. **Where the coordinator's completion commit lands.** G13:111-112 puts claim and completion commits in the primary checkout. protocol.md §11 lists only the claim commit with its catalog regeneration and the fast-forward, yet backlog-protocol.md §10 and session-close step 7 put the completion edit "on the integration branch". D92 says "on the integration branch" and does not enumerate the checkout. The §11 enumeration omits the completion commit; that plugin gap is outside this family.
+6. **Where the coordinator's completion commit lands.** G13:111-112 puts claim and completion commits in the primary checkout. protocol.md §11 lists only the claim commit with its catalog regeneration and the fast-forward, yet backlog-protocol.md §10 and session-close step 7 put the completion edit "on the integration branch". D92 says "on the integration branch" and does not enumerate the checkout. The §11 enumeration omitted the completion commit; this phase adds it to protocol.md §11 (see family F conflict 3).
 7. **Batch status on the integration branch against protocol.md §11.** Not shipped (section 2).
 8. **The completion trap in the plugin.** G13:63 assumes completion needs a human. The plugin lets a coordinator complete via session-close, but condition 3 still needs the owner's integration yes for each phase. D81-D83 are worded so the trap holds whenever the owner is absent from integration.
 9. **`max_active` defaults to 1** (backlog-protocol.md §2). D82 and D126 make every stage serial at the default. That is correct as stated; no change.
@@ -384,7 +384,7 @@ G8, G9, G13, G16 and G3 abbreviate the four sources and the decision ledger. Rul
     - All four destinations are confirmed as coordinator.md, and C14's as prompt-packs.md. Each C-id appears once.
 11. **No tracker location.** G13:113 calls the tracker gitignored working state, but the plugin configures no tracker path. `staging_dir` is defined for partition drafts and corpora, so pointing the tracker there would reword a mechanism. D110 is conduct; a tracker location option could be added later.
 12. **Rules that appear in several sources.** Selective injection, agent hygiene and cost protocols appear in G8, G9 and G13. Each is stated once (prompt-packs.md D21, D24-D28), and the other two documents point to it and add only their own specifics.
-13. **Model names.** D26 and D66 name Haiku, Sonnet and Opus. They are kept because the plugin targets Claude Code. The alternative is tier wording ("the cheapest capable model / the standard model / the most capable model"), which is for the owner to choose.
+13. **Model names.** D26 and D66 name Haiku, Sonnet and Opus. The owner ruled for tier wording ("the cheapest capable model / the standard model / the most capable model"), which is what prompt-packs.md §3 and research-packs.md §3 ship; see "Owner rulings".
 14. **"Prefix-based" collision (G16:101).** The plugin's `path_conflict` compares path components, not raw strings. D128 says "path-component prefix", so `a/b` and `a/bc` do not collide.
 
 ## Family E: role contracts and review (GOV-014, GOV-018, PROMPT-038)
@@ -938,9 +938,9 @@ G is `docs/08-governance/GOV-017-multi-session-coordination-protocol.md`, M is
 | Shared contract | M:54-101 | `batch` turn purpose dropped (see below); gate stated generically (C31); clean-checkout confirmation stands in for the hook script; hook rule added to item 10 (F41) |
 | Batch Runner | M:105-125 | Batch-table status commit dropped |
 | Builder | M:127-149 | One text for every builder |
-| Standby Builder | M:151-165 | Review points to plan-review.md §4 |
+| Standby Builder | M:151-165 | Review method points to plan-review.md §3 (phase altitude), with §4's backlog edits |
 | Scout | M:167-185 | Unchanged apart from placeholders |
-| Ideation | M:187-209 | Triage limited to ideas the owner names (owner ruling) |
+| Ideation | M:187-209 | Triage limited to ideas the owner names (owner ruling); the read-only scouting that M:202-204 allows outside a turn is dropped, because the plugin's triage agent writes its own finding in the same dispatch |
 | Prompt Planner | M:211-226 | Prompt code made generic |
 
 ### Family F: not shipped
@@ -996,6 +996,12 @@ G is `docs/08-governance/GOV-017-multi-session-coordination-protocol.md`, M is
    triages only ideas the owner names.
 8. **Batch turn.** Family D found batch tables have no status fields in the plugin, so the `batch`
    turn purpose and C29.5 are not shipped; `NEXT-BATCH` stays as a message.
+9. **Releasing a claim.** The owner's ruling on C30 hands a phase back as interrupted when its
+   worktree preflight fails, which is a primary-checkout write. The `claim` turn purpose covers it
+   (a claim, a widening or a release), so `multi-session.md` §3's list stays complete; the
+   `session-start` skill and the Builder template say the release happens inside a `claim` turn.
+10. **The `backlog` skill on its own.** Under multi-session operation with no worktree, the skill
+    skips the tests and says so; `session-start` runs them in the new worktree.
 
 ## Ledger rules in part two
 
