@@ -50,6 +50,7 @@ Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZA
 | `triage_search` | `docs` |
 | `exempt_files` | none |
 | `staging_dir` | `.idea-realization/staging`, which must be gitignored |
+| `partitions_dir` | `ideas/partitions` |
 
 `uv run scripts/paths.py` prints every resolved value.
 

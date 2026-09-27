@@ -68,6 +68,12 @@
       "title": "Staging directory",
       "description": "Gitignored directory for partition drafts and corpora, relative to the repository root.",
       "default": ".idea-realization/staging"
+    },
+    "partitions_dir": {
+      "type": "string",
+      "title": "Partitions directory",
+      "description": "Directory the accepted idea partitions are copied into, relative to the repository root.",
+      "default": "ideas/partitions"
     }
   }
 }

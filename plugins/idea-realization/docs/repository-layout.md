@@ -14,7 +14,8 @@ The `scaffold` skill creates what each feature needs and never overwrites a file
 ├── ideas/
 │   ├── ideas.jsonl          idea log (ideas_path)
 │   ├── ideas.md             rendered view of the log (ideas_view_path)
-│   └── priority.yaml        ideas that jump the queue (priority_path)
+│   ├── priority.yaml        ideas that jump the queue (priority_path)
+│   └── partitions/          accepted idea partitions (partitions_dir)
 ├── backlog/
 │   └── backlog.yaml         phase catalog and lock table (backlog_path)
 ├── docs/                    document root (docs_root)
@@ -42,7 +43,10 @@ The `scaffold` skill creates what each feature needs and never overwrites a file
 **`ideas/`** — The idea log is append-only: every capture, status move, amendment, annotation and
 link is one event line, and the current state is replayed from them, so nothing is ever edited in
 place. The rendered view is generated from the log and never edited by hand. The priority file is
-the one hand-ordered list: ideas that should be looked at before the rest.
+the one hand-ordered list: ideas that should be looked at before the rest. `partitions/` holds
+each partition the owner accepted at the end of a partition sweep: its markdown and its JSON
+record, copied there from the staging directory so they can be committed. It is not under the
+document root, because a partition is not a governed document.
 
 **`backlog/backlog.yaml`** — The phase catalog. Each phase fits one session and declares the
 systems and paths it will touch; on the integration branch this file is also the lock table that
@@ -66,7 +70,8 @@ generated and never edited by hand.
 **`.idea-realization/`** — The plugin's own state in the repository. `install-state.json` records
 every file the scaffold wrote so the `doctor` skill can report drift. `schemas/` holds copies of
 the plugin's schemas for people and other tools; the plugin's scripts validate against their own.
-`staging/` holds partition drafts and is added to `.gitignore` only with the person's consent.
+`staging/` holds partition drafts and corpora and is added to `.gitignore` only with the person's
+consent. A partition sweep writes there in the primary checkout, where its subagents run.
 
 **The worktree directory** — Every session works in its own worktree on its own branch, outside the
 repository so no scanner or test run walks a second copy. Pre-merge code reservations live under
