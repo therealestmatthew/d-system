@@ -21310,3 +21310,37 @@ What exists today: GOV-017's default is owner-in-the-loop — the owner approves
 What the idea asks for: one configuration file, owned by the owner and referenced by AGENTS.md or GOV-017 and by the Session Manager's kickoff, that states the autonomy level in force and what each level permits. Candidate axes: who approves a claim assignment (owner per phase, owner per batch, coordinator); who approves a merge (owner per merge, conditional grant on green gates, coordinator); how questions are handled (stop and ask, batch and continue on a stated default, decide and log for review); what is never delegated regardless of level (the owner-reserved list in GOV-014: AGENTS.md and CLAUDE.md edits, _private, deletions under _working, next_up ranking). Each setting names the record that captures a decision taken under it so the owner can review afterwards. Starters and briefs would cite the file instead of restating the mode; a change of level would be one edit, dated, rather than a re-explanation.
 
 Unresolved: whether this is a governance document (a GOV-* with the levels as absolutes) plus a small YAML the check validates, or a section in GOV-017; whether the Session Manager reads it at kickoff automatically; how a level change mid-run is communicated to sessions already oriented; whether the idea-realization plugin (PLAN-048) ships the same mechanism for target repositories, which would make it part of the absolute governance documents in phase-plug-07/09.
+
+---
+
+## 000467 · AGENTS.md and GOV-014 still say only owner-invoked /session-close may mark a phase complete, contradicting GOV-003's coordinator-completion rule
+
+**Created 2026-09-26T22:33:47-04:00 · Status: `open`**
+
+AGENTS.md lines 178-180 say an agent may checkpoint progress but must not mark a phase complete: "only the owner-invoked review (e.g., /session-close) does that. An agent must never invoke final closure itself."
+
+GOV-014 (realization role contracts), lines 174-175, carries the same clause in a role's never-do list: "never mark its own phase complete — completion via /session-close is owner-reserved".
+
+Both contradict the repository-wide, standing rule recorded in GOV-003 lines 458-480, "Coordinator completion replaces owner-invoked /session-close, repository-wide" (owner decision, 2026-09-16). Under that rule a coordinator may mark a phase complete once every verification command has run green with its output recorded, an independent adversarial review has run with its findings fixed or explicitly accepted, and the branch has been integrated onto dev with the owner's approval.
+
+What it would touch: AGENTS.md (which needs the owner's explicit approval for any edit, per CLAUDE.md) and GOV-014. Both need an owner-approved amendment so they point at or agree with the GOV-003 rule.
+
+Unresolved: the replacement wording for each file, and whether GOV-014's never-do clause should keep a narrower prohibition (for example, a builder role must not complete its own phase even though a coordinator may).
+
+Reported by Session 1 - Builder A during phase-plug-07's ledger triage; recorded by the Ideation session.
+
+---
+
+## 000468 · GOV-002 cites a stale-claim recovery procedure in GOV-003 that has not been written (phase-conc-04 still queued)
+
+**Created 2026-09-26T22:33:48-04:00 · Status: `open`**
+
+GOV-002 (backlog protocol), lines 127-129, says: "The authorized recovery procedure that does release a stale claim is phase-conc-04's, written into GOV-003; it consumes this signal as evidence rather than re-deriving staleness."
+
+GOV-003 has no such entry. phase-conc-04 ("Write the claim-recovery procedure and record it in GOV-003", plan doc-concurrency-git-safety) is still queued, so GOV-002 describes the procedure as existing and points to a rule that does not exist yet. An agent that follows the pointer to recover a stale claim finds nothing.
+
+What it would touch: GOV-002's wording (make it say the procedure is planned, not written, until phase-conc-04 lands), or phase-conc-04 itself (do it, which makes the pointer true). Another backlog phase also defers to phase-conc-04's deliverables "where they exist" (backlog.yaml near line 12978), so the gap affects more than GOV-002.
+
+Unresolved: whether to fix the wording now or leave it and move phase-conc-04 up the queue.
+
+Reported by Session 1 - Builder A during phase-plug-07's ledger triage; recorded by the Ideation session.
