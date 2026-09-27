@@ -27,7 +27,7 @@ phases.
 | Prompt Planner | meta | none | Writes the prompts the owner runs in execution sessions |
 | Batch Runner | execution | one at a time | Runs the coordinator through its batches one phase at a time (`coordinator.md`, `batches.md`) |
 | Builder | execution | one | Builds the phase the Session Manager assigns |
-| Standby Builder | execution | none until assigned | First in line for the next free slot; until then, reviews queued phases at the phase altitude (`plan-review.md`, section 3), with the backlog edits section 4 allows |
+| Standby Builder | execution | none until assigned | First in line for the next free slot; until then, reviews queued phases against the phase-altitude checks (`plan-review.md`, section 3) and reports findings, writing no dispositions; section 4 bounds any backlog edit |
 | Scout | execution | none | Read-only: finds conflict-free candidate phases, reconnoitres batches, audits worktrees and branches |
 
 There is no reviewer session. Each build path's own independent review is the phase review

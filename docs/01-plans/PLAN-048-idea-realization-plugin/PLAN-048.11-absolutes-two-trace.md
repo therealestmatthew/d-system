@@ -1047,6 +1047,11 @@ exactly one of the nine documents, or is pointed to where part one placed it, or
   rationale) is not shipped, because the `session-close` reviewer receives the session record by
   design; "never accepts the rationale as evidence" stays. The Planner's "never allocates a code"
   and Phase-fit's "never registers a phase" are dropped (family E conflicts 3 and 10).
+- **plan-review.md §1 and §2.** The accepted headings are cited from `P:scripts/plan_check.py`
+  (M1 names both it and `protocol.md` §4), and the staleness exclusion of G4 is stated in §2's
+  preamble.
+- **Standby Builder.** Its review uses the phase-altitude checks and reports findings without
+  writing dispositions; `plan-review.md` §4 bounds any backlog edit.
 - **plan-review.md §2, P9.** Worded as a rule for the plans a repository writes, not for the
   plugin's own documents.
 
@@ -1057,6 +1062,13 @@ After the rebase onto the partition-sweep phase, the plugin carries the `partiti
 Partition contract (E13 to E15, `GOV-014`:88-102) therefore ships in `role-contracts.md` §3, and
 family E's not-shipped row for it no longer applies. The plan quality standard's optional
 "sizing against a partition" section (O3) applies for the same reason.
+
+Two clauses of the source contract have no mechanism in the plugin's sweep and are not shipped:
+
+| Source | Clause | Why not shipped |
+|---|---|---|
+| GOV-014:92-93 | The partition proposes a new-plan-or-amendment ruling per track | The plugin's partition record leaves each track's `disposition` null until the owner rules one (`P:schemas/idea-partition-record.schema.json`), and the pack asks for none; `role-contracts.md` states that the ruling is the owner's |
+| GOV-014:95-96 | After an adversary blocker, one revision cycle before proceeding | The sweep has no blocker-keyed revision step; audit findings go to the owner at the gates (`P:skills/partition-ideas/SKILL.md`). `role-contracts.md` states "proceeds past a gate without the owner's answer" instead |
 
 ## Acceptance and verification
 

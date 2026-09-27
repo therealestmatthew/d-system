@@ -8,8 +8,9 @@ at the plan-approval gate.
 
 ## 1. The mechanical check
 
-- The required plan sections, their accepted headings and the two conditions that add sections are
-  those in `protocol.md` section 4, checked by the `plan-check` skill. They are not restated here.
+- The required plan sections and the two conditions that add sections are those in `protocol.md`
+  section 4. The headings accepted for each section are listed in `scripts/plan_check.py`
+  (`REQUIRED`), which the `plan-check` skill runs. Neither is restated here.
 - A plan starts from `templates/plan.md`, which passes the check as shipped. A requirement starts
   from `templates/requirement.md`.
 - The two investigation headings in the design section are for a plan whose outcome is the thing
@@ -26,7 +27,8 @@ at the plan-approval gate.
 
 The reviewer applies the judgements after the mechanical check passes. Each stands on its own: a
 document can meet one and fail another. They cover plans and requirements only. Front matter and
-lifecycle are covered by `protocol.md` sections 5 to 7; phase sizing is not covered here.
+lifecycle are covered by `protocol.md` sections 5 to 7. Phase sizing is not covered here, and
+neither is whether a document still describes the system.
 
 ### Plans
 

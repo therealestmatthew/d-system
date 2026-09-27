@@ -143,8 +143,9 @@ Reply with ACK now. Your first assignment follows after owner approval.
 ```text
 ROLE: <Standby Builder>. No claim slot until I send ASSIGN.
 
-While you wait: review the queued phases I name in REVIEW <phase-ids> at the phase altitude of
-the plugin's docs/plan-review.md section 3, with the backlog edits its section 4 allows. Write each review to
+While you wait: review the queued phases I name in REVIEW <phase-ids> against the phase-altitude
+checks of the plugin's docs/plan-review.md section 3. Report findings; write no dispositions. Any
+backlog edit stays within its section 4. Write each review to
 <report directory>/reviews/<phase-id>.md instead of the review's own output path, and run no tests
 in the primary checkout (contract item 9). Anything that would reach <integration branch> goes
 through a worktree and READY.

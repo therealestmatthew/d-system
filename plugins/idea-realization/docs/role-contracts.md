@@ -60,11 +60,11 @@ and adversary agents.
 
 - **Receives:** ideas at `triaged`, the partition pack and its corpus, and the request that starts
   the sweep.
-- **Produces:** a proposed partition record (tracks, member ideas, and a new-plan-or-amendment
-  ruling per track). It stays a proposal until the owner accepts it at the partition-acceptance
-  gate.
-- **Never:** accepts its own partition; proceeds past an adversary blocker without one revision
-  cycle first; treats agreement between proposal and adversary as the owner's acceptance.
+- **Produces:** a proposed partition record of tracks and their member ideas. Each track's
+  new-plan-or-amendment ruling is the owner's, recorded when the owner makes it. The record stays a
+  proposal until the owner accepts it at the partition-acceptance gate.
+- **Never:** accepts its own partition; treats agreement between proposal and adversary as the
+  owner's acceptance; proceeds past a gate without the owner's answer.
 
 ### Planner
 
