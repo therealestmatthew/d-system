@@ -17164,7 +17164,7 @@ Related: 000319 (state capture and session resumability), 000334 (the Session Ma
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-23T01:11:39-04:00): # Triage: 000340 — Monitor each parallel session's context use and have the Session Manager find safe points to clear or compact each one
 
@@ -17200,6 +17200,7 @@ The idea asks for monitoring mechanisms and safe-point detection within the exis
 
 ## Finding
 000340 identifies a capability gap in the Session Manager system defined in GOV-017 and implemented in PROMPT-037. The protocol successfully coordinates parallel sessions through locks and messages, but does not automate context monitoring or provide guidance on when and how to clear/compact long-running sessions. This touches coordination protocol (GOV-017) and the delivery system (000334). No related plan, phase or requirement document yet addresses context usage monitoring for the interactive multi-session roster.
+- **finding** by agent-ideation (2026-09-27T12:31:17-04:00): Scout synthesis, context-threshold and ledger rows (batch E). Row 22: a threshold that fires once per compaction epoch and re-arms only after a compaction, fed by a real usage source (dCompress C9; K3's absolute floor is a variant); ADR-023 D9 already rules soft 50% / hard 75%. Row 23: snapshot at PreCompact, inject at SessionStart, with the boundary that a hook never rewrites a selecting or exact-bytes read (unproven in dCompress itself). Context-agent's 'known to model' decay ledger (A8): the Scout recommended skipping it because its clock is the engine's own output, not real usage; the owner ruled it in (Q18 (c)), below. Row 7: never treat the /compact summary as a fact source. Row 11 (Q17): the run schema has no parent id or tool event. Batch E rulings (owner), as recorded: Q17 (a) the run ledger records FULL child events: a parent id plus tool and subagent child events (auto-04 re-scope; with the model field, 000215); Q18 (c) context thresholds add the re-arm rule, the absolute margin AND the decay ledger (Session Manager's reading: the options were cumulative, so (c) includes (a) and (b)); Q19 PreCompact/SessionStart hooks only after 000389's generator is checked on real sessions, and no hook ever returns permissionDecision "allow"; Q20 local prompt regression datasets (JSONL + scorer) after the router's shadow record exists. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -18149,7 +18150,7 @@ Support coordinating agent sessions from other providers (Gemini, Codex) under t
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T14:32:13-04:00): 000359 asks for Gemini and Codex sessions to be coordinated under the multi-session protocol, possibly on LangChain/LangGraph with multi-provider models.
 
@@ -18161,6 +18162,7 @@ Against a phase now: P3 is a draft and not governed, and 000334 is itself unplan
 
 PROPOSED LINK: 000359 --extends--> 000334 (multi-provider generalisation of carrying GOV-017 onto LangGraph)
 PROPOSED LINK: 000359 --relates_to--> 000306 (an existing Claude/Codex definition-sync gap)
+- **finding** by agent-ideation (2026-09-27T12:31:15-04:00): Scout synthesis, provider rows (Q22: context-compression K4/K5, routing R7). Row 20: model groups per role, with fallbacks limited to allowed endpoints (LiteLLM Router's shape); Scout's verdict was borrow the shape as a small role table, skip LiteLLM for now. Row 21: one core, thin per-provider adapters under a written contract; token figures counted with each provider's own tokenizer or reported usage, and labelled when estimated; applies at the Dispatcher seam in src/orchestrator/dispatch.py. Row 19: escalate only on quality failure, never environment failure. Confidentiality (§3.1): a fallback off Anthropic sends that call's content to another provider. Maturity (§3.2): LiteLLM v1.102.1 (2026-09-23), very active, very large; its complexity router is an '[Add-on]' outside the MIT part, commercial terms unverified. The Scout recommended Q8 (a); the owner ruled (b), below. Q8 ruling (owner), as recorded: (b) roles that see client data never fall back off Anthropic endpoints or local models, role table in config, AND evaluate LiteLLM Router for LangGraph-node calls. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -19199,7 +19201,7 @@ Overlapping ideas from fold: 000319 (investigate proper state capture and sessio
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-23T16:40:02-04:00): Read on dev: resume state exists in several forms, as the body says. Session records have a fixed skeleton that the checkpoint skill fills (.claude/skills/checkpoint/SKILL.md). GOV-017 defines the board (line 214) and the message types (REBASE and others, around line 201). PROMPT-037 carries each role's starter text. Ideation's own resume brief (_working/overnight-sprint/ideation-state.md) is a hand-written example of the brief this idea proposes, and it worked for this session's restart.
 
@@ -19210,6 +19212,7 @@ P3 (the Prompt Planner's ungoverned draft, _working/overnight-sprint/planning/se
 Related: 000319 (state capture and resumability), 000340 (safe points to clear), 000029 (durable run ledger), 000391 (the tracking log a restart file would be generated from).
 
 PROPOSED LINK: 000389 --relates_to--> 000319 (the same resumability ask, now with a concrete format)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, extraction verdict (Q23). Of the three candidates read (dCompress, context-agent, context-compression), only dCompress reads agent context; context-agent reads code and context-compression re-encodes data files. None is worth a dependency; dCompress is the design reference (four days of history, 0 stars, n = 1 benchmark). Skipped: action-keyword classification kept as data tables, because dCompress's cue rule matched 2 of 104 user blocks in our transcripts (most owner decisions arrive as AskUserQuestion answers and tagged cross-session messages); lossless JSON/CSV re-encoding. Borrowed rows: 5 facts, not transcripts ({line, sha256} evidence a verifier re-checks; a generated view admitted only if it passes an equality check against its source); 6 say what was left out (coverage number, reason codes, 'estimated' labels); 7 error-to-fix pairing by normalised command text, and never treat the /compact summary as a fact source; 8 resume-brief shape (typed items, superseded items kept and linked, fixed type order within a byte budget, visible elision notice, stale when a cited file's hash changes); 9 hash only the payload, clock/host/path in an unhashed envelope. Risk (§3.1): any brief or fact pack carries transcript snippets and dCompress has no secret redaction, so it must stay gitignored or be redacted. Batch C rulings (owner), as recorded: Q9 proceed from dCompress as the design reference, close the 000449 search; Q10 essential set from structured sources first (000389's list; AskUserQuestion answers, message types, git); Q11 extend the reducer (000291) once promoted to tools/; Q12 adopt the checkable brief shape for 000389 (typed superseded items, priority order, byte budget with elision notice, hash evidence, coverage, 'estimated' labels, stale on source change). Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20416,7 +20419,7 @@ As given: "A third potential idea is an agent dedicated or multiple agents speci
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T07:43:26-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words exactly as relayed, including the relay's "...". Context as relayed: when ruling on D3-3, the owner accepted the Scout's recommendation for now: a LangGraph router node with typed Literal output, run in shadow before it may route (langgraph-supervisor is deprecated). The owner asked for this idea so that existing routing solutions are investigated before one is built. The relay names these as related: 000334, and the 000347 session rulings (_working/session-manager/reports/rulings-000347.md, gitignored).
 - **finding** by agent-ideation (2026-09-24T07:43:26-04:00): Triage (checked on dev 4881427). No backlog phase covers this. The "router" entries in backlog.yaml are about the frontend's ts/src/router.tsx and are unrelated. Related material:
@@ -20426,6 +20429,7 @@ As given: "A third potential idea is an agent dedicated or multiple agents speci
 - 000082 (agent engineering: orchestration, routing, multi-agent coordination and recovery paths), triaged. It covers the same topic at the level of a discipline.
 PROPOSED LINK: this idea --relates_to--> 000334 (the relay names it; the router node is part of carrying the Session Manager system into the orchestrator)
 PROPOSED LINK: this idea --relates_to--> 000082 (the same topic, at the discipline level)
+- **finding** by agent-ideation (2026-09-27T12:31:15-04:00): Scout synthesis, routing rows (Q21: routing R1-R7, context-agent A3, A5-A7). Row 16: a stateless router node in LangGraph's custom-workflow pattern (one classification call, then Command(goto=...)); adopt LangGraph (installed, 1.2.12). Row 17: a JSON Schema built per event whose enum is that event's legal set, a reason field, and a separate 'no legal route fits' outcome that writes a gate item; code checks the answer before goto (LangGraph raises KeyError on an unmapped route and validates nothing); adopt Anthropic structured output, borrow the rest; routing §7 estimates about a dozen lines plus tests. Row 18: a shadow record in our own ledger (legal set, proposal, reason, route taken, model and prompt version); agreement is a query; needs the model field (000215). Row 19: escalate only on a quality failure, never an environment failure; the core never imports the router and reports 'routing off' rather than failing. Scout's verdict: no library has a per-event legal set, typed output limited to it, and a shadow mode (routing §6); skipped as dependencies: langgraph-supervisor (archived), -swarm, Pydantic AI, LlamaIndex, Haystack, DSPy, semantic-router, hosted model routers, RouteLLM, OpenAI Agents SDK. Row 15: tune the router prompt from its shadow record later (routing R5). The Scout recommended Q5 (a) build-thin; the owner ruled (b), below. Batch B rulings (owner), as recorded: Q5 (b) EVALUATE Pydantic AI 'Choices' as a router dependency before accepting build-thin (a Scout task after the reset); Q6 agreement measured PER ROUTE, numbers set in the follow-on plan; Q7 router calls through the Agent SDK output_format; Q8 (b) roles that see client data never fall back off Anthropic endpoints or local models, role table in config, AND evaluate LiteLLM Router for LangGraph-node calls. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20477,7 +20481,7 @@ PROPOSED LINK: this idea --relates_to--> 000249 (event surfaces of the orchestra
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T07:57:08-04:00): Relay record. The owner raised this idea in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words exactly as relayed; the title is Ideation's short form of them. Context as relayed: the LangGraph and Agent SDK orchestrator is the first focus area of the 000347 session. The relay names 000427 as related.
 - **finding** by agent-ideation (2026-09-24T07:57:08-04:00): Triage (checked on dev 87c236b). No backlog phase, plan or governed document mentions LangSmith. The only tracked mention is uv.lock: langsmith 0.14.0 is already installed as a dependency of langchain-core, which langgraph pulls in (pyproject.toml lists langgraph and langgraph-checkpoint-sqlite, not langsmith). So the client library is present, and the investigation is about whether to turn on its tracing and use the hosted service, not about adding a package. Related material:
@@ -20488,6 +20492,7 @@ PROPOSED LINK: this idea --relates_to--> 000249 (event surfaces of the orchestra
 - A point for the investigation: tracing sends run content to an external service, so what may leave the machine is governed by the private-content rules (ADR-009).
 PROPOSED LINK: this idea --relates_to--> 000427 (named by the relay)
 PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, observability rows (batch A). Row 10: count each tool_use.id once and each message.id's usage once; reconcile tokens from the transcript (not a contracted API). Row 11: run-tree shape (parent id and a type: chain, llm, tool); schemas/run.schema.json has no parent id and no tool event and rejects extra fields. Row 12: collect per-tool data through the SDK's hooks (PreToolUse, PostToolUse by tool_use_id, SubagentStart/Stop), locally. Row 13: Claude Code's built-in OpenTelemetry, content redacted by default, to a local collector (e.g. Jaeger, Apache-2.0); covers Agent SDK processes too. Row 14: scores and verdicts recorded against a run id. Row 15: local prompt regression datasets later. Skipped: hosted LangSmith tracing, prompt hub, self-hosted LangSmith. Risks (§3.1): hosted tracing uploads every prompt, tool input/output and file read; configure_claude_agent_sdk() posts tool runs even with tracing off if the client can authenticate (LangSmith §2.3, read in code, not run); langsmith honours LANGCHAIN_* as well as LANGSMITH_*. PLAN-039.01 §8: use the SDK's model_usage, not usage, which leaves out subagents. Checked 2026-09-25: nothing sends traces from this repository (one shell and the tracked files). Batch A rulings (owner), as recorded: Q1 local only (Claude Code OTel to a local collector + our ledger; no hosted LangSmith); Q2 ban configure_claude_agent_sdk() + orchestrator startup guard on LANGSMITH_/LANGCHAIN_TRACING*; Q3 OTel enabled inside a phase (irs-12 or auto-04 re-scope); Q4 running cloned code case by case, approved by the owner in the acting session. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20566,7 +20571,7 @@ PROPOSED LINK: this idea --relates_to--> 000432 (split from the same owner messa
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T08:30:12-04:00): Relay record. The owner raised this in the 000347 decision session on 2026-09-24, and Session Manager relayed it to Ideation, split from the same owner message as 000431 (whose relay record quotes the whole message). The body is the owner's words for this part, verbatim as relayed. The relay's statement of the idea: investigate the adaptations needed and where different models fit best. Model choice should be configurable per role, with fallback when a provider is unavailable and per environment. The owner's examples are Gemini agents validating plans and OpenAI auditing what was built. The relay names 000359, 000427, 000429 and 000430 as related.
 - **finding** by agent-ideation (2026-09-24T08:30:12-04:00): Triage (checked on dev 9f8a5d5). No backlog phase covers this.
@@ -20586,6 +20591,7 @@ PROPOSED LINK: this idea --relates_to--> 000430 (same direction; named by the re
 PROPOSED LINK: this idea --relates_to--> 000359 (named by the relay)
 PROPOSED LINK: this idea --relates_to--> 000397 (the auditor example)
 PROPOSED LINK: this idea --relates_to--> 000431 (split from the same owner message)
+- **finding** by agent-ideation (2026-09-27T12:31:15-04:00): Scout synthesis, provider rows (Q22: context-compression K4/K5, routing R7). Row 20: model groups per role, with fallbacks limited to allowed endpoints (LiteLLM Router's shape); Scout's verdict was borrow the shape as a small role table, skip LiteLLM for now. Row 21: one core, thin per-provider adapters under a written contract; token figures counted with each provider's own tokenizer or reported usage, and labelled when estimated; applies at the Dispatcher seam in src/orchestrator/dispatch.py. Row 19: escalate only on quality failure, never environment failure. Confidentiality (§3.1): a fallback off Anthropic sends that call's content to another provider. Maturity (§3.2): LiteLLM v1.102.1 (2026-09-23), very active, very large; its complexity router is an '[Add-on]' outside the MIT part, commercial terms unverified. The Scout recommended Q8 (a); the owner ruled (b), below. Q8 ruling (owner), as recorded: (b) roles that see client data never fall back off Anthropic endpoints or local models, role table in config, AND evaluate LiteLLM Router for LangGraph-node calls. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20640,13 +20646,14 @@ PROPOSED LINK: this idea --relates_to--> 000079 (what goes in a system prompt)
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T09:27:03-04:00): Relay record. The owner raised this in the 000347 decision session, 2026-09-24, relayed by Session Manager to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's statement of them. Context as relayed: the run ledger _data/runs.jsonl (phase-irs-04) is canonical under today's D13 ruling; phase-auto-04 is re-scoped to add model and tool versions, a context-pack hash and a payload hash; 000215 notes that nothing records which model ran.
 - **finding** by agent-ideation (2026-09-24T09:27:03-04:00): Triage (checked on dev 80d7da7). What a run records today: src/orchestrator/ledger.py is the write path to _data/runs.jsonl, which does not exist yet on dev (no run has been recorded). A dispatch result (DispatchResult in src/orchestrator/dispatch.py) carries only outcome, input_tokens and output_tokens. Nothing records tool calls, the model, wall time, turns or cost. phase-auto-04 (build the durable run ledger with resumable steps), queued, lists 000029's fields: correlation id, payload hash, model and tool versions, context-pack hash, budget, timeout, retry count, checkpoints, produced artifacts and final disposition. Tool calls are not among them, so this idea would extend that list. Related: 000215 (nothing records which model ran), 000029 (the run ledger's field list), 000054 (observability and telemetry), 000429 (look into LangSmith, whose tracing records tool calls per run).
 PROPOSED LINK: this idea --relates_to--> 000215 (named in the relay's context)
 PROPOSED LINK: this idea --relates_to--> 000029 (the ledger field list this would extend)
 PROPOSED LINK: this idea --relates_to--> 000054 (observability umbrella)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, run-metrics rows (batches A and E). Row 10: count each tool_use.id once and each message.id's usage once; reconcile tokens from the transcript, since the stream carries partial counts. Row 11: run-tree shape (parent id and type), a schema change since run.schema.json has additionalProperties: false. Row 12: per-tool data through SDK hooks, written locally. Row 13: Claude Code OpenTelemetry, content off, to a local collector. Row 21: token figures from each provider's own tokenizer or reported usage, labelled when estimated. PLAN-039.01 §8: use the SDK's model_usage, not usage, which leaves out subagents (agent-run-metrics.md). Batch E rulings (owner), as recorded: Q17 (a) the run ledger records FULL child events: a parent id plus tool and subagent child events (auto-04 re-scope; with the model field, 000215); Q18 (c) context thresholds add the re-arm rule, the absolute margin AND the decay ledger (Session Manager's reading: the options were cumulative, so (c) includes (a) and (b)); Q19 PreCompact/SessionStart hooks only after 000389's generator is checked on real sessions, and no hook ever returns permissionDecision "allow"; Q20 local prompt regression datasets (JSONL + scorer) after the router's shadow record exists. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20773,12 +20780,13 @@ PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 5 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: this idea and 000440 are alternatives to each other.
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). No phase covers it. The nearest existing mechanism is tools/generate_agent_workflows.py (OPS-010): it renders skills, commands and agents from one manifest (agent-workflows/workflows.yaml) into per-host files, deterministically, with a --check mode. That is installation into this repository for several hosts, not into another repository. 000067 (portable agent workflows, promoted) is the idea behind it. Which systems are candidates depends on 000436.
 PROPOSED LINK: this idea --relates_to--> 000440 (the relay calls them alternatives)
 PROPOSED LINK: this idea --relates_to--> 000067 (the existing deterministic generator)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, install rows (batch D; ECC). Row 1: an install-state record in the target repository (request, resolved units, source commit, per file destination, owner and SHA-256) plus an ownership guard (never overwrite or later delete a file the installer did not record; uninstall only files whose digest still matches); would extend tools/generate_agent_workflows.py (OPS-010); one phase, requirement and plan first. Row 2: drift doctor, dry-run plan as JSON, recorded hook consent, namespaced installed files. Row 3: every source path must belong to a module, checked in CI (unverified: ECC's validator not read). Row 4: modules with dependencies and profiles, later, after the 000436 decision. Verdict: build a Python install tool, do not adopt ECC (its GitHub App sends repository history to a hosted service; its hook runtime is unaudited). The install-state record is also what an orchestrator would read to know what a target contains (ECC §5). Batch D rulings (owner), as recorded: Q13 track other repositories first (000440 via a per-repo markdown file, 000436/000438), designed so an install-state record can be added later; Q14 unit of installation = a workflow from workflows.yaml; Q15 an install may write the target's .claude/settings.json or hooks ONLY with a separate consent recorded in the install state; Q16 yes, a short read-only Scout task on ECC's scripts/ci/validate-install-manifests.js before 000442 is planned. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20798,12 +20806,13 @@ PROPOSED LINK: this idea --relates_to--> 000067 (the existing deterministic gene
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Relay record. The owner raised this on 2026-09-24 as bullet 6 of a seven-bullet message ("Capture ideas for: ..."), and Session Manager relayed it to Ideation. The body is the owner's bullet verbatim as relayed; the title is Ideation's short form of it. The seven are 000435 to 000441; bullet 1 stands alone, and bullets 2 to 7 form one batch on multiple repositories, anchored on 000436 at the relay's instruction (GOV-006). Context as relayed: this idea and 000439 are alternatives to each other.
 - **finding** by agent-ideation (2026-09-24T09:59:36-04:00): Triage (checked on dev bdda45c). No phase covers it. The orchestrator today (src/orchestrator/, ADR-018, PLAN-039.01) works on this repository only: PLAN-039.01 scopes the daemon's watchers to events inside the repository. 000248 (expand the orchestrator daemon into a host for other always-on agents) and 000249 (watch for external events beyond the repository) are the nearest ideas that widen its reach. Part of the 000436 batch.
 PROPOSED LINK: this idea --relates_to--> 000439 (the relay calls them alternatives)
 PROPOSED LINK: this idea --relates_to--> 000248 (widening the daemon's reach)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, install rows (batch D; ECC). Row 1: an install-state record in the target repository (request, resolved units, source commit, per file destination, owner and SHA-256) plus an ownership guard (never overwrite or later delete a file the installer did not record; uninstall only files whose digest still matches); would extend tools/generate_agent_workflows.py (OPS-010); one phase, requirement and plan first. Row 2: drift doctor, dry-run plan as JSON, recorded hook consent, namespaced installed files. Row 3: every source path must belong to a module, checked in CI (unverified: ECC's validator not read). Row 4: modules with dependencies and profiles, later, after the 000436 decision. Verdict: build a Python install tool, do not adopt ECC (its GitHub App sends repository history to a hosted service; its hook runtime is unaudited). The install-state record is also what an orchestrator would read to know what a target contains (ECC §5). Batch D rulings (owner), as recorded: Q13 track other repositories first (000440 via a per-repo markdown file, 000436/000438), designed so an install-state record can be added later; Q14 unit of installation = a workflow from workflows.yaml; Q15 an install may write the target's .claude/settings.json or hooks ONLY with a separate consent recorded in the install state; Q16 yes, a short read-only Scout task on ECC's scripts/ci/validate-install-manifests.js before 000442 is planned. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -20955,7 +20964,7 @@ PLAN-039's "Execution order" section is stale: "04 unblocking five phases (08, 1
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them. Sent together with 000448.
 - **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Triage (checked on dev 9edd219). No phase covers it. It overlaps 000054 (observability and telemetry: structured logging, metrics and tracing across the backend, agent runs and tooling), triaged. Whether this is a duplicate of 000054 or the agent-specific part of it is for the owner. Related material:
@@ -20965,6 +20974,7 @@ PLAN-039's "Execution order" section is stale: "04 unblocking five phases (08, 1
 PROPOSED LINK: this idea --relates_to--> 000054 (the observability umbrella; possible duplicate)
 PROPOSED LINK: this idea --relates_to--> 000434 (agent-run metrics)
 PROPOSED LINK: this idea --relates_to--> 000215 (model provenance)
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, observability rows (batch A). Row 10: count each tool_use.id once and each message.id's usage once; reconcile tokens from the transcript (not a contracted API). Row 11: run-tree shape (parent id and a type: chain, llm, tool); schemas/run.schema.json has no parent id and no tool event and rejects extra fields. Row 12: collect per-tool data through the SDK's hooks (PreToolUse, PostToolUse by tool_use_id, SubagentStart/Stop), locally. Row 13: Claude Code's built-in OpenTelemetry, content redacted by default, to a local collector (e.g. Jaeger, Apache-2.0); covers Agent SDK processes too. Row 14: scores and verdicts recorded against a run id. Row 15: local prompt regression datasets later. Skipped: hosted LangSmith tracing, prompt hub, self-hosted LangSmith. Risks (§3.1): hosted tracing uploads every prompt, tool input/output and file read; configure_claude_agent_sdk() posts tool runs even with tracing off if the client can authenticate (LangSmith §2.3, read in code, not run); langsmith honours LANGCHAIN_* as well as LANGSMITH_*. PLAN-039.01 §8: use the SDK's model_usage, not usage, which leaves out subagents. Checked 2026-09-25: nothing sends traces from this repository (one shell and the tracked files). Batch A rulings (owner), as recorded: Q1 local only (Claude Code OTel to a local collector + our ledger; no hosted LangSmith); Q2 ban configure_claude_agent_sdk() + orchestrator startup guard on LANGSMITH_/LANGCHAIN_TRACING*; Q3 OTel enabled inside a phase (irs-12 or auto-04 re-scope); Q4 running cloned code case by case, approved by the owner in the acting session. Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
@@ -21002,7 +21012,7 @@ PROPOSED LINK: this idea --relates_to--> 000435 (the decisions it would capture)
 
 
 <details>
-<summary>3 finding(s)</summary>
+<summary>4 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Relay record. The owner raised this on 2026-09-24, and Session Manager relayed it to Ideation. The body is the owner's words verbatim as relayed; the title is Ideation's short form of them.
 - **finding** by agent-ideation (2026-09-24T11:56:35-04:00): Triage (checked on dev 9edd219). No phase covers it. The first step is to find the source the owner remembers; Session Manager ran a web search; its candidates are in the next finding. Related material in this repository: 000340 (monitor each parallel session's context use), 000060 (memory and context management), 000319 (state capture and session resumability), 000040 (deterministic search across ideas, backlog, memories and decisions), 000081 (context pipelines: metadata graphs, RAG, semantic layers), and 000447 and 000448 (observability and the System Monitor agent, recorded in the same turn).
@@ -21014,6 +21024,7 @@ PROPOSED LINK: this idea --relates_to--> 000340 (context use)
 - context-compression, https://github.com/saminkhan1/context-compression: a deterministic, lossless structured-context selector for several agent runtimes.
 - A survey list: https://github.com/YerbaPage/Awesome-Agent-Context-Compression.
 Not checked: X posts, which the search does not index reliably.
+- **finding** by agent-ideation (2026-09-27T12:31:16-04:00): Scout synthesis, extraction verdict (Q23). Of the three candidates read (dCompress, context-agent, context-compression), only dCompress reads agent context; context-agent reads code and context-compression re-encodes data files. None is worth a dependency; dCompress is the design reference (four days of history, 0 stars, n = 1 benchmark). Skipped: action-keyword classification kept as data tables, because dCompress's cue rule matched 2 of 104 user blocks in our transcripts (most owner decisions arrive as AskUserQuestion answers and tagged cross-session messages); lossless JSON/CSV re-encoding. Borrowed rows: 5 facts, not transcripts ({line, sha256} evidence a verifier re-checks; a generated view admitted only if it passes an equality check against its source); 6 say what was left out (coverage number, reason codes, 'estimated' labels); 7 error-to-fix pairing by normalised command text, and never treat the /compact summary as a fact source; 8 resume-brief shape (typed items, superseded items kept and linked, fixed type order within a byte budget, visible elision notice, stale when a cited file's hash changes); 9 hash only the payload, clock/host/path in an unhashed envelope. Risk (§3.1): any brief or fact pack carries transcript snippets and dCompress has no secret redaction, so it must stay gitignored or be redacted. Batch C rulings (owner), as recorded: Q9 proceed from dCompress as the design reference, close the 000449 search; Q10 essential set from structured sources first (000389's list; AskUserQuestion answers, message types, git); Q11 extend the reducer (000291) once promoted to tools/; Q12 adopt the checkable brief shape for 000389 (typed superseded items, priority order, byte budget with elision notice, hash evidence, coverage, 'estimated' labels, stale on source change). Sources: _working/session-manager/scout/ext-synthesis.md (Scout, 2026-09-25) and _working/session-manager/reports/rulings-000347.md (owner rulings, Scout synthesis batches A-F), both gitignored; posted per the owner's batch F ruling.
 
 </details>
 
