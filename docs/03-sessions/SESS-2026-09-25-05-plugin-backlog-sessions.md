@@ -82,11 +82,11 @@ The verification list is green after the final rebase.
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-b`. `next_action`: rebase onto the integration branch once
-`phase-plug-02` lands the portable-test fix, re-run the plugin suite and send READY; the review is
-done and dispositioned. `session: doc-session-plugin-backlog-sessions`; `completion_evidence` cites
-the backlog script, check module, regression script, schema, the two test files and this record;
-`result` records the suite's one outside failure and the review outcome.
+`status: complete`, `agent: agent-builder-b`, completed on the integration branch after the
+owner-approved fast-forward to 02b1b1f. `session: doc-session-plugin-backlog-sessions`;
+`completion_evidence` cites the backlog script, check module, regression script, schema, the two test
+files and this record; `result` records the verification, the Session Manager's independent re-run
+and the review outcome. `phase-plug-04` removed from `next_up`.
 
 ## Unresolved
 
@@ -187,7 +187,7 @@ stays green over its own tests.
   backlog is clean and a phase is reported with its unknown plan, systems and owner. A registry
   that exists but fails still stops the backlog check. New test:
   `test_without_the_documents_feature_phases_resolve_against_nothing`. The review did not see this
-  change; reported to the Session Manager with READY.
+  change; reported to the Session Manager, and the owner approved it with the merge.
 
 ## Left undone
 

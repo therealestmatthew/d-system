@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-04
 - phase-plug-06
 - phase-plug-03
 - phase-plug-07
@@ -14714,7 +14713,7 @@ items:
   systems:
   - sys-plugin-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 1
   session_budget: 1
@@ -14760,8 +14759,7 @@ items:
   - plugins/idea-realization/skills/session-close/
   - plugins/idea-realization/test/test_backlog.py
   - plugins/idea-realization/test/test_regression.py
-  next_action: Owner-approved merge once the Session Manager re-verifies the rebased tip; then the
-    completion edit.
+  next_action: Complete. R24's wording and the empty-items schema ruling are on dev (015f297).
   session: doc-session-plugin-backlog-sessions
   completion_evidence:
   - plugins/idea-realization/scripts/backlog.py
@@ -14771,11 +14769,12 @@ items:
   - plugins/idea-realization/test/test_backlog.py
   - plugins/idea-realization/test/test_regression.py
   - docs/03-sessions/SESS-2026-09-25-05-plugin-backlog-sessions.md
-  result: Backlog check, ready command, status regression, schema and the backlog, session-start,
-    checkpoint and session-close skills built on agent/phase-plug-04; after rebasing onto phase-plug-02
-    the plugin suite passed 400, strict validation passed. The demo-adversary review found all five
-    Met; two minor findings accepted by the owner. One post-review change (backlog check without the
-    documents feature) recorded in the session record. Not yet merged.
+  result: 'plugins/idea-realization pytest: 400 passed; claude plugin validate --strict: passed; uv run
+    pytest: 1115 passed; uv run python -m src.governance: OK; ruff and mypy src/ clean, after rebase on dev
+    015f297 and re-run independently by the Session Manager. Independent demo-adversary review found all
+    five acceptance conditions met; its two minor findings (empty items, R24 wording) accepted by the
+    owner. One post-review change (the backlog check without the documents feature) approved by the
+    owner with the merge.'
 - id: phase-plug-05
   title: Document-governance engine — check, next-code with reservations, catalog, plan-check
   plan: doc-idea-realization-plugin
