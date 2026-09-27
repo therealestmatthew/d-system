@@ -21667,6 +21667,9 @@ One of three ideas from phase-plug-07 batched for the planning after the plugin'
 
 - relates_to ← `000471`
 - relates_to ← `000472`
+- relates_to ← `000474`
+- relates_to ← `000475`
+- relates_to ← `000476`
 
 ---
 
@@ -21725,3 +21728,71 @@ The ask: the gate (the Session Manager's re-run, refuse_dirty_integration.py, or
 What it would touch: refuse_dirty_integration.py or a new gate script, the Session Manager's READY/merge procedure (GOV-017 and the coordination contract), and AGENTS.md's merge step 9 if the check lives there.
 
 Unresolved: cost (the governance check on every commit of a long branch); whether a failing intermediate commit blocks the merge or requires the branch to be rewritten, which conflicts with not rewriting shared history; whether the private-content check alone should run per commit, since that is the failure history cannot undo, while governance runs only on the tip; and whether commits in dev..<branch> that were rebased from peers are exempt.
+
+---
+
+## 000474 · The plugin's doctor reports ordinary edits to scaffolded data files as drift, so it can never pass after first use
+
+**Created 2026-09-27T07:06:41-04:00 · Status: `open`**
+
+Raised by Session 2 - Builder B in the phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
+
+plugins/idea-realization/scripts/doctor.py compares every file in the scaffold's install-state record against its recorded SHA-256 and reports it as unchanged, drifted or missing; it exits 1 when any file has drifted. The record includes the seed data files the scaffold creates and people are meant to edit: the idea log, the rendered ideas view, the backlog and systems.yaml. Recording one idea or editing the backlog therefore counts as drift, and after first use doctor can never exit 0.
+
+The ask: doctor needs to tell seed data files people edit apart from plugin-owned files such as the schemas, where drift really means a local modification.
+
+What it would touch: the install-state record written by scripts/scaffold.py (a per-entry kind or ownership marker), doctor.py's comparison and exit code, and REQ-031 R05 (the install-state record) if the requirement is amended.
+
+Unresolved: whether seed files are dropped from the record after creation, recorded with a marker so doctor only checks that they exist, or checked for validity against their schema instead of by hash; and how records written by earlier plugin versions are handled.
+
+Recorded by the Ideation session.
+
+**Links**
+
+- relates_to → `000470`
+
+---
+
+## 000475 · The plugin's scaffolded backlog names no decision_record, so every check in a fresh repository reports status-regression not run
+
+**Created 2026-09-27T07:06:41-04:00 · Status: `open`**
+
+Raised by Session 2 - Builder B in the phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
+
+The backlog the plugin's scaffold creates has no decision_record entry. plugins/idea-realization/scripts/backlog.py runs the status-regression check only when the backlog names one, so every check in a freshly scaffolded repository prints "backlog: status-regression not run: the backlog names no decision_record". The check never runs and the message repeats on every check.
+
+The ask: the scaffold should seed a decision record, or the documented setup should say how to add one.
+
+Overlap: 000470 (should the plugin's scaffold seed a decision record in a target repository?, raised in phase-plug-07) asks the same question for another reason: a target repository has nowhere to record its own decisions. This idea adds a concrete consequence, the status-regression check that cannot run. Recorded separately as given; triage can link them.
+
+What it would touch: scripts/scaffold.py's backlog seed and the documents it creates, backlog.py's handling of a missing decision_record (warn once, or stay silent until one exists), and the plugin's setup documentation.
+
+Unresolved: the same question 000470 raises, whether a decision record belongs in a plugin whose documents deliberately carry no history.
+
+Recorded by the Ideation session.
+
+**Links**
+
+- relates_to → `000470`
+
+---
+
+## 000476 · The plugin's partition record schema has no field for a group-level condition, so a conditional group is lost to JSON readers
+
+**Created 2026-09-27T07:06:42-04:00 · Status: `open`**
+
+Raised by the second audit in Session 2 - Builder B's phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
+
+plugins/idea-realization/schemas/idea-partition-record.schema.json has no field for a condition or caveat on a group. A conditional group, one that splits if an assumption fails, can be described only in the partition's markdown. Anything that reads the JSON record, such as a later planning step or a tool, cannot tell that the group is conditional or what assumption it depends on.
+
+The ask: add a group-level condition or caveat field to the partition record schema.
+
+What it would touch: the plugin's partition record schema and whatever writes the record (the partition skill), and possibly this repository's own partition record if 000462 (whether d-system consumes its own plugin) keeps the two in step.
+
+Unresolved: the field's shape (free text, or a structured assumption plus the split it triggers), and whether existing records need migration.
+
+Recorded by the Ideation session.
+
+**Links**
+
+- relates_to → `000470`
