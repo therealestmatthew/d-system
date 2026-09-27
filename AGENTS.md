@@ -270,6 +270,9 @@ uv run python tools/rebuild_db.py         # each worktree has its own gitignored
 
 Perform these in order. Do not mark a phase complete before the post-rebase validator run passes.
 
+Never commit with `--no-verify`. A pre-commit hook failure is a finding to fix or report, even when
+the cause is known.
+
 1. Run every command in the phase's `verification` list inside your worktree and keep the real
    output. Record actual results — a failing check is a result, not a reason to skip the step.
 2. Write a session record with governed front matter (`kind: session`), covering outcomes, evidence
