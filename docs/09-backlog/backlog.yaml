@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-02
-- phase-plug-08
 - phase-idg-19
 - phase-dam-01
 - phase-grd-03
@@ -15015,8 +15014,9 @@ items:
   systems:
   - sys-plugin-core
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
+  session: doc-session-plugin-end-to-end
   priority: 2
   session_budget: 1
   depends_on:
@@ -15048,8 +15048,18 @@ items:
   deliverables:
   - plugins/idea-realization/
   - docs/03-sessions/
-  next_action: Every acceptance condition is met and the independent review is recorded in the session
-    record; waits for the owner-approved merge, then the completion edit on the integration branch.
+  next_action: Complete. The plugin was exercised end to end in a scratch repository; its three open
+    findings are ideas 000474, 000475 and 000476, batched on 000470.
+  completion_evidence:
+  - docs/03-sessions/SESS-2026-09-27-02-plugin-end-to-end.md
+  - plugins/idea-realization/README.md
+  - plugins/idea-realization/scripts/paths.py
+  - plugins/idea-realization/test/test_paths.py
+  result: 'Plugin suite 497 passed; claude plugin validate --strict passed; check_no_private_content OK;
+    governance OK; repo 1115 passed, ruff and mypy src/ clean; re-run independently by the Session Manager.
+    One independent demo-adversary review: no blocker or major, all four acceptance conditions Met; its one
+    minor finding (an undisclosed direct quote in the record) fixed. Second audit ran; second scaffold run
+    created no file.'
 - id: phase-plug-09
   title: Governance documents as absolutes, part two — methodology, role contracts and review, multi-session coordination
   plan: doc-idea-realization-plugin
