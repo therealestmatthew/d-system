@@ -4,7 +4,7 @@ schema_version: 1
 id: batch-005
 title: The gate queue, the execution-loop harness, delivered status and the anti-pattern store
 status: queued
-sequence: 5
+sequence: 6
 created: '2026-09-22'
 updated: '2026-09-22'
 coordinator: PROMPT-036

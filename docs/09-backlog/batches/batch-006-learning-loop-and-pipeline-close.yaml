@@ -4,7 +4,7 @@ schema_version: 1
 id: batch-006
 title: The learning loop, the Gate 2 consolidation, trace baselines and the forced-failure drill
 status: queued
-sequence: 6
+sequence: 7
 created: '2026-09-22'
 updated: '2026-09-22'
 coordinator: PROMPT-036

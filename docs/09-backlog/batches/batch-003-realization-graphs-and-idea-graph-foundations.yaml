@@ -6,72 +6,42 @@ title: Batch graph and run budgets, with the idea schema bundle and plan-quality
 status: queued
 sequence: 3
 created: '2026-09-22'
-updated: '2026-09-23'
+updated: '2026-09-27'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
   the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
   and unclaimed, no edge pointing later in the global order. Its stage decomposition was computed
   then, not in the original. On 2026-09-23 the owner''s batch-003 Q1 answer moved phase-irs-11 to
   stage 1 and phase-irs-14 to stage 2, with phase-irs-14 gaining depends_on phase-irs-11; the
-  composition was re-checked by script that day (see verified).'
+  composition was re-checked by script that day. On 2026-09-27 the owner recomposed the table, before
+  any run had opened against it: phase-irs-11 is on owner hold (its budgets come from measured
+  baselines only), and as the only unbuilt stage-1 phase it blocked every later stage. phase-irs-11
+  and phase-irs-14 (which depends on it) moved to batch-007 with their stage order and external
+  dependencies. phase-idg-10 and phase-idg-01 were built and completed outside this batch, so they
+  were removed; see notes. phase-idg-11 is the only phase left. The title is kept as the batch''s
+  historical name.'
 verified:
-  date: '2026-09-23'
-  method: 'Script over docs/09-backlog/backlog.yaml after the Q1 reorder: every phase id resolved;
-    the one in-batch depends_on edge (phase-irs-14 on phase-irs-11) points to an earlier stage; stage
-    boundaries follow from that edge and from collisions() in src/governance/backlog.py (irs-11/idg-01,
-    idg-10/idg-11, irs-14/idg-01, idg-11/idg-01), with no colliding pair in one stage. At that date
-    phase-irs-04 was complete, phase-part-03 was not yet complete (external dependency of
-    phase-irs-14), and phase-idg-10 was already complete, built outside the batch.'
-external_depends_on:
-- id: phase-irs-04
-  expected_status: complete
-  note: LangGraph orchestrator skeleton with interrupt gates and the thin-stat — depended on by phase-irs-14.
-- id: phase-part-03
-  expected_status: complete
-  note: Build the partition-ideas workflow — depended on by phase-irs-14.
+  date: '2026-09-27'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 21a4943 after the split, using
+    collisions() from src/governance/backlog.py: phase-idg-11 resolves, is queued and unclaimed, and
+    has no depends_on, so the batch needs no external dependency. Its single-phase stage needs no
+    collision check within the batch. At that date phase-idg-10 and phase-idg-01 were complete
+    (agent-builder-a), and phase-grd-02 was active and collides with phase-idg-11 (share system
+    sys-gov-docs, share deliverable path
+    docs/08-governance/GOV-011-promoted-plan-staging.md).'
 stages:
 - stage: 1
-  parallel: true
-  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or
-    overlapping deliverable path.'
+  parallel: false
+  rationale: The only phase left after the 2026-09-27 split. It was cut into stage 2 by its collision
+    with phase-idg-10, which completed outside the batch.
   phases:
-  - id: phase-irs-11
-    title: Run budgets, hard caps and the kill switch
-    after: []
-    conflicts_with:
-    - phase-idg-01
-  - id: phase-idg-10
-    title: Audit the plan corpus and write the plan-quality standard
-    after: []
-    conflicts_with:
-    - phase-idg-11
-- stage: 2
-  parallel: true
-  rationale: Cut after stage 1 because phase-irs-14 depends on phase-irs-11 (batch-003 Q1, so its
-    dispatches are covered by the cap and kill switch from their first run); phase-idg-11 shares a
-    locked system or deliverable path with phase-idg-10.
-  phases:
-  - id: phase-irs-14
-    title: Batch graph with per-track fan-out and the amend-as-re-key flow
-    after:
-    - phase-irs-11
-    conflicts_with:
-    - phase-idg-01
   - id: phase-idg-11
     title: Define where a promoted plan lives before it earns a code
     after: []
-    conflicts_with:
-    - phase-idg-01
-    - phase-idg-10
-- stage: 3
-  parallel: false
-  rationale: Cut after stage 2 because phase-idg-01 shares a locked system or deliverable path with
-    phase-irs-11, phase-idg-11.
-  phases:
-  - id: phase-idg-01
-    title: Ship the idea schema bundle and record the scope-fork decision
-    after: []
-    conflicts_with:
-    - phase-irs-14
-    - phase-irs-11
-    - phase-idg-11
+notes: 'Completed outside this batch, so no longer members (recorded here because the schema has no
+  field for it; owner ruling 2026-09-27): phase-idg-10 (Audit the plan corpus and write the
+  plan-quality standard), completed by agent-builder-a in ba79c15 on 2026-09-22; phase-idg-01 (Ship
+  the idea schema bundle and record the scope-fork decision), completed by agent-builder-a in
+  4a95e12 on 2026-09-25. phase-idg-11 collides with phase-grd-02 on sys-gov-docs and on
+  docs/08-governance/GOV-011-promoted-plan-staging.md, so it cannot be claimed while phase-grd-02 is
+  active.'

@@ -1,0 +1,59 @@
+# Run budgets and the batch graph
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-007
+title: Run budgets, hard caps and the kill switch, then the batch graph
+status: queued
+sequence: 5
+created: '2026-09-27'
+updated: '2026-09-27'
+coordinator: PROMPT-036
+provenance: 'Split out of batch-003 on 2026-09-27 by owner ruling, before any run had opened against
+  batch-003. phase-irs-11 is on owner hold (its budgets come from measured baselines only), and it
+  blocked batch-003''s later stages. phase-irs-14 depends on it. Both phases keep their batch-003
+  stage order (batch-003 Q1, 2026-09-23) and external dependencies. Sequence 5 is by owner ruling
+  the same day: batch-005 lists phase-irs-11 and phase-irs-14 in external_depends_on, and batch-006
+  lists phase-irs-14, so this table must run before both. batch-005 moved to sequence 6 and
+  batch-006 to sequence 7. The id is batch-007 because ids are allocated in creation order, and
+  sequence alone sets run order.'
+verified:
+  date: '2026-09-27'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 21a4943, using collisions() from
+    src/governance/backlog.py: both phases resolve and are queued and unclaimed; the one in-batch
+    depends_on edge (phase-irs-14 on phase-irs-11) points to an earlier stage; the other edges
+    resolve to phase-irs-04 and phase-part-03, both complete and listed in external_depends_on.
+    phase-irs-11 and phase-irs-14 also collide (share system sys-realization, share deliverable
+    paths src/ and test/). A script over every batch table found batch-005 (phase-irs-13 on
+    phase-irs-11, phase-irs-15 on phase-irs-14) and batch-006 (phase-irs-12 and phase-irs-17 on
+    phase-irs-14) depending on this table''s phases.'
+external_depends_on:
+- id: phase-irs-04
+  expected_status: complete
+  note: LangGraph orchestrator skeleton with interrupt gates and the thin-stat — depended on by phase-irs-11 and phase-irs-14.
+- id: phase-part-03
+  expected_status: complete
+  note: Build the partition-ideas workflow — depended on by phase-irs-14.
+stages:
+- stage: 1
+  parallel: false
+  rationale: Opening stage. phase-irs-11 builds the budget cap and kill switch that phase-irs-14's
+    dispatches must pass through (batch-003 Q1).
+  phases:
+  - id: phase-irs-11
+    title: Run budgets, hard caps and the kill switch
+    after: []
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-irs-14 depends on phase-irs-11, and the two also share
+    sys-realization and the src/ and test/ deliverable paths.
+  phases:
+  - id: phase-irs-14
+    title: Batch graph with per-track fan-out and the amend-as-re-key flow
+    after:
+    - phase-irs-11
+    conflicts_with:
+    - phase-irs-11
+notes: 'phase-irs-11 is on owner hold (2026-09-27; budgets from measured baselines only). Do not claim
+  it until the owner lifts the hold. Because this table has sequence 5, PROMPT-036 selects it after
+  batch-004 and then stops here while the hold stands, which keeps batch-005 and batch-006 behind
+  their dependencies.'
