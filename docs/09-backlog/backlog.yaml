@@ -14980,9 +14980,9 @@ items:
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.10-absolutes-trace.md
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md
   - plugins/idea-realization/docs/vocabulary.md
-  next_action: Waits for phase-plug-04 and phase-plug-06. Start from
-    _working/session-manager/plugin-analysis/05-governance-documents.md sections 1 and 5; families
-    A, B and C are this phase.
+  next_action: Every acceptance condition is met and the independent review is recorded in
+    SESS-2026-09-26-09. Waits for the owner-approved merge, then the completion edit on the
+    integration branch.
 - id: phase-plug-08
   title: End-to-end exercise in a scratch repository, install documentation, and handover
   plan: doc-idea-realization-plugin
