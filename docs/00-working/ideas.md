@@ -21400,7 +21400,7 @@ This is a d-system correction, separate from the plugin: the plugin's absolute r
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-26T23:21:08-04:00): Idea 000461 (GOV-001 and GOV-002 still name main as the integration branch and lock table) is confirmed: GOV-001 around lines 181 and 192, and GOV-002 around lines 168-170, name `main` as the integration branch. AGENTS.md records the trunk move from `main` to `dev` on 2026-09-09 and tells readers to read older references to `main` as `dev`.
 
@@ -21409,6 +21409,7 @@ This overlaps directly with 000377 (governance docs still name `main` as the int
 Related: 000402 (consistency checks across governance documents) proposes a mechanical check that would catch this class of drift.
 
 PROPOSED LINK: 000461 --relates_to--> 000377 (same governance documentation drift; 000377 is the broader, already-triaged version)
+- **finding** by agent-ideation (2026-09-27T14:38:58-04:00): Fixed on dev at 029d536 (owner-approved merge, 2026-09-27; branch agent/fix-gov-main-refs by Session 3). Two commits: 513f823 names dev, not main, as the integration branch in GOV-001 and GOV-002; 029d536 names dev as the build target in GOV-002's disjointness paragraph. Checked on dev: GOV-001 lines 181, 182 and 192 and GOV-002 lines 90, 168 and 170 now say dev. Status left unchanged; moving it is the owner's call.
 
 </details>
 
@@ -21687,6 +21688,7 @@ One of three ideas from phase-plug-07 batched for the planning after the plugin'
 - relates_to ← `000474`
 - relates_to ← `000475`
 - relates_to ← `000476`
+- relates_to ← `000477`
 
 ---
 
@@ -21746,6 +21748,10 @@ What it would touch: refuse_dirty_integration.py or a new gate script, the Sessi
 
 Unresolved: cost (the governance check on every commit of a long branch); whether a failing intermediate commit blocks the merge or requires the branch to be rewritten, which conflicts with not rewriting shared history; whether the private-content check alone should run per commit, since that is the failure history cannot undo, while governance runs only on the tip; and whether commits in dev..<branch> that were rebased from peers are exempt.
 
+**Links**
+
+- relates_to ← `000488`
+
 ---
 
 ## 000474 · The plugin's doctor reports ordinary edits to scaffolded data files as drift, so it can never pass after first use
@@ -21767,6 +21773,7 @@ Recorded by the Ideation session.
 **Links**
 
 - relates_to → `000470`
+- relates_to ← `000483`
 
 ---
 
@@ -21813,3 +21820,208 @@ Recorded by the Ideation session.
 **Links**
 
 - relates_to → `000470`
+
+---
+
+## 000477 · Verify whether a repository's committed .claude/settings.json can set pluginConfigs for an installed plugin
+
+**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27; the owner asked for new ideas to be identified from the independent validation of the ChatGPT plugin audit. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 1.
+
+The question decides the severity of audit findings F1 (configured paths can write outside the repository) and F2 (a saved plugin option can inject shell commands). Both are rated Major because only the person's own saved options are shown to reach them; if a repository's committed project-scoped settings can set pluginConfigs, whoever can commit to a repository can set them, and both become Blockers. The validation could not settle it: a string search of the Claude Code 2.1.280 binary shows pluginConfigs in a settings key set together with enabledPlugins and extraKnownMarketplaces, which does not show whether project scope is honoured (§3 item 2).
+
+**Links**
+
+- relates_to → `000470`
+- relates_to ← `000478`
+- relates_to ← `000479`
+- relates_to ← `000480`
+- relates_to ← `000481`
+- relates_to ← `000482`
+- relates_to ← `000483`
+- relates_to ← `000484`
+- relates_to ← `000485`
+- relates_to ← `000486`
+- relates_to ← `000487`
+- relates_to ← `000488`
+
+---
+
+## 000478 · A shell-rendering test harness that executes every plugin skill's bash fences with hostile option values
+
+**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 2.
+
+Every plugin skill passes options as CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}', and Claude Code substitutes the saved value into the skill text; there are 158 substitution sites across 11 skills plus docs/tools.md. test_skills.py checks only that the placeholder is not double-quoted. A value containing an apostrophe breaks the quoting, and the validation reproduced command execution with a value like ideas'$(touch injected)' (F2). The harness would render each skill's bash fences with hostile values (apostrophes, $(...), backticks, $VAR, spaces, a leading '-') and execute them in a sandbox, asserting that the value reaches the script intact and nothing else runs. It would also cover F7 (unquoted worktree paths with spaces) and found-in-passing a (idea_corpus.py's double-quoted partition check command).
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000479 · A concurrency test category for every plugin writer: idea log, catalog, reservations and backlog
+
+**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 3.
+
+Audit finding F3 (Blocker, reproduced): 12 parallel idea.py add calls produced two created events for 000008, after which every read of the log fails. The same read-then-write race exists for every idea mutation (status, revisit, amend, annotate, link, retract-link, classify). The validation's fix plan covers the idea log with a lock and a deterministic barrier test (§2 F3). This idea is the general category: each plugin script that writes shared state (the idea log, the catalog, code reservations, the backlog) gets a concurrency test in the same deterministic form (threads held at a barrier inside the read step), with a subprocess stress test as a secondary check.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000480 · A sanctioned repair path for an uncommitted, malformed tail in the plugin's idea log
+
+**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 4.
+
+When the plugin's idea log gets a bad tail (the F3 race wrote a second created event for one id), every later read fails, including idea.py list, so no sanctioned command can run and the only way out is a hand edit of an append-only file. The idea: a repair command, limited to lines not yet committed, that shows the malformed or conflicting trailing events, and removes or re-numbers them only on explicit confirmation, leaving committed history untouched.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000481 · Make the plugin's test_no_source_references independent of the git remote URL shape
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 5 (found in passing c).
+
+plugins/idea-realization/test/test_no_source_references.py (lines 40-55) builds its forbidden identities from the origin remote URL. In a clone whose origin is a local path such as /code/d-system, path components like "code" become forbidden identities, and the suite fails with 3 failures (test_no_source_references.py and test_templates.py[AGENTS.md|CLAUDE.md]); with an https origin the same tree gives 497 passed. The validation asks for this to be fixed before the suite is relied on in clones.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000482 · amend --file for the plugin's idea.py, matching annotate and add
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 6 (found in passing e).
+
+plugins/idea-realization/scripts/idea.py's amend has no --file option (lines 643-646), so a corrected body can only pass through --body as a shell argument. That contradicts idea.py's own rule at lines 69-73 ("Prose never belongs in a shell argument"), and idea/SKILL.md line 53 shows amend <id> --title "corrected title", contradicting idea/SKILL.md lines 23-27. add and annotate already take a file.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000483 · A plugin doctor report of every configured path, its resolved location and whether it stays inside the repository
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 7.
+
+Audit finding F1 (confirmed): paths.py returns an absolute configured path unchanged and joins '..' without a check, so absolute, '..' and symlinked values write outside the repository, although plugin.json describes each option as "relative to the repository root". The validation's fix plan puts central containment validation in paths.py with doctor reporting (§5 item 2). The idea: doctor lists every configured path key with its raw value, its resolved absolute location and a containment status (inside, outside, through a symlink), so a person can see where the plugin will write before it does.
+
+**Links**
+
+- relates_to → `000477`
+- relates_to → `000474`
+
+---
+
+## 000484 · Windows CI coverage for the idea-realization plugin's scripts
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 8.
+
+prerequisites.py (lines 31-43) lists Windows as supported, but nothing runs the plugin's tests there. The validation's idea-log lock (F3, decision D2) needs an msvcrt branch alongside fcntl, and it notes there is no Windows CI to exercise it (§5 risks). Path handling (F1) and quoting (F2, F7) also differ on Windows.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000485 · Audit-rubric note: "declared paths" in the plugin's protocol.md §7 means document and backlog declarations, not plugin options
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 9.
+
+The ChatGPT audit cited docs/protocol.md line 133 ("Declared paths are repository-relative", enforced by the document scan and the backlog check) as the rule that F1 breaks. The validation found that rule is about paths declared inside documents and the backlog, and it holds (checks/backlog.py repository_path); the promise F1 actually breaks is plugin.json's "relative to the repository root" on each option. A note in the audit rubric, or in protocol.md §7 itself, would keep later audits from citing the wrong rule.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000486 · Record code-reservation holders as structured fields so release-code can list stale reservations by branch
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 10.
+
+Audit finding F6 (partially confirmed, reproduced): the plugin's reservations.py prunes by a 14-day age alone, so a phase active for longer has its code reissued, and the second branch to integrate renumbers. The holder is stored only as one combined string (reservations.py lines 141-143, 176-185). The validation's fix: store branch and worktree as separate fields, and in prune skip a reservation whose worktree is still listed by git worktree list on that branch; legacy reservations keep the TTL. With the fields, release-code could also list stale reservations by branch. Related wording fix: document-codes.md line 79 says "expired before its document was written" where the risk is expiry before the document merged (found in passing d).
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000487 · Claude Code permission-rule recommendations for owner-gated plugin commands
+
+**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 11.
+
+Audit finding F4 (partially confirmed): idea_corpus.py accept marks a partition accepted with no authorization input; "only on the owner's explicit acceptance" is prose in the skill. A script cannot verify an approval the agent running it could not forge, but a Claude Code permission prompt is an approval the agent cannot answer for itself. The validation recommends the plugin README list permission rules for owner-gated commands, for example ask for Bash(uv run *idea_corpus.py accept*), kept as documentation because the owner ruled that the scaffold never writes settings (SESS-2026-09-25-02 lines 107-108). This is option (a) of the validation's decision D4, which is the owner's.
+
+**Links**
+
+- relates_to → `000477`
+
+---
+
+## 000488 · A plugin backlog check that a phase marked complete has its branch merged into the integration branch
+
+**Created 2026-09-27T14:38:50-04:00 · Status: `open`**
+
+[agent-proposed by Session Manager]
+
+Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/reports/plugin-audit-validation.md (gitignored), the independent validation of the ChatGPT audit of plugins/idea-realization/, 2026-09-27; this idea is its §7 item 12.
+
+Audit finding F5 (not confirmed as a defect): the plugin's backlog check accepts a completed phase with session, completion_evidence and result present and the evidence files existing; it does not check review or integration, and protocol.md lines 139-140 say those are human responsibilities. The validation lists optional hardening under decision D4 (c): a machine check that the phase's branch is an ancestor of the integration branch, alongside a check that the referenced session record has its Review section (backlog-protocol.md line 178).
+
+**Links**
+
+- relates_to → `000477`
+- relates_to → `000473`
