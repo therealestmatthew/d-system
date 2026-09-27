@@ -133,8 +133,8 @@ contains, in this order:
 7. Ideas for local Ideation, one line each.
 8. Open owner questions and stated assumptions.
 
-If you were started from `master-prompt.md`, update your row in `status.md` as it says, in the
-same commit as the handoff file.
+If you were started from `master-prompt.md`, update your row in `status.md` as its step 6 says,
+in the same commit as the handoff file, after the gates.
 
 The local Session Manager re-runs the gates and relays the merge to the owner. You do not merge.
 
@@ -248,4 +248,4 @@ Fix or disposition every finding.
 Normally the owner pastes the master prompt's kickoff instead. Use this one only to run this
 prompt out of order, and only once every earlier row in `status.md` is merged.
 
-Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/plan-anatomy.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/plan-anatomy.md`) and follow it exactly. It is a read-only investigation of plan anatomy and plan folders for idea 000505 (plan and plan-folder anatomy), on branch `agent/cloud-plan-anatomy`. It ends in findings and a proposed standard under `docs/00-working/plan-anatomy/` and moves no file. Tests run only in this clone on that branch, never on `dev`. Never commit to or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
+Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/plan-anatomy.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/plan-anatomy.md`) and follow it exactly. It is a read-only investigation of plan anatomy and plan folders for idea 000505 (plan and plan-folder anatomy), on branch `agent/cloud-plan-anatomy`. It ends in findings and a proposed standard under `docs/00-working/plan-anatomy/` and moves no file. Tests run only in this clone on that branch, never on `dev`. Never commit to, merge into or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.

@@ -155,8 +155,8 @@ contains, in this order:
 7. Ideas for local Ideation, one line each.
 8. Open owner questions and stated assumptions.
 
-If you were started from `master-prompt.md`, update your row in `status.md` as it says, in the
-same commit as the handoff file.
+If you were started from `master-prompt.md`, update your row in `status.md` as its step 6 says,
+in the same commit as the handoff file, after the gates.
 
 The local Session Manager re-runs the gates and relays the merge to the owner. You do not merge.
 
@@ -212,7 +212,7 @@ Follow `GOV-018` steps 1 to 5 exactly, with these specifics:
 
 - **Entry check** (step 1): run the script on
   `docs/01-plans/PLAN-050-system-boundary-study/PLAN-050-overview.md`. `PLAN-050` was created
-  2026-09-26, so it is not exempt. If it returns, write the returned record as step 1 says,
+  2026-09-26, so it is not exempt. It passed when this prompt was written. If it returns, write the returned record as step 1 says,
   using `review_id` `<date>-plan-050-entry`. Then, as planner, add the missing sections, re-run
   the check, and continue.
 - **Target** (step 2): the plan altitude is the overview and its requirement `REQ-033`.
@@ -299,7 +299,12 @@ uncorrected numbers.
 
 1. **Concern map:** the three cores (personal productivity, idea realization, workbench), the
    governance/framework layer, and the adjacent and incubating systems, with each registered
-   system from `systems.yaml` placed in its concern.
+   system from `systems.yaml` placed in its concern. `systems.yaml` has no concern field, and
+   the study's map (`docs/00-working/boundary-study/current-boundary-map.md`) assigns some
+   systems by wildcard group. So first add a per-system table to the validation report: every
+   system id, its concern, and the source of the assignment (the map row it matches, or your
+   reasoning from its `systems.yaml` entry). Mark any system you cannot place as *unplaced*
+   rather than guessing. The diagram draws from that table.
 2. **Crossings:** the allowed interfaces between concerns as labelled edges (what data or
    capability crosses), with the prohibited ownership crossings marked.
 3. **Registry maturity:** implemented, scaffold, planned and retired counts, overall and per
@@ -348,11 +353,13 @@ Dispatch `partition-adversary` once more over the validation report and your `AR
 > evidence, and no claim in it lacks a source; (4) every finding in
 > `docs/08-governance/reviews/<date>-plan-050.json` has a disposition, and each `fixed` names a
 > change that exists in the diff; (5) every number in
-> `docs/00-working/boundary-study/boundary-overview.html` matches the report, each of its eight
-> required diagrams is present, and it loads nothing external (grep for `http`, `src=`,
-> `@import`); (6) no file changed outside `ARCH-012`, `PLAN-050`,
-> `backlog.yaml`, the catalog, the review records, `docs/00-working/boundary-study/`,
-> `docs/00-working/cloud-prompts/status.md` and the handoff file. Rank each finding blocker, major or minor, with evidence.
+> `docs/00-working/boundary-study/boundary-overview.html` matches the report; the report's
+> per-system concern table lists every system in `docs/08-governance/systems.yaml` once, and
+> each assignment follows from the source it cites (contest any that do not); each of the HTML's
+> eight required diagrams is present, and it loads nothing external (grep for `http`, `src=`,
+> `@import`); (6) no file changed outside `ARCH-012`, `PLAN-050`, `backlog.yaml`, the catalog,
+> the review records, `docs/00-working/boundary-study/`, `docs/00-working/cloud-prompts/status.md`
+> and the handoff file. Rank each finding blocker, major or minor, with evidence.
 
 Fix or disposition every finding. List them in the handoff file.
 
@@ -366,4 +373,4 @@ start it.
 Normally the owner pastes the master prompt's kickoff instead. Use this one only to run this
 prompt out of order, and only once every earlier row in `status.md` is merged.
 
-Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/boundary-validation.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/boundary-validation.md`) and follow it exactly. It is an independent adversarial validation of the system boundary study (`ARCH-012`, `REQ-033`, `PLAN-050`), on branch `agent/cloud-boundary-validation`. You re-derive its figures, review the plan under GOV-018 acting as its planner, extend it with next steps and deferred phases, and re-assess options A, B and C without choosing. Tests run only in this clone on that branch, never on `dev`. Never commit to or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
+Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/boundary-validation.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/boundary-validation.md`) and follow it exactly. It is an independent adversarial validation of the system boundary study (`ARCH-012`, `REQ-033`, `PLAN-050`), on branch `agent/cloud-boundary-validation`. You re-derive its figures, review the plan under GOV-018 acting as its planner, extend it with next steps and deferred phases, and re-assess options A, B and C without choosing. Tests run only in this clone on that branch, never on `dev`. Never commit to, merge into or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.

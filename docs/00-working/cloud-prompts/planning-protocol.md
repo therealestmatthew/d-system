@@ -137,8 +137,8 @@ contains, in this order:
 7. Ideas for local Ideation, one line each.
 8. Open owner questions and stated assumptions.
 
-If you were started from `master-prompt.md`, update your row in `status.md` as it says, in the
-same commit as the handoff file.
+If you were started from `master-prompt.md`, update your row in `status.md` as its step 6 says,
+in the same commit as the handoff file, after the gates.
 
 The local Session Manager re-runs the gates and relays the merge to the owner. You do not merge.
 
@@ -241,4 +241,4 @@ Fix or disposition every finding, then re-run the checks you changed.
 Normally the owner pastes the master prompt's kickoff instead. Use this one only to run this
 prompt out of order, and only once every earlier row in `status.md` is merged.
 
-Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/planning-protocol.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/planning-protocol.md`) and follow it exactly. It has you write one short governance document listing the planning steps in order for idea 000500 (a short end-to-end planning protocol document), on branch `agent/cloud-planning-protocol`. Tests run only in this clone on that branch, never on `dev`. Never commit to or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
+Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/planning-protocol.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/planning-protocol.md`) and follow it exactly. It has you write one short governance document listing the planning steps in order for idea 000500 (a short end-to-end planning protocol document), on branch `agent/cloud-planning-protocol`. Tests run only in this clone on that branch, never on `dev`. Never commit to, merge into or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
