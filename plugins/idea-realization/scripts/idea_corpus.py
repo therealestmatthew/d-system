@@ -121,14 +121,7 @@ def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
                           check=False)
 
 
-def primary_checkout(root: Path) -> Path:
-    """The first entry of ``git worktree list``; the root itself outside a git repository."""
-    listed = _git(root, "worktree", "list", "--porcelain")
-    if listed.returncode == 0:
-        for line in listed.stdout.splitlines():
-            if line.startswith("worktree "):
-                return Path(line.removeprefix("worktree ")).resolve()
-    return root.resolve()
+primary_checkout = paths.primary_checkout
 
 
 def _repository_of(path: Path) -> Path | None:

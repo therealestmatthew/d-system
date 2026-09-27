@@ -69,8 +69,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     config = paths.resolve(args)
     values = {
         "integration_branch": config.text("integration_branch"),
-        "worktree_dir": str(config.values["worktree_dir"]).replace("<repository>",
-                                                                    config.root.name),
+        "worktree_dir": str(config.values["worktree_dir"]).replace(
+            "<repository>", paths.primary_checkout(config.root).name),
     }
     for item in args.set:
         name, sep, value = item.partition("=")

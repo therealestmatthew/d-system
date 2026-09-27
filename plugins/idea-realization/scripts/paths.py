@@ -20,6 +20,11 @@ reads ``${user_config.`` counts as unset.
 Relative paths resolve against the repository root: ``--root``, then ``IDEA_REALIZATION_ROOT``,
 then ``CLAUDE_PROJECT_DIR``, then the git top level of the working directory, then the working
 directory. No path is ever derived from a script's own location except the plugin's own files.
+
+``worktree_dir`` is the exception: it names a directory beside the repository rather than a file
+in one checkout, so it resolves against the primary checkout, the first entry of
+``git worktree list``, and ``<repository>`` in it is the primary checkout's directory name. Run
+from any worktree, it names the same directory.
 """
 
 from __future__ import annotations
@@ -60,6 +65,9 @@ class Key:
 
 #: Keys that hold plain text rather than a path. A ``multiple`` key is a list of paths.
 TEXT_KEYS = {"integration_branch"}
+
+#: Keys that resolve against the primary checkout rather than the current one.
+PRIMARY_KEYS = {"worktree_dir"}
 
 
 def load_keys(manifest: Path = MANIFEST) -> dict[str, Key]:
@@ -125,6 +133,17 @@ def repository_root(flag: str | None = None, env: Mapping[str, str] | None = Non
     return Path(top).resolve()
 
 
+def primary_checkout(root: Path) -> Path:
+    """The first entry of ``git worktree list``; the root itself outside a git repository."""
+    listed = subprocess.run(["git", "-C", str(root), "worktree", "list", "--porcelain"],
+                            capture_output=True, text=True, check=False)
+    if listed.returncode == 0:
+        for line in listed.stdout.splitlines():
+            if line.startswith("worktree "):
+                return Path(line.removeprefix("worktree ")).resolve()
+    return root.resolve()
+
+
 def _to_path(root: Path, value: str) -> Path:
     value = value.replace("<repository>", root.name)
     path = Path(value).expanduser()
@@ -141,7 +160,7 @@ class Config:
     def path(self, name: str) -> Path:
         value = self.values[name]
         assert isinstance(value, str) and KEYS[name].kind == "path", name
-        return _to_path(self.root, value)
+        return _to_path(primary_checkout(self.root) if name in PRIMARY_KEYS else self.root, value)
 
     def paths(self, name: str) -> list[Path]:
         value = self.values[name]

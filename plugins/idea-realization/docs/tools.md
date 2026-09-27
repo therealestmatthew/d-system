@@ -26,6 +26,11 @@ Relative paths resolve against the repository root: ``--root``, then ``IDEA_REAL
 then ``CLAUDE_PROJECT_DIR``, then the git top level of the working directory, then the working
 directory. No path is ever derived from a script's own location except the plugin's own files.
 
+``worktree_dir`` is the exception: it names a directory beside the repository rather than a file
+in one checkout, so it resolves against the primary checkout, the first entry of
+``git worktree list``, and ``<repository>`` in it is the primary checkout's directory name. Run
+from any worktree, it names the same directory.
+
 ## `backlog.py`
 
 ```bash

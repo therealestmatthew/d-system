@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import paths
@@ -74,6 +75,26 @@ def test_worktree_dir_names_the_repository(tmp_path: Path) -> None:
     root.mkdir()
     config = paths.resolve({"root": str(root)}, env={})
     assert config.path("worktree_dir") == root / ".." / "sample-worktrees"
+
+
+def test_worktree_dir_from_a_worktree_is_the_repositorys(tmp_path: Path) -> None:
+    def git(cwd: Path, *args: str) -> None:
+        subprocess.run(["git", "-C", str(cwd), "-c", "user.name=fixture",
+                        "-c", "user.email=fixture@example", *args],
+                       capture_output=True, text=True, check=True)
+
+    primary = tmp_path / "sample"
+    primary.mkdir()
+    git(primary, "init", "-q")
+    git(primary, "commit", "-q", "--allow-empty", "-m", "fixture")
+    worktree = tmp_path / "sample-worktrees" / "session"
+    git(primary, "worktree", "add", "-q", "-b", "session", str(worktree))
+    expected = primary.resolve() / ".." / "sample-worktrees"
+    assert paths.resolve({"root": str(worktree)}, env={}).path("worktree_dir") == expected
+    assert paths.resolve({"root": str(primary)}, env={}).path("worktree_dir") == expected
+    # Every other relative path still belongs to the checkout it was resolved in.
+    assert paths.resolve({"root": str(worktree)}, env={}).path("ideas_path") == (
+        worktree / "ideas" / "ideas.jsonl")
 
 
 def test_root_precedence(tmp_path: Path) -> None:
