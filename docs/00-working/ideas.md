@@ -15630,6 +15630,7 @@ No existing plan, requirement document or backlog phase was found that covers th
 **Links**
 
 - relates_to ← `000317`
+- relates_to ← `000499`
 
 ---
 
@@ -20941,6 +20942,10 @@ PROPOSED LINK: this idea --relates_to--> 000434 (the run metrics the heuristic w
 
 </details>
 
+**Links**
+
+- relates_to ← `000500`
+
 ---
 
 ## 000446 · PLAN-039's "Execution order" section is stale: it omits phase-irs-16 from the phases irs-04 unblocks, and does not reflect irs-14's dependency on irs-11
@@ -22228,4 +22233,46 @@ Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "need to c
 
 **Links**
 
+- relates_to → `None`
+
+---
+
+## 000499 · Keep batch tables' phase status fresh while delivery is ongoing
+
+**Created 2026-09-27T16:12:44-04:00 · Status: `open`**
+
+Owner ask, 2026-09-27, relayed by Session 5 - Batch Runner, as given: fix how batch phases are managed and tracked, possibly by folding it into the existing session-open, checkpoint and session-close protocols or other relevant ones, so a batch table's status doesn't go stale while phases are delivered. Trigger: batch-003 (idg-10, idg-01) and batch-004 (irs-06) had phases completed outside their batch while the tables still said "every phase queued".
+
+The tables are docs/09-backlog/batches/*.yaml, governed by GOV-016 (batch orchestration protocol) and shaped by schemas/batch.schema.json. Related: 000316 (enforce the batch-table schema in the governance check), which proposes a check that resolves each table's phase ids against backlog.yaml but not their status.
+
+**Links**
+
+- relates_to → `000316`
+- relates_to → `None`
+
+---
+
+## 000500 · A short end-to-end planning protocol governance document: the steps in order, each pointing to where it is already written
+
+**Created 2026-09-27T16:12:44-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager. A one-page governance document that lists the planning steps in order, each pointing to where it is already written: ARCH-006 (idea realization system stages), GOV-010 (plan quality standard), GOV-018 (three-altitude review procedure), GOV-016 (batch orchestration protocol), GOV-002 (backlog protocol) and AGENTS.md.
+
+The owner's statement of the protocol, as given: "plan -> audit -> decompose plan into phases -> audit phases -> further decomposition -> additional audit (repeat until still undetermined criteria is met)... assign systems to phases, batch phases and order dependencies".
+
+The owner's rulings on it are recorded as findings on this idea. It is the first planning item of the next session. Related: 000445 (resolve phase-irs-05's phase-fit heuristic in a planning session), and 000492, whose list of reference artifacts includes a Planning Procedure.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-27T16:12:55-04:00): Owner rulings given with the idea, 2026-09-27, relayed by the Session Manager, recorded as given: (1) the document states explicitly: requirement first, the owner gates (G2 partition acceptance, G3 plan approval and next_up ratification), and execution and after (validators, realization check, learning loop); (2) whether an investigation/prompt pack before the plan is a tracked step is NOT decided (the owner questioned its purpose); (3) the decompose -> audit loop stops by default when every phase fits one session by a measured heuristic (relates to 000445 and phase-irs-05); the exception, when the audit proposes no split but the heuristic says the phase does not fit, is to be designed; (4) home: a new short GOV document.
+
+</details>
+
+**Links**
+
+- relates_to → `000445`
 - relates_to → `None`
