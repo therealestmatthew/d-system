@@ -1,0 +1,260 @@
+{
+  "review_id": "2026-09-27-plan-052",
+  "procedure": "GOV-018",
+  "date": "2026-09-27",
+  "target": {
+    "plan": "PLAN-052",
+    "requirement": "REQ-035",
+    "phases": [
+      "phase-plfx-01",
+      "phase-plfx-02",
+      "phase-plfx-03",
+      "phase-plfx-04",
+      "phase-plfx-05",
+      "phase-plfx-06"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on PLAN-052-plugin-audit-remediation.md at dab2d46: exit 0. Re-run after each revision: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "id": "F01",
+      "altitude": "phase",
+      "subject": "phase-plfx-02",
+      "severity": "blocker",
+      "title": "The test the scope says to delete (test/test_paths.py:67-70) does not assert the escaping behaviour F8 claims — it asserts the opposite, control case R04 says must keep passing.",
+      "evidence": "plugins/idea-realization/test/test_paths.py lines 67-70:\n`def test_absolute_path_is_kept(tmp_path: Path) -> None:`\n`    other = tmp_path / \"elsewhere.jsonl\"`\n`    config = paths.resolve({\"root\": str(tmp_path), \"ideas_path\": str(other)}, env={})`\n`    assert config.path(\"ideas_path\") == other`\n`other` is `tmp_path / \"elsewhere.jsonl\"`, i.e. INSIDE `tmp_path` (the root), not outside it. `git diff --stat d8a635b HEAD -- plugins/idea-realization` is empty, so this is exactly what the audit read. REQ-035 R04's own 'What each requirement is not' section states: 'An absolute path inside the root is kept (control; passes before and after)' — describing this exact test. There is no other test anywhere in test_paths.py asserting that an absolute-outside, `..`, or symlink-escaping path is silently accepted.",
+      "consequence": "phase-plfx-02's scope literally instructs deleting this test ('delete the absolute-outside assertion at test/test_paths.py:67-70'), and its acceptance line and REQ-035 R16 both build the pytest-count arithmetic ('previous count plus new tests, less the one replaced assertion') on this deletion. Following the scope as written removes a control test that must keep passing, while no test anywhere actually covers the true escaping case being described. The phase cannot satisfy both 'delete this line range' and 'this behaviour still passes as a control' — one of REQ-035/PLAN-052's F8 finding or phase-plfx-02's scope must be corrected before the count arithmetic in acceptance and R16 is achievable.",
+      "minimal_fix": "Correct F8's citation (there is no existing escaping assertion to delete) and phase-plfx-02's scope: keep test_absolute_path_is_kept unchanged (it is the control), and don't count it in the 'tests removed' arithmetic; the only replaced test in this phase's counting is whichever new test doesn't apply, if any.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "misidentified-test-citation",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "Verified by reading test_paths.py:66-69. REQ-035 problem 2 and R16, PLAN-052's label table and a new Context paragraph now say F8 is not a defect and test_absolute_path_is_kept stays as R04's control; phase-plfx-02's scope keeps it and its acceptance says none removed; D8's order line notes F8 was dropped."
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "altitude": "phase",
+      "subject": "phase-plfx-02",
+      "severity": "major",
+      "title": "scaffold.py resolves and writes each configured path one seed at a time, so a PathError on any key but ideas_path (the first SEEDS entry) leaves earlier seeds already written to disk, contradicting the 'writes no file' acceptance.",
+      "evidence": "plugins/idea-realization/scripts/scaffold.py: `SEEDS` tuple starts with `Seed(\"ideas\", _key(\"ideas_path\"), lambda: \"\")` (first of 14 entries: ideas_path, ideas_view_path, priority_path, 2 schemas, staging_dir, its schema, backlog_path, its schema, docs_root, 2 more files, 3 more schemas). Inside `scaffold()`: `for seed in SEEDS: ... target = seed.target(config) ... if not dry_run: target.mkdir(...)` / `target.open(\"xb\")` — resolution and write happen per-seed, interleaved, not validated up front.",
+      "consequence": "The one acceptance line the plan actually names ('scaffold.py --ideas-path <absolute path outside> exits 2 and writes no file') passes only because ideas_path happens to be the first seed evaluated. R04's general requirement ('every configured path key... otherwise exits 2... and writes nothing') is not met for any other key (e.g. docs_root, backlog_path, staging_dir): a PathError raised on one of those would leave every earlier seed's files/directories already on disk, so 'writes no file' silently fails for those keys while the named test misleadingly passes.",
+      "minimal_fix": "Have scaffold's main() (or scaffold() itself) resolve every configured Config key/paths entry the run will need before performing any mkdir/open, so PathError aborts before the first write regardless of which key is invalid.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "partial-validation-before-write",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "REQ-035 R04 now requires the scaffold to resolve every key before its first write and adds a docs_root ../outside case that must leave an empty repository empty; phase-plfx-02's scope and acceptance carry both."
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "altitude": "plan",
+      "subject": "phase-plfx-02 / REQ-035 R05 / ADR-025 D1",
+      "severity": "major",
+      "title": "No phase corrects the `worktree_dir` manifest description, which will contradict the new outside-the-primary-checkout rule the plan ships",
+      "evidence": "`.claude-plugin/plugin.json`'s `worktree_dir` entry reads: `\"description\": \"Directory that holds one worktree per session, relative to the repository root. <repository> is replaced by the repository directory's name.\"` — the identical phrase (\"relative to the repository root\") used for every path key that R04 requires to be CONTAINED inside the root. REQ-035 R05 and D1 require `worktree_dir` to resolve OUTSIDE the primary checkout, refusing an inside value with exit 2 (`worktree_dir = wt` is the failing case named in R05). No phase's `deliverables` list includes `.claude-plugin/plugin.json` or `plugin.json` (checked `docs/09-backlog/backlog.yaml` phase-plfx-01 through -06, and grepped PLAN-052/REQ-035/ADR-025 for `plugin.json`/`manifest` — the only near-mentions are the general path-containment promise and the D1 sentence rejecting *only* wording-without-code-fix as an alternative for the general case). No test asserts manifest description text (grepped `test/*.py` for `worktree_dir` and `userConfig`).",
+      "consequence": "After the fix ships, a user who reads the manifest description literally (\"relative to the repository root\") and sets `worktree_dir` to an ordinary subdirectory value will be refused with exit 2 — the exact confusing failure the D1 fix exists to prevent for other keys — while the manifest text keeps telling them the opposite of what is now enforced. This is the same class of stale-promise defect F1 itself was raised to fix, left unaddressed for one key.",
+      "minimal_fix": "Add `.claude-plugin/plugin.json` to phase-plfx-02's deliverables and change `worktree_dir`'s description to state it must resolve outside the repository (or outside the primary checkout for a worktree).",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "REQ-035 R05 now requires the manifest description to say worktree_dir is outside the repository, verified by a test on the description that fails at the baseline; phase-plfx-02 declares .claude-plugin/plugin.json and test/test_manifest.py and carries the scope and acceptance lines."
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "altitude": "plan",
+      "subject": "PLAN-052 Decisions, D9",
+      "severity": "minor",
+      "title": "D9 does not name the cost of the rejected alternative, as GOV-010 P2 requires",
+      "evidence": "D9 (PLAN-052 lines 97-99): \"The validation suggested landing F1 first because the lock would be taken on the validated log path. Under D2 the lock is in the git common directory, not on the log path, so it does not depend on F1. The blocker lands first.\" This explains why the alternative's stated rationale is now false, but never states what running F1 before F3 would have cost — e.g., leaving the blocker-severity log-corruption defect (F3) live for one additional phase's duration behind a lower-severity fix, for no remaining technical reason.",
+      "consequence": "Read against GOV-010 (`docs/08-governance/GOV-010-plan-quality-standard.md`) P2 — \"'Chosen because it is good' is not a reason. The reason is what the rejected option would have cost here\" — D9 gives only a refutation of the alternative's premise, not its cost, unlike D8, D10 and D11 in the same section which each state a concrete cost.",
+      "minimal_fix": "Add one clause to D9 naming the cost of landing F1 first: the highest-severity fix would ship later for no remaining technical reason.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "PLAN-052 D9 now states the cost: the only blocker-severity defect would stay live for one more phase, for no remaining technical reason."
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "altitude": "phase",
+      "subject": "phase-plfx-01",
+      "severity": "major",
+      "title": "The scoped SIGKILL-recovery test cannot show a baseline failure, contradicting D10",
+      "evidence": "REQ-035 R02's verification text (docs/06-requirements/REQ-035-plugin-audit-remediation.md:99) and the phase's own scope (docs/09-backlog/backlog.yaml:15335-15337) both list 'SIGKILL while holding' among the tests to 'record failing at d8a635b'. At d8a635b, `add` (scripts/idea.py:315-319) takes no lock at all (confirmed by reading the function and by ADR-025's own description of the pre-fix state). With no lock in existence, there is nothing for a killed process to 'hold', so a second `add` after a SIGKILL trivially never blocks -- the property the test checks is already true before the fix, by construction of a lock-less system.",
+      "consequence": "The phase cannot produce the evidence D10 requires for this sub-test (a real, non-import-error failure at the baseline). Either the builder fabricates a baseline-failing variant that doesn't test the real crash-recovery property, or the session record silently omits this test's baseline run, and no one downstream notices because the phase's own acceptance criteria (see the companion finding) never call this test out by name.",
+      "minimal_fix": "Drop the SIGKILL sub-test from the 'must fail at baseline' set explicitly in scope, the way phase-plfx-04 explicitly limits D10 to 'the first' of its three R12 tests.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "d10-baseline-infeasible-for-absent-behavior",
+      "aliases": [
+        "baseline-failure-vacuously-true"
+      ],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "phase-plfx-01's scope now names the tests that must fail at d8a635b (barrier, stress, concurrent status moves, R03 warning) and states that the lock-path, timeout and SIGKILL tests have no baseline run; REQ-035 R02's verification says the same."
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "altitude": "phase",
+      "subject": "phase-plfx-03",
+      "severity": "major",
+      "title": "No acceptance line names an input that must be rejected (GOV-010 P6)",
+      "evidence": "docs/08-governance/GOV-010-plan-quality-standard.md:196-198: 'Acceptance names the command or observation, the expected result, and at least one input that must be rejected.' phase-plfx-03's full acceptance block (docs/09-backlog/backlog.yaml:15485-15494) covers a static test passing, an execution test creating no files, placeholders being quoted, a live-check record, and a test count -- none of them is an exit-nonzero/refusal case. F2 (heredoc quoting), F7 (placeholder quoting) and 'a' (shlex.quote) are all containment-through-safe-passing fixes: the hostile value is still accepted and passed through literally, never refused.",
+      "consequence": "A reviewer checking this phase against P6 at G3 has no case to point to; the gap is structural (the fixes never reject anything) rather than an omission that a one-line addition repairs, so it will surface again at review and force a rewrite of the acceptance section or a documented exception.",
+      "minimal_fix": "Add an explicit P6 exception to the phase, on the model GOV-010 itself cites for PLAN-038 ('why' stated above the exclusion): state that F2/F7/a are safe-passing fixes with no refusal path, so no input-must-be-rejected case exists for this phase.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "acceptance-missing-rejection-case",
+      "aliases": [
+        "gov-010-p6-gap"
+      ],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "Fixed with a real rejected input rather than an exception: the static test must reject a fixture skill that reintroduces one single-quoted CLAUDE_PLUGIN_OPTION assignment (phase-plfx-03 acceptance)."
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "altitude": "phase",
+      "subject": "phase-plfx-03",
+      "severity": "major",
+      "title": "The phase bundles a large mechanical rewrite with an exploratory live Claude Code session check in one 1-session budget",
+      "evidence": "grep confirms 146 `CLAUDE_PLUGIN_OPTION_*=` sites across the 11 skills (`grep -ro 'CLAUDE_PLUGIN_OPTION_[A-Z_]*=' skills/ | wc -l` -> 146) plus 2 in docs/tools.md per REQ-035 finding 4, and 11 files needing placeholder re-quoting. On top of that, scope requires 'Run the live check headless (PLAN-052 D11) -- a scratch repository, claude --plugin-dir with a --settings file ... one run with ideas/it's.jsonl and one with the hostile value' (docs/09-backlog/backlog.yaml:15481-15484), where D11 itself acknowledges the outcome is unknown until run: 'If the heredoc form is prompted or denied ... the phase stops before READY and puts the choice to the owner' (PLAN-052 D11, line 129-131).",
+      "consequence": "The phase combines a wide mechanical edit surface (11 skills + 3 docs + idea_corpus.py) with a genuinely open-ended verification step whose result can force a mid-phase stop and an owner round-trip. Unlike the other four phases in this dispatch, which are each one bounded engineering change, this one risks not reaching the live check within the session, or reaching it and stalling on an unresolved permission-matching question.",
+      "minimal_fix": "Split the live-session check (D11/R09) into its own phase or explicitly flag it as the item most likely to consume the whole session budget, so a partial-completion session record is expected rather than a surprise.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "session-budget-bundles-exploratory-step",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "Fixed by ordering rather than a split: phase-plfx-03 now runs the live check first, on the idea skill alone, and stops there for the owner if the heredoc form is prompted or denied, before the other ten skills are converted; PLAN-052 D11 says so. The remaining rewrite is mechanical and scriptable."
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "altitude": "phase",
+      "subject": "phase-plfx-04",
+      "severity": "major",
+      "title": "No acceptance line names an input that must be rejected (GOV-010 P6)",
+      "evidence": "docs/09-backlog/backlog.yaml:15539-15543, phase-plfx-04's full acceptance block: a live-worktree test failing/passing, two reservations being pruned after 15 days, an absent phrase in a doc, and a test count. F6's fix (reservations.py's prune, confirmed at scripts/reservations.py:120-133 today) is a scheduling change -- it makes prune skip a still-live reservation it previously would have dropped. Nothing in the fix or the acceptance criteria refuses an input; it only changes what does or does not get pruned.",
+      "consequence": "Same as phase-plfx-03's P6 gap: a G3 reviewer checking for the required rejection case finds none, and the gap is structural to the kind of fix (TTL/scheduling), not a missing line that can be bolted on without changing the fix's design.",
+      "minimal_fix": "Add the same kind of documented P6 exception naming why F6's TTL-preservation fix has no refusal case, or if one exists (e.g. a malformed branch/worktree field falling back to the age rule rather than crashing), name it explicitly as the required rejected-input case.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "acceptance-missing-rejection-case",
+      "aliases": [
+        "gov-010-p6-gap"
+      ],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "Fixed with a real rejected case: a reservation whose recorded worktree is still listed but now on a different branch must not be kept past its TTL (phase-plfx-04 scope and acceptance, REQ-035 R12)."
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "altitude": "phase",
+      "subject": "phase-plfx-06",
+      "severity": "major",
+      "title": "No acceptance line names an input that must be rejected (GOV-010 P6)",
+      "evidence": "docs/09-backlog/backlog.yaml:15626-15630, phase-plfx-06's full acceptance block: a section-7 test failing/passing, two greps finding text, and a test count. This phase is pure documentation by design -- D4 in PLAN-052 explicitly rules 'checks come later' for both partition acceptance and phase completion (REQ-035's Accepted decisions, D4) -- so no validation logic is added at all and there is no input for the plugin to reject.",
+      "consequence": "This is the clearest case of the pattern: a documentation-only phase structurally cannot satisfy P6 as written, yet nothing in the phase or the plan records that as a deliberate, reviewed exception the way GOV-010 itself expects (citing PLAN-038's precedent). Left unaddressed, this phase reads as non-compliant with a governance standard the plan claims to follow (PLAN-052 depends_on doc-plan-quality-standard).",
+      "minimal_fix": "State explicitly in the phase or in PLAN-052 that F4/F5 are documentation-only per owner ruling D4, so GOV-010 P6 does not apply -- mirroring PLAN-038's documented exclusion that GOV-010 itself cites as the correct pattern.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "acceptance-missing-rejection-case",
+      "aliases": [
+        "gov-010-p6-gap"
+      ],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "Fixed with a real rejected input: the section 7 test must reject a fixture protocol.md with either row removed (phase-plfx-06 acceptance)."
+        }
+      ]
+    },
+    {
+      "id": "F10",
+      "altitude": "phase",
+      "subject": "phase-plfx-01",
+      "severity": "minor",
+      "title": "Acceptance omits three of the R01/R02 tests the scope requires be written and shown failing",
+      "evidence": "Scope (docs/09-backlog/backlog.yaml:15335-15337) requires writing and baseline-failing: 'barrier test for two adds, 20-subprocess stress, two concurrent status moves, same lock path from the primary checkout and a linked worktree, timeout with the lock held, SIGKILL while holding'. The five acceptance lines (15351-15359) verify only the barrier test, the 20-subprocess stress test, the lock-held-timeout case, and the D3 warning -- the 'two concurrent status moves' race test and the 'same lock path from primary checkout and linked worktree' consistency test appear in scope but in no acceptance line.",
+      "consequence": "A builder can satisfy every acceptance line in this phase while never demonstrating that the lock actually serializes a second, different mutating operation (`status`) under concurrency, or that the lock path is computed consistently across worktrees -- both of which are named in REQ-035 R01/R02 as load-bearing guarantees.",
+      "minimal_fix": "Add two acceptance lines mirroring REQ-035 R01/R02's text: one for the concurrent status-move race, one for the cross-worktree lock-path consistency check.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "acceptance-scope-coverage-gap",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 3 - Standby Builder (planner, agent/plan-plugin-audit-remediation)",
+          "date": "2026-09-27",
+          "reason": "phase-plfx-01 acceptance now has a line for the concurrent status moves (one refused, log folds, fails at d8a635b) and one for the same lock path from the primary checkout and a linked worktree."
+        }
+      ]
+    }
+  ],
+  "notes": "No later-added phases: all six were registered with the plan in dab2d46. The phase altitude ran in two dispatches. The first, over all six phases, reached its turn limit and returned findings only for phase-plfx-02 (F01, F02) with no summary of what else it checked; a second dispatch covered phase-plfx-01 and 03 to 06 (F05 to F10). F05 as returned carried an extra field, consequence_addendum: null, which is not in the finding schema and was dropped. The Scout's settlement of idea 000477 (F1 and F2 stay major) was applied in the same revision; it is not a finding of this review."
+}

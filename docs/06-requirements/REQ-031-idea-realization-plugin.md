@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-25'
-updated: '2026-09-25'
+updated: '2026-09-27'
 systems: [sys-plugin]
 depends_on: [doc-realization-role-contracts, doc-plan-quality-standard, doc-governance-protocol, doc-document-code-protocol, doc-idea-node-classification, doc-repeatable-idea-partition-requirements, doc-idea-graph-lifecycle-requirements]
 ---
@@ -171,3 +171,6 @@ Owner, 2026-09-25, in the Session Manager session:
   `plan-check`) each get a thin skill (R24), amending `phase-plug-04` and `phase-plug-05`.
 - The analysis and planning work is distributed across the agent crew; the build phases dispatch
   per-family work the same way.
+- Owner, 2026-09-27, ruling D2 on the plugin audit: R03's dependency list gains `filelock`, the
+  idea-log lock library, pinned to one version. The row is amended by
+  [REQ-035](REQ-035-plugin-audit-remediation.md) R02 and [ADR-025](../04-decisions/ADR-025-plugin-idea-log-lock.md); R03's text above is unchanged.

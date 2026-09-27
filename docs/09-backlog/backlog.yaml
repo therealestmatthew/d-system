@@ -15464,3 +15464,342 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   next_action: Waits for phase-mode-02. phase-grd-03 and phase-asr-04 also edit GOV-017 and PROMPT-037; rebase onto
     whichever merged first and re-read those passages before editing.
+- id: phase-plfx-01
+  title: Serialize every idea-writer mutation in the plugin on a filelock lock, and warn off the integration branch
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  - doc-adr-plugin-idea-log-lock
+  systems:
+  - sys-plugin-ideas
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the tests first. Record failing at d8a635b in a detached baseline worktree (PLAN-052 D10) the
+    ones whose behaviour exists there - the barrier test for two adds, the 20-subprocess stress, the two
+    concurrent status moves and the R03 warning tests. The lock-path, timeout and SIGKILL tests check a
+    lock that does not exist at d8a635b, so they have no baseline run; they are written first and must
+    pass on the branch.
+  - Add a lock helper to plugins/idea-realization/scripts/idea.py that takes a filelock FileLock on
+    <git common directory>/idea-realization/ideas.lock and holds it across the whole read, validate and
+    append of add, status, revisit, amend, annotate, amend-annotation, link, retract-link and classify
+    (ADR-025). On timeout, exit non-zero naming the lock file and append nothing.
+  - Pin filelock with == to one version in the PEP 723 header of every script that imports it and in the
+    repository's dev extra (pyproject.toml, uv.lock); allow it in test/test_scripts_portable.py and make
+    that test fail when two headers pin different versions.
+  - Warn on stderr when the writer runs anywhere other than the integration branch in the primary
+    checkout, then write (R03, owner ruling D3).
+  - Replace "The plugin supplies no lock" in docs/multi-session.md, state the D3 rule there and in
+    docs/protocol.md, and regenerate docs/tools.md from the changed docstrings.
+  acceptance:
+  - The R01 barrier test fails at d8a635b (a duplicate id or an unreadable log) and passes on the branch;
+    the session record quotes both runs.
+  - Twenty concurrent idea.py add subprocesses leave a log that idea.py list reads with exit 0 and 20
+    distinct ids.
+  - Two concurrent status <id> reviewing calls - exactly one succeeds, the other is refused with the
+    illegal-transition error, and the log still folds; this fails at d8a635b.
+  - The lock path resolved from the primary checkout and from a linked worktree is the same file under
+    git rev-parse --git-common-dir.
+  - With the lock held by the test, idea.py add exits non-zero naming the lock file, and the log is
+    byte-identical before and after.
+  - In a linked worktree idea.py add prints the D3 warning; in the primary checkout on the integration
+    branch it prints none.
+  - The plugin suite count is 497 plus this phase's new tests, with none removed.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/scripts/idea.py
+  - plugins/idea-realization/scripts/ideas.py
+  - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/test/test_scripts_portable.py
+  - plugins/idea-realization/docs/multi-session.md
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/tools.md
+  - plugins/idea-realization/skills/idea/SKILL.md
+  - pyproject.toml
+  - uv.lock
+  - docs/03-sessions/
+  next_action: Queued behind the owner's G3 approval of PLAN-052; not in next_up until the owner places
+    it there.
+- id: phase-plfx-02
+  title: Validate every configured plugin value centrally — contained paths, worktree_dir outside, a well-formed integration branch
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  systems:
+  - sys-plugin-core
+  - sys-plugin-ideas
+  - sys-plugin-partition
+  - sys-plugin-backlog
+  - sys-plugin-documents
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-plfx-01
+  scope:
+  - Write the R04 to R07 tests first (absolute outside, traversal, symlink escape, escaping list entries,
+    absolute inside kept, worktree_dir inside refused, integration_branch --output refused, doctor with
+    two invalid keys, idea.py add --ideas-path ../x.jsonl, scaffold with an outside ideas_path and with
+    an outside docs_root, the manifest's worktree_dir description) and record them failing at d8a635b
+    (PLAN-052 D10). Keep test_absolute_path_is_kept (test/test_paths.py:67-70); its path is inside the
+    root and it is R04's control.
+  - In plugins/idea-realization/scripts/paths.py add PathError and validate in Config.path and
+    Config.paths - resolve through symlinks, require the result inside the root the key is taken from,
+    refuse a .git component, keep absolute paths inside the root; require worktree_dir outside the
+    primary checkout; require integration_branch to pass git check-ref-format --branch and not start
+    with a dash.
+  - Catch PathError in every script's main as exit 2 with the message; make scaffold resolve every key
+    it will write before its first write; have doctor report every invalid key and exit 1.
+  - Change worktree_dir's description in .claude-plugin/plugin.json to say it must resolve outside the
+    repository, not relative to the repository root.
+  - Put --end-of-options before every ref argument the plugin passes to git (regression.py git show,
+    idea.py's commit check).
+  - Add a protocol.md section 7 row stating that configured paths stay inside the repository and
+    worktree_dir outside, next to the declared-paths row; note the breaking change in the README;
+    regenerate docs/tools.md.
+  acceptance:
+  - Each R04, R05 and R06 refusal test fails at d8a635b and passes on the branch; the session record
+    quotes both runs.
+  - idea.py add --ideas-path ../x.jsonl exits 2 and creates no file; scaffold.py with an absolute outside
+    ideas_path, and separately with docs_root ../outside, exits 2 and leaves an empty repository empty -
+    no file, no install-state record and no .gitignore line.
+  - An absolute path inside the root still resolves, and the partition sweep's check command still runs.
+  - integration_branch set to --output=<tmp>/x exits 2 and no file appears in <tmp>.
+  - The manifest's worktree_dir description no longer says relative to the repository root.
+  - The plugin suite count is the previous phase's count plus this phase's new tests, with none removed.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/scripts/
+  - plugins/idea-realization/.claude-plugin/plugin.json
+  - plugins/idea-realization/test/test_manifest.py
+  - plugins/idea-realization/test/test_paths.py
+  - plugins/idea-realization/test/test_scaffold.py
+  - plugins/idea-realization/test/test_doctor.py
+  - plugins/idea-realization/test/test_regression.py
+  - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/tools.md
+  - plugins/idea-realization/README.md
+  - docs/03-sessions/
+  next_action: Queued behind phase-plfx-01 and the owner's G3 approval of PLAN-052.
+- id: phase-plfx-03
+  title: Pass plugin options through quoted heredocs, quote path placeholders and the partition check command, and check the form live
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  systems:
+  - sys-plugin-core
+  - sys-plugin-partition
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on:
+  - phase-plfx-02
+  scope:
+  - Run the live check first, on the idea skill alone (PLAN-052 D11) - a scratch repository, claude
+    --plugin-dir with a --settings file carrying pluginConfigs and an allow rule that permits the
+    single-quoted form, one run with ideas/it's.jsonl and one with the hostile value, before and after
+    converting that one skill - and quote the rendered command, the value received and the permission
+    outcome in the session record. If the heredoc form is prompted or denied where the single-quoted
+    form was allowed, stop here and put the choice to the owner before converting the other ten skills.
+  - Write the R08, R10 and R11 tests first - the static heredoc test replacing
+    test_no_option_is_double_quoted, the execution test rendering every skill bash fence with the value
+    a'$(touch P)'"$(touch Q)" and uv run replaced by printenv, the shlex-quoted check command test, and
+    the quoted-placeholder test - and record them failing at d8a635b (PLAN-052 D10).
+  - Rewrite every CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}' in the eleven skills and in
+    docs/tools.md as a quoted heredoc per option (<<'IR_OPTION', the substitution alone on its line), and
+    update the paths.py docstring that describes the form; reword skills/idea/SKILL.md so its ban on
+    heredocs for prose does not read as a ban on option heredocs.
+  - Quote <worktree directory> and <integration branch> in every shell fence of the skills and of
+    docs/protocol.md, docs/multi-session.md and docs/session-manager-messages.md, with a sentence to keep
+    the quotes when filling them in.
+  - Build the partition check command in scripts/idea_corpus.py with shlex.quote on each argument.
+  acceptance:
+  - The static test fails at d8a635b on all eleven skills that pass options and passes on the branch,
+    and it rejects a fixture skill that reintroduces one single-quoted CLAUDE_PLUGIN_OPTION assignment.
+  - The execution test creates neither P nor Q, and every printed value is byte-identical to the input;
+    an unsubstituted placeholder still counts as unset.
+  - Every bash-fence occurrence of either placeholder is inside double quotes.
+  - The live check's rendered text and permission outcome are in the session record, from before the
+    other ten skills were converted. If the heredoc form is prompted or denied where the single-quoted
+    form was allowed, the phase stops there and the choice goes to the owner.
+  - The plugin suite count is the previous phase's count plus this phase's new tests, less the replaced
+    test_no_option_is_double_quoted.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/skills/
+  - plugins/idea-realization/scripts/paths.py
+  - plugins/idea-realization/scripts/idea_corpus.py
+  - plugins/idea-realization/test/test_skills.py
+  - plugins/idea-realization/test/test_partition.py
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/multi-session.md
+  - plugins/idea-realization/docs/session-manager-messages.md
+  - plugins/idea-realization/docs/tools.md
+  - docs/03-sessions/
+  next_action: Queued behind phase-plfx-02 and the owner's G3 approval of PLAN-052.
+- id: phase-plfx-04
+  title: Keep code reservations of live worktrees past their TTL, and correct the reservation wording
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  systems:
+  - sys-plugin-documents
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-plfx-03
+  scope:
+  - Write the R12 tests first (a reservation from a linked worktree survives a prune 15 days later; after
+    git worktree remove it is pruned; a worktree now on another branch does not keep it; a reservation
+    without the new fields is pruned by age) and record
+    the first failing at d8a635b (PLAN-052 D10).
+  - Record branch and worktree as separate fields in the reservation payload in
+    plugins/idea-realization/scripts/reservations.py, and in prune skip a reservation whose worktree is
+    still listed by git worktree list --porcelain on that branch; reservations without the fields keep the
+    age rule.
+  - Correct docs/document-codes.md so the risk is expiry before the document merges (R13), and
+    regenerate docs/tools.md if the docstring changed.
+  acceptance:
+  - The live-worktree test fails at d8a635b and passes on the branch; the session record quotes both runs.
+  - A removed worktree's reservation and a legacy reservation are both pruned after 15 days.
+  - A reservation whose recorded worktree is still listed but now on a different branch is not kept past
+    its TTL - it is pruned after 15 days.
+  - The phrase "expired before its document was written" is absent from docs/document-codes.md.
+  - The plugin suite count is the previous phase's count plus this phase's new tests, with none removed.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/scripts/reservations.py
+  - plugins/idea-realization/test/test_reservations.py
+  - plugins/idea-realization/docs/document-codes.md
+  - plugins/idea-realization/docs/tools.md
+  - docs/03-sessions/
+  next_action: Queued behind phase-plfx-03 and the owner's G3 approval of PLAN-052.
+- id: phase-plfx-05
+  title: Give the plugin's idea.py amend a --file option and use it in the idea skill
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  systems:
+  - sys-plugin-ideas
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-plfx-04
+  scope:
+  - Write the R14 tests first (an amend from a file whose body holds a single quote, a double quote and
+    $(touch P); --file together with --title refused) and record them failing at d8a635b at the
+    command-line level (PLAN-052 D10).
+  - Add --file to amend in plugins/idea-realization/scripts/idea.py with add --file's title and body
+    split, refusing --file with --title or --body; record only fields that differ from the current value
+    and refuse an amendment that changes nothing (owner, 2026-09-27; PLAN-052 open question 1).
+  - Change the amend example in skills/idea/SKILL.md to use --file, and regenerate docs/tools.md.
+  acceptance:
+  - The amend-from-file test fails at d8a635b (non-zero exit, unrecognised --file) and passes on the
+    branch, with the body byte-identical and no P created.
+  - amend --file f --title t exits non-zero and appends nothing; an amend from a file equal to the current
+    title and body exits non-zero and appends nothing; one with only the body changed records only the body.
+  - No amend example in skills/idea/SKILL.md passes a title or body as a quoted argument.
+  - The plugin suite count is the previous phase's count plus this phase's new tests, with none removed.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/scripts/idea.py
+  - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/skills/idea/SKILL.md
+  - plugins/idea-realization/docs/tools.md
+  - docs/03-sessions/
+  next_action: Queued behind phase-plfx-04 and the owner's G3 approval of PLAN-052.
+- id: phase-plfx-06
+  title: Document partition acceptance and phase completion as human controls, with recommended ask permission rules
+  plan: doc-plugin-audit-remediation
+  sources:
+  - doc-plugin-audit-remediation-requirements
+  - doc-plugin-audit-remediation
+  systems:
+  - sys-plugin-absolutes
+  - sys-plugin-partition
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-plfx-05
+  scope:
+  - Write the R15 test first (protocol.md section 7 has a row for partition acceptance and one for phase
+    completion) and record it failing at d8a635b (PLAN-052 D10).
+  - Add the two section 7 rows to plugins/idea-realization/docs/protocol.md, saying no script verifies
+    either; add the sentence to skills/partition-ideas/SKILL.md that accept does not check for the
+    owner's ruling.
+  - Check the current Claude Code permission-rule syntax against its documentation, then recommend in
+    the README an ask rule for the partition accept command and an ask rule on Edit of the configured
+    backlog file for the phase-completion edit (owner, 2026-09-27; PLAN-052 open question 2).
+  acceptance:
+  - The section 7 test fails at d8a635b and passes on the branch, and it rejects a fixture protocol.md
+    with either row removed.
+  - A grep of the README finds both recommended rules, and a grep of the partition skill finds the
+    sentence.
+  - The plugin suite count is the previous phase's count plus this phase's new tests, with none removed.
+  verification:
+  - cd plugins/idea-realization && uv run pytest
+  - claude plugin validate plugins/idea-realization --strict
+  - uv run python tools/check_no_private_content.py
+  - uv run python -m src.governance
+  - uv run pytest
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/skills/partition-ideas/SKILL.md
+  - plugins/idea-realization/README.md
+  - plugins/idea-realization/test/test_protocol_controls.py
+  - docs/03-sessions/
+  next_action: Queued behind phase-plfx-05 and the owner's G3 approval of PLAN-052.
