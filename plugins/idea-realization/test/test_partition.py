@@ -158,6 +158,16 @@ def test_a_staging_directory_that_is_not_gitignored_stops_the_sweep_before_writi
     assert not where.staging.exists()
 
 
+def test_a_staging_directory_outside_any_checkout_stops_the_sweep(
+        root: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    outside = tmp_path / "outside"
+    args = ["--root", str(root), "--staging-dir", str(outside)]
+    assert idea_corpus.main(["locate", *args]) == 1
+    assert "not gitignored" in capsys.readouterr().err
+    assert idea_corpus.main(["build", *args]) == 1
+    assert not outside.exists()
+
+
 def test_writing_the_corpus_leaves_the_primary_checkout_status_unchanged(where: Layout) -> None:
     before = idea_corpus.status_digest(where.primary)
     idea_corpus.build(where.idea_log, where.corpus, frozenset({"triaged"}))

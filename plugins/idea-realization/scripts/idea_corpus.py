@@ -140,24 +140,25 @@ def _repository_of(path: Path) -> Path | None:
     return Path(top.stdout.strip()).resolve() if top.returncode == 0 else None
 
 
-def is_ignored(directory: Path) -> bool | None:
-    """Whether git ignores files in ``directory``; None when it is in no git checkout.
+def is_ignored(directory: Path) -> bool:
+    """Whether ``git check-ignore`` accepts files in ``directory``.
 
-    A path in a checkout that git will not answer for (outside it, say) counts as not ignored.
+    A directory in no git checkout, or one git will not answer for, counts as not ignored:
+    nothing but an accepted ``check-ignore`` lets the sweep write.
     """
     repository = _repository_of(directory)
     if repository is None:
-        return None
+        return False
     probe = directory.resolve() / "idea-partition-probe.md"
     return _git(repository, "check-ignore", "-q", str(probe)).returncode == 0
 
 
 def guard_write(directory: Path) -> None:
     """Refuse to write into a checkout's directory that git does not ignore."""
-    if is_ignored(directory) is False:
-        raise CorpusError(f"{directory} is not gitignored; writing there would change the "
-                          "checkout's git status. Ignore it (the scaffold skill offers to) or "
-                          "configure a staging directory that is.")
+    if not is_ignored(directory):
+        raise CorpusError(f"{directory} is not gitignored in a git checkout. "
+                          "Ignore it (the scaffold skill offers to) or configure a staging "
+                          "directory that is.")
 
 
 def status_digest(checkout: Path) -> str:
@@ -666,10 +667,10 @@ def _locate(where: Layout) -> int:
         print(f"corpus_size: {manifest['corpus_size']} | status: {','.join(manifest['status'])}"
               f" | seed: {manifest['shuffle_seed']} | corpus date: {corpus_date(where.corpus)}")
         print(f"stamp: {run_stamp(manifest)}")
-    if ignored is False:
+    if not ignored:
         print(f"refused: {where.staging} is not gitignored in {where.primary}", file=sys.stderr)
         return 1
-    print("staging ignored: " + ("yes" if ignored else "no checkout"))
+    print("staging ignored: yes")
     return 0
 
 
