@@ -185,8 +185,9 @@ exits 0 before any hand-off.
 
 - Every session works in its own worktree on its own branch, whatever the work touches, and the
   primary checkout's branch is never switched. The only work in the primary checkout is the claim
-  commit plus the catalog regeneration it forces, committed together, and the fast-forward that
-  integrates a branch.
+  commit plus the catalog regeneration it forces, committed together; the fast-forward that
+  integrates a branch; and the completion edit that follows it (`backlog-protocol.md`, section 10).
+  While sessions run under `multi-session.md`, its turn purposes are the complete list.
 - The branch is `agent/<phase-id>` and the worktree is `<worktree directory>/<phase-id>`. The
   worktree directory sits outside the repository, so no scan or test walks a second copy.
 - Ignored directories (virtual environments, databases, `node_modules`) belong to one worktree.

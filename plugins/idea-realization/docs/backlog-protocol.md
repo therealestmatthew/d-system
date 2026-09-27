@@ -95,7 +95,8 @@ illustrative. Source ids stay stable when a file moves.
 - `max_active` bounds the number of simultaneously active phases. Raising it authorizes nothing by
   itself.
 - An agent holds at most one active phase and reuses the agent id it chose once.
-- Orientation runs the check and the tests first. If either fails, nothing is claimed.
+- Orientation runs the check and the tests first. If either fails, nothing is claimed. While
+  sessions run under `multi-session.md`, the tests run in the new worktree instead (section 4 there).
 - The owner is asked before a claim is committed. An unanswered question is not a yes.
 - A claim is one commit on the integration branch in the primary checkout. It holds this phase's
   `status: active` and `agent`, the backlog `updated` set to today, and the regenerated catalog,

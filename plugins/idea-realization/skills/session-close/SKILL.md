@@ -96,7 +96,8 @@ Write these as narrative someone could read in six months, not as a restatement 
 ## 6. Hand off for integration
 
 Rebase onto the integration branch, re-run the check and the repository's tests, and ask the owner
-whether to integrate, as the `session-start` skill's hand-off describes. Until the owner approves and
+whether to integrate, as the `session-start` skill's hand-off describes. Under the plugin's
+`docs/multi-session.md`, the owner's approval arrives relayed as `GRANTED merge`. Until the owner approves and
 the merge happens, condition 3 is unmet and the phase stays `active`.
 
 ## 7. Decide completion — the only step that may write `status: complete`

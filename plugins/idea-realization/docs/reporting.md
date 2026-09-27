@@ -65,6 +65,9 @@ per distinct ask.
 - Asks that belong together for one future session are linked to a shared anchor idea and
   annotated there, so they come up together.
 
+While sessions run under `multi-session.md`, capturing an ask means sending it to the Ideation
+session as an `IDEA` message; the immediacy and one-per-ask rules are unchanged.
+
 The idea log is the capture path in every session and context. It keeps the current work
 uninterrupted and makes sure the ask outlives the session.
 

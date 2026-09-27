@@ -66,6 +66,10 @@ claims.
 **If the check or the tests fail, stop.** Create no branch, no worktree, and claim nothing. Report
 the failure and nothing else.
 
+While sessions run under the plugin's `docs/multi-session.md`, the tests in this step run after
+step 4, in the new worktree, never in the primary checkout. If they fail there, hand the phase back
+as an interrupted phase: return it to queued with an exact `next_action`, and remove the worktree.
+
 ## 2. Ask before the claim commit
 
 The claim is a change peers read as a lock. Ask with the AskUserQuestion tool whether to claim the
@@ -163,7 +167,8 @@ In the worktree, in this order:
    Never stash a peer's uncommitted work and never force an integration around it; uncommitted
    changes there are someone's work in progress, to be reported and waited on.
 5. **Ask the owner before merging into the integration branch.** A green branch on a clean
-   integration branch is ready to integrate, not cleared to. Without a yes, leave the branch
+   integration branch is ready to integrate, not cleared to. Under the plugin's
+   `docs/multi-session.md`, a `GRANTED merge` relayed by the Session Manager is the owner's yes. Without a yes, leave the branch
    unmerged and report that it is ready for review with `git diff <integration branch>..agent/<phase-id>`.
 
 Marking the phase complete is not part of this procedure. The `session-close` skill does that, and
@@ -199,5 +204,6 @@ never resolve it with a merge commit that skips the green run.
 ## What this skill never does
 
 - It never marks a phase complete.
-- It never merges into the integration branch without the owner saying so in this session.
+- It never merges into the integration branch without the owner's approval, given in this session
+  or relayed as `GRANTED merge` under the plugin's `docs/multi-session.md`.
 - It never switches the primary checkout away from the integration branch.

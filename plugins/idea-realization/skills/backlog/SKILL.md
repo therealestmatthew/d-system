@@ -23,7 +23,9 @@ CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
-Then the repository's own test command, if it has one. Report the real output. **If either fails,
+Then the repository's own test command, if it has one; while sessions run under the plugin's
+`docs/multi-session.md`, run it in the session's worktree once that exists, never here. Report
+the real output. **If either fails,
 stop**: report the failure and nothing else. Do not orient and do not offer to continue past it. A
 failure found before any edit is a fix; the same failure found three edits in is tangled with
 yours.

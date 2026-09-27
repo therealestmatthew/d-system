@@ -53,6 +53,19 @@ Carried by the `idea-triage` skill and its agent (`agents/idea-triage.md`).
   only a `PROPOSED PROMOTION:` line; runs a writer command other than `annotate`; invents a
   relationship it has not verified by reading the target.
 
+### Partition
+
+Carried by the `partition-ideas` skill, its partition pack (`partition-pack.md`) and its analyst
+and adversary agents.
+
+- **Receives:** ideas at `triaged`, the partition pack and its corpus, and the request that starts
+  the sweep.
+- **Produces:** a proposed partition record (tracks, member ideas, and a new-plan-or-amendment
+  ruling per track). It stays a proposal until the owner accepts it at the partition-acceptance
+  gate.
+- **Never:** accepts its own partition; proceeds past an adversary blocker without one revision
+  cycle first; treats agreement between proposal and adversary as the owner's acceptance.
+
 ### Planner
 
 Any session that writes a plan. Supported by `protocol.md` section 4, the plan and requirement
