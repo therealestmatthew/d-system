@@ -14949,7 +14949,7 @@ items:
   - Write docs/protocol.md, docs/backlog-protocol.md, docs/document-codes.md and docs/reporting.md
     from the extractions, inlining the ledger's still-standing rules into the documents they amend
     and naming the integration branch and directories by their userConfig role.
-  - Write the trace table PLAN-048.07-trace.md in this repository, one row per plugin rule with its
+  - Write the trace table PLAN-048.10-absolutes-trace.md in this repository, one row per plugin rule with its
     source passage, plus the ledger triage's classification (still-standing versus history) so
     phase-plug-09 reads it rather than re-dispatching family C.
   - Write test/test_no_history.py, the history-word grep over the plugin's docs/.
@@ -14972,7 +14972,8 @@ items:
   - plugins/idea-realization/docs/document-codes.md
   - plugins/idea-realization/docs/reporting.md
   - plugins/idea-realization/test/test_no_history.py
-  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-trace.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.10-absolutes-trace.md
+  - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.07-absolute-documents.md
   - plugins/idea-realization/docs/vocabulary.md
   next_action: Waits for phase-plug-04 and phase-plug-06. Start from
     _working/session-manager/plugin-analysis/05-governance-documents.md sections 1 and 5; families
