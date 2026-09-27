@@ -52,7 +52,7 @@ are history. §5 proposes six families. The owner excluded GOV-007 and GOV-015.
 - **GOV-010's worked examples are dropped**, leaving the mechanical table and the judgements
   P1–P11, Q1–Q5, T1–T2 stated abstractly (analysis 05 §2 note). Rejected: inventing generic
   examples (prose that performs).
-- **The trace table lives in this repository** (`PLAN-048.07-trace.md` in this folder), one row
+- **The trace table lives in this repository** (`PLAN-048.10-absolutes-trace.md` in this folder), one row
   per plugin rule: plugin document and section, source document and line. The plugin never cites
   it (R02).
 
