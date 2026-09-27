@@ -359,6 +359,77 @@ Shared configuration flags: every configured path and value, resolved by the sha
 
 Exit codes found in source: 0, 1.
 
+## `idea_corpus.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/idea_corpus.py"
+```
+
+Build and check the files of an idea partition sweep: corpus, prompts, reports and draft.
+
+The partition-ideas skill runs every step of a sweep through this script, so no step depends on
+a command typed out by hand. The subcommands, in the order a sweep uses them:
+
+    idea_corpus.py locate                       # where the sweep's files live; exit 1 if unsafe
+    idea_corpus.py start                        # resume a sweep in progress, or move an old one aside
+    idea_corpus.py build [--status open,triaged] [--seed N] [--exclude ids.txt] [--stats]
+    idea_corpus.py prompt R1                    # one pack section, filled in, saved as sent
+    idea_corpus.py report R1 --file reply.md    # write an agent's returned report, stamped
+    idea_corpus.py name <corpus date>           # the draft's markdown and record paths
+    idea_corpus.py check <draft.md> <draft.json>
+    idea_corpus.py accept <draft.md> <draft.json>
+
+**Where things live.** Subagents run in the primary checkout, whatever worktree the coordinator
+is in, so every file an agent reads is in the primary checkout's staging directory
+(``staging_dir``): the corpus, the reports and the synthesis draft. The primary checkout is the
+first entry of ``git worktree list``. ``prompt`` fills each pack section with absolute paths
+there, so the second audit reads the draft at a path it can open. The accepted partition is
+copied by ``accept`` into ``partitions_dir`` in the current checkout, where it can be committed.
+
+**The staging directory must be gitignored.** ``locate`` exits 1 when it is not, and every
+subcommand that writes into it refuses to. ``locate`` also prints a digest of the primary
+checkout's ``git status``; the skill compares it before and after its writes there.
+
+**The corpus.** ``build`` selects the ideas whose folded status is in ``--status`` (one status or
+a comma-separated list, default ``triaged``), minus the ids an optional ``--exclude`` file lists
+(one six-digit id per line, ``#`` comments allowed; no file means no exclusions). It writes two
+files that differ only in what they carry, so the control analyst cannot tell its input differs:
+
+    corpus-R1.md   title, body, links, findings
+    corpus-R4.md   title, body, links           <- the control
+
+and ``manifest.json``: the corpus size, the status selection, the excluded ids, the ideas with
+more than one finding, and a random seed that identifies the build. "Findings" are every
+annotation of kind ``finding``, any author, in time order. ``--stats`` prints the manifest and
+writes nothing.
+
+**The run stamp.** Every file the sweep writes into the corpus directory, and the draft markdown,
+starts with a stamp naming the build it belongs to. That is how ``start`` tells this sweep's
+output from an earlier sweep's file at the same path.
+
+Nothing here writes the idea log.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `--status` | status or comma-separated statuses to select (default: triaged) |  |  |  |
+| `--seed` | the build's seed; drawn at random if omitted |  |  |  |
+| `--out` | output directory (default: <staging>/corpus in the primary checkout) |  |  |  |
+| `--exclude` | file of idea ids to leave out, one per line; none by default |  |  |  |
+| `--stats` | print the manifest; write nothing |  |  |  |
+| `section` |  |  |  |  |
+| `--draft` | the synthesis draft (S and A2) |  |  |  |
+| `section` |  |  |  |  |
+| `--file` | the returned text |  |  | yes |
+| `date` | the corpus date, from locate |  |  |  |
+| `markdown` |  |  |  |  |
+| `record` |  |  |  |  |
+| `markdown` |  |  |  |  |
+| `record` |  |  |  |  |
+
+Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 1.
+
 ## `ideas.py`
 
 ```bash
