@@ -15048,8 +15048,8 @@ items:
   deliverables:
   - plugins/idea-realization/
   - docs/03-sessions/
-  next_action: Waits for phase-plug-03 and phase-plug-09. Runs alone on the plugin tree. Create the scratch
-    repository outside this repository and its worktrees.
+  next_action: Every acceptance condition is met and the independent review is recorded in the session
+    record; waits for the owner-approved merge, then the completion edit on the integration branch.
 - id: phase-plug-09
   title: Governance documents as absolutes, part two — methodology, role contracts and review, multi-session coordination
   plan: doc-idea-realization-plugin

@@ -52,7 +52,9 @@ Governance OK: 43 systems, 389 documents, 34 memories, 323 backlog phases
 
 ## Backlog
 
-`status: active`, `agent: agent-builder-b`.
+`status: active`, `agent: agent-builder-b`. `next_action`: every acceptance condition is met and the
+independent review is recorded in the session record; waits for the owner-approved merge, then the
+completion edit on the integration branch.
 
 ## Unresolved
 
@@ -87,7 +89,8 @@ The plugin was loaded from this phase's worktree rather than the primary checkou
 below was exercised by the steps after it; at the start the two trees were identical. Where a
 skill stopped for a person's answer (a consent, a claim, a partition gate), I answered as the
 scratch repository's person by resuming that session with `--resume`. The quoted output below is
-each command's tool result as the nested session received it.
+each command's tool result as the nested session received it, except the scratch repository's
+setup above and the one post-fix `paths.py` check in step 8, which I ran directly.
 
 ## The exercise
 
@@ -486,7 +489,8 @@ $ git -C <scratch>/orchard worktree add -b agent/phase-harvest-01 <scratch>/orch
 ```
 
 The nested session re-read the values from the primary checkout, which would have given the
-right answer before the fix too. Run from the worktree with the fixed script:
+right answer before the fix too. Run from the worktree with the fixed script, directly by this
+session rather than through a nested one:
 
 ```
 $ uv run .../scripts/paths.py | grep worktree_dir      # from <scratch>/orchard-worktrees/exercise
@@ -586,6 +590,74 @@ marketplace. Installing into a real repository is the owner's own step, outside 
 
 ## Review
 
+One independent `demo-adversary` review ran on `dev...HEAD` at `5d06cbf`. The type follows the
+owner's choice for the plugin phases. It stopped at its turn limit and delivered on request. Its
+report, condition by condition:
+
+**Verification**, reproduced: 497 passed; `✔ Validation passed`;
+`check_no_private_content: OK (1053 tracked files, 0 identifiers checked)`;
+`Governance OK: 43 systems, 389 documents, 34 memories, 323 backlog phases`. The catalog
+regenerated clean; `docs/tools.md` is current against a fresh `--check`; the R02 and no-history
+tests pass, 12 of 12.
+
+**Minor**: "one quoted command in the session record has no supporting transcript evidence." The
+post-fix `paths.py | grep worktree_dir` quote in step 8 appears in no nested transcript; the only
+matching output ran from the primary checkout, so the record's statement that every quote is the
+nested session's tool result was untrue for that line. The reviewer reran it from the exercise
+worktree and got the quoted value: "mechanically true and reproducible", "worth a one-line
+disclosure". **Fixed**: the method paragraph and step 8 now say this session ran it directly.
+
+**No other discrepancy.** The reviewer checked against the transcripts: the first sweep's refusal,
+the corpus build and R1/R4 reports, audit 1's framing, the A2 dispatch and findings, the
+pre-fix `worktree_dir` output, the claim commit, and the final doctor and second-scaffold block.
+All match, allowing for the stated elisions. It found no defect in the transcripts that the record
+omits.
+
+**The `worktree_dir` fix** "holds under adversarial testing": the new test fails with the fix
+reverted, with exactly the bug described, and the suite passes with it; a non-git directory falls
+back to `<dir>/../<dir>-worktrees`; a bare repository resolves sanely; every `primary_checkout`
+call site still matches; the README's row and install step 5 match the code.
+
+**README**: no false claim found in the spot-checked claims against the skills and scripts.
+
+**Ideas 000474, 000475 and 000476**: present on `dev`, linked to 000470, content matching the
+table.
+
+**Verdicts:**
+1. Record names the scratch repository, quotes real output, lists the scaffold's files: **Met,
+   with a caveat**: the one undisclosed direct quote, since disclosed.
+2. The second audit ran and its findings are in the record: **Met**. `dispatch-A2.txt` names the
+   primary-checkout draft while the nested session worked in the worktree.
+3. A second scaffold run creates no file: **Met**.
+4. Every defect fixed with a test or recorded as an idea by id: **Met**.
+
+"Nothing here rises to blocker or major."
+
+## Decisions
+
+- **The plugin loaded from this phase's worktree**, not from the primary checkout the assignment
+  named. The two were identical at the start, and loading from the worktree meant the steps after
+  the fix exercised it. The record says so.
+- **I answered the skills' questions as the scratch repository's person**: the `.gitignore`
+  consent, the three partition gates, the claim, and fast-forwarding the scratch `main`. The
+  exercise needed someone in that seat. None of these answers touched this repository.
+- **Triage ran on all four ideas**, not one, because the sweep's corpus defaults to triaged
+  ideas and its open-set gate stops on open ones.
+- **The `worktree_dir` defect was fixed here**: one resolver moved into `paths.py`, one test. The
+  doctor's drift reporting, the missing decision record and the partition schema's missing
+  condition field each needed a design choice, so they went to Ideation as ideas.
+- **The handover note is in this record**, not appended to the Session Manager's restart file as
+  the plan says, on the Session Manager's instruction; it is sent with READY.
+
+## Corrections
+
+- The record first stated that every quote was the nested session's tool result, which was untrue
+  for one line. The review caught it, and the record now discloses it.
+- The first draft of the record said the triage runs proposed three links; they proposed five.
+  Corrected before commit.
+
 ## Left undone
 
 - The completion edit waits for the owner-approved merge.
+- Ideas 000474, 000475 and 000476, batched on 000470 for the planning after this phase.
+- The scratch repository under the session's scratchpad is disposable and is not kept.
