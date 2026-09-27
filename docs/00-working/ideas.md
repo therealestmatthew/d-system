@@ -5564,6 +5564,7 @@ PROPOSED LINK: 000106 --relates_to--> 000057 (both address system testing strate
 
 - relates_to → `000057`
 - relates_to ← `000121`
+- relates_to ← `000491`
 
 ---
 
@@ -21564,6 +21565,7 @@ No plan, requirement or ADR found that addresses session autonomy configuration.
 **Links**
 
 - extended_by ← `000469`
+- extended_by ← `000496`
 
 ---
 
@@ -21960,6 +21962,7 @@ prerequisites.py (lines 31-43) lists Windows as supported, but nothing runs the 
 **Links**
 
 - relates_to → `000477`
+- relates_to ← `000489`
 
 ---
 
@@ -22025,3 +22028,118 @@ Audit finding F5 (not confirmed as a defect): the plugin's backlog check accepts
 
 - relates_to → `000477`
 - relates_to → `000473`
+
+---
+
+## 000489 · Audit Linux and Windows compatibility across every built function in the repository, Windows especially
+
+**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "need to audit Linux plus windows compatibility across all built functions in the repo (namely windows compatibility since this repo was built on linux)."
+
+Related: 000484 (Windows CI coverage for the idea-realization plugin's scripts) covers the plugin only; this asks for the whole repository.
+
+**Links**
+
+- relates_to → `000484`
+
+---
+
+## 000490 · Find out what happened to the system boundary study the owner had ChatGPT perform
+
+**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "need to figure out what happened to the boundary study I had ChatGPT perform for eventually parsing out the different key features of this repo (idea realization engine, the workbench / separate from the workbench HTML generation in general)"
+
+What Ideation found when recording (read-only, dev 270e688): the study is on dev. REQ-033 (system boundary study requirements), PLAN-050 with sub-plans PLAN-050.01 to .05, PROMPT-041 (phase runner), working evidence under docs/00-working/boundary-study/, and the decision report ARCH-012 (status: draft, 2026-09-26). Its phases phase-bnd-01 to phase-bnd-05 are all complete in the backlog. The Session Manager's restart notes record that its 28 commits landed on local dev outside the lock on 2026-09-26 and that the owner ruled keep and push. ARCH-012's recommendation: keep one repository now and set explicit ownership and interface contracts before any package or repository extraction. It is a draft awaiting the owner.
+
+**Links**
+
+- relates_to → `000492`
+
+---
+
+## 000491 · A running list of the repository's active HTML artifacts, static and live, with a workflow that keeps each in sync as the repository changes
+
+**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running list of active HTML artifacts in this repo. Static references and libe ones that we need to ensure workflow exists to maintain them in sync as the repo grows and changes."
+
+("libe" is recorded as typed; read as "live".) Related: 000106 (no drift test covers _public/overview/index.html), 000300 and 000301 (auto-regenerated idea and backlog pages).
+
+**Links**
+
+- relates_to → `000492`
+- relates_to → `000106`
+
+---
+
+## 000492 · An active reference artifact for each major area of the repository, starting from an inventory of what exists
+
+**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a reference artifact (active) for each of: governance docs, Idea Realization Engine (IRE), Workbench, HTML generator, personal productivity system, protocol docs, boundary study (repeatable process for what ChatGPT did), Plan Audit Procedure, Build Audit Procedure, Planning Procedure (including different levels of granularity and complexity of plans from a single plan phase file to multi-phase complex plans with references and use of the prompt pack protocol), maybe consider separate artifacts for subcomponents of IRE (Idea Capture, Idea Fold, Idea Triage, Idea Partition, Idea Analytics, etc.). [...] Also need an artifact for the literature review research protocol. Some of these may exist already so we need to first inventory what we have and align on structure and how they are presented, target audience, how to make them most effective and mantainable and so on."
+
+Batch anchor for the owner's 2026-09-27 artifact asks: the artifact registry, the artifact-and-docs tracking agent, the path-finding agent, the HTML artifact list and the boundary study question relate to this idea. The first step the owner named is the inventory, then agreement on structure, presentation, target audience, effectiveness and maintainability.
+
+**Links**
+
+- relates_to ← `000490`
+- relates_to ← `000491`
+- relates_to ← `000493`
+- relates_to ← `000494`
+- relates_to ← `000495`
+
+---
+
+## 000493 · An artifact that tracks every artifact in the repository, and the protocol for maintaining them
+
+**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We definitely need an artifact for tracking all the artifacts and protocol for maintaining them."
+
+Close to the running list of active HTML artifacts recorded in the same batch; kept separate because the owner named it separately and it covers every artifact plus the maintenance protocol.
+
+**Links**
+
+- relates_to → `000492`
+
+---
+
+## 000494 · A dedicated agent that tracks the repository's artifacts, protocols, governance and documents
+
+**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We maybe need a dedicated agent for tracking all the artifacts and protocols and governance and docs in the repo."
+
+**Links**
+
+- relates_to → `000492`
+
+---
+
+## 000495 · An agent that tracks paths and finds things in the repository
+
+**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Maybe another agent for tracking paths and finding things in the repo."
+
+**Links**
+
+- relates_to → `000492`
+
+---
+
+## 000496 · Port the session autonomy configuration to the idea-realization plugin's multi-session.md and session-manager-messages.md once it has been used in d-system
+
+**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+
+[agent-proposed by Session 1 - Builder A]
+
+Relayed by Session 1 - Builder A, 2026-09-27, as given: port the session autonomy configuration (PLAN-051 / REQ-034: axes, presets, mobile flag, resolver, MODE message) to the idea-realization plugin's multi-session.md and session-manager-messages.md once it has been used in d-system. The owner ruled "not now" on 2026-09-27. Extends 000466 (make the sessions' level of autonomy configurable through a referenced autonomy configuration file).
+
+State when recorded: REQ-034 and PLAN-051 (session autonomy configuration, with phase-mode-01..03) are drafted on branch agent/plan-autonomy-levels (8f1c966) and not yet on dev. The two target files exist at plugins/idea-realization/docs/multi-session.md and plugins/idea-realization/docs/session-manager-messages.md.
+
+**Links**
+
+- extends → `000466`
