@@ -90,7 +90,7 @@ legal amendment retracts it.
 | Type | Inverse | Meaning | May point at a document |
 |---|---|---|---|
 | `extends` | `extended_by` | This idea builds on the target. | yes |
-| `supersedes` | `superseded_by` | This idea replaces the target. It does not discard the target; that is a separate status event. | no |
+| `supersedes` | `superseded_by` | This idea takes the place of the target. It does not discard the target; that is a separate status event. | no |
 | `relates_to` | `relates_to` | A symmetric relationship, its own inverse. | yes |
 | `component_of` | `has_component` | This atomic idea functions within the target compound idea. Many-to-many. | no |
 
@@ -189,7 +189,7 @@ Applied when more than one value seems to fit, and recorded by id in the classif
 | `O1` | ontological | Artifact vs Process. Editing a file, schema, code or data is Artifact. Changing steps, their order or who performs them is Process, even when the steps live in a file. If the title names both, pick the thing the record's observation measures or counts; if nothing is measured, Process. |
 | `O2` | ontological | Actor vs Artifact. An agent type and its remit or definition are Actor / Agent. Tooling that generates, indexes or lists agent files is Artifact. |
 | `O3` | ontological | Metric vs Artifact or Process. Metric / Standard only when the number or threshold is the subject. The tool that computes it, or the step that checks it, is Artifact or Process. |
-| `O4` | ontological | Event. An incident that evidences a lasting defect is evidence, not the subject. Classify the defective thing. |
+| `O4` | ontological | Event. An event that evidences a lasting defect is evidence, not the subject. Classify the defective thing. |
 | `O5` | ontological | Actor vs Process. Adding, removing or re-scoping a role is Actor / Agent. Changing an existing role's steps is Process. |
 | `O6` | ontological | A bundle of unrelated findings. The record is `knowledge` with `decompose` set. Its ontological value is the value its parts share, otherwise the value of the first finding named in the title. |
 | `E1` | epistemic | The record's point. Classify what the record asks or asserts as its point, using the title as the proxy. A defect, count or fact in the title is Axiom. An imperative, proposal or question is Not Applicable. |
