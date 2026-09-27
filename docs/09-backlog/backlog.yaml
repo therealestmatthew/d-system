@@ -3,7 +3,6 @@ updated: '2026-09-27'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
-- phase-grd-02
 - phase-idg-19
 - phase-dam-01
 - phase-grd-03
@@ -14057,7 +14056,7 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 1
   session_budget: 1
@@ -14089,18 +14088,22 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/06-requirements/REQ-028-deterministic-guards.md
-  next_action: Rebased onto dev 2026-09-27; independent review re-run (demo-adversary), both findings fixed;
-    READY sent. The merge is held by the owner until they are at the terminal and dev is pushed; then
-    GRANTED merge, ff-merge and the completion edit with --catalog.
+  next_action: Complete. The Session Manager runs tools/check_dev_ci.py --wait 600 before each claim, dryrun
+    and merge grant (GOV-017, OPS-025).
   session: doc-session-green-dev-ci-before-grants
   completion_evidence:
   - tools/check_dev_ci.py
   - test/test_check_dev_ci.py
   - docs/08-governance/OPS-025-check-dev-ci.md
   - docs/03-sessions/SESS-2026-09-24-03-green-dev-ci-before-grants.md
-  result: Tool, 27 tests, OPS-025 and the GOV-017/PROMPT-037/REQ-028 edits are built; after the 2026-09-27
-    rebase, verification green in the worktree (1152 passed) with the live tool at exit 2 (dev not pushed)
-    and exit 1 on 024443c. Independent review 2026-09-27, no blockers; both findings fixed.
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/06-requirements/REQ-028-deterministic-guards.md
+  result: 'check_dev_ci.py with 27 tests over recorded gh JSON; live run exit 2 (dev not pushed) at the head
+    and exit 1 with the run URL on 024443c; OPS-025; GOV-017, PROMPT-037 item 1 and REQ-028 R06 state the
+    green-CI grant rule and push-before-TURN-DONE. After the rebase onto 61bc946: governance OK, 1152 passed,
+    ruff and mypy clean, re-run green by the Session Manager. Independent demo-adversary review: no blockers,
+    both findings fixed. Merged with the owner''s approval, 2026-09-27.'
 - id: phase-grd-03
   title: 'Branch diff guards: the test-count baseline, the diff-pattern check and the plan-versus-registered
     check'
