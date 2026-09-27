@@ -21147,13 +21147,29 @@ The owner's words, as relayed: "Ideation agent was very confusing in it's wordin
 
 ## 000455 · Package the idea capture and triage system as a shareable Claude Code plugin
 
-**Created 2026-09-25T12:09:36-04:00 · Status: `open`**
+**Created 2026-09-25T12:09:36-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, in the Session Manager session. The owner asked: "What would be an impactful plugin we could create and share with what exists in this repository today?" The Session Manager recommended the idea capture and triage system, and the owner chose it: "Let's do the idea capture and triage." The owner wants it built next, before the active work resumes.
 
 Scope, as the Session Manager proposed it (to be settled in planning): the /idea skill; the sanctioned writer tools/append_idea.py over an append-only ideas.jsonl; fold() to read state and the ideas.md renderer; the idea schema; the idea-triage agent and the /idea-triage workflow; and the four-axis classification (ARCH-005, accepted 2026-09-25). The packaging work is making paths configurable, removing references specific to this repository (_private/, the backlog, governance documents), and writing documentation.
 
 Related: 000439 (install features into a target repository deterministically): a plugin is a ready-made install mechanism, and the owner's rulings of 2026-09-25 apply (the unit of installation is a workflow; settings and hooks are written only with recorded consent). Also 000436 (the multi-repository anchor), 000433 (skills vs agents), 000452 (the four-axis schema work) and 000127 (the idea skill delegates capture to a subagent).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:05-04:00): Idea 000455 (package the idea capture and triage system as a shareable Claude Code plugin) is being delivered through PLAN-048 (Idea-realization plugin), an approved plan the owner authorized on 2026-09-25. The scope expanded from capture and triage alone to the whole idea-realization pipeline: capture, fold, render, triage, priority queue, four-axis classification, partition, planning and phases, backlog, document governance, generators, repository layout, and the working agreement and governance documents.
+
+The plan governs nine phases, phase-plug-01 through phase-plug-09. Status on 2026-09-26: five complete (01, 02, 04, 05, 06), two active (03, 07), two queued (08, end-to-end exercise and handover; 09, governance documents part two). The requirements are in REQ-031 (Idea-realization plugin requirements, draft, created 2026-09-25), which cites 000455 by id.
+
+The idea mentions as related context, without recorded links: 000439 (install features deterministically), 000436 (multi-repository systems), 000433 (skills vs agents taxonomy), 000452 (four-axis schema) and 000127 (idea skill architecture). Ideas 000456-000460 extend this one and are already linked.
+
+No related plan, phase, requirement or backlog item found outside PLAN-048 and REQ-031. Not proposed for promotion: the plan is still in execution.
+
+</details>
 
 **Links**
 
@@ -21167,13 +21183,39 @@ Related: 000439 (install features into a target repository deterministically): a
 
 ## 000456 · Extend the plugin to the whole idea-realization pipeline: priority queue, four-axis schema, partition, planning and phases, backlog and its ordering
 
-**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+**Created 2026-09-25T12:24:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, answering the Session Manager's scope question for 000455 (package the idea capture and triage system as a shareable Claude Code plugin). Asked whether version 1 should be capture + fold + render + triage only, the owner replied that it should include "capture + fold + render + triage + priority queue + four-axis schema. It should also include partition, planning + phases, backlog, backlog ordering. It should include all vocabulary related to idea properties (link types of relationships and so on)."
 
 What this touches in the repository today: the idea priority queue (src/governance/idea_priority.py, docs/00-working/ideas-priority.yaml, schemas/idea-priority.schema.json); the four-axis classification (ARCH-005, whose schema fields are phase-idg-01's unbuilt work); the partition sweep (the partition-ideas skill, the partition-analyst and partition-adversary agents, schemas/idea-partition-record.schema.json); planning documents and phases (docs/01-plans, GOV-001); the backlog and its ordering (docs/09-backlog/backlog.yaml, src/governance/backlog.py, next_up, the backlog skill).
 
 Unresolved: whether this ships as one plugin or several in one marketplace (000439 rules the unit of installation is a workflow); whether the four-axis fields are built here first (phase-idg-01) and then ported, or the plugin leads; sequencing against the coordination work that is paused for the plugin build.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:06-04:00): The scope that 000456 proposes — priority queue, four-axis classification, partition, planning and phases, backlog and ordering, and related vocabulary for the idea-realization plugin — is already formally captured and planned.
+
+Related documents found:
+
+- REQ-031 (Idea-realization plugin requirements) — created 2026-09-25, the same session as 000456, and explicitly cites ideas 000455-000460 as scope-setting. It formalizes all the areas 000456 names as observable requirements R01–R25.
+- PLAN-048 (Idea-realization plugin overview and child plans) — approved 2026-09-25, covers nine phases phase-plug-01 to phase-plug-09 implementing REQ-031, with explicit decisions (D1–D13) resolving the three unresolved questions 000456 raises: D1 (one plugin, not several), D5 (four-axis fields from phase-idg-01 first, then ported to phase-plug-02), and wave order in execution tying plugin phases to phase-idg-01's completion.
+- PLAN-019 (Idea priority queue) — covers ideas-priority.yaml, the priority ordering mechanism mentioned in 000456.
+- ARCH-005 (Idea node classification) — documents the four-axis schema (ontological, epistemic, lifecycle, temporal) that 000456 references.
+
+Related ideas:
+
+- 000457–000460 — sibling ideas from the same 2026-09-25 scope discussion, all extending 000455, each detailing a component: code generation/documentation (000457), scaffold skill (000458), prerequisites skill (000459), rewritten governance documents (000460). All already linked.
+- 000039 (priority queue) — directly mentioned in 000456 as part of plugin scope, promoted to PLAN-019.
+
+Backlog phase coverage: the backlog includes phase-plug-01 through phase-plug-09 and phase-idg-01, implementing PLAN-048 in wave order.
+
+Status: the unresolved questions in 000456 have been answered by REQ-031's requirements analysis and PLAN-048's decisions, both dated 2026-09-25. No gap found between the scope this idea clarifies and the formal work that followed it.
+
+</details>
 
 **Links**
 
@@ -21183,13 +21225,33 @@ Unresolved: whether this ships as one plugin or several in one marketplace (0004
 
 ## 000457 · Plugin content for code generation and management, document management, and repository structure
 
-**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+**Created 2026-09-25T12:24:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, in the same answer that expanded 000455's scope: "We also need code generation and code management, document management and how to structure repository."
 
 Recorded as given. The owner's phrasing is broad and the Session Manager has not yet asked what each term means in practice. Candidate readings, to be settled with the owner: document management as the governance protocol (GOV-001), document codes and --next-code (GOV-005, src/governance/codes.py), the catalog generator and the governance check (src/governance); repository structure as the docs/00..09 layout, _data, _working, _tmpagent, schemas and agent-workflows conventions described in CLAUDE.md and AGENTS.md; code generation and management as the tool-docs generator (tools/generate_tool_docs.py), the agent-workflow adapter generator (tools/generate_agent_workflows.py), or something else the owner has in mind.
 
 Unresolved: which of these are meant, and whether they form one plugin or several.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:06-04:00): Idea 000457 (plugin content for code generation and management, document management, and repository structure) extends 000455, already linked. It asks for three plugin content areas.
+
+Related governed documents:
+- REQ-031 (Idea-realization plugin requirements) has explicit requirements for each area: code generation (R18: two generators, tool-docs and agent workflows), document management (R16: document-governance engine with check, next-code, catalog and plan-check), and repository structure (R01, R05, R19: scaffold, install-state record and layout reference).
+- PLAN-048 (Idea-realization plugin) delivers them in three phases, all complete on 2026-09-26: phase-plug-01 (scaffold and install-state record: repository structure), phase-plug-05 (document-governance engine ported from src/governance: document management), and phase-plug-06 (generators ported from tools/generate_tool_docs.py and tools/generate_agent_workflows.py, plus the repository layout reference: code generation and repository structure).
+
+Related ideas, all extending 000455: 000456 (whole idea-realization pipeline, PLAN-048), 000458 (scaffold skill, phase-plug-01), 000459 (prerequisites skill, phase-plug-01), 000460 (governance documents, phase-plug-07 and phase-plug-09).
+
+The rest of PLAN-048 (phase-plug-03 and 07 active, 08 and 09 queued) covers other scope, not this idea's three areas.
+
+PROPOSED PROMOTION: 000457 -> PLAN-048 (code generation, document management and repository structure delivered by the completed phases phase-plug-01, phase-plug-05 and phase-plug-06)
+
+</details>
 
 **Links**
 
@@ -21199,13 +21261,40 @@ Unresolved: which of these are meant, and whether they form one plugin or severa
 
 ## 000458 · A scaffold skill that creates the framework's folder structure in a new or existing repository
 
-**Created 2026-09-25T12:24:17-04:00 · Status: `open`**
+**Created 2026-09-25T12:24:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, in the same answer that expanded 000455's scope: "Maybe include scaffold framework so if we start this in a new repo or existing it can quickly whip up the folder structure it needs."
 
 What it would be: a skill in the plugin (or a plugin of its own) that, run in a target repository, creates the directories and seed files the framework expects — the ideas log and rendered view, and whatever the settled scope of the plugin needs (docs layout, backlog file, schemas). It must be safe on an existing repository: never overwrite a file that exists, report what it created, and respect 000439's rulings (install deterministically; write settings or hooks only with recorded consent). The ECC scout report (_working/session-manager/scout/ext-ecc.md) describes an install-state record with a per-file hash, an ownership guard and a drift doctor, which apply directly.
 
 Unresolved: which structure exactly, and whether scaffolding is one command or per-workflow (000439's unit of installation).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:07-04:00): Idea 000458 is already delivered by PLAN-048 (Idea-realization plugin).
+
+This idea requests a scaffold skill that creates the framework's folder structure safely in a new or existing repository, never overwriting existing files, reporting what was created, and offering a dry run.
+
+The idea is explicitly delivered as part of PLAN-048 (Idea-realization plugin), specifically in PLAN-048.01 — "Skeleton, prerequisites, scaffold and doctor" (approved, 2026-09-25). PLAN-048.01 describes the scaffold's implementation in detail:
+
+- `scripts/scaffold.py` provides the core functionality with feature selection (`--feature ideas|partition|backlog|documents|all`), dry-run mode, never-overwrite logic, and an install-state record with per-file SHA-256 hashes
+- `skills/scaffold/SKILL.md` wraps the script for Claude Code sessions
+- The scaffold respects `000439`'s rulings on deterministic installation and consent-gated writes (`.gitignore` only)
+- REQ-031 R05 specifies the exact requirements the idea asks for: creating directories and seed files for each feature, never overwriting, reporting status, offering dry run, and recording an install-state record
+
+The phase implementing this plan, `phase-plug-01`, is marked `status: complete` in `docs/09-backlog/backlog.yaml` as of 2026-09-26.
+
+The idea's already-recorded link (`extends->000455`) is correct and reflects the relationship to the broader plugin packaging effort.
+
+No other related ideas beyond the already-recorded link were found.
+
+PROPOSED PROMOTION: 000458 -> PLAN-048 (delivered by phase-plug-01 via PLAN-048.01 as the scaffold skill with install-state record and doctor)
+
+</details>
 
 **Links**
 
@@ -21215,13 +21304,27 @@ Unresolved: which structure exactly, and whether scaffolding is one command or p
 
 ## 000459 · A plugin skill that validates system requirements and installs prerequisites
 
-**Created 2026-09-25T12:24:18-04:00 · Status: `open`**
+**Created 2026-09-25T12:24:18-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, answering the Session Manager's runtime question for 000455: the scripts run with uv and PEP 723 inline dependencies, but "we need to include a skill in the plugin that helps the user validate system requirements and to install any prerequisites or dependencies."
 
 What it would do: check for uv (and the Python version it needs), git, and anything else a workflow in the plugin depends on; report what is missing with the exact install step; and, when the user says yes, run the install. The check-and-report half is read-only; the install half changes the machine and should ask first, in the spirit of 000439's consent ruling. Claude Code's plugin docs describe a SessionStart hook that installs dependencies into ${CLAUDE_PLUGIN_DATA}; this skill is the explicit, user-invoked alternative, and the two could coexist.
 
 Unresolved: whether the check runs automatically at session start or only on invocation.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:07-04:00): Idea 000459 asks for a plugin skill that validates system requirements (Python >= 3.12, uv, git, optional claude CLI) and installs prerequisites only after user confirmation, with a check mode that changes nothing.
+
+This work has been fully delivered by phase-plug-01 (plugin skeleton and prerequisites), which shipped as complete in the idea-realization plugin (PLAN-048). The prerequisites skill lives at plugins/idea-realization/skills/prerequisites/SKILL.md and implements every requirement from the idea as asked: checks for missing tools, reports each with its install command, installs only on --yes, and never runs automatically at session start (resolving the unresolved question posed in the idea). REQ-031 R04 specifies the observable behavior; the session record SESS-2026-09-25-02-plugin-skeleton.md confirms the acceptance criteria were met and the skill is in place and tested.
+
+PROPOSED PROMOTION: 000459 -> PLAN-048 (prerequisites skill delivered complete in phase-plug-01, shipped in the idea-realization plugin)
+
+</details>
 
 **Links**
 
@@ -21231,7 +21334,7 @@ Unresolved: whether the check runs automatically at session start or only on inv
 
 ## 000460 · Ship the key governance and protocol documents in the plugin, rewritten as absolutes with no overridden history
 
-**Created 2026-09-25T12:26:46-04:00 · Status: `open`**
+**Created 2026-09-25T12:26:46-04:00 · Status: `triaged`**
 
 Owner, 2026-09-25, while settling the plugin's scope (000455 and 000456-000459): "We also need to include key governance and protocol documents - but we must write these files as absolutes and facts - exclude any reference to decisions or old states that have been overridden. We will need to parse out responsibilities that we distribute to our agent crew for analysis and planning."
 
@@ -21241,6 +21344,27 @@ Second, the work of deciding which documents qualify, extracting each one's stan
 
 Unresolved: the exact document list; whether the rewritten set is one document or mirrors the source set; how drift between the source documents and the plugin's copies is detected after the fact.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:07-04:00): Idea 000460 (ship the key governance and protocol documents in the plugin, rewritten as absolutes with no overridden history) is scoped into the approved Idea-realization plugin plan (PLAN-048) and is in execution.
+
+The work is split across two backlog phases, both delivering REQ-031 R20 ("The governance documents ship rewritten as current rules with no history"):
+
+- phase-plug-07 (active): governance documents as absolutes, part one — core protocol, codes, reporting, and the ledger triage (families A, B, C). Three analysts each return one-line absolutes with source lines; it writes four plugin documents (protocol.md, backlog-protocol.md, document-codes.md, reporting.md) and a trace table.
+- phase-plug-09 (queued): governance documents as absolutes, part two — methodology, role contracts and review, multi-session coordination (families D, E, F). Three more analysts; nine shorter documents (prompt-packs.md, research-packs.md, coordinator.md, batches.md, role-contracts.md, plan-review.md, adversary-prompt.md, multi-session.md, session-manager-messages.md).
+
+PLAN-048's overview names 000460 in its scope and quotes the owner's 2026-09-25 instruction to write these documents as absolutes, excluding decisions or old states that have been overridden, with the analysis split among the agent crew. Decision D13 in PLAN-048.07 sets out the six analyst dispatches (one per family) and the trace table mapping each rule to its source.
+
+Related documents: REQ-031 R20; PLAN-048.07-absolute-documents.md (families A-C); PLAN-048.09-absolute-documents-two.md (families D-F).
+
+The existing link (extends->000455) is not re-proposed. No other open idea needs a link to 000460. Not proposed for promotion: both phases are still unfinished.
+
+</details>
+
 **Links**
 
 - extends → `000455`
@@ -21249,17 +21373,33 @@ Unresolved: the exact document list; whether the rewritten set is one document o
 
 ## 000461 · GOV-001 and GOV-002 still name main as the integration branch and lock table
 
-**Created 2026-09-25T12:39:34-04:00 · Status: `open`**
+**Created 2026-09-25T12:39:34-04:00 · Status: `triaged`**
 
 Found 2026-09-25 by the governance-documents analyst dispatched for the plugin planning (000460). AGENTS.md states the trunk moved from main to dev on 2026-09-09 and tells readers to reinterpret older references, but GOV-001's "Concurrent agent execution" section (lines 181 and 191) and GOV-002's "Selecting and running a session" section (lines 168 and 172) still say main literally, as the integration branch and the lock table. A reader-side reinterpretation rule is not a fix; the text should say dev.
 
 This is a d-system correction, separate from the plugin: the plugin's absolute rewrite of these documents will say dev (or, more likely, "the integration branch" with the name configured), but the source documents here stay wrong until someone edits them. Small, mechanical, and safe to fold into the next governance-document phase that touches either file.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:08-04:00): Idea 000461 (GOV-001 and GOV-002 still name main as the integration branch and lock table) is confirmed: GOV-001 around lines 181 and 192, and GOV-002 around lines 168-170, name `main` as the integration branch. AGENTS.md records the trunk move from `main` to `dev` on 2026-09-09 and tells readers to read older references to `main` as `dev`.
+
+This overlaps directly with 000377 (governance docs still name `main` as the integration branch), recorded 2026-09-23 and already triaged. 000377 covers the same drift across GOV-001, GOV-002, OPS-001 and session-close.md; its finding notes no backlog phase covers the text fix.
+
+Related: 000402 (consistency checks across governance documents) proposes a mechanical check that would catch this class of drift.
+
+PROPOSED LINK: 000461 --relates_to--> 000377 (same governance documentation drift; 000377 is the broader, already-triaged version)
+
+</details>
+
 ---
 
 ## 000462 · Decide whether d-system consumes its own plugin instead of keeping parallel copies
 
-**Created 2026-09-25T12:39:34-04:00 · Status: `open`**
+**Created 2026-09-25T12:39:34-04:00 · Status: `triaged`**
 
 Raised 2026-09-25 by the Session Manager while planning the plugin (000455, 000456-000460). The owner ruled that the plugin carries a new thin CLI over the portable modules (ideas, backlog, codes, priority, staleness) and that this repository's src/governance stays untouched. From that moment two copies of the same logic exist: the plugin's scripts and d-system's src/governance, tools/append_idea.py, tools/generate_ideas_md.py, agent-workflows and governance documents. Every later change to one must be ported to the other by hand, or the two drift.
 
@@ -21267,41 +21407,117 @@ The question for a later planning session: does d-system install the plugin and 
 
 Not part of the plugin build; recorded so the fork is a decision rather than an accident.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:08-04:00): Idea 000462 (decide whether d-system consumes its own plugin instead of keeping parallel copies) is the decision PLAN-048 (Idea-realization plugin, approved 2026-09-25) deliberately deferred. PLAN-048 packages d-system's idea-realization pipeline as a plugin but leaves this repository's own src/governance, tools, workflows and governance documents unchanged, so the build produces two parallel copies of the same logic.
+
+PLAN-048's overview, decision D4, records the trade-off: "Cost of the chosen option: two copies of the pure modules until `000462` is decided." REQ-031 (plugin requirements) says in its scope that nothing in this repository changes its own behaviour because of the plugin, and names 000462 as the later question of whether it should.
+
+No decision has been taken. PLAN-048 is still in execution (phase-plug-03 and 07 active, 08 and 09 queued). The idea's three options remain open: consume the plugin and delete this repository's copies; keep both with a drift-detection check; or accept the fork as two independent implementations. The idea notes that the absolute-rewrite governance documents (000460) raise the same question in document form.
+
+Related: ADR-009 (structure/content boundary); PLAN-035 and the phase-sch-* phases describe drift detection in the schema layer, which is similar infrastructure.
+
+PROPOSED LINK: 000462 --relates_to--> 000455 (the plugin idea whose build creates the parallel copies)
+PROPOSED LINK: 000462 --relates_to--> 000460 (governance documents as absolutes carry the same source-versus-plugin-copy question)
+
+</details>
+
 ---
 
 ## 000463 · Idea consumers outside phase-idg-01's lock do not know the new statuses
 
-**Created 2026-09-25T13:37:58-04:00 · Status: `open`**
+**Created 2026-09-25T13:37:58-04:00 · Status: `triaged`**
 
 tools/overview_metrics.py STATUSES, src/api/routes/workbench.py status ranking, src/orchestrator/state.py:67 all hard-code the five old statuses and will miscount delivered/resolved/absorbed once written.
 
 Reported by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:09-04:00): Idea 000463 (idea consumers outside phase-idg-01's lock do not know the new statuses) is confirmed. phase-idg-01 (complete) added three terminal statuses (delivered, resolved, absorbed) and made promoted non-terminal, but three consumers still hard-code the old five and will miscount or mislabel once the new statuses are written:
+
+- tools/overview_metrics.py line 45: STATUSES = ("discarded", "open", "promoted", "reviewing", "triaged")
+- src/api/routes/workbench.py: the idea queue status precedence maps only the five old statuses and relies on a fallback for anything else
+- src/orchestrator/state.py line 67: the decision gate checks idea_status against {"triaged", "reviewing", "promoted", "discarded"}
+
+The phase-idg-01 session record (SESS-2026-09-25-01-idea-schema-bundle) names 000463, 000464 and 000465 as "the three knock-ons outside the lock", recorded as ideas for later phases because each file was outside that phase's deliverables.
+
+Related documents: ADR-024 (idea classification as schema fields); REQ-014 R21 (ideas whose work shipped are closed into delivered, resolved or absorbed). No backlog phase found that covers updating these three consumers.
+
+PROPOSED LINK: 000463 --relates_to--> 000464 (both are knock-ons of phase-idg-01's schema outside its lock; this one covers statuses, 000464 the DuckDB projection)
+
+</details>
+
 ---
 
 ## 000464 · The DuckDB idea projection has no columns for phase-idg-01's new event data
 
-**Created 2026-09-25T13:37:58-04:00 · Status: `open`**
+**Created 2026-09-25T13:37:58-04:00 · Status: `triaged`**
 
 The DuckDB idea projection (sql/001_schema.sql, tools/rebuild_db.py) has no columns for phase-idg-01's classified events, closes_with pointers or document-code link targets (target_code), so ARCH-005's axis queries cannot run in DuckDB until sys-projection is extended.
 
 Reported by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:09-04:00): Idea 000464 (the DuckDB idea projection has no columns for phase-idg-01's new event data) is confirmed. phase-idg-01 (complete, 2026-09-25) extended schemas/idea.schema.json, src/db/ideas.py and tools/append_idea.py with ARCH-005's classification fields (record_kind; the four axes ontological, epistemic, lifecycle and temporal; reasons, confidence, tie_breaks, lifecycle_remedy, decompose), document-code link targets (target_code) and closes_with pointers. sql/001_schema.sql was not changed: neither the idea_events table nor the derived ideas table has columns for any of these fields.
+
+As a result, classified event data cannot be stored or queried through DuckDB, and ARCH-005's intended traversal queries (for example, every Strategic Directive resting on an Assumption rather than an Axiom) cannot run in the relational layer. ARCH-005 lists the query surface as an open question: whether DuckDB can express those joins adequately at this corpus size.
+
+ADR-024 (idea classification as schema fields) chose ordinary schema fields over a separate graph layer, so the projection is where the queries would have to run.
+
+The phase-idg-01 session record (SESS-2026-09-25-01) names this as one of three knock-ons outside that phase's lock, with 000463 (status consumers) and 000465 (renderer). No backlog phase found that covers the projection change.
+
+PROPOSED LINK: 000464 --relates_to--> 000465 (both are knock-ons of phase-idg-01's schema outside its lock; this one covers the DuckDB projection, 000465 the markdown renderer)
+
+</details>
+
 ---
 
 ## 000465 · generate_ideas_md.py does not render phase-idg-01's document links, classification or closes_with
 
-**Created 2026-09-25T13:52:41-04:00 · Status: `open`**
+**Created 2026-09-25T13:52:41-04:00 · Status: `triaged`**
 
 tools/generate_ideas_md.py renders every link as its `target`, so a phase-idg-01 document link (target_code, target null) would render as `None` in docs/00-working/ideas.md, and classification and closes_with are not rendered at all.
 
 Reported by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:10-04:00): Idea 000465 (generate_ideas_md.py does not render phase-idg-01's document links, classification or closes_with) is confirmed: tools/generate_ideas_md.py has no handling for any of the three fields phase-idg-01 added to the idea schema (document links with target_code, classification axes, closes_with), so a link with a target_code and a null target renders as "None". phase-idg-01 is complete, so these fields can now be written and docs/00-working/ideas.md will show them wrongly or not at all.
+
+The plugin's port of the same renderer already handles all three: plugins/idea-realization/scripts/render_ideas.py renders document links by target_code (line 76), the latest classification (_render_classification, line 83) and closes_with (_closes_with, line 117). The fix here could copy that logic, or disappear if this repository adopts the plugin's scripts (see 000462, decide whether d-system consumes its own plugin).
+
+Related: ARCH-005 (idea node classification) defines the axes; REQ-031 R09 sets the plugin's rendering requirement; 000463 (consumers outside phase-idg-01's lock do not know the new statuses) and 000464 (the DuckDB projection has no columns for phase-idg-01's new event data) are the other gaps in consuming phase-idg-01's schema.
+
+No plan or backlog phase found that covers fixing generate_ideas_md.py.
+
+PROPOSED LINK: 000465 --relates_to--> 000463 (both are consumers of phase-idg-01's schema that were not updated)
+PROPOSED LINK: 000465 --relates_to--> 000462 (the plugin renderer already handles these fields; adopting it would remove the gap)
+
+</details>
+
 ---
 
 ## 000466 · Make the sessions' level of autonomy configurable through a referenced autonomy configuration file
 
-**Created 2026-09-26T21:17:37-04:00 · Status: `open`**
+**Created 2026-09-26T21:17:37-04:00 · Status: `triaged`**
 
 Owner, 2026-09-26, at the safe-point clear of the plugin build's Session Manager session: "make configurable the level of autonomy of these sessions. For example, the standard right now requires me to stop and answer questions and approve merges. But we have done overnight sessions where we front-load the questions and backlog the decisions for review when I'm available. So rather than having to explain that every time, we would need to make it configurable, and then reference that user-agent autonomy configuration file."
 
@@ -21311,6 +21527,22 @@ What the idea asks for: one configuration file, owned by the owner and reference
 
 Unresolved: whether this is a governance document (a GOV-* with the levels as absolutes) plus a small YAML the check validates, or a section in GOV-017; whether the Session Manager reads it at kickoff automatically; how a level change mid-run is communicated to sessions already oriented; whether the idea-realization plugin (PLAN-048) ships the same mechanism for target repositories, which would make it part of the absolute governance documents in phase-plug-07/09.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:10-04:00): Idea 000466 (make the sessions' level of autonomy configurable through a referenced autonomy configuration file) asks for one owner-owned configuration file, referenced by AGENTS.md or GOV-017 and by the Session Manager's kickoff, that states the autonomy level in force and what each level permits: who approves claims and merges, how questions are handled, and what is never delegated. Today the owner-in-the-loop default, the overnight batch mode and conditional merge grants are each stated case by case in hand-edited starters and briefs.
+
+Nearest planned work: phase-plug-09 (queued; PLAN-048.09, governance documents as absolutes, part two) writes family F, multi-session coordination, from GOV-017 and PROMPT-037. That phase rewrites existing rules as absolutes; it does not create a configuration mechanism, so it would carry this idea only if the mechanism exists by then or the phase is widened to include it. The idea itself raises this as its last open question: whether PLAN-048 ships the same mechanism for target repositories.
+
+The idea's other open questions remain: a GOV-* document with a YAML file the check validates, or a section in GOV-017; whether the Session Manager reads it at kickoff; how a mid-run level change reaches sessions already oriented.
+
+No plan, requirement or ADR found that addresses session autonomy configuration. No other open idea overlaps directly.
+
+</details>
+
 **Links**
 
 - extended_by ← `000469`
@@ -21319,7 +21551,7 @@ Unresolved: whether this is a governance document (a GOV-* with the levels as ab
 
 ## 000467 · AGENTS.md and GOV-014 still say only owner-invoked /session-close may mark a phase complete, contradicting GOV-003's coordinator-completion rule
 
-**Created 2026-09-26T22:33:47-04:00 · Status: `open`**
+**Created 2026-09-26T22:33:47-04:00 · Status: `triaged`**
 
 AGENTS.md lines 178-180 say an agent may checkpoint progress but must not mark a phase complete: "only the owner-invoked review (e.g., /session-close) does that. An agent must never invoke final closure itself."
 
@@ -21333,11 +21565,29 @@ Unresolved: the replacement wording for each file, and whether GOV-014's never-d
 
 Reported by Session 1 - Builder A during phase-plug-07's ledger triage; recorded by the Ideation session.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:11-04:00): Idea 000467 (AGENTS.md and GOV-014 still say only owner-invoked /session-close may mark a phase complete) is confirmed and is already recorded and planned under an earlier idea.
+
+The contradiction stands in the current files: AGENTS.md lines 178-180 and GOV-014 around line 175 say completion is owner-reserved through /session-close, while GOV-003 (lines 456-480, owner decision 2026-09-16) lets a coordinator mark a phase complete once verification is green, an independent adversarial review has run, and the owner has approved the integration onto dev.
+
+000378 (phase-completion authority contradicts itself across documents, triaged) records the same contradiction more broadly, across session-start.md, the orient skill, resume-lit-review.md, GOV-014 and AGENTS.md, and carries the owner's 2026-09-23 ruling that GOV-003 governs.
+
+The fix is planned: REQ-029 (design-document amendments) lists GOV-014 lines 34, 175 and 195 and AGENTS.md lines 179-180 among the passages to amend, and PLAN-046 (design-document amendments) is executed by phase-dam-01 ("Amend ARCH-006, GOV-014, GOV-018, REQ-022 and the session commands to the 2026-09-23 rulings"), queued. The phase title does not name AGENTS.md; any AGENTS.md edit still needs the owner's explicit approval for that change.
+
+PROPOSED LINK: 000467 --relates_to--> 000378 (same phase-completion authority contradiction; 000378 is broader and carries the owner ruling)
+
+</details>
+
 ---
 
 ## 000468 · GOV-002 cites a stale-claim recovery procedure in GOV-003 that has not been written (phase-conc-04 still queued)
 
-**Created 2026-09-26T22:33:48-04:00 · Status: `open`**
+**Created 2026-09-26T22:33:48-04:00 · Status: `triaged`**
 
 GOV-002 (backlog protocol), lines 127-129, says: "The authorized recovery procedure that does release a stale claim is phase-conc-04's, written into GOV-003; it consumes this signal as evidence rather than re-deriving staleness."
 
@@ -21348,6 +21598,24 @@ What it would touch: GOV-002's wording (make it say the procedure is planned, no
 Unresolved: whether to fix the wording now or leave it and move phase-conc-04 up the queue.
 
 Reported by Session 1 - Builder A during phase-plug-07's ledger triage; recorded by the Ideation session.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-09-26T23:21:11-04:00): Idea 000468 (GOV-002 cites a stale-claim recovery procedure in GOV-003 that has not been written) is confirmed. GOV-002 lines 127-129 describe the authorized recovery procedure as phase-conc-04's, written into GOV-003; GOV-003 has no such entry, and phase-conc-04 ("Write the claim-recovery procedure and record it in GOV-003") is queued. An agent following the pointer finds nothing.
+
+Other documents also defer to phase-conc-04's deliverables: PLAN-026 (concurrency and git safety), PLAN-039's boundary table, REQ-022 R19 and ARCH-006 (idea-realization system), and a backlog phase near backlog.yaml line 12978 that consumes claim recovery "where they exist".
+
+This is a specific consequence of the gap recorded in 000025 (no recovery procedure exists for an abandoned agent claim in the concurrency protocol, triaged): 000025 names the missing procedure, 000468 names a document that says it exists.
+
+Resolution is either amending GOV-002 to say the procedure is planned, not written, or completing phase-conc-04.
+
+PROPOSED LINK: 000468 --relates_to--> 000025 (both concern the missing stale-claim recovery procedure; 000468 is the false citation it causes in GOV-002)
+
+</details>
 
 ---
 
