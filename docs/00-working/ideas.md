@@ -21311,6 +21311,10 @@ What the idea asks for: one configuration file, owned by the owner and reference
 
 Unresolved: whether this is a governance document (a GOV-* with the levels as absolutes) plus a small YAML the check validates, or a section in GOV-017; whether the Session Manager reads it at kickoff automatically; how a level change mid-run is communicated to sessions already oriented; whether the idea-realization plugin (PLAN-048) ships the same mechanism for target repositories, which would make it part of the absolute governance documents in phase-plug-07/09.
 
+**Links**
+
+- extended_by ← `000469`
+
 ---
 
 ## 000467 · AGENTS.md and GOV-014 still say only owner-invoked /session-close may mark a phase complete, contradicting GOV-003's coordinator-completion rule
@@ -21344,3 +21348,94 @@ What it would touch: GOV-002's wording (make it say the procedure is planned, no
 Unresolved: whether to fix the wording now or leave it and move phase-conc-04 up the queue.
 
 Reported by Session 1 - Builder A during phase-plug-07's ledger triage; recorded by the Ideation session.
+
+---
+
+## 000469 · A session configuration for when the owner works from a mobile device with no terminal access
+
+**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+
+Owner, 2026-09-26, relayed by the Session Manager: a specific session configuration for when the owner is working from a mobile device with no terminal access, which may differ from the configuration used when they have terminal access on the computer. Examples given: no `!` commands asked of the owner, pushes deferred, and every ask routed through a question the owner can answer on mobile.
+
+Why it came up: on 2026-09-26 a session asked the owner to run `! git -C /code/d-system push origin d3e2bb1:dev` after the permission classifier blocked the push. The owner then decided the commit need not be pushed and origin/dev could stay behind. A mobile session cannot run a `!` command, so an ask of that kind stalls the work until the owner is back at the computer. A standing memory already records that Remote Control on mobile does not render AskUserQuestion previews, so drafts must go in message text; that is the same kind of constraint.
+
+What it would touch: the autonomy configuration proposed in 000466 (a referenced file stating the autonomy level in force and what each level permits). This idea adds a second dimension to it, the owner's access mode (mobile without a terminal, or computer with one), which may change what sessions may ask of the owner independently of the autonomy level. It would also touch the starters and briefs, and the Session Manager's kickoff, which would need to know the current mode.
+
+Unresolved: whether access mode is its own setting or a named preset inside 000466's levels; how a session learns that the mode changed mid-run; what a session does with an action only the owner can run in a terminal while the mode is mobile (defer and queue it, or stop); and whether deferring pushes should be the rule in mobile mode or remain a decision the owner makes each time.
+
+Recorded by the Ideation session.
+
+**Links**
+
+- extends → `000466`
+
+---
+
+## 000470 · Should the idea-realization plugin's scaffold seed a decision record in a target repository?
+
+**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+
+Raised by Session 1 - Builder A in phase-plug-07's trace table (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
+
+The question: when the plugin's scaffold (phase-plug-01, scripts/scaffold.py) sets up a target repository, should it also create a decision record, the target's counterpart to this repository's accepted-decisions record (GOV-003)? The phase-plug-07 trace table maps each standing rule to its source, and some rules here trace to decisions recorded in GOV-003. The plugin ships the rules as absolutes without that history (REQ-031 R20), so a target repository has nowhere to record its own decisions unless the scaffold seeds one.
+
+What it would touch: the scaffold's per-feature seed files and install-state record (REQ-031 R05), the repository layout reference, and possibly the plugin's governance documents if they need to point at the record.
+
+Unresolved: whether a decision record belongs in the plugin at all, given the plugin's documents deliberately carry no history; which scaffold feature would own it; and what shape the seeded file takes.
+
+One of three ideas from phase-plug-07 batched for the planning after the plugin's end-to-end exercise and handover (phase-plug-08). This idea is the batch anchor.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-26T23:20:38-04:00): Batch anchor. At the Session Manager's relay of the owner's request, 000471 and 000472 are linked relates_to this idea as one batch: three questions from phase-plug-07's work (Session 1 - Builder A), for the planning session after the plugin's end-to-end exercise and handover (phase-plug-08).
+
+</details>
+
+**Links**
+
+- relates_to ← `000471`
+- relates_to ← `000472`
+
+---
+
+## 000471 · The plugin's backlog.py carries a history comment that the history-word test does not catch
+
+**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+
+Raised by Session 1 - Builder A during phase-plug-07 (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
+
+plugins/idea-realization/scripts/backlog.py lines 25-26 carry a comment that describes history rather than a current rule: "Stale-claim threshold: double the longest claim-to-completion gap observed where this rule was first measured (one day)". The plugin ships its content as present-tense absolutes with no history (REQ-031 R20). phase-plug-07 adds a test for history words, but it covers only the plugin's docs/ directory, so comments in the scripts are not checked.
+
+What it would touch: the comment in backlog.py (reword it as the rule alone, for example "a claim with no commit for two days is stale"), or the history-word test (widen it to scripts/ and other plugin content), or both.
+
+Unresolved: whether the test should cover code comments at all, since some history in comments may be useful to maintainers; and whether other scripts carry similar comments. The history-word test is on phase-plug-07's branch and not yet on dev as of this recording.
+
+One of three ideas from phase-plug-07 batched for the planning after phase-plug-08; linked to the batch anchor.
+
+**Links**
+
+- relates_to → `000470`
+
+---
+
+## 000472 · Nothing loads the plugin's docs/reporting.md at session start in a target repository
+
+**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+
+Raised by Session 1 - Builder A during phase-plug-07 (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
+
+phase-plug-07 writes the plugin's docs/reporting.md, the portable form of this repository's reporting rules (GOV-006, how agents report to the owner). In this repository GOV-006 takes effect from the first turn because CLAUDE.md imports it. A target repository that installs the plugin has no such import, so nothing loads docs/reporting.md at session start and its rules are not in effect until an agent happens to read it. That breaks the reason the import exists: the reporting rules govern the first sentence of a session.
+
+What it would touch: the plugin's scaffold (it could add an import line to the target's CLAUDE.md, which would need the target owner's consent), a session-start hook shipped by the plugin, or the plugin's session-start skill.
+
+Unresolved: which mechanism, and whether writing to a target's CLAUDE.md fits the scaffold's consent rules (000439's rulings allow consent-gated writes to .gitignore only). docs/reporting.md is on phase-plug-07's branch and not yet on dev as of this recording.
+
+One of three ideas from phase-plug-07 batched for the planning after phase-plug-08; linked to the batch anchor.
+
+**Links**
+
+- relates_to → `000470`
