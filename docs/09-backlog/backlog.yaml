@@ -15099,6 +15099,12 @@ items:
   - plugins/idea-realization/docs/session-manager-messages.md
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.11-absolutes-two-trace.md
   - docs/01-plans/PLAN-048-idea-realization-plugin/PLAN-048.09-absolute-documents-two.md
+  - plugins/idea-realization/skills/backlog/SKILL.md
+  - plugins/idea-realization/skills/session-start/SKILL.md
+  - plugins/idea-realization/skills/session-close/SKILL.md
+  - plugins/idea-realization/docs/backlog-protocol.md
+  - plugins/idea-realization/docs/protocol.md
+  - plugins/idea-realization/docs/reporting.md
   next_action: Waits for phase-plug-07, whose trace table carries the ledger classification this phase
     reads. Families D, E and F are this phase.
 - id: phase-bnd-01
