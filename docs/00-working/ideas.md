@@ -14544,6 +14544,7 @@ PROPOSED LINK: 000300 --relates_to--> 000042 (same ask—generated page showing 
 
 - relates_to → `000299`
 - relates_to → `000042`
+- relates_to ← `000497`
 
 ---
 
@@ -14590,6 +14591,7 @@ Related governed work already explicitly covering this decision:
 **Links**
 
 - relates_to → `000299`
+- relates_to ← `000497`
 
 ---
 
@@ -22173,7 +22175,7 @@ The process the owner wants, as relayed: triage it immediately, then prompt-plan
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-27T15:23:50-04:00): Idea 000497 asks for a unified monitoring artifact that consolidates repository state the owner needs to reference: idea metrics (triaged vs open, priority queue), active plans/phases/batches, backlog, next_up, other plans, plan metrics, and governance docs.
 
@@ -22192,6 +22194,7 @@ PLAN-021 (live demo stage and overview build) and PLAN-036 (HTML generation desi
 
 PROPOSED LINK: 000497 --relates_to--> 000300 (both ask for auto-regenerated pages that consolidate idea log state and priority queue)
 PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated pages that consolidate backlog and next_up)
+- **finding** by agent-ideation (2026-09-27T15:32:57-04:00): Relay record: owner scope addition, 2026-09-27, relayed by the Session Manager, recorded as given: "Additions to the monitoring dashboard: include branches, worktrees, statuses on them, mappings from them to plans/phases/batches/unclaimed etc. Also include systems." Recorded as an annotation on this idea rather than a separate idea (the owner allowed either).
 
 </details>
 
@@ -22202,6 +22205,8 @@ PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated page
 - relates_to → `000493`
 - relates_to → `000494`
 - relates_to → `000495`
+- relates_to → `000300`
+- relates_to → `000301`
 
 ---
 
