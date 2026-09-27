@@ -461,7 +461,7 @@ CI regenerates it and fails on any difference.
 | PLAN-045 | doc-deterministic-guards | approved | 3 | 0 | 1 | agent-builder-a |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
 | PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
-| PLAN-048 | doc-idea-realization-plugin | approved | 1 | 1 | 7 | agent-builder-a, agent-builder-b, agent-standby-builder |
+| PLAN-048 | doc-idea-realization-plugin | approved | 1 | 0 | 8 | agent-builder-a, agent-builder-b, agent-standby-builder |
 | PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 0 | 0 | 1 | agent-builder-b |
 | PLAN-048.02 | doc-idea-realization-plugin-idea-system | approved | 0 | 0 | 1 | agent-standby-builder |
 | PLAN-048.03 | doc-idea-realization-plugin-partition | approved | 0 | 0 | 1 | agent-standby-builder |
@@ -470,9 +470,9 @@ CI regenerates it and fails on any difference.
 | PLAN-048.06 | doc-idea-realization-plugin-generators-layout | approved | 0 | 0 | 1 | agent-builder-a |
 | PLAN-048.07 | doc-idea-realization-plugin-absolute-documents | approved | 0 | 0 | 1 | agent-builder-a |
 | PLAN-048.08 | doc-idea-realization-plugin-end-to-end | approved | 1 | 0 | 0 | — |
-| PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 0 | 1 | 0 | agent-builder-a |
+| PLAN-048.09 | doc-idea-realization-plugin-absolute-documents-two | approved | 0 | 0 | 1 | agent-builder-a |
 | PLAN-048.10 | doc-idea-realization-plugin-absolutes-trace | approved | 0 | 0 | 1 | agent-builder-a |
-| PLAN-048.11 | doc-idea-realization-plugin-absolutes-two-trace | approved | 0 | 1 | 0 | agent-builder-a |
+| PLAN-048.11 | doc-idea-realization-plugin-absolutes-two-trace | approved | 0 | 0 | 1 | agent-builder-a |
 | PLAN-050 | doc-system-boundary-study | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-050.01 | doc-system-boundary-study-system-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.02 | doc-system-boundary-study-prompt-rubric | draft | 0 | 0 | 2 | agent-codex-boundary-study |
