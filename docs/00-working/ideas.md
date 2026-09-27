@@ -18181,6 +18181,7 @@ PROPOSED LINK: 000359 --relates_to--> 000306 (an existing Claude/Codex definitio
 - relates_to ← `000385`
 - relates_to ← `000430`
 - relates_to ← `000432`
+- relates_to ← `000506`
 
 ---
 
@@ -20543,6 +20544,7 @@ PROPOSED LINK: this idea --relates_to--> 000215 (named by the relay; recording t
 - relates_to → `000397`
 - relates_to → `000215`
 - relates_to ← `000432`
+- relates_to ← `000506`
 
 ---
 
@@ -20612,6 +20614,7 @@ PROPOSED LINK: this idea --relates_to--> 000431 (split from the same owner messa
 - relates_to → `000359`
 - relates_to → `000397`
 - relates_to → `000431`
+- relates_to ← `000506`
 
 ---
 
@@ -22374,3 +22377,22 @@ State when recorded (read-only, dev): five plans are folders today (PLAN-003, PL
 - relates_to → `None`
 - relates_to → `None`
 - relates_to → `000502`
+
+---
+
+## 000506 · OpenAI agents callable from Claude Code, for mostly read-only investigations to start and for adversarial audits
+
+**Created 2026-09-27T16:53:07-04:00 · Status: `open`**
+
+Owner, 2026-09-27, relayed by the Session Manager; lower priority, capture only. As given: "OpenAI agents that you can call and utilize through Claude Code, to support mostly read-only investigatory operations to start, and adversarial audits."
+
+The owner is planning it independently with ChatGPT in the worktree /code/d-system-worktrees/openai-agent-interoperability-preplan (branch agent/openai-agent-interoperability-preplan), which will hold a plan document to be audited and enhanced later. When this idea was recorded, that branch carried one commit, 02d20b9 ("Add OpenAI agent interoperability pre-plan"), which adds a PROMPT-043 pre-plan prompt; it is not on dev.
+
+Related: 000432 (other providers' models per role), 000430 (second-provider models as planners and in ideation), 000359 (coordinate other providers' sessions under the multi-session protocol), and PROMPT-040 (the Gemini review sequence).
+
+**Links**
+
+- relates_to → `000432`
+- relates_to → `000430`
+- relates_to → `000359`
+- relates_to → `None`
