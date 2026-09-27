@@ -19,6 +19,45 @@ depends_on: [doc-idea-realization-plugin-end-to-end]
 `phase-plug-08` — End-to-end exercise in a scratch repository, install documentation, and
 handover. The last phase of the idea-realization plugin build (`PLAN-048`, `REQ-031` R22).
 
+## Verification
+
+Run in the worktree on `agent/phase-plug-08` at `cdfc579`:
+
+```
+$ cd plugins/idea-realization && uv run pytest
+497 passed
+
+$ claude plugin validate plugins/idea-realization --strict
+✔ Validation passed
+
+$ uv run python tools/check_no_private_content.py
+check_no_private_content: OK (1053 tracked files, 0 identifiers checked)
+
+$ uv run python -m src.governance
+Governance OK: 43 systems, 389 documents, 34 memories, 323 backlog phases
+```
+
+## Acceptance
+
+- The session record names the scratch repository, quotes each command's real output, and lists
+  the scaffold's created files: **Met**. See *The scratch repository* and *The exercise*, step 2,
+  below.
+- The partition sweep's second audit ran and its findings are in the record: **Met**. A2 was
+  dispatched with the draft's absolute primary-checkout path and wrote `audit-2-findings.md`; its
+  findings are quoted under *The exercise*, step 6.
+- A second scaffold run over the scratch repository creates no file: **Met**. Every line was
+  `skipped`, with no `recorded` line and a clean `git status` (*The exercise*, step 9).
+- Every defect found is either fixed with a test or recorded as an idea by id: **Met**. See *Defects found*
+  below.
+
+## Backlog
+
+`status: active`, `agent: agent-builder-b`.
+
+## Unresolved
+
+None.
+
 ## The scratch repository
 
 An empty repository named `orchard`, created outside this repository and its worktrees, with one
@@ -527,36 +566,6 @@ No `recorded` line, so the install record was not rewritten either, and the tree
 
 All three ideas are linked to 000470, the anchor for the planning after this phase.
 
-## Verification
-
-Run in the worktree on `agent/phase-plug-08`:
-
-```
-$ cd plugins/idea-realization && uv run pytest
-497 passed
-
-$ claude plugin validate plugins/idea-realization --strict
-✔ Validation passed
-
-$ uv run python tools/check_no_private_content.py
-check_no_private_content: OK (1052 tracked files, 0 identifiers checked)
-
-$ uv run python -m src.governance
-Governance OK: 43 systems, 388 documents, 34 memories, 323 backlog phases
-```
-
-## Acceptance
-
-- The session record names the scratch repository, quotes each command's real output, and lists
-  the scaffold's created files: **Met**, above.
-- The partition sweep's second audit ran and its findings are in the record: **Met**. A2 was
-  dispatched with the draft's absolute primary-checkout path and wrote `audit-2-findings.md`; its
-  findings are quoted under step 6.
-- A second scaffold run over the scratch repository creates no file: **Met**. Every line was
-  `skipped`, with no `recorded` line and a clean `git status`.
-- Every defect found is either fixed with a test or recorded as an idea by id: **Met**. The table
-  above.
-
 ## Handover
 
 **What shipped.** The idea-realization plugin, loadable with `--plugin-dir`, with fourteen skills
@@ -574,14 +583,6 @@ primary-checkout draft. Five defects: two fixed here, three recorded as ideas 00
 
 **What is left.** The three ideas, batched on 000470. A persistent install waits for a
 marketplace. Installing into a real repository is the owner's own step, outside this plan.
-
-## Backlog
-
-`status: active`, `agent: agent-builder-b`.
-
-## Unresolved
-
-None.
 
 ## Review
 
