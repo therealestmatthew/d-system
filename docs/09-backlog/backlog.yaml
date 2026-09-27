@@ -14662,7 +14662,8 @@ items:
   systems:
   - sys-plugin-partition
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-builder
   priority: 2
   session_budget: 1
   depends_on:
@@ -14699,6 +14700,7 @@ items:
   - plugins/idea-realization/docs/partition-pack.md
   - plugins/idea-realization/schemas/idea-partition-record.schema.json
   - plugins/idea-realization/test/test_partition.py
+  - plugins/idea-realization/docs/tools.md
   next_action: Waits for phase-plug-02. Read _working/session-manager/plugin-analysis/02-partition.md
     section 2 for the sequence and section 6 for the audit-2 block. May run alongside phase-plug-04
     and phase-plug-06.
