@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-24'
+updated: '2026-09-26'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -27,7 +27,9 @@ the post-merge completion edit (item 4), and the `_working/` report exemption (i
 revised again on 2026-09-23 to add the owner's rulings that the merge gate includes `ruff` and
 `mypy` and that the dirty-integration check runs before every fast-forward. Item 4(iii) and the
 builder roles' step 5 were revised on 2026-09-24 (`phase-grd-01`, `REQ-028` R05) to name the
-catalog regeneration in the completion edit.
+catalog regeneration in the completion edit. Item 11 was added on 2026-09-26 from the owner's
+ruling of 2026-09-23 that a failing pre-commit hook is never bypassed with `--no-verify` (`GOV-017`,
+"The merge gate").
 
 ## Kickoff for the Session Manager
 
@@ -96,6 +98,8 @@ Roster
 10. One pytest run at a time per worktree, for the same reason, and run
     `git diff --exit-code docs/08-governance/catalog.md` before each commit that is not meant to
     change the catalog. When a commit does change it, regenerate it with --catalog instead.
+11. Never commit with --no-verify. A failing pre-commit hook stops you; send BLOCKED to me with
+    the check and its message.
 
 Reply now to "Session Manager": ACK <your session name> <state: phase/branch/worktree, or none>
 ```
