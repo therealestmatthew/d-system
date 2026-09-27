@@ -264,7 +264,7 @@ def test_wait_times_out_with_2() -> None:
     runner = FakeRunner([[IN_PROGRESS]])
     verdict = tool.check_with_wait(None, 100, 30, runner, clock.sleep, clock)
     assert verdict.code == 2
-    assert "still unknown after waiting 100 s" in verdict.message
+    assert "still unknown after waiting 90 s" in verdict.message
     assert len(runner.gh_calls) == 4
     assert clock.now <= 100
 

@@ -168,13 +168,15 @@ def check_with_wait(
     clock: Callable[[], float] = time.monotonic,
 ) -> Verdict:
     """Re-check while the answer is 2, until a 0 or 1 or until `wait` seconds have passed."""
-    deadline = clock() + wait
+    start = clock()
+    deadline = start + wait
     verdict = check(commit, run)
     while verdict.code == 2 and clock() + interval <= deadline:
         sleep(interval)
         verdict = check(commit, run)
     if verdict.code == 2 and wait > 0:
-        return Verdict(2, f"{verdict.message} (still unknown after waiting {wait:g} s)")
+        waited = clock() - start
+        return Verdict(2, f"{verdict.message} (still unknown after waiting {waited:g} s)")
     return verdict
 
 

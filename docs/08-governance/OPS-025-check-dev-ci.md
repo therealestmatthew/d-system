@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-24'
-updated: '2026-09-24'
+updated: '2026-09-27'
 systems: [sys-governance]
 depends_on: [doc-deterministic-guards-requirements, doc-deterministic-guards, doc-multi-session-coordination-protocol]
 ---
@@ -50,8 +50,9 @@ a worktree as from the primary checkout.
 - **`dev is not pushed`.** Local `dev` and `origin/dev` differ, so CI has not seen the head. The
   lock holder pushes `dev` before sending `TURN DONE` (GOV-017), so this means a turn ended
   without its push. Push `dev`, then run the check again with `--wait`.
-- **`still unknown after waiting 600 s`.** CI is slow or queued. Ask the owner whether to wait
-  longer or grant; do not grant on an older green commit, which would let an untested head through.
+- **`still unknown after waiting <n> s`.** CI is slow or queued; `<n>` is the time actually
+  waited, at most `--wait`. Ask the owner whether to wait longer or grant; do not grant on an
+  older green commit, which would let an untested head through.
 - **Red.** The run URL names the failing job. Only the fix is granted, on the owner's ruling. An
   `idea` turn to record the failure is not gated.
 - **`gh failed`.** Usually authentication (`gh auth status`) or the network. The result is unknown,
