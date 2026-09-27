@@ -20,8 +20,9 @@ and `000469` (a session configuration for when the owner works from a mobile dev
 access).
 
 **Status: draft.** Written 2026-09-27 by Session 1 - Builder A on an owner-directed assignment
-relayed by the Session Manager, running unclaimed (no backlog phase). It awaits the three-altitude
-review (`GOV-018`) and G3.
+relayed by the Session Manager, running unclaimed (no backlog phase). It was reviewed under
+`GOV-018` at the plan and phase altitudes. The review record is `2026-09-27-plan-051`, with eight
+findings, all `fixed` and none escalated. It awaits G3.
 
 ## Context and scope
 
@@ -98,7 +99,10 @@ explain what a value lets a session do, and rules in this repository live in gov
 excluded, an expiry, and a decision-log path.** The covered items are, for example, the phases
 pre-approved for a night and the fixes branches `01-authority.md` §1 listed. The exclusions are
 free-text items that a delegated setting never covers, such as `01-authority.md` §4's run-specific
-"Wire the broker hook". The Session Manager repeats them in the contract line.
+"Wire the broker hook". The Session Manager repeats them in the contract line. The rejected
+alternative was a preset with no run-specific fields, where a delegated setting would cover every
+phase and branch. That would widen `01-authority.md`'s practice: it named six phases and two branches
+and said "Nothing else may be claimed", and the owner would lose that limit.
 
 **D6. A resolver tool computes the effective setting and falls back to `attended`.** The tool is
 `tools/autonomy.py`. It prints each axis and behaviour value with its source layer, and one contract
@@ -123,6 +127,9 @@ question previews:
 A queued terminal-only action is written to the decision log and to the board, and the work carries
 on, as the owner chose. A push blocked by the permission classifier, which is the case in `000469`,
 is a terminal-only action, so the "pushes deferred" example is covered without a separate behaviour.
+Two alternatives were rejected. A fixed mobile preset, with no behaviour settable on its own,
+would stop the owner switching "each behavior based on our preferences". A mobile variant of
+each preset would double the presets and duplicate the mapping in each one.
 
 **D8. No setting delegates an owner-reserved decision. A delegated merge is the owner's approval,
 given in advance.** `GOV-014` reserves "integration into `dev`" to the owner permanently. Under
@@ -132,7 +139,10 @@ decide the merge. `GOV-017` already treats a relayed `GRANTED merge` as the owne
 (*Departures*, item 4). This extends that approval to one given before the `READY` arrives. The
 reading is not the same as the one `GOV-014` states, so `GOV-003` records it only as the owner's
 ruling at G3 (OQ2). The document reproduces the owner-reserved list, and the schema has no axis
-that reaches it.
+that reaches it. Two alternatives were rejected. Leaving out delegated merges would drop the mode
+that `01-authority.md` ran on 2026-09-23 and that the owner asked to configure. Treating a
+delegated merge as the Session Manager's own decision would move an owner-reserved item to an
+agent.
 
 **D9. Sessions learn the setting at kickoff, through `MODE` when it changes mid-run, and
 `OWNER-BACK` ends an `on-owner-contact` expiry.** At kickoff the Session Manager runs the resolver
@@ -141,7 +151,18 @@ setting, the Session Manager sends `MODE <contract line>` to every session. Each
 `ACK <session> MODE`, and the ACKs go on the board. When the owner speaks to a session while an
 `on-owner-contact` expiry is in force, that session sends `OWNER-BACK` to the Session Manager. The
 Session Manager then sets the in-force file to `attended`, keeps the mobile flag as it was, and
-sends `MODE`. The rejected alternative was for each session to re-read the file before every
+sends `MODE`.
+
+Failure paths. A step already under way when `MODE` arrives finishes under the setting it started
+under, and the session's next step uses the new one. A merge turn counts as one step from
+`GRANTED merge` to `TURN DONE`. Until a session has sent `ACK <session> MODE`, the Session Manager
+grants it no turn, assignment or merge, and when a grant is waiting on that session it tells the
+owner. If the owner speaks to the Session Manager itself under an `on-owner-contact` expiry, that
+counts as `OWNER-BACK`. If the owner speaks to a session that does not send `OWNER-BACK`, the
+setting stays in force until the owner's next message to the Session Manager. `GOV-017` records
+that gap.
+
+The rejected alternative was for each session to re-read the file before every
 decision. A change would then arrive with no acknowledgement, and a session partway through a step
 could act on either version.
 
@@ -154,7 +175,10 @@ does not need it.
 in-force file names the log's path. It defaults to `_working/session-manager/decisions.md`, beside
 the board, which the owner reads on return. `01-authority.md`'s `morning-report.md` shows the need.
 An entry names the time, the session, the item, the axis and value that authorised it, and the
-outcome.
+outcome. Two alternatives were rejected. Keeping decisions on the board would mix them with lock
+and slot events, so the owner would have to read the whole board on return. Writing them to each
+session's own record would split one night's decisions across several files, and a parked item
+has no session record yet.
 
 ## Implementation phases
 
@@ -190,16 +214,18 @@ Every requirement maps to a phase, and every phase has a row.
 - `phase-mode-01` and `phase-mode-02` each declare `docs/08-governance/` for a new document, so each
   collides with any active phase that declares that directory: today `phase-asr-02`, `phase-asr-03`,
   `phase-asr-04` and the `phase-grd-*` and `phase-dam-01` phases that edit documents there.
-- `phase-mode-03` edits `GOV-017` and `PROMPT-037`, which `phase-grd-03` and `phase-asr-04` also
-  edit. The phases do not depend on each other. Declaring the same files means they cannot be
+- `phase-mode-03` edits `GOV-017` and `PROMPT-037`, which `phase-grd-02`, `phase-grd-03` and
+  `phase-asr-04` also edit. `phase-grd-02` has been active since 2026-09-27 (claimed for
+  `agent-builder-b` at `270e688`) and changes `GOV-017`'s primary-checkout lock section and
+  `PROMPT-037`'s contract item 1. The phases do not depend on each other. Declaring the same files means they cannot be
   active at the same time, and whichever runs second rebases onto the other's text.
 - No phase goes into `next_up` without the owner's word (OQ4).
 
 ## Out of scope
 
 - **Porting the mechanism to the idea-realization plugin** (`plugins/idea-realization/docs/multi-session.md`
-  and `session-manager-messages.md`). The owner ruled "not now" on 2026-09-27. It goes to Ideation
-  as a follow-on idea.
+  and `session-manager-messages.md`). The owner ruled "not now" on 2026-09-27. Ideation recorded
+  it as `000496` (port the session autonomy configuration to the plugin), which extends `000466`.
 - **Enforcing the setting at the tool boundary.** The resolver reports; sessions comply under
   `GOV-017`. Enforcement at the tool boundary is the broker's job (`phase-auto-*`, `PLAN-032`).
 - **The orchestrator of `ADR-023`.** It would read the same files if it takes over the Session

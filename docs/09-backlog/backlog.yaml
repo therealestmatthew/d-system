@@ -15327,6 +15327,7 @@ items:
   - doc-realization-role-contracts
   systems:
   - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -15370,6 +15371,7 @@ items:
   - doc-session-autonomy-configuration
   systems:
   - sys-governance
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -15382,9 +15384,10 @@ items:
     preset, then the mobile mapping when mobile is true, then overrides; print every axis and behaviour value with its
     source layer, and one contract line; exit non-zero and print the attended defaults when the file is missing, fails
     validation, names anything undeclared, or has expired (REQ-034 R04, R06; PLAN-051 D6).
-  - Write test/test_autonomy_resolver.py with fixtures under test/fixtures/autonomy/ - a valid file; each precedence
+  - Write test/test_autonomy_resolver.py with fixtures under test/fixtures/autonomy/ - a valid file, including
+    overnight-mobile.yaml (the overnight preset with mobile true), which the verification commands run; each precedence
     layer; mobile true with and without a behaviour override; mobile false; a missing file; an undeclared axis; an
-    out-of-range value; an expired setting; a registry extended by one axis and one behaviour, resolved with the tool
+    out-of-range value; an expired setting (expired.yaml); a registry extended by one axis and one behaviour, resolved with the tool
     unchanged (R07).
   - Write the tool's OPS-* document, leaving the generated block empty, then run tools/generate_tool_docs.py.
   acceptance:
@@ -15417,6 +15420,7 @@ items:
   - doc-backlog-decisions
   systems:
   - sys-governance
+  - sys-gov-docs
   - sys-backlog
   owner: repository-owner
   status: queued
@@ -15439,11 +15443,18 @@ items:
   - grep -n "The owner approves every merge" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md returns
     nothing, and the merge item points to the setting.
   - GOV-017's message table has MODE, ACK <session> MODE and OWNER-BACK rows, and its kickoff names tools/autonomy.py.
+  - GOV-017 cites the autonomy document by code, has a departure entry for the Session Manager writing the in-force
+    file on lapse, states PLAN-051 D9's two failure rules, and its Claim slots and merge-gate sections each point to
+    the setting; each is found by a grep for the autonomy document's code in that section.
   - The GOV-003 entry quotes the owner's ruling with its date.
-  - The session record shows the dry run's contract line and decision-log entry.
+  - The dry run is recorded in the session record, including a rejected case - an expired sample in-force file makes
+    tools/autonomy.py exit non-zero and print attended, and the contract line the Session Manager would send says
+    attended.
   verification:
   - grep -n "The owner approves every merge" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - grep -n "MODE\|OWNER-BACK" docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - grep -n "GOV-0[0-9][0-9]" docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - uv run python tools/autonomy.py --in-force test/fixtures/autonomy/expired.yaml
   - uv run python tools/autonomy.py --in-force test/fixtures/autonomy/overnight-mobile.yaml
   - uv run python -m src.governance --catalog
   - uv run python -m src.governance

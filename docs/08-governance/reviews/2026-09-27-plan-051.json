@@ -1,0 +1,199 @@
+{
+  "review_id": "2026-09-27-plan-051",
+  "procedure": "GOV-018",
+  "date": "2026-09-27",
+  "target": {
+    "plan": "PLAN-051",
+    "requirement": "REQ-034",
+    "phases": [
+      "phase-mode-01",
+      "phase-mode-02",
+      "phase-mode-03"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-051-session-autonomy-configuration.md at 8f1c966: exit 0. Re-run after the revision: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "notes": "Reviewed at 8f1c966 on agent/plan-autonomy-levels, two dispatches on partition-adversary with PROMPT-038: the plan altitude, and the phase altitude for phase-mode-01..03. No later-added altitude: every phase was registered in the plan's first commit. Findings recorded as reported; the dispatcher added only id, engine and author. Dispositions by Session 1 - Builder A as planner; none escalated. The revised plan was not re-reviewed; GOV-018 defines no second review. The adversary reported the sys-gov-docs finding once with subject 'phase-mode-01, phase-mode-02, phase-mode-03'; the schema requires one phase id per phase-altitude subject, so it is recorded as F06, F07 and F08 with identical text and only the subject split.",
+  "findings": [
+    {
+      "altitude": "plan",
+      "subject": "PLAN-051, Execution order and real concurrency",
+      "severity": "major",
+      "title": "The plan's list of phases colliding with phase-mode-03 on GOV-017 and PROMPT-037 omits phase-grd-02, which touches both files and is the only one of the group actually claimed.",
+      "evidence": "PLAN-051 states: \"`phase-mode-03` edits `GOV-017` and `PROMPT-037`, which `phase-grd-03` and `phase-asr-04` also edit.\" A scan of every non-complete backlog entry for `docs/08-governance/`, `GOV-017` and `PROMPT-037` mentions shows phase-grd-02's scope (docs/09-backlog/backlog.yaml:14066: \"Require a 0 before any GRANTED in GOV-017's primary-checkout lock section and PROMPT-037's contract item 1\") touches both files, exactly the category the sentence names — yet it is absent from the sentence (grd-02 only appears folded into the separate, wildcarded \"phase-grd-*\" sentence about docs/08-governance/ collisions for mode-01/02, not the specific GOV-017-and-PROMPT-037 sentence for mode-03). Independently, the primary checkout's git log (outside this worktree, which forked one commit earlier) shows phase-grd-02 was claimed for agent-builder-b (commit 270e688, 2026-09-27, same day as this plan) — it is not merely queued like grd-03/asr-04/dam-01, it is being actively worked right now.",
+      "consequence": "Anyone scheduling phase-mode-03 off this list will not know that phase-grd-02 — already claimed and editing the same primary-checkout-lock/contract-item-1 territory of GOV-017/PROMPT-037 — is a live collision, and may schedule mode-03 assuming only grd-03 and asr-04 need to clear first.",
+      "minimal_fix": "Add phase-grd-02 to the sentence naming GOV-017/PROMPT-037 editors, and note its current claim status.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "Execution order section now names phase-grd-02 with its claim (agent-builder-b, 270e688) and the passages it changes; verified with the backlog on dev e4f0859."
+        }
+      ],
+      "id": "F01"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-051 Decisions D5, D7, D8, D11",
+      "severity": "major",
+      "title": "Four of the plan's eleven numbered decisions name no rejected alternative or its cost, failing GOV-010 P2.",
+      "evidence": "D5 (in-force file fields), D7 (mobile as one boolean with per-behaviour defaults), D8 (no setting delegates an owner-reserved decision), and D11 (one decision log, default path) each state only what was chosen, with no \"Two alternatives were rejected\" (or equivalent) clause and no stated cost of the road not taken — contrast with D1, D2, D4, D6, D9, which each name at least one alternative and its concrete cost. GOV-010 P2 (docs/08-governance/GOV-010-*.md:140-143): \"'Chosen because it is good' is not a reason. The reason is what the rejected option would have cost here.\"",
+      "consequence": "A G3 reviewer applying GOV-010 P2 literally has grounds to bounce the plan back for these four decisions; the owner cannot tell from the document what an alternative in-force-file shape, mobile design, delegation reading, or logging destination would have cost.",
+      "minimal_fix": "Add one alternative-and-cost sentence to each of D5, D7, D8 and D11 (D8 in particular has an obvious candidate: no delegated merges at all, at the cost of defeating overnight mode's purpose).",
+      "slug": "decision-missing-rejected-alternative",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "D5 now rejects a preset with no run-specific fields (loses 01-authority.md's 'Nothing else may be claimed' limit); D7 rejects a fixed mobile preset and per-preset mobile variants; D8 rejects omitting delegated merges and treating them as the Session Manager's decision; D11 rejects the board and per-session records."
+        }
+      ],
+      "id": "F02"
+    },
+    {
+      "altitude": "plan",
+      "subject": "PLAN-051 D9",
+      "severity": "major",
+      "title": "The MODE / ACK / OWNER-BACK protocol the plan introduces states no failure path for a session that never ACKs or is mid-step when MODE arrives.",
+      "evidence": "D9: \"When the owner changes the setting, the Session Manager sends `MODE <contract line>` to every session. Each session replies `ACK <session> MODE`, and the ACKs go on the board.\" No text says what the Session Manager does if a session does not reply, replies late, or is executing a step when MODE arrives (which axis/value governs that in-flight action). GOV-017's message contract table (docs/08-governance/GOV-017-multi-session-coordination-protocol.md:196-220) defines `ACK` and other messages but carries no generic timeout/non-response rule this could inherit. D9's own rejected-alternative paragraph shows the plan is aware of the race (\"a session partway through a step could act on either version\") but only as the reason a different design was rejected, not as a resolved case for the design it kept.",
+      "consequence": "phase-mode-03's implementer has no specification to build against for a non-responsive or mid-step session; this will be decided ad hoc during the build and is likely to surface as a G3 or review finding rather than being caught now.",
+      "minimal_fix": "Add one sentence to D9 stating what governs an in-flight action when MODE arrives, and what the Session Manager does (retry, escalate to the owner, proceed under the prior mode) if an ACK does not arrive within a stated bound.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "D9 gains a failure-path paragraph: an in-flight step (a merge turn counts as one) finishes under its starting setting; no grant to a session until it ACKs, with the owner told when a grant waits; owner contact with the Session Manager counts as OWNER-BACK; a missed OWNER-BACK is a stated gap GOV-017 records. REQ-034 R09 and phase-mode-03's acceptance now require both rules."
+        }
+      ],
+      "id": "F03"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-mode-03",
+      "severity": "major",
+      "title": "Three of the five GOV-017 scope items have no acceptance or verification check, and no acceptance line names a case that must be rejected.",
+      "evidence": "backlog.yaml phase-mode-03 scope (line 15427-15430): 'cite the autonomy document as the source of the setting in force; add the kickoff step...; add a departure entry for the Session Manager writing the in-force file on lapse; add MODE, ACK <session> MODE and OWNER-BACK to the message table; point the merge gate and claim slots at the setting.' Its acceptance block (lines 15437-15442) has only four lines: a grep for absence of old text in PROMPT-037, a check that the message table has the three new rows and the kickoff names tools/autonomy.py, a GOV-003 quote check, and a session-record read for the dry run. Nothing checks the citation, the departure entry, or that the merge gate/claim slots actually point at the setting. None of the four lines names an input that must be rejected, unlike phase-mode-01 ('each negative fixture fails for its stated reason') and phase-mode-02 ('every failure fixture exits non-zero with the attended defaults printed'), which both satisfy GOV-010 P6.",
+      "consequence": "A builder can complete phase-mode-03 and pass its own acceptance gate while never writing the citation, the departure entry, or the merge-gate/claim-slots wiring — three of the five things the scope requires GOV-017 to gain. Nothing mechanical would catch the gap before the three-altitude review, at which point the phase would need to be reopened.",
+      "minimal_fix": "Add acceptance/verification lines for the citation text, the departure-entry text, and the merge-gate/claim-slots text (e.g. grep for each), and one line naming a rejected case (e.g. the dry run's decision-log entry is refused if it is missing a required field, or an expired sample resolves to attended and is logged as such).",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "phase-mode-03 acceptance adds a line covering the citation, departure entry, D9's failure rules and the Claim slots and merge-gate pointers, and a rejected case: an expired sample in-force file resolves to attended. Verification adds a grep for the document code in GOV-017 and the expired.yaml run."
+        }
+      ],
+      "id": "F04"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-mode-02",
+      "severity": "minor",
+      "title": "The verification command's fixture filename is never named in the phase's own scope.",
+      "evidence": "backlog.yaml line 15395 (and reused at line 15446 for phase-mode-03): `uv run python tools/autonomy.py --in-force test/fixtures/autonomy/overnight-mobile.yaml`. The scope (line 15384-15387) describes fixtures only by role ('a valid file', 'mobile true with and without a behaviour override', etc.) and never names `overnight-mobile.yaml`. Confirmed by `grep -rn overnight-mobile` across PLAN-051, REQ-034 and backlog.yaml: the string appears only in these two verification lines, nowhere it is defined.",
+      "consequence": "The builder can only discover this exact required filename by reading their own verification command, not the scope; if they instead name that fixture something else (all the scope's fixture descriptions fit several files), their own phase-mode-02 verification step still forces the name into existence, but the contract is implicit rather than stated, and would be easy to lose if the verification line is ever edited independently of the scope.",
+      "minimal_fix": "Name `test/fixtures/autonomy/overnight-mobile.yaml` explicitly in phase-mode-02's scope bullet as 'the valid, mobile-true fixture'.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "phase-mode-02 scope now names overnight-mobile.yaml (overnight preset, mobile true) and expired.yaml, the two fixtures verification commands run."
+        }
+      ],
+      "id": "F05"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-mode-01",
+      "severity": "minor",
+      "title": "All three phases tag `sys-governance` for work that is actually governance-document authoring, which the repository split into a separate system specifically to stop this miscategorization.",
+      "evidence": "docs/08-governance/systems.yaml: `sys-governance`'s `paths` are exactly `src/governance`, three schema files, `systems.yaml`, `codes.yaml` and `tools/generate_tool_docs.py` — none of which phase-mode-01/02/03 touch. `sys-gov-docs` (paths: `docs/08-governance/`) exists precisely because 'phases that write new documents in this directory were tagged sys-governance despite never touching the engine's own paths' (owner ruling, 2026-09-16). Every comparable phase that authors or edits a document under `docs/08-governance/` in the current backlog declares `sys-gov-docs`: phase-asr-02, phase-asr-03 (`[sys-gov-docs]`), phase-asr-04, phase-grd-02, phase-grd-03, phase-dam-01 (`[sys-governance, sys-gov-docs, ...]`). phase-mode-01 declares only `[sys-governance]`, phase-mode-02 only `[sys-governance]`, phase-mode-03 only `[sys-governance, sys-backlog]` — none declares `sys-gov-docs`, though phase-mode-01 writes a new GOV document and the registry, phase-mode-02 writes a new OPS document, and phase-mode-03 edits GOV-017 and GOV-003.",
+      "consequence": "Checked whether this changes any actual collision outcome: it does not today, because `collisions()` in `src/governance/backlog.py` also matches on shared deliverable paths, and all three phases already declare the whole `docs/08-governance/` directory as a deliverable, which independently produces 'share deliverable path docs/08-governance/' against every phase above. So the plan's stated collisions (execution-order section) are accurate despite the mistagging. The defect is that the plan's own systems declaration doesn't reflect its footprint, reproducing the exact anti-pattern the split was meant to end, and would misfire if a future phase in this area ever declares a narrower deliverable path than the whole directory.",
+      "minimal_fix": "Add sys-gov-docs to all three phases' systems lists.",
+      "slug": "sys-gov-docs-mistagged",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "sys-gov-docs added to phase-mode-01, -02 and -03. sys-governance kept: phase-mode-01 adds a schema under schemas/ and phase-mode-02 a tool beside tools/generate_tool_docs.py."
+        }
+      ],
+      "id": "F06"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-mode-02",
+      "severity": "minor",
+      "title": "All three phases tag `sys-governance` for work that is actually governance-document authoring, which the repository split into a separate system specifically to stop this miscategorization.",
+      "evidence": "docs/08-governance/systems.yaml: `sys-governance`'s `paths` are exactly `src/governance`, three schema files, `systems.yaml`, `codes.yaml` and `tools/generate_tool_docs.py` — none of which phase-mode-01/02/03 touch. `sys-gov-docs` (paths: `docs/08-governance/`) exists precisely because 'phases that write new documents in this directory were tagged sys-governance despite never touching the engine's own paths' (owner ruling, 2026-09-16). Every comparable phase that authors or edits a document under `docs/08-governance/` in the current backlog declares `sys-gov-docs`: phase-asr-02, phase-asr-03 (`[sys-gov-docs]`), phase-asr-04, phase-grd-02, phase-grd-03, phase-dam-01 (`[sys-governance, sys-gov-docs, ...]`). phase-mode-01 declares only `[sys-governance]`, phase-mode-02 only `[sys-governance]`, phase-mode-03 only `[sys-governance, sys-backlog]` — none declares `sys-gov-docs`, though phase-mode-01 writes a new GOV document and the registry, phase-mode-02 writes a new OPS document, and phase-mode-03 edits GOV-017 and GOV-003.",
+      "consequence": "Checked whether this changes any actual collision outcome: it does not today, because `collisions()` in `src/governance/backlog.py` also matches on shared deliverable paths, and all three phases already declare the whole `docs/08-governance/` directory as a deliverable, which independently produces 'share deliverable path docs/08-governance/' against every phase above. So the plan's stated collisions (execution-order section) are accurate despite the mistagging. The defect is that the plan's own systems declaration doesn't reflect its footprint, reproducing the exact anti-pattern the split was meant to end, and would misfire if a future phase in this area ever declares a narrower deliverable path than the whole directory.",
+      "minimal_fix": "Add sys-gov-docs to all three phases' systems lists.",
+      "slug": "sys-gov-docs-mistagged",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "sys-gov-docs added to phase-mode-01, -02 and -03. sys-governance kept: phase-mode-01 adds a schema under schemas/ and phase-mode-02 a tool beside tools/generate_tool_docs.py."
+        }
+      ],
+      "id": "F07"
+    },
+    {
+      "altitude": "phase",
+      "subject": "phase-mode-03",
+      "severity": "minor",
+      "title": "All three phases tag `sys-governance` for work that is actually governance-document authoring, which the repository split into a separate system specifically to stop this miscategorization.",
+      "evidence": "docs/08-governance/systems.yaml: `sys-governance`'s `paths` are exactly `src/governance`, three schema files, `systems.yaml`, `codes.yaml` and `tools/generate_tool_docs.py` — none of which phase-mode-01/02/03 touch. `sys-gov-docs` (paths: `docs/08-governance/`) exists precisely because 'phases that write new documents in this directory were tagged sys-governance despite never touching the engine's own paths' (owner ruling, 2026-09-16). Every comparable phase that authors or edits a document under `docs/08-governance/` in the current backlog declares `sys-gov-docs`: phase-asr-02, phase-asr-03 (`[sys-gov-docs]`), phase-asr-04, phase-grd-02, phase-grd-03, phase-dam-01 (`[sys-governance, sys-gov-docs, ...]`). phase-mode-01 declares only `[sys-governance]`, phase-mode-02 only `[sys-governance]`, phase-mode-03 only `[sys-governance, sys-backlog]` — none declares `sys-gov-docs`, though phase-mode-01 writes a new GOV document and the registry, phase-mode-02 writes a new OPS document, and phase-mode-03 edits GOV-017 and GOV-003.",
+      "consequence": "Checked whether this changes any actual collision outcome: it does not today, because `collisions()` in `src/governance/backlog.py` also matches on shared deliverable paths, and all three phases already declare the whole `docs/08-governance/` directory as a deliverable, which independently produces 'share deliverable path docs/08-governance/' against every phase above. So the plan's stated collisions (execution-order section) are accurate despite the mistagging. The defect is that the plan's own systems declaration doesn't reflect its footprint, reproducing the exact anti-pattern the split was meant to end, and would misfire if a future phase in this area ever declares a narrower deliverable path than the whole directory.",
+      "minimal_fix": "Add sys-gov-docs to all three phases' systems lists.",
+      "slug": "sys-gov-docs-mistagged",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session 1 - Builder A (planner, agent/plan-autonomy-levels)",
+          "date": "2026-09-27",
+          "reason": "sys-gov-docs added to phase-mode-01, -02 and -03. sys-governance kept: phase-mode-01 adds a schema under schemas/ and phase-mode-02 a tool beside tools/generate_tool_docs.py."
+        }
+      ],
+      "id": "F08"
+    }
+  ]
+}
