@@ -6333,6 +6333,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 - relates_to ← `000139`
 - relates_to ← `000170`
 - relates_to ← `000433`
+- relates_to ← `000510`
 
 ---
 
@@ -22149,6 +22150,8 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We maybe need a 
 
 - relates_to → `000492`
 - relates_to ← `000497`
+- relates_to ← `000509`
+- relates_to ← `000510`
 
 ---
 
@@ -22162,6 +22165,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Maybe another ag
 
 - relates_to → `000492`
 - relates_to ← `000497`
+- relates_to ← `000509`
 
 ---
 
@@ -22226,6 +22230,7 @@ PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated page
 - relates_to → `000300`
 - relates_to → `000301`
 - relates_to ← `000507`
+- relates_to ← `000509`
 
 ---
 
@@ -22488,3 +22493,71 @@ full build in the article, then run the fake-edge test before you wire up an eig
 - relates_to → `000334`
 - relates_to → `000431`
 - relates_to → `None`
+
+---
+
+## 000509 · HelpDesk Agent: answers the owner's questions about any repository system, process or method, from a structured, human-readable knowledge source
+
+**Created 2026-09-27T19:41:21-04:00 · Status: `triaged`**
+
+Owner, 2026-09-27, directly in the Ideation session. Verbatim:
+
+"Idea: we create a Helpdesk Agent - it's role is to answer questions about the repository - it knows all the governance and protocols, it knows the plan structure and planning methodology. It knows the 'Idea Management' system by which we use a sanctioned writer, append only event log design, the idea fold (calculations and process), idea metrics, and so-on.  The user can ask the HelpDesk Agent about any system in the repository, or any process, or any method by which the human user interacts with the agents in this system, and the HelpDesk Agent will respond with tact and clarity. It will present the information in short, direct structures - no long paragraphs and unnecessary prose.  Simple one-to-two line statements, single line bullet points, and readability are key - It will present the user with all the requested information in a structured format (such as a /helpdeskhelp command could be separate from the agent, paired with the agent to present: HelpDesk Agent self-introduction on /helpdeskhelp or maybe "/hd_help" - something more abbreviated and simpler to type and remember.  The HelpDesk Agent will not be the harbourer of the information it presents (only the manner in which it interacts wtih the user). The information first needs to be structured as data source, targeted files to be ingested by the agent upon which it will use it's system prompt and python harness with Claude AgentsSDK. Have this immediately triaged as well. [...] This is an important one so do an initial dimension map and identify the key documents you need to create as part of tracking total relevant repo in formation for the HelpDesk Agent.  How do we structure that data? Where is it saved?  The HelpDesk Agent would have key-words that trigger what it shares with you deterministically and it would have structured input/output contract.  First priority is planning the framework to be ingested by the HelpDesk Agent (the ideas and information it has around the repo, structured and organized so it could be used by the agent and it would be human readable."
+
+The elided sentence ("Plus we need a running list of Active/Approved Agents ...") is a separate ask, recorded as its own idea and linked here.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-27T19:41:36-04:00): Triage (Ideation, 2026-09-27, owner asked for immediate triage). No existing idea asks for a question-answering agent; nothing in the fold mentions helpdesk, FAQ or "ask the repo".
+Closest ideas: 000494 (dedicated agent that tracks artifacts, protocols, governance and documents) and 000495 (agent that tracks paths and finds things) ask for the tracking side of the same knowledge; this idea is the answering side. 000497 (monitoring artifact) shows repository state; this answers questions about how the repository works.
+Closest planned work: PLAN-033 / REQ-018 (retrieval and knowledge infrastructure, phase-ret-*), and sys-memory-agents (planned Librarian role, PLAN-001).
+Reusable sources already in place: catalog.md, codes.yaml, systems.yaml, backlog.yaml, brain/ via load_context.py, GLOSSARY.md, OPS runbooks with generated tool references, tools/overview_inventory.py, plugins/idea-realization/skills/tools (the nearest existing help skill).
+Agent SDK: not yet a dependency; src/orchestrator/dispatch.py is the planned dispatch point and is a stub (ADR-018, PLAN-039.01).
+Owner-requested dimension map, proposed knowledge-pack structure and key-document list: docs/00-working/helpdesk-dimension-map.md. Twelve dimensions; proposed structure is a schema-validated topic index (keywords -> source files -> answer shape) plus one short generated Markdown card per topic.
+Naming: existing commands are lowercase kebab-case; /hd or /helpdesk fits, /hd_help does not.
+Next step per owner: framework planning, routed to the Prompt Planner.
+
+</details>
+
+**Links**
+
+- relates_to → `000494`
+- relates_to → `000495`
+- relates_to → `000497`
+- relates_to → `None`
+- relates_to ← `000510`
+
+---
+
+## 000510 · A running list of Active/Approved agents created or planned with the Agent SDK, here and in other repositories
+
+**Created 2026-09-27T19:41:25-04:00 · Status: `triaged`**
+
+Owner, 2026-09-27, directly in the Ideation session, in the same message as the HelpDesk Agent idea. Verbatim:
+
+"Plus we need a running list of Active/Approved Agents that we create (or plan to create) using the AgentsSDK and iterating on select agents cross the full inventory we have (here and in other repos)."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-27T19:41:36-04:00): Triage (Ideation, 2026-09-27, owner asked for triage alongside 000509). No agent registry or inventory exists.
+Current agents: 15 in .claude/agents, 14 Codex twins in .codex/agents, 3 portable copies in plugins/idea-realization/agents. About 13 more are planned in queued backlog phases (for example phase-idg-02 classification, phase-idg-07 connection-builder, phase-idg-12 idea planner, phase-agx-10 lifecycle roster, phase-des-06 HTML Designer, phase-expl-05 cross-repo awareness, phase-irs-05 phase-fit, phase-irs-07 dependency mapping). None is built on the Agent SDK yet; the SDK is not a dependency.
+Nearest sources: GOV-014 (realization role contracts, authority over matching agent files), GOV-015 (agent surface audit, point-in-time, 2026-09-17), agent-workflows/workflows.yaml (generator manifest), PROMPT-012 (demo roster spec), ADR-021 (Claude-Code-only demo agents).
+GOV-001 says the claim system "adds no scheduler, agent registry, service or lock daemon". That sentence is about claim identities; planning should state whether an inventory file needs a clarification there.
+Other repos: the idea-realization plugin is packaged for the owner's other repositories (REQ-031, PLAN-048) but not installed anywhere yet; phase-expl-05 plans a cross-repo awareness agent; 000436 proposes tracking repos as one file each.
+Related: 000126 (audit of commands, skills and agents), 000494. Proposed record shape is in docs/00-working/helpdesk-dimension-map.md.
+
+</details>
+
+**Links**
+
+- relates_to → `000509`
+- relates_to → `000126`
+- relates_to → `000494`
