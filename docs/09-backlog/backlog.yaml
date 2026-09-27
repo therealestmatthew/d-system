@@ -14704,9 +14704,9 @@ items:
   - plugins/idea-realization/README.md
   - plugins/idea-realization/test/test_paths.py
   - plugins/idea-realization/docs/repository-layout.md
-  next_action: Waits for phase-plug-02. Read _working/session-manager/plugin-analysis/02-partition.md
-    section 2 for the sequence and section 6 for the audit-2 block. May run alongside phase-plug-04
-    and phase-plug-06.
+  next_action: Built on agent/phase-plug-03 and verified; every acceptance condition met at the
+    close checkpoint. Waits for the owner's merge approval, then the completion edit on dev.
+  session: doc-session-plugin-partition-sweep
 - id: phase-plug-04
   title: Backlog check and ready report, plus the session-start, checkpoint and session-close skills
   plan: doc-idea-realization-plugin
