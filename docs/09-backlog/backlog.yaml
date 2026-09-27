@@ -15317,3 +15317,139 @@ items:
   - docs/03-sessions/SESS-2026-09-26-05-system-boundary-prompt-inventory.md
   result: 'Complete: governance passed; 40 prompts reconciled to 40 inventory rows; diff and staged confidentiality checks passed; and 1,115 tests passed.'
   next_action: Complete; phase-bnd-03 may begin the system-and-backlog portfolio review.
+- id: phase-mode-01
+  title: The autonomy governance document, its registry of axes, presets and mobile behaviours, and the schema and agreement tests
+  plan: doc-session-autonomy-configuration
+  sources:
+  - doc-session-autonomy-configuration-requirements
+  - doc-session-autonomy-configuration
+  - doc-multi-session-coordination-protocol
+  - doc-realization-role-contracts
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write a governance document (code from --next-code governance) defining the axes claim_approval, merge_approval,
+    decision_points, fix_cycles and expiry; the behaviours bang_commands, question_previews and terminal_only_actions;
+    the presets attended, conditional and overnight, each value quoted beside its source line (GOV-017,
+    restart-2026-09-26.md section 4, 01-authority.md); the mobile mapping; the precedence preset, then mobile mapping,
+    then overrides; the in-force file's fields and path _working/session-manager/autonomy.yaml; the decision-log
+    entry fields; and GOV-014's owner-reserved list reproduced word for word (REQ-034 R01, R03, R04, R05, R08, R11;
+    PLAN-051 D1-D5, D7, D8, D11).
+  - Write docs/08-governance/autonomy.yaml and schemas/autonomy.schema.json in general terms, so a new axis, value,
+    preset or behaviour needs no schema change (R02, R07).
+  - Write test/test_autonomy_registry.py - the registry passes the schema; a preset naming an undeclared axis fails; an
+    out-of-range value fails; attended equals the axis and behaviour defaults; the document and the registry name the
+    same axes, values, presets and behaviours; the owner-reserved list matches GOV-014.
+  acceptance:
+  - uv run pytest test/test_autonomy_registry.py passes, and each negative fixture fails for its stated reason.
+  - Every non-default value in each preset is quoted beside its source line in the document.
+  - git check-ignore _working/session-manager/autonomy.yaml reports the path ignored.
+  verification:
+  - uv run pytest test/test_autonomy_registry.py
+  - git check-ignore _working/session-manager/autonomy.yaml
+  - uv run ruff check src/ test/
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/
+  - schemas/autonomy.schema.json
+  - test/test_autonomy_registry.py
+  next_action: Take the value definitions from the three source files named in PLAN-051's context table; read the
+    _working/ ones at the primary-checkout path, since they are gitignored. Settle OQ1 (question_previews default) from
+    the owner's G3 answer before writing the registry.
+- id: phase-mode-02
+  title: The autonomy resolver - effective setting by preset, mobile mapping and overrides, with a fallback to attended
+  plan: doc-session-autonomy-configuration
+  sources:
+  - doc-session-autonomy-configuration-requirements
+  - doc-session-autonomy-configuration
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mode-01
+  scope:
+  - Write tools/autonomy.py - read the registry and an in-force file (default the primary checkout's
+    _working/session-manager/autonomy.yaml, found through git worktree list; --in-force PATH to override); apply
+    preset, then the mobile mapping when mobile is true, then overrides; print every axis and behaviour value with its
+    source layer, and one contract line; exit non-zero and print the attended defaults when the file is missing, fails
+    validation, names anything undeclared, or has expired (REQ-034 R04, R06; PLAN-051 D6).
+  - Write test/test_autonomy_resolver.py with fixtures under test/fixtures/autonomy/ - a valid file; each precedence
+    layer; mobile true with and without a behaviour override; mobile false; a missing file; an undeclared axis; an
+    out-of-range value; an expired setting; a registry extended by one axis and one behaviour, resolved with the tool
+    unchanged (R07).
+  - Write the tool's OPS-* document, leaving the generated block empty, then run tools/generate_tool_docs.py.
+  acceptance:
+  - uv run pytest test/test_autonomy_resolver.py passes, and every failure fixture exits non-zero with the attended
+    defaults printed.
+  - The extended-registry fixture resolves its new axis and behaviour with no change to tools/autonomy.py.
+  verification:
+  - uv run pytest test/test_autonomy_resolver.py
+  - uv run python tools/autonomy.py --in-force test/fixtures/autonomy/overnight-mobile.yaml
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - tools/autonomy.py
+  - test/test_autonomy_resolver.py
+  - test/fixtures/autonomy/
+  - docs/08-governance/
+  next_action: Waits for phase-mode-01. A new tool under tools/ ships with its OPS document named after the tool stem
+    (AGENTS.md, Documentation governance).
+- id: phase-mode-03
+  title: Wire the autonomy setting into GOV-017 and PROMPT-037, record the owner's ruling in GOV-003, and dry-run the kickoff
+    line
+  plan: doc-session-autonomy-configuration
+  sources:
+  - doc-session-autonomy-configuration-requirements
+  - doc-session-autonomy-configuration
+  - doc-multi-session-coordination-protocol
+  - doc-prompt-session-manager-starter-messages
+  - doc-backlog-decisions
+  systems:
+  - sys-governance
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-mode-02
+  scope:
+  - GOV-017 - cite the autonomy document as the source of the setting in force; add the kickoff step that runs the
+    resolver; add a departure entry for the Session Manager writing the in-force file on lapse; add MODE, ACK <session>
+    MODE and OWNER-BACK to the message table; point the merge gate and claim slots at the setting (REQ-034 R09;
+    PLAN-051 D9, D10).
+  - PROMPT-037 - the kickoff runs tools/autonomy.py before composing starters; the shared contract gains an item
+    carrying the contract line; item 4 stops restating the merge mode and points at the setting (R10).
+  - GOV-003 - one entry quoting the owner's G3 ruling on delegated merges and the standing status of the configuration
+    (R12; PLAN-051 D8, OQ2).
+  - Dry run - resolve a sample in-force file under _working/ into the contract line, write one decision-log entry to a
+    gitignored log, and record both in the session record (R11).
+  acceptance:
+  - grep -n "The owner approves every merge" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md returns
+    nothing, and the merge item points to the setting.
+  - GOV-017's message table has MODE, ACK <session> MODE and OWNER-BACK rows, and its kickoff names tools/autonomy.py.
+  - The GOV-003 entry quotes the owner's ruling with its date.
+  - The session record shows the dry run's contract line and decision-log entry.
+  verification:
+  - grep -n "The owner approves every merge" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - grep -n "MODE\|OWNER-BACK" docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - uv run python tools/autonomy.py --in-force test/fixtures/autonomy/overnight-mobile.yaml
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  next_action: Waits for phase-mode-02. phase-grd-03 and phase-asr-04 also edit GOV-017 and PROMPT-037; rebase onto
+    whichever merged first and re-read those passages before editing.

@@ -157,6 +157,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.03 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.03-prompt-corpus-inventory.md |
 | PLAN-050.04 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.04-system-backlog-review.md |
 | PLAN-050.05 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.05-boundary-decision-report.md |
+| PLAN-051 | plan | draft | repository-owner | docs/01-plans/PLAN-051-session-autonomy-configuration.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -229,6 +230,7 @@ CI regenerates it and fails on any difference.
 | REQ-030 | requirement | draft | repository-owner | docs/06-requirements/REQ-030-reviewer-contract.md |
 | REQ-031 | requirement | draft | repository-owner | docs/06-requirements/REQ-031-idea-realization-plugin.md |
 | REQ-033 | requirement | draft | repository-owner | docs/06-requirements/REQ-033-system-boundary-study.md |
+| REQ-034 | requirement | draft | repository-owner | docs/06-requirements/REQ-034-session-autonomy-configuration.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -480,6 +482,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.03 | doc-system-boundary-study-prompt-inventory | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
+| PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
 
 ## Held codes
 
@@ -492,4 +495,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-389 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 79, prompt: 40, requirement: 32, session: 167.
+391 documents — adr: 21, architecture: 12, governance: 17, operation: 21, plan: 80, prompt: 40, requirement: 33, session: 167.
