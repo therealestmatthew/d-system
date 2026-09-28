@@ -110,7 +110,9 @@ correction that produces no durable change did not land.
 
 ## Project Purpose
 
-Personal consulting management system for tracking people, projects, commitments, and tasks — reducing mental overhead by centralizing work responsibilities. Doubles as a platform for HTML generation, reporting, and agentic workflow triggering.
+Idea realization engine: it carries an idea from capture through triage, planning, adversarial review and backlog phases to governed, delivered work, with the owner deciding at explicit gates. The pipeline is specified in ARCH-006; the portable form is the `idea-realization` plugin in `plugins/idea-realization/`.
+
+Secondary: a personal consulting management system for tracking people, projects, commitments and tasks; the workbench UI; and a platform for HTML generation, reporting and agentic workflow triggering.
 
 ## Data Architecture
 
