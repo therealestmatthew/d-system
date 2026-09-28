@@ -102,8 +102,8 @@ contracts are in `GOV-014`, "Roles".
 ### Execution and after
 
 14. **Execute.** A developer claims a phase and works it in its own worktree. Defined: `AGENTS.md`,
-    the three "Concurrent agents" sections; `GOV-002`, "Selecting and running a session";
-    `ADR-003`; `ARCH-006` stage 8; `GOV-014`, "Developer".
+    "Concurrent agents: claim a phase" and "Concurrent agents: work in a worktree"; `GOV-002`,
+    "Selecting and running a session"; `ADR-003`; `ARCH-006` stage 8; `GOV-014`, "Developer".
 15. **Validate.** Validators check each diff against the requirement text, never the developer's
     rationale, by executed commands. Defined: `ARCH-006` stage 8; `GOV-014`, "Validator" and "The
     evidence rule for validators". The execution harness is not yet built (`phase-irs-08`, queued).
