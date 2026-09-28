@@ -79,6 +79,7 @@ Only the overview is required. `decisions.md` exists when the plan has a Decisio
 | Accepted-decisions record | `GOV-003` | Backlog and process rulings. 7 of its 22 sections name no plan at all |
 | Review record | `docs/08-governance/reviews/` | Fixed there by the review procedure (`GOV-018`, step 4). Linked by code, not path. Read across plans by the schema test and, as specified, by the learning loop. A review of a draft with no code has no folder to go in. The overview names its record id (rule 5) |
 | Session record | `docs/03-sessions/` | Belongs to a session, not a plan; ten sessions serve more than one plan family. The `SESS` series is located there |
+| Governance, architecture and other plan documents the plan builds on | where they are | They are prerequisites the plan depends on, not parts of it; 23 of 49 plan families name a governance document in `depends_on`, 13 another plan and 6 an architecture document. The plan reaches them by `depends_on`, which rule 5 does not replace |
 | Backlog phases | `docs/09-backlog/backlog.yaml` | One file; the phase names its plan by id |
 | Product outputs | wherever the product lives | They are the work, not a record of it (rule 8) |
 | Reusable prompts | `docs/02-prompts/` | They serve many plans (rule 7) |
@@ -186,7 +187,7 @@ Each would need an amendment if the owner adopts the corresponding part. None is
 | Plan quality standard (`GOV-010`) | P2 and P3 are judged on the plan; the Design row lists the accepted headings | Under rule 6, P2 and P3 are judged on `decisions.md`. The Design row's headings still work |
 | Document code protocol (`GOV-005`), "Multi-file plans" | "A plan set lives in a folder named for the parent code" | Rule 1 makes every new plan a folder, with or without children |
 | Governance protocol (`GOV-001`) | "Only the exact navigation files listed in `src/governance/__main__.py:EXEMPT` … are exempt in the scanned roots" | Rule 4 adds the member names inside plan folders |
-| Prompt-pack protocol (`GOV-008`) | Each pack stage is "a governed prompt document" | Rule 7 makes one-time prompts ungoverned members. The planning protocol (`GOV-021`, step 4) already records the owner's ruling that a pre-plan package may be ungoverned |
+| Prompt-pack protocol (`GOV-008`) | Each pack stage is "a governed prompt document": Prompt A, Prompt B (whose template has it allocate codes with `--next-code`), the coordinator prompt (precedents `PROMPT-014`, `PROMPT-022`) and the kick-off record (precedent `PROMPT-023`) | Rule 7 makes one-time prompts ungoverned members. Every one of those stages is written for one build, so if `000501` classes them all as one-time, rule 7 removes governance from four `GOV-008` stages, not only the pre-plan package. The planning protocol (`GOV-021`, step 4) covers only the pre-plan package |
 | Three-altitude review procedure (`GOV-018`), step 2 | The plan altitude reviews "the plan and the requirement it depends on" | With rule 6, `decisions.md` is dispatched too, as part of the plan |
 | Plans README (`docs/01-plans/README.md`) | "Name files descriptively: `YYYY-MM-DD-topic.md`" | Already contradicts `GOV-005`; would also need the folder layout |
 
@@ -200,7 +201,7 @@ Each with this session's recommendation. The letters are for reference in this f
 | B | Are the 44 existing single-file plans migrated? | No. The move breaks 263 path references in 94 files, and 8 in the append-only idea log cannot be fixed. A plan moves only if the owner asks, for example when it gains a child |
 | C | Are decisions split into a one-line ruling in the plan and a record beside it (rule 6)? | Yes, for new plans |
 | D | Is the decision record an uncoded member file (`decisions.md`), rather than a child plan or a new document kind? | Uncoded member file. A child plan is reviewed as a plan and fails the entry check; a new kind costs a series and changes two checks (findings, 2B) |
-| E | Do one-time prompts go in `prompts/` (rule 7)? | Yes, with the one-time/reusable line drawn under `000501`. Already-governed prompts keep their codes |
+| E | Do one-time prompts go in `prompts/` (rule 7)? | Yes, with the one-time/reusable line drawn under `000501`. Already-governed prompts keep their codes. Note the reach: it can cover four `GOV-008` stages (Prompt A, Prompt B, coordinator, kick-off record), not only the pre-plan package |
 | F | Do review records stay in `docs/08-governance/reviews/`? | Yes |
 | G | Is there an `evidence/` member, and must `_working/` evidence a tracked plan relies on be copied into it (rules 8, 9)? | Yes to both |
 | H | Is the entry point always named `PLAN-NNN-overview.md`, even for a one-document plan? | Yes |

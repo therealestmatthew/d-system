@@ -415,6 +415,7 @@ the plan as an example are left out.
 | Session records | 1 by its `depends_on` | 15 by `depends_on`, 10 prose only | 13 by `depends_on`, 14 prose only | 4 by `depends_on`, 13 prose only | 9 by `depends_on` | 6 by `depends_on` | none yet |
 | Backlog phases | 6 (`phase-doc-*`) | 10 (`phase-wb-*`) | 9 (`phase-lit-*`) | 20 | 9 (`phase-plug-*`) | 5 (`phase-bnd-*`), on the children | 6 (`phase-plfx-*`) |
 | Evidence and outputs | `completion_evidence`: 6 paths | `_data/workbench/`, `src/`, `ts/`, `test/`; the plan cites `docs/00-working/handoff-workbench-layout-and-terminal-fixes.md` | `research/literature-review/` (14 files) | spread over `docs/`, `schemas/`, `src/`, `tools/`, `.claude/`; the plan cites `docs/00-working/idea-batching-partition.md` | `plugins/idea-realization/`; trace tables `PLAN-048.10`, `.11` | `docs/00-working/boundary-study/` (6 files), `ARCH-012` | `plugins/idea-realization/`; its input, the audit report, is `docs/00-working/chatgpt-plugin-audit-report.md` |
+| Other documents the plan's own `depends_on` names | `GOV-001` | none | `GOV-009`; `PROMPT-027`, `PROMPT-028` | `ARCH-005` | `ARCH-005`; `GOV-001`, `GOV-005`, `GOV-010`, `GOV-014`, `GOV-018` | `ARCH-002`; `GOV-008`; the idea realization plan `PLAN-039` | `GOV-010`, `GOV-018`; `PLAN-048` |
 | Paths the plan cites that a clone cannot open | none | none | none | none | 5 under `_working/session-manager/` | none | 1 under `_working/session-manager/` |
 
 ## 4. What this inventory cannot see
@@ -447,6 +448,7 @@ Searched with `git grep -n -E "01-plans|PLAN-|\"plan\"|'plan'" -- src tools test
 | `test/test_adversarial_finding_schema.py` | review records are `docs/08-governance/reviews/*.json`, one level | test |
 | `GOV-018` step 1 script | `depends_on` targets are one directory below `docs/` (the fault in section 1) | procedure script, not code |
 | `plugins/idea-realization/scripts/codes.py` and `test/test_codes.py` | the same naming and folder rules, for the plugin's `plans/` directory | separate copy of the rules |
+| `.claude/skills/partition-ideas/SKILL.md:203` | reads `docs/02-prompts/PROMPT-034-reusable-partition-pack.md` by path | a skill that opens a governed prompt at run time |
 | `src/api/routes/workbench.py:497`, `tools/check_dev_ci.py:31`, `tools/check_no_private_content.py:36`, `tools/lit_report_extract.py:4`, `.claude/commands/resume-lit-review.md:26` | a plan's current path, in a comment, docstring or table | prose only; nothing reads the path at run time |
 
 The backlog's `plan` field, `parent`, `depends_on`, a review's `target.plan` and the catalog all

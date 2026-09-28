@@ -35,7 +35,7 @@ error.
 | (b) An uncoded `decisions.md`, no front matter, inside that folder | `ERROR …/decisions.md: missing opening front matter delimiter` |
 | (c) A `review.json` and an `evidence/t.csv` inside that folder | catalog stale only; non-Markdown files are not scanned |
 | (d) A governed requirement `REQ-099-test.md` inside that folder | `ERROR …/REQ-099-test.md: requirement belongs under docs/06-requirements/` |
-| (e) A decision record typed as child plan `PLAN-099.01-decisions.md` | catalog stale only. The `GOV-018` entry check on it: missing Context, Design, Work, Verification, Boundaries, Open questions and Requirement coverage; exit 1 |
+| (e) A decision record typed as child plan `PLAN-099.01-decisions.md`, with `depends_on: [doc-folder-test]` | catalog stale only. The `GOV-018` entry check on it: missing Context, Design, Work, Verification, Boundaries, Open questions and Requirement coverage; exit 1. The last of the seven is the entry-check fault (its parent is in a folder); the other six are real |
 
 ## 1. Should every plan be a folder, even when it is one file?
 
@@ -68,11 +68,11 @@ error.
 | **1B. Every new plan starts as a folder; existing plans stay where they are** | `GOV-005` "Multi-file plans" text; the plans README; the plan template's instructions | No code change for placement (test a). The entry-check fault must be fixed first, or every plan that depends on a newer plan is misreported. `PLAN-039.01` is resolved as in 1A |
 | **1C. Every plan is a folder, and the 44 existing single files move** | Everything in 1B, plus 44 file moves | 263 path references in 94 files and 103 sibling links to rewrite or leave broken. 8 references in `_data/ideas.jsonl` stay broken, because the log is append-only. Session records are historical; rewriting their links changes history, and leaving them breaks the links. The plugin's copy of the rules (`plugins/idea-realization/scripts/codes.py`) is unaffected either way |
 
+### Recommendation
+
 A folder only pays for itself if something other than plan documents can go in it. That depends on
 questions 2 and 3. Under 1A or 1B with no member files allowed, a folder for a one-file plan adds a
 directory and nothing else.
-
-### Recommendation
 
 **1B**, adopted together with the answer to question 2. Starting a plan as a folder costs nothing
 now (test a) and avoids a later move when the plan gains a child or a member file. The move is the
@@ -234,6 +234,7 @@ From the inventory:
 | Session records | `docs/03-sessions/` (168) | the session's own `depends_on` for 138; the plan side names one |
 | Phases | `docs/09-backlog/backlog.yaml` | the phase's `plan` field, by id, for every phase |
 | Outputs and evidence | wherever the work belongs: `research/`, `plugins/`, `docs/00-working/`, `src/` | phase `deliverables`; `completion_evidence` for complete plans |
+| Other governed documents the plan builds on | `docs/07-architecture/`, `docs/08-governance/`, other plans | plan `depends_on`: of 49 plan families, 23 name a governance document, 13 another plan and 6 an architecture document; in the seven traced plans, 6 of 7 name one or more (inventory, 3.7) |
 | Evidence the plan cites but a clone cannot open | `_working/` (6 distinct paths, cited by `PLAN-048` and `PLAN-052`) | a path in prose |
 
 A plan's artifacts sit in at least seven directories. The links run mostly from the artifact to the
@@ -241,10 +242,14 @@ plan. From the plan itself, a reader can reach its requirement (by `depends_on`)
 searching the backlog), and sometimes its review record (by id in prose). The plan does not list
 its prompts, sessions or decision records outside itself in any consistent way.
 
-The owner's impression that it is scattered is borne out. Of the scattering, two parts have a
-reason: artifacts shared by several plans (one requirement, six ADRs, ten sessions) cannot live in
-one plan's folder, and cross-plan readers such as the review test read one directory. The rest,
-per-plan prompts and decision reasoning, has no reason recorded for being where it is.
+### Reading (this session's view, not a measurement)
+
+The numbers support the owner's impression that a plan's material is scattered. Two parts of the
+scattering have a reason that the inventory shows: artifacts shared by several plans (one
+requirement, six ADRs, ten sessions) cannot live in one plan's folder, and cross-plan readers such
+as the review test read one directory. For per-plan prompts and decision reasoning, this session
+found no recorded reason for where they are; that is an absence of evidence, not a finding that
+there is no reason.
 
 ## Other findings
 
