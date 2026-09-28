@@ -18,7 +18,9 @@ The pipeline and its gates are specified in
 [ARCH-006](docs/07-architecture/ARCH-006-idea-realization-system.md) (nine stages, from capture to
 the realization check).
 
-**In use today**
+**In use today, run by a person or a coordinating session** (ARCH-006 stages 1–3 exist in manual
+or batch form; the later stages are carried out through the protocols below rather than by the
+planned automation)
 
 - **Idea log** — `_data/ideas.jsonl`, append-only, written only through `tools/append_idea.py`
   (the `/idea` skill); `docs/00-working/ideas.md` is its rendered view.
@@ -35,7 +37,9 @@ the realization check).
   ([GOV-017](docs/08-governance/GOV-017-multi-session-coordination-protocol.md)).
 - **The portable plugin** — [`plugins/idea-realization/`](plugins/idea-realization/README.md)
   packages the idea log, triage, partition sweep, backlog, session skills and document governance
-  as a Claude Code plugin for any git repository.
+  as a Claude Code plugin for any git repository. Its build phases (`phase-plug-01`–`09`) are
+  complete, but `systems.yaml` still lists `sys-plugin` as `planned`, and the fixes from its
+  adversarial audit are planned in [PLAN-052](docs/01-plans/PLAN-052-plugin-audit-remediation.md).
 
 **Planned** — the orchestrator that runs the stages end to end with interrupt gates
 ([PLAN-039](docs/01-plans/PLAN-039-idea-realization-system.md),
