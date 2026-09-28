@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-09-27'
+updated: '2026-09-28'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -15820,3 +15820,332 @@ items:
   - plugins/idea-realization/test/test_protocol_controls.py
   - docs/03-sessions/
   next_action: Queued behind phase-plfx-05 and the owner's G3 approval of PLAN-052.
+- id: phase-bnd-06
+  title: Publish the concern ownership and interface contract as a governed architecture record
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-requirements
+  - doc-system-boundary-study-system-inventory
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-04
+  scope:
+  - Start from the per-system concern table in docs/00-working/boundary-study/validation-report.md and
+    the concern table in ARCH-012; re-check each system's concern against systems.yaml and tracked
+    code at the execution revision, including the plugin systems and sys-demo-overview, whose planned
+    status tracked code contradicts.
+  - Allocate a code with --next-code architecture and write one governed record that lists every
+    registered system once with its concern, every allowed crossing with the data or capability that
+    crosses it and its evidence (file and line, or registry entry), and at least one prohibited
+    ownership crossing per concern boundary. Include the workbench API's reads of the idea log
+    (fold()) and of backlog.yaml, which the study's boundary map omits.
+  - Change no code, registry entry or phase state.
+  acceptance:
+  - A set comparison between the record's system ids and the ids in systems.yaml at the execution
+    revision prints no difference, and the same comparison run on a scratch copy of the record with
+    one row deleted prints that system id and exits non-zero.
+  - Every crossing names its evidence, and every concern boundary names at least one prohibited
+    ownership crossing.
+  verification:
+  - uv run python -m src.governance
+  - The set-comparison command, run and quoted in the session record, including the scratch-copy run
+    that must fail.
+  - git diff --check
+  deliverables:
+  - docs/07-architecture/
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects A, review this
+    scope against current dev, release the phase to queued and claim it.
+  blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
+    The owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option A at ARCH-012's owner decision gate. Review the scope against
+    current dev before releasing it.
+- id: phase-bnd-07
+  title: Add a concern field to the system registry and reject a missing or unknown value
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-requirements
+  systems:
+  - sys-governance
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-06
+  scope:
+  - Add a required concern property to schemas/systems.schema.json whose allowed values are the concerns
+    named in phase-bnd-06's architecture record.
+  - Set the concern of every entry in docs/08-governance/systems.yaml from that record, and change no
+    other field of any entry.
+  - Add tests to test/test_governance.py for a registry entry with no concern and one with a value
+    outside the allowed set.
+  acceptance:
+  - uv run python -m src.governance exits 0 with every registered system carrying a concern that
+    matches phase-bnd-06's record.
+  - A registry copy with one concern removed, and one with a concern value outside the allowed set,
+    are each rejected by the governance check with an error naming the system id; the new tests
+    assert both rejections.
+  verification:
+  - uv run pytest test/test_governance.py
+  - uv run python -m src.governance
+  - uv run ruff check src/ test/
+  - uv run mypy src/
+  deliverables:
+  - schemas/systems.schema.json
+  - docs/08-governance/systems.yaml
+  - test/test_governance.py
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012 and for phase-bnd-06.
+  blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
+    The owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option A at ARCH-012's owner decision gate and phase-bnd-06 is complete.
+    Review the scope against current dev before releasing it.
+- id: phase-bnd-08
+  title: Define the entry-point values and publish a prompt operating index covering every governed prompt
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-prompt-rubric
+  - doc-system-boundary-study-prompt-inventory
+  - doc-prompt-pack-protocol
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-04
+  scope:
+  - Write a one-sentence definition and a decision rule for each default-entry-point value in
+    docs/00-working/boundary-study/prompt-classification-rubric.md that settles the ambiguity the
+    2026-09-28 validation found (a prompt's position in a sequence versus where the covered work
+    begins).
+  - Classify every kind prompt document at the execution revision under that rule, citing the line
+    each value rests on, and have a partition-analyst dispatch classify the same set independently;
+    record every disagreement and how it was settled.
+  - Publish the index in docs/02-prompts/README.md, routing to direct entries and planning starts and
+    listing campaign records as evidence. Change no prompt's status or lifecycle.
+  acceptance:
+  - "The index lists every document with kind prompt exactly once; a comparison of the index's codes with
+    the output of rg -l '^kind: prompt$' docs prints no difference, and the same comparison on a copy of
+    the index with one row deleted prints that code."
+  - Every disagreement between the two classifications is recorded with its settlement, and no prompt's
+    front matter changes in the diff.
+  verification:
+  - uv run python -m src.governance
+  - The index-versus-corpus comparison, run and quoted in the session record, including the run that
+    must fail.
+  - git diff --check
+  deliverables:
+  - docs/02-prompts/README.md
+  - docs/00-working/boundary-study/prompt-classification-rubric.md
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects A, review this
+    scope against current dev, release the phase to queued and claim it.
+  blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
+    The owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option A at ARCH-012's owner decision gate. Review the scope against
+    current dev before releasing it.
+- id: phase-bnd-09
+  title: Measure document retrieval against a fixed question set
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-system-backlog-review
+  systems:
+  - sys-retrieval
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-04
+  scope:
+  - Write at least twenty questions an agent asks when starting work here, each with the governed
+    document or memory that answers it, before running any lookup.
+  - Run each question through the catalog, uv run python -m src.governance --inventory and
+    tools/load_context.py filters; record for each whether the expected document was returned.
+  - Report hits, misses and what each miss shares. Change no tool, document or memory.
+  acceptance:
+  - Every question has its expected answer recorded before its lookup result, and the reported hit and
+    miss counts sum to the number of questions.
+  - A question whose expected document is not returned is recorded as a miss, not dropped or reworded;
+    the session record shows at least the command output for each miss.
+  verification:
+  - uv run python -m src.governance
+  - Re-run three recorded lookups, one of them a miss, and compare with the recorded result.
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/retrieval-measurement.md
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects A, review this
+    scope against current dev, release the phase to queued and claim it.
+  blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
+    The owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option A at ARCH-012's owner decision gate. Review the scope against
+    current dev before releasing it.
+- id: phase-bnd-10
+  title: Assess three extraction candidates against option B's five preconditions
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-system-inventory
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-04
+  scope:
+  - For the idea-realization plugin (plugins/idea-realization/), the workbench (ts/src/stage/ and
+    src/api/routes/workbench.py) and the governance engine (src/governance/), record evidence for each
+    of ARCH-012's five option B preconditions (a documented API or data contract, independent tests,
+    an identified audience, a named maintainer and release owner, and repeated change pressure that a
+    module boundary cannot handle).
+  - Cite a command or file line for every cell and write unknown where there is none. Include whether
+    each candidate's tests run in CI (pyproject.toml testpaths) and pass at the execution revision.
+  - Stop for the owner to name one candidate or none. Do not recommend a candidate on the owner's behalf
+    and move no code.
+  acceptance:
+  - The assessment has fifteen cells (three candidates by five preconditions), each with a cited command
+    or file line, or unknown; a cell marked met without a citation is a review failure and is changed
+    to unknown.
+  - The document ends with the owner question and no nominated candidate, and the diff changes no file
+    under plugins/, ts/ or src/.
+  verification:
+  - uv run python -m src.governance
+  - cd plugins/idea-realization && uv run pytest
+  - git diff --check
+  deliverables:
+  - docs/00-working/boundary-study/extraction-candidates.md
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects B, review this
+    scope against current dev, release the phase to queued and claim it.
+  blocked_reason: Follow-up work under option B of ARCH-012 (prepare selective extraction). The owner has
+    not yet chosen between options A, B and C.
+  resume_when: The owner selects option B at ARCH-012's owner decision gate. Review the scope against
+    current dev before releasing it.
+- id: phase-bnd-11
+  title: Extraction discovery for the candidate the owner names, with no code moved
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-10
+  scope:
+  - For the one candidate the owner named after phase-bnd-10, write a governed requirement and plan
+    (codes from --next-code) covering its API or data contract, source authority, test isolation,
+    versioning, migration and rollback.
+  - Register the extraction's phases in the backlog, each sized to one session; add the candidate's
+    systems to this phase's declaration before claiming it.
+  - Move no code and create no repository.
+  acceptance:
+  - The requirement has one row each for contract, source authority, tests, versioning, migration and
+    rollback, each with a verification method, and the plan passes GOV-018's entry check.
+  - No registered phase is claimed or started, and the diff changes no file under the candidate's source
+    paths; a diff that does is rejected in review.
+  verification:
+  - uv run python -m src.governance
+  - The GOV-018 step 1 entry-check script on the new plan
+  - git diff --check
+  deliverables:
+  - docs/06-requirements/
+  - docs/01-plans/
+  - docs/09-backlog/backlog.yaml
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision, phase-bnd-10 and the owner's named candidate.
+  blocked_reason: Follow-up work under option B of ARCH-012 (prepare selective extraction). The owner has
+    not yet chosen between options A, B and C, and has named no extraction candidate.
+  resume_when: The owner selects option B, phase-bnd-10 is complete, and the owner names one candidate
+    from its assessment. Review the scope against current dev before releasing it.
+- id: phase-bnd-12
+  title: Migration architecture plan for splitting the repository by concern
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-system-inventory
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-04
+  scope:
+  - Write a governed architecture record (code from --next-code architecture) naming each destination
+    repository, the registered systems and tracked paths that move to each, the data boundaries
+    (including where the real portfolio would live, without reading _private/), maintainers, the release
+    process, compatibility between repositories, and rollback.
+  - Place every registered system in exactly one destination or in a list of systems that stay.
+  - Create no repository and move no file.
+  acceptance:
+  - A set comparison between the record's placed system ids and systems.yaml prints no difference, and
+    the same comparison with one system removed from a scratch copy prints that id.
+  - Each destination names a maintainer and a release process, or marks it as an open owner question;
+    a destination with neither is a review failure.
+  verification:
+  - uv run python -m src.governance
+  - The set-comparison command, run and quoted in the session record, including the run that must fail.
+  - git diff --check
+  deliverables:
+  - docs/07-architecture/
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects C, review this
+    scope against current dev, release the phase to queued and claim it.
+  blocked_reason: Follow-up work under option C of ARCH-012 (split now), which the study rejected. The
+    owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option C at ARCH-012's owner decision gate. Review the scope against
+    current dev before releasing it.
+- id: phase-bnd-13
+  title: Cross-repository governance design for a split repository
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-backlog-protocol
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-12
+  scope:
+  - Using phase-bnd-12's destinations, design how the claim lock table, backlog, document codes, catalog
+    and governance check work across the repositories, and which of them each repository duplicates.
+  - For each duplicated mechanism, state its maintenance cost and what breaks when two copies diverge.
+  - Change no governance code, schema or protocol.
+  acceptance:
+  - Each of the five mechanisms (claims, backlog, codes, catalog, governance check) has a stated owner
+    repository or an explicit duplication with its cost.
+  - The design names at least one cross-repository change it cannot keep atomic and the failure that
+    results; a design claiming every change stays atomic is rejected in review.
+  verification:
+  - uv run python -m src.governance
+  - git diff --check
+  deliverables:
+  - docs/07-architecture/
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012 and for phase-bnd-12.
+  blocked_reason: Follow-up work under option C of ARCH-012 (split now), which the study rejected. The
+    owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option C at ARCH-012's owner decision gate and phase-bnd-12 is complete.
+    Review the scope against current dev before releasing it.

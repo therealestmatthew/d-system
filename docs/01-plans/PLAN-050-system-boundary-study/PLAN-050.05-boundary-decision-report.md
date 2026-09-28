@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-26'
-updated: '2026-09-26'
+updated: '2026-09-28'
 systems: [sys-gov-docs, sys-backlog]
 depends_on: [doc-system-boundary-study, doc-system-boundary-study-requirements, doc-system-boundary-study-system-backlog-review]
 parent: doc-system-boundary-study
@@ -41,6 +41,8 @@ This phase delivers R02, R05, R06, and the final reconciliation required by R07.
 The report distinguishes the three core systems, framework, and adjacent-system dispositions; has
 three options and explicit costs; and gives every owner question a decider, timing, recommendation,
 and consequence. Run `--next-code architecture`, governance, and `git diff --check`.
+
+**When a check fails** (added 2026-09-28). An owner question without a decider, decision point, recommendation or consequence fails acceptance. The phase then stays `active`, its session record quotes the failing output, and it is completed only after the check passes on a re-run (PLAN-050 overview, *Acceptance and verification*).
 
 ## Out of scope
 

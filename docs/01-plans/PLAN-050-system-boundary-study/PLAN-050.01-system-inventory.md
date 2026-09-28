@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-26'
-updated: '2026-09-26'
+updated: '2026-09-28'
 systems: [sys-gov-docs]
 depends_on: [doc-system-boundary-study, doc-system-boundary-study-requirements]
 parent: doc-system-boundary-study
@@ -43,6 +43,8 @@ R01 and R02 are delivered directly; R07 is met by the baseline and evidence cita
 The inventory covers the whole registry and the map labels each proposed crossing and at least one
 negative ownership rule per boundary. Run governance, compare the inventory with `systems.yaml` at
 the recorded revision, and run `git diff --check`.
+
+**When a check fails** (added 2026-09-28). A registry entry with no inventory row, or an entry with two rows, fails the reconciliation. The phase then stays `active`, its session record quotes the failing output, and it is completed only after the check passes on a re-run (PLAN-050 overview, *Acceptance and verification*).
 
 ## Out of scope
 

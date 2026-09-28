@@ -1,0 +1,157 @@
+{
+  "review_id": "2026-09-28-plan-050",
+  "procedure": "GOV-018",
+  "date": "2026-09-28",
+  "target": {
+    "plan": "PLAN-050",
+    "requirement": "REQ-033",
+    "phases": []
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-050-system-boundary-study/PLAN-050-overview.md at 9772c21 before any revision: exit 0 (PLAN-050 was created 2026-09-26, so it is not exempt). Run on the five children at the same commit: PLAN-050.02 and PLAN-050.03 printed 'missing: Concurrency' and exited 1; the others exited 0. After revision all six exit 0."
+  },
+  "altitudes_run": [
+    "plan"
+  ],
+  "status": "dispositioned",
+  "findings": [
+    {
+      "id": "F01",
+      "altitude": "plan",
+      "subject": "PLAN-050.05",
+      "severity": "blocker",
+      "title": "ARCH-012's central claim that no concern is ready for extraction is already contradicted by tracked code: the idea-realization plugin, treated throughout the study's evidence as merely 'planned' and having 'no implemented writer,' is now a fully built, tested, installable plugin validated end-to-end outside this repository.",
+      "evidence": "`git show origin/dev:docs/08-governance/systems.yaml` shows all eight `sys-plugin*` entries still `status: planned`. `git show origin/dev:docs/09-backlog/backlog.yaml` shows `phase-plug-01` through `phase-plug-09` all `status: complete`, including `phase-plug-08: End-to-end exercise in a scratch repository, install documentation, and handover`. `git ls-tree -r --name-only origin/dev -- plugins/` returns 102 tracked files (agents, schemas, `pytest.ini`, `scripts/backlog.py`, `scripts/check.py`, etc.). `git show origin/dev:plugins/idea-realization/README.md` opens: 'A Claude Code plugin that carries an idea from capture through triage, partition, planning, phases and backlog to governed documents, in any git repository,' with install/prerequisites/scaffold/doctor steps. The study's own evidence file (`docs/00-working/boundary-study/system-backlog-review.md:16`) records that at its own baseline, 3 of the 4 occupied active-claim slots were `sys-plugin-backlog`, `sys-plugin-generators`, and `sys-plugin-ideas` — i.e. the plugin was being actively built throughout the study window. Yet ARCH-012 (lines 31-32) states: 'The evidence does not show an independently operated concern with a stable enough runtime contract, release cadence, or audience to justify immediate separation,' and the system-interface-inventory (`docs/00-working/boundary-study/system-interface-inventory.md`) describes every `sys-plugin*` row as 'planned,' 'No implemented writer,' 'planned plugin sub-area.' Phase-bnd-04's reconciliation only ran `git diff 2fd11e9..0c47c27 -- docs/08-governance/systems.yaml` (empty) to conclude the registry evidence 'remains current' — it never checked backlog/code state, only the registry file's text.",
+      "consequence": "The owner would be asked to choose a boundary direction from a report whose supporting evidence about 'no candidate ready for extraction' is already overtaken: a concern the report calls incubating already has a documented schema/data contract, independent tests, install documentation, and an out-of-repository validation run — several of Option B's own stated preconditions. Approving ARCH-012 as decision-ready without addressing this risks anchoring the owner's decision on stale evidence.",
+      "minimal_fix": "Before G3, add a one-paragraph addendum to ARCH-012 checking the plugin's actual implementation/test/install state against its registry status and Option B's precondition list, rather than relying on a registry-text diff alone as proof the evidence 'remains current.'",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "reconciliation-checks-file-not-state",
+      "dispositions": [
+        {
+          "value": "escalated-g3",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "The evidence holds and matters, with two corrections: the plugin's own suite is not green (cd plugins/idea-realization && pytest: 3 failed, 494 passed on 2026-09-28) and CI does not run it (pyproject.toml testpaths = [\"test\"]), so 'fully built, tested' overstates it. The plan changed: PLAN-050 overview, 'Next steps after the owner's decision', adds phase-bnd-10, which assesses the plugin, the workbench and the governance engine against option B's five preconditions. The finding itself asks for a change to ARCH-012's evidence statement and recommendation paragraph. The owner's 2026-09-27 ruling limits this session's ARCH-012 edits to figure corrections, so the change is proposed in docs/00-working/boundary-study/validation-report.md section 6 and not applied. The owner decides at G3 whether to adopt that wording before choosing A, B or C."
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "altitude": "plan",
+      "subject": "PLAN-050.03",
+      "severity": "major",
+      "title": "The corpus-wide entry-point classification (`phase-bnd-05`) is applied inconsistently across structurally identical prompts, undermining the 13/14/12/1 split ARCH-012 cites.",
+      "evidence": "Re-applying the rubric's entry-point question to 13 non-pilot prompts found four discrepancies: (1) PROMPT-001 is a standalone `depends_on: []` prompt 'feed to a Claude instance... to drive code generation,' never named as a step by any other governed document (`grep -rl \"PROMPT-001\" docs/02-prompts` returns only itself; ADR-012:95 calls it 'a reusable code-generation prompt for this system') yet is classified `sequence-factory-step`, the bucket meant for pack children like PROMPT-011 ('Child of the agent factory prompt... read at its Step 1'). (2) PROMPT-009 ('Fourth of four... Reusable, and deliberately read-only. Run it periodically... to find where the plan record and the repository have drifted apart') is classified `planning-sequence-start`, while its structural twin PROMPT-008 ('Third of four... reusable... run it repeatedly') is classified `direct-operational-entry` — both described identically as recurring, standalone, reusable work. (3) PROMPT-025 ('Prompt A'... 'pasteable seed for the planning session'... 'produces Prompt B... and nothing else') is classified `owner-launched-campaign`, while its two structural twins under the same pack-protocol shape, PROMPT-020 (pilot) and PROMPT-027 ('produces... Prompt B... and nothing else'), are both classified `planning-sequence-start`. (4) PROMPT-041, the study's own phase-runner ('Use this prompt to continue the System Boundary Study one phase at a time... not permission to execute the whole study in one session'), is classified `direct-operational-entry` alongside general-purpose PROMPT-006/008/036, despite being bound to one specific five-phase study rather than general recurring work.",
+      "consequence": "4 of 13 sampled non-pilot prompts (roughly a third) have an entry-point value not supported, or contradicted, by the text cited as evidence. Because the smallest bucket (`direct-operational-entry` = 4) is the headline 'small navigable operating core' ARCH-012 leans on, a shift of even one or two prompts changes that reading materially, and the full-corpus rows (unlike the four pilot rows) carry no per-field rationale to check against.",
+      "minimal_fix": "Re-review the full-corpus rows' entry-point field with the same per-prompt rationale the four pilot prompts received, at least for prompts with no dependency chain or with parallel structural siblings.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "unjustified-classification-divergence",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "Examples (1) PROMPT-001 and (2) PROMPT-009 are confirmed. Example (3) is wrong: the inventory row for PROMPT-025 reads planning-sequence-start, not owner-launched-campaign (docs/00-working/boundary-study/prompt-corpus-inventory.md, the PROMPT-025 row). Example (4) is kept as direct-operational-entry: being bound to one study is a reuse-field matter, not an entry-point one. A full independent re-classification found nine rows that change, five of them inconsistent with the inventory's own treatment of structurally identical prompts (PROMPT-015 and -017 versus -011 to -013; PROMPT-018 versus -021, -024, -029, -032; PROMPT-009 versus -008; PROMPT-001 with no sequence naming it). Fixed in ARCH-012, 'Prompt and portfolio implications': 13 / 14 / 12 / 1 corrected to 15 / 18 / 7 / 0 at the study's baseline, with the old values kept. The per-prompt table and the rule difference are in validation-report.md section 2. PLAN-050's next steps add phase-bnd-08, which defines each entry-point value before any index is built."
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "altitude": "plan",
+      "subject": "PLAN-050",
+      "severity": "major",
+      "title": "No decision in the plan family names the alternative it rejected and what that alternative would have cost, failing GOV-010 P2.",
+      "evidence": "Read the overview's 'Chosen design' section and every child plan's 'Approach'/'Design' section (PLAN-050.01 through PLAN-050.05). Each states a choice made (serial phases; five independent prompt fields instead of one composite category; treating 'no repository split' as a valid recommended outcome; rebase-and-reconcile before the final report) but none states what alternative was rejected or its cost, unlike GOV-010's own passing examples (`docs/08-governance/GOV-010-plan-quality-standard.md:140-155`, e.g. PLAN-016's 'a status change rewrites a file, so immutability becomes a claim about content rather than a fact about bytes').",
+      "consequence": "A reviewer applying GOV-010's content judgement cannot verify any decision in this plan family meets P2; the plan reads as assertions of what was done, not as reasoned choices among alternatives.",
+      "minimal_fix": "Add one sentence per material choice in the overview's 'Chosen design' section naming the rejected alternative and its cost (e.g. why not classify prompts into one composite category, why not run phases in parallel).",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "decision-without-rejected-alternative",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "PLAN-050 overview, 'Chosen design': a table now names, for each of six choices, the rejected alternative and what it would have cost."
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "altitude": "plan",
+      "subject": "PLAN-050",
+      "severity": "major",
+      "title": "No stage, phase gate, or verification step across the plan family states what happens if it fails.",
+      "evidence": "`grep -n \"if.*fail\\|does not pass\\|fails\\b\" docs/01-plans/PLAN-050-system-boundary-study/*.md` returns no output. Every child plan's 'Acceptance and verification' section states what a passing run looks like ('Run governance, compare the inventory with systems.yaml at the recorded revision, and run git diff --check' — PLAN-050.01; 'compare the measured count with the baseline command' — PLAN-050.02; similarly for .03, .04, .05) but none states what happens on a governance failure, a reconciliation mismatch, or a failed diff check.",
+      "consequence": "An agent that hits a governance or reconciliation failure mid-phase has no plan-level guidance on whether to stop, re-baseline, or escalate to the owner; the plan family was only ever exercised on the success path, per the session records' passing-test summaries.",
+      "minimal_fix": "Add one sentence per child plan's acceptance section naming the stop/escalate rule for a failed check.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "missing-failure-path",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "PLAN-050 overview, 'Acceptance and verification', paragraph 'When a check fails'; and a 'When a check fails' paragraph in the 'Acceptance and verification' section of each of PLAN-050.01 to PLAN-050.05, naming the check that fails and what the phase does."
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "altitude": "plan",
+      "subject": "PLAN-050.02",
+      "severity": "minor",
+      "title": "The '40 governed prompts' figure is drift: correct throughout the study, now stale at `origin/dev` tip because a new prompt was added the day after the study closed.",
+      "evidence": "`git grep -l '^kind: prompt$' <commit> -- docs | wc -l` returns 40 at `2fd11e9` (phase-bnd-01 baseline), `0c47c27` (ARCH-012's reconciliation revision), and `13ea2fc` (phase-bnd-04's merge commit), but 41 at `origin/dev` tip (`9772c21`). The added document is `docs/02-prompts/PROMPT-042-monitoring-artifact-investigation-pack.md`; `git log --oneline origin/dev -- docs/02-prompts/PROMPT-042-monitoring-artifact-investigation-pack.md` shows it was created 2026-09-27, `created: '2026-09-27'` in its front matter — one day after the study's 2026-09-26 baseline.",
+      "consequence": "If the owner reviews ARCH-012 today, its 40-prompt count and the derived 13/14/12/1 navigation split are already one document short.",
+      "minimal_fix": "Note the drift in a one-line addendum, or classify PROMPT-042 before the owner reviews.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "evidence-drift-after-baseline",
+      "dispositions": [
+        {
+          "value": "accepted-no-change",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "The figure is drift, not an error: 40 at 7e3a067 and 0c47c27, 41 at tip after PROMPT-042 was added on 2026-09-27. The validation prompt's rule is that drift is reported with both values and not edited in ARCH-012. validation-report.md section 2 records both values and classifies PROMPT-042 (owner-launched-campaign)."
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "altitude": "plan",
+      "subject": "PLAN-050.04",
+      "severity": "minor",
+      "title": "'The current four-slot claim limit is fully occupied' is drift: true at the review's baseline and at ARCH-012's reconciliation revision, but false at `origin/dev` tip.",
+      "evidence": "At `4f3848e` (the backlog-review baseline) and `0c47c27` (ARCH-012's reconciliation revision), `awk` over `docs/09-backlog/backlog.yaml` shows exactly 4 `status: active` phases against `max_active: 4`. At `origin/dev` tip, the same check returns zero active phases out of 332 total (126 complete, 197 queued, 8 deferred, 1 blocked), with `max_active` still 4.",
+      "consequence": "ARCH-012 (lines 82-84) cites full occupancy as evidence that 'today's coupling includes governance sequencing... as well as runtime relationships'; a reader relying on the report today would be told capacity is saturated when it is currently empty.",
+      "minimal_fix": "Flag as a point-in-time observation rather than a present fact before the owner reviews.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038 (plan altitude, with the boundary-validation brief's additions: re-derive four figures, attack the A-over-C conclusion)",
+      "slug": "evidence-drift-after-baseline",
+      "aliases": [
+        "stale-capacity-claim"
+      ],
+      "dispositions": [
+        {
+          "value": "accepted-no-change",
+          "by": "planner",
+          "recorded_by": "cloud session on agent/cloud-boundary-validation, acting as planner by the owner's ruling of 2026-09-27",
+          "date": "2026-09-28",
+          "reason": "Drift, not an error: 4 of 4 active at 4f3848e and 0c47c27, 0 of 4 at tip. Not edited in ARCH-012, by the same rule. validation-report.md section 2 records both values and that the four slots were three plugin build phases (phase-plug-02, -04, -06) and the study's own phase; section 6 proposes the ARCH-012 wording that follows from that."
+        }
+      ]
+    }
+  ],
+  "notes": "Ran unclaimed: owner-directed work with no backlog phase; no peer holds a lock against it. Run from a cloud session on agent/cloud-boundary-validation, per docs/00-working/cloud-prompts/boundary-validation.md. Two departures from GOV-018, both by the owner's ruling of 2026-09-27. (1) target.phases is empty: all five PLAN-050 phases (phase-bnd-01 to phase-bnd-05) are complete, and GOV-018 step 2 reviews only queued, waiting or blocked phases; the phase-level attack on the five completed phases was run anyway and is reported in docs/00-working/boundary-study/validation-report.md section 4, not in this record. (2) GOV-018 says a child plan is its own target; the five children PLAN-050.01 to PLAN-050.05 were read by the adversary as part of the plan instead, to fit one session. Separate child reviews are an open owner question. The planner dispositions were written by the validation session, acting as PLAN-050's planner by the owner's ruling."
+}
