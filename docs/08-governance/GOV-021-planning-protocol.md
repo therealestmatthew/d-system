@@ -6,8 +6,8 @@ title: Planning protocol — the steps from an idea to completed work, in order,
 kind: governance
 status: draft
 owner: repository-owner
-created: '2026-09-28'
-updated: '2026-09-28'
+created: '2026-09-27'
+updated: '2026-09-27'
 systems: [sys-gov-docs]
 depends_on: [doc-idea-realization-system, doc-realization-role-contracts, doc-plan-quality-standard, doc-three-altitude-review-procedure, doc-batch-orchestration-protocol, doc-backlog-protocol, doc-prompt-pack-protocol, doc-governance-protocol, doc-document-code-protocol]
 ---
