@@ -5,7 +5,7 @@
 ## 1. Branch and tip
 
 - Branch: `agent/cloud-planning-protocol`
-- Tip when the final gates ran: `62c7444`. This handoff commit sits directly on top of it; it changes
+- Tip when the final gates ran: `d9fa3bd`. This handoff commit sits directly on top of it; it changes
   only this file and `status.md`, both ungoverned.
 - Rebased onto `origin/dev` at `a34e8f3` (`git rebase origin/dev` reported "Current branch
   agent/cloud-planning-protocol is up to date").
@@ -14,7 +14,9 @@
 
 - `docs/08-governance/GOV-021-planning-protocol.md`: added. The planning protocol, `status:
   draft`, 19 steps in three groups (before planning, planning, execution and after), each
-  pointing to where it is defined; an Out of scope section; five open questions.
+  pointing to where it is defined; an Out of scope section; six open questions.
+- `AGENTS.md`: "Session backlog" rule on `/session-close` amended with the owner's explicit
+  approval (section 6).
 - `docs/08-governance/catalog.md`: regenerated for the new document (one row, and the governance
   count 17 → 18).
 - `docs/00-working/cloud-prompts/status.md`: row 1 set to `in progress`, then `ready`.
@@ -23,7 +25,8 @@
 Commits: `95970b4` (tracker start), `935bf2f` (the document and catalog), `4d83a82` (a pointer
 fix in step 14: `AGENTS.md` has four "Concurrent agents" sections, not three; the step now names
 the two it relies on), `a04ec06` (first handoff, review open), `62c7444` (fixes for review findings
-F1 to F5).
+F1 to F5), `bc5295e` (handoff with the review), `d9fa3bd` (the owner-approved `AGENTS.md`
+amendment, with `GOV-021` step 17 and Open question 6 updated to match).
 
 ## 3. Codes allocated with `--next-code`
 
@@ -61,7 +64,11 @@ phase is queued on the backlog; no invented rules; nothing decided for `000501`,
 
 Two full runs. The first ran at `4d83a82`, before the review, and all four gates passed with
 the same output as below except pytest's time (146.99s). The second, below, ran at `62c7444`
-after the review fixes, following `git rebase origin/dev` (up to date at `a34e8f3`).
+after the review fixes, following `git rebase origin/dev` (up to date at `a34e8f3`). A third run
+at `d9fa3bd`, after the `AGENTS.md` amendment, also passed all four: governance `Governance OK: 43
+systems, 398 documents, 34 memories, 332 backlog phases` (exit 0); pytest `1151 passed, 1
+skipped, 1 warning in 145.43s` (exit 0); ruff `All checks passed!`; mypy `Success: no issues found
+in 46 source files`. `origin/dev` was still `a34e8f3`.
 
 `uv run python -m src.governance`:
 
@@ -120,7 +127,9 @@ The `status-regression` warning appears because this clone has no local `dev` br
   phases in one sitting. No standing owner-only rule is delegated". `GOV-003` superseded that on
   2026-09-16 ("Coordinator completion replaces owner-invoked /session-close,
   repository-wide"). Found by review finding F1; `GOV-021` Open question 6.
-- **`AGENTS.md`, "Session backlog", line 180: needs the owner's approval, not edited.** It reads:
+- **`AGENTS.md`, "Session backlog", line 180: amended on 2026-09-28 with the owner's explicit
+  approval (answer "Both" to "Edit AGENTS.md line 180" and "Merge into dev and push"), using the
+  proposed wording below. `GOV-021` step 17 and Open question 6 were updated to match.** It read:
   "It is safe to record progress any number of times, but do not mark a phase complete; only the
   owner-invoked review (e.g., `/session-close`) does that. An agent must never invoke final
   closure itself." That contradicts `GOV-003`'s 2026-09-16 decision. Proposed wording, if the
@@ -160,8 +169,8 @@ Still open for the owner (`GOV-021`, "Open questions"):
 - Whether and when to amend `GOV-008` for the optional pre-plan package (Open question 1).
 - Whether the decompose-and-audit loop needs an interim stop rule until the heuristic (`000445`,
   `phase-irs-05`) exists (Open question 2).
-- Who may run `/session-close`: `GOV-003` against `ARCH-006` and `AGENTS.md` (Open question 6,
-  and section 6).
+- Whether and when to amend `ARCH-006`'s G5 row to match `GOV-003` (Open question 6, and
+  section 6). `AGENTS.md` was amended on 2026-09-28.
 - Whether `GOV-018`, `GOV-014`, `GOV-002` or the backlog schema change to match the owner's step
   order, or the order changes to match them (Open questions 3 and 4).
 
