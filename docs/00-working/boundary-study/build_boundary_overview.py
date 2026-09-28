@@ -168,6 +168,52 @@ VALIDATION_ENTRY: dict[str, tuple[str, str, str]] = {
 }
 TIP_ONLY = {"PROMPT-042": (CAMPAIGN, "new", "dated investigation pack with an owner-pasted kickoff (lines 596-607)")}
 
+# The independent partition-analyst's values (2026-09-28, read-only dispatch at 0c47c27, without the
+# study's inventory), kept so the comparison in validation-report.md section 2.2 can be checked.
+ANALYST_ENTRY = {
+    "PROMPT-001": "direct-operational-entry",
+    "PROMPT-002": "direct-operational-entry",
+    "PROMPT-003": "sequence-factory-step",
+    "PROMPT-004": "direct-operational-entry",
+    "PROMPT-005": "sequence-factory-step",
+    "PROMPT-006": "direct-operational-entry",
+    "PROMPT-007": "direct-operational-entry",
+    "PROMPT-008": "direct-operational-entry",
+    "PROMPT-009": "direct-operational-entry",
+    "PROMPT-010": "sequence-factory-step",
+    "PROMPT-011": "sequence-factory-step",
+    "PROMPT-012": "sequence-factory-step",
+    "PROMPT-013": "sequence-factory-step",
+    "PROMPT-014": "owner-launched-campaign",
+    "PROMPT-015": "sequence-factory-step",
+    "PROMPT-016": "sequence-factory-step",
+    "PROMPT-017": "sequence-factory-step",
+    "PROMPT-018": "sequence-factory-step",
+    "PROMPT-019": "direct-operational-entry",
+    "PROMPT-020": "planning-sequence-start",
+    "PROMPT-021": "sequence-factory-step",
+    "PROMPT-022": "sequence-factory-step",
+    "PROMPT-023": "owner-launched-campaign",
+    "PROMPT-024": "sequence-factory-step",
+    "PROMPT-025": "planning-sequence-start",
+    "PROMPT-026": "sequence-factory-step",
+    "PROMPT-027": "planning-sequence-start",
+    "PROMPT-028": "sequence-factory-step",
+    "PROMPT-029": "sequence-factory-step",
+    "PROMPT-030": "sequence-factory-step",
+    "PROMPT-031": "owner-launched-campaign",
+    "PROMPT-032": "sequence-factory-step",
+    "PROMPT-033": "owner-launched-campaign",
+    "PROMPT-034": "sequence-factory-step",
+    "PROMPT-035": "owner-launched-campaign",
+    "PROMPT-036": "direct-operational-entry",
+    "PROMPT-037": "direct-operational-entry",
+    "PROMPT-038": "sequence-factory-step",
+    "PROMPT-040": "owner-launched-campaign",
+    "PROMPT-041": "direct-operational-entry",
+    "PROMPT-042": "owner-launched-campaign",
+}
+
 GROUPS = [
     ("Direct entry or planning start", (D, P)),
     ("Sequence step", (S,)),
@@ -237,9 +283,9 @@ def markdown(g: dict) -> str:
         if s["contested"]:
             src += f"; contested: registry says {s['status']}, but {s['contested']}"
         lines.append(f"| `{s['id']}` | {s['status']} | {s['concern']} | {src} |")
-    lines += ["", "| Prompt | Study value | Validation value | Agreement | Basis |", "|---|---|---|---|---|"]
+    lines += ["", "| Prompt | Study value | Independent analyst | Validation value | Agreement | Basis |", "|---|---|---|---|---|---|"]
     for code, (val, agr, basis) in {**VALIDATION_ENTRY, **TIP_ONLY}.items():
-        lines.append(f"| {code} | {g['study'].get(code, '(not in study)')} | {val} | {agr} | {basis} |")
+        lines.append(f"| {code} | {g['study'].get(code, '(not in study)')} | {ANALYST_ENTRY[code]} | {val} | {agr} | {basis} |")
     lines += ["", f"study groups {g['study_groups']}; validation at baseline {g['val_base_groups']}; "
               f"validation at tip {g['val_tip_groups']}"]
     return "\n".join(lines)

@@ -16179,6 +16179,8 @@ items:
     the index with one row deleted prints that code."
   - Every disagreement between the two classifications is recorded with its settlement, and no prompt's
     front matter changes in the diff.
+  - Each settlement cites the file and line it rests on; a settlement without a citation is changed to
+    unknown in review.
   verification:
   - uv run python -m src.governance
   - The index-versus-corpus comparison, run and quoted in the session record, including the run that

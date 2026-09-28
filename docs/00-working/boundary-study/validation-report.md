@@ -95,7 +95,8 @@ own recurring trigger is a direct entry.
 (identical in `docs/02-prompts/` to `7e3a067`) without seeing the study's inventory. Its split was
 14 / 20 / 6 / 0. I then read every prompt where it or I disagreed with the study. Its values and
 mine differ on the planning-versus-direct line and on three close calls. They agree on the six firm
-changes below, and neither reproduces the study's figure.
+changes below, and neither reproduces the study's figure. The analyst's value for every prompt
+is in the table's *Independent analyst* column.
 
 Nine rows change. Six are firm: the study's value is unsupported by the prompt's text, or
 inconsistent with its treatment of a structurally identical prompt (`PROMPT-001`, `-009`, `-015`,
@@ -108,49 +109,49 @@ change added contract items and did not move its entry point.
 The finding that navigation depends on the reading still stands: 25 of the 40 prompts are sequence
 steps or campaigns under the corrected values, against the study's 26.
 
-| Prompt | Study value | Validation value | Agreement | Basis |
-|---|---|---|---|---|
-| PROMPT-001 | sequence-factory-step | direct-operational-entry | firm | 'Feed this prompt to a Claude instance' (line 17); no document names it as a step |
-| PROMPT-002 | planning-sequence-start | planning-sequence-start | agree | definition session ending in requirement, plan and phases |
-| PROMPT-003 | planning-sequence-start | planning-sequence-start | agree | ends in ADRs and phases; close call: requires PROMPT-004 first |
-| PROMPT-004 | planning-sequence-start | planning-sequence-start | agree | first of the 004 then 003 sequence; close call: writes content, not a plan |
-| PROMPT-005 | planning-sequence-start | planning-sequence-start | agree | ends in one ADR and phases; close call: run after PROMPT-004 |
-| PROMPT-006 | direct-operational-entry | direct-operational-entry | agree | rubric pilot |
-| PROMPT-007 | planning-sequence-start | planning-sequence-start | agree | turns a triaged idea into a requirement, plan and phases |
-| PROMPT-008 | direct-operational-entry | direct-operational-entry | agree | 'run it repeatedly to advance the backlog' |
-| PROMPT-009 | planning-sequence-start | direct-operational-entry | firm | 'Reusable, and deliberately read-only. Run it periodically' (line 20), the same framing as PROMPT-008 |
-| PROMPT-010 | sequence-factory-step | sequence-factory-step | agree | rubric pilot |
-| PROMPT-011 | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Step 1' |
-| PROMPT-012 | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Step 2' |
-| PROMPT-013 | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Steps 3 and 4' |
-| PROMPT-014 | owner-launched-campaign | owner-launched-campaign | agree | the demo build's pasted coordinator; no separate kick-off |
-| PROMPT-015 | owner-launched-campaign | sequence-factory-step | firm | 'Child of ... PROMPT-014, read at its Step 1', the wording the inventory marks as a step for PROMPT-011 |
-| PROMPT-016 | no-default-known | sequence-factory-step | close | 'Child of ... PROMPT-014. Binding on the coordinator'; the study read it as a reference with no start |
-| PROMPT-017 | owner-launched-campaign | sequence-factory-step | firm | 'Child of ... PROMPT-014, read at its Step 3' |
-| PROMPT-018 | owner-launched-campaign | sequence-factory-step | firm | delegation pack 'Every prompt the build coordinator sends', the shape of 021, 024, 029 and 032, all steps in the inventory |
-| PROMPT-019 | owner-launched-campaign | owner-launched-campaign | agree | single dated dispatch for phase-demo-07; close call with a direct entry |
-| PROMPT-020 | planning-sequence-start | planning-sequence-start | agree | rubric pilot |
-| PROMPT-021 | sequence-factory-step | sequence-factory-step | agree | delegation pack |
-| PROMPT-022 | owner-launched-campaign | sequence-factory-step | close | coordinator; its kick-off PROMPT-023 is what is pasted and 'wins' where they differ |
-| PROMPT-023 | owner-launched-campaign | owner-launched-campaign | agree | pasteable kick-off for the workbench build |
-| PROMPT-024 | sequence-factory-step | sequence-factory-step | agree | delegation pack |
-| PROMPT-025 | planning-sequence-start | planning-sequence-start | agree | Prompt A pre-plan package |
-| PROMPT-026 | sequence-factory-step | sequence-factory-step | agree | Prompt B factory |
-| PROMPT-027 | planning-sequence-start | planning-sequence-start | agree | Prompt A pre-plan package |
-| PROMPT-028 | sequence-factory-step | sequence-factory-step | agree | Prompt B factory |
-| PROMPT-029 | sequence-factory-step | sequence-factory-step | agree | delegation pack |
-| PROMPT-030 | owner-launched-campaign | sequence-factory-step | close | coordinator; its kick-off PROMPT-031 is what is pasted |
-| PROMPT-031 | owner-launched-campaign | owner-launched-campaign | agree | kick-off record for the literature review |
-| PROMPT-032 | sequence-factory-step | sequence-factory-step | agree | delegation pack |
-| PROMPT-033 | owner-launched-campaign | owner-launched-campaign | agree | kick-off record for idea batching |
-| PROMPT-034 | sequence-factory-step | sequence-factory-step | agree | pack a workflow dispatches verbatim |
-| PROMPT-035 | owner-launched-campaign | owner-launched-campaign | agree | dated one-run review kickoff |
-| PROMPT-036 | direct-operational-entry | direct-operational-entry | agree | generic, idempotent coordinator the owner pastes every batch |
-| PROMPT-037 | sequence-factory-step | direct-operational-entry | firm | 'a kickoff the owner pastes into the Session Manager session' (lines 17-20); nothing sequences it |
-| PROMPT-038 | sequence-factory-step | sequence-factory-step | agree | dispatch prompt for GOV-018 step 3 |
-| PROMPT-040 | owner-launched-campaign | owner-launched-campaign | agree | rubric pilot |
-| PROMPT-041 | direct-operational-entry | direct-operational-entry | agree | phase runner for this study, run directly each session |
-| PROMPT-042 | (not in study) | owner-launched-campaign | new | dated investigation pack with an owner-pasted kickoff (lines 596-607) |
+| Prompt | Study value | Independent analyst | Validation value | Agreement | Basis |
+|---|---|---|---|---|---|
+| PROMPT-001 | sequence-factory-step | direct-operational-entry | direct-operational-entry | firm | 'Feed this prompt to a Claude instance' (line 17); no document names it as a step |
+| PROMPT-002 | planning-sequence-start | direct-operational-entry | planning-sequence-start | agree | definition session ending in requirement, plan and phases |
+| PROMPT-003 | planning-sequence-start | sequence-factory-step | planning-sequence-start | agree | ends in ADRs and phases; close call: requires PROMPT-004 first |
+| PROMPT-004 | planning-sequence-start | direct-operational-entry | planning-sequence-start | agree | first of the 004 then 003 sequence; close call: writes content, not a plan |
+| PROMPT-005 | planning-sequence-start | sequence-factory-step | planning-sequence-start | agree | ends in one ADR and phases; close call: run after PROMPT-004 |
+| PROMPT-006 | direct-operational-entry | direct-operational-entry | direct-operational-entry | agree | rubric pilot |
+| PROMPT-007 | planning-sequence-start | direct-operational-entry | planning-sequence-start | agree | turns a triaged idea into a requirement, plan and phases |
+| PROMPT-008 | direct-operational-entry | direct-operational-entry | direct-operational-entry | agree | 'run it repeatedly to advance the backlog' |
+| PROMPT-009 | planning-sequence-start | direct-operational-entry | direct-operational-entry | firm | 'Reusable, and deliberately read-only. Run it periodically' (line 20), the same framing as PROMPT-008 |
+| PROMPT-010 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | rubric pilot |
+| PROMPT-011 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Step 1' |
+| PROMPT-012 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Step 2' |
+| PROMPT-013 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | 'Child of ... PROMPT-010, read at its Steps 3 and 4' |
+| PROMPT-014 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | the demo build's pasted coordinator; no separate kick-off |
+| PROMPT-015 | owner-launched-campaign | sequence-factory-step | sequence-factory-step | firm | 'Child of ... PROMPT-014, read at its Step 1', the wording the inventory marks as a step for PROMPT-011 |
+| PROMPT-016 | no-default-known | sequence-factory-step | sequence-factory-step | close | 'Child of ... PROMPT-014. Binding on the coordinator'; the study read it as a reference with no start |
+| PROMPT-017 | owner-launched-campaign | sequence-factory-step | sequence-factory-step | firm | 'Child of ... PROMPT-014, read at its Step 3' |
+| PROMPT-018 | owner-launched-campaign | sequence-factory-step | sequence-factory-step | firm | delegation pack 'Every prompt the build coordinator sends', the shape of 021, 024, 029 and 032, all steps in the inventory |
+| PROMPT-019 | owner-launched-campaign | direct-operational-entry | owner-launched-campaign | agree | single dated dispatch for phase-demo-07; close call with a direct entry |
+| PROMPT-020 | planning-sequence-start | planning-sequence-start | planning-sequence-start | agree | rubric pilot |
+| PROMPT-021 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | delegation pack |
+| PROMPT-022 | owner-launched-campaign | sequence-factory-step | sequence-factory-step | close | coordinator; its kick-off PROMPT-023 is what is pasted and 'wins' where they differ |
+| PROMPT-023 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | pasteable kick-off for the workbench build |
+| PROMPT-024 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | delegation pack |
+| PROMPT-025 | planning-sequence-start | planning-sequence-start | planning-sequence-start | agree | Prompt A pre-plan package |
+| PROMPT-026 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | Prompt B factory |
+| PROMPT-027 | planning-sequence-start | planning-sequence-start | planning-sequence-start | agree | Prompt A pre-plan package |
+| PROMPT-028 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | Prompt B factory |
+| PROMPT-029 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | delegation pack |
+| PROMPT-030 | owner-launched-campaign | sequence-factory-step | sequence-factory-step | close | coordinator; its kick-off PROMPT-031 is what is pasted |
+| PROMPT-031 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | kick-off record for the literature review |
+| PROMPT-032 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | delegation pack |
+| PROMPT-033 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | kick-off record for idea batching |
+| PROMPT-034 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | pack a workflow dispatches verbatim |
+| PROMPT-035 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | dated one-run review kickoff |
+| PROMPT-036 | direct-operational-entry | direct-operational-entry | direct-operational-entry | agree | generic, idempotent coordinator the owner pastes every batch |
+| PROMPT-037 | sequence-factory-step | direct-operational-entry | direct-operational-entry | firm | 'a kickoff the owner pastes into the Session Manager session' (lines 17-20); nothing sequences it |
+| PROMPT-038 | sequence-factory-step | sequence-factory-step | sequence-factory-step | agree | dispatch prompt for GOV-018 step 3 |
+| PROMPT-040 | owner-launched-campaign | owner-launched-campaign | owner-launched-campaign | agree | rubric pilot |
+| PROMPT-041 | direct-operational-entry | direct-operational-entry | direct-operational-entry | agree | phase runner for this study, run directly each session |
+| PROMPT-042 | (not in study) | owner-launched-campaign | owner-launched-campaign | new | dated investigation pack with an owner-pasted kickoff (lines 596-607) |
 
 ### 2.3 Per-system concern table
 
