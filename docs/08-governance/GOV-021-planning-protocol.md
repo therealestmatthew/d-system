@@ -111,8 +111,9 @@ contracts are in `GOV-014`, "Roles".
 16. **Integrate.** Gate **G4**: the owner decides whether a branch merges into `dev`. Defined:
     `ARCH-006`, the G4 row; `AGENTS.md`, "Confidentiality and publishing" and "Concurrent agents:
     complete and hand off" steps 8 and 9.
-17. **Complete.** Gate **G5**: `/session-close` is the only way a phase reaches `complete`. Who
-    may run it is stated differently by different documents (see Open question 6). Defined:
+17. **Complete.** Gate **G5**: `/session-close` is the only way a phase reaches `complete`,
+    invoked by the owner or by a coordinator once `GOV-003`'s three conditions hold. `ARCH-006`'s
+    G5 row still says otherwise (see Open question 6). Defined:
     `.claude/commands/session-close.md`; `GOV-003`, "Coordinator completion replaces
     owner-invoked /session-close, repository-wide"; `ARCH-006`, the G5 row; `AGENTS.md`,
     "Session backlog".
@@ -157,11 +158,10 @@ contracts are in `GOV-014`, "Roles".
    the steps as dependencies, then G3, then batching, because `GOV-016` verifies a batch against
    `depends_on` edges that must already exist ("Verify a composition before declaring it
    runnable", check 3). `ARCH-006` has no batching stage.
-6. **Who may run `/session-close` (step 17).** `GOV-003` records an owner decision of 2026-09-16
+6. **`ARCH-006`'s G5 row is stale (step 17).** `GOV-003` records an owner decision of 2026-09-16
    that a coordinator may mark a phase `complete` once all three of its conditions hold, and
    `.claude/commands/session-close.md` says the same. That decision supersedes the rule that
-   `/session-close` stays owner-invoked. `ARCH-006`'s G5 row still carries the superseded text:
+   `/session-close` stays owner-invoked. `AGENTS.md`, "Session backlog", was amended to match on
+   2026-09-28 with the owner's approval. `ARCH-006`'s G5 row still carries the superseded text:
    "the owner runs `/session-close` over a queue of finished phases in one sitting. No standing
-   owner-only rule is delegated". `AGENTS.md`, "Session backlog", says "only the owner-invoked
-   review (e.g., `/session-close`) does that. An agent must never invoke final closure itself."
-   Step 17 does not choose between them. The owner decides which documents are amended.
+   owner-only rule is delegated". The owner decides whether and when `ARCH-006` is amended.

@@ -177,7 +177,8 @@ cd ts && npm run dev
 - Keep deferred work visible with a resume condition; split phases that exceed one session.
 - Checkpoint your progress mid-session by writing updates to your phase's session record (e.g., using
   an available checkpoint skill). It is safe to record progress any number of times, but do not mark a phase complete;
-  only the owner-invoked review (e.g., `/session-close`) does that. An agent must never invoke final closure itself.
+  only `/session-close` does that, invoked by the owner or by a coordinator once the three conditions in `GOV-003`
+  ('Coordinator completion replaces owner-invoked /session-close') hold. No other agent invokes final closure.
 
 ## Concurrent agents: claim a phase
 
