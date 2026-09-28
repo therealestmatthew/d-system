@@ -252,12 +252,12 @@ def cmd_decisions() -> None:
         for line in body.splitlines():
             if line.startswith("```"):
                 fenced = not fenced
+            n = len(line.split())
+            total += n  # heading words count toward the body total
             head = re.match(r"^## (.+)$", line) if not fenced else None
             if head:
                 current = head.group(1).strip()
                 continue
-            n = len(line.split())
-            total += n
             if current and DECISION_H2.match(current):
                 words[current] += n
         share = sum(words.values())
