@@ -20,15 +20,16 @@ against it.
 This is a list of the planning steps in order, from an idea to completed work (idea `000500`).
 Each step says what happens, who does it, the gate if there is one, and where the step is
 defined. Read the pointed-to document for how the step is done. This document adds no rule. The
-owner rulings of 2026-09-27 recorded on idea `000500` are the exception: they are stated here,
-marked **Owner ruling**, because no other document states them yet.
+owner's rulings are the exception, because no other document states them yet: those of 2026-09-27
+recorded on idea `000500`, marked **Owner ruling**, and the owner's answers of 2026-09-28 on the
+step order, marked **Owner ruling, 2026-09-28**.
 
 The owner's statement of the protocol, as given: *"plan -> audit -> decompose plan into phases
 -> audit phases -> further decomposition -> additional audit (repeat until still undetermined
 criteria is met)... assign systems to phases, batch phases and order dependencies"*.
 
 The gates G1 to G5 are the owner's decision categories in the idea realization system
-(`ARCH-006`, "The gate model"). Stage numbers below are `ARCH-006`'s ("The nine stages"). Role
+(`ARCH-006`, "The gate model: five decision categories, not five interruptions"). Stage numbers below are `ARCH-006`'s ("The nine stages"). Role
 contracts are in `GOV-014`, "Roles".
 
 ## Steps
@@ -52,8 +53,8 @@ contracts are in `GOV-014`, "Roles".
    before the plan is optional. It is tracked as a governed document when it will be re-run, has
    owner gates, or needs its own review; otherwise it lives in `docs/00-working/`. What the
    package contains: `GOV-008`, "1. Prompt A — the pre-plan package" and the template appendix.
-   `GOV-008` does not itself say the package is optional (see Open questions). It comes before
-   the requirement, as Prompt A does in `GOV-008` (owner, 2026-09-28).
+   `GOV-008` does not itself say the package is optional (see Open questions). **Owner ruling,
+   2026-09-28:** it comes before the requirement, as Prompt A does in `GOV-008`.
 5. **Requirement.** **Owner ruling:** the requirement comes first, before the plan. The planner
    writes observable requirement rows with verification methods. Defined: `AGENTS.md`, "Before
    you start" item 3; `GOV-010`, "Requirement sections" and "Content judgements for
@@ -73,10 +74,10 @@ contracts are in `GOV-014`, "Roles".
    planner for one revision cycle; unresolved blockers escalate to G3. Defined: `GOV-018`, phase
    altitude (steps 2 to 5); `ARCH-006` stage 5.
 10. **Further decomposition and re-audit, repeated.** The phase-fit check splits a phase that does
-    not fit one session; each split re-enters review at the phase altitude, and a phase added after
-    the plan is also reviewed against the standing plan. Defined: `ARCH-006` stage 6; `GOV-014`,
-    "Phase-fit"; `GOV-018`, later-added altitude. The phase-fit procedure is not yet defined
-    (`phase-irs-05`, queued).
+    not fit one session; each split re-enters review at the phase altitude. Defined: `ARCH-006`
+    stage 6; `GOV-014`, "Phase-fit". A phase added after the plan is reviewed against the standing
+    plan. Defined: `ARCH-006` stage 5 (the third altitude); `GOV-018`, later-added altitude. The
+    phase-fit procedure is not yet defined (`phase-irs-05`, queued).
     **Owner ruling, stop rule:** the loop stops by default when every phase fits one session by a
     measured heuristic. The heuristic is not yet defined (idea `000445`, `phase-irs-05`).
     **Owner ruling, exception:** when the audit proposes no split but the heuristic says the phase
@@ -85,9 +86,9 @@ contracts are in `GOV-014`, "Roles".
     figure out the Heuristics. Once that is finalized maybe we change this to audit wins or always
     split."*
 11. **Assign systems and order dependencies.** The mapper writes each phase's `systems` and
-    `depends_on`, the governance check validates them, and the mapper proposes a `next_up`
+    `depends_on`, the `src.governance` validator checks them, and the mapper proposes a `next_up`
     ordering. Rejected twice: escalate to G3 with the validator output. Defined: `ARCH-006`
-    stage 7; `GOV-014`, "Mapper"; `GOV-002`, "State and dependency rules" and "Concurrent
+    stage 7, including its "Rides on" column; `GOV-014`, "Mapper"; `GOV-002`, "State and dependency rules" and "Concurrent
     phases". The mapping agent is not yet built (`phase-irs-07`, queued).
 12. **Plan approval.** Gate **G3**: the owner approves the plan and its phases, and ratifies or
     reorders the proposed `next_up`. Escalated findings are decided here. Defined: `ARCH-006`, the
@@ -110,8 +111,10 @@ contracts are in `GOV-014`, "Roles".
 16. **Integrate.** Gate **G4**: the owner decides whether a branch merges into `dev`. Defined:
     `ARCH-006`, the G4 row; `AGENTS.md`, "Confidentiality and publishing" and "Concurrent agents:
     complete and hand off" steps 8 and 9.
-17. **Complete.** Gate **G5**: the owner runs `/session-close`, the only way a phase reaches
-    `complete`. Defined: `ARCH-006`, the G5 row; `.claude/commands/session-close.md`; `AGENTS.md`,
+17. **Complete.** Gate **G5**: `/session-close` is the only way a phase reaches `complete`. Who
+    may run it is stated differently by different documents (see Open question 6). Defined:
+    `.claude/commands/session-close.md`; `GOV-003`, "Coordinator completion replaces
+    owner-invoked /session-close, repository-wide"; `ARCH-006`, the G5 row; `AGENTS.md`,
     "Session backlog".
 18. **Realization check.** The realization agent verifies the delivered capability against the
     originating idea's text and proposes the terminal `delivered` status, which G5 accepts.
@@ -137,20 +140,28 @@ contracts are in `GOV-014`, "Roles".
    whether a phase truly fits a session ("State and dependency rules"). The owner decides whether
    an interim rule is needed.
 3. **Steps 7 to 9 audit the plan before it has phases; the documents assume the phases already
-   exist.** The owner chose on 2026-09-28 to keep the order as stated and flag the difference.
+   exist.** **Owner ruling, 2026-09-28:** keep the order as stated and flag the difference.
    `GOV-018`'s plan altitude checks that "every requirement row maps to a phase and every phase to
    a row" (step 3). `GOV-002` fails the governance check for any draft plan with no phase
    ("Capture before implementation" item 3). `ARCH-006` stage 4 has the planner write the plan
    already decomposed to minimum scope, and stage 5 reviews the plan and its phases together.
 4. **Step 11 assigns `systems` and `depends_on` after the loop; the backlog requires them
-   earlier.** The owner chose on 2026-09-28 to keep this order, which matches `ARCH-006` stage 7,
-   and flag the difference. `schemas/backlog.schema.json` requires both fields on every
+   earlier.** **Owner ruling, 2026-09-28:** keep this order, which matches `ARCH-006` stage 7, and
+   flag the difference. `schemas/backlog.schema.json` requires both fields on every
    registered phase. `GOV-018`'s phase altitude reviews phases read from
    `docs/09-backlog/backlog.yaml` and checks their `systems` and `depends_on` (step 3). `GOV-014`
    says only the mapper registers a phase ("Phase-fit", never-do), so under `GOV-014` the phases
    `GOV-018` reviews would not be registered yet.
 5. **Step 13 places batching after the dependencies and G3.** The owner's statement reads "assign
-   systems to phases, batch phases and order dependencies". The owner chose on 2026-09-28 to order
+   systems to phases, batch phases and order dependencies". **Owner ruling, 2026-09-28:** order
    the steps as dependencies, then G3, then batching, because `GOV-016` verifies a batch against
    `depends_on` edges that must already exist ("Verify a composition before declaring it
    runnable", check 3). `ARCH-006` has no batching stage.
+6. **Who may run `/session-close` (step 17).** `GOV-003` records an owner decision of 2026-09-16
+   that a coordinator may mark a phase `complete` once all three of its conditions hold, and
+   `.claude/commands/session-close.md` says the same. That decision supersedes the rule that
+   `/session-close` stays owner-invoked. `ARCH-006`'s G5 row still carries the superseded text:
+   "the owner runs `/session-close` over a queue of finished phases in one sitting. No standing
+   owner-only rule is delegated". `AGENTS.md`, "Session backlog", says "only the owner-invoked
+   review (e.g., `/session-close`) does that. An agent must never invoke final closure itself."
+   Step 17 does not choose between them. The owner decides which documents are amended.
