@@ -14,7 +14,7 @@ branch is on `origin/dev`) · `stopped` (the session ended without a handoff fil
 
 | Order | Prompt | Idea | Branch | Status | Tip | Handoff | Notes |
 |---|---|---|---|---|---|---|---|
-| 1 | [Planning protocol document](planning-protocol.md) | 000500 | `agent/cloud-planning-protocol` | in progress | | | |
+| 1 | [Planning protocol document](planning-protocol.md) | 000500 | `agent/cloud-planning-protocol` | ready | | [handoff-planning-protocol.md](handoff-planning-protocol.md) | GOV-021 drafted; gates green; partition-adversary review left open (agent type unavailable in the cloud session) |
 | 2 | [Plan anatomy investigation](plan-anatomy.md) | 000505 | `agent/cloud-plan-anatomy` | not started | | | |
 | 3 | [Boundary validation](boundary-validation.md) | — | `agent/cloud-boundary-validation` | not started | | | |
 
