@@ -119,7 +119,7 @@ def dispositions() -> dict[str, str]:
 
 # --- Prompts: study value (prompt-corpus-inventory.md) and the validation's value ---------------
 
-D, P, S, O, N = (
+D, P, S, CAMPAIGN, N = (
     "direct-operational-entry", "planning-sequence-start", "sequence-factory-step",
     "owner-launched-campaign", "no-default-known",
 )
@@ -138,16 +138,16 @@ VALIDATION_ENTRY: dict[str, tuple[str, str, str]] = {
     "PROMPT-011": (S, "agree", "'Child of ... PROMPT-010, read at its Step 1'"),
     "PROMPT-012": (S, "agree", "'Child of ... PROMPT-010, read at its Step 2'"),
     "PROMPT-013": (S, "agree", "'Child of ... PROMPT-010, read at its Steps 3 and 4'"),
-    "PROMPT-014": (O, "agree", "the demo build's pasted coordinator; no separate kick-off"),
+    "PROMPT-014": (CAMPAIGN, "agree", "the demo build's pasted coordinator; no separate kick-off"),
     "PROMPT-015": (S, "firm", "'Child of ... PROMPT-014, read at its Step 1', the wording the inventory marks as a step for PROMPT-011"),
     "PROMPT-016": (S, "close", "'Child of ... PROMPT-014. Binding on the coordinator'; the study read it as a reference with no start"),
     "PROMPT-017": (S, "firm", "'Child of ... PROMPT-014, read at its Step 3'"),
     "PROMPT-018": (S, "firm", "delegation pack 'Every prompt the build coordinator sends', the shape of 021, 024, 029 and 032, all steps in the inventory"),
-    "PROMPT-019": (O, "agree", "single dated dispatch for phase-demo-07; close call with a direct entry"),
+    "PROMPT-019": (CAMPAIGN, "agree", "single dated dispatch for phase-demo-07; close call with a direct entry"),
     "PROMPT-020": (P, "agree", "rubric pilot"),
     "PROMPT-021": (S, "agree", "delegation pack"),
     "PROMPT-022": (S, "close", "coordinator; its kick-off PROMPT-023 is what is pasted and 'wins' where they differ"),
-    "PROMPT-023": (O, "agree", "pasteable kick-off for the workbench build"),
+    "PROMPT-023": (CAMPAIGN, "agree", "pasteable kick-off for the workbench build"),
     "PROMPT-024": (S, "agree", "delegation pack"),
     "PROMPT-025": (P, "agree", "Prompt A pre-plan package"),
     "PROMPT-026": (S, "agree", "Prompt B factory"),
@@ -155,23 +155,23 @@ VALIDATION_ENTRY: dict[str, tuple[str, str, str]] = {
     "PROMPT-028": (S, "agree", "Prompt B factory"),
     "PROMPT-029": (S, "agree", "delegation pack"),
     "PROMPT-030": (S, "close", "coordinator; its kick-off PROMPT-031 is what is pasted"),
-    "PROMPT-031": (O, "agree", "kick-off record for the literature review"),
+    "PROMPT-031": (CAMPAIGN, "agree", "kick-off record for the literature review"),
     "PROMPT-032": (S, "agree", "delegation pack"),
-    "PROMPT-033": (O, "agree", "kick-off record for idea batching"),
+    "PROMPT-033": (CAMPAIGN, "agree", "kick-off record for idea batching"),
     "PROMPT-034": (S, "agree", "pack a workflow dispatches verbatim"),
-    "PROMPT-035": (O, "agree", "dated one-run review kickoff"),
+    "PROMPT-035": (CAMPAIGN, "agree", "dated one-run review kickoff"),
     "PROMPT-036": (D, "agree", "generic, idempotent coordinator the owner pastes every batch"),
     "PROMPT-037": (D, "firm", "'a kickoff the owner pastes into the Session Manager session' (lines 17-20); nothing sequences it"),
     "PROMPT-038": (S, "agree", "dispatch prompt for GOV-018 step 3"),
-    "PROMPT-040": (O, "agree", "rubric pilot"),
+    "PROMPT-040": (CAMPAIGN, "agree", "rubric pilot"),
     "PROMPT-041": (D, "agree", "phase runner for this study, run directly each session"),
 }
-TIP_ONLY = {"PROMPT-042": (O, "new", "dated investigation pack with an owner-pasted kickoff (lines 596-607)")}
+TIP_ONLY = {"PROMPT-042": (CAMPAIGN, "new", "dated investigation pack with an owner-pasted kickoff (lines 596-607)")}
 
 GROUPS = [
     ("Direct entry or planning start", (D, P)),
     ("Sequence step", (S,)),
-    ("Owner-launched campaign", (O,)),
+    ("Owner-launched campaign", (CAMPAIGN,)),
     ("No known entry", (N,)),
 ]
 
@@ -629,7 +629,7 @@ def options() -> str:
 def figures(g: dict) -> str:
     b0, br, b1 = g["backlog_base"], g["backlog_review"], g["backlog_tip"]
     mb, mt = g["maturity_base"], g["maturity_tip"]
-    sg, vb, vt = g["study_groups"], g["val_base_groups"], g["val_tip_groups"]
+    vb, vt = g["val_base_groups"], g["val_tip_groups"]
 
     def split(v: list[int]) -> str:
         return " / ".join(str(x) for x in v)
