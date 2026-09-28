@@ -182,7 +182,7 @@ def cmd_trace(codes: list[str]) -> None:
         cited = sorted(set(re.findall(r"\b(?:REQ|ADR|PROMPT|ARCH|GOV|OPS)-\d{3}\b", own_text)))
         print("  cited by code in the plan's own text:", " ".join(cited))
         print("  paths cited in the plan's own text:",
-              sorted(set(re.findall(r"(?:_working|docs/00-working|research)/[\w./-]+", own_text))))
+              sorted(set(re.findall(r"(?:_working|00-working|research)/[\w./-]+", own_text))))
         for i, d in sorted(docs.items(), key=lambda kv: kv[1]["code"]):
             if i in members:
                 continue
