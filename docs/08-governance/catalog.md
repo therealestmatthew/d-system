@@ -58,6 +58,7 @@ CI regenerates it and fails on any difference.
 | GOV-017 | governance | active | repository-owner | docs/08-governance/GOV-017-multi-session-coordination-protocol.md |
 | GOV-018 | governance | active | repository-owner | docs/08-governance/GOV-018-three-altitude-review-procedure.md |
 | GOV-020 | governance | active | repository-owner | docs/08-governance/GOV-020-agentic-ai-planning-reference.md |
+| GOV-021 | governance | draft | repository-owner | docs/08-governance/GOV-021-planning-protocol.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -502,4 +503,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-397 documents — adr: 22, architecture: 12, governance: 17, operation: 22, plan: 81, prompt: 41, requirement: 34, session: 168.
+398 documents — adr: 22, architecture: 12, governance: 18, operation: 22, plan: 81, prompt: 41, requirement: 34, session: 168.
