@@ -22583,7 +22583,7 @@ Owner, 2026-09-28, relayed by the Session Manager. The owner's words:
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-28T12:40:50-04:00): Owner rulings, 2026-09-28, as relayed by the Session Manager (recorded by Ideation; not an agent judgement):
 (1) Amend PLAN-036 (HTML generation and design system) rather than write a new plan.
@@ -22595,6 +22595,11 @@ Existing ideas this builds on: 000083 (template library), 000084 (component libr
 What exists today to capture: _public/*.html (d-system-architecture, idea-realization-system, prompt-pack-protocol, research-protocol, skills-and-agents-lexicon, overview/) and templates/styles/ (atlas.css, lit-report.css, overview.css). These are the "current house style" input.
 Related tracking asks: 000491 (running list of HTML artifacts), 000493 (artifact tracker), 000497 (monitoring artifact).
 Open for planning: where the tokens live and their format; how the light/dark flag works (colour-scheme swap only, per the owner); how the Claude Design System artifact is kept in sync with the repo tokens; how the review of sample themes is recorded.
+- **finding** by agent-ideation (2026-09-28T15:21:24-04:00): Owner preference, 2026-09-28, as relayed by the Session Manager after the owner reviewed the theme gallery (https://claude.ai/artifact/Jq5ZSH6tymdLXeyVpbe35K; 11 themes, each in light and dark, built from the Scout's style inventory in _working/session-manager/scout/style-inventory.md, gitignored). The owner's words: "My favorite is magazine bold, followed by either swiss modernist or technical mono."
+Owner rulings on the same review, 2026-09-28, as relayed by the Session Manager:
+(a) "One house + variants": Magazine bold is the house style; Swiss modernist and Technical/mono become variants of it for dense documents and code/protocol pages, sharing tokens.
+(b) Webfonts are allowed from Google Fonts, with a system-font fallback for offline/self-contained pages.
+(c) Next step: a round-2 gallery refining the three on more page types, before PLAN-036 is amended.
 
 </details>
 
