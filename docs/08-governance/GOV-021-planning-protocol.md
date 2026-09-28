@@ -7,7 +7,7 @@ kind: governance
 status: draft
 owner: repository-owner
 created: '2026-09-27'
-updated: '2026-09-27'
+updated: '2026-09-28'
 systems: [sys-gov-docs]
 depends_on: [doc-idea-realization-system, doc-realization-role-contracts, doc-plan-quality-standard, doc-three-altitude-review-procedure, doc-batch-orchestration-protocol, doc-backlog-protocol, doc-prompt-pack-protocol, doc-governance-protocol, doc-document-code-protocol]
 ---
@@ -80,6 +80,8 @@ contracts are in `GOV-014`, "Roles".
     phase-fit procedure is not yet defined (`phase-irs-05`, queued).
     **Owner ruling, stop rule:** the loop stops by default when every phase fits one session by a
     measured heuristic. The heuristic is not yet defined (idea `000445`, `phase-irs-05`).
+    **Owner ruling, 2026-09-28, until the heuristic exists:** the loop stops when the phase-altitude
+    audit proposes no further split; any doubt goes to the owner at G3.
     **Owner ruling, exception:** when the audit proposes no split but the heuristic says the phase
     does not fit, the case escalates to G3 with both results, and the owner chooses: split by
     hand, accept with a recorded reason, or adjust the heuristic. The owner: *"We still need to
@@ -112,8 +114,7 @@ contracts are in `GOV-014`, "Roles".
     `ARCH-006`, the G4 row; `AGENTS.md`, "Confidentiality and publishing" and "Concurrent agents:
     complete and hand off" steps 8 and 9.
 17. **Complete.** Gate **G5**: `/session-close` is the only way a phase reaches `complete`,
-    invoked by the owner or by a coordinator once `GOV-003`'s three conditions hold. `ARCH-006`'s
-    G5 row still says otherwise (see Open question 6). Defined:
+    invoked by the owner or by a coordinator once `GOV-003`'s three conditions hold. Defined:
     `.claude/commands/session-close.md`; `GOV-003`, "Coordinator completion replaces
     owner-invoked /session-close, repository-wide"; `ARCH-006`, the G5 row; `AGENTS.md`,
     "Session backlog".
@@ -135,11 +136,12 @@ contracts are in `GOV-014`, "Roles".
 
 1. **`GOV-008` does not say the pre-plan package is optional.** Its pipeline treats Prompt A as a
    governed prompt document ("The pipeline", stage 1) and names no ungoverned case. Step 4 carries
-   the owner's ruling; `GOV-008` needs an amendment to match. The owner decides whether and when.
-2. **The stop rule cannot be applied until the heuristic exists.** Nothing defines what stops the
-   decompose-and-audit loop in the meantime. `GOV-002` says the governance check cannot decide
-   whether a phase truly fits a session ("State and dependency rules"). The owner decides whether
-   an interim rule is needed.
+   the owner's ruling; `GOV-008` needs an amendment to match. **Owner ruling, 2026-09-28:** amend
+   `GOV-008` once, with the plan-folder standard's work, after idea `000501` separates one-time
+   prompts from reusable ones.
+2. **Settled 2026-09-28: the interim stop rule.** The stop rule needs the heuristic, which does not
+   exist yet. The owner ruled that until it does, the loop stops when the phase-altitude audit
+   proposes no further split, and any doubt goes to the owner at G3 (step 10).
 3. **Steps 7 to 9 audit the plan before it has phases; the documents assume the phases already
    exist.** **Owner ruling, 2026-09-28:** keep the order as stated and flag the difference.
    `GOV-018`'s plan altitude checks that "every requirement row maps to a phase and every phase to
@@ -158,10 +160,10 @@ contracts are in `GOV-014`, "Roles".
    the steps as dependencies, then G3, then batching, because `GOV-016` verifies a batch against
    `depends_on` edges that must already exist ("Verify a composition before declaring it
    runnable", check 3). `ARCH-006` has no batching stage.
-6. **`ARCH-006`'s G5 row is stale (step 17).** `GOV-003` records an owner decision of 2026-09-16
-   that a coordinator may mark a phase `complete` once all three of its conditions hold, and
-   `.claude/commands/session-close.md` says the same. That decision supersedes the rule that
-   `/session-close` stays owner-invoked. `AGENTS.md`, "Session backlog", was amended to match on
-   2026-09-28 with the owner's approval. `ARCH-006`'s G5 row still carries the superseded text:
-   "the owner runs `/session-close` over a queue of finished phases in one sitting. No standing
-   owner-only rule is delegated". The owner decides whether and when `ARCH-006` is amended.
+6. **Settled 2026-09-28: who may run `/session-close` (step 17).** `GOV-003` records an owner
+   decision of 2026-09-16 that a coordinator may mark a phase `complete` once all three of its
+   conditions hold, and `.claude/commands/session-close.md` says the same. `AGENTS.md`, "Session
+   backlog", and `ARCH-006`'s G5 row were amended to match on 2026-09-28 with the owner's approval.
+
+The owner ruled on 2026-09-28 that Open questions 3 and 4 stay as they are, with both sides
+unchanged, until a planning session resolves them.

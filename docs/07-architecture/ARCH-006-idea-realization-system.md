@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-16'
+updated: '2026-09-28'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-record-system, doc-idea-graph-lifecycle, doc-agent-engineering-delegation, doc-autonomous-agent-operations, doc-repeatable-idea-partition]
 ---
@@ -65,7 +65,7 @@ adversarial findings against it, and the evidence, pre-digested — never as a r
 | G2 Track acceptance | The partition's tracks and new-plan-vs-amendment rulings stand | Stage 3, per partition run, one sitting. `PLAN-025`'s three check-ins consolidate into this gate where the material allows; the consolidation is an amendment to `PLAN-025` executed by `phase-irs-02`, recorded in `GOV-003` |
 | G3 Plan approval | A plan, its phases, and their proposed ordering are approved after adversarial review | Stage 5/7 boundary, per plan. Ratifying or reordering the proposed `next_up` contribution happens here |
 | G4 Integration | A branch merges into `dev` | Stage 8, per unit of work, batchable. Enforced at the tool boundary by P5's capability broker so an automated run cannot merge itself |
-| G5 Completion review | A phase reaches `status: complete`; a delivered idea's evidence is accepted | Stages 8–9, **batched**: the owner runs `/session-close` over a queue of finished phases in one sitting. No standing owner-only rule is delegated |
+| G5 Completion review | A phase reaches `status: complete`; a delivered idea's evidence is accepted | Stages 8–9, **batched**: `/session-close` is run over a queue of finished phases, by the owner or by a coordinator once the three conditions in `GOV-003` ("Coordinator completion replaces owner-invoked /session-close, repository-wide", 2026-09-16) hold |
 
 The audit trail between gates is the run ledger (P5) plus the repository's own records; every
 automated transition is reconstructible after the fact.
