@@ -5,7 +5,7 @@
 ## 1. Branch and tip
 
 - Branch: `agent/cloud-planning-protocol`
-- Tip when the gates ran: `4d83a82`. This handoff commit sits directly on top of it; it changes
+- Tip when the final gates ran: `62c7444`. This handoff commit sits directly on top of it; it changes
   only this file and `status.md`, both ungoverned.
 - Rebased onto `origin/dev` at `a34e8f3` (`git rebase origin/dev` reported "Current branch
   agent/cloud-planning-protocol is up to date").
@@ -22,7 +22,8 @@
 
 Commits: `95970b4` (tracker start), `935bf2f` (the document and catalog), `4d83a82` (a pointer
 fix in step 14: `AGENTS.md` has four "Concurrent agents" sections, not three; the step now names
-the two it relies on).
+the two it relies on), `a04ec06` (first handoff, review open), `62c7444` (fixes for review findings
+F1 to F5).
 
 ## 3. Codes allocated with `--next-code`
 
@@ -31,29 +32,36 @@ the two it relies on).
 
 ## 4. Review verdict
 
-**Not run. This is an open item.** The prompt names `partition-adversary`. The Agent tool
-rejected it: `Agent type 'partition-adversary' not found. Available agents: claude,
-claude-code-guide, demo-adversary, demo-creator-docs, demo-creator-py, demo-creator-web,
-demo-orch-content, demo-orch-data, demo-orch-stage, demo-validator-check, demo-validator-code,
-demo-validator-web, Explore, general-purpose, idea-triage, Plan, statusline-setup`.
+**Agent type:** `partition-adversary`, dispatched with model Sonnet (owner direction: `GOV-008`
+cost protocols and agent hygiene). **Brief:** the prompt's brief verbatim ("Adversarial review"
+in `planning-protocol.md`), `{ABS}` = `/home/user/d-system`, `<file>` =
+`GOV-021-planning-protocol.md`, plus the owner's four 2026-09-28 answers stated as rulings for the
+fidelity check. It received no account of the drafting session's reasoning. The work was
+committed and pushed before dispatch.
 
-Cause: the session loaded its agent types from the branch the clone opened on,
-`claude/master-prompt-execution-udywbn`. That branch was cut from `main` at `6a9ab96`
-(2026-09-12), and its `.claude/agents/` has 11 files and no `partition-adversary.md`. The file is
-on `origin/dev` and on this branch.
+The first attempt, before the session restarted, failed: `Agent type 'partition-adversary' not
+found`. The session had loaded its agent types from `claude/master-prompt-execution-udywbn`, cut
+from `main` at `6a9ab96` (2026-09-12), which has no `partition-adversary.md`. After the restart
+the type was available, and the owner directed the run.
 
-The prompt forbids substituting `general-purpose`. The owner was asked whether to substitute
-`demo-adversary` and chose to leave the review open. The Session Manager should dispatch
-`partition-adversary` locally with the prompt's brief (`planning-protocol.md`, "Adversarial
-review"), `{ABS}` set to the local checkout, `<file>` = `GOV-021-planning-protocol.md`. Add this
-to the brief: the owner's four answers of 2026-09-28 (section 7 below) count as owner rulings
-for the fidelity check.
+| # | Severity | Finding | Disposition |
+|---|---|---|---|
+| F1 | blocker | Step 17 said the owner runs `/session-close`. `GOV-003` ("Coordinator completion replaces owner-invoked /session-close, repository-wide", owner, 2026-09-16) and `.claude/commands/session-close.md` let a coordinator complete a phase once three conditions hold; `ARCH-006`'s G5 row is stale | `fixed` in `62c7444`. The session confirmed the quotes. Step 17 now says `/session-close` is the only path and does not name who runs it; new Open question 6 records `GOV-003` against `ARCH-006` and `AGENTS.md`. Not settled here, because `AGENTS.md` also disagrees with `GOV-003` (section 6) |
+| F2 | major | Step 10 cited `ARCH-006` stage 6 for the later-added-phase review; that altitude is stage 5 | `fixed` in `62c7444`: stage 6 cited for splits, stage 5 (third altitude) for later-added phases |
+| F3 | minor | The 2026-09-28 owner rulings were not marked **Owner ruling** like the 2026-09-27 ones | `fixed` in `62c7444`: the intro names both sets; step 4 and Open questions 3 to 5 carry **Owner ruling, 2026-09-28** |
+| F4 | minor | Step 11's `GOV-002` citations cover how `systems` and `depends_on` are used, not the validator that checks them | `fixed` in `62c7444`: step 11 names the `src.governance` validator and `ARCH-006` stage 7's "Rides on" column; the `GOV-002` citations stay for the field semantics |
+| F5 | minor | "The gate model" shortened a heading every other citation quotes in full | `fixed` in `62c7444`: full heading quoted |
 
-As a partial check, which does not replace the review, the session opened every document and
-section the draft points to. It found one wrong pointer (step 14, fixed in `4d83a82`) and none
-elsewhere.
+The adversary reported these checks as holding: fidelity to idea `000500`'s findings and the
+2026-09-28 rulings; coverage of all nine `ARCH-006` stages and gates G1 to G5; every "queued"
+phase is queued on the backlog; no invented rules; nothing decided for `000501`, `000502` or
+`000505`. The fixes did not change step order, so the review was not re-dispatched.
 
 ## 5. Gate runs (last ten lines each, verbatim)
+
+Two full runs. The first ran at `4d83a82`, before the review, and all four gates passed with
+the same output as below except pytest's time (146.99s). The second, below, ran at `62c7444`
+after the review fixes, following `git rebase origin/dev` (up to date at `a34e8f3`).
 
 `uv run python -m src.governance`:
 
@@ -74,7 +82,7 @@ test/test_workbench_layout_schema.py .....................               [100%]
     _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-============ 1151 passed, 1 skipped, 1 warning in 146.99s (0:02:26) ============
+============ 1151 passed, 1 skipped, 1 warning in 148.16s (0:02:28) ============
 EXIT=0
 ```
 
@@ -108,6 +116,19 @@ The `status-regression` warning appears because this clone has no local `dev` br
   phase in `docs/09-backlog/backlog.yaml` whose `plan` is this plan's `id`", which is stage 5,
   before the mapper runs. `GOV-021` Open question 4 records it. Which one should change is the
   owner's decision.
+- **`ARCH-006`, the G5 row.** It reads: "the owner runs `/session-close` over a queue of finished
+  phases in one sitting. No standing owner-only rule is delegated". `GOV-003` superseded that on
+  2026-09-16 ("Coordinator completion replaces owner-invoked /session-close,
+  repository-wide"). Found by review finding F1; `GOV-021` Open question 6.
+- **`AGENTS.md`, "Session backlog", line 180: needs the owner's approval, not edited.** It reads:
+  "It is safe to record progress any number of times, but do not mark a phase complete; only the
+  owner-invoked review (e.g., `/session-close`) does that. An agent must never invoke final
+  closure itself." That contradicts `GOV-003`'s 2026-09-16 decision. Proposed wording, if the
+  owner confirms `GOV-003` stands: "It is safe to record progress any number of times, but do not
+  mark a phase complete; only `/session-close` does that, invoked by the owner or by a coordinator
+  once the three conditions in `GOV-003` ('Coordinator completion replaces owner-invoked
+  /session-close') hold. No other agent invokes final closure." If the owner meant `AGENTS.md` to
+  stand, `GOV-003` and `session-close.md` need amending instead.
 
 ## 7. Ideas for local Ideation
 
@@ -130,13 +151,17 @@ Owner answers given in this session (2026-09-28), all recorded in `GOV-021`:
 3. Order: systems and dependencies, then G3, then batching (Open question 5 records that the
    owner's wording read "batch phases and order dependencies").
 4. The optional pre-plan investigation comes before the requirement (step 4).
-5. The adversarial review is left open rather than substituted (section 4).
+5. The adversarial review was first left open rather than substituted; after the session
+   restarted, the owner directed the run with Sonnet under `GOV-008`'s cost and agent-hygiene
+   rules (section 4).
 
 Still open for the owner (`GOV-021`, "Open questions"):
 
 - Whether and when to amend `GOV-008` for the optional pre-plan package (Open question 1).
 - Whether the decompose-and-audit loop needs an interim stop rule until the heuristic (`000445`,
   `phase-irs-05`) exists (Open question 2).
+- Who may run `/session-close`: `GOV-003` against `ARCH-006` and `AGENTS.md` (Open question 6,
+  and section 6).
 - Whether `GOV-018`, `GOV-014`, `GOV-002` or the backlog schema change to match the owner's step
   order, or the order changes to match them (Open questions 3 and 4).
 
