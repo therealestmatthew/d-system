@@ -4639,6 +4639,7 @@ The template library idea is not formally linked to PLAN-003 yet, though it clea
 - relates_to ← `000084`
 - relates_to ← `000092`
 - relates_to ← `000367`
+- relates_to ← `000511`
 
 ---
 
@@ -4679,6 +4680,7 @@ PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building b
 - relates_to ← `000092`
 - relates_to ← `000132`
 - relates_to ← `000367`
+- relates_to ← `000511`
 
 ---
 
@@ -4729,6 +4731,7 @@ PROPOSED LINK: 000085 --relates_to--> 000084 (both are optional reusable librari
 
 - relates_to → `000084`
 - relates_to ← `000092`
+- relates_to ← `000511`
 
 ---
 
@@ -5050,6 +5053,7 @@ PROPOSED LINK: 000092 --relates_to--> 000085 (color palettes are extraction scop
 - relates_to → `000084`
 - relates_to → `000085`
 - relates_to ← `000093`
+- relates_to ← `000511`
 
 ---
 
@@ -22102,6 +22106,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running l
 - relates_to → `000106`
 - relates_to ← `000497`
 - relates_to ← `000507`
+- relates_to ← `000511`
 
 ---
 
@@ -22137,6 +22142,7 @@ Close to the running list of active HTML artifacts recorded in the same batch; k
 
 - relates_to → `000492`
 - relates_to ← `000497`
+- relates_to ← `000511`
 
 ---
 
@@ -22231,6 +22237,7 @@ PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated page
 - relates_to → `000301`
 - relates_to ← `000507`
 - relates_to ← `000509`
+- relates_to ← `000511`
 
 ---
 
@@ -22561,3 +22568,43 @@ Related: 000126 (audit of commands, skills and agents), 000494. Proposed record 
 - relates_to → `000509`
 - relates_to → `000126`
 - relates_to → `000494`
+
+---
+
+## 000511 · Application design styles and principles: a design system and template/theme library for the HTML artifacts, with sample themes to review, mocked up in Claude Design
+
+**Created 2026-09-28T12:40:41-04:00 · Status: `triaged`**
+
+Owner, 2026-09-28, relayed by the Session Manager. The owner's words:
+
+"I want to figure out our application design styles and principles and consider using Claude Design to mock up some UI for our HTML artifacts. What do we need to consider when crafting our design? What needs to be tracked? ... This is fundamental to ensuring consistency across our various artifacts but also aligns with the HTML generation concept and keeping a library of templates on styles, themes, etc. I want to come up with a handful of sample templates and themes that we can review to decide on what fits best for us - and we also need to capture what we already use for our static html pages (such as the reference HTML files in the _public/ folder)."
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-28T12:40:50-04:00): Owner rulings, 2026-09-28, as relayed by the Session Manager (recorded by Ideation; not an agent judgement):
+(1) Amend PLAN-036 (HTML generation and design system) rather than write a new plan.
+(2) Scope: static HTML, the workbench, and "we may acquire other non-static designs, animations, etc. in the future that we would want to be able to adapt and re-use".
+(3) Source of truth: design tokens in the repository, mirrored to a Claude Design System artifact.
+(4) First sample batch: pages about the idea realization engine using real repository content (grids/tables, flow chart, text blocks, images, etc.), in these themes: editorial/document, dense dashboard, technical/mono, warm minimal, high-contrast accessible, blueprint/diagram, soft corporate, current house style, plus 2-3 more. "both Light and Dark mode versions where applicable (ideally a simple flag that alternates the modes by swapping color schemes rather than any major structural changes)".
+- **finding** by agent-ideation (2026-09-28T12:40:50-04:00): Triage (Ideation, 2026-09-28, owner-named). PLAN-036 (HTML generation and design system, P9, active) is the home the owner chose. Its phases: phase-des-01 (audit pre-build HTML plans, ready), phase-des-02 (governance atlas page, ready), phase-des-03 template library, phase-des-04 component library, phase-des-05 colour palette library (all waiting on des-01), phase-des-06 HTML Designer agent (waiting on des-03/04/05), and phase-html-01..10 (page generation vertical slice).
+Existing ideas this builds on: 000083 (template library), 000084 (component library), 000085 (colour palette library), 000092 (HTML Designer agent). No existing idea covers design principles, theme sampling, light/dark switching, or Claude Design; nothing in the fold mentions design tokens.
+What exists today to capture: _public/*.html (d-system-architecture, idea-realization-system, prompt-pack-protocol, research-protocol, skills-and-agents-lexicon, overview/) and templates/styles/ (atlas.css, lit-report.css, overview.css). These are the "current house style" input.
+Related tracking asks: 000491 (running list of HTML artifacts), 000493 (artifact tracker), 000497 (monitoring artifact).
+Open for planning: where the tokens live and their format; how the light/dark flag works (colour-scheme swap only, per the owner); how the Claude Design System artifact is kept in sync with the repo tokens; how the review of sample themes is recorded.
+
+</details>
+
+**Links**
+
+- relates_to → `None`
+- relates_to → `000083`
+- relates_to → `000084`
+- relates_to → `000085`
+- relates_to → `000092`
+- relates_to → `000491`
+- relates_to → `000493`
+- relates_to → `000497`
