@@ -14,8 +14,8 @@ branch is on `origin/dev`) · `stopped` (the session ended without a handoff fil
 
 | Order | Prompt | Idea | Branch | Status | Tip | Handoff | Notes |
 |---|---|---|---|---|---|---|---|
-| 1 | [Planning protocol document](planning-protocol.md) | 000500 | `agent/cloud-planning-protocol` | ready | | [handoff-planning-protocol.md](handoff-planning-protocol.md) | GOV-021 drafted; partition-adversary review run, 5 findings fixed; gates green |
-| 2 | [Plan anatomy investigation](plan-anatomy.md) | 000505 | `agent/cloud-plan-anatomy` | not started | | | |
+| 1 | [Planning protocol document](planning-protocol.md) | 000500 | `agent/cloud-planning-protocol` | merged | 280584c | [handoff-planning-protocol.md](handoff-planning-protocol.md) | GOV-021 drafted; partition-adversary review run, 5 findings fixed; gates green |
+| 2 | [Plan anatomy investigation](plan-anatomy.md) | 000505 | `agent/cloud-plan-anatomy` | in progress | | | |
 | 3 | [Boundary validation](boundary-validation.md) | — | `agent/cloud-boundary-validation` | not started | | | |
 
 A fourth prompt, the boundary follow-up, is added here only after the owner's A/B/C decision.
