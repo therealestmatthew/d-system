@@ -5,8 +5,10 @@
 ## 1. Branch and tip
 
 - Branch: `agent/cloud-boundary-validation`
-- Tip of the last content commit: `afddda1`. This handoff and the `status.md` row are committed
-  together on top of it; that commit's hash is the branch head after the final push.
+- Tip of the last content commit: `afddda1`. This handoff was committed on top of it in `f8dcbfe`;
+  the `status.md` row update followed in the next commit, because a quoting error left it out of
+  `f8dcbfe` and the branch is never force-pushed. The branch head after the final push is that
+  follow-up commit.
 - Rebased onto: `origin/dev` at `9772c21`. `git fetch origin dev && git rebase origin/dev` reported
   the branch up to date, because `origin/dev` had not moved since the session started.
 
