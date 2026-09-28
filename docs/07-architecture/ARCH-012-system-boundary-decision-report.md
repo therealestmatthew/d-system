@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-26'
-updated: '2026-09-26'
+updated: '2026-09-28'
 systems: [sys-portfolio, sys-realization, sys-ui, sys-governance, sys-gov-docs, sys-backlog]
 depends_on:
   - doc-system-boundary-study
@@ -71,9 +71,12 @@ crossings, not evidence that the concerns should be separated today.
 ## Prompt and portfolio implications
 
 Prompt documents are operating material, templates, and campaign evidence—not a single product
-surface. The reconciled inventory contains 40 prompts, of which 13 are direct operational entries
-or planning starts, 14 are sequence steps, 12 are owner-launched campaigns, and one has no known
-default entry point. Their independent reuse, precedent, and review fields mean a prompt's active
+surface. The reconciled inventory contains 40 prompts, of which 15 are direct operational entries
+or planning starts, 18 are sequence steps, 7 are owner-launched campaigns, and none has no known
+default entry point. (Figure corrected 2026-09-28 from 13, 14, 12 and 1: the independent validation
+found the inventory's default-entry-point values inconsistent across structurally identical prompts
+at the same baseline. The per-prompt values and the rule applied are in
+`docs/00-working/boundary-study/validation-report.md`, section 2.) Their independent reuse, precedent, and review fields mean a prompt's active
 status must not be interpreted as a separate release unit or a reason to retire it. A future
 operating index can improve navigation without changing lifecycle status.
 

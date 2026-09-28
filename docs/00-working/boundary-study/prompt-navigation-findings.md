@@ -19,9 +19,12 @@ below are counts of the default-entry-point field, not a lifecycle taxonomy.
 
 ## Findings and limits
 
-1. The corpus is not one menu of interchangeable commands. Twenty-three documents are either
+1. The corpus is not one menu of interchangeable commands. Twenty-six documents are either
    owner-launched campaigns or sequence steps, so presenting all `active` prompts as directly
    runnable would discard their recorded prerequisites.
+   *Corrected 2026-09-28, with the owner's approval: this read "Twenty-three", but the table above
+   gives 12 + 14 = 26. The table itself is unchanged; the independent validation's re-classification
+   of the entry-point field is in [the validation report](validation-report.md), section 2.*
 2. The thirteen direct or planning-start prompts provide a small navigable operating core;
    the remainder mainly preserves reusable patterns or evidence of bounded campaigns.
 3. Reuse and review remain intentionally non-exclusive: adaptable patterns frequently require
