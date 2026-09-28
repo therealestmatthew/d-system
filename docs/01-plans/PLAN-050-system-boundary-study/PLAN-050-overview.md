@@ -75,8 +75,9 @@ decision as the reason.
 | Option | Phase | Outcome | Depends on |
 |---|---|---|---|
 | A. One repository with explicit contracts | `phase-bnd-06` | Governed concern ownership and interface contract: every system, every allowed crossing, a prohibited crossing per boundary | `phase-bnd-04` |
-| A | `phase-bnd-07` | A `concern` field in the system registry, with a governance check that rejects a missing or unknown value | `phase-bnd-06` |
-| A | `phase-bnd-08` | Defined entry-point values and a prompt operating index covering every governed prompt | `phase-bnd-04` |
+| A | `phase-bnd-07` | A `concern` field in the system registry, with a governance check that rejects a missing or unknown value. Needs the owner's separate approval, because `ARCH-012` says choosing A changes no registry entry | `phase-bnd-06` |
+| A | `phase-bnd-08` | Defined entry-point values, and every governed prompt classified against them with a cited line | `phase-bnd-04` |
+| A | `phase-bnd-14` | An independent second classification, its disagreements settled, and a prompt operating index | `phase-bnd-08` |
 | A | `phase-bnd-09` | Document retrieval measured against a fixed question set | `phase-bnd-04` |
 | B. Prepare selective extraction | `phase-bnd-10` | Three candidates (the idea-realization plugin, the workbench, the governance engine) assessed against option B's five preconditions; the owner names one or none | `phase-bnd-04` |
 | B | `phase-bnd-11` | Extraction discovery for the named candidate: contract, source authority, tests, versioning, migration and rollback, with no code moved | `phase-bnd-10` |
@@ -84,7 +85,7 @@ decision as the reason.
 | C | `phase-bnd-13` | Cross-repository governance design: claims, backlog, codes, catalog and the governance check across repositories | `phase-bnd-12` |
 
 `ARCH-012`'s conditional next actions are the source for each option's first phase. `phase-bnd-07`
-and `phase-bnd-08` answer `ARCH-012`'s owner questions on registry contracts and prompt navigation.
+and `phase-bnd-08` with `phase-bnd-14` answer `ARCH-012`'s owner questions on registry contracts and prompt navigation.
 `phase-bnd-09` measures the retrieval gap the portfolio review named as unmeasured.
 `phase-bnd-10` exists because the validation found that the idea-realization plugin was built
 during and after the study while the registry still lists it as `planned` (validation report,
@@ -98,7 +99,7 @@ figures and phase findings).
 | R03 | PLAN-050.02 and PLAN-050.03 / `phase-bnd-02`, `phase-bnd-05` |
 | R04 | PLAN-050.04 / `phase-bnd-03` |
 | R05–R06 | PLAN-050.05 / `phase-bnd-04` |
-| R06 (the sequenced next action after each possible decision) | `phase-bnd-06` to `phase-bnd-13`, one group per option |
+| R06 (the sequenced next action after each possible decision) | `phase-bnd-06` to `phase-bnd-14`, one group per option |
 | R07 | Every child plan |
 
 ## Execution order and real concurrency
@@ -109,10 +110,14 @@ time; none of these phases assumes a free slot.
 
 The next-step phases run only for the option the owner chooses. Within an option they are also
 close to serial, measured from their declared systems: `phase-bnd-06`, `phase-bnd-08`,
-`phase-bnd-10`, `phase-bnd-11`, `phase-bnd-12` and `phase-bnd-13` all declare `sys-gov-docs`, so no
-two of them can be active together. Under option A, `phase-bnd-07` (`sys-governance`) waits on
-`phase-bnd-06` by dependency, and `phase-bnd-09` (`sys-retrieval`) is the one phase that can run
-beside `phase-bnd-06` or `phase-bnd-08`.
+`phase-bnd-10` to `phase-bnd-13` and `phase-bnd-14` all declare `sys-gov-docs`, so no two of them can
+be active together. Under option A, `phase-bnd-07` (`sys-governance`) waits on `phase-bnd-06` by
+dependency, `phase-bnd-14` waits on `phase-bnd-08`, and `phase-bnd-09` (`sys-retrieval`) is the one
+phase that can run beside `phase-bnd-06` or `phase-bnd-08`.
+
+`phase-bnd-14` was split from `phase-bnd-08` on 2026-09-28, after the later-added-phase review found
+that one session could not hold both the classification and its independent check (review record,
+later-added findings).
 
 ## Acceptance and verification
 

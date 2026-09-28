@@ -15843,8 +15843,9 @@ items:
   - Allocate a code with --next-code architecture and write one governed record that lists every
     registered system once with its concern, every allowed crossing with the data or capability that
     crosses it and its evidence (file and line, or registry entry), and at least one prohibited
-    ownership crossing per concern boundary. Include the workbench API's reads of the idea log
-    (fold()) and of backlog.yaml, which the study's boundary map omits.
+    ownership crossing per concern boundary. Include the workbench API's read of the idea log
+    (fold()), which the study's boundary map omits, and its read of backlog.yaml, which the map
+    covers only as repository-state inputs.
   - Change no code, registry entry or phase state.
   acceptance:
   - A set comparison between the record's system ids and the ids in systems.yaml at the execution
@@ -15903,13 +15904,16 @@ items:
   - docs/08-governance/systems.yaml
   - test/test_governance.py
   - docs/03-sessions/
-  next_action: Wait for the owner's A/B/C decision in ARCH-012 and for phase-bnd-06.
+  next_action: Wait for the owner's A/B/C decision in ARCH-012, for phase-bnd-06, and for the owner's
+    separate approval of this registry change.
   blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
-    The owner has not yet chosen between options A, B and C.
-  resume_when: The owner selects option A at ARCH-012's owner decision gate and phase-bnd-06 is complete.
-    Review the scope against current dev before releasing it.
+    The owner has not yet chosen between options A, B and C. ARCH-012's option A row says no
+    system-registry change follows from choosing A, so this phase also needs its own approval.
+  resume_when: The owner selects option A, phase-bnd-06 is complete, and the owner separately approves
+    adding a concern field to systems.yaml. Choosing A alone does not release this phase. Review the
+    scope against current dev before releasing it.
 - id: phase-bnd-08
-  title: Define the entry-point values and publish a prompt operating index covering every governed prompt
+  title: Define the entry-point values and classify every governed prompt against them
   plan: doc-system-boundary-study
   sources:
   - doc-system-boundary-decision-report
@@ -15929,25 +15933,22 @@ items:
     docs/00-working/boundary-study/prompt-classification-rubric.md that settles the ambiguity the
     2026-09-28 validation found (a prompt's position in a sequence versus where the covered work
     begins).
-  - Classify every kind prompt document at the execution revision under that rule, citing the line
-    each value rests on, and have a partition-analyst dispatch classify the same set independently;
-    record every disagreement and how it was settled.
-  - Publish the index in docs/02-prompts/README.md, routing to direct entries and planning starts and
-    listing campaign records as evidence. Change no prompt's status or lifecycle.
+  - Classify every kind prompt document at the execution revision under that rule, one row per prompt,
+    citing the line each value rests on, in a new classification file. Change no prompt.
   acceptance:
-  - "The index lists every document with kind prompt exactly once; a comparison of the index's codes with
-    the output of rg -l '^kind: prompt$' docs prints no difference, and the same comparison on a copy of
-    the index with one row deleted prints that code."
-  - Every disagreement between the two classifications is recorded with its settlement, and no prompt's
-    front matter changes in the diff.
+  - "The classification has one row per document with kind prompt; a comparison of its codes with the
+    output of rg -l '^kind: prompt$' docs prints no difference, and the same comparison on a copy with
+    one row deleted prints that code."
+  - Every row cites a file and line, and a row whose value its cited line does not support is changed to
+    unknown in review; no prompt's front matter changes in the diff.
   verification:
   - uv run python -m src.governance
-  - The index-versus-corpus comparison, run and quoted in the session record, including the run that
-    must fail.
+  - The classification-versus-corpus comparison, run and quoted in the session record, including the run
+    that must fail.
   - git diff --check
   deliverables:
-  - docs/02-prompts/README.md
   - docs/00-working/boundary-study/prompt-classification-rubric.md
+  - docs/00-working/boundary-study/prompt-entry-classification.md
   - docs/03-sessions/
   next_action: Wait for the owner's A/B/C decision in ARCH-012. If the owner selects A, review this
     scope against current dev, release the phase to queued and claim it.
@@ -15971,7 +15972,8 @@ items:
   - phase-bnd-04
   scope:
   - Write at least twenty questions an agent asks when starting work here, each with the governed
-    document or memory that answers it, before running any lookup.
+    document or memory that answers it, before running any lookup. Include one control question whose
+    answer is in no tracked document, so the miss path is exercised.
   - Run each question through the catalog, uv run python -m src.governance --inventory and
     tools/load_context.py filters; record for each whether the expected document was returned.
   - Report hits, misses and what each miss shares. Change no tool, document or memory.
@@ -15980,6 +15982,8 @@ items:
     miss counts sum to the number of questions.
   - A question whose expected document is not returned is recorded as a miss, not dropped or reworded;
     the session record shows at least the command output for each miss.
+  - The control question with no tracked answer is recorded as a miss; a result that reports it as a hit
+    means the check is wrong and fails acceptance.
   verification:
   - uv run python -m src.governance
   - Re-run three recorded lookups, one of them a miss, and compare with the recorded result.
@@ -16148,4 +16152,44 @@ items:
   blocked_reason: Follow-up work under option C of ARCH-012 (split now), which the study rejected. The
     owner has not yet chosen between options A, B and C.
   resume_when: The owner selects option C at ARCH-012's owner decision gate and phase-bnd-12 is complete.
+    Review the scope against current dev before releasing it.
+- id: phase-bnd-14
+  title: Check the prompt classification independently and publish the prompt operating index
+  plan: doc-system-boundary-study
+  sources:
+  - doc-system-boundary-decision-report
+  - doc-system-boundary-study-prompt-rubric
+  systems:
+  - sys-gov-docs
+  owner: repository-owner
+  status: deferred
+  priority: 4
+  session_budget: 1
+  depends_on:
+  - phase-bnd-08
+  scope:
+  - Dispatch a partition-analyst to classify every kind prompt document under phase-bnd-08's rule,
+    without showing it phase-bnd-08's values; record every disagreement and how it was settled.
+  - Publish the index in docs/02-prompts/README.md from the settled values, routing to direct entries
+    and planning starts and listing campaign records as evidence. Change no prompt's status or
+    lifecycle.
+  acceptance:
+  - "The index lists every document with kind prompt exactly once; a comparison of the index's codes with
+    the output of rg -l '^kind: prompt$' docs prints no difference, and the same comparison on a copy of
+    the index with one row deleted prints that code."
+  - Every disagreement between the two classifications is recorded with its settlement, and no prompt's
+    front matter changes in the diff.
+  verification:
+  - uv run python -m src.governance
+  - The index-versus-corpus comparison, run and quoted in the session record, including the run that
+    must fail.
+  - git diff --check
+  deliverables:
+  - docs/02-prompts/README.md
+  - docs/00-working/boundary-study/prompt-entry-classification.md
+  - docs/03-sessions/
+  next_action: Wait for the owner's A/B/C decision in ARCH-012 and for phase-bnd-08.
+  blocked_reason: Follow-up work under option A of ARCH-012 (keep one repository with explicit contracts).
+    The owner has not yet chosen between options A, B and C.
+  resume_when: The owner selects option A at ARCH-012's owner decision gate and phase-bnd-08 is complete.
     Review the scope against current dev before releasing it.
