@@ -55,6 +55,17 @@ changes a document except where a line says it was applied.
 - Open questions 3 and 4, the owner's step order against `GOV-018`, `GOV-002`, `GOV-014` and the
   backlog schema: **plan it later**. Both sides stay as they are until a planning session.
 
+## Status follow-up
+
+- Tracker row 3 (boundary validation): **mark it merged now**. Applied: `Status` merged, `Tip`
+  `238b6a0`.
+- Boundary phases after option A (`phase-bnd-06`, `-08`, `-09` released by A; `-10` to `-13` tied
+  to options B and C): **leave for Prompt Planner**. The fourth prompt reviews their scope against
+  `dev` and releases or cancels them. The backlog was not edited.
+- Ideas `000500` and `000505`, still `open`: **local Ideation** records these rulings as findings
+  and moves their status.
+- `GOV-021` and `ARCH-012`: **both stay `draft`**. `ARCH-012` still needs the F01 wording changes.
+
 ## Branches on `origin` to delete
 
 `agent/cloud-planning-protocol`, `agent/cloud-plan-anatomy` and `agent/cloud-boundary-validation`

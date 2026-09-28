@@ -16,6 +16,6 @@ branch is on `origin/dev`) · `stopped` (the session ended without a handoff fil
 |---|---|---|---|---|---|---|---|
 | 1 | [Planning protocol document](planning-protocol.md) | 000500 | `agent/cloud-planning-protocol` | merged | 280584c | [handoff-planning-protocol.md](handoff-planning-protocol.md) | GOV-021 drafted; partition-adversary review run, 5 findings fixed; gates green |
 | 2 | [Plan anatomy investigation](plan-anatomy.md) | 000505 | `agent/cloud-plan-anatomy` | merged | 9772c21 | [handoff-plan-anatomy.md](handoff-plan-anatomy.md) | Inventory, findings and proposed plan-folder standard; two partition-adversary passes, 7 findings fixed; gates green |
-| 3 | [Boundary validation](boundary-validation.md) | — | `agent/cloud-boundary-validation` | ready | | [handoff-boundary-validation.md](handoff-boundary-validation.md) | One figure error corrected in ARCH-012; A still favoured, C's rejection stronger; plugin weighed for B; 9 review findings dispositioned (1 escalated); phase-bnd-06 to -14 deferred; gates green |
+| 3 | [Boundary validation](boundary-validation.md) | — | `agent/cloud-boundary-validation` | merged | 238b6a0 | [handoff-boundary-validation.md](handoff-boundary-validation.md) | One figure error corrected in ARCH-012; A still favoured, C's rejection stronger; plugin weighed for B; 9 review findings dispositioned (1 escalated); phase-bnd-06 to -14 deferred; gates green |
 
 A fourth prompt, the boundary follow-up, is added here only after the owner's A/B/C decision.
