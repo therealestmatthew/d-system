@@ -1,64 +1,60 @@
 # D-System
 
-A personal system for tracking people, projects, commitments, and tasks — reducing mental overhead by centralizing work responsibilities. It also serves as a platform for HTML generation, reporting, and agentic workflow triggering.
+**An idea realization engine: it carries an idea from the moment it is captured to delivered,
+governed work.** An idea is recorded in an append-only log, triaged, grouped with related ideas,
+turned into a requirement and a plan, reviewed adversarially, decomposed into one-session backlog
+phases and built by agents in isolated worktrees. The owner decides at explicit gates. Most stages
+run today with a person or a coordinating session driving them; running them end to end
+automatically is the planned next step (see below).
 
-**Model-Agnostic Design:** This system is built to be worked on interchangeably by Claude (Anthropic), GPT-4o (OpenAI), and Gemini (Google), and the repository owner.
+**Model-agnostic:** the repository is worked on interchangeably by Claude, OpenAI and Gemini models
+and by the owner.
 
 ---
 
-## 🖥️ Running the demo app
+## 💡 The idea realization engine
 
-The demo stage and workbench UI need `D_SYSTEM_DEMO_TERMINAL=1` on **both** processes, and the
-frontend additionally needs `VITE_API_TARGET` pointed at the backend's port. Setting the flag on
-the backend alone is the common failure — see below.
+The pipeline and its gates are specified in
+[ARCH-006](docs/07-architecture/ARCH-006-idea-realization-system.md) (nine stages, from capture to
+the realization check).
 
-```bash
-# backend — terminal 1
-env D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010
+**In use today**
 
-# frontend — terminal 2
-cd ts && env D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 \
-  npm run dev -- --port 5180 --strictPort
-```
+- **Idea log** — `_data/ideas.jsonl`, append-only, written only through `tools/append_idea.py`
+  (the `/idea` skill); `docs/00-working/ideas.md` is its rendered view.
+- **Triage and partition** — an `idea-triage` agent scouts each open idea for related work; the
+  partition sweep groups triaged ideas into tracks for planning (`/idea-triage`,
+  `/partition-ideas`).
+- **Planning** — requirement first, then a plan measured against the plan quality standard
+  ([GOV-010](docs/08-governance/GOV-010-plan-quality-standard.md)) and reviewed at three altitudes
+  ([GOV-018](docs/08-governance/GOV-018-three-altitude-review-procedure.md)).
+- **Backlog and execution** — [docs/09-backlog/](docs/09-backlog/README.md) holds one-session phases
+  with declared systems and paths; agents claim a phase, work in their own worktree, and integrate
+  only after the post-rebase checks pass and the owner approves. Several sessions can run at once
+  under the coordination protocol
+  ([GOV-017](docs/08-governance/GOV-017-multi-session-coordination-protocol.md)).
+- **The portable plugin** — [`plugins/idea-realization/`](plugins/idea-realization/README.md)
+  packages the idea log, triage, partition sweep, backlog, session skills and document governance
+  as a Claude Code plugin for any git repository.
 
-Then open http://localhost:5180.
+**Planned** — the orchestrator that runs the stages end to end with interrupt gates
+([PLAN-039](docs/01-plans/PLAN-039-idea-realization-system.md),
+[ADR-018](docs/04-decisions/ADR-018-langgraph-orchestration.md)), run budgets and the realization
+check. [systems.yaml](docs/08-governance/systems.yaml) and the backlog say what is built.
 
-**Verify the proxy before using the UI.** This must print `200`, not `404`:
+---
 
-```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5180/api/v1/workbench/injection-sources
-```
+## 🧩 Also in this repository
 
-### If the terminal reports "availability is unknown" and the dropdowns are greyed out
-
-Both symptoms have one cause: the **frontend** process is missing the two variables.
-
-- Without `VITE_API_TARGET`, `ts/vite.config.ts` proxies `/api` to its default `:8000`. If anything
-  else is listening there, every API call returns 404 — which reads as "backend down" rather than
-  "wrong backend". The stage shows "Terminal availability is unknown — the stage backend is not
-  reachable", and all four injection dropdowns render as disabled buttons labelled
-  "(terminal absent)" — they cannot be opened at all. Note that Commands goes dark for a different
-  reason than the other three: it is fed by the static `/demo-commands.json`, never by the proxy,
-  and is disabled only because the terminal is not enabled.
-- Without `D_SYSTEM_DEMO_TERMINAL=1`, the `serveRepositoryFiles` plugin is not registered, so
-  `/workbench-file/*` is never routed. The request does not 404 — the dev server's history fallback
-  answers it with the app shell at HTTP 200, so the HTML Viewer goes silently blank with no error
-  anywhere.
-
-**Do not trust the in-app message.** If the dropdowns are reachable in some other failure, their
-404 state tells you to start the backend with `D_SYSTEM_DEMO_TERMINAL=1` — advice that is wrong in
-exactly this case, because the backend already has it. The frontend is the process to check:
-
-```bash
-tr '\0' '\n' < "/proc/$(pgrep -f 'node.*vite --port 5180' | head -1)/environ" | grep -E 'D_SYSTEM|VITE_API'
-```
-
-Both `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010` must appear. If they do
-not, the environment prefix was dropped — recalling the launch command from shell history is the
-usual way that happens, since the prefix is easy to lose from a recalled line. Restart with the
-`env ...` form above, which keeps the variables attached to the whole invocation. (`head -1` matters:
-without it, `pgrep` run from inside a `bash -c` wrapper also matches the wrapper's own command line
-and the redirect fails with "ambiguous redirect".)
+- **Personal productivity core** — the owner's people, projects, commitments and tasks as JSON
+  source records, projected into DuckDB for queries and reports (see *Critical Data Architecture
+  Rule* below).
+- **Workbench** — a React/FastAPI browser workspace with a terminal, viewers, explorers and notes
+  (see *Running the workbench demo* below).
+- **Governance framework** — document codes, lifecycle rules, the catalog and the checks every
+  change passes ([GOV-001](docs/08-governance/GOV-001-protocol.md),
+  [catalog.md](docs/08-governance/catalog.md)).
+- **Shared brain** — model-agnostic memory entries in `brain/` (see below).
 
 ---
 
@@ -228,6 +224,62 @@ When adding a new domain entity, execute in this exact order (see `docs/02-promp
 7. Run `uv run python tools/rebuild_db.py`
 8. Write tests in `test/`
 9. Add React components in `ts/src/components/` (if UI in scope)
+
+---
+
+## 🖥️ Running the workbench demo
+
+The demo stage and workbench UI need `D_SYSTEM_DEMO_TERMINAL=1` on **both** processes, and the
+frontend additionally needs `VITE_API_TARGET` pointed at the backend's port. Setting the flag on
+the backend alone is the common failure — see below.
+
+```bash
+# backend — terminal 1
+env D_SYSTEM_DEMO_TERMINAL=1 uv run uvicorn src.main:app --port 8010
+
+# frontend — terminal 2
+cd ts && env D_SYSTEM_DEMO_TERMINAL=1 VITE_API_TARGET=http://localhost:8010 \
+  npm run dev -- --port 5180 --strictPort
+```
+
+Then open http://localhost:5180.
+
+**Verify the proxy before using the UI.** This must print `200`, not `404`:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:5180/api/v1/workbench/injection-sources
+```
+
+### If the terminal reports "availability is unknown" and the dropdowns are greyed out
+
+Both symptoms have one cause: the **frontend** process is missing the two variables.
+
+- Without `VITE_API_TARGET`, `ts/vite.config.ts` proxies `/api` to its default `:8000`. If anything
+  else is listening there, every API call returns 404 — which reads as "backend down" rather than
+  "wrong backend". The stage shows "Terminal availability is unknown — the stage backend is not
+  reachable", and all four injection dropdowns render as disabled buttons labelled
+  "(terminal absent)" — they cannot be opened at all. Note that Commands goes dark for a different
+  reason than the other three: it is fed by the static `/demo-commands.json`, never by the proxy,
+  and is disabled only because the terminal is not enabled.
+- Without `D_SYSTEM_DEMO_TERMINAL=1`, the `serveRepositoryFiles` plugin is not registered, so
+  `/workbench-file/*` is never routed. The request does not 404 — the dev server's history fallback
+  answers it with the app shell at HTTP 200, so the HTML Viewer goes silently blank with no error
+  anywhere.
+
+**Do not trust the in-app message.** If the dropdowns are reachable in some other failure, their
+404 state tells you to start the backend with `D_SYSTEM_DEMO_TERMINAL=1` — advice that is wrong in
+exactly this case, because the backend already has it. The frontend is the process to check:
+
+```bash
+tr '\0' '\n' < "/proc/$(pgrep -f 'node.*vite --port 5180' | head -1)/environ" | grep -E 'D_SYSTEM|VITE_API'
+```
+
+Both `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010` must appear. If they do
+not, the environment prefix was dropped — recalling the launch command from shell history is the
+usual way that happens, since the prefix is easy to lose from a recalled line. Restart with the
+`env ...` form above, which keeps the variables attached to the whole invocation. (`head -1` matters:
+without it, `pgrep` run from inside a `bash -c` wrapper also matches the wrapper's own command line
+and the redirect fails with "ambiguous redirect".)
 
 ---
 
