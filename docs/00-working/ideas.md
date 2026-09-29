@@ -23111,3 +23111,29 @@ Neighbours: 000389 (session state and resumability: a resume brief per session r
 - relates_to → `000389`
 - relates_to → `000340`
 - relates_to → `None`
+
+---
+
+## 000516 · Teach the workbench's idea-queue precedence map and the idea explorer's status list the set-aside status that phase-idg-19 adds
+
+**Created 2026-09-29T02:52:14-04:00 · Status: `open`**
+
+Session 2 - Builder B, 2026-09-29, as given: "teach the workbench's idea-queue precedence map (src/api/routes/workbench.py) and the idea explorer's STATUSES list (ts/src/stage/IdeaExplorerRegion.tsx) the set-aside status that phase-idg-19 adds. Otherwise set-aside ideas sort as "unknown" and can't be filtered."
+
+**Links**
+
+- relates_to → `None`
+- relates_to ← `000517`
+
+---
+
+## 000517 · Add the set-aside status to the idea-realization plugin's writer and schema, with a parity test against the repository writer
+
+**Created 2026-09-29T02:52:14-04:00 · Status: `open`**
+
+Session 2 - Builder B, 2026-09-29, as given: "once phase-idg-19 merges, the idea-realization plugin's own writer and schema (plugins/idea-realization/scripts/ideas.py, its schemas/idea.schema.json) will lack the set-aside status. Add the status there, plus a parity test between the repository writer and the plugin writer so their status tables can't drift apart."
+
+**Links**
+
+- relates_to → `000516`
+- relates_to → `None`
