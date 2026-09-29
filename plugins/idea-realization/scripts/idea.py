@@ -396,7 +396,7 @@ def off_integration_warning(config: paths.Config) -> str | None:
     where = f"branch {branch}" if branch else "a detached HEAD"
     return (
         f"ideas are recorded only on the integration branch in the primary checkout "
-        f"({integration} in {primary}); writing anyway on {where} in {checkout}"
+        f"({integration} in {primary}); this run is on {where} in {checkout}"
     )
 
 
