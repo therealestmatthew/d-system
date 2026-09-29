@@ -10159,7 +10159,8 @@ items:
   - sys-contracts
   - sys-portfolio
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-b
   priority: 1
   session_budget: 1
   depends_on:
@@ -10187,11 +10188,17 @@ items:
   - schemas/idea.schema.json
   - tools/append_idea.py
   - src/db/ideas.py
-  - test/
+  - test/test_ideas.py
+  - test/test_overview_tools.py
+  - test/test_orchestrator.py
+  - test/test_idea_partition_record.py
   - schemas/idea-partition-record.schema.json
   - agent-workflows/partition-ideas.md
   - .claude/skills/partition-ideas/SKILL.md
   - .agents/skills/partition-ideas/SKILL.md
+  - tools/overview_metrics.py
+  - src/orchestrator/state.py
+  - agent-workflows/idea.md
   next_action: Split out of phase-idg-01 on 2026-09-24 (Session Manager sizing call, owner ruling (b) on
     000417), because folding the status and the partition field into phase-idg-01 took it past
     session_budget 1. Do not start before phase-idg-01 ships; this phase adds a status to the same
