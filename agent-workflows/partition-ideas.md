@@ -294,7 +294,8 @@ each fine group exactly as the record names it.
 **The record** is the same partition as JSON, validated against
 `schemas/idea-partition-record.schema.json`: `corpus_date`, the markdown's path, the manifest's
 `corpus_size`, `status` and `shuffle_seed`, `state: proposed`, every track with its fine groups and
-member ids, the unbatched ideas with reasons, and both decline tiers. A track's `disposition` stays
+member ids, the unbatched ideas with reasons, the owner's hold-outs with reasons (`held_out`, empty
+until GATE 3), and both decline tiers. A track's `disposition` stays
 `null` unless the owner rules one; the pack asks for none.
 
 **Check the pair before going on.** This validates the record, checks it against the manifest's
@@ -315,6 +316,7 @@ if not problems:
     corpus_ids = set(re.findall(r"^## (\d{6}) — ", corpus_text, re.M))  # one per idea entry
     placed = [i for t in record["tracks"] for g in t["groups"] for i in g["ideas"]]
     placed += [u["id"] for u in record["unbatched"]]
+    placed += [h["id"] for h in record.get("held_out", [])]
     manifest = json.loads((corpus / "manifest.json").read_text(encoding="utf-8"))
     stamp = (f"<!-- partition-ideas: seed={manifest['shuffle_seed']} corpus_size={manifest['corpus_size']} "
              f"status={','.join(manifest.get('status', ['triaged']))} -->")
@@ -333,7 +335,7 @@ if not problems:
     both = [c["id"] for c in tiers["nominated_by_both"]]
     one = [c["id"] for c in tiers["nominated_by_one"]]
     problems += [f"decline candidate listed twice: {i}" for i in sorted({i for i in both + one if (both + one).count(i) > 1})]
-    problems += [f"decline candidate not in a group or unbatched: {i}" for i in sorted(set(both + one) - set(placed))]
+    problems += [f"decline candidate not in a group, unbatched or held out: {i}" for i in sorted(set(both + one) - set(placed))]
     problems += [f"decline candidate not in the markdown: {i}" for i in sorted(set(both + one) - md_ids)]
     names = [t["name"] for t in record["tracks"]] + [g["name"] for t in record["tracks"] for g in t["groups"]]
     problems += [f"name not in the markdown: {n!r}" for n in names if n not in markdown]
@@ -370,9 +372,16 @@ start of the sweep (`git diff --quiet -- _data/ideas.jsonl` against the commit y
 
 **Stop.** Present the partition, audit 2's findings and the checklist. The owner accepts or corrects
 the partition, and rules on **every decline candidate individually**. Apply their corrections to
-both the markdown and the record, and re-run the step 5 check. Set the record's `state` to
-`accepted` only on the owner's explicit acceptance. A decline ruling changes no idea's status here;
-recording it in the idea log is a separate, owner-directed action.
+both the markdown and the record, and re-run the step 5 check.
+
+When the owner **holds an idea out** of the partition without discarding it, move it from its group
+or from `unbatched` into the record's `held_out` list with the owner's reason, and list it under a
+held-out heading in the markdown. Record it there, not as an unbatched reason: a hold-out is the
+owner's ruling, not a synthesis finding. Set the record's `state` to
+`accepted` only on the owner's explicit acceptance. Neither a decline ruling nor a hold-out
+changes any idea's status here: this workflow writes nothing to `_data/ideas.jsonl`. Moving a
+held-out idea to `set_aside`, or a declined one to `discarded`, is a separate, owner-directed action
+through `tools/append_idea.py`.
 
 ## Closing — the spend posture
 

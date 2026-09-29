@@ -100,7 +100,12 @@
     "unbatched": {
       "type": "array",
       "items": { "$ref": "#/definitions/reasoned_id" },
-      "description": "Ideas with no confident home, each with its reason. Every corpus idea is in exactly one track group or here."
+      "description": "Ideas with no confident home, each with its reason. Every corpus idea is in exactly one track group, here, or in held_out."
+    },
+    "held_out": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/reasoned_id" },
+      "description": "Ideas the owner held out of this partition at GATE 3 without discarding them, each with the owner's reason (idea 000417). A hold-out is recorded here, not as an unbatched reason: it is the owner's ruling, not a synthesis finding. Optional, so a record written before the field existed still validates. Nothing here changes an idea's status; moving a held-out idea to set_aside in _data/ideas.jsonl is a separate, owner-directed action."
     },
     "decline_candidates": {
       "type": "object",
