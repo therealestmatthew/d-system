@@ -13,22 +13,60 @@ from conftest import PLUGIN_ROOT, SCRIPTS
 
 HEADER = re.compile(r"\A# /// script\n(?:#.*\n)*?# ///\n")
 SCRIPTS_LIST = sorted(p for p in SCRIPTS.glob("*.py") if p.name != "__init__.py")
-ALLOWED = {"jsonschema", "pyyaml"}
+ALLOWED = {"jsonschema", "pyyaml", "filelock"}
+#: Packages every header must pin to one exact version, the same in each header.
+PINNED = {"filelock"}
+REQUIREMENT = re.compile(r"([A-Za-z0-9_.-]+)\s*(.*)")
 
 
 def python_files() -> list[Path]:
     return sorted(p for p in SCRIPTS.rglob("*.py") if "__pycache__" not in p.parts)
 
 
-@pytest.mark.parametrize("script", SCRIPTS_LIST, ids=lambda p: p.name)
-def test_inline_metadata_names_only_allowed_packages(script: Path) -> None:
-    text = script.read_text()
+def requirements(text: str) -> dict[str, str]:
+    """Each package a PEP 723 header names, mapped to its version specifier ('' when none)."""
     match = HEADER.match(text)
-    assert match, f"{script.name} lacks a PEP 723 header"
+    assert match, "no PEP 723 header"
     dependencies = re.search(r"dependencies = \[(.*?)\]", match.group(0))
     assert dependencies
-    names = {name.strip().strip('"') for name in dependencies.group(1).split(",") if name.strip()}
-    assert names <= ALLOWED
+    found = {}
+    for entry in dependencies.group(1).split(","):
+        if entry.strip():
+            parsed = REQUIREMENT.fullmatch(entry.strip().strip('"'))
+            assert parsed, entry
+            found[parsed.group(1)] = parsed.group(2).strip()
+    return found
+
+
+def pin_conflicts(headers: dict[str, str]) -> list[str]:
+    """Every pinned package that is unpinned somewhere or pinned to two versions."""
+    specifiers: dict[str, set[str]] = {}
+    for text in headers.values():
+        for name, specifier in requirements(text).items():
+            if name in PINNED:
+                specifiers.setdefault(name, set()).add(specifier)
+    return sorted(
+        f"{name}: {sorted(found)}" for name, found in specifiers.items()
+        if len(found) != 1 or not next(iter(found)).startswith("==")
+    )
+
+
+@pytest.mark.parametrize("script", SCRIPTS_LIST, ids=lambda p: p.name)
+def test_inline_metadata_names_only_allowed_packages(script: Path) -> None:
+    assert set(requirements(script.read_text())) <= ALLOWED
+
+
+def test_a_pinned_package_has_one_exact_version_in_every_header() -> None:
+    assert pin_conflicts({p.name: p.read_text() for p in SCRIPTS_LIST}) == []
+
+
+def test_two_headers_pinning_different_versions_conflict() -> None:
+    def header(specifier: str) -> str:
+        return f'# /// script\n# dependencies = ["filelock{specifier}"]\n# ///\n'
+
+    assert pin_conflicts({"a": header("==1.0"), "b": header("==1.0")}) == []
+    assert pin_conflicts({"a": header("==1.0"), "b": header("==2.0")}) != []
+    assert pin_conflicts({"a": header(">=1.0")}) != []
 
 
 def test_no_script_derives_data_paths_from_its_location_or_imports_src() -> None:

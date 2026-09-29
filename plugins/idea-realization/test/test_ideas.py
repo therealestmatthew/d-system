@@ -14,8 +14,10 @@ import io
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +26,7 @@ import ideas
 import paths
 import pytest
 import yaml  # type: ignore[import-untyped]
-from conftest import PLUGIN_ROOT
+from conftest import PLUGIN_ROOT, SCRIPTS
 from ideas import IdeaError, fold, identity, link_diagnostics, load_events
 
 EPOCH = dt.datetime(2030, 1, 1, tzinfo=dt.UTC)
@@ -1109,3 +1111,197 @@ def test_the_triage_search_list_is_a_documented_option() -> None:
     assert key.kind == "paths" and key.default
     skill = (PLUGIN_ROOT / "skills" / "idea-triage" / "SKILL.md").read_text(encoding="utf-8")
     assert "${user_config.triage_search}" in skill
+
+
+# --- Concurrent writers serialize on one lock per repository --------------------------------
+
+
+def git_repo(root: Path, branch: str = "trunk") -> Path:
+    """Make `root` a git repository on `branch` with one commit, and return it."""
+    root.mkdir(parents=True, exist_ok=True)
+    for args in (("init", "-q", "-b", branch), ("commit", "-q", "--allow-empty", "-m", "fixture")):
+        subprocess.run(
+            ["git", "-C", str(root), "-c", "user.name=fixture", "-c",
+             "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", *args],
+            capture_output=True, text=True, check=True,
+        )
+    return root
+
+
+def linked_worktree(primary: Path, path: Path, branch: str) -> Path:
+    subprocess.run(["git", "-C", str(primary), "worktree", "add", "-q", "-b", branch, str(path)],
+                   capture_output=True, text=True, check=True)
+    return path
+
+
+def log_of(root: Path) -> Path:
+    return paths.resolve({"root": str(root)}, env={}).path("ideas_path")
+
+
+@pytest.fixture
+def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A git repository whose integration branch is its current branch, so no warning prints."""
+    monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
+    return git_repo(tmp_path / "repo")
+
+
+def fold_held_at(barrier: threading.Barrier, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Make the writer's fold wait for a second writer, or give up waiting after two seconds.
+
+    Without a lock both writers fold the same log before either appends. With one, the second
+    writer cannot reach the fold while the first holds the lock, so the first times out here,
+    the barrier breaks, and each writer folds the log the other left.
+    """
+    real_fold = idea.fold
+
+    def held(events: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        try:
+            barrier.wait(timeout=2)
+        except threading.BrokenBarrierError:
+            pass
+        return real_fold(events)
+
+    monkeypatch.setattr(idea, "fold", held)
+
+
+def in_threads(*calls: list[str], root: Path) -> list[int]:
+    codes: list[int] = []
+    threads = [threading.Thread(target=lambda a=args: codes.append(cli(root, *a)))
+               for args in calls]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    return codes
+
+
+def test_two_adds_held_at_a_barrier_take_distinct_ids(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Two writers that fold before either appends would both take the first id."""
+    fold_held_at(threading.Barrier(2), monkeypatch)
+    codes = in_threads(["add", "--title", "First", "--body", "Body"],
+                       ["add", "--title", "Second", "--body", "Body"], root=repo)
+    assert codes == [0, 0]
+    assert sorted(state_of(log_of(repo))) == [ONE, TWO]
+
+
+def test_two_concurrent_status_moves_admit_exactly_one(
+    repo: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The second move sees the first one's result and is refused as illegal."""
+    assert cli(repo, "add", "--title", "First", "--body", "Body") == 0
+    fold_held_at(threading.Barrier(2), monkeypatch)
+    codes = in_threads(["status", ONE, "reviewing"], ["status", ONE, "reviewing"], root=repo)
+    assert sorted(codes) == [0, 1]
+    assert "illegal transition" in capsys.readouterr().err
+    assert state_of(log_of(repo))[ONE]["status"] == "reviewing"
+
+
+def test_twenty_concurrent_add_processes_leave_twenty_ids(repo: Path) -> None:
+    script = str(SCRIPTS / "idea.py")
+    writers = [
+        subprocess.Popen([sys.executable, script, "add", "--title", f"Idea {n}", "--body", "Body",
+                          "--root", str(repo)],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        for n in range(20)
+    ]
+    for writer in writers:
+        writer.communicate(timeout=120)
+    listed = subprocess.run([sys.executable, script, "list", "--root", str(repo)],
+                            capture_output=True, text=True, check=False)
+    assert listed.returncode == 0, listed.stderr
+    ids = [line.split(" | ")[0] for line in listed.stdout.splitlines()]
+    assert len(ids) == 20 and len(set(ids)) == 20
+
+
+def test_every_worktree_resolves_one_lock_under_the_git_common_directory(tmp_path: Path) -> None:
+    primary = git_repo(tmp_path / "repo")
+    worktree = linked_worktree(primary, tmp_path / "wt", "side")
+    common = subprocess.run(
+        ["git", "-C", str(worktree), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    from_primary = idea.lock_path(paths.resolve({"root": str(primary)}, env={}))
+    from_worktree = idea.lock_path(paths.resolve({"root": str(worktree)}, env={}))
+    assert from_primary == from_worktree == Path(common) / "idea-realization" / "ideas.lock"
+
+
+def test_outside_a_git_repository_the_lock_sits_beside_the_log(config: paths.Config,
+                                                               log: Path) -> None:
+    assert idea.lock_path(config) == log.with_name(log.name + ".lock")
+    assert cli(config.root, "add", "--title", "First", "--body", "Body") == 0
+    assert list(state_of(log)) == [ONE]
+
+
+def test_a_held_lock_times_out_and_appends_nothing(
+    repo: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from filelock import FileLock
+
+    assert cli(repo, "add", "--title", "First", "--body", "Body") == 0
+    before = log_of(repo).read_bytes()
+    lock = idea.lock_path(paths.resolve({"root": str(repo)}, env={}))
+    monkeypatch.setattr(idea, "LOCK_TIMEOUT_SECONDS", 0.2)
+    with FileLock(lock):
+        code = cli(repo, "add", "--title", "Second", "--body", "Body")
+    assert code != 0
+    assert str(lock) in capsys.readouterr().err
+    assert log_of(repo).read_bytes() == before
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="SIGKILL is POSIX-only")
+def test_a_writer_killed_while_holding_the_lock_does_not_block_the_next(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    lock = idea.lock_path(paths.resolve({"root": str(repo)}, env={}))
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    holder = subprocess.Popen(
+        [sys.executable, "-c",
+         "import sys, time\nfrom filelock import FileLock\n"
+         "FileLock(sys.argv[1]).acquire()\nprint('held', flush=True)\ntime.sleep(120)\n",
+         str(lock)],
+        stdout=subprocess.PIPE, text=True,
+    )
+    assert holder.stdout is not None and holder.stdout.readline().strip() == "held"
+    holder.send_signal(signal.SIGKILL)
+    holder.wait(timeout=10)
+    monkeypatch.setattr(idea, "LOCK_TIMEOUT_SECONDS", 5)
+    assert cli(repo, "add", "--title", "First", "--body", "Body") == 0
+    assert list(state_of(log_of(repo))) == [ONE]
+
+
+# --- The writer warns off the integration branch in the primary checkout ---------------------
+
+
+WARNING = "ideas are recorded only on the integration branch in the primary checkout"
+
+
+def test_a_linked_worktree_warns_and_still_writes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
+    primary = git_repo(tmp_path / "repo")
+    worktree = linked_worktree(primary, tmp_path / "wt", "side")
+    assert cli(worktree, "add", "--title", "First", "--body", "Body") == 0
+    err = capsys.readouterr().err
+    assert WARNING in err and "side" in err and str(worktree.resolve()) in err
+    assert list(state_of(log_of(worktree))) == [ONE]
+
+
+def test_the_primary_checkout_on_another_branch_warns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
+    primary = git_repo(tmp_path / "repo", branch="feature")
+    assert cli(primary, "add", "--title", "First", "--body", "Body") == 0
+    err = capsys.readouterr().err
+    assert WARNING in err and "feature" in err
+    assert list(state_of(log_of(primary))) == [ONE]
+
+
+def test_the_primary_checkout_on_the_integration_branch_does_not_warn(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert cli(repo, "add", "--title", "First", "--body", "Body") == 0
+    assert WARNING not in capsys.readouterr().err
