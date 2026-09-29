@@ -104,13 +104,12 @@ pinned package present.
 `status: active`, agent `agent-builder-a`, on dev since `95ce893`; deliverables widened by the
 plugin README at `5db0c00`. Under the Session Manager's contract the phase stays active until the
 owner approves the merge; the completion edit is made on dev after the fast-forward. Next action:
-READY to the Session Manager, with the merge held for the owner's ruling on the lock outside a git
-repository (below).
+merge to dev (the owner approved it in this session), then the completion edit on dev.
 
 ## Unresolved
 
-- The owner's ruling on where the lock goes when the root is not a git repository (option A built;
-  see Decisions). The Session Manager holds the merge until it is given.
+None. The owner ruled option A on the morning of 2026-09-29, in the Session Manager session (see
+Decisions), and approved the merge in this session.
 
 ## Review
 
@@ -181,7 +180,10 @@ the owner through the Session Manager's morning report. A (built, recommended): 
 is the log's path plus `.lock`; "never write without the lock" holds and no existing test changes.
 B: refuse outside git, as `reservations.py` does, at the cost of a `git init` in about 20 fixtures.
 C: no lock outside git, which breaks "never writes without the lock". The Session Manager directed
-A, noted in `docs/protocol.md` only, with `ADR-025` untouched until the owner rules.
+A, noted in `docs/protocol.md` only, with `ADR-025` untouched until the owner rules. The owner ruled
+option A as built on the morning of 2026-09-29, in the Session Manager session: the lock is
+`<ideas_path>.lock` beside the log outside git, noted in `docs/protocol.md` only, and `ADR-025` is
+unchanged.
 
 **Assumptions the session stated rather than asked.**
 
@@ -223,4 +225,4 @@ no lock" sentence corrected; the rule under §7 Ideas), in `skills/idea/SKILL.md
 ## Left undone
 
 - The Windows lock path has no test run. It is out of scope under `PLAN-052`, idea `000484`.
-- `ADR-025` does not mention the fallback location outside git. That waits on the owner's ruling.
+- `ADR-025` does not mention the fallback location outside git, by the owner's ruling.
