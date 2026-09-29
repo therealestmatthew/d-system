@@ -183,6 +183,13 @@ From [`owner-rulings-2026-09-28.md`](owner-rulings-2026-09-28.md), quoted where 
   them."
 - `ARCH-012` and `GOV-021`: **both stay `draft`**. Do not change either document's `status`.
 
+A later ruling, given 2026-09-29 in the local Session Manager's session while this prompt was being
+reviewed, and recorded only here:
+
+- **`phase-bnd-10`, `phase-bnd-11` and `phase-bnd-14` stay `deferred`.** The owner ruled this knowing
+  it departs from `PLAN-050`'s rule that the other options' phases are cancelled and the chosen
+  option's released. Do not ask again.
+
 ## Read first
 
 `AGENTS.md`; `owner-rulings-2026-09-28.md`; `GOV-018` in full; `GOV-002-backlog-protocol.md`
@@ -236,33 +243,26 @@ For each of `phase-bnd-06` to `phase-bnd-14`, read its full entry in `backlog.ya
 has since been done elsewhere (search the backlog and `docs/` before assuming nothing overlaps).
 Revise a field only where current `dev` makes it wrong, and record each revision.
 
-What this prompt proposes for each phase, from the owner's rulings and `ARCH-012`:
+The action for each phase, from the owner's rulings and `ARCH-012`:
 
-| Phase | Tied to | Proposed action | Why |
+| Phase | Tied to | Action | Why |
 |---|---|---|---|
 | `phase-bnd-06` (concern ownership and interface contract) | A | Release to `queued` | The owner ruled that A releases it |
 | `phase-bnd-07` (a `concern` field in the registry) | A | Keep `deferred`; rewrite `blocked_reason` and `resume_when` | The owner approved it but kept it deferred until `phase-bnd-06` is complete. Record the approval (2026-09-28) so the only remaining condition is `phase-bnd-06`'s completion |
 | `phase-bnd-08` (entry-point values and prompt classification) | A | Release to `queued` | The owner ruled that A releases it |
 | `phase-bnd-09` (retrieval measurement) | A | Release to `queued` | The owner ruled that A releases it |
-| `phase-bnd-14` (independent classification check and prompt operating index) | A | **Ask the owner** | It publishes a prompt operating index, which is `ARCH-012`'s separate *Prompt navigation treatment* decision. The owner has not ruled on that row. Recommendation: keep it `deferred`, with `resume_when` naming that decision and `phase-bnd-08`'s completion |
-| `phase-bnd-10` (three extraction candidates against B's preconditions) | B | **Ask the owner** | Change 6 of the approved wording names `phase-bnd-10` as the candidate assessment, and the *Owner decision gate* allows a candidate "after new evidence satisfies its preconditions", even under A. Cancelling it would leave change 6 pointing at a cancelled phase. Recommendation: keep it `deferred`, with `resume_when` naming the evidence threshold row of the *Owner decision gate* |
-| `phase-bnd-11` (extraction discovery for a named candidate) | B | **Ask the owner** | It depends on `phase-bnd-10`. Recommendation: the same as `phase-bnd-10` |
+| `phase-bnd-14` (independent classification check and prompt operating index) | A | Keep `deferred` (owner, 2026-09-29) | It publishes a prompt operating index, which is `ARCH-012`'s separate *Prompt navigation treatment* decision, not yet ruled. Rewrite `resume_when` to name that decision and `phase-bnd-08`'s completion |
+| `phase-bnd-10` (three extraction candidates against B's preconditions) | B | Keep `deferred` (owner, 2026-09-29) | Change 6 of the approved wording names `phase-bnd-10` as the candidate assessment, and the *Owner decision gate* allows a candidate "after new evidence satisfies its preconditions", even under A. Rewrite `resume_when` to name the evidence threshold row of the *Owner decision gate* |
+| `phase-bnd-11` (extraction discovery for a named candidate) | B | Keep `deferred` (owner, 2026-09-29) | It depends on `phase-bnd-10`. Rewrite `resume_when` as for `phase-bnd-10`, plus `phase-bnd-10`'s completion and the owner naming a candidate |
 | `phase-bnd-12` (migration architecture for a split) | C | Cancel | The owner chose A. Option C's work is withdrawn |
 | `phase-bnd-13` (cross-repository governance for a split) | C | Cancel | As `phase-bnd-12` |
 
-**The three questions depart from recorded rules, and the owner must be told so.** The owner's
-ruling names only two outcomes ("releases or cancels"), and the `PLAN-050` overview's *Next steps
-after the owner's decision* already says: "When the owner chooses, the chosen option's phases are
-reviewed against current `dev` and released to `queued`; the other options' phases are cancelled
-with the decision as the reason." Under that rule `phase-bnd-14` would be released, and
-`phase-bnd-10` and `-11` cancelled. The recommendations above keep all three deferred instead, for
-the reasons in the table. So each question states, in the message text: the recorded rule and what
-it would do; the recommendation and why; and, for `phase-bnd-10`, that cancelling it leaves the
-approved change 6 naming a cancelled phase, because the approved wording is applied unchanged.
-
-Ask the three questions in one batch before editing `backlog.yaml`, with the recommendation first.
-Whatever the owner answers, Step 2's `PLAN-050` update rewrites that *Next steps* sentence so the
-plan and the backlog agree, and the amendment line records the owner's answer. Then:
+**Reconcile `PLAN-050`.** Its *Next steps after the owner's decision* says: "When the owner
+chooses, the chosen option's phases are reviewed against current `dev` and released to `queued`;
+the other options' phases are cancelled with the decision as the reason." The owner's 2026-09-29
+ruling keeps `phase-bnd-10`, `-11` and `-14` deferred instead. Step 2's `PLAN-050` update rewrites
+that sentence to match the table above, naming the ruling and its date, so the plan and the backlog
+agree. Then:
 
 - **Release** (`deferred` to `queued`): remove `blocked_reason` and `resume_when`, and make sure
   `next_action` is the first useful step for whoever claims it. The backlog schema has no notes
@@ -311,8 +311,9 @@ Before the gates, dispatch `partition-adversary` once more, with this brief:
 > *Owner decision gate* and `updated` (`git diff origin/dev...HEAD -- docs/07-architecture/`);
 > `ARCH-012`'s `status` is still `draft`; (2) every `phase-bnd-*` status change in
 > `docs/09-backlog/backlog.yaml` matches the owner's rulings in
-> `docs/00-working/cloud-prompts/owner-rulings-2026-09-28.md` or an owner answer recorded in the
-> handoff file, and follows `GOV-002`'s lifecycle; no released phase depends on a cancelled phase;
+> `docs/00-working/cloud-prompts/owner-rulings-2026-09-28.md`, the 2026-09-29 ruling in
+> `docs/00-working/cloud-prompts/boundary-option-a.md` (*What the owner ruled*), or an owner answer
+> recorded in the handoff file, and follows `GOV-002`'s lifecycle; no released phase depends on a cancelled phase;
 > no phase was added to `next_up`; (3) F01's owner disposition in
 > `docs/08-governance/reviews/2026-09-28-plan-050.json` is valid against
 > `schemas/adversarial-finding.schema.json` and names a commit that exists; (4) the `PLAN-050`
@@ -336,4 +337,4 @@ Fix or disposition every finding. List them in the handoff file.
 Normally the owner pastes the master prompt's kickoff instead. Use this one only to run this
 prompt out of order, and only once every earlier row in `status.md` is merged.
 
-Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/boundary-option-a.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/boundary-option-a.md`) and follow it exactly. It is the boundary follow-up after the owner chose option A: it applies the seven approved `ARCH-012` wording changes, records the owner's decisions, and releases, keeps deferred or cancels the deferred `phase-bnd-*` phases after reviewing them against `dev`, on branch `agent/cloud-boundary-option-a`. Tests run only in this clone on that branch, never on `dev`. Never commit to, merge into or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
+Kickoff: you are running owner-directed, unclaimed work in a cloud clone of this repository. Run `git fetch origin dev`, then read `docs/00-working/cloud-prompts/boundary-option-a.md` from `origin/dev` (`git show origin/dev:docs/00-working/cloud-prompts/boundary-option-a.md`) and follow it exactly. It is the boundary follow-up after the owner chose option A: it applies the seven approved `ARCH-012` wording changes, records the owner's decisions, and releases, keeps deferred or cancels the deferred `phase-bnd-*` phases as the owner ruled, after reviewing them against `dev`, on branch `agent/cloud-boundary-option-a`. Tests run only in this clone on that branch, never on `dev`. Never commit to, merge into or push `dev`. Ask me questions with AskUserQuestion, batched, drafts in the message text and never in previews. Finish by pushing your branch with the handoff file the prompt describes.
