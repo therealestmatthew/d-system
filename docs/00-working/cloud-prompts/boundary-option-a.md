@@ -177,6 +177,8 @@ From [`owner-rulings-2026-09-28.md`](owner-rulings-2026-09-28.md), quoted where 
 - `phase-bnd-07` (a required `concern` field in `systems.yaml`): **approved**. "It is still
   deferred until `phase-bnd-06` is complete; its scope is reviewed against current `dev` before it
   is released."
+- `phase-bnd-07`: **approved**, but "still deferred until `phase-bnd-06` is complete; its scope is
+  reviewed against current `dev` before it is released."
 - The deferred phases: "The fourth prompt reviews their scope against `dev` and releases or cancels
   them."
 - `ARCH-012` and `GOV-021`: **both stay `draft`**. Do not change either document's `status`.
@@ -217,8 +219,8 @@ decision record.
    for the other three rows. The owner has not ruled on the first portability candidate, prompt
    navigation, or the evidence threshold.
 2. **The review record** `2026-09-28-plan-050.json`. F01 carries a planner `escalated-g3`
-   disposition. Append the owner's G3 disposition as the schema requires (`by: owner`), with a
-   reason naming the ruling file and the commit that applied the seven changes. Validate with
+   disposition. Append the owner's G3 disposition as the schema requires (`by: owner`,
+   `value: fixed`), with a reason naming the ruling file and the commit that applied the seven changes. Validate with
    `uv run pytest test/test_adversarial_finding_schema.py`. If the schema rejects the entry, report
    the output and ask the owner; do not change the schema.
 3. **`PLAN-050` overview.** Add a dated amendment line recording that the owner selected option A,
@@ -248,18 +250,30 @@ What this prompt proposes for each phase, from the owner's rulings and `ARCH-012
 | `phase-bnd-12` (migration architecture for a split) | C | Cancel | The owner chose A. Option C's work is withdrawn |
 | `phase-bnd-13` (cross-repository governance for a split) | C | Cancel | As `phase-bnd-12` |
 
-Ask the three owner questions in one batch before editing `backlog.yaml`, with the recommendation
-first and the reason in the message text. Then:
+**The three questions depart from recorded rules, and the owner must be told so.** The owner's
+ruling names only two outcomes ("releases or cancels"), and the `PLAN-050` overview's *Next steps
+after the owner's decision* already says: "When the owner chooses, the chosen option's phases are
+reviewed against current `dev` and released to `queued`; the other options' phases are cancelled
+with the decision as the reason." Under that rule `phase-bnd-14` would be released, and
+`phase-bnd-10` and `-11` cancelled. The recommendations above keep all three deferred instead, for
+the reasons in the table. So each question states, in the message text: the recorded rule and what
+it would do; the recommendation and why; and, for `phase-bnd-10`, that cancelling it leaves the
+approved change 6 naming a cancelled phase, because the approved wording is applied unchanged.
+
+Ask the three questions in one batch before editing `backlog.yaml`, with the recommendation first.
+Whatever the owner answers, Step 2's `PLAN-050` update rewrites that *Next steps* sentence so the
+plan and the backlog agree, and the amendment line records the owner's answer. Then:
 
 - **Release** (`deferred` to `queued`): remove `blocked_reason` and `resume_when`, and make sure
   `next_action` is the first useful step for whoever claims it. The backlog schema has no notes
   field and rejects unknown properties, so do not add one: the release evidence (the owner's
   option A ruling and your scope review, dated) goes in the `PLAN-050` amendment line from Step 2
   and in the handoff file. Do not add any phase to `next_up`: the queue order is the owner's.
-- **Keep deferred**: rewrite `blocked_reason` and `resume_when` so they no longer say the owner has
-  not chosen between A, B and C.
+- **Keep deferred**: rewrite `blocked_reason`, `resume_when` and `next_action` so none of them
+  still says the owner has not chosen between A, B and C.
 - **Cancel** (`deferred` to `cancelled`): record why the scope was withdrawn, naming the ruling,
-  in the `PLAN-050` amendment line. Keep or drop `blocked_reason` and `resume_when` as the
+  in the `PLAN-050` amendment line, and rewrite `next_action` so it no longer waits for the A/B/C
+  decision. Keep or drop `blocked_reason` and `resume_when` as the
   validator requires for `cancelled`, and report which.
   Check that no remaining phase depends on a cancelled one (`GOV-002`: "a cancelled dependency does
   not silently satisfy its dependents").
