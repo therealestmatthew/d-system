@@ -15555,6 +15555,7 @@ items:
   - plugins/idea-realization/docs/protocol.md
   - plugins/idea-realization/docs/tools.md
   - plugins/idea-realization/skills/idea/SKILL.md
+  - plugins/idea-realization/README.md
   - pyproject.toml
   - uv.lock
   - docs/03-sessions/
