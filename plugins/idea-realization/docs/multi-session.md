@@ -4,10 +4,12 @@ How the owner runs several interactive sessions against one repository at once. 
 Session Manager, coordinates the rest: session roles, serialized access to the primary checkout,
 claim slots, merge relay and the message contract.
 
-This is a procedure the owner and the sessions follow. The plugin supplies no lock, no relay and no
-messaging: the backlog on the integration branch stays the only lock table (`backlog-protocol.md`,
-section 6), and sessions message each other through the host's cross-session messaging, addressed
-by registered name. The protocol runs only where the host provides that messaging.
+This is a procedure the owner and the sessions follow. The plugin supplies no relay and no
+messaging, and its one lock is the idea writer's, which serializes writes to the idea log on one
+machine (`protocol.md`, section 11). The backlog on the integration branch stays the only lock
+table for claims (`backlog-protocol.md`, section 6), and sessions message each other through the
+host's cross-session messaging, addressed by registered name. The protocol runs only where the
+host provides that messaging.
 
 `protocol.md` and `backlog-protocol.md` govern each session. This document governs how sessions take
 turns at the work that cannot run in parallel, and a rule here applies only while sessions run
@@ -123,6 +125,8 @@ branch still passes after peers' merges.
 - A session that meets an idea outside its work does not record it. It sends the bare idea to
   Ideation in an `IDEA` message, one idea per message, with its own name.
 - Ideation batches the waiting ideas into one `idea` turn. Recording new ideas comes before triage.
+- Ideas are recorded only on the integration branch in the primary checkout, which is why recording
+  takes a turn. The idea writer warns when run anywhere else, then writes.
 - When no idea is waiting, Ideation triages the open ideas the owner names, inside an `idea` turn.
 - Ideation takes each id from the writer's output and returns `IDEA-RECORDED` to the originating
   session and to the Session Manager.

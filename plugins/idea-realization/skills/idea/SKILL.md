@@ -14,6 +14,15 @@ reach the script. Run them from the repository root, assignments included. An op
 never saved appears as its `${user_config.…}` text; the script treats that as unset and uses the
 documented default. The values are single-quoted so the shell leaves that text alone.
 
+## Where ideas are recorded
+
+Record ideas only on the integration branch in the primary checkout. Anywhere else the writer
+prints a warning naming the branch and checkout, then writes anyway. Pass the warning on to the
+person: an idea recorded on another branch can take the same id as one recorded on the integration
+branch.
+Concurrent writers on one machine wait for each other on a shared lock; a writer that waits too long
+exits with an error naming the lock file and records nothing, and the same command can be run again.
+
 ## Recording a new idea
 
 Read the request as the idea. Distil a **title** — one line, specific enough to recognise in a list
@@ -31,6 +40,7 @@ after it is the body.
 CLAUDE_PLUGIN_OPTION_IDEAS_PATH='${user_config.ideas_path}' \
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
 CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
+CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/idea.py" add --file <path to the file>
 ```
 

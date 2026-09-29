@@ -322,6 +322,20 @@ flagged to stderr, never refused — capture always wins.
 ``--file`` or stdin, so reasons never pass through a shell argument. The latest classification
 wins; an earlier one stays in the log. Any author may classify.
 
+**Every mutating subcommand holds one lock across its whole read, validate and append**, so
+concurrent writers never take the same id or make a move the other has already made. The lock is
+``<git common directory>/idea-realization/ideas.lock``, which every worktree of the repository
+shares; outside a git repository it is the log's own path plus ``.lock``. A writer that cannot
+take it within ``LOCK_TIMEOUT_SECONDS`` exits 1, names the lock file and appends nothing. The
+operating system releases the lock when its holder exits, however it exits, so a crashed writer
+never blocks the next one. ``list`` and ``show`` take no lock.
+
+**Ideas are recorded only on the integration branch in the primary checkout.** Run anywhere
+else in a git repository — a linked worktree, or the primary checkout on another branch — a
+mutating subcommand warns on stderr, naming the branch and checkout, and then writes. The lock
+serializes writers on one machine; it cannot stop two branches from each taking the same id
+and merging.
+
 **Prose never belongs in a shell argument.** A ``--title``, ``--body`` or ``--text`` containing a
 backtick or ``$(`` is evaluated by the calling shell before this script sees it, and the log
 keeps whatever the shell produced. ``--file`` (or plain stdin) never puts prose in a shell

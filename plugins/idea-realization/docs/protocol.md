@@ -131,6 +131,8 @@ exits 0 before any hand-off.
 | No cycle in dependency, parent, supersession, system or phase graphs | The document scan and the backlog check |
 | No overlapping or unclaimed concurrent active phases | The backlog check |
 | Declared paths are repository-relative, never escape the repository, and never pass through `.git`, `.venv`, `node_modules` or a symlink; missing system and evidence paths fail | The document scan and the backlog check |
+| Concurrent idea writes on one machine never take the same id or make a move twice | The idea writer's lock |
+| Ideas are recorded only on the integration branch in the primary checkout | The idea writer's warning, which does not refuse the write |
 | Work stays inside a phase's declared systems and deliverables; prose is accurate | The owner's diff review |
 
 - The check reads only the document root, its two registers, the backlog and git metadata, and
@@ -185,8 +187,9 @@ exits 0 before any hand-off.
 
 - Every session works in its own worktree on its own branch, whatever the work touches, and the
   primary checkout's branch is never switched. The only work in the primary checkout is the claim
-  commit plus the catalog regeneration it forces, committed together; the fast-forward that
-  integrates a branch; and the completion edit that follows it (`backlog-protocol.md`, section 10).
+  commit plus the catalog regeneration it forces, committed together; recording ideas; the
+  fast-forward that integrates a branch; and the completion edit that follows it
+  (`backlog-protocol.md`, section 10).
   While sessions run under `multi-session.md`, its turn purposes are the complete list.
 - The branch is `agent/<phase-id>` and the worktree is `<worktree directory>/<phase-id>`. The
   worktree directory sits outside the repository, so no scan or test walks a second copy.
@@ -198,6 +201,11 @@ exits 0 before any hand-off.
 - Diffs are narrow, one concern per commit, on the session's own branch only.
 - A session rebases onto the integration branch whenever a peer integrates, and never merges the
   integration branch in.
+- Ideas are recorded only on the integration branch in the primary checkout. The idea writer takes
+  a lock that every worktree of the repository shares,
+  `<git common directory>/idea-realization/ideas.lock` (outside a git repository, the log's path
+  plus `.lock`), so concurrent writers on one machine wait for each other. The lock cannot stop two branches from each taking the same id, so the
+  writer run anywhere else prints a warning naming the branch and checkout, then writes.
 
 The `session-start` skill carries these steps.
 
