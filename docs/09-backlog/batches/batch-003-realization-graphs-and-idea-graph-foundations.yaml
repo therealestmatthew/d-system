@@ -3,10 +3,10 @@
 schema_version: 1
 id: batch-003
 title: Batch graph and run budgets, with the idea schema bundle and plan-quality standard
-status: queued
+status: in_progress
 sequence: 3
 created: '2026-09-22'
-updated: '2026-09-27'
+updated: '2026-09-29'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
   the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
