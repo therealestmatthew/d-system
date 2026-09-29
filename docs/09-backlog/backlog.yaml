@@ -15492,7 +15492,8 @@ items:
   systems:
   - sys-plugin-ideas
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 1
   session_budget: 1
   depends_on: []
@@ -15547,8 +15548,8 @@ items:
   - pyproject.toml
   - uv.lock
   - docs/03-sessions/
-  next_action: Queued behind the owner's G3 approval of PLAN-052; not in next_up until the owner places
-    it there.
+  next_action: Claimed by agent-builder-a on 2026-09-29 after the owner's G3 approval of PLAN-052 (a78bc33);
+    build the lock, the pin and the D3 warning test-first in the phase worktree.
 - id: phase-plfx-02
   title: Validate every configured plugin value centrally — contained paths, worktree_dir outside, a well-formed integration branch
   plan: doc-plugin-audit-remediation
