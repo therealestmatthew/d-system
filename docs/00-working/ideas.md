@@ -22613,3 +22613,13 @@ Owner rulings on the same review, 2026-09-28, as relayed by the Session Manager:
 - relates_to → `000491`
 - relates_to → `000493`
 - relates_to → `000497`
+
+---
+
+## 000512 · Review the agentic-architecture capture's idea candidates and decide which to record
+
+**Created 2026-09-29T02:11:20-04:00 · Status: `open`**
+
+A private capture session (2026-09-28) distilled 42 pasted answers on agentic-AI design into topic files under _private/agentic-architecture/ and collected 56 idea candidates, C-001 to C-056, for owner review. The candidates are grouped by theme in _private/agentic-architecture/wrap-up.md, and their full wording and rationale are in idea-candidates.md in the same folder. Every claim behind them is unverified.
+
+The review should decide, candidate by candidate, which to record as ideas, which to merge, and which to drop. C-030 needs a separate ruling because it conflicts with the current memory rule to delete memories that turn out to be wrong. No candidate has been written to the idea log yet.
