@@ -16840,6 +16840,7 @@ PROPOSED LINK: 000334 --relates_to--> 000247 (Session Manager integration into t
 - relates_to ← `000427`
 - relates_to ← `000428`
 - relates_to ← `000508`
+- relates_to ← `000513`
 
 ---
 
@@ -17225,6 +17226,7 @@ The idea asks for monitoring mechanisms and safe-point detection within the exis
 - relates_to → `000347`
 - relates_to ← `000169`
 - relates_to ← `000237`
+- relates_to ← `000515`
 
 ---
 
@@ -18598,6 +18600,7 @@ PROPOSED LINK: 000370 --relates_to--> 000334 (both ask how GOV-017's coordinatio
 - relates_to ← `000385`
 - relates_to ← `000393`
 - relates_to ← `000508`
+- relates_to ← `000513`
 
 ---
 
@@ -19236,6 +19239,7 @@ PROPOSED LINK: 000389 --relates_to--> 000319 (the same resumability ask, now wit
 
 - relates_to → `000385`
 - relates_to → `000319`
+- relates_to ← `000515`
 
 ---
 
@@ -20578,6 +20582,7 @@ PROPOSED LINK: this idea --relates_to--> 000432 (split from the same owner messa
 
 - relates_to ← `000432`
 - relates_to ← `000508`
+- relates_to ← `000513`
 
 ---
 
@@ -22280,7 +22285,7 @@ The tables are docs/09-backlog/batches/*.yaml, governed by GOV-016 (batch orches
 
 ## 000500 · A short end-to-end planning protocol governance document: the steps in order, each pointing to where it is already written
 
-**Created 2026-09-27T16:12:44-04:00 · Status: `open`**
+**Created 2026-09-27T16:12:44-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager. A one-page governance document that lists the planning steps in order, each pointing to where it is already written: ARCH-006 (idea realization system stages), GOV-010 (plan quality standard), GOV-018 (three-altitude review procedure), GOV-016 (batch orchestration protocol), GOV-002 (backlog protocol) and AGENTS.md.
 
@@ -22292,12 +22297,19 @@ The owner's rulings on it are recorded as findings on this idea. It is the first
 
 
 <details>
-<summary>4 finding(s)</summary>
+<summary>5 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-27T16:12:55-04:00): Owner rulings given with the idea, 2026-09-27, relayed by the Session Manager, recorded as given: (1) the document states explicitly: requirement first, the owner gates (G2 partition acceptance, G3 plan approval and next_up ratification), and execution and after (validators, realization check, learning loop); (2) whether an investigation/prompt pack before the plan is a tracked step is NOT decided (the owner questioned its purpose); (3) the decompose -> audit loop stops by default when every phase fits one session by a measured heuristic (relates to 000445 and phase-irs-05); the exception, when the audit proposes no split but the heuristic says the phase does not fit, is to be designed; (4) home: a new short GOV document.
 - **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (1) An investigation/prompt pack before the plan is an OPTIONAL step, pointing to GOV-008's pre-plan package ("Prompt A"); tracked when it will be re-run, has owner gates, or needs its own review; otherwise docs/00-working. This settles ruling (2) of the earlier rulings finding, which left it undecided.
 - **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (2) The stop-rule exception (audit proposes no split, size heuristic says it does not fit one session) escalates at G3 with both results; the owner chooses split by hand, accept with a recorded reason, or adjust the heuristic. Owner: "We still need to figure out the Heuristics. Once that is finalized maybe we change this to audit wins or always split."
 - **finding** by agent-ideation (2026-09-27T16:23:33-04:00): Owner rulings, 2026-09-27, relayed by the Session Manager, recorded as given. (3) Order: the next restart runs PROMPT-042 (monitoring investigation) and drafts the 000500 document in parallel; the dashboard build is planned in the restart after.
+- **finding** by agent-ideation (2026-09-29T02:21:01-04:00): Owner rulings, 2026-09-28, given in a cloud session through AskUserQuestion and recorded in docs/00-working/cloud-prompts/owner-rulings-2026-09-28.md ("Planning protocol", GOV-021). As given:
+Open question 6, ARCH-006's G5 row: amend now. Applied the same day: the row says /session-close is run by the owner or by a coordinator once GOV-003's three conditions hold; AGENTS.md was amended to the same effect earlier that day with the owner's approval.
+Open question 1, GOV-008 and the optional pre-plan package: amend GOV-008 once, with the plan-folder standard's work (000505), after 000501 separates one-time prompts from reusable ones.
+Open question 2, what stops the decompose-and-audit loop until the phase-fit heuristic exists: the loop stops when the phase-altitude audit proposes no further split; any doubt goes to the owner at G3. Applied: GOV-021 step 10 and Open question 2.
+Open questions 3 and 4, the owner's step order against GOV-018, GOV-002, GOV-014 and the backlog schema: plan it later; both sides stay as they are until a planning session.
+GOV-021 stays draft.
+Status: moved open -> triaged at the owner's direction (2026-09-29).
 
 </details>
 
@@ -22381,11 +22393,34 @@ Related: ARCH-005 (idea node classification: record kinds and the axes), 000452 
 
 ## 000505 · Re-investigate the anatomy of a plan and of a plan folder: decisions kept apart from the plan, every plan in a folder, and where prompt packs live
 
-**Created 2026-09-27T16:36:18-04:00 · Status: `open`**
+**Created 2026-09-27T16:36:18-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager, as given: "we need to reinvestigate the anatomy of a plan that we created and look at the anatomy of a plan folder ... Should we have a separate document just to hold the decisions for the plan and should all plans be in a folder? No free form plan files or even if the plan is a single file to start, should it still be in a folder? The decision should be kept separate from the plan. So we can trace back to them, but the specific decisions and reasoning is only necessary for auditing, not for actually planning. We might need a separate file or folder for the various prompt packs. Do we put all of this in the plan folder? I think it's currently scattered throughout the repository. Maybe some more investigating to do here."
 
 State when recorded (read-only, dev): five plans are folders today (PLAN-003, PLAN-017, PLAN-023, PLAN-048, PLAN-050); the rest are single files in docs/01-plans/. phase-idg-11 (define where a promoted plan lives before it earns a code; PLAN-029) is queued, and its decision ADR-019 (promoted-plan staging) is reserved in the catalog, not yet written. Related: 000501 (archive one-time plans and prompts), 000500 (planning protocol document), GOV-008 (prompt pack protocol), GOV-010 (plan quality standard, which puts decisions in plans).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:21:00-04:00): Owner rulings, 2026-09-28, given in a cloud session through AskUserQuestion and recorded in docs/00-working/cloud-prompts/owner-rulings-2026-09-28.md ("Plan-folder standard"), on docs/00-working/plan-anatomy/proposed-standard.md. As given:
+A. Every new plan is a folder: yes.
+B. Migrate the 44 existing single-file plans: no.
+C. Split decisions into a one-line ruling in the plan and a record beside it: yes, for new plans.
+D. The decision record is an uncoded member file, decisions.md.
+E. One-time prompts go in a prompts/ member folder: yes; 000501 draws the one-time/reusable line; coded prompts keep their codes.
+F. Review records stay in docs/08-governance/reviews/: yes.
+G. An evidence/ member, with _working/ evidence a tracked plan relies on copied into it: yes to both.
+H. The entry point is always PLAN-NNN-overview.md, even for a one-document plan: yes.
+I. Fix the GOV-018 entry-check script now, independent of the rest: yes.
+J. The flat child plan PLAN-039.01: move it. PLAN-039 and PLAN-039.01 go into a folder, with their path references rewritten (18 in 10 files, per the proposal). This differs from the proposal's recommendation.
+K. Settle the standard before phase-idg-11 runs: yes.
+L. Whether the idea-realization plugin adopts the same standard: decide after the repository adopts it.
+Status: moved open -> triaged at the owner's direction (2026-09-29).
+
+</details>
 
 **Links**
 
@@ -22500,6 +22535,7 @@ full build in the article, then run the fake-edge test before you wire up an eig
 - relates_to → `000334`
 - relates_to → `000431`
 - relates_to → `None`
+- relates_to ← `000513`
 
 ---
 
@@ -22623,3 +22659,57 @@ Owner rulings on the same review, 2026-09-28, as relayed by the Session Manager:
 A private capture session (2026-09-28) distilled 42 pasted answers on agentic-AI design into topic files under _private/agentic-architecture/ and collected 56 idea candidates, C-001 to C-056, for owner review. The candidates are grouped by theme in _private/agentic-architecture/wrap-up.md, and their full wording and rationale are in idea-candidates.md in the same folder. Every claim behind them is unverified.
 
 The review should decide, candidate by candidate, which to record as ideas, which to merge, and which to drop. C-030 needs a separate ruling because it conflicts with the current memory rule to delete memories that turn out to be wrong. No candidate has been written to the idea log yet.
+
+---
+
+## 000513 · Consider pivoting away from LangGraph: the owner does not want to pay for a separate API key that the Max subscription does not cover
+
+**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
+
+Owner, 2026-09-28, relayed by the Session Manager. The owner's words: "I also may need to pivot away from the LangGraph option because I don't want to pay for a separate API key when it's not supported by my Max subscription."
+Related: ADR-018 (LangGraph orchestration), 000431 (is an API key necessary for LangGraph?), 000508 (graph-engineering frameworks), 000334, 000370.
+
+**Links**
+
+- relates_to → `None`
+- relates_to → `000431`
+- relates_to → `000508`
+- relates_to → `000334`
+- relates_to → `000370`
+
+---
+
+## 000514 · Track more commands we can run to automate repeatable things: a catalog of repeatable automation commands and scripts
+
+**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
+
+Owner, 2026-09-28, relayed by the Session Manager. The owner's words: "We need to track more commands that we can run to automate things that are repeatable."
+
+**Links**
+
+- relates_to ← `000515`
+
+---
+
+## 000515 · A bash script that reopens every planning session in its own terminal window after a restart
+
+**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
+
+Owner, 2026-09-28, relayed by the Session Manager, as a specific example of the repeatable-commands catalog. The owner's words: "if I restart my computer and I want to open all 8 of these planning sessions (Session Manager, Ideation, Prompt Planner, the 2 builders, the backup builder, and so on), is there a way we can run a bash script that automatically opens each of these sessions into their respective terminal windows?"
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:21:12-04:00): Checked by the Session Manager on the owner's machine, 2026-09-28, relayed as given: the claude CLI has -n/--name <name> (sets the session's display name: prompt box, /resume picker, terminal title), -r/--resume <session-id>, -c/--continue and --session-id <uuid>; gnome-terminal is installed (GNOME desktop). Not yet verified: whether -n sets the registered name that ListAgents and cross-session messaging use (GOV-017 "Session names").
+Neighbours: 000389 (session state and resumability: a resume brief per session role), 000340 (monitor each session's context use).
+
+</details>
+
+**Links**
+
+- relates_to → `000514`
+- relates_to → `000389`
+- relates_to → `000340`
