@@ -31,6 +31,7 @@ dev = [
     "pytest",
     "pytest-asyncio",
     "httpx",
+    "filelock==4.0.6",
 ]
 
 [build-system]

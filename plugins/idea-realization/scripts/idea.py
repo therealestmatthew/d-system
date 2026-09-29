@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["jsonschema", "pyyaml"]
+# dependencies = ["jsonschema", "pyyaml", "filelock==4.0.6"]
 # ///
 """The only sanctioned writer for the idea log.
 
@@ -69,6 +69,20 @@ flagged to stderr, never refused — capture always wins.
 ``--file`` or stdin, so reasons never pass through a shell argument. The latest classification
 wins; an earlier one stays in the log. Any author may classify.
 
+**Every mutating subcommand holds one lock across its whole read, validate and append**, so
+concurrent writers never take the same id or make a move the other has already made. The lock is
+``<git common directory>/idea-realization/ideas.lock``, which every worktree of the repository
+shares; outside a git repository it is the log's own path plus ``.lock``. A writer that cannot
+take it within ``LOCK_TIMEOUT_SECONDS`` exits 1, names the lock file and appends nothing. The
+operating system releases the lock when its holder exits, however it exits, so a crashed writer
+never blocks the next one. ``list`` and ``show`` take no lock.
+
+**Ideas are recorded only on the integration branch in the primary checkout.** Run anywhere
+else in a git repository — a linked worktree, or the primary checkout on another branch — a
+mutating subcommand warns on stderr, naming the branch and checkout, and then writes. The lock
+serializes writers on one machine; it cannot stop two branches from each taking the same id
+and merging.
+
 **Prose never belongs in a shell argument.** A ``--title``, ``--body`` or ``--text`` containing a
 backtick or ``$(`` is evaluated by the calling shell before this script sees it, and the log
 keeps whatever the shell produced. ``--file`` (or plain stdin) never puts prose in a shell
@@ -82,11 +96,14 @@ import datetime as dt
 import json
 import subprocess
 import sys
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
 import paths
 import yaml  # type: ignore[import-untyped]
+from filelock import FileLock, Timeout
 from ideas import (
     ANNOTATION_KINDS,
     CLASSIFICATION_FIELDS,
@@ -107,6 +124,10 @@ from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 POINTER_KINDS = ("doc", "phase", "commit")
 PATH_KEYS = ("ideas_path", "docs_root", "backlog_path", "exempt_files")
+CONFIG_KEYS = (*PATH_KEYS, "integration_branch")
+
+#: How long a writer waits for another writer to finish before it gives up and appends nothing.
+LOCK_TIMEOUT_SECONDS = 30.0
 
 
 def _validator() -> Draft7Validator:
@@ -307,6 +328,76 @@ def append(event: dict[str, Any], log: Path) -> None:
     log.parent.mkdir(parents=True, exist_ok=True)
     with log.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+# --- The writer lock and the integration-branch warning -------------------------------------
+
+
+def _git(root: Path, *args: str) -> str | None:
+    """A git command's stripped output, or None when it fails (outside a repository)."""
+    completed = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               check=False)
+    return completed.stdout.strip() if completed.returncode == 0 else None
+
+
+def lock_path(config: paths.Config) -> Path:
+    """The one lock file every writer in this repository takes, from any worktree.
+
+    It is under the git common directory, so every worktree resolves the same file and nothing
+    needs an ignore rule. Outside a git repository there is one checkout and one log, so the lock
+    sits beside the log.
+    """
+    common = _git(config.root, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    if common is None:
+        log = config.path("ideas_path")
+        return log.with_name(log.name + ".lock")
+    return Path(common) / "idea-realization" / "ideas.lock"
+
+
+@contextmanager
+def writer_lock(config: paths.Config) -> Iterator[None]:
+    """Hold the repository's writer lock, or raise ``IdeaError`` naming it after the timeout.
+
+    Only an operating-system lock is accepted: a lock that falls back to a plain marker file
+    would outlive a crashed writer and block every later one.
+    """
+    path = lock_path(config)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock = FileLock(path, timeout=LOCK_TIMEOUT_SECONDS, fallback_to_soft=False,
+                    preserve_lock_file=True)
+    try:
+        lock.acquire()
+    except Timeout as exc:
+        raise IdeaError(
+            f"another writer holds the idea-log lock {path}; gave up after "
+            f"{LOCK_TIMEOUT_SECONDS:g} seconds and appended nothing"
+        ) from exc
+    try:
+        yield
+    finally:
+        lock.release()
+
+
+def off_integration_warning(config: paths.Config) -> str | None:
+    """Say where this write lands when that is not the integration branch in the primary checkout.
+
+    None on the integration branch in the primary checkout, and outside a git repository, where
+    there is no branch to be on.
+    """
+    top = _git(config.root, "rev-parse", "--show-toplevel")
+    if top is None:
+        return None
+    checkout = Path(top).resolve()
+    primary = paths.primary_checkout(config.root)
+    integration = config.text("integration_branch")
+    branch = _git(config.root, "symbolic-ref", "--short", "-q", "HEAD")
+    if checkout == primary and branch == integration:
+        return None
+    where = f"branch {branch}" if branch else "a detached HEAD"
+    return (
+        f"ideas are recorded only on the integration branch in the primary checkout "
+        f"({integration} in {primary}); writing anyway on {where} in {checkout}"
+    )
 
 
 # --- Operations -----------------------------------------------------------------------------
@@ -595,7 +686,7 @@ def list_ideas(log: Path, status: str | None = None) -> list[str]:
 
 def _parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
-    paths.add_arguments(common, PATH_KEYS)
+    paths.add_arguments(common, CONFIG_KEYS)
     parser = argparse.ArgumentParser(
         description="Append an event to the idea log. Timestamps are generated, never supplied."
     )
@@ -694,11 +785,40 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _operation(
+    args: argparse.Namespace, config: paths.Config, log: Path
+) -> Callable[[], tuple[dict[str, Any], list[str]]]:
+    """Read every input first, so the lock is never held while waiting on a file or stdin."""
+    if args.command == "add":
+        title, body = _read_add_input(args)
+        return lambda: (add(title, body, log), [])
+    if args.command == "status":
+        pointers = _pointers(args)
+        return lambda: (change_status(args.idea, args.to, args.promoted_to, log=log,
+                                      closes_with=pointers, config=config), [])
+    if args.command == "revisit":
+        return lambda: (revisit(args.idea, log), [])
+    if args.command == "amend":
+        return lambda: (amend(args.idea, args.title, args.body, log=log), [])
+    if args.command == "annotate":
+        text = _read_annotation_text(args)
+        return lambda: (annotate(args.idea, args.author, args.kind, text, log), [])
+    if args.command == "amend-annotation":
+        text = _read_annotation_text(args)
+        return lambda: (amend_annotation(args.idea, args.eid, text, log), [])
+    if args.command == "link":
+        return lambda: link(args.idea, args.type_, args.target, log=log,
+                            target_code=args.target_code, config=config)
+    if args.command == "classify":
+        classification = _read_classification(args.file)
+        return lambda: (classify(args.idea, args.author, classification, log), [])
+    return lambda: (retract_link(args.idea, args.eid, log), [])
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     config = paths.resolve(args)
     log = config.path("ideas_path")
-    diagnostics: list[str] = []
     try:
         if args.command == "list":
             for line in list_ideas(log, args.status):
@@ -708,32 +828,12 @@ def main(argv: list[str] | None = None) -> int:
             state = fold(load_events(log))
             print(json.dumps(_require(state, args.idea), ensure_ascii=False, indent=2))
             return 0
-        if args.command == "add":
-            title, body = _read_add_input(args)
-            event = add(title, body, log)
-        elif args.command == "status":
-            event = change_status(
-                args.idea, args.to, args.promoted_to, log=log, closes_with=_pointers(args),
-                config=config,
-            )
-        elif args.command == "revisit":
-            event = revisit(args.idea, log)
-        elif args.command == "amend":
-            event = amend(args.idea, args.title, args.body, log=log)
-        elif args.command == "annotate":
-            event = annotate(args.idea, args.author, args.kind, _read_annotation_text(args), log)
-        elif args.command == "amend-annotation":
-            event = amend_annotation(args.idea, args.eid, _read_annotation_text(args), log)
-        elif args.command == "link":
-            event, diagnostics = link(
-                args.idea, args.type_, args.target, log=log, target_code=args.target_code,
-                config=config,
-            )
-        elif args.command == "classify":
-            classification = _read_classification(args.file)
-            event = classify(args.idea, args.author, classification, log)
-        else:
-            event = retract_link(args.idea, args.eid, log)
+        operation = _operation(args, config, log)
+        warning = off_integration_warning(config)
+        if warning:
+            print(f"warning: {warning}", file=sys.stderr)
+        with writer_lock(config):
+            event, diagnostics = operation()
     except IdeaError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -741,7 +841,6 @@ def main(argv: list[str] | None = None) -> int:
     for diagnostic in diagnostics:
         print(f"warning: {diagnostic}", file=sys.stderr)
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
