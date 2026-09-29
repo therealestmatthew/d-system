@@ -158,8 +158,9 @@ knows what was installed.
 ## Scripts
 
 Every script runs with `uv run scripts/<name>.py`, declares its dependencies inline (PEP 723:
-`jsonschema` and `pyyaml` only), and prints its flags with `--help`. `prerequisites.py` uses only
-the standard library, so it also runs with a bare `python3` when `uv` is missing.
+`jsonschema` and `pyyaml`, plus `filelock` pinned to one exact version in the idea writer), and
+prints its flags with `--help`. `prerequisites.py` uses only the standard library, so it also runs
+with a bare `python3` when `uv` is missing.
 
 `scripts/check.py` and `scripts/cli.py` are dispatchers. A feature adds a module
 `scripts/checks/<feature>.py` defining `check(config)`, `COMMANDS`, or both, and both dispatchers
