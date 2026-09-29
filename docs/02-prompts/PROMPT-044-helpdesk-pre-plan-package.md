@@ -116,8 +116,10 @@ priority where the owner gave one (decision 8).
   repository knowledge with where each lives and what is missing; a proposed structure (a
   schema-validated topic index plus one short card per topic, pointing to sources rather than
   copying them, with a staleness check); and a proposed document list. Its own words: "Nothing here
-  is decided." Its counts are unverified: on 2026-09-29 `.codex/agents/` held 4 files, not the 14 the
-  map and `000510`'s triage give. Re-count every figure at planning time.
+  is decided." Its counts depend on where they are taken: on 2026-09-29 `.codex/agents/` held 14
+  files in the primary checkout but only 4 tracked ones, because 10 are local-only through
+  `.git/info/exclude`, so a worktree or clone sees 4. An inventory must say which it counts.
+  Re-count every figure at planning time.
 - The triage findings on `000509` and `000510` (read through `fold()`): no question-answering agent
   or agent registry exists; the Agent SDK is not a dependency; `src/orchestrator/dispatch.py` names
   the Agent SDK adapter as not built and refuses rather than guess at a binding; `GOV-001` line 194
