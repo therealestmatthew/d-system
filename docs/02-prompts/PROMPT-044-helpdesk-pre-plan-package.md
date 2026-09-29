@@ -8,7 +8,7 @@ status: active
 owner: repository-owner
 created: '2026-09-29'
 updated: '2026-09-29'
-systems: [sys-gov-docs, sys-memory-agents, sys-retrieval]
+systems: [sys-gov-docs, sys-memory-agents, sys-retrieval, sys-realization]
 depends_on: [doc-prompt-pack-protocol, doc-three-altitude-review-procedure, doc-retrieval-knowledge-infrastructure, doc-agent-surface-audit]
 ---
 
@@ -116,7 +116,8 @@ priority where the owner gave one (decision 8).
   repository knowledge with where each lives and what is missing; a proposed structure (a
   schema-validated topic index plus one short card per topic, pointing to sources rather than
   copying them, with a staleness check); and a proposed document list. Its own words: "Nothing here
-  is decided."
+  is decided." Its counts are unverified: on 2026-09-29 `.codex/agents/` held 4 files, not the 14 the
+  map and `000510`'s triage give. Re-count every figure at planning time.
 - The triage findings on `000509` and `000510` (read through `fold()`): no question-answering agent
   or agent registry exists; the Agent SDK is not a dependency; `src/orchestrator/dispatch.py` names
   the Agent SDK adapter as not built and refuses rather than guess at a binding; `GOV-001` line 194
@@ -143,7 +144,8 @@ coordinator prompt (`GOV-008` stage 7).
       keyword triggering (decision 5) as a deterministic, testable mapping.
    2. **Decision records** (`--next-code decision`), at least: where the knowledge framework lives;
       adding the Claude Agent SDK as a dependency and how the harness relates to
-      `src/orchestrator/dispatch.py` and `ADR-018`; whether an agent inventory needs a
+      `src/orchestrator/dispatch.py` and `ADR-018` (the owner approves the dependency through this
+      record; that routing is this package's choice, not an existing rule); whether an agent inventory needs a
       clarification of `GOV-001` line 194.
    3. **Architecture** (`--next-code architecture`) for the knowledge framework: its record shape,
       how it points to sources, how it is generated or written, and how drift is caught.
@@ -189,26 +191,30 @@ often on a phone: put drafts and content in the message text, never in option pr
    `/helpdesk`.
 10. **Where the agent runs.** A standalone Python command, a workbench panel, an API route, a Claude
     Code agent definition as well as the SDK harness, or a combination.
-11. **Model and credentials.** Which model the harness uses by default, and how its API key is
-    supplied without being written into a tracked file.
-12. **Freshness.** Does the agent answer only from the framework, or may it also read the live
+11. **Model, credentials and cost.** Which model the harness uses by default, how its API key is
+    supplied without being written into a tracked file, and what per-question token or cost ceiling
+    it runs under.
+12. **Portability.** Does the agent and its command ship through the idea-realization plugin
+    (`plugins/idea-realization/`, which already carries three portable agents and packages them for
+    the owner's other repositories), or stay local to this repository?
+13. **Freshness.** Does the agent answer only from the framework, or may it also read the live
     source file a topic points to?
 
 **The agent inventory (`000510`)**
 
-13. **What it lists.** Only agents built or planned on the Agent SDK, or every agent (`.claude/agents/`,
+14. **What it lists.** Only agents built or planned on the Agent SDK, or every agent (`.claude/agents/`,
     `.codex/agents/`, the plugin's agents) with the SDK ones marked. The owner's sentence names
     the SDK and also "the full inventory we have".
-14. **"Iterating on select agents".** What the inventory must support for that: a status field, a
+15. **"Iterating on select agents".** What the inventory must support for that: a status field, a
     revision history, links to the phases that change an agent, or something else.
-15. **Other repositories.** Which ones, and how their agents are discovered (`000436`, and the
+16. **Other repositories.** Which ones, and how their agents are discovered (`000436`, and the
     planned cross-repo awareness phase, are related).
-16. **One plan or two.** Is the inventory part of the HelpDesk plan, or its own plan the HelpDesk
+17. **One plan or two.** Is the inventory part of the HelpDesk plan, or its own plan the HelpDesk
     reads from?
 
 **Overlap**
 
-17. **Existing work.** Does this plan absorb, depend on, or stay separate from the retrieval plan
+18. **Existing work.** Does this plan absorb, depend on, or stay separate from the retrieval plan
     (`PLAN-033`), the planned Librarian role (`PLAN-001`), and ideas `000494`, `000495` and `000497`?
 
 ## Standing constraints
@@ -235,7 +241,6 @@ often on a phone: put drafts and content in the message text, never in option pr
   differ.
 - `GOV-008`'s cost policy: Sonnet for judgment work, Haiku for mechanical gates, Opus never
   pre-assigned.
-- Adding a dependency to `pyproject.toml` is a decision the owner approves (decision record above).
 
 ## Deadline context
 
@@ -257,6 +262,6 @@ None is recorded. Open question 2 asks.
 > "What the planning session must produce" section lists. Resolve with the owner, through
 > AskUserQuestion, only the open questions whose answers change what Prompt B says, one batch at a
 > time; leave the rest in Prompt B's open-questions protocol. Do not re-ask a ratified decision. Do
-> not write the requirement, plan or any code, and do not run Prompt B. Stop when Prompt B exists,
-> governance exits 0, an adversary agent type (never `general-purpose`) has reviewed it and every
-> finding is fixed or explicitly accepted, and the owner has the review summary for sign-off.
+> not write the requirement, plan or any code, and do not run Prompt B: it runs only after its
+> adversarial review (`GOV-008` stage 3) and the owner's sign-off, which are a separate gate. Stop
+> when Prompt B exists, governance exits 0, and the owner has a summary of it.
