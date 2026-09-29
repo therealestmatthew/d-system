@@ -154,14 +154,18 @@ def claim_conflicts(item: dict[str, Any], items: dict[str, Any]) -> list[str]:
     )
 
 
-def deliverable_code(path: str, series: set[str]) -> str | None:
-    """The document code a deliverable's filename leads with, or None when it carries none."""
+def deliverable_code(path: str, numbering: dict[str, str]) -> str | None:
+    """The document code a deliverable's filename leads with, or None when it carries none.
+
+    `numbering` maps each registered series to its numbering mode; a code counts only when its
+    grammar matches its series' mode, so `GOV-2026-09-29-01` is not a code in the counter series.
+    """
     parts = PurePosixPath(path).stem.split("-")
     # A dated code spans five hyphen-separated parts and a counter code two; trying the longer
     # form first keeps `SESS-2026-09-06-04` from being read as a malformed counter code.
     for width in (5, 2):
         parsed = parse_code("-".join(parts[:width]))
-        if parsed and parsed["series"] in series:
+        if parsed and numbering.get(parsed["series"]) == parsed["numbering"]:
             return "-".join(parts[:width])
     return None
 
@@ -175,12 +179,12 @@ def code_claim_errors(
     ignored, so the result is the same on every clone (GOV-005, "Two different things are called
     a reservation").
     """
-    series = {entry["code"] for entry in register["series"]}
+    numbering = {entry["code"]: entry["numbering"] for entry in register["series"]}
     existing = {meta["code"] for meta in documents.values() if meta.get("code")}
     held = held_codes(register)
     errors = []
     for path in item["deliverables"]:
-        code = deliverable_code(path, series)
+        code = deliverable_code(path, numbering)
         if code is None or code in existing or held.get(code) == "reserved":
             continue
         if held.get(code) == "retired":

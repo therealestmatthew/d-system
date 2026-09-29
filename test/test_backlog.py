@@ -568,6 +568,20 @@ def test_unknown_dated_code_is_not_misread_as_counter_code(backlog_repo: Any) ->
     assert "unreserved code SESS-2026-09-07-01;" in errors[0]
 
 
+def test_code_shape_outside_its_series_numbering_is_not_a_code(backlog_repo: Any) -> None:
+    """A counter series never issues dated codes, so a date after its prefix claims nothing."""
+    root, catalog, result = backlog_repo
+    catalog["items"] = [
+        phase(
+            deliverables=[
+                "docs/04-decisions/ADR-2026-09-29-01-freeze-notice.md",
+                "docs/03-sessions/SESS-001-not-dated.md",
+            ]
+        )
+    ]
+    assert check((root, catalog, result)) == []
+
+
 def test_repository_reservation_only_deliverables_pass() -> None:
     """Every coded deliverable in the live backlog that exists only as a reservation passes."""
     from src.governance.backlog import deliverable_code
@@ -576,14 +590,14 @@ def test_repository_reservation_only_deliverables_pass() -> None:
     assert errors == []
     backlog_errors, catalog = audit_backlog(ROOT, result)
     assert backlog_errors == []
-    series = {entry["code"] for entry in result["register"]["series"]}
+    numbering = {entry["code"]: entry["numbering"] for entry in result["register"]["series"]}
     existing = {meta["code"] for meta in result["documents"].values() if meta.get("code")}
     reserved = {entry["code"] for entry in result["register"]["reserved"]}
     reservation_only = {
         code
         for item in catalog["items"]
         for path in item["deliverables"]
-        if (code := deliverable_code(path, series)) and code not in existing
+        if (code := deliverable_code(path, numbering)) and code not in existing
     }
     assert reservation_only
     assert reservation_only <= reserved
