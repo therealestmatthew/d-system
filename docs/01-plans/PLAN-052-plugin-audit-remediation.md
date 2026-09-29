@@ -4,10 +4,10 @@ id: doc-plugin-audit-remediation
 code: PLAN-052
 title: Plugin audit remediation — six phases fixing the confirmed findings of the idea-realization plugin audit
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-09-27'
-updated: '2026-09-27'
+updated: '2026-09-29'
 systems: [sys-plugin]
 depends_on: [doc-plugin-audit-remediation-requirements, doc-adr-plugin-idea-log-lock, doc-idea-realization-plugin, doc-plan-quality-standard, doc-three-altitude-review-procedure]
 ---

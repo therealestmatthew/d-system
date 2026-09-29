@@ -161,7 +161,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.04 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.04-system-backlog-review.md |
 | PLAN-050.05 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.05-boundary-decision-report.md |
 | PLAN-051 | plan | draft | repository-owner | docs/01-plans/PLAN-051-session-autonomy-configuration.md |
-| PLAN-052 | plan | draft | repository-owner | docs/01-plans/PLAN-052-plugin-audit-remediation.md |
+| PLAN-052 | plan | approved | repository-owner | docs/01-plans/PLAN-052-plugin-audit-remediation.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -490,7 +490,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
-| PLAN-052 | doc-plugin-audit-remediation | draft | 6 | 0 | 0 | — |
+| PLAN-052 | doc-plugin-audit-remediation | approved | 6 | 0 | 0 | — |
 
 ## Held codes
 
