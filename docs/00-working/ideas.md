@@ -6338,6 +6338,7 @@ Outcome: auditable ask with no existing governed delivery. The audit sits cleanl
 - relates_to ← `000170`
 - relates_to ← `000433`
 - relates_to ← `000510`
+- relates_to ← `000514`
 
 ---
 
@@ -21669,7 +21670,7 @@ PROPOSED LINK: 000468 --relates_to--> 000025 (both concern the missing stale-cla
 
 ## 000469 · A session configuration for when the owner works from a mobile device with no terminal access
 
-**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+**Created 2026-09-26T23:20:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-26, relayed by the Session Manager: a specific session configuration for when the owner is working from a mobile device with no terminal access, which may differ from the configuration used when they have terminal access on the computer. Examples given: no `!` commands asked of the owner, pushes deferred, and every ask routed through a question the owner can answer on mobile.
 
@@ -21681,15 +21682,26 @@ Unresolved: whether access mode is its own setting or a named preset inside 0004
 
 Recorded by the Ideation session.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:02-04:00): Triage (Ideation, 2026-09-29). PLAN-051 (session autonomy configuration, draft) and REQ-034 cover this: they plan the autonomy axes and presets and a mobile flag with a resolver that routes asks through answerable questions when the owner has no terminal. 000466 (configurable session autonomy) is the parent idea; 000496 would port the result to the plugin.
+
+</details>
+
 **Links**
 
 - extends → `000466`
+- relates_to → `None`
 
 ---
 
 ## 000470 · Should the idea-realization plugin's scaffold seed a decision record in a target repository?
 
-**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+**Created 2026-09-26T23:20:28-04:00 · Status: `triaged`**
 
 Raised by Session 1 - Builder A in phase-plug-07's trace table (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
 
@@ -21705,14 +21717,16 @@ One of three ideas from phase-plug-07 batched for the planning after the plugin'
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-26T23:20:38-04:00): Batch anchor. At the Session Manager's relay of the owner's request, 000471 and 000472 are linked relates_to this idea as one batch: three questions from phase-plug-07's work (Session 1 - Builder A), for the planning session after the plugin's end-to-end exercise and handover (phase-plug-08).
+- **finding** by agent-ideation (2026-09-29T02:26:51-04:00): Triage (Ideation, 2026-09-29). PLAN-048.04 settled it: decision_record is optional in the plugin's backlog schema; "the scaffold seeds no decisions document, and the regression check runs only when one is named" (owner, 2026-09-25). PLAN-052 (plugin audit remediation, phase-plfx-*) covers related plugin questions.
 
 </details>
 
 **Links**
 
+- relates_to → `None`
 - relates_to ← `000471`
 - relates_to ← `000472`
 - relates_to ← `000474`
@@ -21724,7 +21738,7 @@ One of three ideas from phase-plug-07 batched for the planning after the plugin'
 
 ## 000471 · The plugin's backlog.py carries a history comment that the history-word test does not catch
 
-**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+**Created 2026-09-26T23:20:28-04:00 · Status: `triaged`**
 
 Raised by Session 1 - Builder A during phase-plug-07 (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
 
@@ -21736,6 +21750,16 @@ Unresolved: whether the test should cover code comments at all, since some histo
 
 One of three ideas from phase-plug-07 batched for the planning after phase-plug-08; linked to the batch anchor.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:52-04:00): Triage (Ideation, 2026-09-29). Still present: plugins/idea-realization/scripts/backlog.py lines 25-26 carry a history comment ("Stale-claim threshold: double the longest claim-to-completion gap observed where this rule was first measured (one day)"), against REQ-031 R20. The plugin's test_no_history.py scans only docs/, not scripts/, so the test does not catch it. Already relates_to 000470.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -21744,7 +21768,7 @@ One of three ideas from phase-plug-07 batched for the planning after phase-plug-
 
 ## 000472 · Nothing loads the plugin's docs/reporting.md at session start in a target repository
 
-**Created 2026-09-26T23:20:28-04:00 · Status: `open`**
+**Created 2026-09-26T23:20:28-04:00 · Status: `triaged`**
 
 Raised by Session 1 - Builder A during phase-plug-07 (governance documents as absolutes, part one); the owner asked for it to be recorded. Relayed by the Session Manager, 2026-09-26.
 
@@ -21756,6 +21780,16 @@ Unresolved: which mechanism, and whether writing to a target's CLAUDE.md fits th
 
 One of three ideas from phase-plug-07 batched for the planning after phase-plug-08; linked to the batch anchor.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:52-04:00): Triage (Ideation, 2026-09-29). The plugin's docs/reporting.md (the portable form of GOV-006) is written by phase-plug-07, but nothing loads it at session start in a target repository. This repository imports GOV-006 from CLAUDE.md; a target has no such import, so the reporting rules apply only if an agent happens to read the file. Already relates_to 000470.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -21764,7 +21798,7 @@ One of three ideas from phase-plug-07 batched for the planning after phase-plug-
 
 ## 000473 · The merge gate checks only a branch's tip, so a commit made with --no-verify leaves no trace
 
-**Created 2026-09-26T23:38:53-04:00 · Status: `open`**
+**Created 2026-09-26T23:38:53-04:00 · Status: `triaged`**
 
 Raised by the Session Manager and approved for recording by the owner through /log-anti-patterns, 2026-09-26.
 
@@ -21778,6 +21812,16 @@ What it would touch: refuse_dirty_integration.py or a new gate script, the Sessi
 
 Unresolved: cost (the governance check on every commit of a long branch); whether a failing intermediate commit blocks the merge or requires the branch to be rewritten, which conflicts with not rewriting shared history; whether the private-content check alone should run per commit, since that is the failure history cannot undo, while governance runs only on the tip; and whether commits in dev..<branch> that were rebased from peers are exempt.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:53-04:00): Triage (Ideation, 2026-09-29). tools/git-hooks/pre-commit runs the checks on each commit, but the merge gate re-runs them only against the branch tip (governance, pytest, ruff, mypy, refuse_dirty_integration.py). An intermediate commit made with --no-verify that would have failed the hook leaves no trace. No plan or phase addresses it.
+
+</details>
+
 **Links**
 
 - relates_to ← `000488`
@@ -21786,7 +21830,7 @@ Unresolved: cost (the governance check on every commit of a long branch); whethe
 
 ## 000474 · The plugin's doctor reports ordinary edits to scaffolded data files as drift, so it can never pass after first use
 
-**Created 2026-09-27T07:06:41-04:00 · Status: `open`**
+**Created 2026-09-27T07:06:41-04:00 · Status: `triaged`**
 
 Raised by Session 2 - Builder B in the phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
 
@@ -21800,6 +21844,16 @@ Unresolved: whether seed files are dropped from the record after creation, recor
 
 Recorded by the Ideation session.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:53-04:00): Triage (Ideation, 2026-09-29). Still present: plugins/idea-realization/scripts/doctor.py:35 reports "drifted" when a scaffolded file's SHA-256 differs from the record. The scaffold includes seed files meant to be edited (idea log, backlog, systems.yaml), so any edit is drift and doctor cannot pass after first use. Already relates_to 000470.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -21809,7 +21863,7 @@ Recorded by the Ideation session.
 
 ## 000475 · The plugin's scaffolded backlog names no decision_record, so every check in a fresh repository reports status-regression not run
 
-**Created 2026-09-27T07:06:41-04:00 · Status: `open`**
+**Created 2026-09-27T07:06:41-04:00 · Status: `triaged`**
 
 Raised by Session 2 - Builder B in the phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
 
@@ -21825,6 +21879,16 @@ Unresolved: the same question 000470 raises, whether a decision record belongs i
 
 Recorded by the Ideation session.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:53-04:00): Triage (Ideation, 2026-09-29). scripts/scaffold.py:80-82 creates backlog.yaml with no decision_record, so the status-regression check never runs in a fresh repository and every check prints "backlog: status-regression not run". This follows PLAN-048.04's owner decision (2026-09-25) that decision_record is optional; the open point is only the noise in the check output. Already relates_to 000470.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -21833,7 +21897,7 @@ Recorded by the Ideation session.
 
 ## 000476 · The plugin's partition record schema has no field for a group-level condition, so a conditional group is lost to JSON readers
 
-**Created 2026-09-27T07:06:42-04:00 · Status: `open`**
+**Created 2026-09-27T07:06:42-04:00 · Status: `triaged`**
 
 Raised by the second audit in Session 2 - Builder B's phase-plug-08 end-to-end exercise (the idea-realization plugin's end-to-end exercise and handover), 2026-09-26.
 
@@ -21847,6 +21911,16 @@ Unresolved: the field's shape (free text, or a structured assumption plus the sp
 
 Recorded by the Ideation session.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:53-04:00): Triage (Ideation, 2026-09-29). Still present: plugins/idea-realization/schemas/idea-partition-record.schema.json defines a group (lines 29-38) with only name and ideas. No field holds a group-level condition, so a conditional group loses that condition in the JSON record. Already relates_to 000470.
+
+</details>
+
 **Links**
 
 - relates_to → `000470`
@@ -21855,7 +21929,7 @@ Recorded by the Ideation session.
 
 ## 000477 · Verify whether a repository's committed .claude/settings.json can set pluginConfigs for an installed plugin
 
-**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:48-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21867,9 +21941,10 @@ The question decides the severity of audit findings F1 (configured paths can wri
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-27T15:21:42-04:00): Answered by the Scout (Session 4), 2026-09-27, relayed by the Session Manager. A committed .claude/settings.json cannot set pluginConfigs: since Claude Code v2.1.207, pluginConfigs is read only from user settings (~/.claude/settings.json), the --settings flag and managed settings; project (.claude/settings.json) and local (.claude/settings.local.json) entries are ignored, trusted or not. The installed version is 2.1.280. Primary sources in the report: the settings reference's pluginConfigs entry (Scope: User or managed; "a cloned repository must not be able to supply them"), the settings page, the 2.1.207 changelog entry, and the plugin manifest reference. None of the plugin's 11 options is marked sensitive, so all go through pluginConfigs. Result: audit findings F1 (configured paths escape the repository) and F2 (a saved option injects shell) stay Major; both fixes are still needed. Adjacent vector: a committed settings env can set IDEA_REALIZATION_* after the workspace is trusted (or at startup in -p mode), which paths.py prefers over the plugin option; this reaches F1 only, and crosses no new boundary because trusting a folder also enables its hooks. F2 is not reachable that way, since env values reach the process environment, not the skill text. No blocking owner question; the report describes an optional live confirmation that needs a settings change. Source: _working/session-manager/scout/pluginconfigs-project-scope.md (gitignored). Status unchanged.
+- **finding** by agent-ideation (2026-09-29T02:26:54-04:00): Triage (Ideation, 2026-09-29). Answered in PLAN-052's context and REQ-035: since Claude Code 2.1.207, pluginConfigs is read only from user settings, the --settings flag and managed settings, not from a committed .claude/settings.json. A committed env block can set IDEA_REALIZATION_* variables, which redirect paths but do not reach skill text. The idea already carries a finding.
 
 </details>
 
@@ -21892,7 +21967,7 @@ The question decides the severity of audit findings F1 (configured paths can wri
 
 ## 000478 · A shell-rendering test harness that executes every plugin skill's bash fences with hostile option values
 
-**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:48-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21900,15 +21975,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Every plugin skill passes options as CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}', and Claude Code substitutes the saved value into the skill text; there are 158 substitution sites across 11 skills plus docs/tools.md. test_skills.py checks only that the placeholder is not double-quoted. A value containing an apostrophe breaks the quoting, and the validation reproduced command execution with a value like ideas'$(touch injected)' (F2). The harness would render each skill's bash fences with hostile values (apostrophes, $(...), backticks, $VAR, spaces, a leading '-') and execute them in a sandbox, asserting that the value reaches the script intact and nothing else runs. It would also cover F7 (unquoted worktree paths with spaces) and found-in-passing a (idea_corpus.py's double-quoted partition check command).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:54-04:00): Triage (Ideation, 2026-09-29). From the plugin audit validation (finding F2, option injection: 158 substitution sites across 11 skills). No harness exists yet. PLAN-052's disposition table: delivered in part by phase-plfx-03's execution test (R08); the harness as a reusable tool is not. Already relates_to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000479 · A concurrency test category for every plugin writer: idea log, catalog, reservations and backlog
 
-**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:48-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21916,15 +22002,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Audit finding F3 (Blocker, reproduced): 12 parallel idea.py add calls produced two created events for 000008, after which every read of the log fails. The same read-then-write race exists for every idea mutation (status, revisit, amend, annotate, link, retract-link, classify). The validation's fix plan covers the idea log with a lock and a deterministic barrier test (§2 F3). This idea is the general category: each plugin script that writes shared state (the idea log, the catalog, code reservations, the backlog) gets a concurrency test in the same deterministic form (threads held at a barrier inside the read step), with a subprocess stress test as a secondary check.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:55-04:00): Triage (Ideation, 2026-09-29). From the plugin audit validation (finding F3: 12 parallel idea.py calls produced duplicate created events). PLAN-052's disposition table: delivered for the idea log by phase-plfx-01; the catalog, reservations and backlog stay open. Already relates_to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000480 · A sanctioned repair path for an uncommitted, malformed tail in the plugin's idea log
 
-**Created 2026-09-27T14:38:48-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:48-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21932,15 +22029,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 When the plugin's idea log gets a bad tail (the F3 race wrote a second created event for one id), every later read fails, including idea.py list, so no sanctioned command can run and the only way out is a hand edit of an append-only file. The idea: a repair command, limited to lines not yet committed, that shows the malformed or conflicting trailing events, and removes or re-numbers them only on explicit confirmation, leaving committed history untouched.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:55-04:00): Triage (Ideation, 2026-09-29). Related to PLAN-052 (plugin audit remediation), which lists it out of scope (lines 208-209): the lock added by phase-plfx-01 prevents a malformed tail from being written, and repairing one already written is separate work. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000481 · Make the plugin's test_no_source_references independent of the git remote URL shape
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21948,15 +22056,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 plugins/idea-realization/test/test_no_source_references.py (lines 40-55) builds its forbidden identities from the origin remote URL. In a clone whose origin is a local path such as /code/d-system, path components like "code" become forbidden identities, and the suite fails with 3 failures (test_no_source_references.py and test_templates.py[AGENTS.md|CLAUDE.md]); with an https origin the same tree gives 497 passed. The validation asks for this to be fixed before the suite is relied on in clones.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:56-04:00): Triage (Ideation, 2026-09-29). Related to PLAN-052, which lists it out of scope (line 209) because this repository's worktrees pass the test as written. The defect is in plugins/idea-realization/test/test_no_source_references.py: when the git origin is a local path (for example /code/d-system), path components such as "code" become forbidden identities and fail the test. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000482 · amend --file for the plugin's idea.py, matching annotate and add
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21964,15 +22083,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 plugins/idea-realization/scripts/idea.py's amend has no --file option (lines 643-646), so a corrected body can only pass through --body as a shell argument. That contradicts idea.py's own rule at lines 69-73 ("Prose never belongs in a shell argument"), and idea/SKILL.md line 53 shows amend <id> --title "corrected title", contradicting idea/SKILL.md lines 23-27. add and annotate already take a file.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:57-04:00): Triage (Ideation, 2026-09-29). Planned in PLAN-052 phase-plfx-05 (line 144, R14: add amend --file). The defect is still present: idea.py amend (plugins/idea-realization/scripts/idea.py:643-646) accepts only --title and --body, against the rule at lines 72-75 that prose never goes in a shell argument. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000483 · A plugin doctor report of every configured path, its resolved location and whether it stays inside the repository
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21980,16 +22110,27 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Audit finding F1 (confirmed): paths.py returns an absolute configured path unchanged and joins '..' without a check, so absolute, '..' and symlinked values write outside the repository, although plugin.json describes each option as "relative to the repository root". The validation's fix plan puts central containment validation in paths.py with doctor reporting (§5 item 2). The idea: doctor lists every configured path key with its raw value, its resolved absolute location and a containment status (inside, outside, through a symlink), so a person can see where the plugin will write before it does.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:57-04:00): Triage (Ideation, 2026-09-29). Planned in part by PLAN-052 phase-plfx-02 (line 141, R07): central validation in scripts/paths.py and a doctor report of invalid keys. The defect: paths.py returns configured paths unchanged and joins '..' without a containment check, so writes can leave the repository although plugin.json describes the options as relative to the repository root. Already linked to 000477 and 000474.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
 - relates_to → `000474`
+- relates_to → `None`
 
 ---
 
 ## 000484 · Windows CI coverage for the idea-realization plugin's scripts
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -21997,16 +22138,27 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 prerequisites.py (lines 31-43) lists Windows as supported, but nothing runs the plugin's tests there. The validation's idea-log lock (F3, decision D2) needs an msvcrt branch alongside fcntl, and it notes there is no Windows CI to exercise it (§5 risks). Path handling (F1) and quoting (F2, F7) also differ on Windows.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:58-04:00): Triage (Ideation, 2026-09-29). Related to PLAN-052, which lists it out of scope (line 212) because no Windows runner exists here. prerequisites.py (lines 31-43) lists Windows as supported, but the plugin's tests run only on Unix-like systems. ADR-025 records the untested Windows path in the lock mechanism. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 - relates_to ← `000489`
 
 ---
 
 ## 000485 · Audit-rubric note: "declared paths" in the plugin's protocol.md §7 means document and backlog declarations, not plugin options
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -22014,15 +22166,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 The ChatGPT audit cited docs/protocol.md line 133 ("Declared paths are repository-relative", enforced by the document scan and the backlog check) as the rule that F1 breaks. The validation found that rule is about paths declared inside documents and the backlog, and it holds (checks/backlog.py repository_path); the promise F1 actually breaks is plugin.json's "relative to the repository root" on each option. A note in the audit rubric, or in protocol.md §7 itself, would keep later audits from citing the wrong rule.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:59-04:00): Triage (Ideation, 2026-09-29). Planned in part by PLAN-052 phase-plfx-02 (line 213), which adds a protocol.md section 7 row for configured paths (F1 containment) beside the existing declared-paths row, separating the two meanings. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000486 · Record code-reservation holders as structured fields so release-code can list stale reservations by branch
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -22030,15 +22193,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Audit finding F6 (partially confirmed, reproduced): the plugin's reservations.py prunes by a 14-day age alone, so a phase active for longer has its code reissued, and the second branch to integrate renumbers. The holder is stored only as one combined string (reservations.py lines 141-143, 176-185). The validation's fix: store branch and worktree as separate fields, and in prune skip a reservation whose worktree is still listed by git worktree list on that branch; legacy reservations keep the TTL. With the fields, release-code could also list stale reservations by branch. Related wording fix: document-codes.md line 79 says "expired before its document was written" where the risk is expiry before the document merged (found in passing d).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:26:59-04:00): Triage (Ideation, 2026-09-29). Planned in part by PLAN-052 phase-plfx-04 (line 143, R12): branch and worktree fields on reservation payloads, and prune keeps reservations for live worktrees. Listing stale reservations by branch is not in PLAN-052. The holder is still stored as one combined string in plugins/idea-realization/scripts/reservations.py (lines 141-143, 176-185). Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000487 · Claude Code permission-rule recommendations for owner-gated plugin commands
 
-**Created 2026-09-27T14:38:49-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:49-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -22046,15 +22220,26 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Audit finding F4 (partially confirmed): idea_corpus.py accept marks a partition accepted with no authorization input; "only on the owner's explicit acceptance" is prose in the skill. A script cannot verify an approval the agent running it could not forge, but a Claude Code permission prompt is an approval the agent cannot answer for itself. The validation recommends the plugin README list permission rules for owner-gated commands, for example ask for Bash(uv run *idea_corpus.py accept*), kept as documentation because the owner ruled that the scaffold never writes settings (SESS-2026-09-25-02 lines 107-108). This is option (a) of the validation's decision D4, which is the owner's.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:00-04:00): Triage (Ideation, 2026-09-29). Planned in PLAN-052 phase-plfx-06 (line 145, R15): protocol.md section 7 documents partition acceptance and phase completion as human controls, and the README gains the permission rules. Already linked to 000477.
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
+- relates_to → `None`
 
 ---
 
 ## 000488 · A plugin backlog check that a phase marked complete has its branch merged into the integration branch
 
-**Created 2026-09-27T14:38:50-04:00 · Status: `open`**
+**Created 2026-09-27T14:38:50-04:00 · Status: `triaged`**
 
 [agent-proposed by Session Manager]
 
@@ -22062,20 +22247,41 @@ Relayed by the Session Manager, 2026-09-27. Source: _working/session-manager/rep
 
 Audit finding F5 (not confirmed as a defect): the plugin's backlog check accepts a completed phase with session, completion_evidence and result present and the evidence files existing; it does not check review or integration, and protocol.md lines 139-140 say those are human responsibilities. The validation lists optional hardening under decision D4 (c): a machine check that the phase's branch is an ancestor of the integration branch, alongside a check that the referenced session record has its Review section (backlog-protocol.md line 178).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:01-04:00): Triage (Ideation, 2026-09-29). Related to PLAN-052, which lists it out of scope (line 216): the owner ruled it a later check (D4). It proposes optional hardening: check that a completed phase's branch is merged into the integration branch and that the session record has a Review section. Already linked to 000477 and 000473 (the merge gate defect).
+
+</details>
+
 **Links**
 
 - relates_to → `000477`
 - relates_to → `000473`
+- relates_to → `None`
 
 ---
 
 ## 000489 · Audit Linux and Windows compatibility across every built function in the repository, Windows especially
 
-**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "need to audit Linux plus windows compatibility across all built functions in the repo (namely windows compatibility since this repo was built on linux)."
 
 Related: 000484 (Windows CI coverage for the idea-realization plugin's scripts) covers the plugin only; this asks for the whole repository.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:03-04:00): Triage (Ideation, 2026-09-29). No repository-wide Linux/Windows compatibility audit is planned. Windows appears piecemeal in PLAN-022 (workbench), PLAN-028 (architecture quality), REQ-007 and ADR-013 (terminal capability). 000484 (Windows CI for the plugin's scripts) covers the plugin only.
+
+</details>
 
 **Links**
 
@@ -22085,30 +22291,52 @@ Related: 000484 (Windows CI coverage for the idea-realization plugin's scripts) 
 
 ## 000490 · Find out what happened to the system boundary study the owner had ChatGPT perform
 
-**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "need to figure out what happened to the boundary study I had ChatGPT perform for eventually parsing out the different key features of this repo (idea realization engine, the workbench / separate from the workbench HTML generation in general)"
 
 What Ideation found when recording (read-only, dev 270e688): the study is on dev. REQ-033 (system boundary study requirements), PLAN-050 with sub-plans PLAN-050.01 to .05, PROMPT-041 (phase runner), working evidence under docs/00-working/boundary-study/, and the decision report ARCH-012 (status: draft, 2026-09-26). Its phases phase-bnd-01 to phase-bnd-05 are all complete in the backlog. The Session Manager's restart notes record that its 28 commits landed on local dev outside the lock on 2026-09-26 and that the owner ruled keep and push. ARCH-012's recommendation: keep one repository now and set explicit ownership and interface contracts before any package or repository extraction. It is a draft awaiting the owner.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:03-04:00): Triage (Ideation, 2026-09-29). A boundary study is on dev: PLAN-050 (system boundary study, REQ-033, PROMPT-041 phase runner), phase-bnd-01 to -05 complete, ARCH-012 (decision report, draft), evidence in docs/00-working/boundary-study/. The phases were claimed by agent-codex-boundary-study and agent-boundary-study. Not established here: whether this is the study the owner had ChatGPT perform, or a separate one. The owner chose option A at ARCH-012's gate on 2026-09-28.
+
+</details>
+
 **Links**
 
 - relates_to → `000492`
+- relates_to → `None`
 
 ---
 
 ## 000491 · A running list of the repository's active HTML artifacts, static and live, with a workflow that keeps each in sync as the repository changes
 
-**Created 2026-09-27T14:59:28-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running list of active HTML artifacts in this repo. Static references and libe ones that we need to ensure workflow exists to maintain them in sync as the repo grows and changes."
 
 ("libe" is recorded as typed; read as "live".) Related: 000106 (no drift test covers _public/overview/index.html), 000300 and 000301 (auto-regenerated idea and backlog pages).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:04-04:00): Triage (Ideation, 2026-09-29). PROMPT-042 (monitoring artifact investigation pack) investigates this idea together with 000492 to 000495 and 000497. No plan or phase yet. Neighbours: 000106 (no drift test for the overview page), PLAN-036 and 000511 (design system for the HTML artifacts).
+
+</details>
+
 **Links**
 
 - relates_to → `000492`
 - relates_to → `000106`
+- relates_to → `None`
 - relates_to ← `000497`
 - relates_to ← `000507`
 - relates_to ← `000511`
@@ -22117,14 +22345,25 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a running l
 
 ## 000492 · An active reference artifact for each major area of the repository, starting from an inventory of what exists
 
-**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:29-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Need a reference artifact (active) for each of: governance docs, Idea Realization Engine (IRE), Workbench, HTML generator, personal productivity system, protocol docs, boundary study (repeatable process for what ChatGPT did), Plan Audit Procedure, Build Audit Procedure, Planning Procedure (including different levels of granularity and complexity of plans from a single plan phase file to multi-phase complex plans with references and use of the prompt pack protocol), maybe consider separate artifacts for subcomponents of IRE (Idea Capture, Idea Fold, Idea Triage, Idea Partition, Idea Analytics, etc.). [...] Also need an artifact for the literature review research protocol. Some of these may exist already so we need to first inventory what we have and align on structure and how they are presented, target audience, how to make them most effective and mantainable and so on."
 
 Batch anchor for the owner's 2026-09-27 artifact asks: the artifact registry, the artifact-and-docs tracking agent, the path-finding agent, the HTML artifact list and the boundary study question relate to this idea. The first step the owner named is the inventory, then agreement on structure, presentation, target audience, effectiveness and maintainability.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:04-04:00): Triage (Ideation, 2026-09-29). Batch anchor for the owner's 2026-09-27 artifact asks (000490, 000491, 000493, 000494, 000495, 000497, 000500 link to it). PROMPT-042 (monitoring artifact investigation pack) investigates the artifact members and synthesizes a build priority across them. No plan yet.
+
+</details>
+
 **Links**
 
+- relates_to → `None`
 - relates_to ← `000490`
 - relates_to ← `000491`
 - relates_to ← `000493`
@@ -22137,15 +22376,26 @@ Batch anchor for the owner's 2026-09-27 artifact asks: the artifact registry, th
 
 ## 000493 · An artifact that tracks every artifact in the repository, and the protocol for maintaining them
 
-**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:29-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We definitely need an artifact for tracking all the artifacts and protocol for maintaining them."
 
 Close to the running list of active HTML artifacts recorded in the same batch; kept separate because the owner named it separately and it covers every artifact plus the maintenance protocol.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:05-04:00): Triage (Ideation, 2026-09-29). Investigated by PROMPT-042 with the rest of the 000492 batch. No artifact registry or maintenance protocol exists. 000510 (agent inventory) is the agent-specific counterpart.
+
+</details>
+
 **Links**
 
 - relates_to → `000492`
+- relates_to → `000510`
 - relates_to ← `000497`
 - relates_to ← `000511`
 
@@ -22153,9 +22403,19 @@ Close to the running list of active HTML artifacts recorded in the same batch; k
 
 ## 000494 · A dedicated agent that tracks the repository's artifacts, protocols, governance and documents
 
-**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:29-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We maybe need a dedicated agent for tracking all the artifacts and protocols and governance and docs in the repo."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:05-04:00): Triage (Ideation, 2026-09-29). Investigated by PROMPT-042 with the rest of the 000492 batch. PLAN-037 pairs 000086 (repo tracker agent) with a tracked list and an agent phase, but for cross-repository awareness, not this repository's own documents. 000509 (HelpDesk Agent) would answer questions from the same knowledge this agent tracks; already linked from 000509.
+
+</details>
 
 **Links**
 
@@ -22168,9 +22428,19 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "We maybe need a 
 
 ## 000495 · An agent that tracks paths and finds things in the repository
 
-**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:29-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Maybe another agent for tracking paths and finding things in the repo."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:06-04:00): Triage (Ideation, 2026-09-29). Investigated by PROMPT-042 with the rest of the 000492 batch. No path-finding agent or search tool exists. 000509 (HelpDesk Agent) is the question-answering neighbour; already linked from 000509.
+
+</details>
 
 **Links**
 
@@ -22182,7 +22452,7 @@ Owner, 2026-09-27, directly in the Ideation session. Verbatim: "Maybe another ag
 
 ## 000496 · Port the session autonomy configuration to the idea-realization plugin's multi-session.md and session-manager-messages.md once it has been used in d-system
 
-**Created 2026-09-27T14:59:29-04:00 · Status: `open`**
+**Created 2026-09-27T14:59:29-04:00 · Status: `triaged`**
 
 [agent-proposed by Session 1 - Builder A]
 
@@ -22190,9 +22460,20 @@ Relayed by Session 1 - Builder A, 2026-09-27, as given: port the session autonom
 
 State when recorded: REQ-034 and PLAN-051 (session autonomy configuration, with phase-mode-01..03) are drafted on branch agent/plan-autonomy-levels (8f1c966) and not yet on dev. The two target files exist at plugins/idea-realization/docs/multi-session.md and plugins/idea-realization/docs/session-manager-messages.md.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:01-04:00): Triage (Ideation, 2026-09-29). Related to PLAN-051 (session autonomy configuration, phase-mode-01 to 03). This proposes porting the autonomy configuration (axes, presets, mobile flag, resolver, MODE message) to the plugin's docs/multi-session.md and session-manager-messages.md once proven here. PLAN-051 excludes it (lines 225-228: "not now", owner ruling 2026-09-27). Builds on 000466 (the session autonomy configuration idea).
+
+</details>
+
 **Links**
 
 - extends → `000466`
+- relates_to → `None`
 
 ---
 
@@ -22248,7 +22529,7 @@ PROPOSED LINK: 000497 --relates_to--> 000301 (both ask for auto-regenerated page
 
 ## 000498 · A conversational guidelines document for the rules on how agents output and present words to the owner
 
-**Created 2026-09-27T15:21:35-04:00 · Status: `open`**
+**Created 2026-09-27T15:21:35-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "need to create conversational guidelines doc for rules in how you output and present words to me."
 
@@ -22256,9 +22537,10 @@ Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "need to c
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-27T15:21:42-04:00): Relay note from the Session Manager, recorded by Ideation: GOV-006 (How agents report to the owner, docs/08-governance/GOV-006-conversation-guidelines.md) exists and covers part of this: naming things before citing codes, showing output that carries information, not blocking on questions that can wait, capturing asks as ideas, and saying plainly when a correction is a correction. It is imported into every Claude Code session from CLAUDE.md and is kept short by design. Related, not merged. Other places that carry presentation rules today: CLAUDE.md's "Important Writing Style" section (no mannered prose), and the plugin's docs/reporting.md, the portable form of GOV-006 (see 000472, nothing loads it at session start in a target repository).
+- **finding** by agent-ideation (2026-09-29T02:27:06-04:00): Triage (Ideation, 2026-09-29). GOV-006 (how agents report to the owner) already covers much of this, as the existing relay note says: naming before citing, showing output that carries information, not blocking on questions that can wait, capturing asks as ideas, and stating corrections plainly. What is not in GOV-006 is for the owner to say; CLAUDE.md's "Important Writing Style" section also carries writing rules.
 
 </details>
 
@@ -22270,11 +22552,21 @@ Owner, 2026-09-27, relayed by the Session Manager. The owner's words: "need to c
 
 ## 000499 · Keep batch tables' phase status fresh while delivery is ongoing
 
-**Created 2026-09-27T16:12:44-04:00 · Status: `open`**
+**Created 2026-09-27T16:12:44-04:00 · Status: `triaged`**
 
 Owner ask, 2026-09-27, relayed by Session 5 - Batch Runner, as given: fix how batch phases are managed and tracked, possibly by folding it into the existing session-open, checkpoint and session-close protocols or other relevant ones, so a batch table's status doesn't go stale while phases are delivered. Trigger: batch-003 (idg-10, idg-01) and batch-004 (irs-06) had phases completed outside their batch while the tables still said "every phase queued".
 
 The tables are docs/09-backlog/batches/*.yaml, governed by GOV-016 (batch orchestration protocol) and shaped by schemas/batch.schema.json. Related: 000316 (enforce the batch-table schema in the governance check), which proposes a check that resolves each table's phase ids against backlog.yaml but not their status.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:06-04:00): Triage (Ideation, 2026-09-29). Batch tables in docs/09-backlog/batches/*.yaml (GOV-016) go stale during delivery: batch-003 and batch-004 had phases completed outside their batches while the tables still read queued. Nothing validates the tables mechanically; GOV-016 points to 000316 (enforce the batch-table schema in the governance check) as that check.
+
+</details>
 
 **Links**
 
@@ -22326,11 +22618,21 @@ Status: moved open -> triaged at the owner's direction (2026-09-29).
 
 ## 000501 · Clean up and archive old plan files that are not reusable, and consolidate their ideas into configurable reusable prompts
 
-**Created 2026-09-27T16:23:22-04:00 · Status: `open`**
+**Created 2026-09-27T16:23:22-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager, as given: "we need to go through and clean up/ archive old plan files that are not reusable and consolidate ideas from them into configurable reusable prompts. The goal is to not have governed prompts that are one time use."
 
 Recorded as given: the ask names old plan files, and its stated goal names governed prompts (docs/02-prompts/); which set the cleanup covers is for the owner to settle when this is planned. Related: 000500 (end-to-end planning protocol document) and GOV-008 (prompt pack protocol).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:07-04:00): Triage (Ideation, 2026-09-29). GOV-021 (planning protocol, draft) names this idea as the place where one-time prompts are separated from reusable ones (lines 130, 140), and the owner ruled on 2026-09-28 that GOV-008 (prompt-pack protocol) is amended once, with the plan-folder standard's work (000505), after that separation. No governed document yet defines the one-time/reusable line.
+
+</details>
 
 **Links**
 
@@ -22342,11 +22644,21 @@ Recorded as given: the ask names old plan files, and its stated goal names gover
 
 ## 000502 · Formalize the requirements generation process: are requirements created from ideas, or independently of any idea?
 
-**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+**Created 2026-09-27T16:36:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager, as given: "We need to formalize the requirements generation process. Do we create requirements from ideas or can they be independently created without an associated idea?"
 
 Related: 000038 (formalize the requirements-vs-plans process and design), 000500 (end-to-end planning protocol document, whose rulings put the requirement first).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:07-04:00): Triage (Ideation, 2026-09-29). GOV-021 (planning protocol, draft) names this idea as out of its scope (line 131): the protocol is silent on how requirements are generated. Closest idea: 000038 (formalize the requirements-versus-plans process). 000503 (idea backfill) is a neighbour.
+
+</details>
 
 **Links**
 
@@ -22360,11 +22672,21 @@ Related: 000038 (formalize the requirements-vs-plans process and design), 000500
 
 ## 000503 · Idea backfill: where else to backfill ideas from, what the process is, and whether to flag backfilled ideas
 
-**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+**Created 2026-09-27T16:36:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager, as given: "We have discussed backfilling ideas from plans that existed prior to the idea system existing, but we maybe need to consider where else makes sense to backfill ideas from and what does that process look like? Do we include a flag to signify that ideas were backfilled instead of existing as a generative seed first? Maybe that gives us some insight into what was done without formally exploring the fundamental concepts underlying the build or plans or other docs."
 
 What Ideation found when recording (read-only): no idea in the log records the earlier discussion of backfilling ideas from pre-idea plans. The backfills that exist are different: PLAN-016's one-time migrator moved the old ideas.md entries into the log, and phase-idg-13 and phase-idg-15 to -18 (PLAN-029) backfill existing ideas into the new terminal states. Related: 000038 (which asks whether plans without requirements need backfilling) and 000424 (an explorable representation of what has been built).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:07-04:00): Triage (Ideation, 2026-09-29). No plan or governed document covers backfill methodology: which record types, which sources, whether backfilled ideas are flagged. PLAN-029's phase-idg-13 to -18 backfill existing ideas into terminal states only. Neighbours: 000038 and 000502 (requirements generation), 000424 (explorable HTML of built work).
+
+</details>
 
 **Links**
 
@@ -22376,11 +22698,21 @@ What Ideation found when recording (read-only): no idea in the log records the e
 
 ## 000504 · Which types of ideas are eligible for which escalations, protocols and processes
 
-**Created 2026-09-27T16:36:17-04:00 · Status: `open`**
+**Created 2026-09-27T16:36:17-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager, as given: "building on the idea classification, tagging, etc. We need to figure out which types of ideas are eligible for different kinds of escalation, protocols, processes that build upon them (like, some ideas are just a simple question that requires an answer. Others represent complex systems that need to be decomposed into smaller ideas and those may yield requirements, plans, actual build and so on.)"
 
 Related: ARCH-005 (idea node classification: record kinds and the axes), 000452 (update the schema, writer and processes for the three-axis classification), 000061 (classify idea nodes by type), 000500 (planning protocol).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:07-04:00): Triage (Ideation, 2026-09-29). ARCH-005 (idea node classification, accepted 2026-09-25) defines the axes an idea is classified on; PLAN-029's phase-idg-02 builds the classifier. Routing ideas to escalations and processes by type depends on that classification existing. 000452 (schema for the classification axes) is the implementation neighbour.
+
+</details>
 
 **Links**
 
@@ -22434,13 +22766,23 @@ Status: moved open -> triaged at the owner's direction (2026-09-29).
 
 ## 000506 · OpenAI agents callable from Claude Code, for mostly read-only investigations to start and for adversarial audits
 
-**Created 2026-09-27T16:53:07-04:00 · Status: `open`**
+**Created 2026-09-27T16:53:07-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27, relayed by the Session Manager; lower priority, capture only. As given: "OpenAI agents that you can call and utilize through Claude Code, to support mostly read-only investigatory operations to start, and adversarial audits."
 
 The owner is planning it independently with ChatGPT in the worktree /code/d-system-worktrees/openai-agent-interoperability-preplan (branch agent/openai-agent-interoperability-preplan), which will hold a plan document to be audited and enhanced later. When this idea was recorded, that branch carried one commit, 02d20b9 ("Add OpenAI agent interoperability pre-plan"), which adds a PROMPT-043 pre-plan prompt; it is not on dev.
 
 Related: 000432 (other providers' models per role), 000430 (second-provider models as planners and in ideation), 000359 (coordinate other providers' sessions under the multi-session protocol), and PROMPT-040 (the Gemini review sequence).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:08-04:00): Triage (Ideation, 2026-09-29). Neighbours: 000432 (other providers' models per role), 000430 (second-provider models as planners), 000359 (other providers' sessions under the multi-session protocol), PROMPT-040 (Gemini review sequence). A pre-plan is being prepared on branch agent/openai-agent-interoperability-preplan. No plan in the backlog covers OpenAI agent integration; ADR-018 and ARCH-006 assume the Claude Agent SDK.
+
+</details>
 
 **Links**
 
@@ -22453,7 +22795,7 @@ Related: 000432 (other providers' models per role), 000430 (second-provider mode
 
 ## 000507 · dashboard-builder subagent: a live HTML progress dashboard for every long agent task
 
-**Created 2026-09-27T18:14:06-04:00 · Status: `open`**
+**Created 2026-09-27T18:14:06-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27: "Steal this idea I found from an X post:"
 
@@ -22478,16 +22820,27 @@ Send this prompt to Claude Code 👇
 
 Show me the contents of the files you'll create or change, then explain the whole flow in words a 10-year-old could follow. Don't write anything until I confirm."
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:08-04:00): Triage (Ideation, 2026-09-29). No plan covers a progress dashboard for long agent tasks. Neighbours already linked: 000497 (monitoring artifact), 000491 (running list of HTML artifacts). 000511 (design system) would set its look.
+
+</details>
+
 **Links**
 
 - relates_to → `000497`
 - relates_to → `000491`
+- relates_to → `000511`
 
 ---
 
 ## 000508 · Investigate graph-engineering agent frameworks (LangGraph, CrewAI, AutoGen, ADK, Mastra and others) and the "fake-edge" test
 
-**Created 2026-09-27T18:32:30-04:00 · Status: `open`**
+**Created 2026-09-27T18:32:30-04:00 · Status: `triaged`**
 
 Owner, 2026-09-27: "Steal this idea to investigate.  Another X post:"
 
@@ -22528,6 +22881,16 @@ https://github.com/mastra-ai/mastra
 none of these frameworks fix a bad graph for you. they only make it visible the moment your worker and your verifier have been sharing the same context the entire time
 
 full build in the article, then run the fake-edge test before you wire up an eighth
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:08-04:00): Triage (Ideation, 2026-09-29). ADR-018 chose LangGraph for ARCH-006's pipeline. The orchestrator (src/orchestrator/) uses LangGraph's StateGraph, START/END, SqliteSaver checkpointing and Command/interrupt for gates. No governed document compares CrewAI, AutoGen, ADK, Mastra or open-multi-agent. 000513 (LangGraph pivot over cost) is the owner's related concern.
+
+</details>
 
 **Links**
 
@@ -22604,6 +22967,7 @@ Related: 000126 (audit of commands, skills and agents), 000494. Proposed record 
 - relates_to → `000509`
 - relates_to → `000126`
 - relates_to → `000494`
+- relates_to ← `000493`
 
 ---
 
@@ -22649,25 +23013,46 @@ Owner rulings on the same review, 2026-09-28, as relayed by the Session Manager:
 - relates_to → `000491`
 - relates_to → `000493`
 - relates_to → `000497`
+- relates_to ← `000507`
 
 ---
 
 ## 000512 · Review the agentic-architecture capture's idea candidates and decide which to record
 
-**Created 2026-09-29T02:11:20-04:00 · Status: `open`**
+**Created 2026-09-29T02:11:20-04:00 · Status: `triaged`**
 
 A private capture session (2026-09-28) distilled 42 pasted answers on agentic-AI design into topic files under _private/agentic-architecture/ and collected 56 idea candidates, C-001 to C-056, for owner review. The candidates are grouped by theme in _private/agentic-architecture/wrap-up.md, and their full wording and rationale are in idea-candidates.md in the same folder. Every claim behind them is unverified.
 
 The review should decide, candidate by candidate, which to record as ideas, which to merge, and which to drop. C-030 needs a separate ruling because it conflicts with the current memory rule to delete memories that turn out to be wrong. No candidate has been written to the idea log yet.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:09-04:00): Triage (Ideation, 2026-09-29). No governed document covers the capture or its candidate review; nothing related found in the fold. This is review-and-record work for the owner, done from the private folder the idea names.
+
+</details>
+
 ---
 
 ## 000513 · Consider pivoting away from LangGraph: the owner does not want to pay for a separate API key that the Max subscription does not cover
 
-**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
+**Created 2026-09-29T02:21:01-04:00 · Status: `triaged`**
 
 Owner, 2026-09-28, relayed by the Session Manager. The owner's words: "I also may need to pivot away from the LangGraph option because I don't want to pay for a separate API key when it's not supported by my Max subscription."
 Related: ADR-018 (LangGraph orchestration), 000431 (is an API key necessary for LangGraph?), 000508 (graph-engineering frameworks), 000334, 000370.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-29T02:27:09-04:00): Triage (Ideation, 2026-09-29). 000431's triage recorded the Session Manager's answer (not re-read at the sources by Ideation): the open-source langgraph library needs no API key; LangSmith tracing and LangGraph server/platform deployment do. The orchestrator uses LangGraph as a library (StateGraph, SqliteSaver, interrupt), so LangGraph itself needs no key today. Not checked here, and likely the real cost question: ADR-018 dispatches every agent through the Claude Agent SDK, and whether the Agent SDK can run on a Max subscription rather than an API key is unverified. That answer decides whether a pivot away from LangGraph changes the cost at all.
+
+</details>
 
 **Links**
 
@@ -22681,21 +23066,9 @@ Related: ADR-018 (LangGraph orchestration), 000431 (is an API key necessary for 
 
 ## 000514 · Track more commands we can run to automate repeatable things: a catalog of repeatable automation commands and scripts
 
-**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
+**Created 2026-09-29T02:21:01-04:00 · Status: `triaged`**
 
 Owner, 2026-09-28, relayed by the Session Manager. The owner's words: "We need to track more commands that we can run to automate things that are repeatable."
-
-**Links**
-
-- relates_to ← `000515`
-
----
-
-## 000515 · A bash script that reopens every planning session in its own terminal window after a restart
-
-**Created 2026-09-29T02:21:01-04:00 · Status: `open`**
-
-Owner, 2026-09-28, relayed by the Session Manager, as a specific example of the repeatable-commands catalog. The owner's words: "if I restart my computer and I want to open all 8 of these planning sessions (Session Manager, Ideation, Prompt Planner, the 2 builders, the backup builder, and so on), is there a way we can run a bash script that automatically opens each of these sessions into their respective terminal windows?"
 
 **Annotations**
 
@@ -22703,8 +23076,32 @@ Owner, 2026-09-28, relayed by the Session Manager, as a specific example of the 
 <details>
 <summary>1 finding(s)</summary>
 
+- **finding** by agent-ideation (2026-09-29T02:27:09-04:00): Triage (Ideation, 2026-09-29). No catalog of repeatable commands exists. They are spread across tools/ (about 24 scripts, most with OPS runbooks), .claude/commands/ (12), .claude/skills/ (11), plugins/idea-realization/skills/, and agent-workflows/workflows.yaml (portable workflows). 000126 (audit of commands, skills and agents) and GOV-015 (agent surface audit) are the nearest existing inventories.
+
+</details>
+
+**Links**
+
+- relates_to → `000126`
+- relates_to ← `000515`
+
+---
+
+## 000515 · A bash script that reopens every planning session in its own terminal window after a restart
+
+**Created 2026-09-29T02:21:01-04:00 · Status: `triaged`**
+
+Owner, 2026-09-28, relayed by the Session Manager, as a specific example of the repeatable-commands catalog. The owner's words: "if I restart my computer and I want to open all 8 of these planning sessions (Session Manager, Ideation, Prompt Planner, the 2 builders, the backup builder, and so on), is there a way we can run a bash script that automatically opens each of these sessions into their respective terminal windows?"
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
 - **finding** by agent-ideation (2026-09-29T02:21:12-04:00): Checked by the Session Manager on the owner's machine, 2026-09-28, relayed as given: the claude CLI has -n/--name <name> (sets the session's display name: prompt box, /resume picker, terminal title), -r/--resume <session-id>, -c/--continue and --session-id <uuid>; gnome-terminal is installed (GNOME desktop). Not yet verified: whether -n sets the registered name that ListAgents and cross-session messaging use (GOV-017 "Session names").
 Neighbours: 000389 (session state and resumability: a resume brief per session role), 000340 (monitor each session's context use).
+- **finding** by agent-ideation (2026-09-29T02:27:10-04:00): Triage (Ideation, 2026-09-29). No launcher script exists. It is one instance of 000514's catalog. The Session Manager's CLI finding is already attached; session names and resumption are governed by GOV-017, and 000389 covers the resume brief each role would need.
 
 </details>
 
@@ -22713,3 +23110,4 @@ Neighbours: 000389 (session state and resumability: a resume brief per session r
 - relates_to → `000514`
 - relates_to → `000389`
 - relates_to → `000340`
+- relates_to → `None`
