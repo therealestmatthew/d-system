@@ -175,8 +175,8 @@
   "definitions": {
     "status": {
       "type": "string",
-      "enum": ["open", "triaged", "reviewing", "promoted", "discarded", "delivered", "resolved", "absorbed"],
-      "description": "open=captured, nothing has looked at it | triaged=scouting finished, awaiting the owner | reviewing=the owner is actively considering it | promoted=became a plan, requirement or phase; in flight, not finished, and reaches delivered when that work ships | discarded=rejected, terminal unless revisited once | delivered=a working capability exists and was verified, terminal | resolved=the ask was satisfied without building anything, terminal | absorbed=the substance was folded into another document that now carries it, terminal (GOV-003, 2026-09-22)"
+      "enum": ["open", "triaged", "reviewing", "promoted", "discarded", "delivered", "resolved", "absorbed", "set_aside"],
+      "description": "open=captured, nothing has looked at it | triaged=scouting finished, awaiting the owner | reviewing=the owner is actively considering it | promoted=became a plan, requirement or phase; in flight, not finished, and reaches delivered when that work ships | discarded=rejected, terminal unless revisited once | delivered=a working capability exists and was verified, terminal | resolved=the ask was satisfied without building anything, terminal | absorbed=the substance was folded into another document that now carries it, terminal (GOV-003, 2026-09-22) | set_aside=the owner held it out of a partition without discarding it; not terminal, reached only from triaged, and returns to triaged or reviewing (idea 000417, 2026-09-24). The name is a placeholder until idea 000453 (terminology for idea dispositions) is ruled on"
     },
     "pointer": {
       "type": "object",
@@ -250,7 +250,7 @@
       }
     },
     {
-      "description": "Status transitions move forward only. discarded is reachable from every working state but is never a from — the one way out of it is a revisited event, which is what limits reopening to once. delivered, resolved and absorbed are reachable from every working state and are never a from. promoted is not terminal: its one way on is to delivered, when the work it became ships (GOV-003, 2026-09-22). A move to delivered, resolved or absorbed requires closes_with, as promoted requires promoted_to; no other transition carries one.",
+      "description": "Status transitions move forward only, with one exception: set_aside, reachable from triaged only, returns to triaged or moves on to reviewing, so an owner hold-out from a partition is reversible. discarded is reachable from every working state but is never a from — the one way out of it is a revisited event, which is what limits reopening to once. delivered, resolved and absorbed are reachable from every working state and are never a from. promoted is not terminal: its one way on is to delivered, when the work it became ships (GOV-003, 2026-09-22). A move to delivered, resolved or absorbed requires closes_with, as promoted requires promoted_to; no other transition carries one.",
       "if": { "properties": { "event": { "const": "status" } }, "required": ["event"] },
       "then": {
         "required": ["from", "to"],
@@ -286,7 +286,10 @@
           { "properties": { "from": { "const": "reviewing" }, "to": { "const": "delivered" } } },
           { "properties": { "from": { "const": "reviewing" }, "to": { "const": "resolved" } } },
           { "properties": { "from": { "const": "reviewing" }, "to": { "const": "absorbed" } } },
-          { "properties": { "from": { "const": "promoted" }, "to": { "const": "delivered" } } }
+          { "properties": { "from": { "const": "promoted" }, "to": { "const": "delivered" } } },
+          { "properties": { "from": { "const": "triaged" }, "to": { "const": "set_aside" } } },
+          { "properties": { "from": { "const": "set_aside" }, "to": { "const": "triaged" } } },
+          { "properties": { "from": { "const": "set_aside" }, "to": { "const": "reviewing" } } }
         ]
       }
     },

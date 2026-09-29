@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from typing import Literal, TypedDict
 
+from src.db.ideas import statuses
+
 RunKind = Literal["intake", "batch", "unit", "realization"]
 
 #: The kinds this phase's skeleton actually builds a graph for. `batch`, `unit` and
@@ -60,11 +62,14 @@ def derive_intake_position(idea_status: str) -> str:
     rule (PLAN-039.01 section 3's table). `open` is the only status with unfinished work:
     the run has not yet asked whether to dispatch a triage pass. Every other legal status
     means the idea already left `open` by some transition, so the run's work is done,
-    whether or not that transition happened through this run at all.
+    whether or not that transition happened through this run at all. The legal statuses are
+    read from the schema (`src.db.ideas.statuses`), so a status added there is recognized here
+    without a second edit; before phase-idg-19 this restated five of them and raised on the
+    closing states and on `set_aside`.
     """
     if idea_status == "open":
         return "dispatch_gate"
-    if idea_status in {"triaged", "reviewing", "promoted", "discarded"}:
+    if idea_status in statuses():
         return "done"
     raise ValueError(f"unknown idea status {idea_status!r}")
 

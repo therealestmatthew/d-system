@@ -35,14 +35,16 @@ from typing import Any
 
 import yaml  # type: ignore[import-untyped]
 
-from src.db.ideas import LINK_TYPES, IdeaError, fold, legal_transitions, load_events
+from src.db.ideas import LINK_TYPES, IdeaError, fold, legal_transitions, load_events, statuses
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKLOG = ROOT / "docs" / "09-backlog" / "backlog.yaml"
 
-#: `schemas/idea.schema.json`'s `status` enum, restated here as the fixed funnel vocabulary —
-#: already alphabetical, so it doubles as the sorted label order.
-STATUSES = ("discarded", "open", "promoted", "reviewing", "triaged")
+#: `schemas/idea.schema.json`'s `status` enum, read from the schema and sorted, so it doubles as
+#: the funnel's label order. It used to be restated here, and fell behind twice: the three closing
+#: states (phase-idg-01) and `set_aside` (phase-idg-19) each made `funnel()` raise `KeyError` on
+#: the first real idea to reach them.
+STATUSES = tuple(sorted(statuses()))
 
 #: `docs/09-backlog/backlog.yaml` items' `status` vocabulary (`schemas/backlog.schema.json`),
 #: restated here rather than walked out of the schema — six fixed values duplicated once is

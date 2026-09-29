@@ -30,6 +30,12 @@ WORKING_STATES = {"open", "triaged", "reviewing"}
 CLOSING_STATES = ("delivered", "resolved", "absorbed")
 TERMINAL_STATES = {"discarded", *CLOSING_STATES}
 
+#: The one state that is neither worked in nor closed: the owner held the idea out of a
+#: partition without discarding it (idea 000417). Reachable only from `triaged`, it returns to
+#: `triaged` or moves on to `reviewing`. The name is a placeholder until idea 000453 rules on
+#: the terminology for idea dispositions.
+SET_ASIDE = "set_aside"
+
 #: Fields an `amended` event may correct. `title`/`body` are required on every idea and
 #: `text` is required on every annotation, so none of the three can ever be cleared — see
 #: `field_shape` in the schema for where that is enforced structurally. `target` is the one
@@ -129,6 +135,17 @@ def legal_transitions() -> set[tuple[str, str]]:
             for option in branch["then"]["oneOf"]
         }
     raise IdeaError("schemas/idea.schema.json declares no status transitions")
+
+
+def statuses() -> tuple[str, ...]:
+    """Every legal idea status, read from the schema's `status` enum in its declared order.
+
+    Consumers that need the full vocabulary (the overview funnel, the orchestrator's intake
+    re-derivation) read it here instead of restating it, so a status added to the schema
+    reaches them without a second edit.
+    """
+    enum: list[str] = _schema()["definitions"]["status"]["enum"]
+    return tuple(enum)
 
 
 def load_events(log: Path = LOG) -> list[dict[str, Any]]:

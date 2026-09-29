@@ -27,6 +27,7 @@ from typing import Any
 
 import pytest
 
+from src.db.ideas import statuses
 from src.orchestrator import decisions as decisions_mod
 from src.orchestrator import dispatch as dispatch_mod
 from src.orchestrator import gates, ledger
@@ -102,9 +103,15 @@ def test_derive_intake_position_open_means_dispatch_gate() -> None:
     assert state_mod.derive_intake_position("open") == "dispatch_gate"
 
 
-@pytest.mark.parametrize("status", ["triaged", "reviewing", "promoted", "discarded"])
+@pytest.mark.parametrize("status", [s for s in statuses() if s != "open"])
 def test_derive_intake_position_every_other_legal_status_means_done(status: str) -> None:
+    """Every status the schema declares except `open`, the closing states and `set_aside`
+    included: before phase-idg-19 this function restated five statuses and raised on the rest."""
     assert state_mod.derive_intake_position(status) == "done"
+
+
+def test_derive_intake_position_treats_set_aside_as_done() -> None:
+    assert state_mod.derive_intake_position("set_aside") == "done"
 
 
 def test_derive_intake_position_rejects_an_unknown_status() -> None:

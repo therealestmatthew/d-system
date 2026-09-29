@@ -1090,3 +1090,78 @@ def test_ideas_priority_yaml_is_governance_clean() -> None:
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "ideas-priority" not in result.stdout
+
+
+# --- set_aside: the owner's partition hold-out (phase-idg-19, idea 000417) ---------------
+
+
+def test_set_aside_is_legal_from_triaged_and_returns_to_triaged(log: Path) -> None:
+    append_idea.add("First", "Body", log)
+    append_idea.change_status("000001", "triaged", log=log)
+
+    append_idea.change_status("000001", "set_aside", log=log)
+    assert append_idea.fold(append_idea.load_events(log))["000001"]["status"] == "set_aside"
+
+    append_idea.change_status("000001", "triaged", log=log)
+    assert append_idea.fold(append_idea.load_events(log))["000001"]["status"] == "triaged"
+
+
+def test_set_aside_is_not_terminal_and_moves_on_to_reviewing(log: Path) -> None:
+    append_idea.add("First", "Body", log)
+    append_idea.change_status("000001", "triaged", log=log)
+    append_idea.change_status("000001", "set_aside", log=log)
+
+    append_idea.change_status("000001", "reviewing", log=log)
+
+    assert append_idea.fold(append_idea.load_events(log))["000001"]["status"] == "reviewing"
+    from src.db.ideas import TERMINAL_STATES
+
+    assert "set_aside" not in TERMINAL_STATES
+
+
+@pytest.mark.parametrize("path", [[], ["reviewing"], ["reviewing", "promoted"], ["discarded"]])
+def test_the_writer_refuses_set_aside_from_any_status_but_triaged(
+    log: Path, path: list[str]
+) -> None:
+    append_idea.add("First", "Body", log)
+    for step in path:
+        promoted_to = ["PLAN-016"] if step == "promoted" else None
+        append_idea.change_status("000001", step, promoted_to=promoted_to, log=log)
+    before = _lines(log)
+
+    with pytest.raises(append_idea.IdeaError, match="illegal transition"):
+        append_idea.change_status("000001", "set_aside", log=log)
+
+    assert _lines(log) == before, "a refused transition must leave the log unchanged"
+
+
+def test_the_transition_table_confines_set_aside_to_its_three_edges() -> None:
+    table = append_idea.legal_transitions()
+    assert {source for source, target in table if target == "set_aside"} == {"triaged"}
+    assert {target for source, target in table if source == "set_aside"} == {
+        "triaged",
+        "reviewing",
+    }
+
+
+def test_set_aside_refuses_every_other_way_out(log: Path) -> None:
+    append_idea.add("First", "Body", log)
+    append_idea.change_status("000001", "triaged", log=log)
+    append_idea.change_status("000001", "set_aside", log=log)
+
+    for target in ("open", "promoted", "discarded"):
+        with pytest.raises(append_idea.IdeaError, match="illegal transition"):
+            append_idea.change_status(
+                "000001",
+                target,
+                promoted_to=["PLAN-016"] if target == "promoted" else None,
+                log=log,
+            )
+
+
+def test_the_status_vocabulary_is_read_from_the_schema() -> None:
+    from src.db.ideas import statuses
+
+    schema = json.loads((ROOT / "schemas" / "idea.schema.json").read_text(encoding="utf-8"))
+    assert statuses() == tuple(schema["definitions"]["status"]["enum"])
+    assert "set_aside" in statuses()

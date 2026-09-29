@@ -325,6 +325,26 @@ def test_funnel_reports_zero_for_statuses_never_reached(log: Path) -> None:
         assert counts[status] == 0
 
 
+def test_funnel_counts_a_set_aside_idea_instead_of_raising(log: Path) -> None:
+    """`funnel()` used to restate the status list and raise KeyError on the first idea in a
+    status it lacked; it now reads the schema's enum (phase-idg-19)."""
+    append_idea.add("Held out", "Body", log)
+    append_idea.change_status("000001", "triaged", log=log)
+    append_idea.change_status("000001", "set_aside", log=log)
+    state = fold(load_events(log))
+
+    section = overview_metrics.funnel(state)
+
+    counts = dict(zip(section["labels"], _values(section, "count")))
+    assert counts["set_aside"] == 1
+    assert sum(counts.values()) == 1
+
+
+def test_funnel_statuses_match_the_schema_enum() -> None:
+    schema = json.loads((ROOT / "schemas" / "idea.schema.json").read_text(encoding="utf-8"))
+    assert overview_metrics.STATUSES == tuple(sorted(schema["definitions"]["status"]["enum"]))
+
+
 def test_cycle_time_reports_every_legal_transition_even_unseen(log: Path) -> None:
     append_idea.add("Only idea", "Body", log)
     events = load_events(log)
