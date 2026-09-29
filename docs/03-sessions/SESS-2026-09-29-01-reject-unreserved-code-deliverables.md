@@ -27,7 +27,7 @@ $ uv run pytest test/test_backlog.py
 
 ```text
 $ uv run python -m src.governance
-Governance OK: 43 systems, 398 documents, 34 memories, 341 backlog phases
+Governance OK: 43 systems, 399 documents, 34 memories, 341 backlog phases
 ```
 
 ## Acceptance
