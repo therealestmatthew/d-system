@@ -63,6 +63,15 @@ def backlog_repo(tmp_path: Path) -> tuple[Path, dict[str, Any], dict[str, Any]]:
         },
         "systems": [{"id": "sys-demo"}],
         "owners": {"repository-owner": "Maintainer"},
+        "register": {
+            "series": [
+                {"code": "PLAN", "kind": "plan", "numbering": "counter"},
+                {"code": "ADR", "kind": "adr", "numbering": "counter"},
+                {"code": "SESS", "kind": "session", "numbering": "dated"},
+            ],
+            "reserved": [{"code": "ADR-004", "reason": "Fixture reservation."}],
+            "retired": [{"code": "PLAN-011", "reason": "Fixture retirement."}],
+        },
     }
     return tmp_path, catalog, result
 
@@ -504,3 +513,77 @@ def test_backlog_without_next_up_still_orders_by_priority(
         if line.startswith("| phase-")
     ]
     assert rows[0].startswith("| phase-zzz-01")
+
+
+def test_deliverable_claiming_unreserved_code_fails(backlog_repo: Any) -> None:
+    root, catalog, result = backlog_repo
+    catalog["items"] = [phase(deliverables=["docs/04-decisions/ADR-007-new-decision.md"])]
+    errors = check((root, catalog, result))
+    assert errors == [
+        "phase-demo-01: deliverable docs/04-decisions/ADR-007-new-decision.md claims unreserved "
+        "code ADR-007; reserve it under reserved: in docs/08-governance/codes.yaml, "
+        "naming this phase"
+    ]
+
+
+def test_deliverable_naming_retired_code_fails_with_retired_message(backlog_repo: Any) -> None:
+    root, catalog, result = backlog_repo
+    catalog["items"] = [phase(deliverables=["docs/01-plans/PLAN-011-reissued.md"])]
+    errors = check((root, catalog, result))
+    assert errors == [
+        "phase-demo-01: deliverable docs/01-plans/PLAN-011-reissued.md names retired code "
+        "PLAN-011; a retired code is never reissued, so allocate a new one with --next-code"
+    ]
+
+
+def test_deliverables_naming_existing_or_reserved_codes_pass(backlog_repo: Any) -> None:
+    root, catalog, result = backlog_repo
+    result["documents"].update(
+        {
+            "doc-plan": {"kind": "plan", "status": "approved", "code": "PLAN-039"},
+            "doc-sub": {"kind": "plan", "status": "complete", "code": "PLAN-039.01"},
+            "doc-session": {"kind": "session", "status": "complete", "code": "SESS-2026-09-06-04"},
+        }
+    )
+    catalog["items"] = [
+        phase(
+            deliverables=[
+                "docs/01-plans/PLAN-039-parent.md",
+                "docs/01-plans/PLAN-039.01-child.md",
+                "docs/03-sessions/SESS-2026-09-06-04-a-session.md",
+                "docs/04-decisions/ADR-004-reserved-decision.md",
+                "AGENTS.md",
+                "docs/09-backlog/backlog.yaml",
+            ]
+        )
+    ]
+    assert check((root, catalog, result)) == []
+
+
+def test_unknown_dated_code_is_not_misread_as_counter_code(backlog_repo: Any) -> None:
+    root, catalog, result = backlog_repo
+    catalog["items"] = [phase(deliverables=["docs/03-sessions/SESS-2026-09-07-01-new.md"])]
+    errors = check((root, catalog, result))
+    assert len(errors) == 1
+    assert "unreserved code SESS-2026-09-07-01;" in errors[0]
+
+
+def test_repository_reservation_only_deliverables_pass() -> None:
+    """Every coded deliverable in the live backlog that exists only as a reservation passes."""
+    from src.governance.backlog import deliverable_code
+
+    errors, _, result = audit(ROOT)
+    assert errors == []
+    backlog_errors, catalog = audit_backlog(ROOT, result)
+    assert backlog_errors == []
+    series = {entry["code"] for entry in result["register"]["series"]}
+    existing = {meta["code"] for meta in result["documents"].values() if meta.get("code")}
+    reserved = {entry["code"] for entry in result["register"]["reserved"]}
+    reservation_only = {
+        code
+        for item in catalog["items"]
+        for path in item["deliverables"]
+        if (code := deliverable_code(path, series)) and code not in existing
+    }
+    assert reservation_only
+    assert reservation_only <= reserved

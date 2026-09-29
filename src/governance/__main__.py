@@ -377,6 +377,7 @@ def audit_backlog(
         errors = inspect_backlog(
             catalog,
             result["documents"],
+            result["register"],
             {item["id"] for item in result["systems"]},
             set(result["owners"]),
             lambda path: public_path(root, path).is_file(),

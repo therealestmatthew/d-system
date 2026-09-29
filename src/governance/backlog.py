@@ -10,6 +10,8 @@ from itertools import combinations
 from pathlib import PurePosixPath
 from typing import Any
 
+from src.governance.codes import held_codes, parse_code
+
 OPEN_PLANS = {"draft", "approved", "active"}
 # States that legitimately hold a worktree; every other state must release its claim.
 CLAIMED_STATES = {"active", "blocked", "complete"}
@@ -152,9 +154,52 @@ def claim_conflicts(item: dict[str, Any], items: dict[str, Any]) -> list[str]:
     )
 
 
+def deliverable_code(path: str, series: set[str]) -> str | None:
+    """The document code a deliverable's filename leads with, or None when it carries none."""
+    parts = PurePosixPath(path).stem.split("-")
+    # A dated code spans five hyphen-separated parts and a counter code two; trying the longer
+    # form first keeps `SESS-2026-09-06-04` from being read as a malformed counter code.
+    for width in (5, 2):
+        parsed = parse_code("-".join(parts[:width]))
+        if parsed and parsed["series"] in series:
+            return "-".join(parts[:width])
+    return None
+
+
+def code_claim_errors(
+    key: str, item: dict[str, Any], documents: dict[str, Any], register: dict[str, Any]
+) -> list[str]:
+    """Coded deliverables must name an existing document or a register reservation.
+
+    Only `codes.yaml` `reserved:` counts. The pre-merge store under the git common directory is
+    ignored, so the result is the same on every clone (GOV-005, "Two different things are called
+    a reservation").
+    """
+    series = {entry["code"] for entry in register["series"]}
+    existing = {meta["code"] for meta in documents.values() if meta.get("code")}
+    held = held_codes(register)
+    errors = []
+    for path in item["deliverables"]:
+        code = deliverable_code(path, series)
+        if code is None or code in existing or held.get(code) == "reserved":
+            continue
+        if held.get(code) == "retired":
+            errors.append(
+                f"{key}: deliverable {path} names retired code {code}; a retired code is never "
+                "reissued, so allocate a new one with --next-code"
+            )
+        else:
+            errors.append(
+                f"{key}: deliverable {path} claims unreserved code {code}; reserve it under "
+                "reserved: in docs/08-governance/codes.yaml, naming this phase"
+            )
+    return errors
+
+
 def inspect_backlog(
     catalog: dict[str, Any],
     documents: dict[str, Any],
+    register: dict[str, Any],
     systems: set[str],
     owners: set[str],
     check_file: Callable[[str], bool],
@@ -229,6 +274,7 @@ def inspect_backlog(
             errors.append(
                 f"{key}: completion evidence/results require an active, blocked or complete phase"
             )
+        errors.extend(code_claim_errors(key, item, documents, register))
         try:
             for path in item["deliverables"]:
                 check_file(path)  # Validate public path, but planned files need not exist yet.
