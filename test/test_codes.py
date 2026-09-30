@@ -84,8 +84,15 @@ def test_malformed_codes_are_rejected(value: str) -> None:
     assert parse_code(value) is None
 
 
-def test_counter_allocation_skips_reserved_codes(register: dict[str, Any]) -> None:
-    # ADR-004, ADR-005 and ADR-019 are held for backlog phases that have not been written yet.
+def test_counter_allocation_skips_reserved_codes(bare_register: dict[str, Any]) -> None:
+    # The test's own reserved list, not the live register's, which changes as phases land.
+    register = {
+        **bare_register,
+        "reserved": [
+            {"code": code, "reason": "Held for a phase not yet written."}
+            for code in ("ADR-004", "ADR-005", "ADR-019")
+        ],
+    }
     assert next_code("adr", register, {}) == "ADR-020"
     assert next_code("adr", register, {"doc-a": doc("ADR-020", kind="adr")}) == "ADR-021"
 
