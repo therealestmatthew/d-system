@@ -17,7 +17,6 @@ next_up:
 - phase-cap-08
 - phase-irs-11
 - phase-irs-14
-- phase-idg-11
 - phase-dgov-01
 - phase-idg-12
 - phase-irs-05
@@ -10530,8 +10529,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
+  session: doc-session-promoted-plan-staging
   priority: 2
   session_budget: 1
   depends_on: []
@@ -10559,8 +10559,19 @@ items:
   - docs/08-governance/codes.yaml
   - docs/04-decisions/ADR-010-idea-staging.md
   - test/test_codes.py
-  next_action: 'Built, verified and reviewed (validator PASS, adversary HOLDS, no findings); awaiting
-    the owner-approved merge. Checkpoint: SESS-2026-09-30-03.'
+  completion_evidence:
+  - docs/04-decisions/ADR-019-promoted-plan-staging.md
+  - docs/08-governance/GOV-011-promoted-plan-staging.md
+  - docs/04-decisions/ADR-010-idea-staging.md
+  - docs/08-governance/codes.yaml
+  - test/test_codes.py
+  - docs/03-sessions/SESS-2026-09-30-03-promoted-plan-staging.md
+  result: 'Complete: ADR-019 and GOV-011 define docs/00-working/promoted/<code>-<slug>.md as the draft location
+    on top of GOV-005''s reservation mechanism, with the abandoned-draft case (delete the draft, release the
+    reservation); ADR-010 points at them. test_counter_allocation_skips_reserved_codes decoupled from the live
+    register per the owner''s ruling. 1157 tests passed, governance, ruff and mypy clean; validator PASS and
+    adversary HOLDS with no findings. Integrated onto dev at 8103565 with the owner''s approval.'
+  next_action: Complete; phase-idg-12 may draft promoted plans at the location ADR-019 and GOV-011 define.
 - id: phase-idg-12
   title: Build the idea planner agent and check it against the standard
   plan: doc-idea-graph-lifecycle
