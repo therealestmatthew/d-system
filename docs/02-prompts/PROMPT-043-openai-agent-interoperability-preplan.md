@@ -7,7 +7,7 @@ kind: prompt
 status: draft
 owner: repository-owner
 created: '2026-09-27'
-updated: '2026-09-27'
+updated: '2026-09-30'
 systems: [sys-governance, sys-delivery, sys-realization]
 depends_on: [doc-governance-protocol, doc-prompt-pack-protocol]
 ---
@@ -23,6 +23,18 @@ The intended outcome is a narrowly bounded interoperability layer: independent O
 advisory roles that a person can invoke directly or through Claude Code, without granting a
 remote agent repository write access. Current repository behavior is unchanged.
 
+It serves idea `000506` (OpenAI agents callable from Claude Code, for mostly read-only
+investigations to start and for adversarial audits). The owner drafted the ratified content with
+ChatGPT on 2026-09-27, outside the interactive `AskUserQuestion` process `GOV-008` stage 1
+describes; that is why its status is `draft`. The Prompt Planner added the `GOV-008` structure
+around it on 2026-09-30 (sections *Feature inventory*, *What the planning session must produce*,
+*Open questions*, *Related ideas and rulings*, *Deadline context*, and the rewritten seed) without
+changing any ratified decision's choice.
+
+**Tests never run in the primary checkout** (`/code/d-system`). Every `pytest`, rebuild, `ruff`,
+`mypy` and governance run in any session this package starts happens in that session's own
+worktree. `test/test_codes.py` overwrites the tracked `catalog.md` while it runs.
+
 ## How to use this package
 
 When the owner elects to resume this work, use this document as the ratified starting input for a
@@ -35,7 +47,9 @@ the implementation details are not yet designed.
 
 1. **MVP runtime: OpenAI Agents API.** Use the managed OpenAI Agents API for this MVP. It owns
    managed sessions, context compaction, multi-agent capability, and MCP support. The Agents SDK
-   is a future local-orchestration enhancement, not an MVP substitute.
+   is a future local-orchestration enhancement, not an MVP substitute. *(The choice of runtime is
+   ratified. The capability description is the vendor's, as given in the owner's source plan, and
+   is unverified here: confirm it against official documentation at planning time.)*
 
 2. **One Python core, two thin adapters.** The eventual integration has a shared Python invocation
    core, exposed through a direct CLI and a Claude Code stdio MCP adapter. The adapters do not
@@ -91,6 +105,69 @@ decisions, without treating it as existing implementation:
 - No dependency, MCP registration, API integration, implementation file, backlog phase, or
   execution plan is authorized by this package.
 
+## Feature inventory
+
+The owner's MVP, itemized from the decisions and shape above. Letters are for reference.
+
+- **A. Invocation core.** One typed Python service holding the three role contracts, request
+  construction and the content boundary (decisions 2, 6).
+- **B. CLI adapter.** Direct invocation of any role (decision 2).
+- **C. Claude Code stdio MCP adapter.** Tools `openai_review`, `openai_adversarial_audit` and
+  `openai_research`, each with task, scope and input-reference fields (decision 2).
+- **D. The three roles.** Reviewer, adversarial auditor and research synthesizer; read-only; the
+  research role has hosted web search only (decision 3).
+- **E. Content boundary.** Named tracked files, a bounded Git diff and named specifications only;
+  reject, never trim; `_private/`, `.env*`, credentials, generated data and untracked paths
+  excluded (decision 6). `tools/check_no_private_content.py` is the repository's existing
+  confidential-identifier check; the planning session decides whether the boundary reuses or
+  extends it.
+- **F. Structured reports.** Role, verdict, ranked findings, evidence locations or URLs,
+  uncertainties, next action, session id, usage or error metadata (*MVP shape*).
+- **G. Credential handling.** The key in ignored local `.env` only (decision 5).
+- **H. Tests.** Mocked unit and adapter-level tests of the items the *MVP shape* lists; a real-key
+  smoke test is the owner's later step.
+
+## What the planning session must produce, in order
+
+Through the `GOV-008` pipeline. Nothing is implemented, no dependency is added, no MCP server is
+registered and no credential is set up until the owner signs off the coordinator prompt.
+
+1. **Prompt B**, the pack-factory prompt (`--next-code prompt`), drafted from this package. It
+   stops for its own adversarial review and the owner's sign-off (`GOV-008` stage 3).
+2. Then, by executing Prompt B: a requirement (`--next-code requirement`) with observable rows for
+   items A to H; decision records (`--next-code decision`) at least for the runtime and its
+   relation to `ADR-018`, the content boundary, and credential handling; a plan
+   (`--next-code plan`) with one-session backlog phases, reviewed under `GOV-018`; agent-roster
+   deltas; the delegation pack, coordinator prompt and kick-off record (`GOV-008` stages 4 to 8).
+
+## Related ideas and rulings
+
+- `000506` is the idea this package serves.
+- `000432` (other providers' models per role) carries the owner's 2026-09-27 rulings: a role table
+  in configuration (model, fallback model and endpoint per role, one startup check), LiteLLM
+  Router not adopted, and "the client-data allow-list is Anthropic endpoints only". Its Scout
+  synthesis places per-provider adapters at the `Dispatcher` seam in `src/orchestrator/dispatch.py`.
+- `000430` (second-provider models as planners and in ideation) and `000359` (other providers'
+  sessions under the multi-session protocol) are the owner's related asks.
+- `ADR-018` says the Claude Agent SDK executes every agent a LangGraph node dispatches. These
+  OpenAI roles are invoked by a person or by Claude Code through MCP, not dispatched by the
+  orchestrator; the planning session states that relation in a decision record.
+- `PROMPT-040` (the Gemini review sequence) is the nearest precedent for sending repository content
+  to another provider.
+
+## Open questions for the owner
+
+Asked by the planning session with `AskUserQuestion`, batched, one batch at a time, at the point
+each matters; drafts in the message text, never in option previews.
+
+1. **Gate check-in** (`GOV-008`, always asked up front): should the build session stop at gates for
+   check-in, or push through to close-out?
+2. **Client-data allow-list.** Does the 2026-09-27 ruling on `000432` ("the client-data allow-list
+   is Anthropic endpoints only") cover only `_private/` client records, which decision 6 already
+   excludes, or any repository content sent to OpenAI?
+3. **Role table.** Do these roles join the per-role table ruled on `000432`, or stay a separate
+   configuration because the orchestrator does not dispatch them?
+
 ## Unresolved future work
 
 The following are deliberately open and must be resolved through the planning protocol rather than
@@ -115,12 +192,32 @@ preserved as approved MVP input, not independently revalidated design commitment
 session must verify mutable platform details against official documentation before producing
 implementation artifacts.
 
+## Standing rules for the sessions this starts
+
+- `AGENTS.md` governs. Every governed document takes its code from `--next-code`.
+- Work in a worktree; tests never run in the primary checkout.
+- Ideas are recorded only through the sanctioned writer; under the coordination contract
+  (`GOV-017`), a session sends them to the Ideation session.
+- Never write a confidential identifier into a tracked file; run
+  `tools/check_no_private_content.py` with changes staged, and read its identifier count.
+- Reviews are dispatched on an adversary or validator agent type, never `general-purpose`.
+
+## Deadline context
+
+No deadline binds this work. `000506` was recorded as lower priority, capture only.
+
 ## Prompt A seed
 
-> Treat `PROMPT-043` as the owner-approved pre-plan package for OpenAI-agent interoperability.
-> Preserve every item under “Ratified decisions” as do-not-re-ask. Do not implement the integration.
-> First create the required governed planning artifacts through the applicable planning protocol:
-> requirements, ADRs, an implementation plan, dependency-ordered backlog phases, and a
-> pack-factory prompt. Explicitly resolve every item in “Unresolved future work,” arrange an
-> adversarial audit before implementation, and return to the owner for approval before any
-> implementation session, dependency addition, MCP registration, or credential setup.
+> You are the planner for OpenAI-agent interoperability (idea `000506`). Read `AGENTS.md`, then
+> `docs/08-governance/GOV-006-conversation-guidelines.md`, then
+> `docs/08-governance/GOV-008-prompt-pack-protocol.md`, then this document
+> (`docs/02-prompts/PROMPT-043-openai-agent-interoperability-preplan.md`) in full. Preserve every
+> item under "Ratified decisions" as do-not-re-ask. Read ideas only through `fold()`. Work in your
+> own worktree; tests never run in the primary checkout. Produce exactly one artifact: **Prompt B**,
+> the pack-factory prompt (`--next-code prompt`), carrying this package's decisions, feature
+> inventory, open questions and unresolved work forward, and naming in order what its "What the
+> planning session must produce" section lists. Ask the owner, through AskUserQuestion, only the
+> open questions whose answers change what Prompt B says. Do not write the requirement, decisions,
+> plan or phases, and do not run Prompt B: it runs only after its adversarial review (`GOV-008`
+> stage 3) and the owner's sign-off. Do not add a dependency, register an MCP server or set up a
+> credential. Stop when Prompt B exists, governance exits 0, and the owner has a summary of it.
