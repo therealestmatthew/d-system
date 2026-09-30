@@ -10223,11 +10223,10 @@ items:
   - tools/overview_metrics.py
   - src/orchestrator/state.py
   - agent-workflows/idea.md
-  next_action: Split out of phase-idg-01 on 2026-09-24 (Session Manager sizing call, owner ruling (b) on
-    000417), because folding the status and the partition field into phase-idg-01 took it past
-    session_budget 1. Do not start before phase-idg-01 ships; this phase adds a status to the same
-    transition table. phase-irs-02 also lists .claude/skills/partition-ideas/SKILL.md, so the two
-    collide on that file.
+  next_action: Built on agent/phase-idg-19 (set_aside status and held_out field, both acceptance
+    conditions met). The owner regenerates .agents/skills/partition-ideas/SKILL.md (agents are denied
+    writes there); then commit it, re-run uv run pytest, run /session-close through its review, and
+    send READY. Session record SESS-2026-09-30-01.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle

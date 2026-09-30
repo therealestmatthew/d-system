@@ -412,6 +412,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-27-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-27-02-plugin-end-to-end.md |
 | SESS-2026-09-29-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md |
 | SESS-2026-09-29-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-29-02-plugin-idea-writer-lock.md |
+| SESS-2026-09-30-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-01-idea-set-aside-status.md |
 | SESS-2026-09-30-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-02-glossary-refresh-merge-prep.md |
 | SESS-2026-09-30-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-03-promoted-plan-staging.md |
 | SESS-2026-09-30-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-04-backlog-fix-next-wave.md |
@@ -513,4 +514,4 @@ CI regenerates it and fails on any difference.
 | OPS-028 | reserved | Operations document for tools/generate_engine_pages.py; deliverable of phase-des-09. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-408 documents — adr: 23, architecture: 12, governance: 19, operation: 22, plan: 81, prompt: 43, requirement: 35, session: 173.
+409 documents — adr: 23, architecture: 12, governance: 19, operation: 22, plan: 81, prompt: 43, requirement: 35, session: 174.
