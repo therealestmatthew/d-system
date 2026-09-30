@@ -10558,6 +10558,7 @@ items:
   - docs/08-governance/GOV-011-promoted-plan-staging.md
   - docs/08-governance/codes.yaml
   - docs/04-decisions/ADR-010-idea-staging.md
+  - test/test_codes.py
   next_action: This blocks 000046's design, which is why it is sized ahead of the planner agent rather
     than discovered during it.
 - id: phase-idg-12
