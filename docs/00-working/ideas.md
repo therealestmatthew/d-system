@@ -15035,6 +15035,7 @@ PROPOSED LINK: 000308 --supersedes--> 000296 (000308 corrects the unmarked count
 - supersedes → `000296`
 - relates_to ← `000309`
 - relates_to ← `000310`
+- relates_to ← `000519`
 
 ---
 
@@ -23136,4 +23137,46 @@ Session 2 - Builder B, 2026-09-29, as given: "once phase-idg-19 merges, the idea
 **Links**
 
 - relates_to → `000516`
+- relates_to → `None`
+
+---
+
+## 000518 · Three-axis classification: apply the O6 check before L4 (salvaged from Gemini finding G1-F003)
+
+**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+
+Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "Three-axis framework: apply the O6 check before L4 (Gemini G1-F003)."
+Source: _working/session-manager/scout/gemini-branches-review.md (gitignored). The Gemini run stress-tested a draft copy (three-axis-v3.md) before ARCH-005 became active; the Scout had not checked whether ARCH-005 as it stands already resolves this. In ARCH-005, O6 is a bundle of unrelated findings (decompose set) and L4 is an observation with a remedy (retrospective insight). The run's evidence citations were placeholders, so the point itself is unverified.
+
+**Links**
+
+- relates_to → `None`
+- relates_to → `None`
+
+---
+
+## 000519 · The word "supersede" is used in two senses across the idea system; pick one (salvaged from Gemini finding G1-F006)
+
+**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+
+Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "The word 'supersede' is used in two senses across the idea system; pick one (Gemini G1-F006)."
+Per the Scout's review (_working/session-manager/scout/gemini-branches-review.md, gitignored), the two senses are an idea disposition and a lifecycle trigger. The run's evidence citations were placeholders, so the point itself is unverified.
+
+**Links**
+
+- relates_to → `None`
+- relates_to → `None`
+- relates_to → `000308`
+
+---
+
+## 000520 · A stricter check_outputs.py for external-model runs: reject repeated quotes, or quotes of a provenance or title line, as evidence
+
+**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+
+Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "A stricter check_outputs.py for external-model runs that rejects repeated quotes, or quotes of a provenance line, as evidence (G1's fix step replaced its own evidence with the input file's provenance line, and G3 cited AGENTS.md's title line)."
+Detail from the Scout's review (_working/session-manager/scout/gemini-branches-review.md, gitignored): G1's fix.py rewrote the evidence of six of seven findings to the same citation, the input file's line 3 ("Copied on 2026-09-25 by the Prompt Planner session"); G3-F001, F003 and F004 all cite AGENTS.md lines 1-5, its title line. Both passed the checker, whose rule is only that the quote appears in the cited file. The checker is docs/00-working/gemini/check_outputs.py.
+
+**Links**
+
 - relates_to → `None`
