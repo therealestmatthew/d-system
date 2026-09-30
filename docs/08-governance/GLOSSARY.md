@@ -625,13 +625,17 @@ agent are parked ideas; current identity governance establishes a foundation for
 
 ### Idea classification axes
 
-Ontological classification describes what an idea concerns or is; epistemic classification
-describes its knowledge/evidence standing; lifecycle classification describes where the idea sits in
-the arc from raw thought to executed and reviewed work (Axis 3 in
-`docs/07-architecture/ARCH-005-idea-node-classification.md`, which is still a draft; `REQ-014` R01
-names the three as ontological, epistemic and lifecycle, stored as distinct fields rather than tags).
-These axes are distinct from the idea's workflow status (`open`, `triaged` and so on). Their exact values, links, tags and
-transition rules remain the subject of idea 000268.
+Four axes, defined in `docs/07-architecture/ARCH-005-idea-node-classification.md` (active,
+accepted by the owner 2026-09-25). Ontological classification describes what an idea concerns or is;
+epistemic classification describes its knowledge/evidence standing; lifecycle classification
+describes where the idea sits in the arc from raw thought to executed and reviewed work; temporal
+validity records whether what it states is bound to a time (as-of) or not (standing). A record kind
+is assigned first, and only `knowledge` records carry axis values, one on each axis. `ADR-024`
+(accepted) stores them as fields on the idea schema rather than as tags or a separate graph layer,
+and `phase-idg-01` shipped those fields (`record_kind`, `ontological`, `epistemic`, `lifecycle`,
+`temporal`) in `schemas/idea.schema.json`, as `REQ-014` R01 requires. These axes are distinct from
+the idea's workflow status (`open`, `triaged` and so on). Links, tags and transition rules remain
+the subject of idea 000268.
 
 ---
 
@@ -785,7 +789,7 @@ can recover from a failed command: the failure is just another result to read.
 A second agent started by the first, with its own context window, its own tool set and its own loop,
 which reports one result back to the caller. The point is context isolation: the sub-agent's
 intermediate tool output never enters the caller's context, only its final report does. In this
-repository `.claude/agents/` holds fourteen definitions — a Markdown file whose front matter sets
+repository `.claude/agents/` holds fifteen definitions — a Markdown file whose front matter sets
 `name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
 instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
 

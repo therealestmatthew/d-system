@@ -84,7 +84,7 @@ can recover from a failed command: the failure is just another result to read.
 A second agent started by the first, with its own context window, its own tool set and its own loop,
 which reports one result back to the caller. The point is context isolation: the sub-agent's
 intermediate tool output never enters the caller's context, only its final report does. In this
-repository `.claude/agents/` holds fourteen definitions — a Markdown file whose front matter sets
+repository `.claude/agents/` holds fifteen definitions — a Markdown file whose front matter sets
 `name`, `description`, `tools`, `model` and limits like `maxTurns`, and whose body is the sub-agent's
 instructions. `demo-adversary` is one: it is given `Read, Grep, Glob, Bash` and cannot write.
 
