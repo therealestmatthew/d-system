@@ -10559,10 +10559,8 @@ items:
   - docs/08-governance/codes.yaml
   - docs/04-decisions/ADR-010-idea-staging.md
   - test/test_codes.py
-  next_action: 'Decouple test_counter_allocation_skips_reserved_codes in test/test_codes.py from the
-    live register (owner ruling 2026-09-29: give it its own reserved list, ADR-004, ADR-005 and ADR-019),
-    re-run pytest green, then run PROMPT-036''s validator and adversary on ADR-019, GOV-011, the ADR-010
-    pointer and the codes.yaml change, then READY. Checkpoint: SESS-2026-09-30-03.'
+  next_action: 'Built, verified and reviewed (validator PASS, adversary HOLDS, no findings); awaiting
+    the owner-approved merge. Checkpoint: SESS-2026-09-30-03.'
 - id: phase-idg-12
   title: Build the idea planner agent and check it against the standard
   plan: doc-idea-graph-lifecycle

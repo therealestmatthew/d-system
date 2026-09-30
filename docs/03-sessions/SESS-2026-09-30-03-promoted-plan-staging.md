@@ -22,43 +22,51 @@ widened at e70d198.
 
 ## Verification
 
+Run in the worktree after rebasing onto dev at 51e0924, with the test fix committed at e804461.
+
 `uv run python -m src.governance`
 
 ```
-Governance OK: 43 systems, 401 documents, 34 memories, 341 backlog phases
+Governance OK: 43 systems, 404 documents, 34 memories, 341 backlog phases
 ```
 
 `uv run pytest`
 
 ```
-FAILED test/test_codes.py::test_counter_allocation_skips_reserved_codes - Ass...
-1 failed, 1156 passed, 1 warning
+1157 passed, 1 warning in 115.66s (0:01:55)
 ```
+
+`uv run ruff check src/ test/`: `All checks passed!`. `uv run mypy src/`: `Success: no issues found
+in 46 source files`.
+
+The checkpoint run before the fix had 1 failed, 1156 passed; the failure was
+`test_counter_allocation_skips_reserved_codes`, which read the live register and assumed ADR-019
+was still reserved. Per the owner's ruling of 2026-09-29 it now builds on `bare_register` with its
+own reserved list (ADR-004, ADR-005, ADR-019), so the allocator arithmetic it checks is unchanged.
 
 ## Acceptance
 
-- REQ-014 R18 holds (location defined, abandoned-draft case stated, ADR-010 points at it): Not met
-  yet. ADR-019, GOV-011 and the ADR-010 pointer exist on the branch, but no validator or
-  adversarial review has judged them, and `uv run pytest` above is red.
-- Builds on GOV-005's reservation mechanism rather than a second one: Not met yet. Pending the same
-  review.
-- Consistent with GOV-005's rule that a code is permanent once on the trunk: Not met yet. Pending
-  the same review.
+Judged by a validator (`demo-validator-code`, verdict PASS) and an adversary (`demo-adversary`,
+verdict HOLDS), each with no findings. Evidence in
+`_working/session-manager/build-batch-003/idg-11-validator.md` and `idg-11-adversary.md`.
+
+- REQ-014 R18 holds (location defined, abandoned-draft case stated, ADR-010 points at it): Met.
+  ADR-019 and GOV-011 define `docs/00-working/promoted/<code>-<slug>.md` and the abandoned-draft
+  case (delete the draft, release the reservation); ADR-010 points at them.
+- Builds on GOV-005's reservation mechanism rather than a second one: Met. The draft uses the
+  existing `reserved:` list and `--release-code`; no second ledger.
+- Consistent with GOV-005's rule that a code is permanent once on the trunk: Met. ADR-019 and GOV-011
+  were reservations until their documents landed; no code is renumbered or reissued.
 
 ## Backlog
 
-`status: active`, `agent: agent-coord`. `next_action`: Decouple
-test_counter_allocation_skips_reserved_codes in test/test_codes.py from the live register (owner
-ruling 2026-09-29: give it its own reserved list, ADR-004, ADR-005 and ADR-019, so the allocator
-arithmetic it checks is unchanged), re-run pytest green, then run PROMPT-036's validator and
-adversary on ADR-019, GOV-011, the ADR-010 pointer and the codes.yaml change, then READY to the
-Session Manager.
+`status: active`, `agent: agent-coord`. `next_action`: built, verified and reviewed; awaiting the
+owner-approved merge.
 
 ## Unresolved
 
-- One failing test, cause known and fix ruled by the owner (see Backlog). It is not started,
-  because the Session Manager called a wind-down.
-- The validator and adversary have not run.
+- The merge onto dev needs the owner's approval in the Batch Runner session, then the Session
+  Manager's GRANTED merge.
 - Reconnaissance had reported that no test pins the reserved list; that was wrong, which is how the
   failing test was missed before the claim. Recorded in the coordinator's tracker,
   `_working/session-manager/build-batch-003/tracker.md`.
