@@ -23,6 +23,7 @@ CI regenerates it and fails on any difference.
 | ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
 | ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
 | ADR-018 | adr | accepted | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
+| ADR-019 | adr | accepted | repository-owner | docs/04-decisions/ADR-019-promoted-plan-staging.md |
 | ADR-020 | adr | accepted | repository-owner | docs/04-decisions/ADR-020-session-type-declaration-and-lifecycle.md |
 | ADR-021 | adr | accepted | repository-owner | docs/04-decisions/ADR-021-claude-code-dependency.md |
 | ADR-022 | adr | accepted | repository-owner | docs/04-decisions/ADR-022-broker-first-autonomous-operations.md |
@@ -51,6 +52,7 @@ CI regenerates it and fails on any difference.
 | GOV-008 | governance | active | repository-owner | docs/08-governance/GOV-008-prompt-pack-protocol.md |
 | GOV-009 | governance | active | repository-owner | docs/08-governance/GOV-009-research-protocol.md |
 | GOV-010 | governance | active | repository-owner | docs/08-governance/GOV-010-plan-quality-standard.md |
+| GOV-011 | governance | active | repository-owner | docs/08-governance/GOV-011-promoted-plan-staging.md |
 | GOV-013 | governance | active | repository-owner | docs/08-governance/GOV-013-coordinator-protocol.md |
 | GOV-014 | governance | active | repository-owner | docs/08-governance/GOV-014-realization-role-contracts.md |
 | GOV-015 | governance | active | repository-owner | docs/08-governance/GOV-015-agent-surface-audit.md |
@@ -501,9 +503,7 @@ CI regenerates it and fails on any difference.
 |---|---|---|
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
-| ADR-019 | reserved | Promoted-plan staging decision; deliverable of phase-idg-11. |
-| GOV-011 | reserved | Promoted-plan staging protocol; deliverable of phase-idg-11. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-401 documents — adr: 22, architecture: 12, governance: 18, operation: 22, plan: 81, prompt: 43, requirement: 34, session: 169.
+403 documents — adr: 23, architecture: 12, governance: 19, operation: 22, plan: 81, prompt: 43, requirement: 34, session: 169.

@@ -7,7 +7,7 @@ kind: adr
 status: accepted
 owner: repository-owner
 created: '2026-09-06'
-updated: '2026-09-06'
+updated: '2026-09-29'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-governance-protocol]
 ---
@@ -54,6 +54,12 @@ What it is not:
 - **Not a commitment.** An entry carries no obligation to act. It ends in a status — `promoted` into
   a plan, requirement or phase, or `discarded` with a reason — never in silence and never in
   deletion.
+
+**This ADR stops at promotion.** It does not say where the promoted document's draft lives between
+the owner's decision and the document existing with a code in `docs/01-plans/` or
+`docs/06-requirements/`, or what happens if that draft is abandoned. That is
+[ADR-019](ADR-019-promoted-plan-staging.md) and its protocol document,
+[GOV-011](../08-governance/GOV-011-promoted-plan-staging.md).
 
 ## Ideas are recorded as given, not filtered at entry
 
