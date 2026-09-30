@@ -22302,9 +22302,10 @@ What Ideation found when recording (read-only, dev 270e688): the study is on dev
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-29T02:27:03-04:00): Triage (Ideation, 2026-09-29). A boundary study is on dev: PLAN-050 (system boundary study, REQ-033, PROMPT-041 phase runner), phase-bnd-01 to -05 complete, ARCH-012 (decision report, draft), evidence in docs/00-working/boundary-study/. The phases were claimed by agent-codex-boundary-study and agent-boundary-study. Not established here: whether this is the study the owner had ChatGPT perform, or a separate one. The owner chose option A at ARCH-012's gate on 2026-09-28.
+- **finding** by agent-ideation (2026-09-30T10:14:27-04:00): Owner ruling, 2026-09-30, relayed by the Session Manager: the study in PLAN-050 (system boundary study; phase-bnd-01 to -05 complete, decision report ARCH-012) is the boundary study the owner had ChatGPT perform. This answers the question the 2026-09-29 triage finding left open.
 
 </details>
 
@@ -23049,9 +23050,15 @@ Related: ADR-018 (LangGraph orchestration), 000431 (is an API key necessary for 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-29T02:27:09-04:00): Triage (Ideation, 2026-09-29). 000431's triage recorded the Session Manager's answer (not re-read at the sources by Ideation): the open-source langgraph library needs no API key; LangSmith tracing and LangGraph server/platform deployment do. The orchestrator uses LangGraph as a library (StateGraph, SqliteSaver, interrupt), so LangGraph itself needs no key today. Not checked here, and likely the real cost question: ADR-018 dispatches every agent through the Claude Agent SDK, and whether the Agent SDK can run on a Max subscription rather than an API key is unverified. That answer decides whether a pivot away from LangGraph changes the cost at all.
+- **finding** by agent-ideation (2026-09-30T10:14:27-04:00): Scout finding, 2026-09-30, researched at the owner's request (report: _working/session-manager/scout/agent-sdk-max-auth.md, gitignored; sources fetched that day). The premise does not hold today: no separate API key is needed.
+- The Claude Agent SDK runs the Claude Code binary and uses its credential chain: a Max /login, or a one-year CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token` for unattended runs (not read in --bare mode). Verified at code.claude.com/docs/en/authentication and /agent-sdk/overview.
+- Anthropic's legal page states Pro and Max usage limits "assume ordinary, individual usage of Claude Code and the Agent SDK"; the prohibitions target products offered to other users. Reading the owner's personal orchestrator as allowed is an interpretation, not an Anthropic statement.
+- Cost today: Agent SDK use draws from the same 5-hour and weekly Max allowance as the owner's interactive sessions. A May 2026 plan to move SDK use onto a monthly credit ($100 Max 5x, $200 Max 20x) was paused on 2026-06-15, with advance notice promised before any change (support.claude.com article 15036540).
+- Consequence for this idea: the cost exposure sits in the Agent SDK dispatch layer, not in LangGraph (which needs no key as a library, per 000431). Pivoting away from LangGraph would not change the cost.
+- Operational: ANTHROPIC_API_KEY must be unset in orchestrator processes; when set it silently outranks the subscription login and bills the API.
 
 </details>
 
@@ -23117,9 +23124,19 @@ Neighbours: 000389 (session state and resumability: a resume brief per session r
 
 ## 000516 · Teach the workbench's idea-queue precedence map and the idea explorer's status list the set-aside status that phase-idg-19 adds
 
-**Created 2026-09-29T02:52:14-04:00 · Status: `open`**
+**Created 2026-09-29T02:52:14-04:00 · Status: `triaged`**
 
 Session 2 - Builder B, 2026-09-29, as given: "teach the workbench's idea-queue precedence map (src/api/routes/workbench.py) and the idea explorer's STATUSES list (ts/src/stage/IdeaExplorerRegion.tsx) the set-aside status that phase-idg-19 adds. Otherwise set-aside ideas sort as "unknown" and can't be filtered."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-30T10:14:28-04:00): Triage (Ideation, 2026-09-30). phase-idg-19 (set-aside status and partition hold-out field) is active, not merged. Today schemas/idea.schema.json:178 lists eight statuses without set-aside; the workbench queue precedence map (src/api/routes/workbench.py:504-510) and the idea explorer's STATUSES (ts/src/stage/IdeaExplorerRegion.tsx:23) also lack it. This idea applies once phase-idg-19 lands.
+
+</details>
 
 **Links**
 
@@ -23130,9 +23147,19 @@ Session 2 - Builder B, 2026-09-29, as given: "teach the workbench's idea-queue p
 
 ## 000517 · Add the set-aside status to the idea-realization plugin's writer and schema, with a parity test against the repository writer
 
-**Created 2026-09-29T02:52:14-04:00 · Status: `open`**
+**Created 2026-09-29T02:52:14-04:00 · Status: `triaged`**
 
 Session 2 - Builder B, 2026-09-29, as given: "once phase-idg-19 merges, the idea-realization plugin's own writer and schema (plugins/idea-realization/scripts/ideas.py, its schemas/idea.schema.json) will lack the set-aside status. Add the status there, plus a parity test between the repository writer and the plugin writer so their status tables can't drift apart."
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-30T10:14:28-04:00): Triage (Ideation, 2026-09-30). The plugin's schema (plugins/idea-realization/schemas/idea.schema.json) and writer carry the same eight statuses and no set-aside. No parity test between the repository writer and the plugin writer exists in test/ or plugins/idea-realization/test/. Applies once phase-idg-19 lands.
+
+</details>
 
 **Links**
 
@@ -23143,10 +23170,20 @@ Session 2 - Builder B, 2026-09-29, as given: "once phase-idg-19 merges, the idea
 
 ## 000518 · Three-axis classification: apply the O6 check before L4 (salvaged from Gemini finding G1-F003)
 
-**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+**Created 2026-09-30T09:52:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "Three-axis framework: apply the O6 check before L4 (Gemini G1-F003)."
 Source: _working/session-manager/scout/gemini-branches-review.md (gitignored). The Gemini run stress-tested a draft copy (three-axis-v3.md) before ARCH-005 became active; the Scout had not checked whether ARCH-005 as it stands already resolves this. In ARCH-005, O6 is a bundle of unrelated findings (decompose set) and L4 is an observation with a remedy (retrospective insight). The run's evidence citations were placeholders, so the point itself is unverified.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-30T10:14:28-04:00): Triage (Ideation, 2026-09-30). ARCH-005 defines O6 (a bundle of unrelated findings, lines 171-173) and L4 (an observation with a remedy, lines 196-197). Its only ordering rules (line 155) are: record kind first, L3 before L1, E4 overrides E1. No rule orders O6 against L4, so the point is open against ARCH-005 as it stands.
+
+</details>
 
 **Links**
 
@@ -23157,10 +23194,20 @@ Source: _working/session-manager/scout/gemini-branches-review.md (gitignored). T
 
 ## 000519 · The word "supersede" is used in two senses across the idea system; pick one (salvaged from Gemini finding G1-F006)
 
-**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+**Created 2026-09-30T09:52:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "The word 'supersede' is used in two senses across the idea system; pick one (Gemini G1-F006)."
 Per the Scout's review (_working/session-manager/scout/gemini-branches-review.md, gitignored), the two senses are an idea disposition and a lifecycle trigger. The run's evidence citations were placeholders, so the point itself is unverified.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-30T10:14:29-04:00): Triage (Ideation, 2026-09-30). The two senses are confirmed. As a link type: "supersedes" in schemas/idea.schema.json:90 and src/db/ideas.py:44,51. As a disposition: ARCH-005 lines 144-149 ("discarding and superseding are dispositions of the idea record", in the owner's words of 2026-09-24), yet no superseded status exists in the schema. src/db/ideas.py:429 warns when a supersedes link's target is not discarded, which is the standing "000308 marks 000296 as superseded" warning.
+
+</details>
 
 **Links**
 
@@ -23172,10 +23219,20 @@ Per the Scout's review (_working/session-manager/scout/gemini-branches-review.md
 
 ## 000520 · A stricter check_outputs.py for external-model runs: reject repeated quotes, or quotes of a provenance or title line, as evidence
 
-**Created 2026-09-30T09:52:28-04:00 · Status: `open`**
+**Created 2026-09-30T09:52:28-04:00 · Status: `triaged`**
 
 Owner, 2026-09-30, relayed by the Session Manager: discard the four Gemini PROMPT-040 branches and salvage this as an idea. As given: "A stricter check_outputs.py for external-model runs that rejects repeated quotes, or quotes of a provenance line, as evidence (G1's fix step replaced its own evidence with the input file's provenance line, and G3 cited AGENTS.md's title line)."
 Detail from the Scout's review (_working/session-manager/scout/gemini-branches-review.md, gitignored): G1's fix.py rewrote the evidence of six of seven findings to the same citation, the input file's line 3 ("Copied on 2026-09-25 by the Prompt Planner session"); G3-F001, F003 and F004 all cite AGENTS.md lines 1-5, its title line. Both passed the checker, whose rule is only that the quote appears in the cited file. The checker is docs/00-working/gemini/check_outputs.py.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-09-30T10:14:29-04:00): Triage (Ideation, 2026-09-30). docs/00-working/gemini/check_outputs.py checks report presence and provenance (lines 152-161), schema validity (101-150) and evidence citations (61-88): the cited file is tracked, the line range is valid, and the quote appears in the file (line 74). It does not reject a quote repeated across findings or a quote of a provenance or title line. PROMPT-040 is still active.
+
+</details>
 
 **Links**
 
