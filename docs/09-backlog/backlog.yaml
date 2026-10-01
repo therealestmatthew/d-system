@@ -13001,9 +13001,9 @@ items:
   - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
-  next_action: The backfill touches many phases in backlog.yaml, which every claim also edits. Rebase onto
-    dev immediately before committing the backfill, and re-run it after any rebase rather than resolving
-    conflicts in the field by hand.
+  next_action: Built and verified (SESS-2026-10-01-01); independent review against REQ-036 R17 and R18,
+    then READY. The backfill touches many phases in backlog.yaml, which every claim also edits; re-run
+    --backfill-ideas after any rebase rather than resolving conflicts in the field by hand.
 - id: phase-des-09
   title: Build the engine page generator and the pipeline overview page
   plan: doc-html-generation-design-system

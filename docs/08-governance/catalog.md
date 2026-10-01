@@ -418,6 +418,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-30-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-03-promoted-plan-staging.md |
 | SESS-2026-09-30-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-04-backlog-fix-next-wave.md |
 | SESS-2026-09-30-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-05-house-style-tokens.md |
+| SESS-2026-10-01-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-01-backlog-idea-field.md |
 
 ## Plans and their phases
 
@@ -515,4 +516,4 @@ CI regenerates it and fails on any difference.
 | OPS-028 | reserved | Operations document for tools/generate_engine_pages.py; deliverable of phase-des-09. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-411 documents — adr: 23, architecture: 12, governance: 19, operation: 23, plan: 81, prompt: 43, requirement: 35, session: 175.
+412 documents — adr: 23, architecture: 12, governance: 19, operation: 23, plan: 81, prompt: 43, requirement: 35, session: 176.
