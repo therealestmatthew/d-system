@@ -177,6 +177,7 @@ The idea is a **design question orthogonal to PLAN-001**, not a duplicate of it:
 
 - extended_by ← `000004`
 - extended_by ← `000163`
+- relates_to ← `000534`
 
 ---
 
@@ -827,6 +828,7 @@ No existing plan, requirement, or ADR governs public presence strategy, content 
 
 - relates_to ← `000015`
 - extended_by ← `000017`
+- relates_to ← `000544`
 
 ---
 
@@ -1024,6 +1026,7 @@ PROPOSED LINK: 000020 --relates_to--> PLAN-001 (idea's Librarian for context cur
 - extended_by ← `000160`
 - relates_to ← `000166`
 - relates_to ← `000250`
+- relates_to ← `000532`
 
 ---
 
@@ -2027,6 +2030,7 @@ PROPOSED LINK: 000043 --relates_to--> 000045 (companion ideas both exploring doc
 - relates_to ← `000044`
 - relates_to ← `000056`
 - relates_to ← `000161`
+- relates_to ← `000533`
 
 ---
 
@@ -2073,6 +2077,7 @@ PROPOSED LINK: 000044 --relates_to--> 000045 (Companion explorations of alternat
 - relates_to ← `000043`
 - relates_to ← `000299`
 - relates_to ← `000304`
+- relates_to ← `000534`
 
 ---
 
@@ -2101,6 +2106,7 @@ Open questions: whether this should target the existing phase-mem-* memory syste
 - relates_to ← `000004`
 - relates_to ← `000043`
 - relates_to ← `000044`
+- relates_to ← `000534`
 
 ---
 
@@ -4682,6 +4688,7 @@ PROPOSED LINK: 000084 --relates_to--> 000083 (both address composable building b
 - relates_to ← `000132`
 - relates_to ← `000367`
 - relates_to ← `000511`
+- relates_to ← `000542`
 
 ---
 
@@ -4771,6 +4778,7 @@ Decline candidate nominated by one analyst (R1) in the accepted partition (docs/
 **Links**
 
 - relates_to → `000436`
+- relates_to ← `000535`
 
 ---
 
@@ -5923,6 +5931,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 - relates_to ← `000124`
 - relates_to ← `000134`
 - relates_to ← `000135`
+- relates_to ← `000526`
 
 ---
 
@@ -7987,6 +7996,8 @@ PROPOSED LINK: 000159 --relates_to--> 000031 (approval and capability broker, en
 - relates_to → `000020`
 - relates_to → `000014`
 - relates_to ← `000250`
+- relates_to ← `000532`
+- relates_to ← `000548`
 
 ---
 
@@ -8065,6 +8076,8 @@ PROPOSED LINK: 000160 --relates_to--> 000159 (foundational question about direct
 - relates_to ← `000159`
 - relates_to ← `000250`
 - relates_to ← `000410`
+- relates_to ← `000532`
+- relates_to ← `000548`
 
 ---
 
@@ -8194,6 +8207,10 @@ Related: 000163 (classification axes), 000018 (tagging for ideas, deferred), 000
 - relates_to → `000032`
 - relates_to ← `000161`
 - relates_to ← `000303`
+- relates_to ← `000527`
+- relates_to ← `000528`
+- relates_to ← `000547`
+- relates_to ← `000549`
 
 ---
 
@@ -8514,6 +8531,8 @@ PROPOSED LINK: 000166 --relates_to--> 000161 (ingestion pipeline explicitly call
 - relates_to → `000020`
 - relates_to → `000021`
 - relates_to ← `000161`
+- relates_to ← `000533`
+- relates_to ← `000547`
 
 ---
 
@@ -12809,6 +12828,8 @@ PROPOSED LINK: 000250 --relates_to--> 000160 (000250 is a consumer of the MCP to
 - relates_to → `000159`
 - relates_to → `000160`
 - relates_to → `000347`
+- relates_to ← `000532`
+- relates_to ← `000543`
 
 ---
 
@@ -13186,6 +13207,10 @@ Update relevant records so people and companies can both act as counterparties o
 
 </details>
 
+**Links**
+
+- relates_to ← `000536`
+
 ---
 
 ## 000266 · Expand organizational and WBS vocabulary
@@ -13425,6 +13450,8 @@ PROPOSED PROMOTION: 000274 -> REQ-025 (requirement and phase-fwa-01 already gove
 **Links**
 
 - relates_to → `000281`
+- relates_to ← `000530`
+- relates_to ← `000546`
 
 ---
 
@@ -13592,6 +13619,7 @@ No missing relationship or scope conflict identified. The idea is well-positione
 **Links**
 
 - relates_to → `000281`
+- relates_to ← `000538`
 
 ---
 
@@ -13664,6 +13692,8 @@ PROPOSED PROMOTION: No promotion is justified; the preconditions exist but the k
 - relates_to ← `000278`
 - relates_to ← `000279`
 - relates_to ← `000314`
+- relates_to ← `000526`
+- relates_to ← `000529`
 
 ---
 
@@ -15527,6 +15557,7 @@ Existing link is appropriate: 000314 --relates_to--> 000281, since 000281 is the
 **Links**
 
 - relates_to → `000281`
+- relates_to ← `000525`
 
 ---
 
@@ -18485,6 +18516,7 @@ PROPOSED LINK: 000367 --relates_to--> 000085 (sibling building-block library und
 - relates_to → `000022`
 - relates_to → `000083`
 - relates_to → `000084`
+- relates_to ← `000542`
 
 ---
 
@@ -18973,6 +19005,11 @@ No plan, requirement or ADR covers renaming. PLAN-012 (terminology, draft) provi
 Related: 000371 (glossary protocol), 000376 (generated entries). Part of the Standby Builder's glossary cluster, 000371-000383.
 
 </details>
+
+**Links**
+
+- relates_to ← `000541`
+- relates_to ← `000544`
 
 ---
 
@@ -20283,6 +20320,7 @@ Possible overlap, recorded as given (ADR-010): 000092 (HTML Designer agent: extr
 
 - relates_to → `000424`
 - relates_to ← `000421`
+- relates_to ← `000542`
 
 ---
 
@@ -20754,6 +20792,8 @@ PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
 - relates_to ← `000439`
 - relates_to ← `000440`
 - relates_to ← `000441`
+- relates_to ← `000525`
+- relates_to ← `000526`
 
 ---
 
@@ -20777,6 +20817,7 @@ PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
 **Links**
 
 - relates_to → `000436`
+- relates_to ← `000535`
 
 ---
 
@@ -20800,6 +20841,8 @@ PROPOSED LINK: this idea --relates_to--> 000067 (a system already made portable)
 **Links**
 
 - relates_to → `000436`
+- relates_to ← `000535`
+- relates_to ← `000538`
 
 ---
 
@@ -20854,6 +20897,7 @@ PROPOSED LINK: this idea --relates_to--> 000248 (widening the daemon's reach)
 **Links**
 
 - relates_to → `000436`
+- relates_to ← `000539`
 
 ---
 
@@ -21194,6 +21238,8 @@ The owner's words, as relayed: "Ideation agent was very confusing in it's wordin
 
 - relates_to → `000452`
 - relates_to → `000163`
+- relates_to ← `000534`
+- relates_to ← `000547`
 
 ---
 
@@ -21230,6 +21276,7 @@ No related plan, phase, requirement or backlog item found outside PLAN-048 and R
 - extended_by ← `000458`
 - extended_by ← `000459`
 - extended_by ← `000460`
+- relates_to ← `000531`
 
 ---
 
@@ -21272,6 +21319,7 @@ Status: the unresolved questions in 000456 have been answered by REQ-031's requi
 **Links**
 
 - extends → `000455`
+- relates_to ← `000531`
 
 ---
 
@@ -21351,6 +21399,7 @@ PROPOSED PROMOTION: 000458 -> PLAN-048 (delivered by phase-plug-01 via PLAN-048.
 **Links**
 
 - extends → `000455`
+- relates_to ← `000529`
 
 ---
 
@@ -21381,6 +21430,7 @@ PROPOSED PROMOTION: 000459 -> PLAN-048 (prerequisites skill delivered complete i
 **Links**
 
 - extends → `000455`
+- relates_to ← `000529`
 
 ---
 
@@ -21420,6 +21470,7 @@ The existing link (extends->000455) is not re-proposed. No other open idea needs
 **Links**
 
 - extends → `000455`
+- relates_to ← `000530`
 
 ---
 
@@ -21478,6 +21529,10 @@ PROPOSED LINK: 000462 --relates_to--> 000455 (the plugin idea whose build create
 PROPOSED LINK: 000462 --relates_to--> 000460 (governance documents as absolutes carry the same source-versus-plugin-copy question)
 
 </details>
+
+**Links**
+
+- relates_to ← `000531`
 
 ---
 
@@ -22048,6 +22103,8 @@ When the plugin's idea log gets a bad tail (the F3 race wrote a second created e
 
 - relates_to → `000477`
 - relates_to → `None`
+- relates_to ← `000528`
+- relates_to ← `000549`
 
 ---
 
@@ -22480,6 +22537,7 @@ State when recorded: REQ-034 and PLAN-051 (session autonomy configuration, with 
 
 - extends → `000466`
 - relates_to → `None`
+- relates_to ← `000540`
 
 ---
 
@@ -22646,6 +22704,8 @@ Recorded as given: the ask names old plan files, and its stated goal names gover
 - relates_to → `000500`
 - relates_to → `None`
 - relates_to ← `000505`
+- relates_to ← `000530`
+- relates_to ← `000546`
 
 ---
 
@@ -22727,6 +22787,7 @@ Related: ARCH-005 (idea node classification: record kinds and the axes), 000452 
 - relates_to → `000452`
 - relates_to → `000061`
 - relates_to → `000502`
+- relates_to ← `000537`
 
 ---
 
@@ -22768,6 +22829,7 @@ Status: moved open -> triaged at the owner's direction (2026-09-29).
 - relates_to → `None`
 - relates_to → `None`
 - relates_to → `000502`
+- relates_to ← `000545`
 
 ---
 
@@ -23124,6 +23186,7 @@ Neighbours: 000389 (session state and resumability: a resume brief per session r
 - relates_to → `000389`
 - relates_to → `000340`
 - relates_to → `None`
+- relates_to ← `000540`
 
 ---
 
@@ -23388,3 +23451,440 @@ What it would touch: src/governance (default run) or tools/git-hooks (pre-commit
 Also reported by the Session Manager, 2026-10-01, independently: governance does not run --check-ideas, and completion edits run no pytest. This idea records both reports as one gap.
 
 Unresolved: which option; whether --check-ideas is cheap enough for every commit. Same shape as 000405 and 000406 (the governance-only completion edit missed a stale catalog.md and turned dev red), which were promoted to PLAN-045.
+
+---
+
+## 000525 · Idea Realization Engine: the whole system
+
+**Created 2026-10-01T16:24:59-04:00 · Status: `open`**
+
+The single core idea every other card links to. IRE names the whole system that carries ideas to delivered work across projects; d-system is its baseline.
+
+Overlaps as printed: 000436 (generalisable systems), 000314 (portable framework)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-01T16:25:16-04:00): Owner decision, 2026-10-01 (verbatim in _working/session-manager/vision-ire-2026-10-01-raw.md, Addendum): The four parts of the Idea Realization Engine are Engine, Bridge, Brain and Library. Engine: agents, skills, multi-session orchestration and GitHub multi-repo control; every agent starts here. Bridge: the interface between the other three, the MCP server including the contracts and rules of knowledge interchange. Brain: the active knowledge store; knowledge routinely enters, exits, evolves and is pruned; tiers are treated differently (memories vs governance and protocols); global vs project scope decides which Brain aspects are available to all projects or only particular ones. Library: long-term storage and the component registry; checked out when needed; anything added is officially published and (relatively) permanent.
+
+</details>
+
+**Links**
+
+- relates_to → `000436`
+- relates_to → `000314`
+- relates_to ← `000526`
+- relates_to ← `000527`
+- relates_to ← `000528`
+- relates_to ← `000529`
+- relates_to ← `000530`
+- relates_to ← `000531`
+- relates_to ← `000532`
+- relates_to ← `000533`
+- relates_to ← `000534`
+- relates_to ← `000535`
+- relates_to ← `000536`
+- relates_to ← `000537`
+- relates_to ← `000538`
+- relates_to ← `000539`
+- relates_to ← `000540`
+- relates_to ← `000541`
+- relates_to ← `000542`
+- relates_to ← `000543`
+- relates_to ← `000544`
+- relates_to ← `000545`
+- relates_to ← `000546`
+- relates_to ← `000547`
+- relates_to ← `000548`
+- relates_to ← `000549`
+
+---
+
+## 000526 · Generalize d-system into new repositories beside it
+
+**Created 2026-10-01T16:25:00-04:00 · Status: `open`**
+
+Stand up the generalized system in parallel repositories that use d-system as the reference; change nothing here.
+
+Overlaps as printed: 000436, 000281 (starter kit), 000115 (duplication audit)
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000436`
+- relates_to → `000281`
+- relates_to → `000115`
+
+---
+
+## 000527 · Ideas leave git: a store that does not conflict on clone and pull
+
+**Created 2026-10-01T16:25:01-04:00 · Status: `open`**
+
+Tracking the idea log in git conflicts as soon as others clone and pull; move ideas to a store with its own versioning.
+
+Overlaps as printed: 000162 (append-only knowledge log) · Decision D2
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000162`
+
+---
+
+## 000528 · Prove the idea log is intact without git
+
+**Created 2026-10-01T16:25:01-04:00 · Status: `open`**
+
+A way to version ideas and show the log has not been altered, once git history no longer does that job.
+
+Overlaps as printed: 000162, 000480 (repair path for a malformed tail) · Decision D3
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000162`
+- relates_to → `000480`
+
+---
+
+## 000529 · Start from nothing
+
+**Created 2026-10-01T16:25:02-04:00 · Status: `open`**
+
+A new user installs the system and begins with no ideas and an empty brain, with the governance and protocols shipped as defaults.
+
+Overlaps as printed: 000281, 000458 (scaffold skill), 000459 (prerequisites) · D12
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000281`
+- relates_to → `000458`
+- relates_to → `000459`
+
+---
+
+## 000530 · Prompts, plans and protocols made project-independent
+
+**Created 2026-10-01T16:25:03-04:00 · Status: `open`**
+
+Abstract the prompts, plans and protocols so they work for any project, not only for building d-system.
+
+Overlaps as printed: 000460 (governance as absolutes), 000501 (reusable plans), 000274
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000460`
+- relates_to → `000501`
+- relates_to → `000274`
+
+---
+
+## 000531 · Is a plugin enough? Move it to its own repository
+
+**Created 2026-10-01T16:25:04-04:00 · Status: `open`**
+
+The owner questions whether a plugin can carry the system; ruling: the plugin moves to its own repository, its future decided in the investigation.
+
+Overlaps as printed: 000455, 000456, 000462 · D13
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000455`
+- relates_to → `000456`
+- relates_to → `000462`
+
+---
+
+## 000532 · A custom MCP server between the engine and the Brain
+
+**Created 2026-10-01T16:25:04-04:00 · Status: `open`**
+
+The engine reads and writes ideas, prompts, plans and everything else only through a purpose-built MCP server.
+
+Overlaps as printed: 000020 (Librarian), 000159, 000160, 000250 (remote MCP) · D4
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000020`
+- relates_to → `000159`
+- relates_to → `000160`
+- relates_to → `000250`
+
+---
+
+## 000533 · The Brain holds everything
+
+**Created 2026-10-01T16:25:05-04:00 · Status: `open`**
+
+Ideas, prompts, plans, phases, backlog, governance, protocols and knowledge all live in the Brain, not in a project repository.
+
+Overlaps as printed: 000166 (migration to MCP-held knowledge), 000043
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000166`
+- relates_to → `000043`
+
+---
+
+## 000534 · Knowledge in levels: general above project-specific
+
+**Created 2026-10-01T16:25:06-04:00 · Status: `open`**
+
+The Brain is hierarchical, with generalized knowledge and per-project knowledge, and a way to promote what proves general.
+
+Overlaps as printed: 000002, 000044, 000045, 000454 · D10
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000002`
+- relates_to → `000044`
+- relates_to → `000045`
+- relates_to → `000454`
+
+---
+
+## 000535 · Register projects in the Brain
+
+**Created 2026-10-01T16:25:07-04:00 · Status: `open`**
+
+Any project can register, and each registered project can write to the Brain.
+
+Overlaps as printed: 000086 (repo tracker), 000438 (tracking multiple repositories), 000437
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000086`
+- relates_to → `000438`
+- relates_to → `000437`
+
+---
+
+## 000536 · A core project schema with typed extensions
+
+**Created 2026-10-01T16:25:08-04:00 · Status: `open`**
+
+One core project record; a GitHub project type adds local and remote repositories and forks; other types add their own attributes. Schema extension investigated as a topic of its own.
+
+Overlaps as printed: 000265 (generalized counterparties) · D5
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000265`
+
+---
+
+## 000537 · Idea types: realization vs personal productivity
+
+**Created 2026-10-01T16:25:08-04:00 · Status: `open`**
+
+Ideas to investigate and build run the realization pipeline; personal-productivity items are handled separately. Define the boundary and how the personal productivity system fits.
+
+Overlaps as printed: 000504 (which ideas get which processes) · D6
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000504`
+
+---
+
+## 000538 · GitHub multi-repo control built into the engine
+
+**Created 2026-10-01T16:25:09-04:00 · Status: `open`**
+
+Branching, remotes, forks and merge protocols stored once and reused, so they are not rediscovered for each repository.
+
+Overlaps as printed: 000279 (issue and PR templates), 000438 · D9
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000279`
+- relates_to → `000438`
+
+---
+
+## 000539 · Start every agent in the engine, never in the target repository
+
+**Created 2026-10-01T16:25:09-04:00 · Status: `open`**
+
+Agents launch in the engine and orient on a project through a skill that reads its record in the Brain.
+
+Overlaps as printed: 000440 (orchestrate other repositories without installing) · D8
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000440`
+
+---
+
+## 000540 · The multi-session orchestration ships with the engine
+
+**Created 2026-10-01T16:25:10-04:00 · Status: `open`**
+
+The Session Manager, builder, scout, ideation and Owner Terminal roles, and their agents and skills, become part of the engine.
+
+Overlaps as printed: 000496 (autonomy configuration in the plugin), 000515 (session launcher)
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000496`
+- relates_to → `000515`
+
+---
+
+## 000541 · Multi-project document codes
+
+**Created 2026-10-01T16:25:11-04:00 · Status: `open`**
+
+Document governance extended to many projects, for example a project code prefix, with every project's plans in one store and discoverable across projects.
+
+Overlaps as printed: 000382 (overloaded terms) · D7
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000382`
+
+---
+
+## 000542 · The Library: shared, published, tagged, checked out when needed
+
+**Created 2026-10-01T16:25:11-04:00 · Status: `open`**
+
+Tried and tested components live in the shared Library, relatively permanent once published, found by tags and categories; possibly its own repository.
+
+Overlaps as printed: 000084, 000367 (ideas linked to templates), 000420 · D11
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000084`
+- relates_to → `000367`
+- relates_to → `000420`
+
+---
+
+## 000543 · A Brain that can scale to a hosted database
+
+**Created 2026-10-01T16:25:12-04:00 · Status: `open`**
+
+Start local, with a path to cloud servers and databases when more users or machines share one brain.
+
+Overlaps as printed: 000250 · D2
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000250`
+
+---
+
+## 000544 · Names that drive adoption, fixed once chosen
+
+**Created 2026-10-01T16:25:12-04:00 · Status: `open`**
+
+Decided: Engine, Bridge, Brain, Library, published with the ire- prefix.
+
+Overlaps as printed: 000016 (public presence), 000382 · D15
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000016`
+- relates_to → `000382`
+
+---
+
+## 000545 · Plan the planning: levels before detail
+
+**Created 2026-10-01T16:25:13-04:00 · Status: `open`**
+
+Decide the planning levels first (big picture, then finer), each closed by an owner decision, before planning any one part in detail.
+
+Overlaps as printed: GOV-021 (planning protocol), 000505 (plan anatomy) · D16
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000505`
+
+---
+
+## 000546 · Publishing from the Brain to the Library
+
+**Created 2026-10-01T16:25:13-04:00 · Status: `open`**
+
+Always intentional, when reuse value is identified (rule of three, or sooner by foresight); hand-curated with AI that recommends but never directs.
+
+Overlaps as printed: 000274 (extracting reusable generalities), 000501 · D18
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000274`
+- relates_to → `000501`
+
+---
+
+## 000547 · Brain tiers and scopes
+
+**Created 2026-10-01T16:25:14-04:00 · Status: `open`**
+
+Memories, append-only records and governance are treated differently; global knowledge is available to all projects, project knowledge to one.
+
+Overlaps as printed: 000162, 000454, 000166 · D10
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000162`
+- relates_to → `000454`
+- relates_to → `000166`
+
+---
+
+## 000548 · The Bridge is a contract, not just a server
+
+**Created 2026-10-01T16:25:15-04:00 · Status: `open`**
+
+The Bridge holds the contracts and rules of knowledge interchange between Engine, Brain and Library; the MCP server implements them.
+
+Overlaps as printed: 000159, 000160 · D17
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000159`
+- relates_to → `000160`
+
+---
+
+## 000549 · An interim repository for the idea log
+
+**Created 2026-10-01T16:25:16-04:00 · Status: `open`**
+
+Track the idea log in its own repository for version control until the Brain's storage is settled; immutable events and the fold make append-only merges safe.
+
+Overlaps as printed: 000162, 000480 · D19
+
+**Links**
+
+- relates_to → `000525`
+- relates_to → `000162`
+- relates_to → `000480`
