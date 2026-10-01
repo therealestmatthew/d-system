@@ -3,7 +3,6 @@ updated: '2026-10-01'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
-- phase-des-08
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
@@ -12972,8 +12971,9 @@ items:
   systems:
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
+  session: doc-session-backlog-idea-field
   priority: 1
   session_budget: 1
   depends_on: []
@@ -13001,9 +13001,20 @@ items:
   - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
   - test/test_backlog.py
-  next_action: Built and verified (SESS-2026-10-01-01); independent review against REQ-036 R17 and R18,
-    then READY. The backfill touches many phases in backlog.yaml, which every claim also edits; re-run
-    --backfill-ideas after any rebase rather than resolving conflicts in the field by hand.
+  completion_evidence:
+  - schemas/backlog.schema.json
+  - src/governance/backlog.py
+  - src/governance/__main__.py
+  - test/test_backlog.py
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/03-sessions/SESS-2026-10-01-01-backlog-idea-field.md
+  result: 'Complete: backlog phases carry an optional ideas field that governance checks against fold(),
+    naming the phase and id for an unknown one (R17); --backfill-ideas wrote 167 links across 100 phases,
+    and --check-ideas reports 0 missing and 0 extra (R18). 1228 tests passed; governance, ruff and mypy
+    clean; independent review found both acceptance conditions met with no findings. Integrated onto dev
+    at 621095a with the owner''s approval.'
+  next_action: Complete; phase-des-11's per-idea trace can read the ideas field. Re-run --backfill-ideas
+    when a phase's scope, acceptance or next_action gains an idea id.
 - id: phase-des-09
   title: Build the engine page generator and the pipeline overview page
   plan: doc-html-generation-design-system
