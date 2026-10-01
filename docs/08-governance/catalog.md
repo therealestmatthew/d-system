@@ -85,6 +85,7 @@ CI regenerates it and fails on any difference.
 | OPS-025 | operation | active | repository-owner | docs/08-governance/OPS-025-check-dev-ci.md |
 | OPS-027 | operation | active | repository-owner | docs/08-governance/OPS-027-generate-house-css.md |
 | OPS-028 | operation | active | repository-owner | docs/08-governance/OPS-028-generate-engine-pages.md |
+| OPS-029 | operation | active | repository-owner | docs/08-governance/OPS-029-run-review-checks.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -422,6 +423,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-01-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-01-backlog-idea-field.md |
 | SESS-2026-10-01-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-02-engine-page-generator.md |
 | SESS-2026-10-01-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-03-containment-check.md |
+| SESS-2026-10-01-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-04-review-command-runner.md |
 
 ## Plans and their phases
 
@@ -516,7 +518,6 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
-| OPS-029 | reserved | Operations document for tools/run_review_checks.py; deliverable of phase-asr-02. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-415 documents — adr: 23, architecture: 12, governance: 19, operation: 24, plan: 81, prompt: 43, requirement: 35, session: 178.
+417 documents — adr: 23, architecture: 12, governance: 19, operation: 25, plan: 81, prompt: 43, requirement: 35, session: 179.
