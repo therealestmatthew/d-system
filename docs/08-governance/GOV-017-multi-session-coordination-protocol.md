@@ -38,7 +38,8 @@ Each of these is an owner ruling of 2026-09-22, recorded in
 1. **Ideation commits ideas in the primary checkout**, inside a granted turn. `AGENTS.md` limits the
    primary checkout to claim commits and the catalog regeneration they force.
 2. **Report files under `_working/session-manager/` are written in the primary checkout** by the
-   Session Manager, the Scout and the Standby Builder, without a turn. The path is gitignored and
+   Session Manager, the Scout, the Standby Builder and the Owner Terminal (its command queue), without a
+   turn. The path is gitignored and
    never committed, so it cannot collide with a claim, a merge or an idea commit.
 3. **Builders build the phase the Session Manager assigns**, not the first ready phase in the
    rendered order. The Session Manager assigns in rendered queue order among conflict-free phases.
@@ -53,8 +54,9 @@ Each of these is an owner ruling of 2026-09-22, recorded in
 
 ## The sessions
 
-There are two groups. **Meta sessions** coordinate, capture and plan; they never claim a backlog
-phase. **Execution sessions** build backlog phases.
+There are three groups. **Meta sessions** coordinate, capture and plan; they never claim a backlog
+phase. **Execution sessions** build backlog phases. The optional **owner** session, the Owner Terminal,
+runs commands reserved to the owner; it takes no turns and builds nothing.
 
 | Session | Group | Role | Claim slot |
 |---|---|---|---|
@@ -212,21 +214,24 @@ to the Session Manager.
 Some commands only the owner may run: pushing `dev`, deleting `origin` branches, and writing paths a
 deny rule closes to agents (`.agents/`, `.codex/`). An agent session in auto mode is refused these,
 and the owner cannot type them while working from the Remote Control mobile client. The Owner
-Terminal closes that gap. It is a Claude Code session in the default (manual) permission mode,
+Terminal is the way to run them. It is a Claude Code session in the manual permission mode,
 connected through Remote Control, so the owner approves every tool call it makes from wherever they
 are. It is optional: the arrangement runs without it when the owner is at the terminal.
 
-The owner's approval in the Owner Terminal is the authorization for each command. The session is not
-a way around a refusal in another session: the Session Manager queues only commands that are the
-owner's to run, and never a command another session was denied.
+The owner's approval in the Owner Terminal is the authorization for each command. The Session Manager
+queues only commands reserved to the owner, such as a push of `dev`, which agent sessions are refused
+by design. It never queues a command the owner declined, and never uses the queue to run work that
+belongs to an agent session.
 
 **Starting it.** The owner starts it in a terminal on this machine:
-`claude --permission-mode default --remote-control "Owner Terminal"`. When the owner is away from the
+`claude --permission-mode manual --remote-control "Owner Terminal"`. When the owner is away from the
 terminal, the Session Manager may start or resume it on the owner's explicit request, detached under a
 pseudo-terminal, for example
-`setsid script -qfc "claude --resume <session-id> --permission-mode default --remote-control 'Owner Terminal'" /dev/null`
-(this machine has no tmux). The session started this way on 2026-09-30 ended when the process that
-launched it exited, so check `ListAgents` after any start.
+`setsid script -qfc "claude --resume <session-id> --permission-mode manual --remote-control 'Owner Terminal'" /dev/null`
+(this machine has no tmux). That relaunch used `--permission-mode default`, which the CLI accepts
+but does not list; `manual` is the documented value. The first Owner Terminal, launched from a Codex
+session, ended when that process exited; the relaunch under `setsid` kept running. Check `ListAgents`
+after any start.
 
 **The queue.** The Owner Terminal keeps a running list at
 `_working/session-manager/owner-terminal-queue.md` (gitignored). Each entry has an id (`C1`, `C2`, ...),

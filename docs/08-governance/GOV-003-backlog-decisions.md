@@ -783,10 +783,11 @@ not that an alternative was weighed and declined, and would otherwise reopen the
 On 2026-09-30 the owner was working from the Remote Control mobile client and could not type terminal
 commands. Three steps were waiting on them: pushing `dev` (refused to auto-mode sessions), deleting
 merged `origin` branches, and a generator run that writes under `.agents/` (closed to agents by a deny
-rule). The owner started a Claude Code session in the default (manual) permission mode, named it
+rule). The owner started a Claude Code session in the manual permission mode, named it
 "Owner Terminal", and authorized the Session Manager to queue every owner-only command there. The
 Owner Terminal ran six such commands that night and the next morning (a generator run, two pushes,
-three branch deletions), each one approved by the owner in that session. On 2026-10-01 the owner ruled
+and three branch-deletion commands that removed four merged branches), each one approved by the
+owner in that session. On 2026-10-01 the owner ruled
 that the role becomes part of the multi-session protocol: `GOV-017` "The Owner Terminal" describes it,
 and `PROMPT-037` carries its starter.
 

@@ -31,8 +31,8 @@ catalog regeneration in the completion edit. Item 1 was revised on 2026-09-24 (`
 `REQ-028` R06) to require the push of `dev` before `TURN DONE` and to state the green-CI grant
 rule. Item 11 was added on 2026-09-26 from the owner's ruling of 2026-09-23 that a failing
 pre-commit hook is never bypassed with `--no-verify` (`GOV-017`, "The merge gate"). The Owner Terminal
-starter and kickoff step 6 were added on 2026-10-01 from the owner's ruling that session (`GOV-017`,
-"The Owner Terminal").
+starter and kickoff step 6 were added on 2026-10-01 from the owner's ruling of that day
+that made the Owner Terminal part of the protocol (`GOV-017`, "The Owner Terminal").
 
 ## Kickoff for the Session Manager
 
@@ -47,8 +47,9 @@ from PROMPT-037.
 2. If _working/session-manager/board.md exists, this is a resume: read it, then check it against
    `uv run python -m src.governance --ready` and `git worktree list`. backlog.yaml wins over the
    board; ask me about any claim the board does not explain, and release nothing.
-3. Run ListAgents. Check that every session in GOV-017's table appears under exactly that name. If
-   one does not, stop and ask me to /rename it in the terminal.
+3. Run ListAgents. Check that every meta and execution session in GOV-017's table appears under
+   exactly that name. If one does not, stop and ask me to /rename it in the terminal. The optional
+   Owner Terminal is checked in step 6, not here.
 4. Show me each starter message as plain text (never in a question preview) and ask me to approve
    it with AskUserQuestion. Send only approved messages, with notify_when_idle.
 5. Record ACKs, the lock, the slots and the queue on the board after every event.
@@ -59,7 +60,8 @@ from PROMPT-037.
 
 ## Shared contract
 
-Sent to every session, ahead of its role section.
+Sent to every meta and execution session, ahead of its role section. The Owner Terminal gets its own
+starter instead (see its role section).
 
 ```text
 COORDINATION CONTRACT from Session Manager: applies to every session.
