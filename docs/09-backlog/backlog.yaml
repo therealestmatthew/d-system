@@ -6,7 +6,6 @@ next_up:
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
-- phase-asr-02
 - phase-asr-03
 - phase-asr-01
 - phase-asr-04
@@ -15013,8 +15012,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
+  session: doc-session-review-command-runner
   priority: 1
   session_budget: 1
   depends_on: []
@@ -15044,9 +15044,21 @@ items:
   - test/test_run_review_checks.py
   - docs/08-governance/OPS-029-run-review-checks.md
   - docs/08-governance/codes.yaml
-  next_action: All acceptance conditions met and verification green on agent/phase-asr-02.
-    Awaiting the /session-close independent review, READY to Session Manager, and the owner's
-    merge approval. Session record SESS-2026-10-01-04.
+  completion_evidence:
+  - tools/run_review_checks.py
+  - test/test_run_review_checks.py
+  - docs/08-governance/OPS-029-run-review-checks.md
+  - docs/03-sessions/SESS-2026-10-01-04-review-command-runner.md
+  result: 'Complete: tools/run_review_checks.py takes only a phase id and a commit, reads the phase''s
+    verification list from dev''s backlog, runs it and the four GOV-017 gate checks in a detached
+    temporary worktree, writes evidence and a sha256 manifest under _working/review-checks/, and
+    removes the worktree. A real run of phase-idg-19 at 458ab36 passed and is recorded in
+    SESS-2026-10-01-04. 1291 tests passed, governance, ruff and mypy clean; demo-adversary review
+    found all three conditions Met with one major and one minor finding, both fixed. Merged by
+    fast-forward to 7ce7227 with the owner''s approval.'
+  next_action: Complete. Wiring the runner into GOV-017's merge gate and the coordinator dispatch rule
+    belongs to REQ-030 R03 and R04 in later PLAN-047 phases.
+
 - id: phase-asr-03
   title: Build-review verdict records and the seeded re-review sampler
   plan: doc-reviewer-contract
