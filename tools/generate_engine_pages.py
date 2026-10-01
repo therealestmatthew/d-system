@@ -146,8 +146,8 @@ STAGES: list[dict[str, Any]] = [
      "source": "fold()", "select": _ideas_with("open")},
     {"n": 3, "name": "Partition", "counts": "triaged ideas not yet linked to a plan or phase",
      "source": "fold(); backlog ideas field", "select": g2_queue},
-    {"n": 4, "name": "Planning", "counts": "plans whose front matter reads draft",
-     "source": "plan front matter", "select": _plans_with("draft")},
+    {"n": 4, "name": "Planning", "counts": "plans whose front matter reads draft; the same set "
+     "as the G3 queue", "source": "plan front matter", "select": _plans_with("draft")},
     {"n": 5, "name": "Adversarial review", "counts": NOT_RECORDED,
      "source": "no structured review record exists; reviews live in session records",
      "select": None},
@@ -307,6 +307,9 @@ def render_overview(inputs: dict[str, Any]) -> str:
         "and the sanctioned writer records it only after that.",
         "Stages 5 and 6 show not recorded: adversarial reviews and phase-fit checks are written "
         "into session records as prose, with no structured record to count.",
+        "Stage 4 and the G3 queue are the same plans by construction. Plan front matter does not "
+        "record whether a draft is still being written, under review, or waiting for approval, "
+        "so every draft plan is counted at stage 4 and listed at G3.",
     ]
     if data["ideas_field_present"]:
         notes.append(

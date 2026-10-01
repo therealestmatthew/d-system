@@ -55,7 +55,7 @@ shows "not recorded" rather than an estimate (`REQ-036` R11).
 | 1 Capture | ideas captured, all statuses | `fold()` |
 | 2 Triage | ideas with status `open` | `fold()` |
 | 3 Partition | triaged ideas with no `promoted_to` and no phase naming them | `fold()`, the backlog `ideas` field |
-| 4 Planning | plans whose front matter reads `draft` | plan front matter |
+| 4 Planning | plans whose front matter reads `draft`, the same set as the G3 queue | plan front matter |
 | 5 Adversarial review | not recorded | reviews are prose in session records |
 | 6 Phase-fit check | not recorded | no structured record |
 | 7 Dependency mapping | queued phases (ready or waiting) | `backlog.yaml`, `src.governance.backlog.readiness` |
@@ -63,7 +63,9 @@ shows "not recorded" rather than an estimate (`REQ-036` R11).
 | 9 Realization check | ideas with status `delivered` | `fold()` |
 
 The gates follow `REQ-036` R14's table. G1 shows ideas captured, because nothing waits there. G2
-is the stage-3 set. G3 lists the draft plans. G4 and G5 share one queue, the active phases,
+is the stage-3 set. G3 lists the draft plans, which are also the stage-4 count: plan front matter
+does not record whether a draft is still being written, under review or waiting for approval, and
+the page says so rather than splitting them by guesswork. G4 and G5 share one queue, the active phases,
 because integration is fast-forward-only and the completion edit follows the merge in the same
 turn. When no backlog phase carries the `ideas` field, G2 falls back to `promoted_to` alone and
 the page says phase links are not recorded.

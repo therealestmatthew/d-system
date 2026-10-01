@@ -2,7 +2,9 @@
 
 Every figure on the pipeline overview is recomputed here by code that shares nothing with the
 generator's own `STAGES` and `GATES` selectors except `fold()`, which is the sanctioned reader the
-requirement mandates for both (R10). A count that drifts from its stated derivation fails here.
+requirement mandates for both (R10). Most figures have one plausible computation. G2 does not, so
+its recount takes a different route from the generator: phase links from each phase's text rather
+than its `ideas` field, and the set built by subtraction. A count that drifts fails here.
 """
 
 from __future__ import annotations
@@ -74,11 +76,20 @@ def _queued_split() -> tuple[int, int]:
 
 
 def _g2() -> set[str]:
-    linked = {i for p in _phases() for i in p.get("ideas", [])}
-    return {
-        key for key, idea in _ideas().items()
-        if idea["status"] == "triaged" and not idea["promoted_to"] and key not in linked
-    }
+    """G2 by a second route: phase links read from each phase's own text, not its ideas field.
+
+    The generator reads the backlog `ideas` field. This reads the text that field was backfilled
+    from, through `named_ideas`, and builds the set by subtraction. If the field and the text ever
+    disagree, this recount and the page disagree, and the test says so.
+    """
+    from src.governance.backlog import named_ideas
+
+    ideas = _ideas()
+    known = set(ideas)
+    linked_from_text = {i for p in _phases() for i in named_ideas(p, known)}
+    triaged = {key for key, idea in ideas.items() if idea["status"] == "triaged"}
+    promoted = {key for key, idea in ideas.items() if idea["promoted_to"]}
+    return triaged - promoted - linked_from_text
 
 
 # ---- R14 and R11: every figure matches its stated derivation ----
@@ -131,6 +142,11 @@ def test_stages_without_a_record_say_so_and_name_the_gap(page: str) -> None:
         assert _figure(page, "stage", str(stage)) == gen.NOT_RECORDED
     assert "no structured review record exists" in page
     assert "no structured phase-fit record exists" in page
+
+
+def test_stage_4_and_g3_are_stated_to_be_the_same_set(page: str) -> None:
+    assert _figure(page, "stage", "4") == _figure(page, "gate", "G3")
+    assert "Stage 4 and the G3 queue are the same plans by construction" in page
 
 
 def test_g2_falls_back_when_no_phase_carries_the_ideas_field(inputs: dict) -> None:
