@@ -13095,6 +13095,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-standby-3
+  session: doc-session-idea-funnel-and-ledger
   priority: 1
   session_budget: 1
   depends_on:
@@ -13118,8 +13119,9 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - test/test_engine_pages.py
-  next_action: Read src/db/ideas.py's CLASSIFICATION_FIELDS and AXES before laying out the axis view; the
-    folded record carries no axis keys at all until an idea is classified.
+  next_action: 'Built on agent/phase-des-10 (SESS-2026-10-01-05); review, then the owner-approved
+    merge, after which the completion edit is made on dev. The two R14 recount tests fail on dev 8340c90
+    until phase-dgov-06''s ideas field names 000523.'
 - id: phase-des-11
   title: Build the per-idea trace pages
   plan: doc-html-generation-design-system
