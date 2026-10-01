@@ -23,11 +23,11 @@ inside a granted turn. Work is on `agent/phase-asr-02` in `../d-system-worktrees
 
 ## Verification
 
-Run in this worktree on `agent/phase-asr-02` rebased onto dev `a91a8e3`:
+Run in this worktree on `agent/phase-asr-02` rebased onto dev `2f25d7a`:
 
 ```
 $ uv run pytest test/test_run_review_checks.py
-22 passed, 1 warning
+26 passed, 1 warning
 $ uv run ruff check src/ test/ tools/run_review_checks.py
 All checks passed!
 $ uv run mypy src/ tools/run_review_checks.py
@@ -58,7 +58,8 @@ Supporting checks: `uv run python tools/generate_tool_docs.py --check` reports
   - All pass in the run above.
 - After each run, `git worktree list` shows no worktree left behind: **Met.**
   `test_no_worktree_is_left_behind` covers a passing, a failing and a timed-out phase;
-  `test_the_worktree_is_removed_when_the_run_is_interrupted` covers an interrupted run.
+  `test_the_worktree_is_removed_when_the_run_is_interrupted` covers an interrupted run, and
+  `test_an_os_error_partway_exits_2_and_still_removes_the_worktree` an operating-system error.
   The real run below left none.
 - Run for one completed phase against its completion commit, with the manifest recorded here:
   **Met.**
@@ -92,3 +93,106 @@ independent review, READY to Session Manager, and the owner's merge approval.
 ## Unresolved
 
 None.
+
+## Review
+
+Independent adversarial review by a `demo-adversary` sub-agent (fresh context, not a fork) over
+`dev...agent/phase-asr-02` with dev at `a91a8e3`, given the phase's scope, acceptance, verification,
+deliverables and the four owner rulings. Its findings, as reported:
+
+- **Acceptance 1** (fixtures): **Met.** `22 passed, 1 warning` on its own run. It re-derived the
+  scenarios against disposable repositories under `/tmp` with the same outcomes.
+- **Acceptance 2** (no worktree left behind): **Met for the paths tested.** The passing, failing,
+  timed-out and interrupted runs, a forced `git worktree add` failure and a forced
+  `PermissionError` left no `git worktree list` entry. Finding 1 concerns the evidence directory,
+  not the worktree.
+- **Acceptance 3** (real run recorded): **Met.** All five sha256 values recomputed from the files
+  under `_working/review-checks/phase-idg-19/458ab360d7fc/` match the manifest. The four
+  `GATE_CHECKS` strings match `GOV-017`'s merge gate character for character.
+- **Finding 1, major:** `run()` wiped and recreated the evidence directory before
+  `add_worktree()`. When `git worktree add` failed, the refusal left an empty evidence directory
+  with no manifest. That contradicted OPS-029's "nothing was left behind". Reproduced by occupying
+  the worktree path.
+- **Finding 2, minor:** `main()` caught only `Refused`. A `PermissionError` creating the worktree
+  parent produced a traceback instead of the documented exit 2. A malformed `dev` backlog would
+  likewise raise. Reproduced with a `0o500` parent.
+- **No injection path found.** It tried the commit strings `--upload-pack=touch /tmp/pwned`, `-h`,
+  `--output=x`, `dev; echo injected` and `$(echo dev)`. All were refused as "does not resolve", and
+  no file was created. The phase-id pattern rejects path and shell characters before any git or
+  filesystem use.
+- **Confirmed:**
+  - Deduplication and order match the real manifest.
+  - `passed` and exit 0 are impossible when a run entry failed or timed out.
+  - Each sha256 is taken over the exact bytes written, including the timeout note.
+  - OPS-029 matches the code apart from the two findings.
+  - `generate_tool_docs.py --check` is current.
+  - Governance, ruff and mypy reproduced.
+- **Session-record claims:** none unsupported.
+- **Probes not reached:**
+  - a failure partway through writing an evidence file;
+  - a malformed backlog on the real repository;
+  - two concurrent runs of the same phase and commit racing on the fixed evidence path, noted as a
+    design point, not reproduced.
+- **Worktree:** left clean.
+
+Disposition:
+- **Both findings fixed in `a706a28`.**
+  - The evidence directory is replaced only after the worktree exists, so a refused run leaves the
+    previous evidence untouched.
+  - Failing to create the worktree directory and an unparsable `dev` backlog are refusals (exit 2).
+  - An operating-system error after the run starts exits 2 with `stopped: …`, after the worktree is
+    removed.
+  - Four new tests cover these. OPS-029's exit table and failure list are updated, and its
+    reference block regenerated.
+- **The concurrent-run note is accepted, not fixed.** Under `PLAN-047` D3 one coordinator runs the
+  tool, so two runs of the same phase and commit at once are not an expected use. The OPS document
+  says a second run replaces the directory.
+
+## Decisions
+
+The owner ruled four design points in this session, each through AskUserQuestion, because the
+phase did not settle them:
+- **Prose entries.** An entry runs only when its first word, past `NAME=value` assignments, is `cd`
+  or a program on `PATH`; other entries are listed as not run. About 100 of the backlog's 901
+  verification entries are prose, and some contain backticks, so passing them to a shell was
+  rejected.
+- **Evidence location.** Evidence goes to `_working/review-checks/<phase-id>/<commit12>/` in the
+  running checkout: gitignored, it outlives the worktree, and a reviewer without a shell can read
+  it.
+- **Which backlog.** The verification list is read from `dev`'s backlog, not from the commit, so a
+  branch cannot weaken its own list. A test proves a weakened branch list is ignored.
+- **Timeout.** A fixed 30-minute timeout per command, recorded as exit 124. The tool takes no
+  options, so the limit is a constant.
+
+Two scope changes to the claim, both owner-approved:
+- **At the claim**, the deliverable `docs/08-governance/` was narrowed to the OPS-029 file, with
+  OPS-029 reserved in `codes.yaml`. The whole directory path-conflicted with `phase-des-09`, which
+  was active then.
+- **During the build**, `docs/08-governance/codes.yaml` was added (`a91a8e3`). Governance requires
+  the document's own change to remove its reservation.
+
+Smaller choices made without asking, stated here:
+- a gate check the list also names runs once;
+- `uv sync --extra dev` runs as a listed `setup` entry;
+- commands run with no stdin, so a prose entry starting with `grep … -` cannot hang;
+- `VIRTUAL_ENV` is dropped so `uv run` uses the worktree's environment.
+
+## Corrections
+
+- **Worktree location.** The default worktree parent was first computed from the running checkout's
+  parent. Started from a worktree, that nests under `d-system-worktrees/d-system-worktrees/`. I
+  caught it before the real run and fixed it in its own commit: the parent now comes from the
+  common git directory, with a test.
+- **A stray code reservation.** At the claim I re-ran `--next-code operation`, which reserved
+  OPS-030 in the machine-local store on top of my earlier OPS-029. I released OPS-030 at once and
+  reported it to Session Manager.
+- **A fixture built on a shell builtin.** `exit 3` is a bash builtin, not a program on `PATH`, so
+  the owner-ruled rule correctly treats it as prose. The fixture now uses `sh -c 'exit 3'`, and an
+  `is_command` case pins the builtin behaviour.
+
+## Left undone
+
+- **Not yet wired into the merge gate.** `GOV-017`'s merge-gate step 2 still describes the Session
+  Manager's own re-run, and nothing yet routes reviews through this runner. That is the dispatch
+  rule in `REQ-030` R03 and R04, in later phases of `PLAN-047`.
+- **The completion edit.** It happens on dev after the owner approves the merge.
