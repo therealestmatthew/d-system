@@ -22,12 +22,12 @@ the owner's approval, on branch `agent/phase-dgov-06`.
 
 ## Verification
 
-Run in the worktree, rebased onto dev 8bd31ea.
+Run in the worktree, rebased onto dev 6b873bf, after the review fix.
 
 `uv run pytest test/test_containment.py`
 
 ```
-18 passed, 1 warning in 10.00s
+19 passed, 1 warning in 7.91s
 ```
 
 `uv run python -m src.governance --containment` (exit 0)
@@ -39,8 +39,11 @@ Containment: 133 phases, 91 checked, 42 not located, 75 with findings (1192 file
 `uv run python -m src.governance`
 
 ```
-Governance OK: 43 systems, 414 documents, 34 memories, 347 backlog phases
+Governance OK: 43 systems, 415 documents, 34 memories, 347 backlog phases
 ```
+
+The full suite gave `1265 passed, 1 warning in 139.97s`; `uv run ruff check src/ test/` gave
+`All checks passed!` and `uv run mypy src/` gave `Success: no issues found in 47 source files`.
 
 The full repository run is saved at `_working/session-manager/dgov-06-containment-run.txt`
 (gitignored). Of the 1192 files, 46 lie inside one of the phase's declared systems and 1146 outside
@@ -84,3 +87,67 @@ then READY to the Session Manager and the owner's merge approval.
 - REQ-015 R12's text still says "except those whose message names a different phase id". The
   owner's ruling of 2026-10-01 narrows it to phases active at that commit; the requirement document
   is not one of this phase's deliverables and was not amended.
+
+## Review
+
+Independent review by a `demo-adversary` agent (Sonnet) over dev...agent/phase-dgov-06 at 04b1596,
+recorded as it reported:
+
+- R12: Met. The rerun of `--containment` was byte-identical to the recorded run. Claim and
+  completion commits for phase-plfx-01, phase-cap-05 and phase-gov-01 were checked by hand against
+  `git log -p` on backlog.yaml and were correct.
+- R13: Met on "no write": only `git log`, `git show`, `git diff` and `git merge-base` run, and
+  `git status` and `git show-ref` were unchanged. The too-narrow versus stray distinction is
+  evidence derived from the systems registry, not a label. Undermined in practice by the blocker.
+- phase-prog-04 and phase-prog-05: Met against live history; 3da1295 and 744d4c8 fall inside the
+  ranges.
+- Scratch branch with one undeclared file: Met.
+- The owner's 2026-10-01 peer-drop ruling is implemented exactly as stated.
+- BLOCKER, `src/governance/containment.py:253`: branch mode exempted every file under
+  `docs/03-sessions/`, unlike completed mode, which exempts only the phase's own record. Reproduced:
+  a branch editing another phase's session record reported "no undeclared changes".
+- MINOR, `containment.py:39-40`: the phase-id patterns assume exactly two digits.
+- MINOR, `containment.py:116`: a commit whose body merely mentions an active phase is dropped as
+  that phase's work (phase-cap-05's `32c55d0`, dropped as phase-idg-10's). Across all 188 dropped
+  commits with non-exempt files, every such case genuinely belonged to the named phase.
+- Disclosed: REQ-015 R12's text still reads "names a different phase id".
+
+Resolution:
+
+- Blocker: fixed in 048af24. Branch mode now exempts the phase's recorded session path and the
+  session records the branch adds; an edit to an existing record is reported.
+  `test_branch_mode_reports_an_edit_to_another_session_record` reproduces the reviewer's case.
+- First minor: accepted. `schemas/backlog.schema.json` requires `^phase-[a-z]+-[0-9]{2}$`, so a
+  three-digit id cannot exist.
+- Second minor: accepted. It is the owner's rule ("its message names" a phase), and the reviewer
+  found no case where it misattributed a file.
+
+## Decisions
+
+- The claim and completion commits are found from the phase's own status changes in backlog.yaml,
+  read revision by revision along dev's first-parent history (476 revisions, about 5 seconds),
+  rather than from commit subjects, which the Scout found unreliable for 42 of 129 phases.
+- The owner ruled the completed-phase filter in this session. R12 as written drops any commit
+  naming a different phase id, which drops the two commits acceptance item 3 requires (3da1295
+  names only phase-prog-01; 744d4c8 names four other phases and not phase-prog-05). The check
+  drops a commit only when its message names another phase active before or after that commit and
+  does not name this one.
+- A phase that cannot be located is reported with the reason and no change set, never a guessed
+  range.
+- Each finding carries whether the file lies inside a declared system, so a person can judge a
+  too-narrow declaration from stray work. The check does not decide which.
+- The phase replaced the earlier assignment of phase-des-08 and was claimed after it merged; the
+  owner approved this claim separately.
+
+## Corrections
+
+- One fixture assertion expected one dropped peer commit; the peer's claim commit is a second, and
+  correctly dropped. The test was corrected.
+- The review's blocker above, fixed in 048af24.
+
+## Left undone
+
+- Exact attribution of a phase's own commits needs its integrated range recorded at completion
+  (idea 000523). Until then most findings are other sessions' unlabelled commits within a long
+  range, which a reader has to set aside by hand.
+- REQ-015 R12 still states the broader filter; amending it is the owner's call.
