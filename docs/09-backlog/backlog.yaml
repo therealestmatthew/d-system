@@ -10982,6 +10982,7 @@ items:
   ideas:
   - '000245'
   - '000336'
+  - '000523'
   systems:
   - sys-governance
   - sys-backlog
