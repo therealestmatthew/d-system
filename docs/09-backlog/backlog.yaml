@@ -7,7 +7,6 @@ next_up:
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
-- phase-gov-01
 - phase-dgov-06
 - phase-asr-02
 - phase-asr-03
@@ -3036,7 +3035,7 @@ items:
   - sys-governance
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   session: doc-session-reject-unreserved-code-deliverables
   priority: 1
@@ -3071,8 +3070,18 @@ items:
   - src/governance/backlog.py
   - src/governance/__main__.py
   - test/test_backlog.py
-  next_action: All acceptance met on agent/phase-gov-01 (SESS-2026-09-29-01); awaiting the
-    owner-approved merge, after which the completion edit is made on dev.
+  completion_evidence:
+  - src/governance/backlog.py
+  - src/governance/__main__.py
+  - test/test_backlog.py
+  - docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md
+  result: 'Complete: the backlog audit rejects a deliverable whose filename claims a code that is
+    neither an existing document nor reserved in codes.yaml, with a separate message for a retired
+    code. Codes are read with parse_code() and accepted only in their series'' registered numbering
+    mode. 1163 tests passed, governance, ruff and mypy clean; adversary review met all five acceptance
+    conditions, its major finding fixed and its note accepted as out of scope. Integrated onto dev at
+    67e7fc3 with the owner''s approval.'
+  next_action: Complete.
 - id: phase-ses-01
   title: Define the session type taxonomy and per-type context
   plan: doc-session-lifecycle
