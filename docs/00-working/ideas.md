@@ -23245,7 +23245,7 @@ Detail from the Scout's review (_working/session-manager/scout/gemini-branches-r
 
 ## 000521 · Batch index table in docs/09-backlog/batches/README.md goes stale: keep it in step with the batch tables' status, or generate it
 
-**Created 2026-09-30T20:41:10-04:00 · Status: `open`**
+**Created 2026-09-30T20:41:10-04:00 · Status: `triaged`**
 
 Reported by Session 5 - Batch Runner, 2026-09-30.
 
@@ -23257,11 +23257,31 @@ What it would touch: docs/09-backlog/batches/README.md; the coordinator's open a
 
 Unresolved: which of the two fixes; whether the README's description column ("What it builds") stays hand-written if the rest is generated. Related: the README itself names 000316 (the governance check that would validate batch tables) and 000317 (the protocol governing how they are authored).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-01T03:32:24-04:00): Triage (checked on dev c8f0a1c). No backlog phase covers this.
+Confirmed: docs/09-backlog/batches/batch-003-realization-graphs-and-idea-graph-foundations.yaml reads status: complete, while the README index (docs/09-backlog/batches/README.md:19) still reads "queued".
+Cause: the build coordinator (PROMPT-036, "Updating it", lines 112-118) and the batch orchestration protocol (GOV-016, lines 142-143) both direct the status move to the batch YAML only. Neither names the README index, and nothing checks it against the tables.
+Related:
+- 000316 (enforce the batch-table schema in the governance check), triaged. A drift check on the README index would sit naturally beside it.
+- 000317 (register batching and orchestration as a governance protocol), promoted to GOV-016. A fix that keeps the row edited by hand changes GOV-016's update rule.
+- 000499 (keep batch tables' phase status fresh while delivery is ongoing), triaged. The same staleness one level down: phase status inside a table rather than the table's status in the index.
+- Generator precedent: tools/generate_ideas_md.py renders docs/00-working/ideas.md and the pre-commit hook refuses a stale copy.
+PROPOSED LINK: this idea --relates_to--> 000316 (the batch-table governance check)
+PROPOSED LINK: this idea --relates_to--> 000499 (the same staleness, at phase level)
+PROPOSED LINK: this idea --relates_to--> GOV-016 (the protocol whose update rule omits the index)
+
+</details>
+
 ---
 
 ## 000522 · Bring the idea lifecycle text up to date for set_aside: agent-workflows/idea.md, append_idea.py help, and their generated copies
 
-**Created 2026-09-30T23:49:17-04:00 · Status: `open`**
+**Created 2026-09-30T23:49:17-04:00 · Status: `triaged`**
 
 Session 2 - Builder B, 2026-09-30, as given: "Once phase-idg-19 merges, update agent-workflows/idea.md (the lifecycle it describes has no set_aside and none of the closing states) and tools/append_idea.py's help text, then regenerate their copies (.claude/commands/idea.md, .agents/skills/idea/SKILL.md, OPS-005). Both edits were reverted from phase-idg-19 because those generated copies were outside its claim. Relates to 000516 and 000517."
 
@@ -23275,6 +23295,23 @@ Related: 000516 (set-aside in the workbench's idea-queue precedence map and the 
 
 Unresolved: the source names "none of the closing states" as missing from agent-workflows/idea.md; which states those are is fixed by phase-idg-19's merged text, not here.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-01T03:32:25-04:00): Triage (checked on dev c8f0a1c). No backlog phase covers this; its precondition holds.
+Precondition met: phase-idg-19 (add the set-aside status and the partition hold-out field) is complete on dev. src/db/ideas.py defines SET_ASIDE = "set_aside" (line 37) and CLOSING_STATES = ("delivered", "resolved", "absorbed") (line 30); SESS-2026-09-30-01 (the idea set-aside status session) records the reverted documentation edits.
+Still stale: agent-workflows/idea.md:56 reads "Statuses move forward only: open -> triaged -> reviewing -> promoted, with discarded reachable from any of them", with no set_aside and none of the three closing states. tools/append_idea.py's status subcommand help (line 554) reads only "move an idea's status".
+Regeneration paths, corrected from the idea's wording:
+- .claude/commands/idea.md and .agents/skills/idea/SKILL.md are generated from agent-workflows/idea.md by tools/generate_agent_workflows.py (OPS-010).
+- OPS-005 (append an event to the idea log) is a governed document, not a generated copy. Only its tool-reference block (between the generated:tool-reference markers) is rendered, by tools/generate_tool_docs.py from append_idea.py's argparse help. Its hand-written prose may also need the lifecycle text.
+Related: 000516 and 000517 (already linked; the other two phase-idg-19 follow-ups).
+No proposed links or promotions.
+
+</details>
+
 **Links**
 
 - relates_to → `000516`
@@ -23284,7 +23321,7 @@ Unresolved: the source names "none of the closing states" as missing from agent-
 
 ## 000523 · Record each phase's integrated commit range in its completion edit, so the containment check can attribute a phase's own commits exactly
 
-**Created 2026-10-01T03:28:36-04:00 · Status: `open`**
+**Created 2026-10-01T03:28:36-04:00 · Status: `triaged`**
 
 Session 5 - Batch Runner, 2026-10-01, as given: "Record each phase's integrated commit range (the dev tip before its fast-forward and the branch tip) in its completion edit, so the containment check (phase-dgov-06) can attribute a phase's own commits exactly. The claim-to-completion range on dev's first-parent history sweeps in other sessions' unlabelled work: the first run reports 75 of 91 locatable phases with findings, 1192 files in all (phase-demo-07's range is 403 commits)."
 
@@ -23295,3 +23332,23 @@ The proposal: at merge time, the completion edit records two shas — dev's tip 
 What it would touch: the merge procedure's completion edit (AGENTS.md step 9 and the Session Manager contract's merge item; /session-start and /session-close if they write it); wherever completion is recorded (backlog.yaml phase entry or the session record); the backlog schema if it gains a field; the phase-dgov-06 containment check, to prefer the recorded range when present.
 
 Unresolved: the field name and where it lives; what the check does for the phases already completed without a recorded range (fall back to today's inference, mark them unattributable, or backfill from merge history); whether the pre-fast-forward tip is reliably known when the completion edit is written, since the edit is made on dev after the merge.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-01T03:32:25-04:00): Triage (checked on dev c8f0a1c). Bears directly on an active phase; no phase records a commit range.
+- The containment check (phase-dgov-06, diff a phase's change set against its declared paths) is status: active. Its completed-phase mode is defined exactly as the over-broad range this idea reports: "the files touched on dev's first-parent history between the phase's claim commit and its completion commit", minus commits naming a different phase id (docs/09-backlog/backlog.yaml:10999; PLAN-030, document and backlog governance, line 113). Changing the attribution rule therefore changes PLAN-030's text as well as the check.
+- No field records a commit sha. The completion fields in schemas/backlog.schema.json are session (line 231), completion_evidence (237) and result (248). /session-close's completion edit sets those and nothing else. Some session records note a merge-base and branch tip in prose (e.g. SESS-2026-09-11-05), with no standard form.
+- On the third unresolved point: merges are fast-forwards after a required rebase, so dev's tip before the fast-forward is the rebased branch's base. It is known inside the merge turn before the fast-forward runs, and the branch tip is dev's tip right after it; both can be written in the completion edit made in that same turn.
+Related ideas:
+- 000027 (no mechanical check that a completed phase's diff stayed inside its declared paths), triaged — the need phase-dgov-06 answers.
+- 000398 (commit-time check that a branch's diff stays inside its declared deliverables), triaged — the active-branch side, which has no attribution problem.
+- 000390 (worktree and branch registry) and 000391 (progress and coordination tracking, including lock and queue history), triaged — both would hold merge provenance outside git.
+PROPOSED LINK: this idea --relates_to--> 000027 (the containment need)
+PROPOSED LINK: this idea --relates_to--> 000390 (branch registry; a natural home for the range)
+PROPOSED LINK: this idea --relates_to--> PLAN-030 (defines the claim-to-completion attribution rule)
+
+</details>
