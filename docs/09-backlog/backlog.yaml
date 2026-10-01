@@ -12701,6 +12701,7 @@ items:
   - templates/README.md
   - tools/generate_house_css.py
   - docs/08-governance/OPS-027-generate-house-css.md
+  - docs/08-governance/codes.yaml
   - test/test_house_css.py
   next_action: Read the gallery artifact first and transcribe its tokens into the test fixture before writing
     the tokens file, so the fixture is the record of what was approved rather than a copy of what was built.
@@ -12786,6 +12787,7 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - docs/08-governance/OPS-028-generate-engine-pages.md
+  - docs/08-governance/codes.yaml
   - test/test_engine_pages.py
   next_action: Build the shared data layer against this page's needs only; the later page phases extend
     it. Check what tools/overview_metrics.py already computes from fold() before writing a second count.
