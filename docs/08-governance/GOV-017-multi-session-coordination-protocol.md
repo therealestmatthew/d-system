@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-24'
+updated: '2026-10-01'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-adr-multi-agent-concurrency, doc-coordinator-protocol, doc-build-coordinator, doc-backlog-decisions, doc-conversation-guidelines, doc-governance-operations]
 ---
@@ -66,6 +66,7 @@ phase. **Execution sessions** build backlog phases.
 | Session 2 - Builder B | execution | As Builder A | one |
 | Session 3 - Standby Builder | execution | First in line for the next free slot; until then, reviews queued phases with `PROMPT-035` | none until assigned |
 | Session 4 - Scout | execution | Read-only: candidate phases, batch reconnaissance, worktree and branch audits | never |
+| Owner Terminal | owner | Runs the owner-only commands the Session Manager queues, each approved by the owner in that session (optional; see *The Owner Terminal*) | never |
 
 ### Why these roles
 
@@ -206,6 +207,47 @@ triages open ideas with `/idea-triage` (owner ruling, 2026-09-22): the scouts ar
 findings and status moves are written in one idea turn. Recording a new idea comes before triage. It takes each id from the tool's output and sends it back to the originating session and
 to the Session Manager.
 
+## The Owner Terminal
+
+Some commands only the owner may run: pushing `dev`, deleting `origin` branches, and writing paths a
+deny rule closes to agents (`.agents/`, `.codex/`). An agent session in auto mode is refused these,
+and the owner cannot type them while working from the Remote Control mobile client. The Owner
+Terminal closes that gap. It is a Claude Code session in the default (manual) permission mode,
+connected through Remote Control, so the owner approves every tool call it makes from wherever they
+are. It is optional: the arrangement runs without it when the owner is at the terminal.
+
+The owner's approval in the Owner Terminal is the authorization for each command. The session is not
+a way around a refusal in another session: the Session Manager queues only commands that are the
+owner's to run, and never a command another session was denied.
+
+**Starting it.** The owner starts it in a terminal on this machine:
+`claude --permission-mode default --remote-control "Owner Terminal"`. When the owner is away from the
+terminal, the Session Manager may start or resume it on the owner's explicit request, detached under a
+pseudo-terminal, for example
+`setsid script -qfc "claude --resume <session-id> --permission-mode default --remote-control 'Owner Terminal'" /dev/null`
+(this machine has no tmux). The session started this way on 2026-09-30 ended when the process that
+launched it exited, so check `ListAgents` after any start.
+
+**The queue.** The Owner Terminal keeps a running list at
+`_working/session-manager/owner-terminal-queue.md` (gitignored). Each entry has an id (`C1`, `C2`, ...),
+a purpose, the exact command, a precondition, a status and the result. It records each entry the
+Session Manager sends as `queued` and runs one only when the owner tells it to in its own session.
+
+**Commands that touch `dev`** (a push) carry the precondition *SM GO*. The Owner Terminal asks
+`GO? <id>`, and the Session Manager answers `GO <id>` only when the primary checkout is clean and no
+session holds the lock, then grants nothing else until the result is reported. Other commands run in
+the order the owner chooses.
+
+**Reporting.** After each command the Owner Terminal updates the queue file and sends the Session
+Manager `DONE <id>` or `FAILED <id>` with the real output. A failed or refused command is not retried
+and not worked around. The Owner Terminal never commits, merges, rebases or edits tracked files, and
+runs no tests in the primary checkout.
+
+**Limits seen on 2026-09-30.** Messages to it travel over Remote Control: delivery is not confirmed
+and `notify_when_idle` is not supported, so the Session Manager checks results against the repository
+(`git ls-remote`, the worktree) rather than waiting for a reply. It once ran two commands and reported
+neither until asked; the Session Manager found the push by checking `origin`.
+
 ## The message contract
 
 The first line of every message is its type and subject. All messages to the Session Manager are
@@ -230,6 +272,9 @@ sent to the name `Session Manager`.
 | `IDEA` / `IDEA-RECORDED <id> <title> from <session>` | any / Ideation | An idea to record / the id it was recorded under |
 | `BLOCKED <reason>` | any | Stuck on something outside the sender's worktree |
 | `FREE` | execution | No assignment |
+| `QUEUE <id>` | Session Manager | An owner-only command for the Owner Terminal to record: purpose, command, precondition |
+| `GO? <id>` / `GO <id>` | Owner Terminal / Session Manager | The precondition check before a command that touches `dev`, and its answer |
+| `DONE <id>` / `FAILED <id>` | Owner Terminal | The command ran, with its output, or failed or was refused, with the message |
 
 ## State and resumption
 

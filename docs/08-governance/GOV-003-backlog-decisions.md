@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-30'
+updated: '2026-10-01'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -777,3 +777,24 @@ handler, and the measured value and machine are recorded.
 
 **Why recorded here:** an agent reaching any of these three phases sees the ruling in its scope but
 not that an alternative was weighed and declined, and would otherwise reopen the question.
+
+## An Owner Terminal session runs the owner-only commands — 2026-10-01
+
+On 2026-09-30 the owner was working from the Remote Control mobile client and could not type terminal
+commands. Three steps were waiting on them: pushing `dev` (refused to auto-mode sessions), deleting
+merged `origin` branches, and a generator run that writes under `.agents/` (closed to agents by a deny
+rule). The owner started a Claude Code session in the default (manual) permission mode, named it
+"Owner Terminal", and authorized the Session Manager to queue every owner-only command there. The
+Owner Terminal ran six such commands that night and the next morning (a generator run, two pushes,
+three branch deletions), each one approved by the owner in that session. On 2026-10-01 the owner ruled
+that the role becomes part of the multi-session protocol: `GOV-017` "The Owner Terminal" describes it,
+and `PROMPT-037` carries its starter.
+
+Two alternatives were not taken. Granting push to the agent sessions would remove the owner's hold on
+`dev` reaching `origin`. Waiting for the owner to reach the terminal left the push and the parked
+phase blocked for hours.
+
+**Why recorded here:** an agent reading only `AGENTS.md` or the `GOV-017` roster of 2026-09-22 would
+treat a session running pushes and branch deletions as acting outside its role. The authorization is
+the owner's approval of each command in that session; the session is not a route around a refusal
+elsewhere.

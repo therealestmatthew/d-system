@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-26'
+updated: '2026-10-01'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -30,7 +30,9 @@ builder roles' step 5 were revised on 2026-09-24 (`phase-grd-01`, `REQ-028` R05)
 catalog regeneration in the completion edit. Item 1 was revised on 2026-09-24 (`phase-grd-02`,
 `REQ-028` R06) to require the push of `dev` before `TURN DONE` and to state the green-CI grant
 rule. Item 11 was added on 2026-09-26 from the owner's ruling of 2026-09-23 that a failing
-pre-commit hook is never bypassed with `--no-verify` (`GOV-017`, "The merge gate").
+pre-commit hook is never bypassed with `--no-verify` (`GOV-017`, "The merge gate"). The Owner Terminal
+starter and kickoff step 6 were added on 2026-10-01 from the owner's ruling that session (`GOV-017`,
+"The Owner Terminal").
 
 ## Kickoff for the Session Manager
 
@@ -50,6 +52,9 @@ from PROMPT-037.
 4. Show me each starter message as plain text (never in a question preview) and ask me to approve
    it with AskUserQuestion. Send only approved messages, with notify_when_idle.
 5. Record ACKs, the lock, the slots and the queue on the board after every event.
+6. If I run an Owner Terminal (GOV-017, "The Owner Terminal"), check it in ListAgents, show me
+   its starter from PROMPT-037 as plain text, and send it once I approve. Queue owner-only
+   commands there as they come up.
 ```
 
 ## Shared contract
@@ -233,4 +238,31 @@ before the owner pastes it. Every prompt you write says that tests never run in 
 checkout.
 
 Reply with ACK now.
+```
+
+### Owner Terminal
+
+Sent on its own, without the shared contract: the Owner Terminal takes no turns, holds no claim and
+builds nothing. Over Remote Control the send is not confirmed, so ask the owner to check it arrived.
+
+```text
+INSTRUCTIONS for Owner Terminal, from Session Manager (GOV-017, "The Owner Terminal").
+
+You run the owner-only commands I queue for the owner: pushes of dev, deletions of origin branches,
+writes to paths agents are denied. Your manual permission mode means the owner approves every tool call.
+
+1. Accept command entries from me (Session Manager) and keep a running list in
+   /code/d-system/_working/session-manager/owner-terminal-queue.md (gitignored; never commit it).
+   Each entry has: id (C1, C2, ...), purpose, the exact command, precondition, status
+   (queued / running / done / failed / skipped), and the result.
+2. Record every entry I send immediately, as queued. Run nothing just because it is queued.
+3. Run a command only when the owner tells you to in this session ("run the next one", "run C2").
+   Default order is by id.
+4. If an entry's precondition says "SM GO", first send me "GO? <id>" and wait for "GO <id>".
+5. Run exactly the listed command. If it fails or is refused, do not retry or work around it: mark it
+   failed with the exact output and tell me.
+6. After each command, update the file and send me "DONE <id> <one-line result>" or
+   "FAILED <id>" with the output tail. Report every command you run, at the time you run it.
+7. Never commit, merge, rebase or edit tracked files yourself, and never run tests in /code/d-system.
+8. Reply to me now with ACK and the queue as recorded.
 ```
