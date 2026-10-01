@@ -7,9 +7,9 @@ kind: plan
 status: active
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-15'
+updated: '2026-09-30'
 systems: [sys-html]
-depends_on: [doc-html-generation-design-system-requirements, doc-html-00-overview]
+depends_on: [doc-html-generation-design-system-requirements, doc-engine-pages-house-style-requirements, doc-html-00-overview]
 ---
 
 # HTML generation and design system (P9)
@@ -27,6 +27,14 @@ layer of the generation pipeline, and its relationship to plans written before t
 
 Partition-time sizing was 5–6 phases, "mostly gated on `PLAN-003`". This plan lands **six**, and
 changes what they are gated on — see design decision 1.
+
+**Amended on 2026-09-30.** The owner moved this programme's priority to the idea realization
+engine's generated pages. The amendment adds six phases (`phase-des-07` to `-12`), cancels one
+(`phase-des-05`) and re-gates four. Its requirement is
+[REQ-036](../06-requirements/REQ-036-engine-pages-house-style.md). The section
+"Amendment, 2026-09-30" below states the decisions and their reasons. The sections between here
+and that one are the plan as written on 2026-09-15. Where they conflict with the amendment, the
+amendment wins.
 
 ## What was checked before sizing
 
@@ -157,6 +165,139 @@ phases is an architectural commitment a future reader must be able to trace. If 
 
 Decisions 1, 3, 4 and 5 are recorded here and in `REQ-021`'s rows. Decision 2 is `R02` itself.
 
+## Amendment, 2026-09-30: the engine pages and the house style
+
+### What changed and who decided it
+
+The Session Manager relayed the owner's change of course on 2026-09-30. The owner answered the
+questions below in the amending session. `REQ-036` records each ruling.
+
+- **The house style is approved.** The owner approved the round-2 gallery as shown
+  (`https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi`). It shows the magazine house style with
+  Swiss and technical-mono variants on shared tokens, light and dark through one colour-only flag,
+  and Google Fonts with a system-font fallback. Repository tokens are the source of truth, as
+  recorded on idea `000511`.
+- **The first page set is four pages.** (1) A pipeline overview: the stages with counts and what
+  is waiting at each gate. (2) An idea funnel and ledger: every idea by status and axis, from
+  `fold()`. (3) A per-idea trace: capture, then plan, then phases, then delivered, with gate
+  decisions. (4) A backlog and batch graph: batches, stages and dependencies with their states,
+  showing what is blocked and why.
+
+### Decision A. Pages first: how `phase-des-01` to `-06` fit the new phases
+
+**Decision.** The token phase (`phase-des-07`) and the four page phases are not gated on the audit
+of the pre-build plans (`phase-des-01`). Each existing phase changes as follows:
+
+| Phase | Before | After | Reason |
+|---|---|---|---|
+| `phase-des-01` audit | gated `-03`, `-04`, `-05` | still gates `-03` and `-04`; gates no new phase | The audit dispositions the ten `phase-html-*` phases. That is still real work, but none of the four pages depends on its outcome. They are built from the house family and from records that exist today. |
+| `phase-des-02` governance atlas page | atlas family, no dependency | house family, depends on `-07` | The owner chose to move it onto the house style rather than add a fourth page in the old dark atlas design. |
+| `phase-des-03` template library | depends on `-01` | depends on `-01` and the four page phases | A library extracted from four working pages has real cases to generalise from. Written before them, it would have to guess what the pages need. |
+| `phase-des-04` component library | depends on `-01` | depends on `-01` and the four page phases | Same reason. The pages also show which components are needed and which need script. |
+| `phase-des-05` palette library | depends on `-01` | **cancelled** | Its two open questions, the role set and light and dark coverage, are answered by the approved gallery. `phase-des-07` builds the token set that answers them. The phase id is kept and not reused. |
+| `phase-des-06` designer agent | depends on `-03`, `-04`, `-05` | depends on `-03`, `-04`, `-07` | The token format it writes into now comes from `-07`. |
+
+**Why not keep the old order.** Under the old order the pages would wait for the audit and all
+three library phases. That is five phases, none of which changes what the pages show. The owner
+made the pages the priority.
+
+**Why not retire `-03`, `-04` and `-06`.** The owner chose to keep them. The template library's
+machine-readable population method (`REQ-021` R05, R06), the component library's script
+declaration (R07, R08) and the designer agent (R11) are not covered by the six new phases.
+
+### Decision B. Trace links come from a new structured field on phases
+
+Only 13 ideas carry `promoted_to`, and 37 links point at a document code. No phase field names an
+idea. A trace built on that data would show fewer than one idea in ten. The owner chose a
+structured `ideas` field on backlog phases, backfilled from the ids named in each phase's own text
+(`phase-des-08`). The trace (`phase-des-11`) depends on it. The validator rejects an id that
+`fold()` does not contain, so a backfill error fails the governance check instead of producing
+a wrong trace.
+
+The backfill reads only the phase's own `scope`, `acceptance` and `next_action`. It does not read
+the plan document. A plan that names twenty ideas would otherwise link all twenty to every one of
+its phases, and the trace would claim more than the records say.
+
+### Decision C. Gate decisions are derived from records
+
+`_data/gate-decisions.jsonl` does not exist. The owner chose derivation over starting a new log.
+`REQ-036` R14 and R20 state the derivation for each gate. Two consequences:
+
+- **G2 shows "not recorded".** The accepted partitions are Markdown documents under
+  `docs/00-working/`, not structured records, and parsing prose for gate decisions would make the
+  page guess. The trace says so and names the missing record (`REQ-036` R11).
+- **G4 and G5 are one entry.** Integration is fast-forward-only, so `dev` has no merge commits. The
+  completion edit is made on `dev` in the same turn as the merge (the Session Manager's contract,
+  item 4). The earliest `dev` commit where a phase reads `complete` is therefore the record of both.
+  The owner's wording was "merge commit on dev". This is the nearest record that exists, and the
+  page states the reason.
+
+### Decision D. The funnel's axes are the `ARCH-005` axes, shown as they are
+
+No idea carries a classification today, so every idea is "unclassified" on all four axes. The
+owner chose to show that state rather than drop the axis view or substitute the partition track.
+The view fills in as ideas are classified, with no page change.
+
+### Decision E. Committed snapshots, no staleness gate
+
+Pages are committed under `_public/engine/`, each stamped with its source commit and that
+commit's date. The generator is tested for determinism (`REQ-036` R07), not for currency. The idea
+log changes many times a day, and a currency gate like the catalog's would fail on most commits.
+The owner chose this over a gate and over gitignored output.
+
+### Decision F. One shared generator, then one phase per page
+
+`phase-des-09` builds the generator, its shared data layer and the first page, the pipeline
+overview. The first page is in the same phase so the layer is built against a real consumer. Each
+further page is its own phase because each has a different data question. The ledger's is the
+axes. The trace's is the gate derivation and its git reads. The graph's is a static SVG layout
+with no script (`REQ-036` R12).
+
+All six new phases declare `sys-html` except `phase-des-08`, so the lock table runs the page phases
+one at a time. The dependency chain already orders them, so nothing is lost.
+
+### Decision G. `REQ-021`'s rows that this amendment changes
+
+R09 and R10 are superseded by `REQ-036` R01 to R04. R12 is spent: it forbade building a page whose
+existence `phase-idg-08` was ruling on, and the owner kept those pages on 2026-09-21 (`GOV-003`).
+`phase-idg-08` still records that ruling and wraps the metrics command, and it builds no page. R13
+moves to the house family. `REQ-021` carries a note saying so.
+
+### Boundaries
+
+- **Monitoring artifact** (`000497`, investigated by `PROMPT-042`): sessions, branches, worktrees
+  and claims are not shown here. These pages cover ideas, plans, phases and batches.
+- **Orchestrator batch graph** (`phase-irs-14`): a LangGraph fan-out, not a page. Page 4 draws the
+  batch tables.
+- **Workbench explorers** (`phase-wb-06`): the live view. These pages are the snapshots.
+
+### Open, not sized here
+
+- **Mirroring the tokens to a Claude Design System artifact.** The owner ruled it later. It is the
+  next step after `phase-des-07` and gets a phase when the owner asks for one.
+- **Migrating existing pages to the house style.** The atlas, overview and lit-report families and
+  the six `_public/` pages are unchanged.
+- **Contrast admission for palettes** (`000085`). The owner approved the gallery's values as shown.
+
+### New phases
+
+| Phase | Title | Depends on | Requirement rows |
+|---|---|---|---|
+| `phase-des-07` | Commit the house-style tokens and generate the house family | — | `REQ-036` R01–R06 |
+| `phase-des-08` | Give backlog phases a structured idea field and backfill it | — | `REQ-036` R17, R18 |
+| `phase-des-09` | Build the engine page generator and the pipeline overview page | `07` | `REQ-036` R07–R14 |
+| `phase-des-10` | Build the idea funnel and ledger page | `09` | `REQ-036` R15, R16 |
+| `phase-des-11` | Build the per-idea trace pages | `08`, `10` | `REQ-036` R19, R20 |
+| `phase-des-12` | Build the backlog and batch graph page | `09` | `REQ-036` R21–R23 |
+
+`REQ-036` R24 and R25 are this amendment's own edits to the backlog and to `REQ-021`, made in the
+amending commit.
+
+The critical path is four deep: `07`, then `09`, then `10`, then `11`. `phase-des-07` and
+`phase-des-08` touch different systems and can run at once. The new phases carry priority 1, the
+highest in use, because the owner made them this programme's priority. Their place in `next_up` is
+the owner's to set at G3. This amendment does not edit `next_up`.
+
 ## Implementation phases
 
 Six phases under `phase-des-*`, registered in [the backlog index](../09-backlog/README.md).
@@ -164,11 +305,11 @@ Six phases under `phase-des-*`, registered in [the backlog index](../09-backlog/
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
 | `phase-des-01` | Audit the pre-build HTML plans and disposition every `phase-html-*` phase | `G39` | — |
-| `phase-des-02` | Build the governance atlas page in the atlas family | `G38` | — |
-| `phase-des-03` | Make the template layer a growing library with declared population methods | `G37` | `01` |
-| `phase-des-04` | Build the HTML component library | `G37` | `01` |
-| `phase-des-05` | Build the colour palette library | `G37` | `01` |
-| `phase-des-06` | Build the HTML Designer agent | `G37` | `03`, `04`, `05` |
+| `phase-des-02` | Build the governance atlas page in the atlas family (house family since 2026-09-30) | `G38` | `07` (since 2026-09-30) |
+| `phase-des-03` | Make the template layer a growing library with declared population methods | `G37` | `01`; and `09`–`12` since 2026-09-30 |
+| `phase-des-04` | Build the HTML component library | `G37` | `01`; and `09`–`12` since 2026-09-30 |
+| `phase-des-05` | Build the colour palette library — **cancelled 2026-09-30**, superseded by `phase-des-07` | `G37` | `01` |
+| `phase-des-06` | Build the HTML Designer agent | `G37` | `03`, `04`, `07` (was `05` until 2026-09-30) |
 
 ### Sizing against the partition
 
@@ -205,11 +346,11 @@ Every row of `REQ-021` maps to at least one phase, and every phase carries at le
 | R06 Each template declares a machine-readable population method | `phase-des-03` |
 | R07 Components compose a page without bespoke markup | `phase-des-04` |
 | R08 Script-free components ship no script | `phase-des-04` |
-| R09 Palettes are selectable data, not code branches | `phase-des-05` |
-| R10 Each palette states its roles and variant coverage | `phase-des-05` |
+| R09 Palettes are selectable data, not code branches | superseded by `REQ-036` R01–R04 (`phase-des-07`) |
+| R10 Each palette states its roles and variant coverage | superseded by `REQ-036` R01–R04 (`phase-des-07`) |
 | R11 The designer agent follows the existing family convention | `phase-des-06` |
-| R12 No phase here builds a page `phase-idg-08` is ruling on | `phase-des-01`, `phase-des-02` |
-| R13 The governance atlas page ships in the atlas family | `phase-des-02` |
+| R12 No phase here builds a page `phase-idg-08` is ruling on | spent by the owner's 2026-09-21 ruling (Decision G) |
+| R13 The governance atlas page ships in the atlas family (house family since 2026-09-30) | `phase-des-02` |
 
 ## Key references
 

@@ -279,8 +279,9 @@ systems:
   - sys-api
   - sys-ui
   - sys-contracts
-  description: Proposed YAML-to-JSON pages, API, React Router, typed blocks and styling. Templates are
-    placeholders.
+  description: Proposed YAML-to-JSON pages, API, React Router, typed blocks and styling (PLAN-003, under
+    audit by phase-des-01). Since the 2026-09-30 amendment to PLAN-036 it also covers the planned house-style
+    token family and the generated idea realization engine pages under _public/engine/ (REQ-036). Planned.
 - id: sys-course
   name: Git course production
   domain: delivery

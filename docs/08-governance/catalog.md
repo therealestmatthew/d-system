@@ -241,6 +241,7 @@ CI regenerates it and fails on any difference.
 | REQ-033 | requirement | draft | repository-owner | docs/06-requirements/REQ-033-system-boundary-study.md |
 | REQ-034 | requirement | draft | repository-owner | docs/06-requirements/REQ-034-session-autonomy-configuration.md |
 | REQ-035 | requirement | draft | repository-owner | docs/06-requirements/REQ-035-plugin-audit-remediation.md |
+| REQ-036 | requirement | draft | repository-owner | docs/06-requirements/REQ-036-engine-pages-house-style.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -467,7 +468,7 @@ CI regenerates it and fails on any difference.
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
-| PLAN-036 | doc-html-generation-design-system | active | 6 | 0 | 1 | agent-night |
+| PLAN-036 | doc-html-generation-design-system | active | 11 | 0 | 1 | agent-night |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 9 | 0 | 5 | agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
@@ -509,4 +510,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-406 documents — adr: 23, architecture: 12, governance: 19, operation: 22, plan: 81, prompt: 43, requirement: 34, session: 172.
+407 documents — adr: 23, architecture: 12, governance: 19, operation: 22, plan: 81, prompt: 43, requirement: 35, session: 172.

@@ -7,12 +7,27 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-09-30'
 systems: [sys-html]
 depends_on: [doc-html-00-overview]
 ---
 
 # HTML generation and design system requirements
+
+**Amendment note, 2026-09-30.** The engine-pages amendment to `PLAN-036` changes four rows of this
+document. Its requirement is [REQ-036](REQ-036-engine-pages-house-style.md).
+
+- **R09 and R10 are superseded** by `REQ-036` R01 to R04. The owner approved the round-2 house-style
+  gallery, which settles the palette role set and its light and dark coverage. `phase-des-05` is
+  cancelled.
+- **R12 is spent.** The owner ruled on 2026-09-21 that the generated ideas-and-backlog pages are
+  kept (`GOV-003`). Building them under `PLAN-036` is no longer a crossing of the boundary below.
+- **R13 moves to the house family.** The governance atlas page is built from the house family, not
+  from `atlas-page.html` and `atlas.css`.
+- **R04 applies to the template and component phases only.** The token phase and the page phases
+  do not wait for the audit.
+
+The rest of this document is unchanged and reads as it did on 2026-09-15.
 
 ## Observed problem and scope
 
