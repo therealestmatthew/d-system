@@ -6,7 +6,6 @@ next_up:
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
-- phase-dgov-06
 - phase-asr-02
 - phase-asr-03
 - phase-asr-01
@@ -10987,8 +10986,9 @@ items:
   - sys-governance
   - sys-backlog
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-coord
+  session: doc-session-containment-check
   priority: 2
   session_budget: 1
   depends_on:
@@ -11031,9 +11031,21 @@ items:
   - src/governance/containment.py
   - src/governance/__main__.py
   - test/test_containment.py
-  next_action: Built and verified (SESS-2026-10-01-03); independent review against REQ-015 R12 and R13,
-    then READY. The completed-phase filter drops a commit only when it names another phase active at that
-    commit (owner ruling, 2026-10-01).
+  completion_evidence:
+  - src/governance/containment.py
+  - src/governance/__main__.py
+  - test/test_containment.py
+  - docs/03-sessions/SESS-2026-10-01-03-containment-check.md
+  result: 'Complete: uv run python -m src.governance --containment reports each completed phase''s undeclared
+    files and other phases'' backlog entries, located from its status changes on dev''s first-parent history,
+    and checks an active phase on dev...agent/<id>; findings exit 0 and nothing is written. First run: 133
+    phases, 91 checked, 42 not located, 75 with findings (1192 files, 45 with other phases'' backlog entries),
+    including phase-prog-04 and phase-prog-05. The commit filter follows the owner''s 2026-10-01 ruling. 1265
+    tests passed; governance, ruff and mypy clean; independent review met all four acceptance conditions,
+    its blocker fixed and two minor findings accepted. Integrated onto dev at 00406e5 with the owner''s
+    approval.'
+  next_action: Complete. Findings are noisy until each phase's integrated range is recorded (idea 000523);
+    REQ-015 R12's wording predates the 2026-10-01 filter ruling.
 - id: phase-dgov-07
   title: Register _tmpagent in the systems maturity registry
   plan: doc-document-backlog-governance
