@@ -68,6 +68,40 @@ names the awaited owner-approved merge and the `dev` test drift.
   `ideas` field names `000523`.
 - `OPS-028`'s generated text still names R07-R14 (see Decisions).
 
+## Review
+
+Independent review by a fresh `demo-adversary` sub-agent over `8340c90..HEAD` (`b1546be`,
+`bc0f502`, `4b585b8`, `847fa61`, `ed8288e`). It ran the verification commands in the worktree and
+reported, condition by condition:
+
+1. **REQ-036 R15 — Met.** Both tests pass. The reviewer independently counted 523
+   `<tr data-idea=...>` rows in `_public/engine/ideas.html` and a funnel of
+   0+493+10+13+7+0+0+0+0=523. The funnel is built from `statuses()`, the full schema enum, so a status
+   absent from the data still shows with 0.
+2. **REQ-036 R16 — Met.** Both tests pass, and the corpus has 0 `classified` events. On the
+   amendment risk: the schema's `amended` event accepts only `title`, `body`, `text`, `target` and
+   `target_code`, and `classified` events are replace-only with no retraction shape. The raw-event
+   recount and `fold()` therefore cannot disagree under the current schema. The `no axes (<kind>)`
+   ruling is implemented and visible on the page.
+3. **REQ-036 R07-R13 — Met.** `uv run pytest`: `3 failed, 1274 passed`, the three failures as
+   recorded. The reviewer re-ran them in a throwaway worktree at `8340c90` with no branch changes and
+   got identical failures and the same 373/372 mismatch, so the pre-existing claim holds. Governance
+   OK. The R07-R12 tests pass over both pages. The `ideas.html` stamp `b1546be5bed8` is the parent of
+   the regeneration commit, and `4b585b8` changed only the docstring, so the page is not stale.
+
+Containment: `no undeclared changes`. All figures in the record reproduce: 523 ideas, the funnel,
+and 385 "no recorded plan" plus 138 "trace page not yet generated".
+
+Findings: no blockers, no majors.
+
+- **Minor/note:** the module docstring still says R07-R14 although the module now implements
+  R15/R16. This is deliberate and recorded under Corrections and Left undone. **Accepted.**
+- **Note:** the reviewer could not rerun the R13 scan with identifiers, because it was read-only
+  and limited to the worktree, so R13 rests on this session's primary-checkout scan (31 identifiers,
+  0 hits). **Accepted;** the scan is re-run at merge time.
+
+No discrepancies were found between the record and the reproduced evidence.
+
 ## Decisions
 
 The owner approved the claim for `agent-standby-3` in session, and the Session Manager granted the
