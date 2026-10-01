@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R16.
+"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R14.
 
 The engine (`ARCH-006`) carries an idea from capture to delivered work through nine stages and
 five owner gates. These pages show where everything stands, as committed snapshots built from the
