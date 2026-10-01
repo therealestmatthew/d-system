@@ -15044,8 +15044,9 @@ items:
   - test/test_run_review_checks.py
   - docs/08-governance/OPS-029-run-review-checks.md
   - docs/08-governance/codes.yaml
-  next_action: Reuse the detached-worktree pattern of GOV-017 merge-gate step 2. Never run pytest in the
-    primary checkout; the runner's own worktree is where the phase's commands run.
+  next_action: All acceptance conditions met and verification green on agent/phase-asr-02.
+    Awaiting the /session-close independent review, READY to Session Manager, and the owner's
+    merge approval. Session record SESS-2026-10-01-04.
 - id: phase-asr-03
   title: Build-review verdict records and the seeded re-review sampler
   plan: doc-reviewer-contract
