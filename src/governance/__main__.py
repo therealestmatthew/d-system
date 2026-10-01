@@ -21,7 +21,7 @@ from jsonschema import Draft7Validator, FormatChecker  # type: ignore[import-unt
 
 from src.db.ideas import IdeaError, fold, load_events
 from src.db.source_validation import data_root
-from src.governance import reservations
+from src.governance import containment, reservations
 from src.governance.backlog import (
     backfill_ideas_text,
     idea_backfill_diff,
@@ -600,6 +600,14 @@ def main() -> int:
         action="store_true",
         help="Report phases whose ideas field is missing or carries extra ids; exit 1 if any",
     )
+    output.add_argument(
+        "--containment",
+        nargs="?",
+        const="",
+        metavar="PHASE",
+        help="Report files each completed phase changed outside its declaration, or one phase's; "
+        "an active phase is checked on its agent/<phase-id> branch. Exits 0 on findings",
+    )
     parser.add_argument("--parent", metavar="DOC_ID", help="Allocate a sub-code under this plan")
     args = parser.parse_args()
     if args.parent and not args.next_code:
@@ -626,6 +634,7 @@ def main() -> int:
             args.release_code,
             args.backfill_ideas,
             args.check_ideas,
+            args.containment is not None,
         )
     )
     if plain and catalog and not errors:
@@ -682,6 +691,17 @@ def main() -> int:
         for line in lines:
             print(line)
         return code
+    elif args.containment is not None:
+        # Report-only (REQ-015 R13): findings exit 0; only a failure to run the check exits 1.
+        try:
+            print(
+                containment.run(
+                    ROOT, catalog, result["systems"], result["documents"], args.containment
+                )
+            )
+        except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+            print(f"ERROR containment: {exc}")
+            return 1
     elif args.inventory:
         print(inventory(result))
     else:
