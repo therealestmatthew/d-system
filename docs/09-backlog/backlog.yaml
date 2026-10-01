@@ -12711,7 +12711,8 @@ items:
   systems:
   - sys-backlog
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-coord
   priority: 1
   session_budget: 1
   depends_on: []
