@@ -39,19 +39,26 @@ Approvals behind the claim:
 
 ```
 $ uv run pytest
-FAILED test/test_agent_workflows.py::test_committed_adapters_match_canonical_sources
-1 failed, 1180 passed, 1 warning
+1187 passed, 1 warning
 ```
-
-The one failure is `.agents/skills/partition-ideas/SKILL.md`, a declared deliverable, which is stale
-against its canonical source `agent-workflows/partition-ideas.md`
-(`uv run python tools/generate_agent_workflows.py --check` reports it). Agents are denied writes
-under `.agents/`, so the owner must regenerate it.
 
 ```
 $ uv run python -m src.governance
-Governance OK: 43 systems, 398 documents, 34 memories, 341 backlog phases
+Governance OK: 43 systems, 409 documents, 34 memories, 347 backlog phases
 ```
+
+Supporting checks, run in the same state:
+
+```
+$ uv run python tools/generate_agent_workflows.py --check
+16 workflow adapter(s) current
+```
+
+The owner regenerated `.agents/skills/partition-ideas/SKILL.md` in this worktree (generator exit 0,
+"wrote 16 workflow adapter(s)"), and it is committed as `e47439f`. The private-content check was
+re-run with the identifiers from the primary checkout's `_private/portfolio/`. This worktree has
+none, so the pre-commit hook had checked 0 identifiers. Result: 1100 tracked files, 31 identifiers,
+0 violations.
 
 ## Acceptance
 
@@ -61,25 +68,19 @@ Governance OK: 43 systems, 398 documents, 34 memories, 341 backlog phases
 - A partition record carrying an owner hold-out in the new field validates against
   `schemas/idea-partition-record.schema.json`, and the accepted 2026-09-23 partition record still
   validates unchanged. **Met.** Covered by `test/test_idea_partition_record.py`, which passes.
-- Verification as a whole: **Not met.** `uv run pytest` has one failure until the `.agents` adapter
-  is regenerated.
+- Verification as a whole: **Met.** Both commands are green above.
 
 ## Backlog
 
-`phase-idg-19`: `status: active`, `agent: agent-builder-b`. `next_action`: the owner regenerates
-`.agents/skills/partition-ideas/SKILL.md`; then commit it, re-run the full suite, run
-`/session-close` through its independent review, and send READY.
+`phase-idg-19`: `status: active`, `agent: agent-builder-b`. `next_action`: all acceptance conditions
+met and verification green on `agent/phase-idg-19`; awaiting the `/session-close` independent review,
+READY to Session Manager, and the owner's merge approval. The phase stays active until the merge.
 
 ## Unresolved
 
-- `.agents/skills/partition-ideas/SKILL.md` needs regenerating by the owner. From the worktree:
-  `uv run python tools/generate_agent_workflows.py`, then `--check` to confirm.
 - `agent-workflows/idea.md` still describes the old lifecycle, with no `set_aside` and none of the
   closing states. A follow-up idea should update it, together with its generated adapters and
   `OPS-005`.
-- In this worktree the pre-commit private-content check ran with 0 identifiers, because
-  `_private/portfolio/` is absent here; only paths were checked. Run it against the branch from the
-  primary checkout before READY.
 - The name `set_aside` is a placeholder until idea 000453 (disposition terminology) is ruled on.
 - Follow-ups already recorded by Ideation: 000516 (workbench precedence map and explorer status
   list) and 000517 (plugin writer parity).
