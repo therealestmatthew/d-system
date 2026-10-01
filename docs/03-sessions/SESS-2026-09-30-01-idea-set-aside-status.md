@@ -79,8 +79,8 @@ READY to Session Manager, and the owner's merge approval. The phase stays active
 ## Unresolved
 
 - `agent-workflows/idea.md` still describes the old lifecycle, with no `set_aside` and none of the
-  closing states. A follow-up idea should update it, together with its generated adapters and
-  `OPS-005`.
+  closing states. Idea 000522 covers updating it, together with `append_idea.py`'s help, its
+  generated adapters and `OPS-005`.
 - The name `set_aside` is a placeholder until idea 000453 (disposition terminology) is ruled on.
 - Follow-ups already recorded by Ideation: 000516 (workbench precedence map and explorer status
   list) and 000517 (plugin writer parity).
@@ -139,7 +139,7 @@ Disposition: the one minor finding is accepted as out of scope, tracked by 00051
   schema's enum, which also fixes their silent omission of the closing states.
 - The owner narrowed the claim during the build. The `tools/append_idea.py` help text and the
   `agent-workflows/idea.md` lifecycle edits were reverted, because their generated copies were
-  outside the claim. The follow-up went to Ideation as an IDEA message on 2026-09-30.
+  outside the claim. The follow-up is recorded as idea 000522.
 - Agents cannot write under `.agents/`, so the owner ran `tools/generate_agent_workflows.py` in
   the worktree through Owner Terminal. Its output is committed as `e47439f`.
 
@@ -157,6 +157,6 @@ checkout's identifiers rather than trusted: 1100 files, 31 identifiers, 0 violat
   - the workbench queue precedence map and the explorer status list (000516);
   - the idea-realization plugin's writer and schema (000517);
   - the lifecycle text in `agent-workflows/idea.md` and `append_idea.py`'s help, with their
-    generated copies (sent to Ideation).
+    generated copies (000522).
   None of them raises on the new status. They omit it.
 - **The name.** It waits on 000453.
