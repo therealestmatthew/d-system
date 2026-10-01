@@ -195,6 +195,16 @@ def test_the_worktree_is_removed_when_the_run_is_interrupted(
     assert _worktrees(repo) == [f"worktree {repo}"]
 
 
+def test_the_default_worktree_parent_is_beside_the_primary_checkout(tmp_path: Path) -> None:
+    repo = _make_repo(tmp_path)
+    linked = tmp_path / "linked"
+    _git(repo, "worktree", "add", "-q", "--detach", str(linked), "dev")
+
+    expected = tmp_path / "d-system-worktrees"
+    assert rrc.default_worktree_parent(repo) == expected
+    assert rrc.default_worktree_parent(linked) == expected  # not nested under the linked checkout
+
+
 @pytest.mark.parametrize("entry, expected", [
     ("uv run pytest", True),
     ("cd ts && npm run build", True),

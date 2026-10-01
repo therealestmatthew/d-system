@@ -56,7 +56,7 @@ ROOT = Path(__file__).resolve().parent.parent
 BACKLOG = "docs/09-backlog/backlog.yaml"
 BACKLOG_REF = "dev"
 EVIDENCE_DIR = Path("_working") / "review-checks"
-WORKTREE_PARENT = ROOT.parent / "d-system-worktrees"
+WORKTREES = "d-system-worktrees"  # a sibling of the primary checkout, as AGENTS.md places them
 
 # GOV-017's merge gate, step 1.
 GATE_CHECKS = (
@@ -175,6 +175,12 @@ def execute(command: str, cwd: Path, timeout: float) -> tuple[int, bytes, bool]:
             return TIMEOUT_EXIT, output, True
 
 
+def default_worktree_parent(repo: Path) -> Path:
+    """`../d-system-worktrees` beside the primary checkout, whichever checkout runs the tool."""
+    common = _git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir").stdout.strip()
+    return Path(common).parent.parent / WORKTREES
+
+
 def add_worktree(repo: Path, sha: str, parent: Path, phase_id: str) -> Path:
     parent.mkdir(parents=True, exist_ok=True)
     path = Path(tempfile.mkdtemp(prefix=f"review-{phase_id}-{sha[:12]}-", dir=parent))
@@ -198,7 +204,7 @@ def run(
     repo: Path = ROOT,
     gate_checks: Sequence[str] = GATE_CHECKS,
     setup: Sequence[str] = SETUP,
-    worktree_parent: Path = WORKTREE_PARENT,
+    worktree_parent: Path | None = None,
     timeout: float = TIMEOUT_SECONDS,
 ) -> tuple[int, dict[str, Any]]:
     """Run the phase's checks at the commit; return the exit code and the manifest."""
@@ -210,7 +216,8 @@ def run(
     shutil.rmtree(evidence, ignore_errors=True)
     evidence.mkdir(parents=True)
 
-    worktree = add_worktree(repo, sha, worktree_parent, phase_id)
+    parent = worktree_parent or default_worktree_parent(repo)
+    worktree = add_worktree(repo, sha, parent, phase_id)
     try:
         for number, entry in enumerate(entries, start=1):
             if entry.note is not None:
