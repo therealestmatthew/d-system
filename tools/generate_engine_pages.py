@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R14.
+"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R16.
 
 The engine (`ARCH-006`) carries an idea from capture to delivered work through nine stages and
 five owner gates. These pages show where everything stands, as committed snapshots built from the
@@ -38,7 +38,7 @@ import yaml  # type: ignore[import-untyped]
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.db.ideas import fold, load_events  # noqa: E402
+from src.db.ideas import AXES, SCHEMA, fold, load_events, statuses  # noqa: E402
 from src.governance.__main__ import markdown_paths, parse_frontmatter  # noqa: E402
 from src.governance.backlog import readiness  # noqa: E402
 from tools import generate_house_css as house  # noqa: E402
@@ -49,6 +49,8 @@ OUT = ROOT / "_public" / "engine"
 INPUT_PATHS = ("_data/ideas.jsonl", "docs/09-backlog", "docs/01-plans", "templates")
 
 NOT_RECORDED = "not recorded"
+UNCLASSIFIED = "unclassified"
+NO_RECORDED_PLAN = "no recorded plan"
 
 
 # ---- inputs ----------------------------------------------------------------------------------
@@ -201,6 +203,68 @@ def overview_data(inputs: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def axis_vocabulary() -> tuple[dict[str, list[str]], list[str]]:
+    """Each ARCH-005 axis's legal values, and the record kinds that carry no axis values.
+
+    Read from the idea schema rather than restated, so a value added there reaches the page
+    without a second edit. Only a knowledge record carries axis values; the other kinds carry none.
+    """
+    properties = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))["properties"]
+    values = {axis: list(properties[axis]["enum"]) for axis in AXES}
+    kinds = [kind for kind in properties["record_kind"]["enum"] if kind != "knowledge"]
+    return values, kinds
+
+
+def no_axes(kind: str) -> str:
+    return f"no axes ({kind})"
+
+
+def axis_value(idea: dict[str, Any], axis: str) -> str:
+    """The idea's value on one axis, "unclassified" with no classified event, or the record kind
+    of a classified record that carries no axis values."""
+    classification = idea.get("classification")
+    if not classification:
+        return UNCLASSIFIED
+    if classification["record_kind"] != "knowledge":
+        return no_axes(classification["record_kind"])
+    return str(classification[axis])
+
+
+def ledger_data(inputs: dict[str, Any]) -> dict[str, Any]:
+    """Every figure the idea funnel and ledger shows (REQ-036 R15, R16)."""
+    ideas = inputs["ideas"]
+    linked = linked_ideas(inputs) or set()
+    values, kinds = axis_vocabulary()
+    rows = [
+        {
+            "id": key,
+            "title": idea["title"],
+            "status": idea["status"],
+            "created": str(idea["created"])[:10],
+            "axes": {axis: axis_value(idea, axis) for axis in AXES},
+            "has_plan": bool(idea["promoted_to"]) or key in linked,
+        }
+        for key, idea in sorted(ideas.items())
+    ]
+    funnel = [
+        (status, sum(1 for row in rows if row["status"] == status)) for status in statuses()
+    ]
+    axes = {}
+    for axis in AXES:
+        buckets = [*values[axis], *(no_axes(kind) for kind in kinds), UNCLASSIFIED]
+        axes[axis] = [
+            (bucket, sum(1 for row in rows if row["axes"][axis] == bucket)) for bucket in buckets
+        ]
+    return {
+        "total": len(ideas),
+        "rows": rows,
+        "funnel": funnel,
+        "axes": axes,
+        "classified": sum(1 for idea in ideas.values() if idea.get("classification")),
+        "ideas_field_present": linked_ideas(inputs) is not None,
+    }
+
+
 # ---- rendering -------------------------------------------------------------------------------
 
 
@@ -331,12 +395,108 @@ def render_overview(inputs: dict[str, Any]) -> str:
         + "".join(f"<p>{_e(note)}</p>" for note in notes)
         + "</div>"
     )
-    body = "\n".join([stats, stages, gates, callout])
+    pages = (
+        '<p>Every idea, its status and its four axis values: '
+        '<a href="ideas.html">idea funnel and ledger</a>.</p>'
+    )
+    body = "\n".join([stats, pages, stages, gates, callout])
     return _page(
         inputs["stamp"],
         title="Pipeline overview",
         lede="Where every idea, plan and phase sits in the idea realization engine, stage by "
         "stage, and what is waiting for the owner at each gate.",
+        body=body,
+    )
+
+
+def trace_cell(row: dict[str, Any]) -> str:
+    """The ledger's trace column. phase-des-11 replaces the linked case with the trace page link."""
+    text = "trace page not yet generated" if row["has_plan"] else NO_RECORDED_PLAN
+    return f'<td data-trace="{_e(row["id"])}">{_e(text)}</td>'
+
+
+def _distribution(attr: str, counts: list[tuple[str, int]], total: int) -> str:
+    rows = "".join(
+        f'<tr><td>{_e(label)}</td><td class="num" data-{attr}="{_e(label)}">{count}</td></tr>'
+        for label, count in counts
+    )
+    return (
+        '<div class="tbl-wrap"><table><thead><tr><th>Value</th><th class="num">Ideas</th>'
+        f"</tr></thead><tbody>{rows}"
+        f'<tr><td>Total</td><td class="num">{total}</td></tr></tbody></table></div>'
+    )
+
+
+def render_ledger(inputs: dict[str, Any]) -> str:
+    """The idea funnel and ledger page: every idea once, the status funnel, the axis views."""
+    data = ledger_data(inputs)
+    total = data["total"]
+
+    stats = (
+        '<div class="stats">'
+        f'<div><span class="lab">Ideas</span><span class="v acc" data-stat="ideas">{total}'
+        '</span><span class="d">fold() of the idea log</span></div>'
+        f'<div><span class="lab">Classified</span><span class="v" data-stat="classified">'
+        f'{data["classified"]}</span><span class="d">with a classified event</span></div>'
+        f'<div><span class="lab">Unclassified</span><span class="v" data-stat="unclassified">'
+        f'{total - data["classified"]}</span><span class="d">no classified event</span></div>'
+        "</div>"
+    )
+    funnel = (
+        '<section class="section"><h2>Funnel</h2>'
+        "<p>Ideas at each status now, in the schema's status order. Source: fold().</p>"
+        f'{_distribution("funnel", data["funnel"], total)}</section>'
+    )
+    axis_blocks = "".join(
+        f'<div class="section"><h3>{_e(axis.capitalize())}</h3>'
+        f'{_distribution("axis-" + axis, data["axes"][axis], total)}</div>'
+        for axis in AXES
+    )
+    axes = (
+        '<section class="section"><h2>Classification axes</h2>'
+        "<p>Each ARCH-005 axis, every value the idea schema allows. An idea with no classified "
+        'event counts as unclassified. A collection, fixture or reference record carries no '
+        "axis values and counts under its record kind. Source: fold(); schemas/idea.schema.json."
+        f"</p>{axis_blocks}</section>"
+    )
+    head = "".join(f"<th>{_e(axis.capitalize())}</th>" for axis in AXES)
+    rows = "".join(
+        f'<tr data-idea="{_e(row["id"])}"><td class="id">{_e(row["id"])}</td>'
+        f'<td>{_e(row["title"])}</td><td>{_e(row["status"])}</td><td>{_e(row["created"])}</td>'
+        + "".join(f"<td>{_e(row['axes'][axis])}</td>" for axis in AXES)
+        + trace_cell(row)
+        + "</tr>"
+        for row in data["rows"]
+    )
+    ledger = (
+        '<section class="section"><h2>Ledger</h2>'
+        "<p>Every idea in fold(), once, by id. Created is the date the idea was captured.</p>"
+        '<div class="tbl-wrap"><table><thead><tr><th>Idea</th><th>Title</th><th>Status</th>'
+        f"<th>Created</th>{head}<th>Trace</th></tr></thead><tbody>{rows}</tbody></table></div>"
+        "</section>"
+    )
+    notes = [
+        "Trace: an idea with a recorded plan, through promoted_to or a backlog phase's ideas "
+        "field, gets a trace page in a later phase. Until then its row says so. Every other idea "
+        f"reads {NO_RECORDED_PLAN}.",
+    ]
+    if not data["ideas_field_present"]:
+        notes.append(
+            "Phase links: not recorded. No backlog phase carries an ideas field yet, so only "
+            "promoted_to counts as a recorded plan."
+        )
+    callout = (
+        '<div class="callout"><span class="lab">How to read this page</span>'
+        + "".join(f"<p>{_e(note)}</p>" for note in notes)
+        + "</div>"
+    )
+    back = '<p>Back to the <a href="index.html">pipeline overview</a>.</p>'
+    body = "\n".join([stats, back, funnel, axes, ledger, callout])
+    return _page(
+        inputs["stamp"],
+        title="Idea funnel and ledger",
+        lede="Every captured idea once, how many sit at each status, and how the ideas spread "
+        "across the four ARCH-005 classification axes.",
         body=body,
     )
 
@@ -366,9 +526,10 @@ def _page(stamp: dict[str, Any], title: str, lede: str, body: str) -> str:
     )
 
 
-#: Output file name to renderer. Later phases add the ledger, trace and backlog pages here.
+#: Output file name to renderer. Later phases add the trace and backlog pages here.
 PAGES: dict[str, Callable[[dict[str, Any]], str]] = {
     "index.html": render_overview,
+    "ideas.html": render_ledger,
 }
 
 
