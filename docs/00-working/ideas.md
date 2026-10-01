@@ -23919,3 +23919,23 @@ Related, as named with the ask: 000066 (gate main behind a PR from dev), 000527 
 - relates_to → `000527`
 - relates_to → `000529`
 - relates_to → `000549`
+
+---
+
+## 000551 · New agents: Concept Explorer, Concept Manager, Context Explorer, Context Manager
+
+**Created 2026-10-01T17:19:44-04:00 · Status: `open`**
+
+Owner's words, 2026-10-01 (relayed by the Session Manager), verbatim: "Idea (new agent(s)): - Concept Explorer - Concept Manager - Context Explorer - Context Manager. Concept Eplorers take very specific small information and seek out related concepts in the repo It then structures the related concepts into groups and defines what that grouping structure is. The get batch dispatched in groups of 2-3 to explore different groups them Context Manager assimilated and presents structured findings and new insights on data and knowledge relationships."
+
+No links recorded with the ask; overlaps are left for triage.
+
+---
+
+## 000552 · Build our own graph processing engine (is Python the right language?)
+
+**Created 2026-10-01T17:19:44-04:00 · Status: `open`**
+
+Owner's words, 2026-10-01 (relayed by the Session Manager), verbatim: "Idea - build our own graph processing engine (is python the right choice? I think C or other lower level language would be superior for performance."
+
+No links recorded with the ask; overlaps are left for triage.
