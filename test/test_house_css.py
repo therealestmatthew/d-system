@@ -94,8 +94,14 @@ def css() -> str:
 
 
 def _blocks(css: str) -> dict[str, dict[str, str]]:
-    """Each innermost rule's selector mapped to its declarations, comments removed."""
+    """Each innermost rule's selector mapped to its declarations.
+
+    Comments, `@import` statements and the `@media` wrapper lines are removed first, so the
+    flat regex below sees only `selector { declarations }` pairs and keys `:root` as `:root`.
+    """
     text = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    text = re.sub(r"@import\s+url\(\"[^\"]*\"\);", "", text)
+    text = re.sub(r"@media[^{]*\{", "", text)
     blocks: dict[str, dict[str, str]] = {}
     for selector, body in re.findall(r"([^{}]+)\{([^{}]*)\}", text):
         decls = dict(
@@ -104,6 +110,17 @@ def _blocks(css: str) -> dict[str, dict[str, str]]:
         )
         blocks[selector.strip()] = decls
     return blocks
+
+
+def test_block_parser_keys_every_rule(css: str) -> None:
+    keys = set(_blocks(css))
+    assert {
+        ":root",
+        ':root:not([data-theme="light"])',
+        ':root[data-theme="dark"]',
+        ':root[data-variant="swiss"]',
+        ':root[data-variant="mono"]',
+    } <= keys
 
 
 def _colour_names(tokens: dict) -> set[str]:
