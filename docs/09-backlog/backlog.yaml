@@ -11031,11 +11031,9 @@ items:
   - src/governance/containment.py
   - src/governance/__main__.py
   - test/test_containment.py
-  next_action: Build the completed-phase change-set extraction first (claim and completion commits on
-    dev's first-parent history, dropping commits that name a different phase), then the active-branch
-    mode on the same classifier.
-    Revised 2026-09-23 from the Standby Builder's review (_working/session-manager/reviews/phase-dgov-06.md)
-    and the owner's rulings, under PLAN-045.
+  next_action: Built and verified (SESS-2026-10-01-03); independent review against REQ-015 R12 and R13,
+    then READY. The completed-phase filter drops a commit only when it names another phase active at that
+    commit (owner ruling, 2026-10-01).
 - id: phase-dgov-07
   title: Register _tmpagent in the systems maturity registry
   plan: doc-document-backlog-governance

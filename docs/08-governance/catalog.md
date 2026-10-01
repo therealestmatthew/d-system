@@ -421,6 +421,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-30-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-05-house-style-tokens.md |
 | SESS-2026-10-01-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-01-backlog-idea-field.md |
 | SESS-2026-10-01-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-02-engine-page-generator.md |
+| SESS-2026-10-01-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-03-containment-check.md |
 
 ## Plans and their phases
 
@@ -518,4 +519,4 @@ CI regenerates it and fails on any difference.
 | OPS-029 | reserved | Operations document for tools/run_review_checks.py; deliverable of phase-asr-02. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-414 documents — adr: 23, architecture: 12, governance: 19, operation: 24, plan: 81, prompt: 43, requirement: 35, session: 177.
+415 documents — adr: 23, architecture: 12, governance: 19, operation: 24, plan: 81, prompt: 43, requirement: 35, session: 178.
