@@ -12716,8 +12716,8 @@ items:
   - docs/08-governance/OPS-027-generate-house-css.md
   - docs/08-governance/codes.yaml
   - test/test_house_css.py
-  next_action: Read the gallery artifact first and transcribe its tokens into the test fixture before writing
-    the tokens file, so the fixture is the record of what was approved rather than a copy of what was built.
+  next_action: Built and verified on agent/phase-des-07 (SESS-2026-09-30-05); all four acceptance conditions
+    met. Waiting on the owner's merge approval, then the completion edit on dev.
 - id: phase-des-08
   title: Give backlog phases a structured idea field and backfill it
   plan: doc-html-generation-design-system

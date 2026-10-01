@@ -417,6 +417,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-09-30-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-02-glossary-refresh-merge-prep.md |
 | SESS-2026-09-30-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-03-promoted-plan-staging.md |
 | SESS-2026-09-30-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-04-backlog-fix-next-wave.md |
+| SESS-2026-09-30-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-30-05-house-style-tokens.md |
 
 ## Plans and their phases
 
