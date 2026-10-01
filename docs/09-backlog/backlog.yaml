@@ -35,6 +35,11 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000110'
+  - '000118'
+  - '000119'
+  - '000232'
   systems:
   - sys-ui
   - sys-demo-stage
@@ -2826,6 +2831,8 @@ items:
   sources:
   - doc-capture-routing
   - doc-capture-requirements
+  ideas:
+  - '000343'
   systems:
   - sys-capture
   - sys-portfolio
@@ -2938,6 +2945,8 @@ items:
   plan: doc-capture-build
   sources:
   - doc-capture-requirements
+  ideas:
+  - '000150'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -3809,6 +3818,8 @@ items:
   plan: doc-idea-record-system
   sources:
   - doc-idea-record-system
+  ideas:
+  - '000049'
   systems:
   - sys-portfolio
   - sys-memory-agents
@@ -4199,6 +4210,8 @@ items:
   plan: doc-idea-priority-queue
   sources:
   - doc-idea-priority-queue
+  ideas:
+  - '000039'
   systems:
   - sys-portfolio
   - sys-governance
@@ -4797,6 +4810,8 @@ items:
   plan: doc-live-demo
   sources:
   - doc-live-demo-requirements
+  ideas:
+  - '000071'
   systems:
   - sys-demo-overview
   owner: repository-owner
@@ -5924,6 +5939,9 @@ items:
   plan: doc-workbench
   sources:
   - doc-workbench-requirements
+  ideas:
+  - '000101'
+  - '000104'
   systems:
   - sys-ui
   - sys-demo-stage
@@ -6249,6 +6267,8 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000150'
   systems:
   - sys-research
   owner: repository-owner
@@ -6397,6 +6417,8 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000202'
   systems:
   - sys-research
   owner: repository-owner
@@ -6458,6 +6480,10 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000208'
+  - '000210'
+  - '000215'
   systems:
   - sys-research
   owner: repository-owner
@@ -6529,6 +6555,10 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000217'
+  - '000218'
+  - '000221'
   systems:
   - sys-research
   owner: repository-owner
@@ -6601,6 +6631,10 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000148'
+  - '000221'
+  - '000224'
   systems:
   - sys-research
   owner: repository-owner
@@ -6928,6 +6962,10 @@ items:
   - doc-lit-campaign-domain-matrix
   - doc-lit-campaign-evidence-contract
   - doc-prompt-literature-review-delegation-pack
+  ideas:
+  - '000289'
+  - '000307'
+  - '000308'
   systems:
   - sys-research
   owner: repository-owner
@@ -7440,6 +7478,8 @@ items:
   plan: doc-repeatable-idea-partition
   sources:
   - doc-repeatable-idea-partition-requirements
+  ideas:
+  - '000205'
   systems:
   - sys-governance
   owner: repository-owner
@@ -7813,6 +7853,9 @@ items:
   plan: doc-idea-graph-lifecycle
   sources:
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000070'
+  - '000071'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -7873,6 +7916,9 @@ items:
   plan: doc-document-backlog-governance
   sources:
   - doc-document-backlog-governance
+  ideas:
+  - '000047'
+  - '000056'
   systems:
   - sys-backlog
   owner: repository-owner
@@ -7932,6 +7978,9 @@ items:
   plan: doc-agent-engineering-delegation
   sources:
   - doc-agent-engineering-delegation
+  ideas:
+  - '000046'
+  - '000072'
   systems:
   - sys-delivery
   owner: repository-owner
@@ -7991,6 +8040,10 @@ items:
   plan: doc-autonomous-agent-operations
   sources:
   - doc-autonomous-agent-operations
+  ideas:
+  - '000020'
+  - '000031'
+  - '000128'
   systems:
   - sys-api
   owner: repository-owner
@@ -8168,6 +8221,9 @@ items:
   plan: doc-schema-consistency-testing
   sources:
   - doc-schema-consistency-testing
+  ideas:
+  - '000024'
+  - '000035'
   systems:
   - sys-contracts
   owner: repository-owner
@@ -8346,6 +8402,9 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000135'
+  - '000141'
   systems:
   - sys-brain
   - sys-wb-layout
@@ -8446,6 +8505,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000101'
   systems:
   - sys-wb-layout
   - sys-wb-styles
@@ -8596,6 +8657,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000101'
   systems:
   - sys-wb-layout
   - sys-wb-styles
@@ -8631,6 +8694,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000135'
   systems:
   - sys-wb-layout
   - sys-wb-terminal
@@ -8667,6 +8732,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000133'
   systems:
   - sys-wb-layout
   - sys-wb-styles
@@ -8732,6 +8799,9 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000099'
+  - '000129'
   systems:
   - sys-delivery
   owner: repository-owner
@@ -8828,6 +8898,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000121'
   systems:
   - sys-wb-layout
   - sys-wb-explorers
@@ -8858,6 +8930,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000121'
   systems:
   - sys-api
   - sys-wb-viewer
@@ -8892,6 +8966,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000107'
   systems:
   - sys-wb-terminal
   - sys-demo-stage
@@ -8927,6 +9003,8 @@ items:
   plan: doc-workbench-architecture-quality
   sources:
   - doc-workbench-architecture-quality-requirements
+  ideas:
+  - '000233'
   systems:
   - sys-wb-layout
   - sys-wb-styles
@@ -9076,6 +9154,8 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000119'
   systems:
   - sys-ui
   owner: repository-owner
@@ -9142,6 +9222,9 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000111'
+  - '000120'
   systems:
   - sys-ui
   - sys-contracts
@@ -9180,6 +9263,8 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000115'
   systems:
   - sys-ui
   owner: repository-owner
@@ -9289,6 +9374,8 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000087'
   systems:
   - sys-contracts
   owner: repository-owner
@@ -9491,6 +9578,8 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
+  ideas:
+  - '000041'
   systems:
   - sys-governance
   - sys-delivery
@@ -9761,6 +9850,9 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
+  ideas:
+  - '000012'
+  - '000091'
   systems:
   - sys-governance
   - sys-delivery
@@ -9799,6 +9891,8 @@ items:
   sources:
   - doc-concurrency-git-safety-requirements
   - doc-concurrency-git-safety
+  ideas:
+  - '000091'
   systems:
   - sys-governance
   owner: repository-owner
@@ -9833,6 +9927,10 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000099'
+  - '000129'
+  - '000236'
   systems:
   - sys-contracts
   - sys-portfolio
@@ -9905,6 +10003,9 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000099'
+  - '000129'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -9955,6 +10056,8 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000236'
   systems:
   - sys-contracts
   - sys-portfolio
@@ -10052,6 +10155,14 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000222'
+  - '000225'
+  - '000226'
+  - '000232'
+  - '000234'
+  - '000237'
+  - '000278'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -10177,6 +10288,12 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000417'
+  - '000453'
+  - '000516'
+  - '000517'
+  - '000522'
   systems:
   - sys-contracts
   - sys-portfolio
@@ -10246,6 +10363,9 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000018'
+  - '000055'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -10347,6 +10467,8 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000004'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -10382,6 +10504,9 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000048'
+  - '000127'
   systems:
   - sys-governance
   owner: repository-owner
@@ -10416,6 +10541,8 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000055'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -10449,6 +10576,11 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000008'
+  - '000042'
+  - '000050'
+  - '000071'
   systems:
   - sys-gov-docs
   owner: repository-owner
@@ -10483,6 +10615,8 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000010'
   systems:
   - sys-governance
   owner: repository-owner
@@ -10516,6 +10650,9 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000329'
+  - '000331'
   systems:
   - sys-gov-docs
   owner: repository-owner
@@ -10615,6 +10752,8 @@ items:
   sources:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
+  ideas:
+  - '000072'
   systems:
   - sys-governance
   owner: repository-owner
@@ -10732,6 +10871,8 @@ items:
   sources:
   - doc-document-backlog-governance-requirements
   - doc-document-backlog-governance
+  ideas:
+  - '000006'
   systems:
   - sys-governance
   owner: repository-owner
@@ -10801,6 +10942,8 @@ items:
   sources:
   - doc-document-backlog-governance-requirements
   - doc-document-backlog-governance
+  ideas:
+  - '000011'
   systems:
   - sys-governance
   - sys-backlog
@@ -10838,6 +10981,9 @@ items:
   sources:
   - doc-document-backlog-governance-requirements
   - doc-document-backlog-governance
+  ideas:
+  - '000245'
+  - '000336'
   systems:
   - sys-governance
   - sys-backlog
@@ -10960,6 +11106,10 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000013'
+  - '000069'
+  - '000126'
   systems:
   - sys-delivery
   - sys-governance
@@ -11011,6 +11161,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000138'
   systems:
   - sys-delivery
   - sys-governance
@@ -11065,6 +11217,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000097'
   systems:
   - sys-delivery
   - sys-governance
@@ -11100,6 +11254,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000136'
   systems:
   - sys-delivery
   - sys-governance
@@ -11141,6 +11297,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000139'
   systems:
   - sys-delivery
   - sys-governance
@@ -11175,6 +11333,9 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000020'
+  - '000128'
   systems:
   - sys-delivery
   - sys-governance
@@ -11210,6 +11371,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000079'
   systems:
   - sys-delivery
   - sys-governance
@@ -11244,6 +11407,9 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000081'
+  - '000082'
   systems:
   - sys-delivery
   - sys-governance
@@ -11282,6 +11448,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000072'
   systems:
   - sys-delivery
   - sys-governance
@@ -11355,6 +11523,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000075'
   systems:
   - sys-delivery
   - sys-governance
@@ -11391,6 +11561,8 @@ items:
   sources:
   - doc-agent-engineering-delegation-requirements
   - doc-agent-engineering-delegation
+  ideas:
+  - '000009'
   systems:
   - sys-delivery
   owner: repository-owner
@@ -11424,6 +11596,11 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000028'
+  - '000029'
+  - '000030'
+  - '000031'
   systems:
   - sys-api
   - sys-governance
@@ -11482,6 +11659,8 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000031'
   systems:
   - sys-api
   - sys-governance
@@ -11545,6 +11724,8 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000028'
   systems:
   - sys-auto-gateway
   owner: repository-owner
@@ -11581,6 +11762,8 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000029'
   systems:
   - sys-auto-ledger
   owner: repository-owner
@@ -11620,6 +11803,8 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000030'
   systems:
   - sys-api
   owner: repository-owner
@@ -11654,6 +11839,9 @@ items:
   sources:
   - doc-autonomous-agent-operations-requirements
   - doc-autonomous-agent-operations
+  ideas:
+  - '000020'
+  - '000128'
   systems:
   - sys-governance
   owner: repository-owner
@@ -11729,6 +11917,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000004'
   systems:
   - sys-retrieval
   - sys-governance
@@ -11770,6 +11960,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000002'
   systems:
   - sys-retrieval
   - sys-governance
@@ -11803,6 +11995,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000040'
   systems:
   - sys-retrieval
   owner: repository-owner
@@ -11838,6 +12032,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000043'
   systems:
   - sys-retrieval
   - sys-governance
@@ -11873,6 +12069,10 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000043'
+  - '000044'
+  - '000045'
   systems:
   - sys-retrieval
   - sys-governance
@@ -11905,6 +12105,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000045'
   systems:
   - sys-retrieval
   - sys-governance
@@ -11941,6 +12143,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000005'
   systems:
   - sys-retrieval
   owner: repository-owner
@@ -11983,6 +12187,8 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000060'
   systems:
   - sys-retrieval
   - sys-brain
@@ -12017,6 +12223,10 @@ items:
   sources:
   - doc-retrieval-knowledge-infrastructure-requirements
   - doc-retrieval-knowledge-infrastructure
+  ideas:
+  - '000029'
+  - '000032'
+  - '000060'
   systems:
   - sys-retrieval
   - sys-brain
@@ -12054,6 +12264,8 @@ items:
   sources:
   - doc-blocked-downstream-projections-requirements
   - doc-blocked-downstream-projections
+  ideas:
+  - '000022'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -12091,6 +12303,8 @@ items:
   sources:
   - doc-blocked-downstream-projections-requirements
   - doc-blocked-downstream-projections
+  ideas:
+  - '000033'
   systems:
   - sys-projection
   owner: repository-owner
@@ -12126,6 +12340,8 @@ items:
   sources:
   - doc-blocked-downstream-projections-requirements
   - doc-blocked-downstream-projections
+  ideas:
+  - '000034'
   systems:
   - sys-projection
   owner: repository-owner
@@ -12200,6 +12416,8 @@ items:
   sources:
   - doc-schema-consistency-testing-requirements
   - doc-schema-consistency-testing
+  ideas:
+  - '000024'
   systems:
   - sys-contracts
   owner: repository-owner
@@ -12246,6 +12464,9 @@ items:
   sources:
   - doc-schema-consistency-testing-requirements
   - doc-schema-consistency-testing
+  ideas:
+  - '000024'
+  - '000035'
   systems:
   - sys-contracts
   owner: repository-owner
@@ -12356,6 +12577,8 @@ items:
   sources:
   - doc-schema-consistency-testing-requirements
   - doc-schema-consistency-testing
+  ideas:
+  - '000106'
   systems:
   - sys-delivery
   owner: repository-owner
@@ -12387,6 +12610,8 @@ items:
   sources:
   - doc-schema-consistency-testing-requirements
   - doc-schema-consistency-testing
+  ideas:
+  - '000001'
   systems:
   - sys-contracts
   - sys-delivery
@@ -12546,6 +12771,8 @@ items:
   - doc-html-generation-design-system-requirements
   - doc-html-generation-design-system
   - doc-engine-pages-house-style-requirements
+  ideas:
+  - '000084'
   systems:
   - sys-html
   owner: repository-owner
@@ -12590,6 +12817,8 @@ items:
   - doc-html-generation-design-system-requirements
   - doc-html-generation-design-system
   - doc-engine-pages-house-style-requirements
+  ideas:
+  - '000085'
   systems:
   - sys-html
   owner: repository-owner
@@ -12940,6 +13169,8 @@ items:
   plan: doc-standalone-explorations-housekeeping
   sources:
   - doc-standalone-explorations-housekeeping
+  ideas:
+  - '000054'
   systems:
   - sys-governance
   owner: repository-owner
@@ -12975,6 +13206,10 @@ items:
   plan: doc-standalone-explorations-housekeeping
   sources:
   - doc-standalone-explorations-housekeeping
+  ideas:
+  - '000015'
+  - '000016'
+  - '000017'
   systems:
   - sys-governance
   owner: repository-owner
@@ -13074,6 +13309,8 @@ items:
   plan: doc-standalone-explorations-housekeeping
   sources:
   - doc-standalone-explorations-housekeeping
+  ideas:
+  - '000086'
   systems:
   - sys-portfolio
   owner: repository-owner
@@ -13106,6 +13343,8 @@ items:
   plan: doc-standalone-explorations-housekeeping
   sources:
   - doc-standalone-explorations-housekeeping
+  ideas:
+  - '000122'
   systems:
   - sys-governance
   owner: repository-owner
@@ -13137,6 +13376,9 @@ items:
   plan: doc-standalone-explorations-housekeeping
   sources:
   - doc-standalone-explorations-housekeeping
+  ideas:
+  - '000137'
+  - '000140'
   systems:
   - sys-governance
   owner: repository-owner
@@ -13228,6 +13470,8 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  ideas:
+  - '000247'
   systems:
   - sys-realization
   - sys-governance
@@ -13443,6 +13687,8 @@ items:
   sources:
   - doc-idea-realization-system-requirements
   - doc-idea-realization-system
+  ideas:
+  - '000347'
   systems:
   - sys-realization
   owner: repository-owner
@@ -14142,6 +14388,9 @@ items:
   plan: doc-portable-framework-content-extraction
   sources:
   - doc-portable-framework-content-extraction-requirements
+  ideas:
+  - '000274'
+  - '000281'
   systems:
   - sys-fw-analysis-patterns
   owner: repository-owner
@@ -14173,6 +14422,9 @@ items:
   plan: doc-portable-framework-content-extraction
   sources:
   - doc-portable-framework-content-extraction-requirements
+  ideas:
+  - '000275'
+  - '000281'
   systems:
   - sys-fw-analysis-sessions
   owner: repository-owner
@@ -14203,6 +14455,9 @@ items:
   plan: doc-portable-framework-content-extraction
   sources:
   - doc-portable-framework-content-extraction-requirements
+  ideas:
+  - '000276'
+  - '000281'
   systems:
   - sys-fw-analysis-protocol
   owner: repository-owner
@@ -14297,6 +14552,9 @@ items:
   plan: doc-session-taxonomy-investigation
   sources:
   - doc-session-taxonomy-investigation-requirements
+  ideas:
+  - '000291'
+  - '000294'
   systems:
   - sys-governance
   owner: repository-owner
@@ -14593,6 +14851,10 @@ items:
   sources:
   - doc-design-document-amendments-requirements
   - doc-design-document-amendments
+  ideas:
+  - '000298'
+  - '000377'
+  - '000383'
   systems:
   - sys-governance
   - sys-gov-docs
@@ -15410,6 +15672,11 @@ items:
   - doc-idea-realization-plugin-requirements
   - doc-idea-realization-plugin
   - doc-idea-realization-plugin-end-to-end
+  ideas:
+  - '000470'
+  - '000474'
+  - '000475'
+  - '000476'
   systems:
   - sys-plugin-core
   owner: repository-owner
