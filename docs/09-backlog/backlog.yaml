@@ -13059,8 +13059,8 @@ items:
   - docs/08-governance/OPS-028-generate-engine-pages.md
   - docs/08-governance/codes.yaml
   - test/test_engine_pages.py
-  next_action: Build the shared data layer against this page's needs only; the later page phases extend
-    it. Check what tools/overview_metrics.py already computes from fold() before writing a second count.
+  next_action: Built and verified on agent/phase-des-09 (SESS-2026-10-01-02). Waiting on the owner's merge
+    approval, then the completion edit on dev.
 - id: phase-des-10
   title: Build the idea funnel and ledger page
   plan: doc-html-generation-design-system
