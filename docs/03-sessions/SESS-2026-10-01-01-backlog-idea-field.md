@@ -22,7 +22,8 @@ Batch Runner as agent `agent-coord`, claimed at 3a4e87e with the owner's approva
 
 ## Verification
 
-Run in the worktree, rebased onto dev 458ab36: pytest and mypy on 5014690, governance after this record was added.
+Run in the worktree, rebased onto dev 458ab36: pytest and mypy on 5014690, governance after
+this record was added.
 
 `uv run pytest`
 
