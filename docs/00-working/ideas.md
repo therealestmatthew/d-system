@@ -23279,3 +23279,19 @@ Unresolved: the source names "none of the closing states" as missing from agent-
 
 - relates_to → `000516`
 - relates_to → `000517`
+
+---
+
+## 000523 · Record each phase's integrated commit range in its completion edit, so the containment check can attribute a phase's own commits exactly
+
+**Created 2026-10-01T03:28:36-04:00 · Status: `open`**
+
+Session 5 - Batch Runner, 2026-10-01, as given: "Record each phase's integrated commit range (the dev tip before its fast-forward and the branch tip) in its completion edit, so the containment check (phase-dgov-06) can attribute a phase's own commits exactly. The claim-to-completion range on dev's first-parent history sweeps in other sessions' unlabelled work: the first run reports 75 of 91 locatable phases with findings, 1192 files in all (phase-demo-07's range is 403 commits)."
+
+Why it came up: the containment check from phase-dgov-06 (diff a phase's change set against its declared paths, for completed phases and active branches) has to work out which commits belong to a completed phase. Today it takes the range from the claim commit to the completion commit on dev's first-parent history. With several sessions merging onto dev concurrently, that range includes other sessions' commits that carry no phase label, so the check reports their files as the phase's out-of-scope changes. The sender's figures from the first run: 75 of 91 locatable phases with findings, 1192 files in total; phase-demo-07's range alone spans 403 commits.
+
+The proposal: at merge time, the completion edit records two shas — dev's tip immediately before the fast-forward, and the branch tip that was fast-forwarded. That pair bounds exactly the commits the phase brought in, and the containment check reads it instead of inferring a range.
+
+What it would touch: the merge procedure's completion edit (AGENTS.md step 9 and the Session Manager contract's merge item; /session-start and /session-close if they write it); wherever completion is recorded (backlog.yaml phase entry or the session record); the backlog schema if it gains a field; the phase-dgov-06 containment check, to prefer the recorded range when present.
+
+Unresolved: the field name and where it lives; what the check does for the phases already completed without a recorded range (fall back to today's inference, mark them unattributable, or backfill from merge history); whether the pre-fast-forward tip is reliably known when the completion edit is written, since the edit is made on dev after the merge.
