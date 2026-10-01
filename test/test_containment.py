@@ -151,6 +151,18 @@ def test_branch_mode_names_the_undeclared_file(repo: Repo) -> None:
     assert report.entries == []
 
 
+def test_branch_mode_reports_an_edit_to_another_session_record(repo: Repo) -> None:
+    """Only the phase's own record is exempt; editing an existing record is reported."""
+    repo.git("switch", "-q", "-c", "agent/phase-new-01")
+    repo.commit("Rewrite a peer's record", {"docs/03-sessions/SESS-app.md": "changed\n"})
+    repo.commit("Record its own session", {"docs/03-sessions/SESS-new.md": "s\n"})
+    repo.git("switch", "-q", "dev")
+    report = containment.branch_report(repo.root, phase("phase-new-01", "active"), SYSTEMS)
+    assert report.files == [
+        ("docs/03-sessions/SESS-app.md", "outside declared systems; no system owns it")
+    ]
+
+
 def test_branch_mode_counts_another_phases_backlog_entry(repo: Repo) -> None:
     items = yaml.safe_load((repo.root / containment.BACKLOG).read_text())["items"]
     repo.git("switch", "-q", "-c", "agent/phase-new-01")

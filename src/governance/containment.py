@@ -19,7 +19,8 @@ declaration that was too narrow or work that strayed is for a person to judge, s
 carries the evidence for that judgement (whether the file sits inside one of the phase's declared
 systems) rather than a verdict.
 
-Read-only: it runs `git log`, `git show` and `git diff`, and changes no file and no ref.
+Read-only: it runs `git log`, `git show`, `git diff` and `git merge-base`, and changes no file
+and no ref.
 """
 
 from __future__ import annotations
@@ -244,13 +245,27 @@ def completed_report(
 
 
 def branch_report(
-    root: Path, item: dict[str, Any], systems: list[dict[str, Any]], base: str = "dev"
+    root: Path,
+    item: dict[str, Any],
+    systems: list[dict[str, Any]],
+    documents: dict[str, Any] | None = None,
+    base: str = "dev",
 ) -> Report:
-    """Diff `base...agent/<phase-id>` against the phase's declaration."""
+    """Diff `base...agent/<phase-id>` against the phase's declaration.
+
+    The phase's own session record is exempt: its recorded `session` path, or a record the branch
+    adds, since an active phase's record is new on its branch. An edit to an existing session
+    record is another session's record and is reported.
+    """
     branch = f"agent/{item['id']}"
-    files = set(git(root, "diff", "--name-only", f"{base}...{branch}").split())
+    status = git(root, "diff", "--name-status", "--no-renames", f"{base}...{branch}")
+    changed = [line.split("\t", 1) for line in status.splitlines() if "\t" in line]
+    files = {path for _, path in changed}
     entries: set[str] = set()
-    sessions = {path for path in files if path.startswith(SESSIONS)}
+    sessions = {path for kind, path in changed if kind == "A" and path.startswith(SESSIONS)}
+    own = (documents or {}).get(item.get("session", ""), {}).get("path")
+    if own:
+        sessions.add(own)
     if BACKLOG in files:
         fork = git(root, "merge-base", base, branch).strip()
         before = entry_blocks(git(root, "show", f"{fork}:{BACKLOG}"))
@@ -300,7 +315,7 @@ def run(
     if phase and phase not in items:
         raise ValueError(f"unknown phase {phase}")
     if phase and items[phase]["status"] == "active":
-        return render([branch_report(root, items[phase], systems)])
+        return render([branch_report(root, items[phase], systems, documents)])
     if phase and items[phase]["status"] != "complete":
         raise ValueError(f"{phase} is {items[phase]['status']}; only complete or active phases")
     commits, changes = history(root)
