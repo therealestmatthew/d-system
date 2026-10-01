@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from collections.abc import Callable
 from datetime import date
@@ -21,6 +22,9 @@ CLAIMED_STATES = {"active", "blocked", "complete"}
 # phases closed the same day they were claimed. The threshold is double that observed
 # maximum, so an ordinary session in flight is never flagged.
 STALE_CLAIM_DAYS = 2
+
+# A six-digit run standing alone, so a commit hash or a longer number never yields an idea id.
+IDEA_ID = re.compile(r"(?<![0-9A-Za-z])[0-9]{6}(?![0-9A-Za-z])")
 
 
 def stale_claim_signal(days_since_commit: int | None, worktree_exists: bool | None) -> str | None:
@@ -200,6 +204,74 @@ def code_claim_errors(
     return errors
 
 
+def named_ideas(item: dict[str, Any], known: set[str]) -> list[str]:
+    """Idea ids the phase's own scope, acceptance and next_action name that exist in `known`.
+
+    The plan document is deliberately not read: a plan naming twenty ideas would link all twenty
+    to every one of its phases (PLAN-036, decision B). A six-digit number that is not an idea id
+    is dropped rather than reported: the field links real ideas, and the text may legitimately
+    carry other numbers.
+    """
+    text = "\n".join([*item["scope"], *item["acceptance"], item["next_action"]])
+    return sorted(set(IDEA_ID.findall(text)) & known)
+
+
+def idea_field_errors(key: str, item: dict[str, Any], known: set[str]) -> list[str]:
+    """Every id in a phase's `ideas` field must exist in the folded idea log (REQ-036 R17)."""
+    return [
+        f"{key}: ideas names {idea}, which is not in _data/ideas.jsonl"
+        for idea in item.get("ideas", [])
+        if idea not in known
+    ]
+
+
+def idea_backfill_diff(
+    catalog: dict[str, Any], known: set[str]
+) -> dict[str, tuple[list[str], list[str]]]:
+    """Per phase, the ids the `ideas` field is missing and the ids it carries in excess.
+
+    Only phases with a difference appear. The expected set is `named_ideas`, so a re-run of the
+    backfill over an unchanged backlog and idea log yields an empty result (REQ-036 R18).
+    """
+    diff = {}
+    for item in catalog["items"]:
+        expected = set(named_ideas(item, known))
+        actual = set(item.get("ideas", []))
+        if expected != actual:
+            diff[item["id"]] = (sorted(expected - actual), sorted(actual - expected))
+    return diff
+
+
+def backfill_ideas_text(text: str, catalog: dict[str, Any], known: set[str]) -> str:
+    """Rewrite backlog.yaml text so every phase's `ideas` field equals `named_ideas`.
+
+    Edits only `ideas:` blocks: it drops an existing block and inserts the new one immediately
+    before the phase's `  systems:` line, so the file is never re-serialised and every other line
+    keeps its exact form. Re-dumping the whole file would reflow every long string in it. The
+    caller must re-parse the result and compare it before writing.
+    """
+    wanted = {item["id"]: named_ideas(item, known) for item in catalog["items"]}
+    output: list[str] = []
+    phase: str | None = None
+    lines = text.splitlines(keepends=True)
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        if line.startswith("- id: "):
+            phase = line[len("- id: ") :].strip()
+        if phase is not None and line.rstrip("\n") == "  ideas:":
+            index += 1
+            while index < len(lines) and lines[index].startswith("  - "):
+                index += 1
+            continue
+        if phase is not None and line.rstrip("\n") == "  systems:" and wanted.get(phase):
+            output.append("  ideas:\n")
+            output.extend(f"  - '{idea}'\n" for idea in wanted[phase])
+        output.append(line)
+        index += 1
+    return "".join(output)
+
+
 def inspect_backlog(
     catalog: dict[str, Any],
     documents: dict[str, Any],
@@ -208,8 +280,14 @@ def inspect_backlog(
     owners: set[str],
     check_file: Callable[[str], bool],
     today: date,
+    ideas: set[str] | None = None,
 ) -> list[str]:
-    """Check a schema-validated catalog against source documents and local evidence."""
+    """Check a schema-validated catalog against source documents and local evidence.
+
+    `ideas` is the set of idea ids in the folded idea log. It is required only when some phase
+    carries an `ideas` field; a caller that passes None for such a catalog gets an error, never a
+    silent pass.
+    """
     errors = []
     items = {item["id"]: item for item in catalog["items"]}
     if len(items) != len(catalog["items"]):
@@ -279,6 +357,11 @@ def inspect_backlog(
                 f"{key}: completion evidence/results require an active, blocked or complete phase"
             )
         errors.extend(code_claim_errors(key, item, documents, register))
+        if item.get("ideas"):
+            if ideas is None:
+                errors.append(f"{key}: ideas field present but the idea log was not read")
+            else:
+                errors.extend(idea_field_errors(key, item, ideas))
         try:
             for path in item["deliverables"]:
                 check_file(path)  # Validate public path, but planned files need not exist yet.

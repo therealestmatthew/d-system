@@ -6,6 +6,7 @@ Run: uv run python -m src.governance [--inventory]
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import subprocess
@@ -21,7 +22,13 @@ from jsonschema import Draft7Validator, FormatChecker  # type: ignore[import-unt
 from src.db.ideas import IdeaError, fold, load_events
 from src.db.source_validation import data_root
 from src.governance import reservations
-from src.governance.backlog import inspect_backlog, render_backlog
+from src.governance.backlog import (
+    backfill_ideas_text,
+    idea_backfill_diff,
+    inspect_backlog,
+    named_ideas,
+    render_backlog,
+)
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
 from src.governance.regression import audit as audit_status_regression
@@ -374,6 +381,9 @@ def audit_backlog(
                 f"backlog:{'.'.join(map(str, issue.absolute_path))}: {issue.message}"
                 for issue in issues
             ], {}
+        # The idea log is read only when a phase links an idea, so a backlog without the field
+        # (every test fixture, a fresh clone's history) needs no idea log at all.
+        ideas = idea_ids(root) if any(item.get("ideas") for item in catalog["items"]) else None
         errors = inspect_backlog(
             catalog,
             result["documents"],
@@ -382,10 +392,64 @@ def audit_backlog(
             set(result["owners"]),
             lambda path: public_path(root, path).is_file(),
             today or date.today(),
+            ideas,
         )
         return errors, catalog
-    except (OSError, ValueError, KeyError, yaml.YAMLError) as exc:
+    except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
         return [f"backlog inputs: {exc}"], {}
+
+
+def idea_ids(root: Path) -> set[str]:
+    """The idea ids in the folded idea log; agents read idea state through fold() only."""
+    return set(fold(load_events(public_path(root, "_data/ideas.jsonl"))))
+
+
+def backfill_ideas(root: Path, catalog: dict[str, Any], write: bool) -> tuple[int, list[str]]:
+    """Report, and with `write` apply, the difference between each phase's `ideas` field and the
+    ids its own text names (REQ-036 R18). Returns the exit code and the lines to print.
+
+    The rewrite is checked before it lands: the new text must parse to the old catalog with only
+    the `ideas` fields changed, and must leave nothing for a second run to do. Either failure
+    writes nothing.
+    """
+    known = idea_ids(root)
+    diff = idea_backfill_diff(catalog, known)
+    lines = [
+        f"{key}: missing {', '.join(missing) or '-'}; extra {', '.join(extra) or '-'}"
+        for key, (missing, extra) in sorted(diff.items())
+    ]
+    linked = sum(len(named_ideas(item, known)) for item in catalog["items"])
+    phases = sum(1 for item in catalog["items"] if named_ideas(item, known))
+    missing = sum(len(value[0]) for value in diff.values())
+    extra = sum(len(value[1]) for value in diff.values())
+    summary = (
+        f"{phases} phases name {linked} ideas; {len(diff)} phases differ "
+        f"({missing} missing, {extra} extra)"
+    )
+    if not write:
+        return (1 if diff else 0), [*lines, f"Idea field check: {summary}"]
+    if not diff:
+        return 0, [f"Idea backfill: nothing to change; {summary}"]
+    target = public_path(root, "docs/09-backlog/backlog.yaml")
+    rewritten = backfill_ideas_text(target.read_text(encoding="utf-8"), catalog, known)
+    reparsed = yaml.load(rewritten, Loader=MetadataLoader)
+    expected = copy.deepcopy(catalog)
+    for item in expected["items"]:
+        item.pop("ideas", None)
+        if found := named_ideas(item, known):
+            item["ideas"] = found
+    if reparsed != expected or idea_backfill_diff(reparsed, known):
+        return 1, ["ERROR idea backfill would change more than the ideas fields; nothing written"]
+    fd, tmp_name = tempfile.mkstemp(dir=target.parent, prefix=".backlog-", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(rewritten)
+        os.replace(tmp_name, target)
+    except BaseException:
+        if os.path.exists(tmp_name):
+            os.remove(tmp_name)
+        raise
+    return 0, [*lines, f"Idea backfill wrote docs/09-backlog/backlog.yaml: {summary}"]
 
 
 def audit_idea_priority(root: Path, today: date | None = None) -> list[str]:
@@ -525,6 +589,17 @@ def main() -> int:
         metavar="CODE",
         help="Drop a pre-merge reservation taken by --next-code but never written",
     )
+    output.add_argument(
+        "--backfill-ideas",
+        action="store_true",
+        help="Set each phase's ideas field to the idea ids its own scope, acceptance and "
+        "next_action name",
+    )
+    output.add_argument(
+        "--check-ideas",
+        action="store_true",
+        help="Report phases whose ideas field is missing or carries extra ids; exit 1 if any",
+    )
     parser.add_argument("--parent", metavar="DOC_ID", help="Allocate a sub-code under this plan")
     args = parser.parse_args()
     if args.parent and not args.next_code:
@@ -542,7 +617,16 @@ def main() -> int:
     # Only the plain check compares generated files: `--catalog` is the fix for a stale catalog,
     # and the query modes are run mid-edit, before regeneration (REQ-028 R01, R02).
     plain = not any(
-        (args.inventory, args.backlog, args.ready, args.catalog, args.next_code, args.release_code)
+        (
+            args.inventory,
+            args.backlog,
+            args.ready,
+            args.catalog,
+            args.next_code,
+            args.release_code,
+            args.backfill_ideas,
+            args.check_ideas,
+        )
     )
     if plain and catalog and not errors:
         errors.extend(
@@ -589,6 +673,15 @@ def main() -> int:
         rendered = render_catalog(result["register"], result["documents"], catalog["items"])
         write_catalog(ROOT, rendered)
         print(rendered)
+    elif args.backfill_ideas or args.check_ideas:
+        try:
+            code, lines = backfill_ideas(ROOT, catalog, write=args.backfill_ideas)
+        except (OSError, ValueError, IdeaError, yaml.YAMLError) as exc:
+            print(f"ERROR idea backfill inputs: {exc}")
+            return 1
+        for line in lines:
+            print(line)
+        return code
     elif args.inventory:
         print(inventory(result))
     else:

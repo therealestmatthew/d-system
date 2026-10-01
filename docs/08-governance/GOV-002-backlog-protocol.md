@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-27'
+updated: '2026-10-01'
 systems: [sys-backlog, sys-governance]
 depends_on: [doc-backlog-decisions]
 ---
@@ -34,6 +34,7 @@ Reports are generated on stdout. Edit YAML state, not a second board or manually
 | `id` | Permanent `phase-<track>-NN` ID; insertions do not renumber existing work |
 | `title` | One observable outcome; an implementation or decision phase can both be useful |
 | `plan`, `sources` | One primary plan plus all other governed source IDs covered by the phase |
+| `ideas` | Optional six-digit idea IDs that the phase's own `scope`, `acceptance` or `next_action` names; every ID must exist in the folded idea log |
 | `systems`, `owner` | Existing component IDs and accountable owner key |
 | `priority` | 1: foundations; 2: capabilities; 3: composition; 4: conditional extensions |
 | `next_up` | Catalog-level ordered list of phase IDs that jump the queue; the front of the backlog |
@@ -52,6 +53,15 @@ Reports are generated on stdout. Edit YAML state, not a second board or manually
 Expected session-record filenames in initial deliverables are illustrative; use the real execution date when writing a record. Future ADR filenames are proposed, not reservations that override later repository work. Source IDs remain stable even when a file moves.
 
 A phase that has released its claim — `queued`, `deferred` or `cancelled` — carries none of the three: nobody holds the phase, so there is no interim work left to have evidence of.
+
+The `ideas` field is derived from the phase's own text, never from its plan document, so a plan
+that names many ideas does not link all of them to each of its phases
+([PLAN-036](../01-plans/PLAN-036-html-generation-design-system.md), decision B).
+`uv run python -m src.governance --backfill-ideas` writes it for every phase and changes nothing
+else in `backlog.yaml`. `--check-ideas` reports each phase whose field is missing an ID its text
+names or carries one it does not, and exits 1 if there is any. The default governance run rejects
+an ID that is not in `_data/ideas.jsonl` ([REQ-036](../06-requirements/REQ-036-engine-pages-house-style.md)
+R17, R18).
 
 ## State and dependency rules
 

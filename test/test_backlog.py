@@ -601,3 +601,162 @@ def test_repository_reservation_only_deliverables_pass() -> None:
     }
     assert reservation_only
     assert reservation_only <= reserved
+
+
+def write_ideas(root: Path, *ids: str) -> None:
+    """A minimal idea log: one `created` event per id, enough for fold() to know it."""
+    (root / "_data").mkdir(exist_ok=True)
+    events = [
+        {
+            "idea": idea,
+            "event": "created",
+            "at": "2026-09-06T14:45:00-04:00",
+            "title": f"Fixture idea {idea}",
+            "body": "Fixture.",
+        }
+        for idea in ids
+    ]
+    (root / "_data/ideas.jsonl").write_text("".join(json.dumps(event) + "\n" for event in events))
+
+
+def test_ideas_field_rejects_an_id_the_idea_log_does_not_contain(backlog_repo: Any) -> None:
+    """REQ-036 R17: a made-up id fails the validator, naming the phase and the id."""
+    root, catalog, _ = backlog_repo
+    write_ideas(root, "000417")
+    catalog["items"] = [phase(ideas=["000417", "999999"])]
+    errors = check(backlog_repo)
+    assert errors == [
+        "phase-demo-01: ideas names 999999, which is not in _data/ideas.jsonl"
+    ]
+
+
+def test_ideas_field_with_known_ids_passes(backlog_repo: Any) -> None:
+    root, catalog, _ = backlog_repo
+    write_ideas(root, "000417", "000453")
+    catalog["items"] = [phase(ideas=["000417", "000453"])]
+    assert check(backlog_repo) == []
+
+
+@pytest.mark.parametrize("value", [["417"], ["0004170"], ["abcdef"], []])
+def test_ideas_field_schema_rejects_malformed_ids(backlog_repo: Any, value: list[str]) -> None:
+    root, catalog, _ = backlog_repo
+    write_ideas(root, "000417")
+    catalog["items"] = [phase(ideas=value)]
+    assert any(error.startswith("backlog:items.0.ideas") for error in check(backlog_repo))
+
+
+def test_ideas_field_without_an_idea_log_fails_rather_than_passing(backlog_repo: Any) -> None:
+    # load_events reads a missing log as empty, so the id is reported as unknown.
+    _, catalog, _ = backlog_repo
+    catalog["items"] = [phase(ideas=["000417"])]
+    assert check(backlog_repo) == [
+        "phase-demo-01: ideas names 000417, which is not in _data/ideas.jsonl"
+    ]
+
+
+def test_named_ideas_reads_only_standalone_known_ids_in_the_phase_text() -> None:
+    from src.governance.backlog import named_ideas
+
+    item = phase(
+        scope=["Build on idea 000417's design (000417 again), see commit 3da1295 and a000453."],
+        acceptance=["Ideas 000046 and 999999 are named.", "1234567 is too long."],
+        next_action="Read 000522 first.",
+        # The plan and the other fields are never read, even when they name a known id.
+        title="Mentions 000100",
+        verification=["Check 000101"],
+    )
+    known = {"000046", "000100", "000101", "000417", "000453", "000522"}
+    assert named_ideas(item, known) == ["000046", "000417", "000522"]
+
+
+def test_backfill_text_edits_only_ideas_blocks_and_is_idempotent() -> None:
+    import yaml
+
+    from src.governance.__main__ import MetadataLoader
+    from src.governance.backlog import backfill_ideas_text, idea_backfill_diff
+
+    text = (
+        "schema_version: 1\n"
+        "next_up:\n"
+        "- phase-demo-01\n"
+        "items:\n"
+        "- id: phase-demo-01\n"
+        "  sources: []\n"
+        "  ideas:\n"
+        "  - '000999'\n"
+        "  systems:\n"
+        "  - sys-demo\n"
+        "  scope:\n"
+        "  - 'Long text naming idea 000417, wrapped across\n"
+        "    two lines exactly as written.'\n"
+        "  acceptance: []\n"
+        "  next_action: Then 000453.\n"
+        "- id: phase-demo-02\n"
+        "  systems:\n"
+        "  - sys-demo\n"
+        "  scope:\n"
+        "  - Nothing named.\n"
+        "  acceptance: []\n"
+        "  next_action: None.\n"
+    )
+    known = {"000417", "000453", "000999"}
+    catalog = yaml.load(text, Loader=MetadataLoader)
+    assert idea_backfill_diff(catalog, known) == {
+        "phase-demo-01": (["000417", "000453"], ["000999"])
+    }
+    rewritten = backfill_ideas_text(text, catalog, known)
+    assert rewritten == text.replace("  - '000999'\n", "  - '000417'\n  - '000453'\n")
+    reparsed = yaml.load(rewritten, Loader=MetadataLoader)
+    assert idea_backfill_diff(reparsed, known) == {}
+    assert backfill_ideas_text(rewritten, reparsed, known) == rewritten
+
+
+def test_check_mode_reports_and_backfill_mode_repairs(
+    backlog_repo: Any, monkeypatch: Any, capsys: Any
+) -> None:
+    """REQ-036 R18: check mode reports missing and extra ids and writes nothing; the backfill
+    writes them; check mode then reports no difference."""
+    import yaml
+
+    from src.governance import __main__ as cli
+
+    root, catalog, result = backlog_repo
+    write_ideas(root, "000417", "000453")
+    catalog["items"] = [
+        phase(scope=["Build idea 000417."], ideas=["000453"]),
+    ]
+    path = root / "docs/09-backlog/backlog.yaml"
+    path.write_text(yaml.safe_dump(catalog, sort_keys=False))
+    before = path.read_text()
+    monkeypatch.setattr(cli, "ROOT", root)
+    monkeypatch.setattr(cli, "audit", lambda _: ([], [], result))
+    monkeypatch.setattr(cli, "audit_idea_priority", lambda _: [])
+    monkeypatch.setattr(cli, "audit_status_regression", lambda _root, _catalog: ([], []))
+
+    monkeypatch.setattr("sys.argv", ["governance", "--check-ideas"])
+    assert cli.main() == 1
+    out = capsys.readouterr().out
+    assert "phase-demo-01: missing 000417; extra 000453" in out
+    assert path.read_text() == before
+
+    monkeypatch.setattr("sys.argv", ["governance", "--backfill-ideas"])
+    assert cli.main() == 0
+    assert yaml.safe_load(path.read_text())["items"][0]["ideas"] == ["000417"]
+
+    monkeypatch.setattr("sys.argv", ["governance", "--check-ideas"])
+    assert cli.main() == 0
+    assert "0 phases differ (0 missing, 0 extra)" in capsys.readouterr().out
+
+
+def test_repository_idea_field_matches_its_backfill() -> None:
+    """REQ-036 R17 and R18 on the committed backlog: every id is known, and a re-run of the
+    backfill would change nothing."""
+    from src.governance.__main__ import idea_ids
+    from src.governance.backlog import idea_backfill_diff
+
+    errors, _, result = audit(ROOT)
+    assert errors == []
+    backlog_errors, catalog = audit_backlog(ROOT, result)
+    assert backlog_errors == []
+    assert any(item.get("ideas") for item in catalog["items"])
+    assert idea_backfill_diff(catalog, idea_ids(ROOT)) == {}

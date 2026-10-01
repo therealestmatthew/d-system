@@ -99,6 +99,17 @@
             "minItems": 0,
             "description": "Other source document IDs, including child plan coverage and accepted decisions."
           },
+          "ideas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Six-digit idea ID from _data/ideas.jsonl; must exist in fold().",
+              "pattern": "^[0-9]{6}$"
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Ideas named in this phase's own scope, acceptance or next_action; written by --backfill-ideas and compared by --check-ideas."
+          },
           "systems": {
             "type": "array",
             "items": {
