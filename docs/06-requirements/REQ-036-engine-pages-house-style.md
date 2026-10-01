@@ -44,7 +44,7 @@ Two earlier decisions feed this requirement:
 $ uv run python -c "... fold(ideas.jsonl) ..."
 521 ideas: 490 triaged, 13 promoted, 10 reviewing, 7 discarded, 1 open
 0 ideas carry any ARCH-005 classification field (record_kind, ontological, epistemic, lifecycle, temporal)
-13 ideas carry promoted_to; 37 links point at a document code
+13 ideas carry promoted_to; 38 links point at a document code
 
 $ backlog.yaml
 341 phases: 193 queued, 129 complete, 17 deferred, 1 active, 1 blocked
@@ -108,7 +108,7 @@ approved house style yet. The round-2 gallery is the only rendering of it.
 | G1 Idea approval | Nothing waits. The count shows ideas captured | `fold()` |
 | G2 Track acceptance | Triaged ideas with no `promoted_to` and no phase naming them | `fold()`, the phase idea field (R17) |
 | G3 Plan approval | Plans whose front matter reads `draft` | plan front matter |
-| G4 Integration and G5 Completion review | `active` phases. Integration is fast-forward-only and the completion edit follows the merge in the same turn (the Session Manager's contract, item 4), so the two gates have one queue | `backlog.yaml` |
+| G4 Integration and G5 Completion review | `active` phases. Integration has been fast-forward-only since 2026-09-10, and the completion edit follows the merge in the same turn (the Session Manager's contract, item 4), so the two gates have one queue | `backlog.yaml` |
 
 ### Page 2: idea funnel and ledger
 
@@ -122,14 +122,14 @@ approved house style yet. The round-2 gallery is the only rendering of it.
 | ID | Required observable behavior | Verification method |
 |---|---|---|
 | R17 | A backlog phase may carry an `ideas` list of six-digit idea ids. The schema accepts it, and `uv run python -m src.governance` rejects any id that `fold()` does not contain. | Add a phase with a made-up id in a test fixture and confirm the validator fails naming it. Then confirm the committed backlog passes. |
-| R18 | The field is backfilled. Every phase whose `scope`, `acceptance` or `next_action` names a six-digit id that exists in `fold()` carries that id. The backfill is a script whose output can be re-run and compared. | Re-run the backfill script in check mode and confirm it reports no missing and no extra ids. |
+| R18 | The field is backfilled. Every phase whose `scope`, `acceptance` or `next_action` names a six-digit id that exists in `fold()` carries that id. The backfill is a `src.governance` mode whose output can be re-run and compared. | Re-run the backfill in check mode and confirm it reports no missing and no extra ids. |
 
 ### Page 3: per-idea trace
 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
 | R19 | Each idea with a recorded plan or phase link (`promoted_to`, or a phase's `ideas` field) has a trace page. Every other idea shows "no recorded plan" in the ledger and has no trace page. | A test compares the set of trace pages with the set of linked ideas. |
-| R20 | A trace shows capture, then plan, then phases with their states, then delivery, with gate entries derived as follows. G1 is the idea's `created` date. G2 is "not recorded", because no structured partition record exists in the repository. G3 is the plan's status, dated by the earliest `dev` commit where the plan's front matter reads `approved`, `active` or `complete`. G4 and G5 are one entry: the earliest `dev` commit where the phase reads `complete`. Owner rulings are the idea's annotations of kind `assessment`. Every entry names its source. | A test builds the trace for one idea with a known history and compares each entry with the git log and the fold. |
+| R20 | A trace shows capture, then plan, then phases with their states, then delivery, with gate entries derived as follows. G1 is the idea's `created` date. G2 is "not recorded", because no structured partition record exists in the repository. G3 is the plan's status, dated by the earliest `dev` commit where the plan's front matter reads `approved`, `active` or `complete`. G4 and G5 are one entry: the earliest commit on `dev`'s first-parent history where the phase reads `complete`. Owner rulings are the idea's annotations of kind `assessment`. Every entry names its source. | A test builds the trace for one idea with a known history and compares each entry with the git log and the fold. |
 
 ### Page 4: backlog and batch graph
 

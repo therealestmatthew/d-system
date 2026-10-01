@@ -207,7 +207,7 @@ declaration (R07, R08) and the designer agent (R11) are not covered by the six n
 
 ### Decision B. Trace links come from a new structured field on phases
 
-Only 13 ideas carry `promoted_to`, and 37 links point at a document code. No phase field names an
+Only 13 ideas carry `promoted_to`, and 38 links point at a document code. No phase field names an
 idea. A trace built on that data would show fewer than one idea in ten. The owner chose a
 structured `ideas` field on backlog phases, backfilled from the ids named in each phase's own text
 (`phase-des-08`). The trace (`phase-des-11`) depends on it. The validator rejects an id that
@@ -226,8 +226,9 @@ its phases, and the trace would claim more than the records say.
 - **G2 shows "not recorded".** The accepted partitions are Markdown documents under
   `docs/00-working/`, not structured records, and parsing prose for gate decisions would make the
   page guess. The trace says so and names the missing record (`REQ-036` R11).
-- **G4 and G5 are one entry.** Integration is fast-forward-only, so `dev` has no merge commits. The
-  completion edit is made on `dev` in the same turn as the merge (the Session Manager's contract,
+- **G4 and G5 are one entry.** Integration has been fast-forward-only since 2026-09-10, so `dev` has no
+  merge commits after that date. It has one from before (`818f64b`, 2026-09-10), so the trace walks
+  `dev`'s first-parent history. The completion edit is made on `dev` in the same turn as the merge (the Session Manager's contract,
   item 4). The earliest `dev` commit where a phase reads `complete` is therefore the record of both.
   The owner's wording was "merge commit on dev". This is the nearest record that exists, and the
   page states the reason.
@@ -254,7 +255,21 @@ axes. The trace's is the gate derivation and its git reads. The graph's is a sta
 with no script (`REQ-036` R12).
 
 All six new phases declare `sys-html` except `phase-des-08`, so the lock table runs the page phases
-one at a time. The dependency chain already orders them, so nothing is lost.
+one at a time. The dependency chain orders most of them already. The exception is `phase-des-12`,
+which depends only on `-09` and could otherwise run beside `-10` or `-11`. The lock serialises it
+because all four page phases edit the same generator file, `tools/generate_engine_pages.py`.
+
+Deliverables are declared as specific files where a phase shares a directory with another
+(`docs/08-governance/`, `test/`), so the lock table does not serialise phases that touch different
+files there. The two new operations documents have codes reserved in `codes.yaml` for this reason:
+OPS-027 for `phase-des-07`'s CSS generator and OPS-028 for `phase-des-09`'s page generator.
+`phase-des-08`'s backfill is a `src.governance` mode rather than a new tool, so it needs no
+operations document.
+
+**Sizing.** `phase-des-07` is the densest phase: tokens, a CSS generator, a page shell and five
+components. It is kept as one phase because the gallery already fixes every value and every
+component, so the session transcribes and tests rather than designs. If it runs over, `GOV-002`'s rule
+applies and the remainder gets a new phase id.
 
 ### Decision G. `REQ-021`'s rows that this amendment changes
 

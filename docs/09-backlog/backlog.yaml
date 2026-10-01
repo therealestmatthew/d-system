@@ -12630,7 +12630,7 @@ items:
     in the round-2 gallery on 2026-09-30 (https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi). Read the
     values from the artifact with the Artifact tool's read action, not from memory or from REQ-036's prose.
   - Generate the family's CSS from the tokens with a deterministic tool under tools/, and ship it with
-    its OPS document. The magazine house style is the default; Swiss and technical-mono are variants that
+    its operations document, OPS-027 (reserved in codes.yaml). The magazine house style is the default; Swiss and technical-mono are variants that
     change only type, size, spacing and rule tokens.
   - 'Light and dark through one flag that redefines colour tokens only: prefers-color-scheme, overridden
     by :root[data-theme], the mechanism _public/idea-realization-system.html already uses.'
@@ -12658,8 +12658,8 @@ items:
   - templates/html/
   - templates/README.md
   - tools/generate_house_css.py
-  - docs/08-governance/
-  - test/
+  - docs/08-governance/OPS-027-generate-house-css.md
+  - test/test_house_css.py
   next_action: Read the gallery artifact first and transcribe its tokens into the test fixture before writing
     the tokens file, so the fixture is the record of what was approved rather than a copy of what was built.
 - id: phase-des-08
@@ -12678,16 +12678,16 @@ items:
   scope:
   - Add an optional ideas list of six-digit idea ids to backlog phases in schemas/backlog.schema.json,
     and make uv run python -m src.governance reject any id that fold() does not contain.
-  - Backfill it with a script that reads each phase's own scope, acceptance and next_action - not its plan
-    document - and writes the ids it finds that exist in fold(). Give the script a check mode that reports
-    missing and extra ids.
+  - Backfill it with a src.governance mode, not a new tool under tools/, that reads each phase's own scope,
+    acceptance and next_action - not its plan document - and writes the ids it finds that exist in fold().
+    Give it a check mode that reports missing and extra ids.
   - Document the field in GOV-002's backlog protocol.
   - The owner chose this over parsing prose at page time (2026-09-30, PLAN-036 amendment, decision B). The
     plugin's copy of the backlog schema under plugins/ is not changed here.
   acceptance:
   - 'REQ-036 R17 holds: a fixture phase with a made-up id fails the validator naming it, and the committed
     backlog passes.'
-  - 'REQ-036 R18 holds: the backfill script''s check mode reports no missing and no extra ids.'
+  - 'REQ-036 R18 holds: the backfill''s check mode reports no missing and no extra ids.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
@@ -12696,9 +12696,9 @@ items:
   - schemas/backlog.schema.json
   - src/governance/backlog.py
   - docs/09-backlog/backlog.yaml
+  - src/governance/__main__.py
   - docs/08-governance/GOV-002-backlog-protocol.md
-  - tools/
-  - test/
+  - test/test_backlog.py
   next_action: The backfill touches many phases in backlog.yaml, which every claim also edits. Rebase onto
     dev immediately before committing the backfill, and re-run it after any rebase rather than resolving
     conflicts in the field by hand.
@@ -12717,7 +12717,7 @@ items:
   depends_on:
   - phase-des-07
   scope:
-  - Build one deterministic generator under tools/, with its OPS document, that reads only tracked inputs
+  - Build one deterministic generator under tools/, with its operations document OPS-028 (reserved in codes.yaml), that reads only tracked inputs
     - the idea log through fold(), backlog.yaml, the batch tables, plan front matter and the git history
     of dev - and writes the engine pages to _public/engine/ in the house family.
   - Stamp each page with the source commit and that commit's date, never the time the generator ran, so
@@ -12742,8 +12742,8 @@ items:
   deliverables:
   - tools/generate_engine_pages.py
   - _public/engine/
-  - docs/08-governance/
-  - test/
+  - docs/08-governance/OPS-028-generate-engine-pages.md
+  - test/test_engine_pages.py
   next_action: Build the shared data layer against this page's needs only; the later page phases extend
     it. Check what tools/overview_metrics.py already computes from fold() before writing a second count.
 - id: phase-des-10
@@ -12778,7 +12778,7 @@ items:
   deliverables:
   - tools/generate_engine_pages.py
   - _public/engine/
-  - test/
+  - test/test_engine_pages.py
   next_action: Read src/db/ideas.py's CLASSIFICATION_FIELDS and AXES before laying out the axis view; the
     folded record carries no axis keys at all until an idea is classified.
 - id: phase-des-11
@@ -12816,9 +12816,11 @@ items:
   deliverables:
   - tools/generate_engine_pages.py
   - _public/engine/
-  - test/
+  - test/test_engine_pages.py
   next_action: Git history reads are the slow part. Read each file's history once per run and index it,
-    rather than running git log per idea.
+    rather than running git log per idea. Walk dev with --first-parent - dev carries one merge commit
+    from before the fast-forward-only rule (818f64b, 2026-09-10). CI's pytest job checks out full
+    history (fetch-depth 0); keep it that way or tests that read history will see a truncated log.
 - id: phase-des-12
   title: Build the backlog and batch graph page
   plan: doc-html-generation-design-system
@@ -12855,7 +12857,7 @@ items:
   deliverables:
   - tools/generate_engine_pages.py
   - _public/engine/
-  - test/
+  - test/test_engine_pages.py
   next_action: Three hundred and more phases do not fit one legible graph. Decide the layout - per batch,
     per plan, or only the unfinished phases - from the data before drawing, and state the choice on the
     page.
