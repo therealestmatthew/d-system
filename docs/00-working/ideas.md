@@ -3464,6 +3464,7 @@ The idea requires a plan before implementation per AGENTS.md's plan-before-code 
 **Links**
 
 - relates_to ← `000156`
+- relates_to ← `000550`
 
 ---
 
@@ -23532,6 +23533,7 @@ Overlaps as printed: 000162 (append-only knowledge log) · Decision D2
 
 - relates_to → `000525`
 - relates_to → `000162`
+- relates_to ← `000550`
 
 ---
 
@@ -23565,6 +23567,7 @@ Overlaps as printed: 000281, 000458 (scaffold skill), 000459 (prerequisites) · 
 - relates_to → `000281`
 - relates_to → `000458`
 - relates_to → `000459`
+- relates_to ← `000550`
 
 ---
 
@@ -23888,3 +23891,31 @@ Overlaps as printed: 000162, 000480 · D19
 - relates_to → `000525`
 - relates_to → `000162`
 - relates_to → `000480`
+- relates_to ← `000550`
+
+---
+
+## 000550 · A clean production branch without ideas: dev keeps dev data, main gets releases
+
+**Created 2026-10-01T17:11:28-04:00 · Status: `open`**
+
+Owner's words, 2026-10-01 (relayed by the Session Manager): "Can we create a separate branch that we maintain in sync with dev except it has no ideas... maybe that should be the main branch. When we merge dev into main can we cherry pick everything not idealogy? Can we generate a reusable bash or other workflow type script that allows us to consistently apply the sync with dev by cherrypicking not idea files? Then when we approve pr merge it fires and merges without ideas? Or we create a staging third branch: main, dev, stage. Then the workflow becomes dev->stage, delete ideas from stage and commit, squash merge stage->main... propose a formal release structure where we keep dev with dev data and maintain clean production branches."
+
+Related, as named with the ask: 000066 (gate main behind a PR from dev), 000527 (ideas leave git), 000529 (start from nothing), 000549 (interim idea-log repository).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-01T17:11:29-04:00): Owner follow-up, 2026-10-01 (relayed by the Session Manager), owner's words: "We create the deterministic methods / scripts to surgically remove specific items (or bundles of items). Ability to drop all sessions, prompts, plans + phases, backlog & next up, batches (of phases queued for execution), and so on. Then we just toggle the argument (config file) for each we want to remove. We start with ideas then layer on the others." Owner rulings on it: goal = clean product; main restarts as a fresh orphan at the first release; plan it now in d-system.
+
+</details>
+
+**Links**
+
+- relates_to → `000066`
+- relates_to → `000527`
+- relates_to → `000529`
+- relates_to → `000549`
