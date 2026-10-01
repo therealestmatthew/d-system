@@ -4,10 +4,15 @@ id: doc-code-reservation-enforcement
 code: PLAN-010
 title: Enforce document code reservations mechanically
 kind: plan
-status: draft
+status: complete
 owner: repository-owner
 created: '2026-09-06'
-updated: '2026-09-06'
+updated: '2026-09-30'
+completion_evidence:
+- src/governance/backlog.py
+- src/governance/__main__.py
+- test/test_backlog.py
+- docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-governance-protocol, doc-document-codes]
 ---
@@ -59,6 +64,14 @@ uv run pytest
 A fixture backlog claiming an unreserved code must fail with the phase and code named. The current
 repository must continue to pass unchanged: `phase-rel-04` and `phase-rel-05` name `ADR-004` and
 `ADR-005`, which are reserved, and `phase-priv-01` now names `ADR-009`, which exists.
+
+**Completed 2026-09-30.** `phase-gov-01`, this plan's only phase, completed and was integrated onto
+`dev` at `67e7fc3` with the owner's approval. The backlog audit now rejects a deliverable whose
+filename claims a code that is neither an existing document nor reserved in `codes.yaml`, naming the
+phase, the code and the file, with a separate message for a retired code. At integration 1163 tests
+passed and governance, ruff and mypy were clean; the adversarial review found all five of the
+phase's acceptance conditions met, and its one major finding was fixed. The open question below stays open: the check covers backlog deliverables
+only, not plan prose. See `docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md`.
 
 ## Open questions
 

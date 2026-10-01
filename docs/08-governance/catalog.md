@@ -98,7 +98,7 @@ CI regenerates it and fails on any difference.
 | PLAN-007 | plan | complete | repository-owner | docs/01-plans/PLAN-007-capture-and-structuring-system.md |
 | PLAN-008 | plan | draft | repository-owner | docs/01-plans/PLAN-008-session-lifecycle-protocols.md |
 | PLAN-009 | plan | draft | repository-owner | docs/01-plans/PLAN-009-capture-build.md |
-| PLAN-010 | plan | draft | repository-owner | docs/01-plans/PLAN-010-code-reservation-enforcement.md |
+| PLAN-010 | plan | complete | repository-owner | docs/01-plans/PLAN-010-code-reservation-enforcement.md |
 | PLAN-012 | plan | draft | repository-owner | docs/01-plans/PLAN-012-terminology-system.md |
 | PLAN-013 | plan | draft | repository-owner | docs/01-plans/PLAN-013-tooling-documentation.md |
 | PLAN-014 | plan | draft | repository-owner | docs/01-plans/PLAN-014-governance-and-complexity-review.md |
@@ -432,7 +432,7 @@ CI regenerates it and fails on any difference.
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
 | PLAN-008 | doc-session-lifecycle | draft | 2 | 0 | 5 | agent-build, agent-checkpoint, agent-codex-port, agent-ses06 |
 | PLAN-009 | doc-capture-build | draft | 2 | 0 | 6 | agent-architect, agent-builder-a, agent-builder-b, agent-cap03, agent-cap04, agent-cap07 |
-| PLAN-010 | doc-code-reservation-enforcement | draft | 0 | 0 | 1 | agent-standby-3 |
+| PLAN-010 | doc-code-reservation-enforcement | complete | 0 | 0 | 1 | agent-standby-3 |
 | PLAN-012 | doc-terminology-system | draft | 0 | 0 | 2 | agent-term01, agent-term02 |
 | PLAN-013 | doc-tooling-documentation | draft | 1 | 0 | 1 | agent-tool01 |
 | PLAN-014 | doc-governance-model | draft | 1 | 0 | 4 | agent-gemini, agent-gov02, agent-gov03 |
