@@ -515,4 +515,4 @@ CI regenerates it and fails on any difference.
 | OPS-028 | reserved | Operations document for tools/generate_engine_pages.py; deliverable of phase-des-09. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-410 documents — adr: 23, architecture: 12, governance: 19, operation: 23, plan: 81, prompt: 43, requirement: 35, session: 174.
+411 documents — adr: 23, architecture: 12, governance: 19, operation: 23, plan: 81, prompt: 43, requirement: 35, session: 175.
