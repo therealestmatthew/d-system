@@ -228,7 +228,7 @@ belongs to an agent session.
 terminal, the Session Manager may start or resume it on the owner's explicit request, detached under a
 pseudo-terminal, for example
 `setsid script -qfc "claude --resume <session-id> --permission-mode manual --remote-control 'Owner Terminal'" /dev/null`
-(this machine has no tmux). That relaunch used `--permission-mode default`, which the CLI accepts
+(this machine has no tmux). The 2026-09-30 relaunch used `--permission-mode default`, which the CLI accepts
 but does not list; `manual` is the documented value. The first Owner Terminal, launched from a Codex
 session, ended when that process exited; the relaunch under `setsid` kept running. Check `ListAgents`
 after any start.
