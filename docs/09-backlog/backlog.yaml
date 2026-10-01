@@ -15042,6 +15042,7 @@ items:
   - tools/run_review_checks.py
   - test/test_run_review_checks.py
   - docs/08-governance/OPS-029-run-review-checks.md
+  - docs/08-governance/codes.yaml
   next_action: Reuse the detached-worktree pattern of GOV-017 merge-gate step 2. Never run pytest in the
     primary checkout; the runner's own worktree is where the phase's commands run.
 - id: phase-asr-03
