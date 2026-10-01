@@ -7182,7 +7182,8 @@ items:
   - 'Emit the sort, filter and column-visibility JavaScript inline (owner ruling, 2026-09-30): add an
     {{INLINE_SCRIPT}} token to templates/html/lit-report-page.html, filled by tools/lit_report_render.py
     from a script file under templates/, parallel to {{INLINE_STYLES}}, and left empty on deliverable
-    pages. No CDN and no fetch (REQ-027 R08).'
+    pages. No CDN and no fetch (REQ-027 R08). Update the page shell''s header comment, which still says
+    the page carries no script tag.'
   acceptance:
   - Sorting a named column ascending then descending changes row order and leaves row count
     unchanged, on all three tables.
@@ -12297,6 +12298,7 @@ items:
   - cd ts && npm run lint
   - cd ts && npm test
   - uv run python -m src.governance
+  - No command observes the self-check acceptance line. It is checked by reading the session record.
   deliverables:
   - .github/workflows/ci.yaml
   - ts/package.json
