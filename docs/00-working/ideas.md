@@ -23368,3 +23368,23 @@ PROPOSED LINK: this idea --relates_to--> PLAN-030 (defines the claim-to-completi
 - relates_to → `000027`
 - relates_to → `000390`
 - relates_to → `None`
+
+---
+
+## 000524 · Catch a phase's stale ideas field before it reaches dev: run --check-ideas in the default governance run or pre-commit hook, or --backfill-ideas in the completion edit
+
+**Created 2026-10-01T06:03:43-04:00 · Status: `open`**
+
+Session 5 - Batch Runner, 2026-10-01, as given: "Catch idea-field drift before it reaches dev. A completion edit that names an idea id in a phase's next_action, scope or acceptance leaves that phase's ideas field stale. The default governance run doesn't check it, so dev went red on the repository test at 8340c90 (phase-dgov-06 named 000523). Options: have the default run (or the pre-commit hook) run --check-ideas, or add --backfill-ideas to the completion-edit step."
+
+What happened: 8340c90 ("Complete phase-dgov-06: diff a phase's change set against its declared paths") named idea 000523 in the phase's text without adding it to the phase's ideas field. The completion edit runs governance only (no pytest), and the default governance run does not run the ideas check, so the commit passed and the repository test failed afterwards on dev. 27baa84 ("Backfill idea 000523 onto phase-dgov-06's ideas field") fixed it.
+
+Existing flags on src.governance: --check-ideas reports phases whose ideas field is missing or out of step with the idea ids their text names; --backfill-ideas sets each phase's ideas field from those ids.
+
+Options, as given by the sender: (a) run --check-ideas in the default governance run or in the pre-commit hook, so the completion edit's governance step catches it; (b) add --backfill-ideas to the completion-edit step in the merge procedure.
+
+What it would touch: src/governance (default run) or tools/git-hooks (pre-commit); otherwise the completion-edit step in AGENTS.md step 9, the Session Manager contract's merge item, and /session-close.
+
+Also reported by the Session Manager, 2026-10-01, independently: governance does not run --check-ideas, and completion edits run no pytest. This idea records both reports as one gap.
+
+Unresolved: which option; whether --check-ideas is cheap enough for every commit. Same shape as 000405 and 000406 (the governance-only completion edit missed a stale catalog.md and turned dev red), which were promoted to PLAN-045.
