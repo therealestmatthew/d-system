@@ -1277,6 +1277,7 @@ What's unresolved: whether this belongs in the human/agent-judgment review step 
 **Links**
 
 - extended_by ← `000398`
+- relates_to ← `000523`
 
 ---
 
@@ -15641,6 +15642,7 @@ No existing plan, requirement document or backlog phase was found that covers th
 
 - relates_to ← `000317`
 - relates_to ← `000499`
+- relates_to ← `000521`
 
 ---
 
@@ -19286,6 +19288,7 @@ PROPOSED LINK: 000390 --relates_to--> 000152 (an earlier ask for a worktree regi
 - relates_to → `000385`
 - extends → `000368`
 - relates_to → `000152`
+- relates_to ← `000523`
 
 ---
 
@@ -22575,6 +22578,7 @@ The tables are docs/09-backlog/batches/*.yaml, governed by GOV-016 (batch orches
 
 - relates_to → `000316`
 - relates_to → `None`
+- relates_to ← `000521`
 
 ---
 
@@ -23277,6 +23281,12 @@ PROPOSED LINK: this idea --relates_to--> GOV-016 (the protocol whose update rule
 
 </details>
 
+**Links**
+
+- relates_to → `000316`
+- relates_to → `000499`
+- relates_to → `None`
+
 ---
 
 ## 000522 · Bring the idea lifecycle text up to date for set_aside: agent-workflows/idea.md, append_idea.py help, and their generated copies
@@ -23352,3 +23362,9 @@ PROPOSED LINK: this idea --relates_to--> 000390 (branch registry; a natural home
 PROPOSED LINK: this idea --relates_to--> PLAN-030 (defines the claim-to-completion attribution rule)
 
 </details>
+
+**Links**
+
+- relates_to → `000027`
+- relates_to → `000390`
+- relates_to → `None`

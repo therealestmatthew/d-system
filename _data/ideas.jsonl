@@ -2566,3 +2566,9 @@
 {"idea": "000521", "event": "status", "at": "2026-10-01T03:32:31-04:00", "eid": "e18da577298cc0d38", "from": "open", "to": "triaged"}
 {"idea": "000522", "event": "status", "at": "2026-10-01T03:32:31-04:00", "eid": "e18da5772a40df578", "from": "open", "to": "triaged"}
 {"idea": "000523", "event": "status", "at": "2026-10-01T03:32:31-04:00", "eid": "e18da5772ace1a368", "from": "open", "to": "triaged"}
+{"idea": "000521", "event": "linked", "at": "2026-10-01T04:13:32-04:00", "eid": "e18da59afa184af27", "type": "relates_to", "target": "000316"}
+{"idea": "000521", "event": "linked", "at": "2026-10-01T04:13:32-04:00", "eid": "e18da59afab382805", "type": "relates_to", "target": "000499"}
+{"idea": "000521", "event": "linked", "at": "2026-10-01T04:13:33-04:00", "eid": "e18da59afc2ca1357", "type": "relates_to", "target_code": "GOV-016"}
+{"idea": "000523", "event": "linked", "at": "2026-10-01T04:13:33-04:00", "eid": "e18da59afcc43af6d", "type": "relates_to", "target": "000027"}
+{"idea": "000523", "event": "linked", "at": "2026-10-01T04:13:33-04:00", "eid": "e18da59afd60de41a", "type": "relates_to", "target": "000390"}
+{"idea": "000523", "event": "linked", "at": "2026-10-01T04:13:33-04:00", "eid": "e18da59afed083a49", "type": "relates_to", "target_code": "PLAN-030"}
