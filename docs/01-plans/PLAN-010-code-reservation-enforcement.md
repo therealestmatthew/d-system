@@ -65,13 +65,15 @@ A fixture backlog claiming an unreserved code must fail with the phase and code 
 repository must continue to pass unchanged: `phase-rel-04` and `phase-rel-05` name `ADR-004` and
 `ADR-005`, which are reserved, and `phase-priv-01` now names `ADR-009`, which exists.
 
-**Completed 2026-09-30.** `phase-gov-01`, this plan's only phase, completed and was integrated onto
-`dev` at `67e7fc3` with the owner's approval. The backlog audit now rejects a deliverable whose
-filename claims a code that is neither an existing document nor reserved in `codes.yaml`, naming the
-phase, the code and the file, with a separate message for a retired code. At integration 1163 tests
-passed and governance, ruff and mypy were clean; the adversarial review found all five of the
-phase's acceptance conditions met, and its one major finding was fixed. The open question below stays open: the check covers backlog deliverables
-only, not plan prose. See `docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md`.
+**Completed 2026-09-30.** `phase-gov-01`, this plan's only phase, is complete. With the owner's
+approval, `dev` was fast-forwarded to the phase branch's tip, `67e7fc3`, and the phase was marked
+complete in `42500f3`. The implementation is in `7ab9702` and `84f22ff`. The backlog audit now
+rejects a deliverable whose filename claims a code that is neither an existing document nor reserved
+in `codes.yaml`, naming the phase, the code and the file, with a separate message for a retired code.
+At integration 1163 tests passed and governance, ruff and mypy were clean; the adversarial review
+found all five of the phase's acceptance conditions met, and its one major finding was fixed. The
+open question below stays open: the check covers backlog deliverables only, not plan prose. See
+`docs/03-sessions/SESS-2026-09-29-01-reject-unreserved-code-deliverables.md`.
 
 ## Open questions
 
