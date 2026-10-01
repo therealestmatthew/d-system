@@ -5,7 +5,6 @@ max_active: 4
 next_up:
 - phase-des-07
 - phase-des-08
-- phase-idg-19
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
@@ -10183,8 +10182,9 @@ items:
   - sys-contracts
   - sys-portfolio
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
+  session: doc-session-idea-set-aside-status
   priority: 1
   session_budget: 1
   depends_on:
@@ -10223,10 +10223,24 @@ items:
   - tools/overview_metrics.py
   - src/orchestrator/state.py
   - agent-workflows/idea.md
-  next_action: All acceptance conditions met and verification green on agent/phase-idg-19 (the owner
-    regenerated .agents/skills/partition-ideas/SKILL.md; committed). Awaiting the /session-close
-    independent review, READY to Session Manager, and the owner's merge approval. Session record
-    SESS-2026-09-30-01.
+  completion_evidence:
+  - schemas/idea.schema.json
+  - src/db/ideas.py
+  - schemas/idea-partition-record.schema.json
+  - agent-workflows/partition-ideas.md
+  - .agents/skills/partition-ideas/SKILL.md
+  - test/test_ideas.py
+  - test/test_idea_partition_record.py
+  - docs/03-sessions/SESS-2026-09-30-01-idea-set-aside-status.md
+  result: 'Complete: set_aside is legal from triaged only, is not terminal, and returns to triaged or
+    reviewing; the writer refuses it elsewhere. The partition record gains a held_out field (owner
+    hold-outs with reasons), the 2026-09-23 accepted record still validates, and GATE 3 writes it.
+    overview_metrics and orchestrator state now read the schema status enum. 1187 tests passed,
+    governance, ruff and mypy clean; demo-adversary review found both conditions Met, no blockers or
+    majors, one pre-existing minor accepted (explorer status filter, 000516). Merged by fast-forward
+    to 6e2cabf with the owner''s approval.'
+  next_action: Complete. Consumers outside the claim still omit set_aside without raising (000516
+    workbench, 000517 plugin, 000522 lifecycle text); the name waits on 000453.
 - id: phase-idg-02
   title: Build the pure classification agent
   plan: doc-idea-graph-lifecycle
