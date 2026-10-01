@@ -15014,8 +15014,11 @@ items:
   deliverables:
   - .claude/agents/review-judge.md
   - test/test_agent_tools.py
-  next_action: Start from partition-analyst.md, the one existing agent type without Bash. New agent types
-    appear in running sessions after a delay; check the type is listed before its first dispatch.
+  next_action: Checkpointed at the 2026-10-01 wind-down before any deliverable was written (SESS-2026-10-01-06,
+    branch agent/phase-asr-01). Next, write .claude/agents/review-judge.md from partition-analyst.md, the one
+    existing agent type without Bash, then test/test_agent_tools.py. The owner ruled on 2026-10-01 that there is
+    no .codex mirror for now. New agent types appear in running sessions after a delay; check the type is listed
+    before its first dispatch.
 - id: phase-asr-02
   title: A fixed command runner for build reviews
   plan: doc-reviewer-contract
