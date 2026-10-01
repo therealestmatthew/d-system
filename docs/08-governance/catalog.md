@@ -475,7 +475,7 @@ CI regenerates it and fails on any difference.
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
-| PLAN-036 | doc-html-generation-design-system | active | 8 | 0 | 4 | agent-builder-a, agent-coord, agent-night |
+| PLAN-036 | doc-html-generation-design-system | active | 7 | 1 | 4 | agent-builder-a, agent-coord, agent-night, agent-standby-3 |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 9 | 0 | 5 | agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
