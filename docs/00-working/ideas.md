@@ -23238,3 +23238,19 @@ Detail from the Scout's review (_working/session-manager/scout/gemini-branches-r
 **Links**
 
 - relates_to → `None`
+
+---
+
+## 000521 · Batch index table in docs/09-backlog/batches/README.md goes stale: keep it in step with the batch tables' status, or generate it
+
+**Created 2026-09-30T20:41:10-04:00 · Status: `open`**
+
+Reported by Session 5 - Batch Runner, 2026-09-30.
+
+The index table in docs/09-backlog/batches/README.md (columns Table, Status, Seq, What it builds) listed batch-003 as "queued" through its whole run. The open and close turns edit only the batch YAML's status and updated lines; nothing touches the README row, so the README shows a status the batch table no longer has. Checked on dev 2afe2d9 ("Close batch-003: every phase complete"): the README row still reads "queued".
+
+Proposed fixes, as given by the sender: keep the README row in step with the table's status (make the row edit part of the open and close turns), or generate the index from the batch tables so it cannot drift.
+
+What it would touch: docs/09-backlog/batches/README.md; the coordinator's open and close steps in PROMPT-036 and GOV-016 (the batch orchestration protocol); the Session Manager's "batch" turn type, which today covers a batch table's status and updated lines only. Generating the index would mean a new generator or a --catalog-style option, plus a check that fails when the committed README differs from the rendered one (the pattern tools/generate_ideas_md.py already follows for docs/00-working/ideas.md).
+
+Unresolved: which of the two fixes; whether the README's description column ("What it builds") stays hand-written if the rest is generated. Related: the README itself names 000316 (the governance check that would validate batch tables) and 000317 (the protocol governing how they are authored).
