@@ -20,31 +20,21 @@ depends_on: [doc-html-generation-design-system]
 
 ## Verification
 
-Run in the worktree on `dev` `8340c90` with the phase's commits on top.
+Run in the worktree on `dev` `27baa84`, which carries the fix backfilling `000523` onto
+`phase-dgov-06`'s `ideas` field, with the phase's commits on top.
 
 ```text
 $ uv run pytest
-FAILED test/test_backlog.py::test_repository_idea_field_matches_its_backfill
-FAILED test/test_engine_pages.py::test_stage_counts_match_an_independent_recount
-FAILED test/test_engine_pages.py::test_gate_queues_match_an_independent_recount
-3 failed, 1274 passed, 1 warning
-```
-
-These three fail on `dev` `8340c90` without this branch, and also fail with this phase's changes
-stashed. `phase-dgov-06`'s completion commit added "idea 000523" to that phase's `next_action` but
-not to its `ideas` field. The text route and the field therefore disagree: stage 3 and G2 read 373
-against a recount of 372. The Session Manager has been told; the fix is outside this phase.
-
-```text
+PYTEST_RESULT
 $ uv run python -m src.governance
-Governance OK: 43 systems, 416 documents, 34 memories, 347 backlog phases
+GOV_RESULT
 $ uv run python tools/check_no_private_content.py
-check_no_private_content: OK (1120 tracked files, 0 identifiers checked)
+PRIV_RESULT
 ```
 
-The worktree has no `_private/portfolio/`, so the check above loaded 0 identifiers. The changed files,
+The worktree has no `_private/portfolio/`, so the check above loads 0 identifiers. The changed files,
 including `_public/engine/ideas.html` with every idea title, were scanned from the primary checkout
-with its identifiers: 31 identifiers, 0 hits.
+with its identifiers: SCAN_RESULT.
 
 ## Acceptance
 
@@ -60,12 +50,10 @@ with its identifiers: 31 identifiers, 0 hits.
 ## Backlog
 
 `phase-des-10`: `status: active`, `session: doc-session-idea-funnel-and-ledger`. Its `next_action`
-names the awaited owner-approved merge and the `dev` test drift.
+names the awaited owner-approved merge.
 
 ## Unresolved
 
-- The three `dev`-side test failures above block a green four-check gate until `phase-dgov-06`'s
-  `ideas` field names `000523`.
 - `OPS-028`'s generated text still names R07-R14 (see Decisions).
 
 ## Review
@@ -118,9 +106,16 @@ claim turn (claim commit `8bd31ea`). The work was built on `agent/phase-des-10`.
 test, the no-recorded-plan count and the cross-links. The R07-R13 checks now cover every page instead
 of only the overview.
 
-At the source commit the page shows 523 ideas, 0 classified and 523 unclassified. The funnel reads
-open 0, triaged 493, reviewing 10, promoted 13, discarded 7, delivered 0, resolved 0, absorbed 0,
-set_aside 0. 385 rows read "no recorded plan" and 138 read "trace page not yet generated".
+After the rebase onto `27baa84` the page shows 523 ideas, 0 classified and 523 unclassified. The
+funnel reads open 0, triaged 493, reviewing 10, promoted 13, discarded 7, delivered 0, resolved 0,
+absorbed 0, set_aside 0. 384 rows read "no recorded plan" and 139 read "trace page not yet
+generated". The review saw 385 and 138, on `8340c90`. The difference is `000523`, which the
+`dev` fix linked to `phase-dgov-06`.
+
+The first build ran on `dev` `8340c90`, where three tests failed without this branch:
+`phase-dgov-06`'s completion named `000523` in its `next_action` but not in its `ideas` field, and the
+stage 3 and G2 recounts read 373 against 372. This was reported to the Session Manager. The owner
+had the Batch Runner backfill the id on `dev` (`27baa84`), and this branch was rebased onto it.
 
 Owner rulings in this session, 2026-10-01, given through AskUserQuestion:
 
@@ -140,6 +135,11 @@ Agent's own choices:
   so it does not share the generator's route.
 
 ## Corrections
+
+- While `dev` was red, this phase's own `next_action` named idea `000523`, to explain the
+  failure. On green `dev` that made `test_repository_idea_field_matches_its_backfill` fail for
+  `phase-des-10`, because a backfill re-run would add the id to this phase's `ideas` field. The
+  sentence was obsolete, so it was removed rather than the field changed.
 
 - Widening the generator docstring's requirement range to R07-R16 made `OPS-028`, which is generated
   from that docstring, stale, and failed `test_every_paired_document_matches_regenerated_output`.
