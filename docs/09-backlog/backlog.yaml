@@ -15000,7 +15000,8 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-b
   priority: 1
   session_budget: 1
   depends_on: []
@@ -15028,7 +15029,7 @@ items:
   deliverables:
   - tools/run_review_checks.py
   - test/test_run_review_checks.py
-  - docs/08-governance/
+  - docs/08-governance/OPS-029-run-review-checks.md
   next_action: Reuse the detached-worktree pattern of GOV-017 merge-gate step 2. Never run pytest in the
     primary checkout; the runner's own worktree is where the phase's commands run.
 - id: phase-asr-03

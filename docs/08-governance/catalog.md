@@ -486,7 +486,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
 | PLAN-045 | doc-deterministic-guards | approved | 2 | 0 | 2 | agent-builder-a, agent-builder-b |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
-| PLAN-047 | doc-reviewer-contract | approved | 5 | 0 | 0 | — |
+| PLAN-047 | doc-reviewer-contract | approved | 4 | 1 | 0 | agent-builder-b |
 | PLAN-048 | doc-idea-realization-plugin | approved | 0 | 0 | 9 | agent-builder-a, agent-builder-b, agent-standby-builder |
 | PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 0 | 0 | 1 | agent-builder-b |
 | PLAN-048.02 | doc-idea-realization-plugin-idea-system | approved | 0 | 0 | 1 | agent-standby-builder |
@@ -515,6 +515,7 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
+| OPS-029 | reserved | Operations document for tools/run_review_checks.py; deliverable of phase-asr-02. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
 414 documents — adr: 23, architecture: 12, governance: 19, operation: 24, plan: 81, prompt: 43, requirement: 35, session: 177.
