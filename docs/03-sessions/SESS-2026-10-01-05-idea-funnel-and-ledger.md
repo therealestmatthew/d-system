@@ -25,16 +25,16 @@ Run in the worktree on `dev` `27baa84`, which carries the fix backfilling `00052
 
 ```text
 $ uv run pytest
-PYTEST_RESULT
+1277 passed, 1 warning
 $ uv run python -m src.governance
-GOV_RESULT
+Governance OK: 43 systems, 416 documents, 34 memories, 347 backlog phases
 $ uv run python tools/check_no_private_content.py
-PRIV_RESULT
+check_no_private_content: OK (1120 tracked files, 0 identifiers checked)
 ```
 
 The worktree has no `_private/portfolio/`, so the check above loads 0 identifiers. The changed files,
 including `_public/engine/ideas.html` with every idea title, were scanned from the primary checkout
-with its identifiers: SCAN_RESULT.
+with its identifiers: 31 identifiers over 7 changed files, 0 hits.
 
 ## Acceptance
 
