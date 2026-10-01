@@ -29,7 +29,7 @@ depends_on: [doc-html-generation-design-system, doc-engine-pages-house-style-req
 `uv run python -m src.governance`
 
 ```
-Governance OK: 43 systems, 409 documents, 34 memories, 347 backlog phases
+Governance OK: 43 systems, 410 documents, 34 memories, 347 backlog phases
 ```
 
 `uv run ruff check src/ test/`
