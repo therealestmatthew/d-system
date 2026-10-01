@@ -1,9 +1,8 @@
 schema_version: 1
-updated: '2026-09-30'
+updated: '2026-10-01'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
-- phase-des-07
 - phase-des-08
 - phase-dam-01
 - phase-grd-03
@@ -12674,7 +12673,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 1
   session_budget: 1
@@ -12716,8 +12715,25 @@ items:
   - docs/08-governance/OPS-027-generate-house-css.md
   - docs/08-governance/codes.yaml
   - test/test_house_css.py
-  next_action: Built and verified on agent/phase-des-07 (SESS-2026-09-30-05); all four acceptance conditions
-    met. Waiting on the owner's merge approval, then the completion edit on dev.
+  next_action: Complete. phase-des-09 builds the engine page generator on this family.
+  session: doc-session-house-style-tokens
+  completion_evidence:
+  - templates/styles/house-tokens.json
+  - templates/styles/house.css
+  - templates/styles/house-components.css
+  - templates/html/house-page.html
+  - templates/html/house-components.html
+  - templates/README.md
+  - tools/generate_house_css.py
+  - docs/08-governance/OPS-027-generate-house-css.md
+  - test/test_house_css.py
+  - docs/03-sessions/SESS-2026-09-30-05-house-style-tokens.md
+  result: 'Complete: REQ-036 R01-R06 met. Tokens extracted from the approved round-two gallery (artifact version
+    1790623455-daec, sha256-checked); house.css regenerates byte-identically; variants set no colour and dark
+    sets only colour. Post-rebase gate on 458ab36: governance OK (411 documents), 1217 passed, ruff and mypy
+    clean. Browser validator 7/7: 0px layout difference light vs dark in all three variants, readable with
+    Google Fonts blocked (documentFontsSize 0), no script, no horizontal scroll at 375px. Session-close review
+    (demo-adversary): 0 blocker, 1 major, 2 minor, all fixed; R01-R06 Met.'
 - id: phase-des-08
   title: Give backlog phases a structured idea field and backfill it
   plan: doc-html-generation-design-system
