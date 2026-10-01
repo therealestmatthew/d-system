@@ -170,6 +170,67 @@ def test_the_list_is_read_from_dev_not_from_the_commit(tmp_path: Path) -> None:
     assert manifest["backlog"].startswith("dev ")
 
 
+def test_a_failed_worktree_add_leaves_no_evidence_and_keeps_the_previous_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = _make_repo(tmp_path)
+    code, manifest = _run(repo, tmp_path, "phase-fix-01")
+    evidence = (repo / manifest["entries"][0]["file"]).parent
+    before = sorted(p.name for p in evidence.iterdir())
+
+    occupied = tmp_path / "occupied"
+    occupied.mkdir()
+    # git worktree add refuses a path that is not empty
+    (occupied / "stale").write_text("x", encoding="utf-8")
+    monkeypatch.setattr(rrc.tempfile, "mkdtemp", lambda **kwargs: str(occupied))
+    with pytest.raises(rrc.Refused, match="git worktree add failed"):
+        _run(repo, tmp_path, "phase-fix-01")
+
+    assert sorted(p.name for p in evidence.iterdir()) == before
+    assert _worktrees(repo) == [f"worktree {repo}"]
+
+
+def test_an_unwritable_worktree_parent_is_refused(tmp_path: Path) -> None:
+    repo = _make_repo(tmp_path)
+    blocked = tmp_path / "blocked"
+    blocked.mkdir()
+    blocked.chmod(0o500)
+    try:
+        with pytest.raises(rrc.Refused, match="could not create a worktree directory"):
+            rrc.run("phase-fix-01", "dev", repo=repo, gate_checks=GATES, setup=(),
+                    worktree_parent=blocked / "worktrees")
+    finally:
+        blocked.chmod(0o700)
+    assert not (repo / "_working").exists()
+
+
+def test_an_unreadable_dev_backlog_is_refused(tmp_path: Path) -> None:
+    repo = _make_repo(tmp_path)
+    backlog = repo / "docs" / "09-backlog" / "backlog.yaml"
+    backlog.write_text("items: [unclosed\n", encoding="utf-8")
+    _git(repo, "commit", "-q", "-am", "break the backlog")
+
+    with pytest.raises(rrc.Refused, match="not valid YAML"):
+        _run(repo, tmp_path, "phase-fix-01")
+
+
+def test_an_os_error_partway_exits_2_and_still_removes_the_worktree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = _make_repo(tmp_path)
+
+    def disk_full(*args: Any, **kwargs: Any) -> Any:
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(rrc, "execute", disk_full)
+    monkeypatch.setattr(rrc, "default_worktree_parent", lambda repo: tmp_path / "worktrees")
+    monkeypatch.setattr(rrc.run, "__kwdefaults__",
+                        {**rrc.run.__kwdefaults__, "repo": repo, "setup": (), "gate_checks": GATES})
+
+    assert rrc.main(["phase-fix-01", "dev"]) == 2
+    assert _worktrees(repo) == [f"worktree {repo}"]
+
+
 @pytest.mark.parametrize("phase", ["phase-fix-01", "phase-fix-02", "phase-fix-04"])
 def test_no_worktree_is_left_behind(tmp_path: Path, phase: str) -> None:
     repo = _make_repo(tmp_path)

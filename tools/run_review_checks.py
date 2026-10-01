@@ -26,8 +26,9 @@ sha256) is printed and written there as `manifest.json`. The worktree is removed
 whether the commands passed, failed or the run was interrupted.
 
 Exit codes: 0 when every command that ran exited 0; 1 when any command failed or timed out; 2 when
-the run is refused (unknown phase id, unresolvable commit, an extra argument, or no `dev` backlog)
-or the worktree could not be created.
+the run is refused (unknown phase id, unresolvable commit, an extra argument, no readable `dev`
+backlog, or the worktree could not be created) or an operating-system error stopped it partway.
+A refused run leaves the previous evidence for that phase and commit untouched.
 
 See REQ-030 R02 and PLAN-047 D2 (docs/01-plans/PLAN-047-reviewer-contract.md), phase-asr-02.
 """
@@ -112,7 +113,11 @@ def load_phase(repo: Path, phase_id: str) -> tuple[dict[str, Any], str]:
     shown = _git(repo, "show", f"{BACKLOG_REF}:{BACKLOG}")
     if shown.returncode != 0:
         raise Refused(f"{BACKLOG_REF} has no {BACKLOG}")
-    items = (yaml.safe_load(shown.stdout) or {}).get("items") or []
+    try:
+        backlog = yaml.safe_load(shown.stdout) or {}
+    except yaml.YAMLError as exc:
+        raise Refused(f"{BACKLOG_REF}'s {BACKLOG} is not valid YAML: {exc}") from exc
+    items = (backlog.get("items") or []) if isinstance(backlog, dict) else []
     for item in items:
         if isinstance(item, dict) and item.get("id") == phase_id:
             return item, ref.stdout.strip()
@@ -182,8 +187,11 @@ def default_worktree_parent(repo: Path) -> Path:
 
 
 def add_worktree(repo: Path, sha: str, parent: Path, phase_id: str) -> Path:
-    parent.mkdir(parents=True, exist_ok=True)
-    path = Path(tempfile.mkdtemp(prefix=f"review-{phase_id}-{sha[:12]}-", dir=parent))
+    try:
+        parent.mkdir(parents=True, exist_ok=True)
+        path = Path(tempfile.mkdtemp(prefix=f"review-{phase_id}-{sha[:12]}-", dir=parent))
+    except OSError as exc:
+        raise Refused(f"could not create a worktree directory under {parent}: {exc}") from exc
     result = _git(repo, "worktree", "add", "--detach", str(path), sha)
     if result.returncode != 0:
         shutil.rmtree(path, ignore_errors=True)
@@ -212,13 +220,13 @@ def run(
     sha = resolve_commit(repo, commit)
     entries = plan(phase.get("verification") or [], gate_checks, setup)
 
-    evidence = repo / EVIDENCE_DIR / phase_id / sha[:12]
-    shutil.rmtree(evidence, ignore_errors=True)
-    evidence.mkdir(parents=True)
-
     parent = worktree_parent or default_worktree_parent(repo)
     worktree = add_worktree(repo, sha, parent, phase_id)
+    # The previous run's evidence is replaced only once this run is certain to start.
+    evidence = repo / EVIDENCE_DIR / phase_id / sha[:12]
     try:
+        shutil.rmtree(evidence, ignore_errors=True)
+        evidence.mkdir(parents=True)
         for number, entry in enumerate(entries, start=1):
             if entry.note is not None:
                 continue
@@ -275,6 +283,10 @@ def main(argv: list[str] | None = None) -> int:
         code, manifest = run(args.phase_id, args.commit)
     except Refused as exc:
         print(f"refused: {exc}", file=sys.stderr)
+        return 2
+    except OSError as exc:
+        # The worktree is already removed by run()'s cleanup; no manifest was written.
+        print(f"stopped: {exc}", file=sys.stderr)
         return 2
     print(render(manifest))
     return code

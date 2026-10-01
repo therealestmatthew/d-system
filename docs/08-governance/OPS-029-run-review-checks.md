@@ -74,7 +74,7 @@ directory.
 |---|---|
 | 0 | Every command that ran exited 0. Prose entries were listed, not run |
 | 1 | At least one command exited non-zero or timed out; the manifest names it |
-| 2 | Refused before anything ran: an unknown phase id, a commit that does not resolve, an extra argument, no `dev` backlog, or `git worktree add` failed |
+| 2 | Refused before anything ran: an unknown phase id, a commit that does not resolve, an extra argument, no readable `dev` backlog, or the worktree could not be created. Also an operating-system error that stopped a run partway; the worktree is still removed and no manifest is written |
 
 Exit 0 is not a review verdict. It says the declared commands passed at that commit. Whether the
 acceptance conditions hold, including every prose entry, is the reviewer's judgement.
@@ -89,7 +89,11 @@ acceptance conditions hold, including every prose entry, is the reviewer's judge
   entry is listed as not run. Wrap it (`bash -c '…'`, `sh -c '…'`) in the backlog entry if it is
   meant to run.
 - **Exit 2, `git worktree add failed`.** Usually a stale worktree registration. Run
-  `git worktree prune` and retry. Nothing ran and nothing was left behind.
+  `git worktree prune` and retry. Nothing ran and nothing was left behind; the previous evidence
+  for that phase and commit is untouched, because it is replaced only once a run starts.
+- **Exit 2, `stopped: …`.** An operating-system error, such as a full disk, interrupted the run
+  after it started. The worktree was removed. The evidence directory holds the files written
+  before the error and no `manifest.json`, so treat it as incomplete and run again.
 - **`uv sync` failed** (setup entry non-zero). The commands after it ran without the environment
   and their failures follow from it. Read `01-setup.txt` first.
 - **The run was killed from outside** (the terminal closed, `kill -9`). The `finally` cleanup did
@@ -127,8 +131,9 @@ sha256) is printed and written there as `manifest.json`. The worktree is removed
 whether the commands passed, failed or the run was interrupted.
 
 Exit codes: 0 when every command that ran exited 0; 1 when any command failed or timed out; 2 when
-the run is refused (unknown phase id, unresolvable commit, an extra argument, or no `dev` backlog)
-or the worktree could not be created.
+the run is refused (unknown phase id, unresolvable commit, an extra argument, no readable `dev`
+backlog, or the worktree could not be created) or an operating-system error stopped it partway.
+A refused run leaves the previous evidence for that phase and commit untouched.
 
 See REQ-030 R02 and PLAN-047 D2 (docs/01-plans/PLAN-047-reviewer-contract.md), phase-asr-02.
 
