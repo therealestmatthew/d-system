@@ -13024,7 +13024,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 1
   session_budget: 1
@@ -13059,8 +13059,20 @@ items:
   - docs/08-governance/OPS-028-generate-engine-pages.md
   - docs/08-governance/codes.yaml
   - test/test_engine_pages.py
-  next_action: Built and verified on agent/phase-des-09 (SESS-2026-10-01-02). Waiting on the owner's merge
-    approval, then the completion edit on dev.
+  next_action: Complete. phase-des-10 and phase-des-12 add their pages to the same generator.
+  session: doc-session-engine-page-generator
+  completion_evidence:
+  - tools/generate_engine_pages.py
+  - _public/engine/index.html
+  - docs/08-governance/OPS-028-generate-engine-pages.md
+  - test/test_engine_pages.py
+  - docs/03-sessions/SESS-2026-10-01-02-engine-page-generator.md
+  result: 'Complete: REQ-036 R07-R14 met. Pipeline overview at _public/engine/index.html, stamped b45c7c31c9ed:
+    stages 522/2/371/38/not recorded/not recorded/195/1/0; G1 522, G2 371, G3 38, G4+G5 1. Gate on 166a7e2:
+    governance OK (414 documents), 1246 passed, ruff and mypy clean; Session Manager ran the private-content
+    check with identifiers (31 ids, 0 violations). Two runs byte-identical; same content with JS off; no
+    horizontal scroll at 1280 or 375. Session-close review (demo-adversary): 2 major fixed (stage 4 = G3 stated;
+    independent G2 recount via phase text), 2 minor accepted.'
 - id: phase-des-10
   title: Build the idea funnel and ledger page
   plan: doc-html-generation-design-system
