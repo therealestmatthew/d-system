@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-23'
+updated: '2026-09-30'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -745,3 +745,35 @@ restates step 9.
 
 **Why recorded here:** the first changes what a branch must pass before it may integrate. An agent
 reading only `AGENTS.md` step 6 would send `READY` with `governance` and `pytest` alone.
+
+## Next-wave phase fixes: sch-03, ret-08 and lrr-03 — 2026-09-30
+
+The queued-phase reviews of 2026-09-29 (PROMPT-035 pass 1, kept under
+`_working/session-manager/reviews/`) rated `phase-sch-03`, `phase-ret-08` and `phase-lrr-03`
+ready-with-fixes. The owner approved applying the fixes and answered the choices the reviews left
+open. Those answers are recorded here, because each phase line carries the ruling but not the
+alternatives it was chosen over.
+
+**`phase-sch-03`, frontend lint and test gate.** `ts/package.json` already had
+`"lint": "tsc --noEmit"`, a type-check. `lint` now means eslint, the type-check moves to a
+`typecheck` script, and CI runs `lint` and `test` after the build, which already type-checks through
+`tsc -b`. A combined `lint` and a separate eslint script name were declined. On the first lint run,
+the phase uses a standard default ruleset and fixes what it flags. Choosing a ruleset the current tree
+already passes was declined, because that hides the trade-off the gate exists to show.
+
+**`phase-ret-08`, code-graph tool evaluation.** The tool is LadybugDB, the maintained fork of the
+archived KuzuDB; ArcadeDB (bundles a JVM) and leaving the choice open were declined. The phase tries
+to install and run it. If the permission classifier blocks the run, the phase records the attempt
+and writes a dry run from the tool's documentation, and R11 is recorded as not met rather than
+claimed. Splitting the phase in two and stopping mid-session for the owner were declined. R11 has no
+command that observes it. The phase says so plainly and names the write-up a reader checks, instead
+of adding a grep that would check only section headings.
+
+**`phase-lrr-03`, browsable literature-review tables.** The table JavaScript is inlined by
+`tools/lit_report_render.py` through a new `{{INLINE_SCRIPT}}` token in the page shell, parallel to
+`{{INLINE_STYLES}}`. A `<script>` block carried by the table template was declined. The 500ms filter
+bound is measured by the `demo-validator-web` agent with a `performance.now()` span around the filter
+handler, and the measured value and machine are recorded.
+
+**Why recorded here:** an agent reaching any of these three phases sees the ruling in its scope but
+not that an alternative was weighed and declined, and would otherwise reopen the question.

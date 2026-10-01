@@ -7177,6 +7177,12 @@ items:
     ledger's 1.6MB is paid only when the ledger is opened and no fetch is needed at all.
   - If the 1200-row ledger misses REQ-027 R10's 500ms filter bound, virtualise rows. Do not
     introduce a fetch.
+  - Replace _csv_placeholder() in tools/lit_report_render.py, the seam phase-lrr-02 left for this
+    phase, with the table body.
+  - 'Emit the sort, filter and column-visibility JavaScript inline (owner ruling, 2026-09-30): add an
+    {{INLINE_SCRIPT}} token to templates/html/lit-report-page.html, filled by tools/lit_report_render.py
+    from a script file under templates/, parallel to {{INLINE_STYLES}}, and left empty on deliverable
+    pages. No CDN and no fetch (REQ-027 R08).'
   acceptance:
   - Sorting a named column ascending then descending changes row order and leaves row count
     unchanged, on all three tables.
@@ -7188,11 +7194,19 @@ items:
   verification:
   - uv run python -m src.governance
   - uv run pytest
-  - Browser-driven verification of sort, filter, column visibility and the filter timing, with
-    real measured output recorded
+  - 'Browser-driven by the demo-validator-web agent (Playwright MCP): sort, filter and column visibility
+    on all three tables, and the ledger filter timing read from a performance.now() span around the
+    filter handler, with the measured value and the machine recorded (owner ruling, 2026-09-30).'
   deliverables:
   - templates/html/lit-report-table.html
-  next_action: Blocked on phase-lrr-02's template family.
+  - templates/html/lit-report-page.html
+  - templates/scripts/lit-report-table.js
+  - templates/styles/lit-report.css
+  - tools/lit_report_render.py
+  - test/test_lit_report_render.py
+  - docs/08-governance/OPS-019-lit-report-render.md
+  next_action: Unblocked. phase-lrr-02 is complete, and _csv_placeholder() in tools/lit_report_render.py
+    is the seam this phase replaces.
 
 - id: phase-lrr-04
   title: Cross-links, epistemic framing, generator assembly and the drift test
@@ -11924,18 +11938,30 @@ items:
     imports - and record what it answered.
   - 'Start from a successor rather than the tool 000005 names. The owner''s ruling of 2026-09-13 kept
     the idea and rescoped it: tool dead, KuzuDB archived, question alive.'
+  - 'The tool is LadybugDB (owner ruling, 2026-09-30): the maintained MIT-licensed fork of KuzuDB,
+    embedded, queried in Cypher. The successor survey already exists in
+    docs/00-working/gemini-knowledge-retrieval-graphdb-options.md, which also covers FalkorDBLite and
+    ArcadeDB. Cite it rather than repeating it; confirm only that LadybugDB is still maintained.'
+  - 'Install and run LadybugDB in the worktree. If installing or running it is blocked (the permission
+    classifier has denied running third-party code before), record the attempt and the exact denial,
+    then write a dry run from the tool''s own documentation and examples (owner ruling, 2026-09-30).'
   - 'Keep the corpus distinct from phase-ret-06''s: this is code structure, that is documentation.'
   acceptance:
-  - 'REQ-018 R11 holds: the tool ran over this repository''s code and what it answered is recorded.'
+  - 'REQ-018 R11 holds: the tool ran over this repository''s code and what it answered is recorded. If
+    the run was blocked, the write-up records the attempt and the denial and states plainly that R11 is
+    not met; a dry run does not satisfy R11.'
+  - The write-up records the tool's version, the commands run and their real output.
   - The evaluation names questions it answered that grep and the deterministic design could not, or states
     plainly that it found none.
   - The corpus is code, not documentation, which is what distinguishes this from the G28 surveys.
   verification:
   - uv run python -m src.governance
+  - 'No command observes R11. It is checked by reading docs/00-working/code-graph-retrieval-evaluation.md,
+    which must record the tool, its version, the commands run and their output.'
   deliverables:
-  - docs/00-working/
-  next_action: Confirm the successor tool exists and is maintained before planning around it. 000005's
-    named tool is archived and the ruling that kept the idea says any evaluation starts from a successor.
+  - docs/00-working/code-graph-retrieval-evaluation.md
+  next_action: Successor research exists at docs/00-working/gemini-knowledge-retrieval-graphdb-options.md
+    and names LadybugDB. Confirm LadybugDB is still maintained, then install and run it.
 - id: phase-ret-09
   title: Detect memory staleness and contradiction, and track confidence
   plan: doc-retrieval-knowledge-infrastructure
@@ -12251,21 +12277,32 @@ items:
   scope:
   - Add an eslint configuration under ts/ and a test runner in ts/package.json, and wire both into .github/workflows/ci.yaml's
     frontend job, which today runs npm ci and npm run build and nothing else.
+  - 'Script names (owner ruling, 2026-09-30): "lint" becomes eslint; the existing "lint": "tsc --noEmit"
+    is renamed "typecheck"; the test runner is "test". The frontend job runs npm run lint and npm test
+    after npm run build, which already type-checks through tsc -b.'
+  - No test file exists under ts/ today. Add the first one, so R07 has a suite that can fail.
+  - 'Lint baseline (owner ruling, 2026-09-30): use a standard default eslint ruleset and fix the
+    violations it flags in the existing tree in this phase, recording how many were found and fixed.
+    Do not choose or trim a ruleset so that today''s tree passes.'
   - Fail the build on a lint error and on a failing test.
   - Keep the runner configured in package.json rather than invoked ad hoc in the workflow.
   acceptance:
   - 'REQ-020 R06 holds: a lint violation fails CI and is named; a clean tree passes.'
   - 'REQ-020 R07 holds: a deliberately failing frontend test fails CI.'
   - The existing build step still runs and still passes.
+  - 'The session record shows a local self-check: an introduced lint violation and a deliberately failing
+    test each exit non-zero, and both are reverted.'
   verification:
   - cd ts && npm run build
+  - cd ts && npm run lint
+  - cd ts && npm test
   - uv run python -m src.governance
   deliverables:
   - .github/workflows/ci.yaml
   - ts/package.json
   - ts/
-  next_action: 'Confirmed open: ci.yaml lines 40-41 are npm ci and npm run build with nothing after them.
-    This touches ts/, so it cannot run while a demo is live.'
+  next_action: 'Confirmed open on dev be4ab36: ci.yaml''s frontend job (lines 45-46) runs npm ci and npm
+    run build with nothing after them. This touches ts/, so it cannot run while a demo is live.'
 - id: phase-sch-04
   title: Write the per-layer testing standard
   plan: doc-schema-consistency-testing
