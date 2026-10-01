@@ -1,0 +1,49 @@
+<!--
+  House family — canonical component markup.
+
+  Not a page: a reference sheet of the family's building blocks, one block per component, copied
+  into a house-page.html's {{BODY}} and filled in. The class names are the contract with
+  templates/styles/house-components.css. tools/generate_house_css.py --specimen renders this
+  sheet inside the page skeleton, which is the reference rendering of every block below.
+
+  Colour roles, the same in every variant and mode:
+    accent        = the page's one emphasis colour: kicker, gate badges, callout rule, links
+    accent-2      = a second series colour for charts
+    ok/warn/info/err = status, always as a pill (text colour on its pale fill)
+  Numbers in a stat row or table are computed by the generator, never typed by hand.
+-->
+
+<!-- ==== STAT ROW: four headline numbers ==== -->
+<div class="stats">
+  <div><span class="lab">Ideas logged</span><span class="v acc">521</span><span class="d">append-only</span></div>
+  <div><span class="lab">Triaged</span><span class="v">490</span><span class="d">a finding on each</span></div>
+  <div><span class="lab">Phases complete</span><span class="v">129</span><span class="d">of 347</span></div>
+  <div><span class="lab">Owner gates</span><span class="v">5</span><span class="d">G1 to G5</span></div>
+</div>
+
+<!-- ==== COLUMNS: three short blocks under a rule ==== -->
+<div class="cols">
+  <div><span class="lab">Stages 1–3</span><h3>Capture and triage</h3><p>One or two sentences per column.</p></div>
+  <div><span class="lab">Stages 4–7</span><h3>Plan and review</h3><p>One or two sentences per column.</p></div>
+  <div><span class="lab">Stages 8–9</span><h3>Build and verify</h3><p>One or two sentences per column.</p></div>
+</div>
+
+<!-- ==== CALLOUT: one ruling or note, with its source as the label ==== -->
+<div class="callout">
+  <span class="lab">Owner ruling, 2026-09-30</span>
+  <p>The statement the callout exists to make, with <code>codes</code> in mono.</p>
+</div>
+
+<!-- ==== PILLS: status, one per cell or inline; GATE: an owner gate named inline ==== -->
+<p><span class="pill ok">complete</span> <span class="pill info">ready</span> <span class="pill warn">waiting</span> <span class="pill err">blocked</span> <span class="gate">G3</span></p>
+
+<!-- ==== TABLE: wrap in .tbl-wrap so it scrolls inside itself on narrow screens ==== -->
+<div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Phase</th><th>Title</th><th>State</th><th class="num">Depends on</th></tr></thead>
+    <tbody>
+      <tr><td class="id">phase-des-07</td><td>Commit the house-style tokens</td><td><span class="pill info">ready</span></td><td class="num">0</td></tr>
+      <tr><td class="id">phase-des-09</td><td>Build the engine page generator</td><td><span class="pill warn">waiting</span></td><td class="num">1</td></tr>
+    </tbody>
+  </table>
+</div>

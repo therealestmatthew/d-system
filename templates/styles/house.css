@@ -1,0 +1,132 @@
+/*
+  House family — token stylesheet. GENERATED: do not edit by hand.
+
+  Source: templates/styles/house-tokens.json, regenerated with
+  `uv run python tools/generate_house_css.py`. Edit the tokens file and regenerate;
+  tests fail when this file and the tokens disagree (REQ-036 R01).
+
+  Provenance: House style round-two gallery, approved by the owner as shown on 2026-09-30 (REQ-036, PLAN-036 amendment)
+  https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi (artifact version 1790623455-daec).
+
+  Usage: inline this file, then templates/styles/house-components.css, into
+  templates/html/house-page.html's {{INLINE_STYLES}}. Select a variant with
+  data-variant="swiss" or data-variant="mono" on <html>, and force a mode with
+  data-theme="light" or data-theme="dark"; without data-theme the page follows
+  prefers-color-scheme. Fonts load from Google Fonts; every font token ends in a
+  system stack, so a page whose font request fails still renders.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap");
+
+:root {
+  --sys-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sys-serif: Georgia, "Times New Roman", serif;
+  --sys-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --display: "Bricolage Grotesque", var(--sys-sans);
+  --body: "Literata", var(--sys-serif);
+  --label: "Bricolage Grotesque", var(--sys-sans);
+  --mono: "JetBrains Mono", var(--sys-mono);
+  --fs: 17px;
+  --lh: 1.62;
+  --h1: 3.4;
+  --h2: 1.6;
+  --htrack: -.04em;
+  --hw: 800;
+  --pad: 22px;
+  --gap: 24px;
+  --rule: 1px;
+  --label-track: .1em;
+  --cell: 10px 14px;
+  --radius-pill: 999px;
+  --bg: #ffffff;
+  --surface: #f6f1ea;
+  --line: #ddd6cd;
+  --strong: #1a1a1a;
+  --text: #141414;
+  --muted: #5a5a5a;
+  --accent: #c8205f;
+  --on-accent: #ffffff;
+  --accent-2: #0f7b6c;
+  --ok: #17693a;
+  --ok-bg: #e3f4e8;
+  --warn: #8a5a00;
+  --warn-bg: #fdf1d4;
+  --info: #1d5fa8;
+  --info-bg: #e4eefb;
+  --err: #b3162f;
+  --err-bg: #fbe5e8;
+  --soft: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121015;
+    --surface: #1d1a22;
+    --line: #39333f;
+    --strong: #e9e4ee;
+    --text: #f1edf4;
+    --muted: #aaa3b3;
+    --accent: #ff5c9a;
+    --on-accent: #121015;
+    --accent-2: #3cc9b4;
+    --ok: #5fd68d;
+    --ok-bg: #16291e;
+    --warn: #f0b74a;
+    --warn-bg: #2d2412;
+    --info: #7fb2f0;
+    --info-bg: #172335;
+    --err: #ff7a8c;
+    --err-bg: #341820;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121015;
+  --surface: #1d1a22;
+  --line: #39333f;
+  --strong: #e9e4ee;
+  --text: #f1edf4;
+  --muted: #aaa3b3;
+  --accent: #ff5c9a;
+  --on-accent: #121015;
+  --accent-2: #3cc9b4;
+  --ok: #5fd68d;
+  --ok-bg: #16291e;
+  --warn: #f0b74a;
+  --warn-bg: #2d2412;
+  --info: #7fb2f0;
+  --info-bg: #172335;
+  --err: #ff7a8c;
+  --err-bg: #341820;
+  color-scheme: dark;
+}
+
+:root[data-variant="swiss"] {
+  --body: "Archivo", var(--sys-sans);
+  --label: "Archivo", var(--sys-sans);
+  --fs: 15.5px;
+  --lh: 1.55;
+  --h1: 3.1;
+  --h2: 1.5;
+  --pad: 18px;
+  --gap: 20px;
+  --rule: 2px;
+  --label-track: .16em;
+  --cell: 9px 12px;
+}
+
+:root[data-variant="mono"] {
+  --body: "JetBrains Mono", var(--sys-mono);
+  --label: "JetBrains Mono", var(--sys-mono);
+  --fs: 14px;
+  --lh: 1.62;
+  --h1: 2.5;
+  --h2: 1.35;
+  --htrack: -.03em;
+  --pad: 16px;
+  --gap: 18px;
+  --label-track: .06em;
+  --cell: 8px 12px;
+}

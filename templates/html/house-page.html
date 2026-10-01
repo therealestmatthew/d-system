@@ -1,0 +1,52 @@
+<!--
+  House family — page skeleton for generated pages and documents.
+
+  A generator fills every {{TOKEN}} with plain string substitution; no templating dependency is
+  assumed. tools/generate_house_css.py's fill() is strict in both directions: a token it is
+  given that the template lacks, or a token left unfilled, is an error. Its --specimen mode is
+  the reference rendering, and templates/html/house-components.html carries the canonical markup
+  for everything that goes inside {{BODY}}.
+
+  Token contract:
+    {{ROOT_ATTRS}}     - attributes for <html>, each with a leading space, or empty:
+                         data-variant="swiss" or data-variant="mono" selects a variant (omit it
+                         for the magazine house style); data-theme="light" or data-theme="dark"
+                         forces a mode (omit it to follow the viewer's prefers-color-scheme)
+    {{PAGE_TITLE}}     - plain text for <title>
+    {{INLINE_STYLES}}  - templates/styles/house.css followed by
+                         templates/styles/house-components.css, inlined, so the page is one file
+                         whose only external request is the Google Fonts stylesheet
+    {{KICKER}}         - short uppercase label above the heading: the page's family or source
+    {{HEADING}}        - the page's h1 text
+    {{LEDE}}           - one or two sentences under the heading
+    {{META}}           - one or more <span> items: source commit, date, counts
+    {{BODY}}           - house-components.html renders, in page order
+    {{FOOTER}}         - one line naming what generated the page and from which inputs
+
+  The page needs no script. Mode switching follows prefers-color-scheme in CSS alone.
+-->
+<!doctype html>
+<html lang="en"{{ROOT_ATTRS}}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}}</title>
+<style>
+{{INLINE_STYLES}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="section">
+    <div class="kicker">{{KICKER}}</div>
+    <h1>{{HEADING}}</h1>
+    <p class="lede">{{LEDE}}</p>
+    <div class="meta">{{META}}</div>
+  </header>
+  <hr class="rule">
+{{BODY}}
+  <hr class="rule">
+  <footer class="footer">{{FOOTER}}</footer>
+</main>
+</body>
+</html>
