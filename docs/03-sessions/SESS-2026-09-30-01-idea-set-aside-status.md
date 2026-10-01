@@ -84,3 +84,79 @@ READY to Session Manager, and the owner's merge approval. The phase stays active
 - The name `set_aside` is a placeholder until idea 000453 (disposition terminology) is ruled on.
 - Follow-ups already recorded by Ideation: 000516 (workbench precedence map and explorer status
   list) and 000517 (plugin writer parity).
+
+## Review
+
+Independent adversarial review by a `demo-adversary` sub-agent (fresh context, not a fork) over
+`dev...agent/phase-idg-19` with dev at `8d1bfcf`, given the phase's scope, acceptance, verification
+and deliverables. Its findings, condition by condition, as reported:
+
+- **Acceptance 1** (set_aside legal from triaged only, non-terminal, returns to triaged or
+  reviewing, writer rejects it elsewhere): **Met.** `legal_transitions()` has exactly three edges
+  touching `set_aside`: triaged→set_aside, set_aside→triaged, set_aside→reviewing.
+  `change_status` enforces transitions only through that schema-derived table. The new tests in
+  `test/test_ideas.py` assert `IdeaError` and an unchanged log, so they do not pass trivially.
+- **Acceptance 2** (hold-out field validates; the 2026-09-23 record still validates unchanged):
+  **Met.** The reviewer validated `docs/00-working/idea-partition-2026-09-23.json` against the new
+  schema with `jsonschema` itself: valid. The same record with a synthetic `held_out` entry is also
+  valid. `held_out` reuses `reasoned_id`, the same shape as `unbatched`. The five malformed-entry
+  tests correctly fail validation.
+- **Verification:** `uv run pytest -q` → `1187 passed, 1 warning`; `uv run python -m src.governance`
+  → `Governance OK: 43 systems, 409 documents, 34 memories, 347 backlog phases`.
+- **Findings:** no blockers, no majors.
+  - Minor, pre-existing and out of scope: `ts/src/stage/IdeaExplorerRegion.tsx:23` hardcodes the
+    explorer's status-filter list, which already lacked the closing states and now also lacks
+    `set_aside`. Unfiltered, a `set_aside` idea still renders and counts. The only loss is filtering
+    to that status. The file is outside the deliverables, and the gap is tracked by idea 000516.
+  - Confirmed safe: the workbench queue precedence map falls back to a documented unknown-status
+    precedence rather than raising. `src/orchestrator/state.py` and `tools/overview_metrics.py` now
+    read the schema's status enum instead of a stale restated list, with tests. The three
+    partition-ideas copies match the generator (`16 workflow adapter(s) current`). GATE 3's
+    embedded check counts `held_out` ids as placed. No file changed outside the deliverables and
+    bookkeeping. The phase stays `active`.
+  - Noted, not a finding: the plugin's own schema and writer under `plugins/idea-realization/` lack
+    `held_out` and `set_aside`. The drift predates this phase and is tracked by idea 000517.
+- **Session-record claims:** no discrepancy found between the record and the diff or reruns.
+- **Worktree:** left clean, and the catalog shows no diff.
+- **Coverage gap the reviewer declared:** it read but did not execute the `tools/append_idea.py`
+  command line. I closed this after the review by running `main()` against a scratch log (the
+  module's `LOG` patched; the real `_data/ideas.jsonl` hash unchanged). `status set_aside` from
+  open: exit 1, "illegal transition … open -> set_aside". From triaged: exit 0. set_aside →
+  discarded: exit 1, "Legal from set_aside: reviewing, triaged". set_aside → triaged and
+  set_aside → reviewing: exit 0.
+
+Disposition: the one minor finding is accepted as out of scope, tracked by 000516. Nothing to fix.
+
+## Decisions
+
+- The status is reachable from triaged only. This is the builder's reading of "reachable from
+  triaged". The Session Manager accepted it and it is recorded in the phase scope. The owner has
+  not ruled on it.
+- `set_aside` is a placeholder name until idea 000453 (terminology for idea dispositions) is ruled
+  on. Renaming it later touches the schema enum, the transition branches and the tests.
+- The owner approved widening the deliverables with `tools/overview_metrics.py` and
+  `src/orchestrator/state.py`, because both raised on a status they did not list. Both now read the
+  schema's enum, which also fixes their silent omission of the closing states.
+- The owner narrowed the claim during the build. The `tools/append_idea.py` help text and the
+  `agent-workflows/idea.md` lifecycle edits were reverted, because their generated copies were
+  outside the claim. The follow-up went to Ideation as an IDEA message on 2026-09-30.
+- Agents cannot write under `.agents/`, so the owner ran `tools/generate_agent_workflows.py` in
+  the worktree through Owner Terminal. Its output is committed as `e47439f`.
+
+## Corrections
+
+None in this session's work. The worktree's pre-commit private-content check ran with 0
+identifiers because `_private/portfolio/` is absent there. It was re-run with the primary
+checkout's identifiers rather than trusted: 1100 files, 31 identifiers, 0 violations.
+
+## Left undone
+
+- **Completion.** The phase stays `active`. Under the Session Manager contract, completion happens
+  on dev after the owner approves the merge, with the catalog regenerated in the same commit.
+- **Consumers outside the claim** that do not yet know `set_aside`:
+  - the workbench queue precedence map and the explorer status list (000516);
+  - the idea-realization plugin's writer and schema (000517);
+  - the lifecycle text in `agent-workflows/idea.md` and `append_idea.py`'s help, with their
+    generated copies (sent to Ideation).
+  None of them raises on the new status. They omit it.
+- **The name.** It waits on 000453.
