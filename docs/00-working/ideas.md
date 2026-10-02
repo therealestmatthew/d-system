@@ -7899,7 +7899,7 @@ Relates to 000152 (a registry of active worktrees) and 000151 (the claim system'
 
 
 <details>
-<summary>4 finding(s)</summary>
+<summary>5 finding(s)</summary>
 
 - **finding** by agent-pack-factory (2026-09-13T07:27:13-04:00): THE RACE RECURRED WITHIN THE HOUR, and the second instance is worse than the first.
 
@@ -7925,6 +7925,7 @@ Third, the deferred decision: `PLAN-010-code-reservation-enforcement.md` address
 The practical standing: the yield-and-renumber procedure works and three instances were recovered via its steps. The silent-merge path — where the log takes both append-only additions cleanly and fold() produces one idea with two unrelated created events — remains undetected without a guard. An annotation written against a silently-merged id lands on whichever idea wins the fold, which is the misdirected-write failure that `phase-idea-10` defends against for a different cause (subagent confusion). A collision that produces a git conflict is the lucky case, not the normal one — detection depends on whether the two appends touch adjacent lines.
 
 No related plan, phase or backlog item found proposing a fix. `000158` is currently the sole ownership record for guarding the silent-merge path.
+- **finding** by agent-ideation (2026-10-02T16:28:57-04:00): Session Manager, from the D3 investigation, 2026-10-02, as given: "Concurrent idea appends on two branches do not fold silently under one id. Without a merge attribute (d-system sets none) they conflict in git. With merge=union they merge, but both branches allocate the same next id and the fold refuses the second 'created' event (src/db/ideas.py), which blocks every read of the log. Source: _working/session-manager/ire/D3-idea-log-integrity.md, D2 test 4."
 
 </details>
 
@@ -19839,6 +19840,7 @@ PROPOSED LINK: 000405 --relates_to--> 000198 (a mechanical check for the same st
 - relates_to → `000399`
 - relates_to → `000198`
 - relates_to ← `000406`
+- relates_to ← `000524`
 
 ---
 
@@ -19871,6 +19873,7 @@ Related: 000198, 000208 (fixed: --catalog now writes), 000351.
 
 - relates_to → `000385`
 - relates_to → `000405`
+- relates_to ← `000524`
 
 ---
 
@@ -23469,6 +23472,11 @@ Unresolved: option (a) vs (b), and whether ~26 s per commit is acceptable.
 
 </details>
 
+**Links**
+
+- relates_to → `000405`
+- relates_to → `000406`
+
 ---
 
 ## 000525 · Idea Realization Engine: the whole system
@@ -23483,9 +23491,10 @@ Overlaps as printed: 000436 (generalisable systems), 000314 (portable framework)
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-01T16:25:16-04:00): Owner decision, 2026-10-01 (verbatim in _working/session-manager/vision-ire-2026-10-01-raw.md, Addendum): The four parts of the Idea Realization Engine are Engine, Bridge, Brain and Library. Engine: agents, skills, multi-session orchestration and GitHub multi-repo control; every agent starts here. Bridge: the interface between the other three, the MCP server including the contracts and rules of knowledge interchange. Brain: the active knowledge store; knowledge routinely enters, exits, evolves and is pruned; tiers are treated differently (memories vs governance and protocols); global vs project scope decides which Brain aspects are available to all projects or only particular ones. Library: long-term storage and the component registry; checked out when needed; anything added is officially published and (relatively) permanent.
+- **finding** by agent-ideation (2026-10-02T16:28:58-04:00): Session Manager, step 1 rulings by the owner, 2026-10-01/02, as given: "S2: IRE planning, the d-system release export (000550) and the engine-pages run proceed in parallel. S1: IRE is planned from d-system's sessions and executed in the new repositories. Q1: IRE's planning documents live in a private planning repository. Q2: at the end it is imported into the Brain and archived. Q3: 'all plans under a single repo' (raw line 38) means the Brain, not the code repository. Q4: five planning levels with all four D16 changes. Q5: spikes allowed with an owner-approved brief; no idea-log spike. Q6: a level gate is recorded as a tag in the planning repository plus a pointer finding on 000525. Q7: the charter covers the several-user case, licence, non-goals, first-release scope and d-system's role. Q8: 000525-000549 skip the partition sweep. Q9: D16's dependency corrections with the five synthesis amendments. Q10: no interim idea-log repository. Q11: the merge-path wording in d-system is corrected separately. Source: artifact https://claude.ai/artifact/6NXq2BYHWm26EZZD1t3vZi (v4)."
 
 </details>
 
@@ -23901,6 +23910,16 @@ Overlaps as printed: 000159, 000160 · D17
 Track the idea log in its own repository for version control until the Brain's storage is settled; immutable events and the fold make append-only merges safe.
 
 Overlaps as printed: 000162, 000480 · D19
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-02T16:28:58-04:00): Session Manager, 2026-10-02, as given: "Owner ruled 2026-10-02: no interim idea-log repository. d-system's git already versions and pushes the log; it is imported into the Brain later. merge=union was shown not to work (two branches allocate the same next id; the fold refuses the second 'created')."
+
+</details>
 
 **Links**
 
