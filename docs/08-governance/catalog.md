@@ -426,6 +426,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-01-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-04-review-command-runner.md |
 | SESS-2026-10-01-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-05-idea-funnel-and-ledger.md |
 | SESS-2026-10-01-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-01-06-review-judge-agent.md |
+| SESS-2026-10-02-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-02-01-review-judge-agent-build.md |
 
 ## Plans and their phases
 
