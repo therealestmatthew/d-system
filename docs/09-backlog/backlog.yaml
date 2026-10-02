@@ -13093,7 +13093,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   session: doc-session-idea-funnel-and-ledger
   priority: 1
@@ -13119,9 +13119,21 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - test/test_engine_pages.py
-  next_action: 'Built and reviewed on agent/phase-des-10 (SESS-2026-10-01-05, all acceptance Met, no
-    blocking findings); awaiting the owner-approved merge, after which the completion edit is made on
-    dev.'
+  completion_evidence:
+  - tools/generate_engine_pages.py
+  - test/test_engine_pages.py
+  - _public/engine/ideas.html
+  - docs/03-sessions/SESS-2026-10-01-05-idea-funnel-and-ledger.md
+  result: 'Complete: the engine generator writes _public/engine/ideas.html, which lists every idea in
+    fold() once with its id, title, status, created date and four ARCH-005 axis values, shows the
+    per-status funnel from the full schema enum, each axis''s distribution with unclassified ideas
+    counted as unclassified, and a trace-link column that reads "no recorded plan" or "trace page not
+    yet generated" until phase-des-11 fills it. REQ-036 R15 and R16 are tested; R07 to R13 still hold.
+    demo-adversary review found all conditions Met, no blockers or majors, one minor and one note both
+    accepted (SESS-2026-10-01-05). After the rebase onto dev 56581d8: 1303 tests passed, governance,
+    ruff and mypy clean, private-content check 31 identifiers 0 hits. Merged by fast-forward to cbd4765
+    with the owner''s approval.'
+  next_action: Complete. The per-idea trace pages that fill the trace-link column are phase-des-11.
 - id: phase-des-11
   title: Build the per-idea trace pages
   plan: doc-html-generation-design-system
