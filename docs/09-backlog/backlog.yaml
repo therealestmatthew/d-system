@@ -15015,8 +15015,8 @@ items:
   - .claude/agents/review-judge.md
   - test/test_agent_tools.py
   next_action: Both deliverables written and verified (SESS-2026-10-02-01, branch agent/phase-asr-01);
-    awaiting the independent review, then READY to the Session Manager. The owner ruled on 2026-10-01 that there
-    is no .codex mirror for now. New agent types appear in running sessions after a delay; check review-judge
+    independent review run (demo-adversary, one minor finding fixed); READY to the Session Manager next. The
+    owner ruled on 2026-10-01 that there is no .codex mirror for now. New agent types appear in running sessions after a delay; check review-judge
     is listed before its first dispatch.
 - id: phase-asr-02
   title: A fixed command runner for build reviews

@@ -62,8 +62,8 @@ The full suite in the worktree, after the rebase onto `dev` at `440190c`, gave
 
 `status: active`, `agent: agent-builder-a`. `next_action`: Both deliverables written and verified
 (SESS-2026-10-02-01, branch agent/phase-asr-01); independent review run (demo-adversary, one minor
-finding fixed); READY to the Session Manager next. The owner ruled on 2026-10-01 that there is no .codex mirror for now. New agent
-types appear in running sessions after a delay; check review-judge is listed before its first
+finding fixed); READY to the Session Manager next. The owner ruled on 2026-10-01 that there is no
+.codex mirror for now. New agent types appear in running sessions after a delay; check review-judge is listed before its first
 dispatch.
 
 ## Unresolved
