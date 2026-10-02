@@ -31,7 +31,9 @@ The coordinator's brief is the whole of your input. It holds:
 - the path to the runner's `manifest.json` under `_working/review-checks/<phase-id>/<commit12>/`.
 
 The manifest lists every verification entry and gate check, whether it ran, its exit code, and the
-evidence file holding its output. Read each evidence file the manifest names, in full: a file
+evidence file holding its output. Each entry's `file` is relative to the root of the checkout that
+ran the runner, not to the manifest; every evidence file sits in the same directory as
+`manifest.json`, so join the file's name to that directory. Read each one in full: a file
 longer than one read returns only its first part, so read it in successive ranges with an offset
 and a limit until you reach the end.
 
