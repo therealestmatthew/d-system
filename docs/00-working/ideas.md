@@ -23437,7 +23437,7 @@ PROPOSED LINK: this idea --relates_to--> PLAN-030 (defines the claim-to-completi
 
 ## 000524 · Catch a phase's stale ideas field before it reaches dev: run --check-ideas in the default governance run or pre-commit hook, or --backfill-ideas in the completion edit
 
-**Created 2026-10-01T06:03:43-04:00 · Status: `open`**
+**Created 2026-10-01T06:03:43-04:00 · Status: `triaged`**
 
 Session 5 - Batch Runner, 2026-10-01, as given: "Catch idea-field drift before it reaches dev. A completion edit that names an idea id in a phase's next_action, scope or acceptance leaves that phase's ideas field stale. The default governance run doesn't check it, so dev went red on the repository test at 8340c90 (phase-dgov-06 named 000523). Options: have the default run (or the pre-commit hook) run --check-ideas, or add --backfill-ideas to the completion-edit step."
 
@@ -23452,6 +23452,22 @@ What it would touch: src/governance (default run) or tools/git-hooks (pre-commit
 Also reported by the Session Manager, 2026-10-01, independently: governance does not run --check-ideas, and completion edits run no pytest. This idea records both reports as one gap.
 
 Unresolved: which option; whether --check-ideas is cheap enough for every commit. Same shape as 000405 and 000406 (the governance-only completion edit missed a stale catalog.md and turned dev red), which were promoted to PLAN-045.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-02T01:47:39-04:00): Triage (checked on dev 440190c). No backlog phase, batch or plan covers this; the gap is confirmed in code.
+- The checks exist but nothing default runs them: src/governance/__main__.py:592-602 defines --backfill-ideas and --check-ideas as opt-in flags. tools/git-hooks/pre-commit runs only check_no_private_content.py and the plain `python -m src.governance`.
+- By design so far: GOV-002 (ideas field paragraph, lines 57-64) says the default run rejects only an id missing from _data/ideas.jsonl (REQ-036 R17); the derived match (R18) is reported only by --check-ideas. The phase-des-08 session record (docs/03-sessions/SESS-2026-10-01-01-backlog-idea-field.md:70) states the same.
+- PLAN-045 (phase-grd-01, complete), which closed the same-shaped catalog.md gap from 000405/000406, does not cover the phase ideas field.
+- Cost: `uv run python -m src.governance --check-ideas` took about 26 seconds wall clock in the scout's run (single measurement), which bears on option (a) running on every commit.
+- No completion-edit procedure names --backfill-ideas or --check-ideas; the merge step names --catalog only.
+Unresolved: option (a) vs (b), and whether ~26 s per commit is acceptable.
+
+</details>
 
 ---
 
@@ -23939,3 +23955,23 @@ No links recorded with the ask; overlaps are left for triage.
 Owner's words, 2026-10-01 (relayed by the Session Manager), verbatim: "Idea - build our own graph processing engine (is python the right choice? I think C or other lower level language would be superior for performance."
 
 No links recorded with the ask; overlaps are left for triage.
+
+---
+
+## 000553 · Investigate test_cli_check_exits_two_on_sigterm as a timing-sensitive flake under full-suite load
+
+**Created 2026-10-02T01:47:36-04:00 · Status: `open`**
+
+Session 3 - Standby Builder, 2026-10-02, as given: "test/test_broker.py::test_cli_check_exits_two_on_sigterm failed in a full pytest run (1 failed, 1302 passed, 13 min) but passes alone in 0.78s; investigate it as a timing-sensitive flake under suite load."
+
+Unresolved: the failure message and the commit it ran on were not given with the report; whether the test depends on a fixed delay before the signal is sent has not been checked.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-02T01:47:38-04:00): Session Manager observation, 2026-10-02, as given: "SM gate on dev 440190c in a scratch clone: test/test_daemon.py::test_manual_tick_exits_while_daemon_holds_the_lock and ::test_stale_lock_recovers_after_forced_kill failed in the full suite (2 failed, 1289 passed); run alone with test_broker.py, 47 passed in 32.5 s. Load average was 21 (parallel scratch-clone pytest runs from an SM workflow). No src/, tools/ or test/ change since the last fully green gate at 52d0c41."
+
+</details>
