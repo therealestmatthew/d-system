@@ -20,34 +20,38 @@ depends_on: [doc-html-generation-design-system]
 
 ## Verification
 
-Run in the worktree after the rebase onto `dev` `82c17e4`, at `80779a1`.
+Run in the worktree after the rebase onto `dev` `9d1dff8`, at `3e5f3eb`.
 
 ```text
 $ uv run pytest
-1320 passed, 1 warning
+1401 passed, 1 skipped, 1 warning
 $ uv run python -m src.governance
-Governance OK: 43 systems, 421 documents, 34 memories, 347 backlog phases
+Governance OK: 43 systems, 423 documents, 34 memories, 347 backlog phases
 $ uv run python -m src.governance --check-ideas
 Idea field check: 100 phases name 168 ideas; 0 phases differ (0 missing, 0 extra)
 $ uv run python tools/check_no_private_content.py
-check_no_private_content: OK (1130 tracked files, 0 identifiers checked)
+check_no_private_content: OK (1136 tracked files, 0 identifiers checked)
 $ uv run ruff check src/ test/
 All checks passed!
 $ uv run mypy src/
 Success: no issues found in 47 source files
 ```
 
+The one skip is `test/test_review_verdict.py:271` ("got empty parameter set for (path)"), from
+`phase-asr-03`'s work on `dev`, not this branch.
+
 The worktree has no `_private/portfolio/`, so the check above loads 0 identifiers. Every tracked
 file in the worktree, `_public/engine/backlog.html` included, was scanned with the primary
 checkout's identifiers through the check's own `confidential_identifiers()` and `check_content()`:
-31 identifiers over 1130 tracked files, 0 hits.
+31 identifiers over 1136 tracked files, 0 hits.
 
 ## Acceptance
 
 - REQ-036 R21 holds — **Met.** `test_every_phase_appears_once_with_the_governance_state` compares
   every row's state with `src.governance.backlog.readiness`, called by the test itself, and
-  `test_state_counts_sum_to_every_phase` checks the counts. The page shows 347 phases: active 2,
-  ready 80, waiting 109, blocked 1, deferred 17, complete 137, cancelled 1.
+  `test_state_counts_sum_to_every_phase` checks the counts. At `3e5f3eb` the page shows 347 phases:
+  active 1, ready 80, waiting 109, blocked 1, deferred 17, complete 138, cancelled 1. The review
+  saw active 2 and complete 137, before `phase-asr-03` completed on `dev`.
 - REQ-036 R22 holds — **Met.** `test_each_batch_matches_its_yaml` compares each of the seven batch
   tables' stages and phases, in order, with its YAML, and checks every phase and listed external
   dependency is drawn. `test_every_in_graph_dependency_is_drawn_as_an_edge` checks the edges: 54
