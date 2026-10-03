@@ -9517,9 +9517,11 @@ items:
   - ts/src/stage/HtmlViewerRegion.tsx
   - ts/src/stage/useTerminalEnabled.ts
   - ts/index.html
-  next_action: TerminalRegion.tsx already probes terminal-enabled at line 405. Reuse that result
-    rather than adding a second probe - InjectionDropdowns.tsx renders unconditionally today,
-    which is the whole defect.
+  session: doc-session-silence-flag-off-probes
+  next_action: Acceptance met on agent/phase-wbf-10 (14 console 404s before, 0 after, degradation
+    unchanged; SESS-2026-10-03-01). Awaiting the owner-approved merge, then the completion edit on
+    dev.
+
 - id: phase-conc-01
   title: Define the stale-claim signal and report it in --ready
   plan: doc-concurrency-git-safety
