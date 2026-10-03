@@ -6,7 +6,6 @@ next_up:
 - phase-dam-01
 - phase-grd-03
 - phase-grd-04
-- phase-asr-03
 - phase-asr-04
 - phase-asr-05
 - phase-cap-08
@@ -15096,8 +15095,9 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
+  session: doc-session-verdict-records-rereview-sampler
   priority: 1
   session_budget: 1
   depends_on: []
@@ -15129,8 +15129,24 @@ items:
   - test/test_review_verdict.py
   - test/test_draw_rereview_sample.py
   - docs/08-governance/
-  next_action: Model the schema on schemas/adversarial-finding.schema.json's review definition, so plan
-    reviews and build reviews read alike.
+  completion_evidence:
+  - schemas/review-verdict.schema.json
+  - tools/draw_rereview_sample.py
+  - test/test_review_verdict.py
+  - test/test_draw_rereview_sample.py
+  - docs/08-governance/OPS-030-draw-rereview-sample.md
+  - docs/03-sessions/SESS-2026-10-02-02-verdict-records-rereview-sampler.md
+  result: 'Complete: schemas/review-verdict.schema.json defines one build-review verdict per file under
+    docs/08-governance/reviews/verdicts/ and the draw record; tools/draw_rereview_sample.py draws, from
+    gating verdicts no earlier draw considered, every phase rejected before it passed plus one in ten
+    other passes rounded up, by a recorded seed, lists the reviewer types that may not re-review each,
+    and replays a recorded draw. OPS-030 documents it with the owner''s 2026-10-02 rulings. 1389 tests
+    passed, governance, ruff and mypy clean; demo-adversary rejected the first pass on F01 (major, a
+    finding''s consequence could not be recorded) and F02 (minor), both fixed, and its re-review passed.
+    Merged by fast-forward to a53ec57 with the owner''s approval.'
+  next_action: Complete. Who writes verdict records, the sha256 check at the merge gate and when the
+    coordinator runs the sampler belong to phase-asr-04 (REQ-030 R03, R04, R10); it should state that a
+    sampled re-review is recorded with gating false.
 - id: phase-asr-04
   title: Coordinator-dispatched build review wired into session-close, PROMPT-036, GOV-017 and PROMPT-037
   plan: doc-reviewer-contract
