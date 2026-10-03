@@ -546,6 +546,11 @@ def test_ideas_route_reports_zero_annotation_and_link_counts_as_zero(
         assert body[idea_id]["annotation_count"] == 0
 
 
+def test_idea_queue_status_precedence_covers_every_schema_status() -> None:
+    schema = json.loads((REPO_ROOT / "schemas" / "idea.schema.json").read_text(encoding="utf-8"))
+    assert set(IDEA_QUEUE_STATUS_PRECEDENCE) == set(schema["definitions"]["status"]["enum"])
+
+
 def test_ideas_queue_route_orders_by_status_precedence_then_age(
     rebuild_app: Callable[..., FastAPI],
 ) -> None:
@@ -566,7 +571,7 @@ def test_ideas_queue_route_orders_by_status_precedence_then_age(
     expected_order = sorted(state, key=expected_key)
     assert [row["id"] for row in body] == expected_order
 
-    # Every idea still open or triaged outranks every promoted or discarded idea.
+    # Every idea still open or triaged outranks every discarded idea.
     open_or_triaged = {
         idea_id for idea_id, entry in state.items() if entry["status"] in ("open", "triaged")
     }

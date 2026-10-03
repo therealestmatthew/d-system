@@ -492,21 +492,28 @@ class IdeaRow(BaseModel):
 
 
 #: Status precedence for the queue-ordered view. REQ-007 W10's own text reads "open → triaged →
-#: planned then age", but `planned` is not a legal idea status (`schemas/idea.schema.json`
-#: enumerates `open`, `triaged`, `reviewing`, `promoted`, `discarded`) — it never matches any
-#: idea and would leave the third tier permanently empty. `docs/01-plans/PLAN-019-idea-priority-
-#: queue.md`, which predates and motivates that requirement row, names the identical three-tier
-#: working precedence as "open before triaged before reviewing", so `reviewing` is applied here
-#: as the evident wording correction for `planned`. `promoted` and `discarded` are terminal
-#: (`src/db/ideas.py`'s `WORKING_STATES` excludes both) and rank after the three working states,
-#: tied with each other, so the queue view still surfaces every idea rather than dropping ones
-#: past scouting.
+#: planned then age", but `planned` is not a legal idea status (`schemas/idea.schema.json`'s
+#: `status` enum has no such value) — it never matches any idea and would leave the third tier
+#: permanently empty. `docs/01-plans/PLAN-019-idea-priority-queue.md`, which predates and
+#: motivates that requirement row, names the identical three-tier working precedence as "open
+#: before triaged before reviewing", so `reviewing` is applied here as the evident wording
+#: correction for `planned`. `set_aside` is held out by the owner but not terminal — it returns to
+#: `triaged` or `reviewing` — so it ranks directly after the three working states and ahead of
+#: every idea that has left the queue. `promoted` and the terminal states (`discarded` plus the
+#: closing states `delivered`, `resolved` and `absorbed`) are outside `src/db/ideas.py`'s
+#: `WORKING_STATES` and rank last, tied with each other, so the queue view still surfaces every
+#: idea rather than dropping ones past scouting. Every status the schema enumerates must appear
+#: here; `test/test_workbench_api.py` checks the map against the schema.
 IDEA_QUEUE_STATUS_PRECEDENCE: Final[dict[str, int]] = {
     "open": 0,
     "triaged": 1,
     "reviewing": 2,
-    "promoted": 3,
-    "discarded": 3,
+    "set_aside": 3,
+    "promoted": 4,
+    "discarded": 4,
+    "delivered": 4,
+    "resolved": 4,
+    "absorbed": 4,
 }
 
 #: Precedence assigned to a status this mapping does not recognize — schema-illegal today, but a
