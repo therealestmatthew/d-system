@@ -24027,7 +24027,7 @@ Workbench Idea Explorer status filter (ts/src/stage/IdeaExplorerRegion.tsx:23 ST
 
 **Created 2026-10-03T13:23:56-04:00 · Status: `open`**
 
-decisionator - fully and solely responsible for capturing and loving decisions across all sessions. Needs to be paired with deterministic observability and provenance to support optimal capture design.
+decisionator - fully and solely responsible for capturing and logging decisions across all sessions. Needs to be paired with deterministic observability and provenance to support optimal capture design.
 
 **Links**
 
