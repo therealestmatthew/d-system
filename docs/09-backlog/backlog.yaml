@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-10-02'
+updated: '2026-10-03'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -9487,7 +9487,8 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 4
   session_budget: 1
   depends_on: []
@@ -9506,8 +9507,11 @@ items:
   verification:
   - cd ts && npm run build
   - uv run python -m src.governance
+  - 'load the stage with D_SYSTEM_DEMO_TERMINAL unset and count console 404 entries: 0 (REQ-012 R23)'
   deliverables:
   - ts/src/stage/InjectionDropdowns.tsx
+  - ts/src/stage/NotesStripRegion.tsx
+  - ts/src/stage/FileBrowserRegion.tsx
   next_action: TerminalRegion.tsx already probes terminal-enabled at line 405. Reuse that result
     rather than adding a second probe - InjectionDropdowns.tsx renders unconditionally today,
     which is the whole defect.
