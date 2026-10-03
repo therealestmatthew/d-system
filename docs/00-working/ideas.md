@@ -24020,3 +24020,42 @@ HtmlViewerRegion's page-exists HEAD check (/workbench-file/<file>, HtmlViewerReg
 **Created 2026-10-03T12:43:53-04:00 · Status: `open`**
 
 Workbench Idea Explorer status filter (ts/src/stage/IdeaExplorerRegion.tsx:23 STATUSES) lists only open/triaged/reviewing/promoted/discarded; it can't filter on delivered/resolved/absorbed/set_aside, including delivered idea 000554. — Session 2 - Builder B
+
+---
+
+## 000557 · Decisionator agent: captures decisions across all sessions
+
+**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+
+decisionator - fully and solely responsible for capturing and loving decisions across all sessions. Needs to be paired with deterministic observability and provenance to support optimal capture design.
+
+**Links**
+
+- relates_to → `000559`
+- relates_to ← `000558`
+
+---
+
+## 000558 · Questioneer agent: designs questions, writes them to structured files, logs the answers
+
+**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+
+questioneer - responsible for question design (all questions written to structured file(s) before presenting them the answers logged - to be paired with decisioneer maybe.
+
+**Links**
+
+- relates_to → `000557`
+
+---
+
+## 000559 · Investigate telemetry, observability, provenance, logging, tracking, monitoring (placeholder)
+
+**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+
+Investigate the following: telemetry, observability, provenance, logging, tracking, monitoring, etc.
+
+Placeholder: the owner will share more later.
+
+**Links**
+
+- relates_to ← `000557`
