@@ -24,9 +24,8 @@ this session. Claimed on dev at `73bd6ab` inside a granted turn. Work is on `age
 
 ## Verification
 
-Run in this worktree on `agent/phase-asr-03` rebased onto dev `e4f9496`. The phase-test count is from
-after the review fixes (`b730755`); the full suite ran before them, and the post-rebase gate run sent
-with READY is the final one:
+Run in this worktree on `agent/phase-asr-03` at `bc78404`, after the review fixes and the rebase onto
+dev `d40d4f5`:
 
 ```
 $ uv run pytest test/test_review_verdict.py test/test_draw_rereview_sample.py
@@ -36,9 +35,9 @@ All checks passed!
 $ uv run mypy src/ tools/draw_rereview_sample.py
 Success: no issues found in 48 source files
 $ uv run python -m src.governance --catalog
-421 documents — adr: 23, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 182.
+422 documents — adr: 23, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 183.
 $ uv run python -m src.governance
-Governance OK: 43 systems, 421 documents, 34 memories, 347 backlog phases
+Governance OK: 43 systems, 422 documents, 34 memories, 347 backlog phases
 $ git diff --exit-code docs/08-governance/catalog.md
 (no output, exit 0)
 ```
@@ -55,7 +54,7 @@ All checks passed!
 $ uv run mypy src/
 Success: no issues found in 47 source files
 $ uv run pytest -q
-1387 passed, 1 skipped, 1 warning in 247.16s (0:04:07)
+1389 passed, 1 skipped, 1 warning in 287.33s (0:04:47)
 ```
 
 The private-content check run in the worktree reads no identifiers (`_private/` is not there). The
