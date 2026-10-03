@@ -24080,7 +24080,7 @@ Origin: 000557 (decisionator agent) was recorded with "loving" where "logging" w
 
 **Created 2026-10-03T13:31:24-04:00 · Status: `open`**
 
-I need to investigate a better tool for dictation voice to text.Because the built in one does not properly capture what I'm saying. Despite me intentionally pronouncing and speaking everything as clearly as possible. We should consider whisper flow, but not limit to that consideration. We need to explore options so mark that as an idea as well.
+I need to investigate a better tool for dictation (voice to text), because the built-in one does not properly capture what I'm saying, despite me intentionally pronouncing and speaking everything as clearly as possible. We should consider Wispr Flow, but not limit to that consideration. We need to explore options, so mark that as an idea as well.
 
 **Links**
 
@@ -24106,7 +24106,7 @@ This connects to the observability topics (000559).
 
 **Created 2026-10-03T13:33:38-04:00 · Status: `open`**
 
-I want a system where I can dictate  And I have an agent who will dictate back to me. The default text to voice on Claude code mobile is a little bit wonky, sometimes, so we may need to get creative, what I have currently works and it gets a job done. So this is not super high priority.  But it would be a very nice to have
+I want a system where I can dictate and I have an agent who will dictate back to me. The default text to voice on Claude Code mobile is a little bit wonky sometimes, so we may need to get creative. What I have currently works and it gets the job done, so this is not super high priority. But it would be a very nice to have.
 
 **Links**
 
