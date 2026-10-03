@@ -1,4 +1,4 @@
-"""The idea realization engine pages — REQ-036 R07-R16.
+"""The idea realization engine pages — REQ-036 R07-R16 and R21-R23.
 
 Every figure on the pipeline overview is recomputed here by code that shares nothing with the
 generator's own `STAGES` and `GATES` selectors except `fold()`, which is the sanctioned reader the
@@ -41,6 +41,11 @@ def page(inputs: dict) -> str:
 @pytest.fixture(scope="module")
 def ledger(inputs: dict) -> str:
     return gen.render_ledger(inputs)
+
+
+@pytest.fixture(scope="module")
+def backlog(inputs: dict) -> str:
+    return gen.render_backlog(inputs)
 
 
 @pytest.fixture(scope="module")
@@ -352,3 +357,119 @@ def test_ideas_without_a_recorded_plan_say_so(inputs: dict, ledger: str) -> None
 def test_overview_and_ledger_link_to_each_other(page: str, ledger: str) -> None:
     assert 'href="ideas.html"' in page
     assert 'href="index.html"' in ledger
+
+
+# ---- R21 to R23: the backlog and batch graph ----
+
+
+def _batch_tables() -> list[dict]:
+    return [
+        yaml.safe_load(path.read_text(encoding="utf-8"))
+        for path in sorted((ROOT / "docs/09-backlog/batches").glob("batch-*.yaml"))
+    ]
+
+
+def _expected_states() -> dict[str, str]:
+    """Each phase's state, through the governance readiness function and nothing of the page's."""
+    from src.governance.backlog import readiness
+
+    items = {p["id"]: p for p in _phases()}
+    return {key: readiness(item, items) for key, item in items.items()}
+
+
+def _row(page: str, key: str) -> str:
+    match = re.search(rf'<tr data-phase="{re.escape(key)}"[^>]*>(.*?)</tr>', page)
+    assert match, f"no row for {key}"
+    return match.group(1)
+
+
+def test_every_phase_appears_once_with_the_governance_state(backlog: str) -> None:
+    rows = re.findall(r'<tr data-phase="([^"]+)" data-state="([^"]+)">', backlog)
+    keys = [key for key, _ in rows]
+    assert len(keys) == len(set(keys)), "a phase appears twice"
+    assert dict(rows) == _expected_states()
+
+
+def test_state_counts_sum_to_every_phase(backlog: str) -> None:
+    expected = _expected_states()
+    counts = dict(re.findall(r'data-state-count="([^"]+)">(\d+)<', backlog))
+    assert sum(int(n) for n in counts.values()) == len(expected)
+    for state in set(expected.values()):
+        assert counts[state] == str(sum(1 for s in expected.values() if s == state)), state
+    assert _figure(backlog, "stat", "phases") == str(len(expected))
+
+
+def test_each_batch_matches_its_yaml(backlog: str) -> None:
+    states = _expected_states()
+    for table in _batch_tables():
+        start = backlog.index(f'data-batch="{table["id"]}"')
+        end = backlog.find('data-batch="', start + 1)
+        block = backlog[start:end if end != -1 else len(backlog)]
+        listed = re.findall(r'data-batch-phase="([^"]+)" data-stage="(\d+)"', block)
+        expected = [(p["id"], str(s["stage"])) for s in table["stages"] for p in s["phases"]]
+        assert listed == expected, table["id"]
+        for key, _ in expected:
+            assert f'data-node="{key}" data-node-state="{states[key]}"' in block, (table["id"], key)
+        for entry in table.get("external_depends_on") or []:
+            assert f'data-external="{entry["id"]}"' in block, (table["id"], entry["id"])
+            assert f'data-node="{entry["id"]}"' in block, (table["id"], entry["id"])
+
+
+def test_every_in_graph_dependency_is_drawn_as_an_edge(backlog: str) -> None:
+    items = {p["id"]: p for p in _phases()}
+    for table in _batch_tables():
+        start = backlog.index(f'data-graph="{table["id"]}"')
+        svg = backlog[start:backlog.index("</svg>", start)]
+        drawn = set(re.findall(r'data-edge="([^&]+)&gt;([^"]+)"', svg))
+        members = [p["id"] for s in table["stages"] for p in s["phases"]]
+        expected = {(dep, key) for key in members for dep in items[key]["depends_on"]}
+        assert drawn == expected, table["id"]
+
+
+def test_the_graphs_are_static_svg(backlog: str) -> None:
+    assert "<script" not in backlog.lower()
+    assert backlog.count('<svg class="graph"') == len(_batch_tables())
+    for svg in re.findall(r"<svg.*?</svg>", backlog, re.S):
+        assert not re.search(r"\son[a-z]+=", svg), "an event handler in the graph"
+
+
+def test_every_waiting_phase_lists_its_unmet_dependencies(backlog: str) -> None:
+    items = {p["id"]: p for p in _phases()}
+    states = _expected_states()
+    for key, state in states.items():
+        if state != "waiting":
+            continue
+        unmet = re.findall(r'data-unmet="([^"]+)"', _row(backlog, key))
+        assert unmet, f"{key} is waiting but lists no dependency"
+        assert unmet == [d for d in items[key]["depends_on"] if items[d]["status"] != "complete"]
+        for dependency in unmet:
+            assert f"{dependency}</code> ({states[dependency]})" in _row(backlog, key)
+
+
+def test_every_blocked_or_deferred_phase_shows_both_fields(backlog: str) -> None:
+    for phase in _phases():
+        if phase["status"] not in ("blocked", "deferred"):
+            continue
+        row = html.unescape(_row(backlog, phase["id"]))
+        assert f"Reason: {phase['blocked_reason']}" in row, phase["id"]
+        assert f"Resume when: {phase['resume_when']}" in row, phase["id"]
+
+
+def test_a_missing_field_reads_not_recorded(inputs: dict) -> None:
+    phases = [
+        {k: v for k, v in p.items() if k != "resume_when"} if p["status"] == "deferred" else p
+        for p in inputs["phases"]
+    ]
+    page = gen.render_backlog({**inputs, "phases": phases})
+    key = next(p["id"] for p in phases if p["status"] == "deferred")
+    assert f"Resume when: {gen.NOT_RECORDED}" in _row(page, key)
+
+
+def test_the_layout_choice_is_stated_on_the_page(backlog: str) -> None:
+    assert "the graph is drawn per batch table" in html.unescape(backlog)
+    assert "not the orchestrator's batch graph" in html.unescape(backlog)
+
+
+def test_overview_links_to_the_backlog_page(page: str, backlog: str) -> None:
+    assert 'href="backlog.html"' in page
+    assert 'href="index.html"' in backlog
