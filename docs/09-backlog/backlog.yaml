@@ -13181,7 +13181,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   session: doc-session-backlog-and-batch-graph
   priority: 1
@@ -13211,9 +13211,23 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - test/test_engine_pages.py
-  next_action: Every acceptance condition is met and the review is recorded on agent/phase-des-12
-    (SESS-2026-10-02-03); awaiting the owner-approved merge, after which the completion edit is made
-    on dev.
+  completion_evidence:
+  - tools/generate_engine_pages.py
+  - test/test_engine_pages.py
+  - _public/engine/backlog.html
+  - docs/03-sessions/SESS-2026-10-02-03-backlog-and-batch-graph.md
+  result: 'Complete: the engine generator writes _public/engine/backlog.html. Every backlog phase
+    appears once with its state, ready and waiting split by src.governance.backlog.readiness; every
+    waiting phase lists its unmet dependencies with their states, and every blocked, deferred or
+    cancelled phase shows its blocked_reason and resume_when. Each batch table is drawn as a static
+    SVG, one column per stage plus its external dependencies, with every depends_on edge as an arrow
+    beneath the boxes; the owner chose this per-batch layout and the page states it. REQ-036 R21 to
+    R23 are tested and R07 to R13 still hold; a script-disabled headless-Chrome render confirmed the
+    graphs in light and dark mode. demo-adversary review found all conditions Met, no blockers or
+    majors, one minor and two notes accepted (SESS-2026-10-02-03). After the rebase onto dev 9d1dff8:
+    1401 passed, 1 skipped, governance, ruff and mypy clean, private-content check 31 identifiers 0
+    hits. Merged by fast-forward to 95e225a with the owner''s approval.'
+  next_action: Complete. The per-idea trace pages are phase-des-11.
 - id: phase-expl-01
   title: Scope observability and telemetry, with its boundaries against P4 and P5
   plan: doc-standalone-explorations-housekeeping
