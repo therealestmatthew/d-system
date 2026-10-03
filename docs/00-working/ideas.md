@@ -23994,3 +23994,13 @@ Unresolved: the failure message and the commit it ran on were not given with the
 - **finding** by agent-ideation (2026-10-02T01:47:38-04:00): Session Manager observation, 2026-10-02, as given: "SM gate on dev 440190c in a scratch clone: test/test_daemon.py::test_manual_tick_exits_while_daemon_holds_the_lock and ::test_stale_lock_recovers_after_forced_kill failed in the full suite (2 failed, 1289 passed); run alone with test_broker.py, 47 passed in 32.5 s. Load average was 21 (parallel scratch-clone pytest runs from an SM workflow). No src/, tools/ or test/ change since the last fully green gate at 52d0c41."
 
 </details>
+
+---
+
+## 000554 · Bring OPS-028 (regenerate the engine pages) and its source generator docstring up to date with the pages that now exist
+
+**Created 2026-10-02T21:10:05-04:00 · Status: `open`**
+
+Session 3 - Standby Builder, 2026-10-02, as given: "Bring OPS-028 (regenerate the engine pages) and the generator docstring it is generated from up to date: it still says one page exists and names REQ-036 R07-R14, but the ledger (phase-des-10) and backlog and batch graph (phase-des-12) pages now exist and batch tables are an input."
+
+What it would touch: OPS-028 and the generator docstring it is generated from (the sender did not name the generator file).
