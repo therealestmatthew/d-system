@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R14.
+"""Generate the idea realization engine's pages into `_public/engine/` — `REQ-036`.
 
 The engine (`ARCH-006`) carries an idea from capture to delivered work through nine stages and
 five owner gates. These pages show where everything stands, as committed snapshots built from the
-house family (`templates/html/house-page.html`, `templates/styles/house*.css`, `OPS-027`).
+house family (`templates/html/house-page.html`, `templates/styles/house*.css`, `OPS-027`). Three
+pages exist, one per entry in `PAGES` below:
+
+- `index.html`, the pipeline overview (R14);
+- `ideas.html`, the idea funnel and ledger (R15, R16);
+- `backlog.html`, the backlog and batch graph (R21-R23).
+
+R07-R13 apply to all three. The per-idea trace pages (R19, R20) are not built yet.
 
 Inputs, all tracked: the idea log through `fold()` (never parsed here directly, R10), the backlog
-(`docs/09-backlog/backlog.yaml`), plan front matter under `docs/01-plans/`, the house family
-templates, and two facts from git, the commit the inputs were read at and that commit's date.
+(`docs/09-backlog/backlog.yaml`), the batch tables under `docs/09-backlog/batches/`, plan front
+matter under `docs/01-plans/`, the house family templates, and two facts from git, the commit the
+inputs were read at and that commit's date.
 
 Determinism (R07, R08). Every page is a pure function of those inputs. The stamp is the source
 commit and the commit's own date, never the time the generator ran, so two runs on one commit give

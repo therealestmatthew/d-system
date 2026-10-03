@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-10-01'
-updated: '2026-10-01'
+updated: '2026-10-03'
 systems: [sys-html]
 depends_on: [doc-governance-operations, doc-engine-pages-house-style-requirements]
 ---
@@ -17,7 +17,7 @@ depends_on: [doc-governance-operations, doc-engine-pages-house-style-requirement
 ## Trigger
 
 Run when an up-to-date snapshot of the engine's state is wanted: before sharing the pages, after
-a batch of merges, or after a planning session changes plans or phases. The pages under
+a batch of merges, or after a planning session changes plans, phases or batch tables. The pages under
 `_public/engine/` are committed snapshots
 ([REQ-036](../06-requirements/REQ-036-engine-pages-house-style.md) R08). Nothing regenerates
 them automatically, and no CI check fails when they fall behind their inputs. The owner ruled
@@ -34,8 +34,26 @@ Commit the regenerated pages with a message naming the source commit the stamp s
 
 ## Expected result
 
-One line per page written, `wrote _public/engine/index.html`. Today that is one page, the
-pipeline overview. The ledger, trace and backlog pages are added by `phase-des-10` to `-12`.
+One line per page written. Today that is three pages:
+
+```text
+wrote _public/engine/index.html
+wrote _public/engine/ideas.html
+wrote _public/engine/backlog.html
+```
+
+| Page | File | Requirements | Built by |
+|---|---|---|---|
+| Pipeline overview | `index.html` | `REQ-036` R14 | `phase-des-09` |
+| Idea funnel and ledger | `ideas.html` | `REQ-036` R15, R16 | `phase-des-10` |
+| Backlog and batch graph | `backlog.html` | `REQ-036` R21-R23 | `phase-des-12` |
+
+`REQ-036` R07-R13 apply to every page. The per-idea trace pages (R19, R20) are not built yet;
+`phase-des-11` adds them.
+
+The inputs are all tracked: the idea log through `fold()`, `backlog.yaml`, the batch tables under
+`docs/09-backlog/batches/`, plan front matter, the house family templates, and the source commit
+and its date from git.
 
 Each page states its source commit and that commit's date in the header, never the time the tool
 ran, so two runs on one commit produce identical bytes. If any input has uncommitted changes when
@@ -70,6 +88,26 @@ because integration is fast-forward-only and the completion edit follows the mer
 turn. When no backlog phase carries the `ideas` field, G2 falls back to `promoted_to` alone and
 the page says phase links are not recorded.
 
+## What the idea funnel and ledger shows
+
+Every idea in `fold()` appears once in the ledger, with its id, title, status, created date and
+the four `ARCH-005` axis values. The funnel counts ideas per status, and the counts sum to the
+`fold()` total (`REQ-036` R15). Each axis shows its distribution, and an idea with no
+classification counts as "unclassified" (R16). An idea with no `promoted_to` and no phase naming
+it in its `ideas` field reads "no recorded plan".
+
+## What the backlog and batch graph shows
+
+Every phase in `backlog.yaml` appears with its state. Ready and waiting are computed by
+`src.governance.backlog.readiness`, the same function `--ready` uses (`REQ-036` R21). A waiting
+phase lists its unmet dependencies by id and state, and a blocked or deferred phase shows its
+`blocked_reason` and `resume_when` (R23).
+
+Each batch table under `docs/09-backlog/batches/` appears in sequence order with its stages,
+their phases and their states, drawn as a static SVG graph of `depends_on` edges (R22). Any
+dependency of a batch member that is outside the batch is drawn as external, whether or not the
+table's `external_depends_on` lists it, so no edge is dropped.
+
 ## Failure and recovery
 
 - **`subprocess.CalledProcessError` from git.** The tool was run outside a git checkout, or git
@@ -78,23 +116,32 @@ the page says phase links are not recorded.
   names the bad event. Fix the log through its sanctioned writer, not by hand.
 - **`ValueError: unfilled {{NAME}}`.** The house page template's token contract and this tool's
   `_page()` call have drifted apart. Make them agree.
-- **A count looks wrong.** Each stage and gate is defined once, in `STAGES` and `GATES` in the
-  tool, and the page prints that definition beside the number. `test/test_engine_pages.py`
+- **A count looks wrong.** On the overview, each stage and gate is defined once, in `STAGES` and
+  `GATES` in the tool, and the page prints that definition beside the number. The ledger's
+  figures come from `ledger_data()` and the backlog page's from `backlog_data()`. `test/test_engine_pages.py`
   recomputes every figure independently. Run it before assuming the page is wrong.
 
 <!-- generated:tool-reference:start -->
 
 ### Reference: `tools/generate_engine_pages.py`
 
-Generate the idea realization engine's pages into `_public/engine/` — `REQ-036` R07-R14.
+Generate the idea realization engine's pages into `_public/engine/` — `REQ-036`.
 
 The engine (`ARCH-006`) carries an idea from capture to delivered work through nine stages and
 five owner gates. These pages show where everything stands, as committed snapshots built from the
-house family (`templates/html/house-page.html`, `templates/styles/house*.css`, `OPS-027`).
+house family (`templates/html/house-page.html`, `templates/styles/house*.css`, `OPS-027`). Three
+pages exist, one per entry in `PAGES` below:
+
+- `index.html`, the pipeline overview (R14);
+- `ideas.html`, the idea funnel and ledger (R15, R16);
+- `backlog.html`, the backlog and batch graph (R21-R23).
+
+R07-R13 apply to all three. The per-idea trace pages (R19, R20) are not built yet.
 
 Inputs, all tracked: the idea log through `fold()` (never parsed here directly, R10), the backlog
-(`docs/09-backlog/backlog.yaml`), plan front matter under `docs/01-plans/`, the house family
-templates, and two facts from git, the commit the inputs were read at and that commit's date.
+(`docs/09-backlog/backlog.yaml`), the batch tables under `docs/09-backlog/batches/`, plan front
+matter under `docs/01-plans/`, the house family templates, and two facts from git, the commit the
+inputs were read at and that commit's date.
 
 Determinism (R07, R08). Every page is a pure function of those inputs. The stamp is the source
 commit and the commit's own date, never the time the generator ran, so two runs on one commit give
