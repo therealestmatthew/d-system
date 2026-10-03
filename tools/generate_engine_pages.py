@@ -603,7 +603,10 @@ GRAPH_CSS = """
 
 def batch_graph(batch: dict[str, Any]) -> str:
     """A static SVG of one batch table: a column per stage, external dependencies first, and an
-    arrow along every depends_on edge between drawn phases. No script; titles give the full id."""
+    arrow along every depends_on edge between drawn phases. No script; titles give the full id.
+
+    Arrows are drawn before boxes, so an arrow that skips a stage passes behind the boxes in
+    between instead of striking through their text."""
     columns: list[tuple[str, list[tuple[str, str]], bool]] = []
     if batch["external"]:
         columns.append(("External", batch["external"], True))
@@ -613,7 +616,7 @@ def batch_graph(batch: dict[str, Any]) -> str:
     width = PAD * 2 + len(columns) * NODE_W + (len(columns) - 1) * COL_GAP
     height = PAD * 2 + HEAD + tallest * NODE_H + (tallest - 1) * ROW_GAP
     place: dict[str, tuple[int, int]] = {}
-    parts = []
+    parts, edges = [], []
     for c, (label, nodes, external) in enumerate(columns):
         x = PAD + c * (NODE_W + COL_GAP)
         parts.append(f'<text class="col" x="{x}" y="{PAD + 12}">{_e(label)}</text>')
@@ -637,7 +640,7 @@ def batch_graph(batch: dict[str, Any]) -> str:
         else:
             mid = (x1 + x2) // 2
             path = f"M{x1},{y1} C{mid},{y1} {mid},{y2} {x2},{y2}"
-        parts.append(
+        edges.append(
             f'<path class="edge" data-edge="{_e(f"{source}>{target}")}" d="{path}" '
             f'marker-end="url(#head-{_e(batch["id"])})"/>'
         )
@@ -649,7 +652,8 @@ def batch_graph(batch: dict[str, Any]) -> str:
     return (
         f'<svg class="graph" data-graph="{_e(batch["id"])}" viewBox="0 0 {width} {height}" '
         f'width="{width}" height="{height}" role="img" aria-label="Dependency graph of '
-        f'{_e(batch["id"])}" xmlns="http://www.w3.org/2000/svg">{marker}{"".join(parts)}</svg>'
+        f'{_e(batch["id"])}" xmlns="http://www.w3.org/2000/svg">{marker}'
+        f'{"".join(edges + parts)}</svg>'
     )
 
 

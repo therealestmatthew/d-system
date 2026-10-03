@@ -433,6 +433,13 @@ def test_the_graphs_are_static_svg(backlog: str) -> None:
         assert not re.search(r"\son[a-z]+=", svg), "an event handler in the graph"
 
 
+def test_arrows_are_drawn_beneath_the_boxes(backlog: str) -> None:
+    """An arrow that skips a stage passes behind the boxes between, not through their text."""
+    for svg in re.findall(r"<svg.*?</svg>", backlog, re.S):
+        if 'class="edge"' in svg:
+            assert svg.rindex('class="edge"') < svg.index('<g class="node'), "an arrow over a box"
+
+
 def test_every_waiting_phase_lists_its_unmet_dependencies(backlog: str) -> None:
     items = {p["id"]: p for p in _phases()}
     states = _expected_states()
