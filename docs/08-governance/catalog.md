@@ -490,7 +490,7 @@ CI regenerates it and fails on any difference.
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
 | PLAN-045 | doc-deterministic-guards | approved | 2 | 0 | 2 | agent-builder-a, agent-builder-b |
 | PLAN-046 | doc-design-document-amendments | approved | 1 | 0 | 0 | — |
-| PLAN-047 | doc-reviewer-contract | approved | 3 | 1 | 1 | agent-builder-a, agent-builder-b |
+| PLAN-047 | doc-reviewer-contract | approved | 2 | 2 | 1 | agent-builder-a, agent-builder-b |
 | PLAN-048 | doc-idea-realization-plugin | approved | 0 | 0 | 9 | agent-builder-a, agent-builder-b, agent-standby-builder |
 | PLAN-048.01 | doc-idea-realization-plugin-skeleton-install | approved | 0 | 0 | 1 | agent-builder-b |
 | PLAN-048.02 | doc-idea-realization-plugin-idea-system | approved | 0 | 0 | 1 | agent-standby-builder |
