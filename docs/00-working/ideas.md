@@ -24012,3 +24012,11 @@ What it would touch: OPS-028 and the generator docstring it is generated from (t
 **Created 2026-10-03T09:14:20-04:00 · Status: `open`**
 
 HtmlViewerRegion's page-exists HEAD check (/workbench-file/<file>, HtmlViewerRegion.tsx:268) gets 200 from Vite's SPA fallback when D_SYSTEM_DEMO_TERMINAL is unset, so the viewer reports `ready` and would iframe the app shell instead of showing `missing`. Found in phase-wbf-10's review. — Session 1 - Builder A
+
+---
+
+## 000556 · Workbench Idea Explorer status filter omits delivered, resolved, absorbed and set_aside
+
+**Created 2026-10-03T12:43:53-04:00 · Status: `open`**
+
+Workbench Idea Explorer status filter (ts/src/stage/IdeaExplorerRegion.tsx:23 STATUSES) lists only open/triaged/reviewing/promoted/discarded; it can't filter on delivered/resolved/absorbed/set_aside, including delivered idea 000554. — Session 2 - Builder B
