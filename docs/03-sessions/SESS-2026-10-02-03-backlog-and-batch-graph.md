@@ -20,16 +20,26 @@ depends_on: [doc-html-generation-design-system]
 
 ## Verification
 
-Run in the worktree on `dev` `d40d4f5` (the claim commit), with the phase's commits on top.
+Run in the worktree on `dev` `d40d4f5` (the claim commit), with the phase's commits on top, at
+`21982bc`.
 
 ```text
-VERIFICATION_PLACEHOLDER
+$ uv run pytest
+1319 passed, 1 warning in 296.55s (0:04:56)
+$ uv run python -m src.governance
+Governance OK: 43 systems, 421 documents, 34 memories, 347 backlog phases
+$ uv run python tools/check_no_private_content.py
+check_no_private_content: OK (1130 tracked files, 0 identifiers checked)
+$ uv run ruff check src/ test/
+All checks passed!
+$ uv run mypy src/
+Success: no issues found in 47 source files
 ```
 
 The worktree has no `_private/portfolio/`, so the check above loads 0 identifiers. Every tracked
 file in the worktree, `_public/engine/backlog.html` included, was scanned with the primary
 checkout's identifiers through the check's own `confidential_identifiers()` and `check_content()`:
-31 identifiers over 1137 tracked files, 0 hits.
+31 identifiers over 1130 tracked files, 0 hits.
 
 ## Acceptance
 
@@ -54,7 +64,7 @@ checkout's identifiers through the check's own `confidential_identifiers()` and 
 
 ## Backlog
 
-`phase-des-12`: `status: active`, `agent: agent-standby-3`.
+`phase-des-12`: `status: active`, `agent: agent-standby-3`, `session: doc-session-backlog-and-batch-graph`.
 
 ## Decisions
 
@@ -76,6 +86,16 @@ Agent's own choices:
   reads "not recorded" (R11).
 - Graph colours are CSS rules over house tokens, added to the page's inline styles, so the
   colour-literal test covers the SVG too.
+
+## Corrections
+
+- The first full run gave `3 failed, 1316 passed`: `test_committed_catalog_matches_regenerated_output`,
+  `test_catalog_flag_writes_committed_file` and `test_ideas_priority_yaml_is_governance_clean`, all
+  "catalog.md differs from the rendered catalog". This record was on disk but not yet committed, and
+  the catalog had not been regenerated for it. Fixed by committing the record with the regenerated
+  catalog in `21982bc`; the run above is after that.
+- The first edge test failed because `data-edge` carried a raw `>`. The generator now escapes the
+  whole attribute value.
 
 ## Unresolved
 
