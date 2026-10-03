@@ -47,13 +47,13 @@ checkout's identifiers through the check's own `confidential_identifiers()` and 
   every row's state with `src.governance.backlog.readiness`, called by the test itself, and
   `test_state_counts_sum_to_every_phase` checks the counts. The page shows 347 phases: active 2,
   ready 80, waiting 109, blocked 1, deferred 17, complete 137, cancelled 1.
-- REQ-036 R22 holds — **Partly verified.** `test_each_batch_matches_its_yaml` compares each of the
-  seven batch tables' stages and phases, in order, with its YAML, and checks every phase and listed
-  external dependency is drawn. `test_every_in_graph_dependency_is_drawn_as_an_edge` checks the
-  edges: 54 across the seven graphs. `test_the_graphs_are_static_svg` checks the graphs are inline
-  SVG with no script and no event handler. **Not done:** loading the page in a browser with script
-  disabled. The local headless browser does not run in this session's sandbox, and the
-  `demo-validator-web` agent was dispatched without its Playwright tools. See Unresolved.
+- REQ-036 R22 holds — **Met.** `test_each_batch_matches_its_yaml` compares each of the seven batch
+  tables' stages and phases, in order, with its YAML, and checks every phase and listed external
+  dependency is drawn. `test_every_in_graph_dependency_is_drawn_as_an_edge` checks the edges: 54
+  across the seven graphs. `test_the_graphs_are_static_svg` checks the graphs are inline SVG with
+  no script and no event handler. The page was loaded in headless Chrome with
+  `--disable-javascript`: `--dump-dom` shows all 7 graphs and 54 edges, and screenshots show the
+  graphs rendered and legible in light mode (whole page) and dark mode (`batch-005`, the largest).
 - REQ-036 R23 holds — **Met.** `test_every_waiting_phase_lists_its_unmet_dependencies` checks all
   109 waiting phases list exactly their non-complete dependencies with each one's state.
   `test_every_blocked_or_deferred_phase_shows_both_fields` checks the 18 blocked or deferred
@@ -65,6 +65,41 @@ checkout's identifiers through the check's own `confidential_identifiers()` and 
 ## Backlog
 
 `phase-des-12`: `status: active`, `agent: agent-standby-3`, `session: doc-session-backlog-and-batch-graph`.
+
+## Review
+
+Independent review by a fresh `demo-adversary` sub-agent over `d40d4f5..2d88bff`. It ran the
+verification commands in the worktree (`1319 passed`; governance, ruff and mypy clean; the
+primary-identifier scan, 31 identifiers, 0 hits) and reported, condition by condition:
+
+1. **R21 — Met.** A standalone recount gave the same seven state counts and 347 phases. The test
+   calls the same `readiness()` the generator calls, as R21's method and the phase scope require,
+   so it cannot catch a bug inside `readiness()` itself.
+2. **R22 — Met.** No edge is dropped: every dependency target of a member is drawn. Marker ids are
+   per batch, so seven inline graphs do not collide. Every CSS variable the graph uses is defined in
+   both modes of `house.css`. Per-table edge counts 1, 6, 0, 8, 4, 12, 23 sum to 54. It loaded the
+   page with JavaScript disabled through `--dump-dom`.
+3. **R23 — Met.** No `depends_on` id in the backlog is dangling.
+4. **R07-R13 — Met** over all three pages.
+
+Containment: every changed file is a declared deliverable or the session record, the phase's own
+`session` field, and the regenerated catalog. All figures in this record reproduced.
+
+Findings: no blockers, no majors.
+
+- **Minor:** the generator docstring and `OPS-028` do not name the batch tables as an input.
+  **Accepted** as out of scope: `OPS-028` is not a deliverable of this phase. Recorded as idea
+  `000554`.
+- **Note:** the branch that draws an arrow between boxes in one column has no live data to exercise
+  it. **Accepted:** no batch table has such an edge today.
+- **Note:** `batch-007` (sequence 5) is listed before `batch-005` (sequence 6). **Accepted:** the
+  page orders by sequence, as intended.
+
+After the review, the script-disabled screenshots showed arrows that skip a stage striking through
+the phase ids of the boxes between them. Fixed in `ba68dca`: arrows are drawn before boxes, and
+`test_arrows_are_drawn_beneath_the_boxes` checks it. Such an arrow now passes behind the boxes in
+between, so in `batch-005` an arrow to stage 3 or 4 can look as if it leaves a stage 2 box. The
+text is legible; the routing is left as it is.
 
 ## Decisions
 
@@ -99,8 +134,7 @@ Agent's own choices:
 
 ## Unresolved
 
-- R22's browser check with script disabled was not run. Open
-  `_public/engine/backlog.html` with JavaScript disabled to confirm the seven graphs render.
 - `OPS-028` still says one page exists and names R07-R14, and the generator's docstring does not
   mention the batch tables as an input. `OPS-028`'s reference section is generated from that
-  docstring, and `OPS-028` is outside this phase's deliverables, so neither was changed.
+  docstring, and `OPS-028` is outside this phase's deliverables, so neither was changed. Recorded as
+  idea `000554`.
