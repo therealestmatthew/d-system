@@ -13211,9 +13211,9 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - test/test_engine_pages.py
-  next_action: Three hundred and more phases do not fit one legible graph. Decide the layout - per batch,
-    per plan, or only the unfinished phases - from the data before drawing, and state the choice on the
-    page.
+  next_action: Every acceptance condition is met and the review is recorded on agent/phase-des-12
+    (SESS-2026-10-02-03); awaiting the owner-approved merge, after which the completion edit is made
+    on dev.
 - id: phase-expl-01
   title: Scope observability and telemetry, with its boundaries against P4 and P5
   plan: doc-standalone-explorations-housekeeping

@@ -24,7 +24,7 @@ Run in the worktree after the rebase onto `dev` `82c17e4`, at `80779a1`.
 
 ```text
 $ uv run pytest
-1320 passed, 1 warning in 311.12s (0:05:11)
+1320 passed, 1 warning
 $ uv run python -m src.governance
 Governance OK: 43 systems, 421 documents, 34 memories, 347 backlog phases
 $ uv run python -m src.governance --check-ideas
@@ -66,6 +66,15 @@ checkout's identifiers through the check's own `confidential_identifiers()` and 
 ## Backlog
 
 `phase-des-12`: `status: active`, `agent: agent-standby-3`, `session: doc-session-backlog-and-batch-graph`.
+`next_action`: every acceptance condition is met and the review is recorded on agent/phase-des-12;
+awaiting the owner-approved merge, after which the completion edit is made on dev.
+
+## Unresolved
+
+- `OPS-028` still says one page exists and names R07-R14, and the generator's docstring does not
+  mention the batch tables as an input. `OPS-028`'s reference section is generated from that
+  docstring, and `OPS-028` is outside this phase's deliverables, so neither was changed. Recorded as
+  idea `000554`.
 
 ## Review
 
@@ -132,10 +141,3 @@ Agent's own choices:
   catalog in `21982bc`; the run above is after that.
 - The first edge test failed because `data-edge` carried a raw `>`. The generator now escapes the
   whole attribute value.
-
-## Unresolved
-
-- `OPS-028` still says one page exists and names R07-R14, and the generator's docstring does not
-  mention the batch tables as an input. `OPS-028`'s reference section is generated from that
-  docstring, and `OPS-028` is outside this phase's deliverables, so neither was changed. Recorded as
-  idea `000554`.
