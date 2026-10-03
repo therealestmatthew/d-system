@@ -24059,3 +24059,23 @@ Placeholder: the owner will share more later.
 **Links**
 
 - relates_to ← `000557`
+
+---
+
+## 000560 · Idea capture: question apparent typos or mistakes before recording, since ideas are immutable
+
+**Created 2026-10-03T13:31:24-04:00 · Status: `open`**
+
+Update your ideation agent logic to specifically account for this scenario, where if there is a typo or something that seems unintentional, a mistake, something that is blatantly wrong or unreasonable, you should raise a question about it before immediately capturing the raw idea, since ideas are immutable.
+
+However, if I confirm that what I meant is what I meant, then you accept it. Don't question it and you move on. But you should have the flexibility: if you can retroactively question something like that, then you can do it before logging the idea.
+
+Origin: 000557 (decisionator agent) was recorded with "loving" where "logging" was meant; the agent asked about it only after capture and had to amend it.
+
+---
+
+## 000561 · Investigate a better dictation (voice-to-text) tool
+
+**Created 2026-10-03T13:31:24-04:00 · Status: `open`**
+
+I need to investigate a better tool for dictation voice to text.Because the built in one does not properly capture what I'm saying. Despite me intentionally pronouncing and speaking everything as clearly as possible. We should consider whisper flow, but not limit to that consideration. We need to explore options so mark that as an idea as well.
