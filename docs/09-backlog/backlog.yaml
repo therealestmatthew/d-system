@@ -9507,11 +9507,16 @@ items:
   verification:
   - cd ts && npm run build
   - uv run python -m src.governance
-  - 'load the stage with D_SYSTEM_DEMO_TERMINAL unset and count console 404 entries: 0 (REQ-012 R23)'
+  - 'load the stage with D_SYSTEM_DEMO_TERMINAL unset and count console 404 entries: 0 (REQ-012 R23). Measured baseline on c2c48b5: 14 in vite dev, most doubled by React StrictMode, counted through a Chrome DevTools Protocol console capture'
   deliverables:
   - ts/src/stage/InjectionDropdowns.tsx
   - ts/src/stage/NotesStripRegion.tsx
   - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  - ts/src/stage/DirectoryPickerDialog.tsx
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/useTerminalEnabled.ts
+  - ts/index.html
   next_action: TerminalRegion.tsx already probes terminal-enabled at line 405. Reuse that result
     rather than adding a second probe - InjectionDropdowns.tsx renders unconditionally today,
     which is the whole defect.
