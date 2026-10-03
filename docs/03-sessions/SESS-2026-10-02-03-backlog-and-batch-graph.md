@@ -20,14 +20,15 @@ depends_on: [doc-html-generation-design-system]
 
 ## Verification
 
-Run in the worktree on `dev` `d40d4f5` (the claim commit), with the phase's commits on top, at
-`21982bc`.
+Run in the worktree after the rebase onto `dev` `82c17e4`, at `80779a1`.
 
 ```text
 $ uv run pytest
-1319 passed, 1 warning in 296.55s (0:04:56)
+1320 passed, 1 warning in 311.12s (0:05:11)
 $ uv run python -m src.governance
 Governance OK: 43 systems, 421 documents, 34 memories, 347 backlog phases
+$ uv run python -m src.governance --check-ideas
+Idea field check: 100 phases name 168 ideas; 0 phases differ (0 missing, 0 extra)
 $ uv run python tools/check_no_private_content.py
 check_no_private_content: OK (1130 tracked files, 0 identifiers checked)
 $ uv run ruff check src/ test/
