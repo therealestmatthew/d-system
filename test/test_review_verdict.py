@@ -190,6 +190,12 @@ def test_finding_needs_evidence_and_a_known_severity() -> None:
     assert verdict_errors(verdict(findings=[finding(severity="critical")]))
 
 
+def test_finding_keeps_the_reviewers_consequence() -> None:
+    stated = finding(consequence="Shadow verdicts would be re-reviewed as if they had gated.")
+    assert verdict_errors(verdict(findings=[stated])) == []
+    assert verdict_errors(verdict(findings=[finding(consequence="")]))
+
+
 @pytest.mark.parametrize("field", ["draw_id", "reviewer_type", "verdict"])
 def test_sampled_rereview_outcome_needs_its_draw_reviewer_and_verdict(field: str) -> None:
     broken = outcome()
@@ -237,6 +243,13 @@ def test_drawn_entry_needs_an_excluded_type_and_a_known_reason() -> None:
     assert draw_errors(record)
     record = draw()
     record["sample"][0]["reason"] = "picked"
+    assert draw_errors(record)
+
+
+def test_draw_names_only_verdict_ids() -> None:
+    assert draw_errors(draw(considered=["not-a-verdict"]))
+    record = draw()
+    record["sample"][0]["verdict_id"] = "phase-asr-03"
     assert draw_errors(record)
 
 
