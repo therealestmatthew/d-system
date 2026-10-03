@@ -24059,6 +24059,8 @@ Placeholder: the owner will share more later.
 **Links**
 
 - relates_to ← `000557`
+- relates_to ← `000562`
+- relates_to ← `000563`
 
 ---
 
@@ -24079,3 +24081,34 @@ Origin: 000557 (decisionator agent) was recorded with "loving" where "logging" w
 **Created 2026-10-03T13:31:24-04:00 · Status: `open`**
 
 I need to investigate a better tool for dictation voice to text.Because the built in one does not properly capture what I'm saying. Despite me intentionally pronouncing and speaking everything as clearly as possible. We should consider whisper flow, but not limit to that consideration. We need to explore options so mark that as an idea as well.
+
+**Links**
+
+- relates_to ← `000563`
+
+---
+
+## 000562 · Investigate the Claude devs' plugin that scans sessions for important information to surface to the user
+
+**Created 2026-10-03T13:33:38-04:00 · Status: `open`**
+
+Claude devs on X just announced a plugin that scans sessions for important information to bring to my awareness, or generally the awareness of the user running it.
+
+This connects to the observability topics (000559).
+
+**Links**
+
+- relates_to → `000559`
+
+---
+
+## 000563 · Two-way voice system: I dictate, and an agent speaks back to me (not high priority)
+
+**Created 2026-10-03T13:33:38-04:00 · Status: `open`**
+
+I want a system where I can dictate  And I have an agent who will dictate back to me. The default text to voice on Claude code mobile is a little bit wonky, sometimes, so we may need to get creative, what I have currently works and it gets a job done. So this is not super high priority.  But it would be a very nice to have
+
+**Links**
+
+- relates_to → `000559`
+- relates_to → `000561`
