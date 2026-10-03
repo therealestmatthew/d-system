@@ -9484,10 +9484,12 @@ items:
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
+  ideas:
+  - '000555'
   systems:
   - sys-ui
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
   priority: 4
   session_budget: 1
@@ -9518,9 +9520,17 @@ items:
   - ts/src/stage/useTerminalEnabled.ts
   - ts/index.html
   session: doc-session-silence-flag-off-probes
-  next_action: Acceptance met on agent/phase-wbf-10 (14 console 404s before, 0 after, degradation
-    unchanged; SESS-2026-10-03-01). Awaiting the owner-approved merge, then the completion edit on
-    dev.
+  completion_evidence:
+  - ts/src/stage/useTerminalEnabled.ts
+  - ts/src/stage/InjectionDropdowns.tsx
+  - ts/index.html
+  - docs/03-sessions/SESS-2026-10-03-01-silence-flag-off-probes.md
+  result: 'Complete. With D_SYSTEM_DEMO_TERMINAL unset, console 404 entries on load went from 14 to 0
+    (Chrome DevTools Protocol capture, vite dev), with the four dropdowns still disabled, the
+    absent-terminal message shown and 0 uncaught exceptions; with the flag set every workbench
+    route is still requested. Independent demo-adversary review: PASS WITH FINDINGS, one fixed in
+    the record, two accepted (000555 recorded). Merged onto dev at f7cbdf7 with owner approval.'
+  next_action: None. Complete; follow-up 000555 covers the HTML viewer page-exists check.
 
 - id: phase-conc-01
   title: Define the stale-claim signal and report it in --ready
