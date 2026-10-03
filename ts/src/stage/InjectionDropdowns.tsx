@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Popover from './Popover'
+import { fetchWorkbench } from './useTerminalEnabled'
 
 const INJECTION_SOURCES_URL = '/api/v1/workbench/injection-sources'
 
@@ -72,7 +73,7 @@ function useInjectionSources() {
   const load = () => {
     const generation = ++fetchGeneration.current
     setLoadState('loading')
-    fetch(INJECTION_SOURCES_URL, { cache: 'no-store' })
+    fetchWorkbench(INJECTION_SOURCES_URL, { cache: 'no-store' })
       .then((response) => {
         if (generation !== fetchGeneration.current) return
         if (response.status === 404) {

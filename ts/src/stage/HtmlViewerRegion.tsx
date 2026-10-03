@@ -4,6 +4,7 @@ import Popover from './Popover'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadHtmlViewerTabs, saveHtmlViewerTabs } from '../workbench/storage'
 import { viewerBridge, type ViewerBridgeHandle } from './panelBridge'
+import { fetchWorkbench } from './useTerminalEnabled'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 const SEARCH_URL = '/api/v1/workbench/search'
@@ -235,7 +236,7 @@ export default function HtmlViewerRegion() {
     if (activeTab === null || activeTab.directory === null) return
     let cancelled = false
     setFilesLoadState('loading')
-    fetch(buildSearchUrl(activeTab.directory))
+    fetchWorkbench(buildSearchUrl(activeTab.directory))
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json() as Promise<DirectoryEntry[]>

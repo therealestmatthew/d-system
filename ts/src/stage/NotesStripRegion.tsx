@@ -3,6 +3,7 @@ import Tooltip from './Tooltip'
 import Popover from './Popover'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadActiveNotesFile, saveActiveNotesFile } from '../workbench/storage'
+import { fetchWorkbench } from './useTerminalEnabled'
 
 // The fixed notes directory (REQ-007 W01) — repository-relative, passed to the workbench
 // listing route below. Never walked directly by this component.
@@ -104,7 +105,7 @@ export default function NotesStripRegion() {
   useEffect(() => {
     let cancelled = false
     setFileListState('loading')
-    fetch(NOTES_FILE_LIST_URL)
+    fetchWorkbench(NOTES_FILE_LIST_URL)
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json()

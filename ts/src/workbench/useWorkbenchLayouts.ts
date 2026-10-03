@@ -7,6 +7,7 @@ import {
 } from './types'
 import { loadStoredState, patchStoredState } from './storage'
 import { PANEL_REGISTRY } from './panelRegistry'
+import { fetchWorkbench } from '../stage/useTerminalEnabled'
 
 // The two shipped layout files (REQ-007 W05, ADR-016 rule 1) — served at runtime by the Vite dev
 // plugin `serveWorkbenchLayouts` (`ts/vite.config.ts`) from `_data/workbench/layouts/`, never
@@ -70,7 +71,7 @@ const NO_VISIBLE_PANEL = ''
  * open, one this route's own absence-by-default posture (ADR-013) makes easy to trip over. */
 async function fetchTerminalPlatformDefaultPanel(): Promise<string> {
   try {
-    const response = await fetch(PLATFORM_ROUTE, { cache: 'no-store' })
+    const response = await fetchWorkbench(PLATFORM_ROUTE, { cache: 'no-store' })
     if (!response.ok) return BASH_PANEL_ID
     const body: unknown = await response.json()
     const platform =

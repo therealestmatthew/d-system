@@ -3,6 +3,7 @@ import DirectoryPickerDialog from './DirectoryPickerDialog'
 import FileTreeContextMenu from './FileTreeContextMenu'
 import { COMPATIBLE_EXTENSIONS } from './HtmlViewerRegion'
 import { useTerminalBridge, useViewerBridge } from './panelBridge'
+import { fetchWorkbench } from './useTerminalEnabled'
 
 const SEARCH_URL = '/api/v1/workbench/search'
 const REVEAL_URL = '/api/v1/workbench/reveal'
@@ -289,7 +290,7 @@ export default function FileBrowserRegion() {
   useEffect(() => {
     let cancelled = false
     setLoadState('loading')
-    fetch(buildSearchUrl(contextFolder))
+    fetchWorkbench(buildSearchUrl(contextFolder))
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json() as Promise<DirectoryEntry[]>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Popover from './Popover'
+import { fetchWorkbench } from './useTerminalEnabled'
 
 const LIST_URL = '/api/v1/workbench/list'
 
@@ -56,7 +57,7 @@ export default function DirectoryPickerDialog({
     let cancelled = false
     setLoadState('loading')
     const params = new URLSearchParams({ path: currentPath })
-    fetch(`${LIST_URL}?${params.toString()}`)
+    fetchWorkbench(`${LIST_URL}?${params.toString()}`)
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json() as Promise<DirectoryEntry[]>
