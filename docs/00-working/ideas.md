@@ -23999,7 +23999,7 @@ Unresolved: the failure message and the commit it ran on were not given with the
 
 ## 000554 · Bring OPS-028 (regenerate the engine pages) and its source generator docstring up to date with the pages that now exist
 
-**Created 2026-10-02T21:10:05-04:00 · Status: `open`**
+**Created 2026-10-02T21:10:05-04:00 · Status: `delivered`**
 
 Session 3 - Standby Builder, 2026-10-02, as given: "Bring OPS-028 (regenerate the engine pages) and the generator docstring it is generated from up to date: it still says one page exists and names REQ-036 R07-R14, but the ledger (phase-des-10) and backlog and batch graph (phase-des-12) pages now exist and batch tables are an input."
 
