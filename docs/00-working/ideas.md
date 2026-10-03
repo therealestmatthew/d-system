@@ -24004,3 +24004,11 @@ Unresolved: the failure message and the commit it ran on were not given with the
 Session 3 - Standby Builder, 2026-10-02, as given: "Bring OPS-028 (regenerate the engine pages) and the generator docstring it is generated from up to date: it still says one page exists and names REQ-036 R07-R14, but the ledger (phase-des-10) and backlog and batch graph (phase-des-12) pages now exist and batch tables are an input."
 
 What it would touch: OPS-028 and the generator docstring it is generated from (the sender did not name the generator file).
+
+---
+
+## 000555 · HtmlViewerRegion's page-exists check is fooled by Vite's SPA fallback
+
+**Created 2026-10-03T09:14:20-04:00 · Status: `open`**
+
+HtmlViewerRegion's page-exists HEAD check (/workbench-file/<file>, HtmlViewerRegion.tsx:268) gets 200 from Vite's SPA fallback when D_SYSTEM_DEMO_TERMINAL is unset, so the viewer reports `ready` and would iframe the app shell instead of showing `missing`. Found in phase-wbf-10's review. — Session 1 - Builder A
