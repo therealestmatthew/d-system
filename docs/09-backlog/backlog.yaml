@@ -13183,6 +13183,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-standby-3
+  session: doc-session-backlog-and-batch-graph
   priority: 1
   session_budget: 1
   depends_on:
