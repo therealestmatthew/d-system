@@ -353,7 +353,8 @@ items:
   - sys-retrieval
   owner: repository-owner
   agent: agent-builder-b
-  status: active
+  status: complete
+  session: doc-session-global-memory-retrieval
   priority: 1
   session_budget: 1
   depends_on:
@@ -374,8 +375,19 @@ items:
   - tools/load_context.py
   - test/test_load_context.py
   - docs/08-governance/OPS-003-load-context.md
-  next_action: Every acceptance condition met on agent/phase-rel-08 (SESS-2026-10-04-05); awaiting the
-    owner-approved merge, then the completion edit on dev.
+  completion_evidence:
+  - tools/load_context.py
+  - test/test_load_context.py
+  - docs/08-governance/OPS-003-load-context.md
+  - docs/03-sessions/SESS-2026-10-04-05-global-memory-retrieval.md
+  result: --project now returns that project's memories plus every scope global memory, including those
+    carrying project d-system (30 of 36 in the real brain, from 0), and excludes other projects' entries
+    and session notes with no project. --all is unbounded unless --limit is given; the default stays 10;
+    ties order by id. 17 new tests on a 13-memory corpus pass, 14 of them failing on the pre-change tool;
+    full suite 1436 passed, 1 skipped. An independent demo-adversary review found both acceptance conditions
+    met with two informational notes accepted; the pre-existing negative --limit crash is idea 000565.
+    Merged onto dev with the owner's approval.
+  next_action: Complete.
 - id: phase-rel-09
   title: Extend CI to ingestion and retrieval tooling
   plan: doc-reliability-follow-up
