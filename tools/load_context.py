@@ -127,6 +127,17 @@ def load(
     return "\n\n".join(parts)
 
 
+def positive_int(value: str) -> int:
+    """argparse type for --limit: an integer of at least 1, else a usage error (exit 2)."""
+    try:
+        number = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid int value: {value!r}") from None
+    if number < 1:
+        raise argparse.ArgumentTypeError(f"must be at least 1, got {number}")
+    return number
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Load brain memories as AI context")
     parser.add_argument("--query", "-q", help="Keyword search across title and content")
@@ -137,8 +148,8 @@ def main() -> None:
                         help="Filter by memory type")
     parser.add_argument("--tags", help="Comma-separated tag IDs to filter by")
     parser.add_argument("--system", "-s", help="Filter by system ID from systems.yaml")
-    parser.add_argument("--limit", "-n", type=int, default=None,
-                        help="Max memories to return (default 10; "
+    parser.add_argument("--limit", "-n", type=positive_int, default=None,
+                        help="Max memories to return, at least 1 (default 10; "
                              "unbounded with --all)")
     parser.add_argument("--all", dest="all_memories", action="store_true",
                         help="Return all memories, unbounded unless --limit is given "

@@ -230,3 +230,37 @@ def test_cli_project_and_tags(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
                               capsys: pytest.CaptureFixture[str]) -> None:
     ids = _run_cli(monkeypatch, capsys, "--project", "alpha", "--tags", "python,duckdb", "-n", "50")
     assert ids == ["p-alpha", "g-repo", "g-old"]
+
+
+# --- --limit must be a positive integer (idea 000565) ------------------------------------------
+
+
+@pytest.mark.parametrize("argv", [["--limit", "0"], ["--limit", "-1"], ["-n", "-5"],
+                                  ["--limit=-1"], ["--all", "--limit", "0"], ["--limit", "abc"]])
+def test_cli_rejects_a_non_positive_or_non_integer_limit(
+    corpus_db: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    argv: list[str],
+) -> None:
+    monkeypatch.setattr(sys, "argv", ["load_context.py", *argv])
+    with pytest.raises(SystemExit) as exit_info:
+        load_context.main()
+    assert exit_info.value.code == 2
+    captured = capsys.readouterr()
+    assert "argument --limit/-n:" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+
+
+def test_positive_int_messages() -> None:
+    import argparse
+
+    assert load_context.positive_int("1") == 1
+    with pytest.raises(argparse.ArgumentTypeError, match="must be at least 1, got 0"):
+        load_context.positive_int("0")
+    with pytest.raises(argparse.ArgumentTypeError, match="invalid int value: 'x'"):
+        load_context.positive_int("x")
+
+
+def test_cli_accepts_a_limit_of_one(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                                    capsys: pytest.CaptureFixture[str]) -> None:
+    assert _run_cli(monkeypatch, capsys, "--all", "--limit", "1") == ORDER[:1]

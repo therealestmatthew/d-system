@@ -43,7 +43,8 @@ filter and returns everything, unless an explicit `--limit` caps it.
 
 Requires `data/d_system.duckdb` to exist and be current — if it is missing or stale, rebuild it
 first with `tools/rebuild_db.py` ([OPS-002](OPS-002-rebuild-db.md)). An unrecognized `--type` value
-is rejected by `argparse` before any query runs, listing the legal values.
+is rejected by `argparse` before any query runs, listing the legal values. A `--limit` below 1,
+or one that is not an integer, is rejected the same way, with exit code 2 and no query run.
 
 <!-- generated:tool-reference:start -->
 
@@ -69,7 +70,7 @@ Usage:
 | `--type`, `-t` | Filter by memory type | concept, entity, procedure, episode, decision |  |  |
 | `--tags` | Comma-separated tag IDs to filter by |  |  |  |
 | `--system`, `-s` | Filter by system ID from systems.yaml |  |  |  |
-| `--limit`, `-n` | Max memories to return (default 10; unbounded with --all) |  |  |  |
+| `--limit`, `-n` | Max memories to return, at least 1 (default 10; unbounded with --all) |  |  |  |
 | `--all` | Return all memories, unbounded unless --limit is given (ignores other filters) |  |  |  |
 
 <!-- generated:tool-reference:end -->
