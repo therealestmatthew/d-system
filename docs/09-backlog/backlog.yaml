@@ -16567,6 +16567,7 @@ items:
   - plugins/idea-realization/test/test_doctor.py
   - plugins/idea-realization/test/test_regression.py
   - plugins/idea-realization/test/test_ideas.py
+  - plugins/idea-realization/test/test_partition.py
   - plugins/idea-realization/docs/protocol.md
   - plugins/idea-realization/docs/tools.md
   - plugins/idea-realization/README.md
