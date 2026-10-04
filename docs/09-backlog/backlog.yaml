@@ -12833,6 +12833,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-builder-a
+  session: doc-session-governance-atlas-page
   priority: 3
   session_budget: 1
   depends_on:
@@ -12860,6 +12861,16 @@ items:
   - _public/
   - templates/html/
   - templates/styles/
+  completion_evidence:
+  - _public/governance-atlas.html
+  - docs/03-sessions/SESS-2026-10-04-10-governance-atlas-page.md
+  result: 'Built _public/governance-atlas.html by hand from the house family, at the owner''s choice:
+    document codes and the allocator, the backlog and its claim model, the GOV series, and the idea log
+    with fold() and its one writer, plus how they refer to each other. No colour literal outside the
+    inlined house.css, no script, light and dark through the family''s mode flag, templates unchanged.
+    Governance OK and 1454 tests passed. demo-adversary review PASS WITH FINDINGS: no factual error in
+    over 20 claims checked; one process finding (these fields were missing before the merge) fixed
+    (SESS-2026-10-04-10).'
   next_action: Waits for phase-des-07's house family. Read REQ-036 R01-R06 for what the family provides
     before laying out the page.
 - id: phase-des-03

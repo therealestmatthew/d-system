@@ -76,8 +76,10 @@ page, and the phase declares no `test/` deliverable. The following checks were r
 
 ## Backlog
 
-`status: active`. The phase stays active until the branch is merged onto `dev` with the owner's
-approval. The completion edit follows the merge on `dev`.
+`status: active`, with `session: doc-session-governance-atlas-page`, `completion_evidence` (the page
+and this record) and `result` recorded on the branch, per `AGENTS.md` step 5. The phase stays
+active until the branch is merged onto `dev` with the owner's approval. The completion edit on
+`dev` then sets `status: complete`.
 
 ## Unresolved
 
@@ -86,3 +88,71 @@ approval. The completion edit follows the merge on `dev`.
 - Research for the page found six places where the governing documents disagree with each other
   or with the code. The page states none of the disputed facts; each one went to Ideation as
   `000574` to `000579`. The repository idea writer's lack of a lock was already idea `000158`.
+
+## Review
+
+A `demo-adversary` agent reviewed `b8dbdad..3ac69aa`. It reached its turn limit and was asked to
+report from what it had. Its report, condition by condition:
+
+- Verdict: PASS WITH FINDINGS. The findings concern process, not the page's content.
+- R13: Met.
+  - All four subjects are present (`#codes`, `#backlog`, `#gov`, `#ideas`), plus the cross-reference
+    section.
+  - The inlined CSS is byte-identical to `house.css` followed by `house-components.css`. The page
+    skeleton matches `house-page.html`.
+  - All 51 hex literals sit inside the style block. The body has no `style=` attribute and no
+    `<script>`. A hit on `#bac` is the `href="#backlog"` anchor, not a colour.
+- R12: Met. The page shows no idea or backlog counts or metrics.
+- Light and dark: Met. The page rendered in headless Chrome in light, and in dark with
+  `preferredColorScheme=0`, and the two screenshots differ. `git diff b8dbdad..HEAD -- templates/`
+  is empty.
+- Factual accuracy: no error found in more than 20 claims checked against primary sources:
+  - the series table, the allocator and `--next-code <kind>`, and "a gap is never refilled";
+  - the three reservation and retirement mechanisms;
+  - the claim, worktree, rebase and merge steps;
+  - the `GOV` list, with `GOV-012` reserved and `GOV-019` never issued;
+  - the front-matter fields, and the statuses allowed for each kind, checked against the
+    enforcement code;
+  - the idea event kinds, and every row of the status-transition table, checked against the
+    schema;
+  - the `fold()` and `append_idea.py` behaviour;
+  - the references table;
+  - `GOV-003`'s three completion conditions.
+- Finding 1, minor, process: `backlog.yaml` was not updated on the branch. `phase-des-02` had no
+  `session`, `completion_evidence` or `result`, although `AGENTS.md` step 5 says to add them before
+  asking to merge.
+- Not checked: the full `pytest` run (it timed out in the foreground), the 390 px render, and the
+  private-content check run with the primary checkout's identifiers.
+
+Finding 1 is fixed. The three fields are now on the phase, with `status` still `active`. The
+unchecked items were run in this session and are recorded under Verification.
+
+## Decisions
+
+- **The owner chose a hand-written page** over a generator that reads live data. That fits the
+  declared deliverables, which include no `tools/` or `test/` path. The page therefore carries no
+  live counts, in line with the house components' rule that numbers come from a generator. Its
+  lists are dated by the header.
+- **The page states no fact the governing documents disagree on.** Research found six such
+  disagreements, sent to Ideation as `000574` to `000579`. For example, the claim maximum reads as
+  "the configured `max_active`" rather than a number.
+- **The page is assembled through the family's own `fill()`.** It is not a hand-copied skeleton,
+  so it uses the house family's template and stylesheets exactly. The assembly script was a scratch
+  file and is not tracked, because the content is hand-written.
+
+## Corrections
+
+- `AGENTS.md` hand-off step 5 was skipped: the session, evidence and result fields were left for
+  the completion commit after the merge. The reviewer caught it here, and it is fixed on the branch.
+  The same step was also skipped on `phase-des-11` and `phase-des-01` earlier today. On those
+  phases, all three fields arrived only in the completion commit on `dev`.
+- In the first render, the id cells nested `<code>` inside the already monospaced `td.id`, which
+  shrank the text twice. The nesting was removed before the commit.
+
+## Left undone
+
+- `phase-des-02` stays `active` until the merge. The completion edit on `dev` sets
+  `status: complete`.
+- The page's tables are a snapshot and need a hand edit when the `GOV` series or the code register
+  changes.
+- The phase's title still says "in the atlas family". The phase entry is not edited for that here.
