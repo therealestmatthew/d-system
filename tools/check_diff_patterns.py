@@ -13,8 +13,9 @@ reports each of these whose line is an added line of the diff:
   different code, or more than one code);
 - a `cast(Any, ...)` call (`cast` or `typing.cast`; `Any` or `typing.Any`);
 - an `except` clause that is bare or catches `Exception` or `BaseException` (alone or in a tuple)
-  and whose body is only `pass`. The line reported is the `except` line, so an `except` that was
-  already there is not reported when only its body changes.
+  and whose body is only `pass`, when its `except` line or its `pass` line is added. A handler
+  whose body is replaced by `pass` is reported at the `pass` line even though its `except` line is
+  unchanged (owner ruling, 2026-10-04).
 
 Comments are found with `tokenize` and calls and handlers with `ast`, so the same text inside a
 string literal, or in a Markdown file, is never reported. Unchanged context lines and removed lines
@@ -131,12 +132,14 @@ def findings_in(path: str, source: str, lines: set[int]) -> list[tuple[int, str]
             found.append((node.lineno, "cast-any"))
         if (
             isinstance(node, ast.ExceptHandler)
-            and node.lineno in lines
             and _broad(node)
             and len(node.body) == 1
             and isinstance(node.body[0], ast.Pass)
         ):
-            found.append((node.lineno, "except-pass"))
+            if node.lineno in lines:
+                found.append((node.lineno, "except-pass"))
+            elif node.body[0].lineno in lines:
+                found.append((node.body[0].lineno, "except-pass"))
     return sorted(set(found))
 
 

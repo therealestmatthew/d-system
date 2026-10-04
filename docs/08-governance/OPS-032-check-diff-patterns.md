@@ -43,7 +43,9 @@ The three patterns, on added lines of Python files only:
 - `type-ignore`: a `# type: ignore` comment whose code list is not exactly `[import-untyped]`;
 - `cast-any`: a `cast(Any, ...)` call;
 - `except-pass`: an `except` that is bare or catches `Exception` or `BaseException` and whose body
-  is only `pass`. The `except` line is the one checked.
+  is only `pass`, when its `except` line or its `pass` line is added. Replacing an existing
+  handler's body with `pass` is reported at the `pass` line (owner ruling, 2026-10-04, after the
+  phase review showed the `except`-line-only rule missed it).
 
 Comments and code are read from the file at the head with Python's own tokenizer and parser, so the
 same text in a string literal, a docstring or a Markdown file is not reported. Unchanged and
@@ -78,8 +80,9 @@ reports each of these whose line is an added line of the diff:
   different code, or more than one code);
 - a `cast(Any, ...)` call (`cast` or `typing.cast`; `Any` or `typing.Any`);
 - an `except` clause that is bare or catches `Exception` or `BaseException` (alone or in a tuple)
-  and whose body is only `pass`. The line reported is the `except` line, so an `except` that was
-  already there is not reported when only its body changes.
+  and whose body is only `pass`, when its `except` line or its `pass` line is added. A handler
+  whose body is replaced by `pass` is reported at the `pass` line even though its `except` line is
+  unchanged (owner ruling, 2026-10-04).
 
 Comments are found with `tokenize` and calls and handlers with `ast`, so the same text inside a
 string literal, or in a Markdown file, is never reported. Unchanged context lines and removed lines

@@ -144,6 +144,32 @@ def test_an_unchanged_existing_ignore_in_context_passes(
     assert code == 0, out
 
 
+def test_a_body_replaced_by_pass_fails(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    # The `except Exception:` line stays as context; only the body becomes `pass`.
+    commit(repo, appended("def g() -> None:\n    try:\n        g()\n    except Exception:\n"
+                          "        print('logged')\n"))
+    git(repo, "tag", "-f", "base")
+    commit(repo, appended("def g() -> None:\n    try:\n        g()\n    except Exception:\n"
+                          "        pass\n"))
+    code, out = run(repo, capsys)
+    line = len(appended("def g() -> None:\n    try:\n        g()\n    except Exception:\n")
+               .splitlines()) + 1
+    assert code == 1
+    assert f"pkg/mod.py:{line}: except-pass: pass" in out
+
+
+def test_a_specific_handler_body_replaced_by_pass_passes(
+    repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    commit(repo, appended("def g() -> None:\n    try:\n        g()\n    except KeyError:\n"
+                          "        print('logged')\n"))
+    git(repo, "tag", "-f", "base")
+    commit(repo, appended("def g() -> None:\n    try:\n        g()\n    except KeyError:\n"
+                          "        pass\n"))
+    code, out = run(repo, capsys)
+    assert code == 0, out
+
+
 def test_a_removed_ignore_passes(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     commit(repo, BASE_SOURCE.replace("  # type: ignore[return-value]", ""))
     code, out = run(repo, capsys)

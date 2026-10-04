@@ -892,5 +892,10 @@ Applied by `phase-grd-03` (`PLAN-045`, `REQ-028` R07-R10) in
   merge-gate re-run on `dev`": that re-run tests the branch tip, not `dev`, and comes after `READY`,
   which must already carry the result. Idea `000572` tracks amending D7 to match.
 
+- **A body replaced by `pass` counts** (owner ruling, 2026-10-04, after the phase review): the
+  diff-pattern check reports a broad `except` whose body is only `pass` when either its `except`
+  line or its `pass` line is added. `REQ-028` R08's wording ("an added line containing ... an
+  `except` clause") would leave an existing handler silenced in place unreported.
+
 **Why recorded here:** `PLAN-045` D7 still states the earlier base. A session reading the plan alone
 would wait for a Session Manager run that never produces a base report.
