@@ -302,13 +302,18 @@
   <header class="overview__header">
     <h1 class="overview__title">D-System Overview</h1>
     <p class="overview__meta">
-      Generated 2026-09-12T00:33:23-04:00
-      &middot; 144 ideas
-      &middot; 635 events
-      &middot; 122 backlog phases
-      &middot; 8 concepts
-      &middot; 43 terms
-      &middot; 18 systems
+      Generated 2026-10-04T01:34:07-04:00
+      &middot; 564 ideas
+      &middot; 2717 events
+      &middot; 347 backlog phases
+      &middot; 11 concepts
+      &middot; 127 terms
+      &middot; 43 systems
+    </p>
+    <p class="overview__meta">
+      Source commit <code>442c74eef837</code>
+      &middot; Commit date 2026-10-04
+      &middot; Content hash <code>sha256:e1e86bf738b4a8f05708d4ea5717ab7d99c27951d987df506ea48489e516a6bc</code>
     </p>
   </header>
 
@@ -329,29 +334,49 @@
   <h3 class="metric-section__title">Idea funnel by status</h3>
   <div class="metric-section__chart" role="img" aria-label="Idea funnel by status by count">
     <div class="bar-row">
-  <span class="bar-row__label">discarded</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.48%;"></span></span>
-  <span class="bar-row__value">2</span>
-</div>
-<div class="bar-row">
-  <span class="bar-row__label">open</span>
+  <span class="bar-row__label">absorbed</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
   <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
-  <span class="bar-row__label">promoted</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 5.19%;"></span></span>
+  <span class="bar-row__label">delivered</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.2%;"></span></span>
+  <span class="bar-row__value">1</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.42%;"></span></span>
   <span class="bar-row__value">7</span>
 </div>
 <div class="bar-row">
+  <span class="bar-row__label">open</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.89%;"></span></span>
+  <span class="bar-row__value">39</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">promoted</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 2.63%;"></span></span>
+  <span class="bar-row__value">13</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">resolved</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
   <span class="bar-row__label">reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 2.02%;"></span></span>
+  <span class="bar-row__value">10</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">set_aside</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
   <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">triaged</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">135</span>
+  <span class="bar-row__value">494</span>
 </div>
 
   </div>
@@ -365,7 +390,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>discarded</td><td>2</td><td>0.0139</td></tr><tr><td>open</td><td>0</td><td>0.0</td></tr><tr><td>promoted</td><td>7</td><td>0.0486</td></tr><tr><td>reviewing</td><td>0</td><td>0.0</td></tr><tr><td>triaged</td><td>135</td><td>0.9375</td></tr>
+        <tr><td>absorbed</td><td>0</td><td>0.0</td></tr><tr><td>delivered</td><td>1</td><td>0.0018</td></tr><tr><td>discarded</td><td>7</td><td>0.0124</td></tr><tr><td>open</td><td>39</td><td>0.0691</td></tr><tr><td>promoted</td><td>13</td><td>0.023</td></tr><tr><td>resolved</td><td>0</td><td>0.0</td></tr><tr><td>reviewing</td><td>10</td><td>0.0177</td></tr><tr><td>set_aside</td><td>0</td><td>0.0</td></tr><tr><td>triaged</td><td>494</td><td>0.8759</td></tr>
       </tbody>
     </table>
   </details>
@@ -375,18 +400,33 @@
   <div class="metric-section__chart" role="img" aria-label="Cycle time between statuses (hours) by count">
     <div class="bar-row">
   <span class="bar-row__label">discarded-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.93%;"></span></span>
+  <span class="bar-row__value">10</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;absorbed</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
   <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
+  <span class="bar-row__label">open-&gt;delivered</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.19%;"></span></span>
+  <span class="bar-row__value">1</span>
+</div>
+<div class="bar-row">
   <span class="bar-row__label">open-&gt;discarded</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.43%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.39%;"></span></span>
   <span class="bar-row__value">2</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">open-&gt;promoted</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.43%;"></span></span>
-  <span class="bar-row__value">2</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.58%;"></span></span>
+  <span class="bar-row__value">3</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">open-&gt;resolved</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">open-&gt;reviewing</span>
@@ -396,7 +436,22 @@
 <div class="bar-row">
   <span class="bar-row__label">open-&gt;triaged</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">140</span>
+  <span class="bar-row__value">519</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">promoted-&gt;delivered</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">reviewing-&gt;absorbed</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">reviewing-&gt;delivered</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">reviewing-&gt;discarded</span>
@@ -409,17 +464,52 @@
   <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
-  <span class="bar-row__label">triaged-&gt;discarded</span>
+  <span class="bar-row__label">reviewing-&gt;resolved</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
   <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
+  <span class="bar-row__label">set_aside-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">set_aside-&gt;triaged</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;absorbed</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;delivered</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;discarded</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 2.89%;"></span></span>
+  <span class="bar-row__value">15</span>
+</div>
+<div class="bar-row">
   <span class="bar-row__label">triaged-&gt;promoted</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 3.57%;"></span></span>
-  <span class="bar-row__value">5</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.93%;"></span></span>
+  <span class="bar-row__value">10</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;resolved</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">triaged-&gt;reviewing</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">triaged-&gt;set_aside</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
   <span class="bar-row__value">0</span>
 </div>
@@ -435,7 +525,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>discarded-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;discarded</td><td>2</td><td>2.43</td></tr><tr><td>open-&gt;promoted</td><td>2</td><td>28.32</td></tr><tr><td>open-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;triaged</td><td>140</td><td>3.4</td></tr><tr><td>reviewing-&gt;discarded</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;promoted</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;discarded</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;promoted</td><td>5</td><td>2.32</td></tr><tr><td>triaged-&gt;reviewing</td><td>0</td><td>0.0</td></tr>
+        <tr><td>discarded-&gt;reviewing</td><td>10</td><td>260.74</td></tr><tr><td>open-&gt;absorbed</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;delivered</td><td>1</td><td>12.03</td></tr><tr><td>open-&gt;discarded</td><td>2</td><td>2.43</td></tr><tr><td>open-&gt;promoted</td><td>3</td><td>0.12</td></tr><tr><td>open-&gt;resolved</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>open-&gt;triaged</td><td>519</td><td>3.31</td></tr><tr><td>promoted-&gt;delivered</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;absorbed</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;delivered</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;discarded</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;promoted</td><td>0</td><td>0.0</td></tr><tr><td>reviewing-&gt;resolved</td><td>0</td><td>0.0</td></tr><tr><td>set_aside-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>set_aside-&gt;triaged</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;absorbed</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;delivered</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;discarded</td><td>15</td><td>43.17</td></tr><tr><td>triaged-&gt;promoted</td><td>10</td><td>2.3</td></tr><tr><td>triaged-&gt;resolved</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;reviewing</td><td>0</td><td>0.0</td></tr><tr><td>triaged-&gt;set_aside</td><td>0</td><td>0.0</td></tr>
       </tbody>
     </table>
   </details>
@@ -446,12 +536,12 @@
     <div class="bar-row">
   <span class="bar-row__label">annotated</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">143</span>
+  <span class="bar-row__value">527</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">unannotated</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.7%;"></span></span>
-  <span class="bar-row__value">1</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.02%;"></span></span>
+  <span class="bar-row__value">37</span>
 </div>
 
   </div>
@@ -465,7 +555,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>annotated</td><td>143</td><td>0.9931</td></tr><tr><td>unannotated</td><td>1</td><td>0.0069</td></tr>
+        <tr><td>annotated</td><td>527</td><td>0.9344</td></tr><tr><td>unannotated</td><td>37</td><td>0.0656</td></tr>
       </tbody>
     </table>
   </details>
@@ -474,19 +564,24 @@
   <h3 class="metric-section__title">Link type distribution</h3>
   <div class="metric-section__chart" role="img" aria-label="Link type distribution by count">
     <div class="bar-row">
+  <span class="bar-row__label">component_of</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
   <span class="bar-row__label">extends</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 16.0%;"></span></span>
-  <span class="bar-row__value">24</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 8.59%;"></span></span>
+  <span class="bar-row__value">66</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">relates_to</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">150</span>
+  <span class="bar-row__value">768</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">supersedes</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
-  <span class="bar-row__value">0</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.52%;"></span></span>
+  <span class="bar-row__value">4</span>
 </div>
 
   </div>
@@ -500,7 +595,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>extends</td><td>24</td></tr><tr><td>relates_to</td><td>150</td></tr><tr><td>supersedes</td><td>0</td></tr>
+        <tr><td>component_of</td><td>0</td></tr><tr><td>extends</td><td>66</td></tr><tr><td>relates_to</td><td>768</td></tr><tr><td>supersedes</td><td>4</td></tr>
       </tbody>
     </table>
   </details>
@@ -511,12 +606,12 @@
     <div class="bar-row">
   <span class="bar-row__label">connected</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">119</span>
+  <span class="bar-row__value">485</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">orphaned</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.01%;"></span></span>
-  <span class="bar-row__value">25</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 16.29%;"></span></span>
+  <span class="bar-row__value">79</span>
 </div>
 
   </div>
@@ -530,7 +625,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>connected</td><td>119</td></tr><tr><td>orphaned</td><td>25</td></tr>
+        <tr><td>connected</td><td>485</td></tr><tr><td>orphaned</td><td>79</td></tr>
       </tbody>
     </table>
   </details>
@@ -540,33 +635,148 @@
   <div class="metric-section__chart" role="img" aria-label="Idea throughput by day by created">
     <div class="bar-row">
   <span class="bar-row__label">2026-09-06</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 41.3%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 24.68%;"></span></span>
   <span class="bar-row__value">19</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">2026-09-07</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 36.96%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 22.08%;"></span></span>
   <span class="bar-row__value">17</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">2026-09-08</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 28.26%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 16.88%;"></span></span>
   <span class="bar-row__value">13</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">2026-09-09</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 39.13%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 23.38%;"></span></span>
   <span class="bar-row__value">18</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">2026-09-10</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 67.39%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 40.26%;"></span></span>
   <span class="bar-row__value">31</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">2026-09-11</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 59.74%;"></span></span>
   <span class="bar-row__value">46</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-12</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 64.94%;"></span></span>
+  <span class="bar-row__value">50</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-13</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 37.66%;"></span></span>
+  <span class="bar-row__value">29</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-14</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 18.18%;"></span></span>
+  <span class="bar-row__value">14</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-15</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 15.58%;"></span></span>
+  <span class="bar-row__value">12</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-16</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 6.49%;"></span></span>
+  <span class="bar-row__value">5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-17</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 18.18%;"></span></span>
+  <span class="bar-row__value">14</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-18</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-19</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 25.97%;"></span></span>
+  <span class="bar-row__value">20</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-20</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.79%;"></span></span>
+  <span class="bar-row__value">6</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-21</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 20.78%;"></span></span>
+  <span class="bar-row__value">16</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-22</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 35.06%;"></span></span>
+  <span class="bar-row__value">27</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-23</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">77</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-24</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 51.95%;"></span></span>
+  <span class="bar-row__value">40</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-25</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 14.29%;"></span></span>
+  <span class="bar-row__value">11</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-26</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 10.39%;"></span></span>
+  <span class="bar-row__value">8</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-27</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 48.05%;"></span></span>
+  <span class="bar-row__value">37</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-28</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.3%;"></span></span>
+  <span class="bar-row__value">1</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-29</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 7.79%;"></span></span>
+  <span class="bar-row__value">6</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-09-30</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 6.49%;"></span></span>
+  <span class="bar-row__value">5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-10-01</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 38.96%;"></span></span>
+  <span class="bar-row__value">30</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-10-02</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 2.6%;"></span></span>
+  <span class="bar-row__value">2</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-10-03</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 11.69%;"></span></span>
+  <span class="bar-row__value">9</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">2026-10-04</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.3%;"></span></span>
+  <span class="bar-row__value">1</span>
 </div>
 
   </div>
@@ -580,7 +790,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>2026-09-06</td><td>19</td></tr><tr><td>2026-09-07</td><td>17</td></tr><tr><td>2026-09-08</td><td>13</td></tr><tr><td>2026-09-09</td><td>18</td></tr><tr><td>2026-09-10</td><td>31</td></tr><tr><td>2026-09-11</td><td>46</td></tr>
+        <tr><td>2026-09-06</td><td>19</td></tr><tr><td>2026-09-07</td><td>17</td></tr><tr><td>2026-09-08</td><td>13</td></tr><tr><td>2026-09-09</td><td>18</td></tr><tr><td>2026-09-10</td><td>31</td></tr><tr><td>2026-09-11</td><td>46</td></tr><tr><td>2026-09-12</td><td>50</td></tr><tr><td>2026-09-13</td><td>29</td></tr><tr><td>2026-09-14</td><td>14</td></tr><tr><td>2026-09-15</td><td>12</td></tr><tr><td>2026-09-16</td><td>5</td></tr><tr><td>2026-09-17</td><td>14</td></tr><tr><td>2026-09-18</td><td>0</td></tr><tr><td>2026-09-19</td><td>20</td></tr><tr><td>2026-09-20</td><td>6</td></tr><tr><td>2026-09-21</td><td>16</td></tr><tr><td>2026-09-22</td><td>27</td></tr><tr><td>2026-09-23</td><td>77</td></tr><tr><td>2026-09-24</td><td>40</td></tr><tr><td>2026-09-25</td><td>11</td></tr><tr><td>2026-09-26</td><td>8</td></tr><tr><td>2026-09-27</td><td>37</td></tr><tr><td>2026-09-28</td><td>1</td></tr><tr><td>2026-09-29</td><td>6</td></tr><tr><td>2026-09-30</td><td>5</td></tr><tr><td>2026-10-01</td><td>30</td></tr><tr><td>2026-10-02</td><td>2</td></tr><tr><td>2026-10-03</td><td>9</td></tr><tr><td>2026-10-04</td><td>1</td></tr>
       </tbody>
     </table>
   </details>
@@ -588,7 +798,202 @@
 <article class="metric-section" id="metric-age_of_open_ideas">
   <h3 class="metric-section__title">Age of open ideas (days)</h3>
   <div class="metric-section__chart" role="img" aria-label="Age of open ideas (days) by age_days">
-    
+    <div class="bar-row">
+  <span class="bar-row__label">000525</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000526</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000527</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000528</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000529</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000530</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000531</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000532</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000533</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000534</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000535</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000536</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000537</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000538</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000539</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000540</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000541</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000542</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000543</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000544</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000545</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000546</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000547</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000548</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000549</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
+  <span class="bar-row__value">2.38</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000550</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 98.74%;"></span></span>
+  <span class="bar-row__value">2.35</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000551</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 98.32%;"></span></span>
+  <span class="bar-row__value">2.34</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000552</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 98.32%;"></span></span>
+  <span class="bar-row__value">2.34</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000553</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 83.61%;"></span></span>
+  <span class="bar-row__value">1.99</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000555</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 28.57%;"></span></span>
+  <span class="bar-row__value">0.68</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000556</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 22.27%;"></span></span>
+  <span class="bar-row__value">0.53</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000557</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.43%;"></span></span>
+  <span class="bar-row__value">0.51</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000558</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.43%;"></span></span>
+  <span class="bar-row__value">0.51</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000559</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.43%;"></span></span>
+  <span class="bar-row__value">0.51</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000560</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.01%;"></span></span>
+  <span class="bar-row__value">0.5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000561</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.01%;"></span></span>
+  <span class="bar-row__value">0.5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000562</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.01%;"></span></span>
+  <span class="bar-row__value">0.5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000563</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 21.01%;"></span></span>
+  <span class="bar-row__value">0.5</span>
+</div>
+<div class="bar-row">
+  <span class="bar-row__label">000564</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
+  <span class="bar-row__value">0.0</span>
+</div>
+
   </div>
   <details class="metric-section__table-fallback">
     <summary>Show data table</summary>
@@ -600,7 +1005,7 @@
         </tr>
       </thead>
       <tbody>
-        
+        <tr><td>000525</td><td>2.38</td></tr><tr><td>000526</td><td>2.38</td></tr><tr><td>000527</td><td>2.38</td></tr><tr><td>000528</td><td>2.38</td></tr><tr><td>000529</td><td>2.38</td></tr><tr><td>000530</td><td>2.38</td></tr><tr><td>000531</td><td>2.38</td></tr><tr><td>000532</td><td>2.38</td></tr><tr><td>000533</td><td>2.38</td></tr><tr><td>000534</td><td>2.38</td></tr><tr><td>000535</td><td>2.38</td></tr><tr><td>000536</td><td>2.38</td></tr><tr><td>000537</td><td>2.38</td></tr><tr><td>000538</td><td>2.38</td></tr><tr><td>000539</td><td>2.38</td></tr><tr><td>000540</td><td>2.38</td></tr><tr><td>000541</td><td>2.38</td></tr><tr><td>000542</td><td>2.38</td></tr><tr><td>000543</td><td>2.38</td></tr><tr><td>000544</td><td>2.38</td></tr><tr><td>000545</td><td>2.38</td></tr><tr><td>000546</td><td>2.38</td></tr><tr><td>000547</td><td>2.38</td></tr><tr><td>000548</td><td>2.38</td></tr><tr><td>000549</td><td>2.38</td></tr><tr><td>000550</td><td>2.35</td></tr><tr><td>000551</td><td>2.34</td></tr><tr><td>000552</td><td>2.34</td></tr><tr><td>000553</td><td>1.99</td></tr><tr><td>000555</td><td>0.68</td></tr><tr><td>000556</td><td>0.53</td></tr><tr><td>000557</td><td>0.51</td></tr><tr><td>000558</td><td>0.51</td></tr><tr><td>000559</td><td>0.51</td></tr><tr><td>000560</td><td>0.5</td></tr><tr><td>000561</td><td>0.5</td></tr><tr><td>000562</td><td>0.5</td></tr><tr><td>000563</td><td>0.5</td></tr><tr><td>000564</td><td>0.0</td></tr>
       </tbody>
     </table>
   </details>
@@ -610,33 +1015,33 @@
   <div class="metric-section__chart" role="img" aria-label="Backlog phases by status by count">
     <div class="bar-row">
   <span class="bar-row__label">active</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 3.28%;"></span></span>
-  <span class="bar-row__value">2</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.62%;"></span></span>
+  <span class="bar-row__value">3</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">blocked</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 1.64%;"></span></span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.54%;"></span></span>
   <span class="bar-row__value">1</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">cancelled</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.0%;"></span></span>
-  <span class="bar-row__value">0</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 0.54%;"></span></span>
+  <span class="bar-row__value">1</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">complete</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 86.89%;"></span></span>
-  <span class="bar-row__value">53</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 75.68%;"></span></span>
+  <span class="bar-row__value">140</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">deferred</span>
-  <span class="bar-row__track"><span class="bar-row__fill" style="width: 8.2%;"></span></span>
-  <span class="bar-row__value">5</span>
+  <span class="bar-row__track"><span class="bar-row__fill" style="width: 9.19%;"></span></span>
+  <span class="bar-row__value">17</span>
 </div>
 <div class="bar-row">
   <span class="bar-row__label">queued</span>
   <span class="bar-row__track"><span class="bar-row__fill" style="width: 100.0%;"></span></span>
-  <span class="bar-row__value">61</span>
+  <span class="bar-row__value">185</span>
 </div>
 
   </div>
@@ -650,7 +1055,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>active</td><td>2</td></tr><tr><td>blocked</td><td>1</td></tr><tr><td>cancelled</td><td>0</td></tr><tr><td>complete</td><td>53</td></tr><tr><td>deferred</td><td>5</td></tr><tr><td>queued</td><td>61</td></tr>
+        <tr><td>active</td><td>3</td></tr><tr><td>blocked</td><td>1</td></tr><tr><td>cancelled</td><td>1</td></tr><tr><td>complete</td><td>140</td></tr><tr><td>deferred</td><td>17</td></tr><tr><td>queued</td><td>185</td></tr>
       </tbody>
     </table>
   </details>
@@ -664,7 +1069,7 @@
   <h2 class="overview__panel-title">Concepts &amp; terminology</h2>
 
   <section class="inventory__group">
-    <h3 class="inventory__group-title">Concepts (8)</h3>
+    <h3 class="inventory__group-title">Concepts (11)</h3>
     <table class="inventory-table">
       <thead>
         <tr>
@@ -712,10 +1117,22 @@
   <td>sys-brain, sys-retrieval</td>
 </tr>
 <tr>
+  <td class="inventory-table__id">mem-concept-terms-organizational-schema-system</td>
+  <td>Organizational and Schema-System Terms</td>
+  <td>frameworks, knowledge-base</td>
+  <td>sys-brain, sys-contracts, sys-governance, sys-portfolio</td>
+</tr>
+<tr>
   <td class="inventory-table__id">mem-concept-terms-plans-and-work</td>
   <td>Plans and Work</td>
   <td></td>
   <td>sys-backlog, sys-governance</td>
+</tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-skills-and-agents-demo</td>
+  <td>Skills and agents</td>
+  <td>demo-glossary</td>
+  <td>sys-brain</td>
 </tr>
 <tr>
   <td class="inventory-table__id">mem-concept-terms-systems-vocabulary</td>
@@ -723,13 +1140,19 @@
   <td></td>
   <td>sys-governance</td>
 </tr>
+<tr>
+  <td class="inventory-table__id">mem-concept-terms-workbench-ui</td>
+  <td>Workbench UI</td>
+  <td></td>
+  <td>sys-wb-layout</td>
+</tr>
 
       </tbody>
     </table>
   </section>
 
   <section class="inventory__group">
-    <h3 class="inventory__group-title">Terms (43)</h3>
+    <h3 class="inventory__group-title">Terms (127)</h3>
     <table class="inventory-table">
       <thead>
         <tr>
@@ -739,6 +1162,30 @@
       </thead>
       <tbody>
         <tr>
+  <td>1. Layout `slot_id` values — RENAME</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>2. CSS class names — ALIAS, meaning leave them alone</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>3. `REQ-007` row wording — ALIAS, with one amendment already owed</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>4. localStorage keys — RENAME, executed by a version bump, with no alias and no migration code</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>5. Panel registry ids — ALIAS, meaning leave them alone</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>6. Test fixtures — RENAME, in the same commit as class 1</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
   <td>`_data/`</td>
   <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
 </tr>
@@ -759,8 +1206,36 @@
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
 </tr>
 <tr>
+  <td>Advanced topics, named but not covered in depth</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Affiliation</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Agent</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Agentic loop</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Amendment behavior</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Assignment</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
   <td>Brain</td>
   <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Business contract</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 <tr>
   <td>Catalog</td>
@@ -769,6 +1244,18 @@
 <tr>
   <td>Code</td>
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Command</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Company</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Company relationship</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 <tr>
   <td>Completion evidence</td>
@@ -783,8 +1270,28 @@
   <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
 </tr>
 <tr>
+  <td>Conflict resolution event</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Context</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Control account</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Data contract</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Decision (memory type)</td>
   <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
+</tr>
+<tr>
+  <td>Deliverable</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 <tr>
   <td>Deliverable</td>
@@ -795,6 +1302,10 @@
   <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
 </tr>
 <tr>
+  <td>Document asset</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Document code allocation</td>
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
 </tr>
@@ -803,8 +1314,28 @@
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
 </tr>
 <tr>
+  <td>Document link</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Domain</td>
   <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
+</tr>
+<tr>
+  <td>Effective time and recorded time</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Element</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Engagement</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Engagement-project and engagement-contract</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 <tr>
   <td>Entity (data sense)</td>
@@ -823,6 +1354,22 @@
   <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
 </tr>
 <tr>
+  <td>Event envelope and domain payload</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>External reference</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Generated page</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Global identity</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Governance check</td>
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
 </tr>
@@ -833,6 +1380,42 @@
 <tr>
   <td>Governed plan</td>
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Idea classification axes</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Identity registry</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Layout</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Legal entity</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>LLM</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Master data management (MDM)</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>MCP</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>MCP server</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Memory</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
 </tr>
 <tr>
   <td>Memory type</td>
@@ -847,6 +1430,38 @@
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
 </tr>
 <tr>
+  <td>Opportunity</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Opportunity party and engagement party</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Orchestration and multi-agent</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Overview</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Panel</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Panel type</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Party reference (PartyRef)</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Person alias</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Phase</td>
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
 </tr>
@@ -859,16 +1474,80 @@
   <td>Memory and Retrieval <span class="inventory-table__id">(mem-concept-terms-memory-and-retrieval)</span></td>
 </tr>
 <tr>
+  <td>Programming contract</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Progressive disclosure</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Project</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Project party</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Projection</td>
   <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Prompt and system prompt</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Prospect</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Prospecting</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Provisional party</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Record multiplicity</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Region (workbench)</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
 </tr>
 <tr>
   <td>Reserved code</td>
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
 </tr>
 <tr>
+  <td>Resolved record</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
   <td>Retired code</td>
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
+</tr>
+<tr>
+  <td>Role assignment occurrence</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Role definition</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Schema mapping</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Schema registry</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Schema-governed object</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 <tr>
   <td>Scope (memory field)</td>
@@ -879,8 +1558,28 @@
   <td>Documents and Governance <span class="inventory-table__id">(mem-concept-terms-documents-and-governance)</span></td>
 </tr>
 <tr>
+  <td>Session</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Session (workbench)</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
   <td>Session budget</td>
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Shared analytical dimension</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Skill</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Slot</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
 </tr>
 <tr>
   <td>Source model</td>
@@ -889,6 +1588,10 @@
 <tr>
   <td>Source of truth</td>
   <td>Data and Storage <span class="inventory-table__id">(mem-concept-terms-data-and-storage)</span></td>
+</tr>
+<tr>
+  <td>Sub-agent</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
 </tr>
 <tr>
   <td>Subsystem</td>
@@ -903,12 +1606,68 @@
   <td>Systems <span class="inventory-table__id">(mem-concept-terms-systems-vocabulary)</span></td>
 </tr>
 <tr>
+  <td>Tag assignment</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Template</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Template family</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>Token</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Tool</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
+  <td>Tool call</td>
+  <td>Skills and agents <span class="inventory-table__id">(mem-concept-terms-skills-and-agents-demo)</span></td>
+</tr>
+<tr>
   <td>Track</td>
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
 </tr>
 <tr>
   <td>Verification</td>
   <td>Plans and Work <span class="inventory-table__id">(mem-concept-terms-plans-and-work)</span></td>
+</tr>
+<tr>
+  <td>Visible panel</td>
+  <td>Workbench UI <span class="inventory-table__id">(mem-concept-terms-workbench-ui)</span></td>
+</tr>
+<tr>
+  <td>WBS baseline</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>WBS code and WBS change</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>WBS element</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Work Breakdown Structure (WBS)</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Work dependency</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Work package</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
+</tr>
+<tr>
+  <td>Workstream</td>
+  <td>Organizational and Schema-System Terms <span class="inventory-table__id">(mem-concept-terms-organizational-schema-system)</span></td>
 </tr>
 
       </tbody>
@@ -920,7 +1679,7 @@
 
     <section id="panel-systems" class="overview__panel overview__panel--systems" aria-labelledby="tab-systems">
       <div class="inventory">
-  <h2 class="overview__panel-title">Systems registry (18)</h2>
+  <h2 class="overview__panel-title">Systems registry (43)</h2>
   <table class="inventory-table">
     <thead>
       <tr>
@@ -938,6 +1697,20 @@
   <td>application</td>
   <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
   <td></td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-auto-gateway</td>
+  <td>Autonomous-operations trigger gateway</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-api</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-auto-ledger</td>
+  <td>Autonomous-operations run ledger</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-api</td>
 </tr>
 <tr class="inventory-table__row status-implemented">
   <td class="inventory-table__id">sys-backlog</td>
@@ -982,6 +1755,13 @@
   <td></td>
 </tr>
 <tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-demo-kit</td>
+  <td>Consultant demo kit</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-planned">
   <td class="inventory-table__id">sys-demo-overview</td>
   <td>Deterministic overview generation</td>
   <td>application</td>
@@ -994,6 +1774,41 @@
   <td>application</td>
   <td><span class="status-badge status-badge--implemented">implemented</span></td>
   <td>sys-api, sys-ui</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-fw-analysis-patterns</td>
+  <td>Portable framework - cross-document pattern extraction</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-governance</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-fw-analysis-protocol</td>
+  <td>Portable framework - session/decision record form critique</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-governance</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-fw-analysis-sessions</td>
+  <td>Portable framework - session record decision extraction</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-governance</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-fw-templates</td>
+  <td>Portable framework document templates and schemas</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-governance</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-gov-docs</td>
+  <td>Governance-document authoring</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-governance</td>
 </tr>
 <tr class="inventory-table__row status-implemented">
   <td class="inventory-table__id">sys-governance</td>
@@ -1016,6 +1831,62 @@
   <td><span class="status-badge status-badge--planned">planned</span></td>
   <td>sys-retrieval</td>
 </tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin</td>
+  <td>Idea-realization plugin</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-absolutes</td>
+  <td>Plugin governance documents as absolutes</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-backlog</td>
+  <td>Plugin backlog and session skills</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-core</td>
+  <td>Plugin core (manifest, paths, prerequisites, scaffold, doctor, check dispatcher)</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-documents</td>
+  <td>Plugin document-governance engine</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-generators</td>
+  <td>Plugin generators, layout reference and agreement templates</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-ideas</td>
+  <td>Plugin idea system</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-plugin-partition</td>
+  <td>Plugin partition sweep</td>
+  <td>delivery</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-plugin</td>
+</tr>
 <tr class="inventory-table__row status-implemented">
   <td class="inventory-table__id">sys-portfolio</td>
   <td>Portfolio source files</td>
@@ -1029,6 +1900,20 @@
   <td>data</td>
   <td><span class="status-badge status-badge--implemented">implemented</span></td>
   <td>sys-brain, sys-portfolio</td>
+</tr>
+<tr class="inventory-table__row status-planned">
+  <td class="inventory-table__id">sys-realization</td>
+  <td>Idea realization pipeline</td>
+  <td>governance</td>
+  <td><span class="status-badge status-badge--planned">planned</span></td>
+  <td>sys-backlog, sys-governance, sys-portfolio</td>
+</tr>
+<tr class="inventory-table__row status-scaffold">
+  <td class="inventory-table__id">sys-research</td>
+  <td>Research corpus and literature review</td>
+  <td>memory</td>
+  <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
+  <td></td>
 </tr>
 <tr class="inventory-table__row status-implemented">
   <td class="inventory-table__id">sys-retrieval</td>
@@ -1057,6 +1942,55 @@
   <td>application</td>
   <td><span class="status-badge status-badge--scaffold">scaffold</span></td>
   <td>sys-api</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-explorers</td>
+  <td>Workbench explorer panels</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-api, sys-wb-layout, sys-wb-shared, sys-wb-viewer</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-layout</td>
+  <td>Workbench layout and slot engine</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-api, sys-wb-styles</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-notes</td>
+  <td>Workbench notes strip</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-wb-layout</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-shared</td>
+  <td>Workbench cross-panel primitives</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-wb-layout</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-styles</td>
+  <td>Workbench stylesheet</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td></td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-terminal</td>
+  <td>Workbench terminal panel</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-wb-layout, sys-wb-shared</td>
+</tr>
+<tr class="inventory-table__row status-implemented">
+  <td class="inventory-table__id">sys-wb-viewer</td>
+  <td>Workbench HTML viewer and overview panels</td>
+  <td>application</td>
+  <td><span class="status-badge status-badge--implemented">implemented</span></td>
+  <td>sys-api, sys-wb-layout, sys-wb-shared</td>
 </tr>
 
     </tbody>
