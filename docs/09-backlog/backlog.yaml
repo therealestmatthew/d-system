@@ -13201,8 +13201,9 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
+  session: doc-session-per-idea-trace-pages
   priority: 1
   session_budget: 1
   depends_on:
@@ -13230,10 +13231,24 @@ items:
   - _public/engine/
   - test/test_engine_pages.py
   - docs/08-governance/OPS-028-generate-engine-pages.md
-  next_action: Git history reads are the slow part. Read each file's history once per run and index it,
-    rather than running git log per idea. Walk dev with --first-parent - dev carries one merge commit
-    from before the fast-forward-only rule (818f64b, 2026-09-10). CI's pytest job checks out full
-    history (fetch-depth 0); keep it that way or tests that read history will see a truncated log.
+  completion_evidence:
+  - tools/generate_engine_pages.py
+  - test/test_engine_pages.py
+  - _public/engine/trace/000236.html
+  - _public/engine/ideas.html
+  - docs/08-governance/OPS-028-generate-engine-pages.md
+  - docs/03-sessions/SESS-2026-10-04-03-per-idea-trace-pages.md
+  result: 'Complete: the engine generator writes a trace page under _public/engine/trace/ for each of
+    the 140 ideas with a promoted_to or a phase ideas-field link, showing capture, plan, phases with their
+    states and delivery, and a gate table where every entry names its source: G1 from created, G2 not
+    recorded, G3 and G4/G5 from the earliest first-parent commit where the plan or phase reads the gate''s
+    status, owner rulings from assessment annotations. The ledger links each traced idea. REQ-036 R19 and
+    R20 are tested; R07 to R13 still hold. demo-adversary review PASS, brute-forcing all 505 backlog.yaml
+    versions with 0 mismatches; two minor findings accepted, the owner keeping "not reached" wording
+    (SESS-2026-10-04-03). OPS-028 updated after the owner widened the deliverables. After the rebase onto
+    dev f023121: 1419 tests passed, governance, ruff and mypy clean, private-content check 31 identifiers
+    0 hits. Merged by fast-forward to 8261bf5 with the owner''s approval.'
+  next_action: Complete.
 - id: phase-des-12
   title: Build the backlog and batch graph page
   plan: doc-html-generation-design-system
