@@ -81,9 +81,9 @@ merge approval through READY, then the completion edit on dev. `session`, `compl
 
 ## Unresolved
 
-- The stamp names `442c74eef837`, the branch commit the page was generated at. A fast-forward merge
-  keeps that commit on dev. A rebase before merge rewrites it, and the page then has to be
-  regenerated so the stamp names a commit that exists on dev.
+- The page was first generated at `442c74eef837`. Rebasing onto dev `cb3b42f` rewrote that commit,
+  so the page was regenerated at `0c04c43c3c76` (commit `78cb39f`). A fast-forward merge keeps it on
+  dev; another rebase before merge needs another regeneration.
 
 ## Review
 
