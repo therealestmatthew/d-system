@@ -24122,3 +24122,13 @@ I want a system where I can dictate and I have an agent who will dictate back to
 A governance check for _tmpagent/claims.jsonl: required fields, event order, and the open-claim fold. Nothing reads the file today; lines 13-14 use "agent" instead of the required "by" and went unnoticed.
 
 Raised by Session 2 - Builder B.
+
+---
+
+## 000565 · Reject non-positive --limit in tools/load_context.py
+
+**Created 2026-10-04T07:29:28-04:00 · Status: `open`**
+
+tools/load_context.py --limit -1 (any negative value) crashes with a raw duckdb BinderException traceback. Reject non-positive limits in argparse with a clear message. Pre-existing on dev; found in the phase-rel-08 review.
+
+Raised by Session 2 - Builder B.
