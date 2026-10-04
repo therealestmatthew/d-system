@@ -9492,7 +9492,7 @@ items:
   - sys-demo-stage
   - sys-wb-terminal
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   priority: 2
   session_budget: 1
@@ -9523,8 +9523,7 @@ items:
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
   - ts/src/stage/TerminalRegion.tsx
-  next_action: Built and verified on agent/phase-wbf-09; independent review, then READY and the
-    owner's merge approval.
+  next_action: Complete.
   session: doc-session-terminal-route-defects
   completion_evidence:
   - src/api/routes/demo_terminal.py
@@ -9534,7 +9533,8 @@ items:
   result: The slot is reserved before accept and released on any exit; a cap refusal is accepted
     then closed with 4001 and its reason, which a WHATWG WebSocket client receives; an explicit
     shell is honoured and the override applies only when none is requested. 1454 passed, 1 skipped;
-    governance OK.
+    governance OK. Independent demo-adversary review found R20-R22 holding; one pre-existing minor
+    finding accepted as out of scope (idea 000573). Merged onto dev with owner approval.
 
 - id: phase-wbf-10
   title: Silence the flag-off workbench probes
