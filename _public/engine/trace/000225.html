@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trace of idea 000225 — idea realization engine</title>
+<style>
+/*
+  House family — token stylesheet. GENERATED: do not edit by hand.
+
+  Source: templates/styles/house-tokens.json, regenerated with
+  `uv run python tools/generate_house_css.py`. Edit the tokens file and regenerate;
+  tests fail when this file and the tokens disagree (REQ-036 R01).
+
+  Provenance: House style round-two gallery, approved by the owner as shown on 2026-09-30 (REQ-036, PLAN-036 amendment)
+  https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi (artifact version 1790623455-daec).
+
+  Usage: inline this file, then templates/styles/house-components.css, into
+  templates/html/house-page.html's {{INLINE_STYLES}}. Select a variant with
+  data-variant="swiss" or data-variant="mono" on <html>, and force a mode with
+  data-theme="light" or data-theme="dark"; without data-theme the page follows
+  prefers-color-scheme. Fonts load from Google Fonts; every font token ends in a
+  system stack, so a page whose font request fails still renders.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap");
+
+:root {
+  --sys-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sys-serif: Georgia, "Times New Roman", serif;
+  --sys-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --display: "Bricolage Grotesque", var(--sys-sans);
+  --body: "Literata", var(--sys-serif);
+  --label: "Bricolage Grotesque", var(--sys-sans);
+  --mono: "JetBrains Mono", var(--sys-mono);
+  --fs: 17px;
+  --lh: 1.62;
+  --h1: 3.4;
+  --h2: 1.6;
+  --htrack: -.04em;
+  --hw: 800;
+  --pad: 22px;
+  --gap: 24px;
+  --rule: 1px;
+  --label-track: .1em;
+  --cell: 10px 14px;
+  --radius-pill: 999px;
+  --bg: #ffffff;
+  --surface: #f6f1ea;
+  --line: #ddd6cd;
+  --strong: #1a1a1a;
+  --text: #141414;
+  --muted: #5a5a5a;
+  --accent: #c8205f;
+  --on-accent: #ffffff;
+  --accent-2: #0f7b6c;
+  --ok: #17693a;
+  --ok-bg: #e3f4e8;
+  --warn: #8a5a00;
+  --warn-bg: #fdf1d4;
+  --info: #1d5fa8;
+  --info-bg: #e4eefb;
+  --err: #b3162f;
+  --err-bg: #fbe5e8;
+  --soft: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121015;
+    --surface: #1d1a22;
+    --line: #39333f;
+    --strong: #e9e4ee;
+    --text: #f1edf4;
+    --muted: #aaa3b3;
+    --accent: #ff5c9a;
+    --on-accent: #121015;
+    --accent-2: #3cc9b4;
+    --ok: #5fd68d;
+    --ok-bg: #16291e;
+    --warn: #f0b74a;
+    --warn-bg: #2d2412;
+    --info: #7fb2f0;
+    --info-bg: #172335;
+    --err: #ff7a8c;
+    --err-bg: #341820;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121015;
+  --surface: #1d1a22;
+  --line: #39333f;
+  --strong: #e9e4ee;
+  --text: #f1edf4;
+  --muted: #aaa3b3;
+  --accent: #ff5c9a;
+  --on-accent: #121015;
+  --accent-2: #3cc9b4;
+  --ok: #5fd68d;
+  --ok-bg: #16291e;
+  --warn: #f0b74a;
+  --warn-bg: #2d2412;
+  --info: #7fb2f0;
+  --info-bg: #172335;
+  --err: #ff7a8c;
+  --err-bg: #341820;
+  color-scheme: dark;
+}
+
+:root[data-variant="swiss"] {
+  --body: "Archivo", var(--sys-sans);
+  --label: "Archivo", var(--sys-sans);
+  --fs: 15.5px;
+  --lh: 1.55;
+  --h1: 3.1;
+  --h2: 1.5;
+  --pad: 18px;
+  --gap: 20px;
+  --rule: 2px;
+  --label-track: .16em;
+  --cell: 9px 12px;
+}
+
+:root[data-variant="mono"] {
+  --body: "JetBrains Mono", var(--sys-mono);
+  --label: "JetBrains Mono", var(--sys-mono);
+  --fs: 14px;
+  --lh: 1.62;
+  --h1: 2.5;
+  --h2: 1.35;
+  --htrack: -.03em;
+  --pad: 16px;
+  --gap: 18px;
+  --label-track: .06em;
+  --cell: 8px 12px;
+}
+
+/*
+  House family — page shell and component rules.
+
+  Provenance: the component rules of the round-two house-style gallery the owner approved on
+  2026-09-30 (https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi, artifact version
+  1790623455-daec), rescoped from the gallery's .spec wrapper to page-global selectors, since
+  house pages are standalone documents.
+
+  Every colour, font, size, spacing, rule and radius here is a var() reference to a token in
+  templates/styles/house.css, which is generated from templates/styles/house-tokens.json. This file
+  carries no value of its own for any of them: a colour literal here fails REQ-036 R01's test.
+  Change the look by editing the tokens and regenerating, never by editing this file.
+
+  Usage: inline after house.css into templates/html/house-page.html's {{INLINE_STYLES}}. The
+  canonical markup for each component is in templates/html/house-components.html.
+
+  Components: page shell (.page, .kicker, .lede, .meta, .rule), stat row (.stats), columns
+  (.cols), callout (.callout), pill (.pill with .ok / .warn / .info / .err), table (.tbl-wrap with
+  a plain <table>), and the inline gate badge (.gate). None needs script.
+*/
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: var(--fs);
+  line-height: var(--lh);
+}
+
+/* ---- page shell ---- */
+.page {
+  max-width: 1140px;
+  margin-inline: auto;
+  padding: calc(var(--pad) * 1.6) clamp(16px, 4vw, 52px);
+  display: grid;
+  gap: calc(var(--gap) * 1.3);
+}
+.kicker, .lab {
+  font-family: var(--label);
+  font-size: .72em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--label-track);
+  color: var(--muted);
+}
+.kicker { color: var(--accent); }
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  font-weight: var(--hw);
+  letter-spacing: var(--htrack);
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 { font-size: calc(1em * var(--h1)); max-width: 18ch; }
+h2 { font-size: calc(1em * var(--h2)); }
+h3 { font-size: 1.1em; letter-spacing: -.02em; }
+p { margin: 0; max-width: 64ch; }
+.lede { font-size: 1.15em; color: var(--muted); }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-family: var(--label);
+  font-size: .8em;
+  color: var(--muted);
+}
+.rule { border: 0; border-top: var(--rule) solid var(--strong); margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code {
+  font-family: var(--mono);
+  font-size: .86em;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  padding: 1px 5px;
+}
+.section { display: grid; gap: 14px; }
+.footer { font-family: var(--label); font-size: .8em; color: var(--muted); }
+
+/* ---- stat row ---- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: var(--rule) solid var(--strong);
+  border-bottom: var(--rule) solid var(--strong);
+}
+.stats > div {
+  padding: 14px 16px;
+  border-left: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
+}
+.stats > div:first-child { border-left: 0; }
+.stats .v {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 2.3em;
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+}
+.stats .v.acc { color: var(--accent); }
+.stats .d { font-size: .8em; color: var(--muted); }
+
+/* ---- columns ---- */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+.cols > div {
+  border-top: var(--rule) solid var(--strong);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* ---- callout ---- */
+.callout {
+  border-left: 5px solid var(--accent);
+  background: var(--soft);
+  padding: 14px 18px;
+  display: grid;
+  gap: 6px;
+}
+.callout .lab { color: var(--accent); }
+
+/* ---- pill ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--label);
+  font-size: .74em;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill.ok { color: var(--ok); background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.pill.info { color: var(--info); background: var(--info-bg); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+.pill.err { color: var(--err); background: var(--err-bg); border-color: color-mix(in srgb, var(--err) 35%, transparent); }
+
+/* ---- gate badge ---- */
+.gate {
+  display: inline-block;
+  font-family: var(--label);
+  font-size: .72em;
+  font-weight: 800;
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: 1px 7px;
+  letter-spacing: .04em;
+}
+
+/* ---- table ---- */
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: .9em; }
+th, td {
+  text-align: left;
+  padding: var(--cell);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+thead th {
+  font-family: var(--label);
+  font-size: .72em;
+  text-transform: uppercase;
+  letter-spacing: var(--label-track);
+  color: var(--muted);
+  border-bottom: var(--rule) solid var(--strong);
+}
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.id { font-family: var(--mono); font-size: .9em; white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .cols { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats > div:nth-child(3) { border-left: 0; }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="section">
+    <div class="kicker">d-system · idea realization engine</div>
+    <h1>Trace of idea 000225</h1>
+    <p class="lede">No dispatch owns 06_hypothesis_tests.md after the second reviews land, so it ships stale by construction</p>
+    <div class="meta"><span>Source commit <code>51a7007e491d</code></span><span>Commit date 2026-10-04</span></div>
+  </header>
+  <hr class="rule">
+<div class="stats"><div><span class="lab">Captured</span><span class="v acc" data-stat="captured">2026-09-14</span><span class="d">G1, fold() created</span></div><div><span class="lab">Status</span><span class="v" data-stat="status">triaged</span><span class="d">fold()</span></div><div><span class="lab">Plans</span><span class="v" data-stat="plans">1</span><span class="d">promoted_to and phase plans</span></div><div><span class="lab">Phases complete</span><span class="v" data-stat="phases">0</span><span class="d">of 1 naming this idea</span></div></div>
+<p>Back to the <a href="../ideas.html">idea ledger</a> or the <a href="../index.html">pipeline overview</a>.</p>
+<section class="section"><h2>1. Capture</h2><p data-capture>Idea <code>000225</code> was captured on 2026-09-14: No dispatch owns 06_hypothesis_tests.md after the second reviews land, so it ships stale by construction. Source: fold().</p></section>
+<section class="section"><h2>2. Plan</h2><p>Each plan the idea reaches, through its own promoted_to or the plan of a phase that names it. Status now is the plan's front matter. Source: plan front matter; the first-parent git history.</p><div class="tbl-wrap"><table><thead><tr><th>Plan</th><th>Title</th><th>Status now</th><th>G3 date</th><th>Commit</th><th>Note</th><th>Linked by</th></tr></thead><tbody><tr data-plan="PLAN-029"><td class="id">PLAN-029</td><td>Idea graph and lifecycle (P1)</td><td>active</td><td>2026-09-15</td><td><code>3da12957d2cd</code></td><td></td><td>the plan field of phase-idg-16</td></tr></tbody></table></div></section>
+<section class="section"><h2>3. Phases</h2><p>Every backlog phase whose ideas field names this idea, in backlog order, with its state now. Source: backlog.yaml; src.governance.backlog.readiness; the first-parent git history.</p><div class="tbl-wrap"><table><thead><tr><th>Phase</th><th>Title</th><th>State</th><th>Completed</th><th>Commit</th><th>Note</th></tr></thead><tbody><tr data-phase="phase-idg-16" data-state="waiting"><td class="id">phase-idg-16</td><td>Backfill the idea log into the new terminal states - ideas created 2026-09-13 to 2026-09-21</td><td>waiting</td><td>not reached</td><td></td><td>the phase has never read complete</td></tr></tbody></table></div></section>
+<section class="section"><h2>4. Delivery</h2><p data-delivery>Not delivered: the idea's status is triaged. Source: fold().</p></section>
+<section class="section"><h2>Gates</h2><p>Each gate entry, its date, the commit that dates it, and where it was read.</p><div class="tbl-wrap"><table><thead><tr><th>Gate</th><th>Decision</th><th>For</th><th>Date</th><th>Commit</th><th>Note</th><th>Source</th></tr></thead><tbody><tr data-gate-entry="G1" data-subject="captured"><td><span class="gate">G1</span></td><td>Idea approval</td><td class="id">captured</td><td data-date>2026-09-14</td><td></td><td></td><td data-source>fold(): the idea&#x27;s created event</td></tr><tr data-gate-entry="G2" data-subject="partition"><td><span class="gate">G2</span></td><td>Track acceptance</td><td class="id">partition</td><td data-date>not recorded</td><td></td><td>no structured partition record exists in the repository</td><td data-source>none</td></tr><tr data-gate-entry="G3" data-subject="PLAN-029"><td><span class="gate">G3</span></td><td>Plan approval</td><td class="id">PLAN-029</td><td data-date>2026-09-15</td><td><code data-commit>3da12957d2cd</code></td><td></td><td data-source>earliest first-parent commit where the plan&#x27;s front matter reads approved, active or complete</td></tr><tr data-gate-entry="G4 and G5" data-subject="phase-idg-16"><td><span class="gate">G4 and G5</span></td><td>Integration and completion review</td><td class="id">phase-idg-16</td><td data-date>not reached</td><td></td><td>the phase has never read complete</td><td data-source>earliest first-parent commit where backlog.yaml shows the phase complete</td></tr><tr data-gate-entry="Ruling" data-subject="repository-owner"><td><span class="gate">Ruling</span></td><td>Owner ruling</td><td class="id">repository-owner</td><td data-date>2026-09-14</td><td></td><td>OWNER RULING, pre-synthesis check-in 2026-09-14: LIT-07 X1 reconciles 06_hypothesis_tests.md against the corrected evidence matrix as its item 0, before writing 07_anti_novelty_case.md. It reads each block&#x27;s strongest_challenger against that row&#x27;s current matrix values and its dated review subsection in 05, says so in the block where a review undercuts the challenger, and re-derives the status from the evidence that stands. H11 and H1 are known to need it and are named in the pack; the dispatch is told not to assume they are the only two. Written into PROMPT-029 as LIT-07 X1 item 0. This closes the writer gap for 06 but not the general shape - 000221 remains open on second_review&#x27;s stated sole writer.</td><td data-source>fold(): an annotation of kind assessment</td></tr></tbody></table></div></section>
+<div class="callout"><span class="lab">How to read this page</span><p>G2 is not recorded: accepted partitions are Markdown documents, not structured records, so no partition decision can be read without guessing.</p><p>G4 and G5 are one entry. Integration onto dev is fast-forward-only and the completion edit follows the merge in the same turn, so the earliest commit where the phase reads complete records both. History is read along first parents, so the one merge commit from before that rule counts as a single step.</p><p>Owner rulings are the idea&#x27;s annotations of kind assessment, in the order recorded.</p><p>not reached means the record shows the gate has not happened yet. not recorded means no record exists to date it.</p></div>
+  <hr class="rule">
+  <footer class="footer">Generated by tools/generate_engine_pages.py from the idea log, backlog.yaml, plan front matter and the first-parent git history of the source commit above. A committed snapshot: regenerate to bring it up to date.</footer>
+</main>
+</body>
+</html>
