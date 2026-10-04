@@ -12611,29 +12611,44 @@ items:
   - '000106'
   systems:
   - sys-delivery
+  - sys-demo-overview
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 2
   session_budget: 1
   depends_on: []
   scope:
-  - Add a test asserting the committed _public/overview/index.html matches a fresh regeneration from tools/generate_overview.py.
-  - Mirror test_ideas.py's test_the_committed_markdown_matches_regenerated_output rather than inventing
-    a second shape for the same assertion.
+  - Stamp _public/overview/index.html the way tools/generate_engine_pages.py stamps the engine pages,
+    with the source commit, that commit's date and a flag for uncommitted input changes, plus a hash
+    of the page body, through a {{SOURCE_STAMP}} token documented in templates/html/overview-page.html's
+    token contract.
+  - Add a test that recomputes the hash from the committed page, so a hand edit fails it, and that
+    compares nothing against live idea or backlog counts.
+  - Regenerate _public/overview/index.html once in this phase.
+  - Amend REQ-020 R08 to this snapshot model, keeping its hand-edit verification.
   - Do not mistake the existing determinism tests for this. test_generate_overview.py proves two runs
-    agree with each other; this proves the committed artifact agrees with a run.
+    agree with each other; this proves the committed page has not been edited since it was generated.
+  - Scope amended by owner ruling of 2026-10-04 (snapshot model, content hash keeps R08) - the page
+    is built from live idea and backlog counts, so a comparison against a fresh run would turn dev
+    red on every idea or backlog commit.
   acceptance:
-  - 'REQ-020 R08 holds: editing the committed page by hand makes the test fail.'
-  - The test mirrors the existing ideas.md pattern, so the repository has one shape for this assertion
-    rather than two.
+  - 'REQ-020 R08, as amended, holds: editing the committed page by hand makes the test fail.'
+  - Recording an idea or editing backlog.yaml without regenerating the page leaves the suite green.
+  - The stamp is the source commit and its own date, never the run time, so two runs on one commit
+    still produce byte-identical output.
   - The full suite still passes.
   verification:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - test/
-  next_action: The cheapest phase in the batch - one test modelled on an existing one. 000106 records
-    the real drift that shipped for want of it.
+  - test/test_generate_overview.py
+  - tools/generate_overview.py
+  - templates/html/overview-page.html
+  - _public/overview/index.html
+  - docs/06-requirements/REQ-020-schema-consistency-testing.md
+  next_action: Add the stamp and hash to the generator and template, regenerate the page once, add
+    the hash test, then amend REQ-020 R08. 000106 records the real drift that shipped for want of it.
 - id: phase-sch-06
   title: Design HTML-generation fixtures
   plan: doc-schema-consistency-testing

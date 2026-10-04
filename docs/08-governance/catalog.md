@@ -484,7 +484,7 @@ CI regenerates it and fails on any difference.
 | PLAN-032 | doc-autonomous-agent-operations | active | 4 | 0 | 3 | agent-coord, agent-night |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
-| PLAN-035 | doc-schema-consistency-testing | active | 5 | 0 | 1 | agent-night |
+| PLAN-035 | doc-schema-consistency-testing | active | 4 | 1 | 1 | agent-night, agent-standby-3 |
 | PLAN-036 | doc-html-generation-design-system | active | 5 | 1 | 6 | agent-builder-a, agent-coord, agent-night, agent-standby-3 |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
