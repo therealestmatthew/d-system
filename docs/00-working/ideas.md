@@ -24272,3 +24272,13 @@ Raised by Session 1 - Builder A.
 GOV-002 line 154 has an empty section, "## Start and end a session", with no body. Fill it with a pointer to /session-start and /session-close, or remove it. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
+
+---
+
+## 000580 · Review the type: ignore at test/test_demo_terminal.py:436
+
+**Created 2026-10-04T14:27:49-04:00 · Status: `open`**
+
+Review the `# type: ignore[attr-defined]` at test/test_demo_terminal.py:436, merged with phase-wbf-09. The new diff-pattern check (tools/check_diff_patterns.py, phase-grd-03) flags it on dev~20..dev. Fix the type, or record why the ignore is justified.
+
+Raised by Session 2 - Builder B.
