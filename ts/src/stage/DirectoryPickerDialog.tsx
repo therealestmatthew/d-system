@@ -108,9 +108,9 @@ export default function DirectoryPickerDialog({
             </nav>
             <div className="stage-directory-dialog__body">
               {loadState === 'loading' ? (
-                <p className="stage-placeholder-text">Loading…</p>
+                <p className="stage-placeholder-text" role="status">Loading…</p>
               ) : loadState === 'error' ? (
-                <p className="stage-placeholder-text stage-placeholder-text--absent">
+                <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
                   Could not list this directory.
                 </p>
               ) : entries.length === 0 ? (

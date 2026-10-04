@@ -163,7 +163,7 @@ function InjectionCategoryDropdown({
       {(close) => (
         <div className="stage-command-panel">
           {loadState === 'loading' ? (
-            <p className="stage-placeholder-text">Loading {categoryLabel.toLowerCase()}…</p>
+            <p className="stage-placeholder-text" role="status">Loading {categoryLabel.toLowerCase()}…</p>
           ) : loadState === 'missing' ? (
             <p className="stage-placeholder-text stage-placeholder-text--absent">
               {categoryLabel} list not found. Start the backend with{' '}
@@ -171,7 +171,7 @@ function InjectionCategoryDropdown({
               (`phase-wb-01`).
             </p>
           ) : loadState === 'error' ? (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not load the {categoryLabel.toLowerCase()} list.{' '}
               <button type="button" onClick={onRetry}>
                 Retry

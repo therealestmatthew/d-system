@@ -574,9 +574,9 @@ export default function FileBrowserRegion() {
         </div>
         <div className="stage-file-browser__tree" role="tree" aria-label="File Browser tree">
           {loadState === 'loading' || entriesFolder !== contextFolder ? (
-            <p className="stage-placeholder-text">Loading…</p>
+            <p className="stage-placeholder-text" role="status">Loading…</p>
           ) : loadState === 'error' ? (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not search <code>{contextFolder}</code>.
             </p>
           ) : tree.children.length === 0 ? (

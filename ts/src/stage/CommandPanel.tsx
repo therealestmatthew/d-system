@@ -137,14 +137,14 @@ export default function CommandPanel({
       {(close) => (
         <div className="stage-command-panel">
           {loadState === 'loading' ? (
-            <p className="stage-placeholder-text">Loading commands…</p>
+            <p className="stage-placeholder-text" role="status">Loading commands…</p>
           ) : loadState === 'missing' ? (
             <p className="stage-placeholder-text stage-placeholder-text--absent">
               Command list not found. Add <code>ts/public/demo-commands.json</code> (the real
               entries are authored in <code>phase-demo-05</code>).
             </p>
           ) : loadState === 'error' ? (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not load the command list.{' '}
               <button type="button" onClick={loadEntries}>
                 Retry

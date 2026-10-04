@@ -254,7 +254,7 @@ export default function NotesStripRegion() {
                 </select>
               </label>
               {fileListState === 'error' ? (
-                <p className="stage-notes-strip__menu-list-error">
+                <p className="stage-notes-strip__menu-list-error" role="alert">
                   Could not list notes files from <code>ts/public/</code>.
                 </p>
               ) : null}

@@ -379,9 +379,9 @@ export default function HtmlViewerRegion() {
                   }}
                 />
                 {filesLoadState === 'loading' ? (
-                  <p className="stage-placeholder-text">Searching…</p>
+                  <p className="stage-placeholder-text" role="status">Searching…</p>
                 ) : filesLoadState === 'error' ? (
-                  <p className="stage-placeholder-text stage-placeholder-text--absent">
+                  <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
                     Could not search this directory.
                   </p>
                 ) : filteredFiles.length === 0 ? (
@@ -472,15 +472,15 @@ export default function HtmlViewerRegion() {
           {tabs.length === 0 ? (
             <p className="stage-placeholder-text">No HTML Viewer tabs. Use "+ New tab" to open one.</p>
           ) : activeTab === null ? null : activeTab.directory === null ? (
-            <p className="stage-placeholder-text">Locating the generated overview page…</p>
+            <p className="stage-placeholder-text" role="status">Locating the generated overview page…</p>
           ) : pageState === 'idle' ? (
             <p className="stage-placeholder-text">
               Select a file from the dropdown above, or a directory to search.
             </p>
           ) : pageState === 'checking' ? (
-            <p className="stage-placeholder-text">Checking the selected page…</p>
+            <p className="stage-placeholder-text" role="status">Checking the selected page…</p>
           ) : pageState === 'error' ? (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not reach the backend to check the selected page.
             </p>
           ) : pageState === 'missing' ? (

@@ -584,14 +584,14 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
       ) : (
         <div className="stage-region__body stage-region__body--terminal-placeholder">
           {enabledState === 'checking' ? (
-            <p className="stage-placeholder-text">Checking terminal availability…</p>
+            <p className="stage-placeholder-text" role="status">Checking terminal availability…</p>
           ) : enabledState === 'disabled' ? (
             <p className="stage-placeholder-text stage-placeholder-text--absent">
               Terminal is absent. Start the backend with <code>D_SYSTEM_DEMO_TERMINAL=1</code> to
               enable the embedded terminal (ADR-013).
             </p>
           ) : (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Terminal availability is unknown — the stage backend is not reachable.
             </p>
           )}

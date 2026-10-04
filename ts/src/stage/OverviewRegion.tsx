@@ -102,9 +102,9 @@ export default function OverviewRegion() {
         }
       >
         {locationState === 'loading' ? (
-          <p className="stage-placeholder-text">Locating the generated overview page…</p>
+          <p className="stage-placeholder-text" role="status">Locating the generated overview page…</p>
         ) : locationState === 'error' ? (
-          <p className="stage-placeholder-text stage-placeholder-text--absent">
+          <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
             Could not reach the backend to locate the overview page.
           </p>
         ) : locationState === 'outside-public-dir' ? (
