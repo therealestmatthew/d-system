@@ -81,9 +81,9 @@ merge approval through READY, then the completion edit on dev. `session`, `compl
 
 ## Unresolved
 
-- The page was first generated at `442c74eef837`. Rebasing onto dev `cb3b42f` rewrote that commit,
-  so the page was regenerated at `0c04c43c3c76` (commit `78cb39f`). A fast-forward merge keeps it on
-  dev; another rebase before merge needs another regeneration.
+- The page was first generated at `442c74eef837`. Each rebase onto dev rewrote the stamped commit,
+  so the page was regenerated after each: last at `21ac022f8cae`, after rebasing onto dev `518642d`
+  for the merge. A fast-forward merge keeps that commit on dev.
 
 ## Review
 
