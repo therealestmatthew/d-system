@@ -12731,7 +12731,8 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-a
   priority: 2
   session_budget: 1
   depends_on: []
@@ -12759,6 +12760,7 @@ items:
   - docs/01-plans/PLAN-003-dynamic-html-generation/
   - docs/09-backlog/backlog.yaml
   - docs/00-working/
+  - docs/04-decisions/
   next_action: Since the 2026-09-30 amendment this gates only phase-des-03 and phase-des-04; the token
     and engine page phases do not wait for it. It is still the only phase that can tell a coordinator
     which of the ten queued phase-html-* phases are still real work.
