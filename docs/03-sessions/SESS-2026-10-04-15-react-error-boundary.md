@@ -1,0 +1,124 @@
+---
+schema_version: 1
+id: doc-session-react-error-boundary
+code: SESS-2026-10-04-15
+title: Error boundaries and accessible loading and error status for the stage
+kind: session
+status: active
+owner: repository-owner
+created: '2026-10-04'
+updated: '2026-10-04'
+systems: [sys-ui]
+depends_on: []
+---
+
+# Error boundaries and accessible loading and error status for the stage
+
+## Phase
+
+Unclaimed: owner-directed work, no backlog phase. `fix-react-error-boundary`. Idea 000569 asked
+for an error boundary and an accessible loading and error status for the React stage and
+workbench, because a render error blanked the whole app. The Session Manager assigned it with the
+owner's approval, and the idea's status is left for Ideation.
+
+## Verification
+
+`uv run python -m src.governance`
+
+```text
+Governance OK: 44 systems, 437 documents, 36 memories, 347 backlog phases
+```
+
+`uv run pytest`
+
+```text
+1457 passed, 1 skipped, 1 warning
+```
+
+`uv run ruff check src/ test/` and `uv run mypy src/`
+
+```text
+All checks passed!
+Success: no issues found in 47 source files
+```
+
+`cd ts && npm test` (new in this session)
+
+```text
+Test Files  1 passed (1)
+     Tests  5 passed (5)
+```
+
+`cd ts && npm run build` and `npm run lint`
+
+```text
+✓ built
+> tsc --noEmit        (no errors)
+```
+
+The built stage was also checked live. `npx vite preview` served it with no backend running, and
+headless Chrome rendered it with JavaScript enabled. Every panel rendered; none went blank. The
+File Browser's failed search appeared in the dumped DOM as `role="alert"` with the text "Could not
+search .".
+
+`npm audit` reports `found 0 vulnerabilities` with the new dev dependencies.
+
+## Acceptance
+
+Self-declared from the owner's instruction and the two choices the owner made in this session; no
+backlog acceptance list exists for this session.
+
+- A render error in one workbench panel replaces only that panel, with an error naming it and a
+  Retry button, and the other panels keep running: Met. `ErrorBoundary` wraps each panel at the
+  portal in `StagePage.tsx`. The test "replaces only the panel that threw, with an alert naming it"
+  renders a throwing panel beside a healthy one and asserts both.
+- A render error outside every panel no longer blanks the stage: Met. `App.tsx` wraps `StagePage`
+  in a boundary labelled "The stage".
+- Retry brings the panel back, mounted afresh: Met. The test "Retry remounts the children,
+  re-running their effects" asserts no mount while the child throws and exactly one mount after
+  Retry.
+- Loading and error states are announced to assistive technology: Met.
+  - Loading texts carry `role="status"` and "Could not …" errors carry `role="alert"`, across the
+    layout loader and nine panel files.
+  - The boundary's fallback is `role="alert"`.
+  - Two tests assert the roles on the Idea Explorer's loading and failed states.
+- The behaviour is tested at runtime with vitest and Testing Library, as the owner chose: Met.
+  `npm test` runs five tests.
+
+## Backlog
+
+Unclaimed — no backlog phase was claimed for this session; no line of backlog.yaml was changed.
+
+## Unresolved
+
+- Nothing in CI or the Session Manager's gate runs `npm test` yet. A broken stage test would not
+  stop a merge. Sent to Ideation as an idea.
+- The notes strip's current text has no live region. It changes on a timer, and announcing every
+  change would interrupt a screen reader. Its loading and error states share that element, so they
+  are not announced either.
+- Retry on a crashed terminal panel opens a new terminal session. The old one ended when the panel
+  crashed.
+
+## Decisions
+
+- **Boundary placement: around the root and around each panel.** This was the owner's choice. A
+  boundary only at the root would replace the whole workbench when any one panel crashed.
+- **Tests: vitest and Testing Library.** This was the owner's choice, over a one-off headless
+  browser check or a pytest that reads the source. The boundary's value is runtime behaviour, and
+  only a runtime test exercises it.
+- **vitest 5, not 3.** vitest 3 carries a moderate advisory (GHSA-82fw-gwwq-j7x9). Version 5
+  fixes it and supports the installed Vite 6.4.3.
+- **No key-based remount.** The first version remounted the children under a new key on Retry.
+  React has already unmounted a subtree that threw, so clearing the error mounts it afresh anyway.
+  The key wrapper was removed, and the Retry test still asserts a single fresh mount.
+- **Tests live beside the component** in `ts/src/`, configured in `ts/vitest.config.ts` and kept
+  separate from `vite.config.ts`. That file's dev-server plugins read the repository at startup.
+
+## Corrections
+
+- The first Retry test failed the run on a render count. React retries a throwing render once by
+  itself, so the count did not settle. The test now uses an explicit flag that it flips before
+  clicking Retry.
+- The first pass of status roles missed the terminal panel's "Checking terminal availability…" and
+  "the stage backend is not reachable" messages. The live check exposed them, and both now carry
+  roles.
