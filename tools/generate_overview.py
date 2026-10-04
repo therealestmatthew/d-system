@@ -19,13 +19,6 @@ narrower reading of `templates/html/overview-page.html`'s token-contract comment
 `{{GENERATED_AT}}` to be wall-clock; the dispatched work item for this tool requires
 generation-to-generation identity instead, so the wall clock is never consulted.
 
-The committed page is a snapshot, not a live view (owner ruling 2026-10-04, REQ-020 R08). Its
-`{{SOURCE_STAMP}}` names the commit the inputs were read at and that commit's own date, as
-`tools/generate_engine_pages.py` stamps the engine pages, says when an input had uncommitted
-changes, and carries a SHA-256 of the page body. Nothing compares the page against live idea
-or backlog counts, so recording an idea leaves it valid; `content_hash_matches()` recomputes
-the hash, so a hand edit to the committed page does not.
-
     uv run python tools/generate_overview.py               # write _public/overview/index.html
     uv run python tools/generate_overview.py --out FILE     # write elsewhere instead
 """
@@ -64,6 +57,13 @@ SECTIONS: tuple[tuple[str, str, str], ...] = (
 )
 
 FALLBACK_GENERATED_AT = "no idea-log events yet"
+
+# The committed page is a snapshot, not a live view (owner ruling 2026-10-04, REQ-020 R08). Its
+# {{SOURCE_STAMP}} names the commit the inputs were read at and that commit's own date, as
+# tools/generate_engine_pages.py stamps the engine pages, says when an input had uncommitted
+# changes, and carries a SHA-256 of the page body. Nothing compares the page against live idea
+# or backlog counts, so recording an idea leaves it valid; content_hash_matches() recomputes
+# the hash, so a hand edit to the committed page does not.
 
 #: Paths whose uncommitted changes would make the commit stamp misdescribe what was read.
 INPUT_PATHS = (
