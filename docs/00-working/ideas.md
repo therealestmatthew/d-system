@@ -24292,3 +24292,13 @@ Raised by Session 2 - Builder B.
 A guard for AGENTS.md hand-off step 5: before a merge is granted, check that the phase entry on the branch carries session, completion_evidence and result (with status still active), for example in the Session Manager's READY gate or in a governance mode. The step was skipped on phase-des-11, phase-des-01 and phase-des-02 on 2026-10-04 although the rule was written down. The owner chose a guard idea plus the brain procedure mem-proc-earlier-steps-are-not-absorbed-by-a-later-one.
 
 Raised by Session 1 - Builder A.
+
+---
+
+## 000582 · Run the frontend unit tests in CI and the merge gate
+
+**Created 2026-10-04T17:09:06-04:00 · Status: `open`**
+
+`cd ts && npm test` (vitest, added for idea 000569 on branch agent/fix-react-error-boundary) is not in .github/workflows/ci.yaml or in the Session Manager's merge gate, so a broken stage test would not stop a merge. Run the frontend unit tests in both.
+
+Raised by Session 1 - Builder A.
