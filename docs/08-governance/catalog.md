@@ -512,7 +512,7 @@ CI regenerates it and fails on any difference.
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 2 | 0 | 2 | agent-lrr |
-| PLAN-045 | doc-deterministic-guards | approved | 1 | 1 | 2 | agent-builder-a, agent-builder-b |
+| PLAN-045 | doc-deterministic-guards | approved | 1 | 0 | 3 | agent-builder-a, agent-builder-b |
 | PLAN-046 | doc-design-document-amendments | approved | 0 | 0 | 1 | agent-standby-3 |
 | PLAN-047 | doc-reviewer-contract | approved | 2 | 0 | 3 | agent-builder-a, agent-builder-b |
 | PLAN-048 | doc-idea-realization-plugin | approved | 0 | 0 | 9 | agent-builder-a, agent-builder-b, agent-standby-builder |

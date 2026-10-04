@@ -3,7 +3,6 @@ updated: '2026-10-04'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
-- phase-grd-03
 - phase-grd-04
 - phase-asr-04
 - phase-asr-05
@@ -14978,7 +14977,8 @@ items:
   - sys-gov-docs
   owner: repository-owner
   agent: agent-builder-b
-  status: active
+  status: complete
+  session: doc-session-branch-diff-guards
   priority: 1
   session_budget: 1
   depends_on:
@@ -15023,8 +15023,28 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/01-plans/PLAN-052-plugin-audit-remediation.md
-  next_action: Every acceptance condition met on agent/phase-grd-03 (SESS-2026-10-04-12); awaiting the
-    owner-approved merge, then the completion edit on dev.
+  completion_evidence:
+  - tools/check_test_baseline.py
+  - test/test_check_test_baseline.py
+  - tools/check_diff_patterns.py
+  - test/test_check_diff_patterns.py
+  - src/governance/plan_phases.py
+  - test/test_plan_phases.py
+  - docs/08-governance/OPS-031-check-test-baseline.md
+  - docs/08-governance/OPS-032-check-diff-patterns.md
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/03-sessions/SESS-2026-10-04-12-branch-diff-guards.md
+  result: The test-baseline and diff-pattern tools and the plan-versus-registered governance check are built,
+    each with its REQ-028 fixture table passing (56 focused tests); the repository passes the plan check (81
+    plans, 23 recent, 42 phases checked, 457 ids named) after PLAN-052's phase-plug-10 line was reworded. GOV-017
+    and PROMPT-037 put both tools and the non-blocking containment report in READY with the owner sign-off rule;
+    GOV-003 records the owner's rulings (builder produces both JUnit reports, base in a temporary shared clone,
+    a handler body replaced by pass counts). The diff tool on dev~20..dev found one merged type-ignore (idea
+    000580). An independent demo-adversary review found all four conditions met; its major finding was fixed on
+    an owner ruling and two minor ones accepted. Full suite 1513 passed, 1 skipped; first READY use clean.
+    Merged onto dev with the owner's approval.
+  next_action: Complete.
 - id: phase-grd-04
   title: 'The S3 next_up rule: refuse a queued phase with no dispositioned GOV-018 review record'
   plan: doc-deterministic-guards
