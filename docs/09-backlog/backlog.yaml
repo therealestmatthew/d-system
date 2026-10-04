@@ -352,7 +352,8 @@ items:
   systems:
   - sys-retrieval
   owner: repository-owner
-  status: queued
+  agent: agent-builder-b
+  status: active
   priority: 1
   session_budget: 1
   depends_on:
@@ -372,6 +373,7 @@ items:
   deliverables:
   - tools/load_context.py
   - test/test_load_context.py
+  - docs/08-governance/OPS-003-load-context.md
   next_action: 'Include scope: global memories alongside a requested project, including
     repository-scoped memories.'
 - id: phase-rel-09

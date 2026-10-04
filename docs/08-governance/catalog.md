@@ -447,7 +447,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.04 | doc-html-04-frontend-components | approved | 3 | 0 | 0 | — |
 | PLAN-003.05 | doc-html-05-sample-data | approved | 1 | 0 | 0 | — |
 | PLAN-003.06 | doc-html-06-verification | approved | 2 | 0 | 0 | — |
-| PLAN-004 | doc-reliability-follow-up | approved | 8 | 0 | 3 | agent-architect, agent-rel11 |
+| PLAN-004 | doc-reliability-follow-up | approved | 7 | 1 | 3 | agent-architect, agent-builder-b, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |
