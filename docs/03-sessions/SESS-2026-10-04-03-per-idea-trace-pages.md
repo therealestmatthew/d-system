@@ -84,3 +84,78 @@ approval (the Session Manager's contract). The completion edit is made on `dev` 
 - A historical `dev` commit, `5ec45ea`, holds a `backlog.yaml` that does not parse as YAML. The
   generator's line scan reads it; a full YAML parse of that version fails. Nothing else in this
   phase depends on it.
+
+## Review
+
+A `demo-adversary` agent reviewed `c767045..edf2f46`. It stopped at its turn limit and was asked
+to report from what it had. Its report, condition by condition:
+
+- Verdict: PASS.
+- R19: Met. An independent recount outside the generator gave 140 traced ideas, 140 pages on
+  disk and an empty difference. Commit `befa13a` only adds trace pages.
+- R20: Met, and verified beyond the one sampled idea. The known-idea test is a real second
+  implementation: it rebuilds G3 by its own `--follow` walk with a front-matter regex, and G4 and
+  G5 by its own walk of every first-parent version, not only the generator's `-G` candidates. The
+  reviewer also YAML-parsed all 505 first-parent versions of `backlog.yaml` and compared every
+  phase's earliest complete commit with `_phase_history()`. Both found 140 phases, with no phase
+  only in one and no date mismatched. One version, `5ec45ea` (2026-09-22), failed to parse
+  ("mapping values are not allowed here"), and the line scan reads it correctly. Merge commit
+  `818f64b` is handled.
+- R07 to R13: Met. `test/test_engine_pages.py` gave 51 passed. The private-content check in the
+  worktree read 0 identifiers. The reviewer could not reproduce the "31 identifiers, 0
+  violations" rerun from inside the worktree and took it on faith.
+- Finding 1, minor: `NOT_REACHED = "not reached"` is vocabulary that neither R20 nor the phase
+  scope specifies. It is applied consistently and tested, so it is a wording decision, not a
+  correctness problem.
+- Finding 2, minor: OPS-028's shallow-clone failure note is backed by a unit test on
+  `trace_data` with a synthetic shallow history, not by a shallow clone run end to end.
+- Also checked and holding: `000274`'s promotion to `REQ-025` renders as "not a plan document",
+  "not recorded"; colour literals, script and house family over all 143 pages; CI's
+  `fetch-depth: 0`; the stale-page removal and the 143-page output line in OPS-028.
+- Not checked: plan history under renames or approved-to-draft-to-approved; determinism across
+  two separate processes with a cold cache; every OPS-028 sentence line by line; the 31-identifier
+  figure.
+
+After the review, two of the unchecked items were run in this session:
+
+- Two separate `uv run python tools/generate_engine_pages.py --out` runs produced identical
+  output for all 143 pages.
+- Every first-parent version of every plan file under `docs/01-plans/` was read, with front
+  matter matched by regex, and each plan's earliest G3 commit compared with `_plan_history()`:
+  `brute 43 gen 43 only brute set() only gen set() mismatch {}`.
+
+Both findings are accepted. On finding 1 the owner chose to keep "not reached". Finding 2 is
+accepted as unit-level evidence.
+
+## Decisions
+
+- Gate dates are read from `HEAD`'s first-parent history, the commit the stamp names, rather than
+  from the `dev` ref. Two runs on one commit then agree (R07), and on `dev` the two are the same
+  history.
+- The owner kept "not reached" for a gate the record shows has not happened yet. "not recorded"
+  stays for a gate with no record at all: G2, a `promoted_to` naming a document that is not a
+  plan, and a shallow clone.
+- A `promoted_to` that names something other than a plan (`000274` to `REQ-025`, `000317` to
+  `doc-batch-orchestration-protocol`, which is `GOV-016`) appears in the plan table with G3
+  "not recorded" and the reason, instead of being dropped.
+- The generator's operations document, OPS-028, went stale with the docstring and output change.
+  The owner chose to widen the phase's deliverables to include it (`cb3b42f` on `dev`, through a
+  Session Manager turn) rather than narrow the change or edit it undeclared.
+- Trace pages inline the house stylesheets like the other pages, so the 140 pages add about 2.3 MB
+  to `_public/engine/`.
+
+## Corrections
+
+- The first full test run showed three failures. The session record had been written while that
+  run was going, so the catalog was stale for it. After `--catalog` the suite passed: 1412 passed,
+  1 skipped.
+- The test's first walk of `backlog.yaml` history parsed each version as YAML and failed on
+  `5ec45ea`. It now matches the phase block's status line with a regex.
+- A `git log --diff-merges=first-parent` call in the test printed patches until `-s` was added.
+
+## Left undone
+
+- `phase-des-11` stays `active` until its branch is merged onto `dev` with the owner's approval.
+  The completion edit is made on `dev` after that merge.
+- The historical `backlog.yaml` at `5ec45ea` that does not parse is noted, not repaired. History
+  is not rewritten.
