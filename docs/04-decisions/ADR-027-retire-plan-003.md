@@ -121,6 +121,7 @@ Its amendments were never applied to the plan or the phases.
     `phase-des-03` declares start from the generators that exist.
   - `ARCH-003`'s accessibility findings still apply to any component that `phase-des-04` builds:
     - coherent heading levels and keyboard focus behaviour (M4);
-    - a real breakpoint-aware columns layout, which the plan's inline grid style defeated (M4);
+    - a real breakpoint-aware columns layout, which the plan's inline grid style defeated (M4). The
+      house `.cols` component already does this correctly, so the point is to keep following it;
     - no long-text or long-label horizontal overflow at narrow widths (M4);
     - a stated policy for link schemes and image assets instead of accepting any URL (M1).
