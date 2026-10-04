@@ -15001,7 +15001,8 @@ items:
   - sys-gov-docs
   - sys-realization
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 1
   session_budget: 1
   depends_on: []
@@ -15055,7 +15056,13 @@ items:
   deliverables:
   - docs/07-architecture/ARCH-006-idea-realization-system.md
   - docs/06-requirements/REQ-022-idea-realization-system.md
-  - docs/08-governance/
+  - docs/08-governance/GOV-001-protocol.md
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - docs/08-governance/GOV-005-document-codes.md
+  - docs/08-governance/GOV-014-realization-role-contracts.md
+  - docs/08-governance/GOV-018-three-altitude-review-procedure.md
+  - docs/08-governance/OPS-001-operations.md
   - .claude/commands/session-start.md
   - .claude/commands/session-close.md
   - .claude/commands/resume-lit-review.md
