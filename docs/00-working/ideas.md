@@ -24202,3 +24202,13 @@ Raised by Session 1 - Builder A.
 Amend PLAN-045 D7 to the owner's 2026-10-04 JUnit-base ruling: the builder produces both JUnit reports before READY (the dev tip in a throwaway detached worktree, and the rebased branch). D7 still says the base is "the Session Manager's merge-gate re-run on dev". GOV-003 will record the ruling via phase-grd-03.
 
 Raised by Session 2 - Builder B.
+
+---
+
+## 000573 · Close the adapter and websocket when demo terminal startup fails
+
+**Created 2026-10-04T12:13:30-04:00 · Status: `open`**
+
+In src/api/routes/demo_terminal.py, if create_adapter() or adapter.start() raises after websocket.accept() and before the adapter joins SESSIONS, nothing closes the adapter or the websocket. PosixPtyAdapter.start() can also leak the master pty fd when Popen fails after pty.openpty(). Pre-existing on dev; found by the phase-wbf-09 adversarial review, outside that phase's scope.
+
+Raised by Session 3 - Standby Builder.
