@@ -4,10 +4,10 @@ id: doc-html-02-backend
 code: PLAN-003.02
 title: "Backend \u2014 FastAPI Endpoints & Models"
 kind: plan
-status: approved
+status: deprecated
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-10-04'
 systems:
 - sys-html
 depends_on: []
@@ -166,3 +166,33 @@ Append the pages router to the existing API router:
 This creates the following endpoints:
 - `GET /api/v1/pages/site-config` — site-wide config
 - `GET /api/v1/pages/{page_id}` — individual page data
+
+## Audit disposition (`phase-des-01`, 2026-10-04)
+
+This plan is deprecated. On 2026-10-04 the owner retired the authored YAML content site that `PLAN-003` describes; [ADR-027](../../04-decisions/ADR-027-retire-plan-003.md) records the decision and what it leaves behind. Every requirement this document states is listed below with its disposition, as `REQ-021` R01 requires. Line numbers refer to this document above this section. An accomplished or superseded row names the shipped work, by file and commit or phase (`REQ-021` R03); a retired row gives the reason nothing will be built.
+
+21 requirements: 1 accomplished, 20 retired.
+
+| Id | Line | Requirement | Disposition | Evidence or reason |
+|---|---|---|---|---|
+| 02-R1 | 23-35 | MODIFY `pyproject.toml`: add `pyyaml>=6.0` | accomplished | `pyproject.toml` line 17, present since the initial commit b2b564b. No `phase-html-*` phase delivered it |
+| 02-R2 | 42 | NEW `src/models/pages.py` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R3 | 50-52 | `BlockContent(BaseModel, extra="allow")` | retired | no `/api/v1/pages` backend will exist (ADR-027). GOV-003 had already overruled the permissive model |
+| 02-R4 | 55-58 | `BlockData`: `id`, `type`, `content` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R5 | 61-65 | `PageData`: `title`, `template`, `description`, `blocks` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R6 | 68-71 | `RouteConfig`: `path`, `pageId`, `label` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R7 | 74-76 | `NavItem`: `label`, `path` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R8 | 79-82 | `SiteConfig`: `title`, `routes`, `navigation` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R9 | 85 | Backend stays permissive; TypeScript enforces the block union | retired | no `/api/v1/pages` backend will exist (ADR-027). GOV-003 had already overruled this |
+| 02-R10 | 91-93 | NEW `src/api/routes/pages.py` serving page and site JSON | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R11 | 110 | `APIRouter(prefix="/pages", tags=["pages"])` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R12 | 112 | `_DATA` path to the repository's `_data/` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R13 | 115-119 | `_read_json`: 404 "Config not found" when missing | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R14 | 122-126 | `GET /site-config` returns `SiteConfig` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R15 | 129-140 | `GET /{page_id}` returns `PageData` | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R16 | 135-137 | Sanitise `page_id`; 400 "Invalid page ID" otherwise | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R17 | 145 | Security: `page_id` limited to `[a-zA-Z0-9_-]` before building a path | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R18 | 146 | Security: a missing file gives a 404, not a stack trace | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R19 | 147 | Security: response data validated through Pydantic | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R20 | 153-164 | MODIFY `src/api/__init__.py` to include the pages router | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 02-R21 | 166-168 | Endpoints `GET /api/v1/pages/site-config` and `GET /api/v1/pages/{page_id}` | retired | no `/api/v1/pages` backend will exist (ADR-027) |

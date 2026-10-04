@@ -30,6 +30,7 @@ CI regenerates it and fails on any difference.
 | ADR-023 | adr | accepted | repository-owner | docs/04-decisions/ADR-023-session-manager-into-orchestrator.md |
 | ADR-024 | adr | accepted | repository-owner | docs/04-decisions/ADR-024-idea-classification-as-schema-fields.md |
 | ADR-025 | adr | accepted | repository-owner | docs/04-decisions/ADR-025-plugin-idea-log-lock.md |
+| ADR-027 | adr | accepted | repository-owner | docs/04-decisions/ADR-027-retire-plan-003.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -89,13 +90,13 @@ CI regenerates it and fails on any difference.
 | OPS-030 | operation | active | repository-owner | docs/08-governance/OPS-030-draw-rereview-sample.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
-| PLAN-003 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
-| PLAN-003.01 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.01-build-tooling.md |
-| PLAN-003.02 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.02-backend.md |
-| PLAN-003.03 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.03-frontend-setup.md |
-| PLAN-003.04 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.04-frontend-components.md |
-| PLAN-003.05 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.05-sample-data.md |
-| PLAN-003.06 | plan | approved | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.06-verification.md |
+| PLAN-003 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
+| PLAN-003.01 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.01-build-tooling.md |
+| PLAN-003.02 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.02-backend.md |
+| PLAN-003.03 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.03-frontend-setup.md |
+| PLAN-003.04 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.04-frontend-components.md |
+| PLAN-003.05 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.05-sample-data.md |
+| PLAN-003.06 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.06-verification.md |
 | PLAN-004 | plan | approved | repository-owner | docs/01-plans/PLAN-004-reliability-follow-up.md |
 | PLAN-005 | plan | complete | repository-owner | docs/01-plans/PLAN-005-document-code-system.md |
 | PLAN-006 | plan | complete | repository-owner | docs/01-plans/PLAN-006-confidentiality-sweep.md |
@@ -445,13 +446,13 @@ CI regenerates it and fails on any difference.
 |---|---|---|---|---|---|---|
 | PLAN-001 | doc-agent-memory | approved | 14 | 0 | 0 | — |
 | PLAN-002 | doc-mini-systems | approved | 14 | 0 | 0 | — |
-| PLAN-003 | doc-html-00-overview | approved | 10 | 0 | 0 | — |
-| PLAN-003.01 | doc-html-01-build-tooling | approved | 3 | 0 | 0 | — |
-| PLAN-003.02 | doc-html-02-backend | approved | 3 | 0 | 0 | — |
-| PLAN-003.03 | doc-html-03-frontend-setup | approved | 2 | 0 | 0 | — |
-| PLAN-003.04 | doc-html-04-frontend-components | approved | 3 | 0 | 0 | — |
-| PLAN-003.05 | doc-html-05-sample-data | approved | 1 | 0 | 0 | — |
-| PLAN-003.06 | doc-html-06-verification | approved | 2 | 0 | 0 | — |
+| PLAN-003 | doc-html-00-overview | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.01 | doc-html-01-build-tooling | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.02 | doc-html-02-backend | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.03 | doc-html-03-frontend-setup | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.04 | doc-html-04-frontend-components | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.05 | doc-html-05-sample-data | deprecated | 0 | 0 | 0 | — |
+| PLAN-003.06 | doc-html-06-verification | deprecated | 0 | 0 | 0 | — |
 | PLAN-004 | doc-reliability-follow-up | approved | 7 | 0 | 4 | agent-architect, agent-builder-b, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
@@ -534,4 +535,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-431 documents — adr: 23, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 192.
+432 documents — adr: 24, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 192.

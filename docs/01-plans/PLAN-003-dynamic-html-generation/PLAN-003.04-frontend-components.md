@@ -4,10 +4,10 @@ id: doc-html-04-frontend-components
 code: PLAN-003.04
 title: "Frontend Components \u2014 Types, Layout, Pages, Blocks"
 kind: plan
-status: approved
+status: deprecated
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-10-04'
 systems:
 - sys-html
 depends_on: []
@@ -405,3 +405,39 @@ export default function ColumnsBlock({ content }: { content: ColumnsContent }) {
 ```
 
 > **Note**: Uses inline `style` for `gridTemplateColumns` instead of dynamic Tailwind `grid-cols-${n}` classes, which would require safelisting. The `grid-cols-1` class serves as the mobile-first fallback, overridden by the inline style on wider screens.
+
+## Audit disposition (`phase-des-01`, 2026-10-04)
+
+This plan is deprecated. On 2026-10-04 the owner retired the authored YAML content site that `PLAN-003` describes; [ADR-027](../../04-decisions/ADR-027-retire-plan-003.md) records the decision and what it leaves behind. Every requirement this document states is listed below with its disposition, as `REQ-021` R01 requires. Line numbers refer to this document above this section. An accomplished or superseded row names the shipped work, by file and commit or phase (`REQ-021` R03); a retired row gives the reason nothing will be built.
+
+27 requirements: 4 superseded, 23 retired.
+
+| Id | Line | Requirement | Disposition | Evidence or reason |
+|---|---|---|---|---|
+| 04-R1 | 23 | NEW `ts/src/types/schema.ts` | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R2 | 30-53 | Content interfaces for hero, text, image and columns blocks | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R3 | 57-65 | `BlockData` discriminated on `type` | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R4 | 69-74 | `PageData` with `template` `standard` or `landing` | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R5 | 76-91 | `RouteConfig`, `NavItem`, `SiteConfig` | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R6 | 94 | A new union member without a case is a compile error | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R7 | 100-102, 141 | NEW `ts/src/layouts/RootLayout.tsx` with `<Outlet/>` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R8 | 117-122 | Header: site title linking to `/` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R9 | 123-133 | Navigation links from `config.navigation` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R10 | 113-114, 135-137 | Pulse bar while navigation is loading | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R11 | 119, 140 | `<main>` limited to the container width | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R12 | 152-162 | NEW `ts/src/pages/DynamicPage.tsx` with `pageLoader` | superseded | Rendering pages from data is done at build time instead: static generated pages: `tools/generate_overview.py` (182fefa, `phase-demo-04`) and `tools/generate_engine_pages.py` (1913f26, `phase-des-09`), shown in the workbench by `ts/src/stage/HtmlViewerRegion.tsx` (3d24e5d, `phase-wb-04`) |
+| 04-R13 | 164-166 | Loader throws 400 "Page ID is required" | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 04-R14 | 154, 168-171 | Fetch `/api/v1/pages/{id}` with the request signal | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 04-R15 | 173-178 | 404 and other failures thrown with their status | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 04-R16 | 183-198 | Render title, description and blocks | superseded | The house page shell renders heading, lede and body for every generated page (`templates/html/house-page.html`, 49b0ca2) |
+| 04-R17 | 204-221 | NEW `ts/src/pages/NotFoundPage.tsx` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 04-R18 | 228-230 | NEW `ts/src/components/ErrorBoundary.tsx` | retired | the authored YAML content site is retired (ADR-027). The stage's lack of an error boundary is idea 000569 |
+| 04-R19 | 236-247 | Error boundary distinguishes route responses, errors and unknowns | retired | the authored YAML content site is retired (ADR-027); idea 000569 |
+| 04-R20 | 253-263 | Retry button and Home link on the error screen | retired | the authored YAML content site is retired (ADR-027); idea 000569 |
+| 04-R21 | 273-297 | NEW `ts/src/components/BlockRenderer.tsx` | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R22 | 298-301 | Exhaustive `never` check; "Unknown block type" fallback | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R23 | 310-332 | `HeroBlock`: headline, subheadline, call to action | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R24 | 337-351 | `TextBlock`: heading and body | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R25 | 356-377 | `ImageBlock`: figure, lazy image with `alt`, caption | retired | the authored YAML content site is retired (ADR-027) |
+| 04-R26 | 382-407 | `ColumnsBlock`: responsive grid, one column on narrow screens | superseded | The house `.cols` component collapses to one column at the breakpoint (`templates/styles/house-components.css` lines 109 and 190, 49b0ca2) |
+| 04-R27 | throughout | Components use the `@theme` token utilities | superseded | `templates/styles/house-tokens.json` and the generated `templates/styles/house.css` (49b0ca2, `phase-des-07`) |

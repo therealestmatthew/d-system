@@ -481,7 +481,7 @@ items:
   - sys-contracts
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on: []
@@ -501,8 +501,11 @@ items:
   - schemas/page.schema.json
   - docs/04-decisions/006-page-contracts.md
   - test/test_page_contracts.py
-  next_action: Record authored YAML as canonical and generated JSON as ignored build
-    output in an ADR.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-02
   title: Build validated YAML pages into ignored JSON
   plan: doc-html-00-overview
@@ -514,7 +517,7 @@ items:
   - sys-html
   - sys-contracts
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -533,8 +536,11 @@ items:
   - tools/build_pages.py
   - .gitignore
   - test/test_build_pages.py
-  next_action: Implement the YAML conversion command with schema validation before
-    publishing generated output.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-03
   title: Implement runtime-validated page models
   plan: doc-html-00-overview
@@ -546,7 +552,7 @@ items:
   - sys-api
   - sys-contracts
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -563,8 +569,11 @@ items:
   deliverables:
   - src/models/pages.py
   - test/test_page_models.py
-  next_action: Create strict Pydantic models from the agreed contract boundary for
-    site, page and discriminated block payloads.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-04
   title: Serve site and page configuration through FastAPI
   plan: doc-html-00-overview
@@ -577,7 +586,7 @@ items:
   - sys-api
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -598,8 +607,11 @@ items:
   - src/api/routes/pages.py
   - src/api/__init__.py
   - test/test_pages_api.py
-  next_action: Add and register site-config and page-by-ID routes against the chosen
-    generated-output location.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-05
   title: Install the frontend styling foundation
   plan: doc-html-00-overview
@@ -611,7 +623,7 @@ items:
   - sys-ui
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -631,8 +643,11 @@ items:
   - ts/package-lock.json
   - ts/vite.config.ts
   - ts/src/index.css
-  next_action: Add the planned router/styling dependencies and CSS-first design tokens
-    to the existing Vite app.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-06
   title: Wire typed routing and page-loading states
   plan: doc-html-00-overview
@@ -645,7 +660,7 @@ items:
   - sys-ui
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -668,8 +683,11 @@ items:
   - ts/src/layouts/RootLayout.tsx
   - ts/src/components/ErrorBoundary.tsx
   - ts/src/types/schema.ts
-  next_action: Add typed configuration access, site-config bootstrap and the existing-app
-    router entry point.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-07
   title: Render hero and text content blocks
   plan: doc-html-00-overview
@@ -681,7 +699,7 @@ items:
   - sys-ui
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -700,8 +718,11 @@ items:
   deliverables:
   - ts/src/components/blocks/HeroBlock.tsx
   - ts/src/components/blocks/TextBlock.tsx
-  next_action: Implement typed HeroBlock and TextBlock components against the approved
-    content shapes.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-08
   title: Complete block rendering and dynamic pages
   plan: doc-html-00-overview
@@ -713,7 +734,7 @@ items:
   - sys-ui
   - sys-html
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -734,8 +755,11 @@ items:
   - ts/src/components/blocks/ColumnsBlock.tsx
   - ts/src/components/BlockRenderer.tsx
   - ts/src/pages/DynamicPage.tsx
-  next_action: Add image and responsive columns components plus exhaustive block dispatch
-    and DynamicPage.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-09
   title: Provide sample pages and the authoring workflow
   plan: doc-html-00-overview
@@ -748,7 +772,7 @@ items:
   - sys-html
   - sys-delivery
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -770,8 +794,11 @@ items:
   - _data/pages/home.yaml
   - _data/pages/about.yaml
   - docs/08-governance/page-authoring.md
-  next_action: Add authored site/home/about YAML and wire the generator into documented
-    build steps.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-html-10
   title: Verify the complete page-generation vertical slice
   plan: doc-html-00-overview
@@ -785,7 +812,7 @@ items:
   - sys-ui
   - sys-api
   owner: repository-owner
-  status: queued
+  status: cancelled
   priority: 2
   session_budget: 1
   depends_on:
@@ -808,8 +835,11 @@ items:
   deliverables:
   - test/test_pages_api.py
   - docs/03-sessions/2026-09-05-html-verification.md
-  next_action: Execute the original automated and manual verification checklist against
-    the completed page workflow.
+  blocked_reason: Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04, after the phase-des-01
+    audit, that the authored YAML content site is not wanted; generated pages are built from repository
+    data by the house family and the engine and overview generators instead. The id is kept and not
+    reused.
+  next_action: Cancelled 2026-10-04. Do not claim; see ADR-027.
 - id: phase-sig-01
   title: Add a reproducible SQL view installation boundary
   plan: doc-mini-systems

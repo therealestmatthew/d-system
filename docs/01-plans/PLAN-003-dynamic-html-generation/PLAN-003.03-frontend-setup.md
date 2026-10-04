@@ -4,10 +4,10 @@ id: doc-html-03-frontend-setup
 code: PLAN-003.03
 title: "Frontend Setup \u2014 Dependencies, Tailwind, Router, Entry Point"
 kind: plan
-status: approved
+status: deprecated
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-10-04'
 systems:
 - sys-html
 depends_on: []
@@ -206,3 +206,36 @@ routerPromise.then((router) => {
 ### [DELETE] `ts/src/App.tsx`
 
 The existing `App.tsx` is a placeholder (`<h1>D-System</h1>`). Its responsibilities are now handled by `RootLayout` + `RouterProvider`. No longer imported anywhere.
+
+## Audit disposition (`phase-des-01`, 2026-10-04)
+
+This plan is deprecated. On 2026-10-04 the owner retired the authored YAML content site that `PLAN-003` describes; [ADR-027](../../04-decisions/ADR-027-retire-plan-003.md) records the decision and what it leaves behind. Every requirement this document states is listed below with its disposition, as `REQ-021` R01 requires. Line numbers refer to this document above this section. An accomplished or superseded row names the shipped work, by file and commit or phase (`REQ-021` R03); a retired row gives the reason nothing will be built.
+
+24 requirements: 2 accomplished, 3 superseded, 19 retired.
+
+| Id | Line | Requirement | Disposition | Evidence or reason |
+|---|---|---|---|---|
+| 03-R1 | 26, 32 | Install `react-router-dom@^6.30.0` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R2 | 27, 33 | Install `tailwindcss` (v4) as a dev dependency | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R3 | 27, 34 | Install `@tailwindcss/vite` | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R4 | 36 | No `postcss`, `autoprefixer` or `@types/react-router-dom` | retired | A constraint on an install that will not happen |
+| 03-R5 | 44-55 | Add `tailwindcss()` to `ts/vite.config.ts` before `react()` | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R6 | 56-60 | Keep the `/api` proxy to the backend | accomplished | `ts/vite.config.ts` `server.proxy['/api']`, from b2b564b, defaulted to 127.0.0.1 in e1ab509, with an overridable target and `ws: true` for the demo terminal |
+| 03-R7 | 68-73 | NEW `ts/src/index.css` with `@import "tailwindcss"`, no `tailwind.config.ts` | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R8 | 75-86 | `@theme` colour tokens (primary, secondary, surface, text, accent, danger and variants) | superseded | Colour roles for generated pages: `templates/styles/house-tokens.json` and the generated `templates/styles/house.css` (49b0ca2, `phase-des-07`) |
+| 03-R9 | 89-91 | Font tokens: Inter, Georgia, JetBrains Mono | superseded | Font tokens `--display`, `--body`, `--label`, `--mono` in `templates/styles/house-tokens.json` and the generated `templates/styles/house.css` (49b0ca2, `phase-des-07`) |
+| 03-R10 | 94-95 | Spacing overrides `--spacing-18`, `--spacing-88` | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R11 | 98 | `--container-max-width: 1200px` | superseded | The house page shell's width (`max-width: 1140px`, `templates/styles/house-components.css` line 35, 49b0ca2) |
+| 03-R12 | 102 | `@theme` generates `bg-primary`-style utilities | retired | Tailwind is not adopted; generated pages use the house tokens (ADR-027) |
+| 03-R13 | 108 | NEW `ts/src/router.tsx` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R14 | 110, 121-122 | Bootstrap: fetch `/api/v1/pages/site-config`, throw on failure | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 03-R15 | 125-127 | Map `config.routes` to route objects, `/` as the index | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R16 | 129, 152-153 | Each route's loader injects its `pageId` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R17 | 130 | Each page route has `errorElement: <ErrorBoundary/>` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R18 | 133-143 | Root route renders `RootLayout`, with a catch-all to `NotFoundPage` | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R19 | 146, 151 | `routerPromise` built once at module load | retired | the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R20 | 159-168, 185 | `main.tsx` imports `index.css` and mounts `RouterProvider` | retired | `ts/src/main.tsx` mounts `App`, which renders the stage (b30b685); the React app has no URL routing; it is the demo stage and workbench (ADR-027) |
+| 03-R21 | 172-179 | "Loading D-System..." while the site configuration loads | retired | no `/api/v1/pages` backend will exist (ADR-027) |
+| 03-R22 | 188-199 | Bootstrap failure screen "Failed to load D-System" | retired | no `/api/v1/pages` backend will exist (ADR-027). The stage's missing error handling is idea 000569 |
+| 03-R23 | 164, 174 | Keep `<StrictMode>` | accomplished | `ts/src/main.tsx` line 6, unchanged since b2b564b |
+| 03-R24 | 206-208 | DELETE `ts/src/App.tsx` as an unused placeholder | retired | The premise is false: `ts/src/App.tsx` renders the stage (b30b685) and is `sys-ui` evidence |

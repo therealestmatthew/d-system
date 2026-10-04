@@ -4,10 +4,10 @@ id: doc-html-05-sample-data
 code: PLAN-003.05
 title: "Sample Data \u2014 YAML Configuration Files"
 kind: plan
-status: approved
+status: deprecated
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-10-04'
 systems:
 - sys-html
 depends_on: []
@@ -122,3 +122,27 @@ To add a new page:
 4. Restart/refresh the frontend
 
 > **Tip**: YAML supports comments (`# ...`), multi-line strings (`>`, `|`), and anchors/aliases for reuse — making it much friendlier for authoring than raw JSON.
+
+## Audit disposition (`phase-des-01`, 2026-10-04)
+
+This plan is deprecated. On 2026-10-04 the owner retired the authored YAML content site that `PLAN-003` describes; [ADR-027](../../04-decisions/ADR-027-retire-plan-003.md) records the decision and what it leaves behind. Every requirement this document states is listed below with its disposition, as `REQ-021` R01 requires. Line numbers refer to this document above this section. An accomplished or superseded row names the shipped work, by file and commit or phase (`REQ-021` R03); a retired row gives the reason nothing will be built.
+
+15 requirements: 15 retired.
+
+| Id | Line | Requirement | Disposition | Evidence or reason |
+|---|---|---|---|---|
+| 05-R1 | 23-25 | NEW `_data/site.yaml`, converted to `_data/site.json` | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R2 | 28 | Site title `D-System` | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R3 | 29-35 | Routes `/` (home) and `/about` (about) | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R4 | 37-41 | Navigation: Home, About | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R5 | 44-57 | The exact `site.json` the conversion produces | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R6 | 64-66 | NEW `_data/pages/home.yaml`, a landing page | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R7 | 69-71 | Home: title, `landing` template, description | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R8 | 73-77 | Block `hero-1`: "Welcome to D-System" | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R9 | 78-84 | Block `intro-text` | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R10 | 89-91 | NEW `_data/pages/about.yaml`, a standard page | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R11 | 94-96 | About: title, `standard` template, description | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R12 | 98-104 | Block `about-text` describing D-System | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R13 | 111-116 | Authoring workflow: edit YAML, build, check the API, view the page | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R14 | 118-122 | Adding a page: YAML, route, build, refresh | retired | the authored YAML content site is retired (ADR-027) |
+| 05-R15 | 124 | Tip: YAML comments, multi-line strings, anchors | retired | the authored YAML content site is retired (ADR-027) |
