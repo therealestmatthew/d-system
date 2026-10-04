@@ -9490,8 +9490,10 @@ items:
   systems:
   - sys-api
   - sys-demo-stage
+  - sys-wb-terminal
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 2
   session_budget: 1
   depends_on: []
@@ -9510,8 +9512,9 @@ items:
     verification, not a connect storm.
   - REQ-012 R21 holds - a refused connection delivers the structured code and reason to the
     browser, and the panel displays that reason.
-  - REQ-012 R22 holds - the observed override behavior matches what the OPS document says
-    happens, whichever behavior was chosen.
+  - REQ-012 R22 holds - an explicit shell request is honoured and the D_SYSTEM_DEMO_SHELL override
+    applies only when none is given, as the route's docstring states (owner ruling 2026-10-04, which
+    chose the behavior change over an OPS document).
   verification:
   - uv run pytest test/test_demo_terminal.py
   - uv run pytest
@@ -9519,6 +9522,7 @@ items:
   deliverables:
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
+  - ts/src/stage/TerminalRegion.tsx
   next_action: Read lines 287 to 313 of src/api/routes/demo_terminal.py first. The cap check, the
     pre-accept close and the accept sit within twenty-six lines of each other, and the two code
     fixes are two edits to that one control flow - which is why they share a phase.
