@@ -25,6 +25,8 @@ import duckdb
 ROOT = Path(__file__).parent.parent
 DB_PATH = ROOT / "data" / "d_system.duckdb"
 DEFAULT_LIMIT = 10
+# DuckDB's LIMIT is a BIGINT; a larger value fails inside the query with a raw ConversionException.
+MAX_LIMIT = 2**63 - 1
 
 
 def build_where(
@@ -84,6 +86,8 @@ def load(
     system: str | None = None,
 ) -> str:
     """Render matching memories. `limit=None` means the default: unbounded with `--all`, else 10."""
+    if limit is not None and not 1 <= limit <= MAX_LIMIT:
+        raise ValueError(f"limit must be between 1 and {MAX_LIMIT}, got {limit}")
     if not DB_PATH.exists():
         return "Database not found. Run: uv run python tools/rebuild_db.py"
 
@@ -128,13 +132,15 @@ def load(
 
 
 def positive_int(value: str) -> int:
-    """argparse type for --limit: an integer of at least 1, else a usage error (exit 2)."""
+    """argparse type for --limit: an integer from 1 to MAX_LIMIT, else a usage error (exit 2)."""
     try:
         number = int(value)
     except ValueError:
         raise argparse.ArgumentTypeError(f"invalid int value: {value!r}") from None
     if number < 1:
         raise argparse.ArgumentTypeError(f"must be at least 1, got {number}")
+    if number > MAX_LIMIT:
+        raise argparse.ArgumentTypeError(f"must be at most {MAX_LIMIT}, got {number}")
     return number
 
 

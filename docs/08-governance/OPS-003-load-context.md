@@ -44,7 +44,8 @@ filter and returns everything, unless an explicit `--limit` caps it.
 Requires `data/d_system.duckdb` to exist and be current — if it is missing or stale, rebuild it
 first with `tools/rebuild_db.py` ([OPS-002](OPS-002-rebuild-db.md)). An unrecognized `--type` value
 is rejected by `argparse` before any query runs, listing the legal values. A `--limit` below 1,
-or one that is not an integer, is rejected the same way, with exit code 2 and no query run.
+above 9223372036854775807 (DuckDB's largest `LIMIT`), or not an integer is rejected the same way,
+with exit code 2 and no query run.
 
 <!-- generated:tool-reference:start -->
 

@@ -236,7 +236,8 @@ def test_cli_project_and_tags(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
 
 
 @pytest.mark.parametrize("argv", [["--limit", "0"], ["--limit", "-1"], ["-n", "-5"],
-                                  ["--limit=-1"], ["--all", "--limit", "0"], ["--limit", "abc"]])
+                                  ["--limit=-1"], ["--all", "--limit", "0"], ["--limit", "abc"],
+                                  ["-n-1"], ["--all", "--limit", str(2**63)]])
 def test_cli_rejects_a_non_positive_or_non_integer_limit(
     corpus_db: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
     argv: list[str],
@@ -264,3 +265,14 @@ def test_positive_int_messages() -> None:
 def test_cli_accepts_a_limit_of_one(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
                                     capsys: pytest.CaptureFixture[str]) -> None:
     assert _run_cli(monkeypatch, capsys, "--all", "--limit", "1") == ORDER[:1]
+
+
+def test_cli_accepts_the_largest_bigint_limit(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                                              capsys: pytest.CaptureFixture[str]) -> None:
+    assert _run_cli(monkeypatch, capsys, "--all", "--limit", str(2**63 - 1)) == ORDER
+
+
+@pytest.mark.parametrize("limit", [0, -1, 2**63])
+def test_load_rejects_an_out_of_range_limit(corpus_db: Path, limit: int) -> None:
+    with pytest.raises(ValueError, match="limit must be between 1 and"):
+        load_context.load(all_memories=True, limit=limit)
