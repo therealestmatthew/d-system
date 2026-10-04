@@ -31,6 +31,7 @@ from src.governance.backlog import (
 )
 from src.governance.codes import inspect_codes, inspect_register, next_code, render_catalog
 from src.governance.idea_priority import inspect_idea_priority
+from src.governance.plan_phases import inspect_plan_phases
 from src.governance.regression import audit as audit_status_regression
 from src.governance.staleness import catalog_errors, ideas_md_errors
 
@@ -394,7 +395,12 @@ def audit_backlog(
             today or date.today(),
             ideas,
         )
-        return errors, catalog
+        plan_errors, _ = inspect_plan_phases(
+            result["documents"],
+            catalog["items"],
+            lambda path: public_path(root, path).read_text(encoding="utf-8"),
+        )
+        return errors + plan_errors, catalog
     except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
         return [f"backlog inputs: {exc}"], {}
 

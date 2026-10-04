@@ -7,7 +7,7 @@ kind: plan
 status: approved
 owner: repository-owner
 created: '2026-09-27'
-updated: '2026-09-29'
+updated: '2026-10-04'
 systems: [sys-plugin]
 depends_on: [doc-plugin-audit-remediation-requirements, doc-adr-plugin-idea-log-lock, doc-idea-realization-plugin, doc-plan-quality-standard, doc-three-altitude-review-procedure]
 ---
@@ -102,7 +102,7 @@ open to the adversary and to G3.
   `REQ-031` gets one dated note under its accepted decisions: R03's dependency list now includes
   `filelock`, per `REQ-035` R02. Rejected: amending `REQ-031` in place. Cost of the chosen option:
   two requirement documents describe the plugin, linked in both directions.
-- **D7. A new track, `phase-plfx-*`, under this plan.** Rejected: continuing `phase-plug-10` onward,
+- **D7. A new track, `phase-plfx-*`, under this plan.** Rejected: continuing the `phase-plug-*` track past `phase-plug-09`,
   which would put phases of a different plan under a track row that points at `PLAN-048`. Cost: one
   more row in the backlog README.
 - **D8. The phases run in the validation's dependency order, one at a time.** The order, as the
