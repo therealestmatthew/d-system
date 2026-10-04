@@ -55,7 +55,7 @@ Self-declared from the owner's instruction; no backlog acceptance list exists fo
   `completion_evidence` and `result` first appear in `8042375` and `7d06a7c`, the post-merge
   completion commits. This was checked with `git log -S` on `backlog.yaml`.
 - The guard is captured as an idea, not written as a rule: Met. It was sent to Ideation, as the
-  coordination contract requires.
+  coordination contract requires, and recorded as idea `000581`.
 
 ## Backlog
 
