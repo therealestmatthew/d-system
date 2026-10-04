@@ -61,7 +61,9 @@ Self-declared from the owner's instruction; no backlog acceptance list exists fo
   (`test_socket_is_closed_when_create_adapter_fails`).
 - A real shell that cannot spawn no longer leaks the pty master fd: Met
   (`test_pty_master_fd_is_closed_when_the_shell_cannot_spawn`, which records the fd `openpty()`
-  returned and asserts `os.fstat` on it raises after the request).
+  returned and asserts `os.fstat` on it raises after the request). This is proven for the POSIX
+  adapter only: `WindowsConPtyAdapter.close()` is a no-op after a failed `start()`, which is safe
+  only if `pywinpty` releases its own ConPTY handle when `spawn()` raises; that is untested here.
 - No slot is held after a startup failure, and the full suite passes: Met (all three tests assert
   an empty registry; 1457 passed).
 
@@ -75,3 +77,47 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
   (`ts/src/stage/TerminalRegion.tsx`). A startup failure closes with 4003 after the socket
   opened, so the panel shows a closed terminal without the reason. Changing the panel was outside
   this instruction.
+
+## Review
+
+Independent review by a fresh `demo-adversary` agent over `b8dbdad...HEAD` at `3ed8b18`, given the
+owner's instruction as relayed, idea `000573`'s title, the four self-declared conditions (marked as
+written by this session) and the repository-wide gates, and told not to read this record.
+
+1. `adapter.start()` raising closes the adapter and the socket with a code and reason: **Holds.**
+   With the hunk reverted in a scratch copy the test fails (an unhandled `OSError` leaves the ASGI
+   handler); on the branch it passes.
+2. `create_adapter()` raising closes the socket the same way: **Holds.** Fails on the reverted copy
+   (`anyio.ClosedResourceError` through the test client), passes on the branch.
+3. A shell that cannot spawn no longer leaks the pty master fd: **Holds for POSIX.**
+   `PosixPtyAdapter.start()` sets `_master_fd` before `Popen`, so `close()` releases it. The Windows
+   path is unverified (see finding 1).
+4. No slot held after a failure, and the suite passes: **Holds.** One outer `finally` releases the
+   slot on every exit; 1457 passed, 1 skipped; governance, ruff, mypy and the private-content check
+   clean.
+
+Probes it cleared: `except Exception` lets `asyncio.CancelledError` through; a failing
+`websocket.close()` inside the handler is suppressed and the slot is still released; no other
+`4003` in `src/` or `ts/`; only the declared files changed.
+
+Findings:
+
+1. **Minor.** Condition 3 is proven for the POSIX adapter only; the Windows ConPTY path after a
+   failed `start()` rests on code reading, and was the same before this change.
+
+Disposition: finding 1 accepted, and condition 3's wording now states the POSIX-only proof.
+
+## Decisions
+
+- The fd leak sits in `PosixPtyAdapter.start()`, which stores the master fd before spawning. The
+  instruction named the route file, and the route calling `adapter.close()` on failure releases
+  the fd, so `src/demo/posix.py` was left unchanged.
+- A startup failure closes with a new code, 4003, rather than reusing 4001 (cap) or 4002 (shell
+  refusal), so a client can tell the three apart.
+- The handler catches `Exception`, logs it, and returns rather than re-raising, so the ASGI server
+  does not also try to close the socket.
+
+## Left undone
+
+- The panel does not quote the 4003 reason (see `## Unresolved`).
+- No Windows test of the ConPTY adapter's cleanup after a failed `spawn()`.
