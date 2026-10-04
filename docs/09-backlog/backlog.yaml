@@ -3,7 +3,6 @@ updated: '2026-10-04'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
-- phase-dam-01
 - phase-grd-03
 - phase-grd-04
 - phase-asr-04
@@ -15015,7 +15014,7 @@ items:
   - sys-gov-docs
   - sys-realization
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   priority: 1
   session_budget: 1
@@ -15087,8 +15086,7 @@ items:
   - CLAUDE.md
   - docs/01-plans/PLAN-005-document-code-system.md
   - docs/06-requirements/REQ-003-idea-plan-lifecycle.md
-  next_action: Built, reviewed and verified on agent/phase-dam-01; awaiting the owner's merge
-    approval, then the completion edit on dev.
+  next_action: Complete.
   session: doc-session-design-document-amendments
   completion_evidence:
   - docs/07-architecture/ARCH-006-idea-realization-system.md
@@ -15104,7 +15102,8 @@ items:
   result: Every REQ-029 acceptance grep passes; the owner approved AGENTS.md step 5 and the three
     CLAUDE.md lines and left AGENTS.md 179-181 unchanged. The owner regenerated the .agents orient
     adapter (Owner Terminal C14). The independent review found all acceptance holding; one major (an
-    unruled GOV-018 re-review sentence) fixed, one minor accepted. Governance OK; full suite green.
+    unruled GOV-018 re-review sentence) fixed, one minor accepted. Governance OK; 1450 passed, 1
+    skipped. Merged onto dev with owner approval.
 - id: phase-asr-01
   title: The reviewer-judge agent type, in shadow, with a test that its tools stay read-only
   plan: doc-reviewer-contract
