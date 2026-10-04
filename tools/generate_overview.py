@@ -19,6 +19,13 @@ narrower reading of `templates/html/overview-page.html`'s token-contract comment
 `{{GENERATED_AT}}` to be wall-clock; the dispatched work item for this tool requires
 generation-to-generation identity instead, so the wall clock is never consulted.
 
+The committed page is a snapshot, not a live view (owner ruling 2026-10-04, REQ-020 R08). Its
+`{{SOURCE_STAMP}}` names the commit the inputs were read at and that commit's own date, as
+`tools/generate_engine_pages.py` stamps the engine pages, says when an input had uncommitted
+changes, and carries a SHA-256 of the page body. Nothing compares the page against live idea
+or backlog counts, so recording an idea leaves it valid; `content_hash_matches()` recomputes
+the hash, so a hand edit to the committed page does not.
+
     uv run python tools/generate_overview.py               # write _public/overview/index.html
     uv run python tools/generate_overview.py --out FILE     # write elsewhere instead
 """
@@ -26,6 +33,7 @@ generation-to-generation identity instead, so the wall clock is never consulted.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -56,6 +64,19 @@ SECTIONS: tuple[tuple[str, str, str], ...] = (
 )
 
 FALLBACK_GENERATED_AT = "no idea-log events yet"
+
+#: Paths whose uncommitted changes would make the commit stamp misdescribe what was read.
+INPUT_PATHS = (
+    "_data/ideas.jsonl",
+    "docs/09-backlog/backlog.yaml",
+    "docs/08-governance/systems.yaml",
+    "brain",
+    "templates",
+)
+
+#: The hash slot in the stamp. The page is hashed with the digest left empty, then filled.
+HASH_PREFIX = "Content hash <code>sha256:"
+_HASH_SLOT = re.compile(re.escape(HASH_PREFIX) + r"([0-9a-f]{64})</code>")
 
 
 class Templates:
@@ -246,14 +267,71 @@ def render_systems_panel(inventory: dict[str, Any], templates: Templates) -> str
     )
 
 
-def render_page(metrics: dict[str, Any], inventory: dict[str, Any], templates: Templates) -> str:
+def _git(*args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(ROOT), *args], capture_output=True, text=True, check=True
+    ).stdout.strip()
+
+
+def source_stamp() -> dict[str, Any]:
+    """The commit the inputs were read at, its date, and whether any input differs from it."""
+    dirty = _git("status", "--porcelain", "--", *INPUT_PATHS)
+    return {
+        "commit": _git("rev-parse", "--short=12", "HEAD"),
+        "date": _git("show", "-s", "--format=%cs", "HEAD"),
+        "dirty": bool(dirty),
+    }
+
+
+def render_stamp(stamp: dict[str, Any]) -> str:
+    """The stamp markup, with the content hash slot left empty for `_seal()` to fill."""
+    parts = [
+        f"Source commit <code>{html.escape(stamp['commit'])}</code>",
+        f"Commit date {html.escape(stamp['date'])}",
+    ]
+    if stamp["dirty"]:
+        parts.append("Inputs had uncommitted changes when generated")
+    parts.append(HASH_PREFIX + "</code>")
+    return "\n      &middot; ".join(parts)
+
+
+def _digest(unsealed: str) -> str:
+    return hashlib.sha256(unsealed.encode("utf-8")).hexdigest()
+
+
+def _seal(unsealed: str) -> str:
+    """Fill the empty hash slot with the SHA-256 of the page as it stands with the slot empty."""
+    empty_slot = HASH_PREFIX + "</code>"
+    assert unsealed.count(empty_slot) == 1, "expected exactly one empty content hash slot"
+    return unsealed.replace(empty_slot, HASH_PREFIX + _digest(unsealed) + "</code>")
+
+
+def content_hash_matches(page: str) -> bool:
+    """Whether the page's recorded content hash is the hash of its own body.
+
+    False when the page carries no hash, carries more than one, or was edited after it was
+    generated.
+    """
+    found: list[str] = _HASH_SLOT.findall(page)
+    if len(found) != 1:
+        return False
+    unsealed = _HASH_SLOT.sub(lambda _: HASH_PREFIX + "</code>", page)
+    return _digest(unsealed) == found[0]
+
+
+def render_page(
+    metrics: dict[str, Any],
+    inventory: dict[str, Any],
+    templates: Templates,
+    stamp: dict[str, Any],
+) -> str:
     """The full self-contained page, every figure copied verbatim from the two tools."""
     metrics_sections = "".join(
         render_metrics_section(section_id, title, primary_label, metrics, templates)
         for section_id, title, primary_label in SECTIONS
     )
     generated_at = metrics["meta"]["reference_at"] or FALLBACK_GENERATED_AT
-    return _fill(
+    unsealed = _fill(
         templates.page,
         {
             "PAGE_TITLE": "D-System Overview",
@@ -268,15 +346,17 @@ def render_page(metrics: dict[str, Any], inventory: dict[str, Any], templates: T
             "METRICS_SECTIONS": metrics_sections,
             "CONCEPTS_PANEL": render_concepts_panel(inventory, templates),
             "SYSTEMS_PANEL": render_systems_panel(inventory, templates),
+            "SOURCE_STAMP": render_stamp(stamp),
         },
     )
+    return _seal(unsealed)
 
 
 def generate(templates: Templates | None = None) -> str:
     """Run both tools and render the page — the whole pipeline, no computation of its own."""
     metrics = run_metrics_tool()
     inventory = run_inventory_tool()
-    return render_page(metrics, inventory, templates or Templates())
+    return render_page(metrics, inventory, templates or Templates(), source_stamp())
 
 
 def main(argv: list[str] | None = None) -> int:

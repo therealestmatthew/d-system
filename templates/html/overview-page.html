@@ -32,6 +32,11 @@
                                  concatenated in that order
     {{CONCEPTS_PANEL}}        - one overview-concepts-panel.html render
     {{SYSTEMS_PANEL}}         - one overview-systems-panel.html render
+    {{SOURCE_STAMP}}          - tools/generate_overview.py render_stamp(): the source commit the
+                                 inputs were read at, that commit's own date, a note when an
+                                 input had uncommitted changes, and a SHA-256 of the page body.
+                                 The page is a committed snapshot; the hash is what detects a
+                                 hand edit to it (REQ-020 R08)
 
   Layout: three sections (Metrics / Concepts & Terminology / Systems) behind CSS-only radio
   tabs — no JavaScript, so the page still works if the embedding context blocks scripts.
@@ -62,6 +67,9 @@
       &middot; {{CONCEPT_COUNT}} concepts
       &middot; {{TERM_COUNT}} terms
       &middot; {{SYSTEM_COUNT}} systems
+    </p>
+    <p class="overview__meta">
+      {{SOURCE_STAMP}}
     </p>
   </header>
 

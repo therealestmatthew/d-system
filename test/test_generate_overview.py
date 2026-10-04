@@ -5,6 +5,10 @@ twice against an unchanged repository must produce byte-identical files (no gene
 timestamp, no wall-clock input anywhere in the pipeline), and every figure the page shows
 must be traceable back to `tools/overview_metrics.py`'s or `tools/overview_inventory.py`'s own
 JSON output rather than recomputed by the generator.
+
+REQ-020 R08 adds a third: the committed `_public/overview/index.html` is a stamped snapshot
+whose recorded content hash still matches its body, so a hand edit fails here while a newly
+recorded idea does not.
 """
 
 from __future__ import annotations
@@ -21,6 +25,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATOR = ROOT / "tools" / "generate_overview.py"
+COMMITTED_PAGE = ROOT / "_public" / "overview" / "index.html"
+STAMP = {"commit": "0" * 12, "date": "2026-10-04", "dirty": False}
 
 
 def _load(name: str) -> ModuleType:
@@ -156,8 +162,8 @@ def test_render_page_is_a_pure_function_of_its_inputs(
     metrics: dict[str, Any], inventory: dict[str, Any]
 ) -> None:
     templates = generate_overview.Templates()
-    first = generate_overview.render_page(metrics, inventory, templates)
-    second = generate_overview.render_page(metrics, inventory, templates)
+    first = generate_overview.render_page(metrics, inventory, templates, STAMP)
+    second = generate_overview.render_page(metrics, inventory, templates, STAMP)
     assert first == second
 
 
@@ -182,6 +188,70 @@ def test_render_table_lists_every_series_in_order() -> None:
     )
     assert "<tr><td>x</td><td>1</td><td>0.5</td></tr>" in body_rows
     assert "<tr><td>y</td><td>2</td><td>0.5</td></tr>" in body_rows
+
+
+# --- REQ-020 R08: the committed page is a stamped, unedited snapshot ---------------------------
+
+
+def test_stamp_is_the_source_commit_and_its_own_date() -> None:
+    commit = subprocess.run(
+        ["git", "-C", str(ROOT), "rev-parse", "--short=12", "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    date = subprocess.run(
+        ["git", "-C", str(ROOT), "show", "-s", "--format=%cs", "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    rendered = generate_overview.generate()
+    assert f"Source commit <code>{commit}</code>" in rendered
+    assert f"Commit date {date}" in rendered
+
+
+def test_uncommitted_input_changes_are_stated() -> None:
+    assert "uncommitted" in generate_overview.render_stamp({**STAMP, "dirty": True})
+    assert "uncommitted" not in generate_overview.render_stamp(STAMP)
+
+
+def test_a_generated_page_carries_a_content_hash_of_its_own_body() -> None:
+    assert generate_overview.content_hash_matches(generate_overview.generate())
+
+
+def test_the_committed_page_is_an_unedited_generated_page() -> None:
+    committed = COMMITTED_PAGE.read_text(encoding="utf-8")
+    assert "Source commit <code>" in committed
+    assert generate_overview.content_hash_matches(committed), (
+        "_public/overview/index.html no longer matches its own content hash. It is generated; "
+        "regenerate it with tools/generate_overview.py and do not edit it by hand."
+    )
+
+
+def test_a_hand_edit_to_the_committed_page_is_detected() -> None:
+    committed = COMMITTED_PAGE.read_text(encoding="utf-8")
+    tampered = committed.replace(" ideas\n", " ideas (edited)\n", 1)
+    assert tampered != committed
+    assert not generate_overview.content_hash_matches(tampered)
+
+
+def test_the_hash_does_not_depend_on_live_counts(
+    metrics: dict[str, Any], inventory: dict[str, Any]
+) -> None:
+    """A page rendered from other counts is still self-consistent: the check is the hash, not
+    a comparison with the repository, so recording an idea leaves the committed page valid."""
+    templates = generate_overview.Templates()
+    more = {**metrics, "meta": {**metrics["meta"], "idea_count": metrics["meta"]["idea_count"] + 1}}
+    page = generate_overview.render_page(metrics, inventory, templates, STAMP)
+    other = generate_overview.render_page(more, inventory, templates, STAMP)
+    assert page != other
+    assert generate_overview.content_hash_matches(page)
+    assert generate_overview.content_hash_matches(other)
+
+
+def test_a_page_without_exactly_one_hash_does_not_match() -> None:
+    page = generate_overview.generate()
+    slot = generate_overview._HASH_SLOT.search(page)
+    assert slot
+    assert not generate_overview.content_hash_matches(page.replace(slot.group(0), "", 1))
+    assert not generate_overview.content_hash_matches(page + slot.group(0))
 
 
 # --- The CLI ---------------------------------------------------------------------------------
