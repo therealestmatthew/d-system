@@ -10,12 +10,13 @@ pages exist, one per entry in `PAGES` below:
 - `ideas.html`, the idea funnel and ledger (R15, R16);
 - `backlog.html`, the backlog and batch graph (R21-R23).
 
-R07-R13 apply to all three. The per-idea trace pages (R19, R20) are not built yet.
+R07-R13 apply to all three, and to the per-idea trace pages, `trace/<id>.html`, one for each idea
+with a recorded plan or phase link (R19, R20).
 
 Inputs, all tracked: the idea log through `fold()` (never parsed here directly, R10), the backlog
 (`docs/09-backlog/backlog.yaml`), the batch tables under `docs/09-backlog/batches/`, plan front
-matter under `docs/01-plans/`, the house family templates, and two facts from git, the commit the
-inputs were read at and that commit's date.
+matter under `docs/01-plans/`, the house family templates, the commit the inputs were read at and
+that commit's date, and, for the trace pages' gate dates, the first-parent history of that commit.
 
 Determinism (R07, R08). Every page is a pure function of those inputs. The stamp is the source
 commit and the commit's own date, never the time the generator ran, so two runs on one commit give
@@ -34,6 +35,7 @@ gate queue is in `STAGES` and `GATES` below and is printed on the page beside th
 from __future__ import annotations
 
 import argparse
+import functools
 import html
 import subprocess
 import sys
@@ -46,7 +48,7 @@ import yaml  # type: ignore[import-untyped]
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.db.ideas import AXES, SCHEMA, fold, load_events, statuses  # noqa: E402
+from src.db.ideas import AXES, CLOSING_STATES, SCHEMA, fold, load_events, statuses  # noqa: E402
 from src.governance.__main__ import markdown_paths, parse_frontmatter  # noqa: E402
 from src.governance.backlog import readiness  # noqa: E402
 from tools import generate_house_css as house  # noqa: E402
@@ -59,6 +61,8 @@ INPUT_PATHS = ("_data/ideas.jsonl", "docs/09-backlog", "docs/01-plans", "templat
 NOT_RECORDED = "not recorded"
 UNCLASSIFIED = "unclassified"
 NO_RECORDED_PLAN = "no recorded plan"
+#: A gate the record shows has not happened yet, as distinct from one with no record at all.
+NOT_REACHED = "not reached"
 
 
 # ---- inputs ----------------------------------------------------------------------------------
@@ -99,6 +103,141 @@ def load_batches(root: Path = ROOT) -> list[dict[str, Any]]:
     return sorted(tables, key=lambda table: (table["sequence"], table["id"]))
 
 
+#: Plan statuses that mean the plan passed G3 (REQ-036 R20).
+G3_STATUSES = ("approved", "active", "complete")
+
+BACKLOG_PATH = "docs/09-backlog/backlog.yaml"
+PLANS_PATH = "docs/01-plans"
+
+
+def _first_parent_log(root: Path, head: str, *args: str) -> list[str]:
+    """`git log` over the first-parent history of `head`, oldest first.
+
+    `--diff-merges=first-parent` makes a merge commit's diff the one against its first parent, so
+    the merge from before the fast-forward-only rule (818f64b) is read like any other commit."""
+    return _git(
+        root, "log", "--first-parent", "--diff-merges=first-parent", "--reverse", *args, head
+    ).splitlines()
+
+
+def _blobs(root: Path, specs: list[str]) -> dict[str, str | None]:
+    """The content of each `commit:path`, read through one `git cat-file --batch` process.
+
+    None for a path absent at that commit. One process for every read keeps the history scan to a
+    handful of git calls per run instead of one per file version."""
+    if not specs:
+        return {}
+    output = subprocess.run(
+        ["git", "-C", str(root), "cat-file", "--batch"],
+        input="".join(f"{spec}\n" for spec in specs).encode("utf-8"),
+        capture_output=True, check=True,
+    ).stdout
+    contents: dict[str, str | None] = {}
+    position = 0
+    for spec in specs:
+        end = output.index(b"\n", position)
+        header = output[position:end].decode("utf-8")
+        position = end + 1
+        if header.endswith(" missing"):
+            contents[spec] = None
+            continue
+        size = int(header.rsplit(" ", 1)[1])
+        contents[spec] = output[position:position + size].decode("utf-8")
+        position += size + 1
+    return contents
+
+
+def _plan_history(root: Path, head: str) -> dict[str, dict[str, str]]:
+    """Each plan's earliest first-parent commit where its front matter reads a G3 status.
+
+    Keyed by the front matter `id`, not the path, so a renamed plan file keeps its history. Every
+    version of every plan file a commit touched is read; a version whose front matter does not
+    parse is skipped, as the governance check would have rejected it then too."""
+    touched: list[tuple[str, str, str]] = []
+    commit = date = ""
+    for line in _first_parent_log(
+        root, head, "--name-only", "--format=commit %H %cs", "--", PLANS_PATH
+    ):
+        if line.startswith("commit "):
+            _, commit, date = line.split(" ")
+        elif line.endswith(".md"):
+            touched.append((commit, date, line))
+    blobs = _blobs(root, [f"{commit}:{path}" for commit, _, path in touched])
+    first: dict[str, dict[str, str]] = {}
+    for commit, date, path in touched:
+        text = blobs[f"{commit}:{path}"]
+        if text is None:
+            continue
+        try:
+            meta = parse_frontmatter(text)
+        except ValueError:
+            continue
+        status, key = meta.get("status"), meta.get("id")
+        if meta.get("kind") == "plan" and status in G3_STATUSES and key and key not in first:
+            first[str(key)] = {"commit": commit[:12], "date": date, "status": str(status)}
+    return first
+
+
+def _complete_phases(text: str) -> set[str]:
+    """The phases a version of backlog.yaml shows as complete, read line by line.
+
+    A phase's own `status` key sits two columns right of the dash on its `- id:` line. Reading
+    lines rather than parsing YAML keeps a scan of a hundred versions of an 800 KB file fast."""
+    complete, current, indent = set(), None, -1
+    for line in text.splitlines():
+        stripped = line.lstrip(" ")
+        if stripped.startswith("- id: "):
+            current, indent = stripped[len("- id: "):].strip(), len(line) - len(stripped)
+        elif current and line.startswith(" " * (indent + 2) + "status: "):
+            if stripped.split()[1] == "complete":
+                complete.add(current)
+            current = None
+    return complete
+
+
+def _phase_history(root: Path, head: str) -> dict[str, dict[str, str]]:
+    """Each phase's earliest first-parent commit where backlog.yaml shows it complete (G4, G5).
+
+    Only commits whose diff adds or removes a `status: complete` line are read. The first commit
+    where a phase reads complete must add that line for it, so no candidate is missed."""
+    commits = [
+        line.split(" ")
+        for line in _first_parent_log(
+            root, head, "-s", "-G", "status: complete", "--format=%H %cs", "--", BACKLOG_PATH
+        )
+    ]
+    blobs = _blobs(root, [f"{commit}:{BACKLOG_PATH}" for commit, _ in commits])
+    first: dict[str, dict[str, str]] = {}
+    for commit, date in commits:
+        text = blobs[f"{commit}:{BACKLOG_PATH}"]
+        for key in _complete_phases(text or ""):
+            first.setdefault(key, {"commit": commit[:12], "date": date})
+    return first
+
+
+@functools.lru_cache(maxsize=4)
+def _history_at(root: Path, head: str) -> dict[str, Any]:
+    shallow = _git(root, "rev-parse", "--is-shallow-repository") == "true"
+    if shallow:
+        return {"shallow": True, "root_commits": [], "plans": {}, "phases": {}}
+    return {
+        "shallow": False,
+        "root_commits": [sha[:12] for sha in _git(root, "rev-list", "--max-parents=0", head)
+                         .splitlines()],
+        "plans": _plan_history(root, head),
+        "phases": _phase_history(root, head),
+    }
+
+
+def load_history(root: Path = ROOT) -> dict[str, Any]:
+    """The gate dates the trace pages need, from the first-parent history of the source commit.
+
+    The history is `HEAD`'s, the commit the stamp names, so two runs on one commit agree (R07).
+    Pages are generated on `dev`, where that history is `dev`'s. A shallow clone cannot show when
+    anything first happened, so its pages say "not recorded" instead of dating from the cut-off."""
+    return _history_at(root, _git(root, "rev-parse", "HEAD"))
+
+
 def load_inputs(root: Path = ROOT) -> dict[str, Any]:
     """Everything the pages read, gathered once."""
     backlog = yaml.safe_load((root / "docs" / "09-backlog" / "backlog.yaml").read_text("utf-8"))
@@ -108,6 +247,7 @@ def load_inputs(root: Path = ROOT) -> dict[str, Any]:
         "plans": load_plans(root),
         "batches": load_batches(root),
         "stamp": source_stamp(root),
+        "history": load_history(root),
     }
 
 
@@ -496,10 +636,19 @@ def render_overview(inputs: dict[str, Any]) -> str:
     )
 
 
+def trace_path(key: str) -> str:
+    """A trace page's path under the output directory."""
+    return f"trace/{key}.html"
+
+
 def trace_cell(row: dict[str, Any]) -> str:
-    """The ledger's trace column. phase-des-11 replaces the linked case with the trace page link."""
-    text = "trace page not yet generated" if row["has_plan"] else NO_RECORDED_PLAN
-    return f'<td data-trace="{_e(row["id"])}">{_e(text)}</td>'
+    """The ledger's trace column: a link to the idea's trace page, or "no recorded plan"."""
+    if row["has_plan"]:
+        return (
+            f'<td data-trace="{_e(row["id"])}"><a href="{_e(trace_path(row["id"]))}">trace</a>'
+            "</td>"
+        )
+    return f'<td data-trace="{_e(row["id"])}">{NO_RECORDED_PLAN}</td>'
 
 
 def _distribution(attr: str, counts: list[tuple[str, int]], total: int) -> str:
@@ -564,8 +713,8 @@ def render_ledger(inputs: dict[str, Any]) -> str:
     )
     notes = [
         "Trace: an idea with a recorded plan, through promoted_to or a backlog phase's ideas "
-        "field, gets a trace page in a later phase. Until then its row says so. Every other idea "
-        f"reads {NO_RECORDED_PLAN}.",
+        "field, links to its trace page: capture, plan, phases and delivery, with a date for "
+        f"each gate. Every other idea reads {NO_RECORDED_PLAN}.",
     ]
     if not data["ideas_field_present"]:
         notes.append(
@@ -585,6 +734,261 @@ def render_ledger(inputs: dict[str, Any]) -> str:
         lede="Every captured idea once, how many sit at each status, and how the ideas spread "
         "across the four ARCH-005 classification axes.",
         body=body,
+    )
+
+
+def traced_ideas(inputs: dict[str, Any]) -> list[str]:
+    """Ideas with a recorded plan or phase link: `promoted_to`, or a phase's `ideas` field (R19)."""
+    linked = linked_ideas(inputs) or set()
+    return sorted(
+        key for key, idea in inputs["ideas"].items() if idea["promoted_to"] or key in linked
+    )
+
+
+def _history_gap(history: dict[str, Any]) -> str | None:
+    """Why no history date can be given at all, or None when the history is complete."""
+    if history["shallow"]:
+        return "the repository is a shallow clone, so its history does not reach back far enough"
+    return None
+
+
+def _dated(found: dict[str, str] | None, history: dict[str, Any], absent: str) -> dict[str, Any]:
+    """A gate entry from a history lookup: dated, "not reached" with what has not happened yet, or
+    "not recorded" when the history itself is missing."""
+    gap = _history_gap(history)
+    if gap:
+        return {"date": NOT_RECORDED, "commit": None, "note": gap}
+    if found is None:
+        return {"date": NOT_REACHED, "commit": None, "note": absent}
+    note = ""
+    if found["commit"] in history["root_commits"]:
+        note = "already so in the repository's first commit; nothing earlier is recorded"
+    return {"date": found["date"], "commit": found["commit"], "note": note}
+
+
+def trace_data(inputs: dict[str, Any], key: str) -> dict[str, Any]:
+    """Every entry one idea's trace page shows, each with its source (REQ-036 R20)."""
+    idea = inputs["ideas"][key]
+    history = inputs["history"]
+    states = phase_states(inputs["phases"])
+    by_code = {str(plan["code"]): plan for plan in inputs["plans"]}
+    by_id = {str(plan["id"]): plan for plan in inputs["plans"]}
+
+    phases = [phase for phase in inputs["phases"] if key in phase.get("ideas", [])]
+    plan_refs: list[tuple[str, str]] = [
+        (target, "the idea's promoted_to") for target in idea["promoted_to"] or []
+    ]
+    plan_refs += [(phase["plan"], f"the plan field of {phase['id']}") for phase in phases]
+
+    plans: list[dict[str, Any]] = []
+    seen: dict[str, dict[str, Any]] = {}
+    for ref, origin in plan_refs:
+        plan = by_code.get(ref) or by_id.get(ref)
+        name = str(plan["id"]) if plan else ref
+        if name in seen:
+            seen[name]["origins"].append(origin)
+            continue
+        if plan is None:
+            entry = {"ref": ref, "code": ref, "title": None, "status": None, "origins": [origin],
+                     "g3": {"date": NOT_RECORDED, "commit": None,
+                            "note": f"{ref} is not a plan document, so it has no plan approval"}}
+        else:
+            entry = {
+                "ref": ref, "code": str(plan["code"]), "title": plan["title"],
+                "status": plan["status"], "origins": [origin],
+                "g3": _dated(history["plans"].get(str(plan["id"])), history,
+                             "its front matter has never read approved, active or complete"),
+            }
+        seen[name] = entry
+        plans.append(entry)
+
+    phase_rows = [
+        {
+            "id": phase["id"],
+            "title": phase["title"],
+            "plan": phase["plan"],
+            "state": states[phase["id"]],
+            "g45": _dated(history["phases"].get(phase["id"]), history,
+                          "the phase has never read complete"),
+        }
+        for phase in phases
+    ]
+    status = idea["status"]
+    return {
+        "id": key,
+        "title": idea["title"],
+        "status": status,
+        "created": str(idea["created"])[:10],
+        "plans": plans,
+        "phases": phase_rows,
+        "delivered": status in CLOSING_STATES,
+        "closes_with": idea.get("closes_with") or [],
+        "rulings": [
+            {"date": str(note["at"])[:10], "author": note["author"], "text": note["text"]}
+            for note in idea["annotations"]
+            if note["kind"] == "assessment"
+        ],
+    }
+
+
+def _entry_cells(entry: dict[str, Any]) -> str:
+    """The date, commit and note cells of one dated gate entry."""
+    commit = f"<code>{_e(entry['commit'])}</code>" if entry["commit"] else ""
+    return (
+        f"<td>{_e(entry['date'])}</td><td>{commit}</td><td>{_e(entry['note'])}</td>"
+    )
+
+
+def _pointer(pointer: dict[str, Any]) -> str:
+    return ", ".join(f"{_e(kind)} <code>{_e(value)}</code>" for kind, value in pointer.items())
+
+
+def render_trace(inputs: dict[str, Any], key: str) -> str:
+    """One idea's trace page: capture, then plan, then phases with their states, then delivery."""
+    data = trace_data(inputs, key)
+    plan_count, phase_count = len(data["plans"]), len(data["phases"])
+    complete = sum(1 for row in data["phases"] if row["state"] == "complete")
+    stats = (
+        '<div class="stats">'
+        f'<div><span class="lab">Captured</span><span class="v acc" data-stat="captured">'
+        f'{_e(data["created"])}</span><span class="d">G1, fold() created</span></div>'
+        f'<div><span class="lab">Status</span><span class="v" data-stat="status">'
+        f'{_e(data["status"])}</span><span class="d">fold()</span></div>'
+        f'<div><span class="lab">Plans</span><span class="v" data-stat="plans">{plan_count}'
+        '</span><span class="d">promoted_to and phase plans</span></div>'
+        f'<div><span class="lab">Phases complete</span><span class="v" data-stat="phases">'
+        f'{complete}</span><span class="d">of {phase_count} naming this idea</span></div>'
+        "</div>"
+    )
+
+    gate_rows = [
+        ("G1", "Idea approval", "captured", data["created"], "", "",
+         "fold(): the idea's created event"),
+        ("G2", "Track acceptance", "partition", NOT_RECORDED, "",
+         "no structured partition record exists in the repository", "none"),
+    ]
+    for plan in data["plans"]:
+        gate_rows.append((
+            "G3", "Plan approval", plan["code"], plan["g3"]["date"], plan["g3"]["commit"] or "",
+            plan["g3"]["note"],
+            "earliest first-parent commit where the plan's front matter reads approved, active "
+            "or complete" if plan["status"] is not None else "the idea's promoted_to",
+        ))
+    for row in data["phases"]:
+        gate_rows.append((
+            "G4 and G5", "Integration and completion review", row["id"], row["g45"]["date"],
+            row["g45"]["commit"] or "", row["g45"]["note"],
+            "earliest first-parent commit where backlog.yaml shows the phase complete",
+        ))
+    for ruling in data["rulings"]:
+        gate_rows.append((
+            "Ruling", "Owner ruling", ruling["author"], ruling["date"], "", ruling["text"],
+            "fold(): an annotation of kind assessment",
+        ))
+    gates_body = "".join(
+        f'<tr data-gate-entry="{_e(gate)}" data-subject="{_e(subject)}">'
+        f'<td><span class="gate">{_e(gate)}</span></td><td>{_e(decision)}</td>'
+        f'<td class="id">{_e(subject)}</td><td data-date>{_e(date)}</td>'
+        f"<td>{f'<code data-commit>{_e(commit)}</code>' if commit else ''}</td>"
+        f"<td>{_e(note)}</td><td data-source>{_e(source)}</td></tr>"
+        for gate, decision, subject, date, commit, note, source in gate_rows
+    )
+    gates = (
+        '<section class="section"><h2>Gates</h2>'
+        "<p>Each gate entry, its date, the commit that dates it, and where it was read.</p>"
+        '<div class="tbl-wrap"><table><thead><tr><th>Gate</th><th>Decision</th><th>For</th>'
+        "<th>Date</th><th>Commit</th><th>Note</th><th>Source</th></tr></thead>"
+        f"<tbody>{gates_body}</tbody></table></div></section>"
+    )
+
+    capture = (
+        '<section class="section"><h2>1. Capture</h2>'
+        f'<p data-capture>Idea <code>{_e(data["id"])}</code> was captured on '
+        f'{_e(data["created"])}: {_e(data["title"])}. Source: fold().</p></section>'
+    )
+    if data["plans"]:
+        plan_rows = "".join(
+            f'<tr data-plan="{_e(plan["code"])}"><td class="id">{_e(plan["code"])}</td>'
+            f'<td>{_e(plan["title"] or "not a plan document")}</td>'
+            f'<td>{_e(plan["status"] or NOT_RECORDED)}</td>{_entry_cells(plan["g3"])}'
+            f'<td>{_e("; ".join(plan["origins"]))}</td></tr>'
+            for plan in data["plans"]
+        )
+        plan_table = (
+            '<div class="tbl-wrap"><table><thead><tr><th>Plan</th><th>Title</th>'
+            "<th>Status now</th><th>G3 date</th><th>Commit</th><th>Note</th><th>Linked by</th>"
+            f"</tr></thead><tbody>{plan_rows}</tbody></table></div>"
+        )
+    else:
+        plan_table = f"<p>{NO_RECORDED_PLAN}.</p>"
+    plans = (
+        '<section class="section"><h2>2. Plan</h2>'
+        "<p>Each plan the idea reaches, through its own promoted_to or the plan of a phase that "
+        "names it. Status now is the plan's front matter. Source: plan front matter; the "
+        f"first-parent git history.</p>{plan_table}</section>"
+    )
+    if data["phases"]:
+        phase_rows = "".join(
+            f'<tr data-phase="{_e(row["id"])}" data-state="{_e(row["state"])}">'
+            f'<td class="id">{_e(row["id"])}</td><td>{_e(row["title"])}</td>'
+            f'<td>{_e(row["state"])}</td>{_entry_cells(row["g45"])}</tr>'
+            for row in data["phases"]
+        )
+        phase_table = (
+            '<div class="tbl-wrap"><table><thead><tr><th>Phase</th><th>Title</th><th>State</th>'
+            "<th>Completed</th><th>Commit</th><th>Note</th></tr></thead>"
+            f"<tbody>{phase_rows}</tbody></table></div>"
+        )
+    else:
+        phase_table = "<p>No backlog phase names this idea in its ideas field.</p>"
+    phases = (
+        '<section class="section"><h2>3. Phases</h2>'
+        "<p>Every backlog phase whose ideas field names this idea, in backlog order, with its "
+        "state now. Source: backlog.yaml; src.governance.backlog.readiness; the first-parent git "
+        f"history.</p>{phase_table}</section>"
+    )
+    if data["delivered"]:
+        pointers = "; ".join(_pointer(pointer) for pointer in data["closes_with"])
+        delivery_text = (
+            f"Closed as {_e(data['status'])}, with {pointers or NOT_RECORDED}. Source: fold()."
+        )
+    else:
+        delivery_text = (
+            f"Not delivered: the idea's status is {_e(data['status'])}. Source: fold()."
+        )
+    delivery = (
+        '<section class="section"><h2>4. Delivery</h2>'
+        f"<p data-delivery>{delivery_text}</p></section>"
+    )
+    notes = [
+        "G2 is not recorded: accepted partitions are Markdown documents, not structured records, "
+        "so no partition decision can be read without guessing.",
+        "G4 and G5 are one entry. Integration onto dev is fast-forward-only and the completion "
+        "edit follows the merge in the same turn, so the earliest commit where the phase reads "
+        "complete records both. History is read along first parents, so the one merge commit "
+        "from before that rule counts as a single step.",
+        "Owner rulings are the idea's annotations of kind assessment, in the order recorded.",
+        f"{NOT_REACHED} means the record shows the gate has not happened yet. {NOT_RECORDED} "
+        "means no record exists to date it.",
+    ]
+    callout = (
+        '<div class="callout"><span class="lab">How to read this page</span>'
+        + "".join(f"<p>{_e(note)}</p>" for note in notes)
+        + "</div>"
+    )
+    back = (
+        '<p>Back to the <a href="../ideas.html">idea ledger</a> or the '
+        '<a href="../index.html">pipeline overview</a>.</p>'
+    )
+    body = "\n".join([stats, back, capture, plans, phases, delivery, gates, callout])
+    return _page(
+        inputs["stamp"],
+        title=f"Trace of idea {key}",
+        lede=data["title"],
+        body=body,
+        footer="Generated by tools/generate_engine_pages.py from the idea log, backlog.yaml, "
+        "plan front matter and the first-parent git history of the source commit above. A "
+        "committed snapshot: regenerate to bring it up to date.",
     )
 
 
@@ -797,7 +1201,7 @@ def render_backlog(inputs: dict[str, Any]) -> str:
 
 
 def _page(stamp: dict[str, Any], title: str, lede: str, body: str,
-          extra_styles: str = "") -> str:
+          extra_styles: str = "", footer: str | None = None) -> str:
     styles = (
         house.OUTPUT.read_text(encoding="utf-8")
         + "\n"
@@ -816,14 +1220,16 @@ def _page(stamp: dict[str, Any], title: str, lede: str, body: str,
             "LEDE": _e(lede),
             "META": _stamp_meta(stamp),
             "BODY": body,
-            "FOOTER": "Generated by tools/generate_engine_pages.py from the idea log, "
+            "FOOTER": footer
+            or "Generated by tools/generate_engine_pages.py from the idea log, "
             "backlog.yaml, the batch tables and plan front matter at the source commit above. "
             "A committed snapshot: regenerate to bring it up to date.",
         },
     )
 
 
-#: Output file name to renderer. A later phase adds the trace pages here.
+#: Output file name to renderer for the fixed pages. The trace pages are added per idea by
+#: `render_all`, since which ideas have one depends on the inputs.
 PAGES: dict[str, Callable[[dict[str, Any]], str]] = {
     "index.html": render_overview,
     "ideas.html": render_ledger,
@@ -832,18 +1238,29 @@ PAGES: dict[str, Callable[[dict[str, Any]], str]] = {
 
 
 def render_all(inputs: dict[str, Any]) -> dict[str, str]:
-    """Every engine page, keyed by its file name under the output directory."""
-    return {name: render(inputs) for name, render in PAGES.items()}
+    """Every engine page, keyed by its path under the output directory."""
+    pages = {name: render(inputs) for name, render in PAGES.items()}
+    for key in traced_ideas(inputs):
+        pages[trace_path(key)] = render_trace(inputs, key)
+    return pages
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Generate the idea realization engine pages.")
     parser.add_argument("--out", type=Path, default=OUT, help="output directory")
     args = parser.parse_args(argv)
-    args.out.mkdir(parents=True, exist_ok=True)
-    for name, text in render_all(load_inputs()).items():
-        (args.out / name).write_text(text, encoding="utf-8")
-        print(f"wrote {args.out / name}")
+    pages = render_all(load_inputs())
+    # A trace page whose idea lost its last link is removed, so the trace pages on disk are
+    # exactly the linked ideas (R19).
+    for stale in sorted((args.out / "trace").glob("*.html")):
+        if f"trace/{stale.name}" not in pages:
+            stale.unlink()
+            print(f"removed {stale}")
+    for name, text in pages.items():
+        path = args.out / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    print(f"wrote {len(pages)} pages to {args.out}")
     return 0
 
 

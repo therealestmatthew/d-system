@@ -1,4 +1,4 @@
-"""The idea realization engine pages — REQ-036 R07-R16 and R21-R23.
+"""The idea realization engine pages — REQ-036 R07-R23.
 
 Every figure on the pipeline overview is recomputed here by code that shares nothing with the
 generator's own `STAGES` and `GATES` selectors except `fold()`, which is the sanctioned reader the
@@ -202,8 +202,9 @@ def test_two_runs_into_temporary_directories_are_byte_identical(tmp_path: Path) 
     first, second = tmp_path / "a", tmp_path / "b"
     assert gen.main(["--out", str(first)]) == 0
     assert gen.main(["--out", str(second)]) == 0
-    names = sorted(p.name for p in first.iterdir())
-    assert names == sorted(p.name for p in second.iterdir()) == sorted(gen.PAGES)
+    names = sorted(str(p.relative_to(first)) for p in first.rglob("*.html"))
+    assert names == sorted(str(p.relative_to(second)) for p in second.rglob("*.html"))
+    assert names == sorted(gen.render_all(gen.load_inputs()))
     for name in names:
         assert (first / name).read_bytes() == (second / name).read_bytes(), name
 
@@ -480,3 +481,165 @@ def test_the_layout_choice_is_stated_on_the_page(backlog: str) -> None:
 def test_overview_links_to_the_backlog_page(page: str, backlog: str) -> None:
     assert 'href="backlog.html"' in page
     assert 'href="index.html"' in backlog
+
+
+# ---- R19 and R20: the per-idea trace pages ----
+
+
+#: An idea with a known history: promoted through no plan of its own, linked by phase-idg-01
+#: (complete) and phase-idg-14, both under PLAN-029, and carrying an owner ruling.
+KNOWN_IDEA, KNOWN_PLAN, KNOWN_PHASE = "000236", "PLAN-029", "phase-idg-01"
+
+
+def _linked_ideas() -> set[str]:
+    """Ideas with promoted_to or named by a phase's ideas field, read without the generator."""
+    named = {i for p in _phases() for i in p.get("ideas", [])}
+    return {key for key, idea in _ideas().items() if idea["promoted_to"] or key in named}
+
+
+def _git_lines(*args: str) -> list[str]:
+    return subprocess.run(
+        ["git", "-C", str(ROOT), *args], capture_output=True, text=True, check=True
+    ).stdout.splitlines()
+
+
+def _git_show(spec: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(ROOT), "show", spec], capture_output=True, text=True, check=True
+    ).stdout
+
+
+def _gate_rows(page: str, gate: str) -> dict[str, str]:
+    """Each row of one gate on a trace page, keyed by its subject, unescaped."""
+    rows = re.findall(
+        rf'<tr data-gate-entry="{re.escape(html.escape(gate))}" data-subject="([^"]+)">(.*?)</tr>',
+        page,
+    )
+    return {html.unescape(subject): html.unescape(row) for subject, row in rows}
+
+
+def test_trace_pages_are_exactly_the_linked_ideas(pages: dict[str, str]) -> None:
+    traced = {name[len("trace/"):-len(".html")] for name in pages if name.startswith("trace/")}
+    assert traced == _linked_ideas()
+
+
+def test_ledger_links_each_traced_idea_and_no_other(ledger: str) -> None:
+    linked = _linked_ideas()
+    for key in _ideas():
+        cell = re.search(rf'data-trace="{key}">(.*?)</td>', ledger)
+        assert cell, key
+        if key in linked:
+            assert cell.group(1) == f'<a href="trace/{key}.html">trace</a>', key
+        else:
+            assert cell.group(1) == gen.NO_RECORDED_PLAN, key
+
+
+def test_a_stale_trace_page_is_removed(tmp_path: Path) -> None:
+    stale = tmp_path / "trace" / "999999.html"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("old", encoding="utf-8")
+    assert gen.main(["--out", str(tmp_path)]) == 0
+    assert not stale.exists()
+
+
+def test_the_line_scan_reads_the_same_complete_phases_as_yaml() -> None:
+    text = (ROOT / "docs/09-backlog/backlog.yaml").read_text(encoding="utf-8")
+    assert gen._complete_phases(text) == {p["id"] for p in _phases() if p["status"] == "complete"}
+
+
+def _first_plan_approval(code: str) -> tuple[str, str]:
+    """The earliest first-parent commit where the plan reads a G3 status, walking every version
+    of its file and reading the front matter's status line."""
+    path = next((ROOT / "docs/01-plans").rglob(f"{code}-*.md")).relative_to(ROOT)
+    for line in _git_lines("log", "--first-parent", "--reverse", "--format=%H %cs", "--follow",
+                           "--", str(path)):
+        commit, date = line.split()
+        text = _git_show(f"{commit}:{path}")
+        status = re.search(r"^status: (\w+)$", text.split("---\n", 2)[1], re.M)
+        if status and status.group(1) in ("approved", "active", "complete"):
+            return commit[:12], date
+    raise AssertionError(f"{code} never read a G3 status")
+
+
+def _first_completion(phase: str) -> tuple[str, str]:
+    """The earliest first-parent commit where the phase reads complete, reading every version of
+    backlog.yaml (not only the generator's -G candidates) and matching the status key in the
+    phase's own block. A regex, not YAML: commit 5ec45ea's backlog.yaml does not parse."""
+    path = "docs/09-backlog/backlog.yaml"
+    block = re.compile(rf"^- id: {re.escape(phase)}\n(?:  .*\n|\n)*", re.M)
+    for line in _git_lines("log", "--first-parent", "--diff-merges=first-parent", "-s", "--reverse",
+                           "--format=%H %cs", "--", path):
+        commit, date = line.split()
+        match = block.search(_git_show(f"{commit}:{path}"))
+        if match and re.search(r"^  status: complete$", match.group(0), re.M):
+            return commit[:12], date
+    raise AssertionError(f"{phase} never read complete")
+
+
+def test_a_known_idea_traces_to_the_git_log_and_the_fold(pages: dict[str, str]) -> None:
+    idea = _ideas()[KNOWN_IDEA]
+    page = pages[f"trace/{KNOWN_IDEA}.html"]
+
+    g1 = _gate_rows(page, "G1")["captured"]
+    assert f"<td data-date>{idea['created'][:10]}</td>" in g1
+    assert "fold(): the idea's created event" in g1
+
+    assert gen.NOT_RECORDED in _gate_rows(page, "G2")["partition"]
+    assert "no structured partition record exists" in _gate_rows(page, "G2")["partition"]
+
+    commit, date = _first_plan_approval(KNOWN_PLAN)
+    g3 = _gate_rows(page, "G3")[KNOWN_PLAN]
+    assert f"<td data-date>{date}</td>" in g3 and f"<code data-commit>{commit}</code>" in g3
+    assert "front matter reads approved, active or complete" in g3
+
+    commit, date = _first_completion(KNOWN_PHASE)
+    g45 = _gate_rows(page, "G4 and G5")[KNOWN_PHASE]
+    assert f"<td data-date>{date}</td>" in g45 and f"<code data-commit>{commit}</code>" in g45
+    assert "backlog.yaml shows the phase complete" in g45
+
+    rulings = [note for note in idea["annotations"] if note["kind"] == "assessment"]
+    assert rulings, "the known idea carries an owner ruling"
+    shown = html.unescape(page)
+    for note in rulings:
+        assert note["text"] in shown
+    assert page.count('data-gate-entry="Ruling"') == len(rulings)
+
+
+def test_every_trace_names_a_source_for_every_gate_entry(pages: dict[str, str]) -> None:
+    for name, page in pages.items():
+        if not name.startswith("trace/"):
+            continue
+        rows = re.findall(r"<tr data-gate-entry=.*?</tr>", page)
+        assert rows, name
+        for row in rows:
+            source = re.search(r"<td data-source>([^<]+)</td>", row)
+            assert source and source.group(1).strip(), (name, row)
+        assert 'data-gate-entry="G2"' in page, name
+
+
+def test_a_trace_shows_capture_then_plan_then_phases_then_delivery(pages: dict[str, str]) -> None:
+    page = pages[f"trace/{KNOWN_IDEA}.html"]
+    order = [page.index(f"<h2>{n}. {title}</h2>")
+             for n, title in enumerate(("Capture", "Plan", "Phases", "Delivery"), start=1)]
+    assert order == sorted(order)
+    states = _expected_states()
+    for key, state in re.findall(r'<tr data-phase="([^"]+)" data-state="([^"]+)">', page):
+        assert states[key] == state, key
+
+
+def test_a_promotion_to_a_non_plan_is_not_recorded_at_g3(inputs: dict) -> None:
+    key = next(k for k, i in inputs["ideas"].items()
+               if i["promoted_to"] and not any(
+                   t in {str(p["code"]) for p in inputs["plans"]}
+                   or t in {str(p["id"]) for p in inputs["plans"]} for t in i["promoted_to"]))
+    data = gen.trace_data(inputs, key)
+    target = data["plans"][0]
+    assert target["g3"]["date"] == gen.NOT_RECORDED
+    assert "is not a plan document" in target["g3"]["note"]
+
+
+def test_a_shallow_history_dates_nothing(inputs: dict) -> None:
+    shallow = {"shallow": True, "root_commits": [], "plans": {}, "phases": {}}
+    data = gen.trace_data({**inputs, "history": shallow}, KNOWN_IDEA)
+    for entry in [p["g3"] for p in data["plans"]] + [r["g45"] for r in data["phases"]]:
+        assert entry["date"] == gen.NOT_RECORDED and "shallow clone" in entry["note"]
