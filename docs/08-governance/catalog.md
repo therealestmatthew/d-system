@@ -88,6 +88,8 @@ CI regenerates it and fails on any difference.
 | OPS-028 | operation | active | repository-owner | docs/08-governance/OPS-028-generate-engine-pages.md |
 | OPS-029 | operation | active | repository-owner | docs/08-governance/OPS-029-run-review-checks.md |
 | OPS-030 | operation | active | repository-owner | docs/08-governance/OPS-030-draw-rereview-sample.md |
+| OPS-031 | operation | active | repository-owner | docs/08-governance/OPS-031-check-test-baseline.md |
+| OPS-032 | operation | active | repository-owner | docs/08-governance/OPS-032-check-diff-patterns.md |
 | PLAN-001 | plan | approved | repository-owner | docs/01-plans/PLAN-001-agent-memory-system.md |
 | PLAN-002 | plan | approved | repository-owner | docs/01-plans/PLAN-002-mini-systems-proposal.md |
 | PLAN-003 | plan | deprecated | repository-owner | docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md |
@@ -542,4 +544,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-439 documents — adr: 24, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 199.
+441 documents — adr: 24, architecture: 12, governance: 19, operation: 28, plan: 81, prompt: 43, requirement: 35, session: 199.
