@@ -528,7 +528,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.04 | doc-system-boundary-study-system-backlog-review | draft | 0 | 0 | 1 | agent-codex-boundary-study |
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
-| PLAN-052 | doc-plugin-audit-remediation | approved | 5 | 0 | 1 | agent-builder-a |
+| PLAN-052 | doc-plugin-audit-remediation | approved | 4 | 1 | 1 | agent-builder-a, agent-standby-3 |
 
 ## Held codes
 
