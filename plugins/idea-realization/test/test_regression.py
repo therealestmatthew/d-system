@@ -277,3 +277,22 @@ def test_the_real_check_warns_against_the_configured_integration_branch(tmp_path
     result = target.run("check.py", "--feature", "backlog", "--integration-branch", BRANCH)
     assert result.returncode == 0, result.stdout + result.stderr
     assert f"status-regression ({BRANCH}): {PH}-demo-01 complete -> queued" in result.stderr
+
+
+def test_an_option_shaped_integration_branch_is_refused_and_writes_nothing(
+    tmp_path: Path,
+) -> None:
+    """REQ-035 R06: ``--output=<tmp>/x`` as the integration branch would reach ``git show`` as an
+    option and write a file there. The check refuses it with exit 2 before any git call."""
+    target = TargetRepo(tmp_path / "target")
+    run_git(target.root, "config", "user.email", "test@example.com")
+    run_git(target.root, "config", "user.name", "Test")
+    target.catalog["items"] = [completed(target)]
+    target.write()
+    commit(target.root, "a complete phase")
+    out = tmp_path / "out"
+    out.mkdir()
+    result = target.run("check.py", "--feature", "backlog", f"--integration-branch=--output={out}/x")
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert list(out.iterdir()) == []
+    assert "integration_branch" in result.stderr

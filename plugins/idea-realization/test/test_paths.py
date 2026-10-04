@@ -6,6 +6,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 import paths
 from conftest import PLUGIN_ROOT
 
@@ -114,3 +116,73 @@ def test_help_lists_every_path_flag(capsys: object) -> None:
     text = parser.format_help()
     for key in paths.KEYS.values():
         assert key.flag in text
+
+
+# --- R04 to R06: every configured value is validated (PLAN-052, REQ-035) ----------------------
+#
+# The refusals are written as ``ValueError`` (``paths.PathError`` subclasses it) so each test
+# fails at the baseline on behavior, not on a missing name (PLAN-052 D10).
+
+
+def _config(root: Path, **flags: str) -> paths.Config:
+    return paths.resolve({"root": str(root), **flags}, env={})
+
+
+def test_absolute_path_outside_the_root_is_refused(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    config = _config(root, ideas_path=str(tmp_path / "outside.jsonl"))
+    with pytest.raises(ValueError, match="ideas_path"):
+        config.path("ideas_path")
+
+
+def test_traversal_out_of_the_root_is_refused(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    with pytest.raises(ValueError, match="ideas_path"):
+        _config(root, ideas_path="../x.jsonl").path("ideas_path")
+
+
+def test_symlink_escape_is_refused(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    (root / "ideas").mkdir(parents=True)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (root / "ideas" / "link").symlink_to(outside)
+    with pytest.raises(ValueError, match="ideas_path"):
+        _config(root, ideas_path="ideas/link/x.jsonl").path("ideas_path")
+
+
+def test_a_git_component_is_refused(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="ideas_path"):
+        _config(tmp_path, ideas_path=".git/x.jsonl").path("ideas_path")
+
+
+def test_an_escaping_list_entry_is_refused(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    with pytest.raises(ValueError, match="triage_search"):
+        _config(root, triage_search="docs,../elsewhere").paths("triage_search")
+    with pytest.raises(ValueError, match="exempt_files"):
+        _config(root, exempt_files=str(tmp_path / "x.md")).paths("exempt_files")
+
+
+def test_a_relative_path_inside_the_root_still_resolves(tmp_path: Path) -> None:
+    assert _config(tmp_path, ideas_path="ideas/a/../b.jsonl").path("ideas_path") == (
+        tmp_path / "ideas/a/../b.jsonl")
+
+
+def test_worktree_dir_inside_the_primary_checkout_is_refused(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="worktree_dir"):
+        _config(tmp_path, worktree_dir="wt").path("worktree_dir")
+
+
+@pytest.mark.parametrize("branch", ["--output=x", "-x", "a..b", "with space"])
+def test_a_malformed_integration_branch_is_refused(tmp_path: Path, branch: str) -> None:
+    with pytest.raises(ValueError, match="integration_branch"):
+        _config(tmp_path, integration_branch=branch).text("integration_branch")
+
+
+@pytest.mark.parametrize("branch", ["dev", "main", "release/1.2"])
+def test_a_well_formed_integration_branch_is_accepted(tmp_path: Path, branch: str) -> None:
+    assert _config(tmp_path, integration_branch=branch).text("integration_branch") == branch

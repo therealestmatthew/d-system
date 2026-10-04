@@ -145,3 +145,29 @@ def test_a_file_appearing_mid_run_is_skipped_not_overwritten(tmp_path: Path,
     assert isinstance(files, list)
     assert "ideas/ideas.jsonl" not in [entry["path"] for entry in files]
     assert "ideas/priority.yaml" in [entry["path"] for entry in files]
+
+
+# --- REQ-035 R04: the scaffold resolves every key before its first write ---------------------
+
+
+def test_scaffold_refuses_an_outside_ideas_path_and_writes_nothing(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    outside = tmp_path / "outside.jsonl"
+    code = scaffold.main(["--feature", "all", "--consent", "gitignore", "--root", str(root),
+                          "--ideas-path", str(outside)])
+    assert code == 2
+    assert listing(root) == {}
+    assert not outside.exists()
+
+
+def test_scaffold_refuses_an_outside_docs_root_and_writes_nothing(tmp_path: Path) -> None:
+    """``docs_root`` is a later seed than ``ideas_path``, so a scaffold that resolves keys as it
+    goes writes the ideas files before it reaches the bad key."""
+    root = tmp_path / "repo"
+    root.mkdir()
+    code = scaffold.main(["--feature", "all", "--consent", "gitignore", "--root", str(root),
+                          "--docs-root", "../outside"])
+    assert code == 2
+    assert listing(root) == {}
+    assert not (tmp_path / "outside").exists()

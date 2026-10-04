@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 import doctor
 import paths
 import scaffold
@@ -35,3 +37,22 @@ def test_clean_install_exits_zero(tmp_path: Path) -> None:
 def test_no_record_exits_two(tmp_path: Path) -> None:
     assert doctor.main(["--root", str(tmp_path)]) == 2
     assert list(tmp_path.iterdir()) == []
+
+
+# --- REQ-035 R07: doctor reports every invalid key --------------------------------------------
+
+
+def test_doctor_names_every_invalid_key_and_exits_one(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    scaffold.scaffold(paths.resolve({"root": str(root)}, env={}), list(scaffold.FEATURES))
+    monkeypatch.setenv("IDEA_REALIZATION_IDEAS_PATH", "../escape.jsonl")
+    monkeypatch.setenv("IDEA_REALIZATION_DOCS_ROOT", str(tmp_path / "elsewhere"))
+    assert doctor.main(["--root", str(root)]) == 1
+    out = capsys.readouterr()
+    text = out.out + out.err
+    assert "ideas_path" in text
+    assert "docs_root" in text
+    assert "Traceback" not in text

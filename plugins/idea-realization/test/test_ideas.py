@@ -1305,3 +1305,14 @@ def test_the_primary_checkout_on_the_integration_branch_does_not_warn(
 ) -> None:
     assert cli(repo, "add", "--title", "First", "--body", "Body") == 0
     assert WARNING not in capsys.readouterr().err
+
+
+# --- REQ-035 R04: an escaping ideas path is refused before anything is written ----------------
+
+
+def test_add_refuses_an_ideas_path_outside_the_root(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    assert cli(root, "add", "--title", "T", "--body", "B", "--ideas-path", "../x.jsonl") == 2
+    assert not (tmp_path / "x.jsonl").exists()
+    assert list(root.iterdir()) == []
