@@ -354,3 +354,14 @@ def test_name_continues_this_sweeps_draft_and_suffixes_an_earlier_one(where: Lay
     idea_corpus.build(where.idea_log, where.corpus, frozenset({"triaged"}), seed=2)
     note, fresh, _ = idea_corpus.name(where, a_date())
     assert note is None and fresh.name == f"idea-partition-{a_date()}-2.md"
+
+
+def test_the_sweeps_check_command_runs_with_its_absolute_paths(where: Layout) -> None:
+    """The sweep hands the analyst a check command that names every path absolutely. Those
+    paths are inside the repository, so central validation accepts them and the check runs: it
+    reports on the ideas feature (this fixture has no rendered view) instead of refusing a value."""
+    result = subprocess.run(where.check_command, shell=True, capture_output=True, text=True,
+                            check=False)
+    assert result.returncode != 2, result.stdout + result.stderr
+    assert result.stdout.startswith("ideas: "), result.stdout + result.stderr
+    assert "error:" not in result.stderr
