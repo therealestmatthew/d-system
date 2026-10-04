@@ -16572,7 +16572,19 @@ items:
   - plugins/idea-realization/docs/tools.md
   - plugins/idea-realization/README.md
   - docs/03-sessions/
-  next_action: Queued behind phase-plfx-01 and the owner's G3 approval of PLAN-052.
+  next_action: Built and verified on agent/phase-plfx-02; independent review, then READY and the
+    owner's merge approval.
+  session: doc-session-plugin-config-validation
+  completion_evidence:
+  - plugins/idea-realization/scripts/paths.py
+  - plugins/idea-realization/scripts/scaffold.py
+  - plugins/idea-realization/scripts/doctor.py
+  - plugins/idea-realization/test/test_paths.py
+  - plugins/idea-realization/.claude-plugin/plugin.json
+  - docs/03-sessions/SESS-2026-10-04-14-plugin-config-validation.md
+  result: Every configured value is validated as it is read; a refused one exits 2 naming the key,
+    the scaffold writes nothing, and doctor lists every invalid key. The 16 new refusal tests fail
+    at d8a635b and pass on the branch; plugin suite 530 passed (509 + 21).
 - id: phase-plfx-03
   title: Pass plugin options through quoted heredocs, quote path placeholders and the partition check command, and check the form live
   plan: doc-plugin-audit-remediation
