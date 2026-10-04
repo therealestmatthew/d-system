@@ -96,7 +96,7 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
 ## Unresolved
 
 - Nothing in CI or the Session Manager's gate runs `npm test` yet. A broken stage test would not
-  stop a merge. Sent to Ideation as an idea.
+  stop a merge. Recorded as idea `000582`.
 - The notes strip's current text has no live region. It changes on a timer, and announcing every
   change would interrupt a screen reader. Its loading and error states share that element, so they
   are not announced either.
