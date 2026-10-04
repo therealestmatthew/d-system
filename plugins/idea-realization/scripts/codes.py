@@ -380,6 +380,7 @@ def allocate(
     )
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="next-code",

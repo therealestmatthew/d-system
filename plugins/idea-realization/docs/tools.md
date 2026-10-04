@@ -31,6 +31,13 @@ in one checkout, so it resolves against the primary checkout, the first entry of
 ``git worktree list``, and ``<repository>`` in it is the primary checkout's directory name. Run
 from any worktree, it names the same directory.
 
+Every value is validated when it is read, and a bad one raises ``PathError`` naming the key. A path
+key, and every entry of a list key, must resolve, after following symlinks and collapsing ``..``,
+inside the root it is taken from, with no ``.git`` component; an absolute path inside the root is
+kept. ``worktree_dir`` must resolve outside the primary checkout. ``integration_branch`` must not
+start with ``-`` and must pass ``git check-ref-format --branch``. Each script's ``main`` turns a
+``PathError`` into exit 2 with its message (``exits_on_path_error``).
+
 ## `backlog.py`
 
 ```bash
@@ -120,14 +127,15 @@ Each recorded file is reported as unchanged, drifted (its SHA-256 differs from t
 missing; each recorded directory as unchanged or missing. A file changed under recorded consent,
 such as ``.gitignore``, is reported the same way but marked as consented, since people edit it.
 
+It first checks every configured key the way the scripts do (``paths``) and names each one it
+would refuse, with the reason, rather than stopping at the first.
+
 Exit codes: 0 when every recorded file and directory is unchanged, 1 when any has drifted or is
-missing, 2 when there is no install-state record.
+missing or any configured key is invalid, 2 when there is no install-state record.
 
-| Flag | Help | Choices | Default | Required |
-|---|---|---|---|---|
-| `--root` |  |  |  |  |
+Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
 
-Exit codes found in source: 2.
+Exit codes found in source: 1, 2.
 
 ## `documents.py`
 

@@ -88,6 +88,7 @@ def missing_sections(text: str, kinds: dict[str, str]) -> list[str]:
     return [name for name, accepted in needed if not headings & set(accepted)]
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="plan-check",

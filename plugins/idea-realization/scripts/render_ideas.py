@@ -176,6 +176,7 @@ def _shown(config: paths.Config, path: Path) -> str:
         return str(path)
 
 
+@paths.exits_on_path_error
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="fail if the view is stale")

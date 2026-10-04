@@ -1307,7 +1307,7 @@ def test_the_primary_checkout_on_the_integration_branch_does_not_warn(
     assert WARNING not in capsys.readouterr().err
 
 
-# --- REQ-035 R04: an escaping ideas path is refused before anything is written ----------------
+# --- an escaping ideas path is refused before anything is written -------------------------
 
 
 def test_add_refuses_an_ideas_path_outside_the_root(tmp_path: Path) -> None:

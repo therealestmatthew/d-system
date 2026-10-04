@@ -282,7 +282,7 @@ def test_the_real_check_warns_against_the_configured_integration_branch(tmp_path
 def test_an_option_shaped_integration_branch_is_refused_and_writes_nothing(
     tmp_path: Path,
 ) -> None:
-    """REQ-035 R06: ``--output=<tmp>/x`` as the integration branch would reach ``git show`` as an
+    """``--output=<tmp>/x`` as the integration branch would reach ``git show`` as an
     option and write a file there. The check refuses it with exit 2 before any git call."""
     target = TargetRepo(tmp_path / "target")
     run_git(target.root, "config", "user.email", "test@example.com")

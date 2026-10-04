@@ -46,7 +46,7 @@
     "worktree_dir": {
       "type": "string",
       "title": "Worktree directory",
-      "description": "Directory that holds one worktree per session, relative to the repository root. <repository> is replaced by the repository directory's name.",
+      "description": "Directory that holds one worktree per session. It must resolve outside the repository; a relative value is taken from the primary checkout, so the default names a sibling directory. <repository> is replaced by the repository directory's name.",
       "default": "../<repository>-worktrees"
     },
     "triage_search": {

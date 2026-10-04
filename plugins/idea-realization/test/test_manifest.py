@@ -50,7 +50,7 @@ def test_unknown_top_level_key_fails_strict(tmp_path: Path) -> None:
 
 
 def test_worktree_dir_description_says_it_lives_outside_the_repository() -> None:
-    """REQ-035 R05: the description no longer tells a user the value is taken relative to the
+    """The description no longer tells a user the value is taken relative to the
     repository root, which is where the resolver now refuses it."""
     description = json.loads(MANIFEST.read_text())["userConfig"]["worktree_dir"]["description"]
     assert "relative to the repository root" not in description

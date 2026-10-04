@@ -667,6 +667,7 @@ def _locate(where: Layout) -> int:
     return 0
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     where = layout(paths.resolve(args))

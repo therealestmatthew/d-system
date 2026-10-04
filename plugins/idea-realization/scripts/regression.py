@@ -61,7 +61,7 @@ def read_text_at(root: Path, ref: str, path: str) -> str | None:
     """
     try:
         completed = subprocess.run(
-            ["git", "show", f"{ref}:{path}"],
+            ["git", "show", "--end-of-options", f"{ref}:{path}"],
             cwd=root,
             capture_output=True,
             text=True,

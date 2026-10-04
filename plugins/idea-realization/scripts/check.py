@@ -18,6 +18,7 @@ import paths
 from checks import features
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     available = {name: module for name, module in features().items() if hasattr(module, "check")}
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])

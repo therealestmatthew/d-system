@@ -118,10 +118,10 @@ def test_help_lists_every_path_flag(capsys: object) -> None:
         assert key.flag in text
 
 
-# --- R04 to R06: every configured value is validated (PLAN-052, REQ-035) ----------------------
+# --- every configured value is validated -----------------------------------------------------
 #
 # The refusals are written as ``ValueError`` (``paths.PathError`` subclasses it) so each test
-# fails at the baseline on behavior, not on a missing name (PLAN-052 D10).
+# fails before the fix on behavior, not on a missing name.
 
 
 def _config(root: Path, **flags: str) -> paths.Config:

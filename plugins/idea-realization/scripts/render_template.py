@@ -55,6 +55,7 @@ def render(text: str, values: Mapping[str, str]) -> str:
     return rendered
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Render a plugin template by filling its {{placeholders}}.",

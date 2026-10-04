@@ -141,6 +141,18 @@ Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZA
 
 `uv run scripts/paths.py` prints every resolved value.
 
+Every value is checked when a script reads it. A path option, and every entry of a list option,
+must resolve inside the repository, after following symlinks, and must not pass through `.git`; an
+absolute path inside the repository is accepted. `worktree_dir` must resolve outside the
+repository. `integration_branch` must be a valid branch name that does not start with `-`. A
+script given a refused value exits 2 and names the option, and the scaffold writes nothing.
+`uv run scripts/doctor.py` lists every refused value at once.
+
+**Breaking change.** Earlier versions accepted a path outside the repository, such as an absolute
+`ideas_path` elsewhere on disk or a `docs_root` of `../shared-docs`, and a `worktree_dir` inside
+it. Those values are now refused; move the files inside the repository, or the worktree directory
+outside it, before upgrading.
+
 ## What the scaffold writes
 
 | Feature | Paths |

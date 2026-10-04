@@ -145,7 +145,8 @@ def claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[str, d
         branch = f"agent/{phase_id}"
         try:
             committed = subprocess.run(
-                ["git", "log", "-1", "--format=%ad", "--date=short", branch], cwd=root,
+                ["git", "log", "-1", "--format=%ad", "--date=short", "--end-of-options", branch],
+                cwd=root,
                 capture_output=True, text=True, check=True).stdout.strip()
         except (OSError, subprocess.CalledProcessError):
             committed = ""
@@ -159,6 +160,7 @@ def claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[str, d
     return evidence
 
 
+@paths.exits_on_path_error
 def ready(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="ready",

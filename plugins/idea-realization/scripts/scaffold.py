@@ -130,6 +130,10 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     files: list[dict[str, str]] = record["files"]  # type: ignore[assignment]
     directories: list[dict[str, str]] = record["directories"]  # type: ignore[assignment]
     written = False
+    # Resolve every key this run will write before the first write, so a refused value
+    # (``paths.PathError``) leaves the repository untouched.
+    targets = {id(seed): seed.target(config) for seed in SEEDS if seed.feature in features}
+    wanted = gitignore_lines(config, features)
 
     def remember(entries: list[dict[str, str]], entry: dict[str, str]) -> None:
         entries[:] = [item for item in entries if item["path"] != entry["path"]] + [entry]
@@ -137,7 +141,7 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     for seed in SEEDS:
         if seed.feature not in features:
             continue
-        target = seed.target(config)
+        target = targets[id(seed)]
         name = relative(config, target)
         if seed.content is None and seed.source is None:
             if target.is_dir():
@@ -177,7 +181,6 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
         remember(files, {"path": name, "sha256": sha256(target), "feature": seed.feature})
         written = True
 
-    wanted = gitignore_lines(config, features)
     if wanted:
         gitignore = config.root / ".gitignore"
         present = gitignore.read_text(encoding="utf-8").splitlines() if gitignore.exists() else []
@@ -213,6 +216,7 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     return lines
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("--feature", action="append", default=None,

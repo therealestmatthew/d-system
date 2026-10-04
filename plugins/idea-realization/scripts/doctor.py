@@ -8,8 +8,11 @@ Each recorded file is reported as unchanged, drifted (its SHA-256 differs from t
 missing; each recorded directory as unchanged or missing. A file changed under recorded consent,
 such as ``.gitignore``, is reported the same way but marked as consented, since people edit it.
 
+It first checks every configured key the way the scripts do (``paths``) and names each one it
+would refuse, with the reason, rather than stopping at the first.
+
 Exit codes: 0 when every recorded file and directory is unchanged, 1 when any has drifted or is
-missing, 2 when there is no install-state record.
+missing or any configured key is invalid, 2 when there is no install-state record.
 """
 
 from __future__ import annotations
@@ -56,10 +59,16 @@ def diagnose(root: Path) -> list[tuple[str, str, str]]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
-    parser.add_argument("--root", help=f"repository root (env {paths.ROOT_ENV}; "
-                                       "default: git top level)")
+    paths.add_arguments(parser)
     args = parser.parse_args(argv)
-    root = paths.repository_root(args.root)
+    config = paths.resolve(args)
+    invalid = config.invalid()
+    for error in invalid:
+        print(f"invalid   {error}")
+    if invalid:
+        print(f"{len(invalid)} configured value(s) invalid")
+        return 1
+    root = config.root
     if not (root / RECORD).is_file():
         print(f"no install-state record at {RECORD.as_posix()}; run the scaffold first",
               file=sys.stderr)

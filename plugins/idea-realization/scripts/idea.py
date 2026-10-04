@@ -218,7 +218,7 @@ def phase_ids(backlog: Path) -> set[str]:
 
 def _is_commit(value: str, root: Path) -> bool:
     result = subprocess.run(
-        ["git", "-C", str(root), "cat-file", "-e", f"{value}^{{commit}}"],
+        ["git", "-C", str(root), "cat-file", "-e", "--end-of-options", f"{value}^{{commit}}"],
         capture_output=True,
         check=False,
     )
@@ -815,6 +815,7 @@ def _operation(
     return lambda: (retract_link(args.idea, args.eid, log), [])
 
 
+@paths.exits_on_path_error
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     config = paths.resolve(args)

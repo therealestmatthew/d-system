@@ -147,7 +147,7 @@ def test_a_file_appearing_mid_run_is_skipped_not_overwritten(tmp_path: Path,
     assert "ideas/priority.yaml" in [entry["path"] for entry in files]
 
 
-# --- REQ-035 R04: the scaffold resolves every key before its first write ---------------------
+# --- the scaffold resolves every key before its first write ----------------------------------
 
 
 def test_scaffold_refuses_an_outside_ideas_path_and_writes_nothing(tmp_path: Path) -> None:

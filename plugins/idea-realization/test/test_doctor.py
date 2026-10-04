@@ -39,7 +39,7 @@ def test_no_record_exits_two(tmp_path: Path) -> None:
     assert list(tmp_path.iterdir()) == []
 
 
-# --- REQ-035 R07: doctor reports every invalid key --------------------------------------------
+# --- doctor reports every invalid key --------------------------------------------------------
 
 
 def test_doctor_names_every_invalid_key_and_exits_one(

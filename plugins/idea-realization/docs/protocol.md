@@ -131,6 +131,7 @@ exits 0 before any hand-off.
 | No cycle in dependency, parent, supersession, system or phase graphs | The document scan and the backlog check |
 | No overlapping or unclaimed concurrent active phases | The backlog check |
 | Declared paths are repository-relative, never escape the repository, and never pass through `.git`, `.venv`, `node_modules` or a symlink; missing system and evidence paths fail | The document scan and the backlog check |
+| Configured paths, and every entry of a list option, resolve inside the repository with no `.git` component; `worktree_dir` resolves outside it; `integration_branch` is a valid branch name that does not start with `-` | `scripts/paths.py`, which every script reads its configuration through; a refused value exits 2, and `doctor` names every one |
 | Concurrent idea writes on one machine never take the same id or make a move twice | The idea writer's lock |
 | Ideas are recorded only on the integration branch in the primary checkout | The idea writer's warning, which does not refuse the write |
 | Work stays inside a phase's declared systems and deliverables; prose is accurate | The owner's diff review |

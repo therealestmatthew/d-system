@@ -405,6 +405,7 @@ def write_catalog(target: Path, rendered: str) -> None:
         raise
 
 
+@paths.exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="catalog",

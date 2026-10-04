@@ -25,15 +25,24 @@ directory. No path is ever derived from a script's own location except the plugi
 in one checkout, so it resolves against the primary checkout, the first entry of
 ``git worktree list``, and ``<repository>`` in it is the primary checkout's directory name. Run
 from any worktree, it names the same directory.
+
+Every value is validated when it is read, and a bad one raises ``PathError`` naming the key. A path
+key, and every entry of a list key, must resolve, after following symlinks and collapsing ``..``,
+inside the root it is taken from, with no ``.git`` component; an absolute path inside the root is
+kept. ``worktree_dir`` must resolve outside the primary checkout. ``integration_branch`` must not
+start with ``-`` and must pass ``git check-ref-format --branch``. Each script's ``main`` turns a
+``PathError`` into exit 2 with its message (``exits_on_path_error``).
 """
 
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import subprocess
-from collections.abc import Mapping, Sequence
+import sys
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -150,9 +159,53 @@ def _to_path(root: Path, value: str) -> Path:
     return path if path.is_absolute() else (root / path)
 
 
+class PathError(ValueError):
+    """A configured value the plugin refuses to use. The message names the key."""
+
+    def __init__(self, name: str, value: str, reason: str) -> None:
+        super().__init__(f"{name} = {value!r}: {reason}")
+        self.name = name
+
+
+def _inside(root: Path, path: Path) -> Path | None:
+    """``path``'s location relative to ``root`` after symlinks and ``..``; None when outside."""
+    try:
+        return path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+
+
+def _contained(name: str, value: str, root: Path) -> Path:
+    path = _to_path(root, value)
+    relative = _inside(root, path)
+    if relative is None:
+        raise PathError(name, value, f"resolves outside the repository root {root}")
+    if ".git" in relative.parts:
+        raise PathError(name, value, "names a path inside .git")
+    return path
+
+
+def _outside(name: str, value: str, primary: Path) -> Path:
+    path = _to_path(primary, value)
+    if _inside(primary, path) is not None:
+        raise PathError(name, value, f"resolves inside the primary checkout {primary}; it must "
+                                     "name a directory outside the repository")
+    return path
+
+
+def _branch(name: str, value: str) -> str:
+    if value.startswith("-"):
+        raise PathError(name, value, "a branch name must not start with '-'")
+    checked = subprocess.run(["git", "check-ref-format", "--branch", value],
+                             capture_output=True, text=True, check=False)
+    if checked.returncode != 0:
+        raise PathError(name, value, "is not a valid branch name (git check-ref-format --branch)")
+    return value
+
+
 @dataclass(frozen=True)
 class Config:
-    """Resolved configuration: the root plus every key."""
+    """Resolved configuration: the root plus every key, validated as each is read."""
 
     root: Path
     values: Mapping[str, str | list[str]]
@@ -160,17 +213,44 @@ class Config:
     def path(self, name: str) -> Path:
         value = self.values[name]
         assert isinstance(value, str) and KEYS[name].kind == "path", name
-        return _to_path(primary_checkout(self.root) if name in PRIMARY_KEYS else self.root, value)
+        if name in PRIMARY_KEYS:
+            return _outside(name, value, primary_checkout(self.root))
+        return _contained(name, value, self.root)
 
     def paths(self, name: str) -> list[Path]:
         value = self.values[name]
         assert isinstance(value, list), name
-        return [_to_path(self.root, item) for item in value]
+        return [_contained(name, item, self.root) for item in value]
 
     def text(self, name: str) -> str:
         value = self.values[name]
         assert isinstance(value, str), name
-        return value
+        return _branch(name, value) if name == "integration_branch" else value
+
+    def invalid(self) -> list[PathError]:
+        """Every key that fails validation, in manifest order. Reads only."""
+        found = []
+        for name, key in KEYS.items():
+            reader = {"path": self.path, "paths": self.paths, "text": self.text}[key.kind]
+            try:
+                reader(name)
+            except PathError as error:
+                found.append(error)
+        return found
+
+
+def exits_on_path_error(main: Callable[..., int]) -> Callable[..., int]:
+    """Wrap a script's ``main`` so a refused configured value exits 2 with its message."""
+
+    @functools.wraps(main)
+    def wrapper(*args: object, **kwargs: object) -> int:
+        try:
+            return main(*args, **kwargs)
+        except PathError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 2
+
+    return wrapper
 
 
 def resolve(args: argparse.Namespace | Mapping[str, str | None] | None = None,
@@ -187,6 +267,7 @@ def resolve(args: argparse.Namespace | Mapping[str, str | None] | None = None,
     return Config(root, {name: raw_value(name, flags, env) for name in KEYS})
 
 
+@exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Print every resolved configuration value.")
     add_arguments(parser)
