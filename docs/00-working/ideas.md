@@ -24152,3 +24152,43 @@ Found by Session 3 - Standby Builder, which removed phase-sch-05's worktree on 2
 phase-syn-05 depends on phase-html-10 and needs PLAN-003's YAML-to-JSON page pipeline, which the owner retired on 2026-10-04 (phase-des-01 audit). It needs a new dependency, for example the engine-page generator, or a re-scope.
 
 Raised by Session 1 - Builder A.
+
+---
+
+## 000568 · Re-gate deferred phase-sch-06 off the retired PLAN-003
+
+**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+
+phase-sch-06 is deferred, and its resume_when waits for PLAN-003 to be built. That can no longer happen now that the owner retired PLAN-003 on 2026-10-04 (phase-des-01 audit). Re-gate it on the house/engine generators, or retire it.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000569 · Error boundary and accessible loading/error status for the React stage/workbench
+
+**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+
+The shipped React stage/workbench has no error boundary and no accessible loading/error status; a render error blanks the app. PLAN-003 specified both (ErrorBoundary, retry, status), and ARCH-003 M4 asked for accessible status, but both requirements retire with PLAN-003.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000570 · CI's ruff step should lint tools/
+
+**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+
+CI's ruff step lints only src/ and test/, not tools/, where the page generators and most CLI tools live (.github/workflows/ci.yaml). Found in the phase-des-01 audit of PLAN-003.06.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000571 · Update sys-html in the systems registry after PLAN-003's retirement
+
+**Created 2026-10-04T09:46:24-04:00 · Status: `open`**
+
+sys-html in docs/08-governance/systems.yaml is still "planned", its path is PLAN-003's overview, and it says "under audit by phase-des-01". PLAN-003 is retired (2026-10-04) and the house family plus the engine/overview generators have shipped, so its maturity and paths need review.
+
+Raised by Session 1 - Builder A.
