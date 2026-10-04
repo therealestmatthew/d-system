@@ -33,7 +33,9 @@ def inspect_plan_phases(
     # audit() gives every real document its path. A record without one has no text to read: only
     # tests that build the documents mapping by hand produce it, and they are not plans to check.
     plans = {
-        key: meta for key, meta in documents.items() if meta["kind"] == "plan" and "path" in meta
+        key: meta
+        for key, meta in documents.items()
+        if meta.get("kind") == "plan" and "path" in meta
     }
     phases = list(items)
     registered = {item["id"] for item in phases}

@@ -395,7 +395,7 @@ def audit_backlog(
             today or date.today(),
             ideas,
         )
-        return errors, catalog
+        return errors + audit_plan_phases(root, result, catalog)[0], catalog
     except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
         return [f"backlog inputs: {exc}"], {}
 
@@ -635,7 +635,6 @@ def main() -> int:
         errors.extend(backlog_errors)
         errors.extend(audit_idea_priority(ROOT))
     if catalog:
-        errors.extend(audit_plan_phases(ROOT, result, catalog)[0])
         regression_errors, regression_warnings = audit_status_regression(ROOT, catalog)
         errors.extend(regression_errors)
     # Only the plain check compares generated files: `--catalog` is the fix for a stale catalog,

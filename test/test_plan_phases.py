@@ -2,8 +2,8 @@
 
 The fixture table is REQ-028 R09's: a plan dated 2026-09-23 with an unnamed registered phase fails
 naming both; the same plan dated 2026-09-21 passes; a plan naming `phase-zzz-99` fails; the
-repository as it stands passes. Each runs `audit_plan_phases` on an isolated repository, the
-function the governance command calls after the backlog audit; it exits 1 on any error returned.
+repository as it stands passes. Each runs `audit_plan_phases` on an isolated repository; the
+backlog audit returns its errors, and the governance command exits 1 on any of them.
 """
 
 from __future__ import annotations
@@ -103,8 +103,9 @@ def errors_for(root: Path) -> list[str]:
     errors, _, result = audit(root)
     assert errors == []
     backlog_errors, catalog = audit_backlog(root, result)
-    assert backlog_errors == []
-    return audit_plan_phases(root, result, catalog)[0]
+    plan_errors = audit_plan_phases(root, result, catalog)[0]
+    assert sorted(backlog_errors) == sorted(plan_errors)
+    return plan_errors
 
 
 def test_recent_plan_with_an_unnamed_registered_phase_fails_naming_both(tmp_path: Path) -> None:
@@ -181,16 +182,12 @@ def test_repository_passes_and_reports_its_counts() -> None:
     assert counts["recent_plans"] > 0
     assert counts["registered_phases_checked"] > 0
     assert counts["phase_ids_named"] > 0
-
-
-def test_the_governance_command_runs_the_check(monkeypatch: pytest.MonkeyPatch) -> None:
-    """main() calls audit_plan_phases and turns its errors into a failing exit."""
-    import sys
-
+def test_the_backlog_audit_carries_the_check(monkeypatch: pytest.MonkeyPatch) -> None:
+    """audit_backlog returns audit_plan_phases' errors, so the governance command exits 1."""
     from src.governance import __main__ as governance
 
+    errors, _, result = audit(ROOT)
     monkeypatch.setattr(
         governance, "audit_plan_phases", lambda root, result, catalog: (["planted"], {})
     )
-    monkeypatch.setattr(sys, "argv", ["governance", "--inventory"])
-    assert governance.main() == 1
+    assert "planted" in audit_backlog(ROOT, result)[0]
