@@ -11093,8 +11093,8 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/08-governance/systems.yaml
-  next_action: Well under one session. Do not plan a sitting around it - take it alongside whichever adjacent
-    governance phase you claim next.
+  next_action: Every acceptance condition met on agent/phase-dgov-07 (SESS-2026-10-04-01); awaiting the
+    owner-approved merge, then the completion edit on dev.
 - id: phase-agx-01
   title: Document the truncation cap and make truncation detectable
   plan: doc-agent-engineering-delegation
