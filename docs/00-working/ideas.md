@@ -24212,3 +24212,63 @@ Raised by Session 2 - Builder B.
 In src/api/routes/demo_terminal.py, if create_adapter() or adapter.start() raises after websocket.accept() and before the adapter joins SESSIONS, nothing closes the adapter or the websocket. PosixPtyAdapter.start() can also leak the master pty fd when Popen fails after pty.openpty(). Pre-existing on dev; found by the phase-wbf-09 adversarial review, outside that phase's scope.
 
 Raised by Session 3 - Standby Builder.
+
+---
+
+## 000574 · max_active drift between backlog.yaml and the documents that describe it
+
+**Created 2026-10-04T12:44:33-04:00 · Status: `open`**
+
+backlog.yaml sets max_active: 4 and --ready reports "of 4 allowed", but GOV-002:90 says "this repository sets 3", as do ADR-006:70 and the comment at src/governance/__main__.py:41. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000575 · Align GOV-005's dated-code allocation wording with codes.py
+
+**Created 2026-10-04T12:44:33-04:00 · Status: `open`**
+
+GOV-005:54 says dated codes take the "lowest unused sequence", but src/governance/codes.py:106 allocates max plus one, so gaps are never refilled. Align the wording with the code. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000576 · GOV-011 confuses codes.yaml reservations with pre-merge reservations
+
+**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+
+GOV-011:46-52 tells you to release a codes.yaml reserved: entry with --release-code, but that command only drops pre-merge reservations under the git common dir (GOV-005:98-111 says the two kinds are unrelated). It also says a stale reservation blocks reuse forever, confusing reserved with retired. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000577 · append_idea.py should resolve promoted_to to a governed code
+
+**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+
+tools/append_idea.py checks only that promoted_to is non-empty (lines 323-324); it does not resolve it to a governed code the way it resolves closes_with. Idea 000317 holds a doc id (doc-batch-orchestration-protocol), not a code. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000578 · Stale track-prefix table in docs/09-backlog/README.md
+
+**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+
+docs/09-backlog/README.md's track-prefix table is stale: phase-agnt, bnd, fwa, fwt, irs, kit and port exist in backlog.yaml but are missing, and it lists phase-scope-*, which has no phases. GOV-006 relies on that table to gloss track prefixes. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
+
+---
+
+## 000579 · Empty "Start and end a session" section in GOV-002
+
+**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+
+GOV-002 line 154 has an empty section, "## Start and end a session", with no body. Fill it with a pointer to /session-start and /session-close, or remove it. Found while researching phase-des-02.
+
+Raised by Session 1 - Builder A.
