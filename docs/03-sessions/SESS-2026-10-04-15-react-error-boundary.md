@@ -45,8 +45,8 @@ Success: no issues found in 47 source files
 `cd ts && npm test` (new in this session)
 
 ```text
-Test Files  1 passed (1)
-     Tests  5 passed (5)
+Test Files  2 passed (2)
+     Tests  7 passed (7)
 ```
 
 `cd ts && npm run build` and `npm run lint`
@@ -70,20 +70,24 @@ backlog acceptance list exists for this session.
 
 - A render error in one workbench panel replaces only that panel, with an error naming it and a
   Retry button, and the other panels keep running: Met. `ErrorBoundary` wraps each panel at the
-  portal in `StagePage.tsx`. The test "replaces only the panel that threw, with an alert naming it"
-  renders a throwing panel beside a healthy one and asserts both.
+  portal in `StagePage.tsx`, through `guardedPanel()`. The test "each portaled panel is guarded
+  and named by its display name" renders the element `StagePage` ships, a throwing panel beside a
+  healthy one, and asserts both.
 - A render error outside every panel no longer blanks the stage: Met. `App.tsx` wraps `StagePage`
-  in a boundary labelled "The stage".
+  in a boundary labelled "The stage". The test "App catches a render error that escapes the
+  stage" renders `App` with a throwing `StagePage`.
 - Retry brings the panel back, mounted afresh: Met. The test "Retry remounts the children,
   re-running their effects" asserts no mount while the child throws and exactly one mount after
   Retry.
 - Loading and error states are announced to assistive technology: Met.
-  - Loading texts carry `role="status"` and "Could not …" errors carry `role="alert"`, across the
-    layout loader and nine panel files.
+  - Loading texts carry `role="status"`, and "Could not …" errors carry `role="alert"`. This covers
+    the layout loader and nine panel files, including the terminal's three session overlays
+    (shell refused, session cap reached, connection closed).
   - The boundary's fallback is `role="alert"`.
   - Two tests assert the roles on the Idea Explorer's loading and failed states.
 - The behaviour is tested at runtime with vitest and Testing Library, as the owner chose: Met.
-  `npm test` runs five tests.
+  `npm test` runs seven tests. Two deliberate breaks each failed one: removing the boundary from
+  `App.tsx`, and removing it from `guardedPanel()`.
 
 ## Backlog
 
@@ -98,6 +102,8 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
   are not announced either.
 - Retry on a crashed terminal panel opens a new terminal session. The old one ended when the panel
   crashed.
+- In the File Browser, the loading and error paragraphs sit inside its `role="tree"` container.
+  Whether every screen reader announces a live region there is unconfirmed.
 
 ## Decisions
 
@@ -122,3 +128,33 @@ Unclaimed — no backlog phase was claimed for this session; no line of backlog.
 - The first pass of status roles missed the terminal panel's "Checking terminal availability…" and
   "the stage backend is not reachable" messages. The live check exposed them, and both now carry
   roles.
+
+## Review
+
+A `demo-adversary` agent reviewed `1d2e6ab..542eddb`. Verdict: PASS WITH FINDINGS. Its report,
+condition by condition:
+
+- The boundary is a correct class component, and Retry remounts. `npm test` passed 5 tests, the
+  production bundle contains no test code, `tsc` passed, vite 6.4.3 and vitest 5.0.3 resolve
+  without a peer conflict, `npm audit` was clean, and governance passed.
+- Condition 1 (one panel replaced, others keep running): Met.
+- Condition 2 (an error outside the panels no longer blanks the stage): met in code, but untested.
+- Condition 3 (Retry remounts): Met.
+- Condition 4 (announcements): partially met.
+- Condition 5 (runtime tests): Met, for the scope the record states.
+
+Its findings:
+
+1. **Major.** `TerminalRegion.tsx`'s three session overlays had no role: shell refused, session
+   cap reached, connection closed. Fixed: each now has `role="alert"`.
+2. **Major.** The tests rendered a bare `ErrorBoundary`, not the wiring that ships, so dropping a
+   boundary from `App.tsx` or `StagePage.tsx` would have gone unnoticed. Fixed. `StagePage` now
+   portals `guardedPanel()`, and `wiring.test.tsx` renders `App` and `guardedPanel()`. Removing
+   either boundary made a test fail.
+3. **Minor, not confirmed.** In `FileBrowserRegion.tsx`, the loading and error paragraphs sit
+   inside a `role="tree"` container. Some assistive technology may not announce a live region
+   inside a widget role. Accepted and left open. The paragraph's place inside the tree predates
+   this work, and confirming it needs a screen reader.
+4. **Minor.** `ExplorerRegion`'s roles are tested only through `IdeaExplorerRegion`. Accepted,
+   because the Backlog Explorer renders the same component.
+
