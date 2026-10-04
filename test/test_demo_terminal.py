@@ -20,6 +20,7 @@ that both routes are registered regardless of `D_SYSTEM_DEMO_TERMINAL`.
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import importlib
 import json
@@ -48,6 +49,7 @@ from src.api.routes.demo_terminal import (
     IDLE_TIMEOUT_ENV_VAR,
     MAX_CONCURRENT_SESSIONS,
     SESSION_LIMIT_CLOSE_CODE,
+    SESSION_LIMIT_CLOSE_REASON,
     SHELL_ALLOWLIST,
     SHELL_REFUSAL_CLOSE_CODE,
     SHELL_REFUSAL_MESSAGE_TYPE,
@@ -395,6 +397,10 @@ def test_seventh_concurrent_session_is_refused_while_six_are_open(
     REQ-007 W17) is enforced by the route's own registry, not merely trusted from the UI (idea
     `000087`) — a seventh concurrent websocket is refused with a clear close reason while six
     genuine sessions are still open.
+
+    REQ-012 R21: the refusal is accepted and then closed, so the close frame itself carries the
+    code and the quotable reason. A close before `accept()` would reach a browser as `CloseEvent`
+    1006 with an empty reason.
     """
     app = rebuild_app(flag="1")
     client = TestClient(app)
@@ -406,11 +412,76 @@ def test_seventh_concurrent_session_is_refused_while_six_are_open(
         client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_five,
         client.websocket_connect(DEMO_TERMINAL_WS_PATH) as _ws_six,
     ):
-        with pytest.raises(WebSocketDisconnect) as exc_info:
-            with client.websocket_connect(DEMO_TERMINAL_WS_PATH):
-                pass  # pragma: no cover — refused before any frame can be exchanged
+        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as refused:
+            with pytest.raises(WebSocketDisconnect) as exc_info:
+                refused.receive_bytes()
         assert exc_info.value.code == SESSION_LIMIT_CLOSE_CODE
-        assert str(MAX_CONCURRENT_SESSIONS) in (exc_info.value.reason or "")
+        assert exc_info.value.reason == SESSION_LIMIT_CLOSE_REASON
+        assert str(MAX_CONCURRENT_SESSIONS) in exc_info.value.reason
+
+
+class _AcceptProbe:
+    """A stand-in websocket whose `accept()` records the reserved slots, then stops the route."""
+
+    def __init__(self, module: object, shell: str | None = None) -> None:
+        self.module = module
+        self.query_params: dict[str, str] = {} if shell is None else {"shell": shell}
+        self.reserved_at_accept: int | None = None
+
+    async def accept(self) -> None:
+        self.reserved_at_accept = len(self.module.RESERVED)  # type: ignore[attr-defined]
+        raise RuntimeError("stop after accept")
+
+
+def test_slot_is_reserved_before_accept_and_released_on_failure(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """REQ-012 R20: the slot is taken before `await websocket.accept()`, so two connections cannot
+    both pass the cap while one awaits the accept, and a failure after the reservation releases
+    it. The race itself was never reproduced under asyncio; this pins the ordering it depends on.
+    """
+    rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    probe = _AcceptProbe(module)
+    with pytest.raises(RuntimeError, match="stop after accept"):
+        asyncio.run(module.terminal_websocket(probe))
+    assert probe.reserved_at_accept == 1
+    assert module.RESERVED == set()
+    assert module.SESSIONS == {}
+
+
+def test_reserved_slots_count_against_the_cap(rebuild_app: Callable[..., FastAPI]) -> None:
+    """A connection that has reserved a slot but not yet started its shell counts toward the cap,
+    so a seventh connection is refused while six slots are only reserved."""
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    module.RESERVED.update(f"reserved-{n}" for n in range(MAX_CONCURRENT_SESSIONS))
+    try:
+        client = TestClient(app)
+        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as refused:
+            with pytest.raises(WebSocketDisconnect) as exc_info:
+                refused.receive_bytes()
+        assert exc_info.value.code == SESSION_LIMIT_CLOSE_CODE
+    finally:
+        module.RESERVED.clear()
+
+
+def test_refused_shell_request_releases_its_reserved_slot(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """A shell refusal happens after the reservation; the slot must not leak."""
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    client = TestClient(app)
+    with client.websocket_connect(f"{DEMO_TERMINAL_WS_PATH}?shell=/bin/zsh") as websocket:
+        websocket.receive_text()
+        with pytest.raises(WebSocketDisconnect):
+            websocket.receive_text()
+    deadline = time.monotonic() + 5.0
+    while module.RESERVED and time.monotonic() < deadline:
+        time.sleep(0.05)
+    assert module.RESERVED == set()
+    assert module.SESSIONS == {}
 
 
 def test_refusal_is_absent_once_one_of_six_sessions_closes(
@@ -481,6 +552,40 @@ def test_bash_shell_request_round_trips_a_real_command(
         while b"demo-terminal-bash-shell-marker" not in output and time.monotonic() < deadline:
             output += websocket.receive_bytes()
     assert b"demo-terminal-bash-shell-marker" in output
+
+
+def _shell_marker_output(client: TestClient, path: str) -> bytes:
+    """Print SHELLKIND=bash or SHELLKIND=other from the session's shell, and return the output.
+
+    `printf` keeps the result out of the echoed command line, which shows only the format string.
+    """
+    output = b""
+    with client.websocket_connect(path) as websocket:
+        websocket.send_bytes(
+            b'printf "SHELLKIND=%s\\n" "${BASH_VERSION:+bash}${BASH_VERSION:-other}"\n'
+        )
+        deadline = time.monotonic() + 5.0
+        while (
+            b"SHELLKIND=bash" not in output
+            and b"SHELLKIND=other" not in output
+            and time.monotonic() < deadline
+        ):
+            output += websocket.receive_bytes()
+    return output
+
+
+def test_explicit_shell_request_is_honoured_over_the_operator_override(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """REQ-012 R22, owner ruling 2026-10-04: with `D_SYSTEM_DEMO_SHELL` set to a non-bash shell,
+    an explicit `?shell=bash` still launches bash, and a connection that requests no shell gets
+    the override. The route's `_executable_for_shell` docstring states the same rule."""
+    monkeypatch.setenv(SHELL_ENV_VAR, "/bin/sh")
+    app = rebuild_app(flag="1")
+    client = TestClient(app)
+    explicit = _shell_marker_output(client, f"{DEMO_TERMINAL_WS_PATH}?shell=bash")
+    assert b"SHELLKIND=bash" in explicit
+    assert b"SHELLKIND=other" in _shell_marker_output(client, DEMO_TERMINAL_WS_PATH)
 
 
 @pytest.mark.parametrize("unavailable_shell", ["cmd", "powershell"])

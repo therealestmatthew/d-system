@@ -46,19 +46,18 @@ interface ShellRefusal {
 // REQ-007 W17 item 3 / ADR-014 section 4: the backend caps *concurrent sessions across every
 // terminal panel on the page* (`MAX_CONCURRENT_SESSIONS` in `src/api/routes/demo_terminal.py`),
 // which is what makes two live shells in two slots safe and what a fifth or seventh session runs
-// into. Unlike the shell refusal above, this refusal happens during the websocket handshake —
-// the backend closes before `accept()`, and uvicorn turns a pre-accept close into an HTTP 403
-// handshake rejection, so the browser reports a generic `CloseEvent` (code 1006, empty reason)
-// and the server's own close code and reason never reach this file. The signal available here is
-// therefore structural, not textual: the socket closed without ever having opened.
+// into. The backend accepts a refused connection and then closes it with
+// `SESSION_LIMIT_CLOSE_CODE` (4001) and its reason (REQ-012 R21), so the socket opens and then
+// closes, and `event.reason` carries the server's own wording, which this file quotes.
 //
-// That is still specific enough to say something true and useful. A session whose socket never
-// opens was refused by the server; with the availability check above already reporting the
-// terminal route as enabled, a refusal at this point is the session cap. The message says so
-// without asserting a number this file cannot see, and the `event.reason` branch takes over if a
-// future refusal path closes *after* accepting (where the reason does survive) — the server's own
-// wording beats anything invented here.
+// The structural fallback stays for a socket that closes without ever having opened (a backend
+// that still refuses during the handshake, where the browser reports `CloseEvent` 1006 with an
+// empty reason). With the availability check above already reporting the terminal route as
+// enabled, a refusal at that point is the session cap, so the message says so without asserting a
+// number this file cannot see.
 const CAP_REFUSAL_MIN_CLOSE_CODE = 4000
+// Mirrors `SESSION_LIMIT_CLOSE_CODE` in `src/api/routes/demo_terminal.py`.
+const SESSION_LIMIT_CLOSE_CODE = 4001
 
 function connectionRefusalMessage(event: CloseEvent): string {
   if (event.code >= CAP_REFUSAL_MIN_CLOSE_CODE && event.reason.trim().length > 0) {
@@ -200,11 +199,13 @@ const TerminalSession = forwardRef<
     term.open(container)
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    // REQ-007 W12 / ADR-014 section 5: every session requests its shell explicitly, including
-    // "bash" — the backend's own `_executable_for_shell` treats an explicit "bash" exactly like
-    // the query param's absence (still `D_SYSTEM_DEMO_SHELL`-overridable), so this never changes
-    // the existing bash panel's behavior; it only gives cmd/powershell sessions a name to ask for.
-    const socketUrl = `${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}?shell=${encodeURIComponent(shell)}`
+    // REQ-007 W12 / ADR-014 section 5: cmd and powershell sessions request their shell by name.
+    // A bash session sends no `shell` param: the backend honours an explicit request as asked,
+    // and applies the `D_SYSTEM_DEMO_SHELL` operator override only when none is given, so
+    // omitting it is what keeps that override in effect for this panel's default sessions
+    // (owner ruling 2026-10-04, REQ-012 R22).
+    const shellQuery = shell === 'bash' ? '' : `?shell=${encodeURIComponent(shell)}`
+    const socketUrl = `${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}${shellQuery}`
     const socket = new WebSocket(socketUrl)
     socket.binaryType = 'arraybuffer'
     socketRef.current = socket
@@ -238,7 +239,11 @@ const TerminalSession = forwardRef<
     socket.addEventListener('close', (event) => {
       if (disposed) return
       setConnectionState('closed')
-      if (!everOpened) setConnectionRefusal(connectionRefusalMessage(event))
+      // A cap refusal opens and then closes with the server's code and reason; a socket that
+      // never opened was refused during the handshake. Either way, say why.
+      if (!everOpened || event.code === SESSION_LIMIT_CLOSE_CODE) {
+        setConnectionRefusal(connectionRefusalMessage(event))
+      }
     })
     socket.addEventListener('error', () => {
       if (disposed) return

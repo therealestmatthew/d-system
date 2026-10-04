@@ -74,6 +74,17 @@ SESSION_LIMIT_CLOSE_REASON: Final[str] = (
 # threads), so plain dict reads/writes are safe without a lock.
 SESSIONS: Final[dict[str, TerminalAdapter]] = {}
 
+# Session ids holding a slot between the cap check and their adapter joining `SESSIONS`. The
+# check and the reservation run with no `await` between them, so on this single event loop two
+# connections can no longer both pass the cap while one awaits `accept()` (REQ-012 R20). The cap
+# counts both collections; a slot is released in `terminal_websocket`'s `finally` on any exit.
+RESERVED: Final[set[str]] = set()
+
+
+def _slots_in_use() -> int:
+    """Live sessions plus slots reserved by connections that have not started their shell."""
+    return len(SESSIONS) + len(RESERVED)
+
 # ADR-014 section 5: the three panel options the workbench offers, each through the one adapter
 # interface (POSIX pty for bash; ConPTY via `pywinpty` on Windows for cmd/powershell). This is a
 # fixed allowlist, not a set of examples — an arbitrary executable path or an unlisted name is
@@ -108,14 +119,16 @@ def _shell_is_available_on_host(shell: str, *, windows: bool | None = None) -> b
 def _executable_for_shell(shell: str | None) -> str | None:
     """The `create_adapter(shell=...)` override for an already-allowlisted shell name.
 
-    `None` (no `shell` query param at all) is passed straight through, preserving the existing
-    default-shell behavior untouched. A "bash" request also resolves to `None`, so
-    `D_SYSTEM_DEMO_SHELL` still overrides the default bash panel exactly as it did before this
-    session-per-shell selection existed; "cmd" and "powershell" are passed through as literal
-    executable names for `WindowsConPtyAdapter` to spawn.
+    `None` (no `shell` query param at all) is passed straight through, so the factory's own
+    order applies: the `D_SYSTEM_DEMO_SHELL` operator override if set, otherwise the platform
+    default. An explicit request is honoured as asked: "bash" launches bash, and "cmd" and
+    "powershell" are passed through as literal executable names for `WindowsConPtyAdapter`.
+
+    The override therefore applies only when no shell is requested. Owner ruling of 2026-10-04
+    (REQ-012 R22, idea `000096`): a client that names a shell must get that shell, not a
+    silent substitute. The workbench panel omits the param for its bash sessions, so the
+    override still sets the shell an operator sees there.
     """
-    if shell is None or shell == "bash":
-        return None
     return shell
 
 
@@ -277,17 +290,32 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     runs until the `await` resolves (D06-A finding 2).
 
     ADR-014 adds two refusal paths ahead of the shell actually starting. The session-limit
-    check runs first and closes during the handshake — never accepted, so it reads to the
-    client as a refused connection with a reason, matching "a clear close reason" (section 4).
-    The shell-selection check runs second, via the `?shell=` query param: an unlisted name or
-    one unavailable on this host is accepted, told why over a structured text frame, and closed
-    (`_refuse_shell_request`) — never a pretend-connect (section 5). Neither refusal ever
-    reaches `SESSIONS` or spawns an adapter.
+    check runs first. A refused connection is accepted and then closed with
+    `SESSION_LIMIT_CLOSE_CODE` and its reason: a close before `accept()` becomes an HTTP 403
+    handshake rejection, which a browser reports as `CloseEvent` 1006 with an empty reason, so
+    accepting first is what lets the panel quote the reason (section 4; REQ-012 R21). A
+    connection that passes reserves its slot before any `await` (`RESERVED`, REQ-012 R20). The
+    shell-selection check runs second, via the `?shell=` query param: an unlisted name or one
+    unavailable on this host is accepted, told why over a structured text frame, and closed
+    (`_refuse_shell_request`) — never a pretend-connect (section 5). Neither refusal spawns an
+    adapter, and a refused shell request releases its reserved slot.
     """
-    if len(SESSIONS) >= MAX_CONCURRENT_SESSIONS:
+    if _slots_in_use() >= MAX_CONCURRENT_SESSIONS:
+        await websocket.accept()
         await websocket.close(code=SESSION_LIMIT_CLOSE_CODE, reason=SESSION_LIMIT_CLOSE_REASON)
         return
 
+    session_id = uuid.uuid4().hex
+    RESERVED.add(session_id)
+    try:
+        await _run_session(websocket, session_id)
+    finally:
+        RESERVED.discard(session_id)
+        SESSIONS.pop(session_id, None)
+
+
+async def _run_session(websocket: WebSocket, session_id: str) -> None:
+    """Everything after the slot is reserved: the shell check, then the session itself."""
     requested_shell = websocket.query_params.get(SHELL_QUERY_PARAM)
     if requested_shell is not None:
         if requested_shell not in SHELL_ALLOWLIST:
@@ -311,10 +339,10 @@ async def terminal_websocket(websocket: WebSocket) -> None:
             return
 
     await websocket.accept()
-    session_id = uuid.uuid4().hex
     adapter = create_adapter(shell=_executable_for_shell(requested_shell))
     adapter.start()
     SESSIONS[session_id] = adapter
+    RESERVED.discard(session_id)
     pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))
     idle_timeout_seconds = _resolve_idle_timeout_seconds()
     try:
@@ -339,7 +367,6 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     finally:
         pump_task.cancel()
         adapter.close()
-        SESSIONS.pop(session_id, None)
 
 
 # This module is imported only when D_SYSTEM_DEMO_TERMINAL=1 (see src/api/__init__.py), so
