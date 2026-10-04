@@ -170,7 +170,8 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
 
    - the test baseline, `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>`, where
      the session produces both JUnit reports itself: the base from `uv run pytest --junitxml` on
-     `dev`'s tip in a throwaway detached worktree, the branch from the rebased branch
+     `dev`'s tip in a temporary `git clone --shared`, deleted afterwards, the branch from the
+     rebased branch
      ([OPS-031](OPS-031-check-test-baseline.md));
    - the diff patterns, `uv run python tools/check_diff_patterns.py dev..HEAD`
      ([OPS-032](OPS-032-check-diff-patterns.md)).
@@ -211,7 +212,7 @@ approval, as a standing rule for every session.
 (step 5). Both are recorded in `GOV-003`.
 
 **Owner ruling, 2026-10-04:** the session produces both JUnit reports for the test baseline (step
-1): the base on `dev`'s tip in a throwaway detached worktree and the branch after the rebase. It
+1): the base on `dev`'s tip in a temporary shared clone and the branch after the rebase. It
 replaces `PLAN-045` D7's "the Session Manager's own merge-gate re-run on `dev`", which cannot be the
 base because that re-run tests the branch tip and comes after `READY`. Recorded in `GOV-003`.
 

@@ -4,7 +4,7 @@
 A builder runs the suite twice before `READY` and compares the two JUnit XML reports
 (GOV-017's merge gate, PROMPT-037 item 4):
 
-    uv run pytest -q --junitxml=<base.xml>     # in a detached worktree of dev's tip
+    uv run pytest -q --junitxml=<base.xml>     # in a temporary clone of dev's tip
     uv run pytest -q --junitxml=<branch.xml>   # in the rebased branch worktree
     uv run python tools/check_test_baseline.py <base.xml> <branch.xml>
 

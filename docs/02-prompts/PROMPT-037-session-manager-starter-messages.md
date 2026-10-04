@@ -94,8 +94,8 @@ Roster
    `uv run pytest`, `uv run ruff check src/ test/` and `uv run mypy src/` runs (dev's
    baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
    `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>` (you produce both
-   reports: base from `pytest --junitxml` on dev's tip in a throwaway detached worktree,
-   branch from the rebased branch; OPS-031) and of
+   reports: base from `pytest --junitxml` on dev's tip in a temporary git clone --shared,
+   deleted after, branch from the rebased branch; OPS-031) and of
    `uv run python tools/check_diff_patterns.py dev..HEAD` (OPS-032). A nonzero result from
    either blocks the merge unless the owner signs off naming the tests or lines accepted,
    recorded in your session record; I relay no GRANTED merge without it. For a claimed

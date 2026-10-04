@@ -883,9 +883,12 @@ Applied by `phase-grd-03` (`PLAN-045`, `REQ-028` R07-R10) in
 - **The deliverables diff as a report.** For a claimed phase, `READY` also carries
   `governance --containment <phase-id>`, which does not block (`PLAN-045` D10, owner ruling of
   2026-09-23: "dgov-06 stays report-only, and READY carries its output").
-- **The builder produces both JUnit reports** (owner ruling, 2026-10-04, in Builder B's session):
-  the base from `pytest --junitxml` on `dev`'s tip in a throwaway detached worktree, the branch from
-  the rebased branch. This replaces `PLAN-045` D7's "the base run is the Session Manager's own
+- **The builder produces both JUnit reports** (owner rulings, 2026-10-04, in Builder B's session):
+  the base from `pytest --junitxml` on `dev`'s tip in a temporary `git clone --shared`, deleted
+  afterwards, the branch from the rebased branch. A clone rather than a worktree, so that deleting
+  it needs no approval under the worktree-removal entry above; a clone rather than a `git archive`
+  snapshot, because 78 tests read git data and would fail in the base, leaving them outside the
+  baseline. This replaces `PLAN-045` D7's "the base run is the Session Manager's own
   merge-gate re-run on `dev`": that re-run tests the branch tip, not `dev`, and comes after `READY`,
   which must already carry the result. Idea `000572` tracks amending D7 to match.
 

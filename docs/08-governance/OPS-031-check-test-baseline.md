@@ -23,26 +23,30 @@ does not show which tests stopped running (idea `000409`, `REQ-028` R07, `PLAN-0
 
 ## Command
 
-Both reports are produced by the builder (owner ruling, 2026-10-04, recorded in `GOV-003`). The base
-is `dev`'s tip, run in a throwaway detached worktree; the branch is the rebased branch, run in its
-own worktree. Write both reports under the branch worktree's `_working/`, which is gitignored:
+Both reports are produced by the builder (owner rulings, 2026-10-04, recorded in `GOV-003`). The
+base is `dev`'s tip, run in a temporary `git clone --shared` that is deleted afterwards; the branch
+is the rebased branch, run in its own worktree. Write both reports under the branch worktree's
+`_working/`, which is gitignored:
 
 ```bash
 # From the branch worktree, after `git rebase dev`:
 mkdir -p _working/junit
-git worktree add --detach ../d-system-worktrees/base-<phase-id> dev
-(cd ../d-system-worktrees/base-<phase-id> && uv sync --extra dev \
-  && uv run python tools/rebuild_db.py \
-  && uv run pytest -q --junitxml="$OLDPWD/_working/junit/base.xml")
-git worktree remove --force ../d-system-worktrees/base-<phase-id>
+base=$(mktemp -d)
+git clone -q --shared --branch dev "$(git rev-parse --path-format=absolute --git-common-dir)" "$base/repo"
+(cd "$base/repo" && uv sync --extra dev && uv run python tools/rebuild_db.py \
+  && uv run pytest -q -p no:cacheprovider --junitxml="$OLDPWD/_working/junit/base.xml")
+rm -rf "$base"
 uv run pytest -q --junitxml=_working/junit/branch.xml
 uv run python tools/check_test_baseline.py _working/junit/base.xml _working/junit/branch.xml
 ```
 
-The base worktree gets its own `.venv`, as every worktree does (`AGENTS.md`); `--force` on the
-removal is needed because the suite rewrites `docs/08-governance/catalog.md` in the tree it runs in.
-The branch run can be the same run whose tail `READY` already carries, with `--junitxml` added.
-One pytest run at a time per worktree still applies.
+The base copy is a clone, not a worktree, so removing it needs no approval under `GOV-003`'s
+worktree-removal rule; nothing in it is kept. It has to carry git data: 78 tests read the
+repository's own history, branches or ignore rules (the engine pages, the overview stamp, the demo
+reset tool, the containment report among them), and in a `git archive` snapshot they fail, so the
+baseline would never cover them (measured 2026-10-04: 36 failed, 42 errors). The clone gets its own
+`.venv`. The branch run can be the same run whose tail `READY` already carries, with `--junitxml`
+added. One pytest run at a time per worktree still applies.
 
 ## Expected result
 
@@ -63,7 +67,7 @@ run already fails.
   the old id and where it went; the check does not try to match renames.
 - **A deliberate deletion or skip.** Same route: the sign-off names the tests and the reason.
 - **Exit 2 on `base.xml`.** Usually the base run failed before writing a report — read its output
-  in the base worktree before removing it.
+  before deleting the temporary clone.
 
 <!-- generated:tool-reference:start -->
 
@@ -74,7 +78,7 @@ Refuse a branch whose test run drops a test that passed on its base (REQ-028 R07
 A builder runs the suite twice before `READY` and compares the two JUnit XML reports
 (GOV-017's merge gate, PROMPT-037 item 4):
 
-    uv run pytest -q --junitxml=<base.xml>     # in a detached worktree of dev's tip
+    uv run pytest -q --junitxml=<base.xml>     # in a temporary clone of dev's tip
     uv run pytest -q --junitxml=<branch.xml>   # in the rebased branch worktree
     uv run python tools/check_test_baseline.py <base.xml> <branch.xml>
 
