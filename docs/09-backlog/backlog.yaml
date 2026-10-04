@@ -16513,7 +16513,7 @@ items:
   - sys-plugin-backlog
   - sys-plugin-documents
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   priority: 1
   session_budget: 1
@@ -16572,8 +16572,7 @@ items:
   - plugins/idea-realization/docs/tools.md
   - plugins/idea-realization/README.md
   - docs/03-sessions/
-  next_action: Built and verified on agent/phase-plfx-02; independent review, then READY and the
-    owner's merge approval.
+  next_action: Complete.
   session: doc-session-plugin-config-validation
   completion_evidence:
   - plugins/idea-realization/scripts/paths.py
@@ -16585,7 +16584,8 @@ items:
   result: Every configured value is validated as it is read; a refused one exits 2 naming the key,
     the scaffold writes nothing, and doctor lists every invalid key. 16 new test cases fail at
     d8a635b on behavior and pass on the branch; plugin suite 530 passed (509 + 21). Independent
-    review found no blocker; two minor findings (plugin test lint, this count) fixed.
+    review found no blocker; two minor findings (plugin test lint, this count) fixed. Merged onto
+    dev with owner approval.
 - id: phase-plfx-03
   title: Pass plugin options through quoted heredocs, quote path placeholders and the partition check command, and check the form live
   plan: doc-plugin-audit-remediation
