@@ -16583,8 +16583,9 @@ items:
   - plugins/idea-realization/.claude-plugin/plugin.json
   - docs/03-sessions/SESS-2026-10-04-14-plugin-config-validation.md
   result: Every configured value is validated as it is read; a refused one exits 2 naming the key,
-    the scaffold writes nothing, and doctor lists every invalid key. The 16 new refusal tests fail
-    at d8a635b and pass on the branch; plugin suite 530 passed (509 + 21).
+    the scaffold writes nothing, and doctor lists every invalid key. 16 new test cases fail at
+    d8a635b on behavior and pass on the branch; plugin suite 530 passed (509 + 21). Independent
+    review found no blocker; two minor findings (plugin test lint, this count) fixed.
 - id: phase-plfx-03
   title: Pass plugin options through quoted heredocs, quote path placeholders and the partition check command, and check the form live
   plan: doc-plugin-audit-remediation

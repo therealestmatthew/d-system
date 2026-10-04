@@ -6,9 +6,8 @@ import json
 import subprocess
 from pathlib import Path
 
-import pytest
-
 import paths
+import pytest
 from conftest import PLUGIN_ROOT
 
 EXPECTED_KEYS = {

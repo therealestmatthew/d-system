@@ -143,5 +143,75 @@ From an empty repository (`git init` only):
 
 ## Unresolved
 
-- The detached baseline worktree `../d-system-worktrees/phase-plfx-02-baseline` is still present;
-  its removal waits for the owner's approval.
+None.
+
+## Review
+
+Independent review by a fresh `demo-adversary` agent over `dev...HEAD` at `a15109c`, given
+`REQ-035` R04-R07, `PLAN-052` and the phase's scope, acceptance, verification and deliverables, and
+told not to read this record. It hit its turn limit once and was asked to report what it had.
+
+1. Refusal tests fail at `d8a635b` and pass on the branch: **Holds for the behavior.** Its own run:
+   `d8a635b`'s plugin tree from `git archive`, the branch's changed tests overlaid, run with this
+   worktree's environment: `17 failed, 31 passed`, every failure an assertion (`assert 0 == 2`,
+   `DID NOT RAISE`), none a collection or import error. (Its 17 includes the changed
+   `test_partition.py` test.) On the branch, `530 passed`. It did not read this record, so the
+   "record quotes both runs" half is unverified by design.
+2. `idea.py add` and the scaffold refuse with exit 2 and write nothing: **Holds.** `config.path` is
+   read before any write in `idea.py main`; the scaffold resolves all targets and the gitignore
+   lines before its write loop.
+3. An absolute path inside the root resolves and the sweep's check command runs: **Holds.**
+4. `integration_branch` `--output=<tmp>/x` exits 2 with nothing in `<tmp>`: **Holds.** The value is
+   validated as an argument to `regression.audit`, before `git show` runs.
+5. Manifest description: **Holds.**
+6. Suite count 509 + 21 = 530, none removed: **Holds.**
+
+It also ran: `claude plugin validate --strict` (passed), the private-content check, governance;
+regenerated `docs/tools.md` from its header command and found it identical; confirmed only the
+declared files changed; found every git call with a ref argument has `--end-of-options`; found no
+`except` that swallows a `PathError` and no write before validation in any entry point it traced;
+and confirmed `primary_checkout()` from inside a linked worktree.
+
+Findings:
+
+1. **Minor.** `ruff check` over the plugin's own files (outside the documented gate, which covers
+   `src/` and `test/`) shows three new errors: unsorted imports in `test/test_doctor.py` and
+   `test/test_paths.py`, and a 101-character line in `test/test_regression.py`.
+2. **Minor.** The backlog `result` said "16 new refusal tests"; one of the 16 failing cases is the
+   manifest test, which is not a refusal.
+
+Unverified by it: the top-level `uv run pytest` and `mypy src/` (run here, above); a symlink swapped
+between validation and a later `open()` (an open observation, not a finding); case-insensitive and
+Windows-style paths, which cannot be exercised on this Linux host.
+
+Disposition: both findings fixed (imports sorted with `ruff --fix --select I`, the line wrapped, the
+`result` reworded). The time-of-check gap is recorded under Left undone.
+
+## Decisions
+
+- Validation runs when a value is read, not when the configuration is built. A script that never
+  reads a key is not stopped by it (an option-shaped `integration_branch` in a repository with no
+  backlog leaves the backlog check at exit 0); `doctor` validates every key.
+- `Config.path` validates the resolved location but returns the unresolved path, so existing tests
+  that compare paths, and callers that print them, see the same values as before.
+- `PathError` subclasses `ValueError`, so the new tests assert `ValueError` and fail before the fix
+  on behavior rather than on a missing name (`PLAN-052` D10).
+- The outside-staging partition test had to change, and `test_partition.py` was not declared; it
+  was added to the deliverables on dev in a granted turn (`1d2e6ab`) before the edit.
+- `--end-of-options` was also added to the backlog check's `git log ... <branch>`, which takes a
+  ref built from a phase id, beyond the two calls the scope names.
+- The detached baseline worktree for D10 was removed after the owner approved it in this session.
+
+## Corrections
+
+- The first draft of the baseline list in this record was typed rather than pasted and gave full
+  failure reasons pytest had truncated; it was replaced with the captured lines.
+- Comments citing this repository's document codes failed the plugin's own
+  `test_no_source_references`; they were reworded without codes.
+- The first regeneration of `docs/tools.md` ran from the wrong root and wrote nothing; it was rerun
+  with the command in the file's header.
+
+## Left undone
+
+- A symlink created between `Config.path()`'s check and a caller's later write is not caught; the
+  phase validates configured values, not every later file operation.

@@ -292,7 +292,8 @@ def test_an_option_shaped_integration_branch_is_refused_and_writes_nothing(
     commit(target.root, "a complete phase")
     out = tmp_path / "out"
     out.mkdir()
-    result = target.run("check.py", "--feature", "backlog", f"--integration-branch=--output={out}/x")
+    result = target.run("check.py", "--feature", "backlog",
+                        f"--integration-branch=--output={out}/x")
     assert result.returncode == 2, result.stdout + result.stderr
     assert list(out.iterdir()) == []
     assert "integration_branch" in result.stderr
