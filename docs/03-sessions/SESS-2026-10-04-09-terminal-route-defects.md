@@ -79,8 +79,70 @@ A headless Chrome page with the same script dumped its DOM before the sockets fi
 
 ## Backlog
 
-`status: active`. `next_action`: independent review, then READY.
+`status: active`. `next_action`: READY and the owner's merge approval.
 
 ## Unresolved
 
 - The panel's display of the cap reason is verified by code reading only (R21).
+
+## Review
+
+Independent review by a fresh `demo-adversary` agent over `dev...HEAD` at `49ebfbe`, given
+`REQ-012` R20-R22, the owner's two rulings and the phase's acceptance, and told not to read this
+record. Condition by condition:
+
+1. R20, reservation precedes accept: **Holds.** The check and `RESERVED.add` have no `await`
+   between them; one outer `finally` releases the slot on every exit.
+   `test_slot_is_reserved_before_accept_and_released_on_failure` fails on dev's code
+   (`AttributeError: module has no attribute 'RESERVED'`).
+2. R21, code and reason reach the client and the panel shows them: **Holds.** Its own run against
+   a live server on a scratch port with Node's WHATWG `WebSocket`: `{"opened":true,"code":4001,
+   "reason":"Maximum of 6 concurrent terminal sessions reached"}`; against dev's route the seventh
+   socket stayed CONNECTING for 8 seconds with only an `error` event. The panel's new condition
+   (`event.code === 4001`) does not fire for a normal end (1000) or for the shell refusal (4002).
+3. R22, explicit shell honoured, override only when none is requested: **Holds.** No other caller
+   in `ts/` builds a `?shell=` query; the override test fails on dev's code
+   (`SHELLKIND=other` for an explicit bash request).
+
+Verification it ran: `test/test_demo_terminal.py` 50 passed; full suite 1454 passed, 1 skipped;
+governance OK; `tsc --noEmit` clean; mypy and ruff clean. With dev's route swapped in, all five new
+or changed tests failed and the other 45 passed; the file was restored and `git status` stayed
+clean. No file outside the deliverables changed; `workbench.py` does not read `SESSIONS`.
+
+Findings:
+
+1. **Minor, pre-existing.** If `create_adapter()` or `adapter.start()` raises after `accept()`,
+   the slot is released but nothing closes the adapter or the websocket, and
+   `PosixPtyAdapter.start()` can leak the master pty fd when `Popen` fails after `pty.openpty()`.
+   The same ordering exists on dev.
+2. **Informational.** An explicit `?shell=bash` now execs the PATH-resolved `bash` rather than
+   the default `/bin/bash`; this is the behavior the ruling asked for.
+
+Disposition: no blocker or major finding. Finding 1 is accepted for this phase as outside its scope
+and sent to Ideation as an idea. Finding 2 needs no change.
+
+## Decisions
+
+- R22: the backlog asked for an OPS document or a behavior change. A new `docs/08-governance/OPS-*`
+  file would have collided with `phase-grd-03`. The owner chose the behavior change (2026-10-04),
+  and the claim reworded the acceptance line to match.
+- The panel always sent `?shell=bash`, so the behavior change alone would have retired the
+  operator override from the UI. Put to the owner, who chose to have the panel omit the param for
+  bash, so the override still sets the panel's default sessions.
+- `ts/src/stage/TerminalRegion.tsx` was added to the deliverables with `sys-wb-terminal`, the
+  system `systems.yaml` registers it under.
+- R21's refusal is accepted then closed, not sent as a JSON text frame like the shell refusal: R21
+  asks for the close frame to carry the reason, and the panel already quoted `event.reason`.
+
+## Corrections
+
+- The first marker helper in the R22 test stopped reading once the echoed command line matched;
+  it now uses `printf` so the expected text appears only in the command's output.
+- While comparing with dev's route, a stale server held the port and a `pkill` pattern matched its
+  own shell, leaving dev's route file in the worktree uncommitted. It was restored with
+  `git checkout`; the committed fix was untouched, and the comparison was rerun from a scratch copy.
+
+## Left undone
+
+- The panel's display of the cap reason was not rendered in a browser; it rests on code reading.
+- Review finding 1 (adapter and fd cleanup when the shell fails to start) is sent to Ideation.
