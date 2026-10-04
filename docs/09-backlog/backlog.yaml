@@ -12621,7 +12621,7 @@ items:
   - sys-delivery
   - sys-demo-overview
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   priority: 2
   session_budget: 1
@@ -12655,9 +12655,7 @@ items:
   - templates/html/overview-page.html
   - _public/overview/index.html
   - docs/06-requirements/REQ-020-schema-consistency-testing.md
-  next_action: Built and verified on agent/phase-sch-05; awaiting the owner's merge approval, then the
-    completion edit on dev. If the branch is rebased before merge, regenerate the overview page so its
-    stamp names a commit on dev. 000106 records the real drift that shipped for want of this test.
+  next_action: Complete. 000106 records the real drift that shipped for want of this test.
   session: doc-session-overview-page-snapshot-stamp
   completion_evidence:
   - tools/generate_overview.py
@@ -12669,7 +12667,9 @@ items:
   result: The overview page carries its source commit, commit date and a content hash; the tests check
     the committed page against its own hash, so a hand edit fails and a recorded idea does not.
     1410 passed, 1 skipped; governance OK. Independent adversarial review found one blocker (a
-    next_action edit dropped the 000106 mention and desynced the ideas backfill), fixed and rerun.
+    next_action edit dropped the 000106 mention and desynced the ideas backfill), fixed and rerun;
+    one minor REQ-020 finding fixed; the hash being self-consistency rather than tamper-evidence
+    accepted. Merged onto dev with owner approval.
 - id: phase-sch-06
   title: Design HTML-generation fixtures
   plan: doc-schema-consistency-testing
