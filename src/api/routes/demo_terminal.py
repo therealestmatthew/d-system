@@ -16,7 +16,9 @@ cannot run (section 5).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
+import logging
 import os
 import sys
 import uuid
@@ -102,6 +104,15 @@ SHELL_REFUSAL_MESSAGE_TYPE: Final[str] = "shell_refusal"
 SHELL_REFUSAL_CLOSE_CODE: Final[int] = 4002
 SHELL_REFUSAL_REASON_INVALID: Final[str] = "invalid_shell"
 SHELL_REFUSAL_REASON_UNAVAILABLE: Final[str] = "unavailable_shell"
+
+# Idea `000573`: when `create_adapter()` or `adapter.start()` raises after the socket was accepted,
+# the route closes whatever adapter exists (which closes the pty master fd `PosixPtyAdapter.start()`
+# opened before spawning) and closes the socket with this code and reason, instead of leaving
+# both to the ASGI server's error path.
+STARTUP_FAILURE_CLOSE_CODE: Final[int] = 4003
+STARTUP_FAILURE_CLOSE_REASON: Final[str] = "The terminal session failed to start"
+
+logger = logging.getLogger(__name__)
 
 
 def _shell_is_available_on_host(shell: str, *, windows: bool | None = None) -> bool:
@@ -339,8 +350,20 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
             return
 
     await websocket.accept()
-    adapter = create_adapter(shell=_executable_for_shell(requested_shell))
-    adapter.start()
+    adapter: TerminalAdapter | None = None
+    try:
+        adapter = create_adapter(shell=_executable_for_shell(requested_shell))
+        adapter.start()
+    except Exception:
+        logger.exception("demo terminal session %s failed to start", session_id)
+        if adapter is not None:
+            with contextlib.suppress(Exception):
+                adapter.close()
+        with contextlib.suppress(Exception):
+            await websocket.close(
+                code=STARTUP_FAILURE_CLOSE_CODE, reason=STARTUP_FAILURE_CLOSE_REASON
+            )
+        return
     SESSIONS[session_id] = adapter
     RESERVED.discard(session_id)
     pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))

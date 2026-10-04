@@ -24,6 +24,8 @@ import asyncio
 import contextlib
 import importlib
 import json
+import os
+import pty
 import subprocess
 import sys
 import time
@@ -55,6 +57,8 @@ from src.api.routes.demo_terminal import (
     SHELL_REFUSAL_MESSAGE_TYPE,
     SHELL_REFUSAL_REASON_INVALID,
     SHELL_REFUSAL_REASON_UNAVAILABLE,
+    STARTUP_FAILURE_CLOSE_CODE,
+    STARTUP_FAILURE_CLOSE_REASON,
     UVICORN_HOST_ENV_VAR,
     NonLoopbackBindError,
     enforce_loopback_bind,
@@ -552,6 +556,90 @@ def test_bash_shell_request_round_trips_a_real_command(
         while b"demo-terminal-bash-shell-marker" not in output and time.monotonic() < deadline:
             output += websocket.receive_bytes()
     assert b"demo-terminal-bash-shell-marker" in output
+
+
+class _FailingStartAdapter:
+    """An adapter whose `start()` raises; records whether the route closed it."""
+
+    def __init__(self) -> None:
+        self.closed = False
+
+    def start(self) -> None:
+        raise OSError("simulated spawn failure")
+
+    def close(self) -> None:
+        self.closed = True
+
+
+def _assert_startup_failure_close(client: TestClient) -> None:
+    with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+        with pytest.raises(WebSocketDisconnect) as exc_info:
+            websocket.receive_bytes()
+    assert exc_info.value.code == STARTUP_FAILURE_CLOSE_CODE
+    assert exc_info.value.reason == STARTUP_FAILURE_CLOSE_REASON
+
+
+def test_adapter_and_socket_are_closed_when_start_fails(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Idea `000573`: `adapter.start()` raising after `accept()` closes the adapter, closes the
+    socket with the startup-failure code and reason, and leaves no slot held."""
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    adapter = _FailingStartAdapter()
+    monkeypatch.setattr(module, "create_adapter", lambda shell=None: adapter)
+    _assert_startup_failure_close(TestClient(app))
+    assert adapter.closed
+    assert module.RESERVED == set()
+    assert module.SESSIONS == {}
+
+
+def test_socket_is_closed_when_create_adapter_fails(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`create_adapter()` raising (for example, the Windows adapter's import failing) closes the
+    socket with the same code and reason; there is no adapter to close."""
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+
+    def _raise(shell: str | None = None) -> object:
+        raise ImportError("simulated missing backend")
+
+    monkeypatch.setattr(module, "create_adapter", _raise)
+    _assert_startup_failure_close(TestClient(app))
+    assert module.RESERVED == set()
+    assert module.SESSIONS == {}
+
+
+def test_pty_master_fd_is_closed_when_the_shell_cannot_spawn(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The real leak: `PosixPtyAdapter.start()` opens the pty before `Popen`, so a shell that
+    cannot spawn left the master fd open. The route's `adapter.close()` now closes it."""
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    adapters: list[PosixPtyAdapter] = []
+
+    def _unspawnable(shell: str | None = None) -> PosixPtyAdapter:
+        adapter = PosixPtyAdapter(shell="/nonexistent/d-system-test-shell")
+        adapters.append(adapter)
+        return adapter
+
+    monkeypatch.setattr(module, "create_adapter", _unspawnable)
+    original_openpty = pty.openpty
+    opened: list[int] = []
+
+    def _recording_openpty() -> tuple[int, int]:
+        master, slave = original_openpty()
+        opened.append(master)
+        return master, slave
+
+    monkeypatch.setattr(pty, "openpty", _recording_openpty)
+    _assert_startup_failure_close(TestClient(app))
+    assert len(opened) == 1
+    assert adapters[0]._master_fd is None
+    with pytest.raises(OSError):
+        os.fstat(opened[0])
 
 
 def _shell_marker_output(client: TestClient, path: str) -> bytes:
