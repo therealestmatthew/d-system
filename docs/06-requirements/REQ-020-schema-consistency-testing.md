@@ -76,7 +76,9 @@ compiler.
    matches a fresh regeneration. `test/test_generate_overview.py` has determinism tests — two runs
    produce byte-identical output — but **nothing asserts the committed
    `_public/overview/index.html` matches a regeneration**. That gap let a real drift ship silently
-   (`000106`).
+   (`000106`). R08 below closes it by a different route than this framing suggests: the page is a
+   stamped snapshot checked against its own content hash, because a comparison with a fresh run
+   would fail on every recorded idea (owner ruling of 2026-10-04).
 
 3. **No stated testing philosophy per layer.** Backend routes, frontend components, generation
    scripts and agent-facing tools like `tools/append_idea.py` have no shared answer to what "tested"

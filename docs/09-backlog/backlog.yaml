@@ -12657,7 +12657,7 @@ items:
   - docs/06-requirements/REQ-020-schema-consistency-testing.md
   next_action: Built and verified on agent/phase-sch-05; awaiting the owner's merge approval, then the
     completion edit on dev. If the branch is rebased before merge, regenerate the overview page so its
-    stamp names a commit on dev.
+    stamp names a commit on dev. 000106 records the real drift that shipped for want of this test.
   session: doc-session-overview-page-snapshot-stamp
   completion_evidence:
   - tools/generate_overview.py
@@ -12668,7 +12668,8 @@ items:
   - docs/03-sessions/SESS-2026-10-04-02-overview-page-snapshot-stamp.md
   result: The overview page carries its source commit, commit date and a content hash; the tests check
     the committed page against its own hash, so a hand edit fails and a recorded idea does not.
-    1410 passed, 1 skipped; governance OK. Independent review pending.
+    1410 passed, 1 skipped; governance OK. Independent adversarial review found one blocker (a
+    next_action edit dropped the 000106 mention and desynced the ideas backfill), fixed and rerun.
 - id: phase-sch-06
   title: Design HTML-generation fixtures
   plan: doc-schema-consistency-testing
