@@ -11075,7 +11075,8 @@ items:
   - sys-governance
   owner: repository-owner
   agent: agent-builder-b
-  status: active
+  status: complete
+  session: doc-session-register-tmpagent-system
   priority: 3
   session_budget: 1
   depends_on: []
@@ -11093,8 +11094,15 @@ items:
   - uv run python -m src.governance
   deliverables:
   - docs/08-governance/systems.yaml
-  next_action: Every acceptance condition met on agent/phase-dgov-07 (SESS-2026-10-04-01); awaiting the
-    owner-approved merge, then the completion edit on dev.
+  completion_evidence:
+  - docs/08-governance/systems.yaml
+  - docs/03-sessions/SESS-2026-10-04-01-register-tmpagent-system.md
+  result: sys-tmpagent registered at maturity implemented; --inventory reports it alongside sys-backlog
+    and sys-portfolio, and governance is OK (44 systems). An independent demo-adversary review found all
+    three acceptance conditions met, with every ledger fact in the description verified; one minor finding
+    fixed (AGENTS.md section reference) and one accepted (the description is a snapshot of claims.jsonl).
+    Merged onto dev with the owner's approval. A mechanical ledger check is idea 000564.
+  next_action: Complete.
 - id: phase-agx-01
   title: Document the truncation cap and make truncation detectable
   plan: doc-agent-engineering-delegation
