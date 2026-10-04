@@ -24192,3 +24192,13 @@ Raised by Session 1 - Builder A.
 sys-html in docs/08-governance/systems.yaml is still "planned", its path is PLAN-003's overview, and it says "under audit by phase-des-01". PLAN-003 is retired (2026-10-04) and the house family plus the engine/overview generators have shipped, so its maturity and paths need review.
 
 Raised by Session 1 - Builder A.
+
+---
+
+## 000572 · Amend PLAN-045 D7 to the owner's JUnit-base ruling
+
+**Created 2026-10-04T11:09:28-04:00 · Status: `open`**
+
+Amend PLAN-045 D7 to the owner's 2026-10-04 JUnit-base ruling: the builder produces both JUnit reports before READY (the dev tip in a throwaway detached worktree, and the rebased branch). D7 still says the base is "the Session Manager's merge-gate re-run on dev". GOV-003 will record the ruling via phase-grd-03.
+
+Raised by Session 2 - Builder B.
