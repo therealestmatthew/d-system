@@ -77,3 +77,28 @@ recurring.
 
 `AGENTS.md` and `CLAUDE.md` were not edited. Step 5's rule there is correct; the slip was in
 following it.
+
+## Review
+
+A `demo-adversary` agent reviewed `193c46e..86b543e`. Verdict: PASS, with no discrepancies found.
+Its report, condition by condition:
+
+- Condition 1 (procedure entry): Met.
+  - The front matter has every field the `log-anti-patterns` skill and two existing entries use.
+  - Both tags exist in `_data/tags.json`, and `related: []` has precedent.
+  - The body follows the usual shape: rule, dated example, model-agnostic close.
+  - It is listed at `brain/index.md` line 66, and the governance check counts 37 memories.
+- Condition 2 (account matches history): Met, by replaying the commits:
+  - For `phase-des-11` and `phase-des-01`, the earlier commits leave `backlog.yaml` unchanged. The
+    three fields first appear in `8042375` and `7d06a7c`, together with the status change.
+  - For `phase-des-02`, `d7296c6` adds them before the merge `193c46e`.
+  - The procedure's statement of step 5 matches `AGENTS.md` lines 288-291.
+  - The reviewer also found a contributing cause the procedure does not name.
+    `PROMPT-037`'s Builder role script, lines 161-163, describes the hand-off as the merge followed
+    by "the completion edit on dev", without calling out the branch-side update.
+- Condition 3 (guard as an idea): Met. Idea `000581` is open in the fold, titled "Guard for
+  AGENTS.md hand-off step 5 before a merge is granted".
+- `AGENTS.md` and `CLAUDE.md` are untouched. The catalog regenerates with no change. Governance
+  and `pytest` output match the record.
+- `SESS-2026-10-04-12` is held by a concurrent branch, through the shared reservation mechanism. The
+  jump to `-13` is that mechanism working, not a collision.
