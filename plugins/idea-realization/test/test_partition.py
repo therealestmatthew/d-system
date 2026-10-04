@@ -160,11 +160,13 @@ def test_a_staging_directory_that_is_not_gitignored_stops_the_sweep_before_writi
 
 def test_a_staging_directory_outside_any_checkout_stops_the_sweep(
         root: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """A staging directory outside the repository is refused when the configuration is read,
+    before the sweep's own gitignore check: exit 2, naming the option, and nothing written."""
     outside = tmp_path / "outside"
     args = ["--root", str(root), "--staging-dir", str(outside)]
-    assert idea_corpus.main(["locate", *args]) == 1
-    assert "not gitignored" in capsys.readouterr().err
-    assert idea_corpus.main(["build", *args]) == 1
+    assert idea_corpus.main(["locate", *args]) == 2
+    assert "staging_dir" in capsys.readouterr().err
+    assert idea_corpus.main(["build", *args]) == 2
     assert not outside.exists()
 
 
