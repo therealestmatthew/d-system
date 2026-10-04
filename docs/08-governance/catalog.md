@@ -436,6 +436,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-04-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-03-per-idea-trace-pages.md |
 | SESS-2026-10-04-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-04-idea-explorer-status-filter.md |
 | SESS-2026-10-04-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-05-global-memory-retrieval.md |
+| SESS-2026-10-04-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-06-design-document-amendments.md |
 | SESS-2026-10-04-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-07-reject-non-positive-limit.md |
 
 ## Plans and their phases
@@ -533,4 +534,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-430 documents — adr: 23, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 191.
+431 documents — adr: 23, architecture: 12, governance: 19, operation: 26, plan: 81, prompt: 43, requirement: 35, session: 192.
