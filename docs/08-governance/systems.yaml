@@ -522,7 +522,7 @@ systems:
   depends_on: []
   description: The tracked _tmpagent/ directory carries files that agents in sibling worktrees must
     read, under the claims contract in _tmpagent/AGENTS.md, which AGENTS.md points to from its Key
-    conventions section and its "Concurrent agents - complete and hand off" step 3. Every file is
+    conventions section and from step 3 of its section headed "complete and hand off". Every file is
     created, activated before anyone reads it, claimed by each reading branch or plan, released,
     and removed only once every claim is closed, all as lines appended to claims.jsonl. Implemented
     because the full lifecycle has run for real - 15 ledger lines from 2026-09-14 to 2026-09-22
