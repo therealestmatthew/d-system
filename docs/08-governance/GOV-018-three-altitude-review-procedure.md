@@ -205,8 +205,8 @@ When every finding carries at least one disposition, set `status: dispositioned`
 rejects any finding without one. A `dispositioned` record goes to phase-fit (stage 6) with the
 plan, and its `escalated-g3` findings go to the owner at G3.
 
-`ARCH-006` provides two revision cycles, after which unresolved blockers go to G3. The revised plan
-from the first cycle is reviewed again with this procedure before the second.
+This procedure does not define a second review of the revised plan. `ARCH-006` provides two
+revision cycles, after which unresolved blockers go to G3.
 
 ## Engines after the trio ships
 

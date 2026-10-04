@@ -107,3 +107,74 @@ C14, rerun the verification list, then the independent review and READY.
 - The `GOV-003` worktree-removal entry records that `AGENTS.md` and `/session-start` step 9 still
   remove the worktree without its own approval. Neither text is in this phase's scope; the gap was
   sent to Ideation as an idea.
+
+## Review
+
+Independent review by a fresh `demo-adversary` agent over `dev...HEAD` at `3cfb328`, given
+`REQ-029`, `PLAN-046` and the phase's acceptance, verification and deliverables, and told not to
+read this record (the rule this phase writes into `/session-close` step 3). Its findings, condition
+by condition:
+
+1. Completion grep: **Holds**, with finding 2's caveat.
+2. Owner-reserved lists diff empty: **Holds** (byte-for-byte).
+3. "enforced at the tool boundary" count 0: **Holds**.
+4. Revision-cycle grep returns only stage 3: **Holds**.
+5. Test Author contract, no "nine", stage 8 names it: **Holds**.
+6. No owner spot-audit requirement: **Holds**; the remaining hit is descriptive.
+7. session-close step 3 mentions the record only to exclude it: **Holds**.
+8. Five GOV-003 entries: **Holds**; each marked standing and names what it changes.
+9. AGENTS.md and CLAUDE.md match `PLAN-046` D5's text exactly; 179-181 untouched: **Holds**.
+10. No `main` in the five files; session-close states the exception was withdrawn: **Holds**.
+11. PLAN-005 note and no `triaging` in REQ-003: **Holds**.
+
+Verification: `--check` and one test fail on `.agents/skills/orient/SKILL.md` only; governance OK;
+catalog diff clean; `1 failed, 1418 passed, 1 skipped`, the failure being that adapter. Changes are
+confined to the deliverables, the phase's backlog line, the catalog and this record.
+
+Findings:
+
+1. **Major.** `GOV-018` step 5 gained a sentence the rulings do not authorize: "The revised plan from
+   the first cycle is reviewed again with this procedure before the second." `PLAN-046` D2 changes
+   only the cycle count; the old text disclaimed a second review, and the procedure has no step for
+   one. A builder would read a mandatory re-review into the flow.
+2. **Minor.** `REQ-029` R01's literal grep returns nine lines, all quoting `GOV-003`'s entry title
+   "…replaces owner-invoked /session-close…" as the pointer. None asserts owner-only completion, so
+   the backlog acceptance holds, but R01's wording read literally flags them.
+3. **Informational.** `GOV-001` and `GOV-002` had no `main` on `dev` when the phase started;
+   `REQ-029` problem 9's line numbers are stale for them.
+
+Disposition: finding 1 fixed — the sentence is removed and the original disclaimer kept, with only
+the count changed ("This procedure does not define a second review of the revised plan. `ARCH-006`
+provides two revision cycles, after which unresolved blockers go to G3."). Finding 2 accepted: the
+hits are the pointer R01 asks each file to carry, and changing `REQ-029` is outside this phase.
+Finding 3 needs no change.
+
+## Decisions
+
+- The three `AGENTS.md`/`CLAUDE.md` changes were put to the owner before the claim. `AGENTS.md`
+  179-181 already stated the `GOV-003` rule after the owner-approved commit `d9fa3bd`
+  (2026-09-28), so the owner ruled it unchanged rather than applying `PLAN-046`'s older text.
+  The `CLAUDE.md` lines had moved from 137, 141 and 144 to 139, 143 and 146.
+- By owner ruling of 2026-10-04 the claim replaced the `docs/08-governance/` deliverable with the
+  seven files the scope amends, so the phase could run beside `phase-des-11` and `phase-rel-08`.
+- `.agents/skills/orient/SKILL.md` is closed to agents. The generator's output for it was written to
+  the session's scratchpad and the regeneration queued for the owner (Owner Terminal entry C14);
+  the `.claude` copy was regenerated here.
+- The agent-proposed entry uses the label form in use on the log, `[agent-proposed by <session>]`,
+  which the owner re-ruled on the Session Manager's board; `REQ-029` R08's "Proposed by <session>,
+  not the owner" is its example only.
+
+## Corrections
+
+- A first pass at re-wrapping long lines rewrapped whole blocks, including untouched paragraphs, a
+  front-matter block and a shell code block, and broke governance (`GOV-018`'s front matter).
+  Caught before any commit; all edits were reverted and re-applied from one script with
+  hand-wrapped text.
+- The `GOV-018` sentence in review finding 1 was mine; removed.
+
+## Left undone
+
+- Commit `.agents/skills/orient/SKILL.md` after Owner Terminal C14, then rerun the verification
+  list.
+- The Q8 worktree-removal ruling is recorded, but `AGENTS.md` and `/session-start` step 9 still
+  describe the removal as automatic; sent to Ideation as an idea.
