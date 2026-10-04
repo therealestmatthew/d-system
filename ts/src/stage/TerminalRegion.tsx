@@ -324,18 +324,18 @@ const TerminalSession = forwardRef<
         // the socket, sends this frame, then closes it (ADR-014 section 5), so `connectionState`
         // also reaches 'closed' shortly after — but the refusal's own named-shell message is the
         // one that belongs on screen, not the generic reconnect prompt.
-        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
+        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay" role="alert">
           {refusalDisplayMessage(shellRefusal)}
         </p>
       ) : connectionRefusal ? (
         // A session the backend never let start (the global session cap, in practice) — a
         // different situation from a session that ran and ended, and it gets its own message
         // rather than the generic "reload the page" one below, which would not help here.
-        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
+        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay" role="alert">
           {connectionRefusal}
         </p>
       ) : connectionState === 'closed' ? (
-        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay">
+        <p className="stage-placeholder-text stage-placeholder-text--absent stage-terminal-mount__overlay" role="alert">
           Terminal connection closed. Reload the page to reconnect.
         </p>
       ) : null}

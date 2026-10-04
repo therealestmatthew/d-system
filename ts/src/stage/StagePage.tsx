@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type ComponentType, type ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import './StagePage.css'
 import Slot from '../workbench/Slot'
@@ -7,6 +7,17 @@ import { useWorkbenchLayouts } from '../workbench/useWorkbenchLayouts'
 import { ActiveSchemaVersionProvider } from '../workbench/schemaVersionContext'
 import { PANEL_REGISTRY, panelDisplayName } from '../workbench/panelRegistry'
 import ErrorBoundary from './ErrorBoundary'
+
+/** A workbench panel inside its own error boundary, named for the reader (idea 000569). StagePage
+ * portals exactly this into each panel's host; it is exported so a test can render the same
+ * element the stage does. */
+export function guardedPanel(panelId: string, Component: ComponentType): ReactElement {
+  return (
+    <ErrorBoundary label={panelDisplayName(panelId)}>
+      <Component />
+    </ErrorBoundary>
+  )
+}
 
 /**
  * The stage page: the workbench layout engine's root (REQ-007 W05/W06/W16/W17, ADR-016). Loads
@@ -198,15 +209,7 @@ export default function StagePage() {
     const host = panelHosts.current.get(panelId)
     const Component = PANEL_REGISTRY[panelId]?.Component
     if (!host || !Component) return []
-    return [
-      createPortal(
-        <ErrorBoundary label={panelDisplayName(panelId)}>
-          <Component />
-        </ErrorBoundary>,
-        host,
-        panelId,
-      ),
-    ]
+    return [createPortal(guardedPanel(panelId, Component), host, panelId)]
   })
 
   return (
