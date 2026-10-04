@@ -15023,8 +15023,8 @@ items:
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/01-plans/PLAN-052-plugin-audit-remediation.md
-  next_action: Waits for phase-grd-02. Start with the plan-versus-registered check, the one that reads
-    only repository files.
+  next_action: Every acceptance condition met on agent/phase-grd-03 (SESS-2026-10-04-12); awaiting the
+    owner-approved merge, then the completion edit on dev.
 - id: phase-grd-04
   title: 'The S3 next_up rule: refuse a queued phase with no dispositioned GOV-018 review record'
   plan: doc-deterministic-guards
