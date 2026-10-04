@@ -5,7 +5,8 @@
   with a person at a few checkpoints. It introduces the series; it does not explain a mechanism, so
   it is an illustration rather than a diagram.
 - **Source:** none; the stage count (nine) and gate count (five) are from `ARCH-006`.
-- **Files:** none yet. Save the chosen image here as `image.png`.
+- **Files:** none yet. Save the chosen image here as `image.png`, cropped or resized to
+  1600 × 900 (generators often return other 16:9 sizes such as 1024 × 576).
 
 ## Prompt
 
@@ -31,3 +32,4 @@
 
 - No text was generated into the image (generators often add garbled lettering).
 - The colours are close to the house accent and surface values above.
+- The file is 1600 × 900 PNG.

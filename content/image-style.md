@@ -33,11 +33,12 @@ Rules:
 
 1. Light theme only. X shows images on both light and dark backgrounds, and a white canvas reads on
    both.
-2. 1600 × 900 pixels (16:9), PNG. X does not accept SVG; keep the SVG source next to the PNG.
+2. 1600 × 900 pixels (16:9), PNG. X does not accept SVG; for a diagram, keep the SVG source next to the PNG.
 3. One accent element per image: the thing the post is about.
 4. Text in the image at 28 px or larger, so it is readable on a phone without zooming.
-5. A source line at the bottom in muted mono: the file or command the image is built from and the
-   commit.
+5. Diagrams, charts and stat cards carry a source line at the bottom in muted mono: the file or
+   command the image is built from and the commit. An illustration from an AI image brief carries
+   no text at all, so it has no source line; its `image.md` records where its facts come from.
 6. No screenshots of the owner's desktop, terminal prompt, browser tabs or notifications.
 
 ## Production methods
@@ -56,7 +57,8 @@ Each post with an image has `image.md`:
 
 - **Type:** generated diagram, hand-drawn diagram, screenshot, AI image brief, or animation.
 - **What it shows:** one sentence.
-- **Source:** the command or file it is built from, and the commit.
+- **Source:** the command or file it is built from, and the commit. For an AI image brief, the
+  documents its facts come from, or "none".
 - **Prompt:** for an AI image brief only.
 - **Alt text:** as posted.
 - **Files:** the image files in the post directory.
