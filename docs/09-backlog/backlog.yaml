@@ -9523,9 +9523,19 @@ items:
   - src/api/routes/demo_terminal.py
   - test/test_demo_terminal.py
   - ts/src/stage/TerminalRegion.tsx
-  next_action: Read lines 287 to 313 of src/api/routes/demo_terminal.py first. The cap check, the
-    pre-accept close and the accept sit within twenty-six lines of each other, and the two code
-    fixes are two edits to that one control flow - which is why they share a phase.
+  next_action: Built and verified on agent/phase-wbf-09; independent review, then READY and the
+    owner's merge approval.
+  session: doc-session-terminal-route-defects
+  completion_evidence:
+  - src/api/routes/demo_terminal.py
+  - test/test_demo_terminal.py
+  - ts/src/stage/TerminalRegion.tsx
+  - docs/03-sessions/SESS-2026-10-04-09-terminal-route-defects.md
+  result: The slot is reserved before accept and released on any exit; a cap refusal is accepted
+    then closed with 4001 and its reason, which a WHATWG WebSocket client receives; an explicit
+    shell is honoured and the override applies only when none is requested. 1454 passed, 1 skipped;
+    governance OK.
+
 - id: phase-wbf-10
   title: Silence the flag-off workbench probes
   plan: doc-workbench-features-defects
