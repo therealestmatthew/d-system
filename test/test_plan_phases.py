@@ -2,8 +2,8 @@
 
 The fixture table is REQ-028 R09's: a plan dated 2026-09-23 with an unnamed registered phase fails
 naming both; the same plan dated 2026-09-21 passes; a plan naming `phase-zzz-99` fails; the
-repository as it stands passes. Each runs the backlog audit on an isolated repository; the
-governance command exits 1 on any error that audit returns.
+repository as it stands passes. Each runs `audit_plan_phases` on an isolated repository, the
+function the governance command calls after the backlog audit; it exits 1 on any error returned.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from typing import Any
 
 import pytest
 
-from src.governance.__main__ import ROOT, audit, audit_backlog, public_path
+from src.governance.__main__ import ROOT, audit, audit_backlog, audit_plan_phases
 from src.governance.plan_phases import CUTOFF, inspect_plan_phases, named_phases
 
 PLAN_PATH = "docs/01-plans/PLAN-001-example.md"
@@ -102,8 +102,9 @@ def build(root: Path, created: str, body: str, phases: list[str]) -> Path:
 def errors_for(root: Path) -> list[str]:
     errors, _, result = audit(root)
     assert errors == []
-    backlog_errors, _ = audit_backlog(root, result)
-    return backlog_errors
+    backlog_errors, catalog = audit_backlog(root, result)
+    assert backlog_errors == []
+    return audit_plan_phases(root, result, catalog)[0]
 
 
 def test_recent_plan_with_an_unnamed_registered_phase_fails_naming_both(tmp_path: Path) -> None:
@@ -163,16 +164,33 @@ def test_non_plan_documents_are_ignored() -> None:
     assert counts["plans"] == 0
 
 
+def test_a_plan_record_without_a_path_is_skipped() -> None:
+    documents = {"doc-plan": {"kind": "plan", "status": "approved"}}
+    items = [{"id": "phase-exa-01", "plan": "doc-plan"}]
+    errors, counts = inspect_plan_phases(documents, items, lambda path: "")
+    assert errors == []
+    assert counts["plans"] == 0
+
+
 def test_repository_passes_and_reports_its_counts() -> None:
     errors, _, result = audit(ROOT)
     assert errors == []
     _, catalog = audit_backlog(ROOT, result)
-    plan_errors, counts = inspect_plan_phases(
-        result["documents"],
-        catalog["items"],
-        lambda path: public_path(ROOT, path).read_text(encoding="utf-8"),
-    )
+    plan_errors, counts = audit_plan_phases(ROOT, result, catalog)
     assert plan_errors == []
     assert counts["recent_plans"] > 0
     assert counts["registered_phases_checked"] > 0
     assert counts["phase_ids_named"] > 0
+
+
+def test_the_governance_command_runs_the_check(monkeypatch: pytest.MonkeyPatch) -> None:
+    """main() calls audit_plan_phases and turns its errors into a failing exit."""
+    import sys
+
+    from src.governance import __main__ as governance
+
+    monkeypatch.setattr(
+        governance, "audit_plan_phases", lambda root, result, catalog: (["planted"], {})
+    )
+    monkeypatch.setattr(sys, "argv", ["governance", "--inventory"])
+    assert governance.main() == 1

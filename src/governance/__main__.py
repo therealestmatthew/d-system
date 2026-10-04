@@ -395,14 +395,23 @@ def audit_backlog(
             today or date.today(),
             ideas,
         )
-        plan_errors, _ = inspect_plan_phases(
+        return errors, catalog
+    except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
+        return [f"backlog inputs: {exc}"], {}
+
+
+def audit_plan_phases(
+    root: Path, result: dict[str, Any], catalog: dict[str, Any]
+) -> tuple[list[str], dict[str, int]]:
+    """Plans and registered phases must name each other (REQ-028 R09); see plan_phases."""
+    try:
+        return inspect_plan_phases(
             result["documents"],
             catalog["items"],
             lambda path: public_path(root, path).read_text(encoding="utf-8"),
         )
-        return errors + plan_errors, catalog
-    except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
-        return [f"backlog inputs: {exc}"], {}
+    except (OSError, ValueError, KeyError) as exc:
+        return [f"plan phases inputs: {exc}"], {}
 
 
 def idea_ids(root: Path) -> set[str]:
@@ -626,6 +635,7 @@ def main() -> int:
         errors.extend(backlog_errors)
         errors.extend(audit_idea_priority(ROOT))
     if catalog:
+        errors.extend(audit_plan_phases(ROOT, result, catalog)[0])
         regression_errors, regression_warnings = audit_status_regression(ROOT, catalog)
         errors.extend(regression_errors)
     # Only the plain check compares generated files: `--catalog` is the fix for a stale catalog,

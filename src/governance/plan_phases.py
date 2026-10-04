@@ -30,7 +30,11 @@ def inspect_plan_phases(
     read_text: Callable[[str], str],
 ) -> tuple[list[str], dict[str, int]]:
     """Return errors for both directions, and the counts that show what was checked."""
-    plans = {key: meta for key, meta in documents.items() if meta["kind"] == "plan"}
+    # audit() gives every real document its path. A record without one has no text to read: only
+    # tests that build the documents mapping by hand produce it, and they are not plans to check.
+    plans = {
+        key: meta for key, meta in documents.items() if meta["kind"] == "plan" and "path" in meta
+    }
     phases = list(items)
     registered = {item["id"] for item in phases}
     named = {key: named_phases(read_text(meta["path"])) for key, meta in plans.items()}
