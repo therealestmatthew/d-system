@@ -24132,3 +24132,23 @@ Raised by Session 2 - Builder B.
 tools/load_context.py --limit -1 (any negative value) crashes with a raw duckdb BinderException traceback. Reject non-positive limits in argparse with a clear message. Pre-existing on dev; found in the phase-rel-08 review.
 
 Raised by Session 2 - Builder B.
+
+---
+
+## 000566 · Amend step 9 worktree removal in AGENTS.md and /session-start
+
+**Created 2026-10-04T09:45:46-04:00 · Status: `open`**
+
+AGENTS.md hand-off step 9 and /session-start step 9 still remove the worktree right after an approved merge. That contradicts the owner's 2026-09-23 Q8 ruling that every worktree removal needs owner approval, now recorded in GOV-003 by phase-dam-01. Both texts need amending; the AGENTS.md change needs the owner's per-change approval.
+
+Found by Session 3 - Standby Builder, which removed phase-sch-05's worktree on 2026-10-04 by following step 9 without asking.
+
+---
+
+## 000567 · Re-point phase-syn-05 off the retired PLAN-003 page pipeline
+
+**Created 2026-10-04T09:45:47-04:00 · Status: `open`**
+
+phase-syn-05 depends on phase-html-10 and needs PLAN-003's YAML-to-JSON page pipeline, which the owner retired on 2026-10-04 (phase-des-01 audit). It needs a new dependency, for example the engine-page generator, or a re-scope.
+
+Raised by Session 1 - Builder A.
