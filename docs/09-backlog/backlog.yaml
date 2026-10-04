@@ -15001,6 +15001,7 @@ items:
   - test/test_plan_phases.py
   - docs/08-governance/
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/01-plans/PLAN-052-plugin-audit-remediation.md
   next_action: Waits for phase-grd-02. Start with the plan-versus-registered check, the one that reads
     only repository files.
 - id: phase-grd-04
