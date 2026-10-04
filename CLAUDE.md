@@ -136,14 +136,14 @@ and `GOV-001`'s "The data root" section for the full rule.
 
 ### Schema files: `schemas/` (JSON Schema for validation)
 
-`project.schema.json`, `commitment.schema.json`, `person.schema.json`, `tag.schema.json`
+One JSON Schema per entity and record type; the current set is the contents of `schemas/`.
 
 ### DDL: `sql/001_schema.sql`
 
-Tables: `projects`, `people`, `project_people`, `tags`, `project_tags`, `commitments`, `tasks`
+Tables: see `sql/001_schema.sql` for the current set.
 
 Key relationships:
-- Tasks are embedded in commitment JSON but get their own `tasks` table in DuckDB (unpacked by rebuild)
+- Tasks are separate files under `_data/tasks/`, not embedded in commitment JSON, and load into their own `tasks` table
 - `tags` field on project JSON is denormalized into both the `projects.tags` array column and the `project_tags` junction table
 - `project_people` is populated from the `projects` array inside each person's JSON
 

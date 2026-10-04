@@ -285,9 +285,10 @@ the cause is known.
    closed blocks that file's deletion indefinitely, and no check will catch it.
 4. Confirm each `acceptance` condition is genuinely met. If any is not, leave the phase `active` or
    return it to `queued` with an exact `next_action` — and release your `agent` claim when you do.
-5. Update your phase: `status: complete`, `session:`, `completion_evidence:` (files that exist now),
-   and `result:` summarizing the actual verification output. Keep the `agent` field as the record of
-   who did the work.
+5. Update your phase: `session:`, `completion_evidence:` (files that exist now), and `result:`
+   summarizing the actual verification output. Keep the `agent` field as the record of who did the
+   work. Do not set `status: complete` here: `/session-close` sets it, or a coordinator does under the
+   three conditions in GOV-003's entry "Coordinator completion replaces owner-invoked /session-close".
 6. `git rebase dev`, then re-run `uv run python -m src.governance` and
    `uv run pytest`. This run — after the rebase, against your peers' merged work — is the one that
    decides whether the branch may integrate. If it fails, fix it on your branch; never integrate a
