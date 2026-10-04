@@ -46,7 +46,7 @@ shared file, **A** animation (later stage), **—** text only.
 | 033 | The idea funnel page | 7 | Artifact | S | planned | `_public/engine/ideas.html` |
 | 034 | Reading the system's own record | 7 | Reflection | — | planned | `_public/engine/` |
 | 035 | The IRE: the pipeline as a Claude Code plugin | 8 | Mechanism | D | planned | `plugins/idea-realization/README.md` |
-| 036 | Shipping the mechanism without the history | 8 | Mechanism | — | planned | `test/test_no_source_references.py` |
+| 036 | Shipping the mechanism without the history | 8 | Mechanism | — | planned | `plugins/idea-realization/test/test_no_source_references.py` |
 | 037 | The portable working agreement | 8 | Artifact | S | planned | `plugins/idea-realization/templates/` |
 | 038 | Installing the IRE into an empty repository | 8 | Mechanism | A | planned | `plugins/idea-realization/README.md` |
 | 039 | What is not built yet | 8 | Reflection | — | planned | `PLAN-039`, `ADR-018` |

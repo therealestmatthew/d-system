@@ -96,7 +96,7 @@ The portable form and the release.
 - The `idea-realization` Claude Code plugin: agents, skills, scripts, schemas and templates that
   carry the pipeline into any git repository (`plugins/idea-realization/`).
 - A test forbids repository-specific instances in the plugin, so it ships the mechanism without
-  this repository's history (`test/test_no_source_references.py`).
+  this repository's history (`plugins/idea-realization/test/test_no_source_references.py`).
 - What is planned and not yet built: the end-to-end orchestrator (`PLAN-039`, `ADR-018`).
 - The release posts are written when the owner sets the release; this arc does not fix a date.
 

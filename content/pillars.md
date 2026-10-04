@@ -63,7 +63,7 @@ post can be re-checked. Examples at dev `518642d` (2026-10-04):
 | Plan review findings | 100 across 12 dispositioned reviews: 18 blocker, 53 major, 29 minor | `docs/08-governance/reviews/*.json` |
 | Partition | 371 of 383 ideas in 87 groups under 12 tracks | `docs/00-working/idea-partition-2026-09-23.md` |
 | Phases blocked by one claim's system | 46 of 74 ready phases, 2026-09-22 | `GOV-017` |
-| Commits on the integration branch | 1,644 at `cb3b42f` | `git rev-list --count dev` |
+| Commits on the integration branch | 1,648 | `git rev-list --count dev` |
 
 Recompute every number at the commit the post is drafted against; the values above go stale.
 

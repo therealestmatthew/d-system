@@ -24,8 +24,8 @@
    its branch, and another session's next two commits landed on that branch instead of the
    integration branch.
 
-3. One was repaired with a fast-forward. The second was caught only because `git branch -d` refused
-   to delete a branch that was not fully merged.
+3. One was repaired by a ratified fast-forward. The second was caught only because `git branch -d`
+   refused to delete a branch that was not fully merged.
 
 4. The same day, two sessions drew wrong conclusions from accurate reads of a checkout that was
    mid-switch. One briefly believed a commit was lost. The other nearly recorded a real ordering
