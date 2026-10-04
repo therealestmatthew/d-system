@@ -439,6 +439,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-04-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-05-global-memory-retrieval.md |
 | SESS-2026-10-04-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-06-design-document-amendments.md |
 | SESS-2026-10-04-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-07-reject-non-positive-limit.md |
+| SESS-2026-10-04-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-04-08-plan-003-audit.md |
 
 ## Plans and their phases
 
