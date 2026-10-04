@@ -188,8 +188,10 @@ review. Where this list and `AGENTS.md` differ, `AGENTS.md` wins.
    report that it is ready for review, naming the command that shows it:
    `git diff dev..agent/<phase-id>`.
 
-Marking the phase `status: complete` is **not** part of this. That happens only through the
-owner-invoked `/session-close`, and only after its independent sub-agent review.
+Marking the phase `status: complete` is **not** part of this. That happens only through
+`/session-close`, run by the owner or by a coordinator once the three conditions in `GOV-003`
+("Coordinator completion replaces owner-invoked /session-close, repository-wide") hold, and only
+after its independent sub-agent review.
 
 ## 9. Integrate and clean up — only on the owner's yes
 
@@ -221,7 +223,9 @@ again and re-run the validator; do not resolve it with a merge commit that skips
 
 ## What this command never does
 
-- It never marks a phase `complete` — `/session-close` does, and only the owner invokes it.
+- It never marks a phase `complete` — `/session-close` does, invoked by the owner or by a
+  coordinator under the three conditions in `GOV-003` ("Coordinator completion replaces
+  owner-invoked /session-close, repository-wide").
 - It never merges into `dev` without the owner saying so in this session.
 - It never switches the primary checkout's branch away from `dev`.
 - It never edits `AGENTS.md` or `CLAUDE.md`. If either looks wrong, quote the passage, propose exact

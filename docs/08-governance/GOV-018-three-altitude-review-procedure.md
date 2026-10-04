@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-23'
-updated: '2026-09-23'
+updated: '2026-10-04'
 systems: [sys-realization]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-realization-role-contracts, doc-plan-quality-standard]
 ---
@@ -197,16 +197,16 @@ is appended to the finding's `dispositions` list. The last entry is the current 
 - The owner (`by: owner`) writes a disposition only for a finding the planner escalated, and never
   writes `escalated-g3`. The schema rejects both an owner's `escalated-g3` and an owner's entry on a
   finding with no planner `escalated-g3` entry.
-- `ARCH-006` stage 5 allows one revision cycle. A blocker that is still unresolved after it is
-  dispositioned `escalated-g3`.
+- `ARCH-006` stage 5 allows two revision cycles. A blocker that is still unresolved after the
+  second is dispositioned `escalated-g3`.
 - The adversary writes no disposition.
 
 When every finding carries at least one disposition, set `status: dispositioned`. The schema then
 rejects any finding without one. A `dispositioned` record goes to phase-fit (stage 6) with the
 plan, and its `escalated-g3` findings go to the owner at G3.
 
-This procedure does not define a second review of the revised plan. `ARCH-006` provides one
-revision cycle, after which unresolved blockers go to G3.
+`ARCH-006` provides two revision cycles, after which unresolved blockers go to G3. The revised plan
+from the first cycle is reviewed again with this procedure before the second.
 
 ## Engines after the trio ships
 

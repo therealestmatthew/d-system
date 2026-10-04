@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-16'
+updated: '2026-10-04'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-realization-system]
 ---
@@ -60,7 +60,7 @@ least one phase.
 | R20 | Every run carries a token budget; reaching the hard cap parks the run rather than exceeding it | Set a low cap on a test run; observe the park |
 | R21 | A kill switch halts all pipeline dispatch, is owner-operable, and takes effect before the next agent dispatch | Trip it during a multi-stage run |
 | R22 | The staged confidentiality check runs mechanically inside stage 8 before any push; a failure blocks the push and surfaces the finding | Stage a file with a test identifier; observe the block |
-| R23 | Validation independence is grounded in executed evidence (tests, repository checks) rather than persona prompts, and the owner's spot-audit of passed validations is a defined G5 activity with a sampling rule | Read the validator contracts; perform one spot-audit |
+| R23 | Validation independence is grounded in executed evidence (tests, repository checks) rather than persona prompts, and a sampled independent re-review of passed validations, reported to the owner at G5, is a defined activity with a sampling rule, a reviewer type and stated inputs | Read the validator contracts; run one sampled re-review and confirm its result reaches the G5 queue |
 
 ## Measurement and learning
 

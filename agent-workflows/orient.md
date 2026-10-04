@@ -68,9 +68,11 @@ Read the actual files for their current descriptions rather than trusting this t
 the set has grown beyond four, report what you find.
 
 **Canonical workflows and host adapters.** What each does in one line, who may invoke it, and which
-hosts discover it natively or use a plain-prompt fallback. Flag owner-only commands explicitly —
-`session-close` is owner-only and is the only place a phase reaches `status: complete`. An agent must
-never invoke it or reproduce its steps.
+hosts discover it natively or use a plain-prompt fallback. Flag owner-only commands explicitly.
+`session-close` is the only place a phase reaches `status: complete`; the owner invokes it, or a
+coordinator does once the three conditions in `GOV-003` ("Coordinator completion replaces
+owner-invoked /session-close, repository-wide") hold. No other agent invokes it or reproduces its
+steps.
 
 **Tools.** Each `tools/*.py` with its paired `OPS-*` document. Note which are the sanctioned write
 paths: `append_idea.py` is the only way to write `_data/ideas.jsonl`, and `rebuild_db.py` is how

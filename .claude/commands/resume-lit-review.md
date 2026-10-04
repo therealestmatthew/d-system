@@ -179,8 +179,10 @@ Do not run past it into the next phase, however much budget seems left.
 5. **Leave the tree clean and governance exiting 0.** Rebase onto `dev` at the boundary rather than
    merging it in.
 
-**Do not mark the phase `complete`** — that is the owner's `/session-close`, after its own
-independent review. **Do not integrate into `dev`** — that is the owner's call, at the points
+**Do not mark the phase `complete`** — that is `/session-close`'s, run by the owner or by a
+coordinator under the three conditions in `GOV-003` ("Coordinator completion replaces
+owner-invoked /session-close, repository-wide"), after its own independent review.
+**Do not integrate into `dev`** — that is the owner's call, at the points
 `PLAN-023` names. Both are refusals to make even if the work plainly looks finished.
 
 ## 7. When something goes wrong

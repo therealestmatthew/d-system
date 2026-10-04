@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-21'
+updated: '2026-10-04'
 systems: [sys-governance]
 depends_on: [doc-governance-protocol, doc-adr-document-codes]
 ---
@@ -85,7 +85,7 @@ later document can inherit a withdrawn number's history.
 
 ## Permanence
 
-A code is never reused and never renumbered once it reaches `main`. Superseded and deprecated
+A code is never reused and never renumbered once it reaches `dev`. Superseded and deprecated
 documents keep theirs — the code identifies the document, not its lifecycle state. Renaming a
 document's slug is fine; changing its code is not.
 

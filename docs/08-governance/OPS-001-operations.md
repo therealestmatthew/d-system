@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-22'
+updated: '2026-10-04'
 systems: [sys-governance, sys-delivery]
 depends_on: [doc-governance-protocol]
 ---
@@ -119,23 +119,23 @@ phase complete with an unmet acceptance condition.
 Governed work is normally phase-shaped; the record is what keeps unphased work from being invisible.
 
 A remote exists, so `git fetch`, `git pull` and `git push` all work — but ask the owner before
-pushing (see `AGENTS.md`, *Confidentiality and publishing*). A worktree is required only under the
-conditions in [GOV-003](GOV-003-backlog-decisions.md); a solo agent on a documentation-only phase
-closes in the primary checkout on `main`.
+pushing (see `AGENTS.md`, *Confidentiality and publishing*). Every session works in a worktree,
+documentation-only work included ([GOV-003](GOV-003-backlog-decisions.md), 2026-09-12); only the
+claim commit and its catalog regeneration happen in the primary checkout on `dev`.
 
 ## Claim and run a phase as an agent
 
-Claim on `main` first — the catalog is the lock table and this command is the lock check — then work
+Claim on `dev` first — the catalog is the lock table and this command is the lock check — then work
 in an isolated worktree. [AGENTS.md](../../AGENTS.md) has the full step list; the mechanics are:
 
 ```bash
-git switch main                                   # git pull too, once a remote exists
+git switch dev && git pull
 uv run python -m src.governance --ready          # pick a phase whose Conflicts column is —
 # edit docs/09-backlog/backlog.yaml: status: active, agent: agent-<name>, bump updated
 uv run python -m src.governance                  # the lock check; must pass before committing
 git commit -am "Claim phase-html-03"
 
-git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 main
+git worktree add -b agent/phase-html-03 ../d-system-worktrees/phase-html-03 dev
 cd ../d-system-worktrees/phase-html-03
 uv venv && uv sync --extra dev
 ```
@@ -149,9 +149,9 @@ To finish: run the phase's `verification` commands, write the dated session reco
 with `session`, `completion_evidence` and `result`, then
 
 ```bash
-git rebase main
+git rebase dev
 uv run python -m src.governance && uv run pytest   # after the rebase; this run gates integration
-git switch main && git merge --ff-only agent/phase-html-03
+git -C <primary checkout> merge --ff-only agent/phase-html-03   # only with the owner's approval
 git worktree remove ../d-system-worktrees/phase-html-03 && git branch -d agent/phase-html-03
 ```
 

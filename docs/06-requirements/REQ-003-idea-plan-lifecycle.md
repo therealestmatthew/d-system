@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-06'
-updated: '2026-09-06'
+updated: '2026-10-04'
 systems: [sys-portfolio, sys-projection, sys-governance, sys-backlog]
 depends_on: [doc-idea-staging, doc-governance-protocol]
 ---
@@ -43,7 +43,7 @@ are covered through sources, with counts 3/3/2/3/1/2. No zero-phase repair proje
 | R08 | Raw history and effective current state remain separately queryable; past knowledge excludes later amendments | Synthetic cutoff before/after correction gives different known states; raw row count equals log event count, including retracted contributions | Amendments |
 | R09 | Annotations carry owner or agent-name author, minimal kind and text; terminal states admit notes; assessments remain timestamped notes | Every author/kind fixture, promoted/discarded notes, text replacement/clear, status unchanged | Notes |
 | R10 | Agent findings ship with collapsed rendering and complete accessible details; current prose displays final values without amendment badges | Golden render with 100 findings, owner note, corrected title; reload/refold in different processes/hash seeds; --check detects stale output | Notes/amendments |
-| R11 | Triage enters triaging, writes findings through the sanctioned writer, and ends at triaged; promotion remains owner judgment | Synthetic end-to-end execution of existing triage phase; interrupted run remains observable; no automatic reviewing/promotion/discard | Existing triage phase |
+| R11 | Triage writes findings through the sanctioned writer and moves the idea from open to triaged, with no in-progress status between (`PLAN-016`); promotion remains owner judgment | Synthetic end-to-end execution of existing triage phase; interrupted run remains observable; no automatic reviewing/promotion/discard | Existing triage phase |
 | R12 | Three link types are stored once, inverses derived, contributors retained, and directional cycles flagged at fold time without rejecting capture | Reciprocal relates_to accepted; extends/supersedes cycle flagged; duplicate contributors and selective retraction tested | Relationships |
 | R13 | Promotion supports one idea to several governed documents and several ideas to one; unresolved current targets fail validation, historical closures remain auditable | Code-to-document lookup fixtures for multiplicity, missing/reserved/retired codes, renamed paths and later deprecated targets; reverse lookup | Relationships |
 | R14 | Plan attribution is plan OR sources, deduplicated; every plan has at least one historical phase and open plans retain noncancelled coverage | Coverage fixtures and existing six HTML child counts; zero/all-cancelled cases across every plan status | First fix/matrix |

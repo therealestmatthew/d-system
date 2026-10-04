@@ -7,7 +7,7 @@ kind: architecture
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-28'
+updated: '2026-10-04'
 systems: [sys-portfolio, sys-backlog, sys-governance]
 depends_on: [doc-idea-record-system, doc-idea-graph-lifecycle, doc-agent-engineering-delegation, doc-autonomous-agent-operations, doc-repeatable-idea-partition]
 ---
@@ -64,7 +64,7 @@ adversarial findings against it, and the evidence, pre-digested — never as a r
 | G1 Idea approval | An idea enters the log | Stage 1, per idea, in conversation — as today |
 | G2 Track acceptance | The partition's tracks and new-plan-vs-amendment rulings stand | Stage 3, per partition run, one sitting. `PLAN-025`'s three check-ins consolidate into this gate where the material allows; the consolidation is an amendment to `PLAN-025` executed by `phase-irs-02`, recorded in `GOV-003` |
 | G3 Plan approval | A plan, its phases, and their proposed ordering are approved after adversarial review | Stage 5/7 boundary, per plan. Ratifying or reordering the proposed `next_up` contribution happens here |
-| G4 Integration | A branch merges into `dev` | Stage 8, per unit of work, batchable. Enforced at the tool boundary by P5's capability broker so an automated run cannot merge itself |
+| G4 Integration | A branch merges into `dev` | Stage 8, per unit of work, batchable. The owner approves every integration. Until P3's merge-gate nodes exist, the builder session performs the fast-forward under `GOV-017` once the owner has approved it. Tool-boundary enforcement through P5's capability broker is not yet built: the broker's approval store is not connected to its check, and no hook is configured (owner ruling of 2026-09-23, Scout O-3) |
 | G5 Completion review | A phase reaches `status: complete`; a delivered idea's evidence is accepted | Stages 8–9, **batched**: `/session-close` is run over a queue of finished phases, by the owner or by a coordinator once the three conditions in `GOV-003` ("Coordinator completion replaces owner-invoked /session-close, repository-wide", 2026-09-16) hold |
 
 The audit trail between gates is the run ledger (P5) plus the repository's own records; every
@@ -82,10 +82,10 @@ found exactly that in the draft's stages 7 and 8, and this table is the correcti
 | 2 | Triage | Triage agent, one per idea, dispatched on append | Existing `idea-triage` agent; **stopgap dispatch** (`phase-irs-01`) until/unless P5's gateway exists | — | Dispatch failure or agent stall: idea stays `open`; a sweep run reconciles the log against triage state and re-dispatches, so the stopgap degrades to batch, never to loss |
 | 3 | Partition | Partition agent + `partition-adversary` | `PLAN-025` prompt pack; threshold or on-demand trigger | G2 | Adversary blocker: one revision cycle, then escalate to G2 with findings attached |
 | 4 | Planning | Planner agent drafting requirement + plan per accepted track, decomposed to minimum scope | `phase-idg-12`, measured against the standard from `phase-idg-10`, living where `phase-idg-11` rules | — | Non-conformance to the standard: revise; twice non-conformant: escalate to G3 |
-| 5 | Adversarial review | The three-altitude review **procedure** (whole plan; each phase in isolation; each later-added phase against the standing plan). The procedure is this plan's deliverable (`phase-irs-06`); P4's expander/minimalist/arbiter trio becomes its engine when `phase-agx-11`/`-12` ship, with single-adversary review as the engine until then | `PLAN-031` | G3 | Findings return to stage 4 for one revision cycle; unresolved blockers escalate to G3 |
+| 5 | Adversarial review | The three-altitude review **procedure** (whole plan; each phase in isolation; each later-added phase against the standing plan). The procedure is this plan's deliverable (`phase-irs-06`); P4's expander/minimalist/arbiter trio becomes its engine when `phase-agx-11`/`-12` ship, with single-adversary review as the engine until then | `PLAN-031` | G3 | Findings return to stage 4 for up to two revision cycles; blockers unresolved after the second escalate to G3 |
 | 6 | Phase-fit check | Phase-fit agent applying a **new** procedure for splitting an oversized backlog phase (`phase-irs-05`). Deliberately distinct from `phase-idg-05`, which decomposes compound *ideas* on the idea log — different object, different artifact | `PLAN-029` adjacency only | — | A split re-enters stage 5 at the phase altitude |
 | 7 | Dependency mapping | Mapping agent writes `depends_on` and `systems` locks, validator-checked; **proposes** a `next_up` ordering | `src.governance` validator | G3 (ratification) | Validator rejection (cycle, unknown phase, collision): revise; twice rejected: escalate to G3 with the validator output |
-| 8 | Execution | Developer agents in worktrees per `ADR-003`; validator agents (the demo build's code/check pattern) verify each diff against acceptance, seeing the requirement but never the developer's rationale | P5's supervised worker and run ledger where built; the claim protocol regardless | G4, G5 | Validator rejection: one revise cycle per finding class; second rejection parks the unit `blocked` with the finding, surfaced in the G5 queue. Stall or abandoned run: P5's abandoned-run review; the claim is released, the unit returns to `queued` |
+| 8 | Execution | A Test Author agent runs first: it writes failing tests from the phase's acceptance and commits them. Developer agents then work in worktrees per `ADR-003` and may not change those tests. Validator agents (the demo build's code/check pattern) verify each diff against acceptance, seeing the requirement but never the developer's rationale | P5's supervised worker and run ledger where built; the claim protocol regardless | G4, G5 | Validator rejection: up to two revise cycles per finding class; a third rejection parks the unit `blocked` with the finding, surfaced in the G5 queue. A Developer who holds that one of the Test Author's tests is wrong records a finding; the Validator rules on it, and only the Test Author changes the test; this follows the same two-cycle path and then parks the unit. Stall or abandoned run: P5's abandoned-run review; the claim is released, the unit returns to `queued` |
 | 9 | Realization check | Realization agent verifies the delivered capability against the originating idea's text, records evidence, proposes terminal `delivered` status; feeds the learning loop | Idea log (terminal status added by `phase-irs-09`); anti-pattern store (`phase-agx-03`) | G5 | Capability not verifiable against the idea: recorded as a finding on the idea, surfaced at G5 — never silently closed |
 
 ## Orchestration design
@@ -117,8 +117,9 @@ half.
 
 Owner-reserved, permanently: idea approval and `lineage` annotations; partition acceptance;
 plan approval; `next_up` ranking and all cross-track priority; integration into `dev`; phase
-completion via `/session-close`; edits to `AGENTS.md` and `CLAUDE.md`; deletions under
-`_working/`; anything `_private/`.
+completion via `/session-close`, except where a coordinator completes a phase under the three
+conditions in `GOV-003`; edits to `AGENTS.md` and `CLAUDE.md`; deletions under `_working/`;
+anything `_private/`.
 
 Agent-writable, always with an audit trail: idea annotations of `kind: finding` and status
 moves the writer permits; draft documents; backlog `depends_on` and `systems` on phases within
@@ -131,8 +132,11 @@ token budgets with a hard cap that parks the run rather than exceeding it; a kil
 halts all dispatch; the confidentiality gate (`tools/check_no_private_content.py`, staged) run
 mechanically inside stage 8 rather than left to habit; and validator independence grounded in
 evidence — executed tests and repository checks, not persona prompts — because every agent here
-is the same model and correlated blind spots are real. The owner spot-audits a sample of passed
-validations; the sampling is a G5 activity.
+is the same model and correlated blind spots are real. A sample of passed validations is
+re-reviewed independently: at least one in ten of each G5 sitting's passed validations, chosen at
+random, plus every unit that was rejected once before it passed, is re-reviewed by a validator- or
+adversary-type reviewer that is not the one that passed it, given the requirement and the diff
+only. Its results go to the owner at G5 (`GOV-014`, Validator).
 
 ## The learning loop
 

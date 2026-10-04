@@ -48,9 +48,9 @@ provides for owner-directed work with no backlog phase, and requires a `kind: se
 all the same. Take `checkpoint`'s "Sessions with no claimed phase" branch and carry it through the
 steps below: steps 2, 3, 4, 5, 7, 8 and 9 apply unchanged in substance, step 6 has no phase to
 complete, and the review in step 3 judges the self-declared conditions instead of a backlog
-acceptance list. Step 8 matters most here, not least: an unclaimed session run in the primary
-checkout has no branch and no integration procedure to catch work left uncommitted, so that step is
-the only thing that does.
+acceptance list. Step 8 matters most here, not least: an unclaimed session's work found
+uncommitted in the primary checkout has no branch and no integration procedure to catch it, so that
+step is the only thing that does.
 Do not invent a phase, do not retroactively claim one, and do not re-run this against a phase that
 already closed earlier in the conversation. That last case — a phase closed mid-conversation and the
 owner kept going — has its own recorded handling in
@@ -76,9 +76,11 @@ step 3 — do not make it guess:
 - **Work done on `agent/<phase-id>`:** the range is `dev...HEAD` (or `dev...agent/<phase-id>` if not
   yet merged). An unclaimed session's branch is named after the work (`agent/<slug>`) rather than a
   phase; the range is the same `dev...HEAD`.
-- **Work done directly on `dev`** (the GOV-003 primary-checkout exception): find the commit that set
-  this phase's `status: active` — `git log --oneline -- docs/09-backlog/backlog.yaml` will show it —
-  and use `<that commit>..HEAD`.
+- **Work found directly on `dev`.** No session works there: `GOV-003` ("Every session works in a
+  worktree; the documentation-only exception is withdrawn") withdrew the primary-checkout exception
+  on 2026-09-12. If a session's work is on `dev` anyway, find the commit that set this phase's
+  `status: active` — `git log --oneline -- docs/09-backlog/backlog.yaml` will show it — use
+  `<that commit>..HEAD`, and say in the report that the session broke the worktree rule.
 
 ## 3. Launch an independent sub-agent review
 
@@ -88,18 +90,22 @@ it, in the prompt itself since it starts with nothing:
 
 - The phase id, its `scope`, `acceptance` and `verification` lists from `docs/09-backlog/backlog.yaml`
   (paste them; do not just name the file). **For an unclaimed session there is no such list**: paste
-  instead the owner's instruction as given, the self-declared acceptance conditions from the record's
-  `## Acceptance`, and the three repository-wide gates the record verified against — and say plainly
+  instead the owner's instruction as given, the wording of the self-declared acceptance conditions
+  (the conditions only, without the record's verdicts), and the three repository-wide gates — and
+  say plainly
   that these conditions were written by the session being reviewed, so the reviewer weighs whether
   they are a fair reading of the instruction as well as whether they hold.
 - The exact commit range from step 2, and instructions to run `git diff <range>` and `git log
   <range>` itself.
-- The session record's current path and content.
+- **Never the session record.** Do not give the reviewer the record's path or content, or any other
+  account of what the session did or why. The reviewer is a validator, and `GOV-014`'s Validator
+  contract gives a validator the requirement and the diff only, never the developer's rationale; a
+  reviewer that reads the record judges the session's account instead of the work (owner ruling of
+  2026-09-23).
 - Its job, stated plainly: independently decide, from the diff and its own run of the verification
-  commands, whether each acceptance condition actually holds — not whether the session record *says*
-  it holds. Flag anything the record claims that the diff or a rerun does not support. Report clean
-  findings explicitly when that is the honest result; "no discrepancies found" is a valid finding, not
-  a failure to find one.
+  commands, whether each acceptance condition actually holds. Report clean findings explicitly when
+  that is the honest result; "no discrepancies found" is a valid finding, not a failure to find
+  one.
 
 Wait for its report. Do not paraphrase away an uncomfortable finding, and do not proceed to step 6 by
 assuming the review passed before it actually returns.
@@ -156,14 +162,16 @@ uv run pytest
 
 If any of these fail, fix the cause before finishing — do not close a session on top of a red tree.
 
-## 8. Commit — primary-checkout sessions only
+## 8. Commit — only for work found in the primary checkout
 
 **Skip this step entirely if the session worked in a worktree.** That case has its own commit and
 integration procedure — `AGENTS.md`'s "Concurrent agents: complete and hand off" — and this step
 would duplicate or conflict with it.
 
-If the session worked directly on `dev` (the GOV-003 primary-checkout exception), `git status` at
-this point still shows every change uncommitted — claiming the phase, doing the work, and closing
+If the session's work is in the primary checkout on `dev` anyway — which `GOV-003` ("Every session
+works in a worktree; the documentation-only exception is withdrawn") has not permitted since
+2026-09-12 — `git status` at this point still shows every change uncommitted — claiming the phase,
+doing the work, and closing
 it are not committed as they happen, only recorded in files. Leaving that for "later" is how two
 sessions in a row reached this point with a growing pile of uncommitted work and no natural place to
 notice it. Commit it now, as the last mechanical step before reporting:

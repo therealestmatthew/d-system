@@ -7,7 +7,7 @@ kind: plan
 status: complete
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-05'
+updated: '2026-10-04'
 systems: [sys-governance, sys-delivery]
 depends_on: [doc-document-code-requirements, doc-governance-protocol]
 completion_evidence:
@@ -86,6 +86,12 @@ the allocation ledger and `uv run python -m src.governance` is the check. Two ag
 because codes are free before merge and permanent after. An agent that knows it will write a
 document reserves its code in the same small commit as its backlog claim — which is what
 `phase-rel-04` and `phase-rel-05` already do informally for ADR-004 and ADR-005.
+
+> **Superseded, 2026-10-04.** The manual reservation step in the paragraph above is no longer the
+> procedure. `phase-conc-03` (Make document-code allocation collision-proof across concurrent
+> sessions) retired it on 2026-09-21; allocate a code with `uv run python -m src.governance
+> --next-code <kind>` instead. The paragraph is kept as written so the plan's history stays
+> readable (idea `000298`, `REQ-029` R13).
 
 ## Work and dependencies
 

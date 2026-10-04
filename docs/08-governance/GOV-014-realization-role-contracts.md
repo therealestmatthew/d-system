@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-09-16'
+updated: '2026-10-04'
 systems: [sys-realization, sys-governance]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-irs-orchestrator-design]
 ---
@@ -16,7 +16,8 @@ depends_on: [doc-idea-realization-system, doc-idea-realization-system-requiremen
 
 One written contract per agent role in the idea-realization pipeline mapped by
 [ARCH-006](../07-architecture/ARCH-006-idea-realization-system.md)'s stage table: triage,
-partition, planner, adversary, phase-fit, mapper, developer, validator and realization. Stage 1
+partition, planner, adversary, phase-fit, mapper, test author, developer, validator and
+realization. Stage 1
 (capture) is the owner and assistant in conversation, not an agent role, and carries no contract
 here.
 
@@ -31,13 +32,14 @@ the agent definition is updated to match it, not the reverse.
 Reproduced verbatim from `ARCH-006`'s authority model so no contract below can drift from it:
 
 > idea approval and `lineage` annotations; partition acceptance; plan approval; `next_up` ranking
-> and all cross-track priority; integration into `dev`; phase completion via `/session-close`;
-> edits to `AGENTS.md` and `CLAUDE.md`; deletions under `_working/`; anything `_private/`.
+> and all cross-track priority; integration into `dev`; phase completion via `/session-close`,
+> except where a coordinator completes a phase under the three conditions in `GOV-003`; edits to
+> `AGENTS.md` and `CLAUDE.md`; deletions under `_working/`; anything `_private/`.
 
 No role contract below grants any agent any item on this list. Every "proposes" in a contract's
 outputs is deliberate: the artifact named is a proposal awaiting the gate that reserves the
 decision, never the decision itself. `REQ-022` R03 is checked by grepping the contracts for a
-reservation and finding it absent from all nine.
+reservation and finding it absent from all ten.
 
 Agent-writable, always with an audit trail (also from `ARCH-006`, stated once here rather than
 repeated in each contract): idea annotations of `kind: finding` and status moves the writer
@@ -164,15 +166,38 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
 - **Existing agent definition:** none; none created by this phase.
 - **Per-dispatch ceiling:** 300,000 tokens.
 
+### Test Author
+
+Added by owner ruling of 2026-09-23 (mapping Q5); its place in stage 8 is `PLAN-046` D7.
+
+- **Inputs:** a registered backlog phase's `scope` and `acceptance`, and the existing `test/`
+  tree, in the phase's worktree. Never a Developer's diff or rationale: it runs before the
+  Developer starts.
+- **Outputs:** failing tests under `test/` that express the phase's acceptance, committed to the
+  phase's branch before the Developer starts (Execution stage; consumed by the Developer, who may
+  not change them, and by the Validator). Its write scope is `test/` only.
+- **Never-do:** never write outside `test/`; never write implementation code to make its own tests
+  pass; never weaken or delete a test to settle a Developer's finding — only a Validator ruling on
+  that finding changes it, and then only the Test Author makes the change; never integrate into
+  `dev` — G4 is owner-reserved; never mark a phase complete; never edit `AGENTS.md` or
+  `CLAUDE.md`; never touch `_private/`.
+- **Existing agent definition:** none; none created by this phase.
+- **Per-dispatch ceiling:** 300,000 tokens.
+
 ### Developer
 
 - **Inputs:** a registered backlog phase, claimed under the `ADR-003` protocol unchanged, in its
   own worktree.
 - **Outputs:** a branch and diff meeting the phase's acceptance criteria, ready for validation
   (Execution stage; consumed by the validator role below, and — once integrated by the owner-
-  reserved G4 decision — by realization).
-- **Never-do:** never integrate its own branch into `dev` — G4 is owner-reserved; never mark its
-  own phase complete — completion via `/session-close` is owner-reserved; never skip the staged
+  reserved G4 decision — by realization). Its write scope excludes `test/`: the Test Author's
+  tests are an input, not something it edits.
+- **Never-do:** never create, edit or delete anything under `test/` — a Developer who holds that a
+  test is wrong records a finding for the Validator, per `ARCH-006` stage 8; never integrate its
+  own branch into `dev` — G4 is owner-reserved; never mark its
+  own phase complete — completion is `/session-close`'s, or a coordinator's under the three
+  conditions in `GOV-003` ("Coordinator completion replaces owner-invoked /session-close,
+  repository-wide"); never skip the staged
   confidentiality check (`tools/check_no_private_content.py`) before any push; never edit
   `AGENTS.md` or `CLAUDE.md`; never touch `_private/`; never delete anything under `_working/`
   without the owner's explicit approval.
@@ -193,15 +218,24 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
   second rejection, per `ARCH-006` stage 8's failure path.
 - **Never-do:** never accept the developer's rationale as evidence, even if it leaks into its
   inputs; never edit the diff or fix a finding itself; never mark a phase complete — that is
-  owner-reserved via `/session-close`; never merge or integrate — G4 is owner-reserved; never
+  `/session-close`'s, or a coordinator's under the three conditions in `GOV-003` ("Coordinator
+  completion replaces owner-invoked /session-close, repository-wide"); never merge or integrate —
+  G4 is owner-reserved; never
   substitute a persona assertion ("this looks correct") for an executed check.
 - **Evidence rule (restated for `REQ-022` R23):** every verdict traces to executed tests and
   repository checks captured in the report; a claim with no command behind it is not evidence.
-- **Owner spot-audit sampling rule (G5 activity, per `ARCH-006`'s cost and safety controls):** at
-  each G5 sitting, the owner spot-audits at least one in ten of that sitting's passed validations,
-  selected at random from the sitting's queue. Any unit that was rejected once before it passed is
-  audited every time, never sampled. The rate is this contract's initial rule; the owner may
-  change it by amendment once G5 sittings give real data on where validators actually miss.
+- **Sampled independent re-review (G5 activity, per `ARCH-006`'s cost and safety controls):** at
+  each G5 sitting, at least one in ten of that sitting's passed validations, selected at random from
+  the sitting's queue, is re-reviewed. Any unit that was rejected once before it passed is
+  re-reviewed every time, never sampled. The re-reviewer is a validator- or adversary-type agent,
+  never general-purpose, and never the reviewer that passed the unit; its inputs are this
+  contract's inputs, the requirement and the diff only. Its verdict goes to the owner at G5. This
+  replaces the owner spot-audit (owner ruling of 2026-09-23). The rate is this contract's initial
+  rule; the owner may change it by amendment once G5 sittings give real data on where validators
+  actually miss.
+- **The close review is bound by this contract's input rule.** The independent review in
+  `/session-close` step 3 is a validation: its reviewer gets the phase's requirement text and the
+  diff, never the session record or any other account of the developer's reasoning.
 - **Existing agent definition:** none specific to this pipeline. `ARCH-006` stage 8 names "the
   demo build's code/check pattern" (`.claude/agents/demo-validator-code.md`,
   `.claude/agents/demo-validator-check.md`) as the pattern to follow, not as agent definitions this
@@ -225,7 +259,7 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
 
 ## What this document is not
 
-It does not build any of the nine agents; most have no `.claude/agents/` file yet and this phase
+It does not build any of the ten agents; most have no `.claude/agents/` file yet and this phase
 creates none. It does not set the actual run-level token budget or the kill switch — those are
 `phase-irs-11`'s build, reading the per-dispatch ceilings recorded here. It does not rule on
 `phase-auto-01`'s trigger-gateway question or any other open sequencing decision in `PLAN-039`.

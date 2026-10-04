@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-10-01'
+updated: '2026-10-04'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -799,3 +799,72 @@ phase blocked for hours.
 treat a session running pushes and branch deletions as acting outside its role. The authorization is
 the owner's approval of each command in that session; the session is not a route around a refusal
 elsewhere.
+
+## Remote branch deletion is owner-only — 2026-09-23
+
+Owner ruling, 2026-09-23, answering protocol question Q15: "remote branch deletion OWNER-ONLY
+(standing; needs GOV-003 entry on a docs branch)". **Standing.** No agent session deletes a branch
+on `origin`, merged or not; the deletion is queued for the owner, who runs it or approves it in the
+Owner Terminal (see *An Owner Terminal session runs the owner-only commands*, above). Local branch
+deletion after an approved merge is unchanged.
+
+**What it changes:** before this ruling, the statement that remote deletion was owner-only was the
+Session Manager's own and had no source (idea `000404`). This entry is its source.
+
+## Every worktree removal needs the owner's approval — 2026-09-23
+
+Owner ruling, 2026-09-23, answering protocol question Q8: "owner approval for every worktree
+removal". **Standing.** An agent asks the owner before running `git worktree remove`, including
+after an approved merge, and copies gitignored content out first as before.
+
+**What it changes:** `AGENTS.md` hand-off step 9 and `/session-start` step 9 still list the removal
+as a step that follows the merge without its own approval. Until they are amended, this entry
+governs: the merge approval does not cover the removal.
+
+## Agent-originated ideas carry an "agent-proposed" label — 2026-09-23
+
+Owner ruling, 2026-09-23, answering Scout report `orchestration-1-evidence.md`, "Owner decisions
+needed", item 3, with option (c): ideas an agent originates are labelled as agent-proposed. The
+owner ruled the form on 2026-09-23 (answer to `PLAN-046` OQ2): "GOV-003 records the ruling, and the
+body's first line is the label until an idea-system field exists". **Standing.** The label is the
+idea body's first line, in the form in use since then: `[agent-proposed by <session name>]`, for
+example `[agent-proposed by Session 4 - Scout]`. When the idea system has a field for the proposer,
+the field replaces the line.
+
+**What it changes:** an idea's text alone shows whether the owner or an agent proposed it, so a
+reader of the log does not mistake an agent's proposal for the owner's want.
+
+## A backlog phase id is never reused for different content — 2026-09-23
+
+Owner ruling, 2026-09-23, answering `PLAN-045` OQ8 after `PLAN-045` reused `phase-grd-02`: "a
+STANDING rule that a phase id is never reused for different content, recorded in GOV-003 through
+dam-01". **Standing.** Once a phase id is registered in `docs/09-backlog/backlog.yaml`, it names that
+phase's content for good. A phase whose content is replaced gets a new id; the old id keeps its own
+history, whatever its status.
+
+**What it changes:** session records, review records and idea links cite phase ids; reuse would make
+those citations point at work they never described.
+
+## The 2026-09-23 rulings change ARCH-006, GOV-014, GOV-018 and REQ-022 — 2026-09-23
+
+Owner rulings of 2026-09-23, applied by `phase-dam-01` (`PLAN-046`, `REQ-029`) on 2026-10-04. Each
+reverses a rule a governing document still stated:
+
+- **Two revision cycles** (mapping Q6): `ARCH-006` stages 5 and 8 and `GOV-018` step 5 allow two
+  revision cycles before escalation, where they allowed one. Stage 3 (partition) keeps one.
+- **A Test Author** (mapping Q5): `GOV-014` gains a Test Author contract with write scope `test/`
+  only, and the Developer may not change `test/`; `ARCH-006` stage 8 names the Test Author, its
+  place before the Developer, and the path for a disputed test (`PLAN-046` D7).
+- **G4 as built** (Scout O-3): builders keep performing the fast-forward under `GOV-017`, with the
+  owner's approval of every integration, until P3's merge-gate nodes exist. `ARCH-006`'s G4 row no
+  longer claims tool-boundary enforcement that does not exist.
+- **Sampled independent re-review** (Scout-1 report item 9, option (c)): replaces the owner
+  spot-audit in `GOV-014`, `ARCH-006` and `REQ-022` R23, keeping its sampling rule (one in ten per
+  G5 sitting, plus every once-rejected unit) and changing who reviews (`PLAN-046` D3).
+- **The close reviewer gets no session record** (Scout-1 report item 4, option (a)):
+  `/session-close` step 3 no longer passes the record, and `GOV-014` binds the close review to the
+  Validator's input rule.
+
+**Why recorded here:** a session that finds the old rule in a session record or a plan written
+before 2026-10-04 needs to know which one is current. This entry adds no rule; it records rulings
+the owner made.
