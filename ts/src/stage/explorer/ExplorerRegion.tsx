@@ -223,9 +223,9 @@ export default function ExplorerRegion<T>({
         </div>
         <div className="stage-explorer__table-wrap">
           {loadState === 'loading' ? (
-            <p className="stage-placeholder-text">Loading…</p>
+            <p className="stage-placeholder-text" role="status">Loading…</p>
           ) : loadState === 'error' ? (
-            <p className="stage-placeholder-text stage-placeholder-text--absent">{errorMessage}</p>
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">{errorMessage}</p>
           ) : displayRows.length === 0 ? (
             <p className="stage-placeholder-text">
               {rows.length === 0 ? emptyMessage : 'No rows match the current filters.'}

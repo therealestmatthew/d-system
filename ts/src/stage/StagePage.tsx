@@ -5,7 +5,8 @@ import Slot from '../workbench/Slot'
 import LayoutConfigDialog from '../workbench/LayoutConfigDialog'
 import { useWorkbenchLayouts } from '../workbench/useWorkbenchLayouts'
 import { ActiveSchemaVersionProvider } from '../workbench/schemaVersionContext'
-import { PANEL_REGISTRY } from '../workbench/panelRegistry'
+import { PANEL_REGISTRY, panelDisplayName } from '../workbench/panelRegistry'
+import ErrorBoundary from './ErrorBoundary'
 
 /**
  * The stage page: the workbench layout engine's root (REQ-007 W05/W06/W16/W17, ADR-016). Loads
@@ -189,13 +190,23 @@ export default function StagePage() {
 
   // One portal per visible panel, into that panel's own host. `panelId` is both the React key and
   // the host's identity, and neither changes when the panel moves slots — that is what makes a
-  // reassignment a no-op for React and a plain DOM reparent for the browser.
+  // reassignment a no-op for React and a plain DOM reparent for the browser. Each panel has its own
+  // error boundary, so a panel that throws while rendering is replaced by an error and a Retry
+  // button in its own slot, and the other panels keep running (idea 000569).
   const panelPortals = Object.keys(hostSlotByPanelId).flatMap((panelId) => {
     if (!attachedHosts[panelId]) return []
     const host = panelHosts.current.get(panelId)
     const Component = PANEL_REGISTRY[panelId]?.Component
     if (!host || !Component) return []
-    return [createPortal(<Component />, host, panelId)]
+    return [
+      createPortal(
+        <ErrorBoundary label={panelDisplayName(panelId)}>
+          <Component />
+        </ErrorBoundary>,
+        host,
+        panelId,
+      ),
+    ]
   })
 
   return (
@@ -220,11 +231,11 @@ export default function StagePage() {
         </header>
         {loadState === 'loading' ? (
           <main className="stage-page__grid">
-            <p className="stage-placeholder-text">Loading workbench layouts…</p>
+            <p className="stage-placeholder-text" role="status">Loading workbench layouts…</p>
           </main>
         ) : loadState === 'error' || !activeLayout ? (
           <main className="stage-page__grid">
-            <p className="stage-placeholder-text stage-placeholder-text--absent">
+            <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not load the workbench layout files from{' '}
               <code>_data/workbench/layouts/</code>.
             </p>

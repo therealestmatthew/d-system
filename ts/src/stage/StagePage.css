@@ -388,6 +388,12 @@ body {
   color: #b34700;
 }
 
+/* The error boundary's fallback (stage/ErrorBoundary.tsx), shown in place of a panel or the
+   whole stage after a render error. */
+.stage-error-boundary {
+  padding: 0.75rem;
+}
+
 /* Shared small toggle-button style for a panel's own header controls (rung-2/rung-3 style
    layout-state toggles that now live inside each panel — OverviewRegion's embed/open-in-tab
    toggle — since phase-wb-02 moved them out of StagePage's page-level header). */
