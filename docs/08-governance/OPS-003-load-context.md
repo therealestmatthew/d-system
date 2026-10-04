@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-08'
-updated: '2026-09-08'
+updated: '2026-10-04'
 systems: [sys-retrieval]
 depends_on: [doc-governance-operations]
 ---
@@ -33,7 +33,11 @@ uv run python tools/load_context.py --all
 
 Plain Markdown on stdout: a header naming the query that produced it, then each matching memory
 rendered in full. Read-only — it queries the DuckDB projection and never writes to it. Filters
-combine with AND; `--all` ignores every other filter and returns everything.
+combine with AND, and multiple `--tags` must all match. `--project` returns that project's memories
+plus every `scope: global` memory, including the ones that carry `project: d-system`; another
+project's memories and session notes are left out. Results are ordered by confidence, then newest
+first, then id. At most 10 are returned unless `--limit` says otherwise; `--all` ignores every other
+filter and returns everything, unless an explicit `--limit` caps it.
 
 ## Failure and recovery
 
@@ -61,11 +65,11 @@ Usage:
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
 | `--query`, `-q` | Keyword search across title and content |  |  |  |
-| `--project`, `-p` | Filter by project ID (also includes globals) |  |  |  |
+| `--project`, `-p` | Filter by project ID (also includes scope: global memories) |  |  |  |
 | `--type`, `-t` | Filter by memory type | concept, entity, procedure, episode, decision |  |  |
 | `--tags` | Comma-separated tag IDs to filter by |  |  |  |
 | `--system`, `-s` | Filter by system ID from systems.yaml |  |  |  |
-| `--limit`, `-n` | Max memories to return |  | 10 |  |
-| `--all` | Return all memories (ignores other filters) |  |  |  |
+| `--limit`, `-n` | Max memories to return (default 10; unbounded with --all) |  |  |  |
+| `--all` | Return all memories, unbounded unless --limit is given (ignores other filters) |  |  |  |
 
 <!-- generated:tool-reference:end -->

@@ -24,6 +24,7 @@ import duckdb
 
 ROOT = Path(__file__).parent.parent
 DB_PATH = ROOT / "data" / "d_system.duckdb"
+DEFAULT_LIMIT = 10
 
 
 def build_where(
@@ -42,7 +43,10 @@ def build_where(
         params.extend([pattern, pattern])
 
     if project:
-        clauses.append("(project_id = ? OR project_id IS NULL)")
+        # GOV-003 "Global memory retrieval": scope is the authority, so a scope: global memory
+        # is included even when it carries a project (most carry project: d-system). A memory
+        # with no project but a non-global scope, such as a session note, is excluded.
+        clauses.append("(project_id = ? OR scope = 'global')")
         params.append(project)
 
     if mem_type:
@@ -75,19 +79,25 @@ def load(
     project: str | None = None,
     mem_type: str | None = None,
     tags: list[str] | None = None,
-    limit: int = 10,
+    limit: int | None = None,
     all_memories: bool = False,
     system: str | None = None,
 ) -> str:
+    """Render matching memories. `limit=None` means the default: unbounded with `--all`, else 10."""
     if not DB_PATH.exists():
         return "Database not found. Run: uv run python tools/rebuild_db.py"
 
     conn = duckdb.connect(str(DB_PATH), read_only=True)
 
+    params: list[object]
     if all_memories:
         where, params = "", []
     else:
         where, params = build_where(query, project, mem_type, tags or [], system)
+
+    if limit is None and not all_memories:
+        limit = DEFAULT_LIMIT
+    limit_clause = f"LIMIT {int(limit)}" if limit is not None else ""
 
     sql = f"""
         SELECT id, title, type, confidence, project_id, created, content, file_path
@@ -95,8 +105,9 @@ def load(
         {where}
         ORDER BY
             CASE confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 WHEN 'low' THEN 2 ELSE 3 END,
-            created DESC
-        LIMIT {limit}
+            created DESC,
+            id
+        {limit_clause}
     """
     rows = conn.execute(sql, params).fetchall()
     conn.close()
@@ -119,15 +130,19 @@ def load(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Load brain memories as AI context")
     parser.add_argument("--query", "-q", help="Keyword search across title and content")
-    parser.add_argument("--project", "-p", help="Filter by project ID (also includes globals)")
+    parser.add_argument("--project", "-p",
+                        help="Filter by project ID (also includes scope: global memories)")
     parser.add_argument("--type", "-t", dest="mem_type",
                         choices=["concept", "entity", "procedure", "episode", "decision"],
                         help="Filter by memory type")
     parser.add_argument("--tags", help="Comma-separated tag IDs to filter by")
     parser.add_argument("--system", "-s", help="Filter by system ID from systems.yaml")
-    parser.add_argument("--limit", "-n", type=int, default=10, help="Max memories to return")
+    parser.add_argument("--limit", "-n", type=int, default=None,
+                        help="Max memories to return (default 10; "
+                             "unbounded with --all)")
     parser.add_argument("--all", dest="all_memories", action="store_true",
-                        help="Return all memories (ignores other filters)")
+                        help="Return all memories, unbounded unless --limit is given "
+                             "(ignores other filters)")
     args = parser.parse_args()
 
     tag_list = [t.strip() for t in args.tags.split(",")] if args.tags else []

@@ -82,3 +82,151 @@ def test_no_system_filter_returns_both(seeded_db: Path) -> None:
     result = load_context.load()
     assert "Memory A" in result
     assert "Memory B" in result
+
+
+# --- Scope semantics, --all, limits, tag conjunction and ordering (phase-rel-08) ---------------
+#
+# GOV-003 "Global memory retrieval": a project query includes every scope: global memory —
+# including the ones carrying project: d-system, which is how the shipped brain/ records
+# repository-wide memories — alongside that project's own entries, and nothing else.
+
+# (id, tags, project_id, created, confidence, scope)
+CORPUS: list[tuple[str, list[str], str | None, str, str, str]] = [
+    ("g-null", ["python"], None, "2026-09-01", "high", "global"),
+    ("g-repo", ["python", "duckdb"], "d-system", "2026-09-02", "high", "global"),
+    ("g-repo-2", ["duckdb"], "d-system", "2026-09-03", "medium", "global"),
+    ("p-alpha", ["python", "duckdb"], "alpha", "2026-09-04", "high", "project"),
+    ("s-alpha", ["python"], "alpha", "2026-09-05", "low", "session"),
+    ("p-beta", ["python", "duckdb"], "beta", "2026-09-06", "high", "project"),
+    ("s-beta", ["python"], "beta", "2026-09-07", "medium", "session"),
+    ("p-repo", ["python"], "d-system", "2026-09-08", "medium", "project"),
+    ("s-null", ["python", "duckdb"], None, "2026-09-09", "high", "session"),
+    ("g-tie-b", ["duckdb"], None, "2026-09-10", "medium", "global"),
+    ("g-tie-a", ["duckdb"], None, "2026-09-10", "medium", "global"),
+    ("g-low", ["python"], None, "2026-09-11", "low", "global"),
+    ("g-old", ["python", "duckdb"], None, "2026-08-01", "high", "global"),
+]
+
+# The ordering load() promises: confidence high > medium > low, newest first, then id.
+ORDER = [
+    "s-null", "p-beta", "p-alpha", "g-repo", "g-null", "g-old",
+    "g-tie-a", "g-tie-b", "p-repo", "s-beta", "g-repo-2",
+    "g-low", "s-alpha",
+]
+
+
+@pytest.fixture
+def corpus_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A real DuckDB from the shipped DDL, seeded with more than ten memories across scopes."""
+    ddl = (ROOT / "sql" / "001_schema.sql").read_text(encoding="utf-8")
+    clean = "\n".join(line for line in ddl.splitlines() if not line.strip().startswith("--"))
+    db_path = tmp_path / "d_system.duckdb"
+    conn = duckdb.connect(str(db_path))
+    for statement in (s.strip() for s in clean.split(";") if s.strip()):
+        conn.execute(statement)
+    for id_, tags, project_id, created, confidence, scope in CORPUS:
+        conn.execute(
+            "INSERT INTO memories VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            [id_, f"Title {id_}", "concept", tags, [], "human", project_id, created, None,
+             confidence, [], scope, f"Content {id_}", f"brain/concepts/{id_}.md"],
+        )
+    conn.close()
+    monkeypatch.setattr(load_context, "DB_PATH", db_path)
+    return db_path
+
+
+def _ids(result: str) -> list[str]:
+    """The memory ids load() rendered, in output order."""
+    return [line.split("id:", 1)[1].split(" |", 1)[0]
+            for line in result.splitlines() if line.startswith("*id:")]
+
+
+def test_corpus_is_larger_than_the_default_limit() -> None:
+    assert len(CORPUS) > load_context.DEFAULT_LIMIT
+
+
+def test_project_query_includes_globals_and_own_entries_only(corpus_db: Path) -> None:
+    ids = set(_ids(load_context.load(project="alpha", all_memories=False, limit=100)))
+    assert ids == {"g-null", "g-repo", "g-repo-2", "g-tie-a", "g-tie-b", "g-low", "g-old",
+                   "p-alpha", "s-alpha"}
+
+
+def test_project_query_excludes_unrelated_project_and_session_entries(corpus_db: Path) -> None:
+    ids = set(_ids(load_context.load(project="alpha", limit=100)))
+    assert not ids & {"p-beta", "s-beta", "p-repo", "s-null"}
+
+
+def test_repository_scoped_globals_reach_every_project(corpus_db: Path) -> None:
+    for project in ("alpha", "beta"):
+        ids = set(_ids(load_context.load(project=project, limit=100)))
+        assert {"g-repo", "g-repo-2"} <= ids
+
+
+def test_d_system_project_query_adds_its_project_scoped_entry(corpus_db: Path) -> None:
+    ids = set(_ids(load_context.load(project="d-system", limit=100)))
+    assert "p-repo" in ids
+    assert not ids & {"p-alpha", "p-beta", "s-null"}
+
+
+def test_default_limit_is_ten(corpus_db: Path) -> None:
+    assert _ids(load_context.load()) == ORDER[:10]
+
+
+def test_all_is_unbounded_without_a_limit(corpus_db: Path) -> None:
+    assert _ids(load_context.load(all_memories=True)) == ORDER
+
+
+def test_all_honours_an_explicit_limit(corpus_db: Path) -> None:
+    assert _ids(load_context.load(all_memories=True, limit=5)) == ORDER[:5]
+
+
+def test_explicit_limit_above_default_without_all(corpus_db: Path) -> None:
+    assert _ids(load_context.load(limit=12)) == ORDER[:12]
+
+
+def test_all_ignores_other_filters(corpus_db: Path) -> None:
+    assert _ids(load_context.load(project="alpha", tags=["duckdb"], all_memories=True)) == ORDER
+
+
+def test_tags_are_conjunctive(corpus_db: Path) -> None:
+    ids = _ids(load_context.load(tags=["python", "duckdb"], limit=100))
+    assert ids == [i for i in ORDER if i in {"g-repo", "p-alpha", "p-beta", "s-null", "g-old"}]
+
+
+def test_tags_and_project_combine(corpus_db: Path) -> None:
+    ids = _ids(load_context.load(project="alpha", tags=["python", "duckdb"], limit=100))
+    assert ids == ["p-alpha", "g-repo", "g-old"]
+
+
+def test_ordering_breaks_ties_by_id_and_is_repeatable(corpus_db: Path) -> None:
+    first = _ids(load_context.load(all_memories=True))
+    assert first.index("g-tie-a") < first.index("g-tie-b")
+    assert _ids(load_context.load(all_memories=True)) == first
+
+
+def _run_cli(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+             *argv: str) -> list[str]:
+    monkeypatch.setattr(sys, "argv", ["load_context.py", *argv])
+    load_context.main()
+    return _ids(capsys.readouterr().out)
+
+
+def test_cli_all_is_unbounded(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                              capsys: pytest.CaptureFixture[str]) -> None:
+    assert _run_cli(monkeypatch, capsys, "--all") == ORDER
+
+
+def test_cli_all_with_limit(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                            capsys: pytest.CaptureFixture[str]) -> None:
+    assert _run_cli(monkeypatch, capsys, "--all", "--limit", "3") == ORDER[:3]
+
+
+def test_cli_default_limit(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                           capsys: pytest.CaptureFixture[str]) -> None:
+    assert _run_cli(monkeypatch, capsys) == ORDER[:10]
+
+
+def test_cli_project_and_tags(corpus_db: Path, monkeypatch: pytest.MonkeyPatch,
+                              capsys: pytest.CaptureFixture[str]) -> None:
+    ids = _run_cli(monkeypatch, capsys, "--project", "alpha", "--tags", "python,duckdb", "-n", "50")
+    assert ids == ["p-alpha", "g-repo", "g-old"]
