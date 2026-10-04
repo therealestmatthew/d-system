@@ -13206,6 +13206,7 @@ items:
   - tools/generate_engine_pages.py
   - _public/engine/
   - test/test_engine_pages.py
+  - docs/08-governance/OPS-028-generate-engine-pages.md
   next_action: Git history reads are the slow part. Read each file's history once per run and index it,
     rather than running git log per idea. Walk dev with --first-parent - dev carries one merge commit
     from before the fast-forward-only rule (818f64b, 2026-09-10). CI's pytest job checks out full
