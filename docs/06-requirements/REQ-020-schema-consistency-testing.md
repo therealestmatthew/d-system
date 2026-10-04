@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-15'
-updated: '2026-09-15'
+updated: '2026-10-04'
 systems: [sys-contracts, sys-delivery]
 depends_on: [doc-adr-file-based-governance]
 ---
@@ -99,7 +99,7 @@ is, and `P8` governs code and contract hygiene.
 | R05 | The decision states what would change it, in terms a later reader can evaluate. | Read for a named trigger — a count of drift instances, a new entity type, a second consumer of the schemas. "Revisit later" is not a trigger. |
 | R06 | CI runs a linter over `ts/` and fails the build on a lint error. | Introduce a lint violation and confirm CI fails naming it. Confirm a clean tree passes. |
 | R07 | CI runs a frontend test suite and fails the build on a failing test. | Add a deliberately failing test and confirm CI fails. Confirm the runner is configured in `ts/package.json` rather than invoked ad hoc. |
-| R08 | A committed-output drift test asserts `_public/overview/index.html` matches a fresh regeneration. | Modify the committed page by hand and confirm the test fails. Confirm it mirrors `test_ideas.py`'s existing pattern rather than inventing a second one. |
+| R08 | The committed `_public/overview/index.html` carries a source stamp - the source commit, that commit's date, a note when an input had uncommitted changes, and a hash of the page body - and a test recomputes the hash from the committed page. The page is a committed snapshot and is not compared against live idea or backlog counts. | Modify the committed page by hand and confirm the test fails. Record an idea without regenerating the page and confirm the test still passes. |
 | R09 | A testing standard states what "tested" means per layer — backend routes, frontend components, generation scripts, and agent-facing tools. | Read for one entry per layer, each naming what is covered and what is deliberately not. A layer with no entry has not been reasoned about. |
 | R10 | The standard is derived from what the repository already does, and names where current coverage falls short of its own rule. | Read for citations to existing test files on both sides. A standard that finds the current state already conformant has not been applied. |
 | R11 | HTML-generation fixtures state where they live, whether they are generated from `_data/` or hand-authored, and whether a fixture is a governed artifact or a test asset. | Read for all three. `000001` names them as the decisions that get discovered late; this row makes them decided early instead. |
@@ -124,6 +124,10 @@ schemas appears.
 supports it. What the row forbids is deciding from the proposal's own persuasiveness, which is the
 only evidence available today.
 
-**R08 is not a determinism test.** `test/test_generate_overview.py` already proves two runs agree with
-each other. This row asks whether the *committed file* agrees with a run — a different assertion, and
-the one whose absence let drift ship.
+**R08 is not a determinism test, and not a currency test.** `test/test_generate_overview.py` already
+proves two runs agree with each other. This row asks whether the *committed file* is still what a run
+produced — a different assertion. It does not ask whether the page is current: the page is built from
+live idea and backlog counts, so comparing it with a fresh run would fail on every recorded idea.
+Instead the page states the commit it was read at, and its content hash catches a hand edit. Amended
+to this snapshot model by owner ruling of 2026-10-04; the row first asked for a comparison with a
+fresh regeneration.
