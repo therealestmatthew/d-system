@@ -20,6 +20,7 @@ from __future__ import annotations
 import importlib
 import json
 import os
+import re
 import sys
 import tempfile
 from collections.abc import Callable, Iterator
@@ -549,6 +550,17 @@ def test_ideas_route_reports_zero_annotation_and_link_counts_as_zero(
 def test_idea_queue_status_precedence_covers_every_schema_status() -> None:
     schema = json.loads((REPO_ROOT / "schemas" / "idea.schema.json").read_text(encoding="utf-8"))
     assert set(IDEA_QUEUE_STATUS_PRECEDENCE) == set(schema["definitions"]["status"]["enum"])
+
+
+def test_idea_explorer_status_filter_covers_every_schema_status() -> None:
+    # ts/ has no test runner, so this reads the panel's literal STATUSES array from source.
+    region = REPO_ROOT / "ts" / "src" / "stage" / "IdeaExplorerRegion.tsx"
+    source = region.read_text(encoding="utf-8")
+    match = re.search(r"const STATUSES = \[(.*?)\]", source, re.DOTALL)
+    assert match is not None, "STATUSES array not found in IdeaExplorerRegion.tsx"
+    statuses = re.findall(r"'([a-z_]+)'", match.group(1))
+    schema = json.loads((REPO_ROOT / "schemas" / "idea.schema.json").read_text(encoding="utf-8"))
+    assert statuses == schema["definitions"]["status"]["enum"]
 
 
 def test_ideas_queue_route_orders_by_status_precedence_then_age(

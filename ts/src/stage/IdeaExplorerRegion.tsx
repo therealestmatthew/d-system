@@ -20,7 +20,17 @@ interface IdeaRow {
 /** The idea schema's legal statuses (`schemas/idea.schema.json`'s `definitions.status` enum),
  * used only to populate the status filter dropdown — not idea copy, just the fixed vocabulary an
  * idea's `status` field is drawn from. */
-const STATUSES = ['open', 'triaged', 'reviewing', 'promoted', 'discarded']
+const STATUSES = [
+  'open',
+  'triaged',
+  'reviewing',
+  'promoted',
+  'discarded',
+  'delivered',
+  'resolved',
+  'absorbed',
+  'set_aside',
+]
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000
 
