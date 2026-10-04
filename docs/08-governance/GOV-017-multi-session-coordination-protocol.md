@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-10-01'
+updated: '2026-10-04'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-adr-multi-agent-concurrency, doc-coordinator-protocol, doc-build-coordinator, doc-backlog-decisions, doc-conversation-guidelines, doc-governance-operations]
 ---
@@ -164,6 +164,23 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/` and
    `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.
+
+   `READY` also carries the output of two branch checks run after the rebase (`REQ-028` R07, R08,
+   R10; `PLAN-045` D7, D9):
+
+   - the test baseline, `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>`, where
+     the session produces both JUnit reports itself: the base from `uv run pytest --junitxml` on
+     `dev`'s tip in a throwaway detached worktree, the branch from the rebased branch
+     ([OPS-031](OPS-031-check-test-baseline.md));
+   - the diff patterns, `uv run python tools/check_diff_patterns.py dev..HEAD`
+     ([OPS-032](OPS-032-check-diff-patterns.md)).
+
+   A nonzero result from either blocks the merge unless the owner signs off, and the sign-off names
+   the tests or lines it accepts. The session records that sign-off in its session record before the
+   merge; the Session Manager relays no `GRANTED merge` for a branch with an unsigned nonzero result.
+   For a claimed phase, `READY` also carries the report of
+   `uv run python -m src.governance --containment <phase-id>`, which diffs the active branch against
+   the phase's declared paths (`phase-dgov-06`, `REQ-015` R12-R13). That report never blocks.
 2. The Session Manager re-runs the four gate checks on the branch tip in a detached temporary
    worktree (`git worktree add --detach ../d-system-worktrees/verify-<phase-id> <branch>`, removed
    afterwards), so it touches neither the primary checkout nor the session's worktree.
@@ -192,6 +209,11 @@ approval, as a standing rule for every session.
 **Owner ruling, 2026-09-23:** the gate checks include `ruff` and `mypy` alongside `governance` and
 `pytest` (steps 1, 2 and 4), and the dirty-integration check runs before every fast-forward
 (step 5). Both are recorded in `GOV-003`.
+
+**Owner ruling, 2026-10-04:** the session produces both JUnit reports for the test baseline (step
+1): the base on `dev`'s tip in a throwaway detached worktree and the branch after the rebase. It
+replaces `PLAN-045` D7's "the Session Manager's own merge-gate re-run on `dev`", which cannot be the
+base because that re-run tests the branch tip and comes after `READY`. Recorded in `GOV-003`.
 
 **Owner ruling, 2026-09-23:** a failing pre-commit hook is never bypassed with `--no-verify`. The
 session commits the fix; if the check itself is wrong, it stops and reports to the Session Manager

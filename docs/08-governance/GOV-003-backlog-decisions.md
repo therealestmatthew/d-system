@@ -868,3 +868,26 @@ reverses a rule a governing document still stated:
 **Why recorded here:** a session that finds the old rule in a session record or a plan written
 before 2026-10-04 needs to know which one is current. This entry adds no rule; it records rulings
 the owner made.
+
+## READY carries the test baseline and diff patterns; the builder produces both JUnit reports — 2026-10-04
+
+Applied by `phase-grd-03` (`PLAN-045`, `REQ-028` R07-R10) in
+[GOV-017](GOV-017-multi-session-coordination-protocol.md)'s merge gate and
+[PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md) item 4:
+
+- **Two new checks in `READY`.** A session's `READY` carries the output of
+  `tools/check_test_baseline.py` ([OPS-031](OPS-031-check-test-baseline.md)) and
+  `tools/check_diff_patterns.py dev..HEAD` ([OPS-032](OPS-032-check-diff-patterns.md)). A nonzero
+  result from either blocks the merge unless the owner signs off naming the tests or lines it
+  accepts, recorded in the session record (`PLAN-045` D9, owner ruling of 2026-09-23).
+- **The deliverables diff as a report.** For a claimed phase, `READY` also carries
+  `governance --containment <phase-id>`, which does not block (`PLAN-045` D10, owner ruling of
+  2026-09-23: "dgov-06 stays report-only, and READY carries its output").
+- **The builder produces both JUnit reports** (owner ruling, 2026-10-04, in Builder B's session):
+  the base from `pytest --junitxml` on `dev`'s tip in a throwaway detached worktree, the branch from
+  the rebased branch. This replaces `PLAN-045` D7's "the base run is the Session Manager's own
+  merge-gate re-run on `dev`": that re-run tests the branch tip, not `dev`, and comes after `READY`,
+  which must already carry the result. Idea `000572` tracks amending D7 to match.
+
+**Why recorded here:** `PLAN-045` D7 still states the earlier base. A session reading the plan alone
+would wait for a Session Manager run that never produces a base report.

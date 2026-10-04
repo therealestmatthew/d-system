@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-10-01'
+updated: '2026-10-04'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -92,7 +92,15 @@ Roster
 4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
    explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance`,
    `uv run pytest`, `uv run ruff check src/ test/` and `uv run mypy src/` runs (dev's
-   baseline is 0 ruff findings, 0 mypy errors; the gate is clean). The owner approves every
+   baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
+   `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>` (you produce both
+   reports: base from `pytest --junitxml` on dev's tip in a throwaway detached worktree,
+   branch from the rebased branch; OPS-031) and of
+   `uv run python tools/check_diff_patterns.py dev..HEAD` (OPS-032). A nonzero result from
+   either blocks the merge unless the owner signs off naming the tests or lines accepted,
+   recorded in your session record; I relay no GRANTED merge without it. For a claimed
+   phase, also include `uv run python -m src.governance --containment <phase-id>` as a
+   report; it never blocks. The owner approves every
    merge; I relay, and a GRANTED merge from me is the owner's approval. Merge only after
    GRANTED merge. Inside that turn: (i) if dev moved, rebase, re-run all four, report the new
    tip and wait for my go; (ii) in every case, run
