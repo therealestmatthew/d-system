@@ -12760,8 +12760,9 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-a
+  session: doc-session-plan-003-audit
   priority: 2
   session_budget: 1
   depends_on: []
@@ -12790,9 +12791,22 @@ items:
   - docs/09-backlog/backlog.yaml
   - docs/00-working/
   - docs/04-decisions/
-  next_action: Since the 2026-09-30 amendment this gates only phase-des-03 and phase-des-04; the token
-    and engine page phases do not wait for it. It is still the only phase that can tell a coordinator
-    which of the ten queued phase-html-* phases are still real work.
+  completion_evidence:
+  - docs/04-decisions/ADR-027-retire-plan-003.md
+  - docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md
+  - docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003.04-frontend-components.md
+  - docs/09-backlog/backlog.yaml
+  - docs/03-sessions/SESS-2026-10-04-08-plan-003-audit.md
+  result: 'Complete: every requirement in PLAN-003 and its six child plans carries a disposition, in an
+    audit-disposition section at the end of each document - 176 in all, 9 accomplished, 14 superseded by
+    shipped work named by file and commit or phase, 153 retired with a reason. The owner ruled on 2026-10-04
+    to retire the authored YAML content site: the seven plans are deprecated, phase-html-01 to -10 are
+    cancelled with a blocked_reason naming ADR-027, and --ready offers none of them. ADR-027 records the
+    decision and the stranded work (ideas 000567 to 000571). demo-adversary review PASS, no findings; one
+    soft observation acted on (SESS-2026-10-04-08). After the rebase onto dev 66ca42f: 1450 tests passed,
+    governance, ruff and mypy clean, private-content check 31 identifiers 0 hits. Merged by fast-forward
+    to 0bcec92 with the owner''s approval.'
+  next_action: Complete. phase-des-03 and phase-des-04 scope against ADR-027 and the dispositions.
 - id: phase-des-02
   title: Build the governance atlas page in the atlas family
   plan: doc-html-generation-design-system
