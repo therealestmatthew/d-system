@@ -21,18 +21,19 @@ depends_on: [doc-design-document-amendments]
 
 ## Verification
 
-Run in `/code/d-system-worktrees/phase-dam-01` on `agent/phase-dam-01`, branched from dev `27c3813`.
+Run in `/code/d-system-worktrees/phase-dam-01` on `agent/phase-dam-01`, after rebasing onto dev
+`92777af` and committing the owner-regenerated adapter.
 
 `uv run python tools/generate_agent_workflows.py --check`
 
 ```
-missing or stale workflow adapter(s): .agents/skills/orient/SKILL.md
+16 workflow adapter(s) current
 ```
 
 `uv run python -m src.governance --catalog` then `uv run python -m src.governance`
 
 ```
-Governance OK: 44 systems, 428 documents, 36 memories, 347 backlog phases
+Governance OK: 44 systems, 430 documents, 36 memories, 347 backlog phases
 ```
 
 `git diff --exit-code docs/08-governance/catalog.md`: exit 0, no diff.
@@ -40,13 +41,13 @@ Governance OK: 44 systems, 428 documents, 36 memories, 347 backlog phases
 `uv run pytest`
 
 ```
-FAILED test/test_agent_workflows.py::test_committed_adapters_match_canonical_sources
-1 failed, 1418 passed, 1 skipped, 1 warning
+1436 passed, 1 skipped, 1 warning
 ```
 
-Both failures are the same file. `.agents/skills/orient/SKILL.md` is closed to agents by a deny
-rule; its regeneration is queued for the owner as Owner Terminal entry C14. The `.claude` copy is
-regenerated and current.
+`.agents/skills/orient/SKILL.md` is closed to agents by a deny rule. The owner regenerated it in the
+Owner Terminal (entry C14, exit 0, "wrote 16 workflow adapter(s)"); the file matched this session's
+generator output byte for byte and was committed here. The `.claude` copy was regenerated in this
+session.
 
 Acceptance greps (`REQ-029`'s verification column):
 
@@ -92,21 +93,18 @@ Acceptance greps (`REQ-029`'s verification column):
   session-close.md no longer presents the primary-checkout exception as current: Met (R12; none
   remain).
 - PLAN-005's passage carries the superseded note, and REQ-003 has no triaging status: Met (R13).
-- Verification list: Not met until Owner Terminal entry C14 regenerates
-  `.agents/skills/orient/SKILL.md`; `generate_agent_workflows.py --check` and one test fail on that
-  file only.
+- Verification list: Met — every command above ran green after Owner Terminal entry C14.
 
 ## Backlog
 
-`status: active`. `next_action`: commit `.agents/skills/orient/SKILL.md` after Owner Terminal entry
-C14, rerun the verification list, then the independent review and READY.
+`status: active`. `next_action`: awaiting the owner's merge approval through READY, then the
+completion edit on dev.
 
 ## Unresolved
 
-- `.agents/skills/orient/SKILL.md` waits for Owner Terminal entry C14.
 - The `GOV-003` worktree-removal entry records that `AGENTS.md` and `/session-start` step 9 still
-  remove the worktree without its own approval. Neither text is in this phase's scope; the gap was
-  sent to Ideation as an idea.
+  remove the worktree without its own approval. Neither text is in this phase's scope; it is idea
+  `000566`.
 
 ## Review
 
@@ -174,7 +172,5 @@ Finding 3 needs no change.
 
 ## Left undone
 
-- Commit `.agents/skills/orient/SKILL.md` after Owner Terminal C14, then rerun the verification
-  list.
 - The Q8 worktree-removal ruling is recorded, but `AGENTS.md` and `/session-start` step 9 still
-  describe the removal as automatic; sent to Ideation as an idea.
+  describe the removal as automatic (idea `000566`).

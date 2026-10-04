@@ -15087,8 +15087,8 @@ items:
   - CLAUDE.md
   - docs/01-plans/PLAN-005-document-code-system.md
   - docs/06-requirements/REQ-003-idea-plan-lifecycle.md
-  next_action: Commit .agents/skills/orient/SKILL.md after Owner Terminal entry C14 regenerates it,
-    rerun the verification list, then the independent review and READY.
+  next_action: Built, reviewed and verified on agent/phase-dam-01; awaiting the owner's merge
+    approval, then the completion edit on dev.
   session: doc-session-design-document-amendments
   completion_evidence:
   - docs/07-architecture/ARCH-006-idea-realization-system.md
@@ -15097,12 +15097,14 @@ items:
   - docs/08-governance/GOV-003-backlog-decisions.md
   - docs/06-requirements/REQ-022-idea-realization-system.md
   - .claude/commands/session-close.md
+  - .agents/skills/orient/SKILL.md
   - AGENTS.md
   - CLAUDE.md
   - docs/03-sessions/SESS-2026-10-04-06-design-document-amendments.md
   result: Every REQ-029 acceptance grep passes; the owner approved AGENTS.md step 5 and the three
-    CLAUDE.md lines and left AGENTS.md 179-181 unchanged. Governance OK; pytest 1418 passed, 1 failed
-    on the .agents orient adapter that only the owner can write (Owner Terminal C14).
+    CLAUDE.md lines and left AGENTS.md 179-181 unchanged. The owner regenerated the .agents orient
+    adapter (Owner Terminal C14). The independent review found all acceptance holding; one major (an
+    unruled GOV-018 re-review sentence) fixed, one minor accepted. Governance OK; full suite green.
 - id: phase-asr-01
   title: The reviewer-judge agent type, in shadow, with a test that its tools stay read-only
   plan: doc-reviewer-contract
