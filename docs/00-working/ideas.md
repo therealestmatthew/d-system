@@ -24112,3 +24112,13 @@ I want a system where I can dictate and I have an agent who will dictate back to
 
 - relates_to → `000559`
 - relates_to → `000561`
+
+---
+
+## 000564 · Governance check for _tmpagent/claims.jsonl
+
+**Created 2026-10-04T01:34:07-04:00 · Status: `open`**
+
+A governance check for _tmpagent/claims.jsonl: required fields, event order, and the open-claim fold. Nothing reads the file today; lines 13-14 use "agent" instead of the required "by" and went unnoticed.
+
+Raised by Session 2 - Builder B.
