@@ -24282,3 +24282,13 @@ Raised by Session 1 - Builder A.
 Review the `# type: ignore[attr-defined]` at test/test_demo_terminal.py:436, merged with phase-wbf-09. The new diff-pattern check (tools/check_diff_patterns.py, phase-grd-03) flags it on dev~20..dev. Fix the type, or record why the ignore is justified.
 
 Raised by Session 2 - Builder B.
+
+---
+
+## 000581 · Guard for AGENTS.md hand-off step 5 before a merge is granted
+
+**Created 2026-10-04T14:35:16-04:00 · Status: `open`**
+
+A guard for AGENTS.md hand-off step 5: before a merge is granted, check that the phase entry on the branch carries session, completion_evidence and result (with status still active), for example in the Session Manager's READY gate or in a governance mode. The step was skipped on phase-des-11, phase-des-01 and phase-des-02 on 2026-10-04 although the rule was written down. The owner chose a guard idea plus the brain procedure mem-proc-earlier-steps-are-not-absorbed-by-a-later-one.
+
+Raised by Session 1 - Builder A.
