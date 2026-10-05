@@ -768,7 +768,7 @@ Unresolved: format/length for X posts, frequency, which aspects to prioritize fo
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-08T23:58:19-04:00): Idea 000015 proposes generating an X/Twitter content series documenting d-system development, pulling from ADRs, completed phases, and project milestones to build in public.
 
@@ -783,6 +783,7 @@ No related plan, requirement, ADR or backlog phase found. Content strategy, publ
 PROPOSED LINK: 000015 --relates_to--> 000016 (000016 explicitly extends 000015 to multi-platform presence strategy)
 PROPOSED LINK: 000015 --relates_to--> 000017 (000017 proposes automating the content generation and scheduling that 000015 asks about)
 - **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
+- **finding** by agent-ideation (2026-10-05T05:17:47-04:00): The owner's answer is YES (2026-10-04 evening, relayed by Session 5 - Batch Runner from the Session Manager's restart file, section P, item P2), recorded in ADR-028 (Build in public - the owner's answer for the X series, multi-platform presence and content automation), written in commit b31f154 and merged to dev with phase-expl-02 (completed 7876f0a). ADR-028 rung 1: accepted and under way, realized by the content strategy under content/ (sys-content, draft maturity): the arc, five pillars, image style, post queue and first drafts. Cadence five posts a week, drafted with agents, approved and published by the owner. Still open and the owner's: when the repository becomes visible, engagement targets, and the release date the arc builds toward. First step: the owner approves and publishes the first queued post in content/calendar.md after the private-content check. Status left at triaged; any status change is the owner's.
 
 </details>
 
@@ -813,7 +814,7 @@ Unresolved: which platforms are worth the effort, whether to build presence firs
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:03:56-04:00): Idea 000016 proposes a multi-platform public presence strategy for the AI space, exploring LinkedIn, Bluesky, GitHub, Mastodon, and other platforms as extensions to a narrower X-focused narrative (000015).
 
@@ -821,6 +822,7 @@ Related idea 000017 (AI-powered content automation pipeline for social media) ex
 
 No existing plan, requirement, or ADR governs public presence strategy, content distribution, or audience positioning; this is a new strategic area not yet formalized in the governance system.
 - **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
+- **finding** by agent-ideation (2026-10-05T05:17:47-04:00): The owner's answer is YES (2026-10-04 evening, relayed by Session 5 - Batch Runner from the Session Manager's restart file, section P, item P2), recorded in ADR-028 (Build in public - the owner's answer for the X series, multi-platform presence and content automation), written in commit b31f154 and merged to dev with phase-expl-02 (completed 7876f0a). ADR-028 rung 2: accepted; its governed plan and phases wait for a planning session with the owner. First step: that session chooses the platforms and each one's format and cadence. Prerequisites: the owner's platform choices and accounts the owner creates; no agent creates a platform account. Status left at triaged; any status change is the owner's.
 
 </details>
 
@@ -853,7 +855,7 @@ Unresolved: which content sources to prioritize, how much human review/approval 
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-09T00:03:52-04:00): No related plan, ADR or requirement found. The idea proposes a specific implementation strategy — automating multi-platform content generation from d-system activities — but governance documents address only the high-level presence strategy, not the tooling to support it.
 
@@ -864,6 +866,7 @@ The idea's own unresolved questions (content sources, review/approval workflow, 
 PROPOSED LINK: 000017 --extends--> 000016 (implements automated content generation as part of the multi-platform presence strategy)
 PROPOSED LINK: 000017 --relates_to--> 000015 (both create content from d-system work; 000017 automates what 000015 currently does manually)
 - **finding** by agent-idea-batching (2026-09-13T15:57:59-04:00): Kept as parked; owner ruling 2026-09-13 during the idea-batching partition, where R1 nominated all three of 000015/000016/000017 for decline on grounds of dormancy - captured together, never resumed across roughly 130 subsequent ideas, and adjacent to but outside this system's stated purpose. The owner ruled dormancy is not deadness. They sit in the accepted partition as G58, the cleanest mutual-exclusivity case in the corpus: no shared file, system or consumer with any other group, so they cost nothing where they are. Whether to pursue them is a business-priority question rather than a technical one.
+- **finding** by agent-ideation (2026-10-05T05:17:47-04:00): The owner's answer is YES (2026-10-04 evening, relayed by Session 5 - Batch Runner from the Session Manager's restart file, section P, item P2), recorded in ADR-028 (Build in public - the owner's answer for the X series, multi-platform presence and content automation), written in commit b31f154 and merged to dev with phase-expl-02 (completed 7876f0a). ADR-028 rung 3: accepted; its governed plan waits for a planning session with the owner, after 000016's platforms are chosen. Prerequisites: those platform choices, a manual workflow proven on rung 1, platform API access and credentials held by the owner, tools/check_no_private_content.py as a gate inside the pipeline, and an explicit rule for what, if anything, publishes without the owner (today the owner publishes every post). First step: a requirements and planning session with the owner. Status left at triaged; any status change is the owner's.
 
 </details>
 
