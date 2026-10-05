@@ -33,6 +33,7 @@ from src.governance.codes import inspect_codes, inspect_register, next_code, ren
 from src.governance.idea_priority import inspect_idea_priority
 from src.governance.plan_phases import inspect_plan_phases
 from src.governance.regression import audit as audit_status_regression
+from src.governance.requirement_rule import inspect_requirement_pairing, render_classification
 from src.governance.review_gate import REVIEWS_DIR, inspect_review_gate, shape_error
 from src.governance.staleness import catalog_errors, ideas_md_errors
 
@@ -610,6 +611,12 @@ def main() -> int:
     output = parser.add_mutually_exclusive_group()
     output.add_argument("--inventory", action="store_true", help="Print derived Markdown inventory")
     output.add_argument(
+        "--classify-requirements",
+        action="store_true",
+        help="Print plans that need a requirement document and have none, with their count "
+        "(REQ-015 R02)",
+    )
+    output.add_argument(
         "--backlog", action="store_true", help="Print phases and source plan coverage"
     )
     output.add_argument("--ready", action="store_true", help="Print phases ready for one session")
@@ -670,6 +677,7 @@ def main() -> int:
             args.backfill_ideas,
             args.check_ideas,
             args.containment is not None,
+            args.classify_requirements,
         )
     )
     if plain and catalog and not errors:
@@ -678,6 +686,8 @@ def main() -> int:
                 ROOT, render_catalog(result["register"], result["documents"], catalog["items"])
             )
         )
+    if plain and catalog:
+        errors.extend(inspect_requirement_pairing(result["documents"], catalog["items"]))
     if plain:
         try:
             errors.extend(ideas_md_errors(ROOT))
@@ -739,6 +749,8 @@ def main() -> int:
             return 1
     elif args.inventory:
         print(inventory(result))
+    elif args.classify_requirements:
+        print(render_classification(result["documents"], catalog["items"]))
     else:
         print(
             f"Governance OK: {len(result['systems'])} systems, "

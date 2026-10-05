@@ -10923,6 +10923,7 @@ items:
   verification:
   - uv run pytest
   - uv run python -m src.governance
+  - uv run python -m src.governance --classify-requirements
   deliverables:
   - docs/08-governance/GOV-001-protocol.md
   - src/governance/
