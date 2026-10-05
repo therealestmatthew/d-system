@@ -299,9 +299,12 @@ def test_overview_page_styles_from_the_manifest_match_the_generator() -> None:
     )
 
 
-def test_house_page_replays_byte_identically_through_the_library(
+def test_every_engine_page_replays_byte_identically_through_the_library(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Every house-page fill generate_engine_pages.py makes on the real repository - the overview,
+    the ledger, every trace page and the backlog graph page with its extra GRAPH_CSS - replayed
+    through render() with the same values."""
     engine = _load("generate_engine_pages")
     original = engine.house.fill
     calls: list[tuple[dict[str, str], str]] = []
@@ -312,11 +315,27 @@ def test_house_page_replays_byte_identically_through_the_library(
         return out
 
     monkeypatch.setattr(engine.house, "fill", recording)
-    engine._page({"commit": "abc1234", "date": "2026-10-05", "dirty": False},
-                 "Title", "Lede.", "<p>body</p>")
-    (values, out), = calls
-    result = lib.load().render("house-page.html", values)
-    assert isinstance(result, lib.Rendered) and result.html == out
+    pages = engine.render_all(engine.load_inputs())
+    assert len(calls) == len(pages)
+    assert any(engine.GRAPH_CSS in values["INLINE_STYLES"] for values, _out in calls)
+    library = lib.load()
+    for values, out in calls:
+        result = library.render("house-page.html", values)
+        assert isinstance(result, lib.Rendered) and result.html == out
+
+
+def test_house_inline_styles_default_is_the_base_house_styles() -> None:
+    """The manifest's default is house.css then house-components.css. A page with styles of its
+    own, such as the backlog graph page's GRAPH_CSS, supplies {{INLINE_STYLES}} itself."""
+    engine = _load("generate_engine_pages")
+    base = (
+        engine.house.OUTPUT.read_text(encoding="utf-8")
+        + "\n"
+        + engine.house.COMPONENTS_CSS.read_text(encoding="utf-8")
+    )
+    library = lib.load()
+    assert library.inline_styles(library.get("house-page.html")) == base
+    assert engine.GRAPH_CSS not in base
 
 
 def test_house_specimen_replays_byte_identically_through_the_library(

@@ -92,7 +92,8 @@ Two mutation checks show the tests depend on the behaviour:
   - Overview: `test_every_overview_fill_replays_byte_identically_through_the_library` records
     every fill `generate_overview.generate()` makes on the real repository and replays each one
     through `render()`. All eight overview templates are exercised, and the bytes are equal.
-  - House: the same replay runs for the engine pages and for the `--specimen`.
+  - House: the same replay runs for every engine page, including the backlog graph page with its
+    own `GRAPH_CSS`, and for the `--specimen`.
   - Atlas: no code has ever rendered its pages, so there is no artifact to replay; see Review.
   - `test_adding_templates_leaves_existing_renders_byte_identical` shows that adding a template
     and a family changes neither family's render.
@@ -109,8 +110,9 @@ Two mutation checks show the tests depend on the behaviour:
 
 ## Backlog
 
-`status: active`, `agent: agent-batch-runner`. `next_action`: all acceptance met and reviewed;
-awaiting the owner's merge approval through the Session Manager.
+`status: active`, `agent: agent-batch-runner`. `next_action`: all acceptance met; the
+coordinator-dispatched review's gating verdict is PASS, and its one major is resolved; awaiting the
+owner's merge approval through the Session Manager.
 `completion_evidence`: the six deliverables and this record.
 
 ## Unresolved
@@ -119,6 +121,41 @@ awaiting the owner's merge approval through the Session Manager.
   templates directly and do not consult the manifest. See Review finding 2 and Decisions.
 
 ## Review
+
+### Coordinator-dispatched review (GOV-017)
+
+The Session Manager dispatched the gating and shadow reviewers under `GOV-017`'s build-review
+flow, which `phase-asr-04` merged during this run. Their records are committed unchanged under
+`docs/08-governance/reviews/verdicts/`:
+
+- `2026-10-05-phase-des-03-demo-adversary.json` — at `2d20f61`: pass, `gating: false`.
+  Disqualified as gating because the coordinator's brief included this session record. Its one
+  minor, the doubled `template` row in `OPS-033`'s generated table, was fixed by giving both
+  positional arguments help text.
+- `2026-10-05-phase-des-03-review-judge.json` — shadow, at `2d20f61`: pass.
+  - F01, minor, `render()` silently dropped a caller value for a `both` template's `ai_slots`:
+    fixed in `c7f5025`. It now raises, and `test_both_refuses_a_value_for_an_agent_slot` covers
+    it.
+  - F02, minor, atlas byte-identity evidence: accepted, for the reasons under Dispositions below.
+- `2026-10-05-phase-des-03-demo-adversary-2.json` — gating, fresh brief without
+  `docs/03-sessions/`, judged at `c7f5025`: **pass**.
+  - F01, major, the same `ai_slots` drop: closed by `c7f5025`.
+  - F02, major: the house family's `inline_styles` omits `generate_engine_pages.py`'s
+    `GRAPH_CSS`, which the backlog graph page adds. Fixed:
+    - `GRAPH_CSS` is a Python constant inside a generator outside this phase's files, so it
+      cannot be declared as a stylesheet;
+    - `library.yaml`, `OPS-033` and `templates/README.md` now say that `inline_styles` is the
+      family's base styles, and that a page with styles of its own supplies
+      `{{INLINE_STYLES}}`;
+    - `test_every_engine_page_replays_byte_identically_through_the_library` replaces the
+      bare-`_page()` replay. It records every house-page fill from `render_all(load_inputs())`
+      on the real repository — overview, ledger, every trace page and the backlog graph page —
+      checks that one of them carries `GRAPH_CSS`, and replays each through `render()`;
+    - `test_house_inline_styles_default_is_the_base_house_styles` pins the default.
+  - F03, minor: `next_action` claimed an adversarial review before any coordinator review ran.
+    Reworded.
+
+### Self-dispatched review (before the GOV-017 flow merged)
 
 The reviewer was a fresh `demo-adversary` sub-agent. It reviewed `dev...HEAD` at `74e8397` and
 was given the phase's scope, acceptance, verification and narrowed deliverables, and no session
@@ -168,6 +205,9 @@ Dispositions:
   `OPS-*` document (`test_tool_docs.py`), and governance requires a reserved code for a planned
   deliverable. Both follow `phase-des-09`'s precedent. The reservation was removed when the
   document landed.
+- OVERNIGHT ASSUMPTION: the three verdict records were committed under
+  `docs/08-governance/reviews/verdicts/`, the `GOV-017` record location for every phase, without
+  a widening turn, as the Session Manager directed.
 - OVERNIGHT ASSUMPTION: each family states its population method once, in one manifest, by file
   pattern. A per-file declaration inside each template would have meant editing
   `phase-lrr-03`'s templates, which this claim excluded, and would have changed every template's

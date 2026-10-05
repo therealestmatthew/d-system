@@ -12919,8 +12919,8 @@ items:
   - templates/README.md
   - docs/08-governance/OPS-033-template-library.md
   - docs/08-governance/codes.yaml
-  next_action: All acceptance met and adversarially reviewed; awaiting the owner's merge approval
-    via the Session Manager, then completion on dev.
+  next_action: All acceptance met; coordinator-dispatched review gating PASS with its one major
+    resolved; awaiting the owner's merge approval via the Session Manager, then completion on dev.
   session: doc-session-template-library
   completion_evidence:
   - templates/html/library.yaml

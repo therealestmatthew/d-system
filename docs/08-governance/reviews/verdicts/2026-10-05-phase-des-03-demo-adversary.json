@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-des-03-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-des-03",
+  "reviewed_commit": "2d20f617952a95d9a890d6ac468b06121155e5da",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "OPS-033's generated reference table lists the template flag twice (show's and render's positional), a generate_tool_docs.py subparser-merging behaviour shared by other multi-subcommand tools.",
+      "evidence": "docs/08-governance/OPS-033-template-library.md generated block; generate_tool_docs.py --check reports it current.",
+      "consequence": "None for this branch; not introduced by this phase."
+    }
+  ],
+  "raw_reply_sha256": "0d5a8045051a66a790f4a7cedc9dc168a38bb0498010ce2d7a14602c46bd3064",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews' (new flow formally from the next run's starters, P4). Runner manifests from coordinator scratch clones at the reviewed commit. Raw replies at _working/session-manager/verdict-evidence/phase-des-03/, as received with the harness's indentation removed. DISQUALIFIED AS GATING: dispatched as the gating review, but the coordinator's brief diff included the builder's session record (docs/03-sessions/SESS-2026-10-05-06), which GOV-017's brief rule forbids. Recorded with gating: false; the gating decision is 2026-10-05-phase-des-03-demo-adversary-2. The reviewer also noted (not a finding) that R06 is met by the new tool's own dispatch, not by the four existing generators."
+}

@@ -37,7 +37,9 @@ uv run python tools/template_library.py render house-page.html --data DATA.json 
 
 `--data` is a JSON object of slot names to strings. On a page whose family declares
 `inline_styles`, `{{INLINE_STYLES}}` is filled from the declared stylesheets unless the data
-supplies it.
+supplies it. The declared stylesheets are the family's base styles only. A page with styles of
+its own must supply `{{INLINE_STYLES}}` itself: `generate_engine_pages.py`'s backlog graph page
+does, adding its `GRAPH_CSS`.
 
 ## Expected result
 
@@ -59,8 +61,9 @@ Reference catalogues (`reference: true`, such as `house-components.html` and
 The existing generators — `generate_overview.py`, `generate_engine_pages.py`,
 `generate_house_css.py` and `lit_report_render.py` — keep their own template loading. Their
 output does not depend on this tool. `test/test_template_library.py` replays
-`generate_overview.py`'s fills and both house-page fills (the engine pages and the `--specimen`) through `render()` and compares the
-bytes.
+every fill `generate_overview.py` makes, every house-page fill `generate_engine_pages.py` makes
+(the overview, the ledger, the trace pages and the backlog graph page) and the
+`generate_house_css.py --specimen` fill through `render()`, and compares the bytes.
 
 ## Adding a template
 

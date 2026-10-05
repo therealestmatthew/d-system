@@ -1,0 +1,33 @@
+{
+  "verdict_id": "2026-10-05-phase-des-03-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-des-03",
+  "reviewed_commit": "2d20f617952a95d9a890d6ac468b06121155e5da",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "render() silently drops a caller-supplied value for a slot declared in ai_slots on a 'both' template.",
+      "evidence": "tools/template_library.py render(), diff lines ~1186-1199; not exercised by test_both_fills_the_deterministic_slots_and_briefs_the_rest.",
+      "consequence": "A caller's value vanishes with no error.",
+      "minimal_fix": "Raise LibraryError if any key in values is in ai_slots."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Atlas byte-identity rests on library-internal stability, not a replay against a code-produced artifact (atlas has no generator).",
+      "evidence": "templates/html/library.yaml atlas family generators: []; test_adding_templates_leaves_existing_renders_byte_identical.",
+      "consequence": "Weaker evidence than overview's for the same acceptance line; documented, not a defect."
+    }
+  ],
+  "raw_reply_sha256": "99e427dc2615b4ac4dffa829b21387f40683f02b9efe7558cbcf3f607daba01c",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews' (new flow formally from the next run's starters, P4). Runner manifests from coordinator scratch clones at the reviewed commit. Raw replies at _working/session-manager/verdict-evidence/phase-des-03/, as received with the harness's indentation removed. The brief's diff included the builder's session record (coordinator error); the judge flagged it as its charter requires and states it disregarded that content."
+}

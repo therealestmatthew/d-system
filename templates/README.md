@@ -49,8 +49,11 @@ that matches no file, and an `ai_slots` name the template does not have. Each te
 its slots in a leading `<!-- ... -->` comment, which is removed before filling.
 
 The existing generators keep their own template loading, so their output does not depend on the
-library. The library's tests replay `tools/generate_overview.py`'s fills and the house page's fill
-through it and compare the bytes.
+library. The library's tests replay every fill `tools/generate_overview.py` and
+`tools/generate_engine_pages.py` make, and the `--specimen` fill of `tools/generate_house_css.py`,
+through it and compare the bytes. A family's `inline_styles` is its base stylesheets only; a page
+with styles of its own, such as the engine's backlog graph page, supplies `{{INLINE_STYLES}}`
+itself.
 
 ## HTML Generation System
 

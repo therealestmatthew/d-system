@@ -1,0 +1,40 @@
+{
+  "verdict_id": "2026-10-05-phase-des-03-demo-adversary-2",
+  "date": "2026-10-05",
+  "phase": "phase-des-03",
+  "reviewed_commit": "c7f50252970e99e2fec005430e0f3e373cd06318",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Silent drop of a caller-supplied ai_slots value on a 'both' template (at 2d20f61); closed by the c7f5025 delta.",
+      "evidence": "tools/template_library.py:977-990 at 2d20f61, reproduced live; delta adds LibraryError and test_both_refuses_a_value_for_an_agent_slot.",
+      "consequence": "Resolved at the reviewed commit."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "The house family's inline_styles declaration omits generate_engine_pages.py's GRAPH_CSS used by render_backlog(), so the library's INLINE_STYLES auto-fill silently produces the batch-graph page without ~876 bytes of real CSS; the replay test covers only the bare _page() path while OPS-033 and templates/README.md claim 'the engine pages'.",
+      "evidence": "templates/html/library.yaml:321-332; tools/generate_engine_pages.py _page() ~1203 extra_styles; live check: matches real page? False, 9448 vs 10324 bytes, GRAPH_CSS absent.",
+      "consequence": "No current generator depends on the library, and house byte-identity is outside the stated acceptance, but a near-future phase trusting the auto-fill would ship a broken page silently.",
+      "minimal_fix": "Declare the graph page's CSS (files entry or per-template inline_styles override), or narrow OPS-033/README's 'the engine pages' claim to the tested path, and add a test replaying render_backlog()'s fill."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "backlog.yaml next_action on the branch says the phase was 'adversarially reviewed' before any coordinator review ran.",
+      "evidence": "docs/09-backlog/backlog.yaml:199-200 on the branch.",
+      "consequence": "Inaccurate wording; status stays active."
+    }
+  ],
+  "raw_reply_sha256": "f028cb37f2fb211244d6ae4ca8d88260a7bd7094400a00134124477655b70e6a",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews' (new flow formally from the next run's starters, P4). Runner manifests from coordinator scratch clones at the reviewed commit. Raw replies at _working/session-manager/verdict-evidence/phase-des-03/, as received with the harness's indentation removed. Fresh gating review on a diff excluding docs/03-sessions/ after the first was disqualified; reviewed at 2d20f61, then resumed after its turn limit to judge the c7f5025 delta (runner 5/5 exit 0 at c7f5025). Verdict pass with one open major (F02) the builder must fix or explicitly accept (O2)."
+}

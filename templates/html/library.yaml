@@ -48,6 +48,8 @@ families:
 
   - id: house
     generators: [tools/generate_engine_pages.py, tools/generate_house_css.py]
+    # The base house styles. A page with styles of its own (generate_engine_pages.py's backlog
+    # graph page adds GRAPH_CSS) supplies {{INLINE_STYLES}} itself, as that generator does.
     inline_styles:
       files: [templates/styles/house.css, templates/styles/house-components.css]
       separator: "\n"
