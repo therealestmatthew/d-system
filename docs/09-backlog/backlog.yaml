@@ -13459,7 +13459,7 @@ items:
   - sys-governance
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 4
   session_budget: 1
   depends_on: []
@@ -13483,7 +13483,9 @@ items:
   deliverables:
   - docs/00-working/
   - docs/04-decisions/
-  next_action: Answer recorded in ADR-028; coordinator review gating PASS; awaiting the merge.
+  next_action: Complete. The owner's answer is recorded in ADR-028; merged onto dev with the owner's
+    overnight approval relayed by the Session Manager (GOV-017 gating verdict PASS). The owner is asked
+    to confirm the relayed answer.
   session: doc-session-build-in-public-answer
   completion_evidence:
   - docs/04-decisions/ADR-028-build-in-public-content-chain.md
