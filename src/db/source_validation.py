@@ -13,6 +13,7 @@ stops at the first error — a caller fixing source files wants the whole list.
 
 Schemas see one record at a time, so two checks run across records afterwards
 (`validate_identities`): every reference to a tag, project, person, commitment or memory
+(and, on a decision, the interaction it was made in or the decision it supersedes)
 must name a record that exists, and no two records of one kind may share an ID. Both name
 every source record involved.
 """
@@ -84,7 +85,13 @@ REFERENCES: dict[str, tuple[tuple[str, str], ...]] = {
     "commitment": (("project_id", "project"), ("tags", "tag")),
     "task": (("commitment_id", "commitment"), ("project_id", "project"), ("tags", "tag")),
     "interaction": (("project_id", "project"), ("participants", "person"), ("tags", "tag")),
-    "decision": (("project_id", "project"), ("decided_by", "person"), ("tags", "tag")),
+    "decision": (
+        ("project_id", "project"),
+        ("interaction_id", "interaction"),
+        ("decided_by", "person"),
+        ("supersedes", "decision"),
+        ("tags", "tag"),
+    ),
     "waiting-on": (("project_id", "project"), ("tags", "tag")),
     "development-event": (("project_id", "project"), ("tags", "tag")),
     "memory": (("project", "project"), ("tags", "tag"), ("related", "memory")),
