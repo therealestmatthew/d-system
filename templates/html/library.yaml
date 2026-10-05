@@ -1,0 +1,87 @@
+# The template library: every template under templates/html/, its family, and how it is
+# populated (REQ-021 R05, R06; phase-des-03). tools/template_library.py reads this file; it is
+# the only place a population method is stated, and the library dispatches on it.
+#
+# Adding a template needs no code change. A new file whose name matches a family's pattern is
+# already declared (overview-callout.html is covered by overview-*.html). A new family is one
+# entry below. tools/template_library.py rejects an undeclared file, a pattern that matches
+# nothing, and an ai_slots name the template does not have.
+#
+# Fields:
+#   families[].id           - the family's name, as templates/README.md uses it
+#   families[].generator    - the tool that renders the family today, or null when pages are
+#                             written by an agent or by hand. Informational: generators keep
+#                             their own template loading, so their output cannot change here
+#   families[].inline_styles
+#                           - what fills a page's {{INLINE_STYLES}} when the caller does not:
+#                             `files` concatenated with `separator`, `/* */` comments removed
+#                             first when `strip_comments` is true. Omit it and the caller
+#                             supplies {{INLINE_STYLES}} itself
+#   families[].templates[]  - `file` (one name) or `pattern` (a glob) under templates/html/. A
+#                             `file` entry overrides a `pattern` entry for the same file
+#     population            - slot-fill: every {{SLOT}} is filled deterministically from data
+#                             ai-adaptation: an agent adapts the template; the library returns
+#                               a brief, never a page, and never calls a model
+#                             both: the slots in ai_slots are the agent's; the rest are filled
+#                               deterministically first
+#     ai_slots              - required for `both`, not allowed otherwise
+#     reference             - true for canonical-markup catalogues an author copies from. They
+#                             are declared and never rendered
+#
+# Sources for each declaration: the families' own token-contract comments and the generators
+# that fill them. The phase-des-01 audit (ADR-027, SESS-2026-10-04-08) found PLAN-003
+# contributes no template and retired its YAML-to-JSON population model, so the methods here
+# start from the generators that exist.
+
+schema_version: 1
+
+families:
+  - id: overview
+    generator: tools/generate_overview.py
+    inline_styles:
+      files: [templates/styles/overview.css]
+      separator: ""
+      strip_comments: false
+    templates:
+      - pattern: overview-*.html
+        population: slot-fill
+
+  - id: house
+    generator: tools/generate_engine_pages.py
+    inline_styles:
+      files: [templates/styles/house.css, templates/styles/house-components.css]
+      separator: "\n"
+      strip_comments: false
+    templates:
+      - file: house-page.html
+        population: slot-fill
+      - file: house-components.html
+        population: ai-adaptation
+        reference: true
+
+  - id: atlas
+    generator: null
+    inline_styles:
+      files: [templates/styles/atlas.css]
+      separator: ""
+      strip_comments: false
+    templates:
+      # The shell slots are mechanical; the masthead, sections and page script are the page's
+      # content and its data arrays, which atlas-page.html's own contract leaves to an author
+      # adapting atlas-components.html.
+      - file: atlas-page.html
+        population: both
+        ai_slots: [MASTHEAD, SECTIONS, PAGE_SCRIPT]
+      - file: atlas-components.html
+        population: ai-adaptation
+        reference: true
+
+  - id: lit-report
+    generator: tools/lit_report_render.py
+    inline_styles:
+      files: [templates/styles/lit-report.css]
+      separator: ""
+      strip_comments: true
+    templates:
+      - pattern: lit-report-*.html
+        population: slot-fill
