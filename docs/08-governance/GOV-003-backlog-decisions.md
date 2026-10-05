@@ -972,6 +972,7 @@ Manager's note O1, an `ASSIGN` from the Session Manager is the owner's approval 
 run the question goes to the owner as written.
 [PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md)'s Builder role, step 1,
 says so; the Standby Builder role works "exactly as a Builder" and inherits it.
+`/session-start` step 2 now names this exception and the batch-run one.
 
 The incident: in the overnight run of 2026-10-04/05, Builders A and B both put `/session-start`'s
 claim question to the owner, who was away, and waited on it all night. Builder A was assigned

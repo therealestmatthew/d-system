@@ -51,6 +51,19 @@ to claim the phase you oriented on — with your recommendation first. Report al
 
 Stop here until the answer comes back. An unanswered question is not a yes.
 
+**Two standing exceptions replace this question, and only these two** (`GOV-003`):
+
+- **A batch run under `PROMPT-036`:** the owner's approval of the batch is the claim approval for
+  its phases (`GOV-003`, "Coordinator completion replaces owner-invoked /session-close,
+  repository-wide").
+- **A run the owner has pre-approved, under a Session Manager (`GOV-017`):** the Session Manager's
+  `ASSIGN` is the claim approval (`GOV-003`, 2026-10-05). It applies only when the `ASSIGN` or the
+  run's coordination contract names the owner's pre-approval of the run. Otherwise ask as above.
+
+In either case you still check `max_active` and the Conflicts column, and you still report
+anything that looked wrong during orientation. Record which exception you relied on in the
+session record.
+
 ### Work with no backlog phase
 
 Owner-directed work sometimes has no phase — a one-off document, a command like this one, a fix the
