@@ -112,8 +112,8 @@ The session's own earlier headless-Chrome run agreed: ledger handler 2-7ms, filt
 
 ## Backlog
 
-`status: active`, `agent: agent-batch-runner`. `next_action`: all acceptance met; reviewed and
-browser-verified; awaiting the owner's merge approval through the Session Manager.
+`status: active`, `agent: agent-batch-runner`, re-claimed on 2026-10-05 after the owner's sign-off.
+`next_action`: awaiting the merge through the Session Manager, then completion on `dev`.
 `completion_evidence`: the seven deliverables and this record.
 
 ## Unresolved
