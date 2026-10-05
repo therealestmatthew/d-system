@@ -15483,7 +15483,8 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 1
   session_budget: 1
   depends_on:
@@ -15507,7 +15508,9 @@ items:
   - uv run python -m src.governance
   - git diff --exit-code docs/08-governance/catalog.md
   deliverables:
-  - docs/08-governance/
+  - docs/08-governance/GOV-010-plan-quality-standard.md
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
   next_action: Waits for phase-asr-04. The reviewer is ruled - the built-in /security-review run by the
     coordinator.
 - id: phase-plug-01
