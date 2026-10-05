@@ -351,6 +351,23 @@ def test_check_returns_only_the_requested_severity(tmp_path: Path, monkeypatch: 
 # --- integration: the real `uv run python -m src.governance` entry point -------------------
 
 
+def _unrecorded_target(live_catalog: Any) -> dict[str, Any]:
+    """A real phase that is not complete and that the working `GOV-003` does not name.
+
+    Both tests below fake a prior copy where this phase was `complete`, with an empty prior
+    `GOV-003`. A phase the working `GOV-003` names would count as a recorded reversal, so the
+    guard would rightly say nothing. Taking simply the first non-complete phase made the tests
+    depend on backlog order: they broke when `phase-rel-04`, which `GOV-003` names, became first.
+    """
+    working = (ROOT / regression.DECISIONS_PATH).read_text(encoding="utf-8")
+    found: dict[str, Any] = next(
+        item
+        for item in live_catalog["items"]
+        if item["status"] != "complete" and not is_recorded("", working, item["id"])
+    )
+    return found
+
+
 def test_main_reports_a_status_regression_through_the_real_entry_point(
     monkeypatch: Any, capsys: Any
 ) -> None:
@@ -369,7 +386,7 @@ def test_main_reports_a_status_regression_through_the_real_entry_point(
     assert errors == []
     backlog_errors, live_catalog = audit_backlog(ROOT, result)
     assert backlog_errors == []
-    target = next(item for item in live_catalog["items"] if item["status"] != "complete")
+    target = _unrecorded_target(live_catalog)
 
     fabricated_prior = yaml.safe_dump(
         {
@@ -414,7 +431,7 @@ def test_dev_relative_warning_goes_to_stderr_and_keeps_catalog_stdout_clean(
     assert errors == []
     backlog_errors, live_catalog = audit_backlog(ROOT, result)
     assert backlog_errors == []
-    target = next(item for item in live_catalog["items"] if item["status"] != "complete")
+    target = _unrecorded_target(live_catalog)
 
     fabricated_dev = yaml.safe_dump(
         {
