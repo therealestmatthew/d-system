@@ -63,6 +63,15 @@ are in the exempt set. `phase-grd-04` is cleared by `2026-09-23-plan-045-later-a
 `phase-asr-04` and `phase-asr-05` by `2026-09-24-plan-047.json`. Both records are dispositioned, and
 neither has a finding whose last disposition is `escalated-g3`. No phase is refused.
 
+Re-run after the rebase onto the re-claim commit `5279948` on 2026-10-05, when `phase-asr-04` and
+`phase-asr-05` had completed and left `next_up`:
+
+```
+([], {'records': 13, 'phases_checked': 1, 'phases_exempt': 16})
+```
+
+`phase-grd-04` is the one phase checked, and no phase is refused.
+
 ## Acceptance
 
 - Fixtures (no record 1; dispositioned record 0; last disposition `escalated-g3` 1; `open` record
@@ -83,7 +92,7 @@ in the completion edit on `dev`, after the merge.
 
 ## Unresolved
 
-- The merge needs the owner. Earlier this session the auto-mode permission classifier refused a
+- The merge is owner-approved (2026-10-05) but still a write to `dev`. Earlier this session the auto-mode permission classifier refused a
   fast-forward of `dev` ("Modify Shared Resources") even with the Session Manager's relayed approval.
   The claim commit on `dev` (`869c5d4`) went through. If the merge turn is refused the same way,
   this branch waits for the owner.
@@ -155,6 +164,11 @@ reproduce the reviewer's exact case and pass.
   deliverable.** The new rule broke two of its tests. Fixing their fixtures stays inside the claimed
   systems (`sys-backlog`, `sys-governance`). The alternative, exempting fixture phase ids in the
   check, is what the phase forbids. The containment report names the file.
+- **Owner ruling, 2026-10-05: the `test/test_backlog.py` edit is accepted.** The phase was parked
+  overnight because the file lies outside its declared systems. On the morning of 2026-10-05 the
+  owner accepted the fixture edit and ruled that the phase merges. The phase was re-claimed in
+  `5279948` with the file added to its `deliverables`. The branch was then rebased onto that commit
+  and re-gated.
 
 ## Corrections
 
