@@ -25378,8 +25378,22 @@ The rule it must match is on branch agent/fix-unattended-assign-rule, not yet on
 
 ## 000592 · Start the Owner Terminal outside the project so the project deny rules do not apply to it
 
-**Created 2026-10-05T15:30:03-04:00 · Status: `open`**
+**Created 2026-10-05T15:30:03-04:00 · Status: `triaged`**
 
 The deny rules in the project's .claude/settings.json (AGENTS.md, CLAUDE.md, .agents/, .codex/, _private/, _data/ideas.jsonl) apply to every session started inside /code/d-system, including the Owner Terminal. As a result the Owner Terminal could not make the owner-approved AGENTS.md edit (C17 failed) or write under .codex/. This contradicts GOV-017's statement that the Owner Terminal exists to write paths agents are denied.
 
 Owner ruling (2026-10-05, relayed by the Session Manager): start the Owner Terminal from a directory outside the project, in manual mode, using absolute paths and git -C. Update GOV-017's "The Owner Terminal" section and its start command, and PROMPT-037's Owner Terminal starter, to say so — after a test write from an outside-started session confirms the deny rules no longer apply. Triage after capture.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T18:45:35-04:00): Not yet delivered. No existing plan or backlog phase covers it; the owner ruling (2026-10-05) defines the work: update GOV-017's "The Owner Terminal" section and its start command (currently `claude --permission-mode manual --remote-control "Owner Terminal"`, started inside the project; "Starting it" section) and PROMPT-037's Owner Terminal starter (kickoff step 6 and the Owner Terminal starter section), after a test write from a session started outside /code/d-system confirms the deny rules no longer apply.
+
+Deny rules as tracked in .claude/settings.json on dev: Edit/Write on _private/**, .agents/**, .codex/** and _data/ideas.jsonl in the primary checkout, plus the same paths and AGENTS.md / CLAUDE.md under //code/d-system-worktrees/*/. The tracked file has no AGENTS.md / CLAUDE.md rule for the primary checkout itself, so the rule that blocked the C17 AGENTS.md edit may come from another settings layer; the outside-start test should check that too.
+
+Related ideas (all triaged): 000014 (audit hooks and settings.json), 000306 (.codex/agents/*.toml not bound to .claude/agents/*.md), 000333 (which capabilities to deny before wiring them into settings.json), 000442 (agent-workflows manifest coverage of .claude/agents), 000477 (committed settings.json and pluginConfigs), 000487 (permission rules for owner-gated plugin commands), 000469 (session configuration for mobile-only owner). Thematic overlap only; no proposed link or promotion.
+
+</details>
