@@ -25397,3 +25397,13 @@ Deny rules as tracked in .claude/settings.json on dev: Edit/Write on _private/**
 Related ideas (all triaged): 000014 (audit hooks and settings.json), 000306 (.codex/agents/*.toml not bound to .claude/agents/*.md), 000333 (which capabilities to deny before wiring them into settings.json), 000442 (agent-workflows manifest coverage of .claude/agents), 000477 (committed settings.json and pluginConfigs), 000487 (permission rules for owner-gated plugin commands), 000469 (session configuration for mobile-only owner). Thematic overlap only; no proposed link or promotion.
 
 </details>
+
+---
+
+## 000593 · Close the mandatory-requirement rule's split loophole
+
+**Created 2026-10-05T19:23:11-04:00 · Status: `open`**
+
+The rule (GOV-001, phase-dgov-01) requires a requirement document once one plan has more than one backlog phase, so splitting a multi-phase plan into several one-phase plan documents escapes it. Fix the rule text, the check and a test.
+
+Source: phase-dgov-01 gating review F02, accepted by the owner 2026-10-05 for a follow-up. Sent by Session 5 - Batch Runner.
