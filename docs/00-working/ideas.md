@@ -25356,8 +25356,20 @@ PROPOSED LINK: 000590 --relates_to--> 000583 (both are tests that read live repo
 
 ## 000591 · /session-start step 2 should not stall on claim approval in a run the owner has pre-approved
 
-**Created 2026-10-05T13:53:13-04:00 · Status: `open`**
+**Created 2026-10-05T13:53:13-04:00 · Status: `triaged`**
 
 .claude/commands/session-start.md step 2 ("Stop here until the answer comes back") still reads unconditionally, so in a run the owner has pre-approved a builder can still stall on the claim-approval question, although GOV-003 (2026-10-05 entry), GOV-017 Claim slots and PROMPT-037 builder step 1 now say the Session Manager's ASSIGN is that approval in such runs (on agent/fix-unattended-assign-rule, merging today).
 
 (From the owner, 2026-10-05, relayed by the Session Manager; flagged by Session 1 - Builder A. Recorded as given by Ideation. The owner asked that it be recorded and triaged, and that Builder A then plan a solution.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T13:53:47-04:00): Confirmed on dev: .claude/commands/session-start.md line 52, at the end of step 2 ("Stop and confirm before the claim commit"), reads "Stop here until the answer comes back. An unanswered question is not a yes.", with no exception for a pre-approved run. The command has no generated copy under .agents/ and is not produced by tools/generate_agent_workflows.py, so it is edited directly.
+
+The rule it must match is on branch agent/fix-unattended-assign-rule, not yet on dev: a GOV-003 entry (owner ruling of 2026-10-05, Standing) says that in a run the owner has pre-approved, the Session Manager's ASSIGN is the owner's approval for /session-start's claim question, and that in every other run the question goes to the owner as written. The branch changes GOV-003, GOV-017 and PROMPT-037 and leaves session-start.md untouched. The entry's own "Why recorded here" names step 2 as one of the two texts that blocked the overnight run of 2026-10-04/05 (Builders A and B waited all night; phase-lrr-03 was reassigned to the Batch Runner at 00:40). Step 2 should change only after that branch merges, so that it cites a rule already on dev.
+
+</details>
