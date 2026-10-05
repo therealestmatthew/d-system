@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-04
-- phase-asr-04
 - phase-asr-05
 - phase-cap-08
 - phase-irs-11
@@ -15391,7 +15390,7 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   session: doc-session-coordinator-dispatched-review
   priority: 1
@@ -15446,8 +15445,33 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
   - docs/08-governance/reviews/verdicts/
-  next_action: Built and reviewed on agent/phase-asr-04 (SESS-2026-10-05-04); waits for the
-    owner-approved merge and the completion edit on dev.
+  completion_evidence:
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - .claude/commands/session-close.md
+  - docs/02-prompts/PROMPT-036-build-coordinator.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-review-judge.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-demo-adversary-2.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-review-judge-2.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-demo-adversary-3.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-04-review-judge-3.json
+  - docs/03-sessions/SESS-2026-10-05-04-coordinator-dispatched-review.md
+  result: >-
+    GOV-017 states the assurance dispatch rule in "Build reviews": the coordinator dispatches and briefs every build
+    review, the brief holds only scope, acceptance, verification, the range and its diff, the runner manifest and,
+    for the gating reviewer, a coordinator-made scratch clone, and names what it may not hold; REVIEW-REQUEST and
+    VERDICT are in the message table; verdict records are staged under _working/session-manager/verdicts-pending/
+    and committed unchanged; merge gate step 2 re-runs through tools/run_review_checks.py and checks each record
+    with git show <tip>:<path> | sha256sum, refusing a changed or missing one (REQ-030 R10, demonstrated in
+    SESS-2026-10-05-04); review-judge stays in shadow until the owner decides after ten reviewed phases.
+    /session-close step 3, PROMPT-036 step 6 and its Validator/Adversary templates, and PROMPT-037's kickoff,
+    item 4 and roles follow; effective from the next run's starters (owner ruling P4). Reviewed by the Session
+    Manager as coordinator under the new procedure by hand: demo-adversary gating rejected rounds 1 and 2 (F01-F04,
+    all fixed) and passed round 3 (F05 minor accepted); review-judge shadow passed all three, its minors accepted
+    (one recorded as idea 000588). test_review_verdict 44 passed; full suite 1519 passed. Merged onto dev with the
+    owner's approval relayed by the Session Manager.
+  next_action: Complete.
 - id: phase-asr-05
   title: 'Second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries for
     O-5, O-6 and Q7'
