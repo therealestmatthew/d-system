@@ -25245,12 +25245,13 @@ sys-html's depends_on (sys-api, sys-ui, sys-contracts) reflects retired PLAN-003
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-10-05T00:49:13-04:00): Confirmed on dev: sys-html in docs/08-governance/systems.yaml lists depends_on sys-api, sys-ui and sys-contracts, which come from PLAN-003's YAML-to-JSON design, retired under ADR-027. The shipped engine-page generator, tools/generate_engine_pages.py, imports fold, load_events and statuses from src.db.ideas (the idea log), readiness from src.governance.backlog, and parse_frontmatter from src.governance.__main__. The engine-pages requirements, REQ-036, declare systems: [sys-html, sys-backlog, sys-governance].
 
 The 000571 fix is commit cb48cbd on branch agent/fix-sys-html-registry, not yet on dev. It updates sys-html's status and paths and leaves depends_on unchanged, which is the part this idea records. 000585 (sys-demo-overview's status and paths) is the same kind of registry drift, found by the same session. No plan or phase covers the depends_on correction.
 
 PROPOSED LINK: 000586 --relates_to--> 000571 (the depends_on correction left out of the 000571 registry fix)
+- **finding** by agent-ideation (2026-10-05T00:57:08-04:00): Correction to the triage finding on this idea, from Session 5 - Batch Runner (2026-10-05), relayed as given: an independent demo-adversary review of the 000571 fix judged sys-html's current depends_on (sys-api, sys-ui, sys-contracts) still valid, not PLAN-003 residue: src/api/routes/workbench.py serves _public/ files (sys-api) and ts/src/stage/HtmlViewerRegion.tsx renders them (sys-ui). The open question is whether sys-backlog and the idea log's system (used by tools/generate_engine_pages.py) should be added, not whether the existing three should go. The triage finding's statement that the three entries "come from PLAN-003's YAML-to-JSON design" is superseded by this review.
 
 </details>
