@@ -25325,3 +25325,15 @@ schemas/review-verdict.schema.json requires reviewer.definition_sha256 of an age
 The built-in reviewer is ruled: PLAN-047 (reviewer contract) line 135 says the security review "is the built-in /security-review command", and phase-asr-05 (second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries), now active, scopes it as run by the coordinator and "recorded as a verdict". So phase-asr-05 is the first place a verdict for a reviewer with no definition file will be written; the schema change belongs with it or before it.
 
 </details>
+
+---
+
+## 000590 · Backlog status-regression end-to-end tests should not depend on live backlog order
+
+**Created 2026-10-05T08:37:45-04:00 · Status: `open`**
+
+test/test_backlog_status_regression.py's two end-to-end tests pick the first non-complete backlog phase as their target and silently assume GOV-003 does not name it. They broke on dev at 850cae1, when phase-rel-04 became the first non-complete phase (GOV-003 names it). Choose a target not mentioned in GOV-003, or build a fixture, instead of relying on live backlog order.
+
+(From Session 5 - Batch Runner, 2026-10-05, received after the overnight HOLD; recorded as given by Ideation.)
+
+The owner ruled on the morning of 2026-10-05, as relayed by the Session Manager, that the Batch Runner fixes it, on branch agent/fix-status-regression-tests. It is the same family as 000583: tests that read live repository data break when the data moves.
