@@ -25255,3 +25255,13 @@ PROPOSED LINK: 000586 --relates_to--> 000571 (the depends_on correction left out
 - **finding** by agent-ideation (2026-10-05T00:57:08-04:00): Correction to the triage finding on this idea, from Session 5 - Batch Runner (2026-10-05), relayed as given: an independent demo-adversary review of the 000571 fix judged sys-html's current depends_on (sys-api, sys-ui, sys-contracts) still valid, not PLAN-003 residue: src/api/routes/workbench.py serves _public/ files (sys-api) and ts/src/stage/HtmlViewerRegion.tsx renders them (sys-ui). The open question is whether sys-backlog and the idea log's system (used by tools/generate_engine_pages.py) should be added, not whether the existing three should go. The triage finding's statement that the three entries "come from PLAN-003's YAML-to-JSON design" is superseded by this review.
 
 </details>
+
+---
+
+## 000587 · check_test_baseline.py should fail when a base-passing test fails or errors in the branch
+
+**Created 2026-10-05T01:12:43-04:00 · Status: `open`**
+
+tools/check_test_baseline.py reports OK when a test that passed in the base fails in the branch: it checks only missing and newly skipped tests (REQ-028 R07), so a branch run with 2 failures printed "Test baseline OK" during phase-grd-04. It should also fail on a base-passing test that fails or errors in the branch.
+
+(From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation. The check is part of the merge gate's READY evidence, built by phase-grd-03.)
