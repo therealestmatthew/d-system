@@ -13483,8 +13483,17 @@ items:
   deliverables:
   - docs/00-working/
   - docs/04-decisions/
-  next_action: An agent frames this; it does not answer it. Whether the owner wants to build in public
-    is not a fact in the repository.
+  next_action: Answer recorded in ADR-028; awaiting the coordinator's review verdict and the merge.
+  session: doc-session-build-in-public-answer
+  completion_evidence:
+  - docs/04-decisions/ADR-028-build-in-public-content-chain.md
+  - docs/03-sessions/SESS-2026-10-05-08-build-in-public-answer.md
+  result: 'ADR-028 puts one question (build in public, and how far along the 000015 -> 000016 -> 000017
+    chain), with each rung''s commitments and options, and records the owner''s answer verbatim:
+    yes to all three (2026-10-04 evening, relayed via the Session Manager''s restart file). Dispositions:
+    000015 under way through content/; 000016 and 000017 accepted with planning deferred to a session
+    with the owner, each with an effort, prerequisites and first-step note. No content and no platform
+    account. Governance OK.'
 - id: phase-expl-03
   title: Scout research/ for uncaptured ideas
   plan: doc-standalone-explorations-housekeeping

@@ -1,0 +1,83 @@
+---
+schema_version: 1
+id: doc-session-build-in-public-answer
+code: SESS-2026-10-05-08
+title: Record the owner's answer on building in public
+kind: session
+status: active
+owner: repository-owner
+created: '2026-10-05'
+updated: '2026-10-05'
+systems: [sys-governance]
+depends_on: [doc-standalone-explorations-housekeeping]
+---
+
+# Record the owner's answer on building in public
+
+## Phase
+
+`phase-expl-02`: Put the content-strategy question to the owner and record the answer (`PLAN-037`,
+group `G58`; ideas `000015`, `000016`, `000017`). Run overnight on 2026-10-05 as Session 5 (Batch
+Runner, `agent-batch-runner`). The Session Manager assigned it, and the owner pre-approved the
+assignment.
+
+## Verification
+
+`uv run python -m src.governance` (at `ddfe78d`)
+
+```text
+Governance OK: 45 systems, 446 documents, 37 memories, 347 backlog phases
+```
+
+The deliverable is `docs/04-decisions/ADR-028-build-in-public-content-chain.md` (`ADR-028`).
+
+## Acceptance
+
+- One question is put with its options and their commitments, in the shape `phase-proj-01` uses
+  for the portfolio data gap: Met. `ADR-028`'s "The question" section asks one question, frames
+  the three ideas as one chain, gives a table of each rung's commitments, and states the options
+  for each rung: yes, not now, no.
+- The owner's answer is recorded, and each rung of the chain has a disposition rather than being
+  left collectively parked: Met. "The answer" quotes the owner's ruling verbatim. "Disposition per
+  rung" gives each rung a disposition and a sizing note:
+  - `000015`: accepted, under way through `content/`;
+  - `000016` and `000017`: accepted, with planning deferred to a session with the owner.
+- No content is produced and no platform account is created by this phase: Met. The only files
+  changed are `ADR-028`, this record, `backlog.yaml` and the regenerated catalog. Nothing under
+  `content/` was touched.
+
+## Backlog
+
+`status: active`, `agent: agent-batch-runner`. `next_action`: answer recorded in `ADR-028`;
+awaiting the coordinator's review verdict and the merge.
+`completion_evidence`: `ADR-028` and this record.
+
+## Unresolved
+
+- The answer reached this session by relay, not from the owner directly. `ADR-028` says so and
+  asks the owner to confirm it in the morning report.
+
+## Review
+
+Pending: the coordinator-dispatched review (`GOV-017`) was requested on `ddfe78d`.
+
+## Decisions
+
+- OVERNIGHT ASSUMPTION: the owner's answer is the preloaded ruling P2 in
+  `_working/session-manager/restart-2026-10-04.md`, dated the evening of 2026-10-04. Before
+  recording it, this session checked that the ruling is in that file and that §3 and the merged
+  `content/` work agree with it.
+- The answer is recorded as an ADR, because it is a decision with consequences for three ideas
+  and future plans. The phase's deliverables allow `docs/04-decisions/`.
+- Idea statuses are left to the Ideation session. One note per idea was sent with its
+  disposition and `ADR-028`'s id (contract item 7).
+- The sizing notes give effort, prerequisites and first step only. Governed plans for `000016`
+  and `000017` wait for a planning session with the owner, as the answer directs.
+
+## Corrections
+
+None.
+
+## Left undone
+
+Planning `000016` and `000017` is the owner's next session, not this phase's.
