@@ -65,6 +65,8 @@ reserved:
   reason: Projection publication decision; deliverable of phase-rel-05.
 - code: GOV-012
   reason: Idea metrics command and generated-page rule; deliverable of phase-idg-08.
+- code: OPS-033
+  reason: Operations document for tools/template_library.py; deliverable of phase-des-03.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011

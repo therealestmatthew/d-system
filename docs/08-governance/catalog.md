@@ -543,6 +543,7 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
+| OPS-033 | reserved | Operations document for tools/template_library.py; deliverable of phase-des-03. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
 442 documents — adr: 24, architecture: 12, governance: 19, operation: 28, plan: 81, prompt: 43, requirement: 35, session: 200.
